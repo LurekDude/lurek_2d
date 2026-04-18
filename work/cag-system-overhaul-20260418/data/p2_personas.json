@@ -1,0 +1,260 @@
+{
+  "agent_counts": {
+    "architect": 0,
+    "audio-eng": 0,
+    "cag-architect": 0,
+    "configurator": 0,
+    "debugger": 0,
+    "developer": 0,
+    "doc-writer": 0,
+    "hacker": 0,
+    "lua-designer": 0,
+    "manager": 0,
+    "optimizer": 0,
+    "physicist": 0,
+    "planner": 0,
+    "player": 0,
+    "renderer": 0,
+    "research": 0,
+    "reviewer": 0,
+    "security": 0,
+    "solver": 0,
+    "tester": 0
+  },
+  "agents": [
+    "architect",
+    "audio-eng",
+    "cag-architect",
+    "configurator",
+    "debugger",
+    "developer",
+    "doc-writer",
+    "hacker",
+    "lua-designer",
+    "manager",
+    "optimizer",
+    "physicist",
+    "planner",
+    "player",
+    "renderer",
+    "research",
+    "reviewer",
+    "security",
+    "solver",
+    "tester"
+  ],
+  "errors": {
+    "unmapped_personas": {
+      "EngDev": 0,
+      "EngTest": 0,
+      "GameDev": 0,
+      "GameTest": 0,
+      "Modder": 0,
+      "Player": 0
+    }
+  },
+  "matrix": {
+    "architect": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "audio-eng": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "cag-architect": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "configurator": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "debugger": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "developer": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "doc-writer": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "hacker": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "lua-designer": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "manager": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "optimizer": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "physicist": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "planner": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "player": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "renderer": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "research": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "reviewer": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "security": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "solver": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    },
+    "tester": {
+      "EngDev": false,
+      "EngTest": false,
+      "GameDev": false,
+      "GameTest": false,
+      "Modder": false,
+      "Player": false
+    }
+  },
+  "persona_counts": {
+    "EngDev": 0,
+    "EngTest": 0,
+    "GameDev": 0,
+    "GameTest": 0,
+    "Modder": 0,
+    "Player": 0
+  },
+  "personas": [
+    "EngDev",
+    "GameDev",
+    "Modder",
+    "Player",
+    "GameTest",
+    "EngTest"
+  ],
+  "warnings": {
+    "agents_with_zero_personas": [
+      "architect",
+      "audio-eng",
+      "cag-architect",
+      "configurator",
+      "debugger",
+      "developer",
+      "doc-writer",
+      "hacker",
+      "lua-designer",
+      "manager",
+      "optimizer",
+      "physicist",
+      "planner",
+      "player",
+      "renderer",
+      "research",
+      "reviewer",
+      "security",
+      "solver",
+      "tester"
+    ],
+    "invalid_personas": {},
+    "low_coverage_personas": {}
+  }
+}

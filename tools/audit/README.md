@@ -50,6 +50,17 @@ coverage — producing reports that tell you what still needs work.
 | `stress_report.py`     | Stress test timing report        | stdout / JSON               |
 | `test_analytics.py`    | Test execution trend analysis    | stdout                      |
 
+### CAG layer audits
+
+| Script                    | Purpose                                                                                                                | Output                  |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `cag_link_check.py`       | Walk every `.github/**/*.md`, extract markdown links + backtick paths, and report broken targets by category.          | stdout / JSON (`--report`) |
+| `cag_coverage.py`         | Required-section + frontmatter-field coverage matrix for every CAG file type.                                          | stdout / markdown / JSON |
+| `cag_persona_matrix.py`   | 6 × N persona ↔ agent matrix from frontmatter; flags 0-persona agents and 0-agent personas.                            | stdout / markdown / JSON |
+
+Companion validator: `tools/validate/cag_validate.py` (rule engine for the
+same files; the audit tools above are read-only analytics).
+
 ### Internal helpers
 
 | Script                                  | Purpose                                                  |
@@ -88,4 +99,10 @@ python tools/audit/audit_module.py --all         # all modules
 python tools/audit/audit_module.py --all --docs-quality  # all + docs quality
 python tools/audit/validate_agent_md.py --all    # validate all merged module specs
 python tools/audit/validate_agent_md.py --module audio  # one module
+
+# --- CAG layer audits ---
+python tools/audit/cag_link_check.py                              # broken-link report
+python tools/audit/cag_link_check.py --strict                     # exit 1 on any broken link
+python tools/audit/cag_coverage.py --type agent --format markdown # per-type coverage matrix
+python tools/audit/cag_persona_matrix.py --format markdown        # persona x agent matrix
 ```

@@ -1,0 +1,1708 @@
+{
+  "agent": {
+    "count": 20,
+    "coverage": {
+      "fm:loads_tools": 0.0,
+      "fm:mission": 0.0,
+      "fm:name": 100.0,
+      "fm:personas": 0.0,
+      "fm:primary_skills": 0.0,
+      "fm:routes_to": 0.0,
+      "fm:secondary_skills": 0.0,
+      "sec:Anti-patterns": 100.0,
+      "sec:Inputs": 0.0,
+      "sec:Mission": 100.0,
+      "sec:Outputs": 0.0,
+      "sec:Routing Table": 0.0,
+      "sec:Scope": 100.0,
+      "sec:Workflow": 100.0
+    },
+    "rows": [
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/architect.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/audio-eng.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/cag-architect.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/configurator.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/debugger.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/developer.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/doc-writer.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/hacker.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/lua-designer.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/manager.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/optimizer.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/physicist.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/planner.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/player.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/renderer.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/research.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/reviewer.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/security.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/solver.agent.md"
+      },
+      {
+        "fields": {
+          "fm:loads_tools": false,
+          "fm:mission": false,
+          "fm:name": true,
+          "fm:personas": false,
+          "fm:primary_skills": false,
+          "fm:routes_to": false,
+          "fm:secondary_skills": false,
+          "sec:Anti-patterns": true,
+          "sec:Inputs": false,
+          "sec:Mission": true,
+          "sec:Outputs": false,
+          "sec:Routing Table": false,
+          "sec:Scope": true,
+          "sec:Workflow": true
+        },
+        "file": ".github/agents/tester.agent.md"
+      }
+    ]
+  },
+  "prompt": {
+    "count": 45,
+    "coverage": {
+      "fm:description": 100.0,
+      "fm:expected_agent": 0.0,
+      "fm:inputs_required": 0.0,
+      "fm:loads_skills": 0.0,
+      "fm:loads_tools": 0.0,
+      "fm:mode": 0.0,
+      "sec:Anti-patterns": 2.2,
+      "sec:Example Invocation": 0.0,
+      "sec:Goal": 2.2,
+      "sec:Inputs": 64.4,
+      "sec:Steps": 84.4,
+      "sec:Success Criteria": 0.0
+    },
+    "rows": [
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/analyze-memory-usage.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/analyze-pathfinding-performance.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/analyze-physics-performance.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/analyze-render-performance.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": false,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/analyze-roadmap-phase.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": false,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/audit-module.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-ai-behavior.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-api-function.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-audio-feature.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": false,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-demo.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-draw-command.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-engine-module.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-event-pattern.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-game-example.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-integration-test.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-lua-example.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-physics-feature.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": true,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-roadmap-phase.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-test-suite.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/create-tilemap-feature.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/design-api-surface.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/doc-api-reference.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/fix-api-function.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/fix-compilation-errors.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/fix-dependency-issue.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/fix-engine-bug.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/fix-failing-tests.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/fix-lua-error.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/fix-threading-issue.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": true,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": false,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/flesh-out-example.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": false,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/generate-roadmap-phase-from-description.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": false,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/implement-lua-api-module.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": false,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/implement-roadmap-phase.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/op-build-release.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/review-api-consistency.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/review-code-quality.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/review-entity-lifecycle.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/review-module-deps.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/review-security-audit.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/review-unsafe-code.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/run-cag-validation.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": false,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/run-quality-gates.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/workflow-feature-development.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/workflow-release-check.prompt.md"
+      },
+      {
+        "fields": {
+          "fm:description": true,
+          "fm:expected_agent": false,
+          "fm:inputs_required": false,
+          "fm:loads_skills": false,
+          "fm:loads_tools": false,
+          "fm:mode": false,
+          "sec:Anti-patterns": false,
+          "sec:Example Invocation": false,
+          "sec:Goal": false,
+          "sec:Inputs": true,
+          "sec:Steps": true,
+          "sec:Success Criteria": false
+        },
+        "file": ".github/prompts/workflow-update-roadmap-phase.prompt.md"
+      }
+    ]
+  },
+  "skill": {
+    "count": 32,
+    "coverage": {
+      "fm:companion_files": 0.0,
+      "fm:description": 100.0,
+      "fm:name": 100.0,
+      "fm:related_skills": 0.0,
+      "sec:Companion File Index": 0.0,
+      "sec:Domain Knowledge": 0.0,
+      "sec:Mission": 3.1,
+      "sec:References": 3.1,
+      "sec:When To Load": 0.0,
+      "sec:When To Skip": 0.0
+    },
+    "rows": [
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": true,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/agent-md/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/analytics/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/asset-pipeline/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/build-system/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": true,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/cag-workflow/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/ci-cd-pipeline/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/cross-platform/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/demo-creation/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/dev-debugging/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/documentation/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/error-handling/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/examples-management/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/game-ai/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/github-workflow/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/gpu-programming/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/logging/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/lua-api-design/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/lua-runtime/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/lua-rust-bridge/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/lua-scripting/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/module-architecture/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/module-audit/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/performance-profiling/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/quality-pipeline/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/roadmap-planning/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/rust-coding/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/testing-rust/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/threading/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/tools-cag-validation/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/ui-layout/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/visual-effects/SKILL.md"
+      },
+      {
+        "fields": {
+          "fm:companion_files": false,
+          "fm:description": true,
+          "fm:name": true,
+          "fm:related_skills": false,
+          "sec:Companion File Index": false,
+          "sec:Domain Knowledge": false,
+          "sec:Mission": false,
+          "sec:References": false,
+          "sec:When To Load": false,
+          "sec:When To Skip": false
+        },
+        "file": ".github/skills/vscode-extension/SKILL.md"
+      }
+    ]
+  },
+  "system_prompt": {
+    "count": 1,
+    "coverage": {
+      "Binding Constraints": 0.0,
+      "Cross-Artifact Sync": 100.0,
+      "Discovery": 0.0,
+      "Engine Identity": 0.0,
+      "Quality Gates": 0.0,
+      "Repository Layout": 100.0
+    },
+    "rows": [
+      {
+        "fields": {
+          "Binding Constraints": false,
+          "Cross-Artifact Sync": true,
+          "Discovery": false,
+          "Engine Identity": false,
+          "Quality Gates": false,
+          "Repository Layout": true
+        },
+        "file": ".github/copilot-instructions.md"
+      }
+    ]
+  }
+}

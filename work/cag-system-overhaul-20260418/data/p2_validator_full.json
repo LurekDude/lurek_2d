@@ -1,0 +1,6627 @@
+{
+  "scanned": {
+    "agent": 20,
+    "prompt": 45,
+    "skill": 32,
+    "system_prompt": 1
+  },
+  "summary": {
+    "by_rule": {
+      "E001": 5,
+      "E002": 1,
+      "E003": 1,
+      "E106": 1,
+      "E107": 60,
+      "E201": 450,
+      "E205": 190,
+      "E305": 203,
+      "W005": 12,
+      "W108": 20
+    },
+    "errors": 911,
+    "warnings": 32
+  },
+  "violations": [
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 0,
+      "message": "Missing required section: 'Engine Identity'",
+      "rule": "E001",
+      "severity": "error"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 0,
+      "message": "Missing required section: 'Binding Constraints'",
+      "rule": "E001",
+      "severity": "error"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 0,
+      "message": "Missing required section: 'Discovery'",
+      "rule": "E001",
+      "severity": "error"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 0,
+      "message": "Missing required section: 'Quality Gates'",
+      "rule": "E001",
+      "severity": "error"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 0,
+      "message": "Missing pointer to 'docs/architecture/cag-system.md'",
+      "rule": "E001",
+      "severity": "error"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 0,
+      "message": "File has 297 lines (cap 120)",
+      "rule": "E002",
+      "severity": "error"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 0,
+      "message": "File has 25477 bytes (cap 8192)",
+      "rule": "E003",
+      "severity": "error"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 101,
+      "message": "Broken reference: 'content/demos/README.md'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 137,
+      "message": "Broken reference: 'tests/rust/stress/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 137,
+      "message": "Broken reference: 'tests/rust/config/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 137,
+      "message": "Broken reference: 'tests/rust/security/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 137,
+      "message": "Broken reference: 'tests/rust/game/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 137,
+      "message": "Broken reference: 'tests/lua/content/library/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 141,
+      "message": "Broken reference: 'content/demos/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 141,
+      "message": "Broken reference: 'content/demos/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 147,
+      "message": "Broken reference: 'content/demos/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 165,
+      "message": "Broken reference: 'content/demos/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 276,
+      "message": "Broken reference: 'content/demos/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/copilot-instructions.md",
+      "line": 292,
+      "message": "Broken reference: 'content/demos/'",
+      "rule": "W005",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/architect.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/architect.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/architect.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/architect.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/audio-eng.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/audio-eng.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/audio-eng.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/audio-eng.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/cag-architect.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/cag-architect.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/cag-architect.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/cag-architect.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/configurator.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/configurator.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/configurator.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/configurator.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/debugger.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/debugger.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/debugger.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/debugger.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/developer.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/developer.agent.md",
+      "line": 0,
+      "message": "File has 213 lines (cap 200)",
+      "rule": "E106",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/developer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/developer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/developer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/doc-writer.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/doc-writer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/doc-writer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/doc-writer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/hacker.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/hacker.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/hacker.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/hacker.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/lua-designer.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/lua-designer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/lua-designer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/lua-designer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/manager.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/manager.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/manager.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/manager.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/optimizer.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/optimizer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/optimizer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/optimizer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/physicist.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/physicist.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/physicist.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/physicist.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/planner.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/planner.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/planner.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/planner.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/player.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/player.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/player.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/player.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/renderer.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/renderer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/renderer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/renderer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/research.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/research.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/research.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/research.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/reviewer.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/reviewer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/reviewer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/reviewer.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/security.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/security.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/security.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/security.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/solver.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/solver.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/solver.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/solver.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/tester.agent.md",
+      "line": 0,
+      "message": "No personas declared",
+      "rule": "W108",
+      "severity": "warning"
+    },
+    {
+      "file": ".github/agents/tester.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/tester.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Outputs'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/agents/tester.agent.md",
+      "line": 0,
+      "message": "Missing required section: 'Routing Table'",
+      "rule": "E107",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/agent-md/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/agent-md/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/agent-md/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/agent-md/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/agent-md/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 41,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 45,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 49,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 54,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 58,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 67,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 71,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 85,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 95,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 99,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 103,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 127,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 129,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 140,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 166,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 183,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 191,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 207,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 211,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 220,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/analytics/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/asset-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/asset-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/asset-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/asset-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/asset-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/asset-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 33,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 37,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 61,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 68,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 75,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 82,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 89,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 93,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 109,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 114,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 122,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 140,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 150,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 156,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 162,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 164,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 170,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 173,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 181,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 187,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 189,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 192,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/build-system/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 27,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 35,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 48,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 57,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 61,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 74,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 84,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 98,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 102,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 112,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cag-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ci-cd-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ci-cd-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ci-cd-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ci-cd-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ci-cd-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ci-cd-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cross-platform/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cross-platform/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cross-platform/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cross-platform/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cross-platform/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/cross-platform/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 66,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 74,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 82,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 86,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 91,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 126,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 153,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 157,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 170,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 180,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 184,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 197,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 199,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 211,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 222,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 231,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 236,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 238,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 243,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 245,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 248,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 259,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 261,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 264,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 276,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 278,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 53,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 76,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 100,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 108,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 112,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 121,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 127,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 129,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 139,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 142,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 148,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 154,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 158,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 165,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 171,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 177,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/dev-debugging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/documentation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/documentation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/documentation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/documentation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/documentation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/documentation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/error-handling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/error-handling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/error-handling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/error-handling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/error-handling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/error-handling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 37,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 44,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 48,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 69,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 79,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 85,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 88,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 94,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 108,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 125,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 129,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 141,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 164,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 170,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 178,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 181,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 187,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 194,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 201,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 206,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 225,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 236,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 244,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 251,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 257,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 264,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 268,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 276,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 294,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 306,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 312,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 321,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 331,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 334,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 337,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 341,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/examples-management/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 50,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 55,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 63,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 83,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 85,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 94,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 102,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 126,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 147,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 167,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 175,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 197,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 205,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 232,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 240,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 259,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 265,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 277,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 283,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 302,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 310,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 332,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/game-ai/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 39,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 41,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 80,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 99,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 105,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 107,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/github-workflow/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 31,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 38,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 44,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 53,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 82,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 92,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 105,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 109,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 118,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 130,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 138,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 145,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 147,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 152,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 168,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 174,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/gpu-programming/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 34,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 51,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 71,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 91,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 111,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 124,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 136,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 144,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 148,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 160,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 164,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 176,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 184,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 188,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 196,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 204,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/logging/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 35,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 37,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 70,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 72,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 80,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 87,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 95,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 99,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 105,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 110,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 114,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 144,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 160,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 169,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 173,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 185,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 195,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 197,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 201,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 205,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 212,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 224,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 228,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 238,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 248,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 258,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 269,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 271,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 275,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 277,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 339,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 347,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 350,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 360,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 381,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 383,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-api-design/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 33,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 38,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 42,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 46,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 74,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 84,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 94,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 104,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 111,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 115,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 119,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 133,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 150,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 163,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 171,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 182,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 196,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 207,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 213,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 219,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 225,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 234,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-runtime/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 28,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 37,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 45,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 65,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 79,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 95,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 98,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 101,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 122,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 133,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 148,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 151,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 211,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 218,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-rust-bridge/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-architecture/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-architecture/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-architecture/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-architecture/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-architecture/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-architecture/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 63,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 93,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 115,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 122,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 126,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 132,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 136,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 142,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 150,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 158,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 162,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 175,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 179,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 190,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 194,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 200,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 209,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 221,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 228,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 254,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 266,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 272,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 335,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 339,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 346,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 355,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 362,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 384,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 393,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 402,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/module-audit/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 73,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 77,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 83,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 87,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 91,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 98,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 102,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 105,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 111,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 116,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 144,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 161,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 175,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 182,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 186,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 199,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 36,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 38,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 110,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 112,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 116,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 121,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 125,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 129,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 133,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 161,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/roadmap-planning/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/roadmap-planning/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/roadmap-planning/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/roadmap-planning/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/roadmap-planning/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/roadmap-planning/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/rust-coding/SKILL.md",
+      "line": 63,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/rust-coding/SKILL.md",
+      "line": 74,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/rust-coding/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/rust-coding/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/rust-coding/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/rust-coding/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/rust-coding/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/rust-coding/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 49,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 65,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 74,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 94,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 97,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 99,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 123,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 152,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 155,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 166,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 169,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 179,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 182,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 191,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 198,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 203,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 212,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 224,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 271,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 289,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 316,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 322,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 331,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 337,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 340,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 347,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 350,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 352,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 378,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 381,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 387,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 401,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 418,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 428,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 441,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 451,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 454,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 460,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 472,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 483,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 489,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 503,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 509,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 515,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 552,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 569,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 582,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 588,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 598,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 607,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 611,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 616,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 621,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 629,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 639,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 650,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 665,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 668,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 678,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 690,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 694,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 708,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 767,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 785,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 801,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 813,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 819,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 823,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 31,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 42,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 52,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 67,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 71,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 76,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 80,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 83,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 87,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 94,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 112,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 119,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 148,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 168,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 170,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 179,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 187,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 209,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 213,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 228,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/threading/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/tools-cag-validation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/tools-cag-validation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/tools-cag-validation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/tools-cag-validation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/tools-cag-validation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/tools-cag-validation/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 46,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 52,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 152,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 182,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 195,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 204,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 212,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 224,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 290,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 319,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 323,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 341,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/ui-layout/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 33,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 37,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 45,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 83,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 96,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 100,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 108,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 116,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 120,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 128,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 132,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 139,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 143,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 150,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 154,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 171,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 179,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 206,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 214,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 229,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 247,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 250,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/visual-effects/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 26,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 41,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 49,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 55,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 59,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 64,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 90,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 92,
+      "message": "Triple-backtick fence is forbidden in SKILL.md",
+      "rule": "E201",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Mission'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Load'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'When To Skip'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Domain Knowledge'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'Companion File Index'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "line": 0,
+      "message": "Missing required section: 'References'",
+      "rule": "E205",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-memory-usage.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-memory-usage.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-memory-usage.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-memory-usage.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-pathfinding-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-pathfinding-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-pathfinding-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-pathfinding-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-pathfinding-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-physics-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-physics-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-physics-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-physics-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-render-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-render-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-render-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-render-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-render-performance.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Steps'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/audit-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/audit-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/audit-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Steps'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/audit-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/audit-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/audit-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-ai-behavior.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-ai-behavior.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-ai-behavior.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-ai-behavior.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-ai-behavior.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-api-function.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-api-function.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-api-function.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-api-function.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-demo.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-demo.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Steps'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-demo.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-demo.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-demo.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-draw-command.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-draw-command.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-draw-command.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-draw-command.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-engine-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-engine-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-engine-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-engine-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-event-pattern.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-event-pattern.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-event-pattern.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-event-pattern.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-event-pattern.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-game-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-game-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-game-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-game-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-integration-test.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-integration-test.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-integration-test.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-integration-test.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-lua-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-lua-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-lua-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-lua-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-physics-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-physics-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-physics-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-physics-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Section 'Inputs' is out of order",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Section 'Steps' is out of order",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-test-suite.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-test-suite.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-test-suite.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-test-suite.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-tilemap-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-tilemap-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-tilemap-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-tilemap-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/create-tilemap-feature.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/design-api-surface.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/design-api-surface.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/design-api-surface.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/design-api-surface.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-api-function.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-api-function.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-api-function.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-api-function.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-compilation-errors.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-compilation-errors.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-compilation-errors.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-compilation-errors.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-dependency-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-dependency-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-dependency-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-dependency-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-engine-bug.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-engine-bug.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-engine-bug.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-engine-bug.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-failing-tests.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-failing-tests.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-failing-tests.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-failing-tests.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-lua-error.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-lua-error.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-lua-error.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-lua-error.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-threading-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-threading-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-threading-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-threading-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/fix-threading-issue.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/flesh-out-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/flesh-out-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/flesh-out-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Steps'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/flesh-out-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/flesh-out-example.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/generate-roadmap-phase-from-description.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/generate-roadmap-phase-from-description.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/generate-roadmap-phase-from-description.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Steps'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/generate-roadmap-phase-from-description.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/generate-roadmap-phase-from-description.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/generate-roadmap-phase-from-description.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-lua-api-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-lua-api-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-lua-api-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Steps'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-lua-api-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-lua-api-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-lua-api-module.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Steps'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/op-build-release.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/op-build-release.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/op-build-release.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/op-build-release.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-api-consistency.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-api-consistency.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-api-consistency.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-api-consistency.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-api-consistency.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-code-quality.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-code-quality.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-code-quality.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-code-quality.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-entity-lifecycle.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-entity-lifecycle.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-entity-lifecycle.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-entity-lifecycle.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-entity-lifecycle.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-module-deps.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-module-deps.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-module-deps.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-module-deps.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-module-deps.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-security-audit.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-security-audit.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-security-audit.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-security-audit.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-unsafe-code.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-unsafe-code.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-unsafe-code.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-unsafe-code.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/review-unsafe-code.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-cag-validation.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-cag-validation.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-cag-validation.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-cag-validation.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-cag-validation.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-quality-gates.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-quality-gates.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Inputs'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-quality-gates.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-quality-gates.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/run-quality-gates.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-feature-development.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-feature-development.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-feature-development.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-feature-development.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-release-check.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-release-check.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-release-check.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-release-check.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-update-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Goal'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-update-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Success Criteria'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-update-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Anti-patterns'",
+      "rule": "E305",
+      "severity": "error"
+    },
+    {
+      "file": ".github/prompts/workflow-update-roadmap-phase.prompt.md",
+      "line": 0,
+      "message": "Missing required section: 'Example Invocation'",
+      "rule": "E305",
+      "severity": "error"
+    }
+  ]
+}

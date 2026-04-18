@@ -1,0 +1,1247 @@
+{
+  "broken": [
+    {
+      "category": "docs",
+      "file": ".github/agents/developer.agent.md",
+      "kind": "backtick",
+      "line": 118,
+      "resolved": "docs/wiki/Examples.md",
+      "target": "docs/wiki/Examples.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/agents/doc-writer.agent.md",
+      "kind": "backtick",
+      "line": 2,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/agents/doc-writer.agent.md",
+      "kind": "backtick",
+      "line": 17,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "docs",
+      "file": ".github/agents/doc-writer.agent.md",
+      "kind": "backtick",
+      "line": 88,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/agents/lua-designer.agent.md",
+      "kind": "backtick",
+      "line": 20,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "docs",
+      "file": ".github/agents/lua-designer.agent.md",
+      "kind": "backtick",
+      "line": 22,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/agents/lua-designer.agent.md",
+      "kind": "backtick",
+      "line": 92,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "docs",
+      "file": ".github/agents/lua-designer.agent.md",
+      "kind": "backtick",
+      "line": 93,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/planner.agent.md",
+      "kind": "backtick",
+      "line": 119,
+      "resolved": "tests/physics_tests.rs",
+      "target": "tests/physics_tests.rs"
+    },
+    {
+      "category": "content",
+      "file": ".github/agents/player.agent.md",
+      "kind": "backtick",
+      "line": 16,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/agents/player.agent.md",
+      "kind": "backtick",
+      "line": 47,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/agents/player.agent.md",
+      "kind": "backtick",
+      "line": 71,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/agents/player.agent.md",
+      "kind": "backtick",
+      "line": 97,
+      "resolved": "content/demos/hello_world/main.lua",
+      "target": "content/demos/hello_world/main.lua"
+    },
+    {
+      "category": "src",
+      "file": ".github/agents/renderer.agent.md",
+      "kind": "backtick",
+      "line": 18,
+      "resolved": "src/render/color.rs",
+      "target": "src/render/color.rs"
+    },
+    {
+      "category": "src",
+      "file": ".github/agents/renderer.agent.md",
+      "kind": "backtick",
+      "line": 19,
+      "resolved": "src/render/texture.rs",
+      "target": "src/render/texture.rs"
+    },
+    {
+      "category": "src",
+      "file": ".github/agents/renderer.agent.md",
+      "kind": "backtick",
+      "line": 20,
+      "resolved": "src/render/sprite.rs",
+      "target": "src/render/sprite.rs"
+    },
+    {
+      "category": "src",
+      "file": ".github/agents/renderer.agent.md",
+      "kind": "backtick",
+      "line": 21,
+      "resolved": "src/render/sprite_sheet.rs",
+      "target": "src/render/sprite_sheet.rs"
+    },
+    {
+      "category": "src",
+      "file": ".github/agents/renderer.agent.md",
+      "kind": "backtick",
+      "line": 22,
+      "resolved": "src/render/nine_slice.rs",
+      "target": "src/render/nine_slice.rs"
+    },
+    {
+      "category": "src",
+      "file": ".github/agents/renderer.agent.md",
+      "kind": "backtick",
+      "line": 24,
+      "resolved": "src/render/camera.rs",
+      "target": "src/render/camera.rs"
+    },
+    {
+      "category": "src",
+      "file": ".github/agents/renderer.agent.md",
+      "kind": "backtick",
+      "line": 36,
+      "resolved": "src/lua_api/font_api.rs",
+      "target": "src/lua_api/font_api.rs"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 16,
+      "resolved": "tests/unit",
+      "target": "tests/unit/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 16,
+      "resolved": "tests/ext",
+      "target": "tests/ext/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 16,
+      "resolved": "tests/game",
+      "target": "tests/game/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 16,
+      "resolved": "tests/stress",
+      "target": "tests/stress/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 16,
+      "resolved": "tests/golden/harness.rs",
+      "target": "tests/golden/harness.rs"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 16,
+      "resolved": "tests/lua/validation",
+      "target": "tests/lua/validation/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 63,
+      "resolved": "tests/unit",
+      "target": "tests/unit/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 63,
+      "resolved": "tests/ext",
+      "target": "tests/ext/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 63,
+      "resolved": "tests/game",
+      "target": "tests/game/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/agents/tester.agent.md",
+      "kind": "backtick",
+      "line": 63,
+      "resolved": "tests/stress",
+      "target": "tests/stress/"
+    },
+    {
+      "category": "content",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 101,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 137,
+      "resolved": "tests/rust/stress",
+      "target": "tests/rust/stress/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 137,
+      "resolved": "tests/rust/config",
+      "target": "tests/rust/config/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 137,
+      "resolved": "tests/rust/security",
+      "target": "tests/rust/security/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 137,
+      "resolved": "tests/rust/game",
+      "target": "tests/rust/game/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 137,
+      "resolved": "tests/lua/content/library",
+      "target": "tests/lua/content/library/"
+    },
+    {
+      "category": "content",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 141,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 141,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 147,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 165,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 276,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/copilot-instructions.md",
+      "kind": "backtick",
+      "line": 292,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/analyze-pathfinding-performance.prompt.md",
+      "kind": "backtick",
+      "line": 10,
+      "resolved": "tests/rust/unit/pathfinding_tests.rs",
+      "target": "tests/rust/unit/pathfinding_tests.rs"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "kind": "backtick",
+      "line": 170,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "kind": "backtick",
+      "line": 440,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/audit-module.prompt.md",
+      "kind": "backtick",
+      "line": 191,
+      "resolved": "docs/performance",
+      "target": "docs/performance/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-ai-behavior.prompt.md",
+      "kind": "backtick",
+      "line": 11,
+      "resolved": "tests/rust/game/ai_tests.rs",
+      "target": "tests/rust/game/ai_tests.rs"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-ai-behavior.prompt.md",
+      "kind": "backtick",
+      "line": 37,
+      "resolved": "tests/rust/game/ai_tests.rs",
+      "target": "tests/rust/game/ai_tests.rs"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-api-function.prompt.md",
+      "kind": "backtick",
+      "line": 35,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-api-function.prompt.md",
+      "kind": "backtick",
+      "line": 42,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-api-function.prompt.md",
+      "kind": "backtick",
+      "line": 60,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 7,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 10,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 31,
+      "resolved": "tests/rust/unit/audio_tests.rs",
+      "target": "tests/rust/unit/audio_tests.rs"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 32,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 39,
+      "resolved": "tests/rust/unit/audio_tests.rs",
+      "target": "tests/rust/unit/audio_tests.rs"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 40,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 47,
+      "resolved": "tests/rust/unit/audio_tests.rs",
+      "target": "tests/rust/unit/audio_tests.rs"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 48,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-audio-feature.prompt.md",
+      "kind": "backtick",
+      "line": 60,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "backtick",
+      "line": 43,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "backtick",
+      "line": 52,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "backtick",
+      "line": 95,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "backtick",
+      "line": 110,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "md-link",
+      "line": 139,
+      "resolved": "content/demos/hello_world/main.lua",
+      "target": "../../content/demos/hello_world/main.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "md-link",
+      "line": 140,
+      "resolved": "content/demos/platformer/main.lua",
+      "target": "../../content/demos/platformer/main.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "md-link",
+      "line": 141,
+      "resolved": "content/demos/roguelike/main.lua",
+      "target": "../../content/demos/roguelike/main.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "md-link",
+      "line": 142,
+      "resolved": "content/demos/dialog_demo/main.lua",
+      "target": "../../content/demos/dialog_demo/main.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/create-demo.prompt.md",
+      "kind": "md-link",
+      "line": 143,
+      "resolved": "content/demos/loot_rpg_demo/main.lua",
+      "target": "../../content/demos/loot_rpg_demo/main.lua"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-draw-command.prompt.md",
+      "kind": "backtick",
+      "line": 22,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-event-pattern.prompt.md",
+      "kind": "backtick",
+      "line": 11,
+      "resolved": "tests/rust/unit/event_tests.rs",
+      "target": "tests/rust/unit/event_tests.rs"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-event-pattern.prompt.md",
+      "kind": "backtick",
+      "line": 31,
+      "resolved": "tests/rust/unit/event_tests.rs",
+      "target": "tests/rust/unit/event_tests.rs"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-game-example.prompt.md",
+      "kind": "backtick",
+      "line": 54,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-lua-example.prompt.md",
+      "kind": "backtick",
+      "line": 28,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-tilemap-feature.prompt.md",
+      "kind": "backtick",
+      "line": 11,
+      "resolved": "tests/rust/unit/tilemap_tests.rs",
+      "target": "tests/rust/unit/tilemap_tests.rs"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/create-tilemap-feature.prompt.md",
+      "kind": "backtick",
+      "line": 34,
+      "resolved": "tests/rust/unit/tilemap_tests.rs",
+      "target": "tests/rust/unit/tilemap_tests.rs"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/create-tilemap-feature.prompt.md",
+      "kind": "backtick",
+      "line": 41,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/design-api-surface.prompt.md",
+      "kind": "backtick",
+      "line": 33,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/design-api-surface.prompt.md",
+      "kind": "backtick",
+      "line": 40,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/design-api-surface.prompt.md",
+      "kind": "backtick",
+      "line": 47,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/design-api-surface.prompt.md",
+      "kind": "backtick",
+      "line": 55,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "kind": "backtick",
+      "line": 9,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "kind": "backtick",
+      "line": 24,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "kind": "backtick",
+      "line": 38,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "kind": "backtick",
+      "line": 43,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/doc-api-reference.prompt.md",
+      "kind": "backtick",
+      "line": 54,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/fix-api-function.prompt.md",
+      "kind": "backtick",
+      "line": 23,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/fix-api-function.prompt.md",
+      "kind": "backtick",
+      "line": 35,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/fix-lua-error.prompt.md",
+      "kind": "backtick",
+      "line": 57,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/fix-threading-issue.prompt.md",
+      "kind": "backtick",
+      "line": 11,
+      "resolved": "tests/rust/unit/thread_tests.rs",
+      "target": "tests/rust/unit/thread_tests.rs"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/fix-threading-issue.prompt.md",
+      "kind": "backtick",
+      "line": 40,
+      "resolved": "tests/rust/unit/thread_tests.rs",
+      "target": "tests/rust/unit/thread_tests.rs"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/generate-roadmap-phase-from-description.prompt.md",
+      "kind": "backtick",
+      "line": 68,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "kind": "backtick",
+      "line": 85,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "kind": "backtick",
+      "line": 375,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "kind": "backtick",
+      "line": 376,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/op-build-release.prompt.md",
+      "kind": "backtick",
+      "line": 60,
+      "resolved": "content/demos/hello_world",
+      "target": "content/demos/hello_world"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/review-api-consistency.prompt.md",
+      "kind": "backtick",
+      "line": 18,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/review-api-consistency.prompt.md",
+      "kind": "backtick",
+      "line": 31,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/prompts/review-entity-lifecycle.prompt.md",
+      "kind": "backtick",
+      "line": 11,
+      "resolved": "tests/rust/unit/ecs_tests.rs",
+      "target": "tests/rust/unit/ecs_tests.rs"
+    },
+    {
+      "category": "content",
+      "file": ".github/prompts/workflow-feature-development.prompt.md",
+      "kind": "backtick",
+      "line": 113,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "docs",
+      "file": ".github/prompts/workflow-release-check.prompt.md",
+      "kind": "backtick",
+      "line": 58,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tools",
+      "file": ".github/skills/agent-md/SKILL.md",
+      "kind": "backtick",
+      "line": 22,
+      "resolved": "tools/audit/validate_agent_md.py",
+      "target": "tools/audit/validate_agent_md.py"
+    },
+    {
+      "category": "tools",
+      "file": ".github/skills/agent-md/SKILL.md",
+      "kind": "backtick",
+      "line": 30,
+      "resolved": "tools/audit/validate_agent_md.py",
+      "target": "tools/audit/validate_agent_md.py"
+    },
+    {
+      "category": "src",
+      "file": ".github/skills/asset-pipeline/SKILL.md",
+      "kind": "backtick",
+      "line": 32,
+      "resolved": "src/render/texture.rs",
+      "target": "src/render/texture.rs"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/references/library-integration.md",
+      "kind": "backtick",
+      "line": 3,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/references/library-integration.md",
+      "kind": "backtick",
+      "line": 47,
+      "resolved": "content/library/X.lua",
+      "target": "content/library/X.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/references/library-integration.md",
+      "kind": "backtick",
+      "line": 217,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "kind": "backtick",
+      "line": 15,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "kind": "backtick",
+      "line": 24,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "kind": "backtick",
+      "line": 59,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "kind": "backtick",
+      "line": 240,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "kind": "backtick",
+      "line": 279,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/demo-creation/SKILL.md",
+      "kind": "backtick",
+      "line": 299,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/skills/documentation/SKILL.md",
+      "kind": "backtick",
+      "line": 32,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "tests",
+      "file": ".github/skills/documentation/SKILL.md",
+      "kind": "backtick",
+      "line": 61,
+      "resolved": "tests/unit",
+      "target": "tests/unit/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/skills/documentation/SKILL.md",
+      "kind": "backtick",
+      "line": 61,
+      "resolved": "tests/rust/game",
+      "target": "tests/rust/game/"
+    },
+    {
+      "category": "tests",
+      "file": ".github/skills/documentation/SKILL.md",
+      "kind": "backtick",
+      "line": 61,
+      "resolved": "tests/rust/stress",
+      "target": "tests/rust/stress/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/documentation/SKILL.md",
+      "kind": "backtick",
+      "line": 76,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 10,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 12,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 19,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 24,
+      "resolved": "content/examples/README.md",
+      "target": "content/examples/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 24,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 31,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 33,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 151,
+      "resolved": "content/examples/README.md",
+      "target": "content/examples/README.md"
+    },
+    {
+      "category": "docs",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 152,
+      "resolved": "docs/API/lua_api_data.json",
+      "target": "docs/API/lua_api_data.json"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 157,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 198,
+      "resolved": "content/examples/README.md",
+      "target": "content/examples/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 198,
+      "resolved": "content/demos/README.md",
+      "target": "content/demos/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 215,
+      "resolved": "content/examples/README.md",
+      "target": "content/examples/README.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 219,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 280,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 358,
+      "resolved": "content/examples/entity.lua",
+      "target": "content/examples/entity.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 359,
+      "resolved": "content/examples/fx.lua",
+      "target": "content/examples/fx.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 361,
+      "resolved": "content/examples/localization.lua",
+      "target": "content/examples/localization.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 364,
+      "resolved": "content/examples/modding.lua",
+      "target": "content/examples/modding.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 365,
+      "resolved": "content/examples/pathfinding.lua",
+      "target": "content/examples/pathfinding.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 366,
+      "resolved": "content/examples/graphics.lua",
+      "target": "content/examples/graphics.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 367,
+      "resolved": "content/examples/savegame.lua",
+      "target": "content/examples/savegame.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/examples-management/SKILL.md",
+      "kind": "backtick",
+      "line": 371,
+      "resolved": "content/examples/gui.lua",
+      "target": "content/examples/gui.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "kind": "backtick",
+      "line": 30,
+      "resolved": "content/demos/hello_world/main.lua",
+      "target": "content/demos/hello_world/main.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "kind": "backtick",
+      "line": 31,
+      "resolved": "content/demos/physics_demo/main.lua",
+      "target": "content/demos/physics_demo/main.lua"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "kind": "backtick",
+      "line": 32,
+      "resolved": "content/demos/sprites/main.lua",
+      "target": "content/demos/sprites/main.lua"
+    },
+    {
+      "category": "docs",
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "kind": "backtick",
+      "line": 33,
+      "resolved": "docs/API/lua_api_reference_generated.md",
+      "target": "docs/API/lua_api_reference_generated.md"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/lua-scripting/SKILL.md",
+      "kind": "backtick",
+      "line": 43,
+      "resolved": "content/demos/hello_world/main.lua",
+      "target": "content/demos/hello_world/main.lua"
+    },
+    {
+      "category": "src",
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "kind": "backtick",
+      "line": 127,
+      "resolved": "src/render/sprite_batch.rs",
+      "target": "src/render/sprite_batch.rs"
+    },
+    {
+      "category": "src",
+      "file": ".github/skills/performance-profiling/SKILL.md",
+      "kind": "backtick",
+      "line": 132,
+      "resolved": "src/render/texture.rs",
+      "target": "src/render/texture.rs"
+    },
+    {
+      "category": "content",
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "kind": "backtick",
+      "line": 48,
+      "resolved": "content/demos",
+      "target": "content/demos/"
+    },
+    {
+      "category": "tools",
+      "file": ".github/skills/quality-pipeline/SKILL.md",
+      "kind": "backtick",
+      "line": 67,
+      "resolved": "tools/audit/validate_agent_md.py",
+      "target": "tools/audit/validate_agent_md.py"
+    },
+    {
+      "category": "tests",
+      "file": ".github/skills/testing-rust/SKILL.md",
+      "kind": "backtick",
+      "line": 537,
+      "resolved": "tests/rust/golden/actual",
+      "target": "tests/rust/golden/actual/"
+    },
+    {
+      "category": "docs",
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "kind": "backtick",
+      "line": 73,
+      "resolved": "docs/API/lua_api_data.json",
+      "target": "docs/API/lua_api_data.json"
+    },
+    {
+      "category": "docs",
+      "file": ".github/skills/vscode-extension/SKILL.md",
+      "kind": "backtick",
+      "line": 99,
+      "resolved": "docs/API/lua_api_data.json",
+      "target": "docs/API/lua_api_data.json"
+    }
+  ],
+  "broken_by_category": {
+    "content": 63,
+    "docs": 44,
+    "src": 10,
+    "tests": 33,
+    "tools": 3
+  },
+  "broken_total": 153,
+  "files_scanned": 104,
+  "links_by_category": {
+    "cag": 40,
+    "content": 124,
+    "docs": 110,
+    "extensions": 3,
+    "src": 199,
+    "tests": 95,
+    "tools": 79
+  },
+  "links_total": 650
+}
