@@ -1,13 +1,17 @@
 ---
-description: "Analyze and reduce memory usage in the Lurek2D engine. Use when frame memory allocations are excessive, the buffer grows unboundedly, or Lua GC pressure is suspected."
+description: "Analyze and reduce memory usage in the Lurek2D engine. Use when frame memory allocations are excessive, the buffer grows unboundedly, or..."
+mode: agent
+loads_skills: [gpu-programming, performance-profiling]
+loads_tools: []
+expected_agent: Developer
+inputs_required: [RenderCommand, u32]
 ---
 
 # Analyze Memory Usage
 
-**Purpose**: Profile and reduce per-frame memory allocations in the Lurek2D game loop.
-**Use When**: Frame times are inconsistent (GC pauses), heap allocations appear in profiles, or `Vec` growth is suspected.
-**Do Not Use When**: The issue is CPU-bound rendering time — use `analyze-render-performance.prompt.md` instead.
-**Scope**: `src/app/app.rs`, `src/render/renderer.rs`, `src/lua_api/`.
+## Goal
+
+Analyze and reduce memory usage in the Lurek2D engine. Use when frame memory allocations are excessive, the buffer grows unboundedly, or... The prompt finishes when every Success Criteria item below is checked.
 
 ## Inputs
 
@@ -16,39 +20,30 @@ description: "Analyze and reduce memory usage in the Lurek2D engine. Use when fr
 
 ## Steps
 
-1. Load skill `performance-profiling/SKILL.md`
-2. Identify allocation hot-paths in the game loop:
-   - `render_commands: Vec<RenderCommand>` — is it cleared or recreated each frame?
-   - `Renderer::execute_commands()` — is a new `Vec` allocated per call?
-   - Lua string arguments — are `String::from()` calls avoidable?
-3. Check `SharedState.draw_commands`:
-   - Must use `.clear()` (retains capacity), never `= Vec::new()` (drops and reallocates)
-4. Check `renderer.to_u32_buffer()` — must return `&[u32]` or reuse an owned buffer, not allocate a fresh `Vec<u32>` each frame
-5. Check Lua API closures for unnecessary `String` allocations:
-   - Prefer `lua.create_function` with `&str` args that convert only when needed
-6. If Lua GC is suspected: call `lua.gc_collect()?` at a controlled point (not every frame)
-7. Measure: use `cargo build --release` + system memory profiler
+1. Load [skill: gpu-programming](.github/skills/gpu-programming/SKILL.md), [skill: performance-profiling](.github/skills/performance-profiling/SKILL.md) before changing any files.
+2. Load skill `performance-profiling/SKILL.md`
+3. Identify allocation hot-paths in the game loop:
+4. `render_commands: Vec<RenderCommand>` — is it cleared or recreated each frame?
+5. `Renderer::execute_commands()` — is a new `Vec` allocated per call?
+6. Lua string arguments — are `String::from()` calls avoidable?
+7. Check `SharedState.draw_commands`:
+8. Must use `.clear()` (retains capacity), never `= Vec::new()` (drops and reallocates)
+9. Check `renderer.to_u32_buffer()` — must return `&[u32]` or reuse an owned buffer, not allocate a fresh `Vec<u32>` each frame
+10. Check Lua API closures for unnecessary `String` allocations:
+11. Prefer `lua.create_function` with `&str` args that convert only when needed
+12. If Lua GC is suspected: call `lua.gc_collect()?` at a controlled point (not every frame)
 
-## Outputs
+## Success Criteria
 
-- List of allocation sites found with severity (per-frame vs. one-time)
-- Recommended changes with before/after allocation counts
-- Optionally: patch implementing the highest-impact fixes
+- [ ] List of allocation sites found with severity (per-frame vs. one-time)
+- [ ] Recommended changes with before/after allocation counts
+- [ ] Optionally: patch implementing the highest-impact fixes
 
-## Acceptance
+## Anti-patterns
 
-- [ ] Per-frame `Vec` reallocations in hot path reduced or eliminated
-- [ ] `render_commands` cleared with `.clear()` not re-created
-- [ ] `to_u32_buffer()` does not allocate a new `Vec<u32>` each frame
-- [ ] `cargo test` still passes after any changes
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-## References
+## Example Invocation
 
-**Required Skills**: `performance-profiling`, `gpu-programming`
-**Suggested Agents**: `Optimizer`, `Renderer`
-**Related Prompts**: `analyze-render-performance.prompt.md`
-**Commands**:
-```powershell
-cargo build --release
-cargo test
-```
+> Run this prompt via VS Code Copilot Chat: `/analyze-memory-usage <RenderCommand> <u32>`

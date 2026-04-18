@@ -1,23 +1,17 @@
 ---
 description: "Create a new Lua game example in the content/examples/ directory with main.lua and all required assets."
+mode: agent
+loads_skills: [documentation, lua-scripting]
+loads_tools: []
+expected_agent: Developer
+inputs_required: [name]
 ---
 
 # Create Game Example
 
-## Purpose
+## Goal
 
 Create a new Lua game example that demonstrates specific Lurek2D features.
-
-## Use When
-
-- Demonstrating a new engine feature
-- Creating a tutorial example
-- Adding a showcase game
-
-## Do Not Use When
-
-- Modifying an existing example
-- Writing documentation without code
 
 ## Inputs
 
@@ -27,29 +21,25 @@ Create a new Lua game example that demonstrates specific Lurek2D features.
 
 ## Steps
 
-1. Create directory `content/examples/<name>/`
-2. Write `content/examples/<name>/main.lua` with `lurek.load()`, `lurek.update(dt)`, `lurek.draw()`
-3. Use only `lurek.*` API functions (never external engine prefixes)
-4. Use `local` for all variables (no globals except luna callbacks)
-5. Multiply movement by `dt` for frame-rate independence
-6. Add comments explaining key concepts
-7. Test with `cargo run -- content/examples/<name>`
+1. Load [skill: documentation](.github/skills/documentation/SKILL.md), [skill: lua-scripting](.github/skills/lua-scripting/SKILL.md) before changing any files.
+2. Create directory `content/examples/<name>/`
+3. Write `content/examples/<name>/main.lua` with `lurek.load()`, `lurek.update(dt)`, `lurek.draw()`
+4. Use only `lurek.*` API functions (never external engine prefixes)
+5. Use `local` for all variables (no globals except luna callbacks)
+6. Multiply movement by `dt` for frame-rate independence
+7. Add comments explaining key concepts
+8. Test with `cargo run -- content/examples/<name>`
 
-## Outputs
+## Success Criteria
 
-- `content/examples/<name>/main.lua` — working game script
-- Optional asset files (images, sounds) in the example directory
+- [ ] `content/examples/<name>/main.lua` — working game script
+- [ ] Optional asset files (images, sounds) in the example directory
 
-## Acceptance
+## Anti-patterns
 
-- [ ] Runs with `cargo run -- content/examples/<name>` without errors
-- [ ] Uses only `lurek.*` API
-- [ ] All variables are `local`
-- [ ] Movement uses `dt` for frame independence
-- [ ] Code is commented for learning
+- Modifying an existing example
+- Writing documentation without code
 
-## References
+## Example Invocation
 
-- `lua-scripting` skill
-- `docs/API/lua_api_reference_generated.md`
-- Existing examples in `content/examples/`
+> Run this prompt via VS Code Copilot Chat: `/create-game-example <name>`

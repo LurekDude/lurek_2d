@@ -1,13 +1,17 @@
 ---
-description: "Create a new self-contained Lua example game in content/examples/. Use when demonstrating a Lurek2D API feature or workflow. Produces a runnable content/examples/<name>/main.lua."
+description: "Create a new self-contained Lua example game in content/examples/. Use when demonstrating a Lurek2D API feature or workflow. Produces a r..."
+mode: agent
+loads_skills: [lua-scripting]
+loads_tools: []
+expected_agent: Developer
+inputs_required: [EXAMPLE_NAME]
 ---
 
 # Create Lua Example
 
-**Purpose**: Add a new runnable Lua example to `content/examples/` that demonstrates a specific Lurek2D API capability.
-**Use When**: A new API feature needs a working demo, or a tutorial use-case lacks a concrete example.
-**Do Not Use When**: The example would require assets not committed to the repo, or it tests edge cases rather than typical usage.
-**Scope**: `content/examples/` only; no `src/` changes.
+## Goal
+
+Create a new self-contained Lua example game in content/examples/. Use when demonstrating a Lurek2D API feature or workflow. Produces a r... The prompt finishes when every Success Criteria item below is checked.
 
 ## Inputs
 
@@ -17,41 +21,30 @@ description: "Create a new self-contained Lua example game in content/examples/.
 
 ## Steps
 
-1. Load skill `lua-scripting/SKILL.md`
-2. Create directory `content/examples/<EXAMPLE_NAME>/`
-3. Write `content/examples/<EXAMPLE_NAME>/main.lua` with:
-   - `local` variables for all state
-   - `function lurek.init()` — initialization
-   - `function lurek.process(dt)` — frame logic
-   - `function lurek.render()` — rendering only
-   - Optionally: `lurek.keypressed`, `lurek.mousepressed` callbacks
-4. Check all API calls against `docs/API/lua_api_reference_generated.md`:
-   - Colors: `[0.0, 1.0]` float range
-   - Shapes: `("fill"/"line", x, y, ...)`
-   - Key names: `"space"`, `"escape"`, `"w"`, `"a"`, `"s"`, `"d"`
-5. Verify it runs: `cargo run -- content/examples/<EXAMPLE_NAME>`
-6. Add entry to README.md examples table if it demonstrates a major feature
+1. Load [skill: lua-scripting](.github/skills/lua-scripting/SKILL.md) before changing any files.
+2. Load skill `lua-scripting/SKILL.md`
+3. Create directory `content/examples/<EXAMPLE_NAME>/`
+4. Write `content/examples/<EXAMPLE_NAME>/main.lua` with:
+5. `local` variables for all state
+6. `function lurek.init()` — initialization
+7. `function lurek.process(dt)` — frame logic
+8. `function lurek.render()` — rendering only
+9. Optionally: `lurek.keypressed`, `lurek.mousepressed` callbacks
+10. Check all API calls against `docs/API/lua-api.md`:
+11. Colors: `[0.0, 1.0]` float range
+12. Shapes: `("fill"/"line", x, y, ...)`
 
-## Outputs
+## Success Criteria
 
-- `content/examples/<EXAMPLE_NAME>/main.lua` — working, commented Lua script
-- Any required assets in `content/examples/<EXAMPLE_NAME>/` (images, audio)
-- Verified: `cargo run -- content/examples/<EXAMPLE_NAME>` opens a window without errors
+- [ ] `content/examples/<EXAMPLE_NAME>/main.lua` — working, commented Lua script
+- [ ] Any required assets in `content/examples/<EXAMPLE_NAME>/` (images, audio)
+- [ ] Verified: `cargo run -- content/examples/<EXAMPLE_NAME>` opens a window without errors
 
-## Acceptance
+## Anti-patterns
 
-- [ ] Example runs with `cargo run -- content/examples/<EXAMPLE_NAME>`
-- [ ] Uses only `lurek.*` API — no external engine prefixes or undocumented functions
-- [ ] All variables are `local`
-- [ ] Under 100 lines (demos should be readable)
-- [ ] Has comments explaining non-obvious API usage
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-## References
+## Example Invocation
 
-**Required Skills**: `lua-scripting`
-**Suggested Agents**: `Doc-Writer`, `Developer`
-**Related Prompts**: `create-game-example.prompt.md`
-**Commands**:
-```powershell
-cargo run -- content/examples/<EXAMPLE_NAME>
-```
+> Run this prompt via VS Code Copilot Chat: `/create-lua-example <EXAMPLE_NAME>`

@@ -1,13 +1,17 @@
 ---
-description: "Full release readiness check for Lurek2D. Use before tagging a release or merging to main. Runs all quality gates and produces a go/no-go verdict."
+description: "Full release readiness check for Lurek2D. Use before tagging a release or merging to main. Runs all quality gates and produces a go/no-go..."
+mode: agent
+loads_skills: [rust-coding, testing-rust, tools-cag-validation]
+loads_tools: [tools/validate/cag_validate.py]
+expected_agent: Manager
+inputs_required: [VERSION]
 ---
 
-# Workflow: Release Check
+# Workflow Release Check
 
-**Purpose**: Run all quality gates and produce a binary go/no-go verdict for a Lurek2D release.
-**Use When**: Before tagging a version, cutting a release binary, or merging a feature branch to `main`.
-**Do Not Use When**: During active development — use individual gate prompts instead.
-**Scope**: Full repository.
+## Goal
+
+Full release readiness check for Lurek2D. Use before tagging a release or merging to main. Runs all quality gates and produces a go/no-go... The prompt finishes when every Success Criteria item below is checked.
 
 ## Inputs
 
@@ -16,82 +20,29 @@ description: "Full release readiness check for Lurek2D. Use before tagging a rel
 
 ## Steps
 
-### Gate 1: Compilation
-```powershell
-cargo build --release
-```
-- Must complete with 0 errors
+1. Load [skill: rust-coding](.github/skills/rust-coding/SKILL.md), [skill: testing-rust](.github/skills/testing-rust/SKILL.md), [skill: tools-cag-validation](.github/skills/tools-cag-validation/SKILL.md) before changing any files.
+2. Must complete with 0 errors
+3. Must complete with 0 warnings (treated as errors via `-D warnings`)
+4. Must pass (no unformatted files)
+5. All tests must pass; 0 failures, 0 panics
+6. Must produce grade B or better on all file families
+7. 0 CRITICAL issues, ≤ 3 HIGH issues
+8. Window must open and display without panic
+9. Close manually; verify no stderr errors
+10. `docs/API/lua-api.md` — every `lurek.*` function in the code has an entry
+11. `README.md` — version badge and feature list current
+12. 0 known vulnerabilities in dependencies
 
-### Gate 2: Lint
-```powershell
-cargo clippy -- -D warnings
-```
-- Must complete with 0 warnings (treated as errors via `-D warnings`)
+## Success Criteria
 
-### Gate 3: Format
-```powershell
-cargo fmt --check
-```
-- Must pass (no unformatted files)
+- [ ] Console output from each gate
+- [ ] Go/no-go verdict with specific blocking issues listed
 
-### Gate 4: Tests
-```powershell
-cargo test
-```
-- All tests must pass; 0 failures, 0 panics
+## Anti-patterns
 
-### Gate 5: CAG Validation
-```powershell
-python tools/validate/cag_validate.py
-```
-- Must produce grade B or better on all file families
-- 0 CRITICAL issues, ≤ 3 HIGH issues
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-### Gate 6: Example Smoke Test
-```powershell
-cargo run -- content/demos/hello_world
-```
-- Window must open and display without panic
-- Close manually; verify no stderr errors
+## Example Invocation
 
-### Gate 7: Documentation Check
-- `docs/API/lua_api_reference_generated.md` — every `lurek.*` function in the code has an entry
-- `README.md` — version badge and feature list current
-
-### Gate 8: Security Audit
-```powershell
-cargo audit
-```
-- 0 known vulnerabilities in dependencies
-
-## Outputs
-
-- Console output from each gate
-- Go/no-go verdict with specific blocking issues listed
-
-## Acceptance
-
-- [ ] Gate 1 (build): PASS
-- [ ] Gate 2 (clippy): PASS
-- [ ] Gate 3 (fmt): PASS
-- [ ] Gate 4 (tests): PASS
-- [ ] Gate 5 (CAG): PASS
-- [ ] Gate 6 (smoke): PASS
-- [ ] Gate 7 (docs): PASS
-- [ ] Gate 8 (audit): PASS
-- [ ] All gates passing → tag `<VERSION>` and publish binary
-
-## References
-
-**Required Skills**: `rust-coding`, `testing-rust`, `tools-cag-validation`
-**Suggested Agents**: `Reviewer`, `Tester`
-**Related Prompts**: `run-quality-gates.prompt.md`, `review-code-quality.prompt.md`
-**Commands**:
-```powershell
-cargo build --release
-cargo clippy -- -D warnings
-cargo fmt --check
-cargo test
-python tools/validate/cag_validate.py
-cargo audit
-```
+> Run this prompt via VS Code Copilot Chat: `/workflow-release-check <VERSION>`

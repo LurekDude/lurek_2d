@@ -1,29 +1,43 @@
 ---
 description: "Analyze rendering performance: frame time, draw command throughput, texture memory, wgpu pipeline operations."
+mode: agent
+loads_skills: [gpu-programming, performance-profiling]
+loads_tools: []
+expected_agent: Renderer
+inputs_required: []
 ---
 
 # Analyze Render Performance
 
-## Purpose
+## Goal
 
 Profile and analyze the rendering pipeline performance.
 
+## Inputs
+
+- (none) — this prompt takes no required arguments.
+
 ## Steps
 
-1. Identify the rendering hot path in `src/render/renderer.rs`
-2. Count draw commands processed per frame
-3. Check for per-frame allocations in render loop
-4. Analyze texture memory usage (loaded textures, format conversions)
-5. Check camera transform overhead
-6. Report bottlenecks with recommended optimizations
+1. Load [skill: gpu-programming](.github/skills/gpu-programming/SKILL.md), [skill: performance-profiling](.github/skills/performance-profiling/SKILL.md) before changing any files.
+2. Identify the rendering hot path in `src/render/renderer.rs`
+3. Count draw commands processed per frame
+4. Check for per-frame allocations in render loop
+5. Analyze texture memory usage (loaded textures, format conversions)
+6. Check camera transform overhead
+7. Report bottlenecks with recommended optimizations
 
-## Acceptance
+## Success Criteria
 
 - [ ] Frame time measured per rendering phase
 - [ ] Per-frame allocations identified
 - [ ] Recommendations ordered by impact
 
-## References
+## Anti-patterns
 
-- `performance-profiling` skill
-- `gpu-programming` skill
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
+
+## Example Invocation
+
+> Run this prompt via VS Code Copilot Chat: `/analyze-render-performance`

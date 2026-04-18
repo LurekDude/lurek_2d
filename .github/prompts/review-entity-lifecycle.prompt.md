@@ -1,50 +1,50 @@
 ---
-description: "Review entity lifecycle patterns for correctness: spawn, alive check, kill, ID recycling, blueprint usage, and layer organization. Use when auditing or debugging entity management code."
+description: "Review entity lifecycle patterns for correctness: spawn, alive check, kill, ID recycling, blueprint usage, and layer organization. Use wh..."
+mode: agent
+loads_skills: []
+loads_tools: []
+expected_agent: Reviewer
+inputs_required: []
 ---
 
 # Review Entity Lifecycle
 
-## Prerequisites
+## Goal
 
-- Read `src/ecs/mod.rs` for Universe types
-- Read `src/lua_api/ecs_api.rs` for Lua bindings
-- Read `tests/rust/unit/ecs_tests.rs` for test patterns
-- Load the `ecs-architecture` skill
+Review entity lifecycle patterns for correctness: spawn, alive check, kill, ID recycling, blueprint usage, and layer organization. Use wh... The prompt finishes when every Success Criteria item below is checked.
+
+## Inputs
+
+- (none) — this prompt takes no required arguments.
 
 ## Steps
 
 1. **Check ID management**
-   - IDs are sequential on first spawn (1, 2, 3, ...)
-   - Killed IDs recycle in LIFO order (last killed = first reused)
-   - Verify `is_alive()` check before entity access
-   - Confirm no stale ID references after kill
+2. IDs are sequential on first spawn (1, 2, 3, ...)
+3. Killed IDs recycle in LIFO order (last killed = first reused)
+4. Verify `is_alive()` check before entity access
+5. Confirm no stale ID references after kill
+6. **Check lifecycle ordering**
+7. Entities spawned during `lurek.update()` only — never during `lurek.draw()`
+8. Entities killed during `lurek.update()` only — never during `lurek.draw()`
+9. Blueprint application happens at spawn time
+10. **Check tag/layer usage**
+11. Bitmap tags for fast group membership queries
+12. Layers for spatial/functional entity grouping
 
-2. **Check lifecycle ordering**
-   - Entities spawned during `lurek.update()` only — never during `lurek.draw()`
-   - Entities killed during `lurek.update()` only — never during `lurek.draw()`
-   - Blueprint application happens at spawn time
-
-3. **Check tag/layer usage**
-   - Bitmap tags for fast group membership queries
-   - Layers for spatial/functional entity grouping
-   - No duplicate entities across layers unless intentional
-
-4. **Check blueprint patterns**
-   - Blueprints define reusable entity templates
-   - Blueprint data is copied at spawn — not shared by reference
-   - Blueprint changes don't affect already-spawned entities
-
-5. **Verify test coverage**
-   - Spawn → alive → kill → recycle cycle tested
-   - Tag query correctness tested
-   - Layer membership tested
-   - Blueprint application tested
-   - Edge case: kill-and-recycle in same frame
-
-## Acceptance Criteria
+## Success Criteria
 
 - [ ] No stale ID references in game logic
 - [ ] All mutations happen in `lurek.update()`, not `lurek.draw()`
 - [ ] ID recycling follows LIFO order
 - [ ] Blueprint patterns are copy-on-spawn
 - [ ] Tests cover the full lifecycle
+
+## Anti-patterns
+
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
+
+## Example Invocation
+
+> Run this prompt via VS Code Copilot Chat: `/review-entity-lifecycle`

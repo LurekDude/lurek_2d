@@ -1,12 +1,21 @@
 ---
 description: "Run full quality gates: build, clippy, format check, and all tests."
+mode: agent
+loads_skills: []
+loads_tools: []
+expected_agent: Reviewer
+inputs_required: []
 ---
 
 # Run Quality Gates
 
-## Purpose
+## Goal
 
 Execute all Lurek2D quality gates in sequence.
+
+## Inputs
+
+- (none) — this prompt takes no required arguments.
 
 ## Steps
 
@@ -16,18 +25,16 @@ Execute all Lurek2D quality gates in sequence.
 4. `cargo test` — all tests pass
 5. Report results for each gate
 
-## Outputs
+## Success Criteria
 
-- Pass/fail for each gate
-- Error details for any failures
+- [ ] Pass/fail for each gate
+- [ ] Error details for any failures
 
-## Acceptance
+## Anti-patterns
 
-- [ ] `cargo fmt --check` passes
-- [ ] `cargo clippy` — 0 warnings
-- [ ] `cargo build` succeeds
-- [ ] `cargo test` — all pass
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-## References
+## Example Invocation
 
-- System prompt Quality Gates section
+> Run this prompt via VS Code Copilot Chat: `/run-quality-gates`

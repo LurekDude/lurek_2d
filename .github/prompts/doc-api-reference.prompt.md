@@ -1,12 +1,17 @@
 ---
-description: "Write or update API reference documentation for lurek.* functions. Use when new Lua bindings are added or existing ones change. Produces updated docs/API/lua_api_reference_generated.md."
+description: "Write or update API reference documentation for lurek.* functions. Use when new Lua bindings are added or existing ones change. Produces..."
+mode: agent
+loads_skills: [documentation, lua-api-design]
+loads_tools: []
+expected_agent: Doc-Writer
+inputs_required: [function, module]
 ---
 
-# Doc: API Reference
+# Doc Api Reference
 
-**Purpose**: Write accurate, complete API reference documentation for `lurek.*` Lua functions.
-**Use When**: New `lurek.*` functions are implemented, existing signatures change, or documentation is found to be stale.
-**Scope**: `docs/API/lua_api_reference_generated.md` only.
+## Goal
+
+Write or update API reference documentation for lurek.* functions. Use when new Lua bindings are added or existing ones change. Produces... The prompt finishes when every Success Criteria item below is checked.
 
 ## Inputs
 
@@ -15,40 +20,27 @@ description: "Write or update API reference documentation for lurek.* functions.
 
 ## Steps
 
-1. Load skill `documentation/SKILL.md`
-2. For each function to document:
-   a. Read the Rust implementation in `src/lua_api/<module>_api.rs`
-   b. Identify the exact parameter types and names from the `create_function` closure
-   c. Identify return value (what Lua receives back)
-   d. Note any optional parameters (those with defaults or guarded by `if` in the closure)
-3. Open `docs/API/lua_api_reference_generated.md`
-4. Find the correct sub-section (e.g., `## lurek.gfx`)
-5. Write the entry following this format:
-   ```
-   ### lurek.<module>.<function>([params])
-   Description in one sentence.
-   - `param` — type, range or valid values
-   - Returns: what Lua gets back (or nothing)
-   ```
-6. Verify all key names are lowercase: `"space"` not `"Space"`
-7. Verify color parameters are documented as `[0.0, 1.0]` float range
+1. Load [skill: documentation](.github/skills/documentation/SKILL.md), [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md) before changing any files.
+2. Load skill `documentation/SKILL.md`
+3. For each function to document:
+4. Open `docs/API/lua-api.md`
+5. Find the correct sub-section (e.g., `## lurek.gfx`)
+6. Write the entry following this format:
+7. `param` — type, range or valid values
+8. Returns: what Lua gets back (or nothing)
+9. Verify all key names are lowercase: `"space"` not `"Space"`
+10. Verify color parameters are documented as `[0.0, 1.0]` float range
 
-## Outputs
+## Success Criteria
 
-- Updated `docs/API/lua_api_reference_generated.md` with accurate, complete entries for all specified functions
-- No entries for functions that don't exist in `src/lua_api/`
+- [ ] Updated `docs/API/lua-api.md` with accurate, complete entries for all specified functions
+- [ ] No entries for functions that don't exist in `src/lua_api/`
 
-## Acceptance
+## Anti-patterns
 
-- [ ] Every listed function has an entry in `docs/API/lua_api_reference_generated.md`
-- [ ] Parameter names match the Rust implementation
-- [ ] Optional parameters are marked `[optional]` or given a default value
-- [ ] Return values documented
-- [ ] Key names in docs match `key_to_string()` mapping
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-## References
+## Example Invocation
 
-**Required Skills**: `documentation`, `lua-api-design`
-**Suggested Agents**: `Doc-Writer`
-**Related Prompts**: `design-api-surface.prompt.md`
-**Docs**: `docs/API/lua_api_reference_generated.md`, `src/lua_api/`
+> Run this prompt via VS Code Copilot Chat: `/doc-api-reference <function> <module>`

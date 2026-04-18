@@ -1,22 +1,17 @@
 ---
 description: "Create a new Lua API function in the lurek.* namespace. Guides through API design, Rust binding implementation, documentation, and testing."
+mode: agent
+loads_skills: [lua-api-design, rust-coding]
+loads_tools: []
+expected_agent: Developer
+inputs_required: [module, verb]
 ---
 
-# Create Lua API Function
+# Create Api Function
 
-## Purpose
+## Goal
 
 Step-by-step workflow for adding a new function to the `lurek.*` Lua API.
-
-## Use When
-
-- Adding a new function to any `lurek.<module>.*` namespace
-- Exposing engine functionality to Lua scripts
-
-## Do Not Use When
-
-- Modifying an existing API function (use `fix-api-function.prompt.md`)
-- Designing the overall API surface (use `Lua-Designer` agent)
 
 ## Inputs
 
@@ -28,33 +23,28 @@ Step-by-step workflow for adding a new function to the `lurek.*` Lua API.
 
 ## Steps
 
-1. Check existing API in `src/lua_api/<module>_api.rs` for naming consistency
-2. Verify the function doesn't duplicate existing functionality
-3. Design the signature following Lua API conventions (see `lua-api-design` skill)
-4. Implement the binding in the appropriate `*_api.rs` file using the `register()` pattern
-5. Add the function to `docs/API/lua_api_reference_generated.md`
-6. Write at least one test exercising the new function
-7. Run `cargo test` and `cargo clippy`
+1. Load [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md), [skill: rust-coding](.github/skills/rust-coding/SKILL.md) before changing any files.
+2. Check existing API in `src/lua_api/<module>_api.rs` for naming consistency
+3. Verify the function doesn't duplicate existing functionality
+4. Design the signature following Lua API conventions (see `lua-api-design` skill)
+5. Implement the binding in the appropriate `*_api.rs` file using the `register()` pattern
+6. Add the function to `docs/API/lua-api.md`
+7. Write at least one test exercising the new function
+8. Run `cargo test` and `cargo clippy`
+9. Consult the actual `lurek.*` API surface via [docs/API/lua-api.md](docs/API/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 
-## Outputs
+## Success Criteria
 
-- Modified `src/lua_api/<module>_api.rs` with new binding
-- Updated `docs/API/lua_api_reference_generated.md`
-- New or updated test in `tests/`
-- Verified: `cargo test` passes, `cargo clippy` clean
+- [ ] Modified `src/lua_api/<module>_api.rs` with new binding
+- [ ] Updated `docs/API/lua-api.md`
+- [ ] New or updated test in `tests/`
+- [ ] Verified: `cargo test` passes, `cargo clippy` clean
 
-## Acceptance
+## Anti-patterns
 
-- [ ] Function follows `lurek.<module>.<verb>()` naming
-- [ ] Parameters match existing conventions (dt, x, y, key, etc.)
-- [ ] Returns `LuaResult<T>`
-- [ ] API reference updated
-- [ ] At least one test exists
-- [ ] `cargo test` passes
-- [ ] `cargo clippy` clean
+- Modifying an existing API function (use `fix-api-function.prompt.md`)
+- Designing the overall API surface (use `Lua-Designer` agent)
 
-## References
+## Example Invocation
 
-- `lua-api-design` skill
-- `rust-coding` skill
-- `docs/API/lua_api_reference_generated.md`
+> Run this prompt via VS Code Copilot Chat: `/create-api-function <module> <verb>`

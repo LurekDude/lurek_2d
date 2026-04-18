@@ -1,13 +1,17 @@
 ---
-description: "Debug and fix Lua script errors in Lurek2D. Use when a Lua game script exits with an error, panics the engine, or produces unexpected mlua error messages. Produces a root-cause diagnosis and fix."
+description: "Debug and fix Lua script errors in Lurek2D. Use when a Lua game script exits with an error, panics the engine, or produces unexpected mlu..."
+mode: agent
+loads_skills: [dev-debugging, lua-api-design]
+loads_tools: []
+expected_agent: Debugger
+inputs_required: [SCRIPT_PATH, func, module, name]
 ---
 
 # Fix Lua Error
 
-**Purpose**: Diagnose and fix Lua errors thrown inside the Lurek2D engine at runtime.
-**Use When**: A `main.lua` script exits with an `mlua` error, `attempt to index a nil value`, `bad argument`, stack overflow, or similar Lua-side failure.
-**Do Not Use When**: The crash is a Rust panic (not an mlua `LuaError`) — use `fix-engine-bug.prompt.md` instead.
-**Scope**: `src/lua_api/`, `src/app/app.rs`, and the affected Lua script.
+## Goal
+
+Debug and fix Lua script errors in Lurek2D. Use when a Lua game script exits with an error, panics the engine, or produces unexpected mlu... The prompt finishes when every Success Criteria item below is checked.
 
 ## Inputs
 
@@ -17,41 +21,30 @@ description: "Debug and fix Lua script errors in Lurek2D. Use when a Lua game sc
 
 ## Steps
 
-1. Load skill `dev-debugging/SKILL.md`
-2. Parse the error message:
-   - `attempt to index a nil value (global 'luna')` → `luna` table not constructed; check `create_lua_vm()`
-   - `bad argument #N to '<func>'` → argument type mismatch; check Lua call vs Rust binding signature
-   - `attempt to call a nil value` → function not registered; check `register()` in `lua_api/mod.rs`
-   - Stack overflow → recursive `update`/`draw` callback calling itself
-3. Find the Rust binding for the failing function in `src/lua_api/<module>_api.rs`
-4. Compare the Lua call signature against the Rust `create_function` argument types
-5. Check that the function is registered:
-   - `src/lua_api/mod.rs` — `<module>_api::register(&lua, &luna, state.clone())?`
-   - `lurek.set("<name>", ...)` in the corresponding `register()` function
-6. Fix the mismatch (either the Lua script or the binding — prefer fixing the binding if the API is ambiguous)
-7. Add a guard or descriptive error via `lua.create_error_from_string()` where possible
-8. Verify: `cargo run -- <SCRIPT_PATH>`
+1. Load [skill: dev-debugging](.github/skills/dev-debugging/SKILL.md), [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md) before changing any files.
+2. Load skill `dev-debugging/SKILL.md`
+3. Parse the error message:
+4. `attempt to index a nil value (global 'luna')` → `luna` table not constructed; check `create_lua_vm()`
+5. `bad argument #N to '<func>'` → argument type mismatch; check Lua call vs Rust binding signature
+6. `attempt to call a nil value` → function not registered; check `register()` in `lua_api/mod.rs`
+7. Stack overflow → recursive `update`/`draw` callback calling itself
+8. Find the Rust binding for the failing function in `src/lua_api/<module>_api.rs`
+9. Compare the Lua call signature against the Rust `create_function` argument types
+10. Check that the function is registered:
+11. `src/lua_api/mod.rs` — `<module>_api::register(&lua, &luna, state.clone())?`
+12. `lurek.set("<name>", ...)` in the corresponding `register()` function
 
-## Outputs
+## Success Criteria
 
-- Root-cause explanation (Lua script bug, binding mismatch, or missing registration)
-- Fix applied (Rust or Lua side, with reasoning)
-- Verified: `cargo run -- <SCRIPT_PATH>` succeeds
+- [ ] Root-cause explanation (Lua script bug, binding mismatch, or missing registration)
+- [ ] Fix applied (Rust or Lua side, with reasoning)
+- [ ] Verified: `cargo run -- <SCRIPT_PATH>` succeeds
 
-## Acceptance
+## Anti-patterns
 
-- [ ] The specific error no longer occurs
-- [ ] Fix does not break other examples (`cargo run -- content/demos/hello_world`)
-- [ ] If binding was incorrect, a regression test is added
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-## References
+## Example Invocation
 
-**Required Skills**: `dev-debugging`, `lua-api-design`
-**Suggested Agents**: `Debugger`, `Developer`
-**Related Prompts**: `fix-api-function.prompt.md`, `fix-engine-bug.prompt.md`
-**Commands**:
-```powershell
-cargo run -- <SCRIPT_PATH>
-cargo run -- content/demos/hello_world
-```
-**Docs**: `docs/API/lua_api_reference_generated.md`, `src/lua_api/mod.rs`
+> Run this prompt via VS Code Copilot Chat: `/fix-lua-error <SCRIPT_PATH> <func> <module> <name>`

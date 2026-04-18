@@ -1,10 +1,15 @@
 ---
 description: "Run a full code review against Lurek2D quality gates: compilation, lint, format, tests, conventions."
+mode: agent
+loads_skills: [rust-coding]
+loads_tools: []
+expected_agent: Reviewer
+inputs_required: []
 ---
 
 # Review Code Quality
 
-## Purpose
+## Goal
 
 Systematic code review against all Lurek2D quality gates.
 
@@ -14,30 +19,28 @@ Systematic code review against all Lurek2D quality gates.
 
 ## Steps
 
-1. Run `cargo build` — verify compilation
-2. Run `cargo clippy` — verify 0 warnings
-3. Run `cargo fmt --check` — verify formatting
-4. Run `cargo test` — verify all tests pass
-5. Check for `unsafe` blocks without `// SAFETY:` comments
-6. Check module dependency direction (no cross-domain imports)
-7. Check Lua API naming consistency (`lurek.*` namespace)
-8. Check visibility (`pub(crate)` preferred over `pub`)
-9. Check error handling (no `.unwrap()` in production paths)
-10. Report findings with severity: BLOCKER / WARNING / NOTE
+1. Load [skill: rust-coding](.github/skills/rust-coding/SKILL.md) before changing any files.
+2. Run `cargo build` — verify compilation
+3. Run `cargo clippy` — verify 0 warnings
+4. Run `cargo fmt --check` — verify formatting
+5. Run `cargo test` — verify all tests pass
+6. Check for `unsafe` blocks without `// SAFETY:` comments
+7. Check module dependency direction (no cross-domain imports)
+8. Check Lua API naming consistency (`lurek.*` namespace)
+9. Check visibility (`pub(crate)` preferred over `pub`)
+10. Check error handling (no `.unwrap()` in production paths)
+11. Report findings with severity: BLOCKER / WARNING / NOTE
 
-## Outputs
+## Success Criteria
 
-- Quality gate results (pass/fail for each check)
-- Finding list with file paths, severity, and remediation
+- [ ] Quality gate results (pass/fail for each check)
+- [ ] Finding list with file paths, severity, and remediation
 
-## Acceptance
+## Anti-patterns
 
-- [ ] All quality gates checked
-- [ ] Findings include specific file paths
-- [ ] Severity assigned to each finding
-- [ ] Remediation actionable
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-## References
+## Example Invocation
 
-- `Reviewer` agent
-- `rust-coding` skill
+> Run this prompt via VS Code Copilot Chat: `/review-code-quality`

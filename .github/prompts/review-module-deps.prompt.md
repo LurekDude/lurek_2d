@@ -1,29 +1,43 @@
 ---
 description: "Review module dependencies for correctness: no cross-domain imports, correct dependency direction."
+mode: agent
+loads_skills: [module-architecture]
+loads_tools: []
+expected_agent: Architect
+inputs_required: []
 ---
 
-# Review Module Dependencies
+# Review Module Deps
 
-## Purpose
+## Goal
 
 Audit module dependency graph for violations.
 
+## Inputs
+
+- (none) — this prompt takes no required arguments.
+
 ## Steps
 
-1. For each domain module (`graphics`, `physics`, `audio`, `input`, `timer`, `filesystem`, `window`):
-   - Check imports — should only use `crate::math::*` from other domain modules
-   - No imports from other domain modules
-2. Check `engine` — may import from all modules
-3. Check `lua_api` — may import from `engine` + all domain modules
-4. Report any violations with file path and import line
+1. Load [skill: module-architecture](.github/skills/module-architecture/SKILL.md) before changing any files.
+2. For each domain module (`graphics`, `physics`, `audio`, `input`, `timer`, `filesystem`, `window`):
+3. Check imports — should only use `crate::math::*` from other domain modules
+4. No imports from other domain modules
+5. Check `engine` — may import from all modules
+6. Check `lua_api` — may import from `engine` + all domain modules
+7. Report any violations with file path and import line
 
-## Acceptance
+## Success Criteria
 
 - [ ] No cross-domain module dependencies (except through `math`)
 - [ ] `engine` dependency direction correct
 - [ ] `lua_api` dependency direction correct
 
-## References
+## Anti-patterns
 
-- `module-architecture` skill
-- System prompt Module Direction rules
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
+
+## Example Invocation
+
+> Run this prompt via VS Code Copilot Chat: `/review-module-deps`

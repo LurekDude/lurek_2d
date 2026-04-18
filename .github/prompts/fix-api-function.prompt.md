@@ -1,10 +1,15 @@
 ---
 description: "Fix a broken or incorrect Lua API function: signature, behavior, or error handling."
+mode: agent
+loads_skills: [lua-api-design]
+loads_tools: []
+expected_agent: Developer
+inputs_required: [module]
 ---
 
-# Fix API Function
+# Fix Api Function
 
-## Purpose
+## Goal
 
 Fix a broken `lurek.*` API function.
 
@@ -16,20 +21,26 @@ Fix a broken `lurek.*` API function.
 
 ## Steps
 
-1. Read the binding in `src/lua_api/<module>_api.rs`
-2. Read the underlying engine code
-3. Identify the discrepancy
-4. Fix the binding or engine code
-5. Update `docs/API/lua_api_reference_generated.md` if signature changed
-6. Verify with test
+1. Load [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md) before changing any files.
+2. Read the binding in `src/lua_api/<module>_api.rs`
+3. Read the underlying engine code
+4. Identify the discrepancy
+5. Fix the binding or engine code
+6. Update `docs/API/lua-api.md` if signature changed
+7. Verify with test
+8. Consult the actual `lurek.*` API surface via [docs/API/lua-api.md](docs/API/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 
-## Acceptance
+## Success Criteria
 
 - [ ] Function behaves as documented
 - [ ] API reference accurate
 - [ ] Tests pass
 
-## References
+## Anti-patterns
 
-- `lua-api-design` skill
-- `docs/API/lua_api_reference_generated.md`
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
+
+## Example Invocation
+
+> Run this prompt via VS Code Copilot Chat: `/fix-api-function <module>`

@@ -1,13 +1,17 @@
 ---
-description: "Design a new lurek.* Lua API surface. Use when adding a new function or module to the lurek.* namespace. Produces a finalized API spec ready for Rust implementation."
+description: "Design a new lurek.* Lua API surface. Use when adding a new function or module to the lurek.* namespace. Produces a finalized API spec re..."
+mode: agent
+loads_skills: [lua-api-design]
+loads_tools: []
+expected_agent: Lua-Designer
+inputs_required: []
 ---
 
-# Design API Surface
+# Design Api Surface
 
-**Purpose**: Design a new `lurek.*` function or sub-module API before any Rust implementation starts.
-**Use When**: You need to add new user-facing Lua functionality and want the API contract nailed down first.
-**Do Not Use When**: The implementation is a pure internal Rust change with no new Lua-facing surface.
-**Scope**: `.github/` API design only; no `src/` changes.
+## Goal
+
+Design a new lurek.* Lua API surface. Use when adding a new function or module to the lurek.* namespace. Produces a finalized API spec re... The prompt finishes when every Success Criteria item below is checked.
 
 ## Inputs
 
@@ -17,39 +21,31 @@ description: "Design a new lurek.* Lua API surface. Use when adding a new functi
 
 ## Steps
 
-1. Load skill `lua-api-design/SKILL.md`
-2. Identify which existing `lurek.*` sub-namespace this belongs to, or whether a new sub-table is needed
-3. Design the function signature:
-   - Parameter names: lowercase, concise, no type suffixes
-   - Return values: prefer primitive types (number, boolean, string) over userdata
-   - Defaults: document optional parameters and their default values
-4. Check for consistency with existing `lurek.*` functions in the same namespace:
-   - Color values always `r, g, b [, a]` in `[0.0, 1.0]` range
-   - Shapes always `(mode, x, y, ...)` where mode is `"fill"` or `"line"`
-   - IDs always numeric (not string handles)
-5. Write a Lua usage example showing the intended developer experience
-6. Identify the Rust `RenderCommand` variant or `SharedState` field this will need
-7. Document any side effects or ordering constraints (e.g., "must be called inside `lurek.draw()`")
-8. Record the finalized spec in `docs/API/lua_api_reference_generated.md`
+1. Load [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md) before changing any files.
+2. Load skill `lua-api-design/SKILL.md`
+3. Identify which existing `lurek.*` sub-namespace this belongs to, or whether a new sub-table is needed
+4. Design the function signature:
+5. Parameter names: lowercase, concise, no type suffixes
+6. Return values: prefer primitive types (number, boolean, string) over userdata
+7. Defaults: document optional parameters and their default values
+8. Check for consistency with existing `lurek.*` functions in the same namespace:
+9. Color values always `r, g, b [, a]` in `[0.0, 1.0]` range
+10. Shapes always `(mode, x, y, ...)` where mode is `"fill"` or `"line"`
+11. IDs always numeric (not string handles)
+12. Write a Lua usage example showing the intended developer experience
 
-## Outputs
+## Success Criteria
 
-- Finalized function signature with parameter types and defaults
-- Lua usage example (3–10 lines)
-- Description of required Rust changes (what `RenderCommand` variant or state field)
-- Updated `docs/API/lua_api_reference_generated.md` entry
+- [ ] Finalized function signature with parameter types and defaults
+- [ ] Lua usage example (3–10 lines)
+- [ ] Description of required Rust changes (what `RenderCommand` variant or state field)
+- [ ] Updated `docs/API/lua-api.md` entry
 
-## Acceptance
+## Anti-patterns
 
-- [ ] Function signature follows `lurek.*` namespace conventions (lowercase, no external-engine-prefixed names)
-- [ ] Lua usage example is self-contained and readable
-- [ ] No parameter naming conflicts with existing functions in the same namespace
-- [ ] `docs/API/lua_api_reference_generated.md` updated with new entry
-- [ ] Rust implementation requirements described (not implemented yet — that is `Developer`'s job)
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-## References
+## Example Invocation
 
-**Required Skills**: `lua-api-design`
-**Suggested Agents**: `Lua-Designer`
-**Related Prompts**: `create-api-function.prompt.md`, `fix-api-function.prompt.md`
-**Docs**: `docs/API/lua_api_reference_generated.md`
+> Run this prompt via VS Code Copilot Chat: `/design-api-surface`

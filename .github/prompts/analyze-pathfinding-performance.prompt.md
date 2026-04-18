@@ -1,51 +1,49 @@
 ---
-description: "Analyze and optimize pathfinding performance: A★ cost, grid size impact, HPA★ preprocessing, flow field computation, and multi-unit coordination. Use when pathfinding causes frame drops."
+description: "Analyze and optimize pathfinding performance: A★ cost, grid size impact, HPA★ preprocessing, flow field computation, and multi-unit coord..."
+mode: agent
+loads_skills: [performance-profiling]
+loads_tools: []
+expected_agent: Optimizer
+inputs_required: []
 ---
 
 # Analyze Pathfinding Performance
 
-## Prerequisites
+## Goal
 
-- Read `src/pathfind/mod.rs` for algorithm inventory
-- Read `tests/rust/unit/pathfinding_tests.rs` for test setup patterns
-- Load the `pathfinding-systems` skill and `performance-profiling` skill
+Analyze and optimize pathfinding performance: A★ cost, grid size impact, HPA★ preprocessing, flow field computation, and multi-unit coord... The prompt finishes when every Success Criteria item below is checked.
+
+## Inputs
+
+- (none) — this prompt takes no required arguments.
 
 ## Steps
 
-1. **Identify the bottleneck**
-   - Which algorithm is slow? (A★, HPA★, FlowField)
-   - What grid size and how many simultaneous pathfinding requests?
-   - Is pathfinding running synchronously or via PathThreadPool?
+1. Load [skill: performance-profiling](.github/skills/performance-profiling/SKILL.md) before changing any files.
+2. **Identify the bottleneck**
+3. Which algorithm is slow? (A★, HPA★, FlowField)
+4. What grid size and how many simultaneous pathfinding requests?
+5. Is pathfinding running synchronously or via PathThreadPool?
+6. **Measure current performance**
+7. Time A★ calls for representative grid sizes (50x50, 100x100, 200x200)
+8. Count pathfinding requests per frame
+9. Measure NavGrid cell count and diagonal mode impact
+10. **Evaluate algorithm selection**
+11. **Apply optimizations**
+12. Switch to HPA★ for large static maps — precompute abstract graph at load
 
-2. **Measure current performance**
-   - Time A★ calls for representative grid sizes (50x50, 100x100, 200x200)
-   - Count pathfinding requests per frame
-   - Measure NavGrid cell count and diagonal mode impact
-
-3. **Evaluate algorithm selection**
-   | Grid Size | Agents | Recommended |
-   |---|---|---|
-   | <100x100 | <10 | A★ (synchronous) |
-   | <100x100 | 10-50 | A★ via PathThreadPool |
-   | >200x200 | <10 | HPA★ (precomputed) |
-   | Any | >50 same target | FlowField |
-
-4. **Apply optimizations**
-   - Switch to HPA★ for large static maps — precompute abstract graph at load
-   - Use FlowField for crowd movement toward shared targets
-   - Enable PathThreadPool for non-blocking pathfinding
-   - Use `smooth_path()` sparingly — it adds post-processing cost
-   - Reduce NavGrid resolution if precision allows
-   - Cache paths and reuse when start/end haven't changed
-
-5. **Verify improvement**
-   - Re-measure after optimization
-   - Confirm path quality hasn't degraded (visual inspection)
-   - Run pathfinding stress tests
-
-## Acceptance Criteria
+## Success Criteria
 
 - [ ] Pathfinding stays within frame budget (< 2ms per frame)
 - [ ] No frame drops during heavy pathfinding
 - [ ] Path quality acceptable (no excessive detours)
 - [ ] Algorithm selection matches grid size and agent count
+
+## Anti-patterns
+
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
+
+## Example Invocation
+
+> Run this prompt via VS Code Copilot Chat: `/analyze-pathfinding-performance`

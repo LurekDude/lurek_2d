@@ -1,10 +1,15 @@
 ---
 description: "Create a new physics body type or collision behavior in the physics engine."
+mode: agent
+loads_skills: []
+loads_tools: []
+expected_agent: Developer
+inputs_required: []
 ---
 
 # Create Physics Feature
 
-## Purpose
+## Goal
 
 Add a new physics feature: body type, collision shape, force type, or constraint.
 
@@ -22,8 +27,9 @@ Add a new physics feature: body type, collision shape, force type, or constraint
 4. Add Lua binding in `src/lua_api/physics_api.rs`
 5. Write physics tests with float tolerance assertions
 6. Run `cargo test` and `cargo clippy`
+7. Consult the actual `lurek.*` API surface via [docs/API/lua-api.md](docs/API/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 
-## Acceptance
+## Success Criteria
 
 - [ ] Physics module depends only on `math`
 - [ ] Float comparisons use tolerance
@@ -31,7 +37,11 @@ Add a new physics feature: body type, collision shape, force type, or constraint
 - [ ] Tests cover edge cases
 - [ ] `cargo test` passes
 
-## References
+## Anti-patterns
 
-- `physics-engine` skill
-- `src/physics/` module
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
+
+## Example Invocation
+
+> Run this prompt via VS Code Copilot Chat: `/create-physics-feature`

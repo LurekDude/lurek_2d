@@ -1,49 +1,50 @@
 ---
-description: "Create a new tilemap feature (layer type, autotile rule, collision mapping, or TMX extension). Follow the tilemap module's existing patterns for TileSet, TileMap, AutoTileSheet, IsoMap, and ChunkMap."
+description: "Create a new tilemap feature (layer type, autotile rule, collision mapping, or TMX extension). Follow the tilemap module's existing patte..."
+mode: agent
+loads_skills: [documentation]
+loads_tools: [tools/docs/gen_docs_lua.py]
+expected_agent: Developer
+inputs_required: [SharedState]
 ---
 
 # Create Tilemap Feature
 
-## Prerequisites
+## Goal
 
-- Read `src/tilemap/mod.rs` for module structure and exports
-- Read `src/lua_api/tilemap_api.rs` for existing Lua bindings
-- Read `tests/rust/unit/tilemap_tests.rs` for test patterns
-- Load the `tilemap-rendering` skill
+Create a new tilemap feature (layer type, autotile rule, collision mapping, or TMX extension). Follow the tilemap module's existing patte... The prompt finishes when every Success Criteria item below is checked.
+
+## Inputs
+
+- `SharedState` — value supplied by the user invocation.
 
 ## Steps
 
-1. **Define the feature scope**
-   - Which tilemap type is affected? (TileMap, IsoMap, ChunkMap, AutoTileSheet, TileSet)
-   - Is this a new layer type, a new operation, or an extension to existing behavior?
-   - Does it affect TMX (Tiled) import/export?
+1. Load [skill: documentation](.github/skills/documentation/SKILL.md) before changing any files.
+2. **Define the feature scope**
+3. Which tilemap type is affected? (TileMap, IsoMap, ChunkMap, AutoTileSheet, TileSet)
+4. Is this a new layer type, a new operation, or an extension to existing behavior?
+5. Does it affect TMX (Tiled) import/export?
+6. **Implement in Rust**
+7. Add types/methods to `src/tilemap/` following existing patterns
+8. Use `pub` for cross-module types, `pub(crate)` when possible
+9. Error handling: `EngineError` for internal errors, `LuaResult` for Lua-facing functions
+10. Respect dependency direction: tilemap may depend on math, must NOT depend on graphics/engine
+11. **Add Lua bindings** (if user-facing)
+12. Add to `src/lua_api/tilemap_api.rs` following the `register()` pattern
 
-2. **Implement in Rust**
-   - Add types/methods to `src/tilemap/` following existing patterns
-   - Use `pub` for cross-module types, `pub(crate)` when possible
-   - Error handling: `EngineError` for internal errors, `LuaResult` for Lua-facing functions
-   - Respect dependency direction: tilemap may depend on math, must NOT depend on graphics/engine
-
-3. **Add Lua bindings** (if user-facing)
-   - Add to `src/lua_api/tilemap_api.rs` following the `register()` pattern
-   - Namespace: `lurek.tilemap.*`
-   - Closures capture `Rc<RefCell<SharedState>>` — clone Rc before moving into closure
-   - Return `LuaResult<T>` from all Lua-callable functions
-
-4. **Write tests**
-   - Add integration tests to `tests/rust/unit/tilemap_tests.rs`
-   - Test helper: `create_test_vm()` for Lua-level tests
-   - Test edge cases: empty maps, single tile, maximum dimensions
-   - Float comparisons: `(a - b).abs() < 1e-5`
-
-5. **Update documentation**
-   - Add `///` doc comments to all public items
-   - Update `docs/API/lua_api_reference_generated.md` via `python tools/docs/gen_lua_api.py`
-
-## Acceptance Criteria
+## Success Criteria
 
 - [ ] Feature compiles with 0 clippy warnings
 - [ ] Integration tests pass
 - [ ] Lua bindings follow `lurek.tilemap.*` naming
 - [ ] Public types have `///` doc comments
 - [ ] No dependency direction violations
+
+## Anti-patterns
+
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
+
+## Example Invocation
+
+> Run this prompt via VS Code Copilot Chat: `/create-tilemap-feature <SharedState>`

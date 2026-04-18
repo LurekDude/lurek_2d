@@ -1,13 +1,17 @@
 ---
-description: "Build a release binary for Lurek2D for a target platform. Use when creating a distributable build. Produces a stripped release binary in target/release/."
+description: "Build a release binary for Lurek2D for a target platform. Use when creating a distributable build. Produces a stripped release binary in..."
+mode: agent
+loads_skills: [cross-platform, rust-coding]
+loads_tools: []
+expected_agent: Developer
+inputs_required: [TARGET_TRIPLE]
 ---
 
-# Op: Build Release
+# Op Build Release
 
-**Purpose**: Build a release-optimized Lurek2D binary for distribution.
-**Use When**: Creating a release binary for a specific platform, or verifying the release build is clean.
-**Do Not Use When**: During normal development — use `cargo build` (debug) for iteration.
-**Scope**: `Cargo.toml`, `rust-toolchain.toml`, `target/release/`.
+## Goal
+
+Build a release binary for Lurek2D for a target platform. Use when creating a distributable build. Produces a stripped release binary in... The prompt finishes when every Success Criteria item below is checked.
 
 ## Inputs
 
@@ -16,58 +20,29 @@ description: "Build a release binary for Lurek2D for a target platform. Use when
 
 ## Steps
 
-1. Verify `Cargo.toml` version matches `VERSION` (if provided)
-2. Run all quality gates first:
-   ```powershell
-   cargo clippy -- -D warnings
-   cargo fmt --check
-   cargo test
-   ```
-3. Build release:
-   ```powershell
-   # Native platform:
-   cargo build --release
+1. Load [skill: cross-platform](.github/skills/cross-platform/SKILL.md), [skill: rust-coding](.github/skills/rust-coding/SKILL.md) before changing any files.
+2. Verify `Cargo.toml` version matches `VERSION` (if provided)
+3. Run all quality gates first:
+4. Build release:
+5. Verify output:
+6. Native: `target/release/lurek2d.exe` (Windows) or `target/release/lurek2d` (Linux)
+7. Cross: `target/<TARGET_TRIPLE>/release/lurek2d[.exe]`
+8. Smoke test the binary:
+9. Check binary size:
+10. Typical release binary: 5–15 MB (software rendering stack)
+11. Warning if > 50 MB — likely debug symbols leaked into release build
 
-   # Cross-compile (requires target installed):
-   rustup target add <TARGET_TRIPLE>
-   cargo build --release --target <TARGET_TRIPLE>
-   ```
-4. Verify output:
-   - Native: `target/release/lurek2d.exe` (Windows) or `target/release/lurek2d` (Linux)
-   - Cross: `target/<TARGET_TRIPLE>/release/lurek2d[.exe]`
-5. Smoke test the binary:
-   ```powershell
-   ./target/release/lurek2d content/demos/hello_world
-   ```
-6. Check binary size:
-   ```powershell
-   Get-Item target/release/lurek2d.exe | Select-Object -Property Length
-   ```
-   - Typical release binary: 5–15 MB (software rendering stack)
-   - Warning if > 50 MB — likely debug symbols leaked into release build
+## Success Criteria
 
-## Outputs
+- [ ] Release binary at `target/release/lurek2d[.exe]`
+- [ ] Smoke test result (window opened, no panic)
+- [ ] Binary size reported
 
-- Release binary at `target/release/lurek2d[.exe]`
-- Smoke test result (window opened, no panic)
-- Binary size reported
+## Anti-patterns
 
-## Acceptance
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
 
-- [ ] `cargo build --release` completes with 0 errors
-- [ ] `cargo clippy -- -D warnings` clean before build
-- [ ] `cargo test` passes before build
-- [ ] Release binary runs `content/demos/hello_world` without panic
-- [ ] Binary size is reasonable (< 50 MB)
+## Example Invocation
 
-## References
-
-**Required Skills**: `rust-coding`, `cross-platform`
-**Suggested Agents**: `Developer`
-**Related Prompts**: `workflow-release-check.prompt.md`, `run-quality-gates.prompt.md`
-**Commands**:
-```powershell
-cargo build --release
-cargo test
-./target/release/lurek2d content/demos/hello_world
-```
+> Run this prompt via VS Code Copilot Chat: `/op-build-release <TARGET_TRIPLE>`

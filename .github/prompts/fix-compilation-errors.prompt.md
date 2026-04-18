@@ -1,10 +1,15 @@
 ---
 description: "Fix compilation errors, clippy warnings, or formatting issues in Rust source code."
+mode: agent
+loads_skills: [error-handling, rust-coding]
+loads_tools: []
+expected_agent: Developer
+inputs_required: []
 ---
 
 # Fix Compilation Errors
 
-## Purpose
+## Goal
 
 Resolve Rust compilation errors, clippy warnings, or formatting failures.
 
@@ -15,21 +20,26 @@ Resolve Rust compilation errors, clippy warnings, or formatting failures.
 
 ## Steps
 
-1. Read the full error message (file, line, error code)
-2. Read the affected code in context
-3. Identify the fix (type mismatch, missing import, lifetime issue, etc.)
-4. Apply the fix
-5. Run `cargo build`, `cargo clippy`, `cargo fmt --check`
-6. Run `cargo test` to verify no regressions
+1. Load [skill: error-handling](.github/skills/error-handling/SKILL.md), [skill: rust-coding](.github/skills/rust-coding/SKILL.md) before changing any files.
+2. Read the full error message (file, line, error code)
+3. Read the affected code in context
+4. Identify the fix (type mismatch, missing import, lifetime issue, etc.)
+5. Apply the fix
+6. Run `cargo build`, `cargo clippy`, `cargo fmt --check`
+7. Run `cargo test` to verify no regressions
 
-## Acceptance
+## Success Criteria
 
 - [ ] `cargo build` succeeds
 - [ ] `cargo clippy` — 0 warnings
 - [ ] `cargo fmt --check` passes
 - [ ] `cargo test` passes
 
-## References
+## Anti-patterns
 
-- `rust-coding` skill
-- `error-handling` skill
+- Skipping the Success Criteria check before declaring the prompt done.
+- Running `git add .` instead of staging only the files this prompt produced.
+
+## Example Invocation
+
+> Run this prompt via VS Code Copilot Chat: `/fix-compilation-errors`
