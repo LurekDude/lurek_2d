@@ -102,6 +102,9 @@ pub mod pipeline_api;
 /// Registers the `lurek.graph.*` directed-graph and item-flow simulation API.
 pub mod graph_api;
 
+/// Registers the `lurek.globe.*` Geoscape-style province sphere API.
+pub mod globe_api;
+
 /// Registers the `lurek.ai.*` game AI toolkit API.
 pub mod ai_api;
 
@@ -359,6 +362,11 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     // graph: lurek.graph
     if modules.graph {
         graph_api::register(&lua, &luna, state.clone())?;
+    }
+
+    // globe: lurek.globe
+    if modules.globe {
+        globe_api::register(&lua, &luna, state.clone())?;
     }
 
     // ai: lurek.ai

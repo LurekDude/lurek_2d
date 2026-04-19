@@ -1,0 +1,763 @@
+//! `lurek.globe` — XCOM-style Geoscape province sphere API.
+//!
+//! Thin Lua wrapper. All `mlua` imports and `impl LuaUserData` live here.
+//! Domain logic lives in `crate::globe::*`.
+
+use super::SharedState;
+use mlua::prelude::*;
+use std::cell::RefCell;
+use std::rc::Rc;
+use std::sync::{Arc, Mutex};
+use std::collections::HashMap;
+
+use crate::globe::registry::{Globe, GlobeRegistry};
+use crate::globe::types::{
+    GlobeSpec, Province, GlobeError, LodTier, Layer, Marker, MarkerStyle, Label, LabelStyle,
+    MAX_PROVINCES,
+};
+use crate::globe::projection::OrbitCamera;
+use crate::globe::fog::FogStore;
+use crate::globe::marker::MarkerStore;
+use crate::globe::label::LabelStore;
+use crate::globe::layer::LayerStore;
+use crate::globe::loader;
+use crate::globe::picking::{pick, PickResult};
+use crate::math::sphere::{great_circle_distance, great_circle_path, lat_lon_to_unit, unit_to_lat_lon};
+
+// ── LuaGlobe ────────────────────────────────────────────────────────────────
+
+/// Lua-accessible handle to a `Globe` inside a `GlobeRegistry`.
+///
+/// Internally holds `Arc<Mutex<GlobeRegistry>>` and the name of the globe.
+#[derive(Clone)]
+pub struct LuaGlobe {
+    reg: Arc<Mutex<GlobeRegistry>>,
+    name: String,
+    state: Rc<RefCell<SharedState>>,
+}
+
+impl LuaGlobe {
+    fn with<R>(&self, f: impl FnOnce(&Globe) -> R) -> LuaResult<R> {
+        let guard = self.reg.lock().map_err(|e| {
+            mlua::Error::RuntimeError(format!("globe registry lock poisoned: {e}"))
+        })?;
+        guard.get(&self.name).map(f).ok_or_else(|| {
+            mlua::Error::RuntimeError(format!("globe '{}' not found", self.name))
+        })
+    }
+
+    fn with_mut<R>(&self, f: impl FnOnce(&mut Globe) -> R) -> LuaResult<R> {
+        let mut guard = self.reg.lock().map_err(|e| {
+            mlua::Error::RuntimeError(format!("globe registry lock poisoned: {e}"))
+        })?;
+        guard.get_mut(&self.name).map(f).ok_or_else(|| {
+            mlua::Error::RuntimeError(format!("globe '{}' not found", self.name))
+        })
+    }
+}
+
+impl LuaUserData for LuaGlobe {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── Province management ──────────────────────────────────────────────
+
+        // -- addProvince --
+        /// Adds a province from a table {id, centroid={lat,lon}, vertices={{lat,lon},...},
+        /// neighbors={id,...}, base_color={r,g,b,a}}.
+        /// @param p : table
+        /// @return boolean
+        methods.add_method_mut("addProvince", |_, this, p: LuaTable| {
+            let id: u32 = p.get("id")?;
+            let ct: LuaTable = p.get("centroid")?;
+            let centroid = (ct.get::<_, f32>(1)?, ct.get::<_, f32>(2)?);
+            let verts_tbl: LuaTable = p.get::<_, LuaTable>("vertices").unwrap_or_else(|_| {
+                panic!("vertices missing for province {id}")
+            });
+            let mut vertices = Vec::new();
+            for vt in verts_tbl.sequence_values::<LuaTable>() {
+                let vt = vt?;
+                vertices.push((vt.get::<_, f32>(1)?, vt.get::<_, f32>(2)?));
+            }
+            let neighbors: Vec<u32> = p
+                .get::<_, LuaTable>("neighbors")
+                .map(|t| t.sequence_values::<u32>().collect::<LuaResult<Vec<_>>>())
+                .unwrap_or_else(|_| Ok(vec![]))?;
+            let color_tbl: Option<LuaTable> = p.get("base_color").ok();
+            let base_color = if let Some(ct) = color_tbl {
+                [
+                    ct.get::<_, f32>(1).unwrap_or(0.5),
+                    ct.get::<_, f32>(2).unwrap_or(0.5),
+                    ct.get::<_, f32>(3).unwrap_or(0.5),
+                    ct.get::<_, f32>(4).unwrap_or(1.0),
+                ]
+            } else {
+                [0.5, 0.5, 0.5, 1.0]
+            };
+            let province = Province {
+                id,
+                vertices,
+                centroid,
+                neighbors,
+                attrs: HashMap::new(),
+                edge_tags: HashMap::new(),
+                texture: None,
+                base_color,
+            };
+            this.with_mut(|g| {
+                g.add_province(province)
+                    .map(|_| true)
+                    .unwrap_or(false)
+            })
+        });
+
+        // -- removeProvince --
+        /// Removes a province by ID. Returns true if it existed.
+        /// @param id : integer
+        /// @return boolean
+        methods.add_method_mut("removeProvince", |_, this, id: u32| {
+            this.with_mut(|g| g.remove_province(id).is_some())
+        });
+
+        // -- provinceCount --
+        /// Returns the number of provinces.
+        /// @return integer
+        methods.add_method("provinceCount", |_, this, ()| {
+            this.with(|g| g.province_count())
+        });
+
+        // -- getNeighbors --
+        /// Returns the neighbor IDs of a province.
+        /// @param id : integer
+        /// @return table<integer>
+        methods.add_method("getNeighbors", |lua, this, id: u32| {
+            let neighbors = this.with(|g| {
+                g.get_province(id)
+                    .map(|p| p.neighbors.clone())
+                    .unwrap_or_default()
+            })?;
+            let t = lua.create_table()?;
+            for (i, n) in neighbors.iter().enumerate() {
+                t.set(i + 1, *n)?;
+            }
+            Ok(t)
+        });
+
+        // -- setProvinceAttr --
+        /// Sets a string attribute on a province.
+        /// @param id : integer, key : string, value : string
+        methods.add_method_mut("setProvinceAttr", |_, this, (id, key, val): (u32, String, String)| {
+            this.with_mut(|g| {
+                if let Some(p) = g.get_province_mut(id) {
+                    p.attrs.insert(key, val);
+                    true
+                } else {
+                    false
+                }
+            })
+        });
+
+        // -- getProvinceAttr --
+        /// Gets a string attribute from a province.
+        /// @param id : integer, key : string
+        /// @return string?
+        methods.add_method("getProvinceAttr", |_, this, (id, key): (u32, String)| {
+            this.with(|g| {
+                g.get_province(id)
+                    .and_then(|p| p.attrs.get(&key).cloned())
+            })
+        });
+
+        // ── Camera ──────────────────────────────────────────────────────────
+
+        // -- pan --
+        /// Pan the orbit camera by delta-latitude and delta-longitude (degrees).
+        /// @param dlat : number, dlon : number
+        methods.add_method_mut("pan", |_, this, (dlat, dlon): (f32, f32)| {
+            this.with_mut(|g| g.camera.pan(dlat, dlon))
+        });
+
+        // -- zoom --
+        /// Zoom the camera by a multiplier (>1 zooms in, <1 zooms out).
+        /// @param factor : number
+        methods.add_method_mut("zoom", |_, this, factor: f32| {
+            this.with_mut(|g| g.camera.zoom_by(factor))
+        });
+
+        // -- setCamera --
+        /// Set the camera position directly.
+        /// @param lat : number, lon : number, zoom : number
+        methods.add_method_mut("setCamera", |_, this, (lat, lon, z): (f32, f32, f32)| {
+            this.with_mut(|g| {
+                g.camera.lat_deg = lat;
+                g.camera.lon_deg = lon;
+                g.camera.zoom = z.max(0.1);
+                g.camera.clamp();
+            })
+        });
+
+        // -- getCamera --
+        /// Get the current camera (lat, lon, zoom).
+        /// @return number, number, number
+        methods.add_method("getCamera", |_, this, ()| {
+            this.with(|g| (g.camera.lat_deg, g.camera.lon_deg, g.camera.zoom))
+        });
+
+        // -- getLod --
+        /// Returns the current LOD tier as a string: "far", "mid", or "near".
+        /// @return string
+        methods.add_method("getLod", |_, this, ()| {
+            this.with(|g| match g.camera.lod() {
+                LodTier::Far => "far",
+                LodTier::Mid => "mid",
+                LodTier::Near => "near",
+            }.to_string())
+        });
+
+        // ── Picking ─────────────────────────────────────────────────────────
+
+        // -- pick --
+        /// Returns the province ID under screen coordinates, or nil.
+        /// @param sx : number, sy : number
+        /// @return integer?
+        methods.add_method("pick", |_, this, (sx, sy): (f32, f32)| {
+            this.with(|g| {
+                g.pick_screen(sx, sy).map(|r| r.province_id)
+            })
+        });
+
+        // -- pickLatLon --
+        /// Returns (lat, lon) of the screen point on the globe surface, or nil.
+        /// @param sx : number, sy : number
+        /// @return number?, number?
+        methods.add_method("pickLatLon", |_, this, (sx, sy): (f32, f32)| {
+            this.with(|g| {
+                g.pick_screen(sx, sy).map(|r| (r.lat_deg, r.lon_deg))
+            })
+        });
+
+        // ── Fog of war ───────────────────────────────────────────────────────
+
+        // -- setActiveViewer --
+        /// Set the faction/viewer whose fog mask filters rendering.
+        /// @param viewer : string
+        methods.add_method_mut("setActiveViewer", |_, this, viewer: Option<String>| {
+            this.with_mut(|g| g.active_viewer = viewer)
+        });
+
+        // -- revealProvince --
+        /// Reveal a province for a viewer.
+        /// @param viewer : string, id : integer
+        methods.add_method_mut("revealProvince", |_, this, (viewer, id): (String, u32)| {
+            this.with_mut(|g| g.fog.reveal(&viewer, id))
+        });
+
+        // -- hideProvince --
+        /// Hide a province for a viewer.
+        /// @param viewer : string, id : integer
+        methods.add_method_mut("hideProvince", |_, this, (viewer, id): (String, u32)| {
+            this.with_mut(|g| g.fog.hide(&viewer, id))
+        });
+
+        // -- isVisible --
+        /// Returns true if the province is visible to the viewer.
+        /// @param viewer : string, id : integer
+        /// @return boolean
+        methods.add_method("isVisible", |_, this, (viewer, id): (String, u32)| {
+            this.with(|g| g.fog.is_visible(&viewer, id))
+        });
+
+        // -- revealAll --
+        /// Reveal all provinces for a viewer.
+        /// @param viewer : string
+        methods.add_method_mut("revealAll", |_, this, viewer: String| {
+            this.with_mut(|g| {
+                let ids: Vec<u32> = g.graph.iter().map(|p| p.id).collect();
+                g.fog.reveal_batch(&viewer, &ids);
+            })
+        });
+
+        // ── Markers ──────────────────────────────────────────────────────────
+
+        // -- addMarker --
+        /// Add a marker. Returns marker ID.
+        /// @param mtype : string, lat : number, lon : number, label : string?
+        /// @return integer
+        methods.add_method_mut("addMarker", |_, this, (mtype, lat, lon, label): (String, f32, f32, Option<String>)| {
+            this.with_mut(|g| {
+                g.markers.add(mtype, lat, lon, label, MarkerStyle::default())
+            })
+        });
+
+        // -- removeMarker --
+        /// Remove a marker by ID.
+        /// @param id : integer
+        /// @return boolean
+        methods.add_method_mut("removeMarker", |_, this, id: u32| {
+            this.with_mut(|g| g.markers.remove(id).is_some())
+        });
+
+        // -- moveMarker --
+        /// Move a marker to a new lat/lon.
+        /// @param id : integer, lat : number, lon : number
+        methods.add_method_mut("moveMarker", |_, this, (id, lat, lon): (u32, f32, f32)| {
+            this.with_mut(|g| g.markers.move_to(id, lat, lon))
+        });
+
+        // -- setMarkerVisible --
+        /// Set marker visibility.
+        /// @param id : integer, visible : boolean
+        methods.add_method_mut("setMarkerVisible", |_, this, (id, vis): (u32, bool)| {
+            this.with_mut(|g| g.markers.set_visible(id, vis))
+        });
+
+        // -- setMarkerAttr --
+        /// Set a string attribute on a marker.
+        /// @param id : integer, key : string, value : string
+        methods.add_method_mut("setMarkerAttr", |_, this, (id, key, val): (u32, String, String)| {
+            this.with_mut(|g| g.markers.set_attr(id, key, val))
+        });
+
+        // -- getMarkerAttr --
+        /// Get a string attribute from a marker.
+        /// @param id : integer, key : string
+        /// @return string?
+        methods.add_method("getMarkerAttr", |_, this, (id, key): (u32, String)| {
+            this.with(|g| g.markers.get_attr(id, &key))
+        });
+
+        // ── Labels ───────────────────────────────────────────────────────────
+
+        // -- addLabel --
+        /// Add a text label. Returns label ID.
+        /// @param ltype : string, lat : number, lon : number, text : string
+        /// @return integer
+        methods.add_method_mut("addLabel", |_, this, (ltype, lat, lon, text): (String, f32, f32, String)| {
+            this.with_mut(|g| {
+                g.labels.add(ltype, lat, lon, text, LabelStyle::default(), 0)
+            })
+        });
+
+        // -- setLabelText --
+        /// Update label text.
+        /// @param id : integer, text : string
+        methods.add_method_mut("setLabelText", |_, this, (id, text): (u32, String)| {
+            this.with_mut(|g| g.labels.set_text(id, text))
+        });
+
+        // -- setLabelVisible --
+        /// Set label visibility.
+        /// @param id : integer, visible : boolean
+        methods.add_method_mut("setLabelVisible", |_, this, (id, vis): (u32, bool)| {
+            this.with_mut(|g| g.labels.set_visible(id, vis))
+        });
+
+        // -- removeLabel --
+        /// Remove a label.
+        /// @param id : integer
+        methods.add_method_mut("removeLabel", |_, this, id: u32| {
+            this.with_mut(|g| g.labels.remove(id).is_some())
+        });
+
+        // ── Layers ───────────────────────────────────────────────────────────
+
+        // -- addLayer --
+        /// Add or replace a named thematic layer.
+        /// @param name : string, z_order : integer?
+        methods.add_method_mut("addLayer", |_, this, (name, z_order): (String, Option<i32>)| {
+            this.with_mut(|g| {
+                g.layers.add(Layer {
+                    name,
+                    visible: true,
+                    alpha: 1.0,
+                    z_order: z_order.unwrap_or(0),
+                    kind: String::new(),
+                    province_colors: HashMap::new(),
+                })
+            })
+        });
+
+        // -- removeLayer --
+        /// Remove a layer.
+        /// @param name : string
+        methods.add_method_mut("removeLayer", |_, this, name: String| {
+            this.with_mut(|g| g.layers.remove(&name).is_some())
+        });
+
+        // -- setLayerColor --
+        /// Set a per-province color override on a layer.
+        /// @param layer : string, province_id : integer, r, g, b, a : number
+        methods.add_method_mut("setLayerColor", |_, this, (layer, id, r, g, b, a): (String, u32, f32, f32, f32, f32)| {
+            this.with_mut(|g| g.layers.set_province_color(&layer, id, [r, g, b, a]))
+        });
+
+        // -- setLayerVisible --
+        /// Set layer visibility.
+        /// @param name : string, visible : boolean
+        methods.add_method_mut("setLayerVisible", |_, this, (name, vis): (String, bool)| {
+            this.with_mut(|g| g.layers.set_visible(&name, vis))
+        });
+
+        // -- setLayerAlpha --
+        /// Set layer opacity (0.0–1.0).
+        /// @param name : string, alpha : number
+        methods.add_method_mut("setLayerAlpha", |_, this, (name, alpha): (String, f32)| {
+            this.with_mut(|g| g.layers.set_alpha(&name, alpha))
+        });
+
+        // ── Spec / time ──────────────────────────────────────────────────────
+
+        // -- setTimeOfDay --
+        /// Set time of day (0.0–24.0 hours).
+        /// @param t : number
+        methods.add_method_mut("setTimeOfDay", |_, this, t: f32| {
+            this.with_mut(|g| g.spec.time_of_day = t % 24.0)
+        });
+
+        // -- getTimeOfDay --
+        /// Get time of day.
+        /// @return number
+        methods.add_method("getTimeOfDay", |_, this, ()| {
+            this.with(|g| g.spec.time_of_day)
+        });
+
+        // -- setRotation --
+        /// Set planet rotation (degrees).
+        /// @param deg : number
+        methods.add_method_mut("setRotation", |_, this, deg: f32| {
+            this.with_mut(|g| g.spec.rotation_deg = deg)
+        });
+
+        // -- update --
+        /// Advance globe simulation by dt seconds.
+        /// @param dt : number
+        methods.add_method_mut("update", |_, this, dt: f32| {
+            this.with_mut(|g| g.update(dt))
+        });
+
+        // -- setBorders --
+        /// Enable or disable province border rendering.
+        /// @param show : boolean
+        methods.add_method_mut("setBorders", |_, this, show: bool| {
+            this.with_mut(|g| g.spec.render_borders = show)
+        });
+
+        // ── Path finding ─────────────────────────────────────────────────────
+
+        // -- findPath --
+        /// Find the shortest province path from `from_id` to `to_id`.
+        /// @param from_id : integer, to_id : integer
+        /// @return table<integer>? — ordered province IDs, or nil if no path
+        methods.add_method("findPath", |lua, this, (from_id, to_id): (u32, u32)| {
+            let path_opt = this.with(|g| {
+                g.graph.find_path_default(from_id, to_id)
+            })?;
+            match path_opt {
+                None => Ok(None),
+                Some(path) => {
+                    let t = lua.create_table()?;
+                    for (i, id) in path.provinces.iter().enumerate() {
+                        t.set(i + 1, *id)?;
+                    }
+                    Ok(Some(t))
+                }
+            }
+        });
+
+        // -- reachable --
+        /// Return all provinces reachable within `max_cost` steps from `start_id`.
+        /// @param start_id : integer, max_cost : number
+        /// @return table<integer, number> — map of province_id -> cost
+        methods.add_method("reachable", |lua, this, (start_id, max_cost): (u32, f64)| {
+            let reached = this.with(|g| {
+                g.graph.reachable_default(start_id, max_cost)
+            })?;
+            let t = lua.create_table()?;
+            for (id, cost) in reached {
+                t.set(id, cost)?;
+            }
+            Ok(t)
+        });
+
+        // ── Arc management ──────────────────────────────────────────────────
+
+        // -- addArc --
+        /// Add an arc (great-circle path between two lat/lon points).
+        /// @param lat1 : number, lon1 : number, lat2 : number, lon2 : number
+        /// @param steps : integer?
+        /// @return integer — arc ID
+        methods.add_method_mut("addArc", |_, this, (lat1, lon1, lat2, lon2, steps): (f32, f32, f32, f32, Option<u32>)| {
+            let steps = steps.unwrap_or(24);
+            this.with_mut(|g| {
+                let arc_id = g.arc_next_id;
+                g.arc_next_id += 1;
+                let arc = crate::globe::types::Arc {
+                    id: arc_id,
+                    arc_type: "route".to_string(),
+                    screen_points: Vec::new(), // will be computed at draw time
+                    color: [1.0, 1.0, 0.0, 1.0],
+                    width: 1.5,
+                    from: (lat1, lon1),
+                    to: (lat2, lon2),
+                    steps,
+                    visible: true,
+                };
+                g.arcs.insert(arc_id, arc);
+                arc_id
+            })
+        });
+
+        // -- removeArc --
+        /// Remove an arc by ID.
+        /// @param id : integer
+        methods.add_method_mut("removeArc", |_, this, id: u32| {
+            this.with_mut(|g| g.remove_arc(id))
+        });
+
+        // -- getName --
+        /// Returns the globe name.
+        /// @return string
+        methods.add_method("getName", |_, this, ()| {
+            Ok(this.name.clone())
+        });
+
+        // -- __tostring --
+        methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
+            Ok(format!("Globe(\"{}\")", this.name))
+        });
+    }
+}
+
+// ── LuaGlobeRegistry ────────────────────────────────────────────────────────
+
+/// Lua-accessible handle to the shared `GlobeRegistry`.
+#[derive(Clone)]
+pub struct LuaGlobeRegistry {
+    reg: Arc<Mutex<GlobeRegistry>>,
+    state: Rc<RefCell<SharedState>>,
+}
+
+impl LuaUserData for LuaGlobeRegistry {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- new --
+        /// Create a globe with the given name and optional spec table.
+        /// @param name : string
+        /// @param spec : table?
+        /// @return Globe
+        methods.add_method_mut("new", |_, this, (name, spec_tbl): (String, Option<LuaTable>)| {
+            let spec = parse_globe_spec(spec_tbl);
+            {
+                let mut guard = this.reg.lock().map_err(|e| {
+                    mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+                })?;
+                guard.create(name.clone(), spec);
+            }
+            Ok(LuaGlobe {
+                reg: this.reg.clone(),
+                name,
+                state: this.state.clone(),
+            })
+        });
+
+        // -- get --
+        /// Get an existing globe by name, or nil.
+        /// @param name : string
+        /// @return Globe?
+        methods.add_method("get", |_, this, name: String| {
+            let exists = {
+                let guard = this.reg.lock().map_err(|e| {
+                    mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+                })?;
+                guard.get(&name).is_some()
+            };
+            if exists {
+                Ok(Some(LuaGlobe {
+                    reg: this.reg.clone(),
+                    name,
+                    state: this.state.clone(),
+                }))
+            } else {
+                Ok(None)
+            }
+        });
+
+        // -- remove --
+        /// Remove a globe by name.
+        /// @param name : string
+        methods.add_method_mut("remove", |_, this, name: String| {
+            let mut guard = this.reg.lock().map_err(|e| {
+                mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+            })?;
+            Ok(guard.remove(&name).is_some())
+        });
+
+        // -- names --
+        /// Returns a table of all globe names.
+        /// @return table<string>
+        methods.add_method("names", |lua, this, ()| {
+            let guard = this.reg.lock().map_err(|e| {
+                mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+            })?;
+            let names = guard.names();
+            let t = lua.create_table()?;
+            for (i, n) in names.iter().enumerate() {
+                t.set(i + 1, n.clone())?;
+            }
+            Ok(t)
+        });
+    }
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+fn parse_globe_spec(tbl: Option<LuaTable>) -> GlobeSpec {
+    let mut spec = GlobeSpec::default();
+    if let Some(t) = tbl {
+        if let Ok(v) = t.get::<_, f32>("radius") { spec.radius = v; }
+        if let Ok(v) = t.get::<_, f32>("axial_tilt_deg") { spec.axial_tilt_deg = v; }
+        if let Ok(v) = t.get::<_, f32>("rotation_deg") { spec.rotation_deg = v; }
+        if let Ok(v) = t.get::<_, f32>("time_of_day") { spec.time_of_day = v; }
+        if let Ok(v) = t.get::<_, bool>("render_borders") { spec.render_borders = v; }
+        if let Ok(v) = t.get::<_, f32>("border_width") { spec.border_width = v; }
+        if let Ok(v) = t.get::<_, f32>("ambient") { spec.ambient = v; }
+    }
+    spec
+}
+
+// ── register ─────────────────────────────────────────────────────────────────
+
+/// Register `lurek.globe` into the Lua VM.
+pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
+    let tbl = lua.create_table()?;
+    let registry = Arc::new(Mutex::new(GlobeRegistry::new()));
+
+    // -- globe.new(name, spec?) --
+    /// Create a new globe.
+    /// @param name : string
+    /// @param spec : table?
+    /// @return Globe
+    {
+        let reg = registry.clone();
+        let s = state.clone();
+        tbl.set(
+            "new",
+            lua.create_function(move |_, (name, spec_tbl): (String, Option<LuaTable>)| {
+                let spec = parse_globe_spec(spec_tbl);
+                {
+                    let mut guard = reg.lock().map_err(|e| {
+                        mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+                    })?;
+                    guard.create(name.clone(), spec);
+                }
+                Ok(LuaGlobe { reg: reg.clone(), name, state: s.clone() })
+            })?,
+        )?;
+    }
+
+    // -- globe.get(name) --
+    /// Get an existing globe by name, or nil.
+    /// @param name : string
+    /// @return Globe?
+    {
+        let reg = registry.clone();
+        let s = state.clone();
+        tbl.set(
+            "get",
+            lua.create_function(move |_, name: String| {
+                let exists = {
+                    let guard = reg.lock().map_err(|e| {
+                        mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+                    })?;
+                    guard.get(&name).is_some()
+                };
+                if exists {
+                    Ok(Some(LuaGlobe { reg: reg.clone(), name, state: s.clone() }))
+                } else {
+                    Ok(None)
+                }
+            })?,
+        )?;
+    }
+
+    // -- globe.loadFromTOML(name, toml_src, spec?) --
+    /// Load provinces from a TOML string and create a globe.
+    /// @param name : string, toml_src : string, spec : table?
+    /// @return Globe
+    {
+        let reg = registry.clone();
+        let s = state.clone();
+        tbl.set(
+            "loadFromTOML",
+            lua.create_function(move |_, (name, toml_src, spec_tbl): (String, String, Option<LuaTable>)| {
+                let spec = parse_globe_spec(spec_tbl);
+                let provinces = loader::load_from_toml_str(&toml_src)
+                    .map_err(|e| mlua::Error::RuntimeError(e))?;
+                {
+                    let mut guard = reg.lock().map_err(|e| {
+                        mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+                    })?;
+                    let globe = guard.create(name.clone(), spec);
+                    for p in provinces {
+                        let _ = globe.add_province(p);
+                    }
+                }
+                Ok(LuaGlobe { reg: reg.clone(), name, state: s.clone() })
+            })?,
+        )?;
+    }
+
+    // -- globe.greatCircleDistance(lat1, lon1, lat2, lon2) --
+    /// Great-circle distance between two lat/lon points (in unit-sphere radians).
+    /// @param lat1 : number, lon1 : number, lat2 : number, lon2 : number
+    /// @return number
+    tbl.set(
+        "greatCircleDistance",
+        lua.create_function(|_, (la, lo, lb, lo2): (f32, f32, f32, f32)| {
+            Ok(great_circle_distance(la, lo, lb, lo2))
+        })?,
+    )?;
+
+    // -- globe.greatCirclePath(lat1, lon1, lat2, lon2, steps) --
+    /// Great-circle path as a table of {lat, lon} pairs.
+    /// @param lat1, lon1, lat2, lon2 : number, steps : integer
+    /// @return table<{number, number}>
+    tbl.set(
+        "greatCirclePath",
+        lua.create_function(|lua, (la, lo, lb, lo2, n): (f32, f32, f32, f32, u32)| {
+            let pts = great_circle_path(la, lo, lb, lo2, n);
+            let t = lua.create_table()?;
+            for (i, (lat, lon)) in pts.iter().enumerate() {
+                let p = lua.create_table()?;
+                p.set(1, *lat)?;
+                p.set(2, *lon)?;
+                t.set(i + 1, p)?;
+            }
+            Ok(t)
+        })?,
+    )?;
+
+    // -- globe.latLonToUnit(lat, lon) --
+    /// Convert lat/lon (degrees) to a unit-sphere Cartesian vector {x, y, z}.
+    /// @param lat : number, lon : number
+    /// @return {number, number, number}
+    tbl.set(
+        "latLonToUnit",
+        lua.create_function(|lua, (lat, lon): (f32, f32)| {
+            let v = lat_lon_to_unit(lat, lon);
+            let t = lua.create_table()?;
+            t.set(1, v.x)?;
+            t.set(2, v.y)?;
+            t.set(3, v.z)?;
+            Ok(t)
+        })?,
+    )?;
+
+    // -- globe.MAX_PROVINCES --
+    tbl.set("MAX_PROVINCES", MAX_PROVINCES as u32)?;
+
+    // -- globe.LOD_FAR / LOD_MID / LOD_NEAR (convenience constants) --
+    tbl.set("LOD_FAR", "far")?;
+    tbl.set("LOD_MID", "mid")?;
+    tbl.set("LOD_NEAR", "near")?;
+
+    luna.set("globe", tbl)?;
+    Ok(())
+}

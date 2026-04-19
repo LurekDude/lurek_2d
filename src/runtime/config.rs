@@ -227,6 +227,8 @@ pub struct ModulesConfig {
     pub terminal: bool,
     /// Enable lurek.parallax multi-layer scrolling background API.
     pub parallax: bool,
+    /// Enable lurek.globe Geoscape-style province sphere API.
+    pub globe: bool,
 }
 
 impl ModulesConfig {
@@ -353,6 +355,7 @@ impl Default for Config {
                 spine: true,
                 terminal: true,
                 parallax: true,
+                globe: true,
             },
             performance: PerformanceConfig {
                 target_fps: 60,
