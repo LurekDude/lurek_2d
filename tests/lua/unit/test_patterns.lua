@@ -670,4 +670,337 @@ describe("CommandStack undo/redo (RS parity)", function()
         expect_equal(1, cs:getHistorySize())
     end)
 end)
+
+-- ── Patterns Collections (merged from test_patterns_collections.lua) ──
+
+-- @description Covers suite: lurek.patterns collections (Stack, Queue, List, Set).
+describe("lurek.patterns.Stack", function()
+    -- @covers lurek.patterns.newStack
+    -- @covers lurek.patterns.Stack.push
+    -- @covers lurek.patterns.Stack.pop
+    -- @covers lurek.patterns.Stack.peek
+    -- @covers lurek.patterns.Stack.len
+    -- @covers lurek.patterns.Stack.isEmpty
+    -- @description Verifies LIFO push/pop ordering.
+    it("push and pop follow LIFO order", function()
+        local s = lurek.patterns.newStack()
+        s:push("a")
+        s:push("b")
+        s:push("c")
+        expect_equal(3, s:len())
+        expect_equal("c", s:pop())
+        expect_equal("b", s:pop())
+        expect_equal("a", s:pop())
+        expect_equal(true, s:isEmpty())
+    end)
+
+    -- @covers lurek.patterns.Stack.peek
+    -- @description Verifies that peek does not remove the top item.
+    it("peek does not remove the top item", function()
+        local s = lurek.patterns.newStack()
+        s:push(42)
+        expect_equal(42, s:peek())
+        expect_equal(1, s:len())
+    end)
+
+    -- @covers lurek.patterns.Stack.isFull
+    -- @description Verifies that isFull returns true when capacity is reached.
+    it("isFull returns true at capacity", function()
+        local s = lurek.patterns.newStack(3)
+        s:push(1); s:push(2); s:push(3)
+        expect_equal(true, s:isFull())
+    end)
+
+    -- @covers lurek.patterns.Stack.toArray
+    it("toArray returns all items in order", function()
+        local s = lurek.patterns.newStack()
+        s:push("x"); s:push("y")
+        local arr = s:toArray()
+        expect_equal(2, #arr)
+    end)
+
+    -- @covers lurek.patterns.Stack.clear
+    it("clear empties the stack", function()
+        local s = lurek.patterns.newStack()
+        s:push(1); s:push(2)
+        s:clear()
+        expect_equal(0, s:len())
+    end)
+end)
+
+describe("lurek.patterns.Queue", function()
+    -- @covers lurek.patterns.newQueue
+    -- @covers lurek.patterns.Queue.enqueue
+    -- @covers lurek.patterns.Queue.dequeue
+    -- @description Verifies FIFO enqueue/dequeue ordering.
+    it("enqueue and dequeue follow FIFO order", function()
+        local q = lurek.patterns.newQueue()
+        q:enqueue("first")
+        q:enqueue("second")
+        q:enqueue("third")
+        expect_equal("first", q:dequeue())
+        expect_equal("second", q:dequeue())
+    end)
+
+    -- @covers lurek.patterns.Queue.front
+    it("front peeks without removing", function()
+        local q = lurek.patterns.newQueue()
+        q:enqueue("peek_me")
+        expect_equal("peek_me", q:front())
+        expect_equal(1, q:len())
+    end)
+
+    -- @covers lurek.patterns.Queue.isEmpty
+    it("isEmpty returns true on empty queue", function()
+        local q = lurek.patterns.newQueue()
+        expect_equal(true, q:isEmpty())
+        q:enqueue("x")
+        expect_equal(false, q:isEmpty())
+    end)
+end)
+
+describe("lurek.patterns.List", function()
+    -- @covers lurek.patterns.newList
+    -- @covers lurek.patterns.List.add
+    -- @covers lurek.patterns.List.get
+    -- @covers lurek.patterns.List.set
+    -- @covers lurek.patterns.List.remove
+    -- @description Verifies indexed add/get/set/remove operations.
+    it("supports indexed access and removal", function()
+        local l = lurek.patterns.newList()
+        l:add("alpha")
+        l:add("beta")
+        l:add("gamma")
+        expect_equal(3, l:len())
+        expect_equal("beta", l:get(2))
+        l:set(2, "BETA")
+        expect_equal("BETA", l:get(2))
+        l:remove(1)
+        expect_equal(2, l:len())
+    end)
+
+    -- @covers lurek.patterns.List.contains
+    it("contains returns true for present and false for absent values", function()
+        local l = lurek.patterns.newList()
+        l:add("hello")
+        expect_equal(true, l:contains("hello"))
+        expect_equal(false, l:contains("world"))
+    end)
+end)
+
+describe("lurek.patterns.Set", function()
+    -- @covers lurek.patterns.newSet
+    -- @covers lurek.patterns.Set.add
+    -- @covers lurek.patterns.Set.has
+    -- @covers lurek.patterns.Set.remove
+    -- @description Verifies that Set provides string membership.
+    it("add, has, and remove work for string members", function()
+        local s = lurek.patterns.newSet()
+        s:add("fire")
+        s:add("water")
+        expect_equal(true, s:has("fire"))
+        expect_equal(false, s:has("earth"))
+        s:remove("fire")
+        expect_equal(false, s:has("fire"))
+        expect_equal(1, s:len())
+    end)
+
+    -- @covers lurek.patterns.Set.union
+    it("union returns a set containing all elements of both sets", function()
+        local a = lurek.patterns.newSet()
+        local b = lurek.patterns.newSet()
+        a:add("x"); a:add("y")
+        b:add("y"); b:add("z")
+        local u = a:union(b)
+        expect_equal(3, u:len())
+    end)
+
+    -- @covers lurek.patterns.Set.intersection
+    it("intersection returns only shared elements", function()
+        local a = lurek.patterns.newSet()
+        local b = lurek.patterns.newSet()
+        a:add("x"); a:add("y"); a:add("z")
+        b:add("y"); b:add("z"); b:add("w")
+        local i = a:intersection(b)
+        expect_equal(2, i:len())
+    end)
+
+    -- @covers lurek.patterns.Set.toArray
+    it("toArray returns all set members", function()
+        local s = lurek.patterns.newSet()
+        s:add("one"); s:add("two"); s:add("three")
+        local arr = s:toArray()
+        expect_equal(3, #arr)
+    end)
+end)
+
+-- ── Patterns Mediator (merged from test_patterns_mediator.lua) ──
+
+-- @description Covers suite: lurek.patterns Mediator.
+describe("lurek.patterns.Mediator", function()
+    -- @covers lurek.patterns.newMediator
+    -- @covers lurek.patterns.Mediator.on
+    -- @covers lurek.patterns.Mediator.send
+    -- @description Verifies that a registered handler receives sent messages.
+    it("on registers a handler that receives send messages", function()
+        local m = lurek.patterns.newMediator()
+        local received = nil
+        m:on("click", function(data)
+            received = data
+        end)
+        m:send("click", "hello")
+        expect_equal("hello", received)
+    end)
+
+    -- @covers lurek.patterns.Mediator.off
+    -- @description Verifies that off by handler id stops the handler receiving messages.
+    it("off removes handler by id", function()
+        local m = lurek.patterns.newMediator()
+        local count = 0
+        local id = m:on("tick", function() count = count + 1 end)
+        m:send("tick")
+        m:off("tick", id)
+        m:send("tick")
+        expect_equal(1, count)
+    end)
+
+    -- @covers lurek.patterns.Mediator.broadcast
+    -- @description Verifies that broadcast delivers to all subscribed channels that match.
+    it("send only fires handler on its own channel", function()
+        local m = lurek.patterns.newMediator()
+        local hit = 0
+        m:on("channelA", function() hit = hit + 1 end)
+        m:on("channelB", function() hit = hit + 100 end)
+        m:send("channelA", "payload")
+        expect_equal(1, hit)
+    end)
+
+    -- @covers lurek.patterns.Mediator.handlerCount
+    -- @description Verifies that handlerCount reflects registered/removed handlers.
+    it("handlerCount tracks registration and removal", function()
+        local m = lurek.patterns.newMediator()
+        expect_equal(0, m:handlerCount("events"))
+        local id = m:on("events", function() end)
+        expect_equal(1, m:handlerCount("events"))
+        m:off("events", id)
+        expect_equal(0, m:handlerCount("events"))
+    end)
+
+    -- @covers lurek.patterns.Mediator.channels
+    -- @description Verifies that channels returns all channel names.
+    it("channels returns registered channel names", function()
+        local m = lurek.patterns.newMediator()
+        m:on("alpha", function() end)
+        m:on("beta", function() end)
+        local ch = m:channels()
+        expect_equal(2, #ch)
+    end)
+
+    -- @covers lurek.patterns.Mediator.removeChannel
+    -- @description Verifies that removeChannel clears all handlers on that channel.
+    it("removeChannel removes all handlers on a channel", function()
+        local m = lurek.patterns.newMediator()
+        m:on("destroy", function() end)
+        m:on("destroy", function() end)
+        expect_equal(2, m:handlerCount("destroy"))
+        m:removeChannel("destroy")
+        expect_equal(0, m:handlerCount("destroy"))
+    end)
+
+    -- @covers lurek.patterns.Mediator.clear
+    -- @description Verifies that clear removes all channels and handlers.
+    it("clear removes all channels", function()
+        local m = lurek.patterns.newMediator()
+        m:on("a", function() end)
+        m:on("b", function() end)
+        m:clear()
+        local ch = m:channels()
+        expect_equal(0, #ch)
+    end)
+end)
+
+-- ── Patterns Strategy (merged from test_patterns_strategy.lua) ──
+
+-- @description Covers suite: lurek.patterns Strategy.
+describe("lurek.patterns.Strategy", function()
+    -- @covers lurek.patterns.newStrategy
+    -- @covers lurek.patterns.Strategy.register
+    -- @covers lurek.patterns.Strategy.set
+    -- @covers lurek.patterns.Strategy.execute
+    -- @description Verifies that register+set+execute calls the registered function.
+    it("register, set, and execute calls the strategy function", function()
+        local s = lurek.patterns.newStrategy()
+        local called = false
+        s:register("run", function() called = true end)
+        s:set("run")
+        s:execute()
+        expect_equal(true, called)
+    end)
+
+    -- @covers lurek.patterns.Strategy.getCurrent
+    -- @description Verifies that getCurrent returns the active strategy name.
+    it("getCurrent returns the active strategy name", function()
+        local s = lurek.patterns.newStrategy()
+        s:register("patrol", function() end)
+        expect_equal(nil, s:getCurrent())
+        s:set("patrol")
+        expect_equal("patrol", s:getCurrent())
+    end)
+
+    -- @covers lurek.patterns.Strategy.has
+    -- @description Verifies that has returns true for registered strategies and false otherwise.
+    it("has returns true for registered names and false for unknown", function()
+        local s = lurek.patterns.newStrategy()
+        s:register("attack", function() end)
+        expect_equal(true, s:has("attack"))
+        expect_equal(false, s:has("retreat"))
+    end)
+
+    -- @covers lurek.patterns.Strategy.remove
+    -- @description Verifies that remove unregisters a strategy and clears current if it was active.
+    it("remove unregisters a strategy", function()
+        local s = lurek.patterns.newStrategy()
+        s:register("idle", function() end)
+        s:set("idle")
+        local ok = s:remove("idle")
+        expect_equal(true, ok)
+        expect_equal(false, s:has("idle"))
+        expect_equal(nil, s:getCurrent())
+    end)
+
+    -- @covers lurek.patterns.Strategy.names
+    -- @description Verifies that names returns all registered strategy names.
+    it("names returns all registered names", function()
+        local s = lurek.patterns.newStrategy()
+        s:register("walk", function() end)
+        s:register("sprint", function() end)
+        s:register("crouch", function() end)
+        local names = s:names()
+        expect_equal(3, #names)
+    end)
+
+    -- @covers lurek.patterns.Strategy.execute
+    -- @description Verifies that execute passes arguments to the strategy function.
+    it("execute passes arguments to the strategy function", function()
+        local s = lurek.patterns.newStrategy()
+        local got_dt = nil
+        s:register("move", function(dt) got_dt = dt end)
+        s:set("move")
+        s:execute(0.016)
+        expect_near(0.016, got_dt, 1e-6)
+    end)
+
+    -- @covers lurek.patterns.Strategy.clear
+    -- @description Verifies that clear removes all strategies and resets current.
+    it("clear removes all strategies", function()
+        local s = lurek.patterns.newStrategy()
+        s:register("a", function() end)
+        s:register("b", function() end)
+        s:set("a")
+        s:clear()
+        expect_equal(0, #s:names())
+        expect_equal(nil, s:getCurrent())
+    end)
+end)
+
 test_summary()

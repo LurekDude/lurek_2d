@@ -166,14 +166,14 @@ acyclic (Zen Rule 6).
 
 ### Group Responsibilities
 
-| Group | Responsibility | May Import | Must NOT Import |
-|---|---|---|---|
-| **Foundations** | Pure algorithms, data structures, math, serialisation | Nothing (leaf modules) | render, audio, input, physics, Lua, any higher group |
-| **Core Runtime** | Engine lifecycle, resource registry, I/O, timing, events, concurrency | Foundations | Platform Services, Feature Systems, Edge |
-| **Platform Services** | OS-facing backends behind pure-Rust contracts (GPU, audio, physics, input, windowing) | Foundations, Core Runtime | Feature Systems, Edge |
-| **Feature Systems** | Game-domain services: sprites, scenes, particles, UI, AI, tilemaps | Foundations, Core Runtime, Platform Services | Edge/Integration |
-| **Edge/Integration** | Composition root (`app`), scripting bridge (`lua_api`), devtools | Everything below | (nothing — these are top of the DAG) |
-| **Lunasome** | Pure-Lua gameplay libraries | Public `lurek.*` API only | Rust engine internals |
+| Group                 | Responsibility                                                                        | May Import                                   | Must NOT Import                                      |
+| --------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| **Foundations**       | Pure algorithms, data structures, math, serialisation                                 | Nothing (leaf modules)                       | render, audio, input, physics, Lua, any higher group |
+| **Core Runtime**      | Engine lifecycle, resource registry, I/O, timing, events, concurrency                 | Foundations                                  | Platform Services, Feature Systems, Edge             |
+| **Platform Services** | OS-facing backends behind pure-Rust contracts (GPU, audio, physics, input, windowing) | Foundations, Core Runtime                    | Feature Systems, Edge                                |
+| **Feature Systems**   | Game-domain services: sprites, scenes, particles, UI, AI, tilemaps                    | Foundations, Core Runtime, Platform Services | Edge/Integration                                     |
+| **Edge/Integration**  | Composition root (`app`), scripting bridge (`lua_api`), devtools                      | Everything below                             | (nothing — these are top of the DAG)                 |
+| **Lunasome**          | Pure-Lua gameplay libraries                                                           | Public `lurek.*` API only                    | Rust engine internals                                |
 
 ---
 
@@ -196,78 +196,78 @@ and key types. Modules are listed alphabetically within each group.
 
 ### Foundations
 
-| Module | Responsibility | Key Types |
-|---|---|---|
-| `math` | Vectors, matrices, rects, color, interpolation, easing, RNG | `Vec2`, `Vec3`, `Vec4`, `Mat3`, `Mat4`, `Rect`, `Color`, `Transform2D` |
-| `log` | Logging facade (`log` crate), RUST_LOG filtering | Log macros re-export |
-| `data` | Generic data containers, bin-packing, data views | `DataView`, `BinPack` |
-| `serial` | Serialisation: TOML, JSON, CSV, YAML (read-only) | `toml::from_str`, `json::parse` |
-| `compute` | GPU-free numerical computation, data processing | Compute pipelines |
-| `dataframe` | Tabular data, SQL-like queries, column operations | `DataFrame`, `Column` |
-| `graph` | Graph data structures, traversal algorithms | `Graph`, `Node`, `Edge` |
-| `procgen` | Procedural generation: noise, Voronoi, L-systems | `Noise`, `Voronoi` |
-| `patterns` | Design patterns: state machines, observer, command | `StateMachine`, `Observer` |
+| Module      | Responsibility                                              | Key Types                                                              |
+| ----------- | ----------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `math`      | Vectors, matrices, rects, color, interpolation, easing, RNG | `Vec2`, `Vec3`, `Vec4`, `Mat3`, `Mat4`, `Rect`, `Color`, `Transform2D` |
+| `log`       | Logging facade (`log` crate), RUST_LOG filtering            | Log macros re-export                                                   |
+| `data`      | Generic data containers, bin-packing, data views            | `DataView`, `BinPack`                                                  |
+| `serial`    | Serialisation: TOML, JSON, CSV, YAML (read-only)            | `toml::from_str`, `json::parse`                                        |
+| `compute`   | GPU-free numerical computation, data processing             | Compute pipelines                                                      |
+| `dataframe` | Tabular data, SQL-like queries, column operations           | `DataFrame`, `Column`                                                  |
+| `graph`     | Graph data structures, traversal algorithms                 | `Graph`, `Node`, `Edge`                                                |
+| `procgen`   | Procedural generation: noise, Voronoi, L-systems            | `Noise`, `Voronoi`                                                     |
+| `patterns`  | Design patterns: state machines, observer, command          | `StateMachine`, `Observer`                                             |
 
 ### Core Runtime
 
-| Module | Responsibility | Key Types |
-|---|---|---|
-| `runtime` | Engine lifecycle, shared state, config, resource keys, error types | `SharedState`, `Config`, `EngineError`, resource key types |
-| `event` | Event bus, typed event dispatch | `EventBus`, `EventId` |
-| `timer` | Frame timing, delta time, fixed timestep, timers | `Timer`, `TimerHandle` |
-| `thread` | Thread pool, worker VMs, Channel for inter-VM comms | `ThreadPool`, `Channel` |
-| `network` | HTTP client, WebSocket, networking utilities | `HttpRequest`, `HttpResponse` |
-| `filesystem` | GameFS sandbox, virtual filesystem, path traversal guards | `GameFS`, `VirtualPath` |
+| Module       | Responsibility                                                     | Key Types                                                  |
+| ------------ | ------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `runtime`    | Engine lifecycle, shared state, config, resource keys, error types | `SharedState`, `Config`, `EngineError`, resource key types |
+| `event`      | Event bus, typed event dispatch                                    | `EventBus`, `EventId`                                      |
+| `timer`      | Frame timing, delta time, fixed timestep, timers                   | `Timer`, `TimerHandle`                                     |
+| `thread`     | Thread pool, worker VMs, Channel for inter-VM comms                | `ThreadPool`, `Channel`                                    |
+| `network`    | HTTP client, WebSocket, networking utilities                       | `HttpRequest`, `HttpResponse`                              |
+| `filesystem` | GameFS sandbox, virtual filesystem, path traversal guards          | `GameFS`, `VirtualPath`                                    |
 
 ### Platform Services
 
-| Module | Responsibility | Key Types |
-|---|---|---|
-| `render` | GPU rendering: wgpu pipelines, render passes, RenderCommand contract | `GpuRenderer`, `RenderCommand`, `DrawMode`, `BlendMode`, `Mesh`, `Font`, `Canvas`, `Shader` |
-| `audio` | Audio playback: rodio integration, mixer, sources, volume/pitch/pan | `AudioMixer`, `AudioSource`, `AudioBus` |
-| `physics` | Physics simulation: rapier2d, rigid bodies, colliders, raycasts | `PhysicsWorld`, `RigidBody`, `Collider` |
-| `input` | Keyboard, mouse, gamepad input state and events | `InputState`, `Key`, `MouseButton` |
-| `image` | CPU image loading/decoding, pixel operations, texture data, atlas packing | `ImageData`, `Texture`, `TextureAtlas` |
-| `window` | Window management: winit integration, fullscreen, cursor | `WindowConfig`, `WindowHandle` |
-| `camera` | Viewport transforms, scale modes, coordinate mapping | `Camera2D`, `ScaleMode` |
-| `light` | 2D lighting data: light descriptors, occluder polygons | `Light2D`, `Occluder`, `ShadowFilter` |
-| `effect` | Post-processing effect descriptors, overlay systems | `PostFxEffect`, `PostFxEffectType`, `ShaderPassDescriptor` |
+| Module    | Responsibility                                                            | Key Types                                                                                   |
+| --------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `render`  | GPU rendering: wgpu pipelines, render passes, RenderCommand contract      | `GpuRenderer`, `RenderCommand`, `DrawMode`, `BlendMode`, `Mesh`, `Font`, `Canvas`, `Shader` |
+| `audio`   | Audio playback: rodio integration, mixer, sources, volume/pitch/pan       | `AudioMixer`, `AudioSource`, `AudioBus`                                                     |
+| `physics` | Physics simulation: rapier2d, rigid bodies, colliders, raycasts           | `PhysicsWorld`, `RigidBody`, `Collider`                                                     |
+| `input`   | Keyboard, mouse, gamepad input state and events                           | `InputState`, `Key`, `MouseButton`                                                          |
+| `image`   | CPU image loading/decoding, pixel operations, texture data, atlas packing | `ImageData`, `Texture`, `TextureAtlas`                                                      |
+| `window`  | Window management: winit integration, fullscreen, cursor                  | `WindowConfig`, `WindowHandle`                                                              |
+| `camera`  | Viewport transforms, scale modes, coordinate mapping                      | `Camera2D`, `ScaleMode`                                                                     |
+| `light`   | 2D lighting data: light descriptors, occluder polygons                    | `Light2D`, `Occluder`, `ShadowFilter`                                                       |
+| `effect`  | Post-processing effect descriptors, overlay systems                       | `PostFxEffect`, `PostFxEffectType`, `ShaderPassDescriptor`                                  |
 
 ### Feature Systems
 
-| Module | Responsibility | Key Types |
-|---|---|---|
-| `ecs` | Entity-component-system: entities with components, queries | `Entity`, `Component`, `System` |
-| `scene` | Scene stack: push/pop/switch scene management | `Scene`, `SceneManager`, `Transition` |
-| `animation` | Sprite animation: frame sequences, playback control | `Animation`, `AnimationPlayer` |
-| `tween` | Value interpolation: tweens, easing, sequencing | `Tween`, `Easing`, `TweenSequence` |
-| `particle` | Particle systems: emitters, instances, render command generation | `ParticleSystem`, `ParticleInstance`, `ParticleShape` |
-| `tilemap` | Tile-based maps: tile layers, tile sets, collision | `TileMap`, `TileLayer`, `TileSet` |
-| `parallax` | Parallax scrolling: multi-layer backgrounds | `ParallaxLayer` |
-| `minimap` | Minimap rendering: terrain, fog-of-war, markers | `Minimap`, `MinimapObject` |
-| `raycaster` | 2.5D raycasting: DDA traversal, textured-quad scene generation for first-person tile worlds | `Raycaster2D`, `RayHit`, `RaycasterScene`, `WallQuad`, `FloorQuad`, `CeilingQuad`, `BillboardSprite` |
-| `ui` | GUI widgets: buttons, panels, text, layout | `Widget`, `GuiContext`, `WidgetBase` |
-| `terminal` | In-game terminal: command history, text rendering | `Terminal`, `TerminalState` |
-| `ai` | Game AI: FSM, behaviour trees, steering, blackboard | `FSM`, `BehaviourTree`, `Blackboard` |
-| `pathfind` | Pathfinding: A*, graph search, HPA | `AStar`, `PathResult` |
-| `save` | Save/load game state: serialisation, slots | `SaveManager`, `SaveSlot` |
-| `mods` | Mod loading: mod manifests, sandboxed execution | `ModManager`, `Mod` |
-| `i18n` | Internationalisation: string tables, locale switching | `I18n`, `Locale` |
-| `automation` | Test automation: simulated input, scripted sequences | `Simulator`, `AutoAction` |
-| `sprite` | CPU sprite data: sprite sheets, batches, nine-slice (planned — see render-command-architecture.md §13) | `Sprite`, `SpriteSheet`, `SpriteBatch`, `NineSlice` |
-| `spine` | Spine animation runtime integration | `SpineInstance` |
+| Module       | Responsibility                                                                                         | Key Types                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `ecs`        | Entity-component-system: entities with components, queries                                             | `Entity`, `Component`, `System`                                                                      |
+| `scene`      | Scene stack: push/pop/switch scene management                                                          | `Scene`, `SceneManager`, `Transition`                                                                |
+| `animation`  | Sprite animation: frame sequences, playback control                                                    | `Animation`, `AnimationPlayer`                                                                       |
+| `tween`      | Value interpolation: tweens, easing, sequencing                                                        | `Tween`, `Easing`, `TweenSequence`                                                                   |
+| `particle`   | Particle systems: emitters, instances, render command generation                                       | `ParticleSystem`, `ParticleInstance`, `ParticleShape`                                                |
+| `tilemap`    | Tile-based maps: tile layers, tile sets, collision                                                     | `TileMap`, `TileLayer`, `TileSet`                                                                    |
+| `parallax`   | Parallax scrolling: multi-layer backgrounds                                                            | `ParallaxLayer`                                                                                      |
+| `minimap`    | Minimap rendering: terrain, fog-of-war, markers                                                        | `Minimap`, `MinimapObject`                                                                           |
+| `raycaster`  | 2.5D raycasting: DDA traversal, textured-quad scene generation for first-person tile worlds            | `Raycaster2D`, `RayHit`, `RaycasterScene`, `WallQuad`, `FloorQuad`, `CeilingQuad`, `BillboardSprite` |
+| `ui`         | GUI widgets: buttons, panels, text, layout                                                             | `Widget`, `GuiContext`, `WidgetBase`                                                                 |
+| `terminal`   | In-game terminal: command history, text rendering                                                      | `Terminal`, `TerminalState`                                                                          |
+| `ai`         | Game AI: FSM, behaviour trees, steering, blackboard                                                    | `FSM`, `BehaviourTree`, `Blackboard`                                                                 |
+| `pathfind`   | Pathfinding: A*, graph search, HPA                                                                     | `AStar`, `PathResult`                                                                                |
+| `save`       | Save/load game state: serialisation, slots                                                             | `SaveManager`, `SaveSlot`                                                                            |
+| `mods`       | Mod loading: mod manifests, sandboxed execution                                                        | `ModManager`, `Mod`                                                                                  |
+| `i18n`       | Internationalisation: string tables, locale switching                                                  | `I18n`, `Locale`                                                                                     |
+| `automation` | Test automation: simulated input, scripted sequences                                                   | `Simulator`, `AutoAction`                                                                            |
+| `sprite`     | CPU sprite data: sprite sheets, batches, nine-slice (planned — see render-command-architecture.md §13) | `Sprite`, `SpriteSheet`, `SpriteBatch`, `NineSlice`                                                  |
+| `spine`      | Spine animation runtime integration                                                                    | `SpineInstance`                                                                                      |
 
 ### Edge / Integration
 
-| Module | Responsibility | Key Types |
-|---|---|---|
-| `app` | Composition root: boot, winit event loop, frame orchestration | `App`, `AppBuilder` |
-| `lua_api` | Scripting bridge: registers all `lurek.*` Lua APIs | `register()` per sub-module |
-| `devtools` | Developer overlay: FPS counter, debug draw, inspector | `DevTools` |
-| `debugbridge` | Remote debug server: TCP/WebSocket debug protocol | `DebugBridge`, `DebugServer` |
-| `docs` | Documentation generation support | `DocEntry`, `DocReport` |
-| `pipeline` | Asset pipeline utilities | Pipeline stages |
-| `bin` | Binary entry points, CLI arg parsing | `main()` |
+| Module        | Responsibility                                                | Key Types                    |
+| ------------- | ------------------------------------------------------------- | ---------------------------- |
+| `app`         | Composition root: boot, winit event loop, frame orchestration | `App`, `AppBuilder`          |
+| `lua_api`     | Scripting bridge: registers all `lurek.*` Lua APIs            | `register()` per sub-module  |
+| `devtools`    | Developer overlay: FPS counter, debug draw, inspector         | `DevTools`                   |
+| `debugbridge` | Remote debug server: TCP/WebSocket debug protocol             | `DebugBridge`, `DebugServer` |
+| `docs`        | Documentation generation support                              | `DocEntry`, `DocReport`      |
+| `pipeline`    | Asset pipeline utilities                                      | Pipeline stages              |
+| `bin`         | Binary entry points, CLI arg parsing                          | `main()`                     |
 
 ### Lunasome (content/library/)
 
@@ -291,10 +291,10 @@ render-command-architecture.md links here for render-module specifics.
 
 Every module MUST have:
 
-| File | Purpose | Rule |
-|---|---|---|
-| `mod.rs` | Module declaration + re-exports | **THIN** — only `pub mod`, `pub use`, and `//!` module-level doc comment. No functions, no struct definitions, no logic. Target: ≤30 lines. |
-| `AGENT.md` *(retired — see note below)* | Historical AI agent overview | Retired; per-module context lives in [docs/specs/<module>.md](../specs/). |
+| File                                    | Purpose                         | Rule                                                                                                                                        |
+| --------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mod.rs`                                | Module declaration + re-exports | **THIN** — only `pub mod`, `pub use`, and `//!` module-level doc comment. No functions, no struct definitions, no logic. Target: ≤30 lines. |
+| `AGENT.md` *(retired — see note below)* | Historical AI agent overview    | Retired; per-module context lives in [docs/specs/<module>.md](../specs/).                                                                   |
 
 > **Note:** `AGENT.md` files under `src/<module>/` are retired. Module
 > context now lives in [docs/specs/<module>.md](../specs/). The validator
@@ -306,12 +306,12 @@ Every module MUST have:
 Use these names when needed. The file name is **standardised** — do not
 invent alternatives (`helpers.rs`, `utils.rs`, `misc.rs` are banned).
 
-| File | Purpose | When to Use |
-|---|---|---|
-| `<primary>.rs` | Main logic — algorithms, state, methods | Always, unless `mod.rs` alone is sufficient (leaf modules with one type). Named after the module's primary concept (e.g. `emitter.rs`, `dda.rs`, `widget.rs`). |
-| `types.rs` | Public data types (structs, enums, traits) | When the module exports 5+ public types. Fewer → define in `<primary>.rs`. |
-| `draw.rs` | `draw_to_image()` debug/test CPU pixel utilities | Only for modules that need CPU-side pixel rendering for testing or evidence. May import `crate::image::ImageData`. NOT the production render path. |
-| `builder.rs` | Builder pattern for complex construction | When a primary type has 5+ fields with defaults. |
+| File           | Purpose                                          | When to Use                                                                                                                                                    |
+| -------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<primary>.rs` | Main logic — algorithms, state, methods          | Always, unless `mod.rs` alone is sufficient (leaf modules with one type). Named after the module's primary concept (e.g. `emitter.rs`, `dda.rs`, `widget.rs`). |
+| `types.rs`     | Public data types (structs, enums, traits)       | When the module exports 5+ public types. Fewer → define in `<primary>.rs`.                                                                                     |
+| `draw.rs`      | `draw_to_image()` debug/test CPU pixel utilities | Only for modules that need CPU-side pixel rendering for testing or evidence. May import `crate::image::ImageData`. NOT the production render path.             |
+| `builder.rs`   | Builder pattern for complex construction         | When a primary type has 5+ fields with defaults.                                                                                                               |
 
 ### Key Rules
 
@@ -352,14 +352,14 @@ pub struct ParticleConfig {
 
 ### Anti-Patterns
 
-| Problem | Fix |
-|---|---|
-| Fat `mod.rs` (functions, structs, >30 lines) | Move to `<primary>.rs`, keep `mod.rs` as re-export. |
-| Business logic in `lua_api` (>10 lines per method) | Extract to domain module, call from `lua_api`. |
-| `impl LuaUserData` in `src/<module>/` | Move to `src/lua_api/<module>_api.rs`. |
-| Missing docstrings | Add `///` — violation of Q-05. |
-| `use wgpu::*` in non-render module | Domain modules are GPU-free (Zen Rules 3, 9). |
-| Invented file names (`helpers.rs`, `utils.rs`) | Use standard names: `types.rs`, `draw.rs`, `builder.rs`. |
+| Problem                                            | Fix                                                      |
+| -------------------------------------------------- | -------------------------------------------------------- |
+| Fat `mod.rs` (functions, structs, >30 lines)       | Move to `<primary>.rs`, keep `mod.rs` as re-export.      |
+| Business logic in `lua_api` (>10 lines per method) | Extract to domain module, call from `lua_api`.           |
+| `impl LuaUserData` in `src/<module>/`              | Move to `src/lua_api/<module>_api.rs`.                   |
+| Missing docstrings                                 | Add `///` — violation of Q-05.                           |
+| `use wgpu::*` in non-render module                 | Domain modules are GPU-free (Zen Rules 3, 9).            |
+| Invented file names (`helpers.rs`, `utils.rs`)     | Use standard names: `types.rs`, `draw.rs`, `builder.rs`. |
 
 ---
 
@@ -470,25 +470,25 @@ Every frame follows a fixed callback sequence. All callbacks are **optional**
 Every callback is **optional**. The engine checks whether the Lua global
 function exists before calling it. An empty `main.lua` is valid.
 
-| Callback | Signature | When Called | Purpose |
-|---|---|---|---|
-| `lurek.init` | `(config)` | Once, after VM creation | Game initialisation: load assets, set up state |
-| `lurek.ready` | `()` | Once, after init | First-frame resources are ready |
-| `lurek.process` | `(dt)` | Every frame | Game logic, animation, AI |
-| `lurek.process_physics` | `(dt)` | Fixed timestep (may fire 0..N per frame) | Physics stepping, collision response |
-| `lurek.process_late` | `(dt)` | Every frame, after physics | Camera follow, constraint resolution |
-| `lurek.render` | `()` | Every frame | Push RenderCommands for world layer |
-| `lurek.render_ui` | `()` | Every frame | Push RenderCommands for UI layer |
-| `lurek.keypressed` | `(key, scancode, isrepeat)` | On key down | Keyboard input |
-| `lurek.keyreleased` | `(key, scancode)` | On key up | Keyboard release |
-| `lurek.mousepressed` | `(x, y, button)` | On mouse button down | Mouse click |
-| `lurek.mousereleased` | `(x, y, button)` | On mouse button up | Mouse release |
-| `lurek.mousemoved` | `(x, y, dx, dy)` | On mouse movement | Mouse tracking |
-| `lurek.wheelmoved` | `(dx, dy)` | On scroll wheel | Scroll input |
-| `lurek.textinput` | `(text)` | On text entry | Text input (IME-aware) |
-| `lurek.resize` | `(w, h)` | On window resize | Layout recalculation |
-| `lurek.focus` | `(focused)` | On focus change | Pause/resume |
-| `lurek.quit` | `() → bool` | On close request | Return `true` to cancel quit |
+| Callback                | Signature                   | When Called                              | Purpose                                        |
+| ----------------------- | --------------------------- | ---------------------------------------- | ---------------------------------------------- |
+| `lurek.init`            | `(config)`                  | Once, after VM creation                  | Game initialisation: load assets, set up state |
+| `lurek.ready`           | `()`                        | Once, after init                         | First-frame resources are ready                |
+| `lurek.process`         | `(dt)`                      | Every frame                              | Game logic, animation, AI                      |
+| `lurek.process_physics` | `(dt)`                      | Fixed timestep (may fire 0..N per frame) | Physics stepping, collision response           |
+| `lurek.process_late`    | `(dt)`                      | Every frame, after physics               | Camera follow, constraint resolution           |
+| `lurek.render`          | `()`                        | Every frame                              | Push RenderCommands for world layer            |
+| `lurek.render_ui`       | `()`                        | Every frame                              | Push RenderCommands for UI layer               |
+| `lurek.keypressed`      | `(key, scancode, isrepeat)` | On key down                              | Keyboard input                                 |
+| `lurek.keyreleased`     | `(key, scancode)`           | On key up                                | Keyboard release                               |
+| `lurek.mousepressed`    | `(x, y, button)`            | On mouse button down                     | Mouse click                                    |
+| `lurek.mousereleased`   | `(x, y, button)`            | On mouse button up                       | Mouse release                                  |
+| `lurek.mousemoved`      | `(x, y, dx, dy)`            | On mouse movement                        | Mouse tracking                                 |
+| `lurek.wheelmoved`      | `(dx, dy)`                  | On scroll wheel                          | Scroll input                                   |
+| `lurek.textinput`       | `(text)`                    | On text entry                            | Text input (IME-aware)                         |
+| `lurek.resize`          | `(w, h)`                    | On window resize                         | Layout recalculation                           |
+| `lurek.focus`           | `(focused)`                 | On focus change                          | Pause/resume                                   |
+| `lurek.quit`            | `() → bool`                 | On close request                         | Return `true` to cancel quit                   |
 
 ### Callback Ordering Within a Frame
 
@@ -578,15 +578,15 @@ batches, particle systems) are stored in typed `SlotMap` pools inside
 
 Defined in `src/runtime/resource_keys.rs`:
 
-| Key Type | Resource | Stored In |
-|---|---|---|
-| `TextureKey` | GPU texture handle + CPU metadata | `SharedState::textures` |
-| `FontKey` | Font atlas + glyph metrics | `SharedState::fonts` |
-| `MeshKey` | Vertex + index buffers | `SharedState::meshes` |
-| `CanvasKey` | Off-screen render target | `SharedState::canvases` |
-| `ShaderKey` | Custom WGSL shader | `SharedState::shaders` |
-| `SpriteBatchKey` | Batched sprite collection | `SharedState::sprite_batches` |
-| `ParticleKey` | Particle emitter system | `SharedState::particles` |
+| Key Type         | Resource                          | Stored In                     |
+| ---------------- | --------------------------------- | ----------------------------- |
+| `TextureKey`     | GPU texture handle + CPU metadata | `SharedState::textures`       |
+| `FontKey`        | Font atlas + glyph metrics        | `SharedState::fonts`          |
+| `MeshKey`        | Vertex + index buffers            | `SharedState::meshes`         |
+| `CanvasKey`      | Off-screen render target          | `SharedState::canvases`       |
+| `ShaderKey`      | Custom WGSL shader                | `SharedState::shaders`        |
+| `SpriteBatchKey` | Batched sprite collection         | `SharedState::sprite_batches` |
+| `ParticleKey`    | Particle emitter system           | `SharedState::particles`      |
 
 ### Lifecycle
 
@@ -664,10 +664,10 @@ extraction of CPU-only types from `src/render/`:
 
 ### File Organisation
 
-| Location | Contains | Must NOT Contain |
-|---|---|---|
-| `src/<module>/` | Pure Rust: algorithms, data types, state | `mlua` imports, `impl LuaUserData`, Lua types |
-| `src/lua_api/<module>_api.rs` | `pub fn register()`, Lua wrapper structs, `impl LuaUserData`, `add_method` calls | Business logic (>10 lines), algorithms |
+| Location                      | Contains                                                                         | Must NOT Contain                              |
+| ----------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------- |
+| `src/<module>/`               | Pure Rust: algorithms, data types, state                                         | `mlua` imports, `impl LuaUserData`, Lua types |
+| `src/lua_api/<module>_api.rs` | `pub fn register()`, Lua wrapper structs, `impl LuaUserData`, `add_method` calls | Business logic (>10 lines), algorithms        |
 
 ### Thin Wrapper Pattern
 
@@ -876,12 +876,12 @@ App::new(config)
 
 ### Scale Modes (Camera)
 
-| Mode | Behaviour |
-|---|---|
-| `stretch` | Fill window, ignore aspect ratio |
-| `letterbox` | Fit to window, black bars to preserve aspect ratio |
-| `pixel_perfect` | Integer scaling only, centred |
-| `expand` | Design resolution fills, extra space visible |
+| Mode            | Behaviour                                          |
+| --------------- | -------------------------------------------------- |
+| `stretch`       | Fill window, ignore aspect ratio                   |
+| `letterbox`     | Fit to window, black bars to preserve aspect ratio |
+| `pixel_perfect` | Integer scaling only, centred                      |
+| `expand`        | Design resolution fills, extra space visible       |
 
 Scale mode is set via `conf.toml` (or legacy `conf.lua`) or `lurek.camera.setScaleMode()`.
 
@@ -968,13 +968,13 @@ pub enum EngineError {
 These are **binding constraints** from [philosophy.md](philosophy.md) §
 Quality Gate Constraints:
 
-| ID | Gate | Command |
-|---|---|---|
-| **Q-01** | All tests pass | `cargo test` |
-| **Q-02** | No clippy warnings | `cargo clippy -- -D warnings` |
-| **Q-03** | New public Rust API → integration test | Manual review |
-| **Q-04** | New `lurek.*` function → Lua BDD test | Manual review |
-| **Q-05** | No undocumented public items | `python tools/docs/collect_docs.py --report-missing` |
+| ID       | Gate                                   | Command                                              |
+| -------- | -------------------------------------- | ---------------------------------------------------- |
+| **Q-01** | All tests pass                         | `cargo test`                                         |
+| **Q-02** | No clippy warnings                     | `cargo clippy -- -D warnings`                        |
+| **Q-03** | New public Rust API → integration test | Manual review                                        |
+| **Q-04** | New `lurek.*` function → Lua BDD test  | Manual review                                        |
+| **Q-05** | No undocumented public items           | `python tools/docs/collect_docs.py --report-missing` |
 
 ### Full Quality Gate Command
 
@@ -988,23 +988,23 @@ This must pass before every merge.
 
 ## Technology Stack
 
-| Component | Crate | Version | Purpose |
-|---|---|---|---|
-| Language | Rust | stable ≥1.78 | Engine implementation |
-| Scripting | mlua | 0.9 | LuaJIT binding (primary), Lua 5.4 fallback |
-| Rendering | wgpu | 22 | GPU abstraction (Vulkan/DX12/Metal) |
-| Windowing | winit | 0.30 | Window creation and event loop |
-| Physics | rapier2d | 0.32 | 2D rigid body simulation |
-| Audio | rodio | 0.17 | Audio playback and mixing |
-| Font rendering | fontdue | 0.9 | Font rasterisation |
-| Image loading | image | latest | PNG/JPEG/GIF decode |
+| Component      | Crate    | Version      | Purpose                                    |
+| -------------- | -------- | ------------ | ------------------------------------------ |
+| Language       | Rust     | stable ≥1.78 | Engine implementation                      |
+| Scripting      | mlua     | 0.9          | LuaJIT binding (primary), Lua 5.4 fallback |
+| Rendering      | wgpu     | 22           | GPU abstraction (Vulkan/DX12/Metal)        |
+| Windowing      | winit    | 0.30         | Window creation and event loop             |
+| Physics        | rapier2d | 0.32         | 2D rigid body simulation                   |
+| Audio          | rodio    | 0.17         | Audio playback and mixing                  |
+| Font rendering | fontdue  | 0.9          | Font rasterisation                         |
+| Image loading  | image    | latest       | PNG/JPEG/GIF decode                        |
 
 ### Cargo Feature Flags
 
-| Flag | Effect |
-|---|---|
-| `lua-jit` (default) | Link LuaJIT via mlua — primary runtime |
-| `lua54` | Link Lua 5.4 via mlua — non-shipping dev fallback |
+| Flag                | Effect                                            |
+| ------------------- | ------------------------------------------------- |
+| `lua-jit` (default) | Link LuaJIT via mlua — primary runtime            |
+| `lua54`             | Link Lua 5.4 via mlua — non-shipping dev fallback |
 
 ---
 
@@ -1052,12 +1052,12 @@ lurek2d/
 
 Future Cargo feature flag work to enable modular builds:
 
-| Variant | Contents |
-|---|---|
-| **baseline** | Foundations + Core Runtime + Edge/Integration (lua_api, app) |
-| **core** | baseline + Platform Services (render, audio, physics, input, image, window) |
-| **extended** | core + Feature Systems (all game-domain modules) |
-| **lunasome** | extended + shipped `content/library/` Lua libraries |
+| Variant      | Contents                                                                    |
+| ------------ | --------------------------------------------------------------------------- |
+| **baseline** | Foundations + Core Runtime + Edge/Integration (lua_api, app)                |
+| **core**     | baseline + Platform Services (render, audio, physics, input, image, window) |
+| **extended** | core + Feature Systems (all game-domain modules)                            |
+| **lunasome** | extended + shipped `content/library/` Lua libraries                         |
 
 Purpose: Users who only need rendering and input can build `core`.
 Users who want the full engine experience use `extended` or `lunasome`.

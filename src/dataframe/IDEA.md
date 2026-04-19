@@ -1,11 +1,11 @@
 # IDEA — dataframe
 
-| Field   | Value                          |
-|---------|--------------------------------|
-| Module  | `dataframe`                    |
-| Path    | `src/dataframe/`               |
-| Date    | 2026-04-18                     |
-| Tier    | Foundations                     |
+| Field  | Value            |
+| ------ | ---------------- |
+| Module | `dataframe`      |
+| Path   | `src/dataframe/` |
+| Date   | 2026-04-18       |
+| Tier   | Foundations      |
 
 ## Mission
 
@@ -25,11 +25,11 @@ Provide a zero-dependency, in-memory column-major tabular data engine for Lurek2
 
 ## Features — Competitor Comparison
 
-| Feature                     | Lurek2D (dataframe)        | LÖVE2D                      | Godot 4                    |
-|-----------------------------|----------------------------|-----------------------------|----------------------------|
-| In-memory SQL queries       | ✅ Hand-rolled SQL subset  | ❌ No built-in tabular API  | ❌ Requires SQLite plugin  |
-| CSV/JSON serialization      | ✅ RFC 4180 + JSON AoO     | ❌ Manual or lib            | ❌ Manual or plugin        |
-| Pivot / rolling aggregates  | ✅ pivot_table, rolling_*  | ❌ N/A                      | ❌ N/A                     |
+| Feature                    | Lurek2D (dataframe)      | LÖVE2D                    | Godot 4                  |
+| -------------------------- | ------------------------ | ------------------------- | ------------------------ |
+| In-memory SQL queries      | ✅ Hand-rolled SQL subset | ❌ No built-in tabular API | ❌ Requires SQLite plugin |
+| CSV/JSON serialization     | ✅ RFC 4180 + JSON AoO    | ❌ Manual or lib           | ❌ Manual or plugin       |
+| Pivot / rolling aggregates | ✅ pivot_table, rolling_* | ❌ N/A                     | ❌ N/A                    |
 
 ## Performance / Quality
 

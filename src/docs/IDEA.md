@@ -1,11 +1,11 @@
 # IDEA — docs
 
-| Field   | Value                          |
-|---------|--------------------------------|
-| Module  | `docs`                         |
-| Path    | `src/docs/`                    |
-| Date    | 2026-04-18                     |
-| Tier    | Edge/Integration               |
+| Field  | Value            |
+| ------ | ---------------- |
+| Module | `docs`           |
+| Path   | `src/docs/`      |
+| Date   | 2026-04-18       |
+| Tier   | Edge/Integration |
 
 ## Mission
 
@@ -25,11 +25,11 @@ Provide Lurek2D's in-engine API documentation catalog and runtime data-validatio
 
 ## Features — Competitor Comparison
 
-| Feature                        | Lurek2D (docs)                | LÖVE2D                        | Godot 4                       |
-|--------------------------------|-------------------------------|-------------------------------|-------------------------------|
-| In-engine API catalog          | ✅ Structured DocEntry + search| ❌ External wiki only         | ✅ ClassDB, but not queryable from script |
-| Schema validation for configs  | ✅ FieldRule with enum/bounds  | ❌ No built-in schema         | ❌ Manual GDScript validation |
-| IDE export (completions/hover) | ✅ JSON export for VS Code     | ❌ Community extensions       | ✅ Built-in LSP              |
+| Feature                        | Lurek2D (docs)                 | LÖVE2D                 | Godot 4                                  |
+| ------------------------------ | ------------------------------ | ---------------------- | ---------------------------------------- |
+| In-engine API catalog          | ✅ Structured DocEntry + search | ❌ External wiki only   | ✅ ClassDB, but not queryable from script |
+| Schema validation for configs  | ✅ FieldRule with enum/bounds   | ❌ No built-in schema   | ❌ Manual GDScript validation             |
+| IDE export (completions/hover) | ✅ JSON export for VS Code      | ❌ Community extensions | ✅ Built-in LSP                           |
 
 ## Performance / Quality
 

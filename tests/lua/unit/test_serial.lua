@@ -254,4 +254,289 @@ describe("codec error handling", function()
 end)
 
 -- YAML removed: design-assumption B-05 (TOML is the human-authored config format; serde_yml dependency dropped)
+
+-- ── Serial MsgPack (merged from test_serial_msgpack.lua) ──
+
+describe("lurek.codec.encodeMsgPack", function()
+  it("returns a non-empty string for a simple table", function()
+    local bytes = lurek.codec.encodeMsgPack({ name = "hero", level = 5 })
+    expect_equal(type(bytes), "string")
+    expect_equal(#bytes > 0, true)
+  end)
+
+  it("errors on nil input", function()
+    expect_error(function() lurek.codec.encodeMsgPack(nil) end)
+  end)
+
+  it("errors on string input", function()
+    expect_error(function() lurek.codec.encodeMsgPack("not a table") end)
+  end)
+
+  it("errors on number input", function()
+    expect_error(function() lurek.codec.encodeMsgPack(42) end)
+  end)
+end)
+
+describe("lurek.codec.decodeMsgPack", function()
+  it("round-trips string and number fields", function()
+    local tbl = { name = "hero", level = 5 }
+    local bytes = lurek.codec.encodeMsgPack(tbl)
+    local decoded = lurek.codec.decodeMsgPack(bytes)
+    expect_equal(decoded.name, "hero")
+    expect_equal(decoded.level, 5)
+  end)
+
+  it("round-trips nested tables", function()
+    local tbl = { pos = { x = 10, y = 20 } }
+    local bytes = lurek.codec.encodeMsgPack(tbl)
+    local decoded = lurek.codec.decodeMsgPack(bytes)
+    expect_equal(decoded.pos.x, 10)
+    expect_equal(decoded.pos.y, 20)
+  end)
+
+  it("round-trips a boolean field", function()
+    local tbl = { alive = true, dead = false }
+    local bytes = lurek.codec.encodeMsgPack(tbl)
+    local decoded = lurek.codec.decodeMsgPack(bytes)
+    expect_equal(decoded.alive, true)
+    expect_equal(decoded.dead, false)
+  end)
+
+  it("round-trips an array-style table", function()
+    local tbl = { items = { "sword", "shield", "potion" } }
+    local bytes = lurek.codec.encodeMsgPack(tbl)
+    local decoded = lurek.codec.decodeMsgPack(bytes)
+    expect_equal(decoded.items[1], "sword")
+    expect_equal(decoded.items[2], "shield")
+    expect_equal(decoded.items[3], "potion")
+  end)
+
+  it("errors on invalid bytes", function()
+    expect_error(function() lurek.codec.decodeMsgPack("\xc1\xc1\xc1") end)
+  end)
+end)
+
+-- ── Serial Schema (merged from test_serial_schema.lua) ──
+
+describe("lurek.codec.validate – type checks", function()
+  it("passes when type matches string", function()
+    local ok, err = lurek.codec.validate("hello", { type = "string" })
+    expect_equal(ok, true)
+    expect_equal(err, nil)
+  end)
+
+  it("passes when type matches number", function()
+    local ok, err = lurek.codec.validate(42, { type = "number" })
+    expect_equal(ok, true)
+    expect_equal(err, nil)
+  end)
+
+  it("passes when type matches boolean", function()
+    local ok, err = lurek.codec.validate(true, { type = "boolean" })
+    expect_equal(ok, true)
+    expect_equal(err, nil)
+  end)
+
+  it("fails when type mismatches", function()
+    local ok, err = lurek.codec.validate(42, { type = "string" })
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+
+  it("passes for any type with type='any'", function()
+    local ok = lurek.codec.validate("anything", { type = "any" })
+    expect_equal(ok, true)
+  end)
+end)
+
+describe("lurek.codec.validate – required field", function()
+  it("passes when non-nil value and required=true", function()
+    local ok = lurek.codec.validate("value", { type = "string", required = true })
+    expect_equal(ok, true)
+  end)
+
+  it("fails when nil value and required=true", function()
+    local ok, err = lurek.codec.validate(nil, { type = "string", required = true })
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+
+  it("passes when nil value and required not set", function()
+    local ok = lurek.codec.validate(nil, { type = "string" })
+    expect_equal(ok, true)
+  end)
+end)
+
+describe("lurek.codec.validate – numeric range", function()
+  it("passes when value is within min/max", function()
+    local ok = lurek.codec.validate(50, { type = "number", min = 1, max = 100 })
+    expect_equal(ok, true)
+  end)
+
+  it("fails when value is below min", function()
+    local ok, err = lurek.codec.validate(0, { type = "number", min = 1, max = 100 })
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+
+  it("fails when value exceeds max", function()
+    local ok, err = lurek.codec.validate(101, { type = "number", min = 1, max = 100 })
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+
+  it("passes at exactly min", function()
+    local ok = lurek.codec.validate(1, { type = "number", min = 1, max = 100 })
+    expect_equal(ok, true)
+  end)
+
+  it("passes at exactly max", function()
+    local ok = lurek.codec.validate(100, { type = "number", min = 1, max = 100 })
+    expect_equal(ok, true)
+  end)
+end)
+
+describe("lurek.codec.validate – string length", function()
+  it("passes when string length is within minlen/maxlen", function()
+    local ok = lurek.codec.validate("abc", { type = "string", minlen = 1, maxlen = 10 })
+    expect_equal(ok, true)
+  end)
+
+  it("fails when string is shorter than minlen", function()
+    local ok, err = lurek.codec.validate("", { type = "string", minlen = 1 })
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+
+  it("fails when string exceeds maxlen", function()
+    local ok, err = lurek.codec.validate("toolong", { type = "string", maxlen = 3 })
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+end)
+
+describe("lurek.codec.validate – table fields", function()
+  local schema = {
+    type = "table",
+    fields = {
+      name  = { type = "string", required = true },
+      level = { type = "number", min = 1, max = 100 },
+    }
+  }
+
+  it("passes a valid table", function()
+    local ok = lurek.codec.validate({ name = "hero", level = 5 }, schema)
+    expect_equal(ok, true)
+  end)
+
+  it("fails when required field is missing", function()
+    local ok, err = lurek.codec.validate({ level = 5 }, schema)
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+
+  it("fails when field type is wrong", function()
+    local ok, err = lurek.codec.validate({ name = 42, level = 5 }, schema)
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+
+  it("fails when numeric field is out of range", function()
+    local ok, err = lurek.codec.validate({ name = "hero", level = 200 }, schema)
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+end)
+
+describe("lurek.codec.validate – sequence items", function()
+  local schema = {
+    type  = "table",
+    items = { type = "string" }
+  }
+
+  it("passes when all items match type", function()
+    local ok = lurek.codec.validate({ "a", "b", "c" }, schema)
+    expect_equal(ok, true)
+  end)
+
+  it("fails when an item has the wrong type", function()
+    local ok, err = lurek.codec.validate({ "a", 2, "c" }, schema)
+    expect_equal(ok, false)
+    expect_equal(type(err), "string")
+  end)
+
+  it("passes an empty sequence", function()
+    local ok = lurek.codec.validate({}, schema)
+    expect_equal(ok, true)
+  end)
+end)
+
+-- ── Serial XML (merged from test_serial_xml.lua) ──
+
+describe("lurek.codec.decodeXml", function()
+  it("parses a simple element", function()
+    local xml = "<root/>"
+    local tbl = lurek.codec.decodeXml(xml)
+    expect_equal(tbl.tag, "root")
+  end)
+
+  it("captures text content", function()
+    local xml = "<greeting>Hello World</greeting>"
+    local tbl = lurek.codec.decodeXml(xml)
+    expect_equal(tbl.tag, "greeting")
+    expect_equal(tbl.text, "Hello World")
+  end)
+
+  it("captures attributes", function()
+    local xml = '<player id="1" name="hero"/>'
+    local tbl = lurek.codec.decodeXml(xml)
+    expect_equal(tbl.tag, "player")
+    expect_equal(tbl.attrs.id, "1")
+    expect_equal(tbl.attrs.name, "hero")
+  end)
+
+  it("captures child elements", function()
+    local xml = "<items><item>sword</item><item>shield</item></items>"
+    local tbl = lurek.codec.decodeXml(xml)
+    expect_equal(tbl.tag, "items")
+    expect_equal(#tbl.children, 2)
+    expect_equal(tbl.children[1].tag, "item")
+    expect_equal(tbl.children[1].text, "sword")
+    expect_equal(tbl.children[2].text, "shield")
+  end)
+
+  it("omits attrs table when element has no attributes", function()
+    local xml = "<root><child/></root>"
+    local tbl = lurek.codec.decodeXml(xml)
+    expect_equal(tbl.attrs, nil)
+    expect_equal(tbl.children[1].attrs, nil)
+  end)
+
+  it("omits children table when element has no child elements", function()
+    local xml = "<leaf>text</leaf>"
+    local tbl = lurek.codec.decodeXml(xml)
+    expect_equal(tbl.children, nil)
+  end)
+
+  it("handles a nested document", function()
+    local xml = [[<map version="1"><layer name="ground"><tile id="3"/></layer></map>]]
+    local tbl = lurek.codec.decodeXml(xml)
+    expect_equal(tbl.tag, "map")
+    expect_equal(tbl.attrs.version, "1")
+    local layer = tbl.children[1]
+    expect_equal(layer.tag, "layer")
+    expect_equal(layer.attrs.name, "ground")
+    expect_equal(layer.children[1].tag, "tile")
+    expect_equal(layer.children[1].attrs.id, "3")
+  end)
+
+  it("errors on malformed XML", function()
+    expect_error(function() lurek.codec.decodeXml("<unclosed") end)
+  end)
+
+  it("errors on mismatched tags", function()
+    expect_error(function() lurek.codec.decodeXml("<a></b>") end)
+  end)
+end)
+
 test_summary()

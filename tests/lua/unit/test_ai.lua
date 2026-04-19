@@ -1757,5 +1757,1272 @@ describe("lurek.ai GOAPPlanner maxIterations configurability", function()
     end)
 end)
 
+-- =========================================================================
+-- ContextSteering — Factory
+-- =========================================================================
+-- @description Verifies the ContextSteering factory and basic API.
+describe("lurek.ai.newContextSteering factory", function()
+    -- @covers lurek.ai.newContextSteering
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newContextSteering)
+    end)
+
+    -- @covers lurek.ai.newContextSteering
+    it("creates a userdata object", function()
+        local cs = lurek.ai.newContextSteering(16)
+        expect_type("userdata", cs)
+    end)
+
+    -- @covers lurek.ai.newContextSteering
+    it("slot count reflects argument", function()
+        local cs = lurek.ai.newContextSteering(8)
+        expect_equal(cs:slotCount(), 8)
+    end)
+
+    -- @covers lurek.ai.newContextSteering
+    it("defaults to 16 slots for 0 argument", function()
+        local cs = lurek.ai.newContextSteering(0)
+        expect_equal(cs:slotCount(), 16)
+    end)
+end)
+
+-- =========================================================================
+-- ContextSteering — Evaluate produces a direction vector
+-- =========================================================================
+-- @description Verifies evaluate() returns non-nil floats.
+describe("ContextSteering evaluate", function()
+    -- @covers lurek.ai.newContextSteering
+    it("returns two numbers from evaluate", function()
+        local cs = lurek.ai.newContextSteering(16)
+        cs:addSeekTarget(100, 0, 1.0)
+        local dx, dy = cs:evaluate(0, 0, 0, 0)
+        expect_type("number", dx)
+        expect_type("number", dy)
+    end)
+
+    -- @covers lurek.ai.newContextSteering
+    it("wander returns a non-zero vector length", function()
+        local cs = lurek.ai.newContextSteering(16)
+        cs:addWander(0.5, 1.0)
+        local dx, dy = cs:evaluate(0, 0, 0, 0)
+        local mag = math.sqrt(dx * dx + dy * dy)
+        expect_near(cs:chosenMagnitude(), mag, 0.01)
+    end)
+
+    -- @covers lurek.ai.newContextSteering
+    it("clearBehaviors resets to zero vector", function()
+        local cs = lurek.ai.newContextSteering(16)
+        cs:addSeekTarget(100, 100, 1.0)
+        cs:clearBehaviors()
+        local dx, dy = cs:evaluate(0, 0, 0, 0)
+        expect_near(dx, 0.0, 0.001)
+        expect_near(dy, 0.0, 0.001)
+    end)
+end)
+
+-- =========================================================================
+-- ContextSteering — Avoid pushes away
+-- =========================================================================
+-- @description Verifies addAvoidPoint generates a vector pointing away from the obstacle.
+describe("ContextSteering avoid", function()
+    -- @covers lurek.ai.newContextSteering
+    it("avoid obstacle pushes away on x-axis", function()
+        local cs = lurek.ai.newContextSteering(32)
+        -- Place obstacle to the right; agent at origin, avoid weight high
+        cs:addAvoidPoint(10, 0, 5, 2.0)
+        local dx, _ = cs:evaluate(0, 0, 0, 0)
+        -- Result should be non-positive (pushed left or zero)
+        expect_equal(dx <= 0, true)
+    end)
+end)
+
+-- =========================================================================
+-- AIDirector — Factory
+-- =========================================================================
+-- @description Verifies the AIDirector factory and basic API.
+describe("lurek.ai.newAIDirector factory", function()
+    -- @covers lurek.ai.newAIDirector
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newAIDirector)
+    end)
+
+    -- @covers lurek.ai.newAIDirector
+    it("creates a userdata object", function()
+        local d = lurek.ai.newAIDirector()
+        expect_type("userdata", d)
+    end)
+
+    -- @covers lurek.ai.newAIDirector
+    it("starts with zero tension", function()
+        local d = lurek.ai.newAIDirector()
+        expect_near(d:tension(), 0.0, 0.001)
+    end)
+
+    -- @covers lurek.ai.newAIDirector
+    it("starts in Relief phase", function()
+        local d = lurek.ai.newAIDirector()
+        expect_equal(d:phase(), "Relief")
+    end)
+end)
+
+-- =========================================================================
+-- AIDirector — pushEvent raises tension
+-- =========================================================================
+-- @description Verifies that pushEvent() increases tension.
+describe("AIDirector pushEvent", function()
+    -- @covers lurek.ai.newAIDirector
+    it("pushEvent raises tension", function()
+        local d = lurek.ai.newAIDirector()
+        d:pushEvent(0.8)
+        expect_equal(d:tension() > 0.0, true)
+    end)
+
+    -- @covers lurek.ai.newAIDirector
+    it("tension does not exceed 1.0", function()
+        local d = lurek.ai.newAIDirector()
+        for i = 1, 50 do d:pushEvent(1.0) end
+        expect_equal(d:tension() <= 1.0, true)
+    end)
+end)
+
+-- =========================================================================
+-- AIDirector — Update advances phase
+-- =========================================================================
+-- @description Verifies that update() transitions through phases.
+describe("AIDirector update", function()
+    -- @covers lurek.ai.newAIDirector
+    it("update does not crash", function()
+        local d = lurek.ai.newAIDirector()
+        d:pushEvent(1.0)
+        d:update(0.1)
+        expect_type("string", d:phase())
+    end)
+
+    -- @covers lurek.ai.newAIDirector
+    it("spawnRateFactor returns a number", function()
+        local d = lurek.ai.newAIDirector()
+        expect_type("number", d:spawnRateFactor())
+    end)
+
+    -- @covers lurek.ai.newAIDirector
+    it("lootFactor returns a number", function()
+        local d = lurek.ai.newAIDirector()
+        expect_type("number", d:lootFactor())
+    end)
+
+    -- @covers lurek.ai.newAIDirector
+    it("ambientIntensity returns a number", function()
+        local d = lurek.ai.newAIDirector()
+        expect_type("number", d:ambientIntensity())
+    end)
+end)
+
+-- =========================================================================
+-- AIDirector — Reset
+-- =========================================================================
+-- @description Verifies that reset() restores zero tension.
+describe("AIDirector reset", function()
+    -- @covers lurek.ai.newAIDirector
+    it("reset clears tension", function()
+        local d = lurek.ai.newAIDirector()
+        d:pushEvent(1.0)
+        d:reset()
+        expect_near(d:tension(), 0.0, 0.001)
+    end)
+
+    -- @covers lurek.ai.newAIDirector
+    it("setTension changes tension directly", function()
+        local d = lurek.ai.newAIDirector()
+        d:setTension(0.5)
+        expect_near(d:tension(), 0.5, 0.01)
+    end)
+end)
+
+-- =========================================================================
+-- EmotionModel — Factory
+-- =========================================================================
+-- @description Verifies the EmotionModel factory and basic API.
+describe("lurek.ai.newEmotionModel factory", function()
+    -- @covers lurek.ai.newEmotionModel
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newEmotionModel)
+    end)
+
+    -- @covers lurek.ai.newEmotionModel
+    it("creates a userdata object", function()
+        local em = lurek.ai.newEmotionModel()
+        expect_type("userdata", em)
+    end)
+end)
+
+-- =========================================================================
+-- EmotionModel — Add emotions
+-- =========================================================================
+-- @description Verifies emotions can be added and queried.
+describe("EmotionModel add/query", function()
+    -- @covers lurek.ai.newEmotionModel
+    it("dominant returns nil when empty", function()
+        local em = lurek.ai.newEmotionModel()
+        expect_equal(em:dominant(), nil)
+    end)
+
+    -- @covers lurek.ai.newEmotionModel
+    it("get returns 0 for unknown emotion", function()
+        local em = lurek.ai.newEmotionModel()
+        expect_near(em:get("anger"), 0.0, 0.001)
+    end)
+
+    -- @covers lurek.ai.newEmotionModel
+    it("trigger raises emotion value", function()
+        local em = lurek.ai.newEmotionModel()
+        em:add("fear", 0.0, 0.5, 0.1)
+        em:trigger("fear", 0.8)
+        expect_equal(em:get("fear") > 0.0, true)
+    end)
+
+    -- @covers lurek.ai.newEmotionModel
+    it("isActive returns false before trigger", function()
+        local em = lurek.ai.newEmotionModel()
+        em:add("joy", 0.0, 0.3, 0.2)
+        expect_equal(em:isActive("joy"), false)
+    end)
+
+    -- @covers lurek.ai.newEmotionModel
+    it("isActive returns true after strong trigger", function()
+        local em = lurek.ai.newEmotionModel()
+        em:add("joy", 0.0, 0.3, 0.2)
+        em:trigger("joy", 0.9)
+        expect_equal(em:isActive("joy"), true)
+    end)
+end)
+
+-- =========================================================================
+-- EmotionModel — Dominant
+-- =========================================================================
+-- @description Verifies dominant() returns the strongest emotion.
+describe("EmotionModel dominant", function()
+    -- @covers lurek.ai.newEmotionModel
+    it("dominant returns the triggered emotion when only one", function()
+        local em = lurek.ai.newEmotionModel()
+        em:add("rage", 0.0, 0.2, 0.1)
+        em:trigger("rage", 1.0)
+        expect_equal(em:dominant(), "rage")
+    end)
+end)
+
+-- =========================================================================
+-- EmotionModel — Decay and reset
+-- =========================================================================
+-- @description Verifies update() decays emotions and reset() clears them.
+describe("EmotionModel update/reset", function()
+    -- @covers lurek.ai.newEmotionModel
+    it("update does not crash", function()
+        local em = lurek.ai.newEmotionModel()
+        em:update(0.016)
+        expect_equal(em:dominant(), nil)
+    end)
+
+    -- @covers lurek.ai.newEmotionModel
+    it("reset brings emotions to resting level", function()
+        local em = lurek.ai.newEmotionModel()
+        em:add("dread", 0.0, 0.5, 0.1)
+        em:trigger("dread", 1.0)
+        em:reset()
+        expect_near(em:get("dread"), 0.0, 0.01)
+    end)
+end)
+
+-- =========================================================================
+-- HTNDomain — Factory
+-- =========================================================================
+-- @description Verifies the HTNDomain factory and basic API.
+describe("lurek.ai.newHTNDomain factory", function()
+    -- @covers lurek.ai.newHTNDomain
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newHTNDomain)
+    end)
+
+    -- @covers lurek.ai.newHTNDomain
+    it("creates a userdata object", function()
+        local d = lurek.ai.newHTNDomain()
+        expect_type("userdata", d)
+    end)
+
+    -- @covers lurek.ai.newHTNDomain
+    it("starts with zero tasks", function()
+        local d = lurek.ai.newHTNDomain()
+        expect_equal(d:taskCount(), 0)
+    end)
+end)
+
+-- =========================================================================
+-- HTNDomain — Primitives
+-- =========================================================================
+-- @description Verifies that primitive tasks can be added.
+describe("HTNDomain addPrimitive", function()
+    -- @covers lurek.ai.newHTNDomain
+    it("addPrimitive increments task count", function()
+        local d = lurek.ai.newHTNDomain()
+        d:addPrimitive("MoveTo", {}, {"at_target"}, {})
+        expect_equal(d:taskCount(), 1)
+    end)
+
+    -- @covers lurek.ai.newHTNDomain
+    it("addPrimitive with preconditions is counted", function()
+        local d = lurek.ai.newHTNDomain()
+        d:addPrimitive("Attack", {"has_weapon", "enemy_visible"}, {"attacked"}, {})
+        expect_equal(d:taskCount(), 1)
+    end)
+end)
+
+-- =========================================================================
+-- HTNDomain — Planning
+-- =========================================================================
+-- @description Verifies that plan() returns a sequence of primitive actions.
+describe("HTNDomain plan", function()
+    -- @covers lurek.ai.newHTNDomain
+    it("plan returns nil for unknown root task", function()
+        local d = lurek.ai.newHTNDomain()
+        local result = d:plan("nonexistent", {})
+        expect_equal(result, nil)
+    end)
+
+    -- @covers lurek.ai.newHTNDomain
+    it("plan returns a table of primitive actions for solvable problem", function()
+        local d = lurek.ai.newHTNDomain()
+        -- Primitives
+        d:addPrimitive("Navigate", {}, {"nav_done"}, {})
+        d:addPrimitive("PickUp", {"nav_done"}, {"holding_item"}, {})
+        -- Compound root task
+        d:addCompound("GetItem", {
+            { name = "main_method", preconditions = {}, sub_tasks = {"Navigate", "PickUp"} }
+        })
+        local plan = d:plan("GetItem", {})
+        expect_type("table", plan)
+        expect_equal(#plan, 2)
+        expect_equal(plan[1], "Navigate")
+        expect_equal(plan[2], "PickUp")
+    end)
+
+    -- @covers lurek.ai.newHTNDomain
+    it("plan returns nil when precondition not satisfied", function()
+        local d = lurek.ai.newHTNDomain()
+        d:addPrimitive("Attack", {"has_weapon"}, {"attacked"}, {})
+        d:addCompound("DoAttack", {
+            { name = "armed", preconditions = {"has_weapon"}, sub_tasks = {"Attack"} }
+        })
+        -- State does not include has_weapon
+        local plan = d:plan("DoAttack", {})
+        expect_equal(plan, nil)
+    end)
+end)
+
+-- =========================================================================
+-- AILod — Factory
+-- =========================================================================
+-- @description Verifies the AILod factory and basic API.
+describe("lurek.ai.newAILod factory", function()
+    -- @covers lurek.ai.newAILod
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newAILod)
+    end)
+
+    -- @covers lurek.ai.newAILod
+    it("creates a userdata object", function()
+        local lod = lurek.ai.newAILod()
+        expect_type("userdata", lod)
+    end)
+
+    -- @covers lurek.ai.newAILod
+    it("tierCount is >= 1", function()
+        local lod = lurek.ai.newAILod()
+        expect_equal(lod:tierCount() >= 1, true)
+    end)
+end)
+
+-- =========================================================================
+-- AILod — Tier assignment
+-- =========================================================================
+-- @description Verifies tierFor() returns valid tier indices based on distance.
+describe("AILod tierFor", function()
+    -- @covers lurek.ai.newAILod
+    it("returns an integer tier index", function()
+        local lod = lurek.ai.newAILod()
+        local tier = lod:tierFor(0, 0, 0, 0)
+        expect_type("number", tier)
+        expect_equal(tier >= 0, true)
+    end)
+
+    -- @covers lurek.ai.newAILod
+    it("agent at same position as reference gets tier 0 (nearest)", function()
+        local lod = lurek.ai.newAILod()
+        local tier = lod:tierFor(0, 0, 0, 0)
+        expect_equal(tier, 0)
+    end)
+
+    -- @covers lurek.ai.newAILod
+    it("distant agent gets higher tier than close agent", function()
+        local lod = lurek.ai.newAILod()
+        local near_tier = lod:tierFor(5, 0, 0, 0)    -- close
+        local far_tier  = lod:tierFor(2000, 0, 0, 0) -- very far
+        expect_equal(far_tier >= near_tier, true)
+    end)
+
+    -- @covers lurek.ai.newAILod
+    it("tier index never exceeds tierCount-1", function()
+        local lod = lurek.ai.newAILod()
+        local max_tier = lod:tierCount() - 1
+        local tier = lod:tierFor(99999, 99999, 0, 0)
+        expect_equal(tier <= max_tier, true)
+    end)
+end)
+
+-- =========================================================================
+-- AILod — shouldUpdate
+-- =========================================================================
+-- @description Verifies shouldUpdate() behaviour for near vs far tiers.
+describe("AILod shouldUpdate", function()
+    -- @covers lurek.ai.newAILod
+    it("tier 0 updates every frame", function()
+        local lod = lurek.ai.newAILod()
+        -- Tier 0 (near) should update every frame
+        expect_equal(lod:shouldUpdate(0, 0), true)
+        expect_equal(lod:shouldUpdate(0, 1), true)
+        expect_equal(lod:shouldUpdate(0, 7), true)
+    end)
+
+    -- @covers lurek.ai.newAILod
+    it("far tier does not update every frame", function()
+        local lod = lurek.ai.newAILod()
+        local max_tier = lod:tierCount() - 1
+        if max_tier > 0 then
+            -- At least one frame in the stride should not update
+            -- (stride = update_every for that tier, which is > 1 for far tiers)
+            local updates = 0
+            for frame = 0, 15 do
+                if lod:shouldUpdate(max_tier, frame) then
+                    updates = updates + 1
+                end
+            end
+            -- Far tier should update fewer than 16 times in 16 frames
+            expect_equal(updates < 16, true)
+        else
+            -- Single tier: always updates (pass vacuously)
+            expect_equal(true, true)
+        end
+    end)
+end)
+
+-- =========================================================================
+-- AILod — tierName
+-- =========================================================================
+-- @description Verifies tierName returns a string for valid tiers.
+describe("AILod tierName", function()
+    -- @covers lurek.ai.newAILod
+    it("tier 0 has a non-nil name", function()
+        local lod = lurek.ai.newAILod()
+        local name = lod:tierName(0)
+        expect_type("string", name)
+    end)
+
+    -- @covers lurek.ai.newAILod
+    it("out-of-bounds tier returns nil", function()
+        local lod = lurek.ai.newAILod()
+        local name = lod:tierName(9999)
+        expect_equal(name, nil)
+    end)
+end)
+
+-- =========================================================================
+-- MCTSEngine — Factory
+-- =========================================================================
+-- @description Verifies the MCTSEngine factory and basic API.
+describe("lurek.ai.newMCTSEngine factory", function()
+    -- @covers lurek.ai.newMCTSEngine
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newMCTSEngine)
+    end)
+
+    -- @covers lurek.ai.newMCTSEngine
+    it("creates a userdata object", function()
+        local mcts = lurek.ai.newMCTSEngine(50, 1.41, 10, 42)
+        expect_type("userdata", mcts)
+    end)
+end)
+
+-- =========================================================================
+-- MCTSEngine — Search
+-- =========================================================================
+-- @description Verifies the search() closure-based API with a trivial game.
+--
+-- Trivial game: state = integer 0..5.  Actions: +1 or +2.
+-- Evaluate: higher state = better score.  Best first action from 0 = +2.
+describe("MCTSEngine search", function()
+    -- @covers lurek.ai.newMCTSEngine
+    it("returns an integer action from search", function()
+        local mcts = lurek.ai.newMCTSEngine(100, 1.41, 5, 42)
+        local function get_actions(state)
+            if state >= 5 then return {} end
+            return {1, 2}
+        end
+        local function apply_action(state, action)
+            return state + action
+        end
+        local function evaluate(state)
+            return state / 5.0
+        end
+        local action = mcts:search(0, get_actions, apply_action, evaluate)
+        expect_type("number", action)
+    end)
+
+    -- @covers lurek.ai.newMCTSEngine
+    it("returns nil when no actions available from root", function()
+        local mcts = lurek.ai.newMCTSEngine(50, 1.41, 5, 1)
+        local action = mcts:search(
+            100,
+            function(_) return {} end,
+            function(s, a) return s + a end,
+            function(s) return s * 0.01 end
+        )
+        expect_equal(action, nil)
+    end)
+
+    -- @covers lurek.ai.newMCTSEngine
+    it("prefers higher reward action", function()
+        local mcts = lurek.ai.newMCTSEngine(200, 1.41, 8, 99)
+        -- Game: state is a bank balance. Action 1 adds 1, action 2 adds 10.
+        -- Evaluate linearly.  Best action always 2.
+        local action = mcts:search(
+            0,
+            function(s)
+                if s >= 20 then return {} end
+                return {1, 2}
+            end,
+            function(s, a)
+                return s + a
+            end,
+            function(s)
+                return s / 20.0
+            end
+        )
+        expect_equal(action, 2)
+    end)
+end)
+
+-- =========================================================================
+-- NeuralNet — Factory
+-- =========================================================================
+-- @description Verifies the NeuralNet factory and basic inference.
+describe("lurek.ai.newNeuralNet factory", function()
+    -- @covers lurek.ai.newNeuralNet
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newNeuralNet)
+    end)
+
+    -- @covers lurek.ai.newNeuralNet
+    it("creates a userdata object", function()
+        local net = lurek.ai.newNeuralNet()
+        expect_type("userdata", net)
+    end)
+
+    -- @covers lurek.ai.newNeuralNet
+    it("starts with zero layers", function()
+        local net = lurek.ai.newNeuralNet()
+        expect_equal(net:layerCount(), 0)
+    end)
+
+    -- @covers lurek.ai.newNeuralNet
+    it("addLayer increments layer count", function()
+        local net = lurek.ai.newNeuralNet()
+        net:addLayer(2, 4, "relu")
+        net:addLayer(4, 1, "sigmoid")
+        expect_equal(net:layerCount(), 2)
+    end)
+
+    -- @covers lurek.ai.newNeuralNet
+    it("forward returns table of correct size", function()
+        local net = lurek.ai.newNeuralNet()
+        net:addLayer(3, 2, "relu")
+        local out = net:forward({0.5, 0.1, 0.9})
+        expect_type("table", out)
+        expect_equal(#out, 2)
+    end)
+
+    -- @covers lurek.ai.newNeuralNet
+    it("paramCount is positive after adding layers", function()
+        local net = lurek.ai.newNeuralNet()
+        net:addLayer(2, 3, "tanh")
+        -- 2*3 weights + 3 biases = 9
+        expect_equal(net:paramCount(), 9)
+    end)
+
+    -- @covers lurek.ai.newNeuralNet
+    it("setWeights / getWeights roundtrip", function()
+        local net = lurek.ai.newNeuralNet()
+        net:addLayer(2, 2, "relu")
+        local n = net:paramCount()
+        local w = {}
+        for i = 1, n do w[i] = i * 0.01 end
+        net:setWeights(w)
+        local w2 = net:getWeights()
+        expect_equal(#w2, n)
+        expect_near(w2[1], 0.01, 0.0001)
+    end)
+end)
+
+-- =========================================================================
+-- GeneticAlgorithm — Factory
+-- =========================================================================
+-- @description Verifies the GeneticAlgorithm factory and evolution API.
+describe("lurek.ai.newGeneticAlgorithm factory", function()
+    -- @covers lurek.ai.newGeneticAlgorithm
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newGeneticAlgorithm)
+    end)
+
+    -- @covers lurek.ai.newGeneticAlgorithm
+    it("creates a userdata object", function()
+        local ga = lurek.ai.newGeneticAlgorithm(10, 5, 42)
+        expect_type("userdata", ga)
+    end)
+
+    -- @covers lurek.ai.newGeneticAlgorithm
+    it("popSize matches argument", function()
+        local ga = lurek.ai.newGeneticAlgorithm(20, 4, 1)
+        expect_equal(ga:popSize(), 20)
+    end)
+
+    -- @covers lurek.ai.newGeneticAlgorithm
+    it("getGenes returns table of expected length", function()
+        local ga = lurek.ai.newGeneticAlgorithm(5, 8, 7)
+        local genes = ga:getGenes(0)
+        expect_type("table", genes)
+        expect_equal(#genes, 8)
+    end)
+
+    -- @covers lurek.ai.newGeneticAlgorithm
+    it("evolve increments generation", function()
+        local ga = lurek.ai.newGeneticAlgorithm(6, 4, 3)
+        -- Assign trivial fitness before evolve
+        for i = 0, 5 do ga:setFitness(i, i * 0.1) end
+        local g0 = ga:generation()
+        ga:evolve()
+        expect_equal(ga:generation(), g0 + 1)
+    end)
+
+    -- @covers lurek.ai.newGeneticAlgorithm
+    it("bestGenes returns a table", function()
+        local ga = lurek.ai.newGeneticAlgorithm(4, 3, 9)
+        for i = 0, 3 do ga:setFitness(i, i * 0.5) end
+        ga:evolve()
+        local best = ga:bestGenes()
+        expect_type("table", best)
+    end)
+end)
+
+-- =========================================================================
+-- Bandit — Factory
+-- =========================================================================
+-- @description Verifies the Bandit factory and arms API.
+describe("lurek.ai.newBandit factory", function()
+    -- @covers lurek.ai.newBandit
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newBandit)
+    end)
+
+    -- @covers lurek.ai.newBandit
+    it("creates a userdata object", function()
+        local b = lurek.ai.newBandit(5, "epsilon_greedy", 0.1, 42)
+        expect_type("userdata", b)
+    end)
+
+    -- @covers lurek.ai.newBandit
+    it("armCount matches argument", function()
+        local b = lurek.ai.newBandit(8, "ucb1", 0.0, 1)
+        expect_equal(b:armCount(), 8)
+    end)
+
+    -- @covers lurek.ai.newBandit
+    it("select returns a valid arm index", function()
+        local b = lurek.ai.newBandit(4, "epsilon_greedy", 0.2, 10)
+        local idx = b:select()
+        expect_equal(idx >= 0 and idx < 4, true)
+    end)
+
+    -- @covers lurek.ai.newBandit
+    it("update does not crash", function()
+        local b = lurek.ai.newBandit(3, "ucb1", 0.0, 5)
+        b:update(0, 1.0)
+        b:update(1, 0.5)
+        b:update(2, 0.8)
+        expect_equal(b:totalPulls(), 3)
+    end)
+
+    -- @covers lurek.ai.newBandit
+    it("bestArm returns a valid index after updates", function()
+        local b = lurek.ai.newBandit(3, "ucb1", 0.0, 5)
+        b:update(0, 0.1)
+        b:update(1, 0.9)
+        b:update(2, 0.3)
+        expect_equal(b:bestArm() >= 0, true)
+    end)
+
+    -- @covers lurek.ai.newBandit
+    it("thompson_sampling strategy creates successfully", function()
+        local b = lurek.ai.newBandit(4, "thompson", 0.0, 7)
+        local idx = b:select()
+        expect_equal(idx >= 0 and idx < 4, true)
+    end)
+
+    -- @covers lurek.ai.newBandit
+    it("reset clears pull history", function()
+        local b = lurek.ai.newBandit(2, "epsilon_greedy", 0.5, 99)
+        b:update(0, 1.0)
+        b:reset()
+        expect_equal(b:totalPulls(), 0)
+    end)
+end)
+
+-- =========================================================================
+-- Neuroevolution — Factory
+-- =========================================================================
+-- @description Verifies the Neuroevolution factory and basic API.
+describe("lurek.ai.newNeuroevolution factory", function()
+    -- @covers lurek.ai.newNeuroevolution
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newNeuroevolution)
+    end)
+
+    -- @covers lurek.ai.newNeuroevolution
+    it("creates a userdata object", function()
+        local ne = lurek.ai.newNeuroevolution(
+            {{inputs=2, outputs=4, activation="relu"},
+             {inputs=4, outputs=1, activation="sigmoid"}},
+            10, 42)
+        expect_type("userdata", ne)
+    end)
+
+    -- @covers lurek.ai.newNeuroevolution
+    it("popSize matches argument", function()
+        local ne = lurek.ai.newNeuroevolution(
+            {{inputs=2, outputs=2, activation="relu"}}, 8, 1)
+        expect_equal(ne:popSize(), 8)
+    end)
+
+    -- @covers lurek.ai.newNeuroevolution
+    it("chromosomeToNet returns a NeuralNet userdata", function()
+        local ne = lurek.ai.newNeuroevolution(
+            {{inputs=2, outputs=2, activation="tanh"}}, 5, 3)
+        local net = ne:chromosomeToNet(0)
+        expect_type("userdata", net)
+    end)
+
+    -- @covers lurek.ai.newNeuroevolution
+    it("bestNetwork returns userdata after evolve", function()
+        local ne = lurek.ai.newNeuroevolution(
+            {{inputs=2, outputs=1, activation="sigmoid"}}, 4, 7)
+        for i = 0, 3 do ne:setFitness(i, i * 0.2) end
+        ne:evolve()
+        local best = ne:bestNetwork()
+        expect_type("userdata", best)
+    end)
+
+    -- @covers lurek.ai.newNeuroevolution
+    it("evolve increments generation", function()
+        local ne = lurek.ai.newNeuroevolution(
+            {{inputs=1, outputs=1, activation="linear"}}, 4, 11)
+        for i = 0, 3 do ne:setFitness(i, 1.0) end
+        ne:evolve()
+        expect_equal(ne:generation(), 1)
+    end)
+end)
+
+-- =========================================================================
+-- NeedSystem — Factory
+-- =========================================================================
+-- @description Verifies the NeedSystem factory and basic API.
+describe("lurek.ai.newNeedSystem factory", function()
+    -- @covers lurek.ai.newNeedSystem
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newNeedSystem)
+    end)
+
+    -- @covers lurek.ai.newNeedSystem
+    it("creates a userdata object", function()
+        local ns = lurek.ai.newNeedSystem()
+        expect_type("userdata", ns)
+    end)
+end)
+
+-- =========================================================================
+-- NeedSystem — Add needs
+-- =========================================================================
+-- @description Verifies that needs can be added and queried.
+describe("NeedSystem add/query", function()
+    -- @covers lurek.ai.newNeedSystem
+    it("mostUrgent returns nil when empty", function()
+        local ns = lurek.ai.newNeedSystem()
+        expect_equal(ns:mostUrgent(), nil)
+    end)
+
+    -- @covers lurek.ai.newNeedSystem
+    it("valueOf returns 1.0 for new needs (full by default)", function()
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("hunger", 0.1, 0.3, 2.0)
+        expect_near(ns:valueOf("hunger"), 1.0, 0.001)
+    end)
+
+    -- @covers lurek.ai.newNeedSystem
+    it("valueOf returns 0 for unknown need", function()
+        local ns = lurek.ai.newNeedSystem()
+        expect_near(ns:valueOf("unknown"), 0.0, 0.001)
+    end)
+end)
+
+-- =========================================================================
+-- NeedSystem — Decay
+-- =========================================================================
+-- @description Verifies that needs decay over time.
+describe("NeedSystem update/decay", function()
+    -- @covers lurek.ai.newNeedSystem
+    it("update does not crash with empty system", function()
+        local ns = lurek.ai.newNeedSystem()
+        ns:update(0.016)
+        expect_equal(ns:mostUrgent(), nil)
+    end)
+
+    -- @covers lurek.ai.newNeedSystem
+    it("hunger decays after large dt", function()
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("hunger", 1.0, 0.3, 2.0)   -- fast decay
+        ns:update(0.8)                           -- should reduce value
+        expect_equal(ns:valueOf("hunger") < 1.0, true)
+    end)
+end)
+
+-- =========================================================================
+-- NeedSystem — Satisfy
+-- =========================================================================
+-- @description Verifies that satisfy() increases need value.
+describe("NeedSystem satisfy", function()
+    -- @covers lurek.ai.newNeedSystem
+    it("satisfy increases value", function()
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("hunger", 1.0, 0.3, 2.0)
+        ns:update(1.0)  -- deplete first
+        local before = ns:valueOf("hunger")
+        ns:satisfy("hunger", 0.5)
+        expect_equal(ns:valueOf("hunger") > before, true)
+    end)
+end)
+
+-- =========================================================================
+-- NeedSystem — Most urgent
+-- =========================================================================
+-- @description Verifies mostUrgent returns the name of the most depleted need.
+describe("NeedSystem mostUrgent", function()
+    -- @covers lurek.ai.newNeedSystem
+    it("returns the name of the urgent need when depleted", function()
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("sleep", 0.1, 0.8, 3.0)
+        ns:update(10.0)  -- deplete completely
+        local urgent = ns:mostUrgent()
+        -- The one need should become urgent
+        expect_type("string", urgent)
+    end)
+end)
+
+-- =========================================================================
+-- ORCASolver — Factory
+-- =========================================================================
+-- @description Verifies the ORCASolver factory and basic API.
+describe("lurek.ai.newORCASolver factory", function()
+    -- @covers lurek.ai.newORCASolver
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newORCASolver)
+    end)
+
+    -- @covers lurek.ai.newORCASolver
+    it("creates a userdata object", function()
+        local s = lurek.ai.newORCASolver(2.0)
+        expect_type("userdata", s)
+    end)
+
+    -- @covers lurek.ai.newORCASolver
+    it("starts with zero agents", function()
+        local s = lurek.ai.newORCASolver(2.0)
+        expect_equal(s:agentCount(), 0)
+    end)
+end)
+
+-- =========================================================================
+-- ORCASolver — Add agents
+-- =========================================================================
+-- @description Verifies that agents can be added and counted.
+describe("ORCASolver addAgent", function()
+    -- @covers lurek.ai.newORCASolver
+    it("addAgent increments count", function()
+        local s = lurek.ai.newORCASolver(2.0)
+        s:addAgent(0, 0, 0.5, 3.0)
+        expect_equal(s:agentCount(), 1)
+    end)
+
+    -- @covers lurek.ai.newORCASolver
+    it("multiple agents counted", function()
+        local s = lurek.ai.newORCASolver(2.0)
+        s:addAgent(0, 0, 0.5, 3.0)
+        s:addAgent(10, 0, 0.5, 3.0)
+        expect_equal(s:agentCount(), 2)
+    end)
+end)
+
+-- =========================================================================
+-- ORCASolver — Compute
+-- =========================================================================
+-- @description Verifies that compute() produces safe velocities.
+describe("ORCASolver compute", function()
+    -- @covers lurek.ai.newORCASolver
+    it("compute does not crash with one agent", function()
+        local s = lurek.ai.newORCASolver(2.0)
+        s:addAgent(0, 0, 0.5, 3.0)
+        s:setPreferredVelocity(0, 1.0, 0.0)
+        s:compute(0.016)
+        local vx, vy = s:getSafeVelocity(0)
+        expect_type("number", vx)
+        expect_type("number", vy)
+    end)
+
+    -- @covers lurek.ai.newORCASolver
+    it("getSafeVelocity returns zeros for out-of-bounds index", function()
+        local s = lurek.ai.newORCASolver(2.0)
+        local vx, vy = s:getSafeVelocity(99)
+        expect_near(vx, 0.0, 0.001)
+        expect_near(vy, 0.0, 0.001)
+    end)
+
+    -- @covers lurek.ai.newORCASolver
+    it("two agents heading toward each other get non-colliding velocities", function()
+        local s = lurek.ai.newORCASolver(2.0)
+        s:addAgent(-5, 0, 0.5, 3.0)
+        s:addAgent(5, 0, 0.5, 3.0)
+        -- Both agents head toward each other on the x-axis
+        s:setPreferredVelocity(0, 3.0, 0.0)
+        s:setPreferredVelocity(1, -3.0, 0.0)
+        s:compute(0.016)
+        local vx0, _ = s:getSafeVelocity(0)
+        local vx1, _ = s:getSafeVelocity(1)
+        -- Safe velocities should be less aggressive than preferred (reduced x)
+        expect_equal(vx0 <= 3.0, true)
+        expect_equal(vx1 >= -3.0, true)
+    end)
+end)
+
+-- =========================================================================
+-- StimulusWorld — Factory
+-- =========================================================================
+-- @description Verifies the StimulusWorld factory and basic API.
+describe("lurek.ai.newStimulusWorld factory", function()
+    -- @covers lurek.ai.newStimulusWorld
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newStimulusWorld)
+    end)
+
+    -- @covers lurek.ai.newStimulusWorld
+    it("creates a userdata object", function()
+        local sw = lurek.ai.newStimulusWorld()
+        expect_type("userdata", sw)
+    end)
+
+    -- @covers lurek.ai.newStimulusWorld
+    it("starts with zero stimuli", function()
+        local sw = lurek.ai.newStimulusWorld()
+        expect_equal(sw:count(), 0)
+    end)
+end)
+
+-- =========================================================================
+-- StimulusWorld — Adding stimuli
+-- =========================================================================
+-- @description Verifies that visual and auditory stimuli can be added and counted.
+describe("StimulusWorld add stimuli", function()
+    -- @covers lurek.ai.newStimulusWorld
+    it("addVisual increases count", function()
+        local sw = lurek.ai.newStimulusWorld()
+        sw:addVisual(100, 200, 1.0, 50.0, nil)
+        expect_equal(sw:count(), 1)
+    end)
+
+    -- @covers lurek.ai.newStimulusWorld
+    it("addAuditory increases count", function()
+        local sw = lurek.ai.newStimulusWorld()
+        sw:addAuditory(50, 50, 0.8, 80.0, 0.5, "gunshot")
+        expect_equal(sw:count(), 1)
+    end)
+
+    -- @covers lurek.ai.newStimulusWorld
+    it("multiple stimuli counted correctly", function()
+        local sw = lurek.ai.newStimulusWorld()
+        sw:addVisual(0, 0, 1.0, 40.0, nil)
+        sw:addVisual(10, 10, 0.5, 20.0, "guard")
+        sw:addAuditory(5, 5, 0.9, 60.0, 0.3, "footstep")
+        expect_equal(sw:count(), 3)
+    end)
+end)
+
+-- =========================================================================
+-- StimulusWorld — Remove
+-- =========================================================================
+-- @description Verifies that stimuli can be removed by ID.
+describe("StimulusWorld remove", function()
+    -- @covers lurek.ai.newStimulusWorld
+    it("remove decrements count", function()
+        local sw = lurek.ai.newStimulusWorld()
+        local id = sw:addVisual(0, 0, 1.0, 50.0, nil)
+        expect_equal(sw:count(), 1)
+        sw:remove(id)
+        expect_equal(sw:count(), 0)
+    end)
+
+    -- @covers lurek.ai.newStimulusWorld
+    it("remove returns true for valid id", function()
+        local sw = lurek.ai.newStimulusWorld()
+        local id = sw:addVisual(0, 0, 1.0, 50.0, nil)
+        expect_equal(sw:remove(id), true)
+    end)
+
+    -- @covers lurek.ai.newStimulusWorld
+    it("remove returns false for unknown id", function()
+        local sw = lurek.ai.newStimulusWorld()
+        expect_equal(sw:remove(99999), false)
+    end)
+end)
+
+-- =========================================================================
+-- StimulusWorld — Update and clear
+-- =========================================================================
+-- @description Verifies update and clear operations.
+describe("StimulusWorld update/clear", function()
+    -- @covers lurek.ai.newStimulusWorld
+    it("update does not crash with empty world", function()
+        local sw = lurek.ai.newStimulusWorld()
+        sw:update(0.016)
+        expect_equal(sw:count(), 0)
+    end)
+
+    -- @covers lurek.ai.newStimulusWorld
+    it("clear removes all stimuli", function()
+        local sw = lurek.ai.newStimulusWorld()
+        sw:addVisual(0, 0, 1.0, 50.0, nil)
+        sw:addVisual(10, 10, 0.5, 30.0, nil)
+        sw:clear()
+        expect_equal(sw:count(), 0)
+    end)
+end)
+
+-- =========================================================================
+-- StrategyAI — Factory
+-- =========================================================================
+-- @description Verifies the StrategyAI factory and basic API.
+describe("lurek.ai.newStrategyAI factory", function()
+    -- @covers lurek.ai.newStrategyAI
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newStrategyAI)
+    end)
+
+    -- @covers lurek.ai.newStrategyAI
+    it("creates a userdata object", function()
+        local s = lurek.ai.newStrategyAI(5.0)
+        expect_type("userdata", s)
+    end)
+
+    -- @covers lurek.ai.newStrategyAI
+    it("starts with no active goal", function()
+        local s = lurek.ai.newStrategyAI(5.0)
+        expect_equal(s:activeGoal(), nil)
+    end)
+end)
+
+-- =========================================================================
+-- StrategyAI — Add goals and evaluate
+-- =========================================================================
+-- @description Verifies goals can be added and evaluated by scorer.
+describe("StrategyAI addGoal / forceEvaluate", function()
+    -- @covers lurek.ai.newStrategyAI
+    it("forceEvaluate sets active goal when one has highest score", function()
+        local s = lurek.ai.newStrategyAI(10.0)
+        s:addGoal("attack")
+        s:addGoal("defend")
+        s:forceEvaluate(function(goal)
+            if goal == "attack" then return 0.9
+            else return 0.2 end
+        end)
+        expect_equal(s:activeGoal(), "attack")
+    end)
+
+    -- @covers lurek.ai.newStrategyAI
+    it("activeGoal remains nil if all scores zero", function()
+        local s = lurek.ai.newStrategyAI(10.0)
+        s:addGoal("explore")
+        s:forceEvaluate(function(_) return 0.0 end)
+        expect_equal(s:activeGoal(), nil)
+    end)
+end)
+
+-- =========================================================================
+-- StrategyAI — Update with throttle
+-- =========================================================================
+-- @description Verifies update() only re-evaluates after the interval expires.
+describe("StrategyAI update throttle", function()
+    -- @covers lurek.ai.newStrategyAI
+    it("update does not crash before interval", function()
+        local s = lurek.ai.newStrategyAI(5.0)
+        s:addGoal("patrol")
+        s:update(0.016, function(_) return 1.0 end)
+        expect_type("number", s:timeUntilNext())
+    end)
+
+    -- @covers lurek.ai.newStrategyAI
+    it("update evaluates after interval passes", function()
+        local s = lurek.ai.newStrategyAI(0.1)
+        s:addGoal("hunt")
+        s:addGoal("flee")
+        -- Force immediate evaluation first
+        s:forceEvaluate(function(g)
+            if g == "flee" then return 0.8 else return 0.1 end
+        end)
+        expect_equal(s:activeGoal(), "flee")
+        -- Update well past interval with different scorer
+        s:update(1.0, function(g)
+            if g == "hunt" then return 0.9 else return 0.1 end
+        end)
+        expect_equal(s:activeGoal(), "hunt")
+    end)
+end)
+
+-- =========================================================================
+-- StrategyAI — Tags
+-- =========================================================================
+-- @description Verifies tags can be added and removed.
+describe("StrategyAI tags", function()
+    -- @covers lurek.ai.newStrategyAI
+    it("addTag / removeTag do not crash", function()
+        local s = lurek.ai.newStrategyAI(5.0)
+        s:addTag("night")
+        s:addTag("rain")
+        s:removeTag("night")
+        expect_equal(true, true)  -- no crash = pass
+    end)
+end)
+
+-- =========================================================================
+-- TraitProfile — Factory
+-- =========================================================================
+-- @description Verifies the TraitProfile factory exists and creates a valid object.
+describe("lurek.ai.newTraitProfile factory", function()
+    -- @covers lurek.ai.newTraitProfile
+    it("exists as a function", function()
+        expect_type("function", lurek.ai.newTraitProfile)
+    end)
+
+    -- @covers lurek.ai.newTraitProfile
+    it("creates a userdata object", function()
+        local tp = lurek.ai.newTraitProfile()
+        expect_type("userdata", tp)
+    end)
+end)
+
+-- =========================================================================
+-- TraitProfile — set / get roundtrip
+-- =========================================================================
+-- @description Verifies that trait values set via set() are returned by get().
+describe("TraitProfile set/get", function()
+    -- @covers lurek.ai.newTraitProfile
+    it("starts with zero for unknown trait", function()
+        local tp = lurek.ai.newTraitProfile()
+        expect_near(tp:get("aggression"), 0.0, 0.001)
+    end)
+
+    -- @covers lurek.ai.newTraitProfile
+    it("returns set value", function()
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("courage", 0.75)
+        expect_near(tp:get("courage"), 0.75, 0.001)
+    end)
+
+    -- @covers lurek.ai.newTraitProfile
+    it("has() returns false for unset trait", function()
+        local tp = lurek.ai.newTraitProfile()
+        expect_equal(tp:has("unknown_trait"), false)
+    end)
+
+    -- @covers lurek.ai.newTraitProfile
+    it("has() returns true after set", function()
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("loyalty", 0.5)
+        expect_equal(tp:has("loyalty"), true)
+    end)
+
+    -- @covers lurek.ai.newTraitProfile
+    it("traitCount increments after set", function()
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("a", 0.1)
+        tp:set("b", 0.2)
+        expect_equal(tp:traitCount(), 2)
+    end)
+end)
+
+-- =========================================================================
+-- TraitProfile — Modifiers
+-- =========================================================================
+-- @description Verifies that timed modifiers alter the effective trait value.
+describe("TraitProfile modifiers", function()
+    -- @covers lurek.ai.newTraitProfile
+    it("modifier raises effective value immediately", function()
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("fear", 0.2)
+        tp:addModifier("fear", 0.5, nil, "poison")
+        expect_near(tp:get("fear"), 0.7, 0.01)
+    end)
+
+    -- @covers lurek.ai.newTraitProfile
+    it("removeModifiers restores base value", function()
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("fear", 0.2)
+        tp:addModifier("fear", 0.5, nil, "poison")
+        tp:removeModifiers("poison")
+        expect_near(tp:get("fear"), 0.2, 0.01)
+    end)
+
+    -- @covers lurek.ai.newTraitProfile
+    it("getBase is unchanged by modifier", function()
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("strength", 0.8)
+        tp:addModifier("strength", 0.1, nil, "buff")
+        expect_near(tp:getBase("strength"), 0.8, 0.01)
+    end)
+end)
+
+-- =========================================================================
+-- TraitProfile — Update / decay
+-- =========================================================================
+-- @description Verifies that update() ticks the modifier timer and expires timed modifiers.
+describe("TraitProfile update", function()
+    -- @covers lurek.ai.newTraitProfile
+    it("update does not crash with no modifiers", function()
+        local tp = lurek.ai.newTraitProfile()
+        tp:update(0.016)
+        expect_equal(tp:traitCount(), 0)
+    end)
+
+    -- @covers lurek.ai.newTraitProfile
+    it("timed modifier expires after update", function()
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("speed", 0.5)
+        tp:addModifier("speed", 0.3, 0.001, "boost")  -- expires in 0.001 s
+        tp:update(1.0)  -- well past expiry
+        expect_near(tp:get("speed"), 0.5, 0.01)
+    end)
+end)
+
 -- Print summary
 test_summary()

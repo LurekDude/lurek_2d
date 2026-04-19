@@ -428,4 +428,430 @@ describe("World.getBitmapTagBit", function()
         expect_type("number", bit)
     end)
 end)
+
+-- ── component observers (merged from test_entity_observers.lua) ─────────
+
+-- @description Covers suite: lurek.entity component observers.
+describe("lurek.entity", function()
+    -- @description Covers suite: onComponentAdded and onComponentRemoved.
+    describe("component observers", function()
+        -- @covers lurek.entity.newUniverse
+        -- @covers lurek.entity.onComponentAdded
+        -- @covers lurek.entity.flushObservers
+        -- @description Verifies that onComponentAdded callback fires via flushObservers.
+        it("onComponentAdded fires after flushObservers", function()
+            local w = lurek.entity.newUniverse()
+            local fired = 0
+            local last_id = nil
+            local last_name = nil
+            w:onComponentAdded("hp", function(id, name)
+                fired = fired + 1
+                last_id = id
+                last_name = name
+            end)
+            local e = w:spawn()
+            w:set(e, "hp", 100)
+            expect_equal(0, fired) -- not fired yet
+            w:flushObservers()
+            expect_equal(1, fired)
+            expect_equal(e, last_id)
+            expect_equal("hp", last_name)
+        end)
+
+        -- @covers lurek.entity.onComponentRemoved
+        -- @covers lurek.entity.flushObservers
+        -- @description Verifies that onComponentRemoved callback fires after removing a component.
+        it("onComponentRemoved fires after flushObservers", function()
+            local w = lurek.entity.newUniverse()
+            local fired = 0
+            w:onComponentRemoved("hp", function(id, name)
+                fired = fired + 1
+            end)
+            local e = w:spawn()
+            w:set(e, "hp", 50)
+            w:flushObservers()   -- consume add event
+            w:remove(e, "hp")
+            expect_equal(0, fired) -- not yet
+            w:flushObservers()
+            expect_equal(1, fired)
+        end)
+
+        -- @covers lurek.entity.onComponentAdded
+        -- @description Verifies that removing a non-existent component does not fire remove events.
+        it("removing absent component does not fire remove event", function()
+            local w = lurek.entity.newUniverse()
+            local fired = 0
+            w:onComponentRemoved("hp", function() fired = fired + 1 end)
+            local e = w:spawn()
+            -- hp never set
+            w:remove(e, "hp")
+            w:flushObservers()
+            expect_equal(0, fired)
+        end)
+
+        -- @covers lurek.entity.onComponentAdded
+        -- @description Verifies that multiple observers on the same component all fire.
+        it("multiple observers on same component all fire", function()
+            local w = lurek.entity.newUniverse()
+            local count = 0
+            w:onComponentAdded("pos", function() count = count + 1 end)
+            w:onComponentAdded("pos", function() count = count + 1 end)
+            local e = w:spawn()
+            w:set(e, "pos", {x=0,y=0})
+            w:flushObservers()
+            expect_equal(2, count)
+        end)
+    end)
+end)
+
+-- ── queryNot (merged from test_entity_query_not.lua) ────────────────────
+
+-- @description Covers suite: lurek.entity queryNot.
+describe("lurek.entity", function()
+    -- @description Covers suite: queryNot component exclusion.
+    describe("queryNot", function()
+        -- @covers lurek.entity.newUniverse
+        -- @covers lurek.entity.queryNot
+        -- @description Verifies that queryNot returns entities with all 'with' and none of the 'without' components.
+        it("returns entities that have required and NOT excluded components", function()
+            local w = lurek.entity.newUniverse()
+            local e1 = w:spawn()
+            local e2 = w:spawn()
+            local e3 = w:spawn()
+            w:set(e1, "Health", {hp = 100})
+            w:set(e1, "Visible", true)
+            w:set(e2, "Health", {hp = 50})
+            -- e3 has no components
+            -- queryNot: has Health, does NOT have Visible
+            local res = w:queryNot({"Health"}, {"Visible"})
+            expect_equal(1, #res)
+            expect_equal(e2, res[1])
+        end)
+
+        -- @covers lurek.entity.queryNot
+        -- @description Verifies that an empty without-list behaves like a normal query.
+        it("empty without-list behaves like query", function()
+            local w = lurek.entity.newUniverse()
+            local e1 = w:spawn()
+            local e2 = w:spawn()
+            w:set(e1, "Speed", 5)
+            w:set(e2, "Speed", 10)
+            local res = w:queryNot({"Speed"}, {})
+            expect_equal(2, #res)
+        end)
+
+        -- @covers lurek.entity.queryNot
+        -- @description Verifies that an empty with-list returns all entities not having the excluded component.
+        it("empty with-list returns all entities without excluded component", function()
+            local w = lurek.entity.newUniverse()
+            local e1 = w:spawn()
+            local e2 = w:spawn()
+            local e3 = w:spawn()
+            w:set(e1, "Invisible", true)
+            -- e2, e3 have no Invisible component
+            local res = w:queryNot({}, {"Invisible"})
+            -- e2 and e3 should appear
+            expect_equal(2, #res)
+        end)
+
+        -- @covers lurek.entity.queryNot
+        -- @description Verifies that entities with all excluded components are excluded even if multi-excludes.
+        it("excludes entities with any of the excluded components", function()
+            local w = lurek.entity.newUniverse()
+            local e1 = w:spawn()
+            local e2 = w:spawn()
+            local e3 = w:spawn()
+            w:set(e1, "Health", 10)
+            w:set(e2, "Health", 10)
+            w:set(e2, "Dead", true)
+            w:set(e3, "Health", 10)
+            w:set(e3, "Frozen", true)
+            local res = w:queryNot({"Health"}, {"Dead", "Frozen"})
+            expect_equal(1, #res)
+            expect_equal(e1, res[1])
+        end)
+    end)
+end)
+
+-- ── relationships (merged from test_entity_relationships.lua) ───────────
+
+-- @description Covers suite: lurek.patterns RelationshipManager.
+describe("lurek.patterns.RelationshipManager", function()
+    -- @covers lurek.patterns.newRelationshipManager
+    -- @covers lurek.patterns.RelationshipManager.setValue
+    -- @covers lurek.patterns.RelationshipManager.getValue
+    -- @description Verifies basic numeric relationship storage.
+    it("stores and retrieves numeric values between entity pairs", function()
+        local rm = lurek.patterns.newRelationshipManager()
+        local a, b = 1, 2
+        rm:setValue(a, b, 75.0)
+        expect_near(75.0, rm:getValue(a, b), 1e-5)
+    end)
+
+    -- @covers lurek.patterns.RelationshipManager.adjustValue
+    -- @description Verifies that adjustValue changes the stored value by the delta.
+    it("adjustValue changes the value by delta", function()
+        local rm = lurek.patterns.newRelationshipManager()
+        rm:setValue(1, 2, 50.0)
+        rm:adjustValue(1, 2, -10.0)
+        expect_near(40.0, rm:getValue(1, 2), 1e-5)
+    end)
+
+    -- @covers lurek.patterns.RelationshipManager.defineType
+    -- @covers lurek.patterns.RelationshipManager.setLevel
+    -- @covers lurek.patterns.RelationshipManager.getLevel
+    -- @description Verifies that named relationship levels can be defined and retrieved.
+    it("supports named relationship type levels", function()
+        local rm = lurek.patterns.newRelationshipManager()
+        rm:defineType("Faction", {"enemy", "neutral", "ally"}, "neutral")
+        local ok = rm:setLevel(1, 2, "Faction", "ally")
+        expect_equal(true, ok)
+        expect_equal("ally", rm:getLevel(1, 2, "Faction"))
+    end)
+
+    -- @covers lurek.patterns.RelationshipManager.removePair
+    -- @covers lurek.patterns.RelationshipManager.pairCount
+    -- @description Verifies that removePair removes both numeric and level data.
+    it("removePair resets to defaults and decrements pairCount", function()
+        local rm = lurek.patterns.newRelationshipManager()
+        rm:setValue(1, 2, 100.0)
+        expect_equal(1, rm:pairCount())
+        rm:removePair(1, 2)
+        expect_equal(0, rm:pairCount())
+        expect_near(0.0, rm:getValue(1, 2), 1e-5)
+    end)
+
+    -- @covers lurek.patterns.RelationshipManager.typeNames
+    -- @description Verifies that typeNames returns all defined relationship type names.
+    it("typeNames returns all defined type names", function()
+        local rm = lurek.patterns.newRelationshipManager()
+        rm:defineType("Friendship", {"stranger","friend","bestfriend"})
+        rm:defineType("Faction", {"enemy","ally"})
+        local names = rm:typeNames()
+        expect_equal(2, #names)
+    end)
+end)
+
+-- ──────────────────────────────────────────────────────────────────────────
+-- ECS Universe directed relationship API
+-- ──────────────────────────────────────────────────────────────────────────
+-- @description Covers the directed named-link methods on lurek.entity Universe.
+describe("lurek.entity Universe directed relationships", function()
+
+    -- @covers lurek.entity.addRelation
+    -- @covers lurek.entity.getRelated
+    -- @description Verifies basic add and retrieval of a directed named link.
+    it("addRelation and getRelated round-trip", function()
+        local u = lurek.entity.newUniverse()
+        local e1 = u:spawn()
+        local e2 = u:spawn()
+        u:addRelation(e1, "owns", e2)
+        local related = u:getRelated(e1, "owns")
+        expect_equal(1, #related)
+        expect_equal(e2, related[1])
+    end)
+
+    -- @covers lurek.entity.hasRelation
+    -- @description hasRelation returns true when the link was added.
+    it("hasRelation returns true when relation exists", function()
+        local u = lurek.entity.newUniverse()
+        local e1 = u:spawn()
+        local e2 = u:spawn()
+        u:addRelation(e1, "enemy", e2)
+        expect_equal(true, u:hasRelation(e1, "enemy", e2))
+    end)
+
+    -- @covers lurek.entity.hasRelation
+    -- @description hasRelation returns false before any link is added.
+    it("hasRelation returns false when relation does not exist", function()
+        local u = lurek.entity.newUniverse()
+        local e1 = u:spawn()
+        local e2 = u:spawn()
+        expect_equal(false, u:hasRelation(e1, "ally", e2))
+    end)
+
+    -- @covers lurek.entity.removeRelation
+    -- @description removeRelation removes only the targeted link.
+    it("removeRelation removes a specific link", function()
+        local u = lurek.entity.newUniverse()
+        local e1 = u:spawn()
+        local e2 = u:spawn()
+        u:addRelation(e1, "ally", e2)
+        u:removeRelation(e1, "ally", e2)
+        expect_equal(false, u:hasRelation(e1, "ally", e2))
+    end)
+
+    -- @covers lurek.entity.clearRelations
+    -- @description clearRelations removes all links of the given type.
+    it("clearRelations removes all links of a type", function()
+        local u = lurek.entity.newUniverse()
+        local e1 = u:spawn()
+        local e2 = u:spawn()
+        local e3 = u:spawn()
+        u:addRelation(e1, "friend", e2)
+        u:addRelation(e1, "friend", e3)
+        u:clearRelations(e1, "friend")
+        expect_equal(0, #u:getRelated(e1, "friend"))
+    end)
+
+    -- @covers lurek.entity.addRelation
+    -- @description Adding the same relation twice does not create duplicates.
+    it("addRelation is idempotent — no duplicate links", function()
+        local u = lurek.entity.newUniverse()
+        local e1 = u:spawn()
+        local e2 = u:spawn()
+        u:addRelation(e1, "link", e2)
+        u:addRelation(e1, "link", e2)
+        expect_equal(1, #u:getRelated(e1, "link"))
+    end)
+
+    -- @covers lurek.entity.addRelation
+    -- @description Directed links are one-way — the reverse is not automatically added.
+    it("directed links are not symmetric", function()
+        local u = lurek.entity.newUniverse()
+        local e1 = u:spawn()
+        local e2 = u:spawn()
+        u:addRelation(e1, "owns", e2)
+        expect_equal(0, #u:getRelated(e2, "owns"))
+    end)
+
+end)
+
+-- ── serialization (merged from test_entity_serialization.lua) ───────────
+
+-- @description Covers suite: lurek.entity.serialize and deserialize.
+describe("lurek.entity", function()
+    -- @description Covers suite: entity world serialization.
+    describe("serialize and deserialize", function()
+        -- @covers lurek.entity.newUniverse
+        -- @covers lurek.entity.serialize
+        -- @covers lurek.entity.deserialize
+        -- @description Verifies that serialize produces a snapshot table with entities and bitmap_tags keys.
+        it("serialize returns a table with entities and bitmap_tags", function()
+            local w = lurek.entity.newUniverse()
+            local e = w:spawn()
+            w:set(e, "name", "hero")
+            local snap = w:serialize()
+            expect_equal("table", type(snap))
+            expect_equal("table", type(snap.entities))
+            expect_equal("table", type(snap.bitmap_tags))
+        end)
+
+        -- @covers lurek.entity.serialize
+        -- @description Verifies that serialized entity count matches spawn count.
+        it("serialized entity count matches world entity count", function()
+            local w = lurek.entity.newUniverse()
+            w:spawn() w:spawn() w:spawn()
+            local snap = w:serialize()
+            expect_equal(3, #snap.entities)
+        end)
+
+        -- @covers lurek.entity.deserialize
+        -- @description Verifies that deserialize restores component values.
+        it("deserialize restores component values", function()
+            local w = lurek.entity.newUniverse()
+            local e1 = w:spawn()
+            w:set(e1, "hp", 42)
+            local snap = w:serialize()
+            -- Clear and restore
+            w:clear()
+            w:deserialize(snap)
+            expect_equal(1, w:getEntityCount())
+            local ids = w:getEntities()
+            local hp = w:get(ids[1], "hp")
+            expect_equal(42, hp)
+        end)
+
+        -- @covers lurek.entity.deserialize
+        -- @description Verifies that deserialize restores string tags.
+        it("deserialize restores string tags", function()
+            local w = lurek.entity.newUniverse()
+            local e = w:spawn()
+            w:addTag(e, "enemy")
+            w:addTag(e, "active")
+            local snap = w:serialize()
+            w:clear()
+            w:deserialize(snap)
+            local enemies = w:getEntitiesByTag("enemy")
+            expect_equal(1, #enemies)
+        end)
+
+        -- @covers lurek.entity.deserialize
+        -- @description Verifies that deserialize preserves blueprints (does not delete them).
+        it("deserialize preserves registered blueprints", function()
+            local w = lurek.entity.newUniverse()
+            w:defineBlueprint("Enemy", {hp = 10, speed = 5})
+            local snap = w:serialize()
+            w:clear()
+            w:deserialize(snap)
+            expect_equal(true, w:hasBlueprint("Enemy"))
+        end)
+    end)
+end)
+
+-- ── system priority (merged from test_entity_system_priority.lua) ───────
+
+-- @description Covers suite: lurek.entity system priority dispatch ordering.
+describe("lurek.entity", function()
+    -- @description Covers suite: addSystem with priority.
+    describe("system priority", function()
+        -- @covers lurek.entity.newUniverse
+        -- @covers lurek.entity.addSystem
+        -- @covers lurek.entity.update
+        -- @description Verifies that systems are called in ascending priority order.
+        it("systems dispatch in ascending priority order", function()
+            local w = lurek.entity.newUniverse()
+            local order = {}
+            local sys_a = {
+                update = function(self, world, dt)
+                    table.insert(order, "A")
+                end
+            }
+            local sys_b = {
+                update = function(self, world, dt)
+                    table.insert(order, "B")
+                end
+            }
+            local sys_c = {
+                update = function(self, world, dt)
+                    table.insert(order, "C")
+                end
+            }
+            -- Add in reverse order; lower priority = runs first
+            w:addSystem(sys_c, {priority = 30})
+            w:addSystem(sys_a, {priority = 10})
+            w:addSystem(sys_b, {priority = 20})
+            w:update(0.016)
+            expect_equal("A", order[1])
+            expect_equal("B", order[2])
+            expect_equal("C", order[3])
+        end)
+
+        -- @covers lurek.entity.addSystem
+        -- @description Verifies that systems without explicit priority default to 0.
+        it("systems default to priority 0 when not specified", function()
+            local w = lurek.entity.newUniverse()
+            local order = {}
+            local sys_default = { update = function() table.insert(order, "default") end }
+            local sys_negative = { update = function() table.insert(order, "early") end }
+            w:addSystem(sys_default)            -- priority 0
+            w:addSystem(sys_negative, {priority = -1})  -- runs before
+            w:update(0)
+            expect_equal("early", order[1])
+            expect_equal("default", order[2])
+        end)
+
+        -- @covers lurek.entity.getSystemCount
+        -- @description Verifies that addSystem with priority correctly increments system count.
+        it("getSystemCount increments correctly with priority", function()
+            local w = lurek.entity.newUniverse()
+            expect_equal(0, w:getSystemCount())
+            local s1 = { update = function() end }
+            local s2 = { update = function() end }
+            w:addSystem(s1, {priority = 5})
+            w:addSystem(s2, {priority = 1})
+            expect_equal(2, w:getSystemCount())
+        end)
+    end)
+end)
 test_summary()

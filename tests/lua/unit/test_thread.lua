@@ -293,4 +293,161 @@ describe("Channel value types", function()
         expect_equal(3, ch:pop())
     end)
 end)
+
+-- ═══════════════════════════════════════════════════════════════════════
+-- Merged from test_thread_new_features.lua
+-- ═══════════════════════════════════════════════════════════════════════
+
+-- @description Covers suite: Channel table serialization.
+describe("Channel table serialization", function()
+    it("pushTable is a function", function()
+        local ch = lurek.thread.newChannel()
+        expect_type("function", ch.pushTable)
+    end)
+
+    it("popTable is a function", function()
+        local ch = lurek.thread.newChannel()
+        expect_type("function", ch.popTable)
+    end)
+
+    it("flat table round-trips through pushTable/popTable", function()
+        local ch = lurek.thread.newChannel()
+        ch:pushTable({x = 10, y = 20})
+        local t = ch:popTable()
+        expect_not_nil(t)
+        expect_equal(10, t.x)
+        expect_equal(20, t.y)
+    end)
+
+    it("sequence table preserves FIFO order", function()
+        local ch = lurek.thread.newChannel()
+        ch:pushTable({10, 20, 30})
+        local t = ch:popTable()
+        expect_not_nil(t)
+        expect_equal(10, t[1])
+        expect_equal(20, t[2])
+        expect_equal(30, t[3])
+    end)
+
+    it("getCount increments after pushTable", function()
+        local ch = lurek.thread.newChannel()
+        ch:pushTable({a = 1})
+        expect_equal(1, ch:getCount())
+    end)
+
+    it("popTable on empty channel returns nil", function()
+        local ch = lurek.thread.newChannel()
+        local t = ch:popTable()
+        expect_equal(nil, t)
+    end)
+end)
+
+describe("Channel bytes serialization", function()
+    it("pushBytes is a function", function()
+        local ch = lurek.thread.newChannel()
+        expect_type("function", ch.pushBytes)
+    end)
+
+    it("popBytes is a function", function()
+        local ch = lurek.thread.newChannel()
+        expect_type("function", ch.popBytes)
+    end)
+
+    it("byte string round-trips through pushBytes/popBytes", function()
+        local ch = lurek.thread.newChannel()
+        local original = "binary\0data\255"
+        ch:pushBytes(original)
+        local result = ch:popBytes()
+        expect_not_nil(result)
+        expect_equal(#original, #result)
+    end)
+
+    it("getCount increments after pushBytes", function()
+        local ch = lurek.thread.newChannel()
+        ch:pushBytes("hello")
+        expect_equal(1, ch:getCount())
+    end)
+
+    it("popBytes on empty channel returns nil", function()
+        local ch = lurek.thread.newChannel()
+        local v = ch:popBytes()
+        expect_equal(nil, v)
+    end)
+end)
+
+describe("Thread pool factory", function()
+    it("newPool is a function", function()
+        expect_type("function", lurek.thread.newPool)
+    end)
+
+    it("newPool returns a non-nil object", function()
+        local pool = lurek.thread.newPool(1, "return")
+        expect_not_nil(pool)
+    end)
+
+    it("ThreadPool:size() matches constructor argument", function()
+        local pool = lurek.thread.newPool(3, "return")
+        expect_equal(3, pool:size())
+    end)
+
+    it("ThreadPool has submit method", function()
+        local pool = lurek.thread.newPool(1, "return")
+        expect_type("function", pool.submit)
+    end)
+
+    it("ThreadPool has collect method", function()
+        local pool = lurek.thread.newPool(1, "return")
+        expect_type("function", pool.collect)
+    end)
+
+    it("ThreadPool has join method", function()
+        local pool = lurek.thread.newPool(1, "return")
+        expect_type("function", pool.join)
+    end)
+
+    it("ThreadPool getInputChannel returns a channel", function()
+        local pool = lurek.thread.newPool(1, "return")
+        local ch = pool:getInputChannel()
+        expect_not_nil(ch)
+    end)
+
+    it("ThreadPool getOutputChannel returns a channel", function()
+        local pool = lurek.thread.newPool(1, "return")
+        local ch = pool:getOutputChannel()
+        expect_not_nil(ch)
+    end)
+end)
+
+describe("Async / Promise", function()
+    it("async is a function", function()
+        expect_type("function", lurek.thread.async)
+    end)
+
+    it("async returns a non-nil promise", function()
+        local p = lurek.thread.async("return 42")
+        expect_not_nil(p)
+    end)
+
+    it("Promise has isDone method", function()
+        local p = lurek.thread.async("return 42")
+        expect_type("function", p.isDone)
+    end)
+
+    it("Promise has result method", function()
+        local p = lurek.thread.async("return 42")
+        expect_type("function", p.result)
+    end)
+
+    it("Promise has getError method", function()
+        local p = lurek.thread.async("return 42")
+        expect_type("function", p.getError)
+    end)
+
+    it("isDone returns a boolean value", function()
+        local p = lurek.thread.async("return 42")
+        local done = p:isDone()
+        expect_true(done == true or done == false)
+    end)
+end)
+
 test_summary()

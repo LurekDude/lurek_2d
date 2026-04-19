@@ -1,11 +1,11 @@
 # IDEA — graph
 
-| Field   | Value                          |
-|---------|--------------------------------|
-| Module  | `graph`                        |
-| Path    | `src/graph/`                   |
-| Date    | 2026-04-18                     |
-| Tier    | Foundations                     |
+| Field  | Value        |
+| ------ | ------------ |
+| Module | `graph`      |
+| Path   | `src/graph/` |
+| Date   | 2026-04-18   |
+| Tier   | Foundations  |
 
 ## Mission
 
@@ -25,11 +25,11 @@ Provide a directed flow-simulation graph for Lurek2D: typed nodes and edges with
 
 ## Features — Competitor Comparison
 
-| Feature                      | Lurek2D (graph)              | LÖVE2D                       | Godot 4                      |
-|------------------------------|------------------------------|------------------------------|------------------------------|
-| Flow simulation with items   | ✅ Full push/pull/queue/decay | ❌ No built-in graph system  | ❌ No item-flow graph        |
-| Supply/demand auto-routing   | ✅ Priority-ordered fulfil   | ❌ N/A                       | ❌ Manual via GDScript       |
-| Graph algorithms (MST, A*)   | ✅ 7+ algorithms built-in    | ❌ Manual or lib             | ✅ A* via AStarGrid2D only  |
+| Feature                    | Lurek2D (graph)              | LÖVE2D                     | Godot 4                   |
+| -------------------------- | ---------------------------- | -------------------------- | ------------------------- |
+| Flow simulation with items | ✅ Full push/pull/queue/decay | ❌ No built-in graph system | ❌ No item-flow graph      |
+| Supply/demand auto-routing | ✅ Priority-ordered fulfil    | ❌ N/A                      | ❌ Manual via GDScript     |
+| Graph algorithms (MST, A*) | ✅ 7+ algorithms built-in     | ❌ Manual or lib            | ✅ A* via AStarGrid2D only |
 
 ## Performance / Quality
 

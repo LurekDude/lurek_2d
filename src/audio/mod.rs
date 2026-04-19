@@ -106,5 +106,3 @@ pub fn set_playback_device(name: &str) -> Result<(), crate::runtime::error::Engi
         )))
     }
 }
-
-// Tests migrated to tests/rust/unit/audio_tests.rs

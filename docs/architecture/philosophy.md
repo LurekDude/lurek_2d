@@ -104,12 +104,12 @@ The competitive landscape is dominated by multi-gigabyte engines with visual edi
 
 Lurek2D's visual identity is built on a set of symbols that tell the David vs. Goliath story:
 
-| Symbol | Meaning | Where It Appears |
-|---|---|---|
-| 🌙 Crescent Moon | Lua (Portuguese for "moon") — the scripting surface | Logo, splash screen |
-| ⚙️ Gear / Pacman shape | Rust engine core — industrial-strength, consuming scripts | Logo (primary shape) |
-| 🧊 Small Cube | The industry giants (Engine G, Engine H, Engine C) — orbiting Lurek2D | Logo (accent) |
-| Deep blue + orange palette | Night sky + warm engine glow | All branding materials |
+| Symbol                     | Meaning                                                               | Where It Appears       |
+| -------------------------- | --------------------------------------------------------------------- | ---------------------- |
+| 🌙 Crescent Moon            | Lua (Portuguese for "moon") — the scripting surface                   | Logo, splash screen    |
+| ⚙️ Gear / Pacman shape      | Rust engine core — industrial-strength, consuming scripts             | Logo (primary shape)   |
+| 🧊 Small Cube               | The industry giants (Engine G, Engine H, Engine C) — orbiting Lurek2D | Logo (accent)          |
+| Deep blue + orange palette | Night sky + warm engine glow                                          | All branding materials |
 
 **Naming convention**: "Luna" (engine) + "2D" (scope constraint). Short form: `lurek2d`. Binary name: `lurek2d` (Unix), `lurek2d.exe` (Windows). Lua API prefix: `lurek.*`.
 
@@ -119,15 +119,15 @@ Lurek2D's visual identity is built on a set of symbols that tell the David vs. G
 
 When two paths are available and neither violates a principle above, use these heuristics to choose:
 
-| Heuristic | Meaning |
-|---|---|
-| **Simpler is better** | Fewer moving parts. Fewer concepts. Fewer files. |
-| **Explicit over implicit** | Name things directly. Avoid magic. If a Copilot agent can't infer it from the signature, it's too implicit. |
-| **Defaults over configuration** | Ship the 80% case. Make the other 20% possible but optional. |
-| **Rust performance, Lua ergonomics** | If the user touches it, it should feel Lua-native. If the engine owns it, optimize in Rust. |
-| **Test the contract, not the implementation** | Tests should break when behavior changes, not when code is refactored. |
-| **One canonical place** | Every rule, every pattern, every convention has exactly one source of truth. Reference it, don't duplicate it. |
-| **AI-verifiable** | Could a Copilot agent use this API correctly without a clarifying question? If no, redesign. |
+| Heuristic                                     | Meaning                                                                                                        |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Simpler is better**                         | Fewer moving parts. Fewer concepts. Fewer files.                                                               |
+| **Explicit over implicit**                    | Name things directly. Avoid magic. If a Copilot agent can't infer it from the signature, it's too implicit.    |
+| **Defaults over configuration**               | Ship the 80% case. Make the other 20% possible but optional.                                                   |
+| **Rust performance, Lua ergonomics**          | If the user touches it, it should feel Lua-native. If the engine owns it, optimize in Rust.                    |
+| **Test the contract, not the implementation** | Tests should break when behavior changes, not when code is refactored.                                         |
+| **One canonical place**                       | Every rule, every pattern, every convention has exactly one source of truth. Reference it, don't duplicate it. |
+| **AI-verifiable**                             | Could a Copilot agent use this API correctly without a clarifying question? If no, redesign.                   |
 
 ---
 
@@ -135,13 +135,13 @@ When two paths are available and neither violates a principle above, use these h
 
 These are **active, binding decisions**. All code must comply. Do not propose changes without first opening a design-assumption update discussion.
 
-| ID | Status | Constraint |
-|---|---|---|
-| **A-01** | Active | Lurek2D is a **runtime only** — no embedded visual editor or IDE. The VS Code extension is an opt-in developer experience layer, not part of the engine binary. |
-| **A-02** | Active | **Desktop only** — Windows / Linux / macOS, x86_64 + ARM. Mobile (iOS / Android) and WASM are out of scope. |
-| **A-03** | Active | **2D graphics only** — no 3D scene graph, no perspective projection pipeline. Raycasting columns and isometric rendering are acceptable because they use 2D draw calls. |
-| **A-04** | Active | No distribution platform SDK integration (Steam, Epic, itch.io store APIs) in the core engine binary. Platform wrappers live outside the five-group module stack entirely — constraint T-08. |
-| **A-05** | Proposed | **A-05 (Proposed)** — Core binary stays ≤ 15 MB stripped on desktop targets. Optional subsystems ship as plugins; plugin size is additional and unbudgeted. |
+| ID       | Status   | Constraint                                                                                                                                                                                   |
+| -------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A-01** | Active   | Lurek2D is a **runtime only** — no embedded visual editor or IDE. The VS Code extension is an opt-in developer experience layer, not part of the engine binary.                              |
+| **A-02** | Active   | **Desktop only** — Windows / Linux / macOS, x86_64 + ARM. Mobile (iOS / Android) and WASM are out of scope.                                                                                  |
+| **A-03** | Active   | **2D graphics only** — no 3D scene graph, no perspective projection pipeline. Raycasting columns and isometric rendering are acceptable because they use 2D draw calls.                      |
+| **A-04** | Active   | No distribution platform SDK integration (Steam, Epic, itch.io store APIs) in the core engine binary. Platform wrappers live outside the five-group module stack entirely — constraint T-08. |
+| **A-05** | Proposed | **A-05 (Proposed)** — Core binary stays ≤ 15 MB stripped on desktop targets. Optional subsystems ship as plugins; plugin size is additional and unbudgeted.                                  |
 
 > **A-05 status note**: Currently *Proposed* (not yet binding). It becomes Active when the plugin system described in [plugins.md](plugins.md) is accepted and a baseline stripped-binary measurement is recorded.
 
@@ -149,13 +149,13 @@ These are **active, binding decisions**. All code must comply. Do not propose ch
 
 ## Technology Stack Constraints
 
-| ID | Status | Constraint |
-|---|---|---|
+| ID       | Status | Constraint                                                                                                                                                                                                                       |
+| -------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **B-01** | Active | **LuaJIT** is the primary scripting runtime, vendored through mlua 0.9. Lua 5.4 (`lua54` Cargo feature) is a non-shipping development fallback — it exists for fallback testing and CI environments where LuaJIT is unavailable. |
-| **B-02** | Active | **wgpu 22** is the only renderer backend (Vulkan / DX12 / Metal via the wgpu abstraction). No raw OpenGL path, no software fallback. |
-| **B-03** | Active | Games must run acceptably on **integrated GPUs** (Intel UHD 620, AMD Vega 8 class). No feature requirements beyond wgpu baseline capabilities. Performance target: 60 FPS at 1080p with a reasonable draw call count. |
-| **B-04** | Active | Concurrency lives in **Rust threads**. LuaJIT VMs are single-threaded and cannot share state. Inter-VM communication uses typed MPMC `Channel` objects. |
-| **B-05** | Active | **TOML** is the human-authored configuration format. JSON is accepted for external interop (e.g., exported save files, API data). YAML is not used anywhere in the project. |
+| **B-02** | Active | **wgpu 22** is the only renderer backend (Vulkan / DX12 / Metal via the wgpu abstraction). No raw OpenGL path, no software fallback.                                                                                             |
+| **B-03** | Active | Games must run acceptably on **integrated GPUs** (Intel UHD 620, AMD Vega 8 class). No feature requirements beyond wgpu baseline capabilities. Performance target: 60 FPS at 1080p with a reasonable draw call count.            |
+| **B-04** | Active | Concurrency lives in **Rust threads**. LuaJIT VMs are single-threaded and cannot share state. Inter-VM communication uses typed MPMC `Channel` objects.                                                                          |
+| **B-05** | Active | **TOML** is the human-authored configuration format. JSON is accepted for external interop (e.g., exported save files, API data). YAML is not used anywhere in the project.                                                      |
 
 ---
 
@@ -163,39 +163,39 @@ These are **active, binding decisions**. All code must comply. Do not propose ch
 
 These constraints formalize the [module group model](engine-architecture.md#module-group-model) as enforceable rules. The old Baseline / Tier 1 / Tier 2 / Tier 3 naming is retired — see [Retired Decisions](#retired-decisions).
 
-| ID | Status | Constraint |
-|---|---|---|
+| ID       | Status | Constraint                                                                                                                                                                                                                       |
+| -------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **T-01** | Active | The active module structure uses **five responsibility groups**: Foundations, Core Runtime, Platform Services, Feature Systems, and Edge/Integration. See [engine-architecture.md](engine-architecture.md) § Module Group Model. |
-| **T-02** | Active | `lua_api` (`src/lua_api/`) is the **binding layer** that registers `lurek.*`. It sits in the Edge/Integration group. It may import all Rust groups. No domain module may import `lua_api`. |
-| **T-03** | Active | **No cycles, ever.** The module import graph must remain a DAG. Same-group imports are allowed provided they are acyclic and stable. See Rule 1 and Rule 6 above. |
-| **T-04** | Active | **Composition root is one-way.** `app` and `lua_api` may depend on any module below them. No module below them may import `app` or any `lua_api` binding module. |
-| **T-05** | Active | **Lunasome** (`content/library/`) is the pure-Lua standard library. It consumes public `lurek.*` APIs only — no Rust engine internals, no `require` of engine source files. |
-| **T-06** | Active | **Foundations group modules** (`math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`) must never import render, audio, input, physics, or Lua APIs. See Rule 9. |
-| **T-07** | Active | **Edge/Integration group modules** (`devtools`, `debugbridge`, `automation`) are never imported by domain modules. They are optional components compiled only for development builds. |
-| **T-08** | Active | Platform SDK integrations (Steam, Epic, itch.io store APIs) must not be imported by any module in Foundations, Core Runtime, Platform Services, or Feature Systems groups. They belong to external wrapping binaries only. |
+| **T-02** | Active | `lua_api` (`src/lua_api/`) is the **binding layer** that registers `lurek.*`. It sits in the Edge/Integration group. It may import all Rust groups. No domain module may import `lua_api`.                                       |
+| **T-03** | Active | **No cycles, ever.** The module import graph must remain a DAG. Same-group imports are allowed provided they are acyclic and stable. See Rule 1 and Rule 6 above.                                                                |
+| **T-04** | Active | **Composition root is one-way.** `app` and `lua_api` may depend on any module below them. No module below them may import `app` or any `lua_api` binding module.                                                                 |
+| **T-05** | Active | **Lunasome** (`content/library/`) is the pure-Lua standard library. It consumes public `lurek.*` APIs only — no Rust engine internals, no `require` of engine source files.                                                      |
+| **T-06** | Active | **Foundations group modules** (`math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`) must never import render, audio, input, physics, or Lua APIs. See Rule 9.                                |
+| **T-07** | Active | **Edge/Integration group modules** (`devtools`, `debugbridge`, `automation`) are never imported by domain modules. They are optional components compiled only for development builds.                                            |
+| **T-08** | Active | Platform SDK integrations (Steam, Epic, itch.io store APIs) must not be imported by any module in Foundations, Core Runtime, Platform Services, or Feature Systems groups. They belong to external wrapping binaries only.       |
 
 ---
 
 ## API Design Constraints
 
-| ID | Status | Constraint |
-|---|---|---|
-| **C-01** | Active | All Lua-facing APIs live under the `lurek.*` namespace. No bare globals, no engine-prefixed names, no alternative top-level tables. |
-| **C-02** | Active | Every `lua_api` sub-module exposes exactly one `pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`. |
-| **C-03** | Active | API functions must have **sensible defaults** — never require parameters a beginner would always pass as the same value. Overloaded param counts are preferred over config tables for simple APIs. |
+| ID       | Status | Constraint                                                                                                                                                                                                                      |
+| -------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **C-01** | Active | All Lua-facing APIs live under the `lurek.*` namespace. No bare globals, no engine-prefixed names, no alternative top-level tables.                                                                                             |
+| **C-02** | Active | Every `lua_api` sub-module exposes exactly one `pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`.                                                                                 |
+| **C-03** | Active | API functions must have **sensible defaults** — never require parameters a beginner would always pass as the same value. Overloaded param counts are preferred over config tables for simple APIs.                              |
 | **C-04** | Active | Every callback (`lurek.init`, `lurek.ready`, `lurek.process`, `lurek.process_physics`, `lurek.process_late`, `lurek.render`, `lurek.render_ui`, `lurek.keypressed`, etc.) is **optional**. An empty `main.lua` is a valid game. |
-| **C-05** | Active | Lua API is **synchronous from the script's perspective**. Any asynchronous work happens in Rust threads and communicates results via `Channel`. The Lua VM never blocks on I/O or network. |
+| **C-05** | Active | Lua API is **synchronous from the script's perspective**. Any asynchronous work happens in Rust threads and communicates results via `Channel`. The Lua VM never blocks on I/O or network.                                      |
 
 ---
 
 ## Quality Gate Constraints
 
-| ID | Status | Constraint |
-|---|---|---|
-| **Q-01** | Active | `cargo test` must exit 0 before any merge. All Rust and Lua tests must pass. |
-| **Q-02** | Active | `cargo clippy -- -D warnings` must exit 0 before any merge. No suppressed warnings, no `#[allow(clippy::...)]` without a comment explaining why. |
-| **Q-03** | Active | Every new public Rust API item (`pub fn`, `pub struct`, `pub enum`, `pub trait`) requires at least **one integration test** before merge. |
-| **Q-04** | Active | Every new `lurek.*` Lua API function requires at least **one Lua BDD test** before merge. |
+| ID       | Status | Constraint                                                                                                                                                                                       |
+| -------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Q-01** | Active | `cargo test` must exit 0 before any merge. All Rust and Lua tests must pass.                                                                                                                     |
+| **Q-02** | Active | `cargo clippy -- -D warnings` must exit 0 before any merge. No suppressed warnings, no `#[allow(clippy::...)]` without a comment explaining why.                                                 |
+| **Q-03** | Active | Every new public Rust API item (`pub fn`, `pub struct`, `pub enum`, `pub trait`) requires at least **one integration test** before merge.                                                        |
+| **Q-04** | Active | Every new `lurek.*` Lua API function requires at least **one Lua BDD test** before merge.                                                                                                        |
 | **Q-05** | Active | `python tools/collect_docs.py --report-missing` must exit 0 — no undocumented public items. Every `pub fn`, `pub struct`, `pub enum`, `pub trait`, and `pub type` must have a `///` doc comment. |
 
 → See [test-framework.md](test-framework.md) § Quality Gates for the complete test gate details.
@@ -206,11 +206,11 @@ These constraints formalize the [module group model](engine-architecture.md#modu
 
 Each design constraint has one of three statuses:
 
-| Status | Meaning |
-|---|---|
-| **Active** | Binding. All code must comply. Violations require a design-assumption update discussion before implementation. |
-| **Proposed** | Under consideration. Not yet binding. May be promoted to Active or withdrawn. |
-| **Retired** | Was Active; now superseded by a newer decision. Kept for historical context in the Retired Decisions section below. |
+| Status       | Meaning                                                                                                             |
+| ------------ | ------------------------------------------------------------------------------------------------------------------- |
+| **Active**   | Binding. All code must comply. Violations require a design-assumption update discussion before implementation.      |
+| **Proposed** | Under consideration. Not yet binding. May be promoted to Active or withdrawn.                                       |
+| **Retired**  | Was Active; now superseded by a newer decision. Kept for historical context in the Retired Decisions section below. |
 
 To change a constraint's status:
 1. Open a discussion or issue describing why the change is needed.

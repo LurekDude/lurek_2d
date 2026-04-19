@@ -1,11 +1,11 @@
 # IDEA.md — `ecs` module
 
-| Field | Value |
-|-------|-------|
-| Module | `ecs` |
-| Path | `src/ecs/` |
-| Date | 2026-04-18 |
-| Plugin Tier | CORE-KEEP |
+| Field       | Value      |
+| ----------- | ---------- |
+| Module      | `ecs`      |
+| Path        | `src/ecs/` |
+| Date        | 2026-04-18 |
+| Plugin Tier | CORE-KEEP  |
 
 ---
 

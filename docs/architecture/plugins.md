@@ -52,16 +52,16 @@ The core binary is the product. Every byte added to the default build is paid fo
 
 The current `src/` tree is dominated by a handful of large, optional-by-nature modules. Lines-of-code from the candidate evaluation in [P1_EVIDENCE.md § 5](../../work/docs-api-arch-specs-review-20260418/reports/P1_EVIDENCE.md):
 
-| Module    | LOC   | Used by typical 2D game? |
-|-----------|------:|--------------------------|
-| `ai`      | 7 860 | No — most games ship a custom FSM. |
-| `tilemap` | 7 776 | Yes — fundamental primitive. |
-| `ui`      | 6 882 | Sometimes — many games ship custom Lua UI. |
-| `pathfind`| 5 880 | Only with `ai` or strategy games. |
-| `physics` | 4 921 | Often — but heavy `rapier2d` tree. |
-| `dataframe` | 4 411 | No — power-user only. |
-| `raycaster` | 3 670 | No — Wolfenstein-style only. |
-| `compute` | 3 652 | No — specialist GPU workloads. |
+| Module      |   LOC | Used by typical 2D game?                   |
+| ----------- | ----: | ------------------------------------------ |
+| `ai`        | 7 860 | No — most games ship a custom FSM.         |
+| `tilemap`   | 7 776 | Yes — fundamental primitive.               |
+| `ui`        | 6 882 | Sometimes — many games ship custom Lua UI. |
+| `pathfind`  | 5 880 | Only with `ai` or strategy games.          |
+| `physics`   | 4 921 | Often — but heavy `rapier2d` tree.         |
+| `dataframe` | 4 411 | No — power-user only.                      |
+| `raycaster` | 3 670 | No — Wolfenstein-style only.               |
+| `compute`   | 3 652 | No — specialist GPU workloads.             |
 
 Aggregate the optional-by-nature modules and the heavy crate trees they pull (`rapier2d`, `rusty_enet`, `tungstenite`, `csv`, `roxmltree`) and the saving on a stripped Linux release is conservatively **3–6 MB** plus reduced compile times for users who opt out.
 
@@ -133,12 +133,12 @@ Load order is deterministic: CORE-KEEP first (in module-group order: Foundations
 
 Four tiers, ordered by how aggressively the engine binds the plugin to the core distribution.
 
-| Tier | Distribution | Loaded | Disable strategy |
-|------|--------------|--------|------------------|
-| **CORE-KEEP** | Compiled into the engine binary | Always | Cannot be disabled. Every game depends on it. |
-| **TIER-1-PLUGIN** | Ships as a separate dynamic library next to the binary (e.g. `plugins/ai.dll`) | At engine startup if the file is present | User deletes the file, or sets `[plugins] disabled = ["ai"]` in `conf.toml`. |
-| **TIER-2-PLUGIN** | Built and shipped, but not loaded unless the game opts in | When `conf.lua` declares `plugins = { "physics" }` | Game omits the entry. |
-| **THIRD-PARTY-PLUGIN** | Not shipped by Lurek2D. Built by a community author against the documented Rust crate API. | Discovered like TIER-1 (next to binary) or opted in like TIER-2 | User does not install it. |
+| Tier                   | Distribution                                                                               | Loaded                                                          | Disable strategy                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **CORE-KEEP**          | Compiled into the engine binary                                                            | Always                                                          | Cannot be disabled. Every game depends on it.                                |
+| **TIER-1-PLUGIN**      | Ships as a separate dynamic library next to the binary (e.g. `plugins/ai.dll`)             | At engine startup if the file is present                        | User deletes the file, or sets `[plugins] disabled = ["ai"]` in `conf.toml`. |
+| **TIER-2-PLUGIN**      | Built and shipped, but not loaded unless the game opts in                                  | When `conf.lua` declares `plugins = { "physics" }`              | Game omits the entry.                                                        |
+| **THIRD-PARTY-PLUGIN** | Not shipped by Lurek2D. Built by a community author against the documented Rust crate API. | Discovered like TIER-1 (next to binary) or opted in like TIER-2 | User does not install it.                                                    |
 
 The tier is a property of the **module**, not of the plugin loader: `ai` is always TIER-1, `physics` is always TIER-2, regardless of which loading mechanism (§6) the engine ships first.
 
@@ -151,24 +151,24 @@ CORE-KEEP modules are the floor of the engine identity. They are the modules a t
 
 Source: [P1_EVIDENCE.md § 5 — Plugin candidate evaluation matrix](../../work/docs-api-arch-specs-review-20260418/reports/P1_EVIDENCE.md). Sorted by tier then LOC descending. Per user decision **D-1**, `physics` is **TIER-2-PLUGIN**.
 
-| Module       | LOC   | Heavy deps                                  | Inbound callers (non `lua_api`) | Lua API surface                | Tier              | Rationale |
-|--------------|------:|---------------------------------------------|:------------------------------:|--------------------------------|-------------------|-----------|
-| `ai`         | 7 860 | none                                        | 0                              | `lurek.ai` (34 fn / 27 classes)| TIER-1-PLUGIN     | Largest single optional surface. Most games don't ship FSM/BT/GOAP/HTN/MCTS at the engine level. |
-| `ui`         | 6 882 | none                                        | 1 (`runtime::shared_state`)     | `lurek.ui` (large)             | TIER-1-PLUGIN     | Opinionated widget set; many games author UI in Lua directly. |
-| `pathfind`   | 5 880 | none                                        | 0                              | `lurek.pathfind`               | TIER-1-PLUGIN     | Paired with `ai`; co-extracted. |
-| `raycaster`  | 3 670 | none                                        | 1 (`runtime::shared_state`)     | `lurek.raycaster`              | TIER-1-PLUGIN     | Wolf3D-style 2.5D only. Self-contained. |
-| `dataframe`  | 4 411 | `csv`                                       | 0                              | `lurek.dataframe`              | TIER-1-PLUGIN     | Power-user analytics; orthogonal to gameplay. |
-| `network`    | 2 295 | `rusty_enet`, `ureq`, `tungstenite`, `rmp-serde` | 0                          | `lurek.network`                | TIER-1-PLUGIN     | Heavy HTTP+WS+ENet+TLS tree. Most games are offline. |
-| `terminal`   | 2 606 | none                                        | 0                              | `lurek.terminal`               | TIER-1-PLUGIN     | In-game dev REPL. Dev-only for shipping games. |
-| `spine`      | 1 328 | custom Spine runtime                        | 0                              | `lurek.spine`                  | TIER-1-PLUGIN     | Proprietary format; niche. |
-| `physics`    | 4 921 | `rapier2d`, `rayon`                         | 0                              | `lurek.physics` (19 fn)        | TIER-2-PLUGIN     | Heavy `rapier2d` tree but most 2D games eventually need a solver — opt-in default ON in templates. (D-1) |
-| `compute`    | 3 652 | none                                        | 0                              | `lurek.compute` (11 fn)        | TIER-2-PLUGIN     | GPU compute is specialist. |
-| `procgen`    | 3 021 | none                                        | 0                              | `lurek.procgen`                | TIER-2-PLUGIN     | Keep noise/Perlin in core; move L-systems / WFC / dungeon generators. |
-| `mods`       | 672   | none                                        | 0                              | `lurek.mods`                   | TIER-2-PLUGIN     | Sandboxed mod loader; opt-in per game. |
-| `minimap`    | 1 574 | none                                        | 0                              | `lurek.minimap` (1 fn)         | TIER-2-PLUGIN     | Small; candidate for pure-Lua reimplementation in Lunasome on top of `tilemap`+`camera`. |
-| `parallax`   | 708   | none                                        | 1 (`runtime::shared_state`)     | `lurek.parallax`               | TIER-2-PLUGIN     | Tiny; strongest Lunasome reimplementation candidate. |
-| `save`       | 803   | `serde`                                     | (unchecked)                    | `lurek.save`                   | TIER-2-PLUGIN     | Thin wrapper over `filesystem` + `serial`; could become Lunasome. |
-| `debugbridge`| —     | TCP/WS server                               | 0                              | `lurek.debug.*`                | TIER-2-PLUGIN     | Dev-only. Already optional by intent. |
+| Module        |   LOC | Heavy deps                                       | Inbound callers (non `lua_api`) | Lua API surface                 | Tier          | Rationale                                                                                                |
+| ------------- | ----: | ------------------------------------------------ | :-----------------------------: | ------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------- |
+| `ai`          | 7 860 | none                                             |                0                | `lurek.ai` (34 fn / 27 classes) | TIER-1-PLUGIN | Largest single optional surface. Most games don't ship FSM/BT/GOAP/HTN/MCTS at the engine level.         |
+| `ui`          | 6 882 | none                                             |   1 (`runtime::shared_state`)   | `lurek.ui` (large)              | TIER-1-PLUGIN | Opinionated widget set; many games author UI in Lua directly.                                            |
+| `pathfind`    | 5 880 | none                                             |                0                | `lurek.pathfind`                | TIER-1-PLUGIN | Paired with `ai`; co-extracted.                                                                          |
+| `raycaster`   | 3 670 | none                                             |   1 (`runtime::shared_state`)   | `lurek.raycaster`               | TIER-1-PLUGIN | Wolf3D-style 2.5D only. Self-contained.                                                                  |
+| `dataframe`   | 4 411 | `csv`                                            |                0                | `lurek.dataframe`               | TIER-1-PLUGIN | Power-user analytics; orthogonal to gameplay.                                                            |
+| `network`     | 2 295 | `rusty_enet`, `ureq`, `tungstenite`, `rmp-serde` |                0                | `lurek.network`                 | TIER-1-PLUGIN | Heavy HTTP+WS+ENet+TLS tree. Most games are offline.                                                     |
+| `terminal`    | 2 606 | none                                             |                0                | `lurek.terminal`                | TIER-1-PLUGIN | In-game dev REPL. Dev-only for shipping games.                                                           |
+| `spine`       | 1 328 | custom Spine runtime                             |                0                | `lurek.spine`                   | TIER-1-PLUGIN | Proprietary format; niche.                                                                               |
+| `physics`     | 4 921 | `rapier2d`, `rayon`                              |                0                | `lurek.physics` (19 fn)         | TIER-2-PLUGIN | Heavy `rapier2d` tree but most 2D games eventually need a solver — opt-in default ON in templates. (D-1) |
+| `compute`     | 3 652 | none                                             |                0                | `lurek.compute` (11 fn)         | TIER-2-PLUGIN | GPU compute is specialist.                                                                               |
+| `procgen`     | 3 021 | none                                             |                0                | `lurek.procgen`                 | TIER-2-PLUGIN | Keep noise/Perlin in core; move L-systems / WFC / dungeon generators.                                    |
+| `mods`        |   672 | none                                             |                0                | `lurek.mods`                    | TIER-2-PLUGIN | Sandboxed mod loader; opt-in per game.                                                                   |
+| `minimap`     | 1 574 | none                                             |                0                | `lurek.minimap` (1 fn)          | TIER-2-PLUGIN | Small; candidate for pure-Lua reimplementation in Lunasome on top of `tilemap`+`camera`.                 |
+| `parallax`    |   708 | none                                             |   1 (`runtime::shared_state`)   | `lurek.parallax`                | TIER-2-PLUGIN | Tiny; strongest Lunasome reimplementation candidate.                                                     |
+| `save`        |   803 | `serde`                                          |           (unchecked)           | `lurek.save`                    | TIER-2-PLUGIN | Thin wrapper over `filesystem` + `serial`; could become Lunasome.                                        |
+| `debugbridge` |     — | TCP/WS server                                    |                0                | `lurek.debug.*`                 | TIER-2-PLUGIN | Dev-only. Already optional by intent.                                                                    |
 
 **Coupling refactor required before any of these become dynamic plugins.** [src/runtime/shared_state.rs:26-37](../../src/runtime/shared_state.rs#L26) currently pool-holds `parallax`, `particle`, `raycaster`, `tilemap`, and `ui`. Five candidate modules are wired into the `SharedState` struct by direct `use crate::<m>::...` imports. Plugin extraction MUST first introduce a `SharedState` extension trait or per-plugin registration table so candidates can be removed from `SharedState` without breaking compile. This is migration step **M1** in §9.
 
@@ -325,15 +325,15 @@ Add the `libloading` path behind a `dynamic-plugins` Cargo feature. Port one TIE
 
 ## 10. Comparison to other engines
 
-| Engine        | Plugin model                                                | Native ABI? | Lua-first plugins? | Core size class |
-|---------------|-------------------------------------------------------------|-------------|--------------------|-----------------|
-| **LÖVE**      | None. Extensions are plain Lua libraries or LuaJIT FFI.     | LuaJIT FFI  | Yes (de facto)     | ~6 MB |
-| **Gideros**   | Closed-source plugin SDK (C++). Strong native story (mobile).| Yes         | Limited            | ~10–20 MB |
-| **Solar2D**   | Lua frontend, monolithic Lua + native plugin server.        | Yes (legacy)| Yes                | ~6–10 MB |
-| **GameMaker** | Extensions as DLLs / JS, marketplace-distributed. Tied to GMS. | Yes      | No (GML)           | ~100+ MB |
-| **RPG Maker** | Pure JS plugin model on top of NW.js / Electron.            | No          | n/a (JS)           | ~80–150 MB |
-| **Godot**     | GDExtension: stable C ABI since 4.1, first-class.           | Yes (stable)| GDScript only      | ~60–100 MB |
-| **Lurek2D (proposed)** | Hybrid: Cargo features (M2/M3), Lunasome Lua libs, optional `libloading` (M4). | Planned (M4) | Yes (Lunasome) | **≤ 15 MB stripped (A-05)** |
+| Engine                 | Plugin model                                                                   | Native ABI?  | Lua-first plugins? | Core size class             |
+| ---------------------- | ------------------------------------------------------------------------------ | ------------ | ------------------ | --------------------------- |
+| **LÖVE**               | None. Extensions are plain Lua libraries or LuaJIT FFI.                        | LuaJIT FFI   | Yes (de facto)     | ~6 MB                       |
+| **Gideros**            | Closed-source plugin SDK (C++). Strong native story (mobile).                  | Yes          | Limited            | ~10–20 MB                   |
+| **Solar2D**            | Lua frontend, monolithic Lua + native plugin server.                           | Yes (legacy) | Yes                | ~6–10 MB                    |
+| **GameMaker**          | Extensions as DLLs / JS, marketplace-distributed. Tied to GMS.                 | Yes          | No (GML)           | ~100+ MB                    |
+| **RPG Maker**          | Pure JS plugin model on top of NW.js / Electron.                               | No           | n/a (JS)           | ~80–150 MB                  |
+| **Godot**              | GDExtension: stable C ABI since 4.1, first-class.                              | Yes (stable) | GDScript only      | ~60–100 MB                  |
+| **Lurek2D (proposed)** | Hybrid: Cargo features (M2/M3), Lunasome Lua libs, optional `libloading` (M4). | Planned (M4) | Yes (Lunasome)     | **≤ 15 MB stripped (A-05)** |
 
 Position: **simpler than Godot's GDExtension** (no full ABI surface to maintain in v1), **more native than RPG Maker's JS** (Rust + LuaJIT vs Electron), **smaller core than LÖVE-with-everything-bundled** (LÖVE ships every module always).
 

@@ -1,11 +1,11 @@
 # IDEA.md — `scene` module
 
-| Field | Value |
-|-------|-------|
-| Module | `scene` |
-| Path | `src/scene/` |
-| Date | 2026-04-18 |
-| Plugin Tier | CORE-KEEP |
+| Field       | Value        |
+| ----------- | ------------ |
+| Module      | `scene`      |
+| Path        | `src/scene/` |
+| Date        | 2026-04-18   |
+| Plugin Tier | CORE-KEEP    |
 
 ---
 

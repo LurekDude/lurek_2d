@@ -243,15 +243,15 @@ function in the entire engine that issues wgpu draw calls.
 
 The renderer is NOT just a command interpreter. It owns several GPU subsystems:
 
-| Subsystem | GPU Code Location | Data Source | Responsibility |
-|---|---|---|---|
-| Command dispatch | `gpu_renderer.rs` | `renderer.rs` (RenderCommand enum) | Walk `Vec<RenderCommand>`, batch geometry, issue draws |
-| Camera transforms | `gpu_renderer.rs` | `src/camera/` (viewport, scale) | Apply viewport matrix, coordinate transforms |
-| Post-processing | `gpu_renderer.rs` | `src/effect/` (PostFxEffect stack) | Multi-pass WGSL shader pipeline (bloom, blur, CRT, custom) |
-| 2D lighting | `gpu_renderer.rs` | `src/light/` (Light2D, Occluder) | Shadow map generation, light accumulation buffer, compositing |
-| Texture upload | `gpu_renderer.rs` | `texture.rs` (TextureData pixels) | Upload CPU pixel data to GPU textures |
-| Sprite batching | `gpu_renderer.rs` | `sprite_batch.rs` (BatchEntry list) | Instance buffer management for batched draws |
-| Canvas (off-screen) | `gpu_renderer.rs` | `canvas.rs` (Canvas descriptor) | Off-screen render targets for multi-pass rendering |
+| Subsystem           | GPU Code Location | Data Source                         | Responsibility                                                |
+| ------------------- | ----------------- | ----------------------------------- | ------------------------------------------------------------- |
+| Command dispatch    | `gpu_renderer.rs` | `renderer.rs` (RenderCommand enum)  | Walk `Vec<RenderCommand>`, batch geometry, issue draws        |
+| Camera transforms   | `gpu_renderer.rs` | `src/camera/` (viewport, scale)     | Apply viewport matrix, coordinate transforms                  |
+| Post-processing     | `gpu_renderer.rs` | `src/effect/` (PostFxEffect stack)  | Multi-pass WGSL shader pipeline (bloom, blur, CRT, custom)    |
+| 2D lighting         | `gpu_renderer.rs` | `src/light/` (Light2D, Occluder)    | Shadow map generation, light accumulation buffer, compositing |
+| Texture upload      | `gpu_renderer.rs` | `texture.rs` (TextureData pixels)   | Upload CPU pixel data to GPU textures                         |
+| Sprite batching     | `gpu_renderer.rs` | `sprite_batch.rs` (BatchEntry list) | Instance buffer management for batched draws                  |
+| Canvas (off-screen) | `gpu_renderer.rs` | `canvas.rs` (Canvas descriptor)     | Off-screen render targets for multi-pass rendering            |
 
 ### What the renderer knows about
 
@@ -281,13 +281,13 @@ per domain module.
 
 **Why not `src/ui/lua.rs` inside each domain?**
 
-| Concern | Separate lua_api/ | Per-domain lua.rs |
-|---|---|---|
-| Domain module purity | ✅ No mlua dependency in domain | ❌ mlua bleeds into every domain |
-| Replaceability | ✅ Swap Lua for Wren: edit lua_api/ only | ❌ Touch all 15 domain modules |
-| Compile time | ✅ mlua only compiled once | ❌ Recompiles all domains on mlua change |
-| Testing | ✅ Domain tests need no Lua VM | ❌ Domain tests drag in mlua |
-| Thin wrapper rule | ✅ Enforced by file location | ❌ Easy to add business logic in domain |
+| Concern              | Separate lua_api/                       | Per-domain lua.rs                       |
+| -------------------- | --------------------------------------- | --------------------------------------- |
+| Domain module purity | ✅ No mlua dependency in domain          | ❌ mlua bleeds into every domain         |
+| Replaceability       | ✅ Swap Lua for Wren: edit lua_api/ only | ❌ Touch all 15 domain modules           |
+| Compile time         | ✅ mlua only compiled once               | ❌ Recompiles all domains on mlua change |
+| Testing              | ✅ Domain tests need no Lua VM           | ❌ Domain tests drag in mlua             |
+| Thin wrapper rule    | ✅ Enforced by file location             | ❌ Easy to add business logic in domain  |
 
 **The binding registration contract** (mandatory for every lua_api file):
 
@@ -445,14 +445,14 @@ pub enum RenderCommand {
 
 Resources live in typed `SlotMap` pools inside `SharedState`:
 
-| Handle type | Pool | What it identifies |
-|---|---|---|
-| `TextureKey` | `textures: SlotMap<TextureKey, GpuTexture>` | Uploaded GPU texture |
-| `FontKey` | `fonts: SlotMap<FontKey, RasterFont>` | Rasterized font atlas |
-| `CanvasKey` | `canvases: SlotMap<CanvasKey, Canvas>` | Off-screen render target |
-| `SpriteBatchKey` | `sprite_batches: SlotMap<...>` | Batched sprite geometry |
-| `MeshKey` | `meshes: SlotMap<MeshKey, Mesh>` | Raw vertex/index buffer |
-| `ShaderKey` | `shaders: SlotMap<ShaderKey, Shader>` | Custom WGSL shader |
+| Handle type      | Pool                                        | What it identifies       |
+| ---------------- | ------------------------------------------- | ------------------------ |
+| `TextureKey`     | `textures: SlotMap<TextureKey, GpuTexture>` | Uploaded GPU texture     |
+| `FontKey`        | `fonts: SlotMap<FontKey, RasterFont>`       | Rasterized font atlas    |
+| `CanvasKey`      | `canvases: SlotMap<CanvasKey, Canvas>`      | Off-screen render target |
+| `SpriteBatchKey` | `sprite_batches: SlotMap<...>`              | Batched sprite geometry  |
+| `MeshKey`        | `meshes: SlotMap<MeshKey, Mesh>`            | Raw vertex/index buffer  |
+| `ShaderKey`      | `shaders: SlotMap<ShaderKey, Shader>`       | Custom WGSL shader       |
 
 Lua scripts receive integer IDs (the slot index). `src/lua_api/` converts them
 to typed keys before pushing `RenderCommand`. The renderer resolves keys
@@ -471,38 +471,38 @@ rendering decisions that CPU modules should not know about.
 
 These modules have a `generate_render_commands()` method:
 
-| Module | Output commands | Details |
-|---|---|---|
-| `src/particle/` | `DrawParticleSystem { particles: Vec<ParticleInstance> }` | Already implemented. Single batched command per emitter. Each `ParticleInstance` has position, color, rotation, size, shape, optional texture+quad. |
-| `src/ui/` | `Rectangle`, `RoundedRectangle`, `Print`, `DrawImage`, `DrawNineSlice`, `SetScissor` | One or more commands per widget. Requires layout pass first (see §11.5). |
-| `src/tilemap/` | `DrawQuad` per visible tile | Frustum-cull against camera rect, then emit one `DrawQuad` per visible tile with atlas coordinates. Per-tile tints via `SetColor`. Layer parallax via `Translate`. |
-| `src/parallax/` | `DrawImageEx` per layer | Each layer at scrolled offset. Simple. |
-| `src/animation/` | `DrawQuad` per animated object | Sprite-sheet frame selection → quad region. |
-| `src/spine/` | `DrawQuad` per mesh attachment slot | Mesh deformation computed on CPU, output as textured quads. |
-| `src/camera/` | `PushTransform`, `Translate`, `Scale`, `Rotate`, `PopTransform` | Not a content producer — wraps other content in a transform. |
+| Module           | Output commands                                                                      | Details                                                                                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/particle/`  | `DrawParticleSystem { particles: Vec<ParticleInstance> }`                            | Already implemented. Single batched command per emitter. Each `ParticleInstance` has position, color, rotation, size, shape, optional texture+quad.                |
+| `src/ui/`        | `Rectangle`, `RoundedRectangle`, `Print`, `DrawImage`, `DrawNineSlice`, `SetScissor` | One or more commands per widget. Requires layout pass first (see §11.5).                                                                                           |
+| `src/tilemap/`   | `DrawQuad` per visible tile                                                          | Frustum-cull against camera rect, then emit one `DrawQuad` per visible tile with atlas coordinates. Per-tile tints via `SetColor`. Layer parallax via `Translate`. |
+| `src/parallax/`  | `DrawImageEx` per layer                                                              | Each layer at scrolled offset. Simple.                                                                                                                             |
+| `src/animation/` | `DrawQuad` per animated object                                                       | Sprite-sheet frame selection → quad region.                                                                                                                        |
+| `src/spine/`     | `DrawQuad` per mesh attachment slot                                                  | Mesh deformation computed on CPU, output as textured quads.                                                                                                        |
+| `src/camera/`    | `PushTransform`, `Translate`, `Scale`, `Rotate`, `PopTransform`                      | Not a content producer — wraps other content in a transform.                                                                                                       |
 
 ### Modules that produce structured data (NOT RenderCommands)
 
 These modules give the renderer domain-specific data. The renderer's
 subsystems decide *how* to draw them:
 
-| Module | Output type | Consumed by |
-|---|---|---|
-| `src/light/` (`Light2D`, `Occluder`) | `Vec<Light2D>` + `Vec<Occluder>` | `GpuRenderer` light pass — shadow map generation, light accumulation buffer, blend composite. Uses shaders. |
-| `src/effect/` (`PostFxEffect`, `PostFxStack`) | `Vec<PostFxEffect>` with `HashMap<String, f32>` params | `GpuRenderer` post-FX pass — multi-pass WGSL shader pipeline (bloom, blur, CRT, chromatic, custom). |
-| `src/minimap/` | Terrain grid + fog + objects + pings + markers | Could produce `Vec<RenderCommand>` (simple rects/images) OR render to a canvas. Design choice depends on complexity. |
-| `src/raycaster/` | `RaycasterScene` (wall quads, floor quads, ceiling quads, billboard sprites) | See §11.1. The raycaster model computes perspective-projected textured quads; the GPU renderer draws them. |
+| Module                                        | Output type                                                                  | Consumed by                                                                                                          |
+| --------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `src/light/` (`Light2D`, `Occluder`)          | `Vec<Light2D>` + `Vec<Occluder>`                                             | `GpuRenderer` light pass — shadow map generation, light accumulation buffer, blend composite. Uses shaders.          |
+| `src/effect/` (`PostFxEffect`, `PostFxStack`) | `Vec<PostFxEffect>` with `HashMap<String, f32>` params                       | `GpuRenderer` post-FX pass — multi-pass WGSL shader pipeline (bloom, blur, CRT, chromatic, custom).                  |
+| `src/minimap/`                                | Terrain grid + fog + objects + pings + markers                               | Could produce `Vec<RenderCommand>` (simple rects/images) OR render to a canvas. Design choice depends on complexity. |
+| `src/raycaster/`                              | `RaycasterScene` (wall quads, floor quads, ceiling quads, billboard sprites) | See §11.1. The raycaster model computes perspective-projected textured quads; the GPU renderer draws them.           |
 
 ### Modules that produce no render output
 
-| Module | Role |
-|---|---|
+| Module         | Role                                                                            |
+| -------------- | ------------------------------------------------------------------------------- |
 | `src/physics/` | Simulation only. Debug draw (optional) produces `Vec<RenderCommand>` of shapes. |
-| `src/audio/` | Audio backend — no visual output. |
-| `src/input/` | Input backend — no visual output. |
-| `src/ai/` | Decision logic — no visual output. |
-| `src/math/` | Foundation math — no visual output. |
-| `src/data/` | Foundation data structures — no visual output. |
+| `src/audio/`   | Audio backend — no visual output.                                               |
+| `src/input/`   | Input backend — no visual output.                                               |
+| `src/ai/`      | Decision logic — no visual output.                                              |
+| `src/math/`    | Foundation math — no visual output.                                             |
+| `src/data/`    | Foundation data structures — no visual output.                                  |
 
 ---
 
@@ -647,10 +647,10 @@ screen
 
 **Why textured quads, not column strips?**
 
-| Approach | Pros | Cons |
-|---|---|---|
-| Column strips (vertical scanlines) | Classic technique, simple | Cannot render per-tile floor/ceiling textures; poor quality at high resolution; no perspective-correct walls |
-| Textured quads (Minecraft-style) | Per-tile textures for walls/floor/ceiling; perspective-correct; GPU-native; scales to any resolution | More geometry to upload (quads vs columns) |
+| Approach                           | Pros                                                                                                 | Cons                                                                                                         |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Column strips (vertical scanlines) | Classic technique, simple                                                                            | Cannot render per-tile floor/ceiling textures; poor quality at high resolution; no perspective-correct walls |
+| Textured quads (Minecraft-style)   | Per-tile textures for walls/floor/ceiling; perspective-correct; GPU-native; scales to any resolution | More geometry to upload (quads vs columns)                                                                   |
 
 Column rendering assumes all floor tiles share one colour and all ceiling
 tiles share one colour. This is too limited — games need paths on floors,
@@ -735,15 +735,15 @@ rendering uses GPU fragment shaders for performance. CPU shadow casting
 
 Some modules produce more than one type of output. This is expected and correct:
 
-| Module | Output 1 | Output 2 | Output 3 |
-|---|---|---|---|
-| `src/raycaster/` | `RaycasterScene` (wall/floor/ceiling textured quads for GPU) | `Vec<BillboardSprite>` (depth-sorted for GPU) | Testing: `ImageData` via `draw_to_image()` in model |
-| `src/minimap/` | `Vec<RenderCommand>` (terrain grid, fog overlay) | Ping animations (ephemeral markers) | Viewport indicator rect |
-| `src/effect/` | `Vec<PostFxEffect>` (shader pipeline config) | Overlay state (ambient, weather, fade, shake) | Per-image `ShaderPassDescriptor` |
-| `src/tilemap/` | `Vec<RenderCommand>` (visible tile quads) | Collision data (`Vec<SweepResult>`) | Animation frame updates |
-| `src/ui/` | `Vec<RenderCommand>` (widget draw primitives) | Hit-test results (which widget was clicked) | Layout data (`computed_rect` per widget) |
-| `src/particle/` | `Vec<RenderCommand>` (single `DrawParticleSystem`) | Emitter state (active/stopped/paused) | — |
-| `src/physics/` | Nothing (simulation only) | Debug: `Vec<RenderCommand>` (wireframe shapes) | — |
+| Module           | Output 1                                                     | Output 2                                       | Output 3                                            |
+| ---------------- | ------------------------------------------------------------ | ---------------------------------------------- | --------------------------------------------------- |
+| `src/raycaster/` | `RaycasterScene` (wall/floor/ceiling textured quads for GPU) | `Vec<BillboardSprite>` (depth-sorted for GPU)  | Testing: `ImageData` via `draw_to_image()` in model |
+| `src/minimap/`   | `Vec<RenderCommand>` (terrain grid, fog overlay)             | Ping animations (ephemeral markers)            | Viewport indicator rect                             |
+| `src/effect/`    | `Vec<PostFxEffect>` (shader pipeline config)                 | Overlay state (ambient, weather, fade, shake)  | Per-image `ShaderPassDescriptor`                    |
+| `src/tilemap/`   | `Vec<RenderCommand>` (visible tile quads)                    | Collision data (`Vec<SweepResult>`)            | Animation frame updates                             |
+| `src/ui/`        | `Vec<RenderCommand>` (widget draw primitives)                | Hit-test results (which widget was clicked)    | Layout data (`computed_rect` per widget)            |
+| `src/particle/`  | `Vec<RenderCommand>` (single `DrawParticleSystem`)           | Emitter state (active/stopped/paused)          | —                                                   |
+| `src/physics/`   | Nothing (simulation only)                                    | Debug: `Vec<RenderCommand>` (wireframe shapes) | —                                                   |
 
 **The architecture must not assume one output type per module.** App collects
 each output type through the appropriate channel:
@@ -883,34 +883,34 @@ general-purpose types (Color) to game-domain data (SpriteSheet).
 
 ### Extraction Decision Table
 
-| File | Verdict | Proposed Home | Reasoning |
-|---|---|---|---|
-| `gpu_renderer.rs` | **KEEP** | `src/render/` | Core GPU rendering — wgpu pipelines, render passes, buffer management. The ONLY file that issues draw calls. |
-| `shader.rs` | **KEEP** | `src/render/` | WGSL validation via `wgpu::naga`, GPU pipeline integration. Coupled to wgpu internals. |
-| `renderer.rs` | **KEEP** | `src/render/` | `RenderCommand` enum IS the render contract. Even though it is pure data, it exists solely for the renderer and is the central interface. |
-| `font.rs` | **KEEP** | `src/render/` | Font glyph atlas is tightly coupled to text rendering pipeline. GPU uploads atlas and uses it for all text. No use case for fonts outside rendering. Extracting creates a weak standalone module (Rule 14). |
-| `mesh.rs` | **KEEP** | `src/render/` | `MeshVertex` format is defined by the GPU vertex layout. Vertex/index buffers are renderer-specific data. |
-| `canvas.rs` | **KEEP** | `src/render/` | Off-screen GPU render target descriptor. Only meaningful in a rendering context. |
-| `decal_surface.rs` | **KEEP** | `src/render/` | GPU decal target descriptor. Rendering-specific metadata. |
-| `draw_layer.rs` | **KEEP** | `src/render/` | Z-order queue for `RenderCommand` sorting — a rendering pipeline concern. |
-| `shape.rs` | **KEEP** | `src/render/` | Vector primitive commands that feed `gpu_renderer` tessellation directly. |
-| `image_effect.rs` | **KEEP** | `src/render/` | `ShaderPassDescriptor` configures render passes. Tightly coupled to GPU pipeline. |
-| `color.rs` | **EXTRACT** | `src/math/color.rs` | `Color` (RGBA f32) is a math primitive like `Vec2` and `Rect`. Used by particle, ui, light, effect, tilemap, minimap, raycaster, physics (debug draw) — far broader than rendering. Philosophy Rule 9. |
-| `sprite.rs` | **EXTRACT** | `src/sprite/sprite.rs` (new) | Pure CPU data: position + transform + texture key reference + tint. Used by animation, tilemap, particle. Game-domain data, not render-specific. |
-| `sprite_batch.rs` | **EXTRACT** | `src/sprite/sprite_batch.rs` (new) | CPU sprite collection. Data queue with no GPU calls. Groups naturally with Sprite. |
-| `sprite_sheet.rs` | **EXTRACT** | `src/sprite/sprite_sheet.rs` (new) | Frame grid math, animation groups, direction layouts. Pure CPU. Used by animation system for frame lookup. |
-| `nine_slice.rs` | **EXTRACT** | `src/sprite/nine_slice.rs` (new) | Nine-slice is a sprite technique (texture key + border insets → quad computation). Groups with sprite types. |
-| `texture.rs` | **EXTRACT** | `src/image/texture.rs` | CPU image decode (PNG/JPEG via `image` crate) → `TextureData` (pixel buffer). `src/image/` already handles CPU image operations. GPU texture upload happens in `gpu_renderer.rs`, not here. |
-| `texture_atlas.rs` | **EXTRACT** | `src/image/texture_atlas.rs` | Shelf bin-packing algorithm producing UV regions. Pure CPU. Natural companion to texture loading in `src/image/`. |
+| File               | Verdict     | Proposed Home                      | Reasoning                                                                                                                                                                                                   |
+| ------------------ | ----------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gpu_renderer.rs`  | **KEEP**    | `src/render/`                      | Core GPU rendering — wgpu pipelines, render passes, buffer management. The ONLY file that issues draw calls.                                                                                                |
+| `shader.rs`        | **KEEP**    | `src/render/`                      | WGSL validation via `wgpu::naga`, GPU pipeline integration. Coupled to wgpu internals.                                                                                                                      |
+| `renderer.rs`      | **KEEP**    | `src/render/`                      | `RenderCommand` enum IS the render contract. Even though it is pure data, it exists solely for the renderer and is the central interface.                                                                   |
+| `font.rs`          | **KEEP**    | `src/render/`                      | Font glyph atlas is tightly coupled to text rendering pipeline. GPU uploads atlas and uses it for all text. No use case for fonts outside rendering. Extracting creates a weak standalone module (Rule 14). |
+| `mesh.rs`          | **KEEP**    | `src/render/`                      | `MeshVertex` format is defined by the GPU vertex layout. Vertex/index buffers are renderer-specific data.                                                                                                   |
+| `canvas.rs`        | **KEEP**    | `src/render/`                      | Off-screen GPU render target descriptor. Only meaningful in a rendering context.                                                                                                                            |
+| `decal_surface.rs` | **KEEP**    | `src/render/`                      | GPU decal target descriptor. Rendering-specific metadata.                                                                                                                                                   |
+| `draw_layer.rs`    | **KEEP**    | `src/render/`                      | Z-order queue for `RenderCommand` sorting — a rendering pipeline concern.                                                                                                                                   |
+| `shape.rs`         | **KEEP**    | `src/render/`                      | Vector primitive commands that feed `gpu_renderer` tessellation directly.                                                                                                                                   |
+| `image_effect.rs`  | **KEEP**    | `src/render/`                      | `ShaderPassDescriptor` configures render passes. Tightly coupled to GPU pipeline.                                                                                                                           |
+| `color.rs`         | **EXTRACT** | `src/math/color.rs`                | `Color` (RGBA f32) is a math primitive like `Vec2` and `Rect`. Used by particle, ui, light, effect, tilemap, minimap, raycaster, physics (debug draw) — far broader than rendering. Philosophy Rule 9.      |
+| `sprite.rs`        | **EXTRACT** | `src/sprite/sprite.rs` (new)       | Pure CPU data: position + transform + texture key reference + tint. Used by animation, tilemap, particle. Game-domain data, not render-specific.                                                            |
+| `sprite_batch.rs`  | **EXTRACT** | `src/sprite/sprite_batch.rs` (new) | CPU sprite collection. Data queue with no GPU calls. Groups naturally with Sprite.                                                                                                                          |
+| `sprite_sheet.rs`  | **EXTRACT** | `src/sprite/sprite_sheet.rs` (new) | Frame grid math, animation groups, direction layouts. Pure CPU. Used by animation system for frame lookup.                                                                                                  |
+| `nine_slice.rs`    | **EXTRACT** | `src/sprite/nine_slice.rs` (new)   | Nine-slice is a sprite technique (texture key + border insets → quad computation). Groups with sprite types.                                                                                                |
+| `texture.rs`       | **EXTRACT** | `src/image/texture.rs`             | CPU image decode (PNG/JPEG via `image` crate) → `TextureData` (pixel buffer). `src/image/` already handles CPU image operations. GPU texture upload happens in `gpu_renderer.rs`, not here.                 |
+| `texture_atlas.rs` | **EXTRACT** | `src/image/texture_atlas.rs`       | Shelf bin-packing algorithm producing UV regions. Pure CPU. Natural companion to texture loading in `src/image/`.                                                                                           |
 
 ### Summary
 
-| Action | Files | Count |
-|---|---|---|
-| **KEEP in src/render/** | gpu_renderer, shader, renderer, font, mesh, canvas, decal_surface, draw_layer, shape, image_effect, mod | 11 |
-| **EXTRACT to src/math/** | color | 1 |
-| **EXTRACT to src/sprite/** (new module) | sprite, sprite_batch, sprite_sheet, nine_slice | 4 |
-| **EXTRACT to src/image/** | texture, texture_atlas | 2 |
+| Action                                  | Files                                                                                                   | Count |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----- |
+| **KEEP in src/render/**                 | gpu_renderer, shader, renderer, font, mesh, canvas, decal_surface, draw_layer, shape, image_effect, mod | 11    |
+| **EXTRACT to src/math/**                | color                                                                                                   | 1     |
+| **EXTRACT to src/sprite/** (new module) | sprite, sprite_batch, sprite_sheet, nine_slice                                                          | 4     |
+| **EXTRACT to src/image/**               | texture, texture_atlas                                                                                  | 2     |
 
 ### Post-Refactoring: src/render/ Contents
 

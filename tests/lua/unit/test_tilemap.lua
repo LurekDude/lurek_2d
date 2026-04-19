@@ -1935,6 +1935,227 @@ describe("lurek.tilemap.loadTMX", function()
     end)
 end)
 
+-- ═══════════════════════════════════════════════════════════════════════
+-- Merged from test_tilemap_ext.lua
+-- ═══════════════════════════════════════════════════════════════════════
+
+-- Minimal LDtk JSON with a 4x4 tile layer
+local LDTK_JSON = [[{
+    "levels": [{
+        "identifier": "Level_0",
+        "pxWid": 64,
+        "pxHei": 64,
+        "layerInstances": [{
+            "__type": "Tiles",
+            "__identifier": "Ground",
+            "__gridSize": 16,
+            "gridTiles": [
+                {"px":[0,0], "t":1},
+                {"px":[16,0],"t":1},
+                {"px":[32,0],"t":0},
+                {"px":[48,0],"t":0}
+            ]
+        }]
+    }]
+}]]
+
+describe("lurek.tilemap extended", function()
+    describe("fromLDtk()", function()
+        it("exposes fromLDtk factory", function()
+            expect_type("function", lurek.tilemap.fromLDtk)
+        end)
+
+        it("returns userdata for valid LDtk JSON", function()
+            local tm = lurek.tilemap.fromLDtk(LDTK_JSON)
+            expect_type("userdata", tm)
+        end)
+
+        it("errors on invalid JSON", function()
+            expect_error(function()
+                lurek.tilemap.fromLDtk("not json")
+            end)
+        end)
+
+        it("loads named level without error", function()
+            local tm = lurek.tilemap.fromLDtk(LDTK_JSON, "Level_0")
+            expect_type("userdata", tm)
+        end)
+
+        it("errors for unknown level name", function()
+            expect_error(function()
+                lurek.tilemap.fromLDtk(LDTK_JSON, "NoSuchLevel")
+            end)
+        end)
+    end)
+
+    describe("toNavGrid()", function()
+        it("returns a table of row tables", function()
+            local tm = lurek.tilemap.fromLDtk(LDTK_JSON)
+            local grid = tm:toNavGrid(1, {})
+            expect_type("table", grid)
+            expect_true(#grid > 0, "expected at least one row")
+            expect_type("table", grid[1])
+        end)
+
+        it("empty-cell (GID 0) is walkable by default", function()
+            local tm = lurek.tilemap.fromLDtk(LDTK_JSON)
+            local grid = tm:toNavGrid(1, {})
+            expect_type("boolean", grid[1][1])
+        end)
+
+        it("listed GIDs are walkable", function()
+            local tm = lurek.tilemap.new(2, 1, 16, 16)
+            tm:setTile(1, 0, 0, 5)
+            tm:setTile(1, 1, 0, 6)
+            local grid = tm:toNavGrid(1, {5})
+            expect_equal(true,  grid[1][1])
+            expect_equal(false, grid[1][2])
+        end)
+    end)
+
+    describe("onTileEnter() / checkEntities()", function()
+        it("onTileEnter accepts a callback", function()
+            local tm = lurek.tilemap.new(4, 4, 16, 16)
+            tm:onTileEnter(5, function(wx, wy, tx, ty) end)
+            expect_equal(true, true)
+        end)
+
+        it("callback fires for a matching tile", function()
+            local tm = lurek.tilemap.new(4, 4, 16, 16)
+            tm:setTile(1, 0, 0, 5)
+            local fired = false
+            tm:onTileEnter(5, function(wx, wy, tx, ty)
+                fired = true
+            end)
+            tm:checkEntities(1, {{x=8, y=8}})
+            expect_true(fired, "expected callback to fire")
+        end)
+
+        it("callback does not fire for a non-matching tile", function()
+            local tm = lurek.tilemap.new(4, 4, 16, 16)
+            tm:setTile(1, 0, 0, 3)
+            local fired = false
+            tm:onTileEnter(5, function()
+                fired = true
+            end)
+            tm:checkEntities(1, {{x=8, y=8}})
+            expect_false(fired)
+        end)
+    end)
+end)
+
+-- ═══════════════════════════════════════════════════════════════════════
+-- Merged from test_tilemap_large_map.lua
+-- ═══════════════════════════════════════════════════════════════════════
+
+describe("newLargeMapRenderer factory", function()
+    it("newLargeMapRenderer is a function", function()
+        expect_type("function", lurek.tilemap.newLargeMapRenderer)
+    end)
+
+    it("returns a non-nil object", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        expect_not_nil(lmr)
+    end)
+
+    it("errors on zero tile width", function()
+        expect_error(function()
+            lurek.tilemap.newLargeMapRenderer(0, 16)
+        end)
+    end)
+
+    it("errors on zero tile height", function()
+        expect_error(function()
+            lurek.tilemap.newLargeMapRenderer(16, 0)
+        end)
+    end)
+end)
+
+describe("LargeMapRenderer map data", function()
+    it("setMapData + getMapSize round-trip", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setMapData({0, 1, 0, 1}, 2, 2)
+        local w, h = lmr:getMapSize()
+        expect_equal(2, w)
+        expect_equal(2, h)
+    end)
+
+    it("setTile/getTile round-trip a tile ID", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setMapData({0, 0, 0, 0}, 2, 2)
+        lmr:setTile(0, 0, 42)
+        expect_equal(42, lmr:getTile(0, 0))
+    end)
+
+    it("getTile returns nil out-of-bounds", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setMapData({0}, 1, 1)
+        local v = lmr:getTile(99, 99)
+        expect_equal(nil, v)
+    end)
+end)
+
+describe("LargeMapRenderer chunk settings", function()
+    it("setChunkSize/getChunkSize round-trip", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setChunkSize(8)
+        expect_equal(8, lmr:getChunkSize())
+    end)
+
+    it("setTilesetColumns/getTilesetColumns round-trip", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setTilesetColumns(12)
+        expect_equal(12, lmr:getTilesetColumns())
+    end)
+end)
+
+describe("LargeMapRenderer camera and viewport", function()
+    it("setCamera and setViewport do not error", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setViewport(640, 480)
+        lmr:setCamera(0, 0, 1.0)
+        local v = lmr:getVisibleChunks()
+        expect_true(v >= 0)
+    end)
+
+    it("getTotalChunks returns non-negative", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        expect_true(lmr:getTotalChunks() >= 0)
+    end)
+end)
+
+describe("LargeMapRenderer LOD settings", function()
+    it("setLodEnabled true / isLodEnabled returns true", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setLodEnabled(true)
+        expect_true(lmr:isLodEnabled())
+    end)
+
+    it("setLodEnabled false / isLodEnabled returns false", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setLodEnabled(true)
+        lmr:setLodEnabled(false)
+        expect_false(lmr:isLodEnabled())
+    end)
+
+    it("setLodThresholds accepts a table of thresholds", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setLodThresholds({100, 200, 400})
+    end)
+end)
+
+describe("LargeMapRenderer invalidation", function()
+    it("invalidateAll does not error", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:invalidateAll()
+    end)
+
+    it("invalidateChunk does not error", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:invalidateChunk(0, 0)
+    end)
+end)
+
 -- =========================================================================
 -- End
 -- =========================================================================

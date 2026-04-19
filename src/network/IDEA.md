@@ -1,11 +1,11 @@
 # IDEA.md — `network` module
 
-| Field | Value |
-|-------|-------|
-| **Module** | `network` |
-| **Path** | `src/network/` |
-| **Date** | 2026-04-18 |
-| **Plugin Tier** | TIER-1-PLUGIN |
+| Field           | Value          |
+| --------------- | -------------- |
+| **Module**      | `network`      |
+| **Path**        | `src/network/` |
+| **Date**        | 2026-04-18     |
+| **Plugin Tier** | TIER-1-PLUGIN  |
 
 ---
 

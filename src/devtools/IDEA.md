@@ -1,11 +1,11 @@
 # IDEA.md — `devtools` module
 
-| Field | Value |
-|-------|-------|
-| **Module** | `devtools` |
-| **Path** | `src/devtools/` |
-| **Date** | 2026-04-18 |
-| **Tier** | Edge/Integration |
+| Field      | Value            |
+| ---------- | ---------------- |
+| **Module** | `devtools`       |
+| **Path**   | `src/devtools/`  |
+| **Date**   | 2026-04-18       |
+| **Tier**   | Edge/Integration |
 
 ---
 
@@ -29,11 +29,11 @@ Provide in-process developer tools for Lurek2D: structured logging, hierarchical
 
 ## Features — Competitor Reference
 
-| Feature | Status | Competitor |
-|---------|--------|------------|
-| Entity inspector / scene browser | ❌ Missing | Godot — Remote Scene Tree, Unity — Inspector panel |
-| GPU profiling timeline | ❌ Missing | Unreal — GPU Visualizer, bgfx — built-in GPU profiler |
-| OS-native file watching | ❌ Missing | notify crate (Rust), Unity — FileSystemWatcher |
+| Feature                          | Status    | Competitor                                            |
+| -------------------------------- | --------- | ----------------------------------------------------- |
+| Entity inspector / scene browser | ❌ Missing | Godot — Remote Scene Tree, Unity — Inspector panel    |
+| GPU profiling timeline           | ❌ Missing | Unreal — GPU Visualizer, bgfx — built-in GPU profiler |
+| OS-native file watching          | ❌ Missing | notify crate (Rust), Unity — FileSystemWatcher        |
 
 ## Performance / Quality
 

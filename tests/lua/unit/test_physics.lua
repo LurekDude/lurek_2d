@@ -995,4 +995,1024 @@ describe("World destruction", function()
         expect_no_error(function() lurek.physics.destroyWorld(world) end)
     end)
 end)
+
+-- =========================================================================
+-- Merged from test_physics_body_data.lua
+-- =========================================================================
+
+describe("physics body data", function()
+
+  -- @covers lurek.physics.World:setBodyData
+  -- @covers lurek.physics.World:getBodyData
+  -- @description Stored table data survives a round-trip.
+  it("setBodyData and getBodyData round-trip table", function()
+    local w = lurek.physics.newWorld(0, 9.81)
+    local body = w:newBody(0, 0, "static")
+    local id = body:getId()
+    w:setBodyData(id, { name = "ground", kind = "platform" })
+    local d = w:getBodyData(id)
+    expect_equal(d.name, "ground")
+    expect_equal(d.kind, "platform")
+  end)
+
+  -- @covers lurek.physics.World:getBodyData
+  -- @description Reading data for a body that was never given data returns nil.
+  it("getBodyData returns nil for unset body", function()
+    local w = lurek.physics.newWorld(0, 9.81)
+    local body = w:newBody(0, 0, "static")
+    local id = body:getId()
+    local d = w:getBodyData(id)
+    expect_equal(d, nil)
+  end)
+
+  -- @covers lurek.physics.World:clearBodyData
+  -- @description clearBodyData removes previously stored data.
+  it("clearBodyData removes data", function()
+    local w = lurek.physics.newWorld(0, 9.81)
+    local body = w:newBody(0, 0, "static")
+    local id = body:getId()
+    w:setBodyData(id, "some data")
+    w:clearBodyData(id)
+    expect_equal(w:getBodyData(id), nil)
+  end)
+
+  -- @covers lurek.physics.World:setBodyData
+  -- @description Overwriting data with setBodyData replaces the old value.
+  it("setBodyData overwrites previous value", function()
+    local w = lurek.physics.newWorld(0, 9.81)
+    local body = w:newBody(0, 0, "dynamic")
+    local id = body:getId()
+    w:setBodyData(id, "first")
+    w:setBodyData(id, "second")
+    expect_equal(w:getBodyData(id), "second")
+  end)
+
+  -- @covers lurek.physics.World:setBodyData
+  -- @description Data for multiple bodies is stored independently.
+  it("body data is per-body, not shared", function()
+    local w = lurek.physics.newWorld(0, 9.81)
+    local b1 = w:newBody(0, 0, "static")
+    local b2 = w:newBody(100, 100, "dynamic")
+    local id1 = b1:getId()
+    local id2 = b2:getId()
+    w:setBodyData(id1, "bodyA")
+    w:setBodyData(id2, "bodyB")
+    expect_equal(w:getBodyData(id1), "bodyA")
+    expect_equal(w:getBodyData(id2), "bodyB")
+  end)
+
+end)
+
+-- =========================================================================
+-- Merged from test_physics_cellular.lua
+-- =========================================================================
+
+-- @description Covers suite: lurek.physics cellular factory.
+describe("lurek.physics cellular factory", function()
+    -- @covers lurek.physics.newCellular
+    -- @description Verifies newCellular is exposed as a callable factory.
+    it("newCellular is a function", function()
+        expect_type("function", lurek.physics.newCellular)
+    end)
+
+    -- @covers lurek.physics.newCellular
+    -- @description Verifies newCellular returns userdata.
+    it("newCellular returns userdata", function()
+        local sim = lurek.physics.newCellular(32, 32)
+        expect_type("userdata", sim)
+    end)
+end)
+
+-- @description Covers suite: lurek.physics cellular cell-type constants.
+describe("lurek.physics cellular cell-type constants", function()
+    -- @covers lurek.physics.CELL_AIR
+    -- @description Verifies CELL_AIR is an integer.
+    it("CELL_AIR is an integer", function()
+        expect_type("number", lurek.physics.CELL_AIR)
+        expect_equal(0, lurek.physics.CELL_AIR)
+    end)
+
+    -- @covers lurek.physics.CELL_SAND
+    it("CELL_SAND is greater than CELL_AIR", function()
+        expect_true(lurek.physics.CELL_SAND > lurek.physics.CELL_AIR)
+    end)
+
+    -- @covers lurek.physics.CELL_WATER
+    it("CELL_WATER is an integer", function()
+        expect_type("number", lurek.physics.CELL_WATER)
+    end)
+
+    -- @covers lurek.physics.CELL_ROCK
+    it("CELL_ROCK is an integer", function()
+        expect_type("number", lurek.physics.CELL_ROCK)
+    end)
+
+    -- @covers lurek.physics.CELL_FIRE
+    it("CELL_FIRE is an integer", function()
+        expect_type("number", lurek.physics.CELL_FIRE)
+    end)
+
+    -- @covers lurek.physics.CELL_GAS
+    it("CELL_GAS is an integer", function()
+        expect_type("number", lurek.physics.CELL_GAS)
+    end)
+end)
+
+-- @description Covers suite: lurek.physics cellular cell access.
+describe("lurek.physics cellular cell access", function()
+    local sim
+
+    before_each(function()
+        sim = lurek.physics.newCellular(16, 16)
+    end)
+
+    -- @covers LuaCellular:getCell
+    -- @description Verifies all cells start as CELL_AIR.
+    it("new grid is all air", function()
+        expect_equal(lurek.physics.CELL_AIR, sim:getCell(0, 0))
+        expect_equal(lurek.physics.CELL_AIR, sim:getCell(8, 8))
+    end)
+
+    -- @covers LuaCellular:setCell
+    -- @covers LuaCellular:getCell
+    -- @description Verifies setCell changes the material at a position.
+    it("setCell changes cell type", function()
+        sim:setCell(5, 5, lurek.physics.CELL_SAND)
+        expect_equal(lurek.physics.CELL_SAND, sim:getCell(5, 5))
+    end)
+
+    -- @covers LuaCellular:setCell
+    -- @covers LuaCellular:getCell
+    -- @description Verifies setting a cell back to AIR clears it.
+    it("setting cell to AIR clears it", function()
+        sim:setCell(3, 3, lurek.physics.CELL_ROCK)
+        sim:setCell(3, 3, lurek.physics.CELL_AIR)
+        expect_equal(lurek.physics.CELL_AIR, sim:getCell(3, 3))
+    end)
+end)
+
+-- @description Covers suite: lurek.physics cellular bulk fill.
+describe("lurek.physics cellular bulk fill", function()
+    local sim
+
+    before_each(function()
+        sim = lurek.physics.newCellular(32, 32)
+    end)
+
+    -- @covers LuaCellular:fillRect
+    -- @covers LuaCellular:getCell
+    -- @description Verifies fillRect marks cells inside the region.
+    it("fillRect fills the specified region", function()
+        sim:fillRect(5, 5, 4, 4, lurek.physics.CELL_ROCK)
+        expect_equal(lurek.physics.CELL_ROCK, sim:getCell(6, 6))
+        -- outside the region should remain air
+        expect_equal(lurek.physics.CELL_AIR, sim:getCell(0, 0))
+    end)
+
+    -- @covers LuaCellular:fillCircle
+    -- @covers LuaCellular:getCell
+    -- @description Verifies fillCircle marks the centre cell.
+    it("fillCircle marks centre cell", function()
+        sim:fillCircle(16, 16, 3, lurek.physics.CELL_WATER)
+        expect_equal(lurek.physics.CELL_WATER, sim:getCell(16, 16))
+    end)
+end)
+
+-- @description Covers suite: lurek.physics cellular step.
+describe("lurek.physics cellular step", function()
+    -- @covers LuaCellular:setCell
+    -- @covers LuaCellular:step
+    -- @covers LuaCellular:countCells
+    -- @description Verifies sand falls when there is air below it.
+    it("sand cell falls after one step", function()
+        local sim = lurek.physics.newCellular(8, 8)
+        -- Place sand at top row (row 0), air below.
+        sim:setCell(4, 0, lurek.physics.CELL_SAND)
+        local before = sim:countCells(lurek.physics.CELL_SAND)
+        sim:step()
+        -- Sand count should remain the same (sand moves, not disappears).
+        expect_equal(before, sim:countCells(lurek.physics.CELL_SAND))
+        -- Top cell should now be air (sand moved down).
+        expect_equal(lurek.physics.CELL_AIR, sim:getCell(4, 0))
+    end)
+
+    -- @covers LuaCellular:stepN
+    -- @coverage Verifies stepN is callable with n > 1.
+    it("stepN accepts a count without error", function()
+        local sim = lurek.physics.newCellular(16, 16)
+        sim:fillRect(0, 0, 16, 1, lurek.physics.CELL_SAND)
+        expect_no_error(function()
+            sim:stepN(10)
+        end)
+    end)
+end)
+
+-- @description Covers suite: lurek.physics cellular query.
+describe("lurek.physics cellular query", function()
+    -- @covers LuaCellular:countCells
+    -- @description Verifies countCells returns the precise number of matching cells.
+    it("countCells matches manually placed cells", function()
+        local sim = lurek.physics.newCellular(16, 16)
+        sim:setCell(0, 0, lurek.physics.CELL_ROCK)
+        sim:setCell(1, 0, lurek.physics.CELL_ROCK)
+        sim:setCell(2, 0, lurek.physics.CELL_ROCK)
+        expect_equal(3, sim:countCells(lurek.physics.CELL_ROCK))
+    end)
+
+    -- @covers LuaCellular:findCells
+    -- @description Verifies findCells returns table entries with x/y fields.
+    it("findCells returns x/y tables for each match", function()
+        local sim = lurek.physics.newCellular(16, 16)
+        sim:setCell(3, 7, lurek.physics.CELL_WATER)
+        local found = sim:findCells(lurek.physics.CELL_WATER)
+        expect_equal(1, #found)
+        expect_type("table", found[1])
+        expect_equal(3, found[1].x)
+        expect_equal(7, found[1].y)
+    end)
+end)
+
+-- @description Covers suite: lurek.physics cellular serialisation.
+describe("lurek.physics cellular serialisation", function()
+    -- @covers LuaCellular:toBytes
+    -- @covers LuaCellular:loadFromBytes
+    -- @description Verifies round-trip serialisation preserves cell data.
+    it("toBytes/loadFromBytes round-trip preserves cells", function()
+        local s1 = lurek.physics.newCellular(8, 8)
+        s1:setCell(3, 3, lurek.physics.CELL_SAND)
+        s1:setCell(6, 1, lurek.physics.CELL_ROCK)
+
+        local bytes = s1:toBytes()
+        expect_type("string", bytes)
+
+        local s2 = lurek.physics.newCellular(8, 8)
+        local ok = s2:loadFromBytes(bytes)
+        expect_true(ok)
+        expect_equal(lurek.physics.CELL_SAND, s2:getCell(3, 3))
+        expect_equal(lurek.physics.CELL_ROCK, s2:getCell(6, 1))
+        expect_equal(lurek.physics.CELL_AIR,  s2:getCell(0, 0))
+    end)
+end)
+
+-- =========================================================================
+-- Merged from test_physics_ext.lua
+-- =========================================================================
+
+-- ── Solver iterations ──────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.physics solver iterations API.
+describe("lurek.physics solver iterations", function()
+    local world
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 9.81)
+    end)
+
+    -- @covers lurek.physics.World:getSolverIterations
+    -- @description Verifies default solver iteration count is 4.
+    it("default solver iteration count is 4", function()
+        expect_equal(4, world:getSolverIterations())
+    end)
+
+    -- @covers lurek.physics.World:setSolverIterations
+    -- @covers lurek.physics.World:getSolverIterations
+    -- @description Verifies setSolverIterations persists the new value.
+    it("setSolverIterations persists the value", function()
+        world:setSolverIterations(8)
+        expect_equal(8, world:getSolverIterations())
+    end)
+
+    -- @covers lurek.physics.World:setSolverIterations
+    -- @description Verifies values below 1 are clamped to 1.
+    it("setSolverIterations clamps zero to 1", function()
+        world:setSolverIterations(0)
+        expect_equal(1, world:getSolverIterations())
+    end)
+end)
+
+-- ── Body sleeping ──────────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.physics body sleep API.
+describe("lurek.physics body sleeping", function()
+    local world
+    local body_id
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 9.81)
+        body_id = lurek.physics.newBody(world, 100, 100, "dynamic")
+    end)
+
+    -- @covers lurek.physics.World:isBodySleeping
+    -- @description Verifies isBodySleeping returns a boolean without error.
+    it("isBodySleeping returns boolean", function()
+        local sleeping = world:isBodySleeping(body_id)
+        expect_type("boolean", sleeping)
+    end)
+
+    -- @covers lurek.physics.World:sleepBody
+    -- @covers lurek.physics.World:isBodySleeping
+    -- @description Verifies sleepBody puts a body to sleep.
+    it("sleepBody puts a body to sleep", function()
+        world:sleepBody(body_id)
+        expect_equal(true, world:isBodySleeping(body_id))
+    end)
+
+    -- @covers lurek.physics.World:wakeUpBody
+    -- @covers lurek.physics.World:sleepBody
+    -- @covers lurek.physics.World:isBodySleeping
+    -- @description Verifies wakeUpBody wakes a sleeping body.
+    it("wakeUpBody wakes a sleeping body", function()
+        world:sleepBody(body_id)
+        world:wakeUpBody(body_id)
+        expect_equal(false, world:isBodySleeping(body_id))
+    end)
+
+    -- @covers lurek.physics.Body:isSleeping
+    -- @description Verifies Body:isSleeping returns a boolean.
+    it("Body:isSleeping returns boolean", function()
+        local body = lurek.physics.newBody(world, 200, 200, "dynamic")
+        expect_type("boolean", body:isSleeping())
+    end)
+
+    -- @covers lurek.physics.Body:sleep
+    -- @covers lurek.physics.Body:isSleeping
+    -- @description Verifies Body:sleep and Body:isSleeping.
+    it("Body:sleep puts the body to sleep", function()
+        local body = lurek.physics.newBody(world, 300, 300, "dynamic")
+        body:sleep()
+        expect_equal(true, body:isSleeping())
+    end)
+
+    -- @covers lurek.physics.Body:wakeUp
+    -- @covers lurek.physics.Body:sleep
+    -- @covers lurek.physics.Body:isSleeping
+    -- @description Verifies Body:wakeUp wakes the body after sleeping.
+    it("Body:wakeUp wakes the body", function()
+        local body = lurek.physics.newBody(world, 400, 400, "dynamic")
+        body:sleep()
+        body:wakeUp()
+        expect_equal(false, body:isSleeping())
+    end)
+end)
+
+-- ── One-way platform ───────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.physics one-way platform API.
+describe("lurek.physics one-way platform", function()
+    local world
+    local body_id
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 9.81)
+        body_id = lurek.physics.newBody(world, 0, 0, "static")
+    end)
+
+    -- @covers lurek.physics.World:setBodyOneWay
+    -- @covers lurek.physics.World:getBodyOneWay
+    -- @description Verifies setBodyOneWay stores the normal vector.
+    it("setBodyOneWay stores the normal", function()
+        world:setBodyOneWay(body_id, 0, -1)
+        local nx, ny = world:getBodyOneWay(body_id)
+        expect_near(0,  nx, 1e-5)
+        expect_near(-1, ny, 1e-5)
+    end)
+
+    -- @covers lurek.physics.World:clearBodyOneWay
+    -- @covers lurek.physics.World:getBodyOneWay
+    -- @description Verifies clearBodyOneWay removes the one-way normal.
+    it("clearBodyOneWay removes the one-way flag", function()
+        world:setBodyOneWay(body_id, 0, -1)
+        world:clearBodyOneWay(body_id)
+        local nx, ny = world:getBodyOneWay(body_id)
+        expect_equal(nil, nx)
+        expect_equal(nil, ny)
+    end)
+
+    -- @covers lurek.physics.World:getBodyOneWay
+    -- @description Verifies getBodyOneWay returns nil for a normal body.
+    it("getBodyOneWay returns nil for a normal body", function()
+        local nx, ny = world:getBodyOneWay(body_id)
+        expect_equal(nil, nx)
+        expect_equal(nil, ny)
+    end)
+end)
+
+-- ── CCD ────────────────────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.physics CCD API.
+describe("lurek.physics CCD", function()
+    local world
+    local body_id
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 9.81)
+        body_id = lurek.physics.newBody(world, 100, 100, "dynamic")
+    end)
+
+    -- @covers lurek.physics.World:setBodyCCD
+    -- @covers lurek.physics.World:getBodyCCD
+    -- @description Verifies setBodyCCD enables CCD on a body.
+    it("setBodyCCD enables CCD", function()
+        world:setBodyCCD(body_id, true)
+        expect_equal(true, world:getBodyCCD(body_id))
+    end)
+
+    -- @covers lurek.physics.World:setBodyCCD
+    -- @covers lurek.physics.World:getBodyCCD
+    -- @description Verifies setBodyCCD can disable CCD after enabling.
+    it("setBodyCCD can disable CCD", function()
+        world:setBodyCCD(body_id, true)
+        world:setBodyCCD(body_id, false)
+        expect_equal(false, world:getBodyCCD(body_id))
+    end)
+end)
+
+-- ── Breakable joints ───────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.physics breakable joint API.
+describe("lurek.physics breakable joints", function()
+    local world
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 0)
+    end)
+
+    -- @covers lurek.physics.World:setJointBreakForce
+    -- @covers lurek.physics.World:getJointBreakForce
+    -- @description Verifies setJointBreakForce stores the threshold.
+    it("setJointBreakForce stores the threshold", function()
+        local b1 = lurek.physics.newBody(world, 0, 0, "dynamic")
+        local b2 = lurek.physics.newBody(world, 50, 0, "dynamic")
+        local jid = lurek.physics.newJoint(world, b1, b2, "distance")
+        world:setJointBreakForce(jid, 100.0)
+        expect_near(100.0, world:getJointBreakForce(jid), 1e-4)
+    end)
+
+    -- @covers lurek.physics.World:getJointBreakForce
+    -- @description Verifies getJointBreakForce returns nil for an unset joint.
+    it("getJointBreakForce returns nil when not set", function()
+        local b1 = lurek.physics.newBody(world, 0, 0, "dynamic")
+        local b2 = lurek.physics.newBody(world, 50, 0, "dynamic")
+        local jid = lurek.physics.newJoint(world, b1, b2, "distance")
+        expect_equal(nil, world:getJointBreakForce(jid))
+    end)
+end)
+
+-- ── Contact callbacks ──────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.physics contact callbacks.
+describe("lurek.physics contact callbacks", function()
+    local world
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 0)
+    end)
+
+    -- @covers lurek.physics.World:setBeginContact
+    -- @description Verifies setBeginContact accepts a function without error.
+    it("setBeginContact accepts a function", function()
+        expect_no_error(function()
+            world:setBeginContact(function(a, b) end)
+        end)
+    end)
+
+    -- @covers lurek.physics.World:clearBeginContact
+    -- @description Verifies clearBeginContact does not error.
+    it("clearBeginContact does not error", function()
+        world:setBeginContact(function(a, b) end)
+        expect_no_error(function()
+            world:clearBeginContact()
+        end)
+    end)
+
+    -- @covers lurek.physics.World:setEndContact
+    -- @description Verifies setEndContact accepts a function without error.
+    it("setEndContact accepts a function", function()
+        expect_no_error(function()
+            world:setEndContact(function(a, b) end)
+        end)
+    end)
+
+    -- @covers lurek.physics.World:clearEndContact
+    -- @description Verifies clearEndContact does not error.
+    it("clearEndContact does not error", function()
+        world:setEndContact(function(a, b) end)
+        expect_no_error(function()
+            world:clearEndContact()
+        end)
+    end)
+end)
+
+-- ── Batch body creation ────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.physics batch body creation.
+describe("lurek.physics newBodies", function()
+    local world
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 9.81)
+    end)
+
+    -- @covers lurek.physics.World:newBodies
+    -- @description Verifies newBodies returns the correct number of IDs.
+    it("newBodies returns correct number of IDs", function()
+        local ids = world:newBodies({
+            {0, 0, "dynamic"},
+            {100, 0, "static"},
+            {200, 0, "kinematic"},
+        })
+        expect_equal(3, #ids)
+    end)
+
+    -- @covers lurek.physics.World:newBodies
+    -- @description Verifies all IDs returned by newBodies are integers.
+    it("newBodies IDs are integers", function()
+        local ids = world:newBodies({
+            {10, 20, "dynamic"},
+            {30, 40, "dynamic"},
+        })
+        for _, id in ipairs(ids) do
+            expect_type("number", id)
+        end
+    end)
+
+    -- @covers lurek.physics.World:newBodies
+    -- @description Verifies newBodies with an empty table returns an empty result.
+    it("newBodies with empty table returns empty table", function()
+        local ids = world:newBodies({})
+        expect_equal(0, #ids)
+    end)
+end)
+
+-- =========================================================================
+-- Merged from test_physics_step_fixed.lua
+-- =========================================================================
+
+-- @description Covers suite: lurek.physics World:stepFixed.
+describe("lurek.physics World:stepFixed", function()
+    -- @covers World:stepFixed
+    -- @description Verifies stepFixed is callable on a world handle.
+    it("stepFixed is callable", function()
+        local world = lurek.physics.newWorld(0, 9.81)
+        expect_no_error(function()
+            world:stepFixed(1/60, 1/60, 8)
+        end)
+    end)
+
+    -- @covers World:stepFixed
+    -- @description Verifies the remainder is less than step_dt when accum equals step_dt exactly.
+    it("remainder is zero when accum equals step_dt exactly", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local step_dt = 1/60
+        local remainder = world:stepFixed(step_dt, step_dt, 8)
+        expect_near(0.0, remainder, 1e-4)
+    end)
+
+    -- @covers World:stepFixed
+    -- @description Verifies the remainder is less than step_dt regardless of accum size.
+    it("remainder is always less than step_dt", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local step_dt = 1/60
+        -- Pass 3.5 steps worth of accumulated time.
+        local accum = step_dt * 3.5
+        local remainder = world:stepFixed(accum, step_dt, 8)
+        expect_true(remainder < step_dt, "remainder must be < step_dt")
+        expect_true(remainder >= 0, "remainder must be non-negative")
+    end)
+
+    -- @covers World:stepFixed
+    -- @description Verifies max_steps caps the number of sub-steps.
+    it("max_steps cap leaves remainder >= step_dt when capped", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local step_dt = 1/60
+        -- Pass 100 steps worth of time but cap at 1 sub-step.
+        local accum = step_dt * 100
+        local remainder = world:stepFixed(accum, step_dt, 1)
+        -- After one step, remainder = accum - step_dt ≈ step_dt * 99
+        expect_true(remainder > step_dt, "remaining time should exceed step_dt when capped")
+    end)
+
+    -- @covers World:stepFixed
+    -- @covers World:newBody
+    -- @description Verifies a dynamic body moves after fixed sub-steps under gravity.
+    it("dynamic body moves under gravity after stepFixed", function()
+        local world = lurek.physics.newWorld(0, 100)
+        world:newBody(0, 0, 10, 10, "dynamic")
+        -- Accumulate enough time for one step.
+        world:stepFixed(1/60, 1/60, 4)
+        -- Body position is not queryable here; we only verify no error was raised.
+        expect_true(true)
+    end)
+end)
+
+-- =========================================================================
+-- Merged from test_physics_terrain.lua
+-- =========================================================================
+
+-- @description Covers suite: lurek.physics terrain factory.
+describe("lurek.physics terrain factory", function()
+    -- @covers lurek.physics.newTerrain
+    -- @description Verifies newTerrain is exposed as a callable factory.
+    it("newTerrain is a function", function()
+        expect_type("function", lurek.physics.newTerrain)
+    end)
+
+    -- @covers lurek.physics.newTerrain
+    -- @description Verifies newTerrain returns userdata.
+    it("newTerrain returns userdata", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local terrain = lurek.physics.newTerrain(32, 32, 8, world)
+        expect_type("userdata", terrain)
+    end)
+end)
+
+-- @description Covers suite: lurek.physics terrain cell access.
+describe("lurek.physics terrain cell access", function()
+    local world, terrain
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 0)
+        terrain = lurek.physics.newTerrain(16, 16, 8, world)
+    end)
+
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies all cells start as non-solid.
+    it("all cells start empty", function()
+        expect_false(terrain:getCell(0, 0))
+        expect_false(terrain:getCell(7, 7))
+        expect_false(terrain:getCell(15, 15))
+    end)
+
+    -- @covers LuaTerrain:setCell
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies setCell(solid=true) makes a cell solid.
+    it("setCell true makes cell solid", function()
+        terrain:setCell(3, 3, true)
+        expect_true(terrain:getCell(3, 3))
+    end)
+
+    -- @covers LuaTerrain:setCell
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies setCell(solid=false) removes solid state.
+    it("setCell false clears a solid cell", function()
+        terrain:setCell(5, 5, true)
+        terrain:setCell(5, 5, false)
+        expect_false(terrain:getCell(5, 5))
+    end)
+
+    -- @covers LuaTerrain:setCell
+    -- @covers LuaTerrain:isDirty
+    -- @description Verifies isDirty returns true after setCell changes a value.
+    it("isDirty is true after setCell", function()
+        expect_false(terrain:isDirty())
+        terrain:setCell(0, 0, true)
+        expect_true(terrain:isDirty())
+    end)
+end)
+
+-- @description Covers suite: lurek.physics terrain bulk fill.
+describe("lurek.physics terrain bulk fill", function()
+    local world, terrain
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 0)
+        terrain = lurek.physics.newTerrain(32, 32, 8, world)
+    end)
+
+    -- @covers LuaTerrain:fillAll
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies fillAll(true) makes every cell solid.
+    it("fillAll true marks all cells solid", function()
+        terrain:fillAll(true)
+        expect_true(terrain:getCell(0, 0))
+        expect_true(terrain:getCell(15, 15))
+        expect_true(terrain:getCell(31, 31))
+    end)
+
+    -- @covers LuaTerrain:fillAll
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies fillAll(false) clears every cell.
+    it("fillAll false clears all cells", function()
+        terrain:fillAll(true)
+        terrain:fillAll(false)
+        expect_false(terrain:getCell(0, 0))
+        expect_false(terrain:getCell(15, 15))
+    end)
+
+    -- @covers LuaTerrain:fillRect
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies fillRect marks cells inside the bounds.
+    it("fillRect marks affected cells solid", function()
+        -- fill a 5×5 block at cell (0,0), world coords 0,0 / 40,40 (8px cells)
+        terrain:fillRect(0, 0, 40, 40, true)
+        expect_true(terrain:getCell(2, 2))
+    end)
+
+    -- @covers LuaTerrain:fillCircle
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies fillCircle marks centre cell solid.
+    it("fillCircle marks centre cell solid", function()
+        -- centre at world (64,64), radius 16 → hits cell (8,8)
+        terrain:fillCircle(64, 64, 16, true)
+        expect_true(terrain:getCell(8, 8))
+    end)
+end)
+
+-- @description Covers suite: lurek.physics terrain flush.
+describe("lurek.physics terrain flush", function()
+    -- @covers LuaTerrain:flush
+    -- @covers LuaTerrain:isDirty
+    -- @description Verifies flush clears the dirty flag.
+    it("flush clears isDirty", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local terrain = lurek.physics.newTerrain(16, 16, 8, world)
+        terrain:setCell(0, 0, true)
+        expect_true(terrain:isDirty())
+        terrain:flush()
+        expect_false(terrain:isDirty())
+    end)
+end)
+
+-- @description Covers suite: lurek.physics terrain serialisation.
+describe("lurek.physics terrain serialisation", function()
+    -- @covers LuaTerrain:toBytes
+    -- @covers LuaTerrain:loadFromBytes
+    -- @description Verifies round-trip serialisation preserves cell state.
+    it("toBytes/loadFromBytes round-trip preserves cells", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local t1 = lurek.physics.newTerrain(16, 16, 8, world)
+        t1:setCell(7, 5, true)
+        t1:setCell(2, 10, true)
+
+        local bytes = t1:toBytes()
+        expect_type("string", bytes)
+
+        local t2 = lurek.physics.newTerrain(16, 16, 8, world)
+        local ok = t2:loadFromBytes(bytes)
+        expect_true(ok)
+        expect_true(t2:getCell(7, 5))
+        expect_true(t2:getCell(2, 10))
+        expect_false(t2:getCell(0, 0))
+    end)
+end)
+
+-- =========================================================================
+-- Merged from test_physics_terrain_collapse.lua
+-- =========================================================================
+
+-- @description Covers suite: lurek.physics terrain collapse columns.
+describe("lurek.physics terrain collapse columns", function()
+    -- @covers LuaTerrain:collapseColumns
+    -- @description Verifies collapseColumns returns a non-negative integer.
+    it("collapseColumns returns a non-negative integer", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local terrain = lurek.physics.newTerrain(16, 16, 8, world)
+        local n = terrain:collapseColumns()
+        expect_true(n >= 0, "count must be non-negative")
+    end)
+
+    -- @covers LuaTerrain:fillAll
+    -- @covers LuaTerrain:collapseColumns
+    -- @description Verifies that a fully solid terrain has zero cells to collapse
+    --              (every cell has its neighbour below it).
+    it("fully solid terrain collapses zero cells", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local terrain = lurek.physics.newTerrain(8, 8, 8, world)
+        terrain:fillAll(true)
+        local n = terrain:collapseColumns()
+        expect_equal(0, n)
+    end)
+
+    -- @covers LuaTerrain:setCell
+    -- @covers LuaTerrain:collapseColumns
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies a lone floating cell collapses to empty when
+    --              it has no floor, no left neighbour, and no right neighbour.
+    it("isolated floating cell collapses", function()
+        local world = lurek.physics.newWorld(0, 0)
+        -- 8 columns, 8 rows, 8px cells
+        local terrain = lurek.physics.newTerrain(8, 8, 8, world)
+        -- Place one solid cell in the middle of the top row (row 0, col 4).
+        -- Below it (row 1) is empty.  No horizontal neighbours.
+        terrain:setCell(4, 0, true)
+        local n = terrain:collapseColumns()
+        expect_true(n >= 1, "at least one cell should collapse")
+        expect_false(terrain:getCell(4, 0))
+    end)
+
+    -- @covers LuaTerrain:setCell
+    -- @covers LuaTerrain:collapseColumns
+    -- @covers LuaTerrain:getCell
+    -- @description Verifies that a cell resting on a solid floor does NOT collapse.
+    it("cell on solid floor does not collapse", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local terrain = lurek.physics.newTerrain(8, 8, 8, world)
+        -- Stack: solid at row 6, solid at row 7 (floor row = height-1).
+        terrain:setCell(3, 6, true)
+        terrain:setCell(3, 7, true) -- floor
+        local n = terrain:collapseColumns()
+        expect_equal(0, n)
+        expect_true(terrain:getCell(3, 6))
+    end)
+
+    -- @covers LuaTerrain:collapseColumns
+    -- @covers LuaTerrain:isDirty
+    -- @description Verifies isDirty is set after a collapse removes cells.
+    it("collapseColumns marks terrain dirty when cells fall", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local terrain = lurek.physics.newTerrain(8, 8, 8, world)
+        terrain:setCell(4, 0, true)
+        terrain:flush() -- clear dirty flag first
+        terrain:collapseColumns()
+        expect_true(terrain:isDirty())
+    end)
+end)
+
+-- @description Covers suite: lurek.physics terrain solid positions.
+describe("lurek.physics terrain solid positions", function()
+    -- @covers LuaTerrain:solidPositions
+    -- @description Verifies solidPositions returns an empty table for a blank grid.
+    it("solidPositions empty for blank terrain", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local terrain = lurek.physics.newTerrain(8, 8, 8, world)
+        local pts = terrain:solidPositions()
+        expect_equal(0, #pts)
+    end)
+
+    -- @covers LuaTerrain:setCell
+    -- @covers LuaTerrain:solidPositions
+    -- @description Verifies solidPositions returns one entry after one cell is set.
+    it("solidPositions returns one entry after one setCell", function()
+        local world = lurek.physics.newWorld(0, 0)
+        local terrain = lurek.physics.newTerrain(8, 8, 8, world)
+        terrain:setCell(2, 2, true)
+        local pts = terrain:solidPositions()
+        expect_equal(1, #pts)
+        expect_type("table", pts[1])
+        expect_true(pts[1].x ~= nil, "entry has x field")
+        expect_true(pts[1].y ~= nil, "entry has y field")
+    end)
+end)
+
+-- =========================================================================
+-- Merged from test_physics_zone.lua
+-- =========================================================================
+
+-- @description Covers suite: lurek.physics zone factory.
+describe("lurek.physics zone factory", function()
+    -- @covers lurek.physics.newWorld
+    -- @covers World:addZone
+    -- @description Verifies addZone returns a userdata zone handle.
+    it("addZone returns userdata", function()
+        local world = lurek.physics.newWorld(0, 9.81)
+        local zone = world:addZone(0, 0, 100, 100)
+        expect_type("userdata", zone)
+    end)
+
+    -- @covers World:addZone
+    -- @covers LuaZone:getId
+    -- @description Verifies zone IDs are unique across consecutive addZone calls.
+    it("consecutive zones have different IDs", function()
+        local world = lurek.physics.newWorld(0, 9.81)
+        local z1 = world:addZone(0, 0, 50, 50)
+        local z2 = world:addZone(50, 0, 50, 50)
+        expect_false(z1:getId() == z2:getId(), "zone IDs must be unique")
+    end)
+end)
+
+-- @description Covers suite: lurek.physics zone gravity modes.
+describe("lurek.physics zone gravity modes", function()
+    local world, zone
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 9.81)
+        zone = world:addZone(0, 0, 1000, 1000)
+    end)
+
+    -- @covers LuaZone:setGravityZero
+    -- @description Verifies setGravityZero does not error.
+    it("setGravityZero accepts no arguments", function()
+        expect_no_error(function()
+            zone:setGravityZero()
+        end)
+    end)
+
+    -- @covers LuaZone:setGravityDirectional
+    -- @description Verifies setGravityDirectional accepts gx, gy.
+    it("setGravityDirectional accepts gx and gy", function()
+        expect_no_error(function()
+            zone:setGravityDirectional(0, -50)
+        end)
+    end)
+
+    -- @covers LuaZone:setGravityPoint
+    -- @description Verifies setGravityPoint accepts centre and strength.
+    it("setGravityPoint accepts cx, cy, strength", function()
+        expect_no_error(function()
+            zone:setGravityPoint(500, 500, 1000)
+        end)
+    end)
+
+    -- @covers LuaZone:setGravityRepulsor
+    -- @description Verifies setGravityRepulsor accepts centre and strength.
+    it("setGravityRepulsor accepts cx, cy, strength", function()
+        expect_no_error(function()
+            zone:setGravityRepulsor(500, 500, 500)
+        end)
+    end)
+end)
+
+-- @description Covers suite: lurek.physics zone configuration.
+describe("lurek.physics zone configuration", function()
+    local world, zone
+
+    before_each(function()
+        world = lurek.physics.newWorld(0, 9.81)
+        zone = world:addZone(0, 0, 1000, 1000)
+    end)
+
+    -- @covers LuaZone:setEnabled
+    -- @description Verifies setEnabled accepts a boolean without error.
+    it("setEnabled false does not error", function()
+        expect_no_error(function()
+            zone:setEnabled(false)
+        end)
+    end)
+
+    -- @covers LuaZone:setPriority
+    -- @description Verifies setPriority accepts an integer without error.
+    it("setPriority accepts an integer", function()
+        expect_no_error(function()
+            zone:setPriority(10)
+        end)
+    end)
+
+    -- @covers LuaZone:setLayerMask
+    -- @description Verifies setLayerMask accepts a bitmask without error.
+    it("setLayerMask accepts a bitmask", function()
+        expect_no_error(function()
+            zone:setLayerMask(0xFF)
+        end)
+    end)
+
+    -- @covers LuaZone:setCircle
+    -- @description Verifies switching to a circular boundary does not error.
+    it("setCircle replaces boundary with circle", function()
+        expect_no_error(function()
+            zone:setCircle(500, 500, 300)
+        end)
+    end)
+
+    -- @covers LuaZone:setLinearDampingOverride
+    -- @description Verifies setLinearDampingOverride accepts a number.
+    it("setLinearDampingOverride accepts a value", function()
+        expect_no_error(function()
+            zone:setLinearDampingOverride(2.0)
+        end)
+    end)
+
+    -- @covers LuaZone:setAngularDampingOverride
+    -- @description Verifies setAngularDampingOverride accepts a value.
+    it("setAngularDampingOverride accepts a value", function()
+        expect_no_error(function()
+            zone:setAngularDampingOverride(1.0)
+        end)
+    end)
+
+    -- @covers LuaZone:destroy
+    -- @description Verifies destroy does not error.
+    it("destroy does not error", function()
+        expect_no_error(function()
+            zone:destroy()
+        end)
+    end)
+end)
+
+-- @description Covers suite: lurek.physics zone events.
+describe("lurek.physics zone events", function()
+    -- @covers World:addZone
+    -- @covers World:getZoneEvents
+    -- @description Verifies getZoneEvents returns a table (may be empty before step).
+    it("getZoneEvents returns a table", function()
+        local world = lurek.physics.newWorld(0, 9.81)
+        world:addZone(0, 0, 1000, 1000)
+        local events = world:getZoneEvents()
+        expect_type("table", events)
+    end)
+
+    -- @covers World:addZone
+    -- @covers World:getZoneEvents
+    -- @covers World:step
+    -- @description Verifies that a body created inside a zone produces an enter event after the first step.
+    it("body inside zone produces enter event after step", function()
+        local world = lurek.physics.newWorld(0, 0)
+        world:addZone(0, 0, 1000, 1000)
+        world:newBody(0, 0, 100, 100, "dynamic")
+        world:step(1/60)
+        local events = world:getZoneEvents()
+        expect_true(#events >= 1, "expected at least one zone event")
+        expect_equal("enter", events[1].kind)
+    end)
+end)
+
 test_summary()

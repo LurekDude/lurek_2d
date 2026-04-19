@@ -23,18 +23,18 @@
 
 ## 1. Identity
 
-| Field | Value |
-|---|---|
-| **Package name** | `lurek2d-toolkit` |
-| **Display name** | Lurek2D |
-| **Description** | AI-first IDE support for Lurek2D game engine |
-| **Version** | 0.9.0 |
-| **Publisher** | lurek2d |
-| **VS Code engine** | `^1.90.0` |
-| **Language** | TypeScript (esbuild bundled via `esbuild.config.mjs`) |
-| **Source root** | `extensions/vscode/src/` |
-| **Output** | `extensions/vscode/dist/extension.js` (single esbuild bundle) |
-| **License** | MIT |
+| Field              | Value                                                         |
+| ------------------ | ------------------------------------------------------------- |
+| **Package name**   | `lurek2d-toolkit`                                             |
+| **Display name**   | Lurek2D                                                       |
+| **Description**    | AI-first IDE support for Lurek2D game engine                  |
+| **Version**        | 0.9.0                                                         |
+| **Publisher**      | lurek2d                                                       |
+| **VS Code engine** | `^1.90.0`                                                     |
+| **Language**       | TypeScript (esbuild bundled via `esbuild.config.mjs`)         |
+| **Source root**    | `extensions/vscode/src/`                                      |
+| **Output**         | `extensions/vscode/dist/extension.js` (single esbuild bundle) |
+| **License**        | MIT                                                           |
 
 ---
 
@@ -183,13 +183,13 @@ Note: The original `extension.ts` is a legacy entry point with limited command r
 
 Services are singletons or classes instantiated once and shared via dependency injection into providers and commands.
 
-| Service | File | Responsibility |
-|---|---|---|
-| `ApiDataService` | `services/apiData.ts` | Parses `docs/API/lua_api_reference_generated.md` and `api_data.json`; provides `getFunction()`, `getModule()`, `getAllFunctions()`, `searchFunctions()`. Exposes built-in enum definitions for `DrawMode`, `BodyType`, `BlendMode`, `FilterMode`, and more. |
-| `LuaDocumentAnalyzer` | `services/luaParser.ts` | Full Lua tokeniser producing `Token` streams. Extracts `LuaDocumentInfo`: symbols, require paths, callbacks, scopes, and comments. Cached per document version in each provider. |
-| `LunaProcessService` | `services/lunaProcess.ts` | Resolves the luna binary (user setting → PATH → `cargo run`). Runs the game in an integrated terminal. Emits `onStatusChange` events. Reads `lurek.lunaPath` and `lurek.srcDir` from workspace settings. |
-| `DebugBridge` | `services/debugBridge.ts` | TCP socket client connecting to the running engine on port 19740 (configurable via `lurek.debugBridge.port`). JSON request/response protocol with per-request timeouts. Shows a live stats status bar item when connected. |
-| `SymbolIndex` | `services/symbolIndex.ts` | Regex-based workspace-wide Lua symbol index. Indexes all `*.lua` files for functions, methods, table classes, and constants. Updated incrementally on file change. |
+| Service               | File                      | Responsibility                                                                                                                                                                                                                                              |
+| --------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ApiDataService`      | `services/apiData.ts`     | Parses `docs/API/lua_api_reference_generated.md` and `api_data.json`; provides `getFunction()`, `getModule()`, `getAllFunctions()`, `searchFunctions()`. Exposes built-in enum definitions for `DrawMode`, `BodyType`, `BlendMode`, `FilterMode`, and more. |
+| `LuaDocumentAnalyzer` | `services/luaParser.ts`   | Full Lua tokeniser producing `Token` streams. Extracts `LuaDocumentInfo`: symbols, require paths, callbacks, scopes, and comments. Cached per document version in each provider.                                                                            |
+| `LunaProcessService`  | `services/lunaProcess.ts` | Resolves the luna binary (user setting → PATH → `cargo run`). Runs the game in an integrated terminal. Emits `onStatusChange` events. Reads `lurek.lunaPath` and `lurek.srcDir` from workspace settings.                                                    |
+| `DebugBridge`         | `services/debugBridge.ts` | TCP socket client connecting to the running engine on port 19740 (configurable via `lurek.debugBridge.port`). JSON request/response protocol with per-request timeouts. Shows a live stats status bar item when connected.                                  |
+| `SymbolIndex`         | `services/symbolIndex.ts` | Regex-based workspace-wide Lua symbol index. Indexes all `*.lua` files for functions, methods, table classes, and constants. Updated incrementally on file change.                                                                                          |
 
 ### 4.3 Language Providers
 
@@ -197,63 +197,63 @@ All providers target `{ scheme: "file", language: "lua" }`. Providers that use `
 
 #### IntelliSense Providers
 
-| Provider | File | What it provides |
-|---|---|---|
-| **Completion** | `providers/completion.ts` | Multi-source completion: lurek.* API functions and methods, Lua built-in globals (25 functions), stdlib modules, key names for input functions (50+ keys), string context rules for blend modes / filter modes / wrap modes / body types / source types. LuaCATS `---@type` instance completions. |
-| **Hover** | `providers/hover.ts` | Markdown hover cards for lurek.* functions and modules (from `ApiDataService`), all Lua keywords with code examples, math constant docs (`math.pi`, `math.huge`, `math.maxinteger`), LuaCATS class/field hovers. |
-| **Signature Help** | `providers/signature.ts` | Parameter list help for lurek.* function calls. Tracks cursor position to highlight active parameter. |
-| **Definition** | `providers/definition.ts` | Go-to-definition for lurek.* names opens a virtual `luna-api://` document; for local Lua symbols delegates to `SymbolIndex`. Implements `TextDocumentContentProvider` for the `luna-api` URI scheme. |
-| **References** | `providers/references.ts` | Find-all-references for Lua symbols across the workspace. |
-| **Rename** | `providers/rename.ts` | Safe symbol rename across the workspace (user-defined Lua symbols). |
-| **Symbols** | `providers/symbols.ts` | Document symbol list (Outline view) and workspace symbol search. |
-| **Inlay Hints** | `providers/inlayHints.ts` | Parameter name hints at lurek.* call sites with 2+ arguments. Toggled by `lurek.inlayHints.enabled` setting. |
-| **Semantic Tokens** | `providers/semanticTokens.ts` | Full semantic highlighting with 16 token types: `namespace`, `function`, `method`, `parameter`, `variable`, `property`, `keyword`, `string`, `number`, `comment`, `operator`, `type`, `enumMember`, `macro`, `decorator`, `event`. Cached per document version. |
-| **Code Actions** | `providers/codeActions.ts` | Quick fixes (e.g., auto-import, correct API name). |
-| **Code Lens** | `providers/codeLens.ts` | Function reference count lenses on all function definitions. Luna callback functions (`lurek.load`, `lurek.update`, `lurek.draw`, etc.) get a `⚡ lurek.X callback` lens with API doc link instead. |
-| **Diagnostics** | `providers/diagnostics.ts` | 13 diagnostic rules, debounced at 300 ms: deprecated API usage, color value out of 0–1 range, unused `require` variables, missing asset file, `math.random` in thread context, missing luna callback registration, wrong enum string values, unknown `lurek.*` function names, invalid `conf.lua` fields, per-frame allocation warning, missing `test_summary()` in test files, entity nil access without guard, colon-vs-dot method call suggestion. |
-| **Folding** | `providers/folding.ts` | Folding ranges for Lua `function`/`end`, `if`/`end`, comment blocks. |
-| **Formatting** | `providers/formatting.ts` | Document formatter for Lua files. |
-| **Color** | `providers/color.ts` | Inline colour swatch for `lurek.graphics.setColor(r, g, b)` calls. |
-| **Asset Path** | `providers/assetPath.ts` | Path completion inside string arguments that resolve to workspace asset files. |
-| **LuaCATS** | `providers/luacatsProvider.ts` | Parses `---@class`, `---@field`, `---@param`, `---@return`, `---@type` annotations. Builds a per-document class registry with inheritance. Powers completions and hover for user-defined class instances. |
-| **LuaJIT Hints** | `providers/luajitHints.ts` | LuaJIT-specific hints (FFI, bit ops). |
-| **Type Inference** | `providers/typeInference.ts` | Type inference engine for user Lua variables. Tracks 25+ factory return types (`Image`, `Canvas`, `Font`, `Shader`, `Entity`, `Timer`, `Tween`, `World`, `Body`, `ParticleSystem`, etc.), OOP class instances via `setmetatable`, module aliases (`local gfx = lurek.graphics`), and variable re-assignments. Provides dot-access completion (fields + methods), colon-access completion (methods), and hover information showing type and factory origin. |
+| Provider            | File                           | What it provides                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Completion**      | `providers/completion.ts`      | Multi-source completion: lurek.* API functions and methods, Lua built-in globals (25 functions), stdlib modules, key names for input functions (50+ keys), string context rules for blend modes / filter modes / wrap modes / body types / source types. LuaCATS `---@type` instance completions.                                                                                                                                                          |
+| **Hover**           | `providers/hover.ts`           | Markdown hover cards for lurek.* functions and modules (from `ApiDataService`), all Lua keywords with code examples, math constant docs (`math.pi`, `math.huge`, `math.maxinteger`), LuaCATS class/field hovers.                                                                                                                                                                                                                                           |
+| **Signature Help**  | `providers/signature.ts`       | Parameter list help for lurek.* function calls. Tracks cursor position to highlight active parameter.                                                                                                                                                                                                                                                                                                                                                      |
+| **Definition**      | `providers/definition.ts`      | Go-to-definition for lurek.* names opens a virtual `luna-api://` document; for local Lua symbols delegates to `SymbolIndex`. Implements `TextDocumentContentProvider` for the `luna-api` URI scheme.                                                                                                                                                                                                                                                       |
+| **References**      | `providers/references.ts`      | Find-all-references for Lua symbols across the workspace.                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Rename**          | `providers/rename.ts`          | Safe symbol rename across the workspace (user-defined Lua symbols).                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Symbols**         | `providers/symbols.ts`         | Document symbol list (Outline view) and workspace symbol search.                                                                                                                                                                                                                                                                                                                                                                                           |
+| **Inlay Hints**     | `providers/inlayHints.ts`      | Parameter name hints at lurek.* call sites with 2+ arguments. Toggled by `lurek.inlayHints.enabled` setting.                                                                                                                                                                                                                                                                                                                                               |
+| **Semantic Tokens** | `providers/semanticTokens.ts`  | Full semantic highlighting with 16 token types: `namespace`, `function`, `method`, `parameter`, `variable`, `property`, `keyword`, `string`, `number`, `comment`, `operator`, `type`, `enumMember`, `macro`, `decorator`, `event`. Cached per document version.                                                                                                                                                                                            |
+| **Code Actions**    | `providers/codeActions.ts`     | Quick fixes (e.g., auto-import, correct API name).                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **Code Lens**       | `providers/codeLens.ts`        | Function reference count lenses on all function definitions. Luna callback functions (`lurek.load`, `lurek.update`, `lurek.draw`, etc.) get a `⚡ lurek.X callback` lens with API doc link instead.                                                                                                                                                                                                                                                         |
+| **Diagnostics**     | `providers/diagnostics.ts`     | 13 diagnostic rules, debounced at 300 ms: deprecated API usage, color value out of 0–1 range, unused `require` variables, missing asset file, `math.random` in thread context, missing luna callback registration, wrong enum string values, unknown `lurek.*` function names, invalid `conf.lua` fields, per-frame allocation warning, missing `test_summary()` in test files, entity nil access without guard, colon-vs-dot method call suggestion.      |
+| **Folding**         | `providers/folding.ts`         | Folding ranges for Lua `function`/`end`, `if`/`end`, comment blocks.                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Formatting**      | `providers/formatting.ts`      | Document formatter for Lua files.                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **Color**           | `providers/color.ts`           | Inline colour swatch for `lurek.graphics.setColor(r, g, b)` calls.                                                                                                                                                                                                                                                                                                                                                                                         |
+| **Asset Path**      | `providers/assetPath.ts`       | Path completion inside string arguments that resolve to workspace asset files.                                                                                                                                                                                                                                                                                                                                                                             |
+| **LuaCATS**         | `providers/luacatsProvider.ts` | Parses `---@class`, `---@field`, `---@param`, `---@return`, `---@type` annotations. Builds a per-document class registry with inheritance. Powers completions and hover for user-defined class instances.                                                                                                                                                                                                                                                  |
+| **LuaJIT Hints**    | `providers/luajitHints.ts`     | LuaJIT-specific hints (FFI, bit ops).                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Type Inference**  | `providers/typeInference.ts`   | Type inference engine for user Lua variables. Tracks 25+ factory return types (`Image`, `Canvas`, `Font`, `Shader`, `Entity`, `Timer`, `Tween`, `World`, `Body`, `ParticleSystem`, etc.), OOP class instances via `setmetatable`, module aliases (`local gfx = lurek.graphics`), and variable re-assignments. Provides dot-access completion (fields + methods), colon-access completion (methods), and hover information showing type and factory origin. |
 
 #### Sidebar / Tree Views
 
-| Provider | Contributes |
-|---|---|
-| `ProjectToolsProvider` (`providers/sidebar.ts`) | Sidebar section **Project Health** (main.lua/conf.lua detection, Lua file count, test detection), **Create** (New Project from Template, New File from Template), **Package**, **Libraries** |
-| `DevToolsProvider` (`providers/sidebar.ts`) | Sidebar sections **Run** (game status indicator, run/stop/run-with-args/run-example), **Debug** (connect/disconnect/inspect), **Testing** (last test result display, run all tests) |
-| `AssetExplorerProvider` (`providers/assetExplorer.ts`) | Sidebar tree of workspace assets filtered by type: images, audio, fonts, shaders. Items display file size and open on click. |
+| Provider                                               | Contributes                                                                                                                                                                                  |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ProjectToolsProvider` (`providers/sidebar.ts`)        | Sidebar section **Project Health** (main.lua/conf.lua detection, Lua file count, test detection), **Create** (New Project from Template, New File from Template), **Package**, **Libraries** |
+| `DevToolsProvider` (`providers/sidebar.ts`)            | Sidebar sections **Run** (game status indicator, run/stop/run-with-args/run-example), **Debug** (connect/disconnect/inspect), **Testing** (last test result display, run all tests)          |
+| `AssetExplorerProvider` (`providers/assetExplorer.ts`) | Sidebar tree of workspace assets filtered by type: images, audio, fonts, shaders. Items display file size and open on click.                                                                 |
 
 #### Monitoring Webview Panels
 
-| Panel | File | Content |
-|---|---|---|
-| **Performance Dashboard** | `providers/perfDashboard.ts` | Rolling 300-sample history of FPS, frame time, and Lua heap size. Renders an in-webview chart. Records samples via `recordSample()`. |
-| **System Monitor** | `providers/systemMonitor.ts` | Rolling 120-sample history of CPU %, RAM, luna process CPU + RAM, GPU %, VRAM, disk I/O rates, and network rates. Collects via PowerShell on Windows, `ps`/`vmstat` on Unix. |
-| **Require Graph** | `providers/requireGraph.ts` | Parses `require()` calls across Lua files and visualises the dependency graph as an interactive webview. Resolves module names to workspace files (dot-to-slash, `.lua` / `init.lua` variants). |
-| **API Usage** | `providers/apiUsage.ts` | Analyses lurek.* API function usage frequency across the workspace. |
+| Panel                     | File                         | Content                                                                                                                                                                                         |
+| ------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Performance Dashboard** | `providers/perfDashboard.ts` | Rolling 300-sample history of FPS, frame time, and Lua heap size. Renders an in-webview chart. Records samples via `recordSample()`.                                                            |
+| **System Monitor**        | `providers/systemMonitor.ts` | Rolling 120-sample history of CPU %, RAM, luna process CPU + RAM, GPU %, VRAM, disk I/O rates, and network rates. Collects via PowerShell on Windows, `ps`/`vmstat` on Unix.                    |
+| **Require Graph**         | `providers/requireGraph.ts`  | Parses `require()` calls across Lua files and visualises the dependency graph as an interactive webview. Resolves module names to workspace files (dot-to-slash, `.lua` / `init.lua` variants). |
+| **API Usage**             | `providers/apiUsage.ts`      | Analyses lurek.* API function usage frequency across the workspace.                                                                                                                             |
 
 ### 4.4 Commands
 
 All command implementations live in `src/commands/`. The entry point `extension.ts` currently registers four commands (`lurek2d.runExample`, `lurek2d.listExamples`, `lurek2d.checkBuild`, `lurek2d.getApiDoc`). The full command set is implemented but not yet contributed in `package.json`.
 
-| Module | Functions |
-|---|---|
-| `commands/run.ts` | `runGame()`, `stopGame()`, `runWithArgs()`, `runExample()` — all delegate to `LunaProcessService` |
-| `commands/scaffold.ts` | New project from template (Minimal / Game Loop / Physics / …), new file from template. Writes `main.lua` + `conf.lua` to the chosen directory. |
-| `commands/editors.ts` | Opens any of the webview editors by name |
-| `commands/debugBridge.ts` | Connect / disconnect debug bridge; inspect Lua globals, performance, and logged errors |
-| `commands/cag.ts` | Installs the bundled CAG layer to the workspace `.github/` folder |
-| `commands/gameDevCag.ts` | Game-dev CAG helpers |
-| `commands/gameJam.ts` | Game jam project scaffolding |
-| `commands/library.ts` | Lunasome library management |
-| `commands/packaging.ts` | Build and package the game for distribution |
-| `commands/reference.ts` | Opens the API reference editor panel |
-| `commands/test.ts` | Runs the test suite |
-| `commands/testGenerator.ts` | Generates test stubs from lurek.* API usage |
+| Module                      | Functions                                                                                                                                      |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `commands/run.ts`           | `runGame()`, `stopGame()`, `runWithArgs()`, `runExample()` — all delegate to `LunaProcessService`                                              |
+| `commands/scaffold.ts`      | New project from template (Minimal / Game Loop / Physics / …), new file from template. Writes `main.lua` + `conf.lua` to the chosen directory. |
+| `commands/editors.ts`       | Opens any of the webview editors by name                                                                                                       |
+| `commands/debugBridge.ts`   | Connect / disconnect debug bridge; inspect Lua globals, performance, and logged errors                                                         |
+| `commands/cag.ts`           | Installs the bundled CAG layer to the workspace `.github/` folder                                                                              |
+| `commands/gameDevCag.ts`    | Game-dev CAG helpers                                                                                                                           |
+| `commands/gameJam.ts`       | Game jam project scaffolding                                                                                                                   |
+| `commands/library.ts`       | Lunasome library management                                                                                                                    |
+| `commands/packaging.ts`     | Build and package the game for distribution                                                                                                    |
+| `commands/reference.ts`     | Opens the API reference editor panel                                                                                                           |
+| `commands/test.ts`          | Runs the test suite                                                                                                                            |
+| `commands/testGenerator.ts` | Generates test stubs from lurek.* API usage                                                                                                    |
 
 ### 4.5 Webview Editors
 
@@ -267,37 +267,37 @@ All editors inherit from `WebviewEditor` (`editors/shared.ts`), which provides:
 
 The 29 editor panels are webview-only (HTML canvas + vanilla JS inside the webview). They generate Lua or TOML output and write it to the workspace via the extension host.
 
-| Editor | Opens when |
-|---|---|
-| `ApiReferenceEditor` | Command; reads `docs/API/lua_api_reference_generated.md` |
-| `TileMapEditor` | Command; exports to `tilemap.lua` or `tilemap.toml` |
-| `SceneFlowEditor` | Command; scene state machine editor |
-| `ParticleEditor` | Command; particle system tuner |
-| `DialogEditor` | Command; branching dialogue tree |
-| `EntityEditor` | Command; entity component layout designer |
-| `PixelArtEditor` | Command; pixel art / sprite editor |
-| `GuiWidgetEditor` | Command; GUI widget layout |
-| `AiBehaviorEditor` | Command; AI behaviour tree designer |
-| `GraphEditor` | Command; node graph editor |
-| `ProcMapEditor` | Command; procedural map generator |
-| `QuestTreeEditor` | Command; quest / event tree |
-| `DatabaseEditor` | Command; structured data table editor |
-| `TimelíneEditor` | Command; cutscene / timeline editor |
-| `SpriteAnimEditor` | Command; sprite animation frames |
-| `TilesetEditor` | Command; tileset management |
-| `TilemapScriptEditor` | Command; tilemap scripting / rules |
-| `ShaderPreviewEditor` | Command; WGSL shader live preview |
-| `AudioMixerEditor` | Command; audio bus / mixer |
-| `SoundDspEditor` | Command; DSP chain editor |
-| `FontPreviewEditor` | Command; font metrics preview |
-| `ColorPaletteEditor` | Command; colour palette |
-| `InputMapperEditor` | Command; action → key binding mapper |
-| `LocalizationEditor` | Command; localisation string table |
-| `PostfxOverlayEditor` | Command; post-FX overlay preview |
-| `WorldMapEditor` | Command; world / province map |
-| `VoxelEditor` | Command; voxel map editor |
-| `PhysicsMaterialsEditor` | Command; physics material properties |
-| `TestRunnerEditor` | Command; test runner UI |
+| Editor                   | Opens when                                               |
+| ------------------------ | -------------------------------------------------------- |
+| `ApiReferenceEditor`     | Command; reads `docs/API/lua_api_reference_generated.md` |
+| `TileMapEditor`          | Command; exports to `tilemap.lua` or `tilemap.toml`      |
+| `SceneFlowEditor`        | Command; scene state machine editor                      |
+| `ParticleEditor`         | Command; particle system tuner                           |
+| `DialogEditor`           | Command; branching dialogue tree                         |
+| `EntityEditor`           | Command; entity component layout designer                |
+| `PixelArtEditor`         | Command; pixel art / sprite editor                       |
+| `GuiWidgetEditor`        | Command; GUI widget layout                               |
+| `AiBehaviorEditor`       | Command; AI behaviour tree designer                      |
+| `GraphEditor`            | Command; node graph editor                               |
+| `ProcMapEditor`          | Command; procedural map generator                        |
+| `QuestTreeEditor`        | Command; quest / event tree                              |
+| `DatabaseEditor`         | Command; structured data table editor                    |
+| `TimelíneEditor`         | Command; cutscene / timeline editor                      |
+| `SpriteAnimEditor`       | Command; sprite animation frames                         |
+| `TilesetEditor`          | Command; tileset management                              |
+| `TilemapScriptEditor`    | Command; tilemap scripting / rules                       |
+| `ShaderPreviewEditor`    | Command; WGSL shader live preview                        |
+| `AudioMixerEditor`       | Command; audio bus / mixer                               |
+| `SoundDspEditor`         | Command; DSP chain editor                                |
+| `FontPreviewEditor`      | Command; font metrics preview                            |
+| `ColorPaletteEditor`     | Command; colour palette                                  |
+| `InputMapperEditor`      | Command; action → key binding mapper                     |
+| `LocalizationEditor`     | Command; localisation string table                       |
+| `PostfxOverlayEditor`    | Command; post-FX overlay preview                         |
+| `WorldMapEditor`         | Command; world / province map                            |
+| `VoxelEditor`            | Command; voxel map editor                                |
+| `PhysicsMaterialsEditor` | Command; physics material properties                     |
+| `TestRunnerEditor`       | Command; test runner UI                                  |
 
 ### 4.6 Debug Adapter
 
@@ -321,14 +321,14 @@ Both parse and dispatch `initialize`, `tools/list`, and `tools/call` JSON-RPC me
 
 **`mcp/tools.ts`** defines six MCP tools:
 
-| Tool | Description |
-|---|---|
-| `lurek2d.runExample` | Build and run a named demo project, return output |
-| `lurek2d.getApiDoc` | Search the lurek.* API documentation |
-| `lurek2d.listExamples` | List all demo directories |
-| `lurek2d.runLuaTest` | Run a Lua test file against the debug build |
-| `lurek2d.checkBuild` | Run `cargo check` and return compiler diagnostics |
-| `lurek2d.getLogs` | Return the last N lines of engine log output |
+| Tool                   | Description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `lurek2d.runExample`   | Build and run a named demo project, return output |
+| `lurek2d.getApiDoc`    | Search the lurek.* API documentation              |
+| `lurek2d.listExamples` | List all demo directories                         |
+| `lurek2d.runLuaTest`   | Run a Lua test file against the debug build       |
+| `lurek2d.checkBuild`   | Run `cargo check` and return compiler diagnostics |
+| `lurek2d.getLogs`      | Return the last N lines of engine log output      |
 
 Tool handlers execute shell commands in the workspace root with a configurable timeout.
 
@@ -458,13 +458,13 @@ interface CatsClass {
 
 ## 7. Build and Packaging
 
-| Script | Command |
-|---|---|
-| Bundle | `node esbuild.config.mjs` → `dist/extension.js` (single minified bundle) |
-| Bundle + Tests | `node esbuild.config.mjs --test` → also compiles `dist/test/` |
-| Watch | `node esbuild.config.mjs --watch` (incremental rebuild) |
-| Package | `npm run package` → `npx @vscode/vsce package --no-dependencies` → `.vsix` |
-| Test | `npm run test` → builds test bundle + launches VS Code test electron |
+| Script         | Command                                                                    |
+| -------------- | -------------------------------------------------------------------------- |
+| Bundle         | `node esbuild.config.mjs` → `dist/extension.js` (single minified bundle)   |
+| Bundle + Tests | `node esbuild.config.mjs --test` → also compiles `dist/test/`              |
+| Watch          | `node esbuild.config.mjs --watch` (incremental rebuild)                    |
+| Package        | `npm run package` → `npx @vscode/vsce package --no-dependencies` → `.vsix` |
+| Test           | `npm run test` → builds test bundle + launches VS Code test electron       |
 
 **Dependencies**: only `@modelcontextprotocol/sdk ^1.0.0` at runtime.
 **Dev dependencies**: `@types/vscode`, `@types/node`, `@types/mocha`, `typescript`, `@vscode/vsce`, `@vscode/test-electron`, `@vscode/debugadapter`, `esbuild`, `mocha`, `glob`.
@@ -489,14 +489,14 @@ Test files:
 
 The extension reads from the `luna` workspace configuration namespace:
 
-| Key | Type | Default | Used by |
-|---|---|---|---|
-| `lurek.lunaPath` | string | `""` | `LunaProcessService.findLunaBinary()` |
-| `lurek.srcDir` | string | `""` | `commands/run.ts` — game directory |
-| `lurek.saveOnRun` | boolean | `true` | `LunaProcessService.run()` |
-| `lurek.luaVersion` | string | `"luajit"` | `LuaDebugConfigurationProvider` |
-| `lurek.inlayHints.enabled` | boolean | `true` | `providers/inlayHints.ts` |
-| `lurek.debugBridge.port` | number | `19740` | `services/debugBridge.ts` |
+| Key                        | Type    | Default    | Used by                               |
+| -------------------------- | ------- | ---------- | ------------------------------------- |
+| `lurek.lunaPath`           | string  | `""`       | `LunaProcessService.findLunaBinary()` |
+| `lurek.srcDir`             | string  | `""`       | `commands/run.ts` — game directory    |
+| `lurek.saveOnRun`          | boolean | `true`     | `LunaProcessService.run()`            |
+| `lurek.luaVersion`         | string  | `"luajit"` | `LuaDebugConfigurationProvider`       |
+| `lurek.inlayHints.enabled` | boolean | `true`     | `providers/inlayHints.ts`             |
+| `lurek.debugBridge.port`   | number  | `19740`    | `services/debugBridge.ts`             |
 
 ---
 
@@ -506,12 +506,12 @@ Only the following are currently contributed in `package.json`:
 
 **Commands** (4):
 
-| Command ID | Title |
-|---|---|
-| `lurek2d.runExample` | Lurek2D: Run Example |
-| `lurek2d.listExamples` | Lurek2D: List Examples |
-| `lurek2d.checkBuild` | Lurek2D: Check Build |
-| `lurek2d.getApiDoc` | Lurek2D: Get API Documentation |
+| Command ID             | Title                          |
+| ---------------------- | ------------------------------ |
+| `lurek2d.runExample`   | Lurek2D: Run Example           |
+| `lurek2d.listExamples` | Lurek2D: List Examples         |
+| `lurek2d.checkBuild`   | Lurek2D: Check Build           |
+| `lurek2d.getApiDoc`    | Lurek2D: Get API Documentation |
 
 **Language configuration** (`language-configuration.json`): Lua-specific bracket matching, comment toggles, and auto-closing pairs.
 

@@ -1,11 +1,11 @@
 # IDEA.md — `automation` module
 
-| Field | Value |
-|-------|-------|
-| Module | `automation` |
-| Path | `src/automation/` |
-| Date | 2026-04-18 |
-| Plugin Tier | TIER-1-PLUGIN |
+| Field       | Value             |
+| ----------- | ----------------- |
+| Module      | `automation`      |
+| Path        | `src/automation/` |
+| Date        | 2026-04-18        |
+| Plugin Tier | TIER-1-PLUGIN     |
 
 ---
 

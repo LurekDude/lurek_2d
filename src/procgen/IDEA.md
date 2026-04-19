@@ -1,11 +1,11 @@
 # IDEA.md — `procgen` module
 
-| Field   | Value                |
-|---------|----------------------|
-| Module  | procgen              |
-| Path    | src/procgen/         |
-| Date    | 2026-04-18           |
-| Tier    | TIER-2-PLUGIN        |
+| Field  | Value         |
+| ------ | ------------- |
+| Module | procgen       |
+| Path   | src/procgen/  |
+| Date   | 2026-04-18    |
+| Tier   | TIER-2-PLUGIN |
 
 ---
 

@@ -1,11 +1,11 @@
 # IDEA.md — render
 
-| Field   | Value                  |
-|---------|------------------------|
-| Module  | render                 |
-| Path    | src/render/            |
-| Date    | 2026-04-18             |
-| Tier    | Platform Services      |
+| Field  | Value             |
+| ------ | ----------------- |
+| Module | render            |
+| Path   | src/render/       |
+| Date   | 2026-04-18        |
+| Tier   | Platform Services |
 
 ---
 
@@ -52,11 +52,11 @@ No GPU work happens inside a Lua closure.
 
 ## Features (competitor context, max 3 cites)
 
-| Feature             | Lurek2D status      | Competitor reference |
-|---------------------|---------------------|----------------------|
-| GPU instancing      | ❌ TODO             | Bevy uses automatic batching + GPU instancing for identical meshes (bevy_render). |
-| Anti-aliased lines  | ❌ TODO             | LÖVE 2D uses MSAA (setLineStyle "smooth") for anti-aliased vector drawing. |
-| Post-processing FX  | ✅ 17 built-in      | Godot has a similar per-viewport post-process stack (WorldEnvironment + custom shaders). |
+| Feature            | Lurek2D status | Competitor reference                                                                     |
+| ------------------ | -------------- | ---------------------------------------------------------------------------------------- |
+| GPU instancing     | ❌ TODO         | Bevy uses automatic batching + GPU instancing for identical meshes (bevy_render).        |
+| Anti-aliased lines | ❌ TODO         | LÖVE 2D uses MSAA (setLineStyle "smooth") for anti-aliased vector drawing.               |
+| Post-processing FX | ✅ 17 built-in  | Godot has a similar per-viewport post-process stack (WorldEnvironment + custom shaders). |
 
 ---
 

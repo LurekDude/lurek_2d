@@ -1,11 +1,11 @@
 # IDEA.md — `effect`
 
-| Field     | Value                   |
-|-----------|-------------------------|
-| Module    | `effect`                |
-| Path      | `src/effect/`           |
-| Date      | 2026-04-18              |
-| Tier      | Platform Services       |
+| Field  | Value             |
+| ------ | ----------------- |
+| Module | `effect`          |
+| Path   | `src/effect/`     |
+| Date   | 2026-04-18        |
+| Tier   | Platform Services |
 
 ---
 

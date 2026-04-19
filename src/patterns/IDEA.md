@@ -1,11 +1,11 @@
 # IDEA.md — `patterns` module
 
-| Field | Value |
-|-------|-------|
-| Module | `patterns` |
-| Path | `src/patterns/` |
-| Date | 2026-04-18 |
-| Plugin Tier | CORE-KEEP |
+| Field       | Value           |
+| ----------- | --------------- |
+| Module      | `patterns`      |
+| Path        | `src/patterns/` |
+| Date        | 2026-04-18      |
+| Plugin Tier | CORE-KEEP       |
 
 ---
 

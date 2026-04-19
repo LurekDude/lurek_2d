@@ -41,6 +41,11 @@
 -- @covers LuaParallaxSet.drawAuto
 -- @covers LuaParallaxSet.getName
 -- @covers LuaParallaxSet.setName
+-- @covers LuaParallaxLayer.setDepth
+-- @covers LuaParallaxLayer.getDepth
+-- @covers LuaParallaxLayer.setTiling
+-- @covers LuaParallaxLayer.getTiling
+-- @covers LuaParallaxLayer.setTileSize
 
 -- Helper: load a real texture for tests that require a LuaImage.
 local function load_image()
@@ -703,4 +708,228 @@ describe("Scene-transition: resetAutoscroll pattern", function()
         expect_no_error(function() s:draw(0, 0) end)
     end)
 end)
+
+-- Helper: create a layer backed by a real texture (used by merged satellite tests).
+local function make_layer()
+    local img = lurek.graphic.newImage("assets/icon.png")
+    return lurek.parallax.newLayer({ texture = img })
+end
+
+-- ── Parallax Blend (merged from test_parallax_blend.lua) ──────────────────────
+
+-- @description Covers suite: parallax per-layer blend mode.
+describe("parallax blend modes", function()
+    -- @covers LuaParallaxLayer.getBlendMode
+    -- @description Verifies the default blend mode is 'normal' (alpha blending).
+    it("default blend mode is 'normal'", function()
+        local layer = make_layer()
+        expect_equal("normal", layer:getBlendMode())
+    end)
+
+    -- @covers LuaParallaxLayer.setBlendMode
+    -- @covers LuaParallaxLayer.getBlendMode
+    -- @description Sets mode to 'additive' and verifies it round-trips.
+    it("setBlendMode 'additive' works", function()
+        local layer = make_layer()
+        layer:setBlendMode("additive")
+        expect_equal("additive", layer:getBlendMode())
+    end)
+
+    -- @covers LuaParallaxLayer.setBlendMode
+    -- @covers LuaParallaxLayer.getBlendMode
+    -- @description Sets mode to 'multiply' and verifies it round-trips.
+    it("setBlendMode 'multiply' works", function()
+        local layer = make_layer()
+        layer:setBlendMode("multiply")
+        expect_equal("multiply", layer:getBlendMode())
+    end)
+
+    -- @covers LuaParallaxLayer.setBlendMode
+    -- @covers LuaParallaxLayer.getBlendMode
+    -- @description Sets mode to 'screen' and verifies it round-trips.
+    it("setBlendMode 'screen' works", function()
+        local layer = make_layer()
+        layer:setBlendMode("screen")
+        expect_equal("screen", layer:getBlendMode())
+    end)
+
+    -- @covers LuaParallaxLayer.setBlendMode
+    -- @covers LuaParallaxLayer.getBlendMode
+    -- @description Sets mode to 'replace' and verifies it round-trips.
+    it("setBlendMode 'replace' works", function()
+        local layer = make_layer()
+        layer:setBlendMode("replace")
+        expect_equal("replace", layer:getBlendMode())
+    end)
+
+    -- @covers LuaParallaxLayer.setBlendMode
+    -- @covers LuaParallaxLayer.getBlendMode
+    -- @description Verifies the legacy alias 'alpha' maps to 'normal'.
+    it("legacy alias 'alpha' maps to 'normal'", function()
+        local layer = make_layer()
+        layer:setBlendMode("alpha")
+        expect_equal("normal", layer:getBlendMode())
+    end)
+
+    -- @covers LuaParallaxLayer.setBlendMode
+    -- @covers LuaParallaxLayer.getBlendMode
+    -- @description Verifies the legacy alias 'add' maps to 'additive'.
+    it("legacy alias 'add' maps to 'additive'", function()
+        local layer = make_layer()
+        layer:setBlendMode("add")
+        expect_equal("additive", layer:getBlendMode())
+    end)
+
+    -- @covers LuaParallaxLayer.setBlendMode
+    -- @description Verifies an unrecognised blend mode string raises a Lua error.
+    it("invalid blend mode 'glow' raises an error", function()
+        local layer = make_layer()
+        expect_error(function() layer:setBlendMode("glow") end)
+    end)
+
+    -- @covers LuaParallaxLayer.setBlendMode
+    -- @description Verifies blend mode can be changed multiple times.
+    it("blend mode can be changed multiple times", function()
+        local layer = make_layer()
+        layer:setBlendMode("additive")
+        layer:setBlendMode("multiply")
+        layer:setBlendMode("normal")
+        expect_equal("normal", layer:getBlendMode())
+    end)
+end)
+
+-- ── Parallax Depth (merged from test_parallax_depth.lua) ──────────────────────
+
+-- @description Covers suite: parallax layer floating-point depth.
+describe("parallax layer depth", function()
+    -- @covers LuaParallaxLayer.getDepth
+    -- @description Verifies depth defaults to 0.0 on a newly created layer.
+    it("depth defaults to 0.0", function()
+        local layer = make_layer()
+        expect_near(0.0, layer:getDepth(), 0.001)
+    end)
+
+    -- @covers LuaParallaxLayer.setDepth
+    -- @covers LuaParallaxLayer.getDepth
+    -- @description Sets a positive depth and verifies it round-trips.
+    it("setDepth to positive value", function()
+        local layer = make_layer()
+        layer:setDepth(10.0)
+        expect_near(10.0, layer:getDepth(), 0.001)
+    end)
+
+    -- @covers LuaParallaxLayer.setDepth
+    -- @covers LuaParallaxLayer.getDepth
+    -- @description Sets a negative depth and verifies it round-trips.
+    it("setDepth to negative value", function()
+        local layer = make_layer()
+        layer:setDepth(-10.0)
+        expect_near(-10.0, layer:getDepth(), 0.001)
+    end)
+
+    -- @covers LuaParallaxLayer.setDepth
+    -- @covers LuaParallaxLayer.getDepth
+    -- @description Sets a fractional depth and verifies it round-trips with
+    -- floating-point tolerance.
+    it("setDepth to fractional value", function()
+        local layer = make_layer()
+        layer:setDepth(0.5)
+        expect_near(0.5, layer:getDepth(), 0.001)
+    end)
+
+    -- @covers LuaParallaxLayer.setDepth
+    -- @covers LuaParallaxLayer.getDepth
+    -- @description Verifies depth can be updated multiple times.
+    it("setDepth can be updated multiple times", function()
+        local layer = make_layer()
+        layer:setDepth(1.0)
+        layer:setDepth(-5.5)
+        layer:setDepth(100.0)
+        expect_near(100.0, layer:getDepth(), 0.001)
+    end)
+
+    -- @covers LuaParallaxLayer.setDepth
+    -- @covers LuaParallaxLayer.getDepth
+    -- @description Verifies depth is independent of the integer z value.
+    it("setDepth is independent of setZ", function()
+        local layer = make_layer()
+        layer:setZ(5)
+        layer:setDepth(2.5)
+        expect_equal(5, layer:getZ())
+        expect_near(2.5, layer:getDepth(), 0.001)
+    end)
+end)
+
+-- ── Parallax Tiling (merged from test_parallax_tiling.lua) ────────────────────
+
+-- @description Covers suite: parallax tiling enable/disable.
+describe("parallax tiling", function()
+    -- @covers LuaParallaxLayer.getTiling
+    -- @description Verifies tiling is disabled by default on a newly created layer.
+    it("tiling is disabled by default", function()
+        local layer = make_layer()
+        expect_equal(false, layer:getTiling())
+    end)
+
+    -- @covers LuaParallaxLayer.setTiling
+    -- @covers LuaParallaxLayer.getTiling
+    -- @description Enables tiling and verifies getTiling returns true.
+    it("setTiling(true) enables tiling", function()
+        local layer = make_layer()
+        layer:setTiling(true)
+        expect_equal(true, layer:getTiling())
+    end)
+
+    -- @covers LuaParallaxLayer.setTiling
+    -- @covers LuaParallaxLayer.getTiling
+    -- @description Disables tiling after enabling and verifies getTiling returns false.
+    it("setTiling(false) disables tiling", function()
+        local layer = make_layer()
+        layer:setTiling(true)
+        layer:setTiling(false)
+        expect_equal(false, layer:getTiling())
+    end)
+
+    -- @covers LuaParallaxLayer.setTiling
+    -- @covers LuaParallaxLayer.getTiling
+    -- @description Verifies multiple toggle round-trips are stable.
+    it("toggling tiling multiple times is stable", function()
+        local layer = make_layer()
+        layer:setTiling(true)
+        layer:setTiling(false)
+        layer:setTiling(true)
+        expect_equal(true, layer:getTiling())
+    end)
+end)
+
+-- @description Covers suite: parallax tile size override.
+describe("parallax tile size", function()
+    -- @covers LuaParallaxLayer.setTileSize
+    -- @description Verifies setTileSize accepts positive dimensions without error.
+    it("setTileSize accepts positive dimensions", function()
+        local layer = make_layer()
+        -- Should not error
+        layer:setTileSize(256.0, 128.0)
+        expect_equal(true, true)  -- reached without error
+    end)
+
+    -- @covers LuaParallaxLayer.setTileSize
+    -- @description Verifies setTileSize with zero width resets to texture-based dimensions.
+    it("setTileSize with zero width resets to texture default", function()
+        local layer = make_layer()
+        layer:setTileSize(0.0, 64.0)
+        -- Non-positive w resets tile_w; no error expected
+        expect_equal(true, true)
+    end)
+
+    -- @covers LuaParallaxLayer.setTileSize
+    -- @description Verifies setTileSize can be combined with setTiling without error.
+    it("setTileSize combined with setTiling works", function()
+        local layer = make_layer()
+        layer:setTiling(true)
+        layer:setTileSize(128.0, 128.0)
+        expect_equal(true, layer:getTiling())
+    end)
+end)
+
 test_summary()

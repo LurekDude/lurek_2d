@@ -282,4 +282,262 @@ describe("lurek.raycaster module functions", function()
         end)
     end)
 end)
+
+-- ── Raycaster Floor UV (merged from test_raycaster_floor_uv.lua) ──
+
+-- Helper: build a basic raycaster and map.
+local function make_raycaster()
+    local map = {
+        {1, 1, 1, 1, 1},
+        {1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1},
+    }
+    local rc = lurek.raycaster.new(5, 5, map)
+    return rc
+end
+
+-- @description Covers suite: lurek.raycaster castFloorRow.
+describe("lurek.raycaster castFloorRow", function()
+    -- @description Covers suite: API exposure.
+    describe("API exposure", function()
+        -- @covers lurek.raycaster:castFloorRow
+        -- @description castFloorRow is callable on a raycaster.
+        it("castFloorRow is a function on raycaster", function()
+            local rc = make_raycaster()
+            expect_type("function", rc.castFloorRow)
+        end)
+    end)
+
+    -- @description Covers suite: return value structure.
+    describe("return value", function()
+        -- Camera basis vectors for a player facing +X.
+        local cam_x, cam_y  = 2.5, 2.5
+        local dir_x, dir_y  = 1.0, 0.0
+        local plane_x, plane_y = 0.0, 0.66  -- standard 66° FOV half-plane
+
+        -- @covers lurek.raycaster:castFloorRow
+        -- @description Returns a table.
+        it("returns a table", function()
+            local rc = make_raycaster()
+            local uvs = rc:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, 100)
+            expect_type("table", uvs)
+        end)
+
+        -- @covers lurek.raycaster:castFloorRow
+        -- @description Table length equals screen width.
+        it("table length equals screen width", function()
+            local rc = make_raycaster()
+            local uvs = rc:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, 100)
+            local w = rc:getScreenWidth()
+            expect_equal(w, #uvs)
+        end)
+
+        -- @covers lurek.raycaster:castFloorRow
+        -- @description Each element has u and v keys.
+        it("each element is a {u, v} table", function()
+            local rc = make_raycaster()
+            local uvs = rc:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, 100)
+            for _, uv in ipairs(uvs) do
+                expect_type("number", uv.u)
+                expect_type("number", uv.v)
+                break  -- check just the first entry
+            end
+        end)
+
+        -- @covers lurek.raycaster:castFloorRow
+        -- @description UV values are in [0, 1] range.
+        it("UV values are in [0, 1]", function()
+            local rc = make_raycaster()
+            local uvs = rc:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, 100)
+            for _, uv in ipairs(uvs) do
+                assert(uv.u >= 0.0 and uv.u <= 1.0,
+                    "tex_u out of range: " .. tostring(uv.u))
+                assert(uv.v >= 0.0 and uv.v <= 1.0,
+                    "tex_v out of range: " .. tostring(uv.v))
+            end
+        end)
+
+        -- @covers lurek.raycaster:castFloorRow
+        -- @description Calling for multiple rows does not error.
+        it("works for consecutive rows", function()
+            local rc = make_raycaster()
+            local h = rc:getScreenHeight()
+            for row = h // 2, h - 1 do
+                local uvs = rc:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, row)
+                expect_type("table", uvs)
+            end
+        end)
+    end)
+end)
+
+-- ── Raycaster Sprite Manager (merged from test_raycaster_sprite_manager.lua) ──
+
+describe("raycaster sprite manager", function()
+  it("newSpriteManager returns a userdata", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    expect_equal(type(sm), "userdata")
+  end)
+
+  it("type() returns SpriteManager", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    expect_equal(sm:type(), "SpriteManager")
+  end)
+
+  it("add returns a numeric id", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    local id = sm:add(10, 10, "barrel.png")
+    expect_equal(type(id), "number")
+  end)
+
+  it("ids are unique and incrementing", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    local a = sm:add(1, 1, "a.png")
+    local b = sm:add(2, 2, "b.png")
+    expect_equal(a ~= b, true)
+  end)
+
+  it("remove does not error when id exists", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    local id = sm:add(10, 10, "barrel.png")
+    sm:remove(id)
+    expect_equal(true, true)
+  end)
+
+  it("remove is silent for unknown id", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    sm:remove(9999)
+    expect_equal(true, true)
+  end)
+
+  it("clear empties all sprites", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    sm:add(1, 1, "a.png")
+    sm:add(2, 2, "b.png")
+    sm:clear()
+    local proj = sm:sortAndProject(0, 0, 0.0)
+    expect_equal(#proj, 0)
+  end)
+
+  it("sortAndProject returns a table", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    sm:add(5, 5, "enemy.png")
+    local projected = sm:sortAndProject(0, 0, 0.0)
+    expect_equal(type(projected), "table")
+  end)
+
+  it("sortAndProject result has correct length", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    sm:add(2, 0, "near.png")
+    sm:add(10, 0, "far.png")
+    local proj = sm:sortAndProject(0, 0, 0.0)
+    expect_equal(#proj, 2)
+  end)
+
+  it("sortAndProject sorts far sprites first (back-to-front)", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    sm:add(2, 0, "near.png")
+    sm:add(10, 0, "far.png")
+    local proj = sm:sortAndProject(0, 0, 0.0)
+    expect_equal(proj[1].texture, "far.png")
+    expect_equal(proj[2].texture, "near.png")
+  end)
+
+  it("sortAndProject entry contains distance field", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    sm:add(3, 4, "enemy.png")   -- 5 units from origin
+    local proj = sm:sortAndProject(0, 0, 0.0)
+    expect_equal(#proj, 1)
+    expect_near(proj[1].distance, 5.0, 0.01)
+  end)
+
+  it("setPosition updates world coordinates", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    local id = sm:add(0, 0, "item.png")
+    sm:setPosition(id, 3, 4)
+    local proj = sm:sortAndProject(0, 0, 0.0)
+    expect_near(proj[1].distance, 5.0, 0.01)
+  end)
+
+  it("setVisible(false) hides sprite from projection", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    local id = sm:add(5, 5, "ghost.png")
+    sm:setVisible(id, false)
+    local proj = sm:sortAndProject(0, 0, 0.0)
+    expect_equal(#proj, 0)
+  end)
+
+  it("setVisible(true) re-shows hidden sprite", function()
+    local sm = lurek.raycaster.newSpriteManager()
+    local id = sm:add(5, 5, "ghost.png")
+    sm:setVisible(id, false)
+    sm:setVisible(id, true)
+    local proj = sm:sortAndProject(0, 0, 0.0)
+    expect_equal(#proj, 1)
+  end)
+end)
+
+-- ── Raycaster Transparent Walls (merged from test_raycaster_transparent.lua) ──
+
+describe("raycaster transparent walls", function()
+  it("setWallAlpha and getWallAlpha round-trip correctly", function()
+    local m = lurek.raycaster.newMap(32, 32)
+    m:setWallAlpha(3, 0.5)
+    expect_near(m:getWallAlpha(3), 0.5, 0.001)
+  end)
+
+  it("getWallAlpha returns 1.0 for unregistered tile type", function()
+    local m = lurek.raycaster.newMap(32, 32)
+    expect_near(m:getWallAlpha(99), 1.0, 0.001)
+  end)
+
+  it("alpha above 1.0 is clamped to 1.0", function()
+    local m = lurek.raycaster.newMap(32, 32)
+    m:setWallAlpha(1, 1.5)
+    expect_near(m:getWallAlpha(1), 1.0, 0.001)
+  end)
+
+  it("alpha below 0.0 is clamped to 0.0", function()
+    local m = lurek.raycaster.newMap(32, 32)
+    m:setWallAlpha(1, -0.5)
+    expect_near(m:getWallAlpha(1), 0.0, 0.001)
+  end)
+
+  it("multiple tile types store independent alpha values", function()
+    local m = lurek.raycaster.newMap(32, 32)
+    m:setWallAlpha(1, 0.25)
+    m:setWallAlpha(2, 0.75)
+    expect_near(m:getWallAlpha(1), 0.25, 0.001)
+    expect_near(m:getWallAlpha(2), 0.75, 0.001)
+    -- unset tile still defaults
+    expect_near(m:getWallAlpha(3), 1.0, 0.001)
+  end)
+
+  it("castRayMulti returns a table", function()
+    local m = lurek.raycaster.newMap(16, 16)
+    m:setCell(8, 4, 1)
+    local hits = m:castRayMulti(8.5, 8.5, -math.pi / 2, 20.0)
+    expect_equal(type(hits), "table")
+  end)
+
+  it("castRayMulti hit table contains alpha field", function()
+    local m = lurek.raycaster.newMap(16, 16)
+    m:setCell(8, 4, 1)
+    local hits = m:castRayMulti(8.5, 8.5, -math.pi / 2, 20.0)
+    if #hits > 0 then
+      expect_equal(type(hits[1].alpha), "number")
+    end
+  end)
+
+  it("castRay hit table contains alpha field", function()
+    local m = lurek.raycaster.newMap(16, 16)
+    m:setCell(8, 4, 1)
+    local hit = m:castRay(8.5, 8.5, -math.pi / 2, 20.0)
+    if hit then
+      expect_equal(type(hit.alpha), "number")
+    end
+  end)
+end)
+
 test_summary()

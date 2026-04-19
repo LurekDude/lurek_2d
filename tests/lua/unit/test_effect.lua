@@ -1,13 +1,70 @@
--- test_effect_overlay_water.lua
--- Unit tests for the WaterOverlayState fields exposed through lurek.overlay / lurek.postfx.
--- Tests: setWater, setWaterTint, setCustomShader, getWater on LuaOverlay.
+-- Lurek2D Effect API Unit Tests (consolidated)
 
-local describe = describe
-local it       = it
-local expect_equal = expect_equal
-local expect_error = expect_error
+-- ── Effect Dedup (merged from test_effect_dedup.lua) ──
 
--- lurek.overlay.newOverlay() -> LuaOverlay
+describe("postfx.setShaderErrorDisplay / getShaderErrorDisplay", function()
+
+    it("setShaderErrorDisplay exists in lurek.postfx", function()
+        expect_equal(type(lurek.postfx.setShaderErrorDisplay), "function")
+    end)
+
+    it("getShaderErrorDisplay exists in lurek.postfx", function()
+        expect_equal(type(lurek.postfx.getShaderErrorDisplay), "function")
+    end)
+
+    it("default shader error display is false", function()
+        -- Should start false (or at least be a boolean)
+        local val = lurek.postfx.getShaderErrorDisplay()
+        expect_equal(type(val), "boolean")
+    end)
+
+    it("setShaderErrorDisplay(true) makes getShaderErrorDisplay return true", function()
+        lurek.postfx.setShaderErrorDisplay(true)
+        expect_equal(lurek.postfx.getShaderErrorDisplay(), true)
+    end)
+
+    it("setShaderErrorDisplay(false) turns it off", function()
+        lurek.postfx.setShaderErrorDisplay(true)
+        lurek.postfx.setShaderErrorDisplay(false)
+        expect_equal(lurek.postfx.getShaderErrorDisplay(), false)
+    end)
+
+end)
+
+describe("PostFxStack:dedup", function()
+
+    it("new PostFxStack has dedup method", function()
+        local stack = lurek.postfx.new(320, 240)
+        expect_equal(type(stack.dedup), "function")
+    end)
+
+    it("dedup on empty stack returns 0 and does not crash", function()
+        local stack = lurek.postfx.new(320, 240)
+        local removed = stack:dedup()
+        expect_equal(removed, 0)
+    end)
+
+    it("dedup on stack with no duplicates returns 0", function()
+        local stack = lurek.postfx.new(320, 240)
+        stack:dedup()  -- no-op
+        local removed = stack:dedup()
+        expect_equal(removed, 0)
+    end)
+
+    it("dedup removes duplicate effects", function()
+        local stack = lurek.postfx.new(320, 240)
+        -- Add same effect kind twice if the API supports kind-based construction
+        local blur1 = lurek.postfx.blur(4.0)
+        stack:add(blur1)
+        stack:add(blur1)  -- same Rc pointer
+        local removed = stack:dedup()
+        expect_equal(removed >= 0, true)  -- at least 0 (may or may not find duplicate)
+    end)
+
+end)
+
+-- ── Effect Overlay/Water (merged from test_effect_overlay_water.lua) ──
+
 local function make_overlay()
     local ov = lurek.overlay.newOverlay()
     assert(ov ~= nil, "newOverlay() must return non-nil")

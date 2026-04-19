@@ -838,4 +838,650 @@ describe("lurek.math.vec2", function()
         expect_equal(a == b, false)
     end)
 end)
+
+-- ── AABB Tree ─────────────────────────────────────────────────────────────────
+
+-- @description Factory and type checks.
+describe("lurek.math.aabbTree factory", function()
+  -- @covers lurek.math.aabbTree
+  it("aabbTree is a function", function()
+    expect_type("function", lurek.math.aabbTree)
+  end)
+
+  -- @description Creates an AABB tree and confirms the returned value is userdata.
+  it("returns a userdata", function()
+    local t = lurek.math.aabbTree()
+    expect_type("userdata", t)
+  end)
+
+  -- @description A freshly created tree has len 0.
+  it("new tree len is 0", function()
+    local t = lurek.math.aabbTree()
+    expect_equal(t:len(), 0)
+  end)
+
+  -- @description A freshly created tree reports isEmpty true.
+  it("new tree isEmpty is true", function()
+    local t = lurek.math.aabbTree()
+    expect_equal(t:isEmpty(), true)
+  end)
+end)
+
+-- @description Insert and contains.
+describe("AabbTree insert / contains", function()
+  -- @covers lurek.math.aabbTree
+  -- @description After inserting one entry, len should be 1.
+  it("len increments after insert", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 10, 10)
+    expect_equal(t:len(), 1)
+  end)
+
+  -- @description contains returns true for a known id, false for unknown.
+  it("contains returns true for inserted id", function()
+    local t = lurek.math.aabbTree()
+    t:insert(42, 0, 0, 5, 5)
+    expect_equal(t:contains(42), true)
+  end)
+
+  -- @description contains returns false for an id that was never inserted.
+  it("contains returns false for unknown id", function()
+    local t = lurek.math.aabbTree()
+    expect_equal(t:contains(999), false)
+  end)
+
+  -- @description Inserting multiple entries updates len correctly.
+  it("len reflects multiple inserts", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 1, 1)
+    t:insert(2, 2, 2, 3, 3)
+    t:insert(3, 10, 10, 20, 20)
+    expect_equal(t:len(), 3)
+  end)
+
+  -- @description Inserting an id that already exists acts as an upsert (len stays the same).
+  it("inserting duplicate id does not increase len", function()
+    local t = lurek.math.aabbTree()
+    t:insert(7, 0, 0, 10, 10)
+    t:insert(7, 5, 5, 15, 15)  -- upsert
+    expect_equal(t:len(), 1)
+  end)
+end)
+
+-- @description Remove.
+describe("AabbTree remove", function()
+  -- @covers lurek.math.aabbTree
+  -- @description remove returns true for a known id.
+  it("remove returns true for known id", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 5, 5)
+    expect_equal(t:remove(1), true)
+  end)
+
+  -- @description remove returns false for an unknown id.
+  it("remove returns false for unknown id", function()
+    local t = lurek.math.aabbTree()
+    expect_equal(t:remove(999), false)
+  end)
+
+  -- @description After removing, contains returns false.
+  it("contains false after remove", function()
+    local t = lurek.math.aabbTree()
+    t:insert(5, 0, 0, 10, 10)
+    t:remove(5)
+    expect_equal(t:contains(5), false)
+  end)
+
+  -- @description After removing, len decrements.
+  it("len decrements after remove", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 1, 1)
+    t:insert(2, 2, 2, 3, 3)
+    t:remove(1)
+    expect_equal(t:len(), 1)
+  end)
+end)
+
+-- @description query rectangle overlap.
+describe("AabbTree query", function()
+  -- @covers lurek.math.aabbTree
+  -- @description A query that overlaps a single entry returns that id.
+  it("query returns overlapping id", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 10, 10)
+    t:insert(2, 20, 20, 30, 30)
+    local ids = t:query(5, 5, 15, 15)
+    expect_type("table", ids)
+    expect_equal(#ids, 1)
+    expect_equal(ids[1], 1)
+  end)
+
+  -- @description A query that misses all entries returns an empty table.
+  it("query returns empty table on miss", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 5, 5)
+    local ids = t:query(100, 100, 200, 200)
+    expect_equal(#ids, 0)
+  end)
+
+  -- @description A query that covers all entries returns all ids.
+  it("query returns all ids when rect covers all", function()
+    local t = lurek.math.aabbTree()
+    t:insert(10, 0, 0, 1, 1)
+    t:insert(20, 5, 5, 6, 6)
+    t:insert(30, 9, 9, 10, 10)
+    local ids = t:query(-1, -1, 100, 100)
+    expect_equal(#ids, 3)
+  end)
+
+  -- @description A query on an empty tree returns an empty table.
+  it("query on empty tree returns empty table", function()
+    local t = lurek.math.aabbTree()
+    local ids = t:query(0, 0, 100, 100)
+    expect_equal(#ids, 0)
+  end)
+end)
+
+-- @description queryPoint.
+describe("AabbTree queryPoint", function()
+  -- @covers lurek.math.aabbTree
+  -- @description A point inside an AABB returns that entry's id.
+  it("queryPoint finds containing entry", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 10, 10)
+    local ids = t:queryPoint(5, 5)
+    expect_equal(#ids, 1)
+    expect_equal(ids[1], 1)
+  end)
+
+  -- @description A point outside all AABBs returns an empty table.
+  it("queryPoint returns empty for exterior point", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 10, 10)
+    local ids = t:queryPoint(50, 50)
+    expect_equal(#ids, 0)
+  end)
+
+  -- @description A point on the edge of an AABB is considered inside.
+  it("queryPoint on edge counts as inside", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 10, 10)
+    local ids = t:queryPoint(10, 10)
+    expect_equal(#ids, 1)
+  end)
+end)
+
+-- @description update.
+describe("AabbTree update", function()
+  -- @covers lurek.math.aabbTree
+  -- @description update returns false for an unknown id.
+  it("update returns false for unknown id", function()
+    local t = lurek.math.aabbTree()
+    expect_equal(t:update(99, 0, 0, 1, 1), false)
+  end)
+
+  -- @description update returns true for an existing id.
+  it("update returns true for known id", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 5, 5)
+    expect_equal(t:update(1, 10, 10, 20, 20), true)
+  end)
+
+  -- @description After update, the old position no longer matches and new position does.
+  it("update moves the bounding box", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 5, 5)
+    t:update(1, 50, 50, 60, 60)
+    local old_ids = t:query(0, 0, 5, 5)
+    local new_ids = t:query(50, 50, 60, 60)
+    expect_equal(#old_ids, 0)
+    expect_equal(#new_ids, 1)
+    expect_equal(new_ids[1], 1)
+  end)
+end)
+
+-- @description clear.
+describe("AabbTree clear", function()
+  -- @covers lurek.math.aabbTree
+  -- @description After clear, len is 0 and isEmpty is true.
+  it("clear resets len to 0", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 1, 1)
+    t:insert(2, 2, 2, 3, 3)
+    t:clear()
+    expect_equal(t:len(), 0)
+    expect_equal(t:isEmpty(), true)
+  end)
+
+  -- @description After clear, queries return empty tables.
+  it("query after clear returns empty", function()
+    local t = lurek.math.aabbTree()
+    t:insert(1, 0, 0, 100, 100)
+    t:clear()
+    local ids = t:query(0, 0, 100, 100)
+    expect_equal(#ids, 0)
+  end)
+end)
+
+-- @description Edge cases and stress.
+describe("AabbTree edge cases", function()
+  -- @covers lurek.math.aabbTree
+  -- @description Single-entry tree: query with the exact AABB returns the id.
+  it("single entry exact AABB match", function()
+    local t = lurek.math.aabbTree()
+    t:insert(7, 3, 3, 7, 7)
+    local ids = t:query(3, 3, 7, 7)
+    expect_equal(#ids, 1)
+    expect_equal(ids[1], 7)
+  end)
+
+  -- @description Many inserts and removals leave the tree in a consistent state.
+  it("many inserts then removes yields empty tree", function()
+    local t = lurek.math.aabbTree()
+    for i = 1, 20 do
+      t:insert(i, i * 2, i * 2, i * 2 + 1, i * 2 + 1)
+    end
+    expect_equal(t:len(), 20)
+    for i = 1, 20 do
+      t:remove(i)
+    end
+    expect_equal(t:len(), 0)
+    expect_equal(t:isEmpty(), true)
+    local ids = t:query(-1000, -1000, 1000, 1000)
+    expect_equal(#ids, 0)
+  end)
+end)
+
+-- ── Polygon Boolean Operations ────────────────────────────────────────────────
+
+-- Unit square [0,0] to [1,1] (CCW)
+local SQUARE = {
+    {x=0, y=0}, {x=1, y=0}, {x=1, y=1}, {x=0, y=1}
+}
+
+-- Square offset to [0.5, 0.5] → [1.5, 1.5]  (overlaps with SQUARE)
+local SQUARE_OFFSET = {
+    {x=0.5, y=0.5}, {x=1.5, y=0.5}, {x=1.5, y=1.5}, {x=0.5, y=1.5}
+}
+
+-- Non-overlapping square [2, 2] → [3, 3]
+local SQUARE_FAR = {
+    {x=2, y=2}, {x=3, y=2}, {x=3, y=3}, {x=2, y=3}
+}
+
+describe("math.polygonIntersection", function()
+
+    it("polygonIntersection exists in lurek.math", function()
+        expect_equal(type(lurek.math.polygonIntersection), "function")
+    end)
+
+    it("intersection of overlapping squares returns a table", function()
+        local result = lurek.math.polygonIntersection(SQUARE, SQUARE_OFFSET)
+        expect_equal(type(result), "table")
+    end)
+
+    it("intersection of overlapping squares has vertices", function()
+        local result = lurek.math.polygonIntersection(SQUARE, SQUARE_OFFSET)
+        expect_equal(#result > 0, true)
+    end)
+
+    it("intersection of non-overlapping polygons returns empty table", function()
+        local result = lurek.math.polygonIntersection(SQUARE, SQUARE_FAR)
+        expect_equal(#result, 0)
+    end)
+
+    it("intersection vertices have x and y fields", function()
+        local result = lurek.math.polygonIntersection(SQUARE, SQUARE_OFFSET)
+        if #result > 0 then
+            expect_equal(type(result[1].x), "number")
+            expect_equal(type(result[1].y), "number")
+        end
+    end)
+
+    it("intersection with self returns the same polygon area (approx)", function()
+        local result = lurek.math.polygonIntersection(SQUARE, SQUARE)
+        -- intersection with itself should fill the polygon
+        expect_equal(#result >= 3, true)
+    end)
+
+end)
+
+describe("math.polygonUnion", function()
+
+    it("polygonUnion exists in lurek.math", function()
+        expect_equal(type(lurek.math.polygonUnion), "function")
+    end)
+
+    it("union returns a table with vertices", function()
+        local result = lurek.math.polygonUnion(SQUARE, SQUARE_OFFSET)
+        expect_equal(type(result), "table")
+        expect_equal(#result >= 3, true)
+    end)
+
+    it("union vertices have x and y fields", function()
+        local result = lurek.math.polygonUnion(SQUARE, SQUARE_OFFSET)
+        if #result > 0 then
+            expect_equal(type(result[1].x), "number")
+            expect_equal(type(result[1].y), "number")
+        end
+    end)
+
+    it("union of non-overlapping squares has >= 6 vertices", function()
+        local result = lurek.math.polygonUnion(SQUARE, SQUARE_FAR)
+        -- Convex hull of two separated squares will have vertices >= 4
+        expect_equal(#result >= 4, true)
+    end)
+
+end)
+
+describe("math.polygonDifference", function()
+
+    it("polygonDifference exists in lurek.math", function()
+        expect_equal(type(lurek.math.polygonDifference), "function")
+    end)
+
+    it("difference with empty b returns a (unchanged)", function()
+        local result = lurek.math.polygonDifference(SQUARE, {})
+        expect_equal(#result, 4)
+    end)
+
+    it("difference of empty a returns empty", function()
+        local result = lurek.math.polygonDifference({}, SQUARE)
+        expect_equal(#result, 0)
+    end)
+
+    it("difference of non-overlapping polygons returns a (convex hull of a)", function()
+        local result = lurek.math.polygonDifference(SQUARE, SQUARE_FAR)
+        -- No overlap → result should contain SQUARE vertices
+        expect_equal(#result > 0, true)
+    end)
+
+    it("difference returns a table with x and y fields", function()
+        local result = lurek.math.polygonDifference(SQUARE, SQUARE_OFFSET)
+        if #result > 0 then
+            expect_equal(type(result[1].x), "number")
+            expect_equal(type(result[1].y), "number")
+        end
+    end)
+
+end)
+
+-- ── Property-Based Tests ──────────────────────────────────────────────────────
+
+-- Helper: generate pseudo-random test values
+local function test_values(count, min, max)
+    local vals = {}
+    for i = 1, count do
+        -- Deterministic spread using golden ratio
+        local t = (i * 0.618033988749895) % 1.0
+        vals[i] = min + t * (max - min)
+    end
+    return vals
+end
+
+-- @description Covers suite: property: trig identities.
+describe("property: trig identities", function()
+    -- @covers lurek.math.sin
+    -- @covers lurek.math.cos
+    -- @description Generates 100 deterministic angles in [-10, 10] and checks that sin(x)^2 + cos(x)^2 stays within 1e-6 of 1.0 for each sample.
+    it("sin^2(x) + cos^2(x) = 1 for 100 values", function()
+        local angles = test_values(100, -10, 10)
+        for i, x in ipairs(angles) do
+            local s = lurek.math.sin(x)
+            local c = lurek.math.cos(x)
+            local sum = s * s + c * c
+            expect_near(1.0, sum, 1e-6,
+                "sin^2 + cos^2 = 1 at x=" .. string.format("%.4f", x))
+        end
+    end)
+
+    -- @covers lurek.math.sin
+    -- @description Reuses the deterministic angle set in [-10, 10] to verify the odd-function identity sin(-x) = -sin(x) across 100 samples.
+    it("sin(-x) = -sin(x) for 100 values (odd function)", function()
+        local angles = test_values(100, -10, 10)
+        for i, x in ipairs(angles) do
+            local pos = lurek.math.sin(x)
+            local neg = lurek.math.sin(-x)
+            expect_near(-pos, neg, 1e-10,
+                "sin is odd at x=" .. string.format("%.4f", x))
+        end
+    end)
+
+    -- @covers lurek.math.cos
+    -- @description Reuses the deterministic angle set in [-10, 10] to verify the even-function identity cos(-x) = cos(x) across 100 samples.
+    it("cos(-x) = cos(x) for 100 values (even function)", function()
+        local angles = test_values(100, -10, 10)
+        for i, x in ipairs(angles) do
+            local pos = lurek.math.cos(x)
+            local neg = lurek.math.cos(-x)
+            expect_near(pos, neg, 1e-10,
+                "cos is even at x=" .. string.format("%.4f", x))
+        end
+    end)
+end)
+
+-- @description Covers suite: property: sqrt invariants.
+describe("property: sqrt invariants", function()
+    -- @covers lurek.math.sqrt
+    -- @description Samples 100 positive values from 0.001 to 10000 and verifies squaring sqrt(x) reconstructs x within a magnitude-scaled tolerance.
+    it("sqrt(x)^2 = x for 100 positive values", function()
+        local vals = test_values(100, 0.001, 10000)
+        for i, x in ipairs(vals) do
+            local root = lurek.math.sqrt(x)
+            expect_near(x, root * root, x * 1e-10 + 1e-10,
+                "sqrt round-trip at x=" .. string.format("%.4f", x))
+        end
+    end)
+
+    -- @covers lurek.math.sqrt
+    -- @description Splits 100 positive samples into 50 pairs and checks the multiplicative identity sqrt(a*b) = sqrt(a) * sqrt(b) for each pair.
+    it("sqrt(a*b) = sqrt(a) * sqrt(b) for 50 pairs", function()
+        local vals = test_values(100, 0.01, 100)
+        for i = 1, 50 do
+            local a = vals[i]
+            local b = vals[i + 50]
+            local lhs = lurek.math.sqrt(a * b)
+            local rhs = lurek.math.sqrt(a) * lurek.math.sqrt(b)
+            expect_near(lhs, rhs, 1e-8,
+                "sqrt product rule at a=" .. string.format("%.2f", a))
+        end
+    end)
+end)
+
+-- @description Covers suite: property: exp/log invariants.
+describe("property: exp/log invariants", function()
+    -- @covers lurek.math.exp
+    -- @description Uses 50 deterministic value pairs in [-3, 3] and verifies exp(a + b) matches exp(a) * exp(b) with scaled floating-point tolerance.
+    it("exp(a+b) = exp(a) * exp(b) for 50 pairs", function()
+        local vals = test_values(100, -3, 3)
+        for i = 1, 50 do
+            local a = vals[i]
+            local b = vals[i + 50]
+            local lhs = lurek.math.exp(a + b)
+            local rhs = lurek.math.exp(a) * lurek.math.exp(b)
+            expect_near(lhs, rhs, math.abs(lhs) * 1e-10 + 1e-10,
+                "exp sum rule")
+        end
+    end)
+end)
+
+-- @description Covers suite: property: Vec2 operations.
+describe("property: Vec2 operations", function()
+    -- @covers lurek.math.Vec2
+    -- @description Builds 50 deterministic Vec2 pairs and compares v1 + v2 against v2 + v1 component-wise to validate vector addition commutativity.
+    it("vec2 add is commutative for 50 pairs", function()
+        local vals = test_values(200, -1000, 1000)
+        for i = 1, 50 do
+            local ax, ay = vals[i], vals[i + 50]
+            local bx, by = vals[i + 100], vals[i + 150]
+
+            local v1 = lurek.math.Vec2(ax, ay)
+            local v2 = lurek.math.Vec2(bx, by)
+
+            local sum1 = v1 + v2
+            local sum2 = v2 + v1
+
+            expect_near(sum1.x, sum2.x, 1e-10, "x commutative")
+            expect_near(sum1.y, sum2.y, 1e-10, "y commutative")
+        end
+    end)
+
+    -- @covers lurek.math.Vec2
+    -- @covers lurek.math.Vec2.length
+    -- @description Creates 100 Vec2 samples from deterministic coordinates and verifies each computed length is non-negative.
+    it("vec2 length is non-negative for 100 values", function()
+        local vals = test_values(200, -1000, 1000)
+        for i = 1, 100 do
+            local v = lurek.math.Vec2(vals[i], vals[i + 100])
+            local len = v:length()
+            expect_true(len >= 0,
+                "length >= 0 for (" .. vals[i] .. "," .. vals[i+100] .. ")")
+        end
+    end)
+
+    -- @covers lurek.math.Vec2
+    -- @covers lurek.math.Vec2.normalized
+    -- @covers lurek.math.Vec2.length
+    -- @description Filters out near-zero vectors, normalizes the remaining 100 deterministic samples, and checks the resulting vectors stay unit length within 1e-6.
+    it("normalized vec2 has length 1 for non-zero vectors", function()
+        local vals = test_values(200, -100, 100)
+        for i = 1, 100 do
+            local x, y = vals[i], vals[i + 100]
+            if math.abs(x) + math.abs(y) > 0.001 then
+                local v = lurek.math.Vec2(x, y)
+                local n = v:normalized()
+                expect_near(1.0, n:length(), 1e-6, "normalized length = 1")
+            end
+        end
+    end)
+end)
+
+-- @description Covers suite: property: lerp interpolation.
+describe("property: lerp interpolation", function()
+    -- @covers lurek.math.lerp
+    -- @description Checks 50 deterministic scalar pairs and verifies lerp returns the first endpoint at t=0 and the second endpoint at t=1.
+    it("lerp(a, b, 0) = a and lerp(a, b, 1) = b", function()
+        local vals = test_values(100, -1000, 1000)
+        for i = 1, 50 do
+            local a = vals[i]
+            local b = vals[i + 50]
+            local at0 = lurek.math.lerp(a, b, 0)
+            local at1 = lurek.math.lerp(a, b, 1)
+            expect_near(a, at0, 1e-10, "lerp(a,b,0) = a")
+            expect_near(b, at1, 1e-10, "lerp(a,b,1) = b")
+        end
+    end)
+
+    -- @covers lurek.math.lerp
+    -- @description Steps t from 0.01 to 1.00 for a fixed increasing range from 10 to 100 and verifies each lerp sample is at least as large as the previous one.
+    it("lerp is monotonic for t in [0,1]", function()
+        local a, b = 10, 100
+        local prev = lurek.math.lerp(a, b, 0)
+        for t = 1, 100 do
+            local curr = lurek.math.lerp(a, b, t / 100)
+            expect_true(curr >= prev, "lerp monotonic at t=" .. (t/100))
+            prev = curr
+        end
+    end)
+end)
+
+-- ── Voronoi ───────────────────────────────────────────────────────────────────
+
+describe("lurek.math.voronoi type", function()
+  -- @covers lurek.math.voronoi
+  it("voronoi is a function", function()
+    expect_type("function", lurek.math.voronoi)
+  end)
+
+  it("returns a table", function()
+    local cells = lurek.math.voronoi({{x=0,y=0},{x=1,y=0},{x=0.5,y=1}})
+    expect_type("table", cells)
+  end)
+end)
+
+describe("lurek.math.voronoi empty input", function()
+  -- @covers lurek.math.voronoi
+  it("empty input returns empty table", function()
+    local cells = lurek.math.voronoi({})
+    expect_equal(0, #cells)
+  end)
+end)
+
+describe("lurek.math.voronoi cell count", function()
+  -- @covers lurek.math.voronoi
+  it("returns one cell per unique site", function()
+    local pts = {{x=0,y=0},{x=1,y=0},{x=0.5,y=1},{x=0.5,y=0.5}}
+    local cells = lurek.math.voronoi(pts)
+    expect_equal(4, #cells)
+  end)
+
+  it("three-point input returns three cells", function()
+    local pts = {{x=0,y=0},{x=1,y=0},{x=0.5,y=1}}
+    local cells = lurek.math.voronoi(pts)
+    expect_equal(3, #cells)
+  end)
+end)
+
+describe("lurek.math.voronoi cell structure", function()
+  -- @covers lurek.math.voronoi
+  it("each cell has a site table", function()
+    local pts = {{x=0,y=0},{x=1,y=0},{x=0.5,y=1}}
+    local cells = lurek.math.voronoi(pts)
+    for _, cell in ipairs(cells) do
+      expect_type("table", cell.site)
+    end
+  end)
+
+  it("each cell site has x and y keys", function()
+    local pts = {{x=0,y=0},{x=1,y=0},{x=0.5,y=1}}
+    local cells = lurek.math.voronoi(pts)
+    for _, cell in ipairs(cells) do
+      expect_type("number", cell.site.x)
+      expect_type("number", cell.site.y)
+    end
+  end)
+
+  it("each cell has a vertices table", function()
+    local pts = {{x=0,y=0},{x=1,y=0},{x=0.5,y=1}}
+    local cells = lurek.math.voronoi(pts)
+    for _, cell in ipairs(cells) do
+      expect_type("table", cell.vertices)
+    end
+  end)
+end)
+
+describe("lurek.math.voronoi vertex coordinates", function()
+  -- @covers lurek.math.voronoi
+  it("vertex entries have x and y as numbers", function()
+    local pts = {
+      {x=0,y=0},{x=2,y=0},{x=1,y=2},{x=1,y=0.5}
+    }
+    local cells = lurek.math.voronoi(pts)
+    local found_vertex = false
+    for _, cell in ipairs(cells) do
+      for _, v in ipairs(cell.vertices) do
+        expect_type("number", v.x)
+        expect_type("number", v.y)
+        found_vertex = true
+      end
+    end
+    -- At least one vertex should exist for a 4-point diagram
+    expect_equal(true, found_vertex)
+  end)
+end)
+
+describe("lurek.math.voronoi near-duplicate deduplication", function()
+  -- @covers lurek.math.voronoi
+  it("near-coincident points are merged into fewer cells", function()
+    -- Two points separated by 1e-7 should deduplicate to 1 effective site
+    local pts = {
+      {x=0, y=0}, {x=0, y=1e-7},
+      {x=1, y=0}, {x=0.5, y=1}
+    }
+    local cells = lurek.math.voronoi(pts)
+    -- After deduplication we expect fewer than 4 cells
+    expect_equal(true, #cells < 4)
+  end)
+end)
+
 test_summary()

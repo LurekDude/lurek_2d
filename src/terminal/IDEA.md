@@ -1,11 +1,11 @@
 # IDEA.md — `terminal` module
 
-| Field | Value |
-|-------|-------|
-| **Module** | `terminal` |
-| **Path** | `src/terminal/` |
-| **Date** | 2026-04-18 |
-| **Tier** | Feature Systems |
+| Field      | Value           |
+| ---------- | --------------- |
+| **Module** | `terminal`      |
+| **Path**   | `src/terminal/` |
+| **Date**   | 2026-04-18      |
+| **Tier**   | Feature Systems |
 
 ---
 
@@ -29,11 +29,11 @@ Provide a grid-based character-cell terminal emulator for roguelikes, text adven
 
 ## Features — Competitor Reference
 
-| Feature | Status | Competitor |
-|---------|--------|------------|
-| 256-colour / true-colour ANSI | ❌ Missing | BearLibTerminal — full 24-bit colour support |
+| Feature                        | Status    | Competitor                                                         |
+| ------------------------------ | --------- | ------------------------------------------------------------------ |
+| 256-colour / true-colour ANSI  | ❌ Missing | BearLibTerminal — full 24-bit colour support                       |
 | Rich-text markup (BBCode tags) | ❌ Missing | Textual (Python TUI) — inline markup, tcod — TCOD_console_print_ex |
-| Mouse hover highlighting | ❌ Missing | BearLibTerminal — TK_MOUSE_MOVE events with cell highlighting |
+| Mouse hover highlighting       | ❌ Missing | BearLibTerminal — TK_MOUSE_MOVE events with cell highlighting      |
 
 ## Performance / Quality
 

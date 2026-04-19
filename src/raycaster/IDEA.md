@@ -1,11 +1,11 @@
 # IDEA — raycaster
 
-| Field   | Value                |
-|---------|----------------------|
-| Module  | raycaster            |
-| Path    | src/raycaster/       |
-| Date    | 2026-04-18           |
-| Tier    | TIER-2-PLUGIN        |
+| Field  | Value          |
+| ------ | -------------- |
+| Module | raycaster      |
+| Path   | src/raycaster/ |
+| Date   | 2026-04-18     |
+| Tier   | TIER-2-PLUGIN  |
 
 ## Mission
 

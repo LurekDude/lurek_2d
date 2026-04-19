@@ -1,11 +1,11 @@
 # IDEA.md — `light`
 
-| Field     | Value                   |
-|-----------|-------------------------|
-| Module    | `light`                 |
-| Path      | `src/light/`            |
-| Date      | 2026-04-18              |
-| Tier      | Platform Services       |
+| Field  | Value             |
+| ------ | ----------------- |
+| Module | `light`           |
+| Path   | `src/light/`      |
+| Date   | 2026-04-18        |
+| Tier   | Platform Services |
 
 ---
 

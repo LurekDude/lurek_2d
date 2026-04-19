@@ -846,4 +846,228 @@ describe("center individual getters", function()
         expect_near(cy, m:getCenterY())
     end)
 end)
+
+-- ── Minimap Layers (merged from test_minimap_layers.lua) ──
+
+-- @description Covers suite: minimap layers.
+describe("minimap layers", function()
+    -- @covers Minimap.getLayer
+    -- @description getLayer returns 0 by default.
+    it("setLayer defaults to layer 0", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        expect_equal(mm:getLayer(), 0)
+    end)
+
+    -- @covers Minimap.setLayer
+    -- @covers Minimap.getLayer
+    -- @description setLayer and getLayer round-trip correctly.
+    it("setLayer and getLayer work", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:setLayer(1)
+        expect_equal(mm:getLayer(), 1)
+    end)
+
+    -- @covers Minimap.setLayer
+    -- @covers Minimap.getLayer
+    -- @description setLayer can switch between multiple layer indices.
+    it("setLayer can switch between layers", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:setLayer(2)
+        expect_equal(mm:getLayer(), 2)
+        mm:setLayer(0)
+        expect_equal(mm:getLayer(), 0)
+    end)
+
+    -- @covers Minimap.setLayerData
+    -- @description setLayerData stores a flat table without error.
+    it("setLayerData stores layer data", function()
+        local mm = lurek.minimap.newMinimap(8, 8)
+        local data = {}
+        for i = 1, 64 do data[i] = 0 end
+        mm:setLayerData(0, data)
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.setLayerData
+    -- @description setLayerData can write non-contiguous layer indices.
+    it("setLayerData works for higher layer indices", function()
+        local mm = lurek.minimap.newMinimap(4, 4)
+        local data = {}
+        for i = 1, 16 do data[i] = 1 end
+        mm:setLayerData(2, data)
+        expect_equal(true, true)
+    end)
+end)
+
+-- @description Covers suite: minimap marker animation.
+describe("minimap marker animation", function()
+    -- @covers Minimap.setMarkerAnimation
+    -- @description setMarkerAnimation with "blink" does not error.
+    it("setMarkerAnimation blink does not error", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id = mm:addMarker(10, 10, "test", 1, 0, 0, 1)
+        mm:setMarkerAnimation(id, "blink", 2.0)
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.setMarkerAnimation
+    -- @description setMarkerAnimation with "pulse" does not error.
+    it("setMarkerAnimation pulse does not error", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id = mm:addMarker(10, 10, "test", 1, 0, 0, 1)
+        mm:setMarkerAnimation(id, "pulse", 1.5)
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.setMarkerAnimation
+    -- @description setMarkerAnimation with "rotate" does not error.
+    it("setMarkerAnimation rotate does not error", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id = mm:addMarker(10, 10, "test", 1, 0, 0, 1)
+        mm:setMarkerAnimation(id, "rotate", 3.14)
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.clearMarkerAnimation
+    -- @description clearMarkerAnimation removes animation without error.
+    it("clearMarkerAnimation stops animation", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id = mm:addMarker(10, 10)
+        mm:setMarkerAnimation(id, "blink", 1.0)
+        mm:clearMarkerAnimation(id)
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.setMarkerAnimation
+    -- @description setMarkerAnimation with an invalid type returns an error.
+    it("setMarkerAnimation rejects unknown type", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id = mm:addMarker(10, 10)
+        expect_error(function()
+            mm:setMarkerAnimation(id, "spin_forever", 1.0)
+        end)
+    end)
+
+    -- @covers Minimap.update
+    -- @covers Minimap.setMarkerAnimation
+    -- @description update advances animation phases without error.
+    it("update advances marker animation phases", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id = mm:addMarker(10, 10)
+        mm:setMarkerAnimation(id, "blink", 2.0)
+        mm:update(0.016)
+        expect_equal(true, true)
+    end)
+end)
+
+-- ── Minimap Overlay (merged from test_minimap_overlay.lua) ──
+
+-- @description Covers suite: minimap geometry overlay.
+describe("minimap geometry overlay", function()
+    -- @covers Minimap.drawLine
+    -- @description drawLine accepts valid coordinates and color table without error.
+    it("drawLine does not error", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:drawLine(0, 0, 32, 32, {255, 0, 0, 255})
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.drawRect
+    -- @description drawRect accepts valid coordinates and color table without error.
+    it("drawRect does not error", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:drawRect(10, 10, 20, 20, {0, 255, 0, 255})
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.clearOverlay
+    -- @description clearOverlay removes all geometry without crashing.
+    it("clearOverlay clears geometry", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:drawLine(0, 0, 10, 10, {255, 0, 0, 255})
+        mm:drawRect(5, 5, 15, 15, {0, 0, 255, 255})
+        mm:clearOverlay()
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.drawLine
+    -- @covers Minimap.clearOverlay
+    -- @description clearOverlay can be called on an empty overlay without error.
+    it("clearOverlay on empty overlay does not error", function()
+        local mm = lurek.minimap.newMinimap(32, 32)
+        mm:clearOverlay()
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.drawLine
+    -- @covers Minimap.drawRect
+    -- @description Multiple shapes can be accumulated before clearing.
+    it("multiple shapes accumulate before clear", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:drawLine(0, 0, 10, 10, {255, 0, 0, 255})
+        mm:drawLine(10, 10, 20, 20, {0, 255, 0, 255})
+        mm:drawRect(0, 0, 8, 8, {255, 255, 0, 255})
+        mm:clearOverlay()
+        expect_equal(true, true)
+    end)
+end)
+
+-- ── Minimap Path (merged from test_minimap_path.lua) ──
+
+-- @description Covers suite: minimap path visualization.
+describe("minimap path visualization", function()
+    -- @covers Minimap.showPath
+    -- @description showPath accepts a list of {x, y} point tables without error.
+    it("showPath accepts a list of points", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:showPath({{0, 0}, {16, 16}, {32, 0}}, {0, 0, 255, 255})
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.showPath
+    -- @description showPath returns a non-zero integer path ID.
+    it("showPath returns a path ID", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id = mm:showPath({{0, 0}, {10, 10}}, {255, 0, 0, 255})
+        expect_true(type(id) == "number")
+        expect_true(id > 0)
+    end)
+
+    -- @covers Minimap.showPath
+    -- @description Each showPath call returns a distinct ID.
+    it("showPath returns distinct IDs", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id1 = mm:showPath({{0, 0}, {5, 5}}, {255, 0, 0, 255})
+        local id2 = mm:showPath({{10, 10}, {20, 20}}, {0, 255, 0, 255})
+        expect_true(id1 ~= id2)
+    end)
+
+    -- @covers Minimap.clearPath
+    -- @description clearPath() with no argument removes all paths without error.
+    it("clearPath removes all paths", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:showPath({{0, 0}, {10, 10}}, {255, 255, 0, 255})
+        mm:showPath({{5, 5}, {15, 15}}, {0, 255, 255, 255})
+        mm:clearPath()
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.clearPath
+    -- @description clearPath(id) removes only the path with the given ID.
+    it("clearPath with id removes specific path", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        local id = mm:showPath({{0, 0}, {10, 10}}, {255, 0, 0, 255})
+        mm:clearPath(id)
+        expect_equal(true, true)
+    end)
+
+    -- @covers Minimap.clearPath
+    -- @description clearPath on an empty set does not error.
+    it("clearPath on empty set does not error", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        mm:clearPath()
+        expect_equal(true, true)
+    end)
+end)
+
 test_summary()

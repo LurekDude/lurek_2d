@@ -2,6 +2,7 @@
 -- BDD tests for lurek.network (high-level UDP API via ENet).
 -- lurek.net and _G.enet tests are guarded â€” they only run if those namespaces exist.
 -- Headless-safe (no GPU/window needed).
+require("tests/lua/init")
 
 -- @description Covers suite: lurek.network.
 describe("lurek.network", function()
@@ -465,4 +466,298 @@ describe("lurek.network constants", function()
     expect_true(lurek.network.DEFAULT_CHANNELS <= lurek.network.MAX_CHANNELS)
   end)
 end)
+
+-- ── Merged from test_network_constants.lua ──────────────────────────────
+
+-- @description Covers suite: lurek.network constants.
+describe("lurek.network constants", function()
+  -- @covers lurek.network
+  -- @covers lurek.network.MAX_PEERS
+  -- @covers lurek.network.DEFAULT_PEERS
+  -- @covers lurek.network.MAX_CHANNELS
+  -- @covers lurek.network.DEFAULT_CHANNELS
+  -- @description Verifies the network namespace is registered as a Lua table before constant lookups run.
+  it("lurek.network is a table", function()
+    expect_equal(type(lurek.network), "table")
+  end)
+
+  -- @covers lurek.network.MAX_PEERS
+  -- @description Verifies MAX_PEERS is exported as a numeric constant.
+  it("MAX_PEERS is a number", function()
+    expect_type("number", lurek.network.MAX_PEERS)
+  end)
+
+  -- @covers lurek.network.MAX_PEERS
+  -- @description Verifies MAX_PEERS matches the documented hard limit of 8 peers.
+  it("MAX_PEERS equals 8", function()
+    expect_equal(lurek.network.MAX_PEERS, 8)
+  end)
+
+  -- @covers lurek.network.DEFAULT_PEERS
+  -- @description Verifies DEFAULT_PEERS is exported as a numeric constant.
+  it("DEFAULT_PEERS is a number", function()
+    expect_type("number", lurek.network.DEFAULT_PEERS)
+  end)
+
+  -- @covers lurek.network.DEFAULT_PEERS
+  -- @description Verifies DEFAULT_PEERS keeps the expected default peer count of 4.
+  it("DEFAULT_PEERS equals 4", function()
+    expect_equal(lurek.network.DEFAULT_PEERS, 4)
+  end)
+
+  -- @covers lurek.network.MAX_CHANNELS
+  -- @description Verifies MAX_CHANNELS is exported as a numeric constant.
+  it("MAX_CHANNELS is a number", function()
+    expect_type("number", lurek.network.MAX_CHANNELS)
+  end)
+
+  -- @covers lurek.network.MAX_CHANNELS
+  -- @description Verifies MAX_CHANNELS matches the documented ENet ceiling of 255.
+  it("MAX_CHANNELS equals 255", function()
+    expect_equal(lurek.network.MAX_CHANNELS, 255)
+  end)
+
+  -- @covers lurek.network.DEFAULT_CHANNELS
+  -- @description Verifies DEFAULT_CHANNELS is exported as a numeric constant.
+  it("DEFAULT_CHANNELS is a number", function()
+    expect_type("number", lurek.network.DEFAULT_CHANNELS)
+  end)
+
+  -- @covers lurek.network.DEFAULT_CHANNELS
+  -- @description Verifies DEFAULT_CHANNELS keeps the default single-channel configuration.
+  it("DEFAULT_CHANNELS equals 1", function()
+    expect_equal(lurek.network.DEFAULT_CHANNELS, 1)
+  end)
+
+  -- @covers lurek.network.DEFAULT_PEERS
+  -- @description Verifies the default peer count never exceeds the advertised peer cap.
+  it("DEFAULT_PEERS does not exceed MAX_PEERS", function()
+    expect_true(lurek.network.DEFAULT_PEERS <= lurek.network.MAX_PEERS)
+  end)
+
+  -- @covers lurek.network.DEFAULT_CHANNELS
+  -- @description Verifies the default channel count stays within the exported channel limit.
+  it("DEFAULT_CHANNELS does not exceed MAX_CHANNELS", function()
+    expect_true(lurek.network.DEFAULT_CHANNELS <= lurek.network.MAX_CHANNELS)
+  end)
+end)
+
+-- ── Merged from test_network_pack_unpack.lua ────────────────────────────
+
+describe("lurek.network.pack / unpack", function()
+    it("should exist as functions", function()
+        expect_equal(type(lurek.network.pack), "function")
+        expect_equal(type(lurek.network.unpack), "function")
+    end)
+
+    it("should round-trip nil", function()
+        local packed = lurek.network.pack(nil)
+        expect_equal(type(packed), "string")
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(unpacked, nil)
+    end)
+
+    it("should round-trip boolean true", function()
+        local packed = lurek.network.pack(true)
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(unpacked, true)
+    end)
+
+    it("should round-trip boolean false", function()
+        local packed = lurek.network.pack(false)
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(unpacked, false)
+    end)
+
+    it("should round-trip integers", function()
+        local packed = lurek.network.pack(42)
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(unpacked, 42)
+    end)
+
+    it("should round-trip negative integers", function()
+        local packed = lurek.network.pack(-100)
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(unpacked, -100)
+    end)
+
+    it("should round-trip zero", function()
+        local packed = lurek.network.pack(0)
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(unpacked, 0)
+    end)
+
+    it("should round-trip floats", function()
+        local packed = lurek.network.pack(3.14)
+        local unpacked = lurek.network.unpack(packed)
+        expect_near(unpacked, 3.14, 0.001)
+    end)
+
+    it("should round-trip strings", function()
+        local packed = lurek.network.pack("hello world")
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(unpacked, "hello world")
+    end)
+
+    it("should round-trip empty string", function()
+        local packed = lurek.network.pack("")
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(unpacked, "")
+    end)
+
+    it("should round-trip arrays (sequential tables)", function()
+        local input = { 1, 2, 3, "four", true }
+        local packed = lurek.network.pack(input)
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(type(unpacked), "table")
+        expect_equal(unpacked[1], 1)
+        expect_equal(unpacked[2], 2)
+        expect_equal(unpacked[3], 3)
+        expect_equal(unpacked[4], "four")
+        expect_equal(unpacked[5], true)
+    end)
+
+    it("should round-trip maps (string-keyed tables)", function()
+        local input = { name = "Alice", score = 100 }
+        local packed = lurek.network.pack(input)
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(type(unpacked), "table")
+        expect_equal(unpacked.name, "Alice")
+        expect_equal(unpacked.score, 100)
+    end)
+
+    it("should round-trip nested tables", function()
+        local input = { pos = { x = 10, y = 20 }, tags = { "a", "b" } }
+        local packed = lurek.network.pack(input)
+        local unpacked = lurek.network.unpack(packed)
+        expect_equal(type(unpacked), "table")
+        expect_equal(type(unpacked.pos), "table")
+        expect_equal(unpacked.pos.x, 10)
+        expect_equal(unpacked.pos.y, 20)
+        expect_equal(unpacked.tags[1], "a")
+        expect_equal(unpacked.tags[2], "b")
+    end)
+
+    it("should produce compact binary (smaller than JSON)", function()
+        local msg = { type = "move", x = 100.5, y = 200.5, id = 42 }
+        local packed = lurek.network.pack(msg)
+        -- MessagePack should be compact — well under 100 bytes for this
+        expect_equal(#packed < 100, true)
+    end)
+
+    it("should error on invalid unpack data", function()
+        expect_error(function()
+            lurek.network.unpack("not valid msgpack \xff\xfe")
+        end)
+    end)
+end)
+
+-- ── Merged from test_network_roles.lua ──────────────────────────────────
+
+describe("lurek.network server/client roles", function()
+    it("should have newServer function", function()
+        expect_equal(type(lurek.network.newServer), "function")
+    end)
+
+    it("should have newClient function", function()
+        expect_equal(type(lurek.network.newClient), "function")
+    end)
+
+    it("should create a server with getRole() == 'server'", function()
+        local server = lurek.network.newServer({ port = 19100 })
+        expect_equal(server:getRole(), "server")
+        expect_equal(server:isServer(), true)
+        expect_equal(server:isClient(), false)
+        server:destroy()
+    end)
+
+    it("should create a generic host with getRole() == 'host'", function()
+        local host = lurek.network.newHost({ addr = "0.0.0.0:0" })
+        expect_equal(host:getRole(), "host")
+        expect_equal(host:isServer(), false)
+        expect_equal(host:isClient(), false)
+        host:destroy()
+    end)
+
+    it("server isDestroyed should be false before destroy", function()
+        local server = lurek.network.newServer({ port = 19101 })
+        expect_equal(server:isDestroyed(), false)
+        server:destroy()
+        expect_equal(server:isDestroyed(), true)
+    end)
+
+    it("should expose updated constants", function()
+        expect_equal(lurek.network.MAX_PEERS, 4096)
+        expect_equal(lurek.network.DEFAULT_PEERS, 16)
+        expect_equal(lurek.network.DEFAULT_CHANNELS, 2)
+        expect_equal(lurek.network.MAX_CHANNELS, 255)
+    end)
+end)
+
+-- ── Merged from test_network_runtime.lua ────────────────────────────────
+
+describe("lurek.network.newRuntime", function()
+    it("should have newRuntime function", function()
+        expect_equal(type(lurek.network.newRuntime), "function")
+    end)
+
+    it("should create a runtime object", function()
+        local rt = lurek.network.newRuntime()
+        expect_equal(type(rt) == "userdata" or type(rt) == "table", true)
+        rt:shutdown()
+    end)
+
+    it("should poll with empty results", function()
+        local rt = lurek.network.newRuntime()
+        local results = rt:poll()
+        expect_equal(type(results), "table")
+        -- No pending requests, so results should be empty
+        expect_equal(#results, 0)
+        rt:shutdown()
+    end)
+
+    it("should survive multiple polls", function()
+        local rt = lurek.network.newRuntime()
+        for i = 1, 5 do
+            local results = rt:poll()
+            expect_equal(type(results), "table")
+        end
+        rt:shutdown()
+    end)
+
+    it("should have httpGet method", function()
+        local rt = lurek.network.newRuntime()
+        expect_equal(type(rt.httpGet), "function")
+        rt:shutdown()
+    end)
+
+    it("should have httpPost method", function()
+        local rt = lurek.network.newRuntime()
+        expect_equal(type(rt.httpPost), "function")
+        rt:shutdown()
+    end)
+
+    it("should have httpRequest method", function()
+        local rt = lurek.network.newRuntime()
+        expect_equal(type(rt.httpRequest), "function")
+        rt:shutdown()
+    end)
+
+    it("should have TCP methods", function()
+        local rt = lurek.network.newRuntime()
+        expect_equal(type(rt.tcpConnect), "function")
+        expect_equal(type(rt.tcpSend), "function")
+        expect_equal(type(rt.tcpClose), "function")
+        rt:shutdown()
+    end)
+
+    it("should have WebSocket methods", function()
+        local rt = lurek.network.newRuntime()
+        expect_equal(type(rt.wsConnect), "function")
+        expect_equal(type(rt.wsSend), "function")
+        expect_equal(type(rt.wsClose), "function")
+        rt:shutdown()
+    end)
+end)
+
 test_summary()

@@ -1,11 +1,11 @@
 # IDEA.md — `save` module
 
-| Field | Value |
-|-------|-------|
-| **Module** | `save` |
-| **Path** | `src/save/` |
-| **Date** | 2026-04-18 |
-| **Plugin Tier** | CORE-KEEP |
+| Field           | Value       |
+| --------------- | ----------- |
+| **Module**      | `save`      |
+| **Path**        | `src/save/` |
+| **Date**        | 2026-04-18  |
+| **Plugin Tier** | CORE-KEEP   |
 
 ---
 

@@ -1,11 +1,11 @@
 # IDEA.md — `spine`
 
-| Field   | Value                          |
-|---------|--------------------------------|
-| Module  | `spine`                        |
-| Path    | `src/spine/`                   |
-| Date    | 2026-04-18                     |
-| Tier    | Feature Systems                |
+| Field  | Value           |
+| ------ | --------------- |
+| Module | `spine`         |
+| Path   | `src/spine/`    |
+| Date   | 2026-04-18      |
+| Tier   | Feature Systems |
 
 ## Mission
 

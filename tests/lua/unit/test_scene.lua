@@ -1148,4 +1148,345 @@ describe("scene overlay clear state", function()
     end)
 end)
 
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Merged from test_scene_overlay.lua
+-- ──────────────────────────────────────────────────────────────────────────────
+
+-- @description Covers suite: Overlay mode (pushOverlay / isOverlay / depth).
+
+describe("lurek.scene overlay mode", function()
+    -- @covers lurek.scene.pushOverlay
+    -- @covers lurek.scene.isOverlay
+    -- @covers lurek.scene.depth
+    -- @covers lurek.scene.getActiveScenes
+    -- @description Verifies that pushOverlay is a registered function.
+    it("pushOverlay is a function", function()
+        expect_equal(type(lurek.scene.pushOverlay), "function")
+    end)
+
+    -- @description Verifies that pushOverlay accepts a scene table without error
+    -- and that depth() correctly counts it on the stack.
+    it("pushOverlay accepts a scene table and increments depth", function()
+        lurek.scene.clear()
+        local overlay = { enter = function() end, draw = function() end }
+        lurek.scene.pushOverlay(overlay)
+        expect_equal(lurek.scene.depth(), 1)
+        lurek.scene.pop()
+        expect_equal(lurek.scene.depth(), 0)
+    end)
+
+    -- @description Verifies that isOverlay() returns true for a scene pushed via pushOverlay.
+    it("isOverlay returns true after pushOverlay", function()
+        lurek.scene.clear()
+        local overlay = {}
+        lurek.scene.pushOverlay(overlay)
+        expect_true(lurek.scene.isOverlay())
+        lurek.scene.pop()
+    end)
+
+    -- @description Verifies that a normal push does NOT mark the scene as an overlay.
+    it("isOverlay returns false after a normal push", function()
+        lurek.scene.clear()
+        local scene = {}
+        lurek.scene.push(scene)
+        expect_false(lurek.scene.isOverlay())
+        lurek.scene.pop()
+    end)
+
+    -- @description Verifies that a background scene and overlay are both active (getActiveScenes).
+    it("both background and overlay are in getActiveScenes", function()
+        lurek.scene.clear()
+        local bg      = { name = "bg"      }
+        local overlay = { name = "overlay" }
+        lurek.scene.push(bg)
+        lurek.scene.pushOverlay(overlay)
+        local active = lurek.scene.getActiveScenes()
+        expect_equal(#active, 2)
+        lurek.scene.clear()
+    end)
+
+    -- @description Verifies that depth() alias equals getStackSize().
+    it("depth() equals getStackSize()", function()
+        lurek.scene.clear()
+        local s1 = {}
+        local s2 = {}
+        lurek.scene.push(s1)
+        lurek.scene.pushOverlay(s2)
+        expect_equal(lurek.scene.depth(), lurek.scene.getStackSize())
+        lurek.scene.clear()
+    end)
+end)
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Merged from test_scene_preload.lua
+-- ──────────────────────────────────────────────────────────────────────────────
+
+-- @description Covers suite: Scene preloading (preload / isPreloaded / pushPreloaded).
+
+describe("lurek.scene.preload", function()
+    -- @covers lurek.scene.preload
+    -- @covers lurek.scene.isPreloaded
+    -- @covers lurek.scene.pushPreloaded
+    -- @description Verifies that preload is a registered function.
+    it("preload is a function", function()
+        expect_equal(type(lurek.scene.preload), "function")
+    end)
+
+    -- @description Verifies that isPreloaded is a registered function.
+    it("isPreloaded is a function", function()
+        expect_equal(type(lurek.scene.isPreloaded), "function")
+    end)
+
+    -- @description Verifies that pushPreloaded is a registered function.
+    it("pushPreloaded is a function", function()
+        expect_equal(type(lurek.scene.pushPreloaded), "function")
+    end)
+
+    -- @description Verifies that registering a preload function completes without error.
+    it("can register a preload function without error", function()
+        lurek.scene.preload("test_scene", function()
+            -- heavy asset load would go here
+        end)
+        expect_equal(true, true)
+    end)
+
+    -- @description Verifies that a scene is NOT marked as preloaded before it is pushed.
+    it("scene is not preloaded before pushPreloaded is called", function()
+        lurek.scene.clear()
+        lurek.scene.preload("lazy_scene", function() end)
+        expect_false(lurek.scene.isPreloaded("lazy_scene"))
+    end)
+
+    -- @description Verifies that the loader is called at most once even when pushPreloaded
+    -- is invoked multiple times for the same name.
+    it("loader is invoked exactly once across multiple pushPreloaded calls", function()
+        lurek.scene.clear()
+        local call_count = 0
+        local dummy = {}
+        lurek.scene.registerScene("once_scene", dummy)
+        lurek.scene.preload("once_scene", function()
+            call_count = call_count + 1
+        end)
+        lurek.scene.pushPreloaded("once_scene")
+        lurek.scene.pop()
+        lurek.scene.pushPreloaded("once_scene")
+        lurek.scene.pop()
+        expect_equal(call_count, 1)
+        lurek.scene.unregisterScene("once_scene")
+        lurek.scene.clear()
+    end)
+
+    -- @description Verifies that isPreloaded returns true after pushPreloaded runs the loader.
+    it("isPreloaded returns true after pushPreloaded triggers the loader", function()
+        lurek.scene.clear()
+        local scene_tbl = {}
+        lurek.scene.registerScene("preload_check", scene_tbl)
+        lurek.scene.preload("preload_check", function() end)
+        lurek.scene.pushPreloaded("preload_check")
+        expect_true(lurek.scene.isPreloaded("preload_check"))
+        lurek.scene.pop()
+        lurek.scene.unregisterScene("preload_check")
+        lurek.scene.clear()
+    end)
+end)
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Merged from test_scene_serialization.lua
+-- ──────────────────────────────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.scene.serializeScene and deserializeScene.
+describe("lurek.scene", function()
+    -- @description Covers suite: scene data serialization.
+    describe("serializeScene and deserializeScene", function()
+        -- @covers lurek.scene.setData
+        -- @covers lurek.scene.getData
+        -- @covers lurek.scene.serializeScene
+        -- @description Verifies that serializeScene captures setData values.
+        it("serializeScene captures setData values", function()
+            lurek.scene.setData("level", 3)
+            lurek.scene.setData("score", 9999)
+            local snap = lurek.scene.serializeScene()
+            expect_equal("table", type(snap))
+            expect_equal("table", type(snap.data))
+            expect_equal(3, snap.data.level)
+            expect_equal(9999, snap.data.score)
+            -- Cleanup
+            lurek.scene.clearData()
+        end)
+
+        -- @covers lurek.scene.deserializeScene
+        -- @description Verifies that deserializeScene restores setData values.
+        it("deserializeScene restores setData values", function()
+            local snap = { data = { gold = 150, hp = 80 }, stack = {} }
+            lurek.scene.clearData()
+            lurek.scene.deserializeScene(snap)
+            expect_equal(150, lurek.scene.getData("gold"))
+            expect_equal(80, lurek.scene.getData("hp"))
+            lurek.scene.clearData()
+        end)
+
+        -- @covers lurek.scene.serializeScene
+        -- @description Verifies that serializeScene with no data returns empty data table.
+        it("serializeScene with no data returns empty data table", function()
+            lurek.scene.clearData()
+            local snap = lurek.scene.serializeScene()
+            local count = 0
+            for _ in pairs(snap.data) do count = count + 1 end
+            expect_equal(0, count)
+        end)
+
+        -- @covers lurek.scene.deserializeScene
+        -- @description Verifies that deserializeScene with empty data does not error.
+        it("deserializeScene with empty snapshot does not error", function()
+            local ok, err = pcall(function()
+                lurek.scene.deserializeScene({ data = {}, stack = {} })
+            end)
+            expect_equal(true, ok)
+        end)
+    end)
+end)
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Merged from test_scene_transitions.lua
+-- ──────────────────────────────────────────────────────────────────────────────
+
+-- @description Covers suite: Built-in transition library (lurek.scene.transitions).
+
+describe("lurek.scene.transitions", function()
+    -- @covers lurek.scene.transitions
+    -- @description Verifies that the transitions table is present on lurek.scene.
+    it("transitions table exists", function()
+        expect_equal(type(lurek.scene.transitions), "table")
+    end)
+
+    -- @description Verifies that lurek.scene.transitions.fade is a function.
+    it("fade transition exists as a function", function()
+        expect_equal(type(lurek.scene.transitions.fade), "function")
+    end)
+
+    -- @description Verifies that lurek.scene.transitions.slide is a function.
+    it("slide transition exists as a function", function()
+        expect_equal(type(lurek.scene.transitions.slide), "function")
+    end)
+
+    -- @description Verifies that lurek.scene.transitions.wipe is a function.
+    it("wipe transition exists as a function", function()
+        expect_equal(type(lurek.scene.transitions.wipe), "function")
+    end)
+
+    -- @description Verifies that lurek.scene.transitions.iris is a function.
+    it("iris transition exists as a function", function()
+        expect_equal(type(lurek.scene.transitions.iris), "function")
+    end)
+
+    -- @description Verifies that fade() with no args returns type="fade" and a default duration.
+    it("fade() returns a table with type=fade", function()
+        local t = lurek.scene.transitions.fade()
+        expect_equal(t.type, "fade")
+    end)
+
+    -- @description Verifies that fade() default duration is 0.5.
+    it("fade() returns default duration 0.5", function()
+        local t = lurek.scene.transitions.fade()
+        expect_near(t.duration, 0.5, 0.001)
+    end)
+
+    -- @description Verifies that fade(1.0) stores the supplied duration.
+    it("fade(1.0) returns duration=1.0", function()
+        local t = lurek.scene.transitions.fade(1.0)
+        expect_near(t.duration, 1.0, 0.001)
+    end)
+
+    -- @description Verifies that slide() default type is "left".
+    it("slide() returns type=left by default", function()
+        local t = lurek.scene.transitions.slide()
+        expect_equal(t.type, "left")
+    end)
+
+    -- @description Verifies that slide("right") stores the supplied direction.
+    it("slide(\"right\") returns type=right", function()
+        local t = lurek.scene.transitions.slide("right")
+        expect_equal(t.type, "right")
+    end)
+
+    -- @description Verifies that slide() default duration is 0.4.
+    it("slide() returns default duration 0.4", function()
+        local t = lurek.scene.transitions.slide()
+        expect_near(t.duration, 0.4, 0.001)
+    end)
+
+    -- @description Verifies that wipe() returns type="wipe" and default duration 0.5.
+    it("wipe() returns type=wipe with default duration", function()
+        local t = lurek.scene.transitions.wipe()
+        expect_equal(t.type, "wipe")
+        expect_near(t.duration, 0.5, 0.001)
+    end)
+
+    -- @description Verifies that iris() returns type="iris" and default duration 0.6.
+    it("iris() returns type=iris with default duration", function()
+        local t = lurek.scene.transitions.iris()
+        expect_equal(t.type, "iris")
+        expect_near(t.duration, 0.6, 0.001)
+    end)
+
+    -- @description Verifies that factory functions return independent table instances.
+    it("each factory call returns a fresh table", function()
+        local a = lurek.scene.transitions.fade()
+        local b = lurek.scene.transitions.fade()
+        expect_false(a == b)
+    end)
+end)
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Merged from test_scene_transitions_extended.lua
+-- ──────────────────────────────────────────────────────────────────────────────
+
+-- @description Covers suite: lurek.scene extended transition types.
+describe("lurek.scene", function()
+    -- @description Covers suite: getTransitionTypes.
+    describe("getTransitionTypes", function()
+        -- @covers lurek.scene.getTransitionTypes
+        -- @description Verifies that getTransitionTypes returns exactly 10 entries.
+        it("returns exactly 10 transition type strings", function()
+            local types = lurek.scene.getTransitionTypes()
+            expect_equal(10, #types)
+        end)
+
+        -- @covers lurek.scene.getTransitionTypes
+        -- @description Verifies that all expected basic types are present.
+        it("contains none, fade, left, right, up, down", function()
+            local types = lurek.scene.getTransitionTypes()
+            local lookup = {}
+            for _, v in ipairs(types) do lookup[v] = true end
+            expect_equal(true, lookup["none"])
+            expect_equal(true, lookup["fade"])
+            expect_equal(true, lookup["left"])
+            expect_equal(true, lookup["right"])
+            expect_equal(true, lookup["up"])
+            expect_equal(true, lookup["down"])
+        end)
+
+        -- @covers lurek.scene.getTransitionTypes
+        -- @description Verifies that extended types wipe, iris, zoom, crossfade are present.
+        it("contains extended types wipe, iris, zoom, crossfade", function()
+            local types = lurek.scene.getTransitionTypes()
+            local lookup = {}
+            for _, v in ipairs(types) do lookup[v] = true end
+            expect_equal(true, lookup["wipe"])
+            expect_equal(true, lookup["iris"])
+            expect_equal(true, lookup["zoom"])
+            expect_equal(true, lookup["crossfade"])
+        end)
+
+        -- @covers lurek.scene.getTransitionTypes
+        -- @description Verifies that all entries are strings.
+        it("all entries are strings", function()
+            local types = lurek.scene.getTransitionTypes()
+            for _, v in ipairs(types) do
+                expect_equal("string", type(v))
+            end
+        end)
+    end)
+end)
+
 test_summary()

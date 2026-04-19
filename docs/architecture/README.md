@@ -22,15 +22,15 @@ For contributor onboarding (clone → build → first game → first engine chan
 
 ## File Index
 
-| File | Purpose | Primary Audience | Length |
-|---|---|---|---:|
-| [philosophy.md](philosophy.md) | Binding constraints, Zen rules, retired decisions. Every other architecture doc refers back here. | EngDev · GameDev · Modder · GameTest · EngTest | ~260 lines |
-| [engine-architecture.md](engine-architecture.md) | Module groups, complete module inventory, boot + frame + state, Lua binding architecture, subsystem pipelines. Canonical for module file-structure standard. | EngDev · GameDev | ~790 lines |
-| [render-command-architecture.md](render-command-architecture.md) | Three-layer `RenderCommand` design, per-module output catalogue, render-module refactoring plan. | EngDev · GameDev | ~890 lines |
-| [test-framework.md](test-framework.md) | Rust + Lua test architecture, BDD framework, golden/evidence suites, coverage tooling, CI gates. | EngTest · GameTest · EngDev | ~980 lines |
-| [vscode-architecture.md](vscode-architecture.md) | Shipping `extensions/vscode/` design: activation, commands, debug bridge, MCP server, webview editors. | EngDev · GameDev | ~535 lines |
-| [cag-system.md](cag-system.md) | CAG layer (`.github/`) file-type catalog, discovery flow, persona matrix, validator & tooling, sweep contract. | All six personas | ~295 lines |
-| [plugins.md](plugins.md) | Plugin architecture (Proposed): core-vs-plugin boundary, Tier A/B/C load mechanism, candidate matrix, migration plan, comparison to other engines. | EngDev · Modder | ~370 lines |
+| File                                                             | Purpose                                                                                                                                                      | Primary Audience                               |     Length |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- | ---------: |
+| [philosophy.md](philosophy.md)                                   | Binding constraints, Zen rules, retired decisions. Every other architecture doc refers back here.                                                            | EngDev · GameDev · Modder · GameTest · EngTest | ~260 lines |
+| [engine-architecture.md](engine-architecture.md)                 | Module groups, complete module inventory, boot + frame + state, Lua binding architecture, subsystem pipelines. Canonical for module file-structure standard. | EngDev · GameDev                               | ~790 lines |
+| [render-command-architecture.md](render-command-architecture.md) | Three-layer `RenderCommand` design, per-module output catalogue, render-module refactoring plan.                                                             | EngDev · GameDev                               | ~890 lines |
+| [test-framework.md](test-framework.md)                           | Rust + Lua test architecture, BDD framework, golden/evidence suites, coverage tooling, CI gates.                                                             | EngTest · GameTest · EngDev                    | ~980 lines |
+| [vscode-architecture.md](vscode-architecture.md)                 | Shipping `extensions/vscode/` design: activation, commands, debug bridge, MCP server, webview editors.                                                       | EngDev · GameDev                               | ~535 lines |
+| [cag-system.md](cag-system.md)                                   | CAG layer (`.github/`) file-type catalog, discovery flow, persona matrix, validator & tooling, sweep contract.                                               | All six personas                               | ~295 lines |
+| [plugins.md](plugins.md)                                         | Plugin architecture (Proposed): core-vs-plugin boundary, Tier A/B/C load mechanism, candidate matrix, migration plan, comparison to other engines.           | EngDev · Modder                                | ~370 lines |
 
 ---
 
@@ -42,14 +42,14 @@ The system prompt at [.github/copilot-instructions.md](../../.github/copilot-ins
 
 ## When to Edit What
 
-| You changed… | Update this arch doc |
-|---|---|
-| A Rust module (`src/<module>/`) | [docs/specs/<module>.md](../specs/) (always); [philosophy.md](philosophy.md) only if a binding rule moves. |
-| Render pipeline, `RenderCommand` variant, pass structure | [render-command-architecture.md](render-command-architecture.md) |
-| Module group assignment, boot sequence, frame order, state layout, module file-structure standard | [engine-architecture.md](engine-architecture.md) |
-| Test strategy, new test tier, golden/evidence rules, harness registration | [test-framework.md](test-framework.md) |
-| VS Code extension commands, MCP server, providers, debug bridge | [vscode-architecture.md](vscode-architecture.md) |
-| `.github/` layer (agent, skill, prompt, validator, persona matrix) | [cag-system.md](cag-system.md) and the system prompt |
-| Plugin boundary, feature flag, plugin ABI | [plugins.md](plugins.md) |
+| You changed…                                                                                      | Update this arch doc                                                                                       |
+| ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| A Rust module (`src/<module>/`)                                                                   | [docs/specs/<module>.md](../specs/) (always); [philosophy.md](philosophy.md) only if a binding rule moves. |
+| Render pipeline, `RenderCommand` variant, pass structure                                          | [render-command-architecture.md](render-command-architecture.md)                                           |
+| Module group assignment, boot sequence, frame order, state layout, module file-structure standard | [engine-architecture.md](engine-architecture.md)                                                           |
+| Test strategy, new test tier, golden/evidence rules, harness registration                         | [test-framework.md](test-framework.md)                                                                     |
+| VS Code extension commands, MCP server, providers, debug bridge                                   | [vscode-architecture.md](vscode-architecture.md)                                                           |
+| `.github/` layer (agent, skill, prompt, validator, persona matrix)                                | [cag-system.md](cag-system.md) and the system prompt                                                       |
+| Plugin boundary, feature flag, plugin ABI                                                         | [plugins.md](plugins.md)                                                                                   |
 
 Always also add a bullet under the current version in [docs/CHANGELOG.md](../CHANGELOG.md).

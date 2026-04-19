@@ -14,5 +14,3 @@ pub mod universe;
 
 pub use relationships::{RelationType, Relationship, RelationshipManager};
 pub use universe::{deep_copy_table, Universe};
-
-// Tests migrated to tests/rust/unit/ecs_tests.rs

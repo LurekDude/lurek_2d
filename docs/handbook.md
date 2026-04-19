@@ -36,14 +36,14 @@ Lurek2D is a desktop 2D game engine written in Rust that loads and executes Lua 
 
 Six personas. Each maps to the handbook sections that matter most.
 
-| Persona     | Who you are                                            | Start here                                | Then read |
-|-------------|--------------------------------------------------------|-------------------------------------------|-----------|
-| **GameDev** | Writing a game in Lua against `lurek.*`.               | §3 First 30 min · §6 First game           | §8 Docs · §9 Testing |
-| **EngDev**  | Modifying Rust source under `src/`.                    | §3 · §7 First engine change               | §10 Quality gates · §8 Docs |
-| **Modder**  | Authoring a Lunasome library or sandboxed mod.         | §3 · §6 (Lua skeleton) · §11 (CAG skills) | [library-authoring](../.github/skills/library-authoring/SKILL.md) |
-| **Player**  | Just running shipped games / demos.                    | §3 (steps 1–4) only                       | — |
-| **GameTest**| Writing Lua BDD tests for game/library behaviour.       | §3 · §9 Testing                           | [test-framework.md](architecture/test-framework.md) |
-| **EngTest** | Writing Rust unit / integration / benches.             | §3 · §9 · §10                             | [test-framework.md](architecture/test-framework.md) |
+| Persona      | Who you are                                       | Start here                                | Then read                                                         |
+| ------------ | ------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------- |
+| **GameDev**  | Writing a game in Lua against `lurek.*`.          | §3 First 30 min · §6 First game           | §8 Docs · §9 Testing                                              |
+| **EngDev**   | Modifying Rust source under `src/`.               | §3 · §7 First engine change               | §10 Quality gates · §8 Docs                                       |
+| **Modder**   | Authoring a Lunasome library or sandboxed mod.    | §3 · §6 (Lua skeleton) · §11 (CAG skills) | [library-authoring](../.github/skills/library-authoring/SKILL.md) |
+| **Player**   | Just running shipped games / demos.               | §3 (steps 1–4) only                       | —                                                                 |
+| **GameTest** | Writing Lua BDD tests for game/library behaviour. | §3 · §9 Testing                           | [test-framework.md](architecture/test-framework.md)               |
+| **EngTest**  | Writing Rust unit / integration / benches.        | §3 · §9 · §10                             | [test-framework.md](architecture/test-framework.md)               |
 
 Personas are formalised in [architecture/cag-system.md § 4](architecture/cag-system.md#4-six-persona-model).
 
@@ -79,18 +79,18 @@ Total cold-start time: about 30 minutes including the first build.
 
 Authoritative layout lives in the system prompt's *Repository Layout* section ([.github/copilot-instructions.md](../.github/copilot-instructions.md)). One sentence per top-level folder:
 
-| Folder            | Purpose                                                                 |
-|-------------------|-------------------------------------------------------------------------|
-| [src/](../src/)               | Rust engine source — 49 modules across the five responsibility groups. |
-| [tests/](../tests/)           | Rust + Lua test suites; Lua tests are registered manually in [tests/lua/harness.rs](../tests/lua/harness.rs). |
-| [docs/](.)                    | Architecture (`architecture/`), per-module specs (`specs/`), generated APIs (`API/`), and the changelog. |
-| [tools/](../tools/)           | Permanent CLI scripts: `validate/`, `audit/`, `fix/`, `docs/`, `dev/`, `demos/`, `dist/`, `github/`, `assets/`. |
-| [content/](../content/)       | Lua content — `games/` (showcase apps), `examples/` (one-file API demos), `library/` (Lunasome libs), `layouts/`, `plugins/`. |
-| [.github/](../.github/)       | CAG layer — system prompt + agents/, skills/, prompts/. See §11. |
-| [extensions/vscode/](../extensions/vscode/) | First-party VS Code extension. |
-| [work/](../work/)             | Active session folders; closed sessions move to `work/archive/`. |
-| [assets/](../assets/)         | Engine assets shipped with the binary (splash, window icon, embedded fonts). |
-| [build/](../build/)           | Cargo output (overrides `target/` via [.cargo/config.toml](../.cargo/config.toml)). |
+| Folder                                      | Purpose                                                                                                                       |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| [src/](../src/)                             | Rust engine source — 49 modules across the five responsibility groups.                                                        |
+| [tests/](../tests/)                         | Rust + Lua test suites; Lua tests are registered manually in [tests/lua/harness.rs](../tests/lua/harness.rs).                 |
+| [docs/](.)                                  | Architecture (`architecture/`), per-module specs (`specs/`), generated APIs (`API/`), and the changelog.                      |
+| [tools/](../tools/)                         | Permanent CLI scripts: `validate/`, `audit/`, `fix/`, `docs/`, `dev/`, `demos/`, `dist/`, `github/`, `assets/`.               |
+| [content/](../content/)                     | Lua content — `games/` (showcase apps), `examples/` (one-file API demos), `library/` (Lunasome libs), `layouts/`, `plugins/`. |
+| [.github/](../.github/)                     | CAG layer — system prompt + agents/, skills/, prompts/. See §11.                                                              |
+| [extensions/vscode/](../extensions/vscode/) | First-party VS Code extension.                                                                                                |
+| [work/](../work/)                           | Active session folders; closed sessions move to `work/archive/`.                                                              |
+| [assets/](../assets/)                       | Engine assets shipped with the binary (splash, window icon, embedded fonts).                                                  |
+| [build/](../build/)                         | Cargo output (overrides `target/` via [.cargo/config.toml](../.cargo/config.toml)).                                           |
 
 For canonical group-by-group module placement, see [architecture/engine-architecture.md § Complete Module Inventory](architecture/engine-architecture.md#complete-module-inventory).
 
@@ -113,17 +113,17 @@ Feature flags:
 
 Common workspace tasks (see [.vscode/tasks.json](../.vscode/tasks.json)) — invoke from VS Code's *Tasks: Run Task*:
 
-| Task label                          | Equivalent CLI |
-|-------------------------------------|----------------|
-| `Build: Debug`                       | `cargo build` |
-| `Build: Release`                     | `cargo build --release` |
-| `Run Debug: Splash (drag-drop ready)`| Launch `build/debug/lurek2d` without rebuilding |
-| `Run Release: Splash (drag-drop ready)` | Launch `build/release/lurek2d` without rebuilding |
-| `Test: All`                          | `cargo test` |
-| `Test: <Module> module`              | `cargo test --test <module>_tests` (Math, Physics, Graphics, Audio, Input, Lua bindings) |
-| `Lint: Clippy (deny warnings)`       | `cargo clippy -- -D warnings` |
-| `Format: Check`                      | `cargo fmt --check` |
-| `Quality Gate: Full`                 | format check → clippy deny → test all (the canonical pre-PR sweep) |
+| Task label                              | Equivalent CLI                                                                           |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `Build: Debug`                          | `cargo build`                                                                            |
+| `Build: Release`                        | `cargo build --release`                                                                  |
+| `Run Debug: Splash (drag-drop ready)`   | Launch `build/debug/lurek2d` without rebuilding                                          |
+| `Run Release: Splash (drag-drop ready)` | Launch `build/release/lurek2d` without rebuilding                                        |
+| `Test: All`                             | `cargo test`                                                                             |
+| `Test: <Module> module`                 | `cargo test --test <module>_tests` (Math, Physics, Graphics, Audio, Input, Lua bindings) |
+| `Lint: Clippy (deny warnings)`          | `cargo clippy -- -D warnings`                                                            |
+| `Format: Check`                         | `cargo fmt --check`                                                                      |
+| `Quality Gate: Full`                    | format check → clippy deny → test all (the canonical pre-PR sweep)                       |
 
 Distribution:
 
@@ -225,11 +225,11 @@ For a deeper walkthrough including the Thin Wrapper Rule for new `lurek.*` APIs,
 
 Three docs tiers. Each has a different lifecycle:
 
-| Tier                          | Location                | Lifecycle                                                                |
-|-------------------------------|-------------------------|--------------------------------------------------------------------------|
-| **Architecture (narrative)**  | [docs/architecture/](architecture/) | Hand-written. Index at [architecture/README.md](architecture/README.md). |
-| **Per-module specs**          | [docs/specs/](specs/)               | Mixed: `Summary` and `Notes` are manual prose; everything else is regenerated by `tools/docs/gen_module_specs.py`. Index at [specs/README.md](specs/README.md). |
-| **Generated API references**  | [docs/API/](API/)                   | Fully auto-generated by `python tools/gen_all_docs.py`. Never hand-edit. |
+| Tier                         | Location                            | Lifecycle                                                                                                                                                       |
+| ---------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Architecture (narrative)** | [docs/architecture/](architecture/) | Hand-written. Index at [architecture/README.md](architecture/README.md).                                                                                        |
+| **Per-module specs**         | [docs/specs/](specs/)               | Mixed: `Summary` and `Notes` are manual prose; everything else is regenerated by `tools/docs/gen_module_specs.py`. Index at [specs/README.md](specs/README.md). |
+| **Generated API references** | [docs/API/](API/)                   | Fully auto-generated by `python tools/gen_all_docs.py`. Never hand-edit.                                                                                        |
 
 The cross-artifact sync table in the system prompt ([.github/copilot-instructions.md § Cross-Artifact Sync](../.github/copilot-instructions.md)) tells you which docs to update when source changes. Regenerate generated docs after any public-API change. Module-spec manual-vs-auto rules are documented in [docs/specs/SPEC_TEMPLATE.md](specs/SPEC_TEMPLATE.md) and enforced by `python tools/audit/validate_agent_md.py`.
 
@@ -313,17 +313,17 @@ Full deep dive in [architecture/cag-system.md](architecture/cag-system.md). When
 
 Common slash prompts — each one is a parameterised playbook under [.github/prompts/](../.github/prompts/):
 
-| Prompt | What it does |
-|--------|--------------|
-| `/run-quality-sweep` | Runs the full audit → diagnose → fix → verify cycle across the repo. |
-| `/run-quality-gates` | Equivalent to the `Quality Gate: Full` task: fmt + clippy + test. |
-| `/run-cag-validation` | Runs `tools/validate/cag_validate.py` and reports any errors / warnings. |
-| `/audit-module` | Per-module quality audit (docs, tests, architecture, Lua bindings). |
-| `/create-demo` | Scaffolds a new showcase under `content/games/showcase/<name>/`. |
-| `/create-engine-module` | Scaffolds a new `src/<module>/` skeleton + spec. |
-| `/create-api-function` | Adds a new `lurek.*` function across Rust, Lua bindings, docs, and tests. |
-| `/fix-failing-tests` | Diagnoses and repairs failing Rust or Lua tests. |
-| `/review-code-quality` | Reviewer agent quality pass before commit. |
+| Prompt                  | What it does                                                              |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `/run-quality-sweep`    | Runs the full audit → diagnose → fix → verify cycle across the repo.      |
+| `/run-quality-gates`    | Equivalent to the `Quality Gate: Full` task: fmt + clippy + test.         |
+| `/run-cag-validation`   | Runs `tools/validate/cag_validate.py` and reports any errors / warnings.  |
+| `/audit-module`         | Per-module quality audit (docs, tests, architecture, Lua bindings).       |
+| `/create-demo`          | Scaffolds a new showcase under `content/games/showcase/<name>/`.          |
+| `/create-engine-module` | Scaffolds a new `src/<module>/` skeleton + spec.                          |
+| `/create-api-function`  | Adds a new `lurek.*` function across Rust, Lua bindings, docs, and tests. |
+| `/fix-failing-tests`    | Diagnoses and repairs failing Rust or Lua tests.                          |
+| `/review-code-quality`  | Reviewer agent quality pass before commit.                                |
 
 All prompts are listed in [.github/prompts/](../.github/prompts/); browse there for the complete set.
 
@@ -331,46 +331,46 @@ All prompts are listed in [.github/prompts/](../.github/prompts/); browse there 
 
 ## 12. Where to look when stuck
 
-| Symptom                                                  | Where to look |
-|----------------------------------------------------------|---------------|
-| Build fails on a fresh clone                              | Verify Rust ≥ 1.78; delete `build/` and retry. See [build-system](../.github/skills/build-system/SKILL.md). |
-| `lurek.*` function isn't documented                       | Run `python tools/gen_all_docs.py`; check [docs/API/lua-api.md](API/lua-api.md). |
-| Module's spec is out of date                              | `python tools/docs/gen_module_specs.py`; manual `Summary` / `Notes` are preserved. |
-| Lua test runs but isn't registered                        | Add a `#[test] fn lua_test_<category>_<name>()` in [tests/lua/harness.rs](../tests/lua/harness.rs). |
-| CAG validator fails                                       | `python tools/validate/cag_validate.py --format text`; see [tools-cag-validation](../.github/skills/tools-cag-validation/SKILL.md). |
-| Game crashes only in release mode                         | Reproduce with `cargo run --release`; load [dev-debugging](../.github/skills/dev-debugging/SKILL.md) skill. |
-| Don't know which module a feature belongs to              | [architecture/engine-architecture.md § Complete Module Inventory](architecture/engine-architecture.md#complete-module-inventory). |
-| Need to design a new `lurek.*` API                        | [lua-api-design](../.github/skills/lua-api-design/SKILL.md) skill. |
-| Need to add a new module                                  | [architecture/engine-architecture.md § Module Internal File Structure Standard](architecture/engine-architecture.md#module-internal-file-structure-standard) + `Architect` agent. |
-| Need a new agent / skill / prompt                         | [architecture/cag-system.md § 6 Authoring Guides](architecture/cag-system.md#6-authoring-guides). |
-| Plugin / size question                                    | [architecture/plugins.md](architecture/plugins.md). |
+| Symptom                                      | Where to look                                                                                                                                                                     |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Build fails on a fresh clone                 | Verify Rust ≥ 1.78; delete `build/` and retry. See [build-system](../.github/skills/build-system/SKILL.md).                                                                       |
+| `lurek.*` function isn't documented          | Run `python tools/gen_all_docs.py`; check [docs/API/lua-api.md](API/lua-api.md).                                                                                                  |
+| Module's spec is out of date                 | `python tools/docs/gen_module_specs.py`; manual `Summary` / `Notes` are preserved.                                                                                                |
+| Lua test runs but isn't registered           | Add a `#[test] fn lua_test_<category>_<name>()` in [tests/lua/harness.rs](../tests/lua/harness.rs).                                                                               |
+| CAG validator fails                          | `python tools/validate/cag_validate.py --format text`; see [tools-cag-validation](../.github/skills/tools-cag-validation/SKILL.md).                                               |
+| Game crashes only in release mode            | Reproduce with `cargo run --release`; load [dev-debugging](../.github/skills/dev-debugging/SKILL.md) skill.                                                                       |
+| Don't know which module a feature belongs to | [architecture/engine-architecture.md § Complete Module Inventory](architecture/engine-architecture.md#complete-module-inventory).                                                 |
+| Need to design a new `lurek.*` API           | [lua-api-design](../.github/skills/lua-api-design/SKILL.md) skill.                                                                                                                |
+| Need to add a new module                     | [architecture/engine-architecture.md § Module Internal File Structure Standard](architecture/engine-architecture.md#module-internal-file-structure-standard) + `Architect` agent. |
+| Need a new agent / skill / prompt            | [architecture/cag-system.md § 6 Authoring Guides](architecture/cag-system.md#6-authoring-guides).                                                                                 |
+| Plugin / size question                       | [architecture/plugins.md](architecture/plugins.md).                                                                                                                               |
 
 ---
 
 ## 13. Glossary
 
-| Term | Meaning |
-|------|---------|
-| **`lurek.*`** | The single Lua API namespace. All scripting goes through it. Rule **C-01**, defined in [architecture/philosophy.md](architecture/philosophy.md). |
-| **CAG** | Context Augmented Guidance — the `.github/` layer customising AI workflows. [architecture/cag-system.md](architecture/cag-system.md). |
-| **CORE-KEEP** | Plugin tier for modules that always ship in the core binary. [architecture/plugins.md § 4](architecture/plugins.md#4-plugin-tiers). |
-| **DAG (no-cycles rule)** | Module import graph must remain acyclic. Zen Rule 1 / constraint **T-03**, [architecture/philosophy.md](architecture/philosophy.md). |
-| **ECS** | Entity-Component-System. Lurek2D's lightweight implementation lives in `src/ecs/` ([docs/specs/ecs.md](specs/ecs.md)). |
-| **Edge/Integration** | The top responsibility group: `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin`. [architecture/engine-architecture.md](architecture/engine-architecture.md#module-group-model). |
-| **GameFS** | Sandboxed filesystem facade preventing path traversal out of the game folder. `src/filesystem/`, [docs/specs/filesystem.md](specs/filesystem.md). |
-| **Lunasome** | Pure-Lua standard library at [content/library/](../content/library/). Consumes only public `lurek.*` APIs. |
-| **LuaJIT** | The shipping Lua runtime via `mlua` (constraint **B-01**). Lua 5.4 is a non-shipping fallback. [architecture/philosophy.md](architecture/philosophy.md). |
-| **Persona** | One of six target user profiles (EngDev, GameDev, Modder, Player, GameTest, EngTest). [architecture/cag-system.md § 4](architecture/cag-system.md#4-six-persona-model). |
-| **Plugin tier** | One of CORE-KEEP / TIER-1-PLUGIN / TIER-2-PLUGIN / THIRD-PARTY-PLUGIN. [architecture/plugins.md § 4](architecture/plugins.md#4-plugin-tiers). |
-| **`RenderCommand`** | The single GPU-agnostic enum that every renderer-bound subsystem emits. [architecture/render-command-architecture.md](architecture/render-command-architecture.md). |
-| **`SharedState`** | The `Rc<RefCell<...>>` hub holding every runtime resource pool. `src/runtime/shared_state.rs`. [architecture/engine-architecture.md § State Architecture](architecture/engine-architecture.md#state-architecture). |
-| **Skill** | On-demand domain knowledge under `.github/skills/<name>/SKILL.md`, loaded when the user task matches. [architecture/cag-system.md § 2](architecture/cag-system.md#2-file-type-catalog). |
-| **Sweep** | The end-of-session CAG-Architect review confirming `.github/` changes are valid. [architecture/cag-system.md § 7](architecture/cag-system.md#7-end-of-session-cag-sweep-contract). |
-| **Thin Wrapper Rule** | `src/lua_api/<module>_api.rs` owns ALL `impl LuaUserData` and `mlua` imports; domain modules under `src/<module>/` stay pure-Rust. Zen Rule 12 / constraint **T-02**. |
-| **TOML / `conf.toml` / `conf.lua`** | TOML is the human-authored config format (constraint **B-05**); per-game config lives in `conf.toml` (preferred) or `conf.lua` (legacy fallback). |
-| **`work/<session>/`** | Per-session scratch folder with `scripts/`, `handovers/`, `reports/`, `data/`, `examples/`, `other/`, `temp/`, `logs/`. Closed sessions move to `work/archive/`. |
-| **`mlua`** | Rust binding crate to LuaJIT / Lua 5.4. Owns all `impl LuaUserData` boundaries inside `src/lua_api/`. |
-| **`wgpu`** | Cross-platform GPU abstraction (Vulkan / DX12 / Metal). Constraint **B-02** — only renderer backend in Lurek2D. |
-| **`rapier2d`** | The 2D rigid-body physics engine used by `src/physics/`. Heavy crate tree — part of the case for plugin tier-2. |
-| **Quality Gate** | The set of must-pass checks before a commit: tests, clippy, CAG validator, doc coverage. §10. |
-| **Spec** | Per-module reference at [docs/specs/<module>.md](specs/), mixing manual `Summary`/`Notes` with auto-regenerated sections. |
+| Term                                | Meaning                                                                                                                                                                                                            |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`lurek.*`**                       | The single Lua API namespace. All scripting goes through it. Rule **C-01**, defined in [architecture/philosophy.md](architecture/philosophy.md).                                                                   |
+| **CAG**                             | Context Augmented Guidance — the `.github/` layer customising AI workflows. [architecture/cag-system.md](architecture/cag-system.md).                                                                              |
+| **CORE-KEEP**                       | Plugin tier for modules that always ship in the core binary. [architecture/plugins.md § 4](architecture/plugins.md#4-plugin-tiers).                                                                                |
+| **DAG (no-cycles rule)**            | Module import graph must remain acyclic. Zen Rule 1 / constraint **T-03**, [architecture/philosophy.md](architecture/philosophy.md).                                                                               |
+| **ECS**                             | Entity-Component-System. Lurek2D's lightweight implementation lives in `src/ecs/` ([docs/specs/ecs.md](specs/ecs.md)).                                                                                             |
+| **Edge/Integration**                | The top responsibility group: `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin`. [architecture/engine-architecture.md](architecture/engine-architecture.md#module-group-model).               |
+| **GameFS**                          | Sandboxed filesystem facade preventing path traversal out of the game folder. `src/filesystem/`, [docs/specs/filesystem.md](specs/filesystem.md).                                                                  |
+| **Lunasome**                        | Pure-Lua standard library at [content/library/](../content/library/). Consumes only public `lurek.*` APIs.                                                                                                         |
+| **LuaJIT**                          | The shipping Lua runtime via `mlua` (constraint **B-01**). Lua 5.4 is a non-shipping fallback. [architecture/philosophy.md](architecture/philosophy.md).                                                           |
+| **Persona**                         | One of six target user profiles (EngDev, GameDev, Modder, Player, GameTest, EngTest). [architecture/cag-system.md § 4](architecture/cag-system.md#4-six-persona-model).                                            |
+| **Plugin tier**                     | One of CORE-KEEP / TIER-1-PLUGIN / TIER-2-PLUGIN / THIRD-PARTY-PLUGIN. [architecture/plugins.md § 4](architecture/plugins.md#4-plugin-tiers).                                                                      |
+| **`RenderCommand`**                 | The single GPU-agnostic enum that every renderer-bound subsystem emits. [architecture/render-command-architecture.md](architecture/render-command-architecture.md).                                                |
+| **`SharedState`**                   | The `Rc<RefCell<...>>` hub holding every runtime resource pool. `src/runtime/shared_state.rs`. [architecture/engine-architecture.md § State Architecture](architecture/engine-architecture.md#state-architecture). |
+| **Skill**                           | On-demand domain knowledge under `.github/skills/<name>/SKILL.md`, loaded when the user task matches. [architecture/cag-system.md § 2](architecture/cag-system.md#2-file-type-catalog).                            |
+| **Sweep**                           | The end-of-session CAG-Architect review confirming `.github/` changes are valid. [architecture/cag-system.md § 7](architecture/cag-system.md#7-end-of-session-cag-sweep-contract).                                 |
+| **Thin Wrapper Rule**               | `src/lua_api/<module>_api.rs` owns ALL `impl LuaUserData` and `mlua` imports; domain modules under `src/<module>/` stay pure-Rust. Zen Rule 12 / constraint **T-02**.                                              |
+| **TOML / `conf.toml` / `conf.lua`** | TOML is the human-authored config format (constraint **B-05**); per-game config lives in `conf.toml` (preferred) or `conf.lua` (legacy fallback).                                                                  |
+| **`work/<session>/`**               | Per-session scratch folder with `scripts/`, `handovers/`, `reports/`, `data/`, `examples/`, `other/`, `temp/`, `logs/`. Closed sessions move to `work/archive/`.                                                   |
+| **`mlua`**                          | Rust binding crate to LuaJIT / Lua 5.4. Owns all `impl LuaUserData` boundaries inside `src/lua_api/`.                                                                                                              |
+| **`wgpu`**                          | Cross-platform GPU abstraction (Vulkan / DX12 / Metal). Constraint **B-02** — only renderer backend in Lurek2D.                                                                                                    |
+| **`rapier2d`**                      | The 2D rigid-body physics engine used by `src/physics/`. Heavy crate tree — part of the case for plugin tier-2.                                                                                                    |
+| **Quality Gate**                    | The set of must-pass checks before a commit: tests, clippy, CAG validator, doc coverage. §10.                                                                                                                      |
+| **Spec**                            | Per-module reference at [docs/specs/<module>.md](specs/), mixing manual `Summary`/`Notes` with auto-regenerated sections.                                                                                          |

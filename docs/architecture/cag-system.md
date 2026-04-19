@@ -40,14 +40,14 @@ The system serves **six personas** — EngDev, GameDev, Modder, Player, GameTest
 
 The CAG layer is built from five artifact types. Each has a fixed location, required frontmatter, required body sections, and a numeric range of validator rules so violations are easy to grep.
 
-| Type | Location | Purpose | Required Frontmatter | Required Sections | Line Cap | Validator Rules |
-|---|---|---|---|---|---|---|
-| **System prompt** | [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | High-level discovery index, always loaded into every chat session. | (top-level config — no frontmatter) | Engine Identity / Binding Constraints / Cross-Artifact Sync / Discovery Directives / Quality Gates / Repository Layout | ≤ 120 lines, ≤ 8 KB | E001–E004, W005 |
-| **Agent** | `.github/agents/<name>.agent.md` | Defines a workflow specialist (mission, scope, IO, routing). | `name`, `mission`, `personas[]`, `primary_skills[]`, `secondary_skills[]`, `routes_to[]`, `loads_tools[]` | Mission / Scope / Inputs / Outputs / Workflow / Routing Table / Anti-patterns | ≤ 200 lines | E101–E107, W108 |
-| **Skill** | `.github/skills/<name>/SKILL.md` | Deep domain knowledge pulled in only when the task matches. **No fenced code blocks** — extracted to companion files. | `name`, `description` (load-when + skip-for), `companion_files[]`, `related_skills[]` | Mission / When To Load / When To Skip / Domain Knowledge / Companion File Index / References | ≤ 120 lines | E201–E205, W206 |
-| **Prompt** | `.github/prompts/<verb>-<noun>.prompt.md` | Concrete user-invocable task, typically run via `/<name>`. | `description`, `mode`, `loads_skills[]`, `loads_tools[]`, `expected_agent`, `inputs_required[]` | Goal / Inputs / Steps / Success Criteria / Anti-patterns / Example Invocation | none | E301–E305, W306 |
-| **Companion file** | `.github/skills/<name>/{examples,templates,snippets}/...` | Code, templates, or extended notes referenced from a `SKILL.md`. | n/a | n/a | none | E203 (referenced-but-missing) |
-| **Agent README** | [.github/agents/README.md](../../.github/agents/README.md) | Cross-agent contracts: routing, handoff schema, families. | (free-form) | (free-form) | suggested ≤ 150 | none |
+| Type               | Location                                                                 | Purpose                                                                                                               | Required Frontmatter                                                                                      | Required Sections                                                                                                      | Line Cap            | Validator Rules               |
+| ------------------ | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------- | ----------------------------- |
+| **System prompt**  | [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | High-level discovery index, always loaded into every chat session.                                                    | (top-level config — no frontmatter)                                                                       | Engine Identity / Binding Constraints / Cross-Artifact Sync / Discovery Directives / Quality Gates / Repository Layout | ≤ 120 lines, ≤ 8 KB | E001–E004, W005               |
+| **Agent**          | `.github/agents/<name>.agent.md`                                         | Defines a workflow specialist (mission, scope, IO, routing).                                                          | `name`, `mission`, `personas[]`, `primary_skills[]`, `secondary_skills[]`, `routes_to[]`, `loads_tools[]` | Mission / Scope / Inputs / Outputs / Workflow / Routing Table / Anti-patterns                                          | ≤ 200 lines         | E101–E107, W108               |
+| **Skill**          | `.github/skills/<name>/SKILL.md`                                         | Deep domain knowledge pulled in only when the task matches. **No fenced code blocks** — extracted to companion files. | `name`, `description` (load-when + skip-for), `companion_files[]`, `related_skills[]`                     | Mission / When To Load / When To Skip / Domain Knowledge / Companion File Index / References                           | ≤ 120 lines         | E201–E205, W206               |
+| **Prompt**         | `.github/prompts/<verb>-<noun>.prompt.md`                                | Concrete user-invocable task, typically run via `/<name>`.                                                            | `description`, `mode`, `loads_skills[]`, `loads_tools[]`, `expected_agent`, `inputs_required[]`           | Goal / Inputs / Steps / Success Criteria / Anti-patterns / Example Invocation                                          | none                | E301–E305, W306               |
+| **Companion file** | `.github/skills/<name>/{examples,templates,snippets}/...`                | Code, templates, or extended notes referenced from a `SKILL.md`.                                                      | n/a                                                                                                       | n/a                                                                                                                    | none                | E203 (referenced-but-missing) |
+| **Agent README**   | [.github/agents/README.md](../../.github/agents/README.md)               | Cross-agent contracts: routing, handoff schema, families.                                                             | (free-form)                                                                                               | (free-form)                                                                                                            | suggested ≤ 150     | none                          |
 
 Why each type exists:
 
@@ -124,37 +124,37 @@ Every agent declares ≥ 1 persona in its frontmatter. The personas describe **w
 
 The agent × persona matrix below is generated from the agents' frontmatter by [tools/audit/cag_persona_matrix.py](../../tools/audit/cag_persona_matrix.py); regenerate with `python tools/audit/cag_persona_matrix.py --format markdown`.
 
-| Agent | EngDev | GameDev | Modder | Player | GameTest | EngTest | total |
-|-------|:---:|:---:|:---:|:---:|:---:|:---:|------:|
-| `architect` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | 1 |
-| `audio-eng` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 2 |
-| `cag-architect` | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | 5 |
-| `configurator` | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | 2 |
-| `debugger` | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | 3 |
-| `developer` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | 1 |
-| `doc-writer` | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 3 |
-| `hacker` | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | 2 |
-| `lua-designer` | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | 2 |
-| `manager` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | 1 |
-| `optimizer` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 2 |
-| `physicist` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 2 |
-| `planner` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | 1 |
-| `player` | ❌ | ✅ | ❌ | ✅ | ✅ | ❌ | 3 |
-| `renderer` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 2 |
-| `research` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 2 |
-| `reviewer` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 2 |
-| `security` | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | 3 |
-| `solver` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | 1 |
-| `tester` | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | 3 |
+| Agent           | EngDev | GameDev | Modder | Player | GameTest | EngTest | total |
+| --------------- | :----: | :-----: | :----: | :----: | :------: | :-----: | ----: |
+| `architect`     |   ✅    |    ❌    |   ❌    |   ❌    |    ❌     |    ❌    |     1 |
+| `audio-eng`     |   ✅    |    ✅    |   ❌    |   ❌    |    ❌     |    ❌    |     2 |
+| `cag-architect` |   ✅    |    ✅    |   ✅    |   ❌    |    ✅     |    ✅    |     5 |
+| `configurator`  |   ❌    |    ✅    |   ✅    |   ❌    |    ❌     |    ❌    |     2 |
+| `debugger`      |   ✅    |    ✅    |   ❌    |   ❌    |    ❌     |    ✅    |     3 |
+| `developer`     |   ✅    |    ❌    |   ❌    |   ❌    |    ❌     |    ❌    |     1 |
+| `doc-writer`    |   ✅    |    ✅    |   ✅    |   ❌    |    ❌     |    ❌    |     3 |
+| `hacker`        |   ❌    |    ❌    |   ❌    |   ❌    |    ✅     |    ✅    |     2 |
+| `lua-designer`  |   ❌    |    ✅    |   ✅    |   ❌    |    ❌     |    ❌    |     2 |
+| `manager`       |   ✅    |    ❌    |   ❌    |   ❌    |    ❌     |    ❌    |     1 |
+| `optimizer`     |   ✅    |    ✅    |   ❌    |   ❌    |    ❌     |    ❌    |     2 |
+| `physicist`     |   ✅    |    ✅    |   ❌    |   ❌    |    ❌     |    ❌    |     2 |
+| `planner`       |   ✅    |    ❌    |   ❌    |   ❌    |    ❌     |    ❌    |     1 |
+| `player`        |   ❌    |    ✅    |   ❌    |   ✅    |    ✅     |    ❌    |     3 |
+| `renderer`      |   ✅    |    ✅    |   ❌    |   ❌    |    ❌     |    ❌    |     2 |
+| `research`      |   ✅    |    ✅    |   ❌    |   ❌    |    ❌     |    ❌    |     2 |
+| `reviewer`      |   ✅    |    ✅    |   ❌    |   ❌    |    ❌     |    ❌    |     2 |
+| `security`      |   ✅    |    ❌    |   ❌    |   ❌    |    ✅     |    ✅    |     3 |
+| `solver`        |   ✅    |    ❌    |   ❌    |   ❌    |    ❌     |    ❌    |     1 |
+| `tester`        |   ✅    |    ❌    |   ❌    |   ❌    |    ✅     |    ✅    |     3 |
 
-| Persona | Agents serving |
-|---------|------:|
-| `EngDev` | 16 |
-| `GameDev` | 12 |
-| `Modder` | 4 |
-| `Player` | 1 |
-| `GameTest` | 5 |
-| `EngTest` | 5 |
+| Persona    | Agents serving |
+| ---------- | -------------: |
+| `EngDev`   |             16 |
+| `GameDev`  |             12 |
+| `Modder`   |              4 |
+| `Player`   |              1 |
+| `GameTest` |              5 |
+| `EngTest`  |              5 |
 
 **Interpretation.** EngDev and GameDev are well covered, as expected for a game-engine project. Modder coverage (4) is intentionally narrow — most Modder needs are served indirectly via `lua-designer`, `doc-writer`, `configurator`, and the Lunasome libraries themselves. **Player** coverage is deliberately low: only the `player` agent acts on Player's behalf (smoke-testing demos, validating UX). The matrix's `WARN — low coverage` line for Player is acknowledged — Player's needs are mostly served by *what the engine already does*, not by agents writing code.
 
@@ -184,12 +184,12 @@ Exit code is non-zero on any error. `--baseline` compares against the recorded b
 
 **Rule index.**
 
-| Range | Type | Meaning |
-|-------|------|---------|
-| **E001–E004 / W005** | System prompt | E001 missing required section · E002 oversize (lines or bytes) · E003 invalid YAML/structure · E004 missing canonical reference · W005 broken markdown link target |
-| **E101–E107 / W108** | Agent | E101 missing required frontmatter field · E102 missing required body section · E103 oversize · E104 invalid persona name · E105 unknown skill in `primary_skills`/`secondary_skills` · E106 unknown agent in `routes_to` · E107 unknown tool in `loads_tools` · W108 routing-table row references unknown agent |
-| **E201–E205 / W206** | Skill | E201 forbidden fenced code block · E202 missing required body section · E203 companion file referenced but missing · E204 invalid `description` (lacks load-when + skip-for clauses) · E205 missing required frontmatter field · W206 oversize |
-| **E301–E305 / W306** | Prompt | E301 missing required frontmatter field · E302 missing required body section · E303 unknown skill in `loads_skills` · E304 unknown tool in `loads_tools` · E305 unknown agent in `expected_agent` · W306 broken markdown link |
+| Range                | Type          | Meaning                                                                                                                                                                                                                                                                                                         |
+| -------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **E001–E004 / W005** | System prompt | E001 missing required section · E002 oversize (lines or bytes) · E003 invalid YAML/structure · E004 missing canonical reference · W005 broken markdown link target                                                                                                                                              |
+| **E101–E107 / W108** | Agent         | E101 missing required frontmatter field · E102 missing required body section · E103 oversize · E104 invalid persona name · E105 unknown skill in `primary_skills`/`secondary_skills` · E106 unknown agent in `routes_to` · E107 unknown tool in `loads_tools` · W108 routing-table row references unknown agent |
+| **E201–E205 / W206** | Skill         | E201 forbidden fenced code block · E202 missing required body section · E203 companion file referenced but missing · E204 invalid `description` (lacks load-when + skip-for clauses) · E205 missing required frontmatter field · W206 oversize                                                                  |
+| **E301–E305 / W306** | Prompt        | E301 missing required frontmatter field · E302 missing required body section · E303 unknown skill in `loads_skills` · E304 unknown tool in `loads_tools` · E305 unknown agent in `expected_agent` · W306 broken markdown link                                                                                   |
 
 ### `tools/audit/cag_link_check.py`
 

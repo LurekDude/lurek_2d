@@ -1,11 +1,11 @@
 # IDEA — math
 
-| Field | Value |
-|---|---|
-| Module | math |
-| Path | src/math/ |
+| Field         | Value      |
+| ------------- | ---------- |
+| Module        | math       |
+| Path          | src/math/  |
 | Last Reviewed | 2026-04-18 |
-| Plugin Tier | CORE-KEEP |
+| Plugin Tier   | CORE-KEEP  |
 
 ## Mission Summary
 

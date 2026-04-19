@@ -1,11 +1,11 @@
 # IDEA.md — `minimap`
 
-| Field   | Value                          |
-|---------|--------------------------------|
-| Module  | `minimap`                      |
-| Path    | `src/minimap/`                 |
-| Date    | 2026-04-18                     |
-| Tier    | Feature Systems                |
+| Field  | Value           |
+| ------ | --------------- |
+| Module | `minimap`       |
+| Path   | `src/minimap/`  |
+| Date   | 2026-04-18      |
+| Tier   | Feature Systems |
 
 ## Mission
 

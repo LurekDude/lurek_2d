@@ -1,11 +1,11 @@
 # IDEA.md — `ui` module
 
-| Field | Value |
-|-------|-------|
-| **Module** | `ui` |
-| **Path** | `src/ui/` |
-| **Date** | 2026-04-18 |
-| **Tier** | Feature Systems |
+| Field      | Value           |
+| ---------- | --------------- |
+| **Module** | `ui`            |
+| **Path**   | `src/ui/`       |
+| **Date**   | 2026-04-18      |
+| **Tier**   | Feature Systems |
 
 ---
 
@@ -28,11 +28,11 @@ Provide a retained-mode 2D widget system for in-game menus, HUDs, dialogs, inven
 
 ## Features — Competitor Reference
 
-| Feature | Status | Competitor |
-|---------|--------|------------|
-| Drag-and-drop between containers | ❌ Missing | LÖVE — Slab library, Godot — Control.drag_and_drop |
-| Data binding for widget values | ❌ Missing | Dear ImGui — automatic model reflection, Godot — property bindings |
-| Widget animation/transitions | ❌ Missing | Flutter — AnimatedWidget, Solar2D — transition.to on UI |
+| Feature                          | Status    | Competitor                                                         |
+| -------------------------------- | --------- | ------------------------------------------------------------------ |
+| Drag-and-drop between containers | ❌ Missing | LÖVE — Slab library, Godot — Control.drag_and_drop                 |
+| Data binding for widget values   | ❌ Missing | Dear ImGui — automatic model reflection, Godot — property bindings |
+| Widget animation/transitions     | ❌ Missing | Flutter — AnimatedWidget, Solar2D — transition.to on UI            |
 
 ## Performance / Quality
 

@@ -1,10 +1,10 @@
 # IDEA.md — `i18n` module
 
-| Field | Value |
-|-------|-------|
-| **Module** | `i18n` |
-| **Path** | `src/i18n/` |
-| **Date** | 2026-04-18 |
+| Field           | Value         |
+| --------------- | ------------- |
+| **Module**      | `i18n`        |
+| **Path**        | `src/i18n/`   |
+| **Date**        | 2026-04-18    |
 | **Plugin Tier** | TIER-2-PLUGIN |
 
 ---
