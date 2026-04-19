@@ -998,6 +998,33 @@ pub enum RenderCommand {
         /// Must match the `id` of the corresponding `PushLayer`.
         id: u64,
     },
+
+    /// Draw a convex polygon fan with an optional texture and a uniform RGBA tint.
+    ///
+    /// Designed for the `globe` module: each province is projected to screen-space vertices
+    /// on the CPU and submitted as a single fan. The GPU path triangulates as a fan
+    /// (vertex 0 is the implicit centre/anchor; or if `center` is provided, it is prepended).
+    ///
+    /// No depth buffer is used — this is a purely 2D draw call. Current transform applies.
+    ///
+    /// # Fields
+    /// - `vertices` — Screen-space positions forming the convex hull in winding order.
+    /// - `uvs` — Normalized UV `[0,1]` per vertex. May be empty for untextured draws.
+    /// - `texture_key` — Optional texture; `None` renders a flat-coloured polygon.
+    /// - `tint` — Per-polygon RGBA tint `[r,g,b,a]` (0.0–1.0). Multiplied against texture colour.
+    /// - `blend` — Blend mode for this polygon.
+    DrawConvexFan {
+        /// Screen-space vertex positions forming the convex hull.
+        vertices: Vec<Vec2>,
+        /// Normalized UV coordinates per vertex. Empty for untextured polygons.
+        uvs: Vec<Vec2>,
+        /// Optional texture key. `None` = flat colour fill using `tint`.
+        texture_key: Option<TextureKey>,
+        /// Per-polygon RGBA tint multiplied against the sampled or flat colour.
+        tint: [f32; 4],
+        /// Blend mode.
+        blend: BlendMode,
+    },
 }
 
 /// Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.

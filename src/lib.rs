@@ -105,6 +105,8 @@ pub mod event;
 pub mod filesystem;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
 pub mod graph;
+/// XCOM-style Geoscape globe — province topology, orbit camera, fog-of-war, markers.
+pub mod globe;
 /// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
 pub mod i18n;
 /// CPU-side pixel-level image manipulation.
