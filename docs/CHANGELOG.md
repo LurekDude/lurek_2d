@@ -4,6 +4,41 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.0] — 2026-04-18
 
+### Globe Module — XCOM-style Geoscape Sphere
+- **feat(globe): new `src/globe/` module — XCOM UFO Defense Geoscape-style province sphere.** Adds `ProvinceGraph` (adjacency, A\* path-finding via `pathfind::graph_path`, reachability flood-fill), `OrbitCamera` (lat/lon pan, zoom, LOD tiers), day/night `lighting` (sun direction, per-province intensity, soft terminator), per-faction `FogMask` bit-vector fog-of-war, `MarkerStore`, `LabelStore`, `LayerStore` (per-province color overrides, effective-color blending), `GlobeArc` great-circle route rendering, hand-rolled TOML `[[province]]` loader, `Globe` container struct, and `GlobeRegistry` multi-globe manager. All rendering emits 2D `RenderCommand` variants (A-03 compliant).
+- **feat(render): add `DrawConvexFan` render command.** New `RenderCommand::DrawConvexFan { vertices: Vec<Vec2>, uvs: Vec<Vec2>, texture_key: Option<TextureKey>, tint: [f32;4], blend: BlendMode }` for UV-mapped convex polygon fills needed by the globe province renderer.
+- **feat(lua-api): add `lurek.globe.*` thin wrapper.** `lurek.globe.new()`, `loadFromTOML()`, `greatCircleDistance()`, `greatCirclePath()`, `latLonToUnit()` module functions; `Globe` userdata with 40+ methods covering province management, camera, fog-of-war, markers, labels, layers, arcs, path-finding, and simulation update. Registered via `globe_api::register()` behind `modules.globe = true` config flag.
+- **feat(config): add `modules.globe` flag to `ModulesConfig`.** Defaults to `true`. Skipping `globe` omits `lurek.globe.*` from the Lua VM.
+- **test(globe): add `tests/lua/unit/test_globe.lua`.** 12 describe blocks, ~70 BDD test cases covering module existence, creation, province management, camera/LOD, fog-of-war, markers, labels, layers, arcs, path-finding, simulation update, and math helpers. Registered in `tests/lua/harness.rs`.
+- **docs(globe): add `docs/specs/globe.md`.** Full module spec with General Info, Summary, Files, Types, Functions, Lua API Reference, References, and Notes tables.
+- **content(globe): add `content/examples/globe.lua`.** Worked example demonstrating all major `lurek.globe.*` features: provinces, camera, fog, markers, labels, layers, arcs, path-finding, math helpers, and simulation update.
+
+### IDEA.md Implementation — Multi-Module Feature Batch
+- **feat(math): add clamp, sign, smoothstep, inverse_lerp free functions.** New convenience utilities in `src/math/mod.rs`.
+- **feat(math): Vec2::from_angle, Vec2::reflect, Vec3::splat.** New constructors and methods on vector types.
+- **feat(math): Color::from_hex, Color::to_hsl, hsl_to_rgb.** Hex-string parsing and HSL conversion for `Color` in `src/math/color.rs`.
+- **feat(math): Rect::union, Rect::from_center, Rect::from_points.** Rectangle combination and construction helpers in `src/math/rect.rs`.
+- **feat(math): Transform::decompose.** Extracts (x, y, angle, scale_x, scale_y) tuple from a Transform.
+- **feat(math): ease_in_out_elastic, ease_in_out_bounce, ease_in_out_back.** Three new easing functions plus `apply()` lookup entries.
+- **feat(math): CatmullRomSpline::add_point, remove_point.** Dynamic control point manipulation for splines.
+- **feat(filesystem): GameFS::list_recursive.** Depth-first recursive directory listing with sorted output; `reject_traversal()` deduplicates 3 inline path-traversal checks.
+- **fix(filesystem): async_loader queue-full now logs a warning** instead of silently dropping requests.
+- **feat(timer): frame-based scheduling.** New `FrameEvent` struct, `Scheduler::after_frames(n)`, `every_frames(n, count)`, `update_frames()` methods for frame-count-based event scheduling alongside existing time-based events.
+- **feat(runtime): ErrorCategory::Filesystem.** FileSystemError now maps to its own error category instead of System.
+- **feat(data): DataWriter write-cursor.** New `src/data/data_writer.rs` with typed write methods (u8/i8/u16/i16/u32/i32/f32/f64 LE/BE, length-prefixed strings, raw bytes), seek/tell, and buffer management. Companion to the read-only `DataView`.
+- **feat(lua_api): expose all new math functions.** `lurek.math.clamp`, `sign`, `smoothstep`, `inverseLerp`, `hslToRgb`, `fromHex`, `rgbToHsl`, `rectUnion`, `rectFromCenter`; `Vec2:fromAngle()`, `Vec2:reflect()`, `Vec3:splat()`; `Transform:decompose()`; easing `inOutElastic`/`inOutBounce`/`inOutBack`; `CatmullRom:addPoint()`/`removePoint()`.
+- **feat(lua_api): lurek.fs.listRecursive.** Exposes recursive directory listing to Lua.
+- **feat(lua_api): lurek.time afterFrames, everyFrames, updateFrames.** Frame-based scheduling callbacks for the Lua timer API.
+- **feat(lua_api): lurek.data.newWriter + DataWriter userdata.** Write-cursor exposed to Lua with typed write methods, seek/tell, and `toBytes()` export.
+
+### Test, Spec, Docs, and Examples Completion (0.15.0 follow-up)
+- **test(lua): Lua BDD tests for all new 0.15.0 API** — added describe/it blocks to `tests/lua/unit/test_math.lua` (smoothstep, inverseLerp, hslToRgb/rgbToHsl, fromHex, rectUnion, rectFromCenter, Vec2 fromAngle/reflect, Vec3 splat, Transform decompose, inOutElastic/Bounce/Back, CatmullRom addPoint/removePoint), `test_timer.lua` (afterFrames, everyFrames, updateFrames), `test_data.lua` (DataWriter full API), `test_filesystem.lua` (listRecursive + traversal rejection).
+- **test(rust): Rust unit tests for private internals** — appended new `mod` blocks to `math_tests.rs` (scalar helpers, Color HSL, Rect union/from_center, Vec2/Vec3, Transform decompose, easing inOut variants, CatmullRom mutations), `timer_tests.rs` (frame event scheduling), `data_tests.rs` (DataWriter seek/overwrite/into_bytes), `runtime_tests.rs` (ErrorCategory::Filesystem as_str/code), `filesystem_tests.rs` (reject_traversal path sandbox).
+- **docs(specs): updated docs/specs/ for 5 modules** — math.md, timer.md, data.md, filesystem.md, runtime.md each reflect new 0.15.0 Lua API and Rust additions.
+- **docs(idea): marked all implemented 0.15.0 gaps as DONE** — updated IDEA.md files in src/math/, src/timer/, src/data/, src/filesystem/, src/runtime/.
+- **docs(examples): added 0.15.0 demos to content/examples/** — math.lua (sign, smoothstep, inverseLerp, HSL, rectUnion, rectFromCenter, Vec2/Vec3 extensions, Transform decompose, easing, CatmullRom), timer.lua (afterFrames, everyFrames, updateFrames), data.lua (DataWriter roundtrip), filesystem.lua (listRecursive + traversal block).
+- **docs(api): regenerated docs/API/lua-api.md, rust-api.md, wiki cheatsheet** via `python tools/gen_all_docs.py` (5962 Lua lines, 5677 Rust lines, 0 errors).
+
 ### CAG Layer — VS Code Frontmatter Compatibility (refactor/src-migration-v2)
 - **chore(cag): strip unsupported VS Code frontmatter from all 109 CAG files.** Transformed `.github/agents/*.agent.md` (20), `.github/prompts/*.prompt.md` (56), and `.github/skills/*/SKILL.md` (33). Each file type now carries only VS Code-validated keys (`name`, `description`, `tools` for agents; `description`, `agent`, `tools` for prompts; `name`, `description` for skills). Fields removed from frontmatter (`personas`, `primary_skills`, `secondary_skills`, `routes_to`, `mission→description`, `loads_tools→tools`, `mode`, `loads_skills`, `inputs_required`, `expected_agent→agent`, `companion_files`, `related_skills`) are preserved in a new `## CAG Metadata` body section.
 - **chore(tools): update CAG validator and audit tools to read relocated metadata.** Added `parse_cag_metadata_section()` to `tools/validate/_cag_common.py`. Updated `check_agent()`, `check_skill()`, `check_prompt()` in `tools/validate/cag_validate.py` to read `personas`, `primary_skills`, `secondary_skills`, `routes_to`, `loads_skills` from body section; `tools` (formerly `loads_tools`) and `agent` (formerly `expected_agent`) from frontmatter. Removed E203 companion-files frontmatter check. Updated `tools/audit/cag_persona_matrix.py` to read `personas` via body section parser.

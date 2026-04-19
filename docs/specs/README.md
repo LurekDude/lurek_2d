@@ -60,6 +60,7 @@ Pure algorithms, data structures, math, serialisation. Leaf modules — no engin
 | `data`      | [data.md](data.md)           | Binary data toolkit: byte buffers, compression, hashing, encoding, structured pack / unpack.        | —               |
 | `dataframe` | [dataframe.md](dataframe.md) | In-memory column-major tabular data with lightweight SQL-style queries (`lurek.dataframe.*`).       | `TIER-1-PLUGIN` |
 | `graph`     | [graph.md](graph.md)         | Directed flow-simulation graph: typed items flow through nodes, accumulate, decay, react.           | —               |
+| `globe`     | [globe.md](globe.md)         | XCOM-style Geoscape province sphere: topology, orbit camera, fog-of-war, markers, day/night.       | —               |
 | `log`       | [log.md](log.md)             | Lua-accessible logging facade over the Rust `log` crate, controlled via `RUST_LOG`.                 | —               |
 | `math`      | [math.md](math.md)           | Foundational 2D math, geometry, and color types. Leaf of the engine dependency graph.               | —               |
 | `patterns`  | [patterns.md](patterns.md)   | Twelve classic game-programming design patterns exposed as `lurek.patterns.*`.                      | —               |
