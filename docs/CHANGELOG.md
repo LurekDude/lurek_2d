@@ -27,6 +27,9 @@ All notable changes to Lurek2D are recorded here.
 - **P7 — Contributor handbook.** New [docs/handbook.md](handbook.md) — onboarding manual covering audience map, first 30 minutes, repository tour, build/run, first game, first engine change, documentation system, testing, quality gates, working with CAG agents, troubleshooting, and a 12+ term glossary.
 - **P7.5 — CAG sync.** `.github/copilot-instructions.md` Cross-Artifact Sync table extended with rows for plugin candidacy → `plugins.md` and contributor onboarding flow → `handbook.md`. System prompt remains under 120-line / 8 KB cap.
 
+### Planning
+- **chore(globe): planning + design artifacts for new `src/globe/` (lurek.globe.*) module.** Session `work/globe-module-20260419/` contains Planner master plan (12 phases, 5 risks, 5 unknowns), Research reference survey (8 titles + 8 generic primitives proposed), Lua-Designer API surface (lurek.globe.*), and Architect sign-off confirming A-03 compliance via 2D-projection-of-unit-sphere rendering (no new wgpu pipeline). Implementation phases P2/P4–P12 not started; routing slip at `handovers/01-next-routing-slip.md`.
+
 ### Changed
 - **CAG System Overhaul (P0–P11)** — full refactor of `.github/` copilot-instructions / agents / skills / prompts to a discovery-driven, validator-enforced structure. See [docs/architecture/cag-system.md](architecture/cag-system.md).
   - System prompt: 297 → 57 lines, 25 KB → 6.3 KB (discovery directives replace inline rosters).
