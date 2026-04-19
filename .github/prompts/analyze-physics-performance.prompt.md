@@ -1,12 +1,7 @@
 ---
-description: "﻿---."
-mode: agent
-loads_skills: [performance-profiling]
-loads_tools: []
-expected_agent: Physicist
-inputs_required: []
+description: ﻿---.
+agent: Physicist
 ---
-
 # Analyze Physics Performance
 
 ## Goal
@@ -45,3 +40,8 @@ inputs_required: []
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/analyze-physics-performance`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: performance-profiling

@@ -1,12 +1,7 @@
 ---
 description: "Create a new AI behavior for Lurek2D game entities. Use when implementing FSM states, behavior tree nodes, steering behaviors, or GOAP ac..."
-mode: agent
-loads_skills: []
-loads_tools: []
-expected_agent: Developer
-inputs_required: [SharedState]
+agent: Developer
 ---
-
 # Create Ai Behavior
 
 ## Goal
@@ -47,3 +42,8 @@ Create a new AI behavior for Lurek2D game entities. Use when implementing FSM st
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-ai-behavior <SharedState>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Inputs required**: SharedState

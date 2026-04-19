@@ -1,12 +1,7 @@
 ---
-description: "Create a new Lua game example in the content/examples/ directory with main.lua and all required assets."
-mode: agent
-loads_skills: [documentation, lua-scripting]
-loads_tools: []
-expected_agent: Developer
-inputs_required: [name]
+description: Create a new Lua game example in the content/examples/ directory with main.lua and all required assets.
+agent: Developer
 ---
-
 # Create Game Example
 
 ## Goal
@@ -43,3 +38,9 @@ Create a new Lua game example that demonstrates specific Lurek2D features.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-game-example <name>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: documentation, lua-scripting
+- **Inputs required**: name

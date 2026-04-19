@@ -1,12 +1,7 @@
 ---
 description: "Create a new engine module in src/ with correct structure, dependencies, and registration."
-mode: agent
-loads_skills: [module-architecture, rust-coding]
-loads_tools: []
-expected_agent: Developer
-inputs_required: [module]
+agent: Developer
 ---
-
 # Create Engine Module
 
 ## Goal
@@ -45,3 +40,9 @@ Add a new module to the Lurek2D engine with the correct file structure, dependen
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-engine-module <module>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: module-architecture, rust-coding
+- **Inputs required**: module

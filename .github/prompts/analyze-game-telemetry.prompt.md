@@ -1,12 +1,8 @@
 ---
-description: "Parse log data and produce game telemetry analytics."
-mode: agent
-loads_skills: [analytics]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Research
-inputs_required: [log_path, report_focus]
+description: Parse log data and produce game telemetry analytics.
+agent: Research
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Analyze Game Telemetry
 
 ## Goal
@@ -40,3 +36,9 @@ Analyse a Lurek2D log or session-event capture and produce a structured analytic
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/analyze-game-telemetry <log_path> <report_focus>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: analytics
+- **Inputs required**: log_path, report_focus

@@ -1,13 +1,7 @@
 ---
 name: library-authoring
 description: "Load this skill when authoring or modifying a Lunasome library under content/library/: creating a new library, refactoring an existing one, fixing helper drift, regenerating the library docs, or registering a new test in tests/lua/harness.rs. Owns library folder layout, LDoc tag conventions, the runtime-namespace name table, and the gen_lib_docs.py workflow. Skip it for engine Rust code, content/examples/ single-file scripts (use examples-management), or content/demos/ games (use demo-creation)."
-companion_files:
-  examples: []
-  templates: []
-  snippets: [snippets/extended-notes.md]
-related_skills: [examples-management, lua-scripting, documentation, lua-api-design]
 ---
-
 # library-authoring
 
 ## Mission
@@ -115,3 +109,7 @@ Every public function and table field uses LDoc tags. The generator parses:
 - [tools/docs/gen_lib_docs.py](../../../tools/docs/gen_lib_docs.py) — library doc generator
 - [tools/mods/mod_init.py](../../../tools/mods/mod_init.py) — scaffold a new `lurek-mod` plugin layout.
 - [content/library/README.md](../../../content/library/README.md) — library index
+
+## CAG Metadata
+
+- **Related skills**: examples-management, lua-scripting, documentation, lua-api-design

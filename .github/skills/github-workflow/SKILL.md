@@ -1,13 +1,7 @@
 ---
 name: github-workflow
 description: "Load this skill when working with Lurek2D's GitHub project: creating or triaging issues, opening PRs, managing labels and milestones, using mcp_github_* tools for automation, or mapping roadmap phases to GitHub milestones. Skip it for CI/CD pipeline configuration (use ci-cd-pipeline skill) or code review (use Reviewer agent)."
-companion_files:
-  examples: []
-  templates: []
-  snippets: [snippets/branch-naming-convention.txt, snippets/using-mcpgithub-tools.txt, snippets/git-commit-convention.txt, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # github-workflow
 
 ## Mission

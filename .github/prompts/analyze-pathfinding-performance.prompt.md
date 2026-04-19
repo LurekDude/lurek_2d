@@ -1,12 +1,7 @@
 ---
 description: "Analyze and optimize pathfinding performance: A★ cost, grid size impact, HPA★ preprocessing, flow field computation, and multi-unit coord..."
-mode: agent
-loads_skills: [performance-profiling]
-loads_tools: []
-expected_agent: Optimizer
-inputs_required: []
+agent: Optimizer
 ---
-
 # Analyze Pathfinding Performance
 
 ## Goal
@@ -47,3 +42,8 @@ Analyze and optimize pathfinding performance: A★ cost, grid size impact, HPA�
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/analyze-pathfinding-performance`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: performance-profiling

@@ -1,13 +1,8 @@
 ---
 name: CAG-Architect
-mission: "Maintain the Lurek2D `.github/` CAG layer (system prompt, agents, skills, prompts) and keep `cag_validate.py --baseline` clean."
-personas: [EngDev, GameDev, Modder, GameTest, EngTest]
-primary_skills: [tools-cag-validation, cag-workflow]
-secondary_skills: [documentation, module-architecture]
-routes_to: [Architect, Developer, Manager, Reviewer, Doc-Writer]
-loads_tools: [tools/validate/cag_validate.py, tools/audit/cag_link_check.py, tools/audit/cag_coverage.py, tools/audit/cag_persona_matrix.py]
+description: "Maintain the Lurek2D `.github/` CAG layer (system prompt, agents, skills, prompts) and keep `cag_validate.py --baseline` clean."
+tools: [tools/validate/cag_validate.py, tools/audit/cag_link_check.py, tools/audit/cag_coverage.py, tools/audit/cag_persona_matrix.py]
 ---
-
 # CAG-Architect
 
 ## Mission
@@ -70,3 +65,10 @@ CAG-Architect owns the `.github/` Context-Augmented-Generation layer that every 
 - Context Bloat: system prompt over its line cap because detail belongs in a skill.
 - Committing without re-running `cag_validate.py --baseline`.
 - Editing engine Rust or `docs/` content during a CAG sweep.
+
+## CAG Metadata
+
+- **Personas**: EngDev, GameDev, Modder, GameTest, EngTest
+- **Primary skills**: tools-cag-validation, cag-workflow
+- **Secondary skills**: documentation, module-architecture
+- **Routes to**: Architect, Developer, Manager, Reviewer, Doc-Writer

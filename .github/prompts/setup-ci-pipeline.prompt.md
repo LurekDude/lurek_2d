@@ -1,12 +1,8 @@
 ---
-description: "Add or modify a GitHub Actions workflow for Lurek2D."
-mode: agent
-loads_skills: [ci-cd-pipeline]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Developer
-inputs_required: [workflow_name, trigger]
+description: Add or modify a GitHub Actions workflow for Lurek2D.
+agent: Developer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Setup Ci Pipeline
 
 ## Goal
@@ -40,3 +36,9 @@ Add or update a `.github/workflows/*.yml` pipeline that runs the requested job â
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/setup-ci-pipeline <workflow_name> <trigger>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: ci-cd-pipeline
+- **Inputs required**: workflow_name, trigger

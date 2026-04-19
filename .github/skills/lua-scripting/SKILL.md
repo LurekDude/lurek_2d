@@ -1,13 +1,7 @@
 ---
 name: lua-scripting
 description: "Load this skill when writing or reviewing Lua game scripts for Lurek2D. It owns lurek.* API usage patterns, Lua idioms, game script structure, and example code conventions. Skip it for Rust engine code or API design."
-companion_files:
-  examples: []
-  templates: []
-  snippets: []
-related_skills: []
 ---
-
 # lua-scripting
 
 ## Mission

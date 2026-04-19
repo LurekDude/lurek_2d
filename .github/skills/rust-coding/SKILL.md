@@ -1,13 +1,7 @@
 ---
 name: rust-coding
 description: "Load this skill when writing or reviewing Rust code in the Lurek2D engine. It owns safe Rust conventions, error handling patterns, module structure, and idiomatic Rust for game engine development. Skip it for Lua scripting, CAG files, or documentation."
-companion_files:
-  examples: [examples/module-group-system.rs]
-  templates: []
-  snippets: []
-related_skills: []
 ---
-
 # rust-coding
 
 ## Mission

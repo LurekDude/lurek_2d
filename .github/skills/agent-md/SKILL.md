@@ -1,13 +1,7 @@
 ---
 name: agent-md
 description: "Load this skill when creating or maintaining merged module reference specs in docs/specs/<module>.md. It owns the required section structure, sync contract, and scaffold+validate workflow after the retirement of src/<module>/AGENT.md. Skip it for writing production Rust code, tests, or Lua scripts."
-companion_files:
-  examples: []
-  templates: []
-  snippets: [snippets/extended-notes.md]
-related_skills: []
 ---
-
 # agent-md
 
 ## Mission

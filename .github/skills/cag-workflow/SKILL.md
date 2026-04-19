@@ -1,13 +1,7 @@
 ---
 name: cag-workflow
 description: "Load this skill when working with the Lurek2D CAG (Copilot Agent Customization) layer: building or editing agents, skills, or prompts under .github/; choosing the right CAG artifact type; running cag_validate.py; or designing the AI-first workflow for a new task type. Skip it for general code implementation, game scripting, or roadmap planning."
-companion_files:
-  examples: []
-  templates: []
-  snippets: [snippets/github-layout.txt, snippets/decision-rule-module-spec-vs-skill.txt, snippets/skill-file-format.md, snippets/agent-file-format.md, snippets/validation.ps1, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # cag-workflow
 
 ## Mission

@@ -1,12 +1,8 @@
 ---
 description: "Add a command, completion, or webview to extensions/vscode/."
-mode: agent
-loads_skills: [vscode-extension]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Developer
-inputs_required: [feature_kind, feature_name]
+agent: Developer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Extend Vscode Extension
 
 ## Goal
@@ -40,3 +36,9 @@ Add a new command, completion provider, or webview panel to the first-party Lure
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/extend-vscode-extension <feature_kind> <feature_name>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: vscode-extension
+- **Inputs required**: feature_kind, feature_name

@@ -1,13 +1,8 @@
 ---
 name: Optimizer
-mission: "Profile Lurek2D performance, identify hot-path bottlenecks, and recommend ranked optimisations with measurement evidence; does not implement them."
-personas: [EngDev, GameDev]
-primary_skills: [performance-profiling]
-secondary_skills: [rust-coding, gpu-programming]
-routes_to: [Developer, Renderer, Physicist, Architect, Manager, CAG-Architect]
-loads_tools: [tools/audit/stress_report.py, tools/audit/quality_report.py]
+description: "Profile Lurek2D performance, identify hot-path bottlenecks, and recommend ranked optimisations with measurement evidence; does not implement them."
+tools: [tools/audit/stress_report.py, tools/audit/quality_report.py]
 ---
-
 # Optimizer
 
 ## Mission
@@ -75,3 +70,10 @@ Optimizer serves the EngDev and GameDev personas by measuring and recommending p
 - Copy Cascade: cloning large structs when references would work.
 - Unverified Claims: "this should be faster" without measurement.
 - Implementing the optimisation yourself instead of handing off.
+
+## CAG Metadata
+
+- **Personas**: EngDev, GameDev
+- **Primary skills**: performance-profiling
+- **Secondary skills**: rust-coding, gpu-programming
+- **Routes to**: Developer, Renderer, Physicist, Architect, Manager, CAG-Architect

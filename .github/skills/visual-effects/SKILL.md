@@ -1,13 +1,7 @@
 ---
 name: visual-effects
 description: "Load this skill when implementing visual post-processing effects, image filters, or shader-based rendering techniques in Lurek2D: full-screen passes using canvas render-to-texture, custom WGSL fragment shaders for blur/bloom/distortion/colour grading, screen-space overlays, or multi-pass render pipelines. Use for: CRT scanlines, vignette, colour correction, bloom, distortion, pixelation, palette swap. Skip it for basic sprite/image drawing (use gpu-programming), or 3D-style rendering (out of scope for Lurek2D)."
-companion_files:
-  examples: [examples/single-pass-effect.lua, examples/built-in-shader-auto-uniforms.wgsl, examples/greyscale-desaturate.wgsl, examples/crt-scanlines.wgsl, examples/animated-wave-distortion.wgsl, examples/pixelation.wgsl, examples/colour-correction-brightness-contrast-saturation.wgsl, examples/multi-pass-pipeline.lua, examples/cpu-side-image-filters-offline-load.lua, examples/performance-budget.lua]
-  templates: []
-  snippets: [snippets/how-post-processing-works-in-lurek2d.txt, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # visual-effects
 
 ## Mission

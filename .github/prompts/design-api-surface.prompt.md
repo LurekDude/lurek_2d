@@ -1,12 +1,7 @@
 ---
 description: "Design a new lurek.* Lua API surface. Use when adding a new function or module to the lurek.* namespace. Produces a finalized API spec re..."
-mode: agent
-loads_skills: [lua-api-design]
-loads_tools: []
-expected_agent: Lua-Designer
-inputs_required: []
+agent: Lua-Designer
 ---
-
 # Design Api Surface
 
 ## Goal
@@ -49,3 +44,8 @@ Design a new lurek.* Lua API surface. Use when adding a new function or module t
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/design-api-surface`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: lua-api-design

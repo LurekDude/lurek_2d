@@ -1,12 +1,8 @@
 ---
 description: "Tune Cargo profiles, feature flags, and build outputs for Lurek2D."
-mode: agent
-loads_skills: [build-system]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Developer
-inputs_required: [target, objective]
+agent: Developer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Tune Cargo Build
 
 ## Goal
@@ -40,3 +36,9 @@ Adjust Cargo profiles, feature flags, or the `build/` output directory so a Lure
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/tune-cargo-build <target> <objective>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: build-system
+- **Inputs required**: target, objective

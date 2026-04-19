@@ -1,13 +1,7 @@
 ---
 name: module-audit
 description: "Load this skill when performing end-to-end quality audits on Lurek2D src/ modules: docstrings, AGENT.md sync, test coverage, architecture compliance, wiki pages, API docs, performance, and code quality. Skip it for implementing features, writing game scripts, or pure Lua work."
-companion_files:
-  examples: []
-  templates: []
-  snippets: [snippets/agent-md-canonical-format-short.md, snippets/s-01-lib-rs-registration.txt, snippets/s-02-mod-rs-simplicity.txt, snippets/s-03-file-size-limits.txt, snippets/d-01-d-05-docstring-checks.txt, snippets/t-01-t-07-test-coverage.txt, snippets/r-01-r-05-architecture-compliance.txt, snippets/q-01-q-06-code-quality.txt, snippets/python-validation-tool.ps1, snippets/what-every-report-contains-docs-quality.txt, snippets/step-1-generate-reports.ps1, snippets/step-4-re-run-and-verify.ps1, snippets/batch-fix-strategy.ps1, snippets/report-template.txt, snippets/batch-mode.txt, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # module-audit
 
 ## Mission

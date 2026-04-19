@@ -1,13 +1,7 @@
 ---
 name: examples-management
 description: "Load this skill when adding, modifying, or reviewing content in the content/examples/ or content/demos/ directories: game example scripts, demo folder structure, conf.lua, or README files. Use for ensuring examples are self-contained, well-commented, and demonstrate one API concept. Skip it for engine Rust code, tests, documentation under docs/, or CAG work."
-companion_files:
-  examples: [examples/content-examples-file-structure-2.lua, examples/content-demos-folder-structure-2.lua, examples/the-scenario-pattern-always-write-this.lua, examples/forbidden-patterns-never-write-these.lua, examples/smoke-testing-2.lua, examples/input-key-names.lua, examples/color-values.lua, examples/rectangle-draw-mode.lua, examples/physics-body-types.lua]
-  templates: []
-  snippets: [snippets/content-examples-file-structure.txt, snippets/content-demos-folder-structure.txt, snippets/examples-and-api-documentation.ps1, snippets/smoke-testing.ps1, snippets/examples-readme.md, snippets/step-1-check-gaps.ps1, snippets/step-2-append-stubs-for-missing.ps1, snippets/step-3-flesh-out-stubs-with.txt, snippets/step-3-flesh-out-stubs-with-2.txt, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # examples-management
 
 ## Mission

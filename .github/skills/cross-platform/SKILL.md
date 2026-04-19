@@ -1,13 +1,7 @@
 ---
 name: cross-platform
 description: "Load this skill when dealing with platform-specific code, conditional compilation, or cross-platform compatibility in Lurek2D. It owns platform abstraction patterns and OS-specific workarounds. Skip it for pure game logic or Lua scripting."
-companion_files:
-  examples: []
-  templates: []
-  snippets: []
-related_skills: []
 ---
-
 # cross-platform
 
 ## Mission

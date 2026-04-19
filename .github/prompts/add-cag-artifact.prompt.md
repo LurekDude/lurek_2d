@@ -1,12 +1,8 @@
 ---
 description: "Author a new agent, skill, or prompt following CAG standards."
-mode: agent
-loads_skills: [cag-workflow]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: CAG-Architect
-inputs_required: [artifact_type, name]
+agent: CAG-Architect
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Add Cag Artifact
 
 ## Goal
@@ -40,3 +36,9 @@ Add a new agent, skill, or prompt under `.github/` that conforms to the CAG stan
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/add-cag-artifact <artifact_type> <name>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: cag-workflow
+- **Inputs required**: artifact_type, name

@@ -1,12 +1,7 @@
 ---
-description: "Write a new integration test suite for a Lurek2D module. Use when a module lacks test coverage or new public API needs validation. Produc..."
-mode: agent
-loads_skills: [rust-coding, testing-rust]
-loads_tools: []
-expected_agent: Tester
-inputs_required: [description, module, module_name]
+description: Write a new integration test suite for a Lurek2D module. Use when a module lacks test coverage or new public API needs validation. Produc...
+agent: Tester
 ---
-
 # Create Integration Test
 
 ## Goal
@@ -45,3 +40,9 @@ Write a new integration test suite for a Lurek2D module. Use when a module lacks
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-integration-test <description> <module> <module_name>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: rust-coding, testing-rust
+- **Inputs required**: description, module, module_name

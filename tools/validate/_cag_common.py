@@ -391,6 +391,71 @@ def known_prompt_names() -> set[str]:
     return {p.name.removesuffix(".prompt.md") for p in discover_prompts()}
 
 
+# ─── CAG Metadata body-section parser ────────────────────────────────────────
+
+_CAG_META_LABEL_MAP: dict[str, str] = {
+    "personas": "personas",
+    "primary skills": "primary_skills",
+    "secondary skills": "secondary_skills",
+    "routes to": "routes_to",
+    "mode": "mode",
+    "loads skills": "loads_skills",
+    "inputs required": "inputs_required",
+    "related skills": "related_skills",
+}
+
+_CAG_META_BULLET_RE = re.compile(r"^\s*-\s+\*\*([^*]+)\*\*:\s*(.+)$")
+
+# Keys whose value is always returned as a plain string (not split)
+_CAG_META_SCALAR_KEYS = {"mode"}
+
+
+def parse_cag_metadata_section(text: str) -> dict[str, "str | list[str]"]:
+    """Parse the ``## CAG Metadata`` section from file body text.
+
+    Returns a dict mapping canonical key names to either a string scalar
+    (for *mode*) or a list of strings (for all other keys). Returns an empty
+    dict when the section is absent.
+
+    Supported bullet format::
+
+        - **Personas**: EngDev, GameDev
+        - **Primary skills**: rust-coding, error-handling
+        - **Routes to**: Lua-Designer, Renderer
+        - **Mode**: agent
+        - **Loads skills**: visual-effects
+        - **Inputs required**: effect_name, target_module
+        - **Related skills**: lua-scripting
+    """
+    result: dict[str, str | list[str]] = {}
+    in_cag = False
+    for line in text.splitlines():
+        heading_m = re.match(r"^(#{1,6})\s+(.+?)\s*$", line)
+        if heading_m:
+            title = heading_m.group(2).strip().lower()
+            if "cag metadata" in title:
+                in_cag = True
+                continue
+            elif in_cag:
+                # Any other heading ends the section
+                break
+            continue
+        if not in_cag:
+            continue
+        bm = _CAG_META_BULLET_RE.match(line)
+        if bm:
+            label = bm.group(1).strip().lower()
+            values_str = bm.group(2).strip()
+            key = _CAG_META_LABEL_MAP.get(label)
+            if key is None:
+                continue
+            if key in _CAG_META_SCALAR_KEYS:
+                result[key] = values_str
+            else:
+                result[key] = [v.strip() for v in values_str.split(",") if v.strip()]
+    return result
+
+
 # ─── Section detection ────────────────────────────────────────────────────────
 
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
@@ -478,6 +543,7 @@ __all__ = [
     "AGENT_REQUIRED_SECTIONS", "SKILL_REQUIRED_SECTIONS",
     "PROMPT_REQUIRED_SECTIONS",
     "Frontmatter", "parse_frontmatter", "body_after_frontmatter",
+    "parse_cag_metadata_section",
     "LinkRef", "extract_links", "strip_fenced_blocks", "find_fenced_block_lines",
     "discover_agents", "discover_skills", "discover_prompts", "discover_all",
     "known_agent_names", "known_skill_names", "known_prompt_names",

@@ -1,12 +1,7 @@
 ---
-description: "Create a new physics body type or collision behavior in the physics engine."
-mode: agent
-loads_skills: []
-loads_tools: []
-expected_agent: Developer
-inputs_required: []
+description: Create a new physics body type or collision behavior in the physics engine.
+agent: Developer
 ---
-
 # Create Physics Feature
 
 ## Goal
@@ -45,3 +40,7 @@ Add a new physics feature: body type, collision shape, force type, or constraint
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-physics-feature`
+
+## CAG Metadata
+
+- **Mode**: agent

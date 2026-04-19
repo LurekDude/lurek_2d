@@ -1,12 +1,8 @@
 ---
 description: "Add a post-processing visual effect (CRT, bloom, distortion, etc)."
-mode: agent
-loads_skills: [visual-effects]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Renderer
-inputs_required: [effect_name]
+agent: Renderer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Add Visual Effect
 
 ## Goal
@@ -40,3 +36,9 @@ Implement a named full-screen post-processing effect using the canvas render-to-
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/add-visual-effect <effect_name>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: visual-effects
+- **Inputs required**: effect_name

@@ -1,12 +1,8 @@
 ---
 description: "Create one or more new Lurek2D demo projects in content/demos/. Generates conf.toml, main.lua, README.md, and screen.png for each demo. U..."
-mode: agent
-loads_skills: [demo-creation, lua-scripting]
-loads_tools: [tools/screenshots/gen_demo_screenshots.py]
-expected_agent: Developer
-inputs_required: [n1, n2, name]
+agent: Developer
+tools: [tools/screenshots/gen_demo_screenshots.py]
 ---
-
 # Create Demo
 
 ## Goal
@@ -55,3 +51,9 @@ Create one or more new Lurek2D demo projects in content/demos/. Generates conf.t
 ```
 
 ---
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: demo-creation, lua-scripting
+- **Inputs required**: n1, n2, name

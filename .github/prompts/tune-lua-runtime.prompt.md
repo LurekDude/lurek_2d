@@ -1,12 +1,8 @@
 ---
 description: "Tune LuaJIT GC, FFI, or hot-path Lua patterns."
-mode: agent
-loads_skills: [lua-runtime]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Optimizer
-inputs_required: [script_path, objective]
+agent: Optimizer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Tune Lua Runtime
 
 ## Goal
@@ -40,3 +36,9 @@ Reduce Lua-side per-frame cost in a named hot path by tuning LuaJIT GC, FFI, or 
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/tune-lua-runtime <script_path> <objective>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: lua-runtime
+- **Inputs required**: script_path, objective

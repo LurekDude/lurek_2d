@@ -1,13 +1,8 @@
 ---
 name: Tester
-mission: "Write and maintain Lurek2D tests across Rust integration, Rust unit, Lua BDD, evidence, and golden layers; enforces the Lua-first testing rule."
-personas: [EngDev, GameTest, EngTest]
-primary_skills: [testing-rust]
-secondary_skills: [rust-coding, error-handling]
-routes_to: [Developer, Architect, Optimizer, Reviewer, CAG-Architect]
-loads_tools: [tools/audit/test_coverage.py, tools/audit/lua_evidence_golden_contract_audit.py, tools/audit/lua_test_structure_audit.py, tools/audit/integration_coverage.py]
+description: "Write and maintain Lurek2D tests across Rust integration, Rust unit, Lua BDD, evidence, and golden layers; enforces the Lua-first testing rule."
+tools: [tools/audit/test_coverage.py, tools/audit/lua_evidence_golden_contract_audit.py, tools/audit/lua_test_structure_audit.py, tools/audit/integration_coverage.py]
 ---
-
 # Tester
 
 ## Mission
@@ -72,3 +67,10 @@ Tester serves the EngDev, GameTest, and EngTest personas by owning the two-layer
 - Test Coupling: tests depending on execution order or shared mutable state.
 - Missing Lua Layer: writing only Rust integration tests for behaviour observable through `lurek.*` (Lua-first rule violation).
 - Adding evidence-test logic to a golden test (or vice versa) — the contracts are distinct.
+
+## CAG Metadata
+
+- **Personas**: EngDev, GameTest, EngTest
+- **Primary skills**: testing-rust
+- **Secondary skills**: rust-coding, error-handling
+- **Routes to**: Developer, Architect, Optimizer, Reviewer, CAG-Architect

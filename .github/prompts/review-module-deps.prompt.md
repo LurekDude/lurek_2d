@@ -1,12 +1,7 @@
 ---
 description: "Review module dependencies for correctness: no cross-domain imports, correct dependency direction."
-mode: agent
-loads_skills: [module-architecture]
-loads_tools: []
-expected_agent: Architect
-inputs_required: []
+agent: Architect
 ---
-
 # Review Module Deps
 
 ## Goal
@@ -41,3 +36,8 @@ Audit module dependency graph for violations.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/review-module-deps`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: module-architecture

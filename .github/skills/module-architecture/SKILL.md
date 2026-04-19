@@ -1,13 +1,7 @@
 ---
 name: module-architecture
 description: "Load this skill when designing module boundaries, dependency direction, or crate organization for Lurek2D. It owns the dependency graph, module responsibility rules, and visibility patterns. Skip it for code implementation or API naming."
-companion_files:
-  examples: []
-  templates: []
-  snippets: []
-related_skills: []
 ---
-
 # module-architecture
 
 ## Mission

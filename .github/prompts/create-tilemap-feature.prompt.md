@@ -1,12 +1,8 @@
 ---
 description: "Create a new tilemap feature (layer type, autotile rule, collision mapping, or TMX extension). Follow the tilemap module's existing patte..."
-mode: agent
-loads_skills: [documentation]
-loads_tools: [tools/docs/gen_docs_lua.py]
-expected_agent: Developer
-inputs_required: [SharedState]
+agent: Developer
+tools: [tools/docs/gen_docs_lua.py]
 ---
-
 # Create Tilemap Feature
 
 ## Goal
@@ -48,3 +44,9 @@ Create a new tilemap feature (layer type, autotile rule, collision mapping, or T
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-tilemap-feature <SharedState>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: documentation
+- **Inputs required**: SharedState

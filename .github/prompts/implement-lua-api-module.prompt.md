@@ -1,12 +1,8 @@
 ---
 description: "Build or rebuild a lurek.* Lua API module from domain module source. Reads domain pub fn signatures, designs the Lua surface, then writes..."
-mode: agent
-loads_skills: [lua-api-design, rust-coding]
-loads_tools: [tools/validate/validate_lua_api.py]
-expected_agent: Lua-Designer
-inputs_required: [LuaRegistryKey, module, module_name, type]
+agent: Lua-Designer
+tools: [tools/validate/validate_lua_api.py]
 ---
-
 # Implement Lua Api Module
 
 ## Goal
@@ -56,3 +52,9 @@ Business logic belongs in the domain module. The lua_api file is a bridge only.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/implement-lua-api-module <LuaRegistryKey> <module> <module_name> <type>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: lua-api-design, rust-coding
+- **Inputs required**: LuaRegistryKey, module, module_name, type

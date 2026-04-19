@@ -1,13 +1,7 @@
 ---
 name: build-system
 description: "Load this skill when working with the Lurek2D build system: Cargo profiles, debug vs release builds, binary size and speed optimisation, the build/ output directory override, feature flags (lua-jit / lua54), or packaging for distribution via installer scripts. Use for: cargo build, cargo check, cargo run, profile tuning, dist.ps1/dist.sh, NSIS installer. Skip it for CI/CD pipeline setup (use ci-cd-pipeline skill) or writing Rust code."
-companion_files:
-  examples: []
-  templates: [templates/output-directory-override.toml, templates/profile-dev-what-it-does.toml, templates/profile-release-what-it-does.toml, templates/profile-dist-what-it-does.toml, templates/feature-flags-lua-backend.toml]
-  snippets: [snippets/development-loop-commands.ps1, snippets/windows-zip-folder.ps1, snippets/linux-macos-tar-gz.sh, snippets/windows-installer-nsis.ps1, snippets/local-install-uninstall.ps1, snippets/local-install-uninstall-2.sh, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # build-system
 
 ## Mission

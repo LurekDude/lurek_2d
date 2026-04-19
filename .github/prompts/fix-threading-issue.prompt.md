@@ -1,12 +1,7 @@
 ---
 description: "Diagnose and fix threading issues in Lurek2D: Channel deadlocks, Worker lifecycle bugs, message delivery failures, or background Lua VM e..."
-mode: agent
-loads_skills: []
-loads_tools: []
-expected_agent: Debugger
-inputs_required: [SharedState]
+agent: Debugger
 ---
-
 # Fix Threading Issue
 
 ## Goal
@@ -48,3 +43,8 @@ Diagnose and fix threading issues in Lurek2D: Channel deadlocks, Worker lifecycl
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/fix-threading-issue <SharedState>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Inputs required**: SharedState

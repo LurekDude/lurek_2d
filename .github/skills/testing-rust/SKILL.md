@@ -1,13 +1,7 @@
 ---
 name: testing-rust
 description: "Load this skill when writing or organizing tests for the Lurek2D engine. It owns test patterns, float comparison strategies, test naming, and integration test architecture for both Rust and Lua BDD tests. Skip it for writing production code."
-companion_files:
-  examples: [examples/2-adding-a-new-rust-integration.rs, examples/3-1-create-the-lua-file.lua, examples/3-1-create-the-lua-file-2.lua, examples/3-1-create-the-lua-file-3.lua, examples/3-1-create-the-lua-file-4.lua, examples/3-2-harness-registration.rs, examples/test-structure.lua, examples/performance-and-golden-helpers.lua, examples/6-test-vm-helpers-rust-side.rs, examples/lua-golden-tests-compare-only-files.lua, examples/syntax.lua, examples/syntax-2.lua, examples/tier-1-headless-state-readback-preferred.lua, examples/tier-2-canvas-pixel-readback-headless.lua, examples/tier-3-runtime-smoke-tests-gpu.rs, examples/syntax-4.lua, examples/canvas-pixel-readback-headless.lua, examples/file-evidence.lua, examples/runtime-smoke-tests-gpu-required.rs, examples/lua-golden-tests.lua, examples/stress-test-output-format.lua, examples/recognized-patterns.lua, examples/example-well-named-describe-blocks.lua, examples/evidence-tests-file-output-required.lua, examples/golden-tests-compare-only.lua, examples/covers-markers-required.lua]
-  templates: []
-  snippets: [snippets/1-test-architecture-overview.txt, snippets/2-adding-a-new-rust-integration-2.ps1, snippets/running-quality-gates.ps1, snippets/analytics-tools.ps1, snippets/adding-missing-docs.ps1, snippets/rust-golden-tests-byte-level.ps1, snippets/syntax-3.ps1, snippets/coverage-scanner.ps1, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # testing-rust
 
 ## Mission

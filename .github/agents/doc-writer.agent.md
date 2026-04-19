@@ -1,13 +1,8 @@
 ---
 name: Doc-Writer
-mission: "Write and maintain Lurek2D user-facing documentation under `docs/`, `content/demos/`, and `content/examples/`, kept in sync with current code."
-personas: [EngDev, GameDev, Modder]
-primary_skills: [documentation]
-secondary_skills: [lua-scripting, lua-api-design, examples-management]
-routes_to: [Developer, Lua-Designer, Architect, Reviewer, CAG-Architect]
-loads_tools: [tools/docs/collect_docs.py, tools/docs/gen_lua_api.py, tools/docs/gen_wiki_api.py, tools/docs/gen_engine_docs.py, tools/audit/doc_coverage.py]
+description: "Write and maintain Lurek2D user-facing documentation under `docs/`, `content/demos/`, and `content/examples/`, kept in sync with current code."
+tools: [tools/docs/collect_docs.py, tools/docs/gen_lua_api.py, tools/docs/gen_wiki_api.py, tools/docs/gen_engine_docs.py, tools/audit/doc_coverage.py]
 ---
-
 # Doc-Writer
 
 ## Mission
@@ -72,3 +67,10 @@ Doc-Writer keeps Lurek2D's user-facing documentation accurate and idiomatic for 
 - Implementation Details: documenting Rust internals in the Lua API reference.
 - Hand-editing generated files instead of regenerating them from source.
 - Architecture docs containing legacy phase notes or stale module names.
+
+## CAG Metadata
+
+- **Personas**: EngDev, GameDev, Modder
+- **Primary skills**: documentation
+- **Secondary skills**: lua-scripting, lua-api-design, examples-management
+- **Routes to**: Developer, Lua-Designer, Architect, Reviewer, CAG-Architect

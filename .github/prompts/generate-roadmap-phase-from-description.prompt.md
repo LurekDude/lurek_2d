@@ -1,12 +1,7 @@
 ---
-description: "Generate a complete Lurek2D roadmap phase file from a natural language description of scope and goals."
-mode: agent
-loads_skills: [documentation, roadmap-planning]
-loads_tools: []
-expected_agent: Architect
-inputs_required: [Noun, StructName, domain, module, name, slug, verb]
+description: Generate a complete Lurek2D roadmap phase file from a natural language description of scope and goals.
+agent: Architect
 ---
-
 # Generate Roadmap Phase From Description
 
 ## Goal
@@ -51,3 +46,9 @@ Generate a complete Lurek2D roadmap phase file from a natural language descripti
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/generate-roadmap-phase-from-description <Noun> <StructName> <domain> <module> <name> <slug> <verb>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: documentation, roadmap-planning
+- **Inputs required**: Noun, StructName, domain, module, name, slug, verb

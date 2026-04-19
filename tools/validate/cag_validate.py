@@ -57,6 +57,7 @@ from _cag_common import (  # noqa: E402
     has_section,
     known_agent_names,
     known_skill_names,
+    parse_cag_metadata_section,
     parse_frontmatter,
     relpath,
     safe_read,
@@ -181,7 +182,13 @@ def check_agent(path: Path, *, skills: set[str], agents: set[str]) -> list[Viola
                              "Missing or malformed YAML frontmatter"))
         return out
 
-    personas = fm.get_list("personas")
+    body = body_after_frontmatter(text, fm)
+    meta = parse_cag_metadata_section(body)
+
+    # Personas now live in the ## CAG Metadata body section
+    personas = meta.get("personas") or []
+    if isinstance(personas, str):
+        personas = [personas]
     invalid = [p for p in personas if p not in PERSONAS]
     if invalid:
         out.append(Violation(rel, "E102", "error",
@@ -191,30 +198,38 @@ def check_agent(path: Path, *, skills: set[str], agents: set[str]) -> list[Viola
         out.append(Violation(rel, "W108", "warning",
                              "No personas declared"))
 
+    # primary_skills / secondary_skills now in body section
     for key in ("primary_skills", "secondary_skills"):
-        for s in fm.get_list(key):
+        skill_list = meta.get(key) or []
+        if isinstance(skill_list, str):
+            skill_list = [skill_list]
+        for s in skill_list:
             if s not in skills:
                 out.append(Violation(rel, "E103", "error",
                                      f"{key} references unknown skill: '{s}'"))
 
+    # routes_to now in body section
     known_lower = {x.lower() for x in agents}
-    for a in fm.get_list("routes_to"):
+    routes_to = meta.get("routes_to") or []
+    if isinstance(routes_to, str):
+        routes_to = [routes_to]
+    for a in routes_to:
         norm = a.lower().replace(" ", "-")
         if norm not in known_lower:
             out.append(Violation(rel, "E104", "error",
                                  f"routes_to references unknown agent: '{a}'"))
 
-    for t in fm.get_list("loads_tools"):
+    # tools (formerly loads_tools) stays in frontmatter
+    for t in fm.get_list("tools"):
         if not (WORKSPACE_ROOT / t).exists():
             out.append(Violation(rel, "E105", "error",
-                                 f"loads_tools references missing path: '{t}'"))
+                                 f"tools references missing path: '{t}'"))
 
     line_count = text.count("\n") + (0 if text.endswith("\n") else 1)
     if line_count > 200:
         out.append(Violation(rel, "E106", "error",
                              f"File has {line_count} lines (cap 200)"))
 
-    body = body_after_frontmatter(text, fm)
     out.extend(_check_required_sections(rel, body, AGENT_REQUIRED_SECTIONS, "E107"))
     return out
 
@@ -241,15 +256,12 @@ def check_skill(path: Path, *, skills: set[str]) -> list[Violation]:
                              "Triple-backtick fence is forbidden in SKILL.md",
                              fl + body_offset_lines))
 
-    skill_dir = path.parent
-    cf = fm.get_mapping("companion_files")
-    for category in ("examples", "templates", "snippets"):
-        for f in cf.get(category, []):
-            if not (skill_dir / f).exists():
-                out.append(Violation(rel, "E203", "error",
-                                     f"companion_files.{category} missing: '{f}'"))
-
-    for s in fm.get_list("related_skills"):
+    # related_skills now lives in the ## CAG Metadata body section (optional)
+    meta = parse_cag_metadata_section(body)
+    related = meta.get("related_skills") or []
+    if isinstance(related, str):
+        related = [related]
+    for s in related:
         if s not in skills:
             out.append(Violation(rel, "E204", "error",
                                  f"related_skills references unknown skill: '{s}'"))
@@ -281,25 +293,33 @@ def check_prompt(
                              "Missing or malformed YAML frontmatter"))
         return out
 
-    for s in fm.get_list("loads_skills"):
+    body = body_after_frontmatter(text, fm)
+    meta = parse_cag_metadata_section(body)
+
+    # loads_skills now in ## CAG Metadata body section
+    loads_skills = meta.get("loads_skills") or []
+    if isinstance(loads_skills, str):
+        loads_skills = [loads_skills]
+    for s in loads_skills:
         if s not in skills:
             out.append(Violation(rel, "E302", "error",
                                  f"loads_skills references unknown skill: '{s}'"))
 
-    for t in fm.get_list("loads_tools"):
+    # tools (formerly loads_tools) stays in frontmatter
+    for t in fm.get_list("tools"):
         if not (WORKSPACE_ROOT / t).exists():
             out.append(Violation(rel, "E303", "error",
-                                 f"loads_tools references missing path: '{t}'"))
+                                 f"tools references missing path: '{t}'"))
 
-    expected = fm.get_str("expected_agent").strip()
+    # agent (formerly expected_agent) stays in frontmatter
+    expected = fm.get_str("agent").strip()
     if expected:
         norm = expected.lower().replace(" ", "-")
         known_lower = {a.lower() for a in agents}
         if norm not in known_lower and expected != "Manager":
             out.append(Violation(rel, "E304", "error",
-                                 f"expected_agent does not exist: '{expected}'"))
+                                 f"agent does not exist: '{expected}'"))
 
-    body = body_after_frontmatter(text, fm)
     out.extend(_check_required_sections(rel, body, PROMPT_REQUIRED_SECTIONS, "E305"))
 
     sc_line = first_section_line(body, "Success Criteria")

@@ -1,13 +1,8 @@
 ---
 name: Architect
-mission: "Design Lurek2D module boundaries, dependency direction, and crate organisation while keeping the import graph acyclic."
-personas: [EngDev]
-primary_skills: [module-architecture]
-secondary_skills: [rust-coding, error-handling, lua-api-design]
-routes_to: [Developer, Lua-Designer, Optimizer, Doc-Writer, Manager, CAG-Architect]
-loads_tools: [tools/audit/audit_module.py, tools/validate/validate_module_coverage.py]
+description: "Design Lurek2D module boundaries, dependency direction, and crate organisation while keeping the import graph acyclic."
+tools: [tools/audit/audit_module.py, tools/validate/validate_module_coverage.py]
 ---
-
 # Architect
 
 ## Mission
@@ -72,3 +67,10 @@ Architect produces module boundary, dependency direction, and crate-organisation
 - API Surface Bloat: making everything `pub` without justification.
 - Design Without Migration: proposing restructuring without a step-by-step path.
 - Implementing the design yourself instead of handing it to `Developer`.
+
+## CAG Metadata
+
+- **Personas**: EngDev
+- **Primary skills**: module-architecture
+- **Secondary skills**: rust-coding, error-handling, lua-api-design
+- **Routes to**: Developer, Lua-Designer, Optimizer, Doc-Writer, Manager, CAG-Architect

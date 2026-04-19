@@ -1,12 +1,7 @@
 ---
 description: "Fix failing tests: diagnose why tests fail and correct either the test or the code."
-mode: agent
-loads_skills: [dev-debugging, testing-rust]
-loads_tools: []
-expected_agent: Tester
-inputs_required: []
+agent: Tester
 ---
-
 # Fix Failing Tests
 
 ## Goal
@@ -42,3 +37,8 @@ Diagnose and fix test failures.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/fix-failing-tests`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: dev-debugging, testing-rust

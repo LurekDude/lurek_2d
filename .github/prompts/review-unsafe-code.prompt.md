@@ -1,12 +1,7 @@
 ---
 description: "Review unsafe code blocks: verify SAFETY comments and justification for every unsafe usage."
-mode: agent
-loads_skills: [rust-coding]
-loads_tools: []
-expected_agent: Security
-inputs_required: []
+agent: Security
 ---
-
 # Review Unsafe Code
 
 ## Goal
@@ -40,3 +35,8 @@ Audit all `unsafe` blocks for proper justification and safety.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/review-unsafe-code`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: rust-coding

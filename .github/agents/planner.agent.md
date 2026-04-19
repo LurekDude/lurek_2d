@@ -1,13 +1,8 @@
 ---
 name: Planner
-mission: "Decompose complex Lurek2D requests into a sequenced phase plan with agent assignments, parallelism, risks, and binary done-when gates."
-personas: [EngDev]
-primary_skills: [module-architecture, rust-coding]
-secondary_skills: [testing-rust, lua-api-design]
-routes_to: [Manager, Architect, Developer, Reviewer, CAG-Architect]
-loads_tools: [tools/validate/cag_validate.py]
+description: "Decompose complex Lurek2D requests into a sequenced phase plan with agent assignments, parallelism, risks, and binary done-when gates."
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Planner
 
 ## Mission
@@ -71,3 +66,10 @@ Planner accepts large or multi-module requests from `Manager` and produces a one
 - Hidden Dependency: parallel phases that actually share a file or type.
 - Plan Drift: revising the plan mid-execution without re-delivering it to `Manager`.
 - Implementation creep: writing code in the plan instead of naming an agent that will write it.
+
+## CAG Metadata
+
+- **Personas**: EngDev
+- **Primary skills**: module-architecture, rust-coding
+- **Secondary skills**: testing-rust, lua-api-design
+- **Routes to**: Manager, Architect, Developer, Reviewer, CAG-Architect

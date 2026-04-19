@@ -1,13 +1,7 @@
 ---
 name: lua-api-design
 description: "Load this skill when designing or modifying the lurek.* Lua API surface. It owns naming conventions, parameter patterns, callback contracts, and API consistency rules. Skip it for Rust internals or pure Lua scripting."
-companion_files:
-  examples: [examples/1-file-header.rs, examples/2-imports-exact-order.rs, examples/4-userdata-struct.rs, examples/5-impl-luauserdata-block.rs, examples/callback-storage-pattern-luaregistrykey.rs, examples/callback-storage-pattern-luaregistrykey-2.rs, examples/method-section-header-8-space-indent.rs, examples/docstring.rs, examples/docstring-2.rs, examples/6-register-section.rs, examples/7-function-entry-pattern-4-space.rs, examples/param-syntax.rs, examples/return-syntax.rs, examples/business-logic-migration-pattern.rs, examples/business-logic-migration-pattern-2.rs]
-  templates: []
-  snippets: [snippets/first-action-read-the-gold-standard.txt, snippets/3-section-separators.txt, snippets/validation.ps1, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # lua-api-design
 
 ## Mission

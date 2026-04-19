@@ -1,12 +1,8 @@
 ---
 description: "Create a new Lurek2D roadmap phase file with all required metadata, tasks, and acceptance gates."
-mode: agent
-loads_skills: [roadmap-planning]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Architect
-inputs_required: []
+agent: Architect
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Create Roadmap Phase
 
 ## Goal
@@ -43,3 +39,8 @@ Create a new Lurek2D roadmap phase file with all required metadata, tasks, and a
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-roadmap-phase`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: roadmap-planning

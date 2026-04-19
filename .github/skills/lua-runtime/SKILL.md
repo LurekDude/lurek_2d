@@ -1,13 +1,7 @@
 ---
 name: lua-runtime
 description: "Load this skill when working with the Lua scripting runtime in Lurek2D: LuaJIT vs Lua 5.4 behavioral differences, the lua-jit and lua54 Cargo feature flags, mlua 0.9 specifics, garbage collector tuning, LuaJIT bitwise ops, upvalue and stack limits, string interning, or Lua performance patterns. Use for: LuaJIT FFI, GC pressure, per-frame Lua optimisation, Lua 5.4 compat testing. Skip it for the Rust binding layer (use lua-rust-bridge), general Lua game scripting (use lua-scripting), or Lua API design (use lua-api-design)."
-companion_files:
-  examples: [examples/writing-cross-compatible-lua.lua, examples/luajit-gc.lua, examples/lua-5-4-gc.lua, examples/gc-pressure-reduction-applies-to-both.lua, examples/upvalue-limit-workaround.lua, examples/luajit-ffi.lua, examples/local-caching-critical-for-hot-loops.lua, examples/avoid-metatables-on-hot-paths.lua, examples/string-interning.lua]
-  templates: [templates/backend-feature-flags.toml]
-  snippets: [snippets/backend-feature-flags-2.ps1, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # lua-runtime
 
 ## Mission

@@ -1,13 +1,7 @@
 ---
 name: quality-pipeline
 description: "Load this skill when running quality checks, interpreting audit/coverage results, or remediating issues found by Lurek2D's Python analysis tools. Covers the full audit→diagnose→fix→verify cycle: which tools to run, what their output means, which agent or fixer script handles each issue type, and how to compose tools into a quality sweep. Skip it for implementing features, writing game scripts, or CAG file editing."
-companion_files:
-  examples: []
-  templates: []
-  snippets: [snippets/1-generators-produce-reference-docs-run.ps1, snippets/quick-check-before-any-commit.ps1, snippets/standard-pre-commit-sweep.ps1, snippets/single-module-deep-audit.ps1, snippets/full-project-quality-sweep.ps1, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # quality-pipeline
 
 ## Mission

@@ -1,12 +1,7 @@
 ---
 description: "Debug and fix Lua script errors in Lurek2D. Use when a Lua game script exits with an error, panics the engine, or produces unexpected mlu..."
-mode: agent
-loads_skills: [dev-debugging, lua-api-design]
-loads_tools: []
-expected_agent: Debugger
-inputs_required: [SCRIPT_PATH, func, module, name]
+agent: Debugger
 ---
-
 # Fix Lua Error
 
 ## Goal
@@ -48,3 +43,9 @@ Debug and fix Lua script errors in Lurek2D. Use when a Lua game script exits wit
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/fix-lua-error <SCRIPT_PATH> <func> <module> <name>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: dev-debugging, lua-api-design
+- **Inputs required**: SCRIPT_PATH, func, module, name

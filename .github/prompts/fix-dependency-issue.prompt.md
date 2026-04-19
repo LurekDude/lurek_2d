@@ -1,12 +1,7 @@
 ---
 description: "Fix a dependency issue in Cargo.toml: version conflict, missing feature, or unnecessary dependency."
-mode: agent
-loads_skills: [documentation]
-loads_tools: []
-expected_agent: Developer
-inputs_required: []
+agent: Developer
 ---
-
 # Fix Dependency Issue
 
 ## Goal
@@ -41,3 +36,8 @@ Resolve Cargo.toml dependency problems.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/fix-dependency-issue`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: documentation

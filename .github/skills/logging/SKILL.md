@@ -1,13 +1,7 @@
 ---
 name: logging
 description: "Load this skill when adding, tuning, or analysing log output in Lurek2D: setting up the log crate facade, choosing the right log level, controlling output with RUST_LOG, writing structured log messages, logging from Lua scripts, or using log output to debug engine and game behaviour. Use for: engine log instrumentation, RUST_LOG syntax, per-crate/per-module filtering, log-to-file patterns. Skip it for general debugging strategy (use dev-debugging skill) or analytics from collected log files (use analytics skill)."
-companion_files:
-  examples: [examples/rust-log-facade.rs, examples/message-content-conventions.rs, examples/simple-print-based-logging.lua, examples/log-to-file-persistent-across-sessions.lua, examples/conditional-verbose-mode.lua]
-  templates: []
-  snippets: [snippets/rustlog-syntax.ps1, snippets/log-to-file-rust-side.ps1, snippets/during-tests.ps1, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # logging
 
 ## Mission

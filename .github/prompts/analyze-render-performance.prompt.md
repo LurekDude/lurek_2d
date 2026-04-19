@@ -1,12 +1,7 @@
 ---
 description: "Analyze rendering performance: frame time, draw command throughput, texture memory, wgpu pipeline operations."
-mode: agent
-loads_skills: [gpu-programming, performance-profiling]
-loads_tools: []
-expected_agent: Renderer
-inputs_required: []
+agent: Renderer
 ---
-
 # Analyze Render Performance
 
 ## Goal
@@ -41,3 +36,8 @@ Profile and analyze the rendering pipeline performance.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/analyze-render-performance`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: gpu-programming, performance-profiling

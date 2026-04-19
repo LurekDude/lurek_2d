@@ -1,12 +1,8 @@
 ---
 description: "Full feature development workflow from design to merged code. Use when starting, extending, or refactoring a Lurek2D feature. Orchestrate..."
-mode: agent
-loads_skills: [documentation, lua-api-design, lua-rust-bridge, module-architecture, rust-coding, testing-rust]
-loads_tools: [tools/audit/audit_module.py, tools/audit/test_coverage.py, tools/dist/dist.ps1, tools/docs/collect_docs.py, tools/docs/gen_docs_lua.py, tools/gen_all_docs.py]
-expected_agent: Manager
-inputs_required: [SharedState, category, expected, module, name, scenario, submodule]
+agent: Manager
+tools: [tools/audit/audit_module.py, tools/audit/test_coverage.py, tools/dist/dist.ps1, tools/docs/collect_docs.py, tools/docs/gen_docs_lua.py, tools/gen_all_docs.py]
 ---
-
 # Workflow Feature Development
 
 ## Goal
@@ -57,3 +53,9 @@ Full feature development workflow from design to merged code. Use when starting,
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/workflow-feature-development <SharedState> <category> <expected> <module> <name> <scenario> <submodule>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: documentation, lua-api-design, lua-rust-bridge, module-architecture, rust-coding, testing-rust
+- **Inputs required**: SharedState, category, expected, module, name, scenario, submodule

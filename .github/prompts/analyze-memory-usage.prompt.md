@@ -1,12 +1,7 @@
 ---
 description: "Analyze and reduce memory usage in the Lurek2D engine. Use when frame memory allocations are excessive, the buffer grows unboundedly, or..."
-mode: agent
-loads_skills: [gpu-programming, performance-profiling]
-loads_tools: []
-expected_agent: Developer
-inputs_required: [RenderCommand, u32]
+agent: Developer
 ---
-
 # Analyze Memory Usage
 
 ## Goal
@@ -47,3 +42,9 @@ Analyze and reduce memory usage in the Lurek2D engine. Use when frame memory all
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/analyze-memory-usage <RenderCommand> <u32>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: gpu-programming, performance-profiling
+- **Inputs required**: RenderCommand, u32

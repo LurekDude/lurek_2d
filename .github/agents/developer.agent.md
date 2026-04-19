@@ -1,13 +1,8 @@
 ---
 name: Developer
-mission: "Implement Rust engine features and bug fixes across non-specialist Lurek2D modules with passing tests and zero clippy warnings."
-personas: [EngDev]
-primary_skills: [rust-coding, error-handling, module-architecture]
-secondary_skills: [lua-rust-bridge, lua-scripting, logging]
-routes_to: [Lua-Designer, Renderer, Physicist, Audio-Eng, Tester, Reviewer, Architect, Doc-Writer, CAG-Architect]
-loads_tools: [tools/docs/collect_docs.py, tools/docs/gen_lua_api.py, tools/audit/doc_coverage.py, tools/validate/cag_validate.py]
+description: Implement Rust engine features and bug fixes across non-specialist Lurek2D modules with passing tests and zero clippy warnings.
+tools: [tools/docs/collect_docs.py, tools/docs/gen_lua_api.py, tools/audit/doc_coverage.py, tools/validate/cag_validate.py]
 ---
-
 # Developer
 
 ## Mission
@@ -78,3 +73,10 @@ Developer is the EngDev workhorse for general Rust engine implementation across 
 - `git add .` instead of explicit files.
 - Skipping the `docs/CHANGELOG.md` update.
 - Running full `cargo build` or full `cargo test` mid-development (blocks parallel work — use scoped variants until commit gate).
+
+## CAG Metadata
+
+- **Personas**: EngDev
+- **Primary skills**: rust-coding, error-handling, module-architecture
+- **Secondary skills**: lua-rust-bridge, lua-scripting, logging
+- **Routes to**: Lua-Designer, Renderer, Physicist, Audio-Eng, Tester, Reviewer, Architect, Doc-Writer, CAG-Architect

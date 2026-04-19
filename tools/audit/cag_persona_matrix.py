@@ -28,7 +28,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "validate"))
 from _cag_common import (  # noqa: E402
     GITHUB_DIR,
     PERSONAS,
+    body_after_frontmatter,
     discover_agents,
+    parse_cag_metadata_section,
     parse_frontmatter,
     relpath,
     safe_read,
@@ -43,7 +45,13 @@ def scan() -> dict[str, object]:
         agent_name = path.name.removesuffix(".agent.md")
         text = safe_read(path)
         fm = parse_frontmatter(text)
-        declared = fm.get_list("personas") if fm.present else []
+        body = body_after_frontmatter(text, fm) if fm.present else text
+        meta = parse_cag_metadata_section(body)
+        # Personas now live in ## CAG Metadata body section; fall back to
+        # frontmatter for files not yet transformed.
+        declared = meta.get("personas") or (fm.get_list("personas") if fm.present else [])
+        if isinstance(declared, str):
+            declared = [declared]
         invalid = [p for p in declared if p not in PERSONAS]
         if invalid:
             invalid_personas[agent_name] = invalid

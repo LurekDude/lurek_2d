@@ -1,12 +1,8 @@
 ---
-description: "Execute the audit-fix-verify quality sweep across the repo."
-mode: agent
-loads_skills: [quality-pipeline]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Reviewer
-inputs_required: [scope]
+description: Execute the audit-fix-verify quality sweep across the repo.
+agent: Reviewer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Run Quality Sweep
 
 ## Goal
@@ -39,3 +35,9 @@ Run the audit-fix-verify quality sweep over the named scope — modules, docs, t
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/run-quality-sweep <scope>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: quality-pipeline
+- **Inputs required**: scope

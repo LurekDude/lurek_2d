@@ -1,13 +1,7 @@
 ---
 name: ui-layout
 description: "Load this skill when designing, reviewing, or scaffolding TOML UI layout files for Lurek2D. Use for: authoring content/layouts/ TOML files, grid-snapping coordinates, choosing widget types, creating game or app screen layouts, running render_layout.py, snap_to_grid.py, or fix_layouts.py. Skip it for Rust engine UI code or Lua game-logic scripting."
-companion_files:
-  examples: [examples/step-2-lua-script-behaviour-only.lua]
-  templates: [templates/file-skeleton.toml, templates/field-ordering-convention-per-widget-block.toml, templates/step-1-layout-toml-structure-only.toml]
-  snippets: [snippets/grid-system.txt, snippets/layout-hierarchy-godot-inspired-patterns.txt, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # ui-layout
 
 ## Mission

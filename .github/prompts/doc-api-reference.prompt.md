@@ -1,12 +1,7 @@
 ---
 description: "Write or update API reference documentation for lurek.* functions. Use when new Lua bindings are added or existing ones change. Produces..."
-mode: agent
-loads_skills: [documentation, lua-api-design]
-loads_tools: []
-expected_agent: Doc-Writer
-inputs_required: [function, module]
+agent: Doc-Writer
 ---
-
 # Doc Api Reference
 
 ## Goal
@@ -44,3 +39,9 @@ Write or update API reference documentation for lurek.* functions. Use when new 
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/doc-api-reference <function> <module>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: documentation, lua-api-design
+- **Inputs required**: function, module

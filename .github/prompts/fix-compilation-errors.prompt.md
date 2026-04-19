@@ -1,12 +1,7 @@
 ---
 description: "Fix compilation errors, clippy warnings, or formatting issues in Rust source code."
-mode: agent
-loads_skills: [error-handling, rust-coding]
-loads_tools: []
-expected_agent: Developer
-inputs_required: []
+agent: Developer
 ---
-
 # Fix Compilation Errors
 
 ## Goal
@@ -43,3 +38,8 @@ Resolve Rust compilation errors, clippy warnings, or formatting failures.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/fix-compilation-errors`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: error-handling, rust-coding

@@ -1,12 +1,7 @@
 ---
 description: "Review entity lifecycle patterns for correctness: spawn, alive check, kill, ID recycling, blueprint usage, and layer organization. Use wh..."
-mode: agent
-loads_skills: []
-loads_tools: []
-expected_agent: Reviewer
-inputs_required: []
+agent: Reviewer
 ---
-
 # Review Entity Lifecycle
 
 ## Goal
@@ -48,3 +43,7 @@ Review entity lifecycle patterns for correctness: spawn, alive check, kill, ID r
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/review-entity-lifecycle`
+
+## CAG Metadata
+
+- **Mode**: agent

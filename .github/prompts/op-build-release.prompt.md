@@ -1,12 +1,7 @@
 ---
-description: "Build a release binary for Lurek2D for a target platform. Use when creating a distributable build. Produces a stripped release binary in..."
-mode: agent
-loads_skills: [cross-platform, rust-coding]
-loads_tools: []
-expected_agent: Developer
-inputs_required: [TARGET_TRIPLE]
+description: Build a release binary for Lurek2D for a target platform. Use when creating a distributable build. Produces a stripped release binary in...
+agent: Developer
 ---
-
 # Op Build Release
 
 ## Goal
@@ -46,3 +41,9 @@ Build a release binary for Lurek2D for a target platform. Use when creating a di
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/op-build-release <TARGET_TRIPLE>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: cross-platform, rust-coding
+- **Inputs required**: TARGET_TRIPLE

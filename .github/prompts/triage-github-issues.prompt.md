@@ -1,12 +1,8 @@
 ---
 description: "Triage and label GitHub issues using mcp_github_* tools."
-mode: agent
-loads_skills: [github-workflow]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Manager
-inputs_required: [repo, label_filter]
+agent: Manager
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Triage Github Issues
 
 ## Goal
@@ -40,3 +36,9 @@ Triage open GitHub issues for the Lurek2D repository — apply correct labels, m
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/triage-github-issues <repo> <label_filter>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: github-workflow
+- **Inputs required**: repo, label_filter

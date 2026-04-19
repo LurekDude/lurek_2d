@@ -1,12 +1,7 @@
 ---
 description: "Create a new Lua API function in the lurek.* namespace. Guides through API design, Rust binding implementation, documentation, and testing."
-mode: agent
-loads_skills: [lua-api-design, rust-coding]
-loads_tools: []
-expected_agent: Developer
-inputs_required: [module, verb]
+agent: Developer
 ---
-
 # Create Api Function
 
 ## Goal
@@ -48,3 +43,9 @@ Step-by-step workflow for adding a new function to the `lurek.*` Lua API.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-api-function <module> <verb>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: lua-api-design, rust-coding
+- **Inputs required**: module, verb

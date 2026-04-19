@@ -1,13 +1,7 @@
 ---
 name: roadmap-planning
 description: "Load this skill when creating or maintaining roadmap phase documentation, updating phase files, or auditing roadmap consistency. Owns phase file format, dependency graph rules, acceptance gate authoring, and roadmap consistency. Skip it for code implementation or API design."
-companion_files:
-  examples: []
-  templates: []
-  snippets: []
-related_skills: []
 ---
-
 # roadmap-planning
 
 ## Mission

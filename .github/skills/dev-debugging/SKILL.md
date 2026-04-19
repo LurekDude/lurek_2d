@@ -1,13 +1,7 @@
 ---
 name: dev-debugging
 description: "Load this skill when diagnosing runtime bugs, crashes, or unexpected behavior in Lurek2D. It owns diagnostic techniques, error tracing, and root cause analysis patterns. Skip it for feature implementation or test writing."
-companion_files:
-  examples: [examples/custom-error-handler.lua, examples/pcall-for-recoverable-errors.lua, examples/refcell-borrow-diagnosis-2.rs, examples/refcell-borrow-diagnosis-3.rs, examples/diagnostic-log-placement.rs]
-  templates: []
-  snippets: [snippets/environment-variables-for-diagnosis.ps1, snippets/tracing-lua-rust-errors.txt, snippets/refcell-borrow-diagnosis.txt, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # dev-debugging
 
 ## Mission

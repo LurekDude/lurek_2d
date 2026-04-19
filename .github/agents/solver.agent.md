@@ -1,13 +1,8 @@
 ---
 name: Solver
-mission: "Structured root-cause analysis and alternative evaluation for hard Lurek2D engineering problems; delivers a decision-ready solution report — does not implement code."
-personas: [EngDev]
-primary_skills: [rust-coding, module-architecture, error-handling]
-secondary_skills: [performance-profiling, lua-scripting, gpu-programming]
-routes_to: [Developer, Architect, Tester, Research, Debugger, Manager, CAG-Architect]
-loads_tools: [tools/audit/audit_module.py]
+description: Structured root-cause analysis and alternative evaluation for hard Lurek2D engineering problems; delivers a decision-ready solution report — does not implement code.
+tools: [tools/audit/audit_module.py]
 ---
-
 # Solver
 
 ## Mission
@@ -71,3 +66,10 @@ Solver serves the EngDev persona on hard problems with no obvious answer. It acc
 - Constraint Blindness: recommending a solution that violates an unstated invariant (`unsafe` without justification, breaking `lurek.*` keys).
 - Scope Inflation: expanding the solution to fix tangentially related issues.
 - Skipping the conservative minimum-change alternative.
+
+## CAG Metadata
+
+- **Personas**: EngDev
+- **Primary skills**: rust-coding, module-architecture, error-handling
+- **Secondary skills**: performance-profiling, lua-scripting, gpu-programming
+- **Routes to**: Developer, Architect, Tester, Research, Debugger, Manager, CAG-Architect

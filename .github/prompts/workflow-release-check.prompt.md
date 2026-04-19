@@ -1,12 +1,8 @@
 ---
-description: "Full release readiness check for Lurek2D. Use before tagging a release or merging to main. Runs all quality gates and produces a go/no-go..."
-mode: agent
-loads_skills: [rust-coding, testing-rust, tools-cag-validation]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Manager
-inputs_required: [VERSION]
+description: Full release readiness check for Lurek2D. Use before tagging a release or merging to main. Runs all quality gates and produces a go/no-go...
+agent: Manager
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Workflow Release Check
 
 ## Goal
@@ -46,3 +42,9 @@ Full release readiness check for Lurek2D. Use before tagging a release or mergin
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/workflow-release-check <VERSION>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: rust-coding, testing-rust, tools-cag-validation
+- **Inputs required**: VERSION

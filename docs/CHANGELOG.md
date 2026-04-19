@@ -4,6 +4,11 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.0] — 2026-04-18
 
+### CAG Layer — VS Code Frontmatter Compatibility (refactor/src-migration-v2)
+- **chore(cag): strip unsupported VS Code frontmatter from all 109 CAG files.** Transformed `.github/agents/*.agent.md` (20), `.github/prompts/*.prompt.md` (56), and `.github/skills/*/SKILL.md` (33). Each file type now carries only VS Code-validated keys (`name`, `description`, `tools` for agents; `description`, `agent`, `tools` for prompts; `name`, `description` for skills). Fields removed from frontmatter (`personas`, `primary_skills`, `secondary_skills`, `routes_to`, `mission→description`, `loads_tools→tools`, `mode`, `loads_skills`, `inputs_required`, `expected_agent→agent`, `companion_files`, `related_skills`) are preserved in a new `## CAG Metadata` body section.
+- **chore(tools): update CAG validator and audit tools to read relocated metadata.** Added `parse_cag_metadata_section()` to `tools/validate/_cag_common.py`. Updated `check_agent()`, `check_skill()`, `check_prompt()` in `tools/validate/cag_validate.py` to read `personas`, `primary_skills`, `secondary_skills`, `routes_to`, `loads_skills` from body section; `tools` (formerly `loads_tools`) and `agent` (formerly `expected_agent`) from frontmatter. Removed E203 companion-files frontmatter check. Updated `tools/audit/cag_persona_matrix.py` to read `personas` via body section parser.
+- Validator result: **0 errors, 0 warnings** across all 110 CAG files.
+
 ### Test Migration
 - **test(all): consolidated Rust unit tests into tests/rust/unit/.** Migrated inline `#[cfg(test)]` blocks from all 49 src/ modules into 49 dedicated `<module>_tests.rs` files under `tests/rust/unit/`. ~26,000 lines of test code. Emptied 14 sibling `*_tests.rs` files in `src/` (replaced with redirect comments). Registered 42 new `[[test]]` entries in `Cargo.toml`.
 - **chore(ideas): moved src-module-review reports to ideas/src-module-review/.** 8 report files relocated from temporary `work/` to permanent `ideas/` storage.

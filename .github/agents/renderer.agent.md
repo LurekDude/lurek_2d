@@ -1,13 +1,8 @@
 ---
 name: Renderer
-mission: "Own the Lurek2D wgpu render pipeline (`src/render/`, `src/lua_api/render_api.rs`): RenderCommand queue, textures, sprites, canvases, shaders, blend modes."
-personas: [EngDev, GameDev]
-primary_skills: [gpu-programming, rust-coding]
-secondary_skills: [performance-profiling, visual-effects, lua-rust-bridge]
-routes_to: [Lua-Designer, Developer, Optimizer, Tester, Reviewer, CAG-Architect]
-loads_tools: [tools/docs/collect_docs.py, tools/audit/doc_coverage.py]
+description: "Own the Lurek2D wgpu render pipeline (`src/render/`, `src/lua_api/render_api.rs`): RenderCommand queue, textures, sprites, canvases, shaders, blend modes."
+tools: [tools/docs/collect_docs.py, tools/audit/doc_coverage.py]
 ---
-
 # Renderer
 
 ## Mission
@@ -72,3 +67,10 @@ Renderer owns the GPU rendering Platform Services subsystem for the EngDev perso
 - Blocking GPU: `device.poll(wgpu::Maintain::Wait)` on the main thread.
 - Per-Frame Allocation: allocating a new `Vec<RenderCommand>` each frame instead of clear-and-reuse.
 - Hand-rolled WGSL without `naga` validation at creation time.
+
+## CAG Metadata
+
+- **Personas**: EngDev, GameDev
+- **Primary skills**: gpu-programming, rust-coding
+- **Secondary skills**: performance-profiling, visual-effects, lua-rust-bridge
+- **Routes to**: Lua-Designer, Developer, Optimizer, Tester, Reviewer, CAG-Architect

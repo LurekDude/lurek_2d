@@ -1,12 +1,8 @@
 ---
 description: "End-to-end roadmap phase completion: Manager-orchestrated workflow that audits a phase file, builds an evidence matrix of every deliverab..."
-mode: agent
-loads_skills: [asset-pipeline, documentation, gpu-programming, lua-api-design, roadmap-planning, rust-coding, testing-rust]
-loads_tools: [tools/docs/collect_docs.py, tools/docs/gen_docs_lua.py]
-expected_agent: Architect
-inputs_required: [module]
+agent: Architect
+tools: [tools/docs/collect_docs.py, tools/docs/gen_docs_lua.py]
 ---
-
 # Analyze Roadmap Phase
 
 ## Goal
@@ -42,3 +38,9 @@ Nothing is skipped. Nothing is assumed done.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/analyze-roadmap-phase <module>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: asset-pipeline, documentation, gpu-programming, lua-api-design, roadmap-planning, rust-coding, testing-rust
+- **Inputs required**: module

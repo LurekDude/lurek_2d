@@ -1,12 +1,8 @@
 ---
 description: "End-to-end quality audit of one or more Lurek2D src/ modules. Validates spec, AGENT.md, Lua bridge separation, docstrings, example comple..."
-mode: agent
-loads_skills: [agent-md, documentation, examples-management, logging, lua-rust-bridge, module-audit]
-loads_tools: [tools/audit/audit_module.py, tools/audit/test_coverage.py, tools/docs/collect_docs.py, tools/validate/validate_lua_api.py]
-expected_agent: Reviewer
-inputs_required: [Module, expected, module, name, scenario, subject]
+agent: Reviewer
+tools: [tools/audit/audit_module.py, tools/audit/test_coverage.py, tools/docs/collect_docs.py, tools/validate/validate_lua_api.py]
 ---
-
 # Audit Module
 
 ## Goal
@@ -50,3 +46,9 @@ End-to-end quality audit of one or more Lurek2D src/ modules. Validates spec, AG
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/audit-module <Module> <expected> <module> <name> <scenario> <subject>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: agent-md, documentation, examples-management, logging, lua-rust-bridge, module-audit
+- **Inputs required**: Module, expected, module, name, scenario, subject

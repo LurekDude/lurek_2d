@@ -1,13 +1,7 @@
 ---
 name: game-ai
 description: "Load this skill when designing or implementing AI behaviour for game actors in Lurek2D using the lurek.ai.* API: finite state machines, behaviour trees, GOAP planners, steering behaviours, utility AI, Q-learning, squad formations, command queues, influence maps, or the shared Blackboard. Use for: enemy patrol/chase/flee, NPC decision-making, group tactics, pathfinding integration, AI testing. Skip it for general Rust AI module internals (see docs/specs/ai.md) or pathfinding algorithms (see docs/specs/pathfind.md)."
-companion_files:
-  examples: [examples/ai-world-setup.lua, examples/fsm-finite-state-machine.lua, examples/fsm-finite-state-machine-2.lua, examples/behaviour-tree.lua, examples/blackboard-shared-ai-memory.lua, examples/steering-behaviours.lua, examples/goap-goal-oriented-action-planning.lua, examples/utility-ai-scored-action-selection.lua, examples/squad-group-formation.lua, examples/influence-map-strategic-spatial-reasoning.lua, examples/testing-ai.lua]
-  templates: []
-  snippets: [snippets/extended-notes.md]
-related_skills: []
 ---
-
 # game-ai
 
 ## Mission

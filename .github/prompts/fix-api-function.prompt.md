@@ -1,12 +1,7 @@
 ---
 description: "Fix a broken or incorrect Lua API function: signature, behavior, or error handling."
-mode: agent
-loads_skills: [lua-api-design]
-loads_tools: []
-expected_agent: Developer
-inputs_required: [module]
+agent: Developer
 ---
-
 # Fix Api Function
 
 ## Goal
@@ -44,3 +39,9 @@ Fix a broken `lurek.*` API function.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/fix-api-function <module>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: lua-api-design
+- **Inputs required**: module

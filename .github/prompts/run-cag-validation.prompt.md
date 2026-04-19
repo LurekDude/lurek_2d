@@ -1,12 +1,8 @@
 ---
 description: "Run CAG validation to check all agents, skills, prompts, and instructions for compliance."
-mode: agent
-loads_skills: [tools-cag-validation]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Developer
-inputs_required: []
+agent: Developer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Run Cag Validation
 
 ## Goal
@@ -38,3 +34,8 @@ Validate the entire CAG layer using `tools/validate/cag_validate.py`.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/run-cag-validation`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: tools-cag-validation

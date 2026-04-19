@@ -1,13 +1,8 @@
 ---
 name: Configurator
-mission: "Author and validate Lurek2D project configuration (`conf.lua`, `conf.toml`, Cargo features) against the `Config` struct in `src/runtime/config.rs`."
-personas: [GameDev, Modder]
-primary_skills: [lua-scripting, documentation]
-secondary_skills: [lua-api-design, asset-pipeline]
-routes_to: [Developer, Lua-Designer, Doc-Writer, Reviewer, CAG-Architect]
-loads_tools: [tools/validate/validate_game.py, tools/validate/validate_lua_api.py]
+description: "Author and validate Lurek2D project configuration (`conf.lua`, `conf.toml`, Cargo features) against the `Config` struct in `src/runtime/config.rs`."
+tools: [tools/validate/validate_game.py, tools/validate/validate_lua_api.py]
 ---
-
 # Configurator
 
 ## Mission
@@ -72,3 +67,10 @@ Configurator covers the GameDev and Modder personas' need for clear, validated p
 - Hardcoded Resolution with `resizable = false` and no `minwidth` — unplayable on small screens.
 - Specifying `lua54` Cargo feature for a shipped game — LuaJIT is the correct default.
 - `log.append = true` in shipped games (unbounded log files over time).
+
+## CAG Metadata
+
+- **Personas**: GameDev, Modder
+- **Primary skills**: lua-scripting, documentation
+- **Secondary skills**: lua-api-design, asset-pipeline
+- **Routes to**: Developer, Lua-Designer, Doc-Writer, Reviewer, CAG-Architect

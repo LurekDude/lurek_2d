@@ -1,12 +1,8 @@
 ---
 description: "Complete phase implementation from a roadmap file. Runs pre-flight analysis of what already exists, audits external libraries so nothing..."
-mode: agent
-loads_skills: [asset-pipeline, gpu-programming, lua-api-design, roadmap-planning, rust-coding, testing-rust]
-loads_tools: [tools/docs/collect_docs.py, tools/validate/cag_validate.py]
-expected_agent: Architect
-inputs_required: [function, module, reason, scenario]
+agent: Architect
+tools: [tools/docs/collect_docs.py, tools/validate/cag_validate.py]
 ---
-
 # Implement Roadmap Phase
 
 ## Goal
@@ -59,3 +55,9 @@ End-to-end delivery of a single roadmap phase: read the phase file, understand w
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/implement-roadmap-phase <function> <module> <reason> <scenario>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: asset-pipeline, gpu-programming, lua-api-design, roadmap-planning, rust-coding, testing-rust
+- **Inputs required**: function, module, reason, scenario

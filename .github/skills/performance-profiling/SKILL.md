@@ -1,13 +1,7 @@
 ---
 name: performance-profiling
 description: "Load this skill when analyzing or optimizing Lurek2D performance: frame time, allocations, hot paths, rendering throughput, or Lua/Rust boundary overhead. Skip it for correctness bugs or feature implementation."
-companion_files:
-  examples: [examples/1-std-time-instant-built-in.rs, examples/2-lua-side-timing.lua, examples/4-debug-overlay.lua, examples/spritebatch-most-important.lua, examples/lua-gc-pressure-reduction.lua, examples/lua-gc-pressure-reduction-2.lua]
-  templates: []
-  snippets: [snippets/3-cargo-flamegraph-install-once.ps1, snippets/3-cargo-flamegraph-install-once-2.ps1, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # performance-profiling
 
 ## Mission

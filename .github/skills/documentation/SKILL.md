@@ -1,13 +1,7 @@
 ---
 name: documentation
 description: "Load this skill when writing or updating Lurek2D documentation: API reference, architecture docs, tutorials, README, or code comments. It owns doc style, structure, and accuracy verification. Skip it for code implementation."
-companion_files:
-  examples: []
-  templates: []
-  snippets: []
-related_skills: []
 ---
-
 # documentation
 
 ## Mission

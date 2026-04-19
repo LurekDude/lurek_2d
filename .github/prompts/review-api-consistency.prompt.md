@@ -1,12 +1,7 @@
 ---
 description: "Review Lua API consistency: naming patterns, parameter conventions, return types across all lurek.* modules."
-mode: agent
-loads_skills: [lua-api-design]
-loads_tools: []
-expected_agent: Lua-Designer
-inputs_required: [module, verb]
+agent: Lua-Designer
 ---
-
 # Review Api Consistency
 
 ## Goal
@@ -44,3 +39,9 @@ Audit the `lurek.*` API surface for naming and convention consistency.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/review-api-consistency <module> <verb>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: lua-api-design
+- **Inputs required**: module, verb

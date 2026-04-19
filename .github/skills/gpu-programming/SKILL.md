@@ -1,13 +1,7 @@
 ---
 name: gpu-programming
 description: "Load this skill when working with the Lurek2D GPU rendering pipeline: wgpu device/surface setup, RenderCommand queue, render passes, texture management, custom WGSL shaders, blend modes, canvas render-to-texture, or transform stacks. Also covers profiling GPU frame time and diagnosing wgpu validation errors. Skip it for font rasterization details, Lua API design, or physics."
-companion_files:
-  examples: [examples/texture-management.rs, examples/canvas-render-to-texture.lua]
-  templates: []
-  snippets: [snippets/wgpu-stack.txt, snippets/rendercommand-queue-lifecycle.txt, snippets/custom-user-shaders.txt, snippets/validation-errors.ps1, snippets/canvas-render-to-texture-2.txt, snippets/transform-stack.txt, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # gpu-programming
 
 ## Mission

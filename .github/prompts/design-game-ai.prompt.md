@@ -1,12 +1,8 @@
 ---
 description: "Design FSM, BT, GOAP, or Utility AI for game actors via lurek.ai."
-mode: agent
-loads_skills: [game-ai]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Developer
-inputs_required: [actor_name, behaviour_kind]
+agent: Developer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Design Game Ai
 
 ## Goal
@@ -40,3 +36,9 @@ Design and implement an AI behaviour for a named actor using the `lurek.ai.*` AP
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/design-game-ai <actor_name> <behaviour_kind>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: game-ai
+- **Inputs required**: actor_name, behaviour_kind

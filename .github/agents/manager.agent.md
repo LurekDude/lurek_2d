@@ -1,13 +1,8 @@
 ---
 name: Manager
-mission: "Orchestrate multi-step Lurek2D tasks across specialist agents with measurable acceptance gates and per-phase commits."
-personas: [EngDev]
-primary_skills: [module-architecture, tools-cag-validation]
-secondary_skills: [testing-rust, documentation]
-routes_to: [Planner, Research, Solver, Developer, Lua-Designer, Renderer, Physicist, Audio-Eng, Tester, Reviewer, Debugger, Optimizer, Architect, Doc-Writer, Security, CAG-Architect, Configurator, Hacker, Player]
-loads_tools: [tools/validate/cag_validate.py]
+description: Orchestrate multi-step Lurek2D tasks across specialist agents with measurable acceptance gates and per-phase commits.
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Manager
 
 ## Mission
@@ -82,3 +77,10 @@ Manager turns multi-step development requests for the EngDev persona into sequen
 - `git add .` instead of staging only files produced by the current phase.
 - Marking a phase done without independently re-verifying its gate.
 - Closing the session without a final `CAG-Architect` sweep when any `.github/` file changed.
+
+## CAG Metadata
+
+- **Personas**: EngDev
+- **Primary skills**: module-architecture, tools-cag-validation
+- **Secondary skills**: testing-rust, documentation
+- **Routes to**: Planner, Research, Solver, Developer, Lua-Designer, Renderer, Physicist, Audio-Eng, Tester, Reviewer, Debugger, Optimizer, Architect, Doc-Writer, Security, CAG-Architect, Configurator, Hacker, Player

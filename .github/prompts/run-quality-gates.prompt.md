@@ -1,12 +1,7 @@
 ---
 description: "Run full quality gates: build, clippy, format check, and all tests."
-mode: agent
-loads_skills: []
-loads_tools: []
-expected_agent: Reviewer
-inputs_required: []
+agent: Reviewer
 ---
-
 # Run Quality Gates
 
 ## Goal
@@ -38,3 +33,7 @@ Execute all Lurek2D quality gates in sequence.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/run-quality-gates`
+
+## CAG Metadata
+
+- **Mode**: agent

@@ -1,12 +1,7 @@
 ---
-description: "Create a new RenderCommand variant for the rendering pipeline with full integration."
-mode: agent
-loads_skills: [gpu-programming]
-loads_tools: []
-expected_agent: Developer
-inputs_required: []
+description: Create a new RenderCommand variant for the rendering pipeline with full integration.
+agent: Developer
 ---
-
 # Create Draw Command
 
 ## Goal
@@ -45,3 +40,8 @@ Add a new RenderCommand variant to the rendering pipeline.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-draw-command`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: gpu-programming

@@ -1,12 +1,8 @@
 ---
-description: "Author or edit a content/layouts/ TOML UI layout."
-mode: agent
-loads_skills: [ui-layout]
-loads_tools: [tools/validate/cag_validate.py]
-expected_agent: Lua-Designer
-inputs_required: [screen_name]
+description: Author or edit a content/layouts/ TOML UI layout.
+agent: Lua-Designer
+tools: [tools/validate/cag_validate.py]
 ---
-
 # Author Ui Layout
 
 ## Goal
@@ -39,3 +35,9 @@ Author or edit a TOML UI layout under `content/layouts/` for a named screen — 
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/author-ui-layout <screen_name>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: ui-layout
+- **Inputs required**: screen_name

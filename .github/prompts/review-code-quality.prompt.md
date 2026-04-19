@@ -1,12 +1,7 @@
 ---
 description: "Run a full code review against Lurek2D quality gates: compilation, lint, format, tests, conventions."
-mode: agent
-loads_skills: [rust-coding]
-loads_tools: []
-expected_agent: Reviewer
-inputs_required: []
+agent: Reviewer
 ---
-
 # Review Code Quality
 
 ## Goal
@@ -44,3 +39,8 @@ Systematic code review against all Lurek2D quality gates.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/review-code-quality`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: rust-coding

@@ -1,12 +1,7 @@
 ---
-description: "Create integration or unit tests for a Lurek2D module with proper patterns and coverage."
-mode: agent
-loads_skills: [testing-rust]
-loads_tools: []
-expected_agent: Tester
-inputs_required: [expected, module, scenario, subject]
+description: Create integration or unit tests for a Lurek2D module with proper patterns and coverage.
+agent: Tester
 ---
-
 # Create Test Suite
 
 ## Goal
@@ -43,3 +38,9 @@ Write tests for a Lurek2D module following proper test conventions.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-test-suite <expected> <module> <scenario> <subject>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: testing-rust
+- **Inputs required**: expected, module, scenario, subject

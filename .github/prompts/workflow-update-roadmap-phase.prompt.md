@@ -1,12 +1,7 @@
 ---
 description: "Update the status, tasks, or acceptance gates of an existing Lurek2D roadmap phase file."
-mode: agent
-loads_skills: [roadmap-planning]
-loads_tools: []
-expected_agent: Architect
-inputs_required: []
+agent: Architect
 ---
-
 # Workflow Update Roadmap Phase
 
 ## Goal
@@ -41,3 +36,8 @@ Update the status, tasks, or acceptance gates of an existing Lurek2D roadmap pha
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/workflow-update-roadmap-phase`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: roadmap-planning

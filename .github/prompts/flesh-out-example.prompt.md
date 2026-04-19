@@ -1,12 +1,8 @@
 ---
 description: "Rewrite content/examples/<module>.lua files as scenario-driven learning examples. Each example tells a coherent story about WHEN and WHY..."
-mode: agent
-loads_skills: [documentation]
-loads_tools: [tools/audit/example_coverage.py]
-expected_agent: Developer
-inputs_required: [module, name]
+agent: Developer
+tools: [tools/audit/example_coverage.py]
 ---
-
 # Flesh Out Example
 
 ## Goal
@@ -49,3 +45,9 @@ Rewrite content/examples/<module>.lua files as scenario-driven learning examples
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/flesh-out-example <module> <name>`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: documentation
+- **Inputs required**: module, name

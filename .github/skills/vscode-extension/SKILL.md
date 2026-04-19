@@ -1,13 +1,7 @@
 ---
 name: vscode-extension
 description: "Load this skill when building, debugging, or extending the Lurek2D VS Code extension in extensions/vscode/. Use for: adding IntelliSense completions, MCP server endpoints, webview panels, new commands, extension configuration, or publishing. Skip it for engine Rust code, game scripting, or documentation outside the extension."
-companion_files:
-  examples: []
-  templates: []
-  snippets: [snippets/extension-layout.txt, snippets/development-loop.ps1, snippets/build-and-package.ps1, snippets/testing-the-extension.ps1]
-related_skills: []
 ---
-
 # vscode-extension
 
 ## Mission

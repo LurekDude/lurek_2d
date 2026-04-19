@@ -1,12 +1,7 @@
 ---
-description: "﻿---."
-mode: agent
-loads_skills: []
-loads_tools: []
-expected_agent: Developer
-inputs_required: []
+description: ﻿---.
+agent: Developer
 ---
-
 # Create Event Pattern
 
 ## Goal
@@ -47,3 +42,7 @@ inputs_required: []
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/create-event-pattern`
+
+## CAG Metadata
+
+- **Mode**: agent

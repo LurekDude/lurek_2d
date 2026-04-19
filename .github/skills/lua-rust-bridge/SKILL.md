@@ -1,13 +1,7 @@
 ---
 name: lua-rust-bridge
 description: "Load this skill when designing or implementing the bridge between Rust engine modules and the lurek.* Lua API: creating UserData types, registration functions, binding domain types to Lua, or keeping src/lua_api/ thin. Use for: new Lua API modules, Lua↔Rust data conversion, docs/specs↔lua_api sync. Skip it for domain Rust logic, game scripting, or GPU code."
-companion_files:
-  examples: [examples/registration-contract.rs, examples/userdata-pattern.rs, examples/userdata-pattern-2.rs, examples/error-handling-at-the-boundary.rs, examples/known-exceptions-lua-eval-justified.rs, examples/rendering-boundary-rule.rs]
-  templates: []
-  snippets: [snippets/bridge-architecture.txt, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # lua-rust-bridge
 
 ## Mission

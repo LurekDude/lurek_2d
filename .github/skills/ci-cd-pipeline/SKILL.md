@@ -1,13 +1,7 @@
 ---
 name: ci-cd-pipeline
 description: "Load this skill when setting up or maintaining CI/CD for Lurek2D: GitHub Actions workflows, build automation, test pipelines, or release processes. Skip it for local development or code implementation."
-companion_files:
-  examples: []
-  templates: []
-  snippets: []
-related_skills: []
 ---
-
 # ci-cd-pipeline
 
 ## Mission

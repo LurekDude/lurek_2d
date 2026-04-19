@@ -1,12 +1,7 @@
 ---
 description: "Fix a bug in the Lurek2D engine: diagnose root cause, implement fix, verify with tests."
-mode: agent
-loads_skills: [dev-debugging, error-handling]
-loads_tools: []
-expected_agent: Developer
-inputs_required: []
+agent: Developer
 ---
-
 # Fix Engine Bug
 
 ## Goal
@@ -45,3 +40,8 @@ Systematic bug fix workflow: reproduce → diagnose → fix → verify.
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/fix-engine-bug`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: dev-debugging, error-handling

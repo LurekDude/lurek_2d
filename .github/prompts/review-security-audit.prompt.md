@@ -1,12 +1,7 @@
 ---
 description: "Security audit for Lurek2D Lua sandboxing, filesystem access, and input validation. Use when adding filesystem features, untrusted script..."
-mode: agent
-loads_skills: [asset-pipeline, dev-debugging, error-handling]
-loads_tools: []
-expected_agent: Security
-inputs_required: []
+agent: Security
 ---
-
 # Review Security Audit
 
 ## Goal
@@ -47,3 +42,8 @@ Security audit for Lurek2D Lua sandboxing, filesystem access, and input validati
 ## Example Invocation
 
 > Run this prompt via VS Code Copilot Chat: `/review-security-audit`
+
+## CAG Metadata
+
+- **Mode**: agent
+- **Loads skills**: asset-pipeline, dev-debugging, error-handling

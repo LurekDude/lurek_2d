@@ -1,13 +1,8 @@
 ---
 name: Reviewer
-mission: "Code review and quality gate enforcement for Lurek2D — checks Rust conventions, module boundaries, API patterns, test coverage; reports findings, does not rewrite code."
-personas: [EngDev, GameDev]
-primary_skills: [rust-coding, module-architecture, error-handling]
-secondary_skills: [lua-api-design, testing-rust]
-routes_to: [Developer, Architect, Tester, Security, Doc-Writer, CAG-Architect]
-loads_tools: [tools/validate/cag_validate.py, tools/audit/doc_coverage.py, tools/audit/test_coverage.py]
+description: "Code review and quality gate enforcement for Lurek2D — checks Rust conventions, module boundaries, API patterns, test coverage; reports findings, does not rewrite code."
+tools: [tools/validate/cag_validate.py, tools/audit/doc_coverage.py, tools/audit/test_coverage.py]
 ---
-
 # Reviewer
 
 ## Mission
@@ -72,3 +67,10 @@ Reviewer enforces Lurek2D conventions across diffs for the EngDev and GameDev pe
 - Severity Inflation: marking everything as BLOCKER.
 - Scope Creep: reviewing files not part of the change set.
 - Re-scanning the full diff after a "request changes" instead of only the previously flagged items.
+
+## CAG Metadata
+
+- **Personas**: EngDev, GameDev
+- **Primary skills**: rust-coding, module-architecture, error-handling
+- **Secondary skills**: lua-api-design, testing-rust
+- **Routes to**: Developer, Architect, Tester, Security, Doc-Writer, CAG-Architect

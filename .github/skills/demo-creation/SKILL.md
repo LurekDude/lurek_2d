@@ -1,13 +1,7 @@
 ---
 name: demo-creation
 description: "Load this skill when creating one or more new demo projects in content/demos/. Use when: scaffolding a demo from a genre or feature description; generating conf.lua + main.lua + README.md + screen.png; registering a new demo in content/demos/README.md; using content/library/ modules alongside lurek.* API; creating batches of demos from a list of genres or specific needs. Skip it for content/examples/ single-file scripts (use examples-management skill), test writing, or engine Rust code."
-companion_files:
-  examples: [examples/step-3-write-main-lua.lua, examples/step-4-library-modules.lua, examples/step-4-library-modules-2.lua]
-  templates: [templates/step-2-write-conf-toml.toml, templates/step-2-write-conf-toml-2.toml]
-  snippets: [snippets/step-5-write-readme-md.md, snippets/notes.txt, snippets/notes-2.ps1, snippets/step-7-register-in-content-demos.md, snippets/step-7-register-in-content-demos-2.md, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # demo-creation
 
 ## Mission

@@ -1,13 +1,7 @@
 ---
 name: analytics
 description: "Load this skill when collecting, parsing, or acting on diagnostic data from Lurek2D log files, performance counters, telemetry events, or game session records: structuring game events for analysis, extracting performance metrics from RUST_LOG output, finding crash patterns, using data to drive game balance or design decisions, or building an in-game telemetry pipeline. Use for: log parsing, session event recording, crash frequency analysis, performance histogram analysis, data-driven game balance. Skip it for live runtime debugging (use dev-debugging skill) or setting up log output (use logging skill)."
-companion_files:
-  examples: [examples/finding-performance-spikes-python.py, examples/lua-recording-helpers.lua, examples/lua-recording-helpers-2.lua, examples/record-for-performance-analysis.lua, examples/death-heatmap-python.py]
-  templates: []
-  snippets: [snippets/collecting-engine-logs.ps1, snippets/extracting-frame-times.ps1, snippets/finding-errors-and-warnings.ps1, snippets/event-schema.txt, snippets/level-completion-funnel-powershell.ps1, snippets/extended-notes.md]
-related_skills: []
 ---
-
 # analytics
 
 ## Mission

@@ -1,13 +1,8 @@
 ---
 name: Player
-mission: "Subjectively review Lurek2D demos, examples, and API proposals through named player personas; report fun and friction — never check correctness."
-personas: [GameDev, Player, GameTest]
-primary_skills: [lua-scripting, lua-api-design]
-secondary_skills: [examples-management, documentation]
-routes_to: [Lua-Designer, Doc-Writer, Developer, Debugger, Manager, CAG-Architect]
-loads_tools: [tools/audit/example_coverage.py]
+description: "Subjectively review Lurek2D demos, examples, and API proposals through named player personas; report fun and friction — never check correctness."
+tools: [tools/audit/example_coverage.py]
 ---
-
 # Player
 
 ## Mission
@@ -73,3 +68,10 @@ Player is the only Lurek2D agent where feeling matters more than correctness. It
 - Mismatched Persona: judging a beginner tutorial through Riley's expectations or an advanced API through Jamie's.
 - Correctness review checks (clippy, missing tests, unsafe code) — that is `Reviewer`'s job.
 - Asking the user for paths instead of searching `content/demos/` yourself.
+
+## CAG Metadata
+
+- **Personas**: GameDev, Player, GameTest
+- **Primary skills**: lua-scripting, lua-api-design
+- **Secondary skills**: examples-management, documentation
+- **Routes to**: Lua-Designer, Doc-Writer, Developer, Debugger, Manager, CAG-Architect
