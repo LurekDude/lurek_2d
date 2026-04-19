@@ -202,6 +202,27 @@ impl Transform {
     pub fn matrix(&self) -> &Mat3 {
         &self.matrix
     }
+
+    /// Decomposes this transform's matrix into translation, rotation, and scale.
+    ///
+    /// Assumes the matrix was built from translate → rotate → scale (no shear).
+    /// The rotation is returned in radians.
+    ///
+    /// # Returns
+    /// `(x, y, angle, scale_x, scale_y)`.
+    pub fn decompose(&self) -> (f32, f32, f32, f32, f32) {
+        let m = &self.matrix.m;
+        // Mat3 is row-major (m[row][col]); 2D affine layout is:
+        //   | a c tx |     m[0] = [a, c, tx]
+        //   | b d ty |     m[1] = [b, d, ty]
+        //   | 0 0  1 |     m[2] = [0, 0, 1]
+        let tx = m[0][2];
+        let ty = m[1][2];
+        let sx = (m[0][0] * m[0][0] + m[1][0] * m[1][0]).sqrt();
+        let sy = (m[0][1] * m[0][1] + m[1][1] * m[1][1]).sqrt();
+        let angle = m[1][0].atan2(m[0][0]);
+        (tx, ty, angle, sx, sy)
+    }
 }
 
 impl Default for Transform {

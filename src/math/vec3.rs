@@ -56,6 +56,17 @@ impl Vec3 {
         Self::new(1.0, 1.0, 1.0)
     }
 
+    /// Creates a vector with all three components set to `v`.
+    ///
+    /// # Parameters
+    /// - `v` — Value for `x`, `y`, and `z`.
+    ///
+    /// # Returns
+    /// `Vec3 { x: v, y: v, z: v }`.
+    pub fn splat(v: f32) -> Self {
+        Self::new(v, v, v)
+    }
+
     /// Dot product of this vector and `other`.
     ///
     /// # Parameters

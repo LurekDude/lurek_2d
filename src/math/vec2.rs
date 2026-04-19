@@ -187,6 +187,29 @@ impl Vec2 {
     pub fn cross(self, other: Vec2) -> f32 {
         self.x * other.y - self.y * other.x
     }
+
+    /// Creates a unit vector from an angle in radians, measured from the positive X axis.
+    ///
+    /// # Parameters
+    /// - `radians` — Angle in radians.
+    ///
+    /// # Returns
+    /// `Vec2` — Unit vector `(cos(radians), sin(radians))`.
+    pub fn from_angle(radians: f32) -> Vec2 {
+        let (sin, cos) = radians.sin_cos();
+        Vec2 { x: cos, y: sin }
+    }
+
+    /// Reflects this vector about a surface normal (normal must be unit length).
+    ///
+    /// # Parameters
+    /// - `normal` — Unit-length surface normal.
+    ///
+    /// # Returns
+    /// `Vec2` — Reflected vector.
+    pub fn reflect(self, normal: Vec2) -> Vec2 {
+        self - normal * (2.0 * self.dot(normal))
+    }
 }
 
 impl Add for Vec2 {

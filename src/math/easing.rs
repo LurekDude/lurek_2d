@@ -251,6 +251,29 @@ pub fn ease_out_elastic(t: f32) -> f32 {
     2.0_f32.powf(-10.0 * t) * ((t - p / 4.0) * 2.0 * PI / p).sin() + 1.0
 }
 
+/// Elastic ease-in-out — spring-like overshoot at both ends.
+///
+/// # Parameters
+/// - `t` — normalised progress value in `[0.0, 1.0]`
+///
+/// # Returns
+/// Eased output (may overshoot for elastic, back, and bounce curves).
+pub fn ease_in_out_elastic(t: f32) -> f32 {
+    if t <= 0.0 {
+        return 0.0;
+    }
+    if t >= 1.0 {
+        return 1.0;
+    }
+    let p = 0.45_f32;
+    let s = p / 4.0;
+    if t < 0.5 {
+        -0.5 * 2.0_f32.powf(20.0 * t - 10.0) * ((2.0 * t - 1.0 - s) * 2.0 * PI / p).sin()
+    } else {
+        0.5 * 2.0_f32.powf(-20.0 * t + 10.0) * ((2.0 * t - 1.0 - s) * 2.0 * PI / p).sin() + 1.0
+    }
+}
+
 /// Bounce ease-out — simulates a bouncing ball landing.
 ///
 /// # Parameters
@@ -284,6 +307,21 @@ pub fn ease_in_bounce(t: f32) -> f32 {
     1.0 - ease_out_bounce(1.0 - t)
 }
 
+/// Bounce ease-in-out — bouncing at both ends.
+///
+/// # Parameters
+/// - `t` — normalised progress value in `[0.0, 1.0]`
+///
+/// # Returns
+/// Eased output; typically in `[0.0, 1.0]`.
+pub fn ease_in_out_bounce(t: f32) -> f32 {
+    if t < 0.5 {
+        0.5 * ease_in_bounce(2.0 * t)
+    } else {
+        0.5 * ease_out_bounce(2.0 * t - 1.0) + 0.5
+    }
+}
+
 /// Back ease-in — pulls back before accelerating past the start.
 ///
 /// # Parameters
@@ -309,13 +347,32 @@ pub fn ease_out_back(t: f32) -> f32 {
     u * u * ((s + 1.0) * u + s) + 1.0
 }
 
+/// Back ease-in-out — pulls back at start, overshoots at end.
+///
+/// # Parameters
+/// - `t` — normalised progress value in `[0.0, 1.0]`
+///
+/// # Returns
+/// Eased output (may overshoot for elastic, back, and bounce curves).
+pub fn ease_in_out_back(t: f32) -> f32 {
+    let s = 1.70158_f32 * 1.525;
+    if t < 0.5 {
+        let t2 = 2.0 * t;
+        0.5 * t2 * t2 * ((s + 1.0) * t2 - s)
+    } else {
+        let t2 = 2.0 * t - 2.0;
+        0.5 * (t2 * t2 * ((s + 1.0) * t2 + s) + 2.0)
+    }
+}
+
 /// Looks up an easing function by name and applies it to progress value `t`.
 ///
 /// Supported names (case-insensitive): `"linear"`, `"inQuad"`, `"outQuad"`,
 /// `"inOutQuad"`, `"inCubic"`, `"outCubic"`, `"inOutCubic"`, `"inQuart"`,
 /// `"outQuart"`, `"inOutQuart"`, `"inSine"`, `"outSine"`, `"inOutSine"`,
 /// `"inExpo"`, `"outExpo"`, `"inOutExpo"`, `"inElastic"`, `"outElastic"`,
-/// `"outBounce"`, `"inBounce"`, `"inBack"`, `"outBack"`.
+/// `"inOutElastic"`, `"outBounce"`, `"inBounce"`, `"inOutBounce"`,
+/// `"inBack"`, `"outBack"`, `"inOutBack"`.
 ///
 /// # Parameters
 /// - `name` — easing name string (case-insensitive)
@@ -343,10 +400,13 @@ pub fn apply(name: &str, t: f32) -> Option<f32> {
         "inoutexpo" => Some(ease_in_out_expo(t)),
         "inelastic" => Some(ease_in_elastic(t)),
         "outelastic" => Some(ease_out_elastic(t)),
+        "inoutelastic" => Some(ease_in_out_elastic(t)),
         "outbounce" => Some(ease_out_bounce(t)),
         "inbounce" => Some(ease_in_bounce(t)),
+        "inoutbounce" => Some(ease_in_out_bounce(t)),
         "inback" => Some(ease_in_back(t)),
         "outback" => Some(ease_out_back(t)),
+        "inoutback" => Some(ease_in_out_back(t)),
         _ => None,
     }
 }

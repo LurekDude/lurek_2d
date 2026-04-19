@@ -1646,3 +1646,90 @@ mod voronoi_tests {
         assert!(cells.len() < pts.len(), "near-duplicate should be merged");
     }
 }
+
+// -- sphere ---------------------------------------------------------------
+
+mod sphere_tests {
+    use lurek2d::math::sphere::{
+        great_circle_distance, great_circle_path, lat_lon_to_unit, ray_sphere_intersect, rot_y,
+        unit_to_lat_lon, Mat3x3,
+    };
+    use lurek2d::math::Vec3;
+
+    fn approx(a: f32, b: f32, eps: f32) -> bool {
+        (a - b).abs() < eps
+    }
+
+    #[test]
+    fn lat_lon_round_trip_origin() {
+        let v = lat_lon_to_unit(0.0, 0.0);
+        assert!(approx(v.x, 1.0, 1e-5));
+        assert!(approx(v.y, 0.0, 1e-5));
+        assert!(approx(v.z, 0.0, 1e-5));
+        let (lat, lon) = unit_to_lat_lon(v);
+        assert!(approx(lat, 0.0, 1e-3));
+        assert!(approx(lon, 0.0, 1e-3));
+    }
+
+    #[test]
+    fn lat_lon_north_pole() {
+        let v = lat_lon_to_unit(90.0, 0.0);
+        assert!(approx(v.y, 1.0, 1e-5));
+        assert!(approx(v.x, 0.0, 1e-5));
+        assert!(approx(v.z, 0.0, 1e-5));
+    }
+
+    #[test]
+    fn great_circle_self_distance_is_zero() {
+        let d = great_circle_distance(45.0, -10.0, 45.0, -10.0);
+        assert!(d < 1e-5);
+    }
+
+    #[test]
+    fn great_circle_quarter_turn_is_pi_over_two() {
+        // Equator from (0,0) to (0,90) is a quarter great circle = π/2.
+        let d = great_circle_distance(0.0, 0.0, 0.0, 90.0);
+        assert!(approx(d, std::f32::consts::FRAC_PI_2, 1e-4));
+    }
+
+    #[test]
+    fn great_circle_path_endpoints_match() {
+        let pts = great_circle_path(45.0, -45.0, 30.0, 60.0, 5);
+        assert_eq!(pts.len(), 5);
+        assert!(approx(pts[0].0, 45.0, 1e-3));
+        assert!(approx(pts[0].1, -45.0, 1e-3));
+        assert!(approx(pts[4].0, 30.0, 1e-3));
+        assert!(approx(pts[4].1, 60.0, 1e-3));
+    }
+
+    #[test]
+    fn ray_sphere_hit_from_outside() {
+        // Ray from (5, 0, 0) toward -X hits unit sphere at t = 4.
+        let t = ray_sphere_intersect(Vec3::new(5.0, 0.0, 0.0), Vec3::new(-1.0, 0.0, 0.0), 1.0);
+        assert!(t.is_some());
+        assert!(approx(t.unwrap(), 4.0, 1e-4));
+    }
+
+    #[test]
+    fn ray_sphere_miss() {
+        let t = ray_sphere_intersect(Vec3::new(0.0, 5.0, 0.0), Vec3::new(0.0, 1.0, 0.0), 1.0);
+        assert!(t.is_none());
+    }
+
+    #[test]
+    fn rot_y_90_maps_x_to_minus_z() {
+        let m = rot_y(90.0);
+        let v = m.mul_vec(Vec3::new(1.0, 0.0, 0.0));
+        assert!(approx(v.x, 0.0, 1e-5));
+        assert!(approx(v.z, -1.0, 1e-5));
+    }
+
+    #[test]
+    fn mat3x3_identity_round_trip() {
+        let i = Mat3x3::identity();
+        let v = i.mul_vec(Vec3::new(2.0, 3.0, 4.0));
+        assert!(approx(v.x, 2.0, 1e-6));
+        assert!(approx(v.y, 3.0, 1e-6));
+        assert!(approx(v.z, 4.0, 1e-6));
+    }
+}

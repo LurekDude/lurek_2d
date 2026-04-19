@@ -109,6 +109,31 @@ impl CatmullRomSpline {
     pub fn is_empty(&self) -> bool {
         self.control_points.is_empty()
     }
+
+    /// Appends a control point to the end of the spline.
+    ///
+    /// # Parameters
+    /// - `point` — `(f32, f32)` to add.
+    pub fn add_point(&mut self, point: (f32, f32)) {
+        self.control_points.push(point);
+    }
+
+    /// Removes the control point at the given index.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    ///
+    /// # Parameters
+    /// - `index` — Zero-based index.
+    ///
+    /// # Returns
+    /// `Option<(f32, f32)>` — The removed point, or `None`.
+    pub fn remove_point(&mut self, index: usize) -> Option<(f32, f32)> {
+        if index < self.control_points.len() {
+            Some(self.control_points.remove(index))
+        } else {
+            None
+        }
+    }
 }
 
 /// A cubic Hermite spline segment defined by two endpoints and their tangents.

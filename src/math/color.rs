@@ -132,6 +132,71 @@ impl Color {
         let (r, g, b, _) = self.to_u8();
         ((r as u32) << 16) | ((g as u32) << 8) | (b as u32)
     }
+
+    /// Creates a color from a hex string such as `"#FF8000"`, `"#FF8000FF"`, or `"FF8000"`.
+    ///
+    /// Supports 6-char (RGB, alpha defaults to 1.0) and 8-char (RGBA) hex strings.
+    /// The leading `#` is optional.
+    ///
+    /// # Parameters
+    /// - `hex` — Hex color string.
+    ///
+    /// # Returns
+    /// `Option<Color>` — `None` if the string is malformed.
+    pub fn from_hex(hex: &str) -> Option<Color> {
+        let hex = hex.strip_prefix('#').unwrap_or(hex);
+        match hex.len() {
+            6 => {
+                let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
+                let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
+                let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
+                Some(Color::from_u8(r, g, b, 255))
+            }
+            8 => {
+                let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
+                let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
+                let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
+                let a = u8::from_str_radix(&hex[6..8], 16).ok()?;
+                Some(Color::from_u8(r, g, b, a))
+            }
+            _ => None,
+        }
+    }
+
+    /// Converts the color to HSL (hue, saturation, lightness).
+    ///
+    /// # Returns
+    /// `(f32, f32, f32)` — `(h, s, l)` where h is in degrees `[0, 360)`, s and l in `[0, 1]`.
+    pub fn to_hsl(&self) -> (f32, f32, f32) {
+        let max = self.r.max(self.g).max(self.b);
+        let min = self.r.min(self.g).min(self.b);
+        let l = (max + min) / 2.0;
+
+        if (max - min).abs() < 1e-7 {
+            return (0.0, 0.0, l);
+        }
+
+        let d = max - min;
+        let s = if l > 0.5 {
+            d / (2.0 - max - min)
+        } else {
+            d / (max + min)
+        };
+
+        let h = if (max - self.r).abs() < 1e-7 {
+            let mut h = (self.g - self.b) / d;
+            if self.g < self.b {
+                h += 6.0;
+            }
+            h
+        } else if (max - self.g).abs() < 1e-7 {
+            (self.b - self.r) / d + 2.0
+        } else {
+            (self.r - self.g) / d + 4.0
+        };
+
+        (h * 60.0, s, l)
+    }
 }
 
 impl Default for Color {
@@ -201,4 +266,49 @@ pub fn linear_to_gamma(c: f32) -> f32 {
     } else {
         1.055 * c.powf(1.0 / 2.4) - 0.055
     }
+}
+
+/// Convert an HSL color to a `Color` (alpha defaults to 1.0).
+///
+/// # Parameters
+/// - `h` — Hue in degrees `[0, 360)`.
+/// - `s` — Saturation in `[0.0, 1.0]`.
+/// - `l` — Lightness in `[0.0, 1.0]`.
+///
+/// # Returns
+/// `Color` — Fully opaque color.
+pub fn hsl_to_rgb(h: f32, s: f32, l: f32) -> Color {
+    if s.abs() < 1e-7 {
+        return Color::new(l, l, l, 1.0);
+    }
+
+    let q = if l < 0.5 {
+        l * (1.0 + s)
+    } else {
+        l + s - l * s
+    };
+    let p = 2.0 * l - q;
+    let h = h / 360.0;
+
+    let hue_to_rgb = |p: f32, q: f32, mut t: f32| -> f32 {
+        if t < 0.0 { t += 1.0; }
+        if t > 1.0 { t -= 1.0; }
+        if t < 1.0 / 6.0 {
+            return p + (q - p) * 6.0 * t;
+        }
+        if t < 1.0 / 2.0 {
+            return q;
+        }
+        if t < 2.0 / 3.0 {
+            return p + (q - p) * (2.0 / 3.0 - t) * 6.0;
+        }
+        p
+    };
+
+    Color::new(
+        hue_to_rgb(p, q, h + 1.0 / 3.0),
+        hue_to_rgb(p, q, h),
+        hue_to_rgb(p, q, h - 1.0 / 3.0),
+        1.0,
+    )
 }

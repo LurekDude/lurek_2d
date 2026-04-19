@@ -112,4 +112,59 @@ impl Rect {
             Rect::new(0.0, 0.0, 0.0, 0.0)
         }
     }
+
+    /// Returns the smallest rectangle that contains both `self` and `other`.
+    ///
+    /// # Parameters
+    /// - `other` — `&Rect`.
+    ///
+    /// # Returns
+    /// `Rect` — Bounding rectangle.
+    pub fn union(&self, other: &Rect) -> Rect {
+        let left = self.x.min(other.x);
+        let top = self.y.min(other.y);
+        let right = (self.x + self.width).max(other.x + other.width);
+        let bottom = (self.y + self.height).max(other.y + other.height);
+        Rect::new(left, top, right - left, bottom - top)
+    }
+
+    /// Creates a rectangle centered at `(cx, cy)` with the given width and height.
+    ///
+    /// # Parameters
+    /// - `cx` — Center X.
+    /// - `cy` — Center Y.
+    /// - `w` — Width.
+    /// - `h` — Height.
+    ///
+    /// # Returns
+    /// `Rect`.
+    pub fn from_center(cx: f32, cy: f32, w: f32, h: f32) -> Rect {
+        Rect::new(cx - w / 2.0, cy - h / 2.0, w, h)
+    }
+
+    /// Creates the smallest axis-aligned bounding rectangle that contains all given points.
+    ///
+    /// Returns a zero-area rectangle at the origin if the slice is empty.
+    ///
+    /// # Parameters
+    /// - `points` — A slice of `(f32, f32)` positions.
+    ///
+    /// # Returns
+    /// `Rect` — Bounding rectangle.
+    pub fn from_points(points: &[(f32, f32)]) -> Rect {
+        if points.is_empty() {
+            return Rect::new(0.0, 0.0, 0.0, 0.0);
+        }
+        let mut min_x = f32::MAX;
+        let mut min_y = f32::MAX;
+        let mut max_x = f32::MIN;
+        let mut max_y = f32::MIN;
+        for &(px, py) in points {
+            if px < min_x { min_x = px; }
+            if py < min_y { min_y = py; }
+            if px > max_x { max_x = px; }
+            if py > max_y { max_y = py; }
+        }
+        Rect::new(min_x, min_y, max_x - min_x, max_y - min_y)
+    }
 }
