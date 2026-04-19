@@ -3444,6 +3444,70 @@ function DataView:getUInt32(offset) end
 ---@return integer
 function DataView:getUInt8(offset) end
 
+--- Write-cursor wrapper for the `lurek.data` module.
+---@class DataWriter
+local DataWriter = {}
+
+--- Returns the total buffer length.
+---@return integer
+function DataWriter:len() end
+
+--- Moves the write cursor to the given position.
+---@param pos any
+function DataWriter:seek(pos) end
+
+--- Returns the current write cursor position.
+---@return integer
+function DataWriter:tell() end
+
+--- Returns the buffer contents as a Lua string.
+---@return string
+function DataWriter:toBytes() end
+
+--- Writes raw bytes from a Lua string.
+---@param value string
+function DataWriter:writeBytes(value) end
+
+--- Writes a 32-bit LE float.
+---@param v any
+function DataWriter:writeF32LE(v) end
+
+--- Writes a 64-bit LE float.
+---@param v any
+function DataWriter:writeF64LE(v) end
+
+--- Writes a signed 16-bit LE integer.
+---@param v any
+function DataWriter:writeI16LE(v) end
+
+--- Writes a signed 32-bit LE integer.
+---@param v any
+function DataWriter:writeI32LE(v) end
+
+--- Writes a signed 8-bit integer.
+---@param v any
+function DataWriter:writeI8(v) end
+
+--- Writes a length-prefixed UTF-8 string (4-byte LE length + bytes).
+---@param s any
+function DataWriter:writeString(s) end
+
+--- Writes an unsigned 16-bit BE integer.
+---@param v any
+function DataWriter:writeU16BE(v) end
+
+--- Writes an unsigned 16-bit LE integer.
+---@param v any
+function DataWriter:writeU16LE(v) end
+
+--- Writes an unsigned 32-bit LE integer.
+---@param v any
+function DataWriter:writeU32LE(v) end
+
+--- Writes an unsigned 8-bit integer.
+---@param v any
+function DataWriter:writeU8(v) end
+
 --- Lua-side fixed-capacity ring buffer that holds any Lua value.
 ---@class RingBuffer
 local RingBuffer = {}
@@ -3578,6 +3642,10 @@ function lurek.data.newDataView(raw, offset, size) end
 ---@param capacity any
 ---@return RingBuffer
 function lurek.data.newRingBuffer(capacity) end
+
+--- Creates a new write-cursor for building binary data.
+---@return DataWriter
+function lurek.data.newWriter() end
 
 --- Packs values into a binary byte string using the format string.
 ---@param fmt any
@@ -5873,6 +5941,11 @@ function lurek.filesystem.isFile(path) end
 ---@return function
 function lurek.filesystem.lines(path) end
 
+--- Returns a sorted list of all files under `path`, recursively.
+---@param path any
+---@return table
+function lurek.filesystem.listRecursive(path) end
+
 --- Loads and compiles a Lua file from the VFS, returning it as a callable function.
 ---@param path any
 ---@return function
@@ -5961,6 +6034,296 @@ function lurek.filesystem.watchPath(path) end
 ---@param data any
 ---@return nil
 function lurek.filesystem.write(path, data) end
+
+---@class lurek.globe
+lurek.globe = {}
+
+--- Lua-accessible handle to a `Globe` inside a `GlobeRegistry`.
+---@class Globe
+local Globe = {}
+
+--- Add an arc (great-circle path between two lat/lon points).
+---@param lat1 any
+---@param lon1 any
+---@param lat2 any
+---@param lon2 any
+---@param steps? any (optional)
+---@return integer
+function Globe:addArc(lat1, lon1, lat2, lon2, steps) end
+
+--- Add a text label. Returns label ID.
+---@param ltype any
+---@param lat any
+---@param lon any
+---@param text any
+---@return integer
+function Globe:addLabel(ltype, lat, lon, text) end
+
+--- Add or replace a named thematic layer.
+---@param name any
+---@param z_order? any (optional)
+function Globe:addLayer(name, z_order) end
+
+--- Add a marker. Returns marker ID.
+---@param mtype any
+---@param lat any
+---@param lon any
+---@param label? any (optional)
+---@return integer
+function Globe:addMarker(mtype, lat, lon, label) end
+
+--- Adds a province from a table {id, centroid={lat,lon}, vertices={{lat,lon},...},
+---@param p any
+---@return boolean
+function Globe:addProvince(p) end
+
+--- Find the shortest province path from `from_id` to `to_id`.
+---@param from_id any
+---@param to_id any
+---@return table<integer>?
+function Globe:findPath(from_id, to_id) end
+
+--- Get the current camera (lat, lon, zoom).
+---@return number
+function Globe:getCamera() end
+
+--- Returns the current LOD tier as a string: "far", "mid", or "near".
+---@return string
+function Globe:getLod() end
+
+--- Get a string attribute from a marker.
+---@param id any
+---@param key any
+---@return string?
+function Globe:getMarkerAttr(id, key) end
+
+--- Returns the globe name.
+---@return string
+function Globe:getName() end
+
+--- Returns the neighbor IDs of a province.
+---@param id any
+---@return table<integer>
+function Globe:getNeighbors(id) end
+
+--- Gets a string attribute from a province.
+---@param id any
+---@param key any
+---@return string?
+function Globe:getProvinceAttr(id, key) end
+
+--- Get time of day.
+---@return number
+function Globe:getTimeOfDay() end
+
+--- Hide a province for a viewer.
+---@param viewer any
+---@param id any
+function Globe:hideProvince(viewer, id) end
+
+--- Returns true if the province is visible to the viewer.
+---@param viewer any
+---@param id any
+---@return boolean
+function Globe:isVisible(viewer, id) end
+
+--- Move a marker to a new lat/lon.
+---@param id any
+---@param lat any
+---@param lon any
+function Globe:moveMarker(id, lat, lon) end
+
+--- Pan the orbit camera by delta-latitude and delta-longitude (degrees).
+---@param dlat any
+---@param dlon any
+function Globe:pan(dlat, dlon) end
+
+--- Returns the province ID under screen coordinates, or nil.
+---@param sx any
+---@param sy any
+---@return integer?
+function Globe:pick(sx, sy) end
+
+--- Returns (lat, lon) of the screen point on the globe surface, or nil.
+---@param sx any
+---@param sy any
+---@return number?
+function Globe:pickLatLon(sx, sy) end
+
+--- Returns the number of provinces.
+---@return integer
+function Globe:provinceCount() end
+
+--- Return all provinces reachable within `max_cost` steps from `start_id`.
+---@param start_id any
+---@param max_cost any
+---@return table<integer
+function Globe:reachable(start_id, max_cost) end
+
+--- Remove an arc by ID.
+---@param id any
+function Globe:removeArc(id) end
+
+--- Remove a label.
+---@param id any
+function Globe:removeLabel(id) end
+
+--- Remove a layer.
+---@param name any
+function Globe:removeLayer(name) end
+
+--- Remove a marker by ID.
+---@param id any
+---@return boolean
+function Globe:removeMarker(id) end
+
+--- Removes a province by ID. Returns true if it existed.
+---@param id any
+---@return boolean
+function Globe:removeProvince(id) end
+
+--- Reveal all provinces for a viewer.
+---@param viewer any
+function Globe:revealAll(viewer) end
+
+--- Reveal a province for a viewer.
+---@param viewer any
+---@param id any
+function Globe:revealProvince(viewer, id) end
+
+--- Set the faction/viewer whose fog mask filters rendering.
+---@param viewer? any (optional)
+function Globe:setActiveViewer(viewer) end
+
+--- Enable or disable province border rendering.
+---@param show any
+function Globe:setBorders(show) end
+
+--- Set the camera position directly.
+---@param lat any
+---@param lon any
+---@param z any
+function Globe:setCamera(lat, lon, z) end
+
+--- Update label text.
+---@param id any
+---@param text any
+function Globe:setLabelText(id, text) end
+
+--- Set label visibility.
+---@param id any
+---@param vis any
+function Globe:setLabelVisible(id, vis) end
+
+--- Set layer opacity (0.0–1.0).
+---@param name any
+---@param alpha any
+function Globe:setLayerAlpha(name, alpha) end
+
+--- Set a per-province color override on a layer.
+---@param layer any
+---@param id any
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+function Globe:setLayerColor(layer, id, r, g, b, a) end
+
+--- Set layer visibility.
+---@param name any
+---@param vis any
+function Globe:setLayerVisible(name, vis) end
+
+--- Set a string attribute on a marker.
+---@param id any
+---@param key any
+---@param val any
+function Globe:setMarkerAttr(id, key, val) end
+
+--- Set marker visibility.
+---@param id any
+---@param vis any
+function Globe:setMarkerVisible(id, vis) end
+
+--- Sets a string attribute on a province.
+---@param id any
+---@param key any
+---@param val any
+function Globe:setProvinceAttr(id, key, val) end
+
+--- Set planet rotation (degrees).
+---@param deg any
+function Globe:setRotation(deg) end
+
+--- Set time of day (0.0–24.0 hours).
+---@param t any
+function Globe:setTimeOfDay(t) end
+
+--- Advance globe simulation by dt seconds.
+---@param dt any
+function Globe:update(dt) end
+
+--- Zoom the camera by a multiplier (>1 zooms in, <1 zooms out).
+---@param factor any
+function Globe:zoom(factor) end
+
+--- Lua-accessible handle to the shared `GlobeRegistry`.
+---@class GlobeRegistry
+local GlobeRegistry = {}
+
+--- Get an existing globe by name, or nil.
+---@param name any
+---@return Globe?
+function GlobeRegistry:get(name) end
+
+--- Returns a table of all globe names.
+---@return table<string>
+function GlobeRegistry:names() end
+
+--- Create a globe with the given name and optional spec table.
+---@param name any
+---@param spec_tbl? any (optional)
+---@return Globe
+function GlobeRegistry:new(name, spec_tbl) end
+
+--- Remove a globe by name.
+---@param name any
+function GlobeRegistry:remove(name) end
+
+---@param name any
+function lurek.globe.get(name) end
+
+--- Great-circle distance between two lat/lon points (in unit-sphere radians).
+---@param la any
+---@param lo any
+---@param lb any
+---@param lo2 any
+---@return number
+function lurek.globe.greatCircleDistance(la, lo, lb, lo2) end
+
+--- Great-circle path as a table of {lat, lon} pairs.
+---@param la any
+---@param lo any
+---@param lb any
+---@param lo2 any
+---@param n any
+---@return table<{number
+function lurek.globe.greatCirclePath(la, lo, lb, lo2, n) end
+
+--- Convert lat/lon (degrees) to a unit-sphere Cartesian vector {x, y, z}.
+---@param lat any
+---@param lon any
+---@return {number
+function lurek.globe.latLonToUnit(lat, lon) end
+
+---@param name any
+---@param toml_src any
+---@param spec_tbl? any (optional)
+function lurek.globe.loadFromTOML(name, toml_src, spec_tbl) end
+
+---@param name any
+---@param spec_tbl? any (optional)
+function lurek.globe.new(name, spec_tbl) end
 
 ---@class lurek.graph
 lurek.graph = {}
@@ -8000,9 +8363,19 @@ function BezierCurve:translate(dx, dy) end
 ---@class CatmullRom
 local CatmullRom = {}
 
+--- Appends a control point to the spline.
+---@param x any
+---@param y any
+function CatmullRom:addPoint(x, y) end
+
 --- Number of control points.
 ---@return integer
 function CatmullRom:len() end
+
+--- Removes the control point at `index` (0-based) and returns it.
+---@param idx any
+---@return number
+function CatmullRom:removePoint(idx) end
 
 --- Sample the spline at global t in [0, 1].
 ---@param t any
@@ -8147,6 +8520,10 @@ local Transform = {}
 --- Returns a copy of this transform.
 ---@return Transform
 function Transform:clone() end
+
+--- Decomposes this transform into translation, rotation, and scale.
+---@return number
+function Transform:decompose() end
 
 --- Returns the 3x3 matrix as a flat table of 9 numbers (row-major).
 ---@return table
@@ -8305,6 +8682,11 @@ function Vec2:normalized() end
 --- Returns the perpendicular vector (-y, x).
 ---@return nil
 function Vec2:perpendicular() end
+
+--- Reflects this vector off a surface with the given normal.
+---@param normal any
+---@return Vec2
+function Vec2:reflect(normal) end
 
 --- Returns a new vector rotated by the given angle in radians.
 ---@param angle any
@@ -8493,6 +8875,13 @@ function lurek.math.circleIntersectsSegment(cx, cy, r, sx1, sy1, sx2, sy2) end
 ---@return number
 function lurek.math.clamp(x, lo, hi) end
 
+--- Clamps `v` between `min` and `max`.
+---@param v any
+---@param min any
+---@param max any
+---@return number
+function lurek.math.clamp(v, min, max) end
+
 --- Returns the closest point on segment (x1,y1)-(x2,y2) to point (px,py).
 ---@param px any
 ---@param py any
@@ -8565,6 +8954,11 @@ function lurek.math.floor(x) end
 ---@return number
 function lurek.math.fmod(x, y) end
 
+--- Parses a hex color string (#RRGGBB or #RRGGBBAA) into (r, g, b, a) floats.
+---@param hex any
+---@return number
+function lurek.math.fromHex(hex) end
+
 --- Converts a gamma-encoded sRGB value to linear space.
 ---@param c any
 ---@return number
@@ -8581,6 +8975,13 @@ function lurek.math.gammaToLinear(c) end
 ---@param m1y any
 ---@return HermiteSpline
 function lurek.math.hermite(p0x, p0y, p1x, p1y, m0x, m0y, m1x, m1y) end
+
+--- Converts HSL (h: 0-360, s: 0-1, l: 0-1) to RGBA (r, g, b, a) floats.
+---@param h any
+---@param s any
+---@param l any
+---@return number
+function lurek.math.hslToRgb(h, s, l) end
 
 --- Back ease-in — overshoots slightly before settling at the target.
 ---@param t any
@@ -8607,10 +9008,25 @@ function lurek.math.inElastic(t) end
 ---@return number
 function lurek.math.inExpo(t) end
 
+--- Back ease-in-out — overshoot on both ends.
+---@param t any
+---@return number
+function lurek.math.inOutBack(t) end
+
+--- Bounce ease-in-out — bouncing motion on both ends.
+---@param t any
+---@return number
+function lurek.math.inOutBounce(t) end
+
 --- Cubic ease-in-out — slow start and end with fast cubic middle.
 ---@param t any
 ---@return number
 function lurek.math.inOutCubic(t) end
+
+--- Elastic ease-in-out — spring-like oscillation on both ends.
+---@param t any
+---@return number
+function lurek.math.inOutElastic(t) end
 
 --- Exponential ease-in-out — very slow start and end with an exponential surge.
 ---@param t any
@@ -8646,6 +9062,13 @@ function lurek.math.inQuart(t) end
 ---@param t any
 ---@return number
 function lurek.math.inSine(t) end
+
+--- Returns the interpolation parameter t for `v` in [a, b].
+---@param a any
+---@param b any
+---@param v any
+---@return number
+function lurek.math.inverseLerp(a, b, v) end
 
 --- Returns true if the polygon (flat table {x1,y1,...}) is convex.
 ---@param pts any
@@ -8862,6 +9285,26 @@ function lurek.math.random(a, b) end
 ---@return integer
 function lurek.math.randomInt(lo, hi) end
 
+--- Creates a rectangle centered at (cx, cy) with the given width and height.
+---@param cx any
+---@param cy any
+---@param w any
+---@param h any
+---@return number
+function lurek.math.rectFromCenter(cx, cy, w, h) end
+
+--- Returns the union (bounding box) of two rectangles.
+---@param x1 any
+---@param y1 any
+---@param w1 any
+---@param h1 any
+---@param x2 any
+---@param y2 any
+---@param w2 any
+---@param h2 any
+---@return number
+function lurek.math.rectUnion(x1, y1, w1, h1, x2, y2, w2, h2) end
+
 --- Remaps `v` from [in_min, in_max] to [out_min, out_max].
 ---@param v any
 ---@param in_min any
@@ -8870,6 +9313,13 @@ function lurek.math.randomInt(lo, hi) end
 ---@param out_max any
 ---@return number
 function lurek.math.remap(v, in_min, in_max, out_min, out_max) end
+
+--- Converts RGBA floats to HSL (h: 0-360, s: 0-1, l: 0-1).
+---@param r any
+---@param g any
+---@param b any
+---@return number
+function lurek.math.rgbToHsl(r, g, b) end
 
 --- Returns x rounded to the nearest integer (half-up).
 ---@param x any
@@ -8893,6 +9343,11 @@ function lurek.math.segmentIntersectsSegment(x1, y1, x2, y2, x3, y3, x4, y4) end
 ---@return number
 function lurek.math.sign(x) end
 
+--- Returns -1, 0, or 1 depending on the sign of `v`.
+---@param v any
+---@return number
+function lurek.math.sign(v) end
+
 --- Returns 2D Simplex noise at (x, y) with the given seed.
 ---@param x any
 ---@param y any
@@ -8911,6 +9366,13 @@ function lurek.math.simplexNoise(x, y, z) end
 ---@param x any
 ---@return number
 function lurek.math.sin(x) end
+
+--- Hermite smoothstep between `edge0` and `edge1`.
+---@param edge0 any
+---@param edge1 any
+---@param x any
+---@return number
+function lurek.math.smoothstep(edge0, edge1, x) end
 
 --- Returns the square root of x.
 ---@param x any
@@ -16241,6 +16703,12 @@ local Scheduler = {}
 ---@return integer
 function Scheduler:after(delay, func) end
 
+--- Schedules a callback to fire once after `n` frames.
+---@param n any
+---@param func any
+---@return integer
+function Scheduler:afterFrames(n, func) end
+
 --- Cancels a scheduled event by its numeric ID.
 ---@param id any
 ---@return boolean
@@ -16332,6 +16800,10 @@ function Scheduler:setTimeScale(scale) end
 ---@param dt any
 ---@return integer
 function Scheduler:update(dt) end
+
+--- Advances frame-based events by one frame, firing due callbacks.
+---@return integer
+function Scheduler:updateFrames() end
 
 --- Schedules a one-shot callback that fires after `delay` wall-clock seconds,
 ---@param delay any

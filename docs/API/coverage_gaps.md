@@ -10,28 +10,92 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (0 items)
+## 1. Rust→Lua Gaps (21 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
 
-*All public Rust functions appear to be exposed to Lua.*
+### `globe::draw`
+
+- `emit_globe_frame` — Emit all render commands for one globe frame.  `default_font `src/globe/draw.rs:24`
+- `project_arc` — Pre-project a great-circle arc into a flat screenspace point `src/globe/draw.rs:197`
+
+### `globe::lighting`
+
+- `compute_intensities` — Batch-compute light intensities for all provinces.  Accepts  `src/globe/lighting.rs:58`
+- `province_intensity` — Compute the lighting intensity for a province centroid.  Ret `src/globe/lighting.rs:43`
+- `sun_direction` — Compute the sun direction as a world-space unit vector.  At  `src/globe/lighting.rs:18`
+- `terminator_alpha` — Compute a day/night terminator alpha for a province for a so `src/globe/lighting.rs:72`
+
+### `globe::loader`
+
+- `load_from_png_file` — Load provinces from a color-indexed PNG.  Each unique color  `src/globe/loader.rs:252`
+- `load_from_toml_file` — Load province data from the filesystem (synchronous). `src/globe/loader.rs:60`
+- `load_from_toml_str` — Parse a TOML province file from a string.  Expected structur `src/globe/loader.rs:52`
+
+### `globe::projection`
+
+- `build_view_matrix` — Build the composite rotation matrix for a frame.  Order: pla `src/globe/projection.rs:93`
+- `normalize_v3` — Normalize a `Vec3` (returns zero vector if near-zero length) `src/globe/projection.rs:207`
+- `project_point` — Project a single unit-sphere point through the view matrix t `src/globe/projection.rs:105`
+- `project_point_with_z` — Project a lat/lon point to screen and also return the camera `src/globe/projection.rs:173`
+- `project_province` — Project a province's boundary vertices. Returns `None` if th `src/globe/projection.rs:129`
+- `screen_delta_to_pan` — Convert a screen delta `(dx, dy)` in pixels to a globe pan ` `src/globe/projection.rs:193`
+
+### `math::sphere`
+
+- `axial_tilt_mat` — Rotation matrix around the X axis (axial-tilt convention). ` `src/math/sphere.rs:146`
+- `ray_sphere_intersect` — Rayâ€“sphere intersection. Returns the nearest non-negative  `src/math/sphere.rs:121`
+- `rot_x` — Rotation about the X axis by `angle_deg` degrees. `src/math/sphere.rs:151`
+- `rot_y` — Rotation about the Y axis (longitude / orbit yaw) by `angle_ `src/math/sphere.rs:158`
+- `rot_z` — Rotation about the Z axis by `angle_deg` degrees. `src/math/sphere.rs:165`
+- `unit_to_lat_lon` — Inverse of `lat_lon_to_unit`. Returns `(lat_deg, lon_deg)`.  `src/math/sphere.rs:63`
 
 ---
 
-## 2. Rust Docstring Issues (0 items)
+## 2. Rust Docstring Issues (12 items)
 
 Public Rust items with missing or very short descriptions (< 25 chars).
 These appear as `// (undocumented)` in `docs/API/rust-api.md`.
 
-*All public Rust items have adequate docstrings.*
+### `globe`
+
+- `mod` **draw** `src/globe/mod.rs:42`
+- `mod` **fog** `src/globe/mod.rs:37`
+- `mod` **label** `src/globe/mod.rs:40`
+- `mod` **layer** `src/globe/mod.rs:41`
+- `mod` **lighting** `src/globe/mod.rs:36`
+- `mod` **loader** `src/globe/mod.rs:38`
+- `mod` **marker** `src/globe/mod.rs:39`
+- `mod` **picking** `src/globe/mod.rs:35`
+- `mod` **projection** `src/globe/mod.rs:34`
+- `mod` **registry** `src/globe/mod.rs:43`
+- `mod` **topology** `src/globe/mod.rs:33`
+- `mod` **types** `src/globe/mod.rs:32`
 
 ---
 
-## 3. Lua Docstring Issues (1 items)
+## 3. Lua Docstring Issues (15 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
+
+### `globe`
+
+- `function` **`lurek.globe.get`** — *(no description)*
+- `function` **`lurek.globe.loadFromTOML`** — *(no description)*
+- `function` **`lurek.globe.new`** — *(no description)*
+- `method` **`Globe:getName`** — *"Returns the globe name."* (too short)
+- `method` **`Globe:getTimeOfDay`** — *"Get time of day."* (too short)
+- `method` **`Globe:removeArc`** — *"Remove an arc by ID."* (too short)
+- `method` **`Globe:removeLabel`** — *"Remove a label."* (too short)
+- `method` **`Globe:removeLayer`** — *"Remove a layer."* (too short)
+- `method` **`Globe:removeMarker`** — *"Remove a marker by ID."* (too short)
+- `method` **`Globe:setLabelText`** — *"Update label text."* (too short)
+- `method` **`Globe:setLabelVisible`** — *"Set label visibility."* (too short)
+- `method` **`Globe:setLayerVisible`** — *"Set layer visibility."* (too short)
+- `method` **`Globe:setMarkerVisible`** — *"Set marker visibility."* (too short)
+- `method` **`GlobeRegistry:remove`** — *"Remove a globe by name."* (too short)
 
 ### `mods`
 
