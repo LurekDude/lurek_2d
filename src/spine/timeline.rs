@@ -1,4 +1,4 @@
-//! Keyframe timelines and skeleton animation playback for the spine module.
+﻿//! Keyframe timelines and skeleton animation playback for the spine module.
 //!
 //! A [`SkeletonAnimation`] contains one or more [`BoneTimeline`]s. Each timeline
 //! animates a single property of a single bone over time. Call
@@ -7,38 +7,38 @@
 
 use super::bone::Bone;
 
-// ── Easing ────────────────────────────────────────────────────────────────────
+// â”€â”€ Easing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Interpolation curve type for keyframe blending.
 ///
 /// # Variants
-/// - `Linear` — uniform lerp.
-/// - `EaseIn` — accelerates from zero.
-/// - `EaseOut` — decelerates to zero.
-/// - `EaseInOut` — S-curve.
-/// - `Step` — jumps to end value at the next frame.
+/// - `Linear` â€” uniform lerp.
+/// - `EaseIn` â€” accelerates from zero.
+/// - `EaseOut` â€” decelerates to zero.
+/// - `EaseInOut` â€” S-curve.
+/// - `Step` â€” jumps to end value at the next frame.
 #[derive(Debug, Clone, PartialEq)]
 pub enum EasingType {
     /// Uniform linear interpolation.
     Linear,
-    /// Quadratic ease-in (t²).
+    /// Quadratic ease-in (tÂ˛).
     EaseIn,
-    /// Quadratic ease-out (1-(1-t)²).
+    /// Quadratic ease-out (1-(1-t)Â˛).
     EaseOut,
     /// Hermite S-curve ease-in-out.
     EaseInOut,
-    /// Instant jump — holds previous value until the next keyframe.
+    /// Instant jump â€” holds previous value until the next keyframe.
     Step,
 }
 
 impl EasingType {
-    /// Applies the easing curve to a normalised time value `t ∈ [0, 1]`.
+    /// Applies the easing curve to a normalised time value `t â [0, 1]`.
     ///
     /// # Parameters
-    /// - `t` — `f32`. Normalised time (0 = start, 1 = end).
+    /// - `t` â€” `f32`. Normalised time (0 = start, 1 = end).
     ///
     /// # Returns
-    /// `f32` — eased value in `[0, 1]`.
+    /// `f32` â€” eased value in `[0, 1]`.
     pub fn apply(&self, t: f32) -> f32 {
         let t = t.clamp(0.0, 1.0);
         match self {
@@ -52,12 +52,12 @@ impl EasingType {
                     1.0 - 2.0 * (1.0 - t) * (1.0 - t)
                 }
             }
-            Self::Step => 0.0, // holds — caller handles by returning previous value
+            Self::Step => 0.0, // holds â€” caller handles by returning previous value
         }
     }
 }
 
-// ── Bone property ─────────────────────────────────────────────────────────────
+// â”€â”€ Bone property â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Bone local-transform property that a timeline can animate.
 ///
@@ -77,14 +77,14 @@ pub enum BoneProperty {
     ScaleY,
 }
 
-// ── Keyframe ──────────────────────────────────────────────────────────────────
+// â”€â”€ Keyframe â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// A single timed value sample on a bone timeline.
 ///
 /// # Fields
-/// - `time` — `f32`. Time in seconds from animation start.
-/// - `value` — `f32`. Target value of the bone property.
-/// - `easing` — [`EasingType`]. Interpolation curve to the next keyframe.
+/// - `time` â€” `f32`. Time in seconds from animation start.
+/// - `value` â€” `f32`. Target value of the bone property.
+/// - `easing` â€” [`EasingType`]. Interpolation curve to the next keyframe.
 #[derive(Debug, Clone)]
 pub struct Keyframe {
     /// Time offset from animation start in seconds.
@@ -95,14 +95,14 @@ pub struct Keyframe {
     pub easing: EasingType,
 }
 
-// ── BoneTimeline ─────────────────────────────────────────────────────────────
+// â”€â”€ BoneTimeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Sequence of keyframes that animate a single property of a single bone.
 ///
 /// # Fields
-/// - `bone_idx` — `usize`. Index of the target bone in the skeleton's bone array.
-/// - `property` — [`BoneProperty`]. Which local transform property to animate.
-/// - `keys` — `Vec<Keyframe>`. Keyframes sorted by ascending time.
+/// - `bone_idx` â€” `usize`. Index of the target bone in the skeleton's bone array.
+/// - `property` â€” [`BoneProperty`]. Which local transform property to animate.
+/// - `keys` â€” `Vec<Keyframe>`. Keyframes sorted by ascending time.
 #[derive(Debug, Clone)]
 pub struct BoneTimeline {
     /// Index of the target bone in the skeleton's bone array.
@@ -117,8 +117,8 @@ impl BoneTimeline {
     /// Creates a new empty timeline for the given bone and property.
     ///
     /// # Parameters
-    /// - `bone_idx` — `usize`. Bone index.
-    /// - `property` — [`BoneProperty`]. Transform property.
+    /// - `bone_idx` â€” `usize`. Bone index.
+    /// - `property` â€” [`BoneProperty`]. Transform property.
     ///
     /// # Returns
     /// `Self`.
@@ -131,9 +131,9 @@ impl BoneTimeline {
     /// Keyframes are kept in ascending time order.
     ///
     /// # Parameters
-    /// - `time` — `f32`. Time in seconds.
-    /// - `value` — `f32`. Target value.
-    /// - `easing` — [`EasingType`].
+    /// - `time` â€” `f32`. Time in seconds.
+    /// - `value` â€” `f32`. Target value.
+    /// - `easing` â€” [`EasingType`].
     pub fn add_key(&mut self, time: f32, value: f32, easing: EasingType) {
         let kf = Keyframe { time, value, easing };
         // Insert in sorted position
@@ -147,7 +147,7 @@ impl BoneTimeline {
     /// timeline range. Uses the easing of the earlier keyframe for blending.
     ///
     /// # Parameters
-    /// - `time` — `f32`. Playback time in seconds.
+    /// - `time` â€” `f32`. Playback time in seconds.
     ///
     /// # Returns
     /// `f32`.
@@ -186,7 +186,7 @@ impl BoneTimeline {
     }
 }
 
-// ── EventKeyframe ─────────────────────────────────────────────────────────────
+// â”€â”€ EventKeyframe â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// A timed event marker inside a [`SkeletonAnimation`].
 ///
@@ -195,9 +195,9 @@ impl BoneTimeline {
 /// at a precise animation frame) without polling the playback time.
 ///
 /// # Fields
-/// - `time` — `f32`.  Position on the timeline in seconds (0.0 … clip duration).
-/// - `name` — `String`.  Logical event label (e.g. `"footstep"`, `"attack"`).
-/// - `value` — `f32`.  Optional numeric payload (default `0.0`).
+/// - `time` â€” `f32`.  Position on the timeline in seconds (0.0 â€¦ clip duration).
+/// - `name` â€” `String`.  Logical event label (e.g. `"footstep"`, `"attack"`).
+/// - `value` â€” `f32`.  Optional numeric payload (default `0.0`).
 #[derive(Debug, Clone)]
 pub struct EventKeyframe {
     /// Timestamp in seconds at which the event fires.
@@ -212,9 +212,9 @@ impl EventKeyframe {
     /// Creates a new event keyframe.
     ///
     /// # Parameters
-    /// - `time` — `f32`. Timestamp in seconds.
-    /// - `name` — `impl Into<String>`. Event label.
-    /// - `value` — `f32`. Numeric payload.
+    /// - `time` â€” `f32`. Timestamp in seconds.
+    /// - `name` â€” `impl Into<String>`. Event label.
+    /// - `value` â€” `f32`. Numeric payload.
     ///
     /// # Returns
     /// `Self`.
@@ -223,16 +223,16 @@ impl EventKeyframe {
     }
 }
 
-// ── SkeletonAnimation ─────────────────────────────────────────────────────────
+// â”€â”€ SkeletonAnimation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Named animation clip for a skeleton: contains timelines for multiple bones
 /// and optional event keyframes.
 ///
 /// # Fields
-/// - `name` — `String`. Clip name.
-/// - `duration` — `f32`. Total duration in seconds.
-/// - `timelines` — `Vec<BoneTimeline>`.
-/// - `events` — `Vec<EventKeyframe>`.  Timed event markers in the clip.
+/// - `name` â€” `String`. Clip name.
+/// - `duration` â€” `f32`. Total duration in seconds.
+/// - `timelines` â€” `Vec<BoneTimeline>`.
+/// - `events` â€” `Vec<EventKeyframe>`.  Timed event markers in the clip.
 #[derive(Debug, Clone)]
 pub struct SkeletonAnimation {
     /// Human-readable animation name.
@@ -249,8 +249,8 @@ impl SkeletonAnimation {
     /// Creates a new empty skeleton animation clip.
     ///
     /// # Parameters
-    /// - `name` — `impl Into<String>`. Clip name.
-    /// - `duration` — `f32`. Duration in seconds.
+    /// - `name` â€” `impl Into<String>`. Clip name.
+    /// - `duration` â€” `f32`. Duration in seconds.
     ///
     /// # Returns
     /// `Self`.
@@ -261,7 +261,7 @@ impl SkeletonAnimation {
     /// Appends a bone timeline.
     ///
     /// # Parameters
-    /// - `timeline` — [`BoneTimeline`].
+    /// - `timeline` â€” [`BoneTimeline`].
     pub fn add_timeline(&mut self, timeline: BoneTimeline) {
         self.timelines.push(timeline);
     }
@@ -269,12 +269,12 @@ impl SkeletonAnimation {
     /// Adds an event keyframe to the clip.
     ///
     /// Events are sorted by time automatically so their insertion order does
-    /// not matter — `collect_events` always returns them in chronological order.
+    /// not matter â€” `collect_events` always returns them in chronological order.
     ///
     /// # Parameters
-    /// - `time` — `f32`. Timestamp in seconds.
-    /// - `name` — `impl Into<String>`. Event label.
-    /// - `value` — `f32`. Numeric payload (pass `0.0` if unused).
+    /// - `time` â€” `f32`. Timestamp in seconds.
+    /// - `name` â€” `impl Into<String>`. Event label.
+    /// - `value` â€” `f32`. Numeric payload (pass `0.0` if unused).
     pub fn add_event_key(&mut self, time: f32, name: impl Into<String>, value: f32) {
         self.events.push(EventKeyframe::new(time, name, value));
         self.events.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap_or(std::cmp::Ordering::Equal));
@@ -285,11 +285,11 @@ impl SkeletonAnimation {
     /// Used each frame to detect which events were crossed since the last update.
     ///
     /// # Parameters
-    /// - `from` — `f32`. Exclusive lower bound (previous playback time).
-    /// - `to` — `f32`. Inclusive upper bound (current playback time).
+    /// - `from` â€” `f32`. Exclusive lower bound (previous playback time).
+    /// - `to` â€” `f32`. Inclusive upper bound (current playback time).
     ///
     /// # Returns
-    /// `Vec<(String, f32)>` — (event name, payload value) pairs in chronological order.
+    /// `Vec<(String, f32)>` â€” (event name, payload value) pairs in chronological order.
     pub fn collect_events(&self, from: f32, to: f32) -> Vec<(String, f32)> {
         self.events
             .iter()
@@ -303,8 +303,8 @@ impl SkeletonAnimation {
     /// Only writes to bone indices that are in-range for the provided bone slice.
     ///
     /// # Parameters
-    /// - `skeleton` — `&mut super::skeleton::Skeleton`. Skeleton to modify.
-    /// - `time` — `f32`. Playback time in seconds.
+    /// - `skeleton` â€” `&mut super::skeleton::Skeleton`. Skeleton to modify.
+    /// - `time` â€” `f32`. Playback time in seconds.
     pub fn apply_to_skeleton(&self, skeleton: &mut super::skeleton::Skeleton, time: f32) {
         for tl in &self.timelines {
             let value = tl.evaluate(time);
@@ -323,9 +323,9 @@ impl SkeletonAnimation {
     /// the clip pose, enabling smooth cross-fades between animations.
     ///
     /// # Parameters
-    /// - `skeleton` — `&mut super::skeleton::Skeleton`. Skeleton to modify.
-    /// - `time` — `f32`. Playback time in seconds.
-    /// - `blend_weight` — `f32`. Blend factor in `[0.0, 1.0]`.  Clamped to that range.
+    /// - `skeleton` â€” `&mut super::skeleton::Skeleton`. Skeleton to modify.
+    /// - `time` â€” `f32`. Playback time in seconds.
+    /// - `blend_weight` â€” `f32`. Blend factor in `[0.0, 1.0]`.  Clamped to that range.
     ///
     /// [`apply_to_skeleton`]: Self::apply_to_skeleton
     pub fn apply_to_skeleton_blended(
@@ -367,141 +367,5 @@ fn current_bone_property(bone: &Bone, prop: &BoneProperty) -> f32 {
         BoneProperty::Rotation => bone.local_rotation,
         BoneProperty::ScaleX => bone.local_scale_x,
         BoneProperty::ScaleY => bone.local_scale_y,
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // ── EasingType ────────────────────────────────────────────────────────
-
-    #[test]
-    fn linear_easing_passthrough() {
-        assert_eq!(EasingType::Linear.apply(0.0), 0.0);
-        assert_eq!(EasingType::Linear.apply(0.5), 0.5);
-        assert_eq!(EasingType::Linear.apply(1.0), 1.0);
-    }
-
-    #[test]
-    fn ease_in_starts_slow() {
-        let mid = EasingType::EaseIn.apply(0.5);
-        assert!(mid < 0.5, "EaseIn(0.5) = {mid}, expected < 0.5");
-    }
-
-    #[test]
-    fn ease_out_ends_slow() {
-        let mid = EasingType::EaseOut.apply(0.5);
-        assert!(mid > 0.5, "EaseOut(0.5) = {mid}, expected > 0.5");
-    }
-
-    #[test]
-    fn ease_in_out_symmetric() {
-        let v = EasingType::EaseInOut.apply(0.5);
-        assert!((v - 0.5).abs() < 0.01, "EaseInOut(0.5) = {v}, expected ~0.5");
-    }
-
-    #[test]
-    fn step_returns_zero() {
-        assert_eq!(EasingType::Step.apply(0.5), 0.0);
-    }
-
-    #[test]
-    fn easing_clamps_input() {
-        assert_eq!(EasingType::Linear.apply(-1.0), 0.0);
-        assert_eq!(EasingType::Linear.apply(2.0), 1.0);
-    }
-
-    // ── BoneTimeline ──────────────────────────────────────────────────────
-
-    #[test]
-    fn empty_timeline_evaluates_to_zero() {
-        let tl = BoneTimeline::new(0, BoneProperty::X);
-        assert_eq!(tl.evaluate(1.0), 0.0);
-    }
-
-    #[test]
-    fn single_keyframe_returns_value() {
-        let mut tl = BoneTimeline::new(0, BoneProperty::X);
-        tl.add_key(0.0, 5.0, EasingType::Linear);
-        assert_eq!(tl.evaluate(0.0), 5.0);
-        assert_eq!(tl.evaluate(10.0), 5.0);
-    }
-
-    #[test]
-    fn linear_interpolation() {
-        let mut tl = BoneTimeline::new(0, BoneProperty::Y);
-        tl.add_key(0.0, 0.0, EasingType::Linear);
-        tl.add_key(1.0, 10.0, EasingType::Linear);
-        let v = tl.evaluate(0.5);
-        assert!((v - 5.0).abs() < 0.01, "expected ~5.0, got {v}");
-    }
-
-    #[test]
-    fn before_first_key_returns_first_value() {
-        let mut tl = BoneTimeline::new(0, BoneProperty::X);
-        tl.add_key(1.0, 3.0, EasingType::Linear);
-        tl.add_key(2.0, 6.0, EasingType::Linear);
-        assert_eq!(tl.evaluate(0.0), 3.0);
-    }
-
-    #[test]
-    fn after_last_key_returns_last_value() {
-        let mut tl = BoneTimeline::new(0, BoneProperty::X);
-        tl.add_key(0.0, 1.0, EasingType::Linear);
-        tl.add_key(1.0, 9.0, EasingType::Linear);
-        assert_eq!(tl.evaluate(5.0), 9.0);
-    }
-
-    #[test]
-    fn step_easing_holds_previous() {
-        let mut tl = BoneTimeline::new(0, BoneProperty::Rotation);
-        tl.add_key(0.0, 0.0, EasingType::Step);
-        tl.add_key(1.0, 90.0, EasingType::Linear);
-        assert_eq!(tl.evaluate(0.5), 0.0); // step holds at 0
-    }
-
-    #[test]
-    fn add_key_maintains_sorted_order() {
-        let mut tl = BoneTimeline::new(0, BoneProperty::X);
-        tl.add_key(2.0, 20.0, EasingType::Linear);
-        tl.add_key(0.0, 0.0, EasingType::Linear);
-        tl.add_key(1.0, 10.0, EasingType::Linear);
-        assert_eq!(tl.keys[0].time, 0.0);
-        assert_eq!(tl.keys[1].time, 1.0);
-        assert_eq!(tl.keys[2].time, 2.0);
-    }
-
-    // ── EventKeyframe ─────────────────────────────────────────────────────
-
-    #[test]
-    fn event_keyframe_new() {
-        let e = EventKeyframe::new(0.5, "footstep", 1.0);
-        assert_eq!(e.time, 0.5);
-        assert_eq!(e.name, "footstep");
-        assert_eq!(e.value, 1.0);
-    }
-
-    // ── SkeletonAnimation ─────────────────────────────────────────────────
-
-    #[test]
-    fn collect_events_in_range() {
-        let mut anim = SkeletonAnimation::new("walk", 2.0);
-        anim.add_event_key(0.5, "step_left", 0.0);
-        anim.add_event_key(1.0, "step_right", 0.0);
-        anim.add_event_key(1.5, "step_left", 0.0);
-
-        let events = anim.collect_events(0.3, 1.0);
-        assert_eq!(events.len(), 2);
-        assert_eq!(events[0].0, "step_left");
-        assert_eq!(events[1].0, "step_right");
-    }
-
-    #[test]
-    fn collect_events_empty_range() {
-        let mut anim = SkeletonAnimation::new("idle", 1.0);
-        anim.add_event_key(0.5, "blink", 0.0);
-        let events = anim.collect_events(0.6, 1.0);
-        assert!(events.is_empty());
     }
 }

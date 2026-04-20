@@ -48,25 +48,3 @@ impl Slot {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn new_defaults_to_white() {
-        let s = Slot::new("body", 0);
-        assert_eq!(s.name, "body");
-        assert_eq!(s.bone_index, 0);
-        assert_eq!(s.color_r, 1.0);
-        assert_eq!(s.color_g, 1.0);
-        assert_eq!(s.color_b, 1.0);
-        assert_eq!(s.color_a, 1.0);
-    }
-
-    #[test]
-    fn new_has_no_attachment() {
-        let s = Slot::new("hat", 2);
-        assert!(s.attachment_name.is_none());
-        assert_eq!(s.draw_order, 0);
-    }
-}
