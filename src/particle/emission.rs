@@ -1,4 +1,4 @@
-//! Particle spawn offset calculations for area distribution and emission shapes.
+﻿//! Particle spawn offset calculations for area distribution and emission shapes.
 
 use super::config::{AreaDistribution, EmissionShape, ParticleConfig};
 use super::math::{rand_normal, rand_range};
@@ -6,11 +6,11 @@ use super::math::{rand_normal, rand_range};
 /// Compute an emission offset `(dx, dy)` based on the config's area distribution.
 ///
 /// # Parameters
-/// - `config` — `&ParticleConfig`.
+/// - `config` â€” `&ParticleConfig`.
 ///
 /// # Returns
 /// `(f32, f32)`.
-pub(crate) fn emission_offset(config: &ParticleConfig) -> (f32, f32) {
+pub fn emission_offset(config: &ParticleConfig) -> (f32, f32) {
     let (dx, dy) = match config.area_distribution {
         AreaDistribution::None => (0.0, 0.0),
         AreaDistribution::Uniform => {
@@ -69,11 +69,11 @@ pub(crate) fn emission_offset(config: &ParticleConfig) -> (f32, f32) {
 /// Compute an emission offset `(dx, dy)` based on the emission shape.
 ///
 /// # Parameters
-/// - `shape` — `&EmissionShape`.
+/// - `shape` â€” `&EmissionShape`.
 ///
 /// # Returns
 /// `(f32, f32)`.
-pub(crate) fn emission_shape_offset(shape: &EmissionShape) -> (f32, f32) {
+pub fn emission_shape_offset(shape: &EmissionShape) -> (f32, f32) {
     match shape {
         EmissionShape::Point => (0.0, 0.0),
         EmissionShape::Circle { radius, fill } => {
@@ -95,7 +95,7 @@ pub(crate) fn emission_shape_offset(shape: &EmissionShape) -> (f32, f32) {
             outer_radius,
         } => {
             let angle = fastrand::f32() * 2.0 * std::f32::consts::PI;
-            // Uniform distribution within ring by sampling radius²
+            // Uniform distribution within ring by sampling radiusÂ˛
             let r_sq = rand_range(inner_radius * inner_radius, outer_radius * outer_radius);
             let r = r_sq.sqrt();
             (angle.cos() * r, angle.sin() * r)
@@ -153,108 +153,6 @@ pub(crate) fn emission_shape_offset(shape: &EmissionShape) -> (f32, f32) {
             let r = t * radius;
             (angle.cos() * r, angle.sin() * r)
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn emission_offset_none_is_zero() {
-        let cfg = ParticleConfig {
-            area_distribution: AreaDistribution::None,
-            ..ParticleConfig::default()
-        };
-        let (dx, dy) = emission_offset(&cfg);
-        assert!((dx).abs() < f32::EPSILON);
-        assert!((dy).abs() < f32::EPSILON);
-    }
-
-    #[test]
-    fn emission_offset_uniform_within_bounds() {
-        let mut cfg = ParticleConfig::default();
-        cfg.area_distribution = AreaDistribution::Uniform;
-        cfg.area_width = 100.0;
-        cfg.area_height = 50.0;
-        for _ in 0..100 {
-            let (dx, dy) = emission_offset(&cfg);
-            assert!(dx.abs() <= 50.0 + 1e-3);
-            assert!(dy.abs() <= 25.0 + 1e-3);
-        }
-    }
-
-    #[test]
-    fn emission_offset_ellipse_within_radius() {
-        let mut cfg = ParticleConfig::default();
-        cfg.area_distribution = AreaDistribution::Ellipse;
-        cfg.area_width = 20.0;
-        cfg.area_height = 20.0;
-        for _ in 0..100 {
-            let (dx, dy) = emission_offset(&cfg);
-            let dist = (dx * dx + dy * dy).sqrt();
-            assert!(dist <= 10.0 + 1e-3);
-        }
-    }
-
-    #[test]
-    fn emission_offset_area_angle_rotates() {
-        let mut cfg = ParticleConfig::default();
-        cfg.area_distribution = AreaDistribution::Uniform;
-        cfg.area_width = 100.0;
-        cfg.area_height = 0.0; // zero height — points lie on X axis
-        cfg.area_angle = std::f32::consts::FRAC_PI_2; // rotate 90°
-        let (dx, dy) = emission_offset(&cfg);
-        // After 90° rotation, X component maps to Y
-        assert!(dx.abs() < 1e-3 || dy.abs() > 0.0);
-    }
-
-    #[test]
-    fn emission_shape_point_is_zero() {
-        let (x, y) = emission_shape_offset(&EmissionShape::Point);
-        assert!((x).abs() < f32::EPSILON);
-        assert!((y).abs() < f32::EPSILON);
-    }
-
-    #[test]
-    fn emission_shape_circle_edge_only() {
-        let shape = EmissionShape::Circle { radius: 10.0, fill: false };
-        for _ in 0..50 {
-            let (x, y) = emission_shape_offset(&shape);
-            let dist = (x * x + y * y).sqrt();
-            assert!((dist - 10.0).abs() < 1e-3, "edge-only circle should be at radius");
-        }
-    }
-
-    #[test]
-    fn emission_shape_star_stays_bounded() {
-        let shape = EmissionShape::Star { points: 5, outer_radius: 20.0, inner_radius: 10.0 };
-        for _ in 0..100 {
-            let (x, y) = emission_shape_offset(&shape);
-            let dist = (x * x + y * y).sqrt();
-            assert!(dist <= 20.0 + 1e-3);
-        }
-    }
-
-    #[test]
-    fn emission_shape_spiral_stays_bounded() {
-        let shape = EmissionShape::Spiral { revolutions: 3.0, radius: 50.0 };
-        for _ in 0..100 {
-            let (x, y) = emission_shape_offset(&shape);
-            let dist = (x * x + y * y).sqrt();
-            assert!(dist <= 50.0 + 1e-3);
-        }
-    }
-
-    #[test]
-    fn border_rectangle_zero_perimeter_returns_zero() {
-        let mut cfg = ParticleConfig::default();
-        cfg.area_distribution = AreaDistribution::BorderRectangle;
-        cfg.area_width = 0.0;
-        cfg.area_height = 0.0;
-        let (dx, dy) = emission_offset(&cfg);
-        assert!((dx).abs() < f32::EPSILON);
-        assert!((dy).abs() < f32::EPSILON);
     }
 }
 

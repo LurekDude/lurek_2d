@@ -1,6 +1,6 @@
-//! Consolidated render-command interface for the particle module.
+﻿//! Consolidated render-command interface for the particle module.
 //!
-//! Pure CPU — no wgpu, winit, or mlua imports.  Provides the standard
+//! Pure CPU â€” no wgpu, winit, or mlua imports.  Provides the standard
 //! `generate_render_commands()` wrapper on [`ParticleSystem`] and
 //! [`Trail`] that delegates to the existing `build_render_commands()`
 //! methods with a zero world offset.
@@ -40,39 +40,3 @@ impl Trail {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::particle::config::ParticleConfig;
-    use crate::particle::emitter::ParticleSystem;
-    use crate::particle::trail::Trail;
-    use crate::render::renderer::RenderCommand;
-
-    #[test]
-    fn empty_system_gives_empty_commands() {
-        let sys = ParticleSystem::new(ParticleConfig::default());
-        let cmds = sys.generate_render_commands();
-        assert!(
-            cmds.is_empty(),
-            "a new emitter with no particles should produce no commands"
-        );
-    }
-
-    #[test]
-    fn generate_render_commands_matches_build() {
-        let sys = ParticleSystem::new(ParticleConfig::default());
-        let a = sys.generate_render_commands();
-        let b = sys.build_render_commands(0.0, 0.0);
-        assert_eq!(
-            a.len(),
-            b.len(),
-            "generate_render_commands must produce the same commands as build_render_commands(0, 0)"
-        );
-    }
-
-    #[test]
-    fn empty_trail_gives_empty_commands() {
-        let trail = Trail::new(2.0, 4.0);
-        let cmds: Vec<RenderCommand> = trail.generate_render_commands();
-        assert!(cmds.is_empty(), "an empty trail should produce no commands");
-    }
-}

@@ -1,4 +1,4 @@
-//! Particle emitter configuration types and enums.
+﻿//! Particle emitter configuration types and enums.
 
 use super::shapes::ParticleShape;
 use crate::runtime::resource_keys::TextureKey;
@@ -6,15 +6,15 @@ use crate::runtime::resource_keys::TextureKey;
 /// Area distribution mode for particle emission.
 ///
 /// # Variants
-/// - `None` — All particles spawn at the emitter center (no area spread).
-/// - `Uniform` — Uniform random distribution inside a rectangle.
-/// - `Normal` — Gaussian-approximated distribution inside a rectangle.
-/// - `Ellipse` — Uniform random distribution inside an ellipse.
-/// - `BorderEllipse` — Random distribution on the border of an ellipse.
-/// - `BorderRectangle` — Random distribution on the border of a rectangle.
+/// - `None` â€” All particles spawn at the emitter center (no area spread).
+/// - `Uniform` â€” Uniform random distribution inside a rectangle.
+/// - `Normal` â€” Gaussian-approximated distribution inside a rectangle.
+/// - `Ellipse` â€” Uniform random distribution inside an ellipse.
+/// - `BorderEllipse` â€” Random distribution on the border of an ellipse.
+/// - `BorderRectangle` â€” Random distribution on the border of a rectangle.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub enum AreaDistribution {
-    /// No area — all particles spawn at the emitter center.
+    /// No area â€” all particles spawn at the emitter center.
     #[default]
     None,
     /// Uniform random distribution inside a rectangle.
@@ -32,9 +32,9 @@ pub enum AreaDistribution {
 /// Insert mode controlling where new particles are placed in the particle list.
 ///
 /// # Variants
-/// - `Top` — New particles added to the end of the list (drawn on top, default).
-/// - `Bottom` — New particles added to the front of the list (drawn behind existing particles).
-/// - `Random` — New particles inserted at a random position in the list.
+/// - `Top` â€” New particles added to the end of the list (drawn on top, default).
+/// - `Bottom` â€” New particles added to the front of the list (drawn behind existing particles).
+/// - `Random` â€” New particles inserted at a random position in the list.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub enum InsertMode {
     /// New particles are added to the end (drawn on top).
@@ -49,9 +49,9 @@ pub enum InsertMode {
 /// Emitter lifecycle state controlling whether the system emits and updates particles.
 ///
 /// # Variants
-/// - `Active` — Emitting and updating particles each frame.
-/// - `Paused` — Particles freeze in place; no new emissions and no physics updates.
-/// - `Stopped` — No new emissions; existing particles continue ageing until dead.
+/// - `Active` â€” Emitting and updating particles each frame.
+/// - `Paused` â€” Particles freeze in place; no new emissions and no physics updates.
+/// - `Stopped` â€” No new emissions; existing particles continue ageing until dead.
 #[derive(Clone, Debug, PartialEq)]
 pub enum EmitterState {
     /// Emitting particles and updating existing ones.
@@ -65,14 +65,14 @@ pub enum EmitterState {
 /// Emission shape controlling where new particles spawn relative to the emitter.
 ///
 /// # Variants
-/// - `Point` — All particles spawn at the emitter center.
-/// - `Circle` — Particles spawn within or on the edge of a circle.
-/// - `Rectangle` — Particles spawn within a rectangle centered on the emitter.
-/// - `Ring` — Particles spawn within an annulus (ring between two radii).
-/// - `Line` — Particles spawn along a line segment.
-/// - `Cone` — Particles spawn within a cone sector.
-/// - `Star` — Particles spawn on the points or edges of a star polygon.
-/// - `Spiral` — Particles spawn along an Archimedean spiral.
+/// - `Point` â€” All particles spawn at the emitter center.
+/// - `Circle` â€” Particles spawn within or on the edge of a circle.
+/// - `Rectangle` â€” Particles spawn within a rectangle centered on the emitter.
+/// - `Ring` â€” Particles spawn within an annulus (ring between two radii).
+/// - `Line` â€” Particles spawn along a line segment.
+/// - `Cone` â€” Particles spawn within a cone sector.
+/// - `Star` â€” Particles spawn on the points or edges of a star polygon.
+/// - `Spiral` â€” Particles spawn along an Archimedean spiral.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub enum EmissionShape {
     /// All particles spawn at the emitter center.
@@ -136,8 +136,8 @@ pub enum EmissionShape {
 /// Relative mode controlling whether particles move with the emitter.
 ///
 /// # Variants
-/// - `Detached` — Particles remain in world space after emission (default).
-/// - `Attached` — Particles move with the emitter position each frame.
+/// - `Detached` â€” Particles remain in world space after emission (default).
+/// - `Attached` â€” Particles move with the emitter position each frame.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub enum RelativeMode {
     /// Particles remain in world space after emission (default).
@@ -153,17 +153,17 @@ pub enum RelativeMode {
 /// Multiple attractors are independently accumulated each physics step.
 ///
 /// # Fields
-/// - `x` — World-space X coordinate of the attractor.
-/// - `y` — World-space Y coordinate of the attractor.
-/// - `strength` — Force magnitude in pixels/s². Positive attracts; negative repels.
-/// - `radius` — Influence radius in pixels. Particles outside this range are unaffected.
+/// - `x` â€” World-space X coordinate of the attractor.
+/// - `y` â€” World-space Y coordinate of the attractor.
+/// - `strength` â€” Force magnitude in pixels/sÂ˛. Positive attracts; negative repels.
+/// - `radius` â€” Influence radius in pixels. Particles outside this range are unaffected.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Attractor {
     /// World-space X coordinate of the attractor.
     pub x: f32,
     /// World-space Y coordinate of the attractor.
     pub y: f32,
-    /// Force magnitude (pixels/s²). Positive = attraction, negative = repulsion.
+    /// Force magnitude (pixels/sÂ˛). Positive = attraction, negative = repulsion.
     pub strength: f32,
     /// Influence radius in pixels. Particles beyond this distance are unaffected.
     pub radius: f32,
@@ -175,9 +175,9 @@ pub struct Attractor {
 /// velocity component on the crossing axis negated and scaled by `restitution`.
 ///
 /// # Fields
-/// - `x_min` / `x_max` — Horizontal bounds in world space (pixels).
-/// - `y_min` / `y_max` — Vertical bounds in world space (pixels).
-/// - `restitution` — Velocity retention factor on bounce (0 = inelastic, 1 = perfectly elastic).
+/// - `x_min` / `x_max` â€” Horizontal bounds in world space (pixels).
+/// - `y_min` / `y_max` â€” Vertical bounds in world space (pixels).
+/// - `restitution` â€” Velocity retention factor on bounce (0 = inelastic, 1 = perfectly elastic).
 #[derive(Clone, Debug, PartialEq)]
 pub struct BounceBounds {
     /// Left boundary (world-space pixels).
@@ -188,7 +188,7 @@ pub struct BounceBounds {
     pub y_min: f32,
     /// Bottom boundary (world-space pixels).
     pub y_max: f32,
-    /// Coefficient of restitution on bounce (0 = stops, 1 = no energy loss). Clamped to 0–1.
+    /// Coefficient of restitution on bounce (0 = stops, 1 = no energy loss). Clamped to 0â€“1.
     pub restitution: f32,
 }
 
@@ -198,17 +198,17 @@ pub struct BounceBounds {
 /// All range fields (e.g. `speed_min` / `speed_max`) are sampled uniformly per particle at spawn.
 ///
 /// # Fields
-/// - `max_particles` — `u32`. Pool size cap.
-/// - `emission_rate` — `f32`. Particles per second.
-/// - `lifetime_min` / `lifetime_max` — `f32`. Particle lifetime range in seconds.
-/// - `speed_min` / `speed_max` — `f32`. Initial speed range.
-/// - `direction` — `f32`. Base emission angle in radians.
-/// - `spread` — `f32`. Angular spread around `direction`.
-/// - `sizes` — `Vec<f32>`. Keyframe sizes over particle lifetime.
-/// - `colors` — `Vec<[f32; 4]>`. RGBA colour gradient keyframes.
-/// - `emission_shape` — `EmissionShape`. Spawn-point distribution shape.
-/// - `relative_mode` — `RelativeMode`. Whether particles follow the emitter.
-/// - `shape` — `ParticleShape`. Rendered primitive type (point, rect, sprite).
+/// - `max_particles` â€” `u32`. Pool size cap.
+/// - `emission_rate` â€” `f32`. Particles per second.
+/// - `lifetime_min` / `lifetime_max` â€” `f32`. Particle lifetime range in seconds.
+/// - `speed_min` / `speed_max` â€” `f32`. Initial speed range.
+/// - `direction` â€” `f32`. Base emission angle in radians.
+/// - `spread` â€” `f32`. Angular spread around `direction`.
+/// - `sizes` â€” `Vec<f32>`. Keyframe sizes over particle lifetime.
+/// - `colors` â€” `Vec<[f32; 4]>`. RGBA colour gradient keyframes.
+/// - `emission_shape` â€” `EmissionShape`. Spawn-point distribution shape.
+/// - `relative_mode` â€” `RelativeMode`. Whether particles follow the emitter.
+/// - `shape` â€” `ParticleShape`. Rendered primitive type (point, rect, sprite).
 /// - (additional fields: gravity, accel, damping, turbulence, drag, orbit, animation, etc.)
 #[derive(Clone, Debug)]
 pub struct ParticleConfig {
@@ -228,9 +228,9 @@ pub struct ParticleConfig {
     pub direction: f32,
     /// Half-angle of the emission cone in radians.
     pub spread: f32,
-    /// Constant acceleration applied along the X axis (pixels / s²).
+    /// Constant acceleration applied along the X axis (pixels / sÂ˛).
     pub gravity_x: f32,
-    /// Constant acceleration applied along the Y axis (pixels / s²).
+    /// Constant acceleration applied along the Y axis (pixels / sÂ˛).
     pub gravity_y: f32,
     /// Multi-stop particle sizes interpolated over lifetime. Replaces size_start/size_end.
     pub sizes: Vec<f32>,
@@ -248,21 +248,21 @@ pub struct ParticleConfig {
     pub spin_variation: f32,
     /// Amount of size variation (0 = none, 1 = full).
     pub size_variation: f32,
-    /// Minimum linear acceleration along X axis (pixels / s²).
+    /// Minimum linear acceleration along X axis (pixels / sÂ˛).
     pub linear_accel_x_min: f32,
-    /// Maximum linear acceleration along X axis (pixels / s²).
+    /// Maximum linear acceleration along X axis (pixels / sÂ˛).
     pub linear_accel_x_max: f32,
-    /// Minimum linear acceleration along Y axis (pixels / s²).
+    /// Minimum linear acceleration along Y axis (pixels / sÂ˛).
     pub linear_accel_y_min: f32,
-    /// Maximum linear acceleration along Y axis (pixels / s²).
+    /// Maximum linear acceleration along Y axis (pixels / sÂ˛).
     pub linear_accel_y_max: f32,
-    /// Minimum radial acceleration (pixels / s²). Positive = away from emitter.
+    /// Minimum radial acceleration (pixels / sÂ˛). Positive = away from emitter.
     pub radial_accel_min: f32,
-    /// Maximum radial acceleration (pixels / s²).
+    /// Maximum radial acceleration (pixels / sÂ˛).
     pub radial_accel_max: f32,
-    /// Minimum tangential acceleration (pixels / s²).
+    /// Minimum tangential acceleration (pixels / sÂ˛).
     pub tangential_accel_min: f32,
-    /// Maximum tangential acceleration (pixels / s²).
+    /// Maximum tangential acceleration (pixels / sÂ˛).
     pub tangential_accel_max: f32,
     /// Minimum linear damping factor.
     pub linear_damping_min: f32,
@@ -338,7 +338,7 @@ pub struct ParticleConfig {
     /// Optional ray aspect ratio (length-to-width), mirroring `shape`'s `aspect` value.
     /// Used for config-builder ergonomics in the Lua API only.
     pub ray_aspect: f32,
-    /// Optional ring thickness as a fraction of particle size (0–1), mirroring `shape`'s `thickness`.
+    /// Optional ring thickness as a fraction of particle size (0â€“1), mirroring `shape`'s `thickness`.
     /// Used for config-builder ergonomics in the Lua API only.
     pub ring_thickness: f32,
 }
@@ -404,99 +404,6 @@ impl Default for ParticleConfig {
             ray_aspect: 4.0,
             ring_thickness: 0.2,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn default_config_pool_and_rate() {
-        let cfg = ParticleConfig::default();
-        assert_eq!(cfg.max_particles, 256);
-        assert!((cfg.emission_rate - 10.0).abs() < f32::EPSILON);
-    }
-
-    #[test]
-    fn default_config_lifetime_range() {
-        let cfg = ParticleConfig::default();
-        assert!(cfg.lifetime_min <= cfg.lifetime_max);
-        assert!((cfg.lifetime_min - 1.0).abs() < f32::EPSILON);
-        assert!((cfg.lifetime_max - 2.0).abs() < f32::EPSILON);
-    }
-
-    #[test]
-    fn default_config_speed_range() {
-        let cfg = ParticleConfig::default();
-        assert!(cfg.speed_min <= cfg.speed_max);
-    }
-
-    #[test]
-    fn default_config_sizes_and_colors() {
-        let cfg = ParticleConfig::default();
-        assert_eq!(cfg.sizes.len(), 2);
-        assert_eq!(cfg.colors.len(), 2);
-    }
-
-    #[test]
-    fn default_config_shape_is_square() {
-        let cfg = ParticleConfig::default();
-        assert_eq!(cfg.shape, ParticleShape::default());
-    }
-
-    #[test]
-    fn area_distribution_default_is_none() {
-        assert_eq!(AreaDistribution::default(), AreaDistribution::None);
-    }
-
-    #[test]
-    fn insert_mode_default_is_top() {
-        assert_eq!(InsertMode::default(), InsertMode::Top);
-    }
-
-    #[test]
-    fn emission_shape_default_is_point() {
-        assert_eq!(EmissionShape::default(), EmissionShape::Point);
-    }
-
-    #[test]
-    fn relative_mode_default_is_detached() {
-        assert_eq!(RelativeMode::default(), RelativeMode::Detached);
-    }
-
-    #[test]
-    fn attractor_clone_preserves_fields() {
-        let a = Attractor { x: 1.0, y: 2.0, strength: 50.0, radius: 100.0 };
-        let b = a.clone();
-        assert!((b.strength - 50.0).abs() < f32::EPSILON);
-        assert!((b.radius - 100.0).abs() < f32::EPSILON);
-    }
-
-    #[test]
-    fn bounce_bounds_clone_preserves_restitution() {
-        let bb = BounceBounds {
-            x_min: 0.0, x_max: 800.0,
-            y_min: 0.0, y_max: 600.0,
-            restitution: 0.7,
-        };
-        let c = bb.clone();
-        assert!((c.restitution - 0.7).abs() < f32::EPSILON);
-    }
-
-    #[test]
-    fn default_config_no_death_emitter() {
-        let cfg = ParticleConfig::default();
-        assert!(cfg.death_emitter.is_none());
-        assert_eq!(cfg.death_burst_count, 0);
-    }
-
-    #[test]
-    fn default_config_shape_helper_fields() {
-        let cfg = ParticleConfig::default();
-        assert_eq!(cfg.shrapnel_edges, 6);
-        assert!((cfg.ray_aspect - 4.0).abs() < f32::EPSILON);
-        assert!((cfg.ring_thickness - 0.2).abs() < f32::EPSILON);
     }
 }
 
