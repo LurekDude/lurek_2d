@@ -1,4 +1,4 @@
-//! Finite-state machine for sprite animation: states, transitions, and parameter-driven switching.
+﻿//! Finite-state machine for sprite animation: states, transitions, and parameter-driven switching.
 //!
 //! [`AnimStateMachine`] owns an [`Animation`] controller and drives clip selection based on
 //! named parameters (`float`, `bool`, `int`) and simple comparison conditions.
@@ -7,14 +7,14 @@ use std::collections::HashMap;
 
 use super::controller::Animation;
 
-// ── Parameter value ──────────────────────────────────────────────────────────
+// â”€â”€ Parameter value â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Value held by an animation parameter.
 ///
 /// # Variants
-/// - `Bool` — `bool` flag.
-/// - `Float` — `f32` continuous value.
-/// - `Int` — `i32` integer value.
+/// - `Bool` â€” `bool` flag.
+/// - `Float` â€” `f32` continuous value.
+/// - `Int` â€” `i32` integer value.
 #[derive(Debug, Clone)]
 pub enum AnimParamValue {
     /// Boolean flag parameter.
@@ -25,12 +25,12 @@ pub enum AnimParamValue {
     Int(i32),
 }
 
-// ── Condition types ──────────────────────────────────────────────────────────
+// â”€â”€ Condition types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Comparison operator for a transition condition.
 ///
 /// # Variants
-/// - `Gt`, `Lt`, `Gte`, `Lte`, `Eq`, `Neq` — comparison operators.
+/// - `Gt`, `Lt`, `Gte`, `Lte`, `Eq`, `Neq` â€” comparison operators.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConditionOp {
     /// Greater than (`>`).
@@ -50,8 +50,8 @@ pub enum ConditionOp {
 /// Right-hand side value for a transition condition.
 ///
 /// # Variants
-/// - `Number` — `f32` numeric threshold.
-/// - `Bool` — `bool` flag.
+/// - `Number` â€” `f32` numeric threshold.
+/// - `Bool` â€” `bool` flag.
 #[derive(Debug, Clone)]
 pub enum ConditionValue {
     /// Numeric threshold value.
@@ -63,9 +63,9 @@ pub enum ConditionValue {
 /// A single condition on one named parameter.
 ///
 /// # Fields
-/// - `param` — `String`. Parameter name.
-/// - `op` — [`ConditionOp`]. Comparison operator.
-/// - `value` — [`ConditionValue`]. Threshold to compare against.
+/// - `param` â€” `String`. Parameter name.
+/// - `op` â€” [`ConditionOp`]. Comparison operator.
+/// - `value` â€” [`ConditionValue`]. Threshold to compare against.
 #[derive(Debug, Clone)]
 pub struct TransitionCondition {
     /// Name of the parameter to test.
@@ -76,14 +76,14 @@ pub struct TransitionCondition {
     pub value: ConditionValue,
 }
 
-// ── Transition ───────────────────────────────────────────────────────────────
+// â”€â”€ Transition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// A directed state transition with a single condition.
 ///
 /// # Fields
-/// - `from` — `String`. Source state name.
-/// - `to` — `String`. Target state name.
-/// - `condition` — [`TransitionCondition`].
+/// - `from` â€” `String`. Source state name.
+/// - `to` â€” `String`. Target state name.
+/// - `condition` â€” [`TransitionCondition`].
 #[derive(Debug, Clone)]
 pub struct AnimTransition {
     /// Name of the source state.
@@ -94,13 +94,13 @@ pub struct AnimTransition {
     pub condition: TransitionCondition,
 }
 
-// ── State config ─────────────────────────────────────────────────────────────
+// â”€â”€ State config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Configuration for a single state in the state machine.
 ///
 /// # Fields
-/// - `clip` — `String`. Animation clip name to play in this state.
-/// - `looping` — `bool`. Whether the clip loops.
+/// - `clip` â€” `String`. Animation clip name to play in this state.
+/// - `looping` â€” `bool`. Whether the clip loops.
 #[derive(Debug, Clone)]
 pub struct AnimStateConfig {
     /// Name of the animation clip to play for this state.
@@ -109,7 +109,7 @@ pub struct AnimStateConfig {
     pub looping: bool,
 }
 
-// ── AnimStateMachine ─────────────────────────────────────────────────────────
+// â”€â”€ AnimStateMachine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Parameter-driven finite-state machine for animation control.
 ///
@@ -118,11 +118,11 @@ pub struct AnimStateConfig {
 /// to see if the current state should change.
 ///
 /// # Fields
-/// - `states` — `HashMap<String, AnimStateConfig>`.
-/// - `transitions` — `Vec<AnimTransition>`.
-/// - `current` — `String`. Active state name.
-/// - `params` — `HashMap<String, AnimParamValue>`.
-/// - `animation` — [`Animation`].
+/// - `states` â€” `HashMap<String, AnimStateConfig>`.
+/// - `transitions` â€” `Vec<AnimTransition>`.
+/// - `current` â€” `String`. Active state name.
+/// - `params` â€” `HashMap<String, AnimParamValue>`.
+/// - `animation` â€” [`Animation`].
 pub struct AnimStateMachine {
     /// All registered states.
     states: HashMap<String, AnimStateConfig>,
@@ -140,8 +140,8 @@ impl AnimStateMachine {
     /// Creates a new state machine with an owned animation and a named initial state.
     ///
     /// # Parameters
-    /// - `animation` — [`Animation`]. Animation controller to drive.
-    /// - `initial` — `String`. Name of the starting state.
+    /// - `animation` â€” [`Animation`]. Animation controller to drive.
+    /// - `initial` â€” `String`. Name of the starting state.
     ///
     /// # Returns
     /// `Self`.
@@ -158,9 +158,9 @@ impl AnimStateMachine {
     /// Registers a named state mapping to a clip.
     ///
     /// # Parameters
-    /// - `name` — `&str`. State name.
-    /// - `clip` — `&str`. Clip name in the owned animation.
-    /// - `looping` — `bool`. Whether the clip loops.
+    /// - `name` â€” `&str`. State name.
+    /// - `clip` â€” `&str`. Clip name in the owned animation.
+    /// - `looping` â€” `bool`. Whether the clip loops.
     pub fn add_state(&mut self, name: &str, clip: &str, looping: bool) {
         self.states.insert(
             name.to_string(),
@@ -175,9 +175,9 @@ impl AnimStateMachine {
     /// - `value` is a number, `"true"`, or `"false"`
     ///
     /// # Parameters
-    /// - `from` — `&str`. Source state name.
-    /// - `to` — `&str`. Target state name.
-    /// - `condition_str` — `&str`. Condition string (e.g. `"speed > 0.1"`).
+    /// - `from` â€” `&str`. Source state name.
+    /// - `to` â€” `&str`. Target state name.
+    /// - `condition_str` â€” `&str`. Condition string (e.g. `"speed > 0.1"`).
     pub fn add_transition(&mut self, from: &str, to: &str, condition_str: &str) {
         match parse_condition(condition_str) {
             Ok(cond) => {
@@ -196,8 +196,8 @@ impl AnimStateMachine {
     /// Sets a float parameter.
     ///
     /// # Parameters
-    /// - `name` — `&str`. Parameter name.
-    /// - `value` — `f32`.
+    /// - `name` â€” `&str`. Parameter name.
+    /// - `value` â€” `f32`.
     pub fn set_param_float(&mut self, name: &str, value: f32) {
         self.params.insert(name.to_string(), AnimParamValue::Float(value));
     }
@@ -205,8 +205,8 @@ impl AnimStateMachine {
     /// Sets a boolean parameter.
     ///
     /// # Parameters
-    /// - `name` — `&str`. Parameter name.
-    /// - `value` — `bool`.
+    /// - `name` â€” `&str`. Parameter name.
+    /// - `value` â€” `bool`.
     pub fn set_param_bool(&mut self, name: &str, value: bool) {
         self.params.insert(name.to_string(), AnimParamValue::Bool(value));
     }
@@ -214,8 +214,8 @@ impl AnimStateMachine {
     /// Sets an integer parameter.
     ///
     /// # Parameters
-    /// - `name` — `&str`. Parameter name.
-    /// - `value` — `i32`.
+    /// - `name` â€” `&str`. Parameter name.
+    /// - `value` â€” `i32`.
     pub fn set_param_int(&mut self, name: &str, value: i32) {
         self.params.insert(name.to_string(), AnimParamValue::Int(value));
     }
@@ -223,7 +223,7 @@ impl AnimStateMachine {
     /// Returns a reference to the current value of a named parameter.
     ///
     /// # Parameters
-    /// - `name` — `&str`. Parameter name.
+    /// - `name` â€” `&str`. Parameter name.
     ///
     /// # Returns
     /// `Option<&AnimParamValue>`.
@@ -237,7 +237,7 @@ impl AnimStateMachine {
     /// state and starts the corresponding clip.
     ///
     /// # Parameters
-    /// - `dt` — `f32`. Delta time in seconds.
+    /// - `dt` â€” `f32`. Delta time in seconds.
     pub fn update(&mut self, dt: f32) {
         self.animation.update(dt);
         self.check_transitions();
@@ -246,14 +246,15 @@ impl AnimStateMachine {
     /// Checks all transitions from the current state and fires the first match.
     fn check_transitions(&mut self) {
         let current = self.current.clone();
-        for transition in &self.transitions {
-            if transition.from != current {
-                continue;
-            }
+        let transitions: Vec<_> = self.transitions.iter()
+            .filter(|t| t.from == current)
+            .cloned()
+            .collect();
+        for transition in transitions {
             if self.evaluate_condition(&transition.condition) {
                 let target = transition.to.clone();
                 if self.force_state(&target) {
-                    // Transition fired — stop checking further transitions
+                    // Transition fired â€” stop checking further transitions
                     return;
                 }
             }
@@ -306,15 +307,15 @@ impl AnimStateMachine {
     /// Forces a transition to the named state, playing the associated clip.
     ///
     /// # Parameters
-    /// - `name` — `&str`. Target state name.
+    /// - `name` â€” `&str`. Target state name.
     ///
     /// # Returns
-    /// `bool` — `true` if the state exists and the transition succeeded.
+    /// `bool` â€” `true` if the state exists and the transition succeeded.
     pub fn force_state(&mut self, name: &str) -> bool {
         if let Some(cfg) = self.states.get(name) {
             let clip = cfg.clip.clone();
             let looping = cfg.looping;
-            // Play the clip (ignore return — clip may not exist yet if lazy-loaded)
+            // Play the clip (ignore return â€” clip may not exist yet if lazy-loaded)
             let played = self.animation.play(&clip);
             if played {
                 // Re-apply looping flag
@@ -344,10 +345,10 @@ impl AnimStateMachine {
     }
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Applies a comparison operator to two `f32` values.
-fn compare_nums(lhs: f32, rhs: f32, op: &ConditionOp) -> bool {
+pub fn compare_nums(lhs: f32, rhs: f32, op: &ConditionOp) -> bool {
     match op {
         ConditionOp::Gt => lhs > rhs,
         ConditionOp::Lt => lhs < rhs,
@@ -363,11 +364,11 @@ fn compare_nums(lhs: f32, rhs: f32, op: &ConditionOp) -> bool {
 /// Multi-character operators (`>=`, `<=`, `!=`) are tried before single-character ones.
 ///
 /// # Parameters
-/// - `s` — `&str`. Condition expression.
+/// - `s` â€” `&str`. Condition expression.
 ///
 /// # Returns
 /// `Result<TransitionCondition, String>`.
-fn parse_condition(s: &str) -> Result<TransitionCondition, String> {
+pub fn parse_condition(s: &str) -> Result<TransitionCondition, String> {
     let s = s.trim();
 
     // Try multi-char operators first to avoid partial matches (e.g. ">=" before ">").
@@ -402,95 +403,4 @@ fn parse_condition(s: &str) -> Result<TransitionCondition, String> {
     }
 
     Err(format!("parse_condition: cannot find operator in '{}'", s))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::animation::controller::Animation;
-    use crate::math::Rect;
-
-    fn make_anim() -> Animation {
-        let mut anim = Animation::new();
-        anim.add_frame(Rect::new(0.0, 0.0, 32.0, 32.0));
-        anim.add_frame(Rect::new(32.0, 0.0, 32.0, 32.0));
-        anim.add_clip("idle", vec![0], 1.0, true);
-        anim.add_clip("walk", vec![0, 1], 10.0, true);
-        anim
-    }
-
-    #[test]
-    fn initial_state_is_set() {
-        let sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        assert_eq!(sm.get_state(), "idle");
-    }
-
-    #[test]
-    fn add_state_and_force_transition() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        sm.add_state("walk", "walk", true);
-        assert!(sm.force_state("walk"));
-        assert_eq!(sm.get_state(), "walk");
-    }
-
-    #[test]
-    fn force_nonexistent_state_returns_false() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        assert!(!sm.force_state("flying"));
-    }
-
-    #[test]
-    fn param_driven_transition() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        sm.add_state("walk", "walk", true);
-        sm.add_transition("idle", "walk", "speed > 0.1");
-        sm.set_param_float("speed", 0.5);
-        sm.update(0.016);
-        assert_eq!(sm.get_state(), "walk");
-    }
-
-    #[test]
-    fn param_below_threshold_stays() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        sm.add_state("walk", "walk", true);
-        sm.add_transition("idle", "walk", "speed > 0.1");
-        sm.set_param_float("speed", 0.05);
-        sm.update(0.016);
-        assert_eq!(sm.get_state(), "idle");
-    }
-
-    #[test]
-    fn bool_param_condition() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        sm.add_state("walk", "walk", true);
-        sm.add_transition("idle", "walk", "moving == true");
-        sm.set_param_bool("moving", true);
-        sm.update(0.016);
-        assert_eq!(sm.get_state(), "walk");
-    }
-
-    #[test]
-    fn parse_condition_gt() {
-        let c = parse_condition("speed > 5.0").unwrap();
-        assert_eq!(c.param, "speed");
-        assert_eq!(c.op, ConditionOp::Gt);
-    }
-
-    #[test]
-    fn parse_condition_invalid_returns_error() {
-        assert!(parse_condition("noop").is_err());
-    }
-
-    #[test]
-    fn compare_nums_helpers() {
-        assert!(compare_nums(2.0, 1.0, &ConditionOp::Gt));
-        assert!(!compare_nums(1.0, 2.0, &ConditionOp::Gt));
-        assert!(compare_nums(1.0, 1.0, &ConditionOp::Eq));
-        assert!(compare_nums(1.0, 2.0, &ConditionOp::Neq));
-    }
 }

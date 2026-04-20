@@ -1,11 +1,11 @@
-//! [`AnimEvent`] — events emitted during animation playback.
+﻿//! [`AnimEvent`] â€” events emitted during animation playback.
 
 /// Events emitted by [`Animation::update`](crate::animation::Animation::update).
 ///
 /// # Variants
-/// - `Finished` — Finished variant.
-/// - `FrameChanged` — FrameChanged variant.
-/// - `Looped` — Looped variant.
+/// - `Finished` â€” Finished variant.
+/// - `FrameChanged` â€” FrameChanged variant.
+/// - `Looped` â€” Looped variant.
 ///
 /// Retrieve pending events with [`Animation::drain_events`](crate::animation::Animation::drain_events).
 #[derive(Debug, Clone, PartialEq)]
@@ -44,42 +44,5 @@ impl AnimEvent {
             Self::FrameChanged { frame_index } => Some(*frame_index),
             _ => None,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn type_name_finished() {
-        assert_eq!(AnimEvent::Finished.type_name(), "finished");
-    }
-
-    #[test]
-    fn type_name_looped() {
-        assert_eq!(AnimEvent::Looped.type_name(), "looped");
-    }
-
-    #[test]
-    fn type_name_frame_changed() {
-        let ev = AnimEvent::FrameChanged { frame_index: 3 };
-        assert_eq!(ev.type_name(), "frameChanged");
-    }
-
-    #[test]
-    fn frame_index_returns_some_for_frame_changed() {
-        let ev = AnimEvent::FrameChanged { frame_index: 7 };
-        assert_eq!(ev.frame_index(), Some(7));
-    }
-
-    #[test]
-    fn frame_index_returns_none_for_finished() {
-        assert_eq!(AnimEvent::Finished.frame_index(), None);
-    }
-
-    #[test]
-    fn frame_index_returns_none_for_looped() {
-        assert_eq!(AnimEvent::Looped.frame_index(), None);
     }
 }

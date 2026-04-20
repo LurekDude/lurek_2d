@@ -1,7 +1,7 @@
-//! Render-command generation for sprite animations.
+﻿//! Render-command generation for sprite animations.
 //!
 //! Provides a helper to convert the current animation frame into a
-//! [`RenderCommand::DrawQuad`].  Pure CPU — no wgpu, winit, or mlua.
+//! [`RenderCommand::DrawQuad`].  Pure CPU â€” no wgpu, winit, or mlua.
 
 use crate::animation::controller::Animation;
 use crate::math::Rect;
@@ -14,16 +14,16 @@ use crate::runtime::resource_keys::TextureKey;
 /// position, texture, or transform, the caller supplies those via this struct.
 ///
 /// # Fields
-/// - `texture_key` — `TextureKey`. Handle to the sprite-sheet texture.
-/// - `tex_w` — `f32`. Full texture width in pixels (for UV normalisation).
-/// - `tex_h` — `f32`. Full texture height in pixels (for UV normalisation).
-/// - `x` — `f32`. World X position.
-/// - `y` — `f32`. World Y position.
-/// - `rotation` — `f32`. Rotation in radians.
-/// - `sx` — `f32`. Horizontal scale.
-/// - `sy` — `f32`. Vertical scale.
-/// - `ox` — `f32`. Origin X offset.
-/// - `oy` — `f32`. Origin Y offset.
+/// - `texture_key` â€” `TextureKey`. Handle to the sprite-sheet texture.
+/// - `tex_w` â€” `f32`. Full texture width in pixels (for UV normalisation).
+/// - `tex_h` â€” `f32`. Full texture height in pixels (for UV normalisation).
+/// - `x` â€” `f32`. World X position.
+/// - `y` â€” `f32`. World Y position.
+/// - `rotation` â€” `f32`. Rotation in radians.
+/// - `sx` â€” `f32`. Horizontal scale.
+/// - `sy` â€” `f32`. Vertical scale.
+/// - `ox` â€” `f32`. Origin X offset.
+/// - `oy` â€” `f32`. Origin Y offset.
 #[derive(Debug, Clone)]
 pub struct AnimRenderParams {
     /// Handle to the sprite-sheet texture.
@@ -55,7 +55,7 @@ impl Animation {
     /// The caller supplies the texture and transform via [`AnimRenderParams`].
     ///
     /// # Parameters
-    /// - `params` — `&AnimRenderParams`. Texture and transform info.
+    /// - `params` â€” `&AnimRenderParams`. Texture and transform info.
     ///
     /// # Returns
     /// `Option<RenderCommand>`.
@@ -68,8 +68,8 @@ impl Animation {
 /// Converts a source quad and render parameters into a `DrawQuad` command.
 ///
 /// # Parameters
-/// - `quad` — `&Rect`. Source rectangle within the sprite-sheet.
-/// - `params` — `&AnimRenderParams`. Texture and transform info.
+/// - `quad` â€” `&Rect`. Source rectangle within the sprite-sheet.
+/// - `params` â€” `&AnimRenderParams`. Texture and transform info.
 ///
 /// # Returns
 /// `RenderCommand`.
@@ -93,79 +93,4 @@ pub fn quad_to_draw_command(quad: &Rect, params: &AnimRenderParams) -> RenderCom
     }
 }
 
-// ── Tests ────────────────────────────────────────────────────────────────────
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::animation::controller::Animation;
-    use crate::math::Rect;
-    use crate::runtime::resource_keys::TextureKey;
-    use slotmap::KeyData;
-
-    fn dummy_key() -> TextureKey {
-        TextureKey::from(KeyData::from_ffi(1))
-    }
-
-    fn make_params() -> AnimRenderParams {
-        AnimRenderParams {
-            texture_key: dummy_key(),
-            tex_w: 256.0,
-            tex_h: 256.0,
-            x: 100.0,
-            y: 200.0,
-            rotation: 0.0,
-            sx: 1.0,
-            sy: 1.0,
-            ox: 16.0,
-            oy: 16.0,
-        }
-    }
-
-    #[test]
-    fn no_clip_returns_none() {
-        let anim = Animation::new();
-        let params = make_params();
-        assert!(anim.generate_render_command(&params).is_none());
-    }
-
-    #[test]
-    fn active_clip_returns_draw_quad() {
-        let mut anim = Animation::new();
-        anim.add_frame(Rect::new(0.0, 0.0, 32.0, 32.0));
-        anim.add_frame(Rect::new(32.0, 0.0, 32.0, 32.0));
-        anim.add_clip("walk", vec![0, 1], 10.0, true);
-        anim.play("walk");
-
-        let params = make_params();
-        let cmd = anim.generate_render_command(&params);
-        assert!(cmd.is_some());
-        if let Some(RenderCommand::DrawQuad { quad_x, quad_y, quad_w, quad_h, x, y, ox, oy, .. }) = cmd {
-            assert!((quad_x).abs() < 1e-5);
-            assert!((quad_y).abs() < 1e-5);
-            assert!((quad_w - 32.0).abs() < 1e-5);
-            assert!((quad_h - 32.0).abs() < 1e-5);
-            assert!((x - 100.0).abs() < 1e-5);
-            assert!((y - 200.0).abs() < 1e-5);
-            assert!((ox - 16.0).abs() < 1e-5);
-            assert!((oy - 16.0).abs() < 1e-5);
-        } else {
-            panic!("Expected DrawQuad");
-        }
-    }
-
-    #[test]
-    fn quad_to_draw_preserves_all_fields() {
-        let quad = Rect::new(64.0, 32.0, 16.0, 16.0);
-        let params = make_params();
-        let cmd = quad_to_draw_command(&quad, &params);
-        if let RenderCommand::DrawQuad { quad_x, quad_y, tex_w, tex_h, .. } = cmd {
-            assert!((quad_x - 64.0).abs() < 1e-5);
-            assert!((quad_y - 32.0).abs() < 1e-5);
-            assert!((tex_w - 256.0).abs() < 1e-5);
-            assert!((tex_h - 256.0).abs() < 1e-5);
-        } else {
-            panic!("Expected DrawQuad");
-        }
-    }
-}
+// â”€â”€ Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

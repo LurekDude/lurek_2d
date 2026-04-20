@@ -1,4 +1,4 @@
-//! [`Animation`] — main controller for sprite animation playback.
+﻿//! [`Animation`] â€” main controller for sprite animation playback.
 
 use std::collections::HashMap;
 
@@ -22,14 +22,14 @@ use crate::log_msg;
 /// 4. Read the current source quad via [`current_quad`](Self::current_quad).
 ///
 /// # Fields
-/// - `frames` — `Vec<AnimFrame>`.
-/// - `clips` — `HashMap<String, AnimClip>`.
-/// - `current_clip` — `Option<String>`.
-/// - `current_frame_pos` — `usize`.
-/// - `timer` — `f32`.
-/// - `playing` — `bool`.
-/// - `speed` — `f32`.
-/// - `pending_events` — `Vec<AnimEvent>`.
+/// - `frames` â€” `Vec<AnimFrame>`.
+/// - `clips` â€” `HashMap<String, AnimClip>`.
+/// - `current_clip` â€” `Option<String>`.
+/// - `current_frame_pos` â€” `usize`.
+/// - `timer` â€” `f32`.
+/// - `playing` â€” `bool`.
+/// - `speed` â€” `f32`.
+/// - `pending_events` â€” `Vec<AnimEvent>`.
 #[derive(Clone)]
 pub struct Animation {
     /// All frames available to this animation.
@@ -78,7 +78,7 @@ impl Animation {
         }
     }
 
-    // ── Frame management ────────────────────────────────────────────────
+    // â”€â”€ Frame management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Adds a single frame and returns its 0-based index.
     ///
@@ -86,7 +86,7 @@ impl Animation {
     /// `usize`.
     ///
     /// # Parameters
-    /// - `quad` — Source rectangle within the sprite-sheet texture.
+    /// - `quad` â€” Source rectangle within the sprite-sheet texture.
     pub fn add_frame(&mut self, quad: Rect) -> usize {
         let idx = self.frames.len();
         self.frames.push(AnimFrame {
@@ -106,12 +106,12 @@ impl Animation {
     /// frames actually added.
     ///
     /// # Parameters
-    /// - `tex_w` — Full texture width in pixels.
-    /// - `tex_h` — Full texture height in pixels.
-    /// - `frame_w` — Single cell width.
-    /// - `frame_h` — Single cell height.
-    /// - `start` — 0-based cell index to begin at.
-    /// - `count` — Number of cells to extract.
+    /// - `tex_w` â€” Full texture width in pixels.
+    /// - `tex_h` â€” Full texture height in pixels.
+    /// - `frame_w` â€” Single cell width.
+    /// - `frame_h` â€” Single cell height.
+    /// - `start` â€” 0-based cell index to begin at.
+    /// - `count` â€” Number of cells to extract.
     pub fn add_frames_from_grid(
         &mut self,
         tex_w: u32,
@@ -148,15 +148,15 @@ impl Animation {
         added
     }
 
-    // ── Clip management ─────────────────────────────────────────────────
+    // â”€â”€ Clip management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Registers a named clip. The insertion is O(1) amortised unless a resize is triggered.
     ///
     /// # Parameters
-    /// - `name` — Unique clip name.
-    /// - `frame_indices` — Indices into the animation's frame pool (0-based).
-    /// - `fps` — Playback speed in frames per second.
-    /// - `looping` — Whether the clip loops.
+    /// - `name` â€” Unique clip name.
+    /// - `frame_indices` â€” Indices into the animation's frame pool (0-based).
+    /// - `fps` â€” Playback speed in frames per second.
+    /// - `looping` â€” Whether the clip loops.
     pub fn add_clip(&mut self, name: &str, frame_indices: Vec<usize>, fps: f32, looping: bool) {
         log_msg!(debug, AN02_CLIP_ADDED, "{}", name);
         self.clips.insert(
@@ -173,15 +173,15 @@ impl Animation {
     /// Convenience method: adds grid-sliced frames then creates a clip referencing them.
     ///
     /// # Parameters
-    /// - `name` — Clip name.
-    /// - `tex_w` — Full texture width.
-    /// - `tex_h` — Full texture height.
-    /// - `frame_w` — Single cell width.
-    /// - `frame_h` — Single cell height.
-    /// - `start` — 0-based cell index to begin at.
-    /// - `count` — Number of cells.
-    /// - `fps` — Playback speed.
-    /// - `looping` — Whether the clip loops.
+    /// - `name` â€” Clip name.
+    /// - `tex_w` â€” Full texture width.
+    /// - `tex_h` â€” Full texture height.
+    /// - `frame_w` â€” Single cell width.
+    /// - `frame_h` â€” Single cell height.
+    /// - `start` â€” 0-based cell index to begin at.
+    /// - `count` â€” Number of cells.
+    /// - `fps` â€” Playback speed.
+    /// - `looping` â€” Whether the clip loops.
     #[allow(clippy::too_many_arguments)]
     pub fn add_clip_from_grid(
         &mut self,
@@ -201,12 +201,12 @@ impl Animation {
         self.add_clip(name, indices, fps, looping);
     }
 
-    // ── Playback control ────────────────────────────────────────────────
+    // â”€â”€ Playback control â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Starts playing a clip by name.
     ///
     /// # Parameters
-    /// - `name` — `&str`.
+    /// - `name` â€” `&str`.
     ///
     /// # Returns
     /// `bool`.
@@ -243,12 +243,12 @@ impl Animation {
         self.playing = true;
     }
 
-    // ── Update ──────────────────────────────────────────────────────────
+    // â”€â”€ Update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Advances the animation by `dt` seconds (scaled by [`speed`](Self::get_speed)).
     ///
     /// # Parameters
-    /// - `dt` — `f32`.
+    /// - `dt` â€” `f32`.
     ///
     /// Generates [`AnimEvent`] entries retrievable via [`drain_events`](Self::drain_events).
     /// For non-looping clips the animation stops at the last frame and emits
@@ -257,7 +257,7 @@ impl Animation {
     pub fn update(&mut self, dt: f32) {
         self.pending_events.clear();
 
-        // Advance crossfade timer — clamp at duration so blend weight saturates at 1.0.
+        // Advance crossfade timer â€” clamp at duration so blend weight saturates at 1.0.
         if self.crossfade_duration > 0.0 {
             self.crossfade_timer = (self.crossfade_timer + dt).min(self.crossfade_duration);
         }
@@ -268,7 +268,7 @@ impl Animation {
 
         // Clone the clip to avoid holding a borrow on `self.clips` while mutating
         // `self.current_frame_pos` and `self.pending_events` below.
-        // TODO(perf): refactor to avoid this clone — see IDEA.md §6.
+        // TODO(perf): refactor to avoid this clone â€” see IDEA.md Â§6.
         let clip = match &self.current_clip {
             Some(name) => match self.clips.get(name) {
                 Some(c) => c.clone(),
@@ -330,7 +330,7 @@ impl Animation {
         1.0 / clip.fps
     }
 
-    // ── Queries ─────────────────────────────────────────────────────────
+    // â”€â”€ Queries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Returns the source rectangle of the current frame, or `None` if no
     /// clip is active or the frame pool is empty.
@@ -390,7 +390,7 @@ impl Animation {
     /// Sets the playback speed multiplier.
     ///
     /// # Parameters
-    /// - `speed` — `f32`.
+    /// - `speed` â€” `f32`.
     ///
     /// A value of `1.0` is normal speed. Values below `0.0` are clamped to `0.0`.
     pub fn set_speed(&mut self, speed: f32) {
@@ -424,7 +424,7 @@ impl Animation {
     /// Sets the playback position within the current clip.
     ///
     /// # Parameters
-    /// - `index` — `usize`.
+    /// - `index` â€” `usize`.
     ///
     /// The index is clamped to the valid range for the active clip.
     /// Has no effect if no clip is active.
@@ -439,7 +439,7 @@ impl Animation {
         }
     }
 
-    // ── Crossfade ────────────────────────────────────────────────────────
+    // â”€â”€ Crossfade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Starts a crossfade to another clip over the given duration in seconds.
     ///
@@ -447,8 +447,8 @@ impl Animation {
     /// the target clip. Returns `false` if the clip does not exist.
     ///
     /// # Parameters
-    /// - `clip_name` — `&str`. Target clip name.
-    /// - `duration` — `f32`. Crossfade duration in seconds.
+    /// - `clip_name` â€” `&str`. Target clip name.
+    /// - `duration` â€” `f32`. Crossfade duration in seconds.
     ///
     /// # Returns
     /// `bool`.
@@ -479,7 +479,7 @@ impl Animation {
         Some((q1, q2, blend))
     }
 
-    // ── Debug rendering ──────────────────────────────────────────────────
+    // â”€â”€ Debug rendering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Renders the current animation frame as a debug image.
     ///
@@ -487,8 +487,8 @@ impl Animation {
     /// Useful for evidence tests where no GPU is available.
     ///
     /// # Parameters
-    /// - `width` — `u32`. Image width in pixels.
-    /// - `height` — `u32`. Image height in pixels.
+    /// - `width` â€” `u32`. Image width in pixels.
+    /// - `height` â€” `u32`. Image height in pixels.
     ///
     /// # Returns
     /// `ImageData`.
@@ -552,7 +552,7 @@ impl Animation {
         img
     }
 
-    // ── Aseprite import ──────────────────────────────────────────────────
+    // â”€â”€ Aseprite import â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Creates an [`Animation`] from an [`AsepriteParsed`] result.
     ///
@@ -560,7 +560,7 @@ impl Animation {
     /// Per-frame duration from the Aseprite export is used when set.
     ///
     /// # Parameters
-    /// - `parsed` — `&AsepriteParsed`. Parsed Aseprite JSON data.
+    /// - `parsed` â€” `&AsepriteParsed`. Parsed Aseprite JSON data.
     ///
     /// # Returns
     /// `Animation`.
@@ -609,101 +609,4 @@ impl Default for Animation {
     }
 }
 
-// ── Unit tests ──────────────────────────────────────────────────────────
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// Helper: create an animation with a single clip from a grid.
-    fn make_clip_anim(count: usize, fps: f32, looping: bool) -> Animation {
-        let mut anim = Animation::new();
-        anim.add_clip_from_grid("walk", 128, 32, 32, 32, 0, count, fps, looping);
-        anim.play("walk");
-        anim
-    }
-
-    #[test]
-    fn new_animation_is_empty() {
-        let anim = Animation::new();
-        assert_eq!(anim.get_frame_count(), 0);
-        assert_eq!(anim.get_clip_count(), 0);
-        assert!(!anim.is_playing());
-        assert!(anim.current_quad().is_none());
-    }
-
-    #[test]
-    fn add_frame_returns_sequential_indices() {
-        let mut anim = Animation::new();
-        let a = anim.add_frame(Rect::new(0.0, 0.0, 32.0, 32.0));
-        let b = anim.add_frame(Rect::new(32.0, 0.0, 32.0, 32.0));
-        assert_eq!(a, 0);
-        assert_eq!(b, 1);
-        assert_eq!(anim.get_frame_count(), 2);
-    }
-
-    #[test]
-    fn add_frames_from_grid_slices_correctly() {
-        let mut anim = Animation::new();
-        let added = anim.add_frames_from_grid(128, 64, 32, 32, 0, 8);
-        assert_eq!(added, 8);
-        assert_eq!(anim.get_frame_count(), 8);
-    }
-
-    #[test]
-    fn add_frames_from_grid_clamps_to_total_cells() {
-        let mut anim = Animation::new();
-        let added = anim.add_frames_from_grid(64, 64, 32, 32, 0, 100);
-        assert_eq!(added, 4); // 2x2 grid = 4 cells max
-    }
-
-    #[test]
-    fn play_nonexistent_clip_returns_false() {
-        let mut anim = Animation::new();
-        assert!(!anim.play("missing"));
-        assert!(!anim.is_playing());
-    }
-
-    #[test]
-    fn play_starts_at_frame_zero() {
-        let anim = make_clip_anim(4, 10.0, true);
-        assert_eq!(anim.current_frame(), 0);
-        assert!(anim.is_playing());
-    }
-
-    #[test]
-    fn update_advances_frames() {
-        let mut anim = make_clip_anim(4, 10.0, true);
-        anim.update(0.15); // 1.5 frames at 10fps -> frame 1
-        assert_eq!(anim.current_frame(), 1);
-    }
-
-    #[test]
-    fn looping_clip_wraps_and_emits_event() {
-        let mut anim = make_clip_anim(2, 10.0, true);
-        anim.update(0.25); // 2.5 frames -> wrap
-        let events = anim.drain_events();
-        assert!(events.contains(&AnimEvent::Looped));
-        assert!(anim.is_playing());
-    }
-
-    #[test]
-    fn non_looping_clip_stops_and_emits_finished() {
-        let mut anim = make_clip_anim(2, 10.0, false);
-        anim.update(0.5); // well past both frames
-        let events = anim.drain_events();
-        assert!(events.contains(&AnimEvent::Finished));
-        assert!(!anim.is_playing());
-    }
-
-    #[test]
-    fn pause_resume_works() {
-        let mut anim = make_clip_anim(4, 10.0, true);
-        anim.pause();
-        anim.update(0.5);
-        assert_eq!(anim.current_frame(), 0);
-        anim.resume();
-        anim.update(0.15);
-        assert_eq!(anim.current_frame(), 1);
-    }
-}
+// â”€â”€ Unit tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

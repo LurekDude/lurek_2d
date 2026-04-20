@@ -1,6 +1,6 @@
-//! Aseprite JSON export parser for sprite animation data.
+﻿//! Aseprite JSON export parser for sprite animation data.
 //!
-//! Parses the JSON exported by Aseprite (File → Export Sprite Sheet → Output → JSON Data)
+//! Parses the JSON exported by Aseprite (File â†’ Export Sprite Sheet â†’ Output â†’ JSON Data)
 //! and converts frame and tag data into types that [`Animation::load_from_aseprite`] can consume.
 
 use serde_json::Value;
@@ -8,11 +8,11 @@ use serde_json::Value;
 /// Pixel-level frame rectangle extracted from an Aseprite JSON export.
 ///
 /// # Fields
-/// - `x` — `u32`. Left edge within the sprite sheet.
-/// - `y` — `u32`. Top edge within the sprite sheet.
-/// - `w` — `u32`. Frame width in pixels.
-/// - `h` — `u32`. Frame height in pixels.
-/// - `duration_ms` — `u32`. Display duration in milliseconds.
+/// - `x` â€” `u32`. Left edge within the sprite sheet.
+/// - `y` â€” `u32`. Top edge within the sprite sheet.
+/// - `w` â€” `u32`. Frame width in pixels.
+/// - `h` â€” `u32`. Frame height in pixels.
+/// - `duration_ms` â€” `u32`. Display duration in milliseconds.
 #[derive(Debug, Clone)]
 pub struct AsepriteFrameData {
     /// Left edge of the frame within the sprite sheet in pixels.
@@ -30,9 +30,9 @@ pub struct AsepriteFrameData {
 /// Playback direction of an Aseprite frame tag.
 ///
 /// # Variants
-/// - `Forward` — plays from `from` to `to`.
-/// - `Reverse` — plays from `to` to `from`.
-/// - `PingPong` — plays forward then backward.
+/// - `Forward` â€” plays from `from` to `to`.
+/// - `Reverse` â€” plays from `to` to `from`.
+/// - `PingPong` â€” plays forward then backward.
 #[derive(Debug, Clone, PartialEq)]
 pub enum AsepriteDirection {
     /// Plays frames from `from` to `to` in order.
@@ -46,10 +46,10 @@ pub enum AsepriteDirection {
 /// Frame tag (named clip range) from an Aseprite JSON export.
 ///
 /// # Fields
-/// - `name` — `String`. Clip name (e.g. "idle", "walk").
-/// - `from` — `usize`. First frame index (0-based).
-/// - `to` — `usize`. Last frame index (0-based, inclusive).
-/// - `direction` — [`AsepriteDirection`].
+/// - `name` â€” `String`. Clip name (e.g. "idle", "walk").
+/// - `from` â€” `usize`. First frame index (0-based).
+/// - `to` â€” `usize`. Last frame index (0-based, inclusive).
+/// - `direction` â€” [`AsepriteDirection`].
 #[derive(Debug, Clone)]
 pub struct AsepriteTagData {
     /// Human-readable clip name.
@@ -65,10 +65,10 @@ pub struct AsepriteTagData {
 /// Result of parsing an Aseprite JSON export.
 ///
 /// # Fields
-/// - `frames` — `Vec<AsepriteFrameData>`. All frame rectangles in order.
-/// - `tags` — `Vec<AsepriteTagData>`. Named animation ranges.
-/// - `sheet_width` — `u32`. Total sprite sheet width.
-/// - `sheet_height` — `u32`. Total sprite sheet height.
+/// - `frames` â€” `Vec<AsepriteFrameData>`. All frame rectangles in order.
+/// - `tags` â€” `Vec<AsepriteTagData>`. Named animation ranges.
+/// - `sheet_width` â€” `u32`. Total sprite sheet width.
+/// - `sheet_height` â€” `u32`. Total sprite sheet height.
 #[derive(Debug, Clone)]
 pub struct AsepriteParsed {
     /// All frame rectangles in export order.
@@ -87,15 +87,15 @@ pub struct AsepriteParsed {
 /// (`"frames": {"name": {...}}`) exports.
 ///
 /// # Parameters
-/// - `json_str` — `&str`. UTF-8 JSON string exported by Aseprite.
+/// - `json_str` â€” `&str`. UTF-8 JSON string exported by Aseprite.
 ///
 /// # Returns
-/// `Result<AsepriteParsed, String>` — parsed data, or an error description.
+/// `Result<AsepriteParsed, String>` â€” parsed data, or an error description.
 pub fn load_aseprite_json(json_str: &str) -> Result<AsepriteParsed, String> {
     let root: Value = serde_json::from_str(json_str)
         .map_err(|e| format!("aseprite: JSON parse error: {}", e))?;
 
-    // ── frames ──────────────────────────────────────────────────────────
+    // â”€â”€ frames â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let frames_val = root
         .get("frames")
         .ok_or("aseprite: missing 'frames' key")?;
@@ -125,7 +125,7 @@ pub fn load_aseprite_json(json_str: &str) -> Result<AsepriteParsed, String> {
         return Err("aseprite: 'frames' must be an array or object".to_string());
     }
 
-    // ── meta ─────────────────────────────────────────────────────────────
+    // â”€â”€ meta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let meta = root
         .get("meta")
         .ok_or("aseprite: missing 'meta' key")?;
@@ -144,7 +144,7 @@ pub fn load_aseprite_json(json_str: &str) -> Result<AsepriteParsed, String> {
         .and_then(Value::as_u64)
         .ok_or("aseprite: missing 'meta.size.h'")? as u32;
 
-    // ── frameTags ────────────────────────────────────────────────────────
+    // â”€â”€ frameTags â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let mut tags: Vec<AsepriteTagData> = Vec::new();
     if let Some(tag_arr) = meta.get("frameTags").and_then(Value::as_array) {
         for tag_val in tag_arr {
@@ -202,69 +202,4 @@ fn parse_frame_entry(entry: &Value) -> Result<AsepriteFrameData, String> {
         .unwrap_or(100) as u32;
 
     Ok(AsepriteFrameData { x, y, w, h, duration_ms })
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn sample_json() -> &'static str {
-        r#"{
-            "frames": [
-                {"frame":{"x":0,"y":0,"w":32,"h":32},"duration":100},
-                {"frame":{"x":32,"y":0,"w":32,"h":32},"duration":200}
-            ],
-            "meta": {
-                "size": {"w":64,"h":32},
-                "frameTags": [
-                    {"name":"idle","from":0,"to":1,"direction":"forward"}
-                ]
-            }
-        }"#
-    }
-
-    #[test]
-    fn parse_array_format() {
-        let parsed = load_aseprite_json(sample_json()).unwrap();
-        assert_eq!(parsed.frames.len(), 2);
-        assert_eq!(parsed.frames[0].w, 32);
-        assert_eq!(parsed.frames[1].duration_ms, 200);
-        assert_eq!(parsed.sheet_width, 64);
-        assert_eq!(parsed.sheet_height, 32);
-    }
-
-    #[test]
-    fn parse_tags() {
-        let parsed = load_aseprite_json(sample_json()).unwrap();
-        assert_eq!(parsed.tags.len(), 1);
-        assert_eq!(parsed.tags[0].name, "idle");
-        assert_eq!(parsed.tags[0].from, 0);
-        assert_eq!(parsed.tags[0].to, 1);
-        assert_eq!(parsed.tags[0].direction, AsepriteDirection::Forward);
-    }
-
-    #[test]
-    fn parse_reverse_direction() {
-        let json = r#"{
-            "frames": [{"frame":{"x":0,"y":0,"w":16,"h":16},"duration":50}],
-            "meta": {
-                "size": {"w":16,"h":16},
-                "frameTags": [{"name":"walk","from":0,"to":0,"direction":"reverse"}]
-            }
-        }"#;
-        let parsed = load_aseprite_json(json).unwrap();
-        assert_eq!(parsed.tags[0].direction, AsepriteDirection::Reverse);
-    }
-
-    #[test]
-    fn parse_missing_frames_key_errors() {
-        let json = r#"{"meta":{"size":{"w":16,"h":16}}}"#;
-        assert!(load_aseprite_json(json).is_err());
-    }
-
-    #[test]
-    fn parse_missing_meta_errors() {
-        let json = r#"{"frames":[]}"#;
-        assert!(load_aseprite_json(json).is_err());
-    }
 }

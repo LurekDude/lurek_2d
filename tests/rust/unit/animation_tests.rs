@@ -7,7 +7,7 @@ use lurek2d::animation::curve::{AnimCurve, EasingKind};
 use lurek2d::animation::event::AnimEvent;
 use lurek2d::animation::frame::{AnimFrame, AnimationFrame};
 use lurek2d::animation::render::{quad_to_draw_command, AnimRenderParams};
-use lurek2d::animation::state_machine::{AnimStateMachine, ConditionOp};
+use lurek2d::animation::state_machine::{compare_nums, parse_condition, AnimStateMachine, ConditionOp};
 use lurek2d::animation::sync_group::AnimSyncGroup;
 use lurek2d::animation::aseprite::{load_aseprite_json, AsepriteDirection};
 use lurek2d::math::Rect;
@@ -173,6 +173,17 @@ mod curve_tests {
         c.add_keyframe(1.0, 10.0);
         // Step at 0.5 should still be v0=5 (alpha 0.5 → eased α=0.0 → v0)
         assert!((c.eval(0.5) - 5.0).abs() < 1e-4);
+    }
+
+    #[test]
+    fn add_keyframe_keeps_sorted_order() {
+        let mut c = AnimCurve::new();
+        c.add_keyframe(0.5, 1.0);
+        c.add_keyframe(0.0, 0.0);
+        c.add_keyframe(1.0, 2.0);
+        assert!((c.keyframes[0].0 - 0.0).abs() < 1e-5);
+        assert!((c.keyframes[1].0 - 0.5).abs() < 1e-5);
+        assert!((c.keyframes[2].0 - 1.0).abs() < 1e-5);
     }
 }
 
@@ -408,6 +419,26 @@ mod state_machine_tests {
         sm.set_param_bool("moving", true);
         sm.update(0.016);
         assert_eq!(sm.get_state(), "walk");
+    }
+
+    #[test]
+    fn parse_condition_gt() {
+        let c = parse_condition("speed > 5.0").unwrap();
+        assert_eq!(c.param, "speed");
+        assert_eq!(c.op, ConditionOp::Gt);
+    }
+
+    #[test]
+    fn parse_condition_invalid_returns_error() {
+        assert!(parse_condition("noop").is_err());
+    }
+
+    #[test]
+    fn compare_nums_helpers() {
+        assert!(compare_nums(2.0, 1.0, &ConditionOp::Gt));
+        assert!(!compare_nums(1.0, 2.0, &ConditionOp::Gt));
+        assert!(compare_nums(1.0, 1.0, &ConditionOp::Eq));
+        assert!(compare_nums(1.0, 2.0, &ConditionOp::Neq));
     }
 }
 
