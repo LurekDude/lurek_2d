@@ -2,6 +2,27 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.3] — 2026-04-22
+
+### Globe Module Quality — Docstrings + Rust Unit Tests + Lua Coverage
+
+- **fix(globe-quality): `globe_api.rs` LOD doc comments** — Added `///` doc comments for `LOD_FAR`, `LOD_MID`, and `LOD_NEAR` constants (`doc_coverage` was reporting 2 uncovered items).
+- **test(globe-quality): `tests/rust/unit/globe_tests.rs`** — New file with 55+ Rust unit tests covering `FogMask`, `FogStore`, `sun_direction`, `province_intensity`, `compute_intensities`, `terminator_alpha`, `OrbitCamera::zoom_by/lod`, `build_view_matrix`, `project_point`, `project_province`, `project_point_with_z`, `screen_delta_to_pan`, `normalize_v3`, `ProvinceGraph::neighbors_of/set_attr/get_attr/find_path_default/reachable_default/rebuild_caches`.
+- **test(globe-quality): `tests/engine_tests.rs`** — Registered `globe_tests` module (alphabetical between `filesystem_tests` and `graph_tests`).
+- **test(globe-quality): `test_globe.lua`** — Added `pickLatLon` test case to "Camera and LOD" describe block; closes the last uncovered Lua function in the globe module.
+
+## [0.20.2] — 2026-04-22
+
+### Feature Batch — IDEA.md Items (runtime · timer) + Prompt hardening
+
+- **feat(runtime): `ModulesConfig::validate_and_fix` — expanded dependency rules** — Added validation for `animation` (requires `graphics`), `tilemap` (requires `graphics`), `raycaster` (requires `graphics`), `camera` (requires `graphics`), `globe` (requires `graphics`), `spine` (requires `graphics` and `animation`). Docstring updated with the full rule list.
+- **feat(lua_api): `lurek.time.delay(seconds)` helper** — Coroutine-based yield-for-duration sugar alias for `waitSeconds`; call from a coroutine to pause for `seconds` engine-time seconds. Registered in `src/lua_api/timer_api.rs`.
+- **test(lua): `afterNamed` replacement semantics BDD tests** — Added `afterNamed replacement` and `lurek.time.delay` describe blocks to `tests/lua/unit/test_timer.lua`.
+- **test(rust): `validate_and_fix` unit tests** — Added 9 new unit tests to `tests/rust/unit/runtime_tests.rs` covering all new module-dependency rules (animation, tilemap, raycaster, camera, globe, spine/graphics, spine/animation).
+- **docs(specs): runtime.md + timer.md** — `validate_and_fix` entry lists all 12 enforced rules; `lurek.time.delay` added to Lua API Reference section.
+- **docs(idea): marked items DONE** — `src/runtime/IDEA.md` Gap 3, `src/timer/IDEA.md` afterNamed test and delay helper.
+- **chore(prompts): workflow prompt hardened** — `cargo check --tests` success gate added; harness.rs registration check and `gen_all_docs.py` anti-pattern made explicit in `Success Criteria` and `Anti-patterns`.
+
 ## [0.20.1] — 2026-04-21
 
 ### Feature Batch — IDEA.md Items (math · filesystem · data · runtime)

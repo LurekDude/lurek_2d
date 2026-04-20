@@ -1,9 +1,9 @@
 {
   "rust": {
     "total": 4081,
-    "covered": 3121,
-    "uncovered": 960,
-    "coverage_pct": 76.5,
+    "covered": 3154,
+    "uncovered": 927,
+    "coverage_pct": 77.3,
     "covered_items": [
       {
         "module": "ai",
@@ -5965,9 +5965,33 @@
       },
       {
         "module": "globe",
+        "name": "FogMask::all_hidden",
+        "file": "src/globe/fog.rs",
+        "line": 23
+      },
+      {
+        "module": "globe",
+        "name": "FogMask::all_visible",
+        "file": "src/globe/fog.rs",
+        "line": 29
+      },
+      {
+        "module": "globe",
         "name": "FogMask::is_visible",
         "file": "src/globe/fog.rs",
         "line": 43
+      },
+      {
+        "module": "globe",
+        "name": "FogMask::reveal",
+        "file": "src/globe/fog.rs",
+        "line": 52
+      },
+      {
+        "module": "globe",
+        "name": "FogMask::hide",
+        "file": "src/globe/fog.rs",
+        "line": 60
       },
       {
         "module": "globe",
@@ -5977,9 +6001,39 @@
       },
       {
         "module": "globe",
+        "name": "FogMask::reveal_batch",
+        "file": "src/globe/fog.rs",
+        "line": 76
+      },
+      {
+        "module": "globe",
+        "name": "FogMask::visible_ids",
+        "file": "src/globe/fog.rs",
+        "line": 83
+      },
+      {
+        "module": "globe",
+        "name": "FogMask::from_visible_ids",
+        "file": "src/globe/fog.rs",
+        "line": 100
+      },
+      {
+        "module": "globe",
+        "name": "FogMask::count_visible",
+        "file": "src/globe/fog.rs",
+        "line": 109
+      },
+      {
+        "module": "globe",
         "name": "FogStore::new",
         "file": "src/globe/fog.rs",
         "line": 122
+      },
+      {
+        "module": "globe",
+        "name": "FogStore::get_or_insert",
+        "file": "src/globe/fog.rs",
+        "line": 128
       },
       {
         "module": "globe",
@@ -5995,6 +6049,24 @@
       },
       {
         "module": "globe",
+        "name": "FogStore::reveal",
+        "file": "src/globe/fog.rs",
+        "line": 149
+      },
+      {
+        "module": "globe",
+        "name": "FogStore::hide",
+        "file": "src/globe/fog.rs",
+        "line": 154
+      },
+      {
+        "module": "globe",
+        "name": "FogStore::visible_ids",
+        "file": "src/globe/fog.rs",
+        "line": 159
+      },
+      {
+        "module": "globe",
         "name": "FogStore::load",
         "file": "src/globe/fog.rs",
         "line": 164
@@ -6004,6 +6076,12 @@
         "name": "FogStore::remove",
         "file": "src/globe/fog.rs",
         "line": 169
+      },
+      {
+        "module": "globe",
+        "name": "FogStore::viewers",
+        "file": "src/globe/fog.rs",
+        "line": 174
       },
       {
         "module": "globe",
@@ -6115,6 +6193,30 @@
       },
       {
         "module": "globe",
+        "name": "sun_direction",
+        "file": "src/globe/lighting.rs",
+        "line": 18
+      },
+      {
+        "module": "globe",
+        "name": "province_intensity",
+        "file": "src/globe/lighting.rs",
+        "line": 43
+      },
+      {
+        "module": "globe",
+        "name": "compute_intensities",
+        "file": "src/globe/lighting.rs",
+        "line": 58
+      },
+      {
+        "module": "globe",
+        "name": "terminator_alpha",
+        "file": "src/globe/lighting.rs",
+        "line": 72
+      },
+      {
+        "module": "globe",
         "name": "MarkerStore::new",
         "file": "src/globe/marker.rs",
         "line": 21
@@ -6151,6 +6253,18 @@
       },
       {
         "module": "globe",
+        "name": "MarkerStore::set_attr",
+        "file": "src/globe/marker.rs",
+        "line": 86
+      },
+      {
+        "module": "globe",
+        "name": "MarkerStore::get_attr",
+        "file": "src/globe/marker.rs",
+        "line": 96
+      },
+      {
+        "module": "globe",
         "name": "MarkerStore::iter",
         "file": "src/globe/marker.rs",
         "line": 101
@@ -6181,9 +6295,51 @@
       },
       {
         "module": "globe",
+        "name": "OrbitCamera::zoom_by",
+        "file": "src/globe/projection.rs",
+        "line": 73
+      },
+      {
+        "module": "globe",
         "name": "OrbitCamera::lod",
         "file": "src/globe/projection.rs",
         "line": 79
+      },
+      {
+        "module": "globe",
+        "name": "build_view_matrix",
+        "file": "src/globe/projection.rs",
+        "line": 93
+      },
+      {
+        "module": "globe",
+        "name": "project_point",
+        "file": "src/globe/projection.rs",
+        "line": 105
+      },
+      {
+        "module": "globe",
+        "name": "project_province",
+        "file": "src/globe/projection.rs",
+        "line": 129
+      },
+      {
+        "module": "globe",
+        "name": "project_point_with_z",
+        "file": "src/globe/projection.rs",
+        "line": 173
+      },
+      {
+        "module": "globe",
+        "name": "screen_delta_to_pan",
+        "file": "src/globe/projection.rs",
+        "line": 193
+      },
+      {
+        "module": "globe",
+        "name": "normalize_v3",
+        "file": "src/globe/projection.rs",
+        "line": 207
       },
       {
         "module": "globe",
@@ -6310,6 +6466,42 @@
         "name": "ProvinceGraph::reachable",
         "file": "src/globe/topology.rs",
         "line": 105
+      },
+      {
+        "module": "globe",
+        "name": "ProvinceGraph::neighbors_of",
+        "file": "src/globe/topology.rs",
+        "line": 121
+      },
+      {
+        "module": "globe",
+        "name": "ProvinceGraph::set_attr",
+        "file": "src/globe/topology.rs",
+        "line": 126
+      },
+      {
+        "module": "globe",
+        "name": "ProvinceGraph::get_attr",
+        "file": "src/globe/topology.rs",
+        "line": 133
+      },
+      {
+        "module": "globe",
+        "name": "ProvinceGraph::find_path_default",
+        "file": "src/globe/topology.rs",
+        "line": 138
+      },
+      {
+        "module": "globe",
+        "name": "ProvinceGraph::reachable_default",
+        "file": "src/globe/topology.rs",
+        "line": 144
+      },
+      {
+        "module": "globe",
+        "name": "ProvinceGraph::rebuild_caches",
+        "file": "src/globe/topology.rs",
+        "line": 151
       },
       {
         "module": "globe",
@@ -8655,7 +8847,7 @@
         "module": "lua_api",
         "name": "register",
         "file": "src/lua_api/globe_api.rs",
-        "line": 668
+        "line": 669
       },
       {
         "module": "lua_api",
@@ -10780,6 +10972,12 @@
         "name": "NetworkHost::flush",
         "file": "src/network/host.rs",
         "line": 308
+      },
+      {
+        "module": "network",
+        "name": "NetworkHost::disconnect",
+        "file": "src/network/host.rs",
+        "line": 322
       },
       {
         "module": "network",
@@ -14547,13 +14745,13 @@
         "module": "runtime",
         "name": "ModulesConfig::validate_and_fix",
         "file": "src/runtime/config.rs",
-        "line": 243
+        "line": 251
       },
       {
         "module": "runtime",
         "name": "Config::load",
         "file": "src/runtime/config.rs",
-        "line": 387
+        "line": 425
       },
       {
         "module": "runtime",
@@ -20685,84 +20883,6 @@
       },
       {
         "module": "globe",
-        "name": "FogMask::all_hidden",
-        "file": "src/globe/fog.rs",
-        "line": 23
-      },
-      {
-        "module": "globe",
-        "name": "FogMask::all_visible",
-        "file": "src/globe/fog.rs",
-        "line": 29
-      },
-      {
-        "module": "globe",
-        "name": "FogMask::reveal",
-        "file": "src/globe/fog.rs",
-        "line": 52
-      },
-      {
-        "module": "globe",
-        "name": "FogMask::hide",
-        "file": "src/globe/fog.rs",
-        "line": 60
-      },
-      {
-        "module": "globe",
-        "name": "FogMask::reveal_batch",
-        "file": "src/globe/fog.rs",
-        "line": 76
-      },
-      {
-        "module": "globe",
-        "name": "FogMask::visible_ids",
-        "file": "src/globe/fog.rs",
-        "line": 83
-      },
-      {
-        "module": "globe",
-        "name": "FogMask::from_visible_ids",
-        "file": "src/globe/fog.rs",
-        "line": 100
-      },
-      {
-        "module": "globe",
-        "name": "FogMask::count_visible",
-        "file": "src/globe/fog.rs",
-        "line": 109
-      },
-      {
-        "module": "globe",
-        "name": "FogStore::get_or_insert",
-        "file": "src/globe/fog.rs",
-        "line": 128
-      },
-      {
-        "module": "globe",
-        "name": "FogStore::reveal",
-        "file": "src/globe/fog.rs",
-        "line": 149
-      },
-      {
-        "module": "globe",
-        "name": "FogStore::hide",
-        "file": "src/globe/fog.rs",
-        "line": 154
-      },
-      {
-        "module": "globe",
-        "name": "FogStore::visible_ids",
-        "file": "src/globe/fog.rs",
-        "line": 159
-      },
-      {
-        "module": "globe",
-        "name": "FogStore::viewers",
-        "file": "src/globe/fog.rs",
-        "line": 174
-      },
-      {
-        "module": "globe",
         "name": "LabelStore::move_to",
         "file": "src/globe/label.rs",
         "line": 85
@@ -20805,30 +20925,6 @@
       },
       {
         "module": "globe",
-        "name": "sun_direction",
-        "file": "src/globe/lighting.rs",
-        "line": 18
-      },
-      {
-        "module": "globe",
-        "name": "province_intensity",
-        "file": "src/globe/lighting.rs",
-        "line": 43
-      },
-      {
-        "module": "globe",
-        "name": "compute_intensities",
-        "file": "src/globe/lighting.rs",
-        "line": 58
-      },
-      {
-        "module": "globe",
-        "name": "terminator_alpha",
-        "file": "src/globe/lighting.rs",
-        "line": 72
-      },
-      {
-        "module": "globe",
         "name": "load_from_toml_str",
         "file": "src/globe/loader.rs",
         "line": 52
@@ -20853,18 +20949,6 @@
       },
       {
         "module": "globe",
-        "name": "MarkerStore::set_attr",
-        "file": "src/globe/marker.rs",
-        "line": 86
-      },
-      {
-        "module": "globe",
-        "name": "MarkerStore::get_attr",
-        "file": "src/globe/marker.rs",
-        "line": 96
-      },
-      {
-        "module": "globe",
         "name": "MarkerStore::iter_visible",
         "file": "src/globe/marker.rs",
         "line": 106
@@ -20874,48 +20958,6 @@
         "name": "MarkerStore::by_type",
         "file": "src/globe/marker.rs",
         "line": 111
-      },
-      {
-        "module": "globe",
-        "name": "OrbitCamera::zoom_by",
-        "file": "src/globe/projection.rs",
-        "line": 73
-      },
-      {
-        "module": "globe",
-        "name": "build_view_matrix",
-        "file": "src/globe/projection.rs",
-        "line": 93
-      },
-      {
-        "module": "globe",
-        "name": "project_point",
-        "file": "src/globe/projection.rs",
-        "line": 105
-      },
-      {
-        "module": "globe",
-        "name": "project_province",
-        "file": "src/globe/projection.rs",
-        "line": 129
-      },
-      {
-        "module": "globe",
-        "name": "project_point_with_z",
-        "file": "src/globe/projection.rs",
-        "line": 173
-      },
-      {
-        "module": "globe",
-        "name": "screen_delta_to_pan",
-        "file": "src/globe/projection.rs",
-        "line": 193
-      },
-      {
-        "module": "globe",
-        "name": "normalize_v3",
-        "file": "src/globe/projection.rs",
-        "line": 207
       },
       {
         "module": "globe",
@@ -20964,42 +21006,6 @@
         "name": "Globe::emit_frame",
         "file": "src/globe/registry.rs",
         "line": 118
-      },
-      {
-        "module": "globe",
-        "name": "ProvinceGraph::neighbors_of",
-        "file": "src/globe/topology.rs",
-        "line": 121
-      },
-      {
-        "module": "globe",
-        "name": "ProvinceGraph::set_attr",
-        "file": "src/globe/topology.rs",
-        "line": 126
-      },
-      {
-        "module": "globe",
-        "name": "ProvinceGraph::get_attr",
-        "file": "src/globe/topology.rs",
-        "line": 133
-      },
-      {
-        "module": "globe",
-        "name": "ProvinceGraph::find_path_default",
-        "file": "src/globe/topology.rs",
-        "line": 138
-      },
-      {
-        "module": "globe",
-        "name": "ProvinceGraph::reachable_default",
-        "file": "src/globe/topology.rs",
-        "line": 144
-      },
-      {
-        "module": "globe",
-        "name": "ProvinceGraph::rebuild_caches",
-        "file": "src/globe/topology.rs",
-        "line": 151
       },
       {
         "module": "graph",
@@ -22038,12 +22044,6 @@
         "name": "NetworkHost::broadcast_bytes",
         "file": "src/network/host.rs",
         "line": 289
-      },
-      {
-        "module": "network",
-        "name": "NetworkHost::disconnect",
-        "file": "src/network/host.rs",
-        "line": 322
       },
       {
         "module": "network",
@@ -23165,13 +23165,13 @@
         "module": "runtime",
         "name": "Config::load_from_conf_toml",
         "file": "src/runtime/config.rs",
-        "line": 408
+        "line": 446
       },
       {
         "module": "runtime",
         "name": "Config::load_from_conf_lua",
         "file": "src/runtime/config.rs",
-        "line": 476
+        "line": 514
       },
       {
         "module": "runtime",
@@ -24497,8 +24497,8 @@
   },
   "lua": {
     "total": 3723,
-    "covered": 3383,
-    "uncovered": 340,
+    "covered": 3384,
+    "uncovered": 339,
     "coverage_pct": 90.9,
     "covered_items": [
       {
@@ -32301,6 +32301,13 @@
       },
       {
         "module": "globe",
+        "lua_name": "Globe:pickLatLon",
+        "kind": "method",
+        "file": "src/lua_api/globe_api.rs",
+        "line": 241
+      },
+      {
+        "module": "globe",
         "lua_name": "Globe:setActiveViewer",
         "kind": "method",
         "file": "src/lua_api/globe_api.rs",
@@ -32528,56 +32535,56 @@
         "lua_name": "GlobeRegistry:remove",
         "kind": "method",
         "file": "src/lua_api/globe_api.rs",
-        "line": 625
+        "line": 626
       },
       {
         "module": "globe",
         "lua_name": "GlobeRegistry:names",
         "kind": "method",
         "file": "src/lua_api/globe_api.rs",
-        "line": 635
+        "line": 636
       },
       {
         "module": "globe",
         "lua_name": "lurek.globe.new",
         "kind": "function",
         "file": "src/lua_api/globe_api.rs",
-        "line": 680
+        "line": 681
       },
       {
         "module": "globe",
         "lua_name": "lurek.globe.get",
         "kind": "function",
         "file": "src/lua_api/globe_api.rs",
-        "line": 702
+        "line": 703
       },
       {
         "module": "globe",
         "lua_name": "lurek.globe.loadFromTOML",
         "kind": "function",
         "file": "src/lua_api/globe_api.rs",
-        "line": 729
+        "line": 730
       },
       {
         "module": "globe",
         "lua_name": "lurek.globe.greatCircleDistance",
         "kind": "function",
         "file": "src/lua_api/globe_api.rs",
-        "line": 756
+        "line": 757
       },
       {
         "module": "globe",
         "lua_name": "lurek.globe.greatCirclePath",
         "kind": "function",
         "file": "src/lua_api/globe_api.rs",
-        "line": 771
+        "line": 772
       },
       {
         "module": "globe",
         "lua_name": "lurek.globe.latLonToUnit",
         "kind": "function",
         "file": "src/lua_api/globe_api.rs",
-        "line": 791
+        "line": 792
       },
       {
         "module": "graph",
@@ -48834,13 +48841,6 @@
         "kind": "function",
         "file": "src/lua_api/filesystem_api.rs",
         "line": 610
-      },
-      {
-        "module": "globe",
-        "lua_name": "Globe:pickLatLon",
-        "kind": "method",
-        "file": "src/lua_api/globe_api.rs",
-        "line": 241
       },
       {
         "module": "graph",

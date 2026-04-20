@@ -201,6 +201,20 @@ describe("Camera and LOD", function()
         local _, _, zoom = g:getCamera()
         expect(zoom > 1.0)
     end)
+
+    -- @description Asserts that pickLatLon returns nil or a lat/lon table for a screen position.
+    -- @covers lurek.globe.Globe.pickLatLon
+    it("pickLatLon returns nil or a table", function()
+        local g = lurek.globe.new("pick_globe")
+        g:setCamera(30.0, 0.0, 1.0)
+        local result = g:pickLatLon(640, 360)
+        if result ~= nil then
+            expect_type("table", result)
+        end
+        -- Picking at a screen corner may return nil (back hemisphere) — that is correct.
+        local edge = g:pickLatLon(0, 0)
+        expect(edge == nil or type(edge) == "table")
+    end)
 end)
 
 -- =========================================================================

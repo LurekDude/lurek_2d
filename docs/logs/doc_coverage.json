@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-20T05:45:55.061418+00:00",
+  "generated_at": "2026-04-20T06:38:30.841919+00:00",
   "summary": {
     "rust": {
       "total": 5239,
@@ -8,35 +8,26 @@
       "pct": 100.0
     },
     "lua_api": {
-      "total": 53,
-      "covered": 51,
-      "missing": 2,
-      "pct": 96.2
+      "total": 54,
+      "covered": 53,
+      "missing": 1,
+      "pct": 98.1
     },
     "total": {
-      "total": 5292,
-      "covered": 5290,
-      "missing": 2,
+      "total": 5293,
+      "covered": 5292,
+      "missing": 1,
       "pct": 100.0
     }
   },
   "missing": [
     {
       "source": "lua_api",
-      "module": "globe_api",
-      "file": "src/lua_api/globe_api.rs",
-      "line": 808,
+      "module": "timer_api",
+      "file": "src/lua_api/timer_api.rs",
+      "line": 762,
       "kind": "fn",
-      "name": "LOD_MID",
-      "has_doc": false
-    },
-    {
-      "source": "lua_api",
-      "module": "globe_api",
-      "file": "src/lua_api/globe_api.rs",
-      "line": 809,
-      "kind": "fn",
-      "name": "LOD_NEAR",
+      "name": "delay",
       "has_doc": false
     }
   ],
@@ -20601,7 +20592,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 668,
+      "line": 669,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -34704,7 +34695,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/config.rs",
-      "line": 243,
+      "line": 251,
       "kind": "fn",
       "name": "validate_and_fix",
       "has_doc": true
@@ -34713,7 +34704,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/config.rs",
-      "line": 281,
+      "line": 319,
       "kind": "struct",
       "name": "PerformanceConfig",
       "has_doc": true
@@ -34722,7 +34713,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/config.rs",
-      "line": 387,
+      "line": 425,
       "kind": "fn",
       "name": "load",
       "has_doc": true
@@ -34731,7 +34722,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/config.rs",
-      "line": 408,
+      "line": 446,
       "kind": "fn",
       "name": "load_from_conf_toml",
       "has_doc": true
@@ -34740,7 +34731,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/config.rs",
-      "line": 476,
+      "line": 514,
       "kind": "fn",
       "name": "load_from_conf_lua",
       "has_doc": true
@@ -47286,7 +47277,7 @@
       "source": "lua_api",
       "module": "globe_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 804,
+      "line": 805,
       "kind": "fn",
       "name": "MAX_PROVINCES",
       "has_doc": true
@@ -47295,7 +47286,7 @@
       "source": "lua_api",
       "module": "globe_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 807,
+      "line": 809,
       "kind": "fn",
       "name": "LOD_FAR",
       "has_doc": true
@@ -47304,19 +47295,19 @@
       "source": "lua_api",
       "module": "globe_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 808,
+      "line": 811,
       "kind": "fn",
       "name": "LOD_MID",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
       "module": "globe_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 809,
+      "line": 813,
       "kind": "fn",
       "name": "LOD_NEAR",
-      "has_doc": false
+      "has_doc": true
     },
     {
       "source": "lua_api",
@@ -47641,6 +47632,15 @@
       "kind": "fn",
       "name": "OBJECT",
       "has_doc": true
+    },
+    {
+      "source": "lua_api",
+      "module": "timer_api",
+      "file": "src/lua_api/timer_api.rs",
+      "line": 762,
+      "kind": "fn",
+      "name": "delay",
+      "has_doc": false
     },
     {
       "source": "lua_api",

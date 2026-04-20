@@ -622,6 +622,7 @@ impl LuaUserData for LuaGlobeRegistry {
         // -- remove --
         /// Remove a globe by name.
         /// @param name : string
+        /// @return boolean
         methods.add_method_mut("remove", |_, this, name: String| {
             let mut guard = this.reg.lock().map_err(|e| {
                 mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
@@ -670,13 +671,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let registry = Arc::new(Mutex::new(GlobeRegistry::new()));
 
     // -- new --
-    /// Create a new globe.
-    /// @param name : string
-    /// @param spec : table?
-    /// @return Globe
     {
         let reg = registry.clone();
         let s = state.clone();
+        /// Create a new globe.
+        /// @param name : string
+        /// @param spec : table?
+        /// @return Globe
         tbl.set(
             "new",
             lua.create_function(move |_, (name, spec_tbl): (String, Option<LuaTable>)| {
@@ -693,12 +694,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     }
 
     // -- get --
-    /// Get an existing globe by name, or nil.
-    /// @param name : string
-    /// @return Globe?
     {
         let reg = registry.clone();
         let s = state.clone();
+        /// Get an existing globe by name, or nil.
+        /// @param name : string
+        /// @return Globe?
         tbl.set(
             "get",
             lua.create_function(move |_, name: String| {
@@ -718,14 +719,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     }
 
     // -- loadFromTOML --
-    /// Load provinces from a TOML string and create a globe.
-    /// @param name : string
-    /// @param toml_src : string
-    /// @param spec : table?
-    /// @return Globe
     {
         let reg = registry.clone();
         let s = state.clone();
+        /// Load provinces from a TOML string and create a globe.
+        /// @param name : string
+        /// @param toml_src : string
+        /// @param spec : table?
+        /// @return Globe
         tbl.set(
             "loadFromTOML",
             lua.create_function(move |_, (name, toml_src, spec_tbl): (String, String, Option<LuaTable>)| {
@@ -804,8 +805,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set("MAX_PROVINCES", MAX_PROVINCES as u32)?;
 
     // -- globe.LOD_FAR / LOD_MID / LOD_NEAR (convenience constants) --
+    /// LOD_FAR: string constant `"far"` — zoomed-out detail tier (zoom < 1.5).
     tbl.set("LOD_FAR", "far")?;
+    /// LOD_MID: string constant `"mid"` — medium detail tier (1.5 ≤ zoom < 4.0).
     tbl.set("LOD_MID", "mid")?;
+    /// LOD_NEAR: string constant `"near"` — high detail, close-zoom tier (zoom ≥ 4.0).
     tbl.set("LOD_NEAR", "near")?;
 
     luna.set("globe", tbl)?;

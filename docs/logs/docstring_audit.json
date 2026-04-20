@@ -1,6 +1,51 @@
 {
-  "total_violations": 0,
-  "by_type": {},
-  "files_with_violations": 0,
-  "violations": []
+  "total_violations": 4,
+  "by_type": {
+    "missing_description": 1,
+    "missing_param": 2,
+    "missing_return": 1
+  },
+  "files_with_violations": 2,
+  "violations": [
+    {
+      "file": "src/lua_api/data_api.rs",
+      "line": 423,
+      "module": "data",
+      "owner": "",
+      "name": "newByteData",
+      "kind": "function",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/data_api.rs",
+      "line": 423,
+      "module": "data",
+      "owner": "",
+      "name": "newByteData",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: value : any"
+    },
+    {
+      "file": "src/lua_api/system_api.rs",
+      "line": 454,
+      "module": "system",
+      "owner": "",
+      "name": "getEnv",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: name : string"
+    },
+    {
+      "file": "src/lua_api/system_api.rs",
+      "line": 454,
+      "module": "system",
+      "owner": "",
+      "name": "getEnv",
+      "kind": "function",
+      "violation": "missing_return",
+      "detail": "Rust return: ?"
+    }
+  ]
 }

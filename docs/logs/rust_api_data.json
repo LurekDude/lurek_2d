@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-04-20T05:45:51.955801+00:00",
+    "generated": "2026-04-20T06:38:25.623721+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "0.20.0",
     "stats": {
@@ -10468,7 +10468,7 @@
             "kind": "struct",
             "description": "Frame rate cap and other performance tuning options.  # Fields - `target_fps` — Desired frames per second for the game loop. - `physics_tick_rate` — Fixed tick rate for `process_physics` callback (Hz, default 60). - `fixed_update_tick_rate` — Optional fixed tick rate for the `fixedUpdate` Lua callback (Hz).  `None` disables fixed update. - `frame_budget_warn_ms` — If set, emit a `warn!` log when a frame exceeds this many milliseconds.",
             "file": "src/runtime/config.rs",
-            "line": 281
+            "line": 319
           }
         ]
       },

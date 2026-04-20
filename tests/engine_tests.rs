@@ -43,6 +43,8 @@ mod effect_tests;
 mod event_tests;
 #[path = "rust/unit/filesystem_tests.rs"]
 mod filesystem_tests;
+#[path = "rust/unit/globe_tests.rs"]
+mod globe_tests;
 #[path = "rust/unit/graph_tests.rs"]
 mod graph_tests;
 #[path = "rust/unit/gui_tests.rs"]

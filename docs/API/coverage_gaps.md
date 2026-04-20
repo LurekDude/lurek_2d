@@ -75,7 +75,7 @@ These appear as `// (undocumented)` in `docs/API/rust-api.md`.
 
 ---
 
-## 3. Lua Docstring Issues (16 items)
+## 3. Lua Docstring Issues (14 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
@@ -86,9 +86,7 @@ These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
 
 ### `globe`
 
-- `function` **`lurek.globe.get`** — *(no description)*
-- `function` **`lurek.globe.loadFromTOML`** — *(no description)*
-- `function` **`lurek.globe.new`** — *(no description)*
+- `function` **`lurek.globe.new`** — *"Create a new globe."* (too short)
 - `method` **`Globe:getName`** — *"Returns the globe name."* (too short)
 - `method` **`Globe:getTimeOfDay`** — *"Get time of day."* (too short)
 - `method` **`Globe:removeArc`** — *"Remove an arc by ID."* (too short)

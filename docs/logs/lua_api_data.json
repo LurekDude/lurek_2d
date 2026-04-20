@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-04-20T05:45:52.714157+00:00",
+    "generated": "2026-04-20T06:38:27.246489+00:00",
     "generator": "tools/gen_lua_api_data.py",
     "version": "0.20.0",
     "stats": {
@@ -11,8 +11,8 @@
   "lua_api": {
     "summary": {
       "total_functions": 3723,
-      "documented": 3719,
-      "coverage_pct": 99.9,
+      "documented": 3722,
+      "coverage_pct": 100.0,
       "modules": 50
     },
     "modules": {
@@ -24039,14 +24039,25 @@
             "lua_name": "lurek.globe.new",
             "kind": "function",
             "owner_type": "",
-            "description": "",
-            "full_doc": "",
+            "description": "Create a new globe.",
+            "full_doc": "Create a new globe.\n@param name : string\n@param spec : table?\n@return Globe",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(name, [spec_tbl])",
-            "typed_params": [],
-            "inferred_return": "",
-            "line": 680,
+            "typed_params": [
+              [
+                "name",
+                "string",
+                false
+              ],
+              [
+                "spec",
+                "table?",
+                true
+              ]
+            ],
+            "inferred_return": "Globe",
+            "line": 681,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -24054,14 +24065,20 @@
             "lua_name": "lurek.globe.get",
             "kind": "function",
             "owner_type": "",
-            "description": "",
-            "full_doc": "",
+            "description": "Get an existing globe by name, or nil.",
+            "full_doc": "Get an existing globe by name, or nil.\n@param name : string\n@return Globe?",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(name)",
-            "typed_params": [],
-            "inferred_return": "",
-            "line": 702,
+            "typed_params": [
+              [
+                "name",
+                "string",
+                false
+              ]
+            ],
+            "inferred_return": "Globe?",
+            "line": 703,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -24069,14 +24086,30 @@
             "lua_name": "lurek.globe.loadFromTOML",
             "kind": "function",
             "owner_type": "",
-            "description": "",
-            "full_doc": "",
+            "description": "Load provinces from a TOML string and create a globe.",
+            "full_doc": "Load provinces from a TOML string and create a globe.\n@param name : string\n@param toml_src : string\n@param spec : table?\n@return Globe",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(name, toml_src, [spec_tbl])",
-            "typed_params": [],
-            "inferred_return": "",
-            "line": 729,
+            "typed_params": [
+              [
+                "name",
+                "string",
+                false
+              ],
+              [
+                "toml_src",
+                "string",
+                false
+              ],
+              [
+                "spec",
+                "table?",
+                true
+              ]
+            ],
+            "inferred_return": "Globe",
+            "line": 730,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -24112,7 +24145,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 756,
+            "line": 757,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -24153,7 +24186,7 @@
               ]
             ],
             "inferred_return": "table<{number",
-            "line": 771,
+            "line": 772,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -24179,7 +24212,7 @@
               ]
             ],
             "inferred_return": "table",
-            "line": 791,
+            "line": 792,
             "file": "src/lua_api/globe_api.rs"
           }
         ],
@@ -25313,7 +25346,7 @@
                 "kind": "method",
                 "owner_type": "GlobeRegistry",
                 "description": "Remove a globe by name.",
-                "full_doc": "Remove a globe by name.\n@param name : string",
+                "full_doc": "Remove a globe by name.\n@param name : string\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(name)",
@@ -25324,8 +25357,8 @@
                     false
                   ]
                 ],
-                "inferred_return": "",
-                "line": 625,
+                "inferred_return": "boolean",
+                "line": 626,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -25340,7 +25373,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table<string>",
-                "line": 635,
+                "line": 636,
                 "file": "src/lua_api/globe_api.rs"
               }
             ]

@@ -6301,9 +6301,12 @@ function GlobeRegistry:new(name, spec_tbl) end
 
 --- Remove a globe by name.
 ---@param name any
+---@return boolean
 function GlobeRegistry:remove(name) end
 
+--- Get an existing globe by name, or nil.
 ---@param name any
+---@return Globe?
 function lurek.globe.get(name) end
 
 --- Great-circle distance between two lat/lon points (in unit-sphere radians).
@@ -6329,13 +6332,17 @@ function lurek.globe.greatCirclePath(la, lo, lb, lo2, n) end
 ---@return table
 function lurek.globe.latLonToUnit(lat, lon) end
 
+--- Load provinces from a TOML string and create a globe.
 ---@param name any
 ---@param toml_src any
 ---@param spec_tbl? any (optional)
+---@return Globe
 function lurek.globe.loadFromTOML(name, toml_src, spec_tbl) end
 
+--- Create a new globe.
 ---@param name any
 ---@param spec_tbl? any (optional)
+---@return Globe
 function lurek.globe.new(name, spec_tbl) end
 
 ---@class lurek.graph
