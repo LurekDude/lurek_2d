@@ -6,9 +6,7 @@
 //! and SimpleState (finite state machine).
 
 use std::cell::RefCell;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::collections::VecDeque;
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
 use mlua::prelude::*;

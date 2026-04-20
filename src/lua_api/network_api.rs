@@ -68,6 +68,37 @@ fn stats_to_table(lua: &Lua, stats: PeerStats) -> LuaResult<LuaTable<'_>> {
     Ok(t)
 }
 
+/// Converts a Lua table into a [`NetValue::Array`] or [`NetValue::Map`].
+fn lua_table_to_netvalue(t: &LuaTable) -> LuaResult<NetValue> {
+    // Detect array vs map: check if key 1 exists
+    if t.raw_get::<_, LuaValue>(1i64).is_ok()
+        && !matches!(t.raw_get::<_, LuaValue>(1i64)?, LuaValue::Nil)
+    {
+        let mut arr = Vec::new();
+        for pair in t.clone().sequence_values::<LuaValue>() {
+            arr.push(lua_to_netvalue(&pair?)?);
+        }
+        Ok(NetValue::Array(arr))
+    } else {
+        let mut map = Vec::new();
+        for pair in t.clone().pairs::<LuaValue, LuaValue>() {
+            let (k, v) = pair?;
+            let key_str = match &k {
+                LuaValue::String(s) => s.to_str()?.to_string(),
+                LuaValue::Integer(i) => i.to_string(),
+                LuaValue::Number(n) => n.to_string(),
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "pack: map keys must be strings or numbers".into(),
+                    ))
+                }
+            };
+            map.push((key_str, lua_to_netvalue(&v)?));
+        }
+        Ok(NetValue::Map(map))
+    }
+}
+
 /// Converts a Lua value to a [`NetValue`] for MessagePack serialization.
 fn lua_to_netvalue(val: &LuaValue) -> LuaResult<NetValue> {
     match val {
@@ -76,35 +107,7 @@ fn lua_to_netvalue(val: &LuaValue) -> LuaResult<NetValue> {
         LuaValue::Integer(i) => Ok(NetValue::Integer(*i)),
         LuaValue::Number(n) => Ok(NetValue::Float(*n)),
         LuaValue::String(s) => Ok(NetValue::String(s.to_str()?.to_string())),
-        LuaValue::Table(t) => {
-            // Detect array vs map: check if key 1 exists
-            if t.raw_get::<_, LuaValue>(1i64).is_ok()
-                && !matches!(t.raw_get::<_, LuaValue>(1i64)?, LuaValue::Nil)
-            {
-                let mut arr = Vec::new();
-                for pair in t.clone().sequence_values::<LuaValue>() {
-                    arr.push(lua_to_netvalue(&pair?)?);
-                }
-                Ok(NetValue::Array(arr))
-            } else {
-                let mut map = Vec::new();
-                for pair in t.clone().pairs::<LuaValue, LuaValue>() {
-                    let (k, v) = pair?;
-                    let key_str = match &k {
-                        LuaValue::String(s) => s.to_str()?.to_string(),
-                        LuaValue::Integer(i) => i.to_string(),
-                        LuaValue::Number(n) => n.to_string(),
-                        _ => {
-                            return Err(LuaError::RuntimeError(
-                                "pack: map keys must be strings or numbers".into(),
-                            ))
-                        }
-                    };
-                    map.push((key_str, lua_to_netvalue(&v)?));
-                }
-                Ok(NetValue::Map(map))
-            }
-        }
+        LuaValue::Table(t) => lua_table_to_netvalue(t),
         _ => Err(LuaError::RuntimeError(format!(
             "pack: unsupported type: {}",
             val.type_name()

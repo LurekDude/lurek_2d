@@ -12,21 +12,16 @@ use std::collections::HashMap;
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Reads a Lua info table into a [`ModInfo`].
-fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
-    let id: String = tbl
-        .get::<_, String>("id")
-        .map_err(|_| LuaError::RuntimeError("newMod requires 'id' field".into()))?;
-    let dependencies = tbl
-        .get::<_, LuaTable>("dependencies")
-        .map(|deps| deps.sequence_values::<String>().flatten().collect())
-        .unwrap_or_default();
-    let capabilities = tbl
-        .get::<_, LuaTable>("capabilities")
-        .map(|caps| caps.sequence_values::<String>().flatten().collect())
-        .unwrap_or_default();
-    let config_schema = tbl
-        .get::<_, LuaTable>("config_schema")
+/// Extracts a Lua string-array field (like `dependencies` or `capabilities`).
+fn read_string_array(tbl: &LuaTable, field: &str) -> Vec<String> {
+    tbl.get::<_, LuaTable>(field)
+        .map(|t| t.sequence_values::<String>().flatten().collect())
+        .unwrap_or_default()
+}
+
+/// Extracts a `config_schema` table into `(key, type_hint, default)` triples.
+fn read_config_schema(tbl: &LuaTable) -> Vec<(String, String, String)> {
+    tbl.get::<_, LuaTable>("config_schema")
         .map(|schema| {
             schema
                 .sequence_values::<LuaTable>()
@@ -39,7 +34,14 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
                 })
                 .collect()
         })
-        .unwrap_or_default();
+        .unwrap_or_default()
+}
+
+/// Reads a Lua info table into a [`ModInfo`].
+fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
+    let id: String = tbl
+        .get::<_, String>("id")
+        .map_err(|_| LuaError::RuntimeError("newMod requires 'id' field".into()))?;
     let mut info = ModInfo::from_parts(
         id,
         tbl.get::<_, String>("name").ok(),
@@ -47,11 +49,11 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
         tbl.get::<_, String>("author").ok(),
         tbl.get::<_, String>("description").ok(),
         tbl.get::<_, i32>("priority").ok(),
-        dependencies,
+        read_string_array(tbl, "dependencies"),
     );
     info.api_version = tbl.get::<_, String>("api_version").ok();
-    info.capabilities = capabilities;
-    info.config_schema = config_schema;
+    info.capabilities = read_string_array(tbl, "capabilities");
+    info.config_schema = read_config_schema(tbl);
     Ok(info)
 }
 

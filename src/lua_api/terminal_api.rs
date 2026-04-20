@@ -289,30 +289,44 @@ fn reindex_widget_handles(terminal: &Rc<TerminalBinding>, removed_index: usize) 
     *terminal.widget_handles.borrow_mut() = reindexed;
 }
 
+/// Inspects a widget's current attachment and either returns the existing
+/// index on this terminal, errors if attached to a different terminal, or
+/// returns the widget + pending children ready to attach.
+type PrepareResult = Result<usize, (Widget, Vec<Rc<RefCell<WidgetBinding>>>)>;
+
+fn prepare_attach(
+    terminal: &Rc<TerminalBinding>,
+    binding: &Rc<RefCell<WidgetBinding>>,
+) -> LuaResult<PrepareResult> {
+    let binding_ref = binding.borrow();
+    match &binding_ref.attachment {
+        WidgetAttachment::Detached => Ok(Err((
+            binding_ref.widget.clone(),
+            binding_ref.pending_children.clone(),
+        ))),
+        WidgetAttachment::Attached {
+            terminal: attached_terminal,
+            index,
+        } => {
+            if Rc::ptr_eq(attached_terminal, terminal) {
+                Ok(Ok(*index))
+            } else {
+                Err(runtime_error(
+                    "Terminal:addWidget",
+                    "widget is already attached to another terminal",
+                ))
+            }
+        }
+    }
+}
+
 fn attach_widget(
     terminal: &Rc<TerminalBinding>,
     binding: &Rc<RefCell<WidgetBinding>>,
 ) -> LuaResult<usize> {
-    let (widget, pending_children) = {
-        let binding_ref = binding.borrow();
-        match &binding_ref.attachment {
-            WidgetAttachment::Detached => (
-                binding_ref.widget.clone(),
-                binding_ref.pending_children.clone(),
-            ),
-            WidgetAttachment::Attached {
-                terminal: attached_terminal,
-                index,
-            } => {
-                if Rc::ptr_eq(attached_terminal, terminal) {
-                    return Ok(*index);
-                }
-                return Err(runtime_error(
-                    "Terminal:addWidget",
-                    "widget is already attached to another terminal",
-                ));
-            }
-        }
+    let (widget, pending_children) = match prepare_attach(terminal, binding)? {
+        Ok(existing_index) => return Ok(existing_index),
+        Err(pair) => pair,
     };
 
     let index = terminal.terminal.borrow_mut().add_widget(widget);

@@ -6123,25 +6123,27 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 ///
 /// `LuaResult<WidgetDef>` — the converted definition, or a `LuaError` if a
 /// child table cannot be read.
+/// Reads the `children` field of a widget-def Lua table (if present) and
+/// recursively converts each entry to a [`crate::ui::WidgetDef`].
+fn read_widget_children(table: &mlua::Table) -> mlua::Result<Option<Vec<crate::ui::WidgetDef>>> {
+    let Some(ct) = table.get::<_, Option<mlua::Table>>("children")? else {
+        return Ok(None);
+    };
+    let len = ct.raw_len();
+    let mut result = Vec::with_capacity(len as usize);
+    for i in 1..=len {
+        let child_table: mlua::Table = ct.get(i)?;
+        result.push(lua_table_to_widget_def(&child_table)?);
+    }
+    Ok(Some(result))
+}
+
 fn lua_table_to_widget_def(table: &mlua::Table) -> mlua::Result<crate::ui::WidgetDef> {
     // Accept both "type" and "widget_type" as the kind key.
     let widget_type: String = table
         .get::<_, String>("type")
         .or_else(|_| table.get::<_, String>("widget_type"))
         .unwrap_or_else(|_| "panel".to_string());
-
-    let children_table: Option<mlua::Table> = table.get("children").ok();
-    let children = if let Some(ct) = children_table {
-        let len = ct.raw_len();
-        let mut result = Vec::with_capacity(len as usize);
-        for i in 1..=len {
-            let child_table: mlua::Table = ct.get(i)?;
-            result.push(lua_table_to_widget_def(&child_table)?);
-        }
-        Some(result)
-    } else {
-        None
-    };
 
     Ok(crate::ui::WidgetDef {
         widget_type,
@@ -6164,7 +6166,7 @@ fn lua_table_to_widget_def(table: &mlua::Table) -> mlua::Result<crate::ui::Widge
         spacing: table.get("spacing").ok(),
         orientation: table.get("orientation").ok(),
         group: table.get("group").ok(),
-        children,
+        children: read_widget_children(table)?,
     })
 }
 
