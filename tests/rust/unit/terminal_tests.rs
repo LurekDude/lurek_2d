@@ -97,29 +97,36 @@ mod widget_tests {
 
     #[test]
     fn widget_new_label() {
-        let w = Widget::new_label(1, 1, "Hello", [1.0, 1.0, 1.0, 1.0]);
+        let w = Widget::new_label(1, 1, "Hello");
         assert!(matches!(w.kind, lurek2d::terminal::WidgetKind::Label { .. }));
-        assert_eq!(w.get_text(), Some("Hello".to_string()));
+        assert_eq!(w.get_text().unwrap(), "Hello".to_string());
     }
 
     #[test]
     fn widget_new_button() {
-        let w = Widget::new_button(1, 1, "OK");
+        let w = Widget::new_button(1, 1, 4, 1, "OK");
         assert!(w.is_button());
     }
 
     #[test]
     fn widget_list_add_and_count() {
         let mut w = Widget::new_list(1, 1, 10, 5);
-        w.add_item("alpha");
-        w.add_item("beta");
-        assert_eq!(w.get_item_count(), 2);
-        assert_eq!(w.get_item_1based(1), Some("alpha".to_string()));
+        w.add_item("alpha".to_string()).unwrap();
+        w.add_item("beta".to_string()).unwrap();
+        assert_eq!(w.get_item_count().unwrap(), 2);
+        assert_eq!(w.get_item_1based(1).unwrap(), "alpha".to_string());
+    }
+
+    #[test]
+    fn widget_set_text() {
+        let mut w = Widget::new_label(1, 1, "A");
+        w.set_text("B".to_string()).unwrap();
+        assert_eq!(w.get_text().unwrap(), "B".to_string());
     }
 
     #[test]
     fn widget_is_type_checks() {
-        let btn = Widget::new_button(1, 1, "X");
+        let btn = Widget::new_button(1, 1, 3, 1, "X");
         assert!(btn.is_button());
         assert!(!btn.is_textbox());
         assert!(!btn.is_list());
@@ -131,6 +138,18 @@ mod widget_tests {
 
 mod terminal_state_tests {
     use lurek2d::terminal::Terminal;
+
+    // Documented caps from src/terminal/mod.rs: 512 cols × 256 rows.
+    // MAX_COLS / MAX_ROWS are pub(crate) so we use the documented literal values.
+    const MAX_COLS: usize = 512;
+    const MAX_ROWS: usize = 256;
+
+    #[test]
+    fn terminal_new_clamps_dimensions_to_max() {
+        let t = Terminal::new(MAX_COLS + 100, MAX_ROWS + 100);
+        assert_eq!(t.cols(), MAX_COLS);
+        assert_eq!(t.rows(), MAX_ROWS);
+    }
 
     #[test]
     fn terminal_new_small_dimensions_preserved() {

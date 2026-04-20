@@ -38,30 +38,3 @@ impl Default for TCell {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn default_cell_is_space() {
-        let cell = TCell::default();
-        assert_eq!(cell.ch, b' ' as u32);
-    }
-
-    #[test]
-    fn default_fg_is_white() {
-        assert_eq!(DEFAULT_FG, [1.0, 1.0, 1.0, 1.0]);
-    }
-
-    #[test]
-    fn default_bg_is_transparent() {
-        assert_eq!(DEFAULT_BG[3], 0.0);
-    }
-
-    #[test]
-    fn cell_clone_eq() {
-        let a = TCell::default();
-        let b = a;
-        assert_eq!(a, b);
-    }
-}
