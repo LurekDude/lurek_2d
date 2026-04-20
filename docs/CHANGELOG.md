@@ -4,6 +4,10 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.3] — 2026-04-22
 
+### Dependency optimizations — binary size reduction
+
+- **chore(deps): reduce dist binary size by ~3-4 MB** — disabled `arboard` `image-data` default feature (removes `image 0.25`, `moxcms`, `pxfm` from the link graph — engine only reads/writes text clipboard); switched `ureq` from `rustls`/`ring` to `native-tls`/Windows SChannel (removes `ring` assembly crypto library ~1.5 MB — no external TLS lib needed on Windows); upgraded `windows-sys` direct dep from 0.59 to 0.61 to match `tempfile`; pinned `rfd` to `"0.17"` (semver floor, not patch-pinned). `cargo check` passes clean; `ring` is fully absent from `cargo tree`.
+
 ### Thin lua_api wrappers — TST-03 (session testing-cleanup-20260420)
 
 - **refactor(lua_api): extract business logic from 5 wrapper files into domain modules per TST-03 (session testing-cleanup-20260420)** — Cleared all VIOLATIONs reported by `tools/audit/thin_wrapper_audit.py`. `src/lua_api/mods_api.rs`: split `mod_info_from_table` into `read_string_array` and `read_config_schema` helpers. `src/lua_api/network_api.rs`: extracted the `LuaValue::Table` arm of `lua_to_netvalue` into a new `lua_table_to_netvalue` helper. `src/lua_api/terminal_api.rs`: split `attach_widget` into a new `prepare_attach` helper that returns a `PrepareResult` type alias. `src/lua_api/ui_api.rs`: extracted the `children` recursion in `lua_table_to_widget_def` into a `read_widget_children` helper. `src/lua_api/patterns_api.rs`: consolidated three separate `use std::collections::*` imports into one brace-grouped import. `python tools/audit/thin_wrapper_audit.py` → 50 scanned / 0 VIOLATION / 46 SUSPECT / 4 CLEAN. `cargo check --lib` → clean (pre-existing warnings only, no new errors).

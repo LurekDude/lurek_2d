@@ -75,7 +75,10 @@ gilrs = "0.11"
 rusty_enet = "0.4"
 
 # HTTP client (pure Rust, minimal deps, uses rustls for TLS)
-ureq = "3"
+# HTTP client for Lua network API
+# native-tls uses Windows SChannel (system-provided) — eliminates ring + rustls (~1.5 MB).
+# gzip: keep for transparent Content-Encoding support (flate2 already a direct dep, no cost).
+ureq = { version = "3", default-features = false, features = ["native-tls", "gzip"] }
 
 # WebSocket client (RFC 6455 compliant, pure Rust)
 tungstenite = "0.26"
@@ -128,10 +131,12 @@ sysinfo = { version = "0.30", default-features = false }
 sys-locale = "0.3"
 
 # Cross-platform clipboard access
-arboard = "3"
+# default-features = false: disables `image-data` feature (image 0.25 + moxcms + pxfm)
+# We only use text clipboard (get_text / set_text) — image copy/paste is not needed.
+arboard = { version = "3", default-features = false }
 
 # Cross-platform native file/message dialogs
-rfd = "0.17.2"
+rfd = "0.17"
 
 # Zip archive reading for .lurek game packages
 zip = { version = "2", default-features = false, features = ["deflate"] }
@@ -143,7 +148,8 @@ tempfile = "3"
 
 [target.'cfg(windows)'.dependencies]
 # Windows message box for panic handler
-windows-sys = { version = "0.59", features = ["Win32_UI_WindowsAndMessaging"] }
+# Using 0.61 to match tempfile/winapi-util — reduces duplication in the windows-sys tree.
+windows-sys = { version = "0.61", features = ["Win32_UI_WindowsAndMessaging"] }
 # DX12 only — native Windows graphics API, best driver support for low-end/iGPU on Windows 10+.
 # Removing metal and vulkan-portability drops unused backend code from the Windows binary.
 wgpu = { version = "22", default-features = false, features = ["wgsl", "dx12"] }
