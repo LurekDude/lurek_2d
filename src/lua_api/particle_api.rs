@@ -9,6 +9,7 @@ use crate::particle::{
     AreaDistribution, EmissionShape, InsertMode, ParticleConfig, ParticleShape, ParticleSystem,
     RelativeMode, Trail,
 };
+use crate::particle::visualization as particle_vis;
 use crate::runtime::resource_keys::ParticleKey;
 
 // -------------------------------------------------------------------------------
@@ -1070,7 +1071,7 @@ impl LuaUserData for LuaParticleSystem {
                 .particle_systems
                 .get(this.key)
                 .ok_or_else(|| LuaError::runtime("ParticleSystem handle is invalid (released)"))?;
-            let img = ps.draw_to_image(w, h);
+            let img = particle_vis::draw_to_image(ps, w, h);
             Ok(img)
         });
 
@@ -1085,7 +1086,7 @@ impl LuaUserData for LuaParticleSystem {
                 .particle_systems
                 .get(this.key)
                 .ok_or_else(|| LuaError::runtime("ParticleSystem handle is invalid (released)"))?;
-            let img = ps.draw_to_image(w, h);
+            let img = particle_vis::draw_to_image(ps, w, h);
             Ok(img)
         });
 

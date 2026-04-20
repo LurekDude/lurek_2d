@@ -38,8 +38,8 @@ The `runtime` module is the dependency tree's root — every other Rust module i
    - ~~Why: error screen could show filesystem-specific hints vs generic system errors.~~
 2. **[P2][GAP]** No `SharedState` size tracking beyond textures — fonts, canvases, shaders, meshes, particle systems have no memory accounting.
    - Why: LRU eviction only covers textures; large font atlases or canvas pools can still exceed GPU memory.
-3. **[P2][GAP]** `ModulesConfig` has no validation for `animation` requiring `graphics`, `tween` not requiring anything, etc. — only 6 of 30+ flags are validated.
-   - Why: Disabling `graphics` but leaving `animation` on causes silent failures.
+3. ~~**[P2][GAP]** `ModulesConfig` has no validation for `animation` requiring `graphics`, `tween` not requiring anything, etc. — only 6 of 30+ flags are validated.~~ ✅ **DONE** — Added validation rules for `animation`, `tilemap`, `raycaster`, `camera`, `globe` (all require `graphics`) and `spine` (requires `animation`); docstring updated.
+   - ~~Why: Disabling `graphics` but leaving `animation` on causes silent failures.~~
 
 ## 5. Feature Ideas
 
@@ -73,7 +73,7 @@ The `runtime` module is the dependency tree's root — every other Rust module i
 - **[P1][TEST-RUST]** Add Rust unit tests for `EngineError` code/category/hint mapping — DONE in this session.
 - **[P1][TEST-RUST]** Add Rust unit tests for `log_messages` ID format and `get_log_level` — DONE in this session.
 - **[P2][TEST-RUST]** Add Rust unit tests for `Config::load_from_conf_toml` TOML merge logic (non-Lua-reachable internal).
-- **[P3][TEST-LUA]** Add Lua BDD tests for `lurek.platform.setLogLevel` / `getLogLevel`.
+- ~~**[P3][TEST-LUA]** Add Lua BDD tests for `lurek.platform.setLogLevel` / `getLogLevel`.~~ ✅ **DONE** — Tests present in `tests/lua/unit/test_system.lua`.
 
 ## 8. TODO(dedup): Cross-Module Overlap
 

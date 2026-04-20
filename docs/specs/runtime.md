@@ -65,7 +65,7 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 
 ## Functions
 
-- `ModulesConfig::validate_and_fix` (`config.rs`): Enforces dependency constraints so that a partially-disabled config is never internally inconsistent.
+- `ModulesConfig::validate_and_fix` (`config.rs`): Enforces dependency constraints so that a partially-disabled config is never internally inconsistent. Current rules: `minimap`, `particle`, `gui`, `overlay`, `parallax`, `terminal`, `animation`, `tilemap`, `raycaster`, `camera`, `globe`, and `spine` all require `graphics`; `spine` additionally requires `animation`.
 - `Config::load` (`config.rs`): Loads engine configuration from the game directory.
 - `Config::load_from_conf_toml` (`config.rs`): Loads engine configuration from `conf.toml` in the game directory.
 - `Config::load_from_conf_lua` (`config.rs`): Loads engine configuration from `conf.lua` in the game directory.

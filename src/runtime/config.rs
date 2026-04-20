@@ -240,6 +240,14 @@ impl ModulesConfig {
     /// - `particle` requires `graphics` (particles are draw calls).
     /// - `gui` requires `graphics` (widgets render to the GPU surface).
     /// - `overlay` requires `graphics` (overlay and postfx are render passes).
+    /// - `parallax` requires `graphics` (layer scrolling renders to the GPU surface).
+    /// - `terminal` requires `graphics` (text-mode terminal renders via the GPU surface).
+    /// - `animation` requires `graphics` (frame clips are GPU draw calls).
+    /// - `tilemap` requires `graphics` (tile layers are batched GPU draw calls).
+    /// - `raycaster` requires `graphics` (DDA output is rendered to a GPU texture).
+    /// - `camera` requires `graphics` (Camera2D transforms are applied at the GPU level).
+    /// - `globe` requires `graphics` (province sphere renders to the GPU surface).
+    /// - `spine` requires `animation` (skeletal animation builds on the animation subsystem).
     pub fn validate_and_fix(&mut self) {
         if !self.graphics {
             if self.minimap {
@@ -266,6 +274,36 @@ impl ModulesConfig {
                 log_msg!(warn, L050_MODULE_DEP_DISABLED, "terminal requires graphics");
                 self.terminal = false;
             }
+            if self.animation {
+                log_msg!(warn, L050_MODULE_DEP_DISABLED, "animation requires graphics");
+                self.animation = false;
+            }
+            if self.tilemap {
+                log_msg!(warn, L050_MODULE_DEP_DISABLED, "tilemap requires graphics");
+                self.tilemap = false;
+            }
+            if self.raycaster {
+                log_msg!(warn, L050_MODULE_DEP_DISABLED, "raycaster requires graphics");
+                self.raycaster = false;
+            }
+            if self.camera {
+                log_msg!(warn, L050_MODULE_DEP_DISABLED, "camera requires graphics");
+                self.camera = false;
+            }
+            if self.globe {
+                log_msg!(warn, L050_MODULE_DEP_DISABLED, "globe requires graphics");
+                self.globe = false;
+            }
+            if self.spine {
+                log_msg!(warn, L050_MODULE_DEP_DISABLED, "spine requires graphics");
+                self.spine = false;
+            }
+        }
+        // spine also requires animation (checked after the graphics block so that
+        // the graphics-disabled path above already cleared both animation and spine).
+        if !self.animation && self.spine {
+            log_msg!(warn, L050_MODULE_DEP_DISABLED, "spine requires animation");
+            self.spine = false;
         }
     }
 }

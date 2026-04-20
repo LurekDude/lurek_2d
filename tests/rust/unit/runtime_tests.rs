@@ -272,6 +272,81 @@ mod config_tests {
         c.modules.validate_and_fix();
         assert!(!c.modules.particle);
     }
+
+    #[test]
+    fn validate_disables_animation_when_no_graphics() {
+        let mut c = Config::default();
+        c.modules.graphics = false;
+        c.modules.animation = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.animation);
+    }
+
+    #[test]
+    fn validate_disables_tilemap_when_no_graphics() {
+        let mut c = Config::default();
+        c.modules.graphics = false;
+        c.modules.tilemap = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.tilemap);
+    }
+
+    #[test]
+    fn validate_disables_raycaster_when_no_graphics() {
+        let mut c = Config::default();
+        c.modules.graphics = false;
+        c.modules.raycaster = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.raycaster);
+    }
+
+    #[test]
+    fn validate_disables_camera_when_no_graphics() {
+        let mut c = Config::default();
+        c.modules.graphics = false;
+        c.modules.camera = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.camera);
+    }
+
+    #[test]
+    fn validate_disables_globe_when_no_graphics() {
+        let mut c = Config::default();
+        c.modules.graphics = false;
+        c.modules.globe = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.globe);
+    }
+
+    #[test]
+    fn validate_disables_spine_when_no_graphics() {
+        let mut c = Config::default();
+        c.modules.graphics = false;
+        c.modules.animation = true;
+        c.modules.spine = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.spine);
+    }
+
+    #[test]
+    fn validate_disables_spine_when_no_animation() {
+        let mut c = Config::default();
+        c.modules.graphics = true;
+        c.modules.animation = false;
+        c.modules.spine = true;
+        c.modules.validate_and_fix();
+        assert!(!c.modules.spine);
+    }
+
+    #[test]
+    fn validate_keeps_spine_when_graphics_and_animation_both_on() {
+        let mut c = Config::default();
+        c.modules.graphics = true;
+        c.modules.animation = true;
+        c.modules.spine = true;
+        c.modules.validate_and_fix();
+        assert!(c.modules.spine);
+    }
 }
 
 // ── ErrorCategory::Filesystem ────────────────────────────────────────────────

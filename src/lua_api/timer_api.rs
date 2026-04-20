@@ -752,6 +752,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // -- delay --
+    /// Coroutine-based yield-for-duration sugar.  Call from within a coroutine to pause
+    /// execution for `seconds` engine-time seconds.  Requires `tickWaits()` to be called
+    /// each frame to resume suspended coroutines.  Semantic alias for `waitSeconds`.
+    /// @param seconds : number
+    /// @return nil
+    let wait_fn: LuaValue = tbl.get("waitSeconds")?;
+    tbl.set("delay", wait_fn)?;
+
     luna.set("time", tbl)?;
     Ok(())
 }

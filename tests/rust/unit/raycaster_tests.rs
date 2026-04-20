@@ -903,3 +903,102 @@ mod build_scene_tests {
         }
     }
 }
+
+// ── dda (migrated from src/raycaster/dda.rs) ─────────────────────────
+
+mod dda_tests {
+    use super::*;
+    use std::f32::consts::PI;
+
+    #[test]
+    fn test_new_grid_empty() {
+        let rc = Raycaster2D::new(8, 8);
+        assert_eq!(rc.width(), 8);
+        assert_eq!(rc.height(), 8);
+        for y in 0..8 {
+            for x in 0..8 {
+                assert_eq!(rc.get_cell(x, y), 0);
+            }
+        }
+    }
+
+    #[test]
+    fn test_set_get_cell() {
+        let mut rc = Raycaster2D::new(4, 4);
+        rc.set_cell(2, 3, 5);
+        assert_eq!(rc.get_cell(2, 3), 5);
+        assert!(rc.is_blocked(2, 3));
+        assert!(!rc.is_blocked(0, 0));
+    }
+
+    #[test]
+    fn test_cast_ray_hits_wall() {
+        let mut rc = Raycaster2D::new(8, 8);
+        rc.set_cell(4, 2, 1); // wall at (4,2)
+        // Cast from (2.5, 2.5) to the right (angle=0)
+        let hit = rc.cast_ray(2.5, 2.5, 0.0, 20.0);
+        assert!(hit.is_some());
+        let h = hit.unwrap();
+        assert!(h.hit);
+        assert_eq!(h.cell_value, 1);
+        assert!((h.distance - 1.5).abs() < 0.1);
+    }
+
+    #[test]
+    fn test_cast_ray_misses() {
+        let rc = Raycaster2D::new(8, 8);
+        // empty grid, ray goes right and exits
+        let hit = rc.cast_ray(1.5, 1.5, 0.0, 5.0);
+        assert!(hit.is_none());
+    }
+
+    #[test]
+    fn test_line_of_sight_clear() {
+        let rc = Raycaster2D::new(8, 8);
+        assert!(rc.line_of_sight(1.5, 1.5, 6.5, 6.5));
+    }
+
+    #[test]
+    fn test_line_of_sight_blocked() {
+        let mut rc = Raycaster2D::new(8, 8);
+        rc.set_cell(3, 3, 1);
+        assert!(!rc.line_of_sight(1.5, 1.5, 6.5, 6.5));
+    }
+
+    #[test]
+    fn test_cast_rays_count() {
+        let mut rc = Raycaster2D::new(8, 8);
+        // Surround with walls
+        for i in 0..8 {
+            rc.set_cell(i, 0, 1);
+            rc.set_cell(i, 7, 1);
+            rc.set_cell(0, i, 1);
+            rc.set_cell(7, i, 1);
+        }
+        let rays = rc.cast_rays(4.0, 4.0, 0.0, PI / 3.0, 10, 20.0);
+        assert_eq!(rays.len(), 10);
+    }
+
+    #[test]
+    fn test_cast_rays_flat_layout() {
+        let mut rc = Raycaster2D::new(8, 8);
+        for i in 0..8 {
+            rc.set_cell(i, 0, 1);
+            rc.set_cell(i, 7, 1);
+            rc.set_cell(0, i, 1);
+            rc.set_cell(7, i, 1);
+        }
+        let flat = rc.cast_rays_flat(4.0, 4.0, 0.0, PI / 3.0, 5, 20.0);
+        assert_eq!(flat.len(), 25); // 5 rays * 5 values
+    }
+
+    #[test]
+    fn test_sprite_projection_behind() {
+        let rc = Raycaster2D::new(8, 8);
+        let proj = rc.project_sprite(3.0, 3.0, 5.0, 5.0, 0.0, PI / 3.0, 320.0);
+        // Sprite is behind or to the side depending on angle
+        // At angle 0, sprite at (3,3) from (5,5) has dx=-2, dy=-2,
+        // transform_y = -(-2)*sin(0) + (-2)*cos(0) = -2, so not visible
+        assert!(!proj.visible);
+    }
+}

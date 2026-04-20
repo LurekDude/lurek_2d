@@ -23,6 +23,7 @@
 //! | `emission.rs` | Spawn-offset calculators for area distribution and emission shapes |
 //! | `render.rs`   | `generate_render_commands()` wrappers for `ParticleSystem` and `Trail` |
 //! | `trail.rs`    | `Trail` / `TrailPoint` — fading ribbon effect attached to moving objects |
+//! | `visualization.rs` | CPU-side diagnostic renderers (`draw_to_image`, `draw_explosion_to_image`, etc.) |
 
 /// Emitter configuration enums and `ParticleConfig` struct.
 pub mod config;
@@ -39,6 +40,8 @@ pub mod particle;
 pub mod render;
 /// `ParticleShape` geometric render primitive enum.
 pub mod shapes;
+/// Visualization / diagnostic renderers for headless image output.
+pub mod visualization;
 
 pub use config::{
     AreaDistribution, EmissionShape, EmitterState, InsertMode, ParticleConfig, RelativeMode,

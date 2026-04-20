@@ -1,17 +1,6 @@
 //! Math helper functions for particle interpolation and random sampling.
 
-/// Linearly interpolate between `a` and `b` by factor `t`.
-///
-/// # Parameters
-/// - `a` — `f32`.
-/// - `b` — `f32`.
-/// - `t` — `f32`.
-///
-/// # Returns
-/// `f32`.
-pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
-    a + (b - a) * t
-}
+pub use crate::math::lerp;
 
 /// Interpolate a multi-stop size array at normalised time `t` (0 = birth, 1 = death).
 ///
@@ -130,32 +119,4 @@ pub(crate) fn rand_normal() -> f32 {
     let u1 = fastrand::f32().max(f32::EPSILON);
     let u2 = fastrand::f32();
     (-2.0 * u1.ln()).sqrt() * (2.0 * std::f32::consts::PI * u2).cos()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn lerp_midpoint_is_average() {
-        let result = lerp(0.0, 10.0, 0.5);
-        assert!((result - 5.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn interpolate_sizes_empty_returns_one() {
-        assert!((interpolate_sizes(&[], 0.5, 0.0) - 1.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn interpolate_sizes_single_value_with_zero_variation() {
-        assert!((interpolate_sizes(&[4.0], 0.5, 0.0) - 4.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn interpolate_sizes_multi_stop_at_start_and_end() {
-        let sizes = [0.0f32, 10.0];
-        assert!((interpolate_sizes(&sizes, 0.0, 0.0) - 0.0).abs() < 1e-5);
-        assert!((interpolate_sizes(&sizes, 1.0, 0.0) - 10.0).abs() < 1e-5);
-    }
 }

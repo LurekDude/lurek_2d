@@ -344,6 +344,26 @@ print("waiting for 10 frames: " .. tostring(frame_wait))
 lurek.timer.tickWaits(0.016)
 print("waits ticked by 0.016 sec")
 
+-- ---- Stub: lurek.time.delay ----------------------------------------------
+--@api-stub: lurek.time.delay
+-- Coroutine-based yield-for-duration sugar.  Call from within a coroutine to
+-- pause execution for a given number of seconds without blocking the main loop.
+-- Requires lurek.time.tickWaits() to be called each frame.
+--
+-- Example: cutscene scripted with sequential delays in a single coroutine.
+local cutscene = coroutine.create(function()
+    print("[cutscene] Part 1: fade in")
+    lurek.time.delay(1.0)        -- yield until 1 second passes
+    print("[cutscene] Part 2: show dialog")
+    lurek.time.delay(3.0)
+    print("[cutscene] Part 3: fade out")
+end)
+-- The game loop would call coroutine.resume(cutscene) once, then
+-- lurek.time.tickWaits() each frame to resume it at the right moment.
+-- Here we just start it to show the API:
+coroutine.resume(cutscene)
+print("delay: cutscene coroutine started and waiting for tick advances")
+
 -- =============================================================================
 -- New in 0.15.0: Frame-count Based Scheduler Events
 -- =============================================================================

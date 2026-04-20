@@ -38,6 +38,8 @@ pub mod sprite_projection;
 pub mod sprite_manager;
 /// Visibility polygon via endpoint raycasting.
 pub mod visibility;
+/// Diagnostic draw_*_to_image helpers for raycaster debugging.
+pub mod visualization;
 
 // Re-exports
 pub use build_scene::{SceneBuildParams, WorldSprite};

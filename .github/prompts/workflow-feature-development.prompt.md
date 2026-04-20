@@ -43,13 +43,14 @@ These three rules are **absolute** — violations are commit-blocking errors, no
 - [ ] Updated `src/<module>/IDEA.md` — implemented items marked `✅ DONE`
 - [ ] `src/<module>/mod.rs` contains ONLY `pub mod` / `pub use` / `pub(crate)` re-exports — zero implementation
 - [ ] File-level `//!` on every `.rs` file touched
-- [ ] Lua BDD tests in `tests/lua/unit/` registered in `tests/lua/harness.rs`
+- [ ] Lua BDD tests in `tests/lua/unit/` registered in `tests/lua/harness.rs` — new test files verified present
 - [ ] Rust unit tests in `tests/rust/unit/<module>_tests.rs` only — never in `src/` files
 - [ ] Expanded docstrings on all public items; `python tools/docs/collect_docs.py --report-missing` exits 0
 - [ ] Updated `docs/specs/<module>.md`; no spec MDs inside `src/`
-- [ ] Regenerated `docs/API/lua-api.md` via `python tools/gen_all_docs.py`
+- [ ] Regenerated `docs/API/lua-api.md` via `python tools/gen_all_docs.py` — command exits 0 with no error lines
 - [ ] `content/examples/<module>.lua` demonstrating the new API
 - [ ] `docs/CHANGELOG.md` entry; `Cargo.toml` version bumped if MINOR/MAJOR
+- [ ] `cargo check --tests` exits 0 before declaring done — run this as the final code gate
 
 ## Anti-patterns
 
@@ -58,6 +59,8 @@ These three rules are **absolute** — violations are commit-blocking errors, no
 - Adding `#[cfg(test)]` blocks anywhere under `src/` — all tests go under `tests/`.
 - Adding any struct, enum, impl, or fn to `mod.rs` — it must remain declarations-only.
 - Putting more than ~10 lines of logic in a `lua_api/` closure — extract to domain module.
+- Declaring done without running `python tools/gen_all_docs.py` and confirming no errors.
+- Adding a new Lua test file without verifying its `describe("...")` block is registered in `tests/lua/harness.rs`.
 
 ## Example Invocation
 

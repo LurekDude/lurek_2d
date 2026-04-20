@@ -45,7 +45,7 @@ The `timer` module owns time measurement (`Clock`) and deferred/repeating event 
 
 ## 7. Test Coverage Gaps
 
-- **[P2][TEST-LUA]** Add Lua BDD test for `lurek.timer.afterNamed` replacement semantics.
+- ~~**[P2][TEST-LUA]** Add Lua BDD test for `lurek.timer.afterNamed` replacement semantics.~~ ✅ **DONE** — Added `afterNamed replacement` describe block in `tests/lua/unit/test_timer.lua`.
 - **[P3][TEST-RUST]** Stress test `Scheduler` with 1000 timers to verify no allocation spike.
 
 ## 8. TODO(dedup): Cross-Module Overlap
@@ -54,7 +54,7 @@ TODO(dedup): tween::TweenManager — both `Scheduler` and `TweenManager` track "
 
 ## 9. TODO(helper): Engine-Level Helper Candidates
 
-TODO(helper): `lurek.timer.delay(seconds)` — coroutine-based yield-for-duration sugar wrapping `after` + resume, for sequential cutscene scripting.
+~~TODO(helper): `lurek.timer.delay(seconds)` — coroutine-based yield-for-duration sugar wrapping `after` + resume, for sequential cutscene scripting.~~ ✅ **DONE** — Added `lurek.time.delay(seconds)` as a semantic alias for `waitSeconds` in `src/lua_api/timer_api.rs`.
 
 ## 10. TODO(plugin): Plugin Candidacy Proposal
 

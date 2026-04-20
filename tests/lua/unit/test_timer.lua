@@ -602,4 +602,64 @@ describe("lurek.time scheduler frame events", function()
   end)
 end)
 
+-- ── afterNamed replacement semantics ────────────────────────────────────────
+
+-- @description Verifies that calling afterNamed twice with the same name replaces the first timer, leaving only one scheduled event.
+describe("lurek.time scheduler afterNamed replacement", function()
+  -- @covers lurek.time.Scheduler.afterNamed
+  -- @description Schedules two afterNamed events with the same name; count must remain 1 (second replaces first).
+  it("afterNamed with same name replaces the previous timer", function()
+    local s = lurek.time.newScheduler()
+    s:afterNamed("step", 5.0, function() end)
+    expect_equal(1, s:getCount())
+    s:afterNamed("step", 5.0, function() end)
+    expect_equal(1, s:getCount())
+  end)
+
+  -- @covers lurek.time.Scheduler.afterNamed
+  -- @description Only the replacement callback fires; the original must not execute.
+  it("afterNamed replacement fires the new callback, not the old one", function()
+    local s = lurek.time.newScheduler()
+    local fired_old = false
+    local fired_new = false
+    s:afterNamed("action", 0.1, function() fired_old = true end)
+    s:afterNamed("action", 0.1, function() fired_new = true end)
+    s:update(0.2)
+    expect_equal(false, fired_old)
+    expect_equal(true,  fired_new)
+  end)
+
+  -- @covers lurek.time.Scheduler.afterNamed
+  -- @description Different names do NOT replace each other; count must equal the number of distinct names.
+  it("afterNamed with different names does not replace", function()
+    local s = lurek.time.newScheduler()
+    s:afterNamed("a", 1.0, function() end)
+    s:afterNamed("b", 1.0, function() end)
+    expect_equal(2, s:getCount())
+  end)
+end)
+
+-- ── lurek.time.delay ─────────────────────────────────────────────────────────
+
+-- @description Verifies lurek.time.delay is a coroutine-based wait alias backed by waitSeconds.
+describe("lurek.time.delay", function()
+  -- @covers lurek.time.delay
+  -- @description delay is exported as a callable function.
+  it("delay is a function", function()
+    expect_type("function", lurek.time.delay)
+  end)
+
+  -- @covers lurek.time.delay
+  -- @covers lurek.time.tickWaits
+  -- @description delay(0) inside a coroutine yields and resumes after one tickWaits.
+  it("delay(0) yields and resumes after tickWaits", function()
+    local co = coroutine.create(function()
+      lurek.time.delay(0)
+    end)
+    coroutine.resume(co)
+    lurek.time.tickWaits()
+    expect_equal("dead", coroutine.status(co))
+  end)
+end)
+
 test_summary()

@@ -99,6 +99,7 @@ The timer module has been extended with physics step controls: `setPhysicsMaxSte
 - `lurek.timer.waitSeconds`: Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
 - `lurek.timer.waitFrames`: Yields the current Lua coroutine for at least `frames` engine frames.
 - `lurek.timer.tickWaits`: Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
+- `lurek.timer.delay`: Coroutine-based yield-for-duration sugar; alias for `waitSeconds`. Call from a coroutine to pause execution for `seconds`. Requires `tickWaits()` per frame.
 
 ### `Scheduler` Methods
 - `Scheduler:after`: Schedules a callback to fire once after a delay.
