@@ -455,12 +455,13 @@ mod screen_effects_tests {
     }
 
     #[test]
-    fn shake_next_random_in_range() {
-        let mut s = ShakeState::default();
-        for _ in 0..100 {
-            let v = s.next_random();
-            assert!(v >= -1.0 && v <= 1.0, "PRNG value {} out of range", v);
-        }
+    fn shake_produces_non_zero_offset() {
+        // ShakeState::next_random() is internal; test via observable Overlay API
+        let mut o = Overlay::new(800, 600);
+        o.trigger_shake(10.0, 0.5);
+        o.update(0.1);
+        let (x, y) = o.get_shake_offset();
+        assert!(x.abs() > 0.0 || y.abs() > 0.0, "shake should produce offset");
     }
 
     #[test]
@@ -503,7 +504,7 @@ mod stack_tests {
 
     #[test]
     fn remove_returns_false_when_absent() {
-        let s = PostFxStack::new(800, 600);
+        let mut s = PostFxStack::new(800, 600);
         assert!(!s.remove(99));
     }
 

@@ -148,39 +148,3 @@ impl Default for FadeState {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn flash_default_is_inactive() {
-        let f = FlashState::default();
-        assert!(!f.active);
-        assert!((f.duration - 0.2).abs() < 1e-6);
-    }
-
-    #[test]
-    fn shake_default_is_inactive() {
-        let s = ShakeState::default();
-        assert!(!s.active);
-        assert!((s.offset_x).abs() < 1e-6);
-        assert!((s.offset_y).abs() < 1e-6);
-    }
-
-    #[test]
-    fn shake_next_random_in_range() {
-        let mut s = ShakeState::default();
-        for _ in 0..100 {
-            let v = s.next_random();
-            assert!(v >= -1.0 && v <= 1.0, "PRNG value {} out of range", v);
-        }
-    }
-
-    #[test]
-    fn fade_default_is_inactive() {
-        let f = FadeState::default();
-        assert!(!f.active);
-        assert!((f.color[3]).abs() < 1e-6);
-    }
-}

@@ -160,37 +160,3 @@ fn preset_static_name(name: &str) -> &'static str {
         _ => "retro_tv",
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn preset_names_are_non_empty() {
-        let names = preset_names();
-        assert!(!names.is_empty());
-        assert!(names.contains(&"retro_tv"));
-        assert!(names.contains(&"horror"));
-    }
-
-    #[test]
-    fn build_preset_returns_none_for_unknown() {
-        assert!(build_preset("nonexistent", 800, 600).is_none());
-    }
-
-    #[test]
-    fn build_preset_retro_tv_has_effects() {
-        let p = build_preset("retro_tv", 800, 600).unwrap();
-        assert!(!p.effects.is_empty());
-        assert_eq!(p.name, "retro_tv");
-        assert_eq!(p.stack.get_effect_count(), p.effects.len());
-    }
-
-    #[test]
-    fn all_named_presets_build_successfully() {
-        for name in preset_names() {
-            let p = build_preset(name, 640, 480);
-            assert!(p.is_some(), "preset '{}' should build", name);
-        }
-    }
-}

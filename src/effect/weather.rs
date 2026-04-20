@@ -160,37 +160,3 @@ impl Default for WeatherState {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn weather_type_from_name_round_trips() {
-        for name in ["none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen"] {
-            let wt = WeatherType::from_name(name).unwrap();
-            assert_eq!(wt.name(), name);
-        }
-    }
-
-    #[test]
-    fn weather_type_from_name_returns_none_for_unknown() {
-        assert!(WeatherType::from_name("tornado").is_none());
-    }
-
-    #[test]
-    fn weather_state_default_is_disabled() {
-        let ws = WeatherState::default();
-        assert!(!ws.enabled);
-        assert_eq!(ws.weather_type, WeatherType::None);
-        assert!(ws.particles.is_empty());
-    }
-
-    #[test]
-    fn weather_particle_fields_accessible() {
-        let p = WeatherParticle {
-            x: 10.0, y: 20.0, vx: 1.0, vy: 5.0, size: 2.0, alpha: 0.8,
-        };
-        assert!((p.alpha - 0.8).abs() < 1e-6);
-    }
-}
