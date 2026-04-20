@@ -237,7 +237,15 @@ The cross-artifact sync table in the system prompt ([.github/copilot-instruction
 
 ## 9. Testing
 
-The Lua-first testing rule ([philosophy.md](architecture/philosophy.md), constraint **C-04**): behaviour observable through `lurek.*` is tested in Lua. Rust unit tests under [tests/rust/unit/](../tests/rust/unit/) are reserved for internals not reachable through Lua bindings.
+The Lua-first testing rule is binding (see [philosophy.md § Testing Constraints](architecture/philosophy.md#testing-constraints), constraints **TST-01**..**TST-04**): behaviour observable through `lurek.*` is tested in Lua. Rust unit tests under [tests/rust/unit/](../tests/rust/unit/) are reserved for internals not reachable through Lua bindings.
+
+### Testing rules for contributors
+
+- **Write Lua tests by default.** If your change affects anything a game script can see, test it under [tests/lua/](../tests/lua/).
+- **Rust unit tests are for internals only.** Put them in [tests/rust/unit/<module>_tests.rs](../tests/rust/unit/). Never add `#[cfg(test)]` blocks inside `src/`.
+- **Keep `src/lua_api/*_api.rs` and every `mod.rs` thin.** Business logic goes in `src/<module>/*.rs` sibling files. See **TST-03** and **TST-04** in [philosophy.md § Testing Constraints](architecture/philosophy.md#testing-constraints).
+
+Full decision tree and banned-patterns list: [test-framework.md § Test placement](architecture/test-framework.md#test-placement).
 
 Two test layers (full design in [architecture/test-framework.md](architecture/test-framework.md)):
 

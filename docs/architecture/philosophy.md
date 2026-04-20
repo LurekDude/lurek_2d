@@ -15,9 +15,10 @@
 6. [Technology Stack Constraints](#technology-stack-constraints)
 7. [Active Module Group Constraints](#active-module-group-constraints)
 8. [API Design Constraints](#api-design-constraints)
-9. [Quality Gate Constraints](#quality-gate-constraints)
-10. [Constraint Status Model](#constraint-status-model)
-11. [Retired Decisions](#retired-decisions)
+9. [Testing Constraints](#testing-constraints)
+10. [Quality Gate Constraints](#quality-gate-constraints)
+11. [Constraint Status Model](#constraint-status-model)
+12. [Retired Decisions](#retired-decisions)
 
 ---
 
@@ -185,6 +186,21 @@ These constraints formalize the [module group model](engine-architecture.md#modu
 | **C-03** | Active | API functions must have **sensible defaults** — never require parameters a beginner would always pass as the same value. Overloaded param counts are preferred over config tables for simple APIs.                              |
 | **C-04** | Active | Every callback (`lurek.init`, `lurek.ready`, `lurek.process`, `lurek.process_physics`, `lurek.process_late`, `lurek.render`, `lurek.render_ui`, `lurek.keypressed`, etc.) is **optional**. An empty `main.lua` is a valid game. |
 | **C-05** | Active | Lua API is **synchronous from the script's perspective**. Any asynchronous work happens in Rust threads and communicates results via `Channel`. The Lua VM never blocks on I/O or network.                                      |
+
+---
+
+## Testing Constraints
+
+These constraints formalise test placement and the layering rules that keep `src/lua_api/*_api.rs` and every `mod.rs` thin. They are binding; new code must comply. Existing violations are migration-scheduled under session [`testing-cleanup-20260420`](../../work/testing-cleanup-20260420/reports/plan.md) and its tiered follow-ups.
+
+| ID         | Status | Constraint                                                                                                                                                                                                                                                                                                                          |
+| ---------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **TST-01** | Active | **Lua-first testing.** Any behaviour reachable through the `lurek.*` Lua API MUST be tested in [tests/lua/](../../tests/lua/). Rust tests MUST NOT duplicate `lurek.*`-reachable coverage. See [test-framework.md § Test placement](test-framework.md#test-placement).                                                              |
+| **TST-02** | Active | **Centralised Rust unit tests.** Rust unit tests for private / internal-only code live in `tests/rust/unit/<module>_tests.rs`. Inline `#[cfg(test)] mod tests` blocks inside `src/**/*.rs` are **banned** — new additions fail review; existing ones are migration-scheduled.                                                       |
+| **TST-03** | Active | **Thin Lua API wrappers.** `src/lua_api/<module>_api.rs` contains ONLY `impl LuaUserData`, `UserData` registration, and type conversions. Business logic (math, state machines, algorithms, branching on game state) MUST live in the corresponding domain module under `src/<module>/` as pure Rust. Reinforces Zen Rule 12.      |
+| **TST-04** | Active | **Thin `mod.rs`.** Every `mod.rs` contains ONLY `pub mod X;`, `pub use X::*;`, module-level attributes, and doc comments. Function / struct / enum / trait / `impl` definitions MUST live in sibling files (e.g. `src/<module>/facade.rs`, `src/<module>/register.rs`). Reinforces Zen Rule 7.                                      |
+
+> **Enforcement.** Audit scripts under `tools/audit/` (authored in session `testing-cleanup-20260420`, phase P3) scan the tree for TST-02, TST-03, and TST-04 violations. TST-01 is enforced by `Reviewer` and by `tools/audit/test_coverage.py`. See [test-framework.md § Test placement](test-framework.md#test-placement) for the decision tree and banned-patterns list.
 
 ---
 

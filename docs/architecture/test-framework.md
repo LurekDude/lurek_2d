@@ -8,29 +8,30 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Two-Layer Test Model](#two-layer-test-model)
-3. [Directory Layout](#directory-layout)
-4. [Rust Test Suites](#rust-test-suites)
-5. [Lua BDD Test Framework](#lua-bdd-test-framework)
-6. [Lua Test Documentation Standard](#lua-test-documentation-standard)
-7. [Golden Tests](#golden-tests)
-8. [VM Helpers](#vm-helpers)
-9. [Naming Conventions](#naming-conventions)
-10. [Float Comparison Rules](#float-comparison-rules)
-11. [Test Constraints](#test-constraints)
-12. [Adding a New Rust Test](#adding-a-new-rust-test)
-13. [Adding a New Lua Test](#adding-a-new-lua-test)
-14. [Running Tests](#running-tests)
-15. [Quality Gates](#quality-gates)
-16. [Test Coverage Tooling](#test-coverage-tooling)
-17. [Test-Driven Development Workflow](#test-driven-development-workflow)
-18. [Marker Annotations for API Coverage](#marker-annotations-for-api-coverage)
-19. [Evidence-Based Testing](#evidence-based-testing)
-20. [Stress Test Standardization](#stress-test-standardization)
-21. [Integration Tests](#integration-tests)
-22. [Describe-Block Coverage Tracking](#describe-block-coverage-tracking)
-23. [Advanced Analytics](#advanced-analytics)
-24. [Problem Areas and Known Issues](#problem-areas-and-known-issues)
+2. [Test placement](#test-placement)
+3. [Two-Layer Test Model](#two-layer-test-model)
+4. [Directory Layout](#directory-layout)
+5. [Rust Test Suites](#rust-test-suites)
+6. [Lua BDD Test Framework](#lua-bdd-test-framework)
+7. [Lua Test Documentation Standard](#lua-test-documentation-standard)
+8. [Golden Tests](#golden-tests)
+9. [VM Helpers](#vm-helpers)
+10. [Naming Conventions](#naming-conventions)
+11. [Float Comparison Rules](#float-comparison-rules)
+12. [Test Constraints](#test-constraints)
+13. [Adding a New Rust Test](#adding-a-new-rust-test)
+14. [Adding a New Lua Test](#adding-a-new-lua-test)
+15. [Running Tests](#running-tests)
+16. [Quality Gates](#quality-gates)
+17. [Test Coverage Tooling](#test-coverage-tooling)
+18. [Test-Driven Development Workflow](#test-driven-development-workflow)
+19. [Marker Annotations for API Coverage](#marker-annotations-for-api-coverage)
+20. [Evidence-Based Testing](#evidence-based-testing)
+21. [Stress Test Standardization](#stress-test-standardization)
+22. [Integration Tests](#integration-tests)
+23. [Describe-Block Coverage Tracking](#describe-block-coverage-tracking)
+24. [Advanced Analytics](#advanced-analytics)
+25. [Problem Areas and Known Issues](#problem-areas-and-known-issues)
 
 ---
 
@@ -52,6 +53,49 @@ Both layers run headless — no window, no GPU, no audio device required. This e
 | Format | Single-file, heavily commented | Folder with `main.lua` and optional `conf.toml` |
 
 Examples are not tested. They exist to document API usage and are not expected to execute in a test harness. **Demos must all pass CI** — each demo has exactly one test file in `tests/lua/content/demos/`.
+
+---
+
+## Test placement
+
+Test placement is governed by binding constraints **TST-01** (Lua-first testing), **TST-02** (centralised Rust unit tests), **TST-03** (thin Lua API wrappers), and **TST-04** (thin `mod.rs`). See [philosophy.md § Testing Constraints](philosophy.md#testing-constraints) for the canonical text.
+
+> **Migration note (2026-04-20).** This project previously tolerated inline `#[cfg(test)] mod tests` blocks inside `src/**/*.rs` for private-helper coverage. That recommendation is **superseded by TST-02**, effective 2026-04-20. Existing inline blocks are tracked for relocation under session [`testing-cleanup-20260420`](../../work/testing-cleanup-20260420/reports/plan.md); no new inline blocks are accepted.
+
+### Decision tree — where does a test go?
+
+1. **Is the behaviour reachable via any `lurek.*` function, userdata, or callback?**
+   → Write a **Lua test** under [`tests/lua/unit/test_<module>.lua`](../../tests/lua/unit/) (single-module surface), or under [`tests/lua/integration/test_<a>_<b>.lua`](../../tests/lua/integration/) when the test exercises two or more `lurek.*` namespaces. This is **TST-01**; it is the default path.
+
+2. **Otherwise, is it a pure internal helper** — private module, `pub(crate)` surface, free function, or algorithm with no Lua exposure?
+   → Write a **Rust unit test** under [`tests/rust/unit/<module>_tests.rs`](../../tests/rust/unit/). Register the binary in `Cargo.toml` if the file is new. This is **TST-02**; inline `#[cfg(test)]` blocks inside `src/` are banned.
+
+3. **Anything else** — integration across Rust + Lua, golden snapshot comparisons, stress / throughput runs, evidence artefact production, config loading, sandbox probes — goes in the existing `tests/rust/` or `tests/lua/` subfolder for that concern (see [Directory Layout](#directory-layout)). The subfolder choice is unchanged by TST-01..TST-04.
+
+If both branch 1 and branch 2 appear to apply, choose branch 1 (Lua-first). Promote private helpers to `pub(crate)` and cover them through the Lua surface unless there is a specific reason they are Rust-only.
+
+### Banned patterns
+
+The following are rejected at code review and by the audit scripts below:
+
+- **`#[cfg(test)] mod tests` inside any `src/**/*.rs` file** — violates **TST-02**. Relocate to `tests/rust/unit/<module>_tests.rs`.
+- **Business logic in `src/lua_api/*_api.rs`** — loops beyond argument unpacking, arithmetic beyond type conversion, branching on game state, state machines. Violates **TST-03**. Move the logic to `src/<module>/*.rs` as a pure-Rust function exposed crate-publicly, then call it from the thin wrapper.
+- **`fn`, `struct`, `enum`, `trait`, or `impl` definitions in any `mod.rs`** — violates **TST-04**. Move to a sibling file (`facade.rs`, `register.rs`, `types.rs`, or similar). `mod.rs` keeps only `pub mod X;`, `pub use X::*;`, module-level `#![...]` attributes, and doc comments.
+- **Duplicating a `lurek.*`-reachable test in Rust** — violates **TST-01**. Delete the Rust duplicate; keep the Lua test as the source of truth.
+
+### Enforcement — audit scripts
+
+Three Python audit scripts under [`tools/audit/`](../../tools/audit/) enforce TST-02..TST-04. They are authored in session `testing-cleanup-20260420` (phase P3) and emit machine-readable JSON alongside a text summary:
+
+- [`tools/audit/inline_test_audit.py`](../../tools/audit/inline_test_audit.py) — lists every inline `#[cfg(test)]` block with a suggested relocation target. Enforces **TST-02**.
+- [`tools/audit/thin_wrapper_audit.py`](../../tools/audit/thin_wrapper_audit.py) — flags business-logic violations inside `src/lua_api/*_api.rs`. Enforces **TST-03**.
+- [`tools/audit/thin_modrs_audit.py`](../../tools/audit/thin_modrs_audit.py) — flags disallowed definitions inside any `mod.rs`. Enforces **TST-04**.
+
+TST-01 is enforced by `Reviewer` sign-off and by [`tools/audit/test_coverage.py`](../../tools/audit/test_coverage.py), which reports undercovered `lurek.*` surface.
+
+### Harness registration
+
+Lua tests are registered manually in [`tests/lua/harness.rs`](../../tests/lua/harness.rs) — auto-discovery is intentionally not used. Follow the registration procedure documented in [handbook.md § 9 Testing](../handbook.md#9-testing) and the repo-memory note on the manual harness pattern.
 
 ---
 

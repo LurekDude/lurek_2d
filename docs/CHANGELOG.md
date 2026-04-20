@@ -4,12 +4,20 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.3] — 2026-04-22
 
+### Testing Architecture — Binding Constraints TST-01..TST-04 (session testing-cleanup-20260420 P1)
+
+- **docs(testing): add binding constraints TST-01..TST-04 for Lua-first testing, centralised Rust unit tests, thin Lua wrappers, and thin `mod.rs`** — New "Testing Constraints" section in [philosophy.md](architecture/philosophy.md#testing-constraints); new "Test placement" section in [test-framework.md](architecture/test-framework.md#test-placement) with decision tree, banned-patterns list, and forward references to the P3 audit scripts (`inline_test_audit.py`, `thin_wrapper_audit.py`, `thin_modrs_audit.py`); [handbook.md § 9 Testing](handbook.md#9-testing) rewritten with the three contributor-facing rules and corrected constraint references (previously cited C-04 in error). Note: prefix is **TST-*** (not plain T-*) because `T-01..T-08` are already taken by Active Module Group Constraints.
+
 ### Globe Module Quality — Docstrings + Rust Unit Tests + Lua Coverage
 
 - **fix(globe-quality): `globe_api.rs` LOD doc comments** — Added `///` doc comments for `LOD_FAR`, `LOD_MID`, and `LOD_NEAR` constants (`doc_coverage` was reporting 2 uncovered items).
 - **test(globe-quality): `tests/rust/unit/globe_tests.rs`** — New file with 55+ Rust unit tests covering `FogMask`, `FogStore`, `sun_direction`, `province_intensity`, `compute_intensities`, `terminator_alpha`, `OrbitCamera::zoom_by/lod`, `build_view_matrix`, `project_point`, `project_province`, `project_point_with_z`, `screen_delta_to_pan`, `normalize_v3`, `ProvinceGraph::neighbors_of/set_attr/get_attr/find_path_default/reachable_default/rebuild_caches`.
 - **test(globe-quality): `tests/engine_tests.rs`** — Registered `globe_tests` module (alphabetical between `filesystem_tests` and `graph_tests`).
 - **test(globe-quality): `test_globe.lua`** — Added `pickLatLon` test case to "Camera and LOD" describe block; closes the last uncovered Lua function in the globe module.
+
+### Test Harness + VS Code Tasks
+
+- **chore(testing): split bundled `lua_tests` cases and add explicit all-core tasks** — `lua_test_window`, `lua_test_compute`, `lua_test_savegame`, and `lua_test_entity` now map one Lua file per `#[test]` so libtest can schedule them independently inside the harness, and `.vscode/tasks.json` now adds OS-specific `Build: Debug (all cores)`, `Test: All (all cores)`, and `Test: Lua bindings (all cores)` tasks that set both Cargo `-j` and libtest `--test-threads`.
 
 ## [0.20.2] — 2026-04-22
 
