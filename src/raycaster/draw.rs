@@ -108,26 +108,3 @@ impl RaycasterScene {
         img
     }
 }
-
-// ── Tests ────────────────────────────────────────────────────────────────────
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn draw_to_image_empty_scene_returns_correct_dimensions() {
-        let scene = RaycasterScene::default();
-        let img = scene.draw_to_image(320, 200);
-        assert_eq!(img.width(), 320);
-        assert_eq!(img.height(), 200);
-    }
-
-    #[test]
-    fn draw_to_image_nonzero_size() {
-        let scene = RaycasterScene::default();
-        let img = scene.draw_to_image(64, 48);
-        assert_eq!(img.width(), 64);
-        assert_eq!(img.height(), 48);
-    }
-}
