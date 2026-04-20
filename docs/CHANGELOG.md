@@ -4,6 +4,10 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.3] — 2026-04-22
 
+### Binary size — UPX compression
+
+- **chore(dist): add UPX LZMA compression to dist binaries** — `lurek2d.exe` and `lurekc.exe` reduced from 20.58 MB to 5.24 MB (25% of original, −15.3 MB each) using `upx --best --lzma`. UPX is already wired into `tools/dist/dist.ps1` via `Get-Command upx` auto-detect. Install UPX once via `winget install upx.upx` and every future dist build compresses automatically.
+
 ### Dependency optimizations — binary size reduction
 
 - **chore(deps): reduce dist binary size by ~3-4 MB** — disabled `arboard` `image-data` default feature (removes `image 0.25`, `moxcms`, `pxfm` from the link graph — engine only reads/writes text clipboard); switched `ureq` from `rustls`/`ring` to `native-tls`/Windows SChannel (removes `ring` assembly crypto library ~1.5 MB — no external TLS lib needed on Windows); upgraded `windows-sys` direct dep from 0.59 to 0.61 to match `tempfile`; pinned `rfd` to `"0.17"` (semver floor, not patch-pinned). `cargo check` passes clean; `ring` is fully absent from `cargo tree`.
