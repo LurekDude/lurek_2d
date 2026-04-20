@@ -1,6 +1,11 @@
 ---
 description: "Audit src/ for inline #[cfg(test)] blocks, thin-wrapper violations in src/lua_api/, and non-thin mod.rs files. Reports placement per TST-01..TST-04."
 agent: Tester
+loads_tools:
+  - tools/audit/inline_test_audit.py
+  - tools/audit/thin_wrapper_audit.py
+  - tools/audit/thin_modrs_audit.py
+  - tools/audit/test_coverage.py
 ---
 # Audit Test Placement
 
