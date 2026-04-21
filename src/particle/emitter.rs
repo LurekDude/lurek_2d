@@ -68,7 +68,7 @@ impl ParticleSystem {
     /// # Returns
     /// `Self`.
     pub fn new(config: ParticleConfig) -> Self {
-        log_msg!(debug, PE01);
+        log_msg!(debug, PE01, "max {} particles", config.max_particles);
         Self {
             particles: Vec::with_capacity(config.max_particles as usize),
             config,

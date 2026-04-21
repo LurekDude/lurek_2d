@@ -35,9 +35,7 @@ When you change one of these, you MUST update the others in the same commit.
 | `lurek.*` API added / renamed / removed      | `content/examples/<module>.lua` · affected `content/games/` · dependent `content/library/` modules |
 | New module created                           | New `docs/specs/<module>.md` · `docs/specs/README.md`                    |
 | `content/library/<name>/init.lua` changed    | `content/library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/API/library-docs.md` via `tools/docs/gen_lib_docs.py` |
-| Plugin candidacy note in `docs/specs/<module>.md` changed | `docs/architecture/plugins.md` §5 candidate table                       |
 | Contributor onboarding flow changes (build steps, first-game tutorial, quality gates) | `docs/handbook.md` (relevant section) · `CONTRIBUTING.md` if needed |
-| Added inline `#[cfg(test)]` in `src/`        | Revert — violates TST-02. Move to `tests/rust/unit/<module>_tests.rs` or `tests/lua/unit/test_<module>.lua`. |
 | New game demo added to `content/games/`      | `tests/lua/content/demos/test_<name>.lua` (new static-analysis test) · `tests/demo_smoke_tests.rs` (new `#[ignore]` screenshot test) · `tests/lua/harness.rs` (add `lua_demo_<name>` entry) |
 | Any change                                   | `docs/CHANGELOG.md`                                                      |
 

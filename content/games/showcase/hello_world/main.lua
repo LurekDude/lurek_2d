@@ -212,11 +212,10 @@ end
 -- Ready
 -- ---------------------------------------------------------------------------
 function lurek.ready()
-    -- Start header color cycling tween (loops via callback restart)
+    -- Start header color cycling tween (loops via onComplete restart)
     local function cycle_header()
-        lurek.tween.to(header_color, 2.0, { r = math.random(), g = math.random(), b = math.random() }, "inOutSine", function()
-            cycle_header()
-        end)
+        lurek.tween.to(header_color, { r = math.random(), g = math.random(), b = math.random() }, 2.0, "inOutSine")
+            :onComplete(function() cycle_header() end)
     end
     cycle_header()
 end

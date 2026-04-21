@@ -295,7 +295,7 @@ BU02 = "audio bus '{}' paused"
 BU03 = "audio bus '{}' resumed"
 
 [particle_emitter]
-PE01 = "particle emitter created (max {} particles)"
+PE01 = "particle emitter created"
 PE02 = "particle emitter started"
 PE03 = "particle emitter stopped"
 PE04 = "particle emitter reset"
