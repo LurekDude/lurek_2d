@@ -2,10 +2,6 @@
 -- Stress tests for lurek.procgen — throughput and allocation under load.
 -- Validates that generators don't crash, memory-leak, or hang under large inputs.
 
-local init = require("tests/lua/init")
-describe, it, expect_equal, expect_near, expect_error, expect_true, expect_type, test_summary =
-    init.describe, init.it, init.expect_equal, init.expect_near,
-    init.expect_error, init.expect_true, init.expect_type, init.test_summary
 
 -- ─────────────────────────────────────────────
 -- Repeated dungeon generation

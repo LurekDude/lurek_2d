@@ -9,5 +9,7 @@ describe("evidence: pathfind", function()
         ensure_evidence_dir("pathfind")
     end)
 
+    -- @description Placeholder: pathfind evidence cases pending migration.
+    pending("pathfind heatmap / flow-field evidence cases pending migration from Rust")
 end)
 test_summary()

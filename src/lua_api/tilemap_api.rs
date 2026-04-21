@@ -1394,7 +1394,8 @@ impl LuaUserData for LuaIsoMap {
         /// @param gid : integer
         /// @return nil
         methods.add_method("fillLevel", |_, this, (z, part, gid): (usize, u32, u32)| {
-            this.inner.borrow_mut().fill_level(z - 1, part, gid);
+            let z = one_based_usize("z", z)?;
+            this.inner.borrow_mut().fill_level(z, part, gid);
             Ok(())
         });
 

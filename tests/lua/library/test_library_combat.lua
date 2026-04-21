@@ -6,7 +6,6 @@ package.path = "./content/library/?/init.lua;" .. package.path
 
 local combat = require("library.combat")
 
-dofile("tests/lua/init.lua")
 
 -- â”€â”€ CollisionGroupSet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 

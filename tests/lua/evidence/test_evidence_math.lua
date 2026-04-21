@@ -9,5 +9,7 @@ describe("evidence: math", function()
         ensure_evidence_dir("math")
     end)
 
+    -- @description Placeholder: math evidence cases pending migration.
+    pending("math noise / terrain evidence cases pending migration from Rust")
 end)
 test_summary()

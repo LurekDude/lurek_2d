@@ -488,6 +488,21 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- newCamera -- (alias for `new`, default 800×600 if called with no args)
+    tbl.set(
+        "newCamera",
+        lua.create_function(|lua, (vw, vh): (Option<f32>, Option<f32>)| {
+            let vw = vw.unwrap_or(800.0);
+            let vh = vh.unwrap_or(600.0);
+            lua.create_userdata(LuaCamera2D {
+                inner: Rc::new(RefCell::new(Camera2D::new(vw, vh))),
+                path: RefCell::new(None),
+                zoom_tween: RefCell::new(None),
+                parallax: RefCell::new(HashMap::new()),
+            })
+        })?,
+    )?;
+
     luna.set("camera", tbl)?;
     Ok(())
 }

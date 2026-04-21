@@ -1,9 +1,5 @@
 -- @testCategory unit
 -- @description Unit tests for the lurek.runtime.* namespace (engine metadata API).
-local test = require("tests/lua/init")
-local describe, it, expect_equal, expect_true, expect_no_error, test_summary =
-    test.describe, test.it, test.expect_equal, test.expect_true,
-    test.expect_no_error, test.test_summary
 
 -- @description Tests for all lurek.runtime.* functions.
 describe("lurek.runtime metadata", function()
