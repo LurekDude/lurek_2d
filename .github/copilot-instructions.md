@@ -21,6 +21,8 @@ Verbatim from `docs/architecture/philosophy.md`. Do not propose changes without 
 - **TST-02** Inline `#[cfg(test)]` blocks in `src/**/*.rs` are banned; Rust unit tests live in `tests/rust/unit/<module>_tests.rs`.
 - **TST-03** `src/lua_api/<module>_api.rs` holds only `impl LuaUserData`, registration, and conversions — business logic lives in `src/<module>/`.
 - **TST-04** Every `mod.rs` holds only `pub mod`, `pub use`, attributes, and doc comments — definitions live in sibling files.
+- **TST-05** Demo/game tests: headless Lua static-analysis tests live in `tests/lua/content/demos/test_<name>.lua` (one file per demo); binary screenshot tests live in `tests/demo_smoke_tests.rs` (`#[ignore]`). Never put demo tests in `tests/lua/unit/`.
+- **TST-06** `tests/lua/unit/` has exactly **one file per Rust module** (`test_<module>.lua`). No split per-sub-feature files (e.g. `test_effect_overlay.lua` alongside `test_effect.lua`). Merge into the single module file.
 
 ## Cross-Artifact Sync
 
