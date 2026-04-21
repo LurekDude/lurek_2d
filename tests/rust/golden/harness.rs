@@ -61,6 +61,10 @@ fn assert_golden(name: &str, actual: &[u8]) {
     }
 }
 
+fn assert_golden_text(name: &str, actual: &str) {
+    assert_golden(name, actual.as_bytes());
+}
+
 // ===========================================================================
 // Image encode determinism
 // ===========================================================================

@@ -4,6 +4,10 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.3] — 2026-04-22
 
+### Test suite restoration — P1.2 (session test-coverage-sweep-20260421)
+
+- **fix(tests): add `assert_golden_text` helper to unblock `golden_tests`** — added a 3-line sibling wrapper in `tests/rust/golden/harness.rs` around `assert_golden` so the four call sites (`raycaster/ray_east_wall.txt`, `ray_north_wall.txt`, `ray_empty_miss.txt`, `multi_ray_east_5col.txt`) compile. `cargo test --test golden_tests` → 10 passed.
+
 ### Binary size — UPX compression
 
 - **chore(dist): add UPX LZMA compression to dist binaries** — `lurek2d.exe` and `lurekc.exe` reduced from 20.58 MB to 5.24 MB (25% of original, −15.3 MB each) using `upx --best --lzma`. UPX is already wired into `tools/dist/dist.ps1` via `Get-Command upx` auto-detect. Install UPX once via `winget install upx.upx` and every future dist build compresses automatically.
