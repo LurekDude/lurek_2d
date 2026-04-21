@@ -1,4 +1,4 @@
-﻿//! Lurek2D â€” a 2D game engine written in Rust that loads and executes Lua game scripts.
+//! Lurek2D â€” a 2D game engine written in Rust that loads and executes Lua game scripts.
 //!
 //! This crate is the engine library. It re-exports every subsystem through public submodules so
 //! that the `lurek2d` binary, integration tests, and tooling can all share the same code paths.

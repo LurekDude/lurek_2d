@@ -1,4 +1,4 @@
-﻿//! `lurek.automation` â€” Automated input simulation via timed step scripts.
+//! `lurek.automation` â€” Automated input simulation via timed step scripts.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -386,6 +386,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    /// Namespace containing the automation API module.
+    /// Provides automation scripts playback for tests.
     lurek.set("automation", tbl)?;
     Ok(())
 }

@@ -1,4 +1,4 @@
-﻿//! Decoded PCM audio sample buffer with per-sample read/write access.
+//! Decoded PCM audio sample buffer with per-sample read/write access.
 //!
 //! `SoundData` stores fully decoded f32 PCM samples in interleaved channel
 //! order (for stereo: L, R, L, R, ...). It can be created as a silent buffer

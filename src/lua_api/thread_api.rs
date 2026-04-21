@@ -1,4 +1,4 @@
-﻿//! `lurek.thread` â€” Background threads and inter-thread channel communication.
+//! `lurek.thread` â€” Background threads and inter-thread channel communication.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -307,6 +307,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    /// Namespace containing the thread API module.
+    /// Provides background processing loops with message channels.
     lurek.set("thread", tbl)?;
     Ok(())
 }

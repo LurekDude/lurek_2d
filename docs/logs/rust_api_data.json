@@ -1,19 +1,19 @@
 {
   "meta": {
-    "generated": "2026-04-21T19:40:30.142809+00:00",
+    "generated": "2026-04-21T21:33:05.590764+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "0.20.0",
     "stats": {
       "rust_items": 1859,
       "rust_modules": 449,
       "rust_tests": 0,
-      "lua_tests": 252
+      "lua_tests": 242
     }
   },
   "rust_api": {
     "summary": {
       "total_items": 1859,
-      "documented": 1833,
+      "documented": 1848,
       "modules": 449
     },
     "modules": {
@@ -1667,23 +1667,23 @@
           {
             "name": "script",
             "kind": "mod",
-            "description": "",
-            "file": "src/automation/mod.rs",
-            "line": 46
-          },
-          {
-            "name": "simulator",
-            "kind": "mod",
-            "description": "",
+            "description": "Script data structures for holding step records.",
             "file": "src/automation/mod.rs",
             "line": 47
           },
           {
+            "name": "simulator",
+            "kind": "mod",
+            "description": "Simulator engine that plays back scripts.",
+            "file": "src/automation/mod.rs",
+            "line": 49
+          },
+          {
             "name": "step",
             "kind": "mod",
-            "description": "",
+            "description": "Individual action steps used in automation.",
             "file": "src/automation/mod.rs",
-            "line": 48
+            "line": 51
           }
         ]
       },
@@ -4263,86 +4263,86 @@
           {
             "name": "draw",
             "kind": "mod",
-            "description": "",
-            "file": "src/globe/mod.rs",
-            "line": 32
-          },
-          {
-            "name": "fog",
-            "kind": "mod",
-            "description": "",
+            "description": "Globe rendering and frame emitting operations.",
             "file": "src/globe/mod.rs",
             "line": 33
           },
           {
-            "name": "label",
+            "name": "fog",
             "kind": "mod",
-            "description": "",
-            "file": "src/globe/mod.rs",
-            "line": 34
-          },
-          {
-            "name": "layer",
-            "kind": "mod",
-            "description": "",
+            "description": "Fog of war subsystem for the globe.",
             "file": "src/globe/mod.rs",
             "line": 35
           },
           {
-            "name": "lighting",
+            "name": "label",
             "kind": "mod",
-            "description": "",
-            "file": "src/globe/mod.rs",
-            "line": 36
-          },
-          {
-            "name": "loader",
-            "kind": "mod",
-            "description": "",
+            "description": "Text labels plotted on the globe surface.",
             "file": "src/globe/mod.rs",
             "line": 37
           },
           {
-            "name": "marker",
+            "name": "layer",
             "kind": "mod",
-            "description": "",
-            "file": "src/globe/mod.rs",
-            "line": 38
-          },
-          {
-            "name": "picking",
-            "kind": "mod",
-            "description": "",
+            "description": "Configurable texture overlay boundaries.",
             "file": "src/globe/mod.rs",
             "line": 39
           },
           {
-            "name": "projection",
+            "name": "lighting",
             "kind": "mod",
-            "description": "",
-            "file": "src/globe/mod.rs",
-            "line": 40
-          },
-          {
-            "name": "registry",
-            "kind": "mod",
-            "description": "",
+            "description": "Real-time shading and day/night terminator computation.",
             "file": "src/globe/mod.rs",
             "line": 41
           },
           {
+            "name": "loader",
+            "kind": "mod",
+            "description": "Province deserialization from PNGs and TOML files.",
+            "file": "src/globe/mod.rs",
+            "line": 43
+          },
+          {
+            "name": "marker",
+            "kind": "mod",
+            "description": "World-space coordinate markers and icons.",
+            "file": "src/globe/mod.rs",
+            "line": 45
+          },
+          {
+            "name": "picking",
+            "kind": "mod",
+            "description": "Subsystem to hit-test screen coordinates against provinces.",
+            "file": "src/globe/mod.rs",
+            "line": 47
+          },
+          {
+            "name": "projection",
+            "kind": "mod",
+            "description": "3D spherical rendering pipeline mapping.",
+            "file": "src/globe/mod.rs",
+            "line": 49
+          },
+          {
+            "name": "registry",
+            "kind": "mod",
+            "description": "Storage and instantiation of individual globes.",
+            "file": "src/globe/mod.rs",
+            "line": 51
+          },
+          {
             "name": "topology",
             "kind": "mod",
-            "description": "",
+            "description": "Mathematical neighborhood graph of connected regions.",
             "file": "src/globe/mod.rs",
-            "line": 42
+            "line": 53
           },
           {
             "name": "types",
             "kind": "mod",
-            "description": "",
+            "description": "Foundational data definitions for the globe.",
             "file": "src/globe/mod.rs",
-            "line": 43
+            "line": 55
           }
         ]
       },
@@ -15869,45 +15869,10 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/evidence/test_bezier_evidence.lua",
-        "module": "test_bezier_evidence",
-        "name": "test_bezier_evidence",
-        "description": "test_evidence_bezier.lua",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/evidence/test_camera_evidence.lua",
         "module": "test_camera_evidence",
         "name": "test_camera_evidence",
         "description": "test_evidence_camera.lua",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/evidence/test_canvas_evidence.lua",
-        "module": "test_canvas_evidence",
-        "name": "test_canvas_evidence",
-        "description": "test_evidence_canvas.lua",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/evidence/test_cellular_sand_evidence.lua",
-        "module": "test_cellular_sand_evidence",
-        "name": "test_cellular_sand_evidence",
-        "description": "Evidence test: cellular sand falling simulation",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/evidence/test_charts_evidence.lua",
-        "module": "test_charts_evidence",
-        "name": "test_charts_evidence",
-        "description": "test_evidence_charts.lua",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/evidence/test_easing_evidence.lua",
-        "module": "test_easing_evidence",
-        "name": "test_easing_evidence",
-        "description": "test_evidence_easing.lua",
         "kind": "lua"
       },
       {
@@ -15918,13 +15883,6 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/evidence/test_geometry_evidence.lua",
-        "module": "test_geometry_evidence",
-        "name": "test_geometry_evidence",
-        "description": "test_evidence_geometry.lua",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/evidence/test_graph_evidence.lua",
         "module": "test_graph_evidence",
         "name": "test_graph_evidence",
@@ -15932,31 +15890,10 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/evidence/test_gui_evidence.lua",
-        "module": "test_gui_evidence",
-        "name": "test_gui_evidence",
-        "description": "test_evidence_gui.lua",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/evidence/test_image_evidence.lua",
         "module": "test_image_evidence",
         "name": "test_image_evidence",
         "description": "Placeholder evidence suite for migrated image-adjacent artifacts.",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/evidence/test_imagedata_evidence.lua",
-        "module": "test_imagedata_evidence",
-        "name": "test_imagedata_evidence",
-        "description": "Evidence test: ImageData pixel creation, manipulation, and PNG save",
-        "kind": "lua"
-      },
-      {
-        "file": "tests/lua/evidence/test_layers_evidence.lua",
-        "module": "test_layers_evidence",
-        "name": "test_layers_evidence",
-        "description": "test_evidence_layers.lua",
         "kind": "lua"
       },
       {
@@ -15981,13 +15918,6 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/evidence/test_noise_evidence.lua",
-        "module": "test_noise_evidence",
-        "name": "test_noise_evidence",
-        "description": "test_evidence_noise.lua",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/evidence/test_particle_evidence.lua",
         "module": "test_particle_evidence",
         "name": "test_particle_evidence",
@@ -16005,7 +15935,7 @@
         "file": "tests/lua/evidence/test_physics_evidence.lua",
         "module": "test_physics_evidence",
         "name": "test_physics_evidence",
-        "description": "Evidence test: physics simulation â€” body positions after stepping",
+        "description": "Evidence test: physics simulation -    body positions after stepping",
         "kind": "lua"
       },
       {
@@ -16037,13 +15967,6 @@
         "kind": "lua"
       },
       {
-        "file": "tests/lua/evidence/test_shapes_evidence.lua",
-        "module": "test_shapes_evidence",
-        "name": "test_shapes_evidence",
-        "description": "test_evidence_shapes.lua",
-        "kind": "lua"
-      },
-      {
         "file": "tests/lua/evidence/test_spine_evidence.lua",
         "module": "test_spine_evidence",
         "name": "test_spine_evidence",
@@ -16055,6 +15978,13 @@
         "module": "test_tilemap_evidence",
         "name": "test_tilemap_evidence",
         "description": "test_evidence_tilemap.lua",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_tween_evidence.lua",
+        "module": "test_tween_evidence",
+        "name": "test_tween_evidence",
+        "description": "test_evidence_easing.lua",
         "kind": "lua"
       },
       {
@@ -16075,7 +16005,7 @@
         "file": "tests/lua/golden/test_animation_golden.lua",
         "module": "test_animation_golden",
         "name": "test_animation_golden",
-        "description": "Golden test: animation â€” compare evidence output against golden samples",
+        "description": "Golden test: animation          compare evidence output against golden samples",
         "kind": "lua"
       },
       {
@@ -16110,7 +16040,7 @@
         "file": "tests/lua/golden/test_graph_golden.lua",
         "module": "test_graph_golden",
         "name": "test_graph_golden",
-        "description": "Golden test: graph â€” compare evidence output against golden samples",
+        "description": "Golden test: graph          compare evidence output against golden samples",
         "kind": "lua"
       },
       {
@@ -16145,14 +16075,14 @@
         "file": "tests/lua/golden/test_physics_golden.lua",
         "module": "test_physics_golden",
         "name": "test_physics_golden",
-        "description": "Golden test: physics â€” compare evidence output against golden samples",
+        "description": "Golden test: physics          compare evidence output against golden samples",
         "kind": "lua"
       },
       {
         "file": "tests/lua/golden/test_procgen_golden.lua",
         "module": "test_procgen_golden",
         "name": "test_procgen_golden",
-        "description": "Golden test: procgen â€” compare evidence output against golden samples",
+        "description": "Golden test: procgen          compare evidence output against golden samples",
         "kind": "lua"
       },
       {
@@ -16180,7 +16110,7 @@
         "file": "tests/lua/golden/test_tilemap_golden.lua",
         "module": "test_tilemap_golden",
         "name": "test_tilemap_golden",
-        "description": "Golden test: tilemap â€” compare evidence output against golden samples",
+        "description": "Golden test: tilemap          compare evidence output against golden samples",
         "kind": "lua"
       },
       {
@@ -16264,14 +16194,14 @@
         "file": "tests/lua/integration/test_cardgame_tween_integration.lua",
         "module": "test_cardgame_tween_integration",
         "name": "test_cardgame_tween_integration",
-        "description": "Integration test: library.cardgame × lurek.tween.",
+        "description": "Integration test: library.cardgame    lurek.tween.",
         "kind": "lua"
       },
       {
         "file": "tests/lua/integration/test_combat_physics_integration.lua",
         "module": "test_combat_physics_integration",
         "name": "test_combat_physics_integration",
-        "description": "Integration test: library.combat × lurek.physics.",
+        "description": "Integration test: library.combat    lurek.physics.",
         "kind": "lua"
       },
       {
@@ -16320,7 +16250,7 @@
         "file": "tests/lua/integration/test_dialog_event_integration.lua",
         "module": "test_dialog_event_integration",
         "name": "test_dialog_event_integration",
-        "description": "Integration test: library.dialog × lurek.event (runtime name for \"lurek.event\").",
+        "description": "Integration test: library.dialog    lurek.event (runtime name for \"lurek.event\").",
         "kind": "lua"
       },
       {
@@ -16418,7 +16348,7 @@
         "file": "tests/lua/integration/test_inventory_save_integration.lua",
         "module": "test_inventory_save_integration",
         "name": "test_inventory_save_integration",
-        "description": "Integration test: library.inventory × lurek.serial (runtime name for \"lurek.serial\").",
+        "description": "Integration test: library.inventory    lurek.serial (runtime name for \"lurek.serial\").",
         "kind": "lua"
       },
       {
@@ -16572,7 +16502,7 @@
         "file": "tests/lua/integration/test_quest_time_integration.lua",
         "module": "test_quest_time_integration",
         "name": "test_quest_time_integration",
-        "description": "Integration test: library.quest × lurek.timer.Scheduler.",
+        "description": "Integration test: library.quest    lurek.timer.Scheduler.",
         "kind": "lua"
       },
       {
@@ -16719,7 +16649,7 @@
         "file": "tests/lua/library/test_library_cardgame.lua",
         "module": "test_library_cardgame",
         "name": "test_library_cardgame",
-        "description": "â”€â”€ Registry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        "description": "Registry",
         "kind": "lua"
       },
       {
@@ -16733,14 +16663,14 @@
         "file": "tests/lua/library/test_library_combat.lua",
         "module": "test_library_combat",
         "name": "test_library_combat",
-        "description": "â”€â”€ CollisionGroupSet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        "description": "CollisionGroupSet",
         "kind": "lua"
       },
       {
         "file": "tests/lua/library/test_library_crafting.lua",
         "module": "test_library_crafting",
         "name": "test_library_crafting",
-        "description": "â”€â”€ Quality â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        "description": "Quality",
         "kind": "lua"
       },
       {
@@ -16810,14 +16740,14 @@
         "file": "tests/lua/library/test_library_patterns.lua",
         "module": "test_library_patterns",
         "name": "test_library_patterns",
-        "description": "── newScheduler ──────────────────────────────────────────────────────────────",
+        "description": "newScheduler",
         "kind": "lua"
       },
       {
         "file": "tests/lua/library/test_library_province_map.lua",
         "module": "test_library_province_map",
         "name": "test_library_province_map",
-        "description": "â”€â”€ Province â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        "description": "Province",
         "kind": "lua"
       },
       {
@@ -16859,7 +16789,7 @@
         "file": "tests/lua/library/test_library_stats.lua",
         "module": "test_library_stats",
         "name": "test_library_stats",
-        "description": "â”€â”€ Attribute â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
+        "description": "Attribute",
         "kind": "lua"
       },
       {

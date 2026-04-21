@@ -1,4 +1,4 @@
-﻿# Lurek2D Changelog
+# Lurek2D Changelog
 
 All notable changes to Lurek2D are recorded here.
 

@@ -1,4 +1,4 @@
-﻿//! `lurek.runtime` â€” Runtime engine metadata and introspection.
+//! `lurek.runtime` â€” Runtime engine metadata and introspection.
 //!
 //! Exposes read-only properties about the running engine: version, target
 //! frame budget, memory usage, host platform, and total uptime.

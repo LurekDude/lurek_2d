@@ -1,4 +1,4 @@
-﻿//! Background Lua thread with independent VM.
+//! Background Lua thread with independent VM.
 //!
 //! Each [`LuaThread`] spawns an OS thread running its own `mlua::Lua` instance.
 //! Communication with the main thread happens exclusively through [`Channel`]

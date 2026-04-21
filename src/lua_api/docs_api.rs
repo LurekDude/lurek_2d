@@ -1,4 +1,4 @@
-﻿//! Registers the `lurek.docs.*` documentation management API.
+//! Registers the `lurek.docs.*` documentation management API.
 //!
 //! Provides engine-integrated documentation management: scanning runtime bindings,
 //! loading TOML doc catalogs, validating completeness, computing quality metrics,

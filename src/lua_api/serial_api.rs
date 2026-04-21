@@ -1,4 +1,4 @@
-﻿//! `lurek.serial` â€” Format-agnostic string serialization: JSON, TOML, and CSV.
+//! `lurek.serial` â€” Format-agnostic string serialization: JSON, TOML, and CSV.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -185,6 +185,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    /// Namespace containing the serial API module.
+    /// Provides serialization primitives and configuration parsers.
     lurek.set("serial", tbl)?;
     Ok(())
 }

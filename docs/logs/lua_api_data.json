@@ -1,23 +1,23 @@
 {
   "meta": {
-    "generated": "2026-04-21T19:40:30.538617+00:00",
+    "generated": "2026-04-21T21:35:37.501135+00:00",
     "generator": "tools/gen_lua_api_data.py",
     "version": "0.20.0",
     "stats": {
-      "lua_functions": 3656,
+      "lua_functions": 3654,
       "lua_modules": 50
     }
   },
   "lua_api": {
     "summary": {
-      "total_functions": 3656,
+      "total_functions": 3654,
       "documented": 3654,
-      "coverage_pct": 99.9,
+      "coverage_pct": 100.0,
       "modules": 50
     },
     "modules": {
       "ai": {
-        "description": "",
+        "description": "`lurek.ai` â€” Game AI toolkit: worlds, agents, FSM, behavior trees, steering, Q-learning, utility AI, GOAP, squads, and command queues.",
         "source_file": "src/lua_api/ai_api.rs",
         "functions": [
           {
@@ -5537,7 +5537,7 @@
         }
       },
       "audio": {
-        "description": "Registers sources (streamed or static), bus-based mixing, MIDI playback,\nstreaming decoders, `SoundData` buffers, and spatial audio positioning.\nAll mixer state lives in [`SharedState`].",
+        "description": "`lurek.audio` â€” Audio playback, mixing, MIDI synthesis, and DSP effects.\n\nRegisters sources (streamed or static), bus-based mixing, MIDI playback,\nstreaming decoders, `SoundData` buffers, and spatial audio positioning.\nAll mixer state lives in [`SharedState`].",
         "source_file": "src/lua_api/audio_api.rs",
         "functions": [
           {
@@ -9904,7 +9904,7 @@
         }
       },
       "automation": {
-        "description": "",
+        "description": "`lurek.automation` â€” Automated input simulation via timed step scripts.",
         "source_file": "src/lua_api/automation_api.rs",
         "functions": [
           {
@@ -10440,7 +10440,7 @@
         "classes": {}
       },
       "camera": {
-        "description": "Each `Camera2D` has position, zoom, rotation, viewport bounds, optional world-space\nclamping, waypoint path following, smooth zoom tweening, per-layer parallax factors,\nand screenâ†”world coordinate transforms.",
+        "description": "`lurek.camera` â€” Camera2D creation and manipulation for 2D viewport control.\n\nEach `Camera2D` has position, zoom, rotation, viewport bounds, optional world-space\nclamping, waypoint path following, smooth zoom tweening, per-layer parallax factors,\nand screenâ†”world coordinate transforms.",
         "source_file": "src/lua_api/camera_api.rs",
         "functions": [
           {
@@ -10467,21 +10467,6 @@
             ],
             "inferred_return": "",
             "line": 479,
-            "file": "src/lua_api/camera_api.rs"
-          },
-          {
-            "name": "newCamera",
-            "lua_name": "lurek.camera.newCamera",
-            "kind": "function",
-            "owner_type": "",
-            "description": "",
-            "full_doc": "",
-            "params_doc": "",
-            "returns_doc": "",
-            "inferred_sig": "([vw], [vh])",
-            "typed_params": [],
-            "inferred_return": "",
-            "line": 492,
             "file": "src/lua_api/camera_api.rs"
           }
         ],
@@ -11177,7 +11162,7 @@
         }
       },
       "collision": {
-        "description": "These pure-math functions perform fast overlap detection without requiring a\nfull physics world. Suitable for RPG, puzzle, or visual-novel games that only\nneed simple overlap detection, not rigid-body simulation.\n\nAll functions are pure and stateless â€” the `_state` parameter is accepted only\nto match the standard `register()` contract.",
+        "description": "`lurek.physics` â€” Lightweight stateless geometric collision helpers.\n\nThese pure-math functions perform fast overlap detection without requiring a\nfull physics world. Suitable for RPG, puzzle, or visual-novel games that only\nneed simple overlap detection, not rigid-body simulation.\n\nAll functions are pure and stateless â€” the `_state` parameter is accepted only\nto match the standard `register()` contract.",
         "source_file": "src/lua_api/collision_api.rs",
         "functions": [
           {
@@ -11383,7 +11368,7 @@
         "classes": {}
       },
       "compute": {
-        "description": "Wraps [`NdArray`] as `Array` userdata supporting element-wise arithmetic, broadcasting,\nreshape/transpose/slice, reduction (sum, mean, min, max), linear algebra (matmul, dot,\nnorm), spatial queries (nearest, radius search), and statistical analytics.",
+        "description": "`lurek.compute` â€” Dense N-dimensional numerical arrays with NumPy-style operations.\n\nWraps [`NdArray`] as `Array` userdata supporting element-wise arithmetic, broadcasting,\nreshape/transpose/slice, reduction (sum, mean, min, max), linear algebra (matmul, dot,\nnorm), spatial queries (nearest, radius search), and statistical analytics.",
         "source_file": "src/lua_api/compute_api.rs",
         "functions": [
           {
@@ -12973,21 +12958,6 @@
             "file": "src/lua_api/data_api.rs"
           },
           {
-            "name": "newByteData",
-            "lua_name": "lurek.data.newByteData",
-            "kind": "function",
-            "owner_type": "",
-            "description": "",
-            "full_doc": "",
-            "params_doc": "",
-            "returns_doc": "",
-            "inferred_sig": "(value)",
-            "typed_params": [],
-            "inferred_return": "",
-            "line": 423,
-            "file": "src/lua_api/data_api.rs"
-          },
-          {
             "name": "newDataView",
             "lua_name": "lurek.data.newDataView",
             "kind": "function",
@@ -13015,7 +12985,7 @@
               ]
             ],
             "inferred_return": "DataView",
-            "line": 449,
+            "line": 450,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13036,7 +13006,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 467,
+            "line": 468,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13067,7 +13037,7 @@
               ]
             ],
             "inferred_return": "table|nil",
-            "line": 483,
+            "line": 484,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13088,7 +13058,7 @@
               ]
             ],
             "inferred_return": "integer",
-            "line": 499,
+            "line": 500,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13109,7 +13079,7 @@
               ]
             ],
             "inferred_return": "table",
-            "line": 510,
+            "line": 511,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13130,7 +13100,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 522,
+            "line": 523,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13151,7 +13121,7 @@
               ]
             ],
             "inferred_return": "RingBuffer",
-            "line": 535,
+            "line": 536,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13172,7 +13142,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 555,
+            "line": 556,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13193,7 +13163,7 @@
               ]
             ],
             "inferred_return": "table|nil",
-            "line": 570,
+            "line": 571,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -13208,7 +13178,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "DataWriter",
-            "line": 584,
+            "line": 585,
             "file": "src/lua_api/data_api.rs"
           }
         ],
@@ -13380,7 +13350,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 661,
+                "line": 662,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13401,7 +13371,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 672,
+                "line": 673,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13422,7 +13392,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 683,
+                "line": 684,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13443,7 +13413,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 694,
+                "line": 695,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13464,7 +13434,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 705,
+                "line": 706,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13485,7 +13455,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 716,
+                "line": 717,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13506,7 +13476,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 727,
+                "line": 728,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13527,7 +13497,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 738,
+                "line": 739,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13542,7 +13512,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 745,
+                "line": 746,
                 "file": "src/lua_api/data_api.rs"
               }
             ]
@@ -13568,7 +13538,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 763,
+                "line": 764,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13589,7 +13559,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 770,
+                "line": 771,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13610,7 +13580,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 777,
+                "line": 778,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13631,7 +13601,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 784,
+                "line": 785,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13652,7 +13622,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 791,
+                "line": 792,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13673,7 +13643,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 798,
+                "line": 799,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13694,7 +13664,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 805,
+                "line": 806,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13715,7 +13685,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 812,
+                "line": 813,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13736,7 +13706,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 819,
+                "line": 820,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13757,7 +13727,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 826,
+                "line": 827,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13778,7 +13748,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 833,
+                "line": 834,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13799,7 +13769,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 840,
+                "line": 841,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13814,7 +13784,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 847,
+                "line": 848,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13829,7 +13799,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 851,
+                "line": 852,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13844,7 +13814,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 855,
+                "line": 856,
                 "file": "src/lua_api/data_api.rs"
               }
             ]
@@ -13864,7 +13834,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 866,
+                "line": 867,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13879,7 +13849,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 870,
+                "line": 871,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13900,7 +13870,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 875,
+                "line": 876,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13926,7 +13896,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 889,
+                "line": 890,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -13941,7 +13911,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "ByteData",
-                "line": 903,
+                "line": 904,
                 "file": "src/lua_api/data_api.rs"
               }
             ]
@@ -15242,7 +15212,7 @@
         }
       },
       "debugbridge": {
-        "description": "Embeds a JSON-over-TCP server (127.0.0.1 only) inside the running game.\nExternal tools (VS Code extension, MCP server) connect to inspect and\ncontrol the game at runtime. Network I/O runs on a background thread;\nLua-dependent methods are queued and dispatched via `poll()` on the main thread.",
+        "description": "Registers the `lurek.debugbridge.*` TCP debug server API.\n\nEmbeds a JSON-over-TCP server (127.0.0.1 only) inside the running game.\nExternal tools (VS Code extension, MCP server) connect to inspect and\ncontrol the game at runtime. Network I/O runs on a background thread;\nLua-dependent methods are queued and dispatched via `poll()` on the main thread.",
         "source_file": "src/lua_api/debugbridge_api.rs",
         "functions": [
           {
@@ -15510,7 +15480,7 @@
         "classes": {}
       },
       "devtools": {
-        "description": "Thin Lua bridge that delegates to the [`devtools`][crate::devtools] domain module.\nAll state management happens in [`crate::devtools`]; this file only converts\nbetween Lua values and domain types.",
+        "description": "Registers the `lurek.devtools.*` runtime diagnostics and developer-tools API.\n\nThin Lua bridge that delegates to the [`devtools`][crate::devtools] domain module.\nAll state management happens in [`crate::devtools`]; this file only converts\nbetween Lua values and domain types.",
         "source_file": "src/lua_api/devtools_api.rs",
         "functions": [
           {
@@ -16389,7 +16359,7 @@
         }
       },
       "docs": {
-        "description": "Provides engine-integrated documentation management: scanning runtime bindings,\nloading TOML doc catalogs, validating completeness, computing quality metrics,\nexporting structured data for VS Code extension IntelliSense, and\na lightweight schema validator for game-developer data validation.",
+        "description": "Registers the `lurek.docs.*` documentation management API.\n\nProvides engine-integrated documentation management: scanning runtime bindings,\nloading TOML doc catalogs, validating completeness, computing quality metrics,\nexporting structured data for VS Code extension IntelliSense, and\na lightweight schema validator for game-developer data validation.",
         "source_file": "src/lua_api/docs_api.rs",
         "functions": [
           {
@@ -17844,7 +17814,7 @@
         }
       },
       "ecs": {
-        "description": "Wraps [`crate::ecs::Universe`] as `LuaUniverse` userdata. Supports spawn/kill,\nper-entity component CRUD, tag flags, named layers, queries, blueprints, and\ncomponent add/remove observer callbacks.",
+        "description": "`lurek.ecs` â€” Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.\n\nWraps [`crate::ecs::Universe`] as `LuaUniverse` userdata. Supports spawn/kill,\nper-entity component CRUD, tag flags, named layers, queries, blueprints, and\ncomponent add/remove observer callbacks.",
         "source_file": "src/lua_api/ecs_api.rs",
         "functions": [
           {
@@ -18832,7 +18802,7 @@
         }
       },
       "effect": {
-        "description": "Exposes `PostFxEffect` (individual shader passes), `PostFxStack` (ordered chains),\n`ImageEffect` (named preset bundles), `Overlay` (screen-space weather/vignette),\nand `ScreenTransition` (fade/wipe between scenes). Also provides render-to-texture\nfeedback loops for motion-trail effects.",
+        "description": "`lurek.effect` â€” Composable visual effects: post-processing pipeline and screen overlays.\n\nExposes `PostFxEffect` (individual shader passes), `PostFxStack` (ordered chains),\n`ImageEffect` (named preset bundles), `Overlay` (screen-space weather/vignette),\nand `ScreenTransition` (fade/wipe between scenes). Also provides render-to-texture\nfeedback loops for motion-trail effects.",
         "source_file": "src/lua_api/effect_api.rs",
         "functions": [
           {
@@ -21434,7 +21404,7 @@
         }
       },
       "engine": {
-        "description": "Exposes read-only properties about the running engine: version, target\nframe budget, memory usage, host platform, and total uptime.",
+        "description": "`lurek.runtime` â€” Runtime engine metadata and introspection.\n\nExposes read-only properties about the running engine: version, target\nframe budget, memory usage, host platform, and total uptime.",
         "source_file": "src/lua_api/engine_api.rs",
         "functions": [
           {
@@ -21597,7 +21567,7 @@
         "classes": {}
       },
       "event": {
-        "description": "Provides `Signal` userdata for named-event pub-sub with once-fire handles,\nper-handle filter predicates, wildcard subscriptions, and integration with the\nengine event bus for built-in events (resize, focus, quit, etc.).",
+        "description": "`lurek.signal` â€” Event queue polling and pub-sub signal dispatching.\n\nProvides `Signal` userdata for named-event pub-sub with once-fire handles,\nper-handle filter predicates, wildcard subscriptions, and integration with the\nengine event bus for built-in events (resize, focus, quit, etc.).",
         "source_file": "src/lua_api/event_api.rs",
         "functions": [
           {
@@ -22000,7 +21970,7 @@
         }
       },
       "filesystem": {
-        "description": "All paths are resolved through the game's [`GameFS`] sandbox. Supports file\nread/write via `FileHandle`, bulk-data via `FileData`, ZIP archive mounting,\ndirectory listing, path manipulation, and per-file change watching.",
+        "description": "`lurek.filesystem` â€” Sandboxed file I/O, directory queries, and async asset loading.\n\nAll paths are resolved through the game's [`GameFS`] sandbox. Supports file\nread/write via `FileHandle`, bulk-data via `FileData`, ZIP archive mounting,\ndirectory listing, path manipulation, and per-file change watching.",
         "source_file": "src/lua_api/filesystem_api.rs",
         "functions": [
           {
@@ -23092,8 +23062,8 @@
             "lua_name": "lurek.globe.new",
             "kind": "function",
             "owner_type": "",
-            "description": "Create a new globe.",
-            "full_doc": "Create a new globe.\n@param name : string\n@param spec : table?\n@return Globe",
+            "description": "Creates a new globe instance with default settings and empty collections.",
+            "full_doc": "Creates a new globe instance with default settings and empty collections.\n@param name : string\n@param spec : table?\n@return Globe",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(name, [spec_tbl])",
@@ -23110,7 +23080,7 @@
               ]
             ],
             "inferred_return": "Globe",
-            "line": 724,
+            "line": 727,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -23131,7 +23101,7 @@
               ]
             ],
             "inferred_return": "Globe?",
-            "line": 750,
+            "line": 753,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -23162,7 +23132,7 @@
               ]
             ],
             "inferred_return": "Globe",
-            "line": 781,
+            "line": 784,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -23198,7 +23168,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 814,
+            "line": 817,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -23239,7 +23209,7 @@
               ]
             ],
             "inferred_return": "table<{number",
-            "line": 829,
+            "line": 832,
             "file": "src/lua_api/globe_api.rs"
           },
           {
@@ -23265,7 +23235,7 @@
               ]
             ],
             "inferred_return": "table",
-            "line": 849,
+            "line": 852,
             "file": "src/lua_api/globe_api.rs"
           }
         ],
@@ -23662,8 +23632,8 @@
                 "lua_name": "Globe:removeMarker",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Remove a marker by ID.",
-                "full_doc": "Remove a marker by ID.\n@param id : integer\n@return boolean",
+                "description": "Removes a marker from the globe map by its unique string identifier.",
+                "full_doc": "Removes a marker from the globe map by its unique string identifier.\n@param id : integer\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(id)",
@@ -23714,8 +23684,8 @@
                 "lua_name": "Globe:setMarkerVisible",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Set marker visibility.",
-                "full_doc": "Set marker visibility.\n@param id : integer\n@param visible : boolean",
+                "description": "Sets whether this specific marker is visible on the globe.",
+                "full_doc": "Sets whether this specific marker is visible on the globe.\n@param id : integer\n@param visible : boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(id, vis)",
@@ -23766,8 +23736,8 @@
                 "lua_name": "Globe:setLabelText",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Update label text.",
-                "full_doc": "Update label text.\n@param id : integer\n@param text : string",
+                "description": "Updates the visible text content of an existing globe label.",
+                "full_doc": "Updates the visible text content of an existing globe label.\n@param id : integer\n@param text : string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(id, text)",
@@ -23792,8 +23762,8 @@
                 "lua_name": "Globe:setLabelVisible",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Set label visibility.",
-                "full_doc": "Set label visibility.\n@param id : integer\n@param visible : boolean",
+                "description": "Sets whether this specific label is visible on the globe.",
+                "full_doc": "Sets whether this specific label is visible on the globe.\n@param id : integer\n@param visible : boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(id, vis)",
@@ -23818,8 +23788,8 @@
                 "lua_name": "Globe:removeLabel",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Remove a label.",
-                "full_doc": "Remove a label.\n@param id : integer",
+                "description": "Removes a text label from the globe map by its unique string identifier.",
+                "full_doc": "Removes a text label from the globe map by its unique string identifier.\n@param id : integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(id)",
@@ -23839,8 +23809,8 @@
                 "lua_name": "Globe:removeLayer",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Remove a layer.",
-                "full_doc": "Remove a layer.\n@param name : string",
+                "description": "Removes a texture layer from the globe map by its unique string identifier.",
+                "full_doc": "Removes a texture layer from the globe map by its unique string identifier.\n@param name : string",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(name)",
@@ -23860,8 +23830,8 @@
                 "lua_name": "Globe:setLayerVisible",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Set layer visibility.",
-                "full_doc": "Set layer visibility.\n@param name : string\n@param visible : boolean",
+                "description": "Sets whether this specific texture layer is visible on the globe.",
+                "full_doc": "Sets whether this specific texture layer is visible on the globe.\n@param name : string\n@param visible : boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(name, vis)",
@@ -23933,14 +23903,14 @@
                 "lua_name": "Globe:getTimeOfDay",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Get time of day.",
-                "full_doc": "Get time of day.\n@return number",
+                "description": "Gets the current simulated time of day for daylight computation.",
+                "full_doc": "Gets the current simulated time of day for daylight computation.\n@return number\nMethod to perform an operation on the globe object.",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 479,
+                "line": 480,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -23961,7 +23931,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 486,
+                "line": 487,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -23982,7 +23952,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 493,
+                "line": 494,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -24003,7 +23973,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 498,
+                "line": 499,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -24029,7 +23999,7 @@
                   ]
                 ],
                 "inferred_return": "table<integer>?",
-                "line": 509,
+                "line": 510,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -24037,8 +24007,8 @@
                 "lua_name": "Globe:removeArc",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Remove an arc by ID.",
-                "full_doc": "Remove an arc by ID.\n@param id : integer",
+                "description": "Removes an arc from the globe map by its unique string identifier.",
+                "full_doc": "Removes an arc from the globe map by its unique string identifier.\n@param id : integer",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(id)",
@@ -24050,7 +24020,7 @@
                   ]
                 ],
                 "inferred_return": "",
-                "line": 577,
+                "line": 578,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -24058,14 +24028,14 @@
                 "lua_name": "Globe:getName",
                 "kind": "method",
                 "owner_type": "Globe",
-                "description": "Returns the globe name.",
-                "full_doc": "Returns the globe name.\n@return string",
+                "description": "Returns the string identifier name assigned to this globe instance.",
+                "full_doc": "Returns the string identifier name assigned to this globe instance.\n@return string\nMethod to perform an operation on the globe object.",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 584,
+                "line": 586,
                 "file": "src/lua_api/globe_api.rs"
               }
             ]
@@ -24091,7 +24061,7 @@
                   ]
                 ],
                 "inferred_return": "Globe?",
-                "line": 631,
+                "line": 633,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -24099,8 +24069,8 @@
                 "lua_name": "GlobeRegistry:remove",
                 "kind": "method",
                 "owner_type": "GlobeRegistry",
-                "description": "Remove a globe by name.",
-                "full_doc": "Remove a globe by name.\n@param name : string\n@return boolean",
+                "description": "Removes a globe from the central registry by its string name.",
+                "full_doc": "Removes a globe from the central registry by its string name.\n@param name : string\n@return boolean\nMethod to perform an operation on the globe object.",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(name)",
@@ -24112,7 +24082,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 653,
+                "line": 656,
                 "file": "src/lua_api/globe_api.rs"
               },
               {
@@ -24127,7 +24097,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table<string>",
-                "line": 664,
+                "line": 667,
                 "file": "src/lua_api/globe_api.rs"
               }
             ]
@@ -24135,7 +24105,7 @@
         }
       },
       "graph": {
-        "description": "Provides a node/edge graph model with typed item transport, overflow policies,\nconversion rules, demand/supply links, and event callbacks (`itemEnter`,\n`itemLeave`, etc.). Also exposes graph-level pathfinding (Dijkstra, BFS, A*)\nthrough the `find*` methods on the `Graph` userdata.",
+        "description": "`lurek.graph` â€” Directed graph with item-flow simulation.\n\nProvides a node/edge graph model with typed item transport, overflow policies,\nconversion rules, demand/supply links, and event callbacks (`itemEnter`,\n`itemLeave`, etc.). Also exposes graph-level pathfinding (Dijkstra, BFS, A*)\nthrough the `find*` methods on the `Graph` userdata.",
         "source_file": "src/lua_api/graph_api.rs",
         "functions": [
           {
@@ -26116,7 +26086,7 @@
         }
       },
       "i18n": {
-        "description": "Thin Lua bridge that delegates to the [`i18n`][crate::i18n] domain module.\nAll translation tables, fallback logic, interpolation, and pluralization live\nin [`crate::i18n`]; this file converts between Lua values and domain types.",
+        "description": "Registers the `lurek.i18n.*` internationalization and i18n API.\n\nThin Lua bridge that delegates to the [`i18n`][crate::i18n] domain module.\nAll translation tables, fallback logic, interpolation, and pluralization live\nin [`crate::i18n`]; this file converts between Lua values and domain types.",
         "source_file": "src/lua_api/i18n_api.rs",
         "functions": [
           {
@@ -26763,7 +26733,7 @@
         "classes": {}
       },
       "image": {
-        "description": "Exposes `ImageData` (RGBA pixel buffers), `CompressedImageData` (DXT/BC/ETC),\n`LayeredImage` (multi-layer compositing), `ProvinceGrid` (colour-keyed region maps),\nand `PaletteLUT` (palette-swap look-up tables). All operations run on the CPU;\nupload to GPU is handled by the render layer.",
+        "description": "`lurek.image` â€” CPU-side pixel-level image manipulation.\n\nExposes `ImageData` (RGBA pixel buffers), `CompressedImageData` (DXT/BC/ETC),\n`LayeredImage` (multi-layer compositing), `ProvinceGrid` (colour-keyed region maps),\nand `PaletteLUT` (palette-swap look-up tables). All operations run on the CPU;\nupload to GPU is handled by the render layer.",
         "source_file": "src/lua_api/image_api.rs",
         "functions": [
           {
@@ -28152,7 +28122,7 @@
         }
       },
       "input": {
-        "description": "",
+        "description": "`lurek.input.keyboard` / `lurek.input.mouse` / `lurek.input.gamepad` / `lurek.input.touch` â€” Input state queries and cursor management.",
         "source_file": "src/lua_api/input_api.rs",
         "functions": [
           {
@@ -29720,7 +29690,7 @@
         }
       },
       "light": {
-        "description": "Manages `Light` handles (point / directional / spot) and `Occluder` handles\n(line-segment shadow casters) within the engine's `LightWorld`. Supports\nattenuation, blend modes, falloff curves, shadow filtering, flicker configs,\ncookie textures, colour transitions, and ambient colour control.",
+        "description": "`lurek.light` â€” 2D lighting, shadow occluders, and ambient control.\n\nManages `Light` handles (point / directional / spot) and `Occluder` handles\n(line-segment shadow casters) within the engine's `LightWorld`. Supports\nattenuation, blend modes, falloff curves, shadow filtering, flicker configs,\ncookie textures, colour transitions, and ambient colour control.",
         "source_file": "src/lua_api/light_api.rs",
         "functions": [
           {
@@ -31317,7 +31287,7 @@
         }
       },
       "log": {
-        "description": "Exposes convenience logging functions so Lua scripts can emit messages at\nspecific severity levels and query or change the active log level at\nruntime. Also supports configurable output sinks (file, memory ring buffer)\nin addition to the default stderr channel, similar to Python's `logging`\nmodule handlers.",
+        "description": "Structured game-level logging API (`lurek.log.*`).\n\nExposes convenience logging functions so Lua scripts can emit messages at\nspecific severity levels and query or change the active log level at\nruntime. Also supports configurable output sinks (file, memory ring buffer)\nin addition to the default stderr channel, similar to Python's `logging`\nmodule handlers.",
         "source_file": "src/lua_api/log_api.rs",
         "functions": [
           {
@@ -36639,7 +36609,7 @@
         }
       },
       "minimap": {
-        "description": "",
+        "description": "`lurek.minimap` â€” Grid-based minimap with terrain, fog of war, objects, pings, and markers.",
         "source_file": "src/lua_api/minimap_api.rs",
         "functions": [
           {
@@ -37716,7 +37686,7 @@
         }
       },
       "mods": {
-        "description": "",
+        "description": "`lurek.mods` - Mod discovery, dependency resolution, load ordering, and hot-reload.",
         "source_file": "src/lua_api/mods_api.rs",
         "functions": [
           {
@@ -37737,7 +37707,7 @@
               ]
             ],
             "inferred_return": "Mod",
-            "line": 614,
+            "line": 615,
             "file": "src/lua_api/mods_api.rs"
           },
           {
@@ -37752,7 +37722,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "ModManager",
-            "line": 625,
+            "line": 626,
             "file": "src/lua_api/mods_api.rs"
           },
           {
@@ -37778,7 +37748,7 @@
               ]
             ],
             "inferred_return": "table|nil",
-            "line": 642,
+            "line": 643,
             "file": "src/lua_api/mods_api.rs"
           }
         ],
@@ -37806,14 +37776,14 @@
                 "lua_name": "Mod:getName",
                 "kind": "method",
                 "owner_type": "Mod",
-                "description": "Returns the display name",
-                "full_doc": "Returns the display name\nReturns the name.\n\n@return string",
+                "description": "Returns the localized or human-readable display name of the mod.",
+                "full_doc": "Returns the localized or human-readable display name of the mod.\nReturns the name.\n\n@return string\nMethod to perform an operation on the mods object.",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 168,
+                "line": 169,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37828,7 +37798,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 175,
+                "line": 176,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37843,7 +37813,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 182,
+                "line": 183,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37858,7 +37828,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 189,
+                "line": 190,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37873,7 +37843,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 198,
+                "line": 199,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37888,7 +37858,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 207,
+                "line": 208,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37903,7 +37873,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 214,
+                "line": 215,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37924,7 +37894,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 222,
+                "line": 223,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37939,7 +37909,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 232,
+                "line": 233,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37954,7 +37924,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string?",
-                "line": 239,
+                "line": 240,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37975,7 +37945,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 249,
+                "line": 250,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -37990,7 +37960,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 259,
+                "line": 260,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38011,7 +37981,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 269,
+                "line": 270,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38026,7 +37996,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 277,
+                "line": 278,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38047,7 +38017,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 293,
+                "line": 294,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38068,7 +38038,7 @@
                   ]
                 ],
                 "inferred_return": "function?",
-                "line": 330,
+                "line": 331,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38089,7 +38059,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 345,
+                "line": 346,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38104,7 +38074,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 354,
+                "line": 355,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38125,7 +38095,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 368,
+                "line": 369,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38140,7 +38110,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table?",
-                "line": 382,
+                "line": 383,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38155,7 +38125,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 395,
+                "line": 396,
                 "file": "src/lua_api/mods_api.rs"
               }
             ]
@@ -38181,7 +38151,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 447,
+                "line": 448,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38202,7 +38172,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 459,
+                "line": 460,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38223,7 +38193,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 469,
+                "line": 470,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38238,7 +38208,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 478,
+                "line": 479,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38253,7 +38223,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 485,
+                "line": 486,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38268,7 +38238,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 494,
+                "line": 495,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38283,7 +38253,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 504,
+                "line": 505,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38298,7 +38268,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 513,
+                "line": 514,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38319,7 +38289,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 523,
+                "line": 524,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38334,7 +38304,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 534,
+                "line": 535,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38355,7 +38325,7 @@
                   ]
                 ],
                 "inferred_return": "table",
-                "line": 545,
+                "line": 546,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38376,7 +38346,7 @@
                   ]
                 ],
                 "inferred_return": "string?",
-                "line": 556,
+                "line": 557,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38397,7 +38367,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 566,
+                "line": 567,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38412,7 +38382,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table",
-                "line": 575,
+                "line": 576,
                 "file": "src/lua_api/mods_api.rs"
               },
               {
@@ -38427,7 +38397,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 584,
+                "line": 585,
                 "file": "src/lua_api/mods_api.rs"
               }
             ]
@@ -38435,7 +38405,7 @@
         }
       },
       "network": {
-        "description": "Provides ENet UDP, HTTP, TCP, WebSocket, and MessagePack serialization\nthrough the `lurek.network` Lua namespace.",
+        "description": "`lurek.network` â€” Full networking toolkit for multiplayer games.\n\nProvides ENet UDP, HTTP, TCP, WebSocket, and MessagePack serialization\nthrough the `lurek.network` Lua namespace.",
         "source_file": "src/lua_api/network_api.rs",
         "functions": [
           {
@@ -39200,7 +39170,7 @@
         }
       },
       "parallax": {
-        "description": "Registers `lurek.parallax.newLayer(opts)` and `lurek.parallax.newSet(name)`.\nDomain logic lives in `src/parallax/`; this file is the thin Lua bridge only.",
+        "description": "`lurek.parallax` â€” multi-layer scrolling background system.\n\nRegisters `lurek.parallax.newLayer(opts)` and `lurek.parallax.newSet(name)`.\nDomain logic lives in `src/parallax/`; this file is the thin Lua bridge only.",
         "source_file": "src/lua_api/parallax_api.rs",
         "functions": [
           {
@@ -40056,7 +40026,7 @@
         }
       },
       "particle": {
-        "description": "",
+        "description": "`lurek.particle` â€” Emitter-based 2D particle systems and trail ribbons.",
         "source_file": "src/lua_api/particle_api.rs",
         "functions": [
           {
@@ -43057,7 +43027,7 @@
         }
       },
       "patterns": {
-        "description": "Provides factory functions and UserData wrappers for reusable patterns:\nEventBus (prioritized pub-sub), ObjectPool (object reuse), CommandStack\n(undo/redo), ServiceLocator (DI container), Factory (named constructors),\nand SimpleState (finite state machine).",
+        "description": "Registers the `lurek.patterns.*` software design patterns API.\n\nProvides factory functions and UserData wrappers for reusable patterns:\nEventBus (prioritized pub-sub), ObjectPool (object reuse), CommandStack\n(undo/redo), ServiceLocator (DI container), Factory (named constructors),\nand SimpleState (finite state machine).",
         "source_file": "src/lua_api/patterns_api.rs",
         "functions": [
           {
@@ -49417,7 +49387,7 @@
         }
       },
       "pipeline": {
-        "description": "",
+        "description": "`lurek.pipeline` â€” DAG-based pipeline orchestrator for composing multi-step workflows.",
         "source_file": "src/lua_api/pipeline_api.rs",
         "functions": [
           {
@@ -51416,7 +51386,7 @@
         "classes": {}
       },
       "raycaster": {
-        "description": "",
+        "description": "`lurek.raycaster` - DDA grid raycasting for retro FPS and dungeon-crawler games.",
         "source_file": "src/lua_api/raycaster_api.rs",
         "functions": [
           {
@@ -52347,7 +52317,7 @@
         }
       },
       "render": {
-        "description": "",
+        "description": "`lurek.graphic` â€” 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.",
         "source_file": "src/lua_api/render_api.rs",
         "functions": [
           {
@@ -56741,7 +56711,7 @@
         }
       },
       "save": {
-        "description": "",
+        "description": "`lurek.save` - Slot-based save/load system with collectors, schema versioning, and auto-save.",
         "source_file": "src/lua_api/save_api.rs",
         "functions": [
           {
@@ -57156,7 +57126,7 @@
         }
       },
       "scene": {
-        "description": "",
+        "description": "`lurek.scene` â€” Scene stack management, transitions, registry, and depth-sorted rendering.",
         "source_file": "src/lua_api/scene_api.rs",
         "functions": [
           {
@@ -57984,7 +57954,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "table",
-            "line": 1022,
+            "line": 1024,
             "file": "src/lua_api/scene_api.rs"
           },
           {
@@ -57999,7 +57969,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "table",
-            "line": 1049,
+            "line": 1051,
             "file": "src/lua_api/scene_api.rs"
           },
           {
@@ -58020,7 +57990,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1090,
+            "line": 1092,
             "file": "src/lua_api/scene_api.rs"
           },
           {
@@ -58041,7 +58011,7 @@
               ]
             ],
             "inferred_return": "table|nil",
-            "line": 1129,
+            "line": 1131,
             "file": "src/lua_api/scene_api.rs"
           },
           {
@@ -58067,7 +58037,7 @@
               ]
             ],
             "inferred_return": "table|nil",
-            "line": 1145,
+            "line": 1147,
             "file": "src/lua_api/scene_api.rs"
           },
           {
@@ -58088,7 +58058,7 @@
               ]
             ],
             "inferred_return": "table|nil",
-            "line": 1163,
+            "line": 1165,
             "file": "src/lua_api/scene_api.rs"
           },
           {
@@ -58109,7 +58079,7 @@
               ]
             ],
             "inferred_return": "table|nil",
-            "line": 1178,
+            "line": 1180,
             "file": "src/lua_api/scene_api.rs"
           }
         ],
@@ -58265,7 +58235,7 @@
         }
       },
       "serial": {
-        "description": "",
+        "description": "`lurek.serial` â€” Format-agnostic string serialization: JSON, TOML, and CSV.",
         "source_file": "src/lua_api/serial_api.rs",
         "functions": [
           {
@@ -58922,7 +58892,7 @@
         }
       },
       "sprite": {
-        "description": "and RPGMaker character-sheet helpers.",
+        "description": "`lurek.sprite` â€” Sprite-sheet UV layout, named frame groups, atlas parsing,\nand RPGMaker character-sheet helpers.",
         "source_file": "src/lua_api/sprite_api.rs",
         "functions": [
           {
@@ -59317,7 +59287,7 @@
         }
       },
       "system": {
-        "description": "preferred locales, clipboard access, and safe URL opening.\n\nRegistered as `lurek.platform.*` in the Lua VM. Domain logic is minimal â€”\nmost functions delegate directly to `std` or `sysinfo`.",
+        "description": "`lurek.platform` â€” Platform queries: OS name, CPU count, memory size, power state,\npreferred locales, clipboard access, and safe URL opening.\n\nRegistered as `lurek.platform.*` in the Lua VM. Domain logic is minimal â€”\nmost functions delegate directly to `std` or `sysinfo`.",
         "source_file": "src/lua_api/system_api.rs",
         "functions": [
           {
@@ -61552,7 +61522,7 @@
         }
       },
       "thread": {
-        "description": "",
+        "description": "`lurek.thread` â€” Background threads and inter-thread channel communication.",
         "source_file": "src/lua_api/thread_api.rs",
         "functions": [
           {
@@ -62011,7 +61981,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 319,
+                "line": 321,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62032,7 +62002,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 323,
+                "line": 325,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62053,7 +62023,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 330,
+                "line": 332,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62068,7 +62038,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string|number|boolean|table|nil",
-                "line": 338,
+                "line": 340,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62083,7 +62053,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string|number|boolean|table|nil",
-                "line": 345,
+                "line": 347,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62104,7 +62074,7 @@
                   ]
                 ],
                 "inferred_return": "string|number|boolean|table|nil",
-                "line": 353,
+                "line": 355,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62119,7 +62089,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 362,
+                "line": 364,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62134,7 +62104,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 366,
+                "line": 368,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62155,7 +62125,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 374,
+                "line": 376,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62176,7 +62146,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 384,
+                "line": 386,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62191,7 +62161,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "table?",
-                "line": 401,
+                "line": 403,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62212,7 +62182,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 411,
+                "line": 413,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -62227,7 +62197,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string?",
-                "line": 420,
+                "line": 422,
                 "file": "src/lua_api/thread_api.rs"
               }
             ]
@@ -62235,7 +62205,7 @@
         }
       },
       "tilemap": {
-        "description": "",
+        "description": "`lurek.tilemap` â€” Tile-based map authoring, chunk streaming, isometric and hex coordinate helpers.",
         "source_file": "src/lua_api/tilemap_api.rs",
         "functions": [
           {
@@ -65255,7 +65225,7 @@
         }
       },
       "timer": {
-        "description": "",
+        "description": "`lurek.timer` - Frame timing, FPS tracking, and scheduled Lua callbacks.",
         "source_file": "src/lua_api/timer_api.rs",
         "functions": [
           {
@@ -66083,7 +66053,7 @@
         }
       },
       "tween": {
-        "description": "# Purpose\n\nThis file is a **registration-only** wrapper following the Thin Wrapper Rule:\nit contains `pub fn register()` and the closure bodies that delegate immediately\nto domain types in `src/tween/`. All business logic, structs, and state machines\nlive in `src/tween/handle.rs` (`LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`)\nand `src/tween/engine.rs` (`TweenEngine`).\n\n# Architecture\n\n`TweenEngine` is a module-local `Rc<RefCell<â€¦>>` that tracks all active handle\nobjects via `LuaRegistryKey` references. Lua scripts hold UserData handles and\nkeep them alive for the duration of the animation. The engine never ticks tweens\nautomatically â€” the script must call `lurek.tween.update(dt)` from `lurek.process`.",
+        "description": "`lurek.tween` â€” thin Lua registration wrapper for the property tween system.\n\n# Purpose\n\nThis file is a **registration-only** wrapper following the Thin Wrapper Rule:\nit contains `pub fn register()` and the closure bodies that delegate immediately\nto domain types in `src/tween/`. All business logic, structs, and state machines\nlive in `src/tween/handle.rs` (`LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`)\nand `src/tween/engine.rs` (`TweenEngine`).\n\n# Architecture\n\n`TweenEngine` is a module-local `Rc<RefCell<â€¦>>` that tracks all active handle\nobjects via `LuaRegistryKey` references. Lua scripts hold UserData handles and\nkeep them alive for the duration of the animation. The engine never ticks tweens\nautomatically â€” the script must call `lurek.tween.update(dt)` from `lurek.process`.",
         "source_file": "src/lua_api/tween_api.rs",
         "functions": [
           {
@@ -74052,7 +74022,7 @@
         }
       },
       "window": {
-        "description": "",
+        "description": "`lurek.window` - Window management, fullscreen, DPI, display queries, and viewport scaling.",
         "source_file": "src/lua_api/window_api.rs",
         "functions": [
           {

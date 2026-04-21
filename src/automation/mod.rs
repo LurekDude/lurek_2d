@@ -43,8 +43,11 @@
 //! `math`, `engine`, and all Tier 1 modules (`event`, `input`, etc.). It
 //! must not import other Tier 2 modules.
 
+/// Script data structures for holding step records.
 pub mod script;
+/// Simulator engine that plays back scripts.
 pub mod simulator;
+/// Individual action steps used in automation.
 pub mod step;
 
 pub use script::Script;

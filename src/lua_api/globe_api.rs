@@ -317,7 +317,7 @@ impl LuaUserData for LuaGlobe {
         );
 
         // -- removeMarker --
-        /// Remove a marker by ID.
+        /// Removes a marker from the globe map by its unique string identifier.
         /// @param id : integer
         /// @return boolean
         methods.add_method_mut("removeMarker", |_, this, id: u32| {
@@ -334,7 +334,7 @@ impl LuaUserData for LuaGlobe {
         });
 
         // -- setMarkerVisible --
-        /// Set marker visibility.
+        /// Sets whether this specific marker is visible on the globe.
         /// @param id : integer
         /// @param visible : boolean
         methods.add_method_mut("setMarkerVisible", |_, this, (id, vis): (u32, bool)| {
@@ -382,7 +382,7 @@ impl LuaUserData for LuaGlobe {
         );
 
         // -- setLabelText --
-        /// Update label text.
+        /// Updates the visible text content of an existing globe label.
         /// @param id : integer
         /// @param text : string
         methods.add_method_mut("setLabelText", |_, this, (id, text): (u32, String)| {
@@ -390,7 +390,7 @@ impl LuaUserData for LuaGlobe {
         });
 
         // -- setLabelVisible --
-        /// Set label visibility.
+        /// Sets whether this specific label is visible on the globe.
         /// @param id : integer
         /// @param visible : boolean
         methods.add_method_mut("setLabelVisible", |_, this, (id, vis): (u32, bool)| {
@@ -398,7 +398,7 @@ impl LuaUserData for LuaGlobe {
         });
 
         // -- removeLabel --
-        /// Remove a label.
+        /// Removes a text label from the globe map by its unique string identifier.
         /// @param id : integer
         methods.add_method_mut("removeLabel", |_, this, id: u32| {
             this.with_mut(|g| g.labels.remove(id).is_some())
@@ -427,7 +427,7 @@ impl LuaUserData for LuaGlobe {
         );
 
         // -- removeLayer --
-        /// Remove a layer.
+        /// Removes a texture layer from the globe map by its unique string identifier.
         /// @param name : string
         methods.add_method_mut("removeLayer", |_, this, name: String| {
             this.with_mut(|g| g.layers.remove(&name).is_some())
@@ -449,7 +449,7 @@ impl LuaUserData for LuaGlobe {
         );
 
         // -- setLayerVisible --
-        /// Set layer visibility.
+        /// Sets whether this specific texture layer is visible on the globe.
         /// @param name : string
         /// @param visible : boolean
         methods.add_method_mut("setLayerVisible", |_, this, (name, vis): (String, bool)| {
@@ -474,8 +474,9 @@ impl LuaUserData for LuaGlobe {
         });
 
         // -- getTimeOfDay --
-        /// Get time of day.
+        /// Gets the current simulated time of day for daylight computation.
         /// @return number
+        /// Method to perform an operation on the globe object.
         methods.add_method("getTimeOfDay", |_, this, ()| {
             this.with(|g| g.spec.time_of_day)
         });
@@ -572,15 +573,16 @@ impl LuaUserData for LuaGlobe {
         );
 
         // -- removeArc --
-        /// Remove an arc by ID.
+        /// Removes an arc from the globe map by its unique string identifier.
         /// @param id : integer
         methods.add_method_mut("removeArc", |_, this, id: u32| {
             this.with_mut(|g| g.remove_arc(id))
         });
 
         // -- getName --
-        /// Returns the globe name.
+        /// Returns the string identifier name assigned to this globe instance.
         /// @return string
+        /// Method to perform an operation on the globe object.
         methods.add_method("getName", |_, this, ()| Ok(this.name.clone()));
 
         // -- __tostring --
@@ -647,9 +649,10 @@ impl LuaUserData for LuaGlobeRegistry {
         });
 
         // -- remove --
-        /// Remove a globe by name.
+        /// Removes a globe from the central registry by its string name.
         /// @param name : string
         /// @return boolean
+        /// Method to perform an operation on the globe object.
         methods.add_method_mut("remove", |_, this, name: String| {
             let mut guard = this
                 .reg
@@ -717,7 +720,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     {
         let reg = registry.clone();
         let s = state.clone();
-        /// Create a new globe.
+        /// Creates a new globe instance with default settings and empty collections.
         /// @param name : string
         /// @param spec : table?
         /// @return Globe

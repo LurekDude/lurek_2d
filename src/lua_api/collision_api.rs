@@ -1,4 +1,4 @@
-﻿//! `lurek.physics` â€” Lightweight stateless geometric collision helpers.
+//! `lurek.physics` â€” Lightweight stateless geometric collision helpers.
 //!
 //! These pure-math functions perform fast overlap detection without requiring a
 //! full physics world. Suitable for RPG, puzzle, or visual-novel games that only

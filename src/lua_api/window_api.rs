@@ -1,4 +1,4 @@
-﻿//! `lurek.window` - Window management, fullscreen, DPI, display queries, and viewport scaling.
+//! `lurek.window` - Window management, fullscreen, DPI, display queries, and viewport scaling.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -747,6 +747,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    /// Namespace containing the window API module.
+    /// Provides platform window controls, styling and displays.
     lurek.set("window", tbl)?;
     Ok(())
 }

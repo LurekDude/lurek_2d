@@ -1,4 +1,4 @@
-﻿//! `lurek.network` â€” Full networking toolkit for multiplayer games.
+//! `lurek.network` â€” Full networking toolkit for multiplayer games.
 //!
 //! Provides ENet UDP, HTTP, TCP, WebSocket, and MessagePack serialization
 //! through the `lurek.network` Lua namespace.

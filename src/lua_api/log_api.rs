@@ -1,4 +1,4 @@
-﻿//! Structured game-level logging API (`lurek.log.*`).
+//! Structured game-level logging API (`lurek.log.*`).
 //!
 //! Exposes convenience logging functions so Lua scripts can emit messages at
 //! specific severity levels and query or change the active log level at

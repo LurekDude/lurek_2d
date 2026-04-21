@@ -1,4 +1,4 @@
-﻿//! Named animation synchronisation groups.
+//! Named animation synchronisation groups.
 //!
 //! An [`AnimSyncGroup`] holds a collection of [`Animation`](crate::animation::Animation)
 //! keys (slot-map `DefaultKey`) that should all receive the same [`tick`](no-link) call

@@ -1,4 +1,4 @@
-﻿//! `lurek.graphic` â€” 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
+//! `lurek.graphic` â€” 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
 
 use super::SharedState;
 use mlua::prelude::*;

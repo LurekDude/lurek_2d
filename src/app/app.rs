@@ -1,4 +1,4 @@
-﻿//! Lurek2D application lifecycle using winit 0.30 + wgpu GPU rendering.
+//! Lurek2D application lifecycle using winit 0.30 + wgpu GPU rendering.
 //!
 //! Uses a `winit` event loop with `GpuRenderer` for hardware-accelerated rendering.
 //! The game loop structure (callbacks, SharedState, Lua VM) follows the standard pattern.

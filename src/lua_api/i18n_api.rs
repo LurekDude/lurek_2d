@@ -1,4 +1,4 @@
-﻿//! Registers the `lurek.i18n.*` internationalization and i18n API.
+//! Registers the `lurek.i18n.*` internationalization and i18n API.
 //!
 //! Thin Lua bridge that delegates to the [`i18n`][crate::i18n] domain module.
 //! All translation tables, fallback logic, interpolation, and pluralization live

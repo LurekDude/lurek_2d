@@ -1,4 +1,4 @@
-﻿//! [`AnimClip`] â€” a named animation clip referencing frames by index.
+//! [`AnimClip`] â€” a named animation clip referencing frames by index.
 
 /// A named animation clip that references frames by index into the parent
 ///

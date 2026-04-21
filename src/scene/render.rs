@@ -1,4 +1,4 @@
-﻿//! Render-command generation and CPU drawing for the scene module.
+//! Render-command generation and CPU drawing for the scene module.
 //!
 //! [`SceneStack`] is a pure ID-based LIFO stack â€” it stores no render data,
 //! only scene identifiers. GPU rendering is driven by Lua-side `draw()`

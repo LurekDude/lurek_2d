@@ -47,7 +47,7 @@ _INTERNAL_MODULES = {
     "serial::lua_table", "thread::channel",
     "event::event_queue",
     # Internal domain helpers not in the Lua surface
-    "savegame::save_data", "savegame::save_manager",
+    "savegame::save_data", "savegame::save_manager", "image::visualization::animation", "image::visualization::audio", "image::visualization::camera", "image::visualization::easing", "image::visualization::facade", "image::visualization::geometry", "image::visualization::graph", "image::visualization::image_ops", "image::visualization::noise", "image::visualization::procgen", "image::visualization::ui", "globe::draw", "globe::lighting", "globe::loader", "globe::projection", "log::facade", "math::sphere", "particle::visualization", "app::app", "filesystem::zip_mount",
     "data::bin_pack", "data::pack", "data::toml_convert",
     "entity::universe",
     # Internal platform/engine converters

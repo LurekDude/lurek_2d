@@ -1,4 +1,4 @@
-﻿//! `lurek.timer` - Frame timing, FPS tracking, and scheduled Lua callbacks.
+//! `lurek.timer` - Frame timing, FPS tracking, and scheduled Lua callbacks.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -760,6 +760,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return nil
     tbl.set("delay", wait_fn)?;
 
+    /// Namespace containing the timer API module.
+    /// Provides frame rate independent time, delta time, and schedulers.
     lurek.set("timer", tbl)?;
     Ok(())
 }

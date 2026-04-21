@@ -1,4 +1,4 @@
-﻿//! `lurek.scene` â€” Scene stack management, transitions, registry, and depth-sorted rendering.
+//! `lurek.scene` â€” Scene stack management, transitions, registry, and depth-sorted rendering.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1014,6 +1014,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
 
+    /// Namespace containing the scene API module.
+    /// Provides scene lifecycle flow execution and state.
     lurek.set("scene", tbl.clone())?;
 
     // -- getTransitionTypes --

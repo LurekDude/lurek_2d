@@ -1,4 +1,4 @@
-﻿//! [`AnimFrame`] â€” a single animation frame with a source rectangle and optional duration.
+//! [`AnimFrame`] â€” a single animation frame with a source rectangle and optional duration.
 
 use crate::math::Rect;
 

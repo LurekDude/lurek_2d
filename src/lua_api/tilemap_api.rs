@@ -1,4 +1,4 @@
-﻿//! `lurek.tilemap` â€” Tile-based map authoring, chunk streaming, isometric and hex coordinate helpers.
+//! `lurek.tilemap` â€” Tile-based map authoring, chunk streaming, isometric and hex coordinate helpers.
 
 use super::render_api::LuaImageData;
 use super::SharedState;
@@ -2543,6 +2543,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // @param tbl : table â€” tilemap module registration
+    /// Namespace containing the tilemap API module.
+    /// Provides tile based level chunks, layouts and rendering.
     lurek.set("tilemap", tbl)?;
     Ok(())
 }

@@ -1,4 +1,4 @@
-﻿//! `lurek.camera` â€” Camera2D creation and manipulation for 2D viewport control.
+//! `lurek.camera` â€” Camera2D creation and manipulation for 2D viewport control.
 //!
 //! Each `Camera2D` has position, zoom, rotation, viewport bounds, optional world-space
 //! clamping, waypoint path following, smooth zoom tweening, per-layer parallax factors,
@@ -490,6 +490,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newCamera -- (alias for `new`, default 800Ă—600 if called with no args)
     tbl.set(
+        /// Creates a new camera object to view the game world.
         "newCamera",
         lua.create_function(|lua, (vw, vh): (Option<f32>, Option<f32>)| {
             let vw = vw.unwrap_or(800.0);

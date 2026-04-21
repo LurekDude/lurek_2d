@@ -1,4 +1,4 @@
-﻿//! `lurek.sprite` â€” Sprite-sheet UV layout, named frame groups, atlas parsing,
+//! `lurek.sprite` â€” Sprite-sheet UV layout, named frame groups, atlas parsing,
 //! and RPGMaker character-sheet helpers.
 
 use super::SharedState;

@@ -1,4 +1,4 @@
-﻿//! `lurek.raycaster` - DDA grid raycasting for retro FPS and dungeon-crawler games.
+//! `lurek.raycaster` - DDA grid raycasting for retro FPS and dungeon-crawler games.
 
 use super::render_api::LuaImageData;
 use super::SharedState;
@@ -992,6 +992,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    /// Namespace containing the raycaster API module.
+    /// Provides raycast intersections and 2.5D visual rendering.
     lurek.set("raycaster", tbl)?;
     Ok(())
 }

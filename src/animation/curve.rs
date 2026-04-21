@@ -1,4 +1,4 @@
-﻿//! Keyframe-based animation curves with per-segment easing.
+//! Keyframe-based animation curves with per-segment easing.
 //!
 //! An [`AnimCurve`] holds a list of `(time, value)` keyframes in ascending time
 //! order and evaluates the interpolated value at any time `t` using the selected

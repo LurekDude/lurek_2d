@@ -1,4 +1,4 @@
-﻿//! `lurek.input.keyboard` / `lurek.input.mouse` / `lurek.input.gamepad` / `lurek.input.touch` â€” Input state queries and cursor management.
+//! `lurek.input.keyboard` / `lurek.input.mouse` / `lurek.input.gamepad` / `lurek.input.touch` â€” Input state queries and cursor management.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1265,6 +1265,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    /// Namespace containing the input API module.
+    /// Provides input handling devices and event streams.
     lurek.set("input", input_tbl)?;
 
     Ok(())

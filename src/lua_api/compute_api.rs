@@ -1,4 +1,4 @@
-﻿//! `lurek.compute` â€” Dense N-dimensional numerical arrays with NumPy-style operations.
+//! `lurek.compute` â€” Dense N-dimensional numerical arrays with NumPy-style operations.
 //!
 //! Wraps [`NdArray`] as `Array` userdata supporting element-wise arithmetic, broadcasting,
 //! reshape/transpose/slice, reduction (sum, mean, min, max), linear algebra (matmul, dot,

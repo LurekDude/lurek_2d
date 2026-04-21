@@ -1,4 +1,4 @@
-﻿//! `lurek.ai` â€” Game AI toolkit: worlds, agents, FSM, behavior trees, steering, Q-learning, utility AI, GOAP, squads, and command queues.
+//! `lurek.ai` â€” Game AI toolkit: worlds, agents, FSM, behavior trees, steering, Q-learning, utility AI, GOAP, squads, and command queues.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -3598,6 +3598,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+        /// Provides comprehensive artificial intelligence routines and types.
     lurek.set("ai", tbl)?;
     Ok(())
 }

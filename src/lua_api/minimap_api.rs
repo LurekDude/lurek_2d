@@ -1,4 +1,4 @@
-﻿//! `lurek.minimap` â€” Grid-based minimap with terrain, fog of war, objects, pings, and markers.
+//! `lurek.minimap` â€” Grid-based minimap with terrain, fog of war, objects, pings, and markers.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -981,6 +981,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
+    /// Namespace containing the minimap API module.
+    /// Provides minimap rendering and overlay functionalities.
     lurek.set("minimap", tbl)?;
     Ok(())
 }

@@ -1,4 +1,4 @@
-﻿//! `lurek.graph` â€” Directed graph with item-flow simulation.
+//! `lurek.graph` â€” Directed graph with item-flow simulation.
 //!
 //! Provides a node/edge graph model with typed item transport, overflow policies,
 //! conversion rules, demand/supply links, and event callbacks (`itemEnter`,

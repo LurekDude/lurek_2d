@@ -29,17 +29,29 @@
 //! `draw`             | `emit_globe_frame` → `Vec<RenderCommand>` |
 //! `registry`         | `Globe` + `GlobeRegistry` |
 
+/// Globe rendering and frame emitting operations.
 pub mod draw;
+/// Fog of war subsystem for the globe.
 pub mod fog;
+/// Text labels plotted on the globe surface.
 pub mod label;
+/// Configurable texture overlay boundaries.
 pub mod layer;
+/// Real-time shading and day/night terminator computation.
 pub mod lighting;
+/// Province deserialization from PNGs and TOML files.
 pub mod loader;
+/// World-space coordinate markers and icons.
 pub mod marker;
+/// Subsystem to hit-test screen coordinates against provinces.
 pub mod picking;
+/// 3D spherical rendering pipeline mapping.
 pub mod projection;
+/// Storage and instantiation of individual globes.
 pub mod registry;
+/// Mathematical neighborhood graph of connected regions.
 pub mod topology;
+/// Foundational data definitions for the globe.
 pub mod types;
 
 // ── Re-exports ───────────────────────────────────────────────────────────────

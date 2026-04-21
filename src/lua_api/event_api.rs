@@ -1,4 +1,4 @@
-﻿//! `lurek.signal` â€” Event queue polling and pub-sub signal dispatching.
+//! `lurek.signal` â€” Event queue polling and pub-sub signal dispatching.
 //!
 //! Provides `Signal` userdata for named-event pub-sub with once-fire handles,
 //! per-handle filter predicates, wildcard subscriptions, and integration with the

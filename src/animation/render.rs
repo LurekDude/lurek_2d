@@ -1,4 +1,4 @@
-﻿//! Render-command generation for sprite animations.
+//! Render-command generation for sprite animations.
 //!
 //! Provides a helper to convert the current animation frame into a
 //! [`RenderCommand::DrawQuad`].  Pure CPU â€” no wgpu, winit, or mlua.

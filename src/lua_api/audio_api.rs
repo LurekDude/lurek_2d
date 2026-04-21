@@ -1,4 +1,4 @@
-﻿//! `lurek.audio` â€” Audio playback, mixing, MIDI synthesis, and DSP effects.
+//! `lurek.audio` â€” Audio playback, mixing, MIDI synthesis, and DSP effects.
 //!
 //! Registers sources (streamed or static), bus-based mixing, MIDI playback,
 //! streaming decoders, `SoundData` buffers, and spatial audio positioning.

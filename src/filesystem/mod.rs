@@ -1,4 +1,4 @@
-﻿//! Sandboxed virtual filesystem for Lurek2D.
+//! Sandboxed virtual filesystem for Lurek2D.
 //!
 //! Provides [`vfs::GameFS`] â€” the central filesystem abstraction that sandboxes all
 //! file I/O to the game's base directory. Every path is checked against a canonical path

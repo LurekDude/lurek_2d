@@ -1,4 +1,4 @@
-﻿//! `lurek.pipeline` â€” DAG-based pipeline orchestrator for composing multi-step workflows.
+//! `lurek.pipeline` â€” DAG-based pipeline orchestrator for composing multi-step workflows.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1349,6 +1349,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    /// Namespace containing the pipeline API module.
+    /// Provides pipeline task scheduling and sequencing workflows.
     lurek.set("pipeline", tbl)?;
     Ok(())
 }

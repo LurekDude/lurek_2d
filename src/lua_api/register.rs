@@ -1,4 +1,4 @@
-﻿//! Lua VM factory: `create_lua_vm` and `create_test_vm`.
+//! Lua VM factory: `create_lua_vm` and `create_test_vm`.
 //!
 //! Moved from `src/lua_api/mod.rs` to satisfy TST-04 (thin `mod.rs`).
 

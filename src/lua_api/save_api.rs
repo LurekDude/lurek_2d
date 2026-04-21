@@ -1,4 +1,4 @@
-﻿//! `lurek.save` - Slot-based save/load system with collectors, schema versioning, and auto-save.
+//! `lurek.save` - Slot-based save/load system with collectors, schema versioning, and auto-save.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -611,6 +611,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |lua, ()| lua.create_userdata(LuaSaveManager::new(s.clone())))?,
     )?;
 
+    /// Namespace containing the save API module.
+    /// Provides read and write access for local save game persistence.
     lurek.set("save", tbl)?;
     Ok(())
 }

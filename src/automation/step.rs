@@ -1,4 +1,4 @@
-﻿//! Step definitions for the automation simulation module.
+//! Step definitions for the automation simulation module.
 //!
 //! This module provides the [`Action`] enum and [`Step`] struct that form the
 //! building blocks of a simulation script. A `Step` pairs a wall-clock offset

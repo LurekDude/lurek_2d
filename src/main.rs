@@ -1,4 +1,4 @@
-﻿//! Lurek2D engine binary entry point.
+//! Lurek2D engine binary entry point.
 //!
 //! This crate is a thin wrapper around the `lurek2d` library crate. Its only job is to call
 //! [`lurek2d::lurek_run`], which installs the panic hook, parses the command-line game-directory

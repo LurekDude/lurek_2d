@@ -1,4 +1,4 @@
-﻿//! `lurek.effect` â€” Composable visual effects: post-processing pipeline and screen overlays.
+//! `lurek.effect` â€” Composable visual effects: post-processing pipeline and screen overlays.
 //!
 //! Exposes `PostFxEffect` (individual shader passes), `PostFxStack` (ordered chains),
 //! `ImageEffect` (named preset bundles), `Overlay` (screen-space weather/vignette),

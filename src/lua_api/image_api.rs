@@ -1,4 +1,4 @@
-﻿//! `lurek.image` â€” CPU-side pixel-level image manipulation.
+//! `lurek.image` â€” CPU-side pixel-level image manipulation.
 //!
 //! Exposes `ImageData` (RGBA pixel buffers), `CompressedImageData` (DXT/BC/ETC),
 //! `LayeredImage` (multi-layer compositing), `ProvinceGrid` (colour-keyed region maps),

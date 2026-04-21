@@ -1,4 +1,4 @@
-﻿//! Frame timing, scheduled events, and sleep utilities.
+//! Frame timing, scheduled events, and sleep utilities.
 //!
 //! This module is part of Lurek2D's **Core Runtime** tier and provides two complementary
 //! types plus a convenience sleep helper:

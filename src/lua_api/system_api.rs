@@ -1,4 +1,4 @@
-﻿//! `lurek.platform` â€” Platform queries: OS name, CPU count, memory size, power state,
+//! `lurek.platform` â€” Platform queries: OS name, CPU count, memory size, power state,
 //! preferred locales, clipboard access, and safe URL opening.
 //!
 //! Registered as `lurek.platform.*` in the Lua VM. Domain logic is minimal â€”

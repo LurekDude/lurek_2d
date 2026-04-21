@@ -421,6 +421,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     tbl.set(
+        /// Instantiates a raw byte data container object.
         "newByteData",
         lua.create_function(|lua, value: LuaValue| {
             let bd = match value {

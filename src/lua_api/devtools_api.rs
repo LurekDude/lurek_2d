@@ -1,4 +1,4 @@
-﻿//! Registers the `lurek.devtools.*` runtime diagnostics and developer-tools API.
+//! Registers the `lurek.devtools.*` runtime diagnostics and developer-tools API.
 //!
 //! Thin Lua bridge that delegates to the [`devtools`][crate::devtools] domain module.
 //! All state management happens in [`crate::devtools`]; this file only converts

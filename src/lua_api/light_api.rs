@@ -1,4 +1,4 @@
-﻿//! `lurek.light` â€” 2D lighting, shadow occluders, and ambient control.
+//! `lurek.light` â€” 2D lighting, shadow occluders, and ambient control.
 //!
 //! Manages `Light` handles (point / directional / spot) and `Occluder` handles
 //! (line-segment shadow casters) within the engine's `LightWorld`. Supports

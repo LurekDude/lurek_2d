@@ -1,4 +1,4 @@
-﻿//! `lurek.particle` â€” Emitter-based 2D particle systems and trail ribbons.
+//! `lurek.particle` â€” Emitter-based 2D particle systems and trail ribbons.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1541,6 +1541,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?;
     }
 
+    /// Namespace containing the particle API module.
+    /// Provides high performance particle emission rendering and updating.
     lurek.set("particle", tbl)?;
     Ok(())
 }

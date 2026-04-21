@@ -1,4 +1,4 @@
-﻿//! Registers the `lurek.debugbridge.*` TCP debug server API.
+//! Registers the `lurek.debugbridge.*` TCP debug server API.
 //!
 //! Embeds a JSON-over-TCP server (127.0.0.1 only) inside the running game.
 //! External tools (VS Code extension, MCP server) connect to inspect and

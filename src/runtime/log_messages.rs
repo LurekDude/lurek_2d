@@ -1,4 +1,4 @@
-﻿//! Structured logging with stable message IDs for the Lurek2D engine.
+//! Structured logging with stable message IDs for the Lurek2D engine.
 //!
 //! Every engine log message has a stable ID (`L001`..`L099`) so that external
 //! tools and Lua scripts can filter or match on them.  Use the [`log_msg!`]

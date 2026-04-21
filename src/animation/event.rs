@@ -1,4 +1,4 @@
-﻿//! [`AnimEvent`] â€” events emitted during animation playback.
+//! [`AnimEvent`] â€” events emitted during animation playback.
 
 /// Events emitted by [`Animation::update`](crate::animation::Animation::update).
 ///
