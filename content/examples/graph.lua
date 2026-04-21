@@ -2,7 +2,7 @@
 -- Lurek2D lurek.graph API Reference
 -- Run with: cargo run -- content/examples/graph
 --
-Scenario: A factory automation game where nodes are machines (smelters,
+-- Scenario: A factory automation game where nodes are machines (smelters,
 -- assemblers, storages), edges are conveyor belts carrying items between them,
 -- and the graph system handles flow logic, routing, supply/demand, and
 -- production chains. Items decay, nodes have capacity, and edges filter types.
@@ -13,10 +13,13 @@ print("=== lurek.graph — Flow Graph System ===\n")
 -- Graph Creation
 -- =============================================================================
 
+--@api-stub: lurek.graph.newGraph
 local factory = lurek.graph.newGraph()
 
+--@api-stub: Graph:type
 print("graph type: " .. factory:type())
 
+--@api-stub: Graph:typeOf
 print("is Graph: " .. tostring(factory:typeOf("Graph")))
 
 -- =============================================================================
@@ -26,15 +29,20 @@ print("is Graph: " .. tostring(factory:typeOf("Graph")))
 -- Nodes are returned from factory:addNode() — we can't call it directly since
 -- it's not listed as a standalone function, but use the graph to get nodes.
 
+--@api-stub: Graph:getNodeCount
 print("nodes: " .. factory:getNodeCount())
 
+--@api-stub: Graph:getNodes
 local nodes = factory:getNodes()
 
+--@api-stub: Graph:hasNode
 -- Check if a node exists by ID.
 -- print("has smelter: " .. tostring(factory:hasNode(smelter_id)))
 
-factory:removeNode(node_id)
+--@api-stub: Graph:removeNode
+-- factory:removeNode(node_id)
 
+--@api-stub: Graph:getNeighbors
 -- local neighbors = factory:getNeighbors(node_id)
 
 -- =============================================================================
@@ -45,247 +53,342 @@ factory:removeNode(node_id)
 local smelter = nodes[1]  -- first node if exists
 
 if smelter then
-        print("node type: " .. smelter:type())
+    --@api-stub: Node:type
+    print("node type: " .. smelter:type())
 
-        print("is Node: " .. tostring(smelter:typeOf("Node")))
+    --@api-stub: Node:typeOf
+    print("is Node: " .. tostring(smelter:typeOf("Node")))
 
-        smelter:setType("smelter")
+    --@api-stub: Node:setType
+    smelter:setType("smelter")
 
-        print("machine: " .. smelter:getType())
+    --@api-stub: Node:getType
+    print("machine: " .. smelter:getType())
 
-        -- Maximum items the smelter can hold.
+    --@api-stub: Node:setCapacity
+    -- Maximum items the smelter can hold.
     smelter:setCapacity(10)
 
-        print("capacity: " .. smelter:getCapacity())
+    --@api-stub: Node:getCapacity
+    print("capacity: " .. smelter:getCapacity())
 
-        print("items stored: " .. smelter:getItemCount())
+    --@api-stub: Node:getItemCount
+    print("items stored: " .. smelter:getItemCount())
 
-        print("full: " .. tostring(smelter:isFull()))
+    --@api-stub: Node:isFull
+    print("full: " .. tostring(smelter:isFull()))
 
-        smelter:setActive(true)
+    --@api-stub: Node:setActive
+    smelter:setActive(true)
 
-        print("active: " .. tostring(smelter:isActive()))
+    --@api-stub: Node:isActive
+    print("active: " .. tostring(smelter:isActive()))
 
     -- =============================================================================
     -- Node Flow Mode — Push/Pull production
     -- =============================================================================
 
-        smelter:setFlowMode("push")
+    --@api-stub: Node:setFlowMode
+    smelter:setFlowMode("push")
 
-        print("flow mode: " .. smelter:getFlowMode())
+    --@api-stub: Node:getFlowMode
+    print("flow mode: " .. smelter:getFlowMode())
 
-        smelter:setPushRate(5)
+    --@api-stub: Node:setPushRate
+    smelter:setPushRate(5)
 
-        print("push rate: " .. smelter:getPushRate())
+    --@api-stub: Node:getPushRate
+    print("push rate: " .. smelter:getPushRate())
 
-        smelter:setPullRate(3)
+    --@api-stub: Node:setPullRate
+    smelter:setPullRate(3)
 
-        print("pull rate: " .. smelter:getPullRate())
+    --@api-stub: Node:getPullRate
+    print("pull rate: " .. smelter:getPullRate())
 
-        smelter:setPushFilter("iron_ingot")
+    --@api-stub: Node:setPushFilter
+    smelter:setPushFilter("iron_ingot")
 
-        print("push filter: " .. smelter:getPushFilter())
+    --@api-stub: Node:getPushFilter
+    print("push filter: " .. smelter:getPushFilter())
 
-        smelter:setPullFilter("iron_ore")
+    --@api-stub: Node:setPullFilter
+    smelter:setPullFilter("iron_ore")
 
-        print("pull filter: " .. smelter:getPullFilter())
+    --@api-stub: Node:getPullFilter
+    print("pull filter: " .. smelter:getPullFilter())
 
-        smelter:setOverflowPolicy("drop")
+    --@api-stub: Node:setOverflowPolicy
+    smelter:setOverflowPolicy("drop")
 
-        print("overflow: " .. smelter:getOverflowPolicy())
+    --@api-stub: Node:getOverflowPolicy
+    print("overflow: " .. smelter:getOverflowPolicy())
 
     -- =============================================================================
     -- Node Processing — Conversion recipes
     -- =============================================================================
 
-        -- 2 seconds to smelt one ore into an ingot.
+    --@api-stub: Node:setProcessTime
+    -- 2 seconds to smelt one ore into an ingot.
     smelter:setProcessTime(2.0)
 
-        print("process time: " .. smelter:getProcessTime())
+    --@api-stub: Node:getProcessTime
+    print("process time: " .. smelter:getProcessTime())
 
-        smelter:clearConversion("iron_ore")
+    --@api-stub: Node:clearConversion
+    smelter:clearConversion("iron_ore")
 
-        smelter:clearAllConversions()
+    --@api-stub: Node:clearAllConversions
+    smelter:clearAllConversions()
 
     -- =============================================================================
     -- Node Queue
     -- =============================================================================
 
-        smelter:setQueueEnabled(true)
+    --@api-stub: Node:setQueueEnabled
+    smelter:setQueueEnabled(true)
 
-        print("queue: " .. tostring(smelter:isQueueEnabled()))
+    --@api-stub: Node:isQueueEnabled
+    print("queue: " .. tostring(smelter:isQueueEnabled()))
 
-        smelter:setQueueCapacity(20)
+    --@api-stub: Node:setQueueCapacity
+    smelter:setQueueCapacity(20)
 
-        print("queue cap: " .. smelter:getQueueCapacity())
+    --@api-stub: Node:getQueueCapacity
+    print("queue cap: " .. smelter:getQueueCapacity())
 
-        print("queue size: " .. smelter:getQueueSize())
+    --@api-stub: Node:getQueueSize
+    print("queue size: " .. smelter:getQueueSize())
 
-        -- smelter:enqueue(item)
+    --@api-stub: Node:enqueue
+    -- smelter:enqueue(item)
 
-        -- local next_item = smelter:dequeue()
+    --@api-stub: Node:dequeue
+    -- local next_item = smelter:dequeue()
 
-        local stored = smelter:getItems()
+    --@api-stub: Node:getItems
+    local stored = smelter:getItems()
 
-        local connected = smelter:getEdges()
+    --@api-stub: Node:getEdges
+    local connected = smelter:getEdges()
 
     -- =============================================================================
     -- Node Tags & Supply/Demand
     -- =============================================================================
 
-        smelter:addTag("production")
+    --@api-stub: Node:addTag
+    smelter:addTag("production")
     smelter:addTag("tier1")
 
-        print("is production: " .. tostring(smelter:hasTag("production")))
+    --@api-stub: Node:hasTag
+    print("is production: " .. tostring(smelter:hasTag("production")))
 
-        smelter:removeTag("tier1")
+    --@api-stub: Node:removeTag
+    smelter:removeTag("tier1")
 
-        local tags = smelter:getTags()
+    --@api-stub: Node:getTags
+    local tags = smelter:getTags()
     print("tags: " .. #tags)
 
-        -- smelter:clearTags()
+    --@api-stub: Node:clearTags
+    -- smelter:clearTags()
 
-        smelter:removeSupply("iron_ingot")
+    --@api-stub: Node:removeSupply
+    smelter:removeSupply("iron_ingot")
 
-        smelter:clearSupplies()
+    --@api-stub: Node:clearSupplies
+    smelter:clearSupplies()
 
-        smelter:removeDemand("iron_ore")
+    --@api-stub: Node:removeDemand
+    smelter:removeDemand("iron_ore")
 
-        smelter:clearDemands()
+    --@api-stub: Node:clearDemands
+    smelter:clearDemands()
 end
 
 -- =============================================================================
 -- Edges — Conveyor belts
 -- =============================================================================
 
+--@api-stub: Graph:getEdgeCount
 print("edges: " .. factory:getEdgeCount())
 
+--@api-stub: Graph:getEdges
 local edges = factory:getEdges()
 
+--@api-stub: Graph:hasEdge
 -- print("has edge: " .. tostring(factory:hasEdge(edge_id)))
 
-factory:removeEdge(edge_id)
+--@api-stub: Graph:removeEdge
+-- factory:removeEdge(edge_id)
 
 local belt = edges[1]
 if belt then
-        print("edge type: " .. belt:type())
+    --@api-stub: Edge:type
+    print("edge type: " .. belt:type())
 
-        print("is Edge: " .. tostring(belt:typeOf("Edge")))
+    --@api-stub: Edge:typeOf
+    print("is Edge: " .. tostring(belt:typeOf("Edge")))
 
-        belt:setType("conveyor_mk2")
+    --@api-stub: Edge:setType
+    belt:setType("conveyor_mk2")
 
-        print("belt: " .. belt:getType())
+    --@api-stub: Edge:getType
+    print("belt: " .. belt:getType())
 
-        print("from: " .. tostring(belt:getFrom()))
+    --@api-stub: Edge:getFrom
+    print("from: " .. tostring(belt:getFrom()))
 
-        print("to: " .. tostring(belt:getTo()))
+    --@api-stub: Edge:getTo
+    print("to: " .. tostring(belt:getTo()))
 
-        belt:setWeight(1.0)
+    --@api-stub: Edge:setWeight
+    belt:setWeight(1.0)
 
-        print("weight: " .. belt:getWeight())
+    --@api-stub: Edge:getWeight
+    print("weight: " .. belt:getWeight())
 
     -- =============================================================================
     -- Edge — Capacity & Throughput
     -- =============================================================================
 
-        belt:setCapacity(10)
+    --@api-stub: Edge:setCapacity
+    belt:setCapacity(10)
 
-        print("belt capacity: " .. belt:getCapacity())
+    --@api-stub: Edge:getCapacity
+    print("belt capacity: " .. belt:getCapacity())
 
-        belt:setThroughput(5)
+    --@api-stub: Edge:setThroughput
+    belt:setThroughput(5)
 
-        print("throughput: " .. belt:getThroughput())
+    --@api-stub: Edge:getThroughput
+    print("throughput: " .. belt:getThroughput())
 
-        belt:setSpeedModifier(1.5)
+    --@api-stub: Edge:setSpeedModifier
+    belt:setSpeedModifier(1.5)
 
-        print("speed mod: " .. belt:getSpeedModifier())
+    --@api-stub: Edge:getSpeedModifier
+    print("speed mod: " .. belt:getSpeedModifier())
 
-        belt:setTravelTime(1.0)
+    --@api-stub: Edge:setTravelTime
+    belt:setTravelTime(1.0)
 
-        print("travel time: " .. belt:getTravelTime())
+    --@api-stub: Edge:getTravelTime
+    print("travel time: " .. belt:getTravelTime())
 
     -- =============================================================================
     -- Edge — Cooldown & Directionality
     -- =============================================================================
 
-        belt:setCooldown(0.5)
+    --@api-stub: Edge:setCooldown
+    belt:setCooldown(0.5)
 
-        print("cooldown: " .. belt:getCooldown())
+    --@api-stub: Edge:getCooldown
+    print("cooldown: " .. belt:getCooldown())
 
-        print("on cooldown: " .. tostring(belt:isOnCooldown()))
+    --@api-stub: Edge:isOnCooldown
+    print("on cooldown: " .. tostring(belt:isOnCooldown()))
 
-        belt:setBidirectional(false)
+    --@api-stub: Edge:setBidirectional
+    belt:setBidirectional(false)
 
-        print("bidirectional: " .. tostring(belt:isBidirectional()))
+    --@api-stub: Edge:isBidirectional
+    print("bidirectional: " .. tostring(belt:isBidirectional()))
 
-        belt:setActive(true)
+    --@api-stub: Edge:setActive
+    belt:setActive(true)
 
-        print("belt active: " .. tostring(belt:isActive()))
+    --@api-stub: Edge:isActive
+    print("belt active: " .. tostring(belt:isActive()))
 
     -- =============================================================================
     -- Edge — Item Filtering
     -- =============================================================================
 
-        belt:addAllowedType("iron_ingot")
+    --@api-stub: Edge:addAllowedType
+    belt:addAllowedType("iron_ingot")
     belt:addAllowedType("copper_ingot")
 
-        print("iron allowed: " .. tostring(belt:isItemTypeAllowed("iron_ingot")))
+    --@api-stub: Edge:isItemTypeAllowed
+    print("iron allowed: " .. tostring(belt:isItemTypeAllowed("iron_ingot")))
 
-        belt:removeAllowedType("copper_ingot")
+    --@api-stub: Edge:removeAllowedType
+    belt:removeAllowedType("copper_ingot")
 
-        -- belt:clearAllowedTypes()
+    --@api-stub: Edge:clearAllowedTypes
+    -- belt:clearAllowedTypes()
 
-        print("in transit: " .. belt:getItemsInTransit())
+    --@api-stub: Edge:getItemsInTransit
+    print("in transit: " .. belt:getItemsInTransit())
 end
 
 -- =============================================================================
 -- Items — Resources flowing through the factory
 -- =============================================================================
 
+--@api-stub: Graph:getItemCount
 print("total items: " .. factory:getItemCount())
 
+--@api-stub: Graph:getItems
 local items = factory:getItems()
 
+--@api-stub: Graph:hasItem
 -- print("has item: " .. tostring(factory:hasItem(item_id)))
 
-factory:removeItem(item_id)
+--@api-stub: Graph:removeItem
+-- factory:removeItem(item_id)
 
 local item = items[1]
 if item then
-        print("item type id: " .. item:type())
+    --@api-stub: GraphItem:type
+    print("item type id: " .. item:type())
 
-        print("is GraphItem: " .. tostring(item:typeOf("GraphItem")))
+    --@api-stub: GraphItem:typeOf
+    print("is GraphItem: " .. tostring(item:typeOf("GraphItem")))
 
-        item:setType("iron_ore")
+    --@api-stub: GraphItem:setType
+    item:setType("iron_ore")
 
-        print("item: " .. item:getType())
+    --@api-stub: GraphItem:getType
+    print("item: " .. item:getType())
 
-        item:setDecayTime(30.0)
+    --@api-stub: GraphItem:setDecayTime
+    item:setDecayTime(30.0)
 
-        print("decay: " .. item:getDecayTime() .. "s")
+    --@api-stub: GraphItem:getDecayTime
+    print("decay: " .. item:getDecayTime() .. "s")
 
-        print("remaining life: " .. item:getRemainingLife())
+    --@api-stub: GraphItem:getRemainingLife
+    print("remaining life: " .. item:getRemainingLife())
 
-        print("alive: " .. tostring(item:isAlive()))
+    --@api-stub: GraphItem:isAlive
+    print("alive: " .. tostring(item:isAlive()))
 
-        -- item:kill()
+    --@api-stub: GraphItem:kill
+    -- item:kill()
 
-        item:setPriority(5)
+    --@api-stub: GraphItem:setPriority
+    item:setPriority(5)
 
-        print("priority: " .. item:getPriority())
+    --@api-stub: GraphItem:getPriority
+    print("priority: " .. item:getPriority())
 
-        print("position: " .. tostring(item:getPosition()))
+    --@api-stub: GraphItem:getPosition
+    print("position: " .. tostring(item:getPosition()))
 end
 
 -- =============================================================================
 -- Graph Simulation
 -- =============================================================================
 
+--@api-stub: Graph:update
 factory:update(1/60)
 
+--@api-stub: Graph:step
 -- Advance one discrete simulation step.
 factory:step()
 
+--@api-stub: Graph:tickParallel
 -- Multi-threaded tick for large graphs.
 factory:tickParallel(4)
 
@@ -293,20 +396,27 @@ factory:tickParallel(4)
 -- Graph Analysis
 -- =============================================================================
 
+--@api-stub: Graph:getComponents
 local components = factory:getComponents()
 print("connected components: " .. #components)
 
+--@api-stub: Graph:hasCycle
 print("has cycle: " .. tostring(factory:hasCycle()))
 
+--@api-stub: Graph:topologicalSort
 local sorted = factory:topologicalSort()
 
+--@api-stub: Graph:mst
 local mst = factory:mst()
 print("MST edges: " .. #mst)
 
+--@api-stub: Graph:colorGraph
 local coloring = factory:colorGraph()
 
+--@api-stub: Graph:isBipartite
 print("bipartite: " .. tostring(factory:isBipartite()))
 
+--@api-stub: Graph:astar
 -- Pathfind through the graph (e.g. item routing).
 local path = factory:astar(1, 5)
 
@@ -314,54 +424,119 @@ local path = factory:astar(1, 5)
 -- Supply & Demand Processing
 -- =============================================================================
 
+--@api-stub: Graph:processDemand
 factory:processDemand()
 
+--@api-stub: Graph:getStats
 local stats = factory:getStats()
 print("graph stats: " .. tostring(stats))
 
 print("\n-- graph.lua example complete --")
 
 -- =============================================================================
--- Advanced Edge Cases and Extra API Demonstrations
+-- STUBS: 12 uncovered lurek.graph API item(s)
+-- Generated by tools/audit/example_add_missing.py
+-- REQUIRED: replace every --@api-stub: block below with a real scenario.
+-- Run .github/prompts/flesh-out-example.prompt.md for instructions.
+-- The final committed file must contain ZERO --@api-stub: lines.
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
 -- Edge methods
 -- -----------------------------------------------------------------------------
 
+-- ---- Stub: Edge:clearAllowedTypes ----------------------------------------
+--@api-stub: Edge:clearAllowedTypes
 -- Clears the edge allow-list so all item types are permitted.
-edge:clearAllowedTypes()
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- edge_stub:clearAllowedTypes()
+-- (replace edge_stub with your real Edge instance above)
+
 -- -----------------------------------------------------------------------------
 -- Graph methods
 -- -----------------------------------------------------------------------------
 
+-- ---- Stub: Graph:removeNode ----------------------------------------------
+--@api-stub: Graph:removeNode
 -- Removes a node from the graph.
-graph:removeNode(node_ud)  -- -> boolean
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- graph_stub:removeNode(node_ud)  -- -> boolean
+-- (replace graph_stub with your real Graph instance above)
+
+-- ---- Stub: Graph:hasNode -------------------------------------------------
+--@api-stub: Graph:hasNode
 -- Returns true if the node exists in the graph.
-graph:hasNode(node_ud)  -- -> boolean
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- graph_stub:hasNode(node_ud)  -- -> boolean
+-- (replace graph_stub with your real Graph instance above)
+
+-- ---- Stub: Graph:removeEdge ----------------------------------------------
+--@api-stub: Graph:removeEdge
 -- Removes an edge from the graph.
-graph:removeEdge(edge_ud)  -- -> boolean
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- graph_stub:removeEdge(edge_ud)  -- -> boolean
+-- (replace graph_stub with your real Graph instance above)
+
+-- ---- Stub: Graph:hasEdge -------------------------------------------------
+--@api-stub: Graph:hasEdge
 -- Returns true if the edge exists in the graph.
-graph:hasEdge(edge_ud)  -- -> boolean
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- graph_stub:hasEdge(edge_ud)  -- -> boolean
+-- (replace graph_stub with your real Graph instance above)
+
+-- ---- Stub: Graph:removeItem ----------------------------------------------
+--@api-stub: Graph:removeItem
 -- Removes an item from the graph entirely.
-graph:removeItem(item_ud)  -- -> boolean
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- graph_stub:removeItem(item_ud)  -- -> boolean
+-- (replace graph_stub with your real Graph instance above)
+
+-- ---- Stub: Graph:hasItem -------------------------------------------------
+--@api-stub: Graph:hasItem
 -- Returns true if the item exists in the graph.
-graph:hasItem(item_ud)  -- -> boolean
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- graph_stub:hasItem(item_ud)  -- -> boolean
+-- (replace graph_stub with your real Graph instance above)
+
+-- ---- Stub: Graph:getNeighbors --------------------------------------------
+--@api-stub: Graph:getNeighbors
 -- Returns a table of direct neighbor Node handles.
-graph:getNeighbors(node_ud)  -- -> table
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- graph_stub:getNeighbors(node_ud)  -- -> table
+-- (replace graph_stub with your real Graph instance above)
+
 -- -----------------------------------------------------------------------------
 -- GraphItem methods
 -- -----------------------------------------------------------------------------
 
+-- ---- Stub: GraphItem:kill ------------------------------------------------
+--@api-stub: GraphItem:kill
 -- Marks this graph item as dead so it is removed on the next cleanup pass.
-graphItem_stub:kill()
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- graphItem_stub:kill()
+-- (replace graphItem_stub with your real GraphItem instance above)
+
 -- -----------------------------------------------------------------------------
 -- Node methods
 -- -----------------------------------------------------------------------------
 
+-- ---- Stub: Node:clearTags ------------------------------------------------
+--@api-stub: Node:clearTags
 -- Removes all tags from this node.
-node:clearTags()
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- node_stub:clearTags()
+-- (replace node_stub with your real Node instance above)
+
+-- ---- Stub: Node:enqueue --------------------------------------------------
+--@api-stub: Node:enqueue
 -- Pushes an item into the node queue.
-node:enqueue(item_ud)  -- -> boolean
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- node_stub:enqueue(item_ud)  -- -> boolean
+-- (replace node_stub with your real Node instance above)
+
+-- ---- Stub: Node:dequeue --------------------------------------------------
+--@api-stub: Node:dequeue
 -- Pops the next item from the node queue, or nil if empty.
-node:dequeue()
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- node_stub:dequeue()
+-- (replace node_stub with your real Node instance above)
