@@ -409,34 +409,34 @@ end)
 lurek.render(function()
     -- Canvas background
     lurek.render.setColor(0.08, 0.08, 0.12, 1)
-    lurek.render.drawRect(0, CANVAS_Y, SCREEN_W, CANVAS_H)
+    lurek.render.rectangle(0, CANVAS_Y, SCREEN_W, CANVAS_H)
 
     -- Canvas border
     lurek.render.setColor(0.25, 0.25, 0.35, 1)
-    lurek.render.drawRectOutline(0, CANVAS_Y, SCREEN_W, CANVAS_H)
+    lurek.render.rectangleOutline(0, CANVAS_Y, SCREEN_W, CANVAS_H)
 
     -- Drawn rectangles
     for _, r in ipairs(canvas_rects) do
         lurek.render.setColor(r.r, r.g, r.b, 0.9)
-        lurek.render.drawRect(r.x, r.y, RECT_SIZE, RECT_SIZE)
+        lurek.render.rectangle(r.x, r.y, RECT_SIZE, RECT_SIZE)
         lurek.render.setColor(r.r * 0.6, r.g * 0.6, r.b * 0.6, 1)
-        lurek.render.drawRectOutline(r.x, r.y, RECT_SIZE, RECT_SIZE)
+        lurek.render.rectangleOutline(r.x, r.y, RECT_SIZE, RECT_SIZE)
     end
 
     -- Particles (world-space ones)
     for _, p in ipairs(particles) do
         if p.y > CANVAS_Y and p.y < CANVAS_Y + CANVAS_H then
             lurek.render.setColor(p.r, p.g, p.b, p.a)
-            lurek.render.drawCircle(p.x, p.y, p.size)
+            lurek.render.circle(p.x, p.y, p.size)
         end
     end
 
     -- Ghost cursor during playback
     if state == STATE_PLAYING then
         lurek.render.setColor(0.2, 1, 0.5, 0.7)
-        lurek.render.drawCircle(ghost_x, ghost_y, GHOST_RADIUS)
+        lurek.render.circle(ghost_x, ghost_y, GHOST_RADIUS)
         lurek.render.setColor(0.1, 0.8, 0.4, 1)
-        lurek.render.drawCircleOutline(ghost_x, ghost_y, GHOST_RADIUS + 2)
+        lurek.render.circleOutline(ghost_x, ghost_y, GHOST_RADIUS + 2)
     end
 end)
 
@@ -451,17 +451,17 @@ lurek.render_ui(function()
             alpha = math.max(0, 1.0 - (title_timer - 2.0))
         end
         lurek.render.setColor(0.3, 0.8, 1, alpha)
-        lurek.render.drawText("AUTOMATION DEMO", SCREEN_W / 2 - 120, SCREEN_H / 2 - 40)
+        lurek.render.print("AUTOMATION DEMO", SCREEN_W / 2 - 120, SCREEN_H / 2 - 40)
         lurek.render.setColor(0.6, 0.6, 0.7, alpha * 0.8)
-        lurek.render.drawText("RECORD AND REPLAY INPUT", SCREEN_W / 2 - 130, SCREEN_H / 2 + 10)
+        lurek.render.print("RECORD AND REPLAY INPUT", SCREEN_W / 2 - 130, SCREEN_H / 2 + 10)
         lurek.render.setColor(0.4, 0.4, 0.5, alpha * 0.6)
-        lurek.render.drawText("Lurek2D Showcase", SCREEN_W / 2 - 70, SCREEN_H / 2 + 50)
+        lurek.render.print("Lurek2D Showcase", SCREEN_W / 2 - 70, SCREEN_H / 2 + 50)
         return
     end
 
     -- HUD background
     lurek.render.setColor(0.05, 0.05, 0.1, 0.9)
-    lurek.render.drawRect(0, 0, SCREEN_W, 55)
+    lurek.render.rectangle(0, 0, SCREEN_W, 55)
 
     -- State indicator
     local state_color_r, state_color_g, state_color_b = 0.5, 0.5, 0.5
@@ -471,7 +471,7 @@ lurek.render_ui(function()
         -- Pulsing record dot
         local pulse = 0.5 + 0.5 * math.sin(get_time() * 6)
         lurek.render.setColor(1, 0.1, 0.1, pulse)
-        lurek.render.drawCircle(15, 20, 6)
+        lurek.render.circle(15, 20, 6)
     elseif state == STATE_PLAYING then
         state_color_r, state_color_g, state_color_b = 0.2, 0.9, 0.5
     elseif state == STATE_IDLE then
@@ -479,38 +479,38 @@ lurek.render_ui(function()
     end
 
     lurek.render.setColor(state_color_r, state_color_g, state_color_b, 1)
-    lurek.render.drawText(state_label, 30, HUD_Y)
+    lurek.render.print(state_label, 30, HUD_Y)
 
     -- Event count
     lurek.render.setColor(0.7, 0.7, 0.8, 1)
-    lurek.render.drawText(string.format("Events: %d", #recorded_events), 160, HUD_Y)
+    lurek.render.print(string.format("Events: %d", #recorded_events), 160, HUD_Y)
 
     -- Playback speed
     lurek.render.setColor(0.6, 0.8, 0.6, 1)
-    lurek.render.drawText(string.format("Speed: %s", speed_labels[playback_speed] or tostring(playback_speed) .. "x"), 320, HUD_Y)
+    lurek.render.print(string.format("Speed: %s", speed_labels[playback_speed] or tostring(playback_speed) .. "x"), 320, HUD_Y)
 
     -- Playback progress
     if state == STATE_PLAYING then
         lurek.render.setColor(0.2, 1, 0.6, 1)
-        lurek.render.drawText(string.format("Progress: %d%%", math.floor(playback_progress * 100)), 470, HUD_Y)
+        lurek.render.print(string.format("Progress: %d%%", math.floor(playback_progress * 100)), 470, HUD_Y)
     end
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.5, 1)
-    lurek.render.drawText(string.format("FPS: %d", fps), SCREEN_W - 80, HUD_Y)
+    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, HUD_Y)
 
     -- Controls hint
     lurek.render.setColor(0.35, 0.35, 0.45, 1)
-    lurek.render.drawText("R:Record  P:Play  C:Clear  T:Test  1/2/3:Speed  ESC:Quit", 10, 35)
+    lurek.render.print("R:Record  P:Play  C:Clear  T:Test  1/2/3:Speed  ESC:Quit", 10, 35)
 
     -- Key flash boxes
     local flash_x = SCREEN_W / 2 - (#key_flashes * (KEY_FLASH_SIZE + 5)) / 2
     for _, f in ipairs(key_flashes) do
         local alpha = f.timer / KEY_FLASH_DURATION
         lurek.render.setColor(1, 1, 0.5, alpha * 0.8)
-        lurek.render.drawRect(flash_x, CANVAS_Y + 5, KEY_FLASH_SIZE, KEY_FLASH_SIZE)
+        lurek.render.rectangle(flash_x, CANVAS_Y + 5, KEY_FLASH_SIZE, KEY_FLASH_SIZE)
         lurek.render.setColor(0.1, 0.1, 0.1, alpha)
-        lurek.render.drawText(f.key, flash_x + 10, CANVAS_Y + 15)
+        lurek.render.print(f.key, flash_x + 10, CANVAS_Y + 15)
         flash_x = flash_x + KEY_FLASH_SIZE + 5
     end
 
@@ -518,15 +518,15 @@ lurek.render_ui(function()
     for _, p in ipairs(particles) do
         if p.y <= CANVAS_Y or p.y >= CANVAS_Y + CANVAS_H then
             lurek.render.setColor(p.r, p.g, p.b, p.a)
-            lurek.render.drawCircle(p.x, p.y, p.size)
+            lurek.render.circle(p.x, p.y, p.size)
         end
     end
 
     -- Event timeline bar
     lurek.render.setColor(0.15, 0.15, 0.2, 1)
-    lurek.render.drawRect(TIMELINE_X, TIMELINE_Y, TIMELINE_W, TIMELINE_H)
+    lurek.render.rectangle(TIMELINE_X, TIMELINE_Y, TIMELINE_W, TIMELINE_H)
     lurek.render.setColor(0.3, 0.3, 0.4, 1)
-    lurek.render.drawRectOutline(TIMELINE_X, TIMELINE_Y, TIMELINE_W, TIMELINE_H)
+    lurek.render.rectangleOutline(TIMELINE_X, TIMELINE_Y, TIMELINE_W, TIMELINE_H)
 
     -- Event markers on timeline
     if record_duration > 0 then
@@ -539,30 +539,30 @@ lurek.render_ui(function()
             else
                 lurek.render.setColor(0.4, 0.4, 0.5, 0.3)
             end
-            lurek.render.drawRect(mx - 1, TIMELINE_Y + 2, 2, TIMELINE_H - 4)
+            lurek.render.rectangle(mx - 1, TIMELINE_Y + 2, 2, TIMELINE_H - 4)
         end
     end
 
     -- Timeline cursor
     if state == STATE_PLAYING then
         lurek.render.setColor(0.2, 1, 0.5, 1)
-        lurek.render.drawRect(timeline_cursor_x - 2, TIMELINE_Y - 3, 4, TIMELINE_H + 6)
+        lurek.render.rectangle(timeline_cursor_x - 2, TIMELINE_Y - 3, 4, TIMELINE_H + 6)
     end
 
     -- Timeline label
     lurek.render.setColor(0.5, 0.5, 0.6, 1)
     if record_duration > 0 then
-        lurek.render.drawText(string.format("%.1fs", record_duration), TIMELINE_X + TIMELINE_W + 5, TIMELINE_Y + 7)
+        lurek.render.print(string.format("%.1fs", record_duration), TIMELINE_X + TIMELINE_W + 5, TIMELINE_Y + 7)
     else
-        lurek.render.drawText("--", TIMELINE_X + TIMELINE_W + 5, TIMELINE_Y + 7)
+        lurek.render.print("--", TIMELINE_X + TIMELINE_W + 5, TIMELINE_Y + 7)
     end
 
     -- Message overlay
     if message_timer > 0 then
         local alpha = math.min(message_timer, 1.0)
         lurek.render.setColor(0.05, 0.05, 0.1, alpha * 0.85)
-        lurek.render.drawRect(SCREEN_W / 2 - 200, SCREEN_H / 2 - 20, 400, 40)
+        lurek.render.rectangle(SCREEN_W / 2 - 200, SCREEN_H / 2 - 20, 400, 40)
         lurek.render.setColor(1, 1, 1, alpha)
-        lurek.render.drawText(message_text, SCREEN_W / 2 - 180, SCREEN_H / 2 - 8)
+        lurek.render.print(message_text, SCREEN_W / 2 - 180, SCREEN_H / 2 - 8)
     end
 end)

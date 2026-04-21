@@ -129,7 +129,7 @@ local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -568,25 +568,25 @@ lurek.render(function()
         ty = ty + 30
 
         lurek.render.setColor(1, 0, 0, 1)
-        lurek.render.drawRect("fill", SCREEN_W / 2 - 80, ty, UFO_W, UFO_H)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 80, ty, UFO_W, UFO_H)
         lurek.render.setColor(1, 1, 1, 1)
         lurek.render.print("= ? MYSTERY", SCREEN_W / 2 - 30, ty + 2)
         ty = ty + 30
 
         lurek.render.setColor(1, 0, 1, 1)
-        lurek.render.drawRect("fill", SCREEN_W / 2 - 80, ty, ALIEN_W, ALIEN_H)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 80, ty, ALIEN_W, ALIEN_H)
         lurek.render.setColor(1, 1, 1, 1)
         lurek.render.print("= 30 PTS", SCREEN_W / 2 - 30, ty + 4)
         ty = ty + 30
 
         lurek.render.setColor(0, 1, 1, 1)
-        lurek.render.drawRect("fill", SCREEN_W / 2 - 80, ty, ALIEN_W, ALIEN_H)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 80, ty, ALIEN_W, ALIEN_H)
         lurek.render.setColor(1, 1, 1, 1)
         lurek.render.print("= 20 PTS", SCREEN_W / 2 - 30, ty + 4)
         ty = ty + 30
 
         lurek.render.setColor(0, 1, 0, 1)
-        lurek.render.drawRect("fill", SCREEN_W / 2 - 80, ty, ALIEN_W, ALIEN_H)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 80, ty, ALIEN_W, ALIEN_H)
         lurek.render.setColor(1, 1, 1, 1)
         lurek.render.print("= 10 PTS", SCREEN_W / 2 - 30, ty + 4)
 
@@ -601,7 +601,7 @@ lurek.render(function()
     for _, shield in ipairs(shields) do
         for _, blk in ipairs(shield) do
             if blk.alive then
-                lurek.render.drawRect("fill", blk.x, blk.y, SHIELD_BLOCK, SHIELD_BLOCK)
+                lurek.render.rectangle("fill", blk.x, blk.y, SHIELD_BLOCK, SHIELD_BLOCK)
             end
         end
     end
@@ -610,20 +610,20 @@ lurek.render(function()
     for _, a in ipairs(aliens) do
         if a.alive then
             lurek.render.setColor(a.color[1], a.color[2], a.color[3], 1)
-            lurek.render.drawRect("fill", a.x, a.y, ALIEN_W, ALIEN_H)
+            lurek.render.rectangle("fill", a.x, a.y, ALIEN_W, ALIEN_H)
         end
     end
 
     -- UFO
     if ufo then
         lurek.render.setColor(1, 0, 0, 1)
-        lurek.render.drawRect("fill", ufo.x, ufo.y, UFO_W, UFO_H)
+        lurek.render.rectangle("fill", ufo.x, ufo.y, UFO_W, UFO_H)
     end
 
     -- Player ship (body + turret)
     lurek.render.setColor(0.2, 0.6, 1.0, 1)
-    lurek.render.drawRect("fill", player.x, player.y, PLAYER_W, PLAYER_H)
-    lurek.render.drawRect("fill",
+    lurek.render.rectangle("fill", player.x, player.y, PLAYER_W, PLAYER_H)
+    lurek.render.rectangle("fill",
         player.x + PLAYER_W / 2 - PLAYER_TURRET_W / 2,
         player.y - PLAYER_TURRET_H,
         PLAYER_TURRET_W, PLAYER_TURRET_H)
@@ -631,13 +631,13 @@ lurek.render(function()
     -- Player bullet
     if player_bullet then
         lurek.render.setColor(1, 1, 0, 1)
-        lurek.render.drawRect("fill", player_bullet.x, player_bullet.y, BULLET_W, BULLET_H)
+        lurek.render.rectangle("fill", player_bullet.x, player_bullet.y, BULLET_W, BULLET_H)
     end
 
     -- Alien bullets
     lurek.render.setColor(1, 0.3, 0.3, 1)
     for _, b in ipairs(alien_bullets) do
-        lurek.render.drawRect("fill", b.x, b.y, BULLET_W, BULLET_H)
+        lurek.render.rectangle("fill", b.x, b.y, BULLET_W, BULLET_H)
     end
 
     -- Particles
@@ -682,5 +682,5 @@ function lurek.render_ui()
 
     -- Ground line
     lurek.render.setColor(0.2, 0.8, 0.2, 1)
-    lurek.render.drawRect("fill", 0, SCREEN_H - 24, SCREEN_W, 2)
+    lurek.render.rectangle("fill", 0, SCREEN_H - 24, SCREEN_W, 2)
 end

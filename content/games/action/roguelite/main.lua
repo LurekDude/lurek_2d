@@ -764,26 +764,26 @@ lurek.render(function()
 
     -- ── Arena background ──────────────────────────────────────────────
     lurek.render.setColor(0.12, 0.10, 0.08, 1)
-    lurek.render.drawRect("fill", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
+    lurek.render.rectangle("fill", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
 
     -- Floor grid pattern
     lurek.render.setColor(0.15, 0.13, 0.10, 1)
     for gx = 0, ARENA_W - 1, 40 do
         for gy = 0, ARENA_H - 1, 40 do
-            lurek.render.drawRect("line", ARENA_X + gx, ARENA_Y + gy, 40, 40)
+            lurek.render.rectangle("line", ARENA_X + gx, ARENA_Y + gy, 40, 40)
         end
     end
 
     -- Arena border
     lurek.render.setColor(0.4, 0.35, 0.25, 1)
-    lurek.render.drawRect("line", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
+    lurek.render.rectangle("line", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
 
     -- ── Door ──────────────────────────────────────────────────────────
     if door_open then
         local da = 0.6 + door_pulse.alpha * 0.4
         lurek.render.setColor(0.2, 0.9, 0.3, da)
         local dx = ARENA_X + (ARENA_W - DOOR_W) / 2
-        lurek.render.drawRect("fill", dx, ARENA_Y - 2, DOOR_W, DOOR_H)
+        lurek.render.rectangle("fill", dx, ARENA_Y - 2, DOOR_W, DOOR_H)
     end
 
     -- ── Enemies ───────────────────────────────────────────────────────
@@ -791,56 +791,56 @@ lurek.render(function()
         local c = e.color
         lurek.render.setColor(c[1], c[2], c[3], 1)
         if e.etype == "melee" then
-            lurek.render.drawCircle("fill", e.x, e.y, e.radius)
+            lurek.render.circle("fill", e.x, e.y, e.radius)
         elseif e.etype == "ranged" then
-            lurek.render.drawRect("fill", e.x - e.radius, e.y - e.radius, e.radius * 2, e.radius * 2)
+            lurek.render.rectangle("fill", e.x - e.radius, e.y - e.radius, e.radius * 2, e.radius * 2)
         elseif e.etype == "charger" then
             -- triangle-like: draw as wider shape
-            lurek.render.drawCircle("fill", e.x, e.y, e.radius)
+            lurek.render.circle("fill", e.x, e.y, e.radius)
             if e.windup > 0 then
                 lurek.render.setColor(1, 1, 0, 0.5)
-                lurek.render.drawCircle("line", e.x, e.y, e.radius + 4)
+                lurek.render.circle("line", e.x, e.y, e.radius + 4)
             end
         end
         -- Enemy HP bar
         local hp_frac = e.hp / e.max_hp
         lurek.render.setColor(0.2, 0.2, 0.2, 0.7)
-        lurek.render.drawRect("fill", e.x - 12, e.y - e.radius - 8, 24, 4)
+        lurek.render.rectangle("fill", e.x - 12, e.y - e.radius - 8, 24, 4)
         lurek.render.setColor(0.9, 0.2, 0.2, 0.9)
-        lurek.render.drawRect("fill", e.x - 12, e.y - e.radius - 8, 24 * hp_frac, 4)
+        lurek.render.rectangle("fill", e.x - 12, e.y - e.radius - 8, 24 * hp_frac, 4)
     end
 
     -- ── Boss ──────────────────────────────────────────────────────────
     if boss and boss.hp > 0 then
         local c = boss.color
         lurek.render.setColor(c[1], c[2], c[3], 1)
-        lurek.render.drawCircle("fill", boss.x, boss.y, boss.radius)
+        lurek.render.circle("fill", boss.x, boss.y, boss.radius)
         if boss.phase == 2 then
             lurek.render.setColor(1, 0.3, 0.8, 0.3)
-            lurek.render.drawCircle("line", boss.x, boss.y, boss.radius + 6)
+            lurek.render.circle("line", boss.x, boss.y, boss.radius + 6)
         end
         if boss.windup > 0 then
             lurek.render.setColor(1, 1, 0, 0.6)
-            lurek.render.drawCircle("line", boss.x, boss.y, boss.radius + 8)
+            lurek.render.circle("line", boss.x, boss.y, boss.radius + 8)
         end
         -- Boss HP bar
         local hp_frac = boss.hp / boss.max_hp
         lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-        lurek.render.drawRect("fill", boss.x - 30, boss.y - boss.radius - 12, 60, 6)
+        lurek.render.rectangle("fill", boss.x - 30, boss.y - boss.radius - 12, 60, 6)
         lurek.render.setColor(0.8, 0.1, 0.6, 1)
-        lurek.render.drawRect("fill", boss.x - 30, boss.y - boss.radius - 12, 60 * hp_frac, 6)
+        lurek.render.rectangle("fill", boss.x - 30, boss.y - boss.radius - 12, 60 * hp_frac, 6)
     end
 
     -- ── Player projectiles ────────────────────────────────────────────
     lurek.render.setColor(1, 1, 0.5, 1)
     for _, p in ipairs(projectiles) do
-        lurek.render.drawCircle("fill", p.x, p.y, PROJ_RADIUS)
+        lurek.render.circle("fill", p.x, p.y, PROJ_RADIUS)
     end
 
     -- ── Enemy projectiles ─────────────────────────────────────────────
     lurek.render.setColor(1, 0.3, 0.1, 0.9)
     for _, p in ipairs(enemy_projs) do
-        lurek.render.drawCircle("fill", p.x, p.y, 4)
+        lurek.render.circle("fill", p.x, p.y, 4)
     end
 
     -- ── Slash effects ─────────────────────────────────────────────────
@@ -853,7 +853,7 @@ lurek.render(function()
             local a = s.angle - s.arc / 2 + (s.arc / steps) * i
             local ex = s.x + math.cos(a) * s.range
             local ey = s.y + math.sin(a) * s.range
-            lurek.render.drawLine(s.x, s.y, ex, ey)
+            lurek.render.line(s.x, s.y, ex, ey)
         end
     end
 
@@ -872,13 +872,13 @@ lurek.render(function()
         else
             lurek.render.setColor(r, g, b, 1)
         end
-        lurek.render.drawCircle("fill", player.x, player.y, PLAYER_RADIUS)
+        lurek.render.circle("fill", player.x, player.y, PLAYER_RADIUS)
 
         -- facing indicator
         lurek.render.setColor(0.8, 0.9, 1, 0.7)
         local fx = player.x + player.facing_x * (PLAYER_RADIUS + 5)
         local fy = player.y + player.facing_y * (PLAYER_RADIUS + 5)
-        lurek.render.drawCircle("fill", fx, fy, 3)
+        lurek.render.circle("fill", fx, fy, 3)
     end
 
     -- ── Particles ─────────────────────────────────────────────────────
@@ -897,51 +897,51 @@ lurek.render_ui(function()
     -- ── Title screen ──────────────────────────────────────────────────
     if state == STATE.TITLE then
         lurek.render.setColor(0.9, 0.2, 0.2, 1)
-        lurek.render.drawText("ROGUELITE", SCREEN_W / 2 - 100, SCREEN_H / 2 - 60, 40)
+        lurek.render.print("ROGUELITE", SCREEN_W / 2 - 100, SCREEN_H / 2 - 60, 40)
 
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(0.8, 0.8, 0.8, 1)
-            lurek.render.drawText("PRESS ENTER OR CLICK", SCREEN_W / 2 - 110, SCREEN_H / 2 + 10, 16)
+            lurek.render.print("PRESS ENTER OR CLICK", SCREEN_W / 2 - 110, SCREEN_H / 2 + 10, 16)
         end
 
         lurek.render.setColor(0.5, 0.5, 0.5, 1)
-        lurek.render.drawText("WASD move | J melee | K ranged | Shift dash", SCREEN_W / 2 - 180, SCREEN_H / 2 + 50, 12)
-        lurek.render.drawText(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
+        lurek.render.print("WASD move | J melee | K ranged | Shift dash", SCREEN_W / 2 - 180, SCREEN_H / 2 + 50, 12)
+        lurek.render.print(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
         return
     end
 
     -- ── Game Over ─────────────────────────────────────────────────────
     if state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(0.9, 0.2, 0.2, 1)
-        lurek.render.drawText("YOU DIED", SCREEN_W / 2 - 80, 120, 36)
+        lurek.render.print("YOU DIED", SCREEN_W / 2 - 80, 120, 36)
 
         lurek.render.setColor(0.9, 0.9, 0.9, 1)
-        lurek.render.drawText(string.format("Rooms Cleared: %d", room_number - 1), SCREEN_W / 2 - 80, 200, 16)
-        lurek.render.drawText(string.format("Enemies Killed: %d", kills_total), SCREEN_W / 2 - 80, 225, 16)
-        lurek.render.drawText(string.format("Score: %d", score), SCREEN_W / 2 - 80, 250, 16)
+        lurek.render.print(string.format("Rooms Cleared: %d", room_number - 1), SCREEN_W / 2 - 80, 200, 16)
+        lurek.render.print(string.format("Enemies Killed: %d", kills_total), SCREEN_W / 2 - 80, 225, 16)
+        lurek.render.print(string.format("Score: %d", score), SCREEN_W / 2 - 80, 250, 16)
 
         lurek.render.setColor(0.7, 0.7, 0.9, 1)
-        lurek.render.drawText("Perks collected:", SCREEN_W / 2 - 80, 290, 14)
+        lurek.render.print("Perks collected:", SCREEN_W / 2 - 80, 290, 14)
         for i, pname in ipairs(perks_collected) do
-            lurek.render.drawText("• " .. pname, SCREEN_W / 2 - 70, 290 + i * 18, 12)
+            lurek.render.print("• " .. pname, SCREEN_W / 2 - 70, 290 + i * 18, 12)
         end
 
         lurek.render.setColor(0.6, 0.6, 0.6, 1)
-        lurek.render.drawText("Press R to return to title", SCREEN_W / 2 - 100, SCREEN_H - 60, 14)
-        lurek.render.drawText(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
+        lurek.render.print("Press R to return to title", SCREEN_W / 2 - 100, SCREEN_H - 60, 14)
+        lurek.render.print(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
         return
     end
 
     -- ── Perk Select ───────────────────────────────────────────────────
     if state == STATE.PERK_SELECT then
         lurek.render.setColor(0, 0, 0, 0.75)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1, 0.85, 0.3, 1)
-        lurek.render.drawText("CHOOSE A PERK", SCREEN_W / 2 - 90, 100, 24)
+        lurek.render.print("CHOOSE A PERK", SCREEN_W / 2 - 90, 100, 24)
 
         for i = 1, 3 do
             local pk = perk_choices[i]
@@ -950,65 +950,65 @@ lurek.render_ui(function()
                 local by = 170 + (i - 1) * 90
                 local glow_a = perk_glow.alpha * 0.15
                 lurek.render.setColor(0.2 + glow_a, 0.18 + glow_a, 0.15, 0.9)
-                lurek.render.drawRect("fill", bx, by, 300, 70)
+                lurek.render.rectangle("fill", bx, by, 300, 70)
                 lurek.render.setColor(0.8, 0.7, 0.3, 1)
-                lurek.render.drawRect("line", bx, by, 300, 70)
+                lurek.render.rectangle("line", bx, by, 300, 70)
 
                 lurek.render.setColor(1, 0.9, 0.4, 1)
-                lurek.render.drawText(string.format("[%d] %s", i, pk.label), bx + 15, by + 15, 16)
+                lurek.render.print(string.format("[%d] %s", i, pk.label), bx + 15, by + 15, 16)
                 lurek.render.setColor(0.7, 0.7, 0.7, 1)
-                lurek.render.drawText(pk.desc, bx + 15, by + 40, 12)
+                lurek.render.print(pk.desc, bx + 15, by + 40, 12)
             end
         end
 
         lurek.render.setColor(0.5, 0.5, 0.5, 1)
-        lurek.render.drawText(string.format("Room %d completed", room_number), SCREEN_W / 2 - 70, SCREEN_H - 50, 12)
-        lurek.render.drawText(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
+        lurek.render.print(string.format("Room %d completed", room_number), SCREEN_W / 2 - 70, SCREEN_H - 50, 12)
+        lurek.render.print(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
         return
     end
 
     -- ── Combat / Boss HUD ─────────────────────────────────────────────
     -- HP bar
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.drawRect("fill", 10, 10, 160, 18)
+    lurek.render.rectangle("fill", 10, 10, 160, 18)
     local hp_frac = player.hp / player.max_hp
     lurek.render.setColor(0.2, 0.8, 0.3, 1)
-    lurek.render.drawRect("fill", 10, 10, 160 * hp_frac, 18)
+    lurek.render.rectangle("fill", 10, 10, 160 * hp_frac, 18)
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.drawText(string.format("HP %d/%d", player.hp, player.max_hp), 15, 12, 12)
+    lurek.render.print(string.format("HP %d/%d", player.hp, player.max_hp), 15, 12, 12)
 
     -- Room + score
     lurek.render.setColor(0.9, 0.9, 0.9, 1)
-    lurek.render.drawText(string.format("Room %d", room_number), 10, 36, 14)
-    lurek.render.drawText(string.format("Score: %d", score), 10, 56, 12)
-    lurek.render.drawText(string.format("Kills: %d", kills_total), 10, 74, 12)
+    lurek.render.print(string.format("Room %d", room_number), 10, 36, 14)
+    lurek.render.print(string.format("Score: %d", score), 10, 56, 12)
+    lurek.render.print(string.format("Kills: %d", kills_total), 10, 74, 12)
 
     -- Cooldown indicators
     local cd_y = SCREEN_H - 40
     lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.render.drawText("J:Melee  K:Ranged  Shift:Dash", 10, cd_y, 11)
+    lurek.render.print("J:Melee  K:Ranged  Shift:Dash", 10, cd_y, 11)
 
     if player.melee_cd > 0 then
         lurek.render.setColor(1, 0.3, 0.3, 0.7)
-        lurek.render.drawRect("fill", 10, cd_y + 14, 50 * (player.melee_cd / (MELEE_COOLDOWN * player.cd_mult)), 4)
+        lurek.render.rectangle("fill", 10, cd_y + 14, 50 * (player.melee_cd / (MELEE_COOLDOWN * player.cd_mult)), 4)
     end
     if player.ranged_cd > 0 then
         lurek.render.setColor(1, 1, 0.3, 0.7)
-        lurek.render.drawRect("fill", 80, cd_y + 14, 50 * (player.ranged_cd / (RANGED_COOLDOWN * player.cd_mult)), 4)
+        lurek.render.rectangle("fill", 80, cd_y + 14, 50 * (player.ranged_cd / (RANGED_COOLDOWN * player.cd_mult)), 4)
     end
     if player.dash_cd > 0 then
         lurek.render.setColor(0.3, 0.7, 1, 0.7)
-        lurek.render.drawRect("fill", 170, cd_y + 14, 50 * (player.dash_cd / (DASH_COOLDOWN * player.cd_mult)), 4)
+        lurek.render.rectangle("fill", 170, cd_y + 14, 50 * (player.dash_cd / (DASH_COOLDOWN * player.cd_mult)), 4)
     end
 
     -- Perks summary
     if #perks_collected > 0 then
         lurek.render.setColor(0.6, 0.5, 0.3, 0.8)
-        lurek.render.drawText("Perks:", SCREEN_W - 200, 10, 11)
+        lurek.render.print("Perks:", SCREEN_W - 200, 10, 11)
         for i, pname in ipairs(perks_collected) do
             if i > 6 then break end -- show max 6
             lurek.render.setColor(0.8, 0.7, 0.4, 0.7)
-            lurek.render.drawText("• " .. pname, SCREEN_W - 200, 10 + i * 14, 10)
+            lurek.render.print("• " .. pname, SCREEN_W - 200, 10 + i * 14, 10)
         end
     end
 
@@ -1017,16 +1017,16 @@ lurek.render_ui(function()
         local bw = 300
         local bx = (SCREEN_W - bw) / 2
         lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-        lurek.render.drawRect("fill", bx, 10, bw, 20)
+        lurek.render.rectangle("fill", bx, 10, bw, 20)
         local bhp_frac = boss.hp / boss.max_hp
         lurek.render.setColor(0.7, 0.1, 0.5, 1)
-        lurek.render.drawRect("fill", bx, 10, bw * bhp_frac, 20)
+        lurek.render.rectangle("fill", bx, 10, bw * bhp_frac, 20)
         lurek.render.setColor(1, 1, 1, 1)
         local phase_txt = boss.phase == 2 and " [ENRAGED]" or ""
-        lurek.render.drawText("BOSS" .. phase_txt, bx + 5, 13, 13)
+        lurek.render.print("BOSS" .. phase_txt, bx + 5, 13, 13)
     end
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
-    lurek.render.drawText(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 20, 11)
+    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 20, 11)
 end)

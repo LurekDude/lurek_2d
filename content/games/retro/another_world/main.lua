@@ -221,7 +221,7 @@ local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -700,40 +700,40 @@ lurek.render(function()
         local g = 0.03 + t * 0.02
         local b = 0.18 - t * 0.08
         lurek.render.setColor(r, g, b, 1)
-        lurek.render.drawRect("fill", 0, row * 100, SCREEN_W, 100)
+        lurek.render.rectangle("fill", 0, row * 100, SCREEN_W, 100)
     end
 
     -- Moon
     if s.moon_x then
         lurek.render.setColor(0.85, 0.82, 0.7, 0.9)
-        lurek.render.drawCircle("fill", s.moon_x, s.moon_y, 30)
+        lurek.render.circle("fill", s.moon_x, s.moon_y, 30)
         lurek.render.setColor(0.05, 0.05, 0.28, 1)
-        lurek.render.drawCircle("fill", s.moon_x + 8, s.moon_y - 6, 26)
+        lurek.render.circle("fill", s.moon_x + 8, s.moon_y - 6, 26)
     end
 
     -- Distant mountains (silhouettes)
     lurek.render.setColor(0.08, 0.06, 0.15, 0.7)
     for mx = 0, SCREEN_W, 160 do
         local mh = 80 + math.sin(mx * 0.01 + current_scene) * 40
-        lurek.render.drawRect("fill", mx, SCREEN_H - 200 - mh, 180, mh + 200)
+        lurek.render.rectangle("fill", mx, SCREEN_H - 200 - mh, 180, mh + 200)
     end
 
     -- ── Platforms ──────────────────────────────────────────────
     for _, p in ipairs(s.platforms) do
         lurek.render.setColor(0.12, 0.10, 0.20, 1)
-        lurek.render.drawRect("fill", p.x, p.y, p.w, p.h)
+        lurek.render.rectangle("fill", p.x, p.y, p.w, p.h)
         -- Top edge highlight
         lurek.render.setColor(0.25, 0.20, 0.40, 1)
-        lurek.render.drawRect("fill", p.x, p.y, p.w, 2)
+        lurek.render.rectangle("fill", p.x, p.y, p.w, 2)
     end
 
     -- ── Shields ────────────────────────────────────────────────
     for _, sd in ipairs(shields) do
         local flicker = 0.6 + 0.4 * math.sin(sd.shimmer)
         lurek.render.setColor(0.3, 0.6, 1.0, flicker)
-        lurek.render.drawRect("fill", sd.x - 2, sd.y, 4, PLAYER_H + 20)
+        lurek.render.rectangle("fill", sd.x - 2, sd.y, 4, PLAYER_H + 20)
         lurek.render.setColor(0.5, 0.8, 1.0, flicker * 0.5)
-        lurek.render.drawRect("fill", sd.x - 5, sd.y, 10, PLAYER_H + 20)
+        lurek.render.rectangle("fill", sd.x - 5, sd.y, 10, PLAYER_H + 20)
     end
 
     -- ── Aliens ─────────────────────────────────────────────────
@@ -741,23 +741,23 @@ lurek.render(function()
         if al.alive then
             -- Body silhouette
             lurek.render.setColor(0.15, 0.08, 0.08, 1)
-            lurek.render.drawRect("fill", al.x - ALIEN_W / 2, al.y - ALIEN_H, ALIEN_W, ALIEN_H)
+            lurek.render.rectangle("fill", al.x - ALIEN_W / 2, al.y - ALIEN_H, ALIEN_W, ALIEN_H)
             -- Head
-            lurek.render.drawCircle("fill", al.x, al.y - ALIEN_H - 4, 7)
+            lurek.render.circle("fill", al.x, al.y - ALIEN_H - 4, 7)
             -- Eyes (menacing red)
             lurek.render.setColor(1.0, 0.15, 0.1, 0.9)
             local eye_off = al.facing > 0 and 2 or -2
-            lurek.render.drawCircle("fill", al.x + eye_off - 2, al.y - ALIEN_H - 5, 2)
-            lurek.render.drawCircle("fill", al.x + eye_off + 2, al.y - ALIEN_H - 5, 2)
+            lurek.render.circle("fill", al.x + eye_off - 2, al.y - ALIEN_H - 5, 2)
+            lurek.render.circle("fill", al.x + eye_off + 2, al.y - ALIEN_H - 5, 2)
         end
     end
 
     -- ── Alien projectiles ──────────────────────────────────────
     for _, p in ipairs(alien_projectiles) do
         lurek.render.setColor(1.0, 0.25, 0.15, 0.9)
-        lurek.render.drawCircle("fill", p.x, p.y, 4)
+        lurek.render.circle("fill", p.x, p.y, 4)
         lurek.render.setColor(1.0, 0.6, 0.3, 0.4)
-        lurek.render.drawCircle("fill", p.x, p.y, 7)
+        lurek.render.circle("fill", p.x, p.y, 7)
     end
 
     -- ── Player ─────────────────────────────────────────────────
@@ -765,29 +765,29 @@ lurek.render(function()
         -- Legs (animated)
         local leg_offset = math.sin(player.anim) * 3
         lurek.render.setColor(0.15, 0.25, 0.5, 1)
-        lurek.render.drawRect("fill", player.x - 5, player.y - 10, 4, 10 + leg_offset)
-        lurek.render.drawRect("fill", player.x + 1, player.y - 10, 4, 10 - leg_offset)
+        lurek.render.rectangle("fill", player.x - 5, player.y - 10, 4, 10 + leg_offset)
+        lurek.render.rectangle("fill", player.x + 1, player.y - 10, 4, 10 - leg_offset)
 
         -- Body
         lurek.render.setColor(0.2, 0.35, 0.6, 1)
-        lurek.render.drawRect("fill", player.x - PLAYER_W / 2, player.y - PLAYER_H, PLAYER_W, PLAYER_H - 10)
+        lurek.render.rectangle("fill", player.x - PLAYER_W / 2, player.y - PLAYER_H, PLAYER_W, PLAYER_H - 10)
 
         -- Head
         lurek.render.setColor(0.75, 0.6, 0.5, 1)
-        lurek.render.drawCircle("fill", player.x, player.y - PLAYER_H - 4, 6)
+        lurek.render.circle("fill", player.x, player.y - PLAYER_H - 4, 6)
 
         -- Gun arm
         lurek.render.setColor(0.3, 0.3, 0.5, 1)
         local gun_x = player.x + player.facing * 8
         local gun_y = player.y - PLAYER_H * 0.6
-        lurek.render.drawRect("fill", gun_x, gun_y - 2, player.facing * 10, 4)
+        lurek.render.rectangle("fill", gun_x, gun_y - 2, player.facing * 10, 4)
 
         -- Charge indicator
         if charging and charge_timer > 0.1 then
             local charge_pct = clamp(charge_timer / CHARGE_SUPER, 0, 1)
             local cr, cg, cb = 1.0, 0.8 * (1 - charge_pct), 0.2 * (1 - charge_pct)
             lurek.render.setColor(cr, cg, cb, 0.6 + charge_pct * 0.4)
-            lurek.render.drawCircle("fill", gun_x + player.facing * 12, gun_y, 3 + charge_pct * 5)
+            lurek.render.circle("fill", gun_x + player.facing * 12, gun_y, 3 + charge_pct * 5)
         end
     end
 
@@ -795,12 +795,12 @@ lurek.render(function()
     for _, sh in ipairs(shots) do
         if sh.kind == "super" then
             lurek.render.setColor(1.0, 0.4, 0.1, 0.9)
-            lurek.render.drawRect("fill", sh.x - 6, sh.y - 4, 12, 8)
+            lurek.render.rectangle("fill", sh.x - 6, sh.y - 4, 12, 8)
             lurek.render.setColor(1.0, 0.7, 0.2, 0.5)
-            lurek.render.drawRect("fill", sh.x - 9, sh.y - 6, 18, 12)
+            lurek.render.rectangle("fill", sh.x - 9, sh.y - 6, 18, 12)
         else
             lurek.render.setColor(1.0, 0.9, 0.3, 0.9)
-            lurek.render.drawRect("fill", sh.x - 3, sh.y - 2, 6, 4)
+            lurek.render.rectangle("fill", sh.x - 3, sh.y - 2, 6, 4)
         end
     end
 
@@ -817,7 +817,7 @@ lurek.render_ui(function()
     -- ── TITLE screen ───────────────────────────────────────────
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(0.85, 0.75, 0.95, 1)
         lurek.render.print("A N O T H E R   W O R L D", SCREEN_W / 2 - 140, 180)
@@ -837,7 +837,7 @@ lurek.render_ui(function()
     -- ── INTRO sequence ─────────────────────────────────────────
     if current_state == STATE.INTRO then
         lurek.render.setColor(0.0, 0.0, 0.0, 1)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         for idx, line in ipairs(intro_lines) do
             local line_time = (idx - 1) * 1.2
@@ -856,7 +856,7 @@ lurek.render_ui(function()
     -- ── DEAD screen ────────────────────────────────────────────
     if current_state == STATE.DEAD then
         lurek.render.setColor(0.6, 0.1, 0.1, 0.4)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1, 0.3, 0.3, 1)
         lurek.render.print("YOU DIED", SCREEN_W / 2 - 36, SCREEN_H / 2 - 20)
@@ -870,7 +870,7 @@ lurek.render_ui(function()
     -- ── GAME OVER ──────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
         lurek.render.setColor(0.0, 0.0, 0.0, 0.7)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(0.9, 0.2, 0.2, 1)
         lurek.render.print("G A M E   O V E R", SCREEN_W / 2 - 80, SCREEN_H / 2 - 30)
@@ -891,7 +891,7 @@ lurek.render_ui(function()
     -- Lives
     lurek.render.setColor(0.9, 0.3, 0.3, 0.9)
     for i = 1, lives do
-        lurek.render.drawCircle("fill", SCREEN_W - 30 * i, 20, 8)
+        lurek.render.circle("fill", SCREEN_W - 30 * i, 20, 8)
     end
 
     -- Scene indicator
@@ -907,7 +907,7 @@ lurek.render_ui(function()
         local bar_w = 60
         local pct = clamp(charge_timer / CHARGE_SUPER, 0, 1)
         lurek.render.setColor(0.2, 0.2, 0.3, 0.7)
-        lurek.render.drawRect("fill", 20, SCREEN_H - 50, bar_w, 8)
+        lurek.render.rectangle("fill", 20, SCREEN_H - 50, bar_w, 8)
         if pct < CHARGE_SHIELD / CHARGE_SUPER then
             lurek.render.setColor(1.0, 0.9, 0.3, 0.9)
         elseif pct < 1 then
@@ -915,7 +915,7 @@ lurek.render_ui(function()
         else
             lurek.render.setColor(1.0, 0.3, 0.1, 0.9)
         end
-        lurek.render.drawRect("fill", 20, SCREEN_H - 50, bar_w * pct, 8)
+        lurek.render.rectangle("fill", 20, SCREEN_H - 50, bar_w * pct, 8)
     end
 
     -- FPS
@@ -925,6 +925,6 @@ lurek.render_ui(function()
     -- ── Fade overlay ───────────────────────────────────────────
     if fade_alpha > 0 then
         lurek.render.setColor(0, 0, 0, fade_alpha)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
     end
 end)

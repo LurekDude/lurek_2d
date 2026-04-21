@@ -351,7 +351,7 @@ lurek.render(function()
 
     -- Draw ground plane hint (dark rectangles)
     lurek.render.setColor(0.06, 0.06, 0.10, 1.0)
-    lurek.render.drawRectFill(ox + 20, HUD_H + 10, SCREEN_W - 40, SCREEN_H - HUD_H - 40)
+    lurek.render.rectangle(ox + 20, HUD_H + 10, SCREEN_W - 40, SCREEN_H - HUD_H - 40)
 
     -- Screen-specific light visualizations
     if state == STATE_SCREEN_1 then
@@ -368,15 +368,15 @@ lurek.render(function()
                 local a = 0.08 * ring
                 local rr = radius * ring * 0.35
                 lurek.render.setColor(c[1], c[2], c[3], a)
-                lurek.render.drawCircleFill(lx, ly, rr)
+                lurek.render.circleFill(lx, ly, rr)
             end
             -- Core
             lurek.render.setColor(c[1], c[2], c[3], 0.9)
-            lurek.render.drawCircleFill(lx, ly, 8)
+            lurek.render.circleFill(lx, ly, 8)
         end
         -- Center marker
         lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-        lurek.render.drawCircle(cx, cy, 6)
+        lurek.render.circle(cx, cy, 6)
 
     elseif state == STATE_SCREEN_2 then
         -- 3 spotlights with cone sweep
@@ -402,7 +402,7 @@ lurek.render(function()
             end
             -- Source dot
             lurek.render.setColor(c[1], c[2], c[3], 0.9)
-            lurek.render.drawCircleFill(cx, cy, 6)
+            lurek.render.circleFill(cx, cy, 6)
         end
 
     elseif state == STATE_SCREEN_3 then
@@ -412,7 +412,7 @@ lurek.render(function()
         local sg = lerp(0.02, 0.55, sky_t)
         local sb = lerp(0.08, 0.85, sky_t)
         lurek.render.setColor(sr, sg, sb, 0.6)
-        lurek.render.drawRectFill(ox + 20, HUD_H + 10, SCREEN_W - 40, SCREEN_H - HUD_H - 40)
+        lurek.render.rectangle(ox + 20, HUD_H + 10, SCREEN_W - 40, SCREEN_H - HUD_H - 40)
 
         -- Sun/moon circle
         local sun_x = SCREEN_W / 2 + ox + math.cos(sun_angle) * 250
@@ -420,7 +420,7 @@ lurek.render(function()
         if sky_t > 0.3 then
             -- Sun
             lurek.render.setColor(1.0, 0.9, 0.4, sky_t)
-            lurek.render.drawCircleFill(sun_x, sun_y, 30)
+            lurek.render.circleFill(sun_x, sun_y, 30)
             -- Sun rays
             for r = 1, 8 do
                 local ra = r * math.pi / 4 + time_acc * 0.3
@@ -429,25 +429,25 @@ lurek.render(function()
                 local rx2 = sun_x + math.cos(ra) * 50
                 local ry2 = sun_y + math.sin(ra) * 50
                 lurek.render.setColor(1.0, 0.9, 0.4, sky_t * 0.5)
-                lurek.render.drawLine(rx1, ry1, rx2, ry2)
+                lurek.render.line(rx1, ry1, rx2, ry2)
             end
         else
             -- Moon
             lurek.render.setColor(0.7, 0.75, 0.9, 0.7)
-            lurek.render.drawCircleFill(sun_x, sun_y, 22)
+            lurek.render.circleFill(sun_x, sun_y, 22)
         end
 
         -- Ground shadow line
         local shadow_len = lerp(200, 20, sky_t)
         lurek.render.setColor(0.0, 0.0, 0.0, 0.3 * sky_t)
-        lurek.render.drawRectFill(ox + SCREEN_W / 2 - 15, SCREEN_H - 100, shadow_len, 6)
+        lurek.render.rectangle(ox + SCREEN_W / 2 - 15, SCREEN_H - 100, shadow_len, 6)
 
         -- Scene objects (trees/buildings silhouette)
         lurek.render.setColor(0.08, 0.12, 0.08, 1.0)
-        lurek.render.drawRectFill(ox + 150, SCREEN_H - 180, 30, 80)
+        lurek.render.rectangle(ox + 150, SCREEN_H - 180, 30, 80)
         lurek.render.drawTriangleFill(ox + 115, SCREEN_H - 180, ox + 195, SCREEN_H - 180, ox + 165, SCREEN_H - 260)
-        lurek.render.drawRectFill(ox + 500, SCREEN_H - 200, 60, 100)
-        lurek.render.drawRectFill(ox + 490, SCREEN_H - 220, 80, 20)
+        lurek.render.rectangle(ox + 500, SCREEN_H - 200, 60, 100)
+        lurek.render.rectangle(ox + 490, SCREEN_H - 220, 80, 20)
 
     elseif state == STATE_SCREEN_4 then
         -- 4 flicker patterns side by side
@@ -463,11 +463,11 @@ lurek.render(function()
                 local a = val * 0.06 * ring
                 local rr = radius * ring * 0.3
                 lurek.render.setColor(pat.color[1], pat.color[2], pat.color[3], a)
-                lurek.render.drawCircleFill(cx, cy, rr)
+                lurek.render.circleFill(cx, cy, rr)
             end
             -- Core
             lurek.render.setColor(pat.color[1], pat.color[2], pat.color[3], val)
-            lurek.render.drawCircleFill(cx, cy, 10 + val * 5)
+            lurek.render.circleFill(cx, cy, 10 + val * 5)
         end
 
     elseif state == STATE_SCREEN_5 then
@@ -481,7 +481,7 @@ lurek.render(function()
             -- Panel divider
             if p > 1 then
                 lurek.render.setColor(0.15, 0.15, 0.2, 1.0)
-                lurek.render.drawLine(px, HUD_H + 10, px, SCREEN_H - 30)
+                lurek.render.line(px, HUD_H + 10, px, SCREEN_H - 30)
             end
 
             -- Attenuation rings: intensity = 1 / (1 + d^falloff)
@@ -491,11 +491,11 @@ lurek.render(function()
                 local intensity = 1.0 / (1.0 + (d * 3) ^ falloff)
                 local rr = d * max_r
                 lurek.render.setColor(0.9, 0.85, 0.6, intensity * 0.3)
-                lurek.render.drawCircleFill(cx, cy, rr)
+                lurek.render.circleFill(cx, cy, rr)
             end
             -- Core
             lurek.render.setColor(1.0, 0.95, 0.7, 0.9)
-            lurek.render.drawCircleFill(cx, cy, 8)
+            lurek.render.circleFill(cx, cy, 8)
         end
 
     elseif state == STATE_SCREEN_6 then
@@ -516,16 +516,16 @@ lurek.render(function()
                 local a = alpha * 0.05 * ring
                 local rr = 30 * ring
                 lurek.render.setColor(c[1], c[2], c[3], a)
-                lurek.render.drawCircleFill(gx, gy, rr)
+                lurek.render.circleFill(gx, gy, rr)
             end
             -- Core
             lurek.render.setColor(c[1], c[2], c[3], alpha * 0.9)
-            lurek.render.drawCircleFill(gx, gy, 12)
+            lurek.render.circleFill(gx, gy, 12)
             -- Disabled cross
             if not enabled then
                 lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-                lurek.render.drawLine(gx - 15, gy - 15, gx + 15, gy + 15)
-                lurek.render.drawLine(gx + 15, gy - 15, gx - 15, gy + 15)
+                lurek.render.line(gx - 15, gy - 15, gx + 15, gy + 15)
+                lurek.render.line(gx + 15, gy - 15, gx - 15, gy + 15)
             end
         end
 
@@ -539,33 +539,33 @@ lurek.render(function()
             -- Panel divider
             if p > 1 then
                 lurek.render.setColor(0.15, 0.15, 0.2, 1.0)
-                lurek.render.drawLine(px, HUD_H + 10, px, SCREEN_H - 30)
+                lurek.render.line(px, HUD_H + 10, px, SCREEN_H - 30)
             end
 
             -- Light source
             lurek.render.setColor(1.0, 0.9, 0.6, 0.8)
-            lurek.render.drawCircleFill(cx, cy - 60, 10)
+            lurek.render.circleFill(cx, cy - 60, 10)
             for ring = 4, 1, -1 do
                 lurek.render.setColor(1.0, 0.9, 0.6, 0.06 * ring)
-                lurek.render.drawCircleFill(cx, cy - 60, 20 * ring)
+                lurek.render.circleFill(cx, cy - 60, 20 * ring)
             end
 
             -- Occluder block
             lurek.render.setColor(0.2, 0.2, 0.25, 1.0)
-            lurek.render.drawRectFill(cx - 20, cy, 40, 25)
+            lurek.render.rectangle(cx - 20, cy, 40, 25)
 
             -- Shadow below occluder
             if p == 1 then
                 -- Hard shadow: solid edge
                 lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
-                lurek.render.drawRectFill(cx - 25, cy + 25, 50, 120)
+                lurek.render.rectangle(cx - 25, cy + 25, 50, 120)
             elseif p == 2 then
                 -- Soft shadow: fading penumbra
                 for s = 6, 1, -1 do
                     local spread = s * 8
                     local a = 0.08 * (7 - s)
                     lurek.render.setColor(0.0, 0.0, 0.0, a)
-                    lurek.render.drawRectFill(cx - 20 - spread / 2, cy + 25, 40 + spread, 120)
+                    lurek.render.rectangle(cx - 20 - spread / 2, cy + 25, 40 + spread, 120)
                 end
             end
             -- p == 3: no shadow drawn
@@ -582,7 +582,7 @@ lurek.render(function()
             -- Panel divider
             if p > 1 then
                 lurek.render.setColor(0.15, 0.15, 0.2, 1.0)
-                lurek.render.drawLine(px, HUD_H + 10, px, SCREEN_H - 30)
+                lurek.render.line(px, HUD_H + 10, px, SCREEN_H - 30)
             end
 
             -- Two overlapping light circles
@@ -596,9 +596,9 @@ lurek.render(function()
                     local a = 0.1 * ring
                     local rr = 20 * ring
                     lurek.render.setColor(c1[1], c1[2], c1[3], a)
-                    lurek.render.drawCircleFill(cx - offset, cy, rr)
+                    lurek.render.circleFill(cx - offset, cy, rr)
                     lurek.render.setColor(c2[1], c2[2], c2[3], a)
-                    lurek.render.drawCircleFill(cx + offset, cy, rr)
+                    lurek.render.circleFill(cx + offset, cy, rr)
                 end
             elseif p == 2 then
                 -- Multiply: darker where lights overlap
@@ -606,26 +606,26 @@ lurek.render(function()
                     local a = 0.08 * ring
                     local rr = 20 * ring
                     lurek.render.setColor(c1[1] * 0.5, c1[2] * 0.5, c1[3] * 0.5, a)
-                    lurek.render.drawCircleFill(cx - offset, cy, rr)
+                    lurek.render.circleFill(cx - offset, cy, rr)
                     lurek.render.setColor(c2[1] * 0.5, c2[2] * 0.5, c2[3] * 0.5, a)
-                    lurek.render.drawCircleFill(cx + offset, cy, rr)
+                    lurek.render.circleFill(cx + offset, cy, rr)
                 end
                 -- Dark overlap zone
                 lurek.render.setColor(0.05, 0.02, 0.08, 0.4)
-                lurek.render.drawCircleFill(cx, cy, 40)
+                lurek.render.circleFill(cx, cy, 40)
             else
                 -- Screen: bright, washed-out overlap
                 for ring = 5, 1, -1 do
                     local a = 0.12 * ring
                     local rr = 20 * ring
                     lurek.render.setColor(c1[1], c1[2], c1[3], a)
-                    lurek.render.drawCircleFill(cx - offset, cy, rr)
+                    lurek.render.circleFill(cx - offset, cy, rr)
                     lurek.render.setColor(c2[1], c2[2], c2[3], a)
-                    lurek.render.drawCircleFill(cx + offset, cy, rr)
+                    lurek.render.circleFill(cx + offset, cy, rr)
                 end
                 -- Bright overlap
                 lurek.render.setColor(0.85, 0.7, 0.95, 0.35)
-                lurek.render.drawCircleFill(cx, cy, 45)
+                lurek.render.circleFill(cx, cy, 45)
             end
         end
     end
@@ -633,7 +633,7 @@ lurek.render(function()
     -- Draw particles (world-space)
     for _, p in ipairs(particles) do
         lurek.render.setColor(p.r, p.g, p.b, p.a)
-        lurek.render.drawCircleFill(p.x + ox, p.y, p.size)
+        lurek.render.circleFill(p.x + ox, p.y, p.size)
     end
 end)
 
@@ -646,43 +646,43 @@ lurek.render_ui(function()
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 2)
 
         lurek.render.setColor(0.9, 0.85, 1.0, 1.0)
-        lurek.render.drawText("LIGHT SHOWCASE", SCREEN_W / 2 - 120, SCREEN_H / 2 - 80)
+        lurek.render.print("LIGHT SHOWCASE", SCREEN_W / 2 - 120, SCREEN_H / 2 - 80)
 
         lurek.render.setColor(0.6, 0.7, 0.9, pulse)
-        lurek.render.drawText("8 LIGHTING TECHNIQUES", SCREEN_W / 2 - 100, SCREEN_H / 2 - 40)
+        lurek.render.print("8 LIGHTING TECHNIQUES", SCREEN_W / 2 - 100, SCREEN_H / 2 - 40)
 
         lurek.render.setColor(0.5, 0.5, 0.6, 0.8)
-        lurek.render.drawText("Press 1-8 to select a technique, or Right Arrow to start", SCREEN_W / 2 - 210, SCREEN_H / 2 + 30)
+        lurek.render.print("Press 1-8 to select a technique, or Right Arrow to start", SCREEN_W / 2 - 210, SCREEN_H / 2 + 30)
 
         -- Screen list
         for i = 1, NUM_SCREENS do
             local sy = SCREEN_H / 2 + 65 + (i - 1) * 18
             lurek.render.setColor(0.5, 0.6, 0.8, 0.7)
-            lurek.render.drawText(i .. ". " .. screen_names[SCREEN_STATES[i]], SCREEN_W / 2 - 80, sy)
+            lurek.render.print(i .. ". " .. screen_names[SCREEN_STATES[i]], SCREEN_W / 2 - 80, sy)
         end
 
         lurek.render.setColor(0.4, 0.4, 0.5, 0.6)
-        lurek.render.drawText("ESC to quit", SCREEN_W / 2 - 40, SCREEN_H - 40)
+        lurek.render.print("ESC to quit", SCREEN_W / 2 - 40, SCREEN_H - 40)
         return
     end
 
     -- HUD bar
     lurek.render.setColor(0.04, 0.04, 0.08, 0.85)
-    lurek.render.drawRectFill(0, 0, SCREEN_W, HUD_H)
+    lurek.render.rectangle(0, 0, SCREEN_W, HUD_H)
 
     -- Screen title
     local title = screen_index .. "/" .. NUM_SCREENS .. "  " .. (screen_names[state] or "")
     lurek.render.setColor(0.9, 0.85, 1.0, 1.0)
-    lurek.render.drawText(title, 12, 8)
+    lurek.render.print(title, 12, 8)
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.6, 0.8)
-    lurek.render.drawText("FPS: " .. fps, SCREEN_W - 80, 8)
+    lurek.render.print("FPS: " .. fps, SCREEN_W - 80, 8)
 
     -- Description
     local desc = screen_descs[state] or ""
     lurek.render.setColor(0.6, 0.65, 0.75, 0.9)
-    lurek.render.drawText(desc, 12, DESC_Y)
+    lurek.render.print(desc, 12, DESC_Y)
 
     -- Per-screen labels
     if state == STATE_SCREEN_4 then
@@ -690,16 +690,16 @@ lurek.render_ui(function()
         for i = 1, 4 do
             local cx = 30 + (i - 1) * col_w + col_w / 2
             lurek.render.setColor(0.7, 0.7, 0.8, 0.9)
-            lurek.render.drawText(flicker_patterns[i].name, cx - 18, SCREEN_H - 80)
+            lurek.render.print(flicker_patterns[i].name, cx - 18, SCREEN_H - 80)
             local bar_w = 60
             local bar_h = 6
             local bx = cx - bar_w / 2
             local by = SCREEN_H - 60
             lurek.render.setColor(0.15, 0.15, 0.2, 1.0)
-            lurek.render.drawRectFill(bx, by, bar_w, bar_h)
+            lurek.render.rectangle(bx, by, bar_w, bar_h)
             local c = flicker_patterns[i].color
             lurek.render.setColor(c[1], c[2], c[3], 0.9)
-            lurek.render.drawRectFill(bx, by, bar_w * flicker_values[i], bar_h)
+            lurek.render.rectangle(bx, by, bar_w * flicker_values[i], bar_h)
         end
     end
 
@@ -707,7 +707,7 @@ lurek.render_ui(function()
         for p = 1, 3 do
             local px = 20 + (p - 1) * PANEL_W
             lurek.render.setColor(0.7, 0.7, 0.8, 0.9)
-            lurek.render.drawText(atten_labels[p], px + PANEL_W / 2 - 25, SCREEN_H - 55)
+            lurek.render.print(atten_labels[p], px + PANEL_W / 2 - 25, SCREEN_H - 55)
         end
     end
 
@@ -717,7 +717,7 @@ lurek.render_ui(function()
             local key = ({"R", "B", "G"})[i]
             local c = group_colors[i]
             lurek.render.setColor(c[1], c[2], c[3], group_enabled[i] and 0.9 or 0.4)
-            lurek.render.drawText("[" .. key .. "] " .. label, 20 + (i - 1) * 240, SCREEN_H - 55)
+            lurek.render.print("[" .. key .. "] " .. label, 20 + (i - 1) * 240, SCREEN_H - 55)
         end
     end
 
@@ -725,7 +725,7 @@ lurek.render_ui(function()
         for p = 1, 3 do
             local px = 20 + (p - 1) * PANEL_W
             lurek.render.setColor(0.7, 0.7, 0.8, 0.9)
-            lurek.render.drawText(shadow_labels[p], px + PANEL_W / 2 - 30, SCREEN_H - 55)
+            lurek.render.print(shadow_labels[p], px + PANEL_W / 2 - 30, SCREEN_H - 55)
         end
     end
 
@@ -733,13 +733,13 @@ lurek.render_ui(function()
         for p = 1, 3 do
             local px = 20 + (p - 1) * PANEL_W
             lurek.render.setColor(0.7, 0.7, 0.8, 0.9)
-            lurek.render.drawText(blend_labels[p], px + PANEL_W / 2 - 28, SCREEN_H - 55)
+            lurek.render.print(blend_labels[p], px + PANEL_W / 2 - 28, SCREEN_H - 55)
         end
     end
 
     -- Navigation footer
     lurek.render.setColor(0.04, 0.04, 0.08, 0.7)
-    lurek.render.drawRectFill(0, SCREEN_H - 28, SCREEN_W, 28)
+    lurek.render.rectangle(0, SCREEN_H - 28, SCREEN_W, 28)
     lurek.render.setColor(0.45, 0.45, 0.55, 0.8)
-    lurek.render.drawText("<Left/Right> Navigate   |   1-8 Jump   |   ESC Quit", SCREEN_W / 2 - 200, NAV_Y)
+    lurek.render.print("<Left/Right> Navigate   |   1-8 Jump   |   ESC Quit", SCREEN_W / 2 - 200, NAV_Y)
 end)

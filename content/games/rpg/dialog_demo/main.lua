@@ -496,94 +496,94 @@ lurek.render(function()
     if scene_name == "forest" then
         -- Sky gradient
         lurek.render.setColor(0.08, 0.12, 0.22, 1)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
         -- Ground
         lurek.render.setColor(0.12, 0.25, 0.1, 1)
-        lurek.render.drawRect("fill", 0, 340, SCREEN_W, 260)
+        lurek.render.rectangle("fill", 0, 340, SCREEN_W, 260)
         -- Trees
         for i = 0, 6 do
             local tx = 50 + i * 120
             -- Trunk
             lurek.render.setColor(0.3, 0.2, 0.1, 1)
-            lurek.render.drawRect("fill", tx - 8, 220, 16, 120)
+            lurek.render.rectangle("fill", tx - 8, 220, 16, 120)
             -- Canopy
             lurek.render.setColor(0.1, 0.35 + i * 0.02, 0.12, 1)
-            lurek.render.drawCircle("fill", tx, 200, 40)
-            lurek.render.drawCircle("fill", tx - 25, 220, 30)
-            lurek.render.drawCircle("fill", tx + 25, 220, 30)
+            lurek.render.circle("fill", tx, 200, 40)
+            lurek.render.circle("fill", tx - 25, 220, 30)
+            lurek.render.circle("fill", tx + 25, 220, 30)
         end
         -- Path
         lurek.render.setColor(0.25, 0.2, 0.12, 1)
-        lurek.render.drawRect("fill", 320, 340, 160, 260)
+        lurek.render.rectangle("fill", 320, 340, 160, 260)
         -- Fireflies
         local t = lurek.timer.getTime()
         for i = 1, 5 do
             local fx = 100 + i * 130 + math.sin(t * 0.8 + i) * 30
             local fy = 180 + math.cos(t * 1.1 + i * 2) * 40
             lurek.render.setColor(0.9, 1.0, 0.4, 0.4 + math.sin(t * 3 + i) * 0.3)
-            lurek.render.drawCircle("fill", fx, fy, 3)
+            lurek.render.circle("fill", fx, fy, 3)
         end
 
     elseif scene_name == "shop" then
         -- Indoor walls
         lurek.render.setColor(0.22, 0.16, 0.1, 1)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
         -- Floor
         lurek.render.setColor(0.3, 0.22, 0.12, 1)
-        lurek.render.drawRect("fill", 0, 350, SCREEN_W, 250)
+        lurek.render.rectangle("fill", 0, 350, SCREEN_W, 250)
         -- Shelves
         for i = 0, 3 do
             local sx = 60 + i * 190
             lurek.render.setColor(0.4, 0.28, 0.15, 1)
-            lurek.render.drawRect("fill", sx, 100, 120, 12)
-            lurek.render.drawRect("fill", sx, 180, 120, 12)
-            lurek.render.drawRect("fill", sx, 260, 120, 12)
+            lurek.render.rectangle("fill", sx, 100, 120, 12)
+            lurek.render.rectangle("fill", sx, 180, 120, 12)
+            lurek.render.rectangle("fill", sx, 260, 120, 12)
             -- Items on shelves
             for j = 0, 2 do
                 lurek.render.setColor(0.5 + j * 0.15, 0.3, 0.2, 1)
-                lurek.render.drawRect("fill", sx + 10 + j * 35, 85, 20, 15)
+                lurek.render.rectangle("fill", sx + 10 + j * 35, 85, 20, 15)
                 lurek.render.setColor(0.3, 0.5 + j * 0.1, 0.2, 1)
-                lurek.render.drawRect("fill", sx + 10 + j * 35, 165, 18, 15)
+                lurek.render.rectangle("fill", sx + 10 + j * 35, 165, 18, 15)
             end
         end
         -- Counter
         lurek.render.setColor(0.45, 0.3, 0.15, 1)
-        lurek.render.drawRect("fill", 200, 310, 400, 40)
+        lurek.render.rectangle("fill", 200, 310, 400, 40)
         lurek.render.setColor(0.5, 0.35, 0.18, 1)
-        lurek.render.drawRect("fill", 210, 315, 380, 30)
+        lurek.render.rectangle("fill", 210, 315, 380, 30)
         -- Lantern glow
         local t = lurek.timer.getTime()
         local glow = 0.15 + math.sin(t * 2) * 0.05
         lurek.render.setColor(1, 0.8, 0.3, glow)
-        lurek.render.drawCircle("fill", 400, 60, 80)
+        lurek.render.circle("fill", 400, 60, 80)
 
     elseif scene_name == "gate" then
         -- Dusk sky
         lurek.render.setColor(0.15, 0.08, 0.18, 1)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
         -- Ground
         lurek.render.setColor(0.2, 0.18, 0.12, 1)
-        lurek.render.drawRect("fill", 0, 360, SCREEN_W, 240)
+        lurek.render.rectangle("fill", 0, 360, SCREEN_W, 240)
         -- Wall
         lurek.render.setColor(0.35, 0.3, 0.25, 1)
-        lurek.render.drawRect("fill", 0, 100, 300, 260)
-        lurek.render.drawRect("fill", 500, 100, 300, 260)
+        lurek.render.rectangle("fill", 0, 100, 300, 260)
+        lurek.render.rectangle("fill", 500, 100, 300, 260)
         -- Gate arch
         lurek.render.setColor(0.25, 0.2, 0.15, 1)
-        lurek.render.drawRect("fill", 300, 100, 200, 40)
+        lurek.render.rectangle("fill", 300, 100, 200, 40)
         -- Gate opening
         lurek.render.setColor(0.05, 0.03, 0.08, 1)
-        lurek.render.drawRect("fill", 320, 140, 160, 220)
+        lurek.render.rectangle("fill", 320, 140, 160, 220)
         -- Torches
         for _, tx in ipairs({280, 520}) do
             lurek.render.setColor(0.4, 0.25, 0.1, 1)
-            lurek.render.drawRect("fill", tx - 4, 140, 8, 50)
+            lurek.render.rectangle("fill", tx - 4, 140, 8, 50)
             local t = lurek.timer.getTime()
             local flicker = 0.7 + math.sin(t * 6 + tx) * 0.3
             lurek.render.setColor(1, 0.6, 0.15, flicker)
-            lurek.render.drawCircle("fill", tx, 132, 12)
+            lurek.render.circle("fill", tx, 132, 12)
             lurek.render.setColor(1, 0.9, 0.3, flicker * 0.5)
-            lurek.render.drawCircle("fill", tx, 132, 20)
+            lurek.render.circle("fill", tx, 132, 20)
         end
         -- Stars
         local t = lurek.timer.getTime()
@@ -591,7 +591,7 @@ lurek.render(function()
             local sx = 50 + i * 95
             local sy = 20 + (i % 3) * 25
             lurek.render.setColor(1, 1, 0.9, 0.3 + math.sin(t * 2 + i) * 0.2)
-            lurek.render.drawCircle("fill", sx, sy, 2)
+            lurek.render.circle("fill", sx, sy, 2)
         end
     end
 end)
@@ -664,17 +664,17 @@ lurek.render_ui(function()
 
     -- Dialog box background
     lurek.render.setColor(0.05, 0.05, 0.08, 0.9)
-    lurek.render.drawRect("fill", 20, DIALOG_BOX_Y, SCREEN_W - 40, DIALOG_BOX_H)
+    lurek.render.rectangle("fill", 20, DIALOG_BOX_Y, SCREEN_W - 40, DIALOG_BOX_H)
     -- Border
     lurek.render.setColor(0.3, 0.3, 0.4, 0.6)
-    lurek.render.drawRect("line", 20, DIALOG_BOX_Y, SCREEN_W - 40, DIALOG_BOX_H)
+    lurek.render.rectangle("line", 20, DIALOG_BOX_Y, SCREEN_W - 40, DIALOG_BOX_H)
 
     -- Speaker name above dialog box
     if current_speaker ~= "" then
         local sc = current_speaker_color
         -- Speaker name background tab
         lurek.render.setColor(sc[1] * 0.3, sc[2] * 0.3, sc[3] * 0.3, 0.8)
-        lurek.render.drawRect("fill", 30, DIALOG_BOX_Y - 26, #current_speaker * 10 + 16, 24)
+        lurek.render.rectangle("fill", 30, DIALOG_BOX_Y - 26, #current_speaker * 10 + 16, 24)
         lurek.render.setColor(sc[1], sc[2], sc[3], 1)
         lurek.render.print(current_speaker, 38, DIALOG_BOX_Y - 22, 0, 0.9, 0.9)
     end
@@ -699,7 +699,7 @@ lurek.render_ui(function()
             -- Choice highlight background (tween pulse)
             if is_sel then
                 lurek.render.setColor(0.2 + pulse_val, 0.25 + pulse_val, 0.4 + pulse_val, 0.5)
-                lurek.render.drawRect("fill", 35, cy - 3, SCREEN_W - 80, 24)
+                lurek.render.rectangle("fill", 35, cy - 3, SCREEN_W - 80, 24)
             end
 
             -- Choice number
@@ -716,13 +716,13 @@ lurek.render_ui(function()
     for _, p in ipairs(bubble_particles) do
         lurek.render.setColor(current_speaker_color[1], current_speaker_color[2],
             current_speaker_color[3], p.alpha)
-        lurek.render.drawCircle("fill", p.x, p.y, p.size)
+        lurek.render.circle("fill", p.x, p.y, p.size)
     end
 
     -- Sparkle particles (choice selected)
     for _, p in ipairs(sparkle_particles) do
         local a = p.life / p.max_life
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end)

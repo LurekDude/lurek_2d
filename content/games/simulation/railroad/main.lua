@@ -516,36 +516,36 @@ lurek.render(function()
             local px, py = MAP_X + gx * TILE, MAP_Y + gy * TILE
             if t == T_GRASS then
                 lurek.render.setColor(0.25, 0.45, 0.2, 1)
-                lurek.render.drawRectFill(px, py, TILE, TILE)
+                lurek.render.rectangle(px, py, TILE, TILE)
                 -- grass texture hint
                 if (gx + gy) % 3 == 0 then
                     lurek.render.setColor(0.28, 0.50, 0.22, 1)
-                    lurek.render.drawRectFill(px + 4, py + 4, 4, 4)
+                    lurek.render.rectangle(px + 4, py + 4, 4, 4)
                 end
             elseif t == T_WATER then
                 lurek.render.setColor(0.15, 0.35, 0.65, 1)
-                lurek.render.drawRectFill(px, py, TILE, TILE)
+                lurek.render.rectangle(px, py, TILE, TILE)
                 lurek.render.setColor(0.2, 0.4, 0.7, 0.5)
-                lurek.render.drawRectFill(px + 8, py + 12, 16, 4)
+                lurek.render.rectangle(px + 8, py + 12, 16, 4)
             elseif t == T_MOUNTAIN then
                 lurek.render.setColor(0.45, 0.40, 0.35, 1)
-                lurek.render.drawRectFill(px, py, TILE, TILE)
+                lurek.render.rectangle(px, py, TILE, TILE)
                 lurek.render.setColor(0.55, 0.50, 0.45, 1)
-                lurek.render.drawRectFill(px + 8, py + 4, 16, 12)
+                lurek.render.rectangle(px + 8, py + 4, 16, 12)
                 lurek.render.setColor(0.7, 0.7, 0.7, 1)
-                lurek.render.drawRectFill(px + 12, py + 2, 8, 6)
+                lurek.render.rectangle(px + 12, py + 2, 8, 6)
             elseif t == T_TOWN then
                 lurek.render.setColor(0.55, 0.42, 0.3, 1)
-                lurek.render.drawRectFill(px, py, TILE, TILE)
+                lurek.render.rectangle(px, py, TILE, TILE)
                 -- building
                 lurek.render.setColor(0.7, 0.55, 0.4, 1)
-                lurek.render.drawRectFill(px + 6, py + 6, 20, 20)
+                lurek.render.rectangle(px + 6, py + 6, 20, 20)
                 lurek.render.setColor(0.85, 0.7, 0.5, 1)
-                lurek.render.drawRectFill(px + 10, py + 10, 12, 12)
+                lurek.render.rectangle(px + 10, py + 10, 12, 12)
             end
             -- grid line
             lurek.render.setColor(0, 0, 0, 0.1)
-            lurek.render.drawRect(px, py, TILE, TILE)
+            lurek.render.rectangle(px, py, TILE, TILE)
         end
     end
 
@@ -556,7 +556,7 @@ lurek.render(function()
         local a = tr.anim or 1
         -- rail bed
         lurek.render.setColor(0.35, 0.3, 0.25, a)
-        lurek.render.drawRectFill(px + 4, py + 4, TILE - 8, TILE - 8)
+        lurek.render.rectangle(px + 4, py + 4, TILE - 8, TILE - 8)
         -- rail lines based on neighbors
         local nb = track_neighbors(tr.gx, tr.gy)
         lurek.render.setColor(0.5, 0.5, 0.5, a)
@@ -566,23 +566,23 @@ lurek.render(function()
             local cx, cy = px + TILE / 2, py + TILE / 2
             if dx ~= 0 then
                 -- horizontal rail
-                lurek.render.drawRectFill(cx - 2, cy - 6, TILE / 2 * dx + 4, 3)
-                lurek.render.drawRectFill(cx - 2, cy + 3, TILE / 2 * dx + 4, 3)
+                lurek.render.rectangle(cx - 2, cy - 6, TILE / 2 * dx + 4, 3)
+                lurek.render.rectangle(cx - 2, cy + 3, TILE / 2 * dx + 4, 3)
             end
             if dy ~= 0 then
                 -- vertical rail
-                lurek.render.drawRectFill(cx - 6, cy - 2, 3, TILE / 2 * dy + 4)
-                lurek.render.drawRectFill(cx + 3, cy - 2, 3, TILE / 2 * dy + 4)
+                lurek.render.rectangle(cx - 6, cy - 2, 3, TILE / 2 * dy + 4)
+                lurek.render.rectangle(cx + 3, cy - 2, 3, TILE / 2 * dy + 4)
             end
         end
         if #nb == 0 then
             -- isolated track piece
-            lurek.render.drawRectFill(px + 8, py + TILE / 2 - 1, TILE - 16, 3)
+            lurek.render.rectangle(px + 8, py + TILE / 2 - 1, TILE - 16, 3)
         end
         -- crossties
         lurek.render.setColor(0.4, 0.3, 0.2, a)
-        lurek.render.drawRectFill(px + 6, py + 8, 3, TILE - 16)
-        lurek.render.drawRectFill(px + TILE - 9, py + 8, 3, TILE - 16)
+        lurek.render.rectangle(px + 6, py + 8, 3, TILE - 16)
+        lurek.render.rectangle(px + TILE - 9, py + 8, 3, TILE - 16)
     end
 
     -- Draw signals
@@ -591,10 +591,10 @@ lurek.render(function()
         local py = MAP_Y + sig.gy * TILE + 2
         -- pole
         lurek.render.setColor(0.3, 0.3, 0.3, 1)
-        lurek.render.drawRectFill(px - 1, py, 3, TILE - 4)
+        lurek.render.rectangle(px - 1, py, 3, TILE - 4)
         -- light
         lurek.render.setColor(0.1, 0.9, 0.1, 1)
-        lurek.render.drawRectFill(px - 3, py, 7, 7)
+        lurek.render.rectangle(px - 3, py, 7, 7)
     end
 
     -- Draw stations
@@ -602,14 +602,14 @@ lurek.render(function()
         local px = MAP_X + st.gx * TILE
         local py = MAP_Y + st.gy * TILE
         lurek.render.setColor(0.8, 0.7, 0.2, 1)
-        lurek.render.drawRectFill(px + 2, py + 2, TILE - 4, TILE - 4)
+        lurek.render.rectangle(px + 2, py + 2, TILE - 4, TILE - 4)
         lurek.render.setColor(0.9, 0.85, 0.4, 1)
-        lurek.render.drawRectFill(px + 6, py + 6, TILE - 12, TILE - 12)
+        lurek.render.rectangle(px + 6, py + 6, TILE - 12, TILE - 12)
         -- S marker
         lurek.render.setColor(0.2, 0.1, 0, 1)
-        lurek.render.drawRectFill(px + 12, py + 10, 8, 3)
-        lurek.render.drawRectFill(px + 12, py + 15, 8, 3)
-        lurek.render.drawRectFill(px + 12, py + 20, 8, 3)
+        lurek.render.rectangle(px + 12, py + 10, 8, 3)
+        lurek.render.rectangle(px + 12, py + 15, 8, 3)
+        lurek.render.rectangle(px + 12, py + 20, 8, 3)
     end
 
     -- Draw town names
@@ -623,7 +623,7 @@ lurek.render(function()
             local gc = GOOD_COLORS[tw.produces]
             for i = 1, tw.stock do
                 lurek.render.setColor(gc[1], gc[2], gc[3], 1)
-                lurek.render.drawRectFill(
+                lurek.render.rectangle(
                     MAP_X + tw.gx * TILE + TILE + 2,
                     MAP_Y + tw.gy * TILE + (i - 1) * 6,
                     5, 4)
@@ -636,22 +636,22 @@ lurek.render(function()
         local c = tr.color
         -- body
         lurek.render.setColor(c[1], c[2], c[3], 1)
-        lurek.render.drawRectFill(tr.x - 8, tr.y - 5, 16, 10)
+        lurek.render.rectangle(tr.x - 8, tr.y - 5, 16, 10)
         -- cabin
         lurek.render.setColor(c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 1)
-        lurek.render.drawRectFill(tr.x - 5, tr.y - 7, 10, 3)
+        lurek.render.rectangle(tr.x - 5, tr.y - 7, 10, 3)
         -- cargo indicator
         if tr.carrying then
             local gc = GOOD_COLORS[tr.carrying]
             lurek.render.setColor(gc[1], gc[2], gc[3], 1)
-            lurek.render.drawRectFill(tr.x - 3, tr.y - 3, 6, 6)
+            lurek.render.rectangle(tr.x - 3, tr.y - 3, 6, 6)
         end
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
         lurek.render.setColor(p.r, p.g, p.b, p.a)
-        lurek.render.drawRectFill(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end)
 
@@ -686,7 +686,7 @@ lurek.render_ui(function()
 
     -- HUD background
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.drawRectFill(0, GRID_H * TILE, 800, 600 - GRID_H * TILE)
+    lurek.render.rectangle(0, GRID_H * TILE, 800, 600 - GRID_H * TILE)
 
     local hud_y = GRID_H * TILE + 4
 
@@ -738,7 +738,7 @@ lurek.render_ui(function()
     for i = 1, 3 do
         local gc = GOOD_COLORS[i]
         lurek.render.setColor(gc[1], gc[2], gc[3], 1)
-        lurek.render.drawRectFill(640, hud_y + 36 + (i - 1) * 14, 10, 10)
+        lurek.render.rectangle(640, hud_y + 36 + (i - 1) * 14, 10, 10)
         lurek.render.setColor(0.8, 0.8, 0.8, 1)
         lurek.render.print(GOOD_NAMES[i], 655, hud_y + 35 + (i - 1) * 14)
     end

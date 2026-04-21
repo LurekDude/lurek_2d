@@ -625,7 +625,7 @@ lurek.render(function()
                 local col = TILE_COLORS[tile] or {0.5, 0.5, 0.5}
                 local tx = (c - 1) * TILE
                 local ty = (r - 1) * TILE
-                lurek.render.drawRect(tx, ty, TILE, TILE, col[1], col[2], col[3])
+                lurek.render.rectangle(tx, ty, TILE, TILE, col[1], col[2], col[3])
                 -- grass detail spots
                 if tile == T_GRASS then
                     local seed = r * 100 + c
@@ -633,14 +633,14 @@ lurek.render(function()
                     for _ = 1, 3 do
                         local sx = tx + math.random(4, TILE - 4)
                         local sy = ty + math.random(4, TILE - 4)
-                        lurek.render.drawRect(sx, sy, 3, 3, 0.15, 0.45, 0.12)
+                        lurek.render.rectangle(sx, sy, 3, 3, 0.15, 0.45, 0.12)
                     end
                     math.randomseed(os.time())
                 end
                 -- heal marker
                 if tile == T_HEAL then
-                    lurek.render.drawRect(tx + 12, ty + 8, 8, 16, 1.0, 0.3, 0.3)
-                    lurek.render.drawRect(tx + 8, ty + 12, 16, 8, 1.0, 0.3, 0.3)
+                    lurek.render.rectangle(tx + 12, ty + 8, 8, 16, 1.0, 0.3, 0.3)
+                    lurek.render.rectangle(tx + 8, ty + 12, 16, 8, 1.0, 0.3, 0.3)
                 end
             end
         end
@@ -648,29 +648,29 @@ lurek.render(function()
         -- draw player
         local px = (player.col - 1) * TILE + 4
         local py = (player.row - 1) * TILE + 4
-        lurek.render.drawRect(px, py, TILE - 8, TILE - 8, 0.2, 0.4, 1.0)
-        lurek.render.drawRect(px + 2, py + 2, TILE - 12, TILE - 12, 0.3, 0.5, 1.0)
+        lurek.render.rectangle(px, py, TILE - 8, TILE - 8, 0.2, 0.4, 1.0)
+        lurek.render.rectangle(px + 2, py + 2, TILE - 12, TILE - 12, 0.3, 0.5, 1.0)
 
         lurek.camera.reset()
     end
 
     -- battle scene background
     if state == STATE_BATTLE or state == STATE_BATTLE_ACTION then
-        lurek.render.drawRect(shake_x, shake_y, 800, 600, 0.12, 0.18, 0.10)
+        lurek.render.rectangle(shake_x, shake_y, 800, 600, 0.12, 0.18, 0.10)
         -- ground
-        lurek.render.drawRect(shake_x, 350 + shake_y, 800, 250, 0.22, 0.35, 0.18)
+        lurek.render.rectangle(shake_x, 350 + shake_y, 800, 250, 0.22, 0.35, 0.18)
 
         -- draw player creature (left side)
         local me = party[active_idx]
         if me then
-            lurek.render.drawCircle(200 + shake_x, 320 + shake_y, 40, me.outline[1], me.outline[2], me.outline[3])
-            lurek.render.drawCircle(200 + shake_x, 320 + shake_y, 34, me.color[1], me.color[2], me.color[3])
+            lurek.render.circle(200 + shake_x, 320 + shake_y, 40, me.outline[1], me.outline[2], me.outline[3])
+            lurek.render.circle(200 + shake_x, 320 + shake_y, 34, me.color[1], me.color[2], me.color[3])
         end
 
         -- draw enemy creature (right side)
         if enemy then
-            lurek.render.drawCircle(550 + shake_x, 280 + shake_y, 44, enemy.outline[1], enemy.outline[2], enemy.outline[3])
-            lurek.render.drawCircle(550 + shake_x, 280 + shake_y, 38, enemy.color[1], enemy.color[2], enemy.color[3])
+            lurek.render.circle(550 + shake_x, 280 + shake_y, 44, enemy.outline[1], enemy.outline[2], enemy.outline[3])
+            lurek.render.circle(550 + shake_x, 280 + shake_y, 38, enemy.color[1], enemy.color[2], enemy.color[3])
         end
     end
 
@@ -678,7 +678,7 @@ lurek.render(function()
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
         local sz = p.size * alpha
-        lurek.render.drawRect(p.x - sz/2, p.y - sz/2, sz, sz, p.r, p.g, p.b, alpha)
+        lurek.render.rectangle(p.x - sz/2, p.y - sz/2, sz, sz, p.r, p.g, p.b, alpha)
     end
 end)
 
@@ -690,18 +690,18 @@ lurek.render_ui(function()
     -- TITLE screen
     -------------------------------------------------------
     if state == STATE_TITLE then
-        lurek.render.drawRect(0, 0, 800, 600, 0.05, 0.08, 0.05)
+        lurek.render.rectangle(0, 0, 800, 600, 0.05, 0.08, 0.05)
         local pulse = 0.7 + 0.3 * math.sin(title_pulse * 2)
-        lurek.render.drawText("CREATURE COLLECTOR", 140, 180, 36, pulse, pulse, 0.2)
-        lurek.render.drawText("GOTTA CATCH 'EM ALL!", 210, 240, 20, 0.8, 0.8, 0.5)
-        lurek.render.drawText("Press 1 to Start", 290, 350, 18, 0.6, 0.6, 0.6)
-        lurek.render.drawText("WASD — Move  |  1-4 — Actions  |  ESC — Quit", 130, 500, 14, 0.4, 0.4, 0.4)
+        lurek.render.print("CREATURE COLLECTOR", 140, 180, 36, pulse, pulse, 0.2)
+        lurek.render.print("GOTTA CATCH 'EM ALL!", 210, 240, 20, 0.8, 0.8, 0.5)
+        lurek.render.print("Press 1 to Start", 290, 350, 18, 0.6, 0.6, 0.6)
+        lurek.render.print("WASD — Move  |  1-4 — Actions  |  ESC — Quit", 130, 500, 14, 0.4, 0.4, 0.4)
         -- draw sample creatures
         for i = 1, #SPECIES do
             local sp = SPECIES[i]
             local cx = 120 + (i - 1) * 100
-            lurek.render.drawCircle(cx, 430, 18, sp.outline[1], sp.outline[2], sp.outline[3])
-            lurek.render.drawCircle(cx, 430, 14, sp.color[1], sp.color[2], sp.color[3])
+            lurek.render.circle(cx, 430, 18, sp.outline[1], sp.outline[2], sp.outline[3])
+            lurek.render.circle(cx, 430, 14, sp.color[1], sp.color[2], sp.color[3])
         end
 
     -------------------------------------------------------
@@ -709,36 +709,36 @@ lurek.render_ui(function()
     -------------------------------------------------------
     elseif state == STATE_OVERWORLD then
         -- party bar
-        lurek.render.drawRect(0, 0, 800, 32, 0.0, 0.0, 0.0, 0.6)
+        lurek.render.rectangle(0, 0, 800, 32, 0.0, 0.0, 0.0, 0.6)
         local me = party[active_idx]
         if me then
-            lurek.render.drawText(me.name .. " Lv." .. me.level, 10, 6, 16, 1.0, 1.0, 1.0)
+            lurek.render.print(me.name .. " Lv." .. me.level, 10, 6, 16, 1.0, 1.0, 1.0)
             -- HP bar
             local hp_ratio = me.hp / me.max_hp
-            lurek.render.drawRect(200, 8, 150, 14, 0.2, 0.2, 0.2)
+            lurek.render.rectangle(200, 8, 150, 14, 0.2, 0.2, 0.2)
             local bar_r = hp_ratio > 0.5 and 0.2 or (hp_ratio > 0.25 and 1.0 or 1.0)
             local bar_g = hp_ratio > 0.5 and 0.8 or (hp_ratio > 0.25 and 0.7 or 0.2)
             local bar_b = hp_ratio > 0.5 and 0.2 or 0.1
-            lurek.render.drawRect(200, 8, math.floor(150 * hp_ratio), 14, bar_r, bar_g, bar_b)
-            lurek.render.drawText(me.hp .. "/" .. me.max_hp, 360, 6, 14, 1.0, 1.0, 1.0)
+            lurek.render.rectangle(200, 8, math.floor(150 * hp_ratio), 14, bar_r, bar_g, bar_b)
+            lurek.render.print(me.hp .. "/" .. me.max_hp, 360, 6, 14, 1.0, 1.0, 1.0)
         end
-        lurek.render.drawText("Party: " .. #party .. "/" .. MAX_PARTY, 500, 6, 14, 0.8, 0.8, 0.8)
-        lurek.render.drawText("Caught: " .. total_caught .. "/6", 650, 6, 14, 0.8, 0.8, 0.8)
+        lurek.render.print("Party: " .. #party .. "/" .. MAX_PARTY, 500, 6, 14, 0.8, 0.8, 0.8)
+        lurek.render.print("Caught: " .. total_caught .. "/6", 650, 6, 14, 0.8, 0.8, 0.8)
 
         -- minimap
         local mm_x, mm_y = 660, 460
         local mm_s = 5
-        lurek.render.drawRect(mm_x - 2, mm_y - 2, COLS * mm_s + 4, ROWS * mm_s + 4, 0.0, 0.0, 0.0, 0.5)
+        lurek.render.rectangle(mm_x - 2, mm_y - 2, COLS * mm_s + 4, ROWS * mm_s + 4, 0.0, 0.0, 0.0, 0.5)
         for r = 1, ROWS do
             for c = 1, COLS do
                 local col = TILE_COLORS[map[r][c]]
                 if col then
-                    lurek.render.drawRect(mm_x + (c-1)*mm_s, mm_y + (r-1)*mm_s, mm_s, mm_s, col[1], col[2], col[3], 0.7)
+                    lurek.render.rectangle(mm_x + (c-1)*mm_s, mm_y + (r-1)*mm_s, mm_s, mm_s, col[1], col[2], col[3], 0.7)
                 end
             end
         end
         -- player dot on minimap
-        lurek.render.drawRect(mm_x + (player.col-1)*mm_s, mm_y + (player.row-1)*mm_s, mm_s, mm_s, 1.0, 1.0, 0.0)
+        lurek.render.rectangle(mm_x + (player.col-1)*mm_s, mm_y + (player.row-1)*mm_s, mm_s, mm_s, 1.0, 1.0, 0.0)
 
     -------------------------------------------------------
     -- BATTLE HUD
@@ -748,85 +748,85 @@ lurek.render_ui(function()
 
         -- player creature info (top-left)
         if me then
-            lurek.render.drawRect(10, 10, 220, 60, 0.0, 0.0, 0.0, 0.7)
-            lurek.render.drawText(me.name .. " Lv." .. me.level, 18, 14, 16, 1.0, 1.0, 1.0)
-            lurek.render.drawText("HP:", 18, 36, 14, 0.8, 0.8, 0.8)
+            lurek.render.rectangle(10, 10, 220, 60, 0.0, 0.0, 0.0, 0.7)
+            lurek.render.print(me.name .. " Lv." .. me.level, 18, 14, 16, 1.0, 1.0, 1.0)
+            lurek.render.print("HP:", 18, 36, 14, 0.8, 0.8, 0.8)
             local hp_ratio = me.hp / me.max_hp
-            lurek.render.drawRect(50, 38, 150, 12, 0.2, 0.2, 0.2)
+            lurek.render.rectangle(50, 38, 150, 12, 0.2, 0.2, 0.2)
             local bar_r = hp_ratio > 0.5 and 0.2 or (hp_ratio > 0.25 and 1.0 or 1.0)
             local bar_g = hp_ratio > 0.5 and 0.8 or (hp_ratio > 0.25 and 0.7 or 0.2)
-            lurek.render.drawRect(50, 38, math.floor(150 * hp_ratio), 12, bar_r, bar_g, 0.1)
-            lurek.render.drawText(me.hp .. "/" .. me.max_hp, 206, 36, 12, 1.0, 1.0, 1.0)
-            lurek.render.drawText("XP: " .. me.xp .. "/" .. me.xp_next, 18, 54, 11, 0.6, 0.8, 0.6)
+            lurek.render.rectangle(50, 38, math.floor(150 * hp_ratio), 12, bar_r, bar_g, 0.1)
+            lurek.render.print(me.hp .. "/" .. me.max_hp, 206, 36, 12, 1.0, 1.0, 1.0)
+            lurek.render.print("XP: " .. me.xp .. "/" .. me.xp_next, 18, 54, 11, 0.6, 0.8, 0.6)
         end
 
         -- enemy creature info (top-right)
         if enemy then
-            lurek.render.drawRect(530, 10, 260, 50, 0.0, 0.0, 0.0, 0.7)
-            lurek.render.drawText(enemy.name .. " Lv." .. enemy.level .. " [" .. enemy.type .. "]", 538, 14, 16, 1.0, 0.8, 0.8)
+            lurek.render.rectangle(530, 10, 260, 50, 0.0, 0.0, 0.0, 0.7)
+            lurek.render.print(enemy.name .. " Lv." .. enemy.level .. " [" .. enemy.type .. "]", 538, 14, 16, 1.0, 0.8, 0.8)
             local ehp = enemy.hp / enemy.max_hp
-            lurek.render.drawRect(538, 38, 200, 12, 0.2, 0.2, 0.2)
-            lurek.render.drawRect(538, 38, math.floor(200 * ehp), 12, 0.8, 0.2, 0.2)
-            lurek.render.drawText(enemy.hp .. "/" .. enemy.max_hp, 744, 36, 12, 1.0, 1.0, 1.0)
+            lurek.render.rectangle(538, 38, 200, 12, 0.2, 0.2, 0.2)
+            lurek.render.rectangle(538, 38, math.floor(200 * ehp), 12, 0.8, 0.2, 0.2)
+            lurek.render.print(enemy.hp .. "/" .. enemy.max_hp, 744, 36, 12, 1.0, 1.0, 1.0)
         end
 
         -- battle log (bottom)
-        lurek.render.drawRect(0, 440, 800, 160, 0.0, 0.0, 0.0, 0.8)
+        lurek.render.rectangle(0, 440, 800, 160, 0.0, 0.0, 0.0, 0.8)
         for i, msg in ipairs(battle_log) do
-            lurek.render.drawText(msg, 16, 446 + (i - 1) * 18, 14, 0.9, 0.9, 0.8)
+            lurek.render.print(msg, 16, 446 + (i - 1) * 18, 14, 0.9, 0.9, 0.8)
         end
 
         -- menu panel
         if battle_phase == "menu" then
-            lurek.render.drawRect(500, 440, 290, 155, 0.1, 0.1, 0.1, 0.9)
-            lurek.render.drawText("1) Fight", 520, 455, 16, 1.0, 1.0, 0.6)
-            lurek.render.drawText("2) Catch", 520, 480, 16, 1.0, 0.8, 0.4)
-            lurek.render.drawText("3) Switch", 520, 505, 16, 0.6, 0.8, 1.0)
-            lurek.render.drawText("4) Run", 520, 530, 16, 0.7, 0.7, 0.7)
+            lurek.render.rectangle(500, 440, 290, 155, 0.1, 0.1, 0.1, 0.9)
+            lurek.render.print("1) Fight", 520, 455, 16, 1.0, 1.0, 0.6)
+            lurek.render.print("2) Catch", 520, 480, 16, 1.0, 0.8, 0.4)
+            lurek.render.print("3) Switch", 520, 505, 16, 0.6, 0.8, 1.0)
+            lurek.render.print("4) Run", 520, 530, 16, 0.7, 0.7, 0.7)
         elseif battle_phase == "fight_select" and me then
-            lurek.render.drawRect(500, 440, 290, 155, 0.1, 0.1, 0.1, 0.9)
-            lurek.render.drawText("Choose move:", 520, 455, 16, 1.0, 1.0, 1.0)
+            lurek.render.rectangle(500, 440, 290, 155, 0.1, 0.1, 0.1, 0.9)
+            lurek.render.print("Choose move:", 520, 455, 16, 1.0, 1.0, 1.0)
             for i, mv in ipairs(me.moves) do
-                lurek.render.drawText(i .. ") " .. mv.name .. " (pow:" .. mv.power .. ")", 520, 475 + (i-1)*25, 15, 0.9, 0.9, 0.6)
+                lurek.render.print(i .. ") " .. mv.name .. " (pow:" .. mv.power .. ")", 520, 475 + (i-1)*25, 15, 0.9, 0.9, 0.6)
             end
         elseif battle_phase == "switch" then
-            lurek.render.drawRect(500, 440, 290, 155, 0.1, 0.1, 0.1, 0.9)
-            lurek.render.drawText("Switch to:", 520, 455, 16, 1.0, 1.0, 1.0)
+            lurek.render.rectangle(500, 440, 290, 155, 0.1, 0.1, 0.1, 0.9)
+            lurek.render.print("Switch to:", 520, 455, 16, 1.0, 1.0, 1.0)
             for i, c in ipairs(party) do
                 local alive = c.hp > 0 and "" or " [FAINTED]"
                 local act = i == active_idx and " *" or ""
-                lurek.render.drawText(i .. ") " .. c.name .. " HP:" .. c.hp .. "/" .. c.max_hp .. alive .. act, 520, 475 + (i-1)*22, 13, 0.8, 0.9, 0.8)
+                lurek.render.print(i .. ") " .. c.name .. " HP:" .. c.hp .. "/" .. c.max_hp .. alive .. act, 520, 475 + (i-1)*22, 13, 0.8, 0.9, 0.8)
             end
         end
 
         -- damage popup
         if popup_timer > 0 then
             local alpha = math.min(1.0, popup_timer / 0.4)
-            lurek.render.drawText(popup_text, popup_x, popup_y, 22, 1.0, 0.2, 0.2, alpha)
+            lurek.render.print(popup_text, popup_x, popup_y, 22, 1.0, 0.2, 0.2, alpha)
         end
 
     -------------------------------------------------------
     -- WIN screen
     -------------------------------------------------------
     elseif state == STATE_WIN then
-        lurek.render.drawRect(0, 0, 800, 600, 0.0, 0.05, 0.0, 0.9)
-        lurek.render.drawText("YOU CAUGHT THEM ALL!", 180, 200, 32, 1.0, 0.9, 0.2)
-        lurek.render.drawText("All 6 species collected!", 240, 260, 20, 0.8, 0.8, 0.6)
-        lurek.render.drawText("Battles: " .. total_battles, 320, 320, 16, 0.7, 0.7, 0.7)
-        lurek.render.drawText("Party:", 320, 360, 16, 0.7, 0.7, 0.7)
+        lurek.render.rectangle(0, 0, 800, 600, 0.0, 0.05, 0.0, 0.9)
+        lurek.render.print("YOU CAUGHT THEM ALL!", 180, 200, 32, 1.0, 0.9, 0.2)
+        lurek.render.print("All 6 species collected!", 240, 260, 20, 0.8, 0.8, 0.6)
+        lurek.render.print("Battles: " .. total_battles, 320, 320, 16, 0.7, 0.7, 0.7)
+        lurek.render.print("Party:", 320, 360, 16, 0.7, 0.7, 0.7)
         for i, c in ipairs(party) do
-            lurek.render.drawText(c.name .. " Lv." .. c.level, 340, 380 + (i-1)*20, 14, 0.6, 0.9, 0.6)
+            lurek.render.print(c.name .. " Lv." .. c.level, 340, 380 + (i-1)*20, 14, 0.6, 0.9, 0.6)
         end
-        lurek.render.drawText("Press ESC to quit", 300, 500, 16, 0.5, 0.5, 0.5)
+        lurek.render.print("Press ESC to quit", 300, 500, 16, 0.5, 0.5, 0.5)
 
     -------------------------------------------------------
     -- GAME OVER screen
     -------------------------------------------------------
     elseif state == STATE_GAME_OVER then
-        lurek.render.drawRect(0, 0, 800, 600, 0.08, 0.0, 0.0, 0.9)
-        lurek.render.drawText("GAME OVER", 280, 220, 36, 1.0, 0.2, 0.2)
-        lurek.render.drawText("All your creatures fainted...", 230, 280, 18, 0.7, 0.4, 0.4)
-        lurek.render.drawText("Caught: " .. total_caught .. "/6  |  Battles: " .. total_battles, 220, 340, 16, 0.6, 0.6, 0.6)
-        lurek.render.drawText("Press ESC to quit", 300, 500, 16, 0.5, 0.5, 0.5)
+        lurek.render.rectangle(0, 0, 800, 600, 0.08, 0.0, 0.0, 0.9)
+        lurek.render.print("GAME OVER", 280, 220, 36, 1.0, 0.2, 0.2)
+        lurek.render.print("All your creatures fainted...", 230, 280, 18, 0.7, 0.4, 0.4)
+        lurek.render.print("Caught: " .. total_caught .. "/6  |  Battles: " .. total_battles, 220, 340, 16, 0.6, 0.6, 0.6)
+        lurek.render.print("Press ESC to quit", 300, 500, 16, 0.5, 0.5, 0.5)
     end
 end)

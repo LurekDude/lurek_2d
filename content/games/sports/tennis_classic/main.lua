@@ -621,25 +621,25 @@ end)
 -- ── Render (world-space: court, players, ball) ────────────────────
 lurek.render(function()
     -- Court background (green)
-    lurek.render.drawRectFill(COURT_L, COURT_T, COURT_W, COURT_H, 0.18, 0.55, 0.18, 1.0)
+    lurek.render.rectangle(COURT_L, COURT_T, COURT_W, COURT_H, 0.18, 0.55, 0.18, 1.0)
 
     -- Court lines (white)
     local lw = 2
     -- Outer boundary
-    lurek.render.drawRect(COURT_L, COURT_T, COURT_W, COURT_H, 1, 1, 1, 1)
+    lurek.render.rectangle(COURT_L, COURT_T, COURT_W, COURT_H, 1, 1, 1, 1)
     -- Center service line (vertical)
-    lurek.render.drawLine(CENTER_X, SERVICE_LINE_T, CENTER_X, SERVICE_LINE_B, 1, 1, 1, 1)
+    lurek.render.line(CENTER_X, SERVICE_LINE_T, CENTER_X, SERVICE_LINE_B, 1, 1, 1, 1)
     -- Service lines (horizontal)
-    lurek.render.drawLine(COURT_L, SERVICE_LINE_T, COURT_R, SERVICE_LINE_T, 1, 1, 1, 1)
-    lurek.render.drawLine(COURT_L, SERVICE_LINE_B, COURT_R, SERVICE_LINE_B, 1, 1, 1, 1)
+    lurek.render.line(COURT_L, SERVICE_LINE_T, COURT_R, SERVICE_LINE_T, 1, 1, 1, 1)
+    lurek.render.line(COURT_L, SERVICE_LINE_B, COURT_R, SERVICE_LINE_B, 1, 1, 1, 1)
     -- Net
-    lurek.render.drawLine(COURT_L - 10, NET_Y, COURT_R + 10, NET_Y, 1, 1, 1, 0.8)
+    lurek.render.line(COURT_L - 10, NET_Y, COURT_R + 10, NET_Y, 1, 1, 1, 0.8)
     -- Net posts
-    lurek.render.drawRectFill(COURT_L - 12, NET_Y - 3, 6, 6, 0.6, 0.6, 0.6, 1)
-    lurek.render.drawRectFill(COURT_R + 6, NET_Y - 3, 6, 6, 0.6, 0.6, 0.6, 1)
+    lurek.render.rectangle(COURT_L - 12, NET_Y - 3, 6, 6, 0.6, 0.6, 0.6, 1)
+    lurek.render.rectangle(COURT_R + 6, NET_Y - 3, 6, 6, 0.6, 0.6, 0.6, 1)
     -- Center marks
-    lurek.render.drawLine(CENTER_X, COURT_B - 15, CENTER_X, COURT_B, 1, 1, 1, 1)
-    lurek.render.drawLine(CENTER_X, COURT_T, CENTER_X, COURT_T + 15, 1, 1, 1, 1)
+    lurek.render.line(CENTER_X, COURT_B - 15, CENTER_X, COURT_B, 1, 1, 1, 1)
+    lurek.render.line(CENTER_X, COURT_T, CENTER_X, COURT_T + 15, 1, 1, 1, 1)
 
     if state == ST.TITLE then
         return
@@ -648,17 +648,17 @@ lurek.render(function()
     -- Ball trail
     for _, t in ipairs(ball_trail) do
         local a = t.t / 0.3
-        lurek.render.drawCircleFill(t.x, t.y, BALL_R * 0.6, 1, 1, 0.7, a * 0.3)
+        lurek.render.circleFill(t.x, t.y, BALL_R * 0.6, 1, 1, 0.7, a * 0.3)
     end
 
     -- Player (blue)
-    lurek.render.drawRectFill(
+    lurek.render.rectangle(
         player.x - PLAYER_W / 2, player.y - PLAYER_H / 2,
         PLAYER_W, PLAYER_H, 0.2, 0.4, 1.0, 1.0
     )
 
     -- Opponent (red)
-    lurek.render.drawRectFill(
+    lurek.render.rectangle(
         opponent.x - PLAYER_W / 2, opponent.y - PLAYER_H / 2,
         PLAYER_W, PLAYER_H, 1.0, 0.3, 0.3, 1.0
     )
@@ -667,15 +667,15 @@ lurek.render(function()
     if ball.active or state == ST.SERVING then
         local br = BALL_R
         -- Shadow
-        lurek.render.drawCircleFill(ball.x + 2, ball.y + 2, br, 0, 0, 0, 0.3)
+        lurek.render.circleFill(ball.x + 2, ball.y + 2, br, 0, 0, 0, 0.3)
         -- Ball
-        lurek.render.drawCircleFill(ball.x, ball.y, br, 1.0, 1.0, 1.0, 1.0)
+        lurek.render.circleFill(ball.x, ball.y, br, 1.0, 1.0, 1.0, 1.0)
     end
 
     -- Charge indicator
     if charging then
         local bar_w = 30 * charge_power
-        lurek.render.drawRectFill(player.x - 15, player.y + PLAYER_H / 2 + 4, bar_w, 4,
+        lurek.render.rectangle(player.x - 15, player.y + PLAYER_H / 2 + 4, bar_w, 4,
             1.0, 1.0 - charge_power, 0, 1)
     end
 
@@ -692,15 +692,15 @@ lurek.render_ui(function()
     if state == ST.TITLE then
         -- Title screen
         local blink = math.abs(math.sin(title_timer * 2))
-        lurek.render.drawText("TENNIS CLASSIC", W / 2 - 120, H / 2 - 60, 32, 1, 1, 1, 1)
-        lurek.render.drawText("GAME  SET  MATCH", W / 2 - 100, H / 2 - 20, 18, 0.8, 0.8, 0.8, 1)
-        lurek.render.drawText("Press SPACE to start", W / 2 - 80, H / 2 + 40, 16, 1, 1, 1, blink)
-        lurek.render.drawText("FPS: " .. fps, 10, H - 20, 12, 0.5, 0.5, 0.5, 1)
+        lurek.render.print("TENNIS CLASSIC", W / 2 - 120, H / 2 - 60, 32, 1, 1, 1, 1)
+        lurek.render.print("GAME  SET  MATCH", W / 2 - 100, H / 2 - 20, 18, 0.8, 0.8, 0.8, 1)
+        lurek.render.print("Press SPACE to start", W / 2 - 80, H / 2 + 40, 16, 1, 1, 1, blink)
+        lurek.render.print("FPS: " .. fps, 10, H - 20, 12, 0.5, 0.5, 0.5, 1)
         return
     end
 
     -- Scoreboard background
-    lurek.render.drawRectFill(0, 0, W, 28, 0, 0, 0, 0.6)
+    lurek.render.rectangle(0, 0, W, 28, 0, 0, 0, 0.6)
 
     -- Score display
     local score_str
@@ -728,22 +728,22 @@ lurek.render_ui(function()
 
     local server_str = (server == 1) and " [P serve]" or " [O serve]"
 
-    lurek.render.drawText("Score: " .. score_str .. server_str, 10, 6, 14, 1, 1, 1, 1)
-    lurek.render.drawText(sets_str, W / 2 - 60, 6, 14, 0.9, 0.9, 0.5, 1)
+    lurek.render.print("Score: " .. score_str .. server_str, 10, 6, 14, 1, 1, 1, 1)
+    lurek.render.print(sets_str, W / 2 - 60, 6, 14, 0.9, 0.9, 0.5, 1)
 
     -- Rally counter
     if rally_count > 0 and state == ST.PLAYING then
-        lurek.render.drawText("Rally: " .. rally_count, W - 100, 6, 14, 0.5, 1.0, 0.5, 1)
+        lurek.render.print("Rally: " .. rally_count, W - 100, 6, 14, 0.5, 1.0, 0.5, 1)
     end
 
     -- Point / set / match messages
     if state == ST.POINT or state == ST.SET_END or state == ST.MATCH_END then
-        lurek.render.drawText(point_msg, W / 2 - 80, H / 2, 24, 1, 1, 0.3, 1)
+        lurek.render.print(point_msg, W / 2 - 80, H / 2, 24, 1, 1, 0.3, 1)
     end
 
     -- Score popup (tween-like fade)
     if score_popup.alpha > 0 then
-        lurek.render.drawText(score_popup.text, W / 2 - 60, score_popup.y, 20,
+        lurek.render.print(score_popup.text, W / 2 - 60, score_popup.y, 20,
             1, 1, 0.2, score_popup.alpha)
     end
 
@@ -751,9 +751,9 @@ lurek.render_ui(function()
     if state == ST.SERVING and server == 1 then
         local msg = (serve_phase == 0) and "Press SPACE to toss" or "Press SPACE to hit!"
         if serve_count == 1 then msg = "Second serve — " .. msg end
-        lurek.render.drawText(msg, W / 2 - 90, H - 30, 14, 1, 1, 1, 0.8)
+        lurek.render.print(msg, W / 2 - 90, H - 30, 14, 1, 1, 1, 0.8)
     end
 
     -- FPS
-    lurek.render.drawText("FPS: " .. fps, W - 70, H - 20, 12, 0.5, 0.5, 0.5, 1)
+    lurek.render.print("FPS: " .. fps, W - 70, H - 20, 12, 0.5, 0.5, 0.5, 1)
 end)

@@ -405,23 +405,23 @@ lurek.render(function()
     -- ── TITLE ───────────────────────────────────────────────────────────
     if state == STATE_TITLE then
         local pulse = 0.7 + 0.3 * math.sin(title_pulse)
-        lurek.render.drawText("TYCOON", W / 2 - 120, H / 2 - 80, 52, 1.0, 0.85, 0.2, pulse)
-        lurek.render.drawText("BUILD YOUR EMPIRE", W / 2 - 130, H / 2, 22, 0.7, 0.7, 0.7, pulse * 0.8)
-        lurek.render.drawText("Press SPACE to start", W / 2 - 100, H / 2 + 60, 16, 0.5, 0.5, 0.5, 0.6)
+        lurek.render.print("TYCOON", W / 2 - 120, H / 2 - 80, 52, 1.0, 0.85, 0.2, pulse)
+        lurek.render.print("BUILD YOUR EMPIRE", W / 2 - 130, H / 2, 22, 0.7, 0.7, 0.7, pulse * 0.8)
+        lurek.render.print("Press SPACE to start", W / 2 - 100, H / 2 + 60, 16, 0.5, 0.5, 0.5, 0.6)
         return
     end
 
     -- ── PRESTIGE_CONFIRM ────────────────────────────────────────────────
     if state == STATE_PRESTIGE then
-        lurek.render.drawRect(W / 2 - 200, H / 2 - 80, 400, 160, 0.1, 0.08, 0.15, 0.95)
-        lurek.render.drawText("PRESTIGE?", W / 2 - 70, H / 2 - 60, 28, 1.0, 0.85, 0.2, 1.0)
-        lurek.render.drawText("Reset all for 2x multiplier", W / 2 - 120, H / 2 - 20, 16, 0.8, 0.8, 0.8, 1.0)
-        lurek.render.drawText("Current mult: " .. string.format("%dx", math.floor(prestige_mult() * 2)), W / 2 - 80, H / 2 + 10, 16, 0.5, 1.0, 0.5, 1.0)
-        lurek.render.drawText("SPACE = confirm  |  ESC = cancel", W / 2 - 140, H / 2 + 50, 14, 0.6, 0.6, 0.6, 0.8)
+        lurek.render.rectangle(W / 2 - 200, H / 2 - 80, 400, 160, 0.1, 0.08, 0.15, 0.95)
+        lurek.render.print("PRESTIGE?", W / 2 - 70, H / 2 - 60, 28, 1.0, 0.85, 0.2, 1.0)
+        lurek.render.print("Reset all for 2x multiplier", W / 2 - 120, H / 2 - 20, 16, 0.8, 0.8, 0.8, 1.0)
+        lurek.render.print("Current mult: " .. string.format("%dx", math.floor(prestige_mult() * 2)), W / 2 - 80, H / 2 + 10, 16, 0.5, 1.0, 0.5, 1.0)
+        lurek.render.print("SPACE = confirm  |  ESC = cancel", W / 2 - 140, H / 2 + 50, 14, 0.6, 0.6, 0.6, 0.8)
         -- Prestige particles
         for _, p in ipairs(prestige_particles) do
             local a = math.max(0, p.life / 1.8)
-            lurek.render.drawRect(p.x, p.y, p.size, p.size, p.r, p.g, p.b, a)
+            lurek.render.rectangle(p.x, p.y, p.size, p.size, p.r, p.g, p.b, a)
         end
         return
     end
@@ -431,51 +431,51 @@ lurek.render(function()
         local y = biz_y(i) + b.slide_y
         if b.owned then
             -- Background bar
-            lurek.render.drawRect(40, y, 500, 56, 0.14, 0.12, 0.18, 0.9)
+            lurek.render.rectangle(40, y, 500, 56, 0.14, 0.12, 0.18, 0.9)
 
             -- Progress fill
             local fill_w = math.floor(496 * math.min(1, b.progress))
             local pr, pg, pb = 0.2, 0.6, 0.3
             if b.ready then pr, pg, pb = 1.0, 0.85, 0.2 end
-            lurek.render.drawRect(42, y + 2, fill_w, 52, pr, pg, pb, 0.6)
+            lurek.render.rectangle(42, y + 2, fill_w, 52, pr, pg, pb, 0.6)
 
             -- Name and level
             local label = b.name .. " Lv." .. b.level
             if b.upgraded then label = label .. " [2x]" end
-            lurek.render.drawText(label, 50, y + 6, 16, 1.0, 1.0, 1.0, 1.0)
+            lurek.render.print(label, 50, y + 6, 16, 1.0, 1.0, 1.0, 1.0)
 
             -- Revenue info
             local rev_text = fmt(effective_revenue(b)) .. "g / " .. b.cycle .. "s"
-            lurek.render.drawText(rev_text, 50, y + 30, 13, 0.8, 0.8, 0.6, 0.9)
+            lurek.render.print(rev_text, 50, y + 30, 13, 0.8, 0.8, 0.6, 0.9)
 
             -- Manager badge
             if b.has_manager then
-                lurek.render.drawRect(460, y + 6, 70, 18, 0.2, 0.5, 0.8, 0.8)
-                lurek.render.drawText("AUTO", 472, y + 8, 12, 1.0, 1.0, 1.0, 1.0)
+                lurek.render.rectangle(460, y + 6, 70, 18, 0.2, 0.5, 0.8, 0.8)
+                lurek.render.print("AUTO", 472, y + 8, 12, 1.0, 1.0, 1.0, 1.0)
             end
 
             -- Ready indicator
             if b.ready then
-                lurek.render.drawRect(460, y + 32, 70, 18, 1.0, 0.85, 0.2, 0.9)
-                lurek.render.drawText("READY!", 466, y + 34, 12, 0.1, 0.08, 0.05, 1.0)
+                lurek.render.rectangle(460, y + 32, 70, 18, 1.0, 0.85, 0.2, 0.9)
+                lurek.render.print("READY!", 466, y + 34, 12, 0.1, 0.08, 0.05, 1.0)
             end
         else
             -- Locked business
-            lurek.render.drawRect(40, y, 500, 56, 0.1, 0.08, 0.12, 0.5)
-            lurek.render.drawText("[" .. b.key .. "] " .. b.name .. " — " .. fmt(b.cost) .. "g", 50, y + 18, 15, 0.4, 0.4, 0.4, 0.7)
+            lurek.render.rectangle(40, y, 500, 56, 0.1, 0.08, 0.12, 0.5)
+            lurek.render.print("[" .. b.key .. "] " .. b.name .. " — " .. fmt(b.cost) .. "g", 50, y + 18, 15, 0.4, 0.4, 0.4, 0.7)
         end
     end
 
     -- Gold-burst particles
     for _, p in ipairs(particles) do
         local a = math.max(0, p.life)
-        lurek.render.drawRect(p.x, p.y, p.size, p.size, p.r, p.g, p.b, a)
+        lurek.render.rectangle(p.x, p.y, p.size, p.size, p.r, p.g, p.b, a)
     end
 
     -- Upgrade flash particles
     for _, p in ipairs(flash_particles) do
         local a = math.max(0, p.life / 0.7)
-        lurek.render.drawRect(p.x, p.y, p.size, p.size, p.r, p.g, p.b, a)
+        lurek.render.rectangle(p.x, p.y, p.size, p.size, p.r, p.g, p.b, a)
     end
 end)
 
@@ -488,8 +488,8 @@ lurek.render_ui(function()
     if state == STATE_PRESTIGE then return end
 
     -- Gold display (tweened)
-    lurek.render.drawText("Gold: " .. fmt(math.floor(display_gold)), 580, 20, 22, 1.0, 0.85, 0.2, 1.0)
-    lurek.render.drawText(fmt(gold_per_second) .. " g/s", 580, 50, 14, 0.7, 0.7, 0.5, 0.9)
+    lurek.render.print("Gold: " .. fmt(math.floor(display_gold)), 580, 20, 22, 1.0, 0.85, 0.2, 1.0)
+    lurek.render.print(fmt(gold_per_second) .. " g/s", 580, 50, 14, 0.7, 0.7, 0.5, 0.9)
 
     -- Stats panel
     local owned_count = 0
@@ -498,31 +498,31 @@ lurek.render_ui(function()
         if b.owned then owned_count = owned_count + 1 end
         if b.has_manager then manager_count = manager_count + 1 end
     end
-    lurek.render.drawText("Businesses: " .. owned_count .. "/6", 580, 90, 13, 0.6, 0.6, 0.6, 0.8)
-    lurek.render.drawText("Managers:   " .. manager_count, 580, 110, 13, 0.6, 0.6, 0.6, 0.8)
-    lurek.render.drawText("Total:      " .. fmt(total_gold), 580, 130, 13, 0.6, 0.6, 0.6, 0.8)
+    lurek.render.print("Businesses: " .. owned_count .. "/6", 580, 90, 13, 0.6, 0.6, 0.6, 0.8)
+    lurek.render.print("Managers:   " .. manager_count, 580, 110, 13, 0.6, 0.6, 0.6, 0.8)
+    lurek.render.print("Total:      " .. fmt(total_gold), 580, 130, 13, 0.6, 0.6, 0.6, 0.8)
     if prestige_level > 0 then
-        lurek.render.drawText("Prestige:   " .. prestige_level .. "x (" .. math.floor(prestige_mult()) .. "x)", 580, 150, 13, 0.5, 1.0, 0.5, 0.8)
+        lurek.render.print("Prestige:   " .. prestige_level .. "x (" .. math.floor(prestige_mult()) .. "x)", 580, 150, 13, 0.5, 1.0, 0.5, 0.8)
     end
 
     -- Mode indicator
     if mode_manager then
-        lurek.render.drawRect(575, 180, 200, 24, 0.2, 0.5, 0.8, 0.8)
-        lurek.render.drawText("MODE: HIRE MANAGER (click biz)", 580, 183, 11, 1.0, 1.0, 1.0, 1.0)
+        lurek.render.rectangle(575, 180, 200, 24, 0.2, 0.5, 0.8, 0.8)
+        lurek.render.print("MODE: HIRE MANAGER (click biz)", 580, 183, 11, 1.0, 1.0, 1.0, 1.0)
     elseif mode_upgrade then
-        lurek.render.drawRect(575, 180, 200, 24, 0.2, 0.8, 0.3, 0.8)
-        lurek.render.drawText("MODE: UPGRADE (click biz)", 580, 183, 11, 1.0, 1.0, 1.0, 1.0)
+        lurek.render.rectangle(575, 180, 200, 24, 0.2, 0.8, 0.3, 0.8)
+        lurek.render.print("MODE: UPGRADE (click biz)", 580, 183, 11, 1.0, 1.0, 1.0, 1.0)
     end
 
     -- Prestige hint
     if gold >= 100000 then
-        lurek.render.drawText("[P] PRESTIGE AVAILABLE!", 580, 220, 14, 1.0, 0.5, 0.2, 0.8 + 0.2 * math.sin(lurek.timer.getTime() * 4))
+        lurek.render.print("[P] PRESTIGE AVAILABLE!", 580, 220, 14, 1.0, 0.5, 0.2, 0.8 + 0.2 * math.sin(lurek.timer.getTime() * 4))
     end
 
     -- Controls reminder
-    lurek.render.drawText("1-6: Buy  |  SPACE: Collect", 40, H - 40, 12, 0.4, 0.4, 0.4, 0.6)
-    lurek.render.drawText("M+Click: Manager  |  U+Click: Upgrade", 40, H - 24, 12, 0.4, 0.4, 0.4, 0.6)
+    lurek.render.print("1-6: Buy  |  SPACE: Collect", 40, H - 40, 12, 0.4, 0.4, 0.4, 0.6)
+    lurek.render.print("M+Click: Manager  |  U+Click: Upgrade", 40, H - 24, 12, 0.4, 0.4, 0.4, 0.6)
 
     -- FPS
-    lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), W - 80, H - 20, 11, 0.3, 0.3, 0.3, 0.5)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), W - 80, H - 20, 11, 0.3, 0.3, 0.3, 0.5)
 end)

@@ -595,15 +595,15 @@ lurek.render(function()
             local t = grid[r][c]
             local clr = TILE_COLORS[t] or TILE_COLORS[TILE_EMPTY]
             local x, y = tileToScreen(r, c)
-            lurek.render.drawRect(x, y, TILE_SIZE - 1, TILE_SIZE - 1, clr[1], clr[2], clr[3], 1.0)
+            lurek.render.rectangle(x, y, TILE_SIZE - 1, TILE_SIZE - 1, clr[1], clr[2], clr[3], 1.0)
 
             -- Tile icons
             if t == TILE_FOOD then
-                lurek.render.drawText("F", x + 14, y + 10, 16, 1, 1, 1, 1)
+                lurek.render.print("F", x + 14, y + 10, 16, 1, 1, 1, 1)
             elseif t == TILE_SHOP then
-                lurek.render.drawText("$", x + 14, y + 10, 16, 1, 1, 0.8, 1)
+                lurek.render.print("$", x + 14, y + 10, 16, 1, 1, 0.8, 1)
             elseif t == TILE_BENCH then
-                lurek.render.drawText("=", x + 12, y + 12, 14, 0.9, 0.8, 0.6, 1)
+                lurek.render.print("=", x + 12, y + 12, 14, 0.9, 0.8, 0.6, 1)
             end
         end
     end
@@ -614,29 +614,29 @@ lurek.render(function()
         local offy = a.hopY or 0
         local clr = a.def.color
         -- Body
-        lurek.render.drawRect(ax + 6, ay + 6 + offy, TILE_SIZE - 12, TILE_SIZE - 12,
+        lurek.render.rectangle(ax + 6, ay + 6 + offy, TILE_SIZE - 12, TILE_SIZE - 12,
             clr[1], clr[2], clr[3], 1.0)
         -- Label
-        lurek.render.drawText(a.def.emoji, ax + 13, ay + 10 + offy, 18, 1, 1, 1, 1)
+        lurek.render.print(a.def.emoji, ax + 13, ay + 10 + offy, 18, 1, 1, 1, 1)
         -- Hunger indicator
         local hr, hg, hb = 0.2, 0.85, 0.2
         if a.hunger > 30 and a.hunger <= 60 then hr, hg, hb = 0.9, 0.85, 0.1
         elseif a.hunger > 60 then hr, hg, hb = 0.9, 0.2, 0.15 end
         local barW = math.max(0, (1 - a.hunger / 100) * (TILE_SIZE - 12))
-        lurek.render.drawRect(ax + 6, ay + TILE_SIZE - 6 + offy, barW, 3, hr, hg, hb, 0.9)
+        lurek.render.rectangle(ax + 6, ay + TILE_SIZE - 6 + offy, barW, 3, hr, hg, hb, 0.9)
     end
 
     -- Draw visitors
     for _, v in ipairs(visitors) do
         local alpha = math.min(v.timer / 2.0, 1.0)
-        lurek.render.drawRect(v.x - 3, v.y - 6, 6, 12, 0.9, 0.85, 0.7, alpha)
-        lurek.render.drawRect(v.x - 3, v.y - 9, 6, 4, 0.95, 0.8, 0.6, alpha)
+        lurek.render.rectangle(v.x - 3, v.y - 6, 6, 12, 0.9, 0.85, 0.7, alpha)
+        lurek.render.rectangle(v.x - 3, v.y - 9, 6, 4, 0.95, 0.8, 0.6, alpha)
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
         local alpha = math.max(0, p.life / p.maxLife)
-        lurek.render.drawRect(p.x - p.size * 0.5, p.y - p.size * 0.5,
+        lurek.render.rectangle(p.x - p.size * 0.5, p.y - p.size * 0.5,
             p.size, p.size, p.r, p.g, p.b, alpha)
     end
 
@@ -649,41 +649,41 @@ end)
 lurek.render_ui(function()
     if state == STATE_TITLE then
         -- Title screen
-        lurek.render.drawRect(0, 0, 800, 600, 0.05, 0.1, 0.05, 1)
-        lurek.render.drawText("ZOO TYCOON", 240, 160, 48, 0.4, 0.9, 0.3, 1)
-        lurek.render.drawText("BUILD THE PERFECT ZOO", 250, 230, 22, 0.7, 0.85, 0.6, 1)
+        lurek.render.rectangle(0, 0, 800, 600, 0.05, 0.1, 0.05, 1)
+        lurek.render.print("ZOO TYCOON", 240, 160, 48, 0.4, 0.9, 0.3, 1)
+        lurek.render.print("BUILD THE PERFECT ZOO", 250, 230, 22, 0.7, 0.85, 0.6, 1)
         -- Animal icons row
         local names = {"Lion", "Penguin", "Monkey", "Bear", "Elephant"}
         for i, name in ipairs(names) do
             local clr = ANIMAL_DEFS[i].color
-            lurek.render.drawRect(200 + (i - 1) * 90, 290, 60, 40, clr[1], clr[2], clr[3], 0.8)
-            lurek.render.drawText(ANIMAL_DEFS[i].emoji, 222 + (i - 1) * 90, 298, 22, 1, 1, 1, 1)
+            lurek.render.rectangle(200 + (i - 1) * 90, 290, 60, 40, clr[1], clr[2], clr[3], 0.8)
+            lurek.render.print(ANIMAL_DEFS[i].emoji, 222 + (i - 1) * 90, 298, 22, 1, 1, 1, 1)
         end
         local blinkAlpha = 0.5 + 0.5 * math.abs(math.sin(titleBlink * 2.5))
-        lurek.render.drawText("Click to Start", 310, 380, 20, 0.8, 0.9, 0.7, blinkAlpha)
-        lurek.render.drawText("FPS: " .. fps, 10, 580, 14, 0.5, 0.5, 0.5, 0.6)
+        lurek.render.print("Click to Start", 310, 380, 20, 0.8, 0.9, 0.7, blinkAlpha)
+        lurek.render.print("FPS: " .. fps, 10, 580, 14, 0.5, 0.5, 0.5, 0.6)
         return
     end
 
     if state == STATE_VICTORY then
-        lurek.render.drawRect(100, 100, 600, 400, 0.05, 0.15, 0.05, 0.95)
-        lurek.render.drawRect(102, 102, 596, 396, 0.1, 0.25, 0.1, 1)
-        lurek.render.drawText("5-STAR ZOO!", 260, 160, 42, 1.0, 0.85, 0.2, 1)
-        lurek.render.drawText("Congratulations! Your zoo is world-class!", 190, 230, 18, 0.8, 0.9, 0.7, 1)
-        lurek.render.drawText("Animals: " .. #animals, 300, 280, 18, 0.7, 0.9, 0.6, 1)
-        lurek.render.drawText("Species: " .. countUniqueSpecies(), 300, 305, 18, 0.7, 0.9, 0.6, 1)
-        lurek.render.drawText("Gold Earned: " .. math.floor(totalEarned), 300, 330, 18, 1, 0.85, 0.3, 1)
+        lurek.render.rectangle(100, 100, 600, 400, 0.05, 0.15, 0.05, 0.95)
+        lurek.render.rectangle(102, 102, 596, 396, 0.1, 0.25, 0.1, 1)
+        lurek.render.print("5-STAR ZOO!", 260, 160, 42, 1.0, 0.85, 0.2, 1)
+        lurek.render.print("Congratulations! Your zoo is world-class!", 190, 230, 18, 0.8, 0.9, 0.7, 1)
+        lurek.render.print("Animals: " .. #animals, 300, 280, 18, 0.7, 0.9, 0.6, 1)
+        lurek.render.print("Species: " .. countUniqueSpecies(), 300, 305, 18, 0.7, 0.9, 0.6, 1)
+        lurek.render.print("Gold Earned: " .. math.floor(totalEarned), 300, 330, 18, 1, 0.85, 0.3, 1)
         -- Draw 5 gold stars
         for i = 1, 5 do
-            lurek.render.drawText("*", 290 + (i - 1) * 40, 370, 36, 1.0, 0.85, 0.15, 1)
+            lurek.render.print("*", 290 + (i - 1) * 40, 370, 36, 1.0, 0.85, 0.15, 1)
         end
-        lurek.render.drawText("Press ESC to exit", 310, 430, 16, 0.6, 0.7, 0.5, 0.8)
+        lurek.render.print("Press ESC to exit", 310, 430, 16, 0.6, 0.7, 0.5, 0.8)
         return
     end
 
     -- HUD bar
-    lurek.render.drawRect(0, 0, 800, 38, 0.08, 0.08, 0.06, 0.95)
-    lurek.render.drawText("Gold: " .. math.floor(displayGold), 10, 10, 18, 1.0, 0.85, 0.2, 1)
+    lurek.render.rectangle(0, 0, 800, 38, 0.08, 0.08, 0.06, 0.95)
+    lurek.render.print("Gold: " .. math.floor(displayGold), 10, 10, 18, 1.0, 0.85, 0.2, 1)
 
     -- Rating stars
     local starStr = ""
@@ -694,12 +694,12 @@ lurek.render_ui(function()
             starStr = starStr .. "."
         end
     end
-    lurek.render.drawText("Rating: " .. starStr .. " (" .. string.format("%.1f", displayRating) .. ")",
+    lurek.render.print("Rating: " .. starStr .. " (" .. string.format("%.1f", displayRating) .. ")",
         200, 10, 16, 0.9, 0.85, 0.4, 1)
 
-    lurek.render.drawText("Visitors: " .. visitorCount, 450, 10, 16, 0.7, 0.9, 0.7, 1)
-    lurek.render.drawText("Animals: " .. #animals, 600, 10, 16, 0.7, 0.85, 0.6, 1)
-    lurek.render.drawText("FPS: " .. fps, 740, 10, 14, 0.5, 0.5, 0.5, 0.6)
+    lurek.render.print("Visitors: " .. visitorCount, 450, 10, 16, 0.7, 0.9, 0.7, 1)
+    lurek.render.print("Animals: " .. #animals, 600, 10, 16, 0.7, 0.85, 0.6, 1)
+    lurek.render.print("FPS: " .. fps, 740, 10, 14, 0.5, 0.5, 0.5, 0.6)
 
     -- Build mode indicator
     local modeText = "None"
@@ -713,38 +713,38 @@ lurek.render_ui(function()
         local idx = tonumber(buildMode:sub(8))
         if idx then modeText = "Place: " .. ANIMAL_DEFS[idx].name .. " (click enclosure)" end
     end
-    lurek.render.drawText("Mode: " .. modeText, 10, 582, 14, 0.7, 0.8, 0.6, 0.9)
+    lurek.render.print("Mode: " .. modeText, 10, 582, 14, 0.7, 0.8, 0.6, 0.9)
 
     -- Build toolbar
-    lurek.render.drawRect(0, 560, 800, 40, 0.08, 0.08, 0.06, 0.9)
+    lurek.render.rectangle(0, 560, 800, 40, 0.08, 0.08, 0.06, 0.9)
     local tools = {"1:Path(5)", "2:Fence(10)", "3:Water(15)", "4:Food(20)", "5:Shop(50)", "6:Bench(10)", "A:Animals", "D:Delete"}
     for i, label in ipairs(tools) do
         local tx = 10 + (i - 1) * 98
-        lurek.render.drawText(label, tx, 565, 12, 0.6, 0.75, 0.5, 0.9)
+        lurek.render.print(label, tx, 565, 12, 0.6, 0.75, 0.5, 0.9)
     end
 
     -- Animal shop overlay
     if shopOpen then
-        lurek.render.drawRect(150, 120, 500, 350, 0.06, 0.12, 0.06, 0.96)
-        lurek.render.drawRect(152, 122, 496, 346, 0.1, 0.2, 0.1, 1)
-        lurek.render.drawText("ANIMAL SHOP", 310, 135, 24, 0.4, 0.9, 0.3, 1)
-        lurek.render.drawText("Press 1-5 to buy, ESC to close", 260, 165, 14, 0.6, 0.7, 0.5, 0.8)
+        lurek.render.rectangle(150, 120, 500, 350, 0.06, 0.12, 0.06, 0.96)
+        lurek.render.rectangle(152, 122, 496, 346, 0.1, 0.2, 0.1, 1)
+        lurek.render.print("ANIMAL SHOP", 310, 135, 24, 0.4, 0.9, 0.3, 1)
+        lurek.render.print("Press 1-5 to buy, ESC to close", 260, 165, 14, 0.6, 0.7, 0.5, 0.8)
 
         for i, def in ipairs(ANIMAL_DEFS) do
             local y = 195 + (i - 1) * 52
             local clr = def.color
             -- Icon
-            lurek.render.drawRect(175, y, 36, 36, clr[1], clr[2], clr[3], 0.9)
-            lurek.render.drawText(def.emoji, 185, y + 8, 20, 1, 1, 1, 1)
+            lurek.render.rectangle(175, y, 36, 36, clr[1], clr[2], clr[3], 0.9)
+            lurek.render.print(def.emoji, 185, y + 8, 20, 1, 1, 1, 1)
             -- Info
             local canBuy = gold >= def.cost
             local textAlpha = canBuy and 1.0 or 0.4
-            lurek.render.drawText(i .. ". " .. def.name, 225, y + 2, 18, 0.9, 0.9, 0.8, textAlpha)
-            lurek.render.drawText("Cost: " .. def.cost .. "g", 225, y + 22, 13, 1.0, 0.85, 0.2, textAlpha)
+            lurek.render.print(i .. ". " .. def.name, 225, y + 2, 18, 0.9, 0.9, 0.8, textAlpha)
+            lurek.render.print("Cost: " .. def.cost .. "g", 225, y + 22, 13, 1.0, 0.85, 0.2, textAlpha)
             local needStr = def.needW .. "x" .. def.needH .. " fenced"
             if def.needWater then needStr = needStr .. " + water" end
             needStr = needStr .. "  (+" .. def.attraction .. " visitors)"
-            lurek.render.drawText(needStr, 380, y + 12, 12, 0.6, 0.75, 0.5, textAlpha)
+            lurek.render.print(needStr, 380, y + 12, 12, 0.6, 0.75, 0.5, textAlpha)
         end
     end
 end)

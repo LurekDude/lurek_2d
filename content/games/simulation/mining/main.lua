@@ -419,59 +419,59 @@ lurek.render(function()
                 -- Dark / hidden
                 lurek.render.setColor(0.03, 0.02, 0.01, 1)
             end
-            lurek.render.drawRect("fill", x * TILE, y * TILE, TILE - 1, TILE - 1)
+            lurek.render.rectangle("fill", x * TILE, y * TILE, TILE - 1, TILE - 1)
 
             -- Tile detail overlays
             if dist <= lr and t == T_ORE then
                 lurek.render.setColor(0.8, 0.55, 0.2, 0.5)
-                lurek.render.drawRect("fill", x * TILE + 8, y * TILE + 8, 6, 6)
-                lurek.render.drawRect("fill", x * TILE + 18, y * TILE + 20, 5, 5)
+                lurek.render.rectangle("fill", x * TILE + 8, y * TILE + 8, 6, 6)
+                lurek.render.rectangle("fill", x * TILE + 18, y * TILE + 20, 5, 5)
             elseif dist <= lr and t == T_GOLD then
                 lurek.render.setColor(1, 0.9, 0.3, 0.7)
-                lurek.render.drawRect("fill", x * TILE + 6, y * TILE + 10, 8, 6)
-                lurek.render.drawRect("fill", x * TILE + 18, y * TILE + 16, 6, 8)
+                lurek.render.rectangle("fill", x * TILE + 6, y * TILE + 10, 8, 6)
+                lurek.render.rectangle("fill", x * TILE + 18, y * TILE + 16, 6, 8)
             elseif dist <= lr and t == T_GEM then
                 lurek.render.setColor(0.4, 1, 1, 0.8)
-                lurek.render.drawRect("fill", x * TILE + 10, y * TILE + 8, 12, 16)
+                lurek.render.rectangle("fill", x * TILE + 10, y * TILE + 8, 12, 16)
                 lurek.render.setColor(0.7, 1, 1, 0.5)
-                lurek.render.drawRect("fill", x * TILE + 13, y * TILE + 10, 6, 4)
+                lurek.render.rectangle("fill", x * TILE + 13, y * TILE + 10, 6, 4)
             elseif dist <= lr and t == T_LADDER then
                 lurek.render.setColor(0.85, 0.65, 0.30, 1)
-                lurek.render.drawRect("fill", x * TILE + 4, y * TILE, 4, TILE)
-                lurek.render.drawRect("fill", x * TILE + 24, y * TILE, 4, TILE)
-                lurek.render.drawRect("fill", x * TILE + 4, y * TILE + 8, 24, 3)
-                lurek.render.drawRect("fill", x * TILE + 4, y * TILE + 22, 24, 3)
+                lurek.render.rectangle("fill", x * TILE + 4, y * TILE, 4, TILE)
+                lurek.render.rectangle("fill", x * TILE + 24, y * TILE, 4, TILE)
+                lurek.render.rectangle("fill", x * TILE + 4, y * TILE + 8, 24, 3)
+                lurek.render.rectangle("fill", x * TILE + 4, y * TILE + 22, 24, 3)
             end
         end
     end
 
     -- Draw player
     lurek.render.setColor(1, 0.85, 0.3, 1)
-    lurek.render.drawRect("fill", player.cx * TILE + 4, player.cy * TILE + 2, TILE - 8, TILE - 4)
+    lurek.render.rectangle("fill", player.cx * TILE + 4, player.cy * TILE + 2, TILE - 8, TILE - 4)
     -- Hard hat
     lurek.render.setColor(0.9, 0.7, 0.1, 1)
-    lurek.render.drawRect("fill", player.cx * TILE + 6, player.cy * TILE, TILE - 12, 6)
+    lurek.render.rectangle("fill", player.cx * TILE + 6, player.cy * TILE, TILE - 12, 6)
     -- Headlamp glow
     if upgrades.headlamp then
         lurek.render.setColor(1, 1, 0.7, 0.15)
         local glow = lr * TILE
-        lurek.render.drawRect("fill", player.cx * TILE - glow + TILE / 2, player.cy * TILE - glow + TILE / 2, glow * 2, glow * 2)
+        lurek.render.rectangle("fill", player.cx * TILE - glow + TILE / 2, player.cy * TILE - glow + TILE / 2, glow * 2, glow * 2)
     end
 
     -- Dig progress indicator (world-space bar above target tile)
     if dig.active then
         local progress = dig.timer / dig.duration
         lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-        lurek.render.drawRect("fill", dig.tx * TILE, dig.ty * TILE - 6, TILE, 4)
+        lurek.render.rectangle("fill", dig.tx * TILE, dig.ty * TILE - 6, TILE, 4)
         lurek.render.setColor(0.2, 0.9, 0.3, 1)
-        lurek.render.drawRect("fill", dig.tx * TILE, dig.ty * TILE - 6, TILE * progress, 4)
+        lurek.render.rectangle("fill", dig.tx * TILE, dig.ty * TILE - 6, TILE * progress, 4)
     end
 
     -- Particles (world-space)
     for _, p in ipairs(particles) do
         local a = math.min(p.life / 0.3, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 
     lurek.camera.reset()
@@ -481,119 +481,119 @@ end)
 lurek.render_ui(function()
     if state == "TITLE" then
         lurek.render.setColor(0.85, 0.7, 0.2, 1)
-        lurek.render.drawText("MINING", W / 2 - 80, H / 3, 48)
+        lurek.render.print("MINING", W / 2 - 80, H / 3, 48)
         lurek.render.setColor(0.7, 0.55, 0.2, 1)
-        lurek.render.drawText("DIG DEEP, FIND RICHES", W / 2 - 130, H / 3 + 60, 20)
+        lurek.render.print("DIG DEEP, FIND RICHES", W / 2 - 130, H / 3 + 60, 20)
         lurek.render.setColor(0.6, 0.6, 0.5, 0.7 + math.sin(lurek.timer.getTime() * 3) * 0.3)
-        lurek.render.drawText("Press ENTER to start", W / 2 - 100, H / 2 + 60, 16)
+        lurek.render.print("Press ENTER to start", W / 2 - 100, H / 2 + 60, 16)
         lurek.render.setColor(0.4, 0.4, 0.35, 1)
-        lurek.render.drawText("ESC to quit", W / 2 - 45, H / 2 + 90, 14)
+        lurek.render.print("ESC to quit", W / 2 - 45, H / 2 + 90, 14)
         return
     end
 
     if state == "GAME_OVER" then
         lurek.render.setColor(0.9, 0.15, 0.1, 1)
-        lurek.render.drawText("GAME OVER", W / 2 - 90, H / 3, 40)
+        lurek.render.print("GAME OVER", W / 2 - 90, H / 3, 40)
         lurek.render.setColor(0.7, 0.7, 0.7, 1)
-        lurek.render.drawText("You were buried at depth " .. player.cy, W / 2 - 130, H / 3 + 55, 18)
-        lurek.render.drawText("Gold collected: " .. player.gold .. "g", W / 2 - 85, H / 3 + 85, 18)
+        lurek.render.print("You were buried at depth " .. player.cy, W / 2 - 130, H / 3 + 55, 18)
+        lurek.render.print("Gold collected: " .. player.gold .. "g", W / 2 - 85, H / 3 + 85, 18)
         lurek.render.setColor(0.6, 0.6, 0.5, 0.7 + math.sin(lurek.timer.getTime() * 3) * 0.3)
-        lurek.render.drawText("Press ENTER to retry", W / 2 - 100, H / 2 + 60, 16)
+        lurek.render.print("Press ENTER to retry", W / 2 - 100, H / 2 + 60, 16)
         return
     end
 
     if state == "VICTORY" then
         lurek.render.setColor(1, 0.9, 0.2, 1)
-        lurek.render.drawText("VICTORY!", W / 2 - 75, H / 3, 42)
+        lurek.render.print("VICTORY!", W / 2 - 75, H / 3, 42)
         lurek.render.setColor(0.8, 0.8, 0.7, 1)
-        lurek.render.drawText("You struck it rich with " .. player.gold .. "g!", W / 2 - 140, H / 3 + 55, 20)
+        lurek.render.print("You struck it rich with " .. player.gold .. "g!", W / 2 - 140, H / 3 + 55, 20)
         lurek.render.setColor(0.6, 0.6, 0.5, 0.7 + math.sin(lurek.timer.getTime() * 3) * 0.3)
-        lurek.render.drawText("Press ENTER for title", W / 2 - 100, H / 2 + 60, 16)
+        lurek.render.print("Press ENTER for title", W / 2 - 100, H / 2 + 60, 16)
         return
     end
 
     if state == "SHOP" then
         lurek.render.setColor(0.85, 0.7, 0.2, 1)
-        lurek.render.drawText("SURFACE SHOP", W / 2 - 80, 40, 28)
+        lurek.render.print("SURFACE SHOP", W / 2 - 80, 40, 28)
         lurek.render.setColor(0.7, 0.7, 0.6, 1)
-        lurek.render.drawText("Gold: " .. player.gold .. "g", W / 2 - 40, 80, 18)
+        lurek.render.print("Gold: " .. player.gold .. "g", W / 2 - 40, 80, 18)
 
         for i, item in ipairs(shop_items) do
             local y = 130 + (i - 1) * 60
             local owned = upgrades[item.key]
             if i == shop_sel then
                 lurek.render.setColor(0.3, 0.25, 0.1, 0.6)
-                lurek.render.drawRect("fill", W / 2 - 160, y - 5, 320, 50)
+                lurek.render.rectangle("fill", W / 2 - 160, y - 5, 320, 50)
             end
             if owned then
                 lurek.render.setColor(0.4, 0.7, 0.3, 1)
-                lurek.render.drawText(item.name .. " [OWNED]", W / 2 - 140, y, 18)
+                lurek.render.print(item.name .. " [OWNED]", W / 2 - 140, y, 18)
             elseif player.gold >= item.cost then
                 lurek.render.setColor(0.9, 0.85, 0.6, 1)
-                lurek.render.drawText(item.name .. " — " .. item.cost .. "g", W / 2 - 140, y, 18)
+                lurek.render.print(item.name .. " — " .. item.cost .. "g", W / 2 - 140, y, 18)
             else
                 lurek.render.setColor(0.5, 0.4, 0.3, 1)
-                lurek.render.drawText(item.name .. " — " .. item.cost .. "g", W / 2 - 140, y, 18)
+                lurek.render.print(item.name .. " — " .. item.cost .. "g", W / 2 - 140, y, 18)
             end
             lurek.render.setColor(0.6, 0.6, 0.5, 0.8)
-            lurek.render.drawText(item.desc, W / 2 - 140, y + 22, 14)
+            lurek.render.print(item.desc, W / 2 - 140, y + 22, 14)
         end
 
         lurek.render.setColor(0.5, 0.5, 0.4, 1)
-        lurek.render.drawText("UP/DOWN to select, ENTER to buy, ESC to return", W / 2 - 180, H - 60, 14)
+        lurek.render.print("UP/DOWN to select, ENTER to buy, ESC to return", W / 2 - 180, H - 60, 14)
         return
     end
 
     -- MINING HUD
     -- Top bar background
     lurek.render.setColor(0, 0, 0, 0.6)
-    lurek.render.drawRect("fill", 0, 0, W, 36)
+    lurek.render.rectangle("fill", 0, 0, W, 36)
 
     -- Depth
     lurek.render.setColor(0.8, 0.8, 0.7, 1)
-    lurek.render.drawText("Depth: " .. player.cy .. "/" .. ROWS, 10, 8, 16)
+    lurek.render.print("Depth: " .. player.cy .. "/" .. ROWS, 10, 8, 16)
 
     -- Gold
     lurek.render.setColor(1, 0.85, 0.2, 1)
-    lurek.render.drawText("Gold: " .. math.floor(gold_display) .. "g", 180, 8, 16)
+    lurek.render.print("Gold: " .. math.floor(gold_display) .. "g", 180, 8, 16)
 
     -- Items
     lurek.render.setColor(0.7, 0.7, 0.65, 1)
-    lurek.render.drawText("Items: " .. player.items .. "/" .. max_carry(), 340, 8, 16)
+    lurek.render.print("Items: " .. player.items .. "/" .. max_carry(), 340, 8, 16)
 
     -- HP bar
     lurek.render.setColor(0.3, 0.3, 0.3, 0.8)
-    lurek.render.drawRect("fill", 500, 10, 100, 14)
+    lurek.render.rectangle("fill", 500, 10, 100, 14)
     local hp_frac = player.hp / 100
     local hp_r = hp_frac < 0.5 and 1 or (1 - (hp_frac - 0.5) * 2)
     local hp_g = hp_frac > 0.3 and math.min(hp_frac * 1.5, 1) or 0.2
     lurek.render.setColor(hp_r, hp_g, 0.1, 1)
-    lurek.render.drawRect("fill", 500, 10, 100 * hp_frac, 14)
+    lurek.render.rectangle("fill", 500, 10, 100 * hp_frac, 14)
     lurek.render.setColor(1, 1, 1, 0.9)
-    lurek.render.drawText("HP:" .. player.hp, 505, 9, 13)
+    lurek.render.print("HP:" .. player.hp, 505, 9, 13)
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.4, 0.7)
-    lurek.render.drawText("FPS:" .. math.floor(fps), W - 70, 8, 13)
+    lurek.render.print("FPS:" .. math.floor(fps), W - 70, 8, 13)
 
     -- Upgrade indicators
     local uy = 44
     if upgrades.pickaxe then
         lurek.render.setColor(0.6, 0.9, 0.3, 0.8)
-        lurek.render.drawText("[PICK+]", 10, uy, 12)
+        lurek.render.print("[PICK+]", 10, uy, 12)
     end
     if upgrades.headlamp then
         lurek.render.setColor(1, 1, 0.6, 0.8)
-        lurek.render.drawText("[LAMP]", 75, uy, 12)
+        lurek.render.print("[LAMP]", 75, uy, 12)
     end
     if upgrades.cart then
         lurek.render.setColor(0.6, 0.7, 0.9, 0.8)
-        lurek.render.drawText("[CART]", 135, uy, 12)
+        lurek.render.print("[CART]", 135, uy, 12)
     end
 
     -- Surface hint
     if player.cy == 0 then
         lurek.render.setColor(0.7, 0.7, 0.5, 0.6 + math.sin(lurek.timer.getTime() * 2) * 0.3)
-        lurek.render.drawText("Press S to open shop  |  L to place ladder (5g)", W / 2 - 180, H - 30, 14)
+        lurek.render.print("Press S to open shop  |  L to place ladder (5g)", W / 2 - 180, H - 30, 14)
     end
 end)

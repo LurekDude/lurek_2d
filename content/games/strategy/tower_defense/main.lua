@@ -332,14 +332,14 @@ lurek.render(function()
     for r = 1, ROWS do
         for c = 1, COLS do
             local col = is_path(c, r) and {0.22,0.18,0.12,1} or {0.1,0.14,0.1,1}
-            lurek.render.drawRect(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-1, CELL-1, { color = col })
+            lurek.render.rectangle(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-1, CELL-1, { color = col })
         end
     end
 
     -- Hover
     if hover_c >= 1 and hover_c <= COLS and hover_r >= 1 and hover_r <= ROWS
        and not is_path(hover_c, hover_r) and not build_map[hover_r][hover_c] then
-        lurek.render.drawRect(OX + (hover_c-1)*CELL, OY + (hover_r-1)*CELL, CELL-1, CELL-1, { color = {1,1,1,0.18} })
+        lurek.render.rectangle(OX + (hover_c-1)*CELL, OY + (hover_r-1)*CELL, CELL-1, CELL-1, { color = {1,1,1,0.18} })
     end
 
     -- Path direction arrows (simple)
@@ -347,22 +347,22 @@ lurek.render(function()
         local a = PATH_PTS[i]
         local ax = OX + (a.c-1)*CELL + CELL/2 - 3
         local ay = OY + (a.r-1)*CELL + CELL/2 - 3
-        lurek.render.drawRect(ax, ay, 6, 6, { color = {0.4,0.35,0.2,1} })
+        lurek.render.rectangle(ax, ay, 6, 6, { color = {0.4,0.35,0.2,1} })
     end
 
     -- Towers
     for _, t in ipairs(towers) do
         local td  = TOWER_TYPES[t.ttype]
-        lurek.render.drawRect(t.x - CELL/2 + 4, t.y - CELL/2 + 4, CELL - 10, CELL - 10, { color = td.color })
-        lurek.render.drawCircle(t.x, t.y, 5, { color = {1,1,1,0.7}, segments = 6 })
+        lurek.render.rectangle(t.x - CELL/2 + 4, t.y - CELL/2 + 4, CELL - 10, CELL - 10, { color = td.color })
+        lurek.render.circle(t.x, t.y, 5, { color = {1,1,1,0.7}, segments = 6 })
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
         local ex, ey = path_world(e.progress)
-        lurek.render.drawRect(ex - 8, ey - 8, 16, 16, { color = {0.8,0.2,0.2,1} })
+        lurek.render.rectangle(ex - 8, ey - 8, 16, 16, { color = {0.8,0.2,0.2,1} })
         local hw = math.floor(16 * e.hp / e.maxHp)
-        lurek.render.drawRect(ex - 8, ey - 12, hw, 3, { color = {0.2,0.8,0.2,1} })
+        lurek.render.rectangle(ex - 8, ey - 12, hw, 3, { color = {0.2,0.8,0.2,1} })
     end
 
     -- Bullets
@@ -370,7 +370,7 @@ lurek.render(function()
         local t  = 1.0 - b.t / b.tmax
         local bx = b.x + (b.tx - b.x) * t
         local by = b.y + (b.ty - b.y) * t
-        lurek.render.drawRect(bx - 2, by - 2, 5, 5, { color = {1,0.9,0.3,1} })
+        lurek.render.rectangle(bx - 2, by - 2, 5, 5, { color = {1,0.9,0.3,1} })
     end
 
     if hit_sparks  then hit_sparks:draw()  end
@@ -381,27 +381,27 @@ end)
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.render_ui()
     -- Top bar
-    lurek.render.drawRect(0, 0, W, OY - 2, { color = {0.08,0.1,0.08,1} })
-    lurek.render.drawText("Gold: " .. gold, 12, 6, { color = {1,0.85,0.2,1}, size = 14 })
-    lurek.render.drawText("Lives: " .. lives, 130, 6, { color = {0.3,1,0.3,1}, size = 14 })
-    lurek.render.drawText("Wave: " .. wave_num .. "/6", 250, 6, { color = {0.7,0.7,1,1}, size = 14 })
-    lurek.render.drawText("Score: " .. score, 370, 6, { color = {1,1,1,1}, size = 14 })
+    lurek.render.rectangle(0, 0, W, OY - 2, { color = {0.08,0.1,0.08,1} })
+    lurek.render.print("Gold: " .. gold, 12, 6, { color = {1,0.85,0.2,1}, size = 14 })
+    lurek.render.print("Lives: " .. lives, 130, 6, { color = {0.3,1,0.3,1}, size = 14 })
+    lurek.render.print("Wave: " .. wave_num .. "/6", 250, 6, { color = {0.7,0.7,1,1}, size = 14 })
+    lurek.render.print("Score: " .. score, 370, 6, { color = {1,1,1,1}, size = 14 })
 
     -- Selected tower info
     local td = TOWER_TYPES[TYPE_ORDER[sel_type]]
-    lurek.render.drawText("[" .. td.name .. " $" .. td.cost .. "]  Tab=next  Q=prev  Space=start wave", 480, 6, { color = {0.5,0.7,1.0,1}, size = 12 })
+    lurek.render.print("[" .. td.name .. " $" .. td.cost .. "]  Tab=next  Q=prev  Space=start wave", 480, 6, { color = {0.5,0.7,1.0,1}, size = 12 })
 
     if game_state == "build" then
-        lurek.render.drawText("BUILD PHASE — place towers then press SPACE", 220, H - 18, { color = {0.4,0.8,0.4,1}, size = 13 })
+        lurek.render.print("BUILD PHASE — place towers then press SPACE", 220, H - 18, { color = {0.4,0.8,0.4,1}, size = 13 })
     elseif game_state == "combat" then
-        lurek.render.drawText("WAVE " .. wave_num .. " — enemies: " .. #enemies, 300, H - 18, { color = {1,0.5,0.3,1}, size = 13 })
+        lurek.render.print("WAVE " .. wave_num .. " — enemies: " .. #enemies, 300, H - 18, { color = {1,0.5,0.3,1}, size = 13 })
     elseif game_state == "gameover" then
-        lurek.render.drawRect(180, 220, 440, 100, { color = {0,0,0,0.88} })
-        lurek.render.drawText("GAME OVER", 290, 245, { color = {0.9,0.2,0.2,1}, size = 36 })
-        lurek.render.drawText("Score: " .. score, 340, 295, { color = {1,1,1,1}, size = 18 })
+        lurek.render.rectangle(180, 220, 440, 100, { color = {0,0,0,0.88} })
+        lurek.render.print("GAME OVER", 290, 245, { color = {0.9,0.2,0.2,1}, size = 36 })
+        lurek.render.print("Score: " .. score, 340, 295, { color = {1,1,1,1}, size = 18 })
     elseif game_state == "victory" then
-        lurek.render.drawRect(180, 220, 440, 100, { color = {0,0,0,0.88} })
-        lurek.render.drawText("VICTORY!", 300, 245, { color = {1,0.9,0.2,1}, size = 36 })
-        lurek.render.drawText("Score: " .. score, 340, 295, { color = {1,1,1,1}, size = 18 })
+        lurek.render.rectangle(180, 220, 440, 100, { color = {0,0,0,0.88} })
+        lurek.render.print("VICTORY!", 300, 245, { color = {1,0.9,0.2,1}, size = 36 })
+        lurek.render.print("Score: " .. score, 340, 295, { color = {1,1,1,1}, size = 18 })
     end
 end

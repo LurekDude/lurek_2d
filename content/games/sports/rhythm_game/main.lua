@@ -511,25 +511,25 @@ lurek.render(function()
         local lx = LANE_START_X + (i - 1) * (LANE_W + LANE_GAP)
         local c = LANE_COLORS[i]
         -- Lane background (dark)
-        lurek.render.drawRect("fill", lx, 0, LANE_W, H, c[1] * 0.1, c[2] * 0.1, c[3] * 0.1, 0.5)
+        lurek.render.rectangle("fill", lx, 0, LANE_W, H, c[1] * 0.1, c[2] * 0.1, c[3] * 0.1, 0.5)
         -- Lane glow
         if lane_glow[i] > 0.01 then
-            lurek.render.drawRect("fill", lx, 0, LANE_W, H, c[1], c[2], c[3], lane_glow[i] * 0.15)
+            lurek.render.rectangle("fill", lx, 0, LANE_W, H, c[1], c[2], c[3], lane_glow[i] * 0.15)
         end
     end
 
     -- Draw hit zone
     local hz_alpha = 0.6 + hit_zone_pulse * 0.4
-    lurek.render.drawRect("fill", LANE_START_X - 10, HIT_ZONE_Y - HIT_ZONE_H / 2, TOTAL_LANE_W + 20, HIT_ZONE_H, 1, 1, 1, hz_alpha * 0.3)
+    lurek.render.rectangle("fill", LANE_START_X - 10, HIT_ZONE_Y - HIT_ZONE_H / 2, TOTAL_LANE_W + 20, HIT_ZONE_H, 1, 1, 1, hz_alpha * 0.3)
     -- Per-lane hit zone highlights
     for i = 1, LANE_COUNT do
         local lx = LANE_START_X + (i - 1) * (LANE_W + LANE_GAP)
         local c = LANE_COLORS[i]
         if lane_held[i] then
-            lurek.render.drawRect("fill", lx, HIT_ZONE_Y - 20, LANE_W, 40, c[1], c[2], c[3], 0.4)
+            lurek.render.rectangle("fill", lx, HIT_ZONE_Y - 20, LANE_W, 40, c[1], c[2], c[3], 0.4)
         end
         if hit_flash[i] > 0 then
-            lurek.render.drawRect("fill", lx, HIT_ZONE_Y - 30, LANE_W, 60, 1, 1, 1, hit_flash[i])
+            lurek.render.rectangle("fill", lx, HIT_ZONE_Y - 30, LANE_W, 60, 1, 1, 1, hit_flash[i])
         end
     end
 
@@ -541,14 +541,14 @@ lurek.render(function()
             -- Hold tail
             if n.hold_rem and n.hold_rem > 0 then
                 local tail_h = n.hold_rem
-                lurek.render.drawRect("fill", nx + 4, n.y - tail_h, NOTE_W - 8, tail_h, c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 0.6)
+                lurek.render.rectangle("fill", nx + 4, n.y - tail_h, NOTE_W - 8, tail_h, c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 0.6)
             end
             -- Note head
             local bright = 1.0
             if n.held then bright = 1.2 end
-            lurek.render.drawRect("fill", nx, n.y - NOTE_H, NOTE_W, NOTE_H, c[1] * bright, c[2] * bright, c[3] * bright, 0.95)
+            lurek.render.rectangle("fill", nx, n.y - NOTE_H, NOTE_W, NOTE_H, c[1] * bright, c[2] * bright, c[3] * bright, 0.95)
             -- Note border
-            lurek.render.drawRect("line", nx, n.y - NOTE_H, NOTE_W, NOTE_H, 1, 1, 1, 0.3)
+            lurek.render.rectangle("line", nx, n.y - NOTE_H, NOTE_W, NOTE_H, 1, 1, 1, 0.3)
         end
     end
 
@@ -605,14 +605,14 @@ function lurek.render_ui()
     local bar_y = 12
     local life_pct = clamp(display_life / LIFE_MAX, 0, 1)
     -- Background
-    lurek.render.drawRect("fill", bar_x, bar_y, bar_w, bar_h, 0.2, 0.2, 0.2, 0.7)
+    lurek.render.rectangle("fill", bar_x, bar_y, bar_w, bar_h, 0.2, 0.2, 0.2, 0.7)
     -- Fill
     local lr, lg, lb = 0.2, 0.8, 0.3
     if life_pct < 0.3 then lr, lg, lb = 0.9, 0.2, 0.2
     elseif life_pct < 0.6 then lr, lg, lb = 0.9, 0.7, 0.2 end
-    lurek.render.drawRect("fill", bar_x, bar_y, bar_w * life_pct, bar_h, lr, lg, lb, 0.9)
+    lurek.render.rectangle("fill", bar_x, bar_y, bar_w * life_pct, bar_h, lr, lg, lb, 0.9)
     -- Border
-    lurek.render.drawRect("line", bar_x, bar_y, bar_w, bar_h, 1, 1, 1, 0.3)
+    lurek.render.rectangle("line", bar_x, bar_y, bar_w, bar_h, 1, 1, 1, 0.3)
     lurek.render.print("LIFE", bar_x - 40, bar_y, 14, 0.8, 0.8, 0.8, 0.7)
 
     -- Song progress
@@ -620,7 +620,7 @@ function lurek.render_ui()
     if total_notes_in_song > 0 then
         progress = clamp((perfects + goods + misses) / total_notes_in_song, 0, 1)
     end
-    lurek.render.drawRect("fill", 10, H - 20, (W - 20) * progress, 6, 0.4, 0.4, 0.8, 0.5)
+    lurek.render.rectangle("fill", 10, H - 20, (W - 20) * progress, 6, 0.4, 0.4, 0.8, 0.5)
 
     -- FPS
     local fps = lurek.timer.getFPS()

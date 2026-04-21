@@ -629,11 +629,11 @@ local function draw_grid()
                 col = MACHINE_COLORS[cell.machine_type] or COL_EMPTY
             end
 
-            lurek.render.drawRect(x, y, TILE, TILE, col[1], col[2], col[3], 1)
+            lurek.render.rectangle(x, y, TILE, TILE, col[1], col[2], col[3], 1)
 
             -- Grid lines
-            lurek.render.drawRect(x, y, TILE, 1, COL_GRID[1], COL_GRID[2], COL_GRID[3], 0.3)
-            lurek.render.drawRect(x, y, 1, TILE, COL_GRID[1], COL_GRID[2], COL_GRID[3], 0.3)
+            lurek.render.rectangle(x, y, TILE, 1, COL_GRID[1], COL_GRID[2], COL_GRID[3], 0.3)
+            lurek.render.rectangle(x, y, 1, TILE, COL_GRID[1], COL_GRID[2], COL_GRID[3], 0.3)
         end
     end
 end
@@ -645,7 +645,7 @@ local function draw_conveyors()
             if cell.type == T_CONVEYOR and cell.dir > 0 then
                 local cx = (c - 1) * TILE + TILE * 0.5
                 local cy = (r - 1) * TILE + TILE * 0.5
-                lurek.render.drawText(DIR_ARROW[cell.dir], cx - 5, cy - 7, 14, 0.9, 0.9, 0.9, 0.8)
+                lurek.render.print(DIR_ARROW[cell.dir], cx - 5, cy - 7, 14, 0.9, 0.9, 0.9, 0.8)
             end
         end
     end
@@ -658,8 +658,8 @@ local function draw_ore_tiles()
         -- Only draw indicator if no machine placed here
         local cell = grid[o.row][o.col]
         if cell.type == T_ORE then
-            lurek.render.drawCircle(cx, cy, 10, 0.6, 0.4, 0.15, 0.7)
-            lurek.render.drawCircle(cx, cy, 6, 0.7, 0.5, 0.2, 0.5)
+            lurek.render.circle(cx, cy, 10, 0.6, 0.4, 0.15, 0.7)
+            lurek.render.circle(cx, cy, 6, 0.7, 0.5, 0.2, 0.5)
         end
     end
 end
@@ -671,18 +671,18 @@ local function draw_machines()
         local mc = MACHINE_COLORS[m.mtype]
 
         -- Machine body
-        lurek.render.drawRect(x, y, TILE - 8, TILE - 8, mc[1], mc[2], mc[3], 1)
+        lurek.render.rectangle(x, y, TILE - 8, TILE - 8, mc[1], mc[2], mc[3], 1)
 
         -- Label
         local label = "M"
         if m.mtype == M_SMELTER then label = "S" end
         if m.mtype == M_ASSEMBLER then label = "A" end
-        lurek.render.drawText(label, x + 7, y + 5, 14, 1, 1, 1, 0.9)
+        lurek.render.print(label, x + 7, y + 5, 14, 1, 1, 1, 0.9)
 
         -- Active indicator
         if m.active then
             local progress = m.timer / MACHINE_TIME[m.mtype]
-            lurek.render.drawRect(x, y + TILE - 10, (TILE - 8) * progress, 3,
+            lurek.render.rectangle(x, y + TILE - 10, (TILE - 8) * progress, 3,
                 0.2, 1, 0.3, 0.8)
         end
 
@@ -691,7 +691,7 @@ local function draw_machines()
         if odir > 0 then
             local ax = (m.col - 1) * TILE + TILE * 0.5 + DIR_DX[odir] * 10
             local ay = (m.row - 1) * TILE + TILE * 0.5 + DIR_DY[odir] * 10
-            lurek.render.drawCircle(ax, ay, 2, 1, 1, 0, 0.6)
+            lurek.render.circle(ax, ay, 2, 1, 1, 0, 0.6)
         end
     end
 end
@@ -702,13 +702,13 @@ local function draw_items()
         local sz = 4
         if item.itype == I_INGOT then sz = 5 end
         if item.itype == I_PRODUCT then sz = 6 end
-        lurek.render.drawCircle(item.x, item.y, sz, ic[1], ic[2], ic[3], 1)
+        lurek.render.circle(item.x, item.y, sz, ic[1], ic[2], ic[3], 1)
     end
 end
 
 local function draw_particles()
     for _, p in ipairs(particles) do
-        lurek.render.drawCircle(p.x, p.y, p.size, p.r, p.g, p.b, p.a)
+        lurek.render.circle(p.x, p.y, p.size, p.r, p.g, p.b, p.a)
     end
 end
 
@@ -718,8 +718,8 @@ local function draw_storage()
             if grid[r][c].type == T_STORAGE then
                 local x = (c - 1) * TILE + 2
                 local y = (r - 1) * TILE + 2
-                lurek.render.drawRect(x, y, TILE - 4, TILE - 4, 0.15, 0.5, 0.25, 0.8)
-                lurek.render.drawText("$", x + 9, y + 6, 16, 1, 0.9, 0.2, 0.9)
+                lurek.render.rectangle(x, y, TILE - 4, TILE - 4, 0.15, 0.5, 0.25, 0.8)
+                lurek.render.print("$", x + 9, y + 6, 16, 1, 0.9, 0.2, 0.9)
             end
         end
     end
@@ -730,41 +730,41 @@ end
 -- ---------------------------------------------------------------------------
 local function draw_hud()
     -- Top bar background
-    lurek.render.drawRect(0, 0, SCREEN_W, 28, 0, 0, 0, 0.7)
+    lurek.render.rectangle(0, 0, SCREEN_W, 28, 0, 0, 0, 0.7)
 
     -- Gold
     local gd = math.floor(gold_display + 0.5)
-    lurek.render.drawText("Gold: " .. gd, 10, 5, 16, 1, 0.85, 0.1, 1)
+    lurek.render.print("Gold: " .. gd, 10, 5, 16, 1, 0.85, 0.1, 1)
 
     -- Goal
-    lurek.render.drawText("/ " .. WIN_GOLD, 110, 5, 14, 0.7, 0.7, 0.7, 0.8)
+    lurek.render.print("/ " .. WIN_GOLD, 110, 5, 14, 0.7, 0.7, 0.7, 0.8)
 
     -- Storage
-    lurek.render.drawText("Storage: " .. storage_count, 200, 5, 14, 0.5, 0.9, 0.5, 1)
+    lurek.render.print("Storage: " .. storage_count, 200, 5, 14, 0.5, 0.9, 0.5, 1)
 
     -- Stats
-    lurek.render.drawText("Items/min: " .. items_last_minute, 340, 5, 12, 0.7, 0.7, 0.9, 0.8)
-    lurek.render.drawText("Machines: " .. #machines, 470, 5, 12, 0.7, 0.7, 0.9, 0.8)
-    lurek.render.drawText("Belts: " .. conveyor_count, 570, 5, 12, 0.7, 0.7, 0.9, 0.8)
+    lurek.render.print("Items/min: " .. items_last_minute, 340, 5, 12, 0.7, 0.7, 0.9, 0.8)
+    lurek.render.print("Machines: " .. #machines, 470, 5, 12, 0.7, 0.7, 0.9, 0.8)
+    lurek.render.print("Belts: " .. conveyor_count, 570, 5, 12, 0.7, 0.7, 0.9, 0.8)
 
     -- Speed
     local speed_text = speed_mult .. "x"
-    lurek.render.drawText("Speed: " .. speed_text, 660, 5, 12, 0.9, 0.9, 0.5, 1)
+    lurek.render.print("Speed: " .. speed_text, 660, 5, 12, 0.9, 0.9, 0.5, 1)
 
     -- FPS
     local fps = lurek.timer.getFPS()
-    lurek.render.drawText("FPS: " .. fps, SCREEN_W - 70, 5, 12, 0.5, 0.5, 0.5, 0.8)
+    lurek.render.print("FPS: " .. fps, SCREEN_W - 70, 5, 12, 0.5, 0.5, 0.5, 0.8)
 
     -- Bottom bar: placement mode
-    lurek.render.drawRect(0, SCREEN_H - 24, SCREEN_W, 24, 0, 0, 0, 0.7)
+    lurek.render.rectangle(0, SCREEN_H - 24, SCREEN_W, 24, 0, 0, 0, 0.7)
     local mode_text = "Mode: " .. place_mode:upper()
     if place_mode == "conveyor" then
         mode_text = mode_text .. " " .. DIR_ARROW[place_dir]
     end
-    lurek.render.drawText(mode_text, 10, SCREEN_H - 19, 14, 0.9, 0.9, 0.9, 1)
+    lurek.render.print(mode_text, 10, SCREEN_H - 19, 14, 0.9, 0.9, 0.9, 1)
 
     -- Hotkey hints
-    lurek.render.drawText(
+    lurek.render.print(
         "WASD:dir  M:miner(10)  S:smelter(20)  A:assembler(30)  D:delete  1-3:speed",
         250, SCREEN_H - 19, 11, 0.6, 0.6, 0.6, 0.8)
 end
@@ -773,29 +773,29 @@ end
 -- Title / Victory Screens
 -- ---------------------------------------------------------------------------
 local function draw_title()
-    lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.08, 0.1, 1)
+    lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.08, 0.1, 1)
 
-    lurek.render.drawText("FACTORY", SCREEN_W * 0.5 - 80, 160, 48, 0.9, 0.7, 0.1, 1)
-    lurek.render.drawText("BUILD YOUR PRODUCTION LINE", SCREEN_W * 0.5 - 140, 230, 18, 0.7, 0.7, 0.7, 1)
+    lurek.render.print("FACTORY", SCREEN_W * 0.5 - 80, 160, 48, 0.9, 0.7, 0.1, 1)
+    lurek.render.print("BUILD YOUR PRODUCTION LINE", SCREEN_W * 0.5 - 140, 230, 18, 0.7, 0.7, 0.7, 1)
 
-    lurek.render.drawText("Place miners on ore, connect with conveyors,", 200, 300, 14, 0.6, 0.6, 0.6, 0.9)
-    lurek.render.drawText("smelt raw materials, assemble products, sell for gold!", 175, 320, 14, 0.6, 0.6, 0.6, 0.9)
-    lurek.render.drawText("Reach " .. WIN_GOLD .. " gold to win.", 320, 350, 14, 0.8, 0.8, 0.3, 1)
+    lurek.render.print("Place miners on ore, connect with conveyors,", 200, 300, 14, 0.6, 0.6, 0.6, 0.9)
+    lurek.render.print("smelt raw materials, assemble products, sell for gold!", 175, 320, 14, 0.6, 0.6, 0.6, 0.9)
+    lurek.render.print("Reach " .. WIN_GOLD .. " gold to win.", 320, 350, 14, 0.8, 0.8, 0.3, 1)
 
     local pulse = 0.6 + 0.4 * math.abs(math.sin(game_time * 2))
-    lurek.render.drawText("Click to Start", SCREEN_W * 0.5 - 55, 430, 18, 1, 1, 1, pulse)
+    lurek.render.print("Click to Start", SCREEN_W * 0.5 - 55, 430, 18, 1, 1, 1, pulse)
 end
 
 local function draw_victory()
-    lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0.05, 0.1, 0.05, 0.85)
+    lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.05, 0.1, 0.05, 0.85)
 
-    lurek.render.drawText("VICTORY!", SCREEN_W * 0.5 - 80, 200, 48, 0.2, 1, 0.3, 1)
-    lurek.render.drawText("You reached " .. gold .. " gold!", SCREEN_W * 0.5 - 90, 280, 20, 1, 0.9, 0.2, 1)
-    lurek.render.drawText("Machines: " .. #machines .. "  Belts: " .. conveyor_count,
+    lurek.render.print("VICTORY!", SCREEN_W * 0.5 - 80, 200, 48, 0.2, 1, 0.3, 1)
+    lurek.render.print("You reached " .. gold .. " gold!", SCREEN_W * 0.5 - 90, 280, 20, 1, 0.9, 0.2, 1)
+    lurek.render.print("Machines: " .. #machines .. "  Belts: " .. conveyor_count,
         SCREEN_W * 0.5 - 100, 320, 16, 0.7, 0.7, 0.7, 0.9)
 
     local pulse = 0.6 + 0.4 * math.abs(math.sin(game_time * 2))
-    lurek.render.drawText("Click to Play Again", SCREEN_W * 0.5 - 75, 400, 18, 1, 1, 1, pulse)
+    lurek.render.print("Click to Play Again", SCREEN_W * 0.5 - 75, 400, 18, 1, 1, 1, pulse)
 end
 
 -- ---------------------------------------------------------------------------

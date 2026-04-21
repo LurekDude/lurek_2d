@@ -587,7 +587,7 @@ lurek.render(function()
     if game_state == STATE.TITLE then
         -- Dark background
         lurek.render.setColor(0.02, 0.01, 0.03, 1)
-        lurek.render.drawRect(-400, -300, SCREEN_W + 800, SCREEN_H + 600)
+        lurek.render.rectangle(-400, -300, SCREEN_W + 800, SCREEN_H + 600)
 
         -- Flickering title
         local flicker = math.sin(title_time * 7) * 0.3 + 0.7
@@ -608,7 +608,7 @@ lurek.render(function()
 
     if game_state == STATE.DEAD then
         lurek.render.setColor(0.15, 0.02, 0.02, 1)
-        lurek.render.drawRect(
+        lurek.render.rectangle(
             player.x - SCREEN_W, player.y - SCREEN_H,
             SCREEN_W * 2, SCREEN_H * 2
         )
@@ -623,7 +623,7 @@ lurek.render(function()
 
     if game_state == STATE.WON then
         lurek.render.setColor(0.02, 0.06, 0.02, 1)
-        lurek.render.drawRect(
+        lurek.render.rectangle(
             player.x - SCREEN_W, player.y - SCREEN_H,
             SCREEN_W * 2, SCREEN_H * 2
         )
@@ -659,24 +659,24 @@ lurek.render(function()
 
             if tile == TILE_WALL then
                 lurek.render.setColor(0.12 * brightness, 0.10 * brightness, 0.15 * brightness, 1)
-                lurek.render.drawRect(tx, ty, TILE_SIZE, TILE_SIZE)
+                lurek.render.rectangle(tx, ty, TILE_SIZE, TILE_SIZE)
                 -- Wall edge highlight
                 lurek.render.setColor(0.18 * brightness, 0.15 * brightness, 0.22 * brightness, 1)
-                lurek.render.drawRectLines(tx, ty, TILE_SIZE, TILE_SIZE, 1)
+                lurek.render.rectangleLines(tx, ty, TILE_SIZE, TILE_SIZE, 1)
             elseif tile == TILE_FLOOR then
                 lurek.render.setColor(0.22 * brightness, 0.20 * brightness, 0.18 * brightness, 1)
-                lurek.render.drawRect(tx, ty, TILE_SIZE, TILE_SIZE)
+                lurek.render.rectangle(tx, ty, TILE_SIZE, TILE_SIZE)
             elseif tile == TILE_RECHARGE then
                 local pulse = 0.5 + 0.5 * math.sin(title_time * 3)
                 lurek.render.setColor(0.1 * brightness, 0.3 * brightness * pulse, 0.15 * brightness, 1)
-                lurek.render.drawRect(tx, ty, TILE_SIZE, TILE_SIZE)
+                lurek.render.rectangle(tx, ty, TILE_SIZE, TILE_SIZE)
                 -- Recharge icon
                 lurek.render.setColor(0.2, 0.8 * pulse, 0.3, brightness * 0.6)
-                lurek.render.drawRectLines(tx + 8, ty + 8, TILE_SIZE - 16, TILE_SIZE - 16, 2)
+                lurek.render.rectangleLines(tx + 8, ty + 8, TILE_SIZE - 16, TILE_SIZE - 16, 2)
             elseif tile == TILE_EXIT then
                 local pulse = 0.5 + 0.5 * math.sin(title_time * 2)
                 lurek.render.setColor(0.35 * brightness * pulse, 0.12 * brightness, 0.12 * brightness, 1)
-                lurek.render.drawRect(tx, ty, TILE_SIZE, TILE_SIZE)
+                lurek.render.rectangle(tx, ty, TILE_SIZE, TILE_SIZE)
                 lurek.render.setColor(0.9, 0.2, 0.2, brightness * 0.7)
                 lurek.render.print("EXIT", tx + 4, ty + 14, 10)
             end
@@ -693,7 +693,7 @@ lurek.render(function()
             local vis = lit and math.max(0.3, 1 - d_k / FLASH_RANGE) or 0.05
             local bob = math.sin(title_time * 3 + i) * 3
             lurek.render.setColor(0.9 * vis, 0.8 * vis, 0.1 * vis, vis)
-            lurek.render.drawRect(kx - 5, ky - 5 + bob, 10, 10)
+            lurek.render.rectangle(kx - 5, ky - 5 + bob, 10, 10)
         end
     end
 
@@ -705,10 +705,10 @@ lurek.render(function()
             local lit = in_flashlight_cone(nx, ny)
             local vis = lit and 0.7 or 0.03
             lurek.render.setColor(0.9 * vis, 0.9 * vis, 0.7 * vis, vis)
-            lurek.render.drawRect(nx - 6, ny - 4, 12, 8)
+            lurek.render.rectangle(nx - 6, ny - 4, 12, 8)
             lurek.render.setColor(0.3 * vis, 0.3 * vis, 0.2 * vis, vis)
-            lurek.render.drawLine(nx - 4, ny - 1, nx + 4, ny - 1, 1)
-            lurek.render.drawLine(nx - 4, ny + 1, nx + 4, ny + 1, 1)
+            lurek.render.line(nx - 4, ny - 1, nx + 4, ny - 1, 1)
+            lurek.render.line(nx - 4, ny + 1, nx + 4, ny + 1, 1)
         end
     end
 
@@ -721,21 +721,21 @@ lurek.render(function()
     if enemy_vis > 0.01 then
         local r = enemy.chasing and 0.9 or 0.4
         lurek.render.setColor(r * enemy_vis, 0.05 * enemy_vis, 0.1 * enemy_vis, enemy_vis)
-        lurek.render.drawCircle(enemy.x, enemy.y, ENEMY_RAD)
+        lurek.render.circle(enemy.x, enemy.y, ENEMY_RAD)
         -- Eyes
         lurek.render.setColor(1.0 * enemy_vis, 0.2 * enemy_vis, 0.2 * enemy_vis, enemy_vis * 0.9)
-        lurek.render.drawCircle(enemy.x - 3, enemy.y - 3, 2)
-        lurek.render.drawCircle(enemy.x + 3, enemy.y - 3, 2)
+        lurek.render.circle(enemy.x - 3, enemy.y - 3, 2)
+        lurek.render.circle(enemy.x + 3, enemy.y - 3, 2)
     end
 
     -- ── Hallucination enemies ─────────────────────────────────
     for _, h in ipairs(halluc_enemies) do
         local ha = h.life * 2
         lurek.render.setColor(0.6, 0.0, 0.1, ha * 0.5)
-        lurek.render.drawCircle(h.x, h.y, 8)
+        lurek.render.circle(h.x, h.y, 8)
         lurek.render.setColor(0.9, 0.1, 0.1, ha * 0.3)
-        lurek.render.drawCircle(h.x - 2, h.y - 2, 2)
-        lurek.render.drawCircle(h.x + 2, h.y - 2, 2)
+        lurek.render.circle(h.x - 2, h.y - 2, 2)
+        lurek.render.circle(h.x + 2, h.y - 2, 2)
     end
 
     -- ── Flashlight cone (visual) ──────────────────────────────
@@ -749,7 +749,7 @@ lurek.render(function()
             local alpha = 0.06 - s * 0.003
             lurek.render.setColor(1, 0.95, 0.7, alpha)
             -- Draw cone segment as triangle approximation (line fan)
-            lurek.render.drawLine(
+            lurek.render.line(
                 player.x, player.y,
                 player.x + math.cos(a1) * r, player.y + math.sin(a1) * r, 2
             )
@@ -758,7 +758,7 @@ lurek.render(function()
         lurek.render.setColor(1, 0.95, 0.7, 0.04)
         for s = 0, segments do
             local a = fa - FLASH_SPREAD + (2 * FLASH_SPREAD) * (s / segments)
-            lurek.render.drawCircle(
+            lurek.render.circle(
                 player.x + math.cos(a) * FLASH_RANGE,
                 player.y + math.sin(a) * FLASH_RANGE, 2
             )
@@ -768,10 +768,10 @@ lurek.render(function()
     -- ── Player ────────────────────────────────────────────────
     local p_bright = (flashlight_on and battery > 0) and 0.9 or 0.3
     lurek.render.setColor(0.7 * p_bright, 0.75 * p_bright, 0.9 * p_bright, 1)
-    lurek.render.drawCircle(player.x, player.y, PLAYER_RAD)
+    lurek.render.circle(player.x, player.y, PLAYER_RAD)
     -- Direction indicator
     lurek.render.setColor(1, 0.95, 0.5, p_bright * 0.8)
-    lurek.render.drawCircle(
+    lurek.render.circle(
         player.x + facing.x * (PLAYER_RAD + 3),
         player.y + facing.y * (PLAYER_RAD + 3), 2
     )
@@ -786,7 +786,7 @@ lurek.render(function()
         local intensity = (50 - sanity) / 50
         local r_shift = math.sin(distort_pulse) * intensity * 0.15
         lurek.render.setColor(0.3 + r_shift, 0.0, 0.1, intensity * 0.15)
-        lurek.render.drawRect(
+        lurek.render.rectangle(
             player.x - SCREEN_W / 2, player.y - SCREEN_H / 2,
             SCREEN_W, SCREEN_H
         )
@@ -803,21 +803,21 @@ lurek.render_ui(function()
 
     -- ── Sanity bar ────────────────────────────────────────────
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.drawRect(10, 10, 154, 18)
+    lurek.render.rectangle(10, 10, 154, 18)
     local san_ratio = sanity / SANITY_MAX
     local san_r = 1 - san_ratio
     local san_g = san_ratio
     lurek.render.setColor(san_r, san_g, 0.1, 0.9)
-    lurek.render.drawRect(12, 12, 150 * san_ratio, 14)
+    lurek.render.rectangle(12, 12, 150 * san_ratio, 14)
     lurek.render.setColor(1, 1, 1, 0.9)
     lurek.render.print("Sanity: " .. math.floor(sanity), 14, 13, 11)
 
     -- ── Battery bar ───────────────────────────────────────────
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.drawRect(10, 32, 154, 18)
+    lurek.render.rectangle(10, 32, 154, 18)
     local bat_ratio = battery / BATTERY_MAX
     lurek.render.setColor(0.9 * bat_ratio, 0.8 * bat_ratio, 0.1, 0.9)
-    lurek.render.drawRect(12, 34, 150 * bat_ratio, 14)
+    lurek.render.rectangle(12, 34, 150 * bat_ratio, 14)
     lurek.render.setColor(1, 1, 1, 0.9)
     local fl_status = flashlight_on and "ON" or "OFF"
     lurek.render.print("Battery: " .. math.floor(battery) .. " [" .. fl_status .. "]", 14, 35, 11)
@@ -826,13 +826,13 @@ lurek.render_ui(function()
     local key_count = 0
     for i = 1, #keys_found do if keys_found[i] then key_count = key_count + 1 end end
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.drawRect(10, 54, 100, 18)
+    lurek.render.rectangle(10, 54, 100, 18)
     lurek.render.setColor(0.9, 0.8, 0.2, 1)
     lurek.render.print("Keys: " .. key_count .. "/5", 14, 57, 11)
 
     -- ── Notes counter ─────────────────────────────────────────
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.drawRect(10, 76, 100, 18)
+    lurek.render.rectangle(10, 76, 100, 18)
     lurek.render.setColor(0.8, 0.8, 0.6, 1)
     lurek.render.print("Notes: " .. notes_read .. "/3", 14, 79, 11)
 
@@ -844,7 +844,7 @@ lurek.render_ui(function()
     if msg_timer > 0 then
         local alpha = math.min(1, msg_timer)
         lurek.render.setColor(0, 0, 0, 0.7 * alpha)
-        lurek.render.drawRect(SCREEN_W / 2 - 150, SCREEN_H / 2 - 16, 300, 32)
+        lurek.render.rectangle(SCREEN_W / 2 - 150, SCREEN_H / 2 - 16, 300, 32)
         lurek.render.setColor(1, 0.9, 0.5, alpha)
         lurek.render.print(msg_text, SCREEN_W / 2 - 140, SCREEN_H / 2 - 8, 13)
     end
@@ -859,9 +859,9 @@ lurek.render_ui(function()
     -- ── Note reading overlay ──────────────────────────────────
     if game_state == STATE.NOTE_READING and current_note then
         lurek.render.setColor(0, 0, 0, 0.85)
-        lurek.render.drawRect(60, 100, SCREEN_W - 120, 300)
+        lurek.render.rectangle(60, 100, SCREEN_W - 120, 300)
         lurek.render.setColor(0.6, 0.5, 0.3, 1)
-        lurek.render.drawRectLines(60, 100, SCREEN_W - 120, 300, 2)
+        lurek.render.rectangleLines(60, 100, SCREEN_W - 120, 300, 2)
 
         lurek.render.setColor(0.95, 0.9, 0.7, 1)
         lurek.render.print(current_note.title, 90, 130, 18)

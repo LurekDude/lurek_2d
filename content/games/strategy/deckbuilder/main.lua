@@ -278,42 +278,42 @@ end
 lurek.render_ui(function()
     local t = state.turn
     if t == "win" then
-        lurek.render.drawText("YOU WIN!", 280, 220, { color = {1,0.9,0.2,1}, size = 48 })
-        lurek.render.drawText("Press SPACE to restart", 270, 310, { color = {0.7,0.7,0.7,1}, size = 18 })
+        lurek.render.print("YOU WIN!", 280, 220, { color = {1,0.9,0.2,1}, size = 48 })
+        lurek.render.print("Press SPACE to restart", 270, 310, { color = {0.7,0.7,0.7,1}, size = 18 })
         return
     end
     if t == "lost" then
-        lurek.render.drawText("DEFEATED", 260, 220, { color = {0.9,0.2,0.2,1}, size = 48 })
-        lurek.render.drawText("Press SPACE to restart", 270, 310, { color = {0.7,0.7,0.7,1}, size = 18 })
+        lurek.render.print("DEFEATED", 260, 220, { color = {0.9,0.2,0.2,1}, size = 48 })
+        lurek.render.print("Press SPACE to restart", 270, 310, { color = {0.7,0.7,0.7,1}, size = 18 })
         return
     end
     if t == "reward" and state.reward then
-        lurek.render.drawText("Choose a card reward:", 260, 150, { color = {1,0.85,0.3,1}, size = 22 })
+        lurek.render.print("Choose a card reward:", 260, 150, { color = {1,0.85,0.3,1}, size = 22 })
         local r = state.reward
-        lurek.render.drawRect(150, 220, 180, 100, { color = {0.2,0.3,0.6,1} })
-        lurek.render.drawText("[Q] " .. r[1].name, 160, 250, { color = {1,1,1,1}, size = 16 })
-        lurek.render.drawText(r[1].desc,            160, 270, { color = {0.7,0.7,0.7,1}, size = 12 })
-        lurek.render.drawRect(470, 220, 180, 100, { color = {0.2,0.3,0.6,1} })
-        lurek.render.drawText("[E] " .. r[2].name, 480, 250, { color = {1,1,1,1}, size = 16 })
-        lurek.render.drawText(r[2].desc,            480, 270, { color = {0.7,0.7,0.7,1}, size = 12 })
+        lurek.render.rectangle(150, 220, 180, 100, { color = {0.2,0.3,0.6,1} })
+        lurek.render.print("[Q] " .. r[1].name, 160, 250, { color = {1,1,1,1}, size = 16 })
+        lurek.render.print(r[1].desc,            160, 270, { color = {0.7,0.7,0.7,1}, size = 12 })
+        lurek.render.rectangle(470, 220, 180, 100, { color = {0.2,0.3,0.6,1} })
+        lurek.render.print("[E] " .. r[2].name, 480, 250, { color = {1,1,1,1}, size = 16 })
+        lurek.render.print(r[2].desc,            480, 270, { color = {0.7,0.7,0.7,1}, size = 12 })
         return
     end
 
     -- Monster info
-    lurek.render.drawText(monster.name, 440, 80, { color = {0.9,0.4,0.4,1}, size = 20 })
-    lurek.render.drawRect(440, 110, 240, 16, { color = {0.3,0.0,0.0,1} })
-    lurek.render.drawRect(440, 110, math.floor(240 * clamp(enemy_hp_tween.v, 0, 1)), 16, { color = {0.8,0.2,0.2,1} })
-    lurek.render.drawText("HP: " .. math.max(0, monster.hp) .. "/" .. monster.maxHp, 440, 130, { color = {1,1,1,1}, size = 12 })
-    if monster.vuln > 0 then lurek.render.drawText("VULNERABLE x" .. monster.vuln, 440, 148, { color = {1,0.5,0.1,1}, size = 11 }) end
-    if monster.stun and monster.stun > 0 then lurek.render.drawText("STUNNED", 560, 148, { color = {0.3,0.8,1,1}, size = 11 }) end
+    lurek.render.print(monster.name, 440, 80, { color = {0.9,0.4,0.4,1}, size = 20 })
+    lurek.render.rectangle(440, 110, 240, 16, { color = {0.3,0.0,0.0,1} })
+    lurek.render.rectangle(440, 110, math.floor(240 * clamp(enemy_hp_tween.v, 0, 1)), 16, { color = {0.8,0.2,0.2,1} })
+    lurek.render.print("HP: " .. math.max(0, monster.hp) .. "/" .. monster.maxHp, 440, 130, { color = {1,1,1,1}, size = 12 })
+    if monster.vuln > 0 then lurek.render.print("VULNERABLE x" .. monster.vuln, 440, 148, { color = {1,0.5,0.1,1}, size = 11 }) end
+    if monster.stun and monster.stun > 0 then lurek.render.print("STUNNED", 560, 148, { color = {0.3,0.8,1,1}, size = 11 }) end
 
     -- Player info
-    lurek.render.drawRect(20, 20, 200, 14, { color = {0.2,0.0,0.0,1} })
-    lurek.render.drawRect(20, 20, math.floor(200 * clamp(hp_tween_val.v, 0, 1)), 14, { color = {0.1,0.8,0.2,1} })
-    lurek.render.drawText("HP " .. math.max(0, player.hp) .. "/" .. player.maxHp, 22, 22, { color = {1,1,1,1}, size = 11 })
-    lurek.render.drawText("Block: " .. player.block, 240, 22, { color = {0.3,0.5,1,1}, size = 14 })
-    lurek.render.drawText("Energy: " .. state.energy .. "/3", 360, 22, { color = {1,0.8,0.2,1}, size = 14 })
-    lurek.render.drawText("Floor: " .. state.floor .. "/" .. #MONSTERS, 500, 22, { color = {0.6,0.6,0.8,1}, size = 14 })
+    lurek.render.rectangle(20, 20, 200, 14, { color = {0.2,0.0,0.0,1} })
+    lurek.render.rectangle(20, 20, math.floor(200 * clamp(hp_tween_val.v, 0, 1)), 14, { color = {0.1,0.8,0.2,1} })
+    lurek.render.print("HP " .. math.max(0, player.hp) .. "/" .. player.maxHp, 22, 22, { color = {1,1,1,1}, size = 11 })
+    lurek.render.print("Block: " .. player.block, 240, 22, { color = {0.3,0.5,1,1}, size = 14 })
+    lurek.render.print("Energy: " .. state.energy .. "/3", 360, 22, { color = {1,0.8,0.2,1}, size = 14 })
+    lurek.render.print("Floor: " .. state.floor .. "/" .. #MONSTERS, 500, 22, { color = {0.6,0.6,0.8,1}, size = 14 })
 
     -- Hand
     local cx = 80
@@ -322,19 +322,19 @@ lurek.render_ui(function()
         local affordable = state.energy >= card.cost
         local alpha = affordable and 1.0 or 0.5
         col[4] = alpha
-        lurek.render.drawRect(cx, 450, 120, 120, { color = {0.15,0.15,0.25, alpha} })
-        lurek.render.drawRect(cx, 450, 120, 4,   { color = col })
-        lurek.render.drawText("[" .. i .. "] " .. card.name, cx + 6, 460, { color = {1,1,1, alpha}, size = 13 })
-        lurek.render.drawText(card.desc, cx + 6, 482, { color = {0.7,0.7,0.7, alpha}, size = 10 })
-        lurek.render.drawText("Cost: " .. card.cost, cx + 6, 552, { color = {1,0.8,0.2, alpha}, size = 11 })
+        lurek.render.rectangle(cx, 450, 120, 120, { color = {0.15,0.15,0.25, alpha} })
+        lurek.render.rectangle(cx, 450, 120, 4,   { color = col })
+        lurek.render.print("[" .. i .. "] " .. card.name, cx + 6, 460, { color = {1,1,1, alpha}, size = 13 })
+        lurek.render.print(card.desc, cx + 6, 482, { color = {0.7,0.7,0.7, alpha}, size = 10 })
+        lurek.render.print("Cost: " .. card.cost, cx + 6, 552, { color = {1,0.8,0.2, alpha}, size = 11 })
         cx = cx + 130
     end
 
     -- Log
     for i, msg in ipairs(log_messages) do
         local a = math.min(1.0, msg.timer)
-        lurek.render.drawText(msg.text, 20, 380 + i * 18, { color = {0.8, 0.8, 0.6, a}, size = 12 })
+        lurek.render.print(msg.text, 20, 380 + i * 18, { color = {0.8, 0.8, 0.6, a}, size = 12 })
     end
 
-    lurek.render.drawText("1-5: play card  Enter: end turn  Esc: quit", 20, H - 20, { color = {0.4,0.4,0.4,1}, size = 12 })
+    lurek.render.print("1-5: play card  Enter: end turn  Esc: quit", 20, H - 20, { color = {0.4,0.4,0.4,1}, size = 12 })
 end)

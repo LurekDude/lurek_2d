@@ -447,27 +447,27 @@ end)
 
 lurek.render(function()
     -- Table background
-    lurek.draw.setColor(0.08, 0.08, 0.12, 1)
-    lurek.draw.rect("fill", TABLE_X, TABLE_Y, TABLE_W, TABLE_H)
+    lurek.render.setColor(0.08, 0.08, 0.12, 1)
+    lurek.render.rectangle("fill", TABLE_X, TABLE_Y, TABLE_W, TABLE_H)
 
     -- Table border
-    lurek.draw.setColor(0.4, 0.35, 0.5, 1)
-    lurek.draw.rect("line", TABLE_X, TABLE_Y, TABLE_W, TABLE_H)
+    lurek.render.setColor(0.4, 0.35, 0.5, 1)
+    lurek.render.rectangle("line", TABLE_X, TABLE_Y, TABLE_W, TABLE_H)
 
     -- Ramps
-    lurek.draw.setColor(0.3, 0.3, 0.6, 1)
+    lurek.render.setColor(0.3, 0.3, 0.6, 1)
     for _, r in ipairs(ramps) do
-        lurek.draw.line(r.x1, r.y1, r.x2, r.y2)
+        lurek.render.line(r.x1, r.y1, r.x2, r.y2)
     end
 
     -- Targets
     for _, t in ipairs(targets) do
         if t.hit then
-            lurek.draw.setColor(0.15, 0.15, 0.15, 1)
+            lurek.render.setColor(0.15, 0.15, 0.15, 1)
         else
-            lurek.draw.setColor(0, 0.9, 0.5, 1)
+            lurek.render.setColor(0, 0.9, 0.5, 1)
         end
-        lurek.draw.rect("fill", t.x, t.y, TARGET_W, TARGET_H)
+        lurek.render.rectangle("fill", t.x, t.y, TARGET_W, TARGET_H)
     end
 
     -- Bumpers
@@ -476,57 +476,57 @@ lurek.render(function()
         local br = 0.9 + flash * 0.1
         local bg = 0.4 + flash * 0.6
         local bb = 0.1 + flash * 0.4
-        lurek.draw.setColor(br, bg, bb, 1)
-        lurek.draw.circle("fill", b.x, b.y, BUMPER_R)
-        lurek.draw.setColor(1, 1, 1, 0.3 + flash * 0.7)
-        lurek.draw.circle("line", b.x, b.y, BUMPER_R)
+        lurek.render.setColor(br, bg, bb, 1)
+        lurek.render.circle("fill", b.x, b.y, BUMPER_R)
+        lurek.render.setColor(1, 1, 1, 0.3 + flash * 0.7)
+        lurek.render.circle("line", b.x, b.y, BUMPER_R)
     end
 
     -- Flippers
-    lurek.draw.setColor(0.8, 0.8, 0.9, 1)
+    lurek.render.setColor(0.8, 0.8, 0.9, 1)
     for _, f in pairs(flippers) do
         local tx, ty = flipper_tip(f)
-        lurek.draw.line(f.px, f.py, tx, ty)
-        lurek.draw.circle("fill", f.px, f.py, 5)
-        lurek.draw.circle("fill", tx, ty, 4)
+        lurek.render.line(f.px, f.py, tx, ty)
+        lurek.render.circle("fill", f.px, f.py, 5)
+        lurek.render.circle("fill", tx, ty, 4)
     end
 
     -- Plunger lane
-    lurek.draw.setColor(0.2, 0.15, 0.25, 1)
-    lurek.draw.rect("fill", PLUNGER_X - 12, TABLE_Y + TABLE_H - 80, 24, 80)
+    lurek.render.setColor(0.2, 0.15, 0.25, 1)
+    lurek.render.rectangle("fill", PLUNGER_X - 12, TABLE_Y + TABLE_H - 80, 24, 80)
 
     -- Plunger
     if state == STATE_PLUNGING then
         local py = PLUNGER_Y + (charge / 100) * 20
-        lurek.draw.setColor(0.7, 0.2, 0.2, 1)
-        lurek.draw.rect("fill", PLUNGER_X - 8, py + 5, 16, 12)
+        lurek.render.setColor(0.7, 0.2, 0.2, 1)
+        lurek.render.rectangle("fill", PLUNGER_X - 8, py + 5, 16, 12)
         -- Charge meter
-        lurek.draw.setColor(0.3, 0.3, 0.3, 1)
-        lurek.draw.rect("fill", PLUNGER_X - 10, TABLE_Y + TABLE_H - 78, 20, 60)
+        lurek.render.setColor(0.3, 0.3, 0.3, 1)
+        lurek.render.rectangle("fill", PLUNGER_X - 10, TABLE_Y + TABLE_H - 78, 20, 60)
         local ch = (charge / 100) * 56
-        lurek.draw.setColor(1, 0.3 + 0.7 * (1 - charge / 100), 0, 1)
-        lurek.draw.rect("fill", PLUNGER_X - 8, TABLE_Y + TABLE_H - 20 - ch, 16, ch)
+        lurek.render.setColor(1, 0.3 + 0.7 * (1 - charge / 100), 0, 1)
+        lurek.render.rectangle("fill", PLUNGER_X - 8, TABLE_Y + TABLE_H - 20 - ch, 16, ch)
     end
 
     -- Ball
     if ball.active or state == STATE_PLUNGING then
-        lurek.draw.setColor(1, 1, 1, 1)
-        lurek.draw.circle("fill", ball.x, ball.y, BALL_R)
-        lurek.draw.setColor(0.7, 0.7, 0.8, 0.5)
-        lurek.draw.circle("line", ball.x, ball.y, BALL_R + 1)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.circle("fill", ball.x, ball.y, BALL_R)
+        lurek.render.setColor(0.7, 0.7, 0.8, 0.5)
+        lurek.render.circle("line", ball.x, ball.y, BALL_R + 1)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        lurek.draw.setColor(p.r, p.g, p.b, p.a)
-        lurek.draw.circle("fill", p.x, p.y, math.max(p.size, 0.5))
+        lurek.render.setColor(p.r, p.g, p.b, p.a)
+        lurek.render.circle("fill", p.x, p.y, math.max(p.size, 0.5))
     end
 
     -- Drain zone indicator
-    lurek.draw.setColor(0.5, 0.1, 0.1, 0.4)
+    lurek.render.setColor(0.5, 0.1, 0.1, 0.4)
     local drain_left = flippers.left.px + 20
     local drain_right = flippers.right.px - 20
-    lurek.draw.rect("fill", drain_left, TABLE_Y + TABLE_H - 6, drain_right - drain_left, 6)
+    lurek.render.rectangle("fill", drain_left, TABLE_Y + TABLE_H - 6, drain_right - drain_left, 6)
 end)
 
 -- ─── Render UI — score, balls, state overlays ───────────────────────
@@ -535,51 +535,51 @@ function lurek.render_ui()
     local fps = lurek.timer.getFPS()
 
     -- Score bar
-    lurek.draw.setColor(0.05, 0.05, 0.08, 0.9)
-    lurek.draw.rect("fill", 0, 0, W, 28)
+    lurek.render.setColor(0.05, 0.05, 0.08, 0.9)
+    lurek.render.rectangle("fill", 0, 0, W, 28)
 
-    lurek.draw.setColor(1, 1, 1, 1)
-    lurek.draw.text(string.format("SCORE: %d", display_score), 10, 6)
-    lurek.draw.text(string.format("HI: %d", high_score), W / 2 - 40, 6)
-    lurek.draw.text(string.format("BALLS: %d", balls_left), W - 120, 6)
-    lurek.draw.text(string.format("FPS: %d", fps), W - 200, 6)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print(string.format("SCORE: %d", display_score), 10, 6)
+    lurek.render.print(string.format("HI: %d", high_score), W / 2 - 40, 6)
+    lurek.render.print(string.format("BALLS: %d", balls_left), W - 120, 6)
+    lurek.render.print(string.format("FPS: %d", fps), W - 200, 6)
 
     -- Multiplier
     if multiplier > 1 then
-        lurek.draw.setColor(1, 1, 0, 1)
-        lurek.draw.text(string.format("%dX COMBO!", multiplier), TABLE_X + TABLE_W / 2 - 30, TABLE_Y - 16)
+        lurek.render.setColor(1, 1, 0, 1)
+        lurek.render.print(string.format("%dX COMBO!", multiplier), TABLE_X + TABLE_W / 2 - 30, TABLE_Y - 16)
     end
 
     -- ── State overlays ──
     if state == STATE_TITLE then
-        lurek.draw.setColor(0, 0, 0, 0.7)
-        lurek.draw.rect("fill", 0, 0, W, H)
-        lurek.draw.setColor(1, 0.8, 0.2, 1)
-        lurek.draw.text("PINBALL", W / 2 - 50, H / 2 - 40)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.8, 0.2, 1)
+        lurek.render.print("PINBALL", W / 2 - 50, H / 2 - 40)
         local alpha = 0.4 + 0.6 * math.abs(math.sin(title_blink * 2))
-        lurek.draw.setColor(1, 1, 1, alpha)
-        lurek.draw.text("FLIP IT", W / 2 - 40, H / 2)
-        lurek.draw.setColor(0.6, 0.6, 0.7, 1)
-        lurek.draw.text("Press SPACE to start", W / 2 - 70, H / 2 + 40)
+        lurek.render.setColor(1, 1, 1, alpha)
+        lurek.render.print("FLIP IT", W / 2 - 40, H / 2)
+        lurek.render.setColor(0.6, 0.6, 0.7, 1)
+        lurek.render.print("Press SPACE to start", W / 2 - 70, H / 2 + 40)
     end
 
     if state == STATE_BALL_LOST then
-        lurek.draw.setColor(1, 0.3, 0.3, 0.8)
-        lurek.draw.text("BALL LOST", W / 2 - 40, H / 2 - 10)
+        lurek.render.setColor(1, 0.3, 0.3, 0.8)
+        lurek.render.print("BALL LOST", W / 2 - 40, H / 2 - 10)
     end
 
     if state == STATE_GAME_OVER then
-        lurek.draw.setColor(0, 0, 0, 0.75)
-        lurek.draw.rect("fill", 0, 0, W, H)
-        lurek.draw.setColor(1, 0.2, 0.2, 1)
-        lurek.draw.text("GAME OVER", W / 2 - 50, H / 2 - 30)
-        lurek.draw.setColor(1, 1, 1, 1)
-        lurek.draw.text(string.format("FINAL SCORE: %d", score), W / 2 - 60, H / 2 + 10)
+        lurek.render.setColor(0, 0, 0, 0.75)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2, 1)
+        lurek.render.print("GAME OVER", W / 2 - 50, H / 2 - 30)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(string.format("FINAL SCORE: %d", score), W / 2 - 60, H / 2 + 10)
         if score >= high_score and score > 0 then
-            lurek.draw.setColor(1, 1, 0, 1)
-            lurek.draw.text("NEW HIGH SCORE!", W / 2 - 55, H / 2 + 40)
+            lurek.render.setColor(1, 1, 0, 1)
+            lurek.render.print("NEW HIGH SCORE!", W / 2 - 55, H / 2 + 40)
         end
-        lurek.draw.setColor(0.6, 0.6, 0.7, 1)
-        lurek.draw.text("Press SPACE", W / 2 - 40, H / 2 + 70)
+        lurek.render.setColor(0.6, 0.6, 0.7, 1)
+        lurek.render.print("Press SPACE", W / 2 - 40, H / 2 + 70)
     end
 end

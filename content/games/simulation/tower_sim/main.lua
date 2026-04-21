@@ -459,11 +459,11 @@ lurek.render(function()
     if state ~= "PLAYING" then return end
 
     -- Draw sky gradient (simple two-band)
-    lurek.render.drawRect(0, -camera_y, 800, 300, 0.4, 0.6, 0.9, 1.0)
-    lurek.render.drawRect(0, 300 - camera_y, 800, 300, 0.6, 0.8, 1.0, 1.0)
+    lurek.render.rectangle(0, -camera_y, 800, 300, 0.4, 0.6, 0.9, 1.0)
+    lurek.render.rectangle(0, 300 - camera_y, 800, 300, 0.6, 0.8, 1.0, 1.0)
 
     -- Draw ground
-    lurek.render.drawRect(0, 560 - camera_y, 800, 40, 0.3, 0.6, 0.2, 1.0)
+    lurek.render.rectangle(0, 560 - camera_y, 800, 40, 0.3, 0.6, 0.2, 1.0)
 
     -- Draw floors
     for _, fl in ipairs(floors) do
@@ -474,8 +474,8 @@ lurek.render(function()
 
         -- Floor slab
         local sw = FLOOR_WIDTH * scale
-        lurek.render.drawRect((FLOOR_WIDTH - sw) / 2, fy, sw, FLOOR_HEIGHT, 0.85, 0.82, 0.78, 1.0)
-        lurek.render.drawRect((FLOOR_WIDTH - sw) / 2, fy, sw, 3, 0.5, 0.5, 0.5, 1.0)
+        lurek.render.rectangle((FLOOR_WIDTH - sw) / 2, fy, sw, FLOOR_HEIGHT, 0.85, 0.82, 0.78, 1.0)
+        lurek.render.rectangle((FLOOR_WIDTH - sw) / 2, fy, sw, 3, 0.5, 0.5, 0.5, 1.0)
 
         -- Rooms
         if scale >= 1.0 then
@@ -488,102 +488,102 @@ lurek.render(function()
 
                 if rm and rm.type ~= "lobby" then
                     local c = rm.color or {0.5, 0.5, 0.5}
-                    lurek.render.drawRect(rx, ry, rw, rh, c[1], c[2], c[3], 0.9)
-                    lurek.render.drawRect(rx, ry, rw, 2, c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 1.0)
-                    lurek.render.drawText(rm.label or "?", rx + 4, ry + 4, 14)
+                    lurek.render.rectangle(rx, ry, rw, rh, c[1], c[2], c[3], 0.9)
+                    lurek.render.rectangle(rx, ry, rw, 2, c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 1.0)
+                    lurek.render.print(rm.label or "?", rx + 4, ry + 4, 14)
 
                     -- Tenant dots for apartments
                     if rm.type == "apartment" and rm.tenants_in then
                         for t = 1, rm.tenants_in do
                             local tx = rx + 10 + (t - 1) * 12
                             local ty2 = ry + rh - 14
-                            lurek.render.drawCircle(tx, ty2, 4, 0.1, 0.1, 0.8, 1.0)
+                            lurek.render.circle(tx, ty2, 4, 0.1, 0.1, 0.8, 1.0)
                         end
                     end
                 elseif rm and rm.type == "lobby" then
-                    lurek.render.drawRect(rx, ry, rw * 3, rh, 0.5, 0.5, 0.5, 0.7)
-                    lurek.render.drawText("LOBBY", rx + 20, ry + 20, 20)
+                    lurek.render.rectangle(rx, ry, rw * 3, rh, 0.5, 0.5, 0.5, 0.7)
+                    lurek.render.print("LOBBY", rx + 20, ry + 20, 20)
                 elseif not rm then
                     -- Empty slot outline
-                    lurek.render.drawRect(rx, ry, rw, rh, 0.9, 0.9, 0.9, 0.3)
+                    lurek.render.rectangle(rx, ry, rw, rh, 0.9, 0.9, 0.9, 0.3)
                 end
             end
         end
 
         -- Floor number
-        lurek.render.drawText(tostring(fl.index), 4, fy + FLOOR_HEIGHT / 2 - 7, 14)
+        lurek.render.print(tostring(fl.index), 4, fy + FLOOR_HEIGHT / 2 - 7, 14)
     end
 
     -- Draw elevator shaft
     local shaft_top = get_floor_y(top_floor_index()) - camera_y
     local shaft_bottom = get_floor_y(0) + FLOOR_HEIGHT - camera_y
-    lurek.render.drawRect(ELEVATOR_X, shaft_top, ELEVATOR_WIDTH, shaft_bottom - shaft_top, 0.3, 0.3, 0.35, 0.8)
+    lurek.render.rectangle(ELEVATOR_X, shaft_top, ELEVATOR_WIDTH, shaft_bottom - shaft_top, 0.3, 0.3, 0.35, 0.8)
     -- Elevator car
     local ecy = elev_pos_y - camera_y
     if ecy == 0 then ecy = shaft_bottom - 30 end
-    lurek.render.drawRect(ELEVATOR_X + 5, ecy - 15, ELEVATOR_WIDTH - 10, 30, 0.8, 0.75, 0.2, 1.0)
-    lurek.render.drawText("E:" .. elevators, ELEVATOR_X + 8, ecy - 10, 12)
+    lurek.render.rectangle(ELEVATOR_X + 5, ecy - 15, ELEVATOR_WIDTH - 10, 30, 0.8, 0.75, 0.2, 1.0)
+    lurek.render.print("E:" .. elevators, ELEVATOR_X + 8, ecy - 10, 12)
 
     -- Particles (dust)
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
-        lurek.render.drawCircle(p.x, p.y - camera_y, 3, p.r, p.g, p.b, alpha)
+        lurek.render.circle(p.x, p.y - camera_y, 3, p.r, p.g, p.b, alpha)
     end
 
     -- Sparkles (revenue)
     for _, s in ipairs(sparkles) do
         local alpha = s.life / s.max_life
         local sz = 2 + (1 - alpha) * 4
-        lurek.render.drawCircle(s.x, s.y - camera_y, sz, s.r, s.g, s.b, alpha)
+        lurek.render.circle(s.x, s.y - camera_y, sz, s.r, s.g, s.b, alpha)
     end
 
     -- Elevator glow
     for _, g in ipairs(elev_glow) do
         local alpha = g.life / g.max_life * 0.5
-        lurek.render.drawCircle(g.x, g.y - camera_y, g.radius, 1.0, 0.9, 0.3, alpha)
+        lurek.render.circle(g.x, g.y - camera_y, g.radius, 1.0, 0.9, 0.3, alpha)
     end
 end)
 
 function lurek.render_ui()
     if state == "TITLE" then
-        lurek.render.drawRect(0, 0, 800, 600, 0.1, 0.1, 0.2, 1.0)
-        lurek.render.drawText("TOWER SIM", 240, 160, 48)
-        lurek.render.drawText("BUILD HIGHER", 270, 240, 28)
-        lurek.render.drawText("Click to start", 310, 350, 18)
-        lurek.render.drawText("[F] Floor  [O] Office  [A] Apt  [S] Shop", 140, 420, 14)
-        lurek.render.drawText("[R] Restaurant  [G] Gym  [E] Elevator", 160, 445, 14)
-        lurek.render.drawText("[ESC] Quit", 350, 480, 14)
+        lurek.render.rectangle(0, 0, 800, 600, 0.1, 0.1, 0.2, 1.0)
+        lurek.render.print("TOWER SIM", 240, 160, 48)
+        lurek.render.print("BUILD HIGHER", 270, 240, 28)
+        lurek.render.print("Click to start", 310, 350, 18)
+        lurek.render.print("[F] Floor  [O] Office  [A] Apt  [S] Shop", 140, 420, 14)
+        lurek.render.print("[R] Restaurant  [G] Gym  [E] Elevator", 160, 445, 14)
+        lurek.render.print("[ESC] Quit", 350, 480, 14)
         return
     end
 
     if state == "VICTORY" then
-        lurek.render.drawRect(0, 0, 800, 600, 0.05, 0.15, 0.05, 0.85)
-        lurek.render.drawText("VICTORY!", 280, 180, 48)
-        lurek.render.drawText("Tower complete: " .. floor_count() .. " floors", 240, 270, 22)
-        lurek.render.drawText("Final gold: " .. math.floor(gold), 280, 310, 22)
-        lurek.render.drawText("Click to return to title", 270, 400, 18)
+        lurek.render.rectangle(0, 0, 800, 600, 0.05, 0.15, 0.05, 0.85)
+        lurek.render.print("VICTORY!", 280, 180, 48)
+        lurek.render.print("Tower complete: " .. floor_count() .. " floors", 240, 270, 22)
+        lurek.render.print("Final gold: " .. math.floor(gold), 280, 310, 22)
+        lurek.render.print("Click to return to title", 270, 400, 18)
         return
     end
 
     -- HUD
-    lurek.render.drawRect(0, 0, 800, 36, 0.1, 0.1, 0.15, 0.85)
-    lurek.render.drawText("Gold: " .. math.floor(display_gold), 10, 8, 18)
-    lurek.render.drawText("Floors: " .. floor_count() .. "/" .. MAX_FLOORS, 200, 8, 18)
-    lurek.render.drawText("Tenants: " .. count_tenants(), 380, 8, 18)
-    lurek.render.drawText("Elevators: " .. elevators, 530, 8, 18)
+    lurek.render.rectangle(0, 0, 800, 36, 0.1, 0.1, 0.15, 0.85)
+    lurek.render.print("Gold: " .. math.floor(display_gold), 10, 8, 18)
+    lurek.render.print("Floors: " .. floor_count() .. "/" .. MAX_FLOORS, 200, 8, 18)
+    lurek.render.print("Tenants: " .. count_tenants(), 380, 8, 18)
+    lurek.render.print("Elevators: " .. elevators, 530, 8, 18)
 
     -- Satisfaction bar
     local sat_pct = display_satisfaction / 100
     local bar_w = 120
-    lurek.render.drawRect(660, 8, bar_w, 18, 0.3, 0.3, 0.3, 1.0)
+    lurek.render.rectangle(660, 8, bar_w, 18, 0.3, 0.3, 0.3, 1.0)
     local sr = satisfaction < 40 and 0.8 or 0.2
     local sg = satisfaction >= 40 and 0.7 or 0.3
-    lurek.render.drawRect(660, 8, bar_w * sat_pct, 18, sr, sg, 0.2, 1.0)
-    lurek.render.drawText("Sat:" .. math.floor(satisfaction) .. "%", 665, 9, 13)
+    lurek.render.rectangle(660, 8, bar_w * sat_pct, 18, sr, sg, 0.2, 1.0)
+    lurek.render.print("Sat:" .. math.floor(satisfaction) .. "%", 665, 9, 13)
 
     -- Revenue timer bar
     local rev_pct = revenue_timer / REVENUE_INTERVAL
-    lurek.render.drawRect(0, 36, 800 * rev_pct, 3, 1.0, 0.85, 0.2, 0.7)
+    lurek.render.rectangle(0, 36, 800 * rev_pct, 3, 1.0, 0.85, 0.2, 0.7)
 
     -- Selected mode indicator
     local mode_text = ""
@@ -595,8 +595,8 @@ function lurek.render_ui()
     else
         mode_text = "[F]loor [O]ffice [A]pt [S]hop [R]est [G]ym [E]levator"
     end
-    lurek.render.drawText(mode_text, 10, 580, 14)
+    lurek.render.print(mode_text, 10, 580, 14)
 
     -- FPS
-    lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), 730, 580, 12)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 730, 580, 12)
 end

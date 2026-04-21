@@ -344,7 +344,7 @@ end)
 -- ── Render ────────────────────────────────────────────────
 lurek.render(function()
     -- Board background
-    lurek.render.drawRect(GRID_X - 6, GRID_Y - 6, GRID_SIZE*CELL + 12, GRID_SIZE*CELL + 12, { color = {0.15,0.12,0.2,1} })
+    lurek.render.rectangle(GRID_X - 6, GRID_Y - 6, GRID_SIZE*CELL + 12, GRID_SIZE*CELL + 12, { color = {0.15,0.12,0.2,1} })
 
     -- Gems
     for r = 1, GRID_SIZE do
@@ -356,15 +356,15 @@ lurek.render(function()
 
                 -- Selection highlight
                 if r == sel_r and c == sel_c then
-                    lurek.render.drawRect(gx - 4, gy - 4, CELL, CELL, { color = {1,1,1,0.3} })
+                    lurek.render.rectangle(gx - 4, gy - 4, CELL, CELL, { color = {1,1,1,0.3} })
                 end
 
                 local col = GEM_COLORS[g.color]
-                lurek.render.drawRect(gx, gy, CELL - 8, CELL - 8, { color = col })
+                lurek.render.rectangle(gx, gy, CELL - 8, CELL - 8, { color = col })
 
                 -- Special bomb marker
                 if g.special == "bomb" then
-                    lurek.render.drawCircle(gx + (CELL-8)/2, gy + (CELL-8)/2, 10, { color = {1,0.5,0.1,0.9}, segments = 6 })
+                    lurek.render.circle(gx + (CELL-8)/2, gy + (CELL-8)/2, 10, { color = {1,0.5,0.1,0.9}, segments = 6 })
                 end
             end
         end
@@ -377,17 +377,17 @@ end)
 
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.render_ui()
-    lurek.render.drawRect(0, 0, W, GRID_Y - 4, { color = {0.08,0.06,0.14,1} })
-    lurek.render.drawText("Score: " .. score, 14, 10, { color = {1,1,0.3,1}, size = 18 })
-    lurek.render.drawText("Moves: " .. moves_left, 240, 10, { color = {0.4,0.9,0.4,1}, size = 18 })
+    lurek.render.rectangle(0, 0, W, GRID_Y - 4, { color = {0.08,0.06,0.14,1} })
+    lurek.render.print("Score: " .. score, 14, 10, { color = {1,1,0.3,1}, size = 18 })
+    lurek.render.print("Moves: " .. moves_left, 240, 10, { color = {0.4,0.9,0.4,1}, size = 18 })
     if combo > 1 then
-        lurek.render.drawText("COMBO x" .. combo .. "!", 420, 10, { color = {1,0.5,0.2,1}, size = 18 })
+        lurek.render.print("COMBO x" .. combo .. "!", 420, 10, { color = {1,0.5,0.2,1}, size = 18 })
     end
-    lurek.render.drawText("Click gem then adjacent gem to swap", 14, 40, { color = {0.4,0.4,0.4,1}, size = 11 })
+    lurek.render.print("Click gem then adjacent gem to swap", 14, 40, { color = {0.4,0.4,0.4,1}, size = 11 })
 
     if game_state == "gameover" then
-        lurek.render.drawRect(180, 220, 440, 100, { color = {0,0,0,0.88} })
-        lurek.render.drawText("GAME OVER", 280, 245, { color = {0.9,0.2,0.2,1}, size = 34 })
-        lurek.render.drawText("Final score: " .. score, 300, 295, { color = {1,1,1,1}, size = 18 })
+        lurek.render.rectangle(180, 220, 440, 100, { color = {0,0,0,0.88} })
+        lurek.render.print("GAME OVER", 280, 245, { color = {0.9,0.2,0.2,1}, size = 34 })
+        lurek.render.print("Final score: " .. score, 300, 295, { color = {1,1,1,1}, size = 18 })
     end
 end

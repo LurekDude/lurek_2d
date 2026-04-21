@@ -506,7 +506,7 @@ lurek.render(function()
             if terrain[r] and terrain[r][c] == 1 then
                 local shade = 0.35 + ((r + c) % 3) * 0.05
                 lurek.render.setColor(shade + 0.1, shade - 0.05, shade - 0.15, 1)
-                lurek.render.drawRect(ox + c * TILE, oy + r * TILE, TILE, TILE)
+                lurek.render.rectangle(ox + c * TILE, oy + r * TILE, TILE, TILE)
             end
         end
     end
@@ -515,21 +515,21 @@ lurek.render(function()
     local ex_px = ox + entrance.col * TILE
     local ey_px = oy + entrance.row * TILE
     lurek.render.setColor(0.6, 0.6, 0.7, 1)
-    lurek.render.drawRect(ex_px - 8, ey_px - 12, 26, 4)
+    lurek.render.rectangle(ex_px - 8, ey_px - 12, 26, 4)
     lurek.render.setColor(0.4, 0.4, 0.5, 1)
-    lurek.render.drawRect(ex_px - 5, ey_px - 8, 20, 10)
+    lurek.render.rectangle(ex_px - 5, ey_px - 8, 20, 10)
     lurek.render.setColor(0.2, 0.2, 0.3, 1)
-    lurek.render.drawRect(ex_px, ey_px - 4, 10, 6)
+    lurek.render.rectangle(ex_px, ey_px - 4, 10, 6)
 
     -- draw exit (archway)
     local xx = ox + exit_pos.col * TILE
     local xy = oy + exit_pos.row * TILE
     lurek.render.setColor(0.2, 0.7, 0.2, 1)
-    lurek.render.drawRect(xx - 6, xy - 18, 4, 20)
-    lurek.render.drawRect(xx + 12, xy - 18, 4, 20)
-    lurek.render.drawRect(xx - 6, xy - 20, 22, 4)
+    lurek.render.rectangle(xx - 6, xy - 18, 4, 20)
+    lurek.render.rectangle(xx + 12, xy - 18, 4, 20)
+    lurek.render.rectangle(xx - 6, xy - 20, 22, 4)
     lurek.render.setColor(0.1, 0.5, 0.1, 1)
-    lurek.render.drawRect(xx - 2, xy - 16, 14, 2)
+    lurek.render.rectangle(xx - 2, xy - 16, 14, 2)
 
     -- draw lemmings
     for _, lem in ipairs(lemmings) do
@@ -540,51 +540,51 @@ lurek.render(function()
             if lem.job == "blocker" then
                 -- red body, arms out
                 lurek.render.setColor(0.9, 0.3, 0.3, 1)
-                lurek.render.drawRect(lx, ly + 2, 6, 6)
+                lurek.render.rectangle(lx, ly + 2, 6, 6)
                 lurek.render.setColor(0.8, 0.2, 0.2, 1)
-                lurek.render.drawRect(lx - 4, ly + 3, 4, 2)
-                lurek.render.drawRect(lx + 6, ly + 3, 4, 2)
+                lurek.render.rectangle(lx - 4, ly + 3, 4, 2)
+                lurek.render.rectangle(lx + 6, ly + 3, 4, 2)
                 -- head
                 lurek.render.setColor(0.95, 0.8, 0.6, 1)
-                lurek.render.drawRect(lx + 1, ly, 4, 3)
+                lurek.render.rectangle(lx + 1, ly, 4, 3)
             elseif lem.job == "digger" then
                 -- brown body, pickaxe motion
                 lurek.render.setColor(0.6, 0.45, 0.2, 1)
-                lurek.render.drawRect(lx, ly + 2, 6, 6)
+                lurek.render.rectangle(lx, ly + 2, 6, 6)
                 lurek.render.setColor(0.95, 0.8, 0.6, 1)
-                lurek.render.drawRect(lx + 1, ly, 4, 3)
+                lurek.render.rectangle(lx + 1, ly, 4, 3)
                 -- pickaxe
                 local swing = math.sin(lem.anim_timer * 8) * 3
                 lurek.render.setColor(0.5, 0.5, 0.5, 1)
-                lurek.render.drawRect(lx + 2, ly - 2 + swing, 2, 4)
+                lurek.render.rectangle(lx + 2, ly - 2 + swing, 2, 4)
             elseif lem.job == "builder" then
                 -- yellow body with brick
                 lurek.render.setColor(0.9, 0.8, 0.2, 1)
-                lurek.render.drawRect(lx, ly + 2, 6, 6)
+                lurek.render.rectangle(lx, ly + 2, 6, 6)
                 lurek.render.setColor(0.95, 0.8, 0.6, 1)
-                lurek.render.drawRect(lx + 1, ly, 4, 3)
+                lurek.render.rectangle(lx + 1, ly, 4, 3)
                 -- brick in hand
                 lurek.render.setColor(0.8, 0.4, 0.2, 1)
-                lurek.render.drawRect(lx + lem.dir * 5, ly + 4, 4, 3)
+                lurek.render.rectangle(lx + lem.dir * 5, ly + 4, 4, 3)
             elseif lem.job == "basher" then
                 -- orange body, punch motion
                 lurek.render.setColor(0.85, 0.55, 0.2, 1)
-                lurek.render.drawRect(lx, ly + 2, 6, 6)
+                lurek.render.rectangle(lx, ly + 2, 6, 6)
                 lurek.render.setColor(0.95, 0.8, 0.6, 1)
-                lurek.render.drawRect(lx + 1, ly, 4, 3)
+                lurek.render.rectangle(lx + 1, ly, 4, 3)
                 local punch = math.abs(math.sin(lem.anim_timer * 10)) * 4
                 lurek.render.setColor(0.95, 0.8, 0.6, 1)
-                lurek.render.drawRect(lx + lem.dir * (4 + punch), ly + 3, 3, 2)
+                lurek.render.rectangle(lx + lem.dir * (4 + punch), ly + 3, 3, 2)
             else
                 -- walker: blue/green body
                 lurek.render.setColor(0.2, 0.5, 0.9, 1)
-                lurek.render.drawRect(lx, ly + 2, 6, 6)
+                lurek.render.rectangle(lx, ly + 2, 6, 6)
                 -- head
                 lurek.render.setColor(0.95, 0.8, 0.6, 1)
-                lurek.render.drawRect(lx + 1, ly, 4, 3)
+                lurek.render.rectangle(lx + 1, ly, 4, 3)
                 -- green hair
                 lurek.render.setColor(0.2, 0.8, 0.3, 1)
-                lurek.render.drawRect(lx + 1, ly - 1, 4, 2)
+                lurek.render.rectangle(lx + 1, ly - 1, 4, 2)
             end
 
             -- feet animation for walkers
@@ -592,11 +592,11 @@ lurek.render(function()
                 local step = math.floor(lem.anim_timer * 6) % 2
                 lurek.render.setColor(0.15, 0.15, 0.4, 1)
                 if step == 0 then
-                    lurek.render.drawRect(lx, ly + 8, 2, 2)
-                    lurek.render.drawRect(lx + 4, ly + 8, 2, 2)
+                    lurek.render.rectangle(lx, ly + 8, 2, 2)
+                    lurek.render.rectangle(lx + 4, ly + 8, 2, 2)
                 else
-                    lurek.render.drawRect(lx + 1, ly + 8, 2, 2)
-                    lurek.render.drawRect(lx + 3, ly + 8, 2, 2)
+                    lurek.render.rectangle(lx + 1, ly + 8, 2, 2)
+                    lurek.render.rectangle(lx + 3, ly + 8, 2, 2)
                 end
             end
         end
@@ -606,49 +606,49 @@ lurek.render(function()
     for _, p in ipairs(particles) do
         local alpha = 1 - (p.age / p.life)
         lurek.render.setColor(p.r, p.g, p.b, alpha)
-        lurek.render.drawRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 
     -- cursor indicator
     lurek.render.setColor(1, 1, 1, 0.5)
-    lurek.render.drawRect(cursor_x - 1, cursor_y - 8, 2, 16)
-    lurek.render.drawRect(cursor_x - 8, cursor_y - 1, 16, 2)
+    lurek.render.rectangle(cursor_x - 1, cursor_y - 8, 2, 16)
+    lurek.render.rectangle(cursor_x - 8, cursor_y - 1, 16, 2)
 end)
 
 lurek.render_ui(function()
     if state == STATE_TITLE then
         lurek.render.setColor(0.3, 0.7, 1, 1)
-        lurek.render.drawText("LEMMINGS", 260, 180, 48)
+        lurek.render.print("LEMMINGS", 260, 180, 48)
         lurek.render.setColor(0.2, 0.9, 0.3, 1)
-        lurek.render.drawText("LET'S GO!", 310, 260, 24)
+        lurek.render.print("LET'S GO!", 310, 260, 24)
         lurek.render.setColor(0.7, 0.7, 0.7, 1)
-        lurek.render.drawText("Press ENTER to start", 290, 340, 16)
-        lurek.render.drawText("Assign jobs: 1=Blocker  2=Digger  3=Builder  4=Basher", 160, 400, 14)
-        lurek.render.drawText("Hover cursor near lemming + press key", 230, 430, 14)
+        lurek.render.print("Press ENTER to start", 290, 340, 16)
+        lurek.render.print("Assign jobs: 1=Blocker  2=Digger  3=Builder  4=Basher", 160, 400, 14)
+        lurek.render.print("Hover cursor near lemming + press key", 230, 430, 14)
         return
     end
 
     if state == STATE_GAME_OVER then
         lurek.render.setColor(0.9, 0.8, 0.2, 1)
-        lurek.render.drawText("GAME OVER", 260, 200, 48)
+        lurek.render.print("GAME OVER", 260, 200, 48)
         lurek.render.setColor(0.7, 0.7, 0.7, 1)
-        lurek.render.drawText("All " .. #levels .. " levels completed!", 280, 280, 20)
-        lurek.render.drawText("Press ENTER to return to title", 250, 340, 16)
+        lurek.render.print("All " .. #levels .. " levels completed!", 280, 280, 20)
+        lurek.render.print("Press ENTER to return to title", 250, 340, 16)
         return
     end
 
     -- HUD
     lurek.render.setColor(0.1, 0.1, 0.2, 0.85)
-    lurek.render.drawRect(0, 0, 800, 28)
+    lurek.render.rectangle(0, 0, 800, 28)
 
     lurek.render.setColor(0.3, 0.9, 0.3, 1)
-    lurek.render.drawText("Saved: " .. saved_count .. "/" .. NEEDED, 10, 6, 16)
+    lurek.render.print("Saved: " .. saved_count .. "/" .. NEEDED, 10, 6, 16)
 
     lurek.render.setColor(0.7, 0.7, 0.9, 1)
-    lurek.render.drawText("Level " .. level, 170, 6, 16)
+    lurek.render.print("Level " .. level, 170, 6, 16)
 
     lurek.render.setColor(0.9, 0.9, 0.5, 1)
-    lurek.render.drawText("Spawned: " .. spawned_count .. "/" .. TOTAL_LEMMINGS, 260, 6, 16)
+    lurek.render.print("Spawned: " .. spawned_count .. "/" .. TOTAL_LEMMINGS, 260, 6, 16)
 
     -- job counters
     local jx = 460
@@ -664,7 +664,7 @@ lurek.render_ui(function()
         local remaining = (job_limits[jn] or 0) - (job_used[jn] or 0)
         local clr = job_colors[jn]
         lurek.render.setColor(clr[1], clr[2], clr[3], 1)
-        lurek.render.drawText(key_labels[jn] .. ":" .. jn:sub(1,1):upper() .. jn:sub(2) .. "=" .. remaining, jx, 6, 13)
+        lurek.render.print(key_labels[jn] .. ":" .. jn:sub(1,1):upper() .. jn:sub(2) .. "=" .. remaining, jx, 6, 13)
         jx = jx + 90
     end
 
@@ -672,31 +672,31 @@ lurek.render_ui(function()
     lurek.render.setColor(0.6, 0.6, 0.6, 1)
     local mins = math.floor(level_timer / 60)
     local secs = math.floor(level_timer % 60)
-    lurek.render.drawText(string.format("Time %d:%02d", mins, secs), 10, 580, 14)
+    lurek.render.print(string.format("Time %d:%02d", mins, secs), 10, 580, 14)
 
     -- FPS
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
-    lurek.render.drawText("FPS: " .. fps, 730, 580, 12)
+    lurek.render.print("FPS: " .. fps, 730, 580, 12)
 
     -- bottom bar: job instructions
     lurek.render.setColor(0.1, 0.1, 0.2, 0.7)
-    lurek.render.drawRect(0, 560, 800, 18)
+    lurek.render.rectangle(0, 560, 800, 18)
     lurek.render.setColor(0.5, 0.5, 0.6, 1)
-    lurek.render.drawText("Hover + 1:Blocker  2:Digger  3:Builder  4:Basher    ESC:Quit", 180, 562, 12)
+    lurek.render.print("Hover + 1:Blocker  2:Digger  3:Builder  4:Basher    ESC:Quit", 180, 562, 12)
 
     -- level complete / failed overlay
     if state == STATE_LEVEL_COMPLETE or state == STATE_FAILED then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.drawRect(0, 200, 800, 120)
+        lurek.render.rectangle(0, 200, 800, 120)
         if state == STATE_LEVEL_COMPLETE then
             lurek.render.setColor(0.3, 1, 0.3, 1)
         else
             lurek.render.setColor(1, 0.3, 0.3, 1)
         end
-        lurek.render.drawText(fanfare_text, 200, 230, 32)
+        lurek.render.print(fanfare_text, 200, 230, 32)
         lurek.render.setColor(0.8, 0.8, 0.8, 1)
-        lurek.render.drawText("Saved: " .. saved_count .. "   Lost: " .. dead_count, 290, 280, 18)
-        lurek.render.drawText("Press ENTER to continue", 280, 310, 14)
+        lurek.render.print("Saved: " .. saved_count .. "   Lost: " .. dead_count, 290, 280, 18)
+        lurek.render.print("Press ENTER to continue", 280, 310, 14)
     end
 end)

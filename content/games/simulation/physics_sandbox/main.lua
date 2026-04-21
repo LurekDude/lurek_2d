@@ -653,20 +653,20 @@ end
 local function render_title()
     local pulse = 0.5 + 0.5 * math.sin(title_timer * 3)
 
-    lurek.render.drawText("PHYSICS SANDBOX", SCREEN_W * 0.5 - 140, 180,
+    lurek.render.print("PHYSICS SANDBOX", SCREEN_W * 0.5 - 140, 180,
         { r = 0.3 + 0.7 * pulse, g = 0.5 + 0.5 * pulse, b = 1.0, size = 32 })
-    lurek.render.drawText("BUILD AND DESTROY", SCREEN_W * 0.5 - 110, 230,
+    lurek.render.print("BUILD AND DESTROY", SCREEN_W * 0.5 - 110, 230,
         { r = 0.8, g = 0.8, b = 0.8, size = 18 })
 
-    lurek.render.drawText("[B] Build   [D] Destroy   [R] Rope",
+    lurek.render.print("[B] Build   [D] Destroy   [R] Rope",
         SCREEN_W * 0.5 - 160, 310, { r = 0.6, g = 0.6, b = 0.6, size = 14 })
-    lurek.render.drawText("[1-4] Shapes   [Space] Launch Ball",
+    lurek.render.print("[1-4] Shapes   [Space] Launch Ball",
         SCREEN_W * 0.5 - 150, 335, { r = 0.6, g = 0.6, b = 0.6, size = 14 })
-    lurek.render.drawText("[G] Gravity   [Arrows] Direction   [C] Color",
+    lurek.render.print("[G] Gravity   [Arrows] Direction   [C] Color",
         SCREEN_W * 0.5 - 185, 360, { r = 0.6, g = 0.6, b = 0.6, size = 14 })
 
     local blink = pulse > 0.5 and 1.0 or 0.4
-    lurek.render.drawText("Click or press Enter to start",
+    lurek.render.print("Click or press Enter to start",
         SCREEN_W * 0.5 - 120, 440, { r = blink, g = blink, b = blink, size = 14 })
 end
 
@@ -675,14 +675,14 @@ end
 -- ---------------------------------------------------------------------------
 local function render_sandbox()
     -- walls
-    lurek.render.drawRectFill(0, 0, SCREEN_W, WALL_THICK, { r = 0.2, g = 0.2, b = 0.25 })
-    lurek.render.drawRectFill(0, SCREEN_H - WALL_THICK, SCREEN_W, WALL_THICK, { r = 0.2, g = 0.2, b = 0.25 })
-    lurek.render.drawRectFill(0, 0, WALL_THICK, SCREEN_H, { r = 0.2, g = 0.2, b = 0.25 })
-    lurek.render.drawRectFill(SCREEN_W - WALL_THICK, 0, WALL_THICK, SCREEN_H, { r = 0.2, g = 0.2, b = 0.25 })
+    lurek.render.rectangle(0, 0, SCREEN_W, WALL_THICK, { r = 0.2, g = 0.2, b = 0.25 })
+    lurek.render.rectangle(0, SCREEN_H - WALL_THICK, SCREEN_W, WALL_THICK, { r = 0.2, g = 0.2, b = 0.25 })
+    lurek.render.rectangle(0, 0, WALL_THICK, SCREEN_H, { r = 0.2, g = 0.2, b = 0.25 })
+    lurek.render.rectangle(SCREEN_W - WALL_THICK, 0, WALL_THICK, SCREEN_H, { r = 0.2, g = 0.2, b = 0.25 })
 
     -- springs (ropes)
     for _, s in ipairs(springs) do
-        lurek.render.drawLine(s.a.x, s.a.y, s.b.x, s.b.y,
+        lurek.render.line(s.a.x, s.a.y, s.b.x, s.b.y,
             { r = 0.6, g = 0.9, b = 0.4, width = 2 })
     end
 
@@ -690,22 +690,22 @@ local function render_sandbox()
     for _, o in ipairs(objects) do
         local alpha = o.is_static and 0.85 or 1.0
         if o.shape == "circle" then
-            lurek.render.drawCircleFill(o.x, o.y, o.w * 0.5,
+            lurek.render.circleFill(o.x, o.y, o.w * 0.5,
                 { r = o.r, g = o.g, b = o.b, a = alpha })
         else
-            lurek.render.drawRectFill(o.x - o.w * 0.5, o.y - o.h * 0.5, o.w, o.h,
+            lurek.render.rectangle(o.x - o.w * 0.5, o.y - o.h * 0.5, o.w, o.h,
                 { r = o.r, g = o.g, b = o.b, a = alpha })
         end
         -- static indicator: small diamond
         if o.is_static then
-            lurek.render.drawRectFill(o.x - 3, o.y - 3, 6, 6,
+            lurek.render.rectangle(o.x - 3, o.y - 3, 6, 6,
                 { r = 1.0, g = 1.0, b = 1.0, a = 0.6 })
         end
     end
 
     -- particles
     for _, p in ipairs(particles) do
-        lurek.render.drawRectFill(p.x - p.size * 0.5, p.y - p.size * 0.5,
+        lurek.render.rectangle(p.x - p.size * 0.5, p.y - p.size * 0.5,
             p.size, p.size,
             { r = p.r, g = p.g, b = p.b, a = p.a })
     end
@@ -718,18 +718,18 @@ local function render_sandbox()
         local x2 = math.max(drag_start_x, mx)
         local y2 = math.max(drag_start_y, my)
         local col = BUILD_COLORS[color_idx]
-        lurek.render.drawRectFill(x1, y1, x2 - x1, y2 - y1,
+        lurek.render.rectangle(x1, y1, x2 - x1, y2 - y1,
             { r = col[1], g = col[2], b = col[3], a = 0.35 })
-        lurek.render.drawRect(x1, y1, x2 - x1, y2 - y1,
+        lurek.render.rectangle(x1, y1, x2 - x1, y2 - y1,
             { r = col[1], g = col[2], b = col[3], a = 0.8 })
     end
 
     -- destroy mode cursor indicator
     if current_mode == MODE.DESTROY then
         local mx, my = lurek.input.getMousePosition()
-        lurek.render.drawCircle(mx, my, EXPLOSION_RADIUS,
+        lurek.render.circle(mx, my, EXPLOSION_RADIUS,
             { r = 1.0, g = 0.3, b = 0.2, a = 0.15 })
-        lurek.render.drawCircle(mx, my, 8,
+        lurek.render.circle(mx, my, 8,
             { r = 1.0, g = 0.5, b = 0.3, a = 0.7 })
     end
 
@@ -738,7 +738,7 @@ local function render_sandbox()
         local mx, my = lurek.input.getMousePosition()
         local a = objects[rope_first]
         if a then
-            lurek.render.drawLine(a.x, a.y, mx, my,
+            lurek.render.line(a.x, a.y, mx, my,
                 { r = 0.4, g = 0.9, b = 0.4, a = 0.5, width = 1 })
         end
     end
@@ -766,12 +766,12 @@ function lurek.render_ui()
     local spring_count = #springs
 
     -- top-left info
-    lurek.render.drawText(string.format("FPS: %d", fps),
+    lurek.render.print(string.format("FPS: %d", fps),
         10, 10, { r = 0.5, g = 0.5, b = 0.5, size = 12 })
-    lurek.render.drawText(string.format("Objects: %d / %d", count, MAX_OBJECTS),
+    lurek.render.print(string.format("Objects: %d / %d", count, MAX_OBJECTS),
         10, 26, { r = 0.6, g = 0.8, b = 0.6, size = 12 })
     if spring_count > 0 then
-        lurek.render.drawText(string.format("Springs: %d", spring_count),
+        lurek.render.print(string.format("Springs: %d", spring_count),
             10, 42, { r = 0.6, g = 0.9, b = 0.4, size = 12 })
     end
 
@@ -783,35 +783,35 @@ function lurek.render_ui()
         [MODE.ROPE]    = { 0.4, 0.9, 0.4 },
     }
     local mc = mode_colors[current_mode]
-    lurek.render.drawText("MODE: " .. mode_names[current_mode],
+    lurek.render.print("MODE: " .. mode_names[current_mode],
         SCREEN_W - 150, 10, { r = mc[1], g = mc[2], b = mc[3], size = 14 })
 
     -- build color indicator
     if current_mode == MODE.BUILD then
         local col = BUILD_COLORS[color_idx]
-        lurek.render.drawRectFill(SCREEN_W - 150, 30, 14, 14,
+        lurek.render.rectangle(SCREEN_W - 150, 30, 14, 14,
             { r = col[1], g = col[2], b = col[3] })
-        lurek.render.drawText(COLOR_NAMES[color_idx],
+        lurek.render.print(COLOR_NAMES[color_idx],
             SCREEN_W - 130, 31, { r = 0.7, g = 0.7, b = 0.7, size = 12 })
     end
 
     -- gravity indicator
     local grav_text = gravity_on and ("GRAVITY: " .. gravity_label) or "GRAVITY: OFF"
     local grav_col = gravity_on and { 0.7, 0.7, 0.3 } or { 0.4, 0.4, 0.4 }
-    lurek.render.drawText(grav_text,
+    lurek.render.print(grav_text,
         SCREEN_W - 150, 50, { r = grav_col[1], g = grav_col[2], b = grav_col[3], size = 12 })
 
     -- mode flash overlay
     if mode_flash > 0 then
-        lurek.render.drawText(mode_flash_text,
+        lurek.render.print(mode_flash_text,
             SCREEN_W * 0.5 - #mode_flash_text * 5, SCREEN_H * 0.5 - 20,
             { r = 1.0, g = 1.0, b = 1.0, a = mode_flash, size = 28 })
     end
 
     -- bottom help bar
-    lurek.render.drawRectFill(0, SCREEN_H - 22, SCREEN_W, 22,
+    lurek.render.rectangle(0, SCREEN_H - 22, SCREEN_W, 22,
         { r = 0.0, g = 0.0, b = 0.0, a = 0.5 })
-    lurek.render.drawText(
+    lurek.render.print(
         "[B]uild  [D]estroy  [R]ope  [1-4]Shapes  [Space]Ball  [G]ravity  [Arrows]Dir  [C]olor  [X]Clear",
         8, SCREEN_H - 18, { r = 0.5, g = 0.5, b = 0.5, size = 11 })
 end

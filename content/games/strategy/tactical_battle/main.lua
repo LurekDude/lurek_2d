@@ -395,21 +395,21 @@ lurek.render(function()
         for c = 1, COLS do
             local v   = MAP[r][c]
             local col = v == TILE_FOREST and {0.15,0.3,0.15,1} or v == TILE_WATER and {0.1,0.2,0.45,1} or {0.1,0.12,0.1,1}
-            lurek.render.drawRect(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-1, CELL-1, { color = col })
+            lurek.render.rectangle(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-1, CELL-1, { color = col })
         end
     end
 
     -- Move/attack overlay
     for _, t in ipairs(move_tiles) do
-        lurek.render.drawRect(OX + (t.c-1)*CELL, OY + (t.r-1)*CELL, CELL-1, CELL-1, { color = {0.2,0.6,1.0,0.35} })
+        lurek.render.rectangle(OX + (t.c-1)*CELL, OY + (t.r-1)*CELL, CELL-1, CELL-1, { color = {0.2,0.6,1.0,0.35} })
     end
     for _, t in ipairs(attack_tiles) do
-        lurek.render.drawRect(OX + (t.c-1)*CELL, OY + (t.r-1)*CELL, CELL-1, CELL-1, { color = {0.9,0.2,0.2,0.35} })
+        lurek.render.rectangle(OX + (t.c-1)*CELL, OY + (t.r-1)*CELL, CELL-1, CELL-1, { color = {0.9,0.2,0.2,0.35} })
     end
 
     -- Hover
     if hover_c >= 1 and hover_c <= COLS and hover_r >= 1 and hover_r <= ROWS then
-        lurek.render.drawRect(OX + (hover_c-1)*CELL, OY + (hover_r-1)*CELL, CELL-1, CELL-1, { color = {1,1,1,0.12} })
+        lurek.render.rectangle(OX + (hover_c-1)*CELL, OY + (hover_r-1)*CELL, CELL-1, CELL-1, { color = {1,1,1,0.12} })
     end
 
     -- Units
@@ -419,14 +419,14 @@ lurek.render(function()
         local uy = OY + (u.r-1)*CELL
         local col = u.team == "player" and {0.3,0.6,1.0,1} or {0.8,0.3,0.2,1}
         if (u.moved and u.attacked) then col[4] = 0.5 end
-        lurek.render.drawRect(ux + 6, uy + 6, CELL - 14, CELL - 14, { color = col })
-        lurek.render.drawText(u.icon, ux + 18, uy + 16, { color = {1,1,1,1}, size = 18 })
+        lurek.render.rectangle(ux + 6, uy + 6, CELL - 14, CELL - 14, { color = col })
+        lurek.render.print(u.icon, ux + 18, uy + 16, { color = {1,1,1,1}, size = 18 })
         -- HP bar
-        lurek.render.drawRect(ux + 2, uy + CELL - 10, CELL - 6, 6, { color = {0.2,0,0,1} })
-        lurek.render.drawRect(ux + 2, uy + CELL - 10, math.floor((CELL-6) * u.hp / u.maxHp), 6, { color = {0.2,0.8,0.2,1} })
+        lurek.render.rectangle(ux + 2, uy + CELL - 10, CELL - 6, 6, { color = {0.2,0,0,1} })
+        lurek.render.rectangle(ux + 2, uy + CELL - 10, math.floor((CELL-6) * u.hp / u.maxHp), 6, { color = {0.2,0.8,0.2,1} })
 
         if selected and selected.id == u.id then
-            lurek.render.drawRect(ux + 2, uy + 2, CELL - 6, CELL - 6, { color = {1,1,0.3,0.3} })
+            lurek.render.rectangle(ux + 2, uy + 2, CELL - 6, CELL - 6, { color = {1,1,0.3,0.3} })
         end
         ::skip::
     end
@@ -438,25 +438,25 @@ end)
 
 -- ── Render UI ─────────────────────────────────────────────
 lurek.render_ui(function()
-    lurek.render.drawText(turn == "player" and "YOUR TURN" or "ENEMY TURN", 14, 8, { color = turn == "player" and {0.3,0.9,0.4,1} or {0.9,0.3,0.3,1}, size = 16 })
-    lurek.render.drawText("Score: " .. score, 400, 8, { color = {1,1,1,1}, size = 14 })
-    lurek.render.drawText("Click unit to select → move tile → attack tile   Enter=end turn", 14, H - 26, { color = {0.4,0.4,0.4,1}, size = 11 })
+    lurek.render.print(turn == "player" and "YOUR TURN" or "ENEMY TURN", 14, 8, { color = turn == "player" and {0.3,0.9,0.4,1} or {0.9,0.3,0.3,1}, size = 16 })
+    lurek.render.print("Score: " .. score, 400, 8, { color = {1,1,1,1}, size = 14 })
+    lurek.render.print("Click unit to select → move tile → attack tile   Enter=end turn", 14, H - 26, { color = {0.4,0.4,0.4,1}, size = 11 })
 
     if selected then
-        lurek.render.drawText(selected.kind .. " HP:" .. selected.hp .. "/" .. selected.maxHp, 320, 8, { color = {0.9,0.9,0.4,1}, size = 13 })
+        lurek.render.print(selected.kind .. " HP:" .. selected.hp .. "/" .. selected.maxHp, 320, 8, { color = {0.9,0.9,0.4,1}, size = 13 })
     end
 
     -- Log
     for i, msg in ipairs(log_msgs) do
         local a = math.min(1.0, msg.timer)
-        lurek.render.drawText(msg.t, 14, ROWS * CELL + OY + 8 + (i-1) * 16, { color = {0.8,0.8,0.6, a}, size = 11 })
+        lurek.render.print(msg.t, 14, ROWS * CELL + OY + 8 + (i-1) * 16, { color = {0.8,0.8,0.6, a}, size = 11 })
     end
 
     if state == "win" then
-        lurek.render.drawRect(200, 220, 400, 100, { color = {0,0,0,0.85} })
-        lurek.render.drawText("VICTORY!", 300, 246, { color = {1,0.9,0.2,1}, size = 36 })
+        lurek.render.rectangle(200, 220, 400, 100, { color = {0,0,0,0.85} })
+        lurek.render.print("VICTORY!", 300, 246, { color = {1,0.9,0.2,1}, size = 36 })
     elseif state == "lose" then
-        lurek.render.drawRect(200, 220, 400, 100, { color = {0,0,0,0.85} })
-        lurek.render.drawText("DEFEATED", 290, 246, { color = {0.9,0.2,0.2,1}, size = 36 })
+        lurek.render.rectangle(200, 220, 400, 100, { color = {0,0,0,0.85} })
+        lurek.render.print("DEFEATED", 290, 246, { color = {0.9,0.2,0.2,1}, size = 36 })
     end
 end)

@@ -453,7 +453,7 @@ function lurek.render()
 
     -- Subtle floor line
     lurek.render.setColor(0.15, 0.15, 0.2, 0.3)
-    lurek.render.drawRectFill(0, SCREEN_H - 2, SCREEN_W, 2)
+    lurek.render.rectangle(0, SCREEN_H - 2, SCREEN_W, 2)
 end
 
 -- ============================================================
@@ -466,7 +466,7 @@ lurek.render_ui(function()
 
         -- Background glow
         lurek.render.setColor(0.15, 0.08, 0.25, a * 0.4)
-        lurek.render.drawRectFill(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
 
         -- Title
         lurek.render.setColor(1.0, 0.85, 0.4, a)
@@ -498,7 +498,7 @@ lurek.render_ui(function()
 
     -- Top bar background
     lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
-    lurek.render.drawRectFill(0, 0, SCREEN_W, 50)
+    lurek.render.rectangle(0, 0, SCREEN_W, 50)
 
     -- Preset name with tween fade-in
     local pa = preset_tween_alpha
@@ -542,7 +542,7 @@ lurek.render_ui(function()
 
     -- Bottom bar: controls hint
     lurek.render.setColor(0.0, 0.0, 0.0, 0.4)
-    lurek.render.drawRectFill(0, SCREEN_H - 24, SCREEN_W, 24)
+    lurek.render.rectangle(0, SCREEN_H - 24, SCREEN_W, 24)
 
     lurek.render.setColor(0.5, 0.5, 0.6, 0.6)
     lurek.render.print(

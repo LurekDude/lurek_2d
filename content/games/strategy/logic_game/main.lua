@@ -243,11 +243,11 @@ lurek.render(function()
         for c = 1, COLS do
             local v = grid[r][c]
             local col = cell_color(v)
-            lurek.render.drawRect(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-2, CELL-2, { color = col })
+            lurek.render.rectangle(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-2, CELL-2, { color = col })
         end
     end
     -- Robot
-    lurek.render.drawRect(OX + (robot.x-1)*CELL + 8, OY + (robot.y-1)*CELL + 8, CELL-18, CELL-18, { color = {0.3,0.7,1.0,1} })
+    lurek.render.rectangle(OX + (robot.x-1)*CELL + 8, OY + (robot.y-1)*CELL + 8, CELL-18, CELL-18, { color = {0.3,0.7,1.0,1} })
 
     if step_particles then step_particles:draw() end
     if win_particles  then win_particles:draw()  end
@@ -256,8 +256,8 @@ end)
 -- ── Render UI ─────────────────────────────────────────────
 lurek.render_ui(function()
     local lv = LEVELS[level_idx]
-    lurek.render.drawText("Level " .. level_idx .. ": " .. lv.title, 40, 14, { color = {1,0.9,0.3,1}, size = 16 })
-    lurek.render.drawText("Program (" .. #program .. " slots):", 40, 520, { color = {0.7,0.7,0.9,1}, size = 14 })
+    lurek.render.print("Level " .. level_idx .. ": " .. lv.title, 40, 14, { color = {1,0.9,0.3,1}, size = 16 })
+    lurek.render.print("Program (" .. #program .. " slots):", 40, 520, { color = {0.7,0.7,0.9,1}, size = 14 })
 
     local px = 40
     for i, cmd in ipairs(program) do
@@ -265,14 +265,14 @@ lurek.render_ui(function()
         local bg   = sel and {0.4,0.3,0.6,1} or {0.2,0.2,0.3,1}
         local step = running and (i == run_step)
         if step then bg = {0.7,0.5,0.1,1} end
-        lurek.render.drawRect(px, 540, 48, 28, { color = bg })
-        lurek.render.drawText(string.upper(cmd):sub(1,2), px+14, 548, { color = {1,1,1,1}, size = 12 })
+        lurek.render.rectangle(px, 540, 48, 28, { color = bg })
+        lurek.render.print(string.upper(cmd):sub(1,2), px+14, 548, { color = {1,1,1,1}, size = 12 })
         px = px + 52
     end
 
-    lurek.render.drawText("W/A/S/D=set cmd  ←/→=slot  Enter=run  R=reset", 40, 578, { color = {0.4,0.4,0.4,1}, size = 11 })
+    lurek.render.print("W/A/S/D=set cmd  ←/→=slot  Enter=run  R=reset", 40, 578, { color = {0.4,0.4,0.4,1}, size = 11 })
 
     if msg_timer > 0 and msg ~= "" then
-        lurek.render.drawText(msg, 40, 494, { color = {1,0.9,0.4,1}, size = 13 })
+        lurek.render.print(msg, 40, 494, { color = {1,0.9,0.4,1}, size = 13 })
     end
 end)

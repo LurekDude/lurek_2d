@@ -616,21 +616,21 @@ lurek.render(function()
 
             if t == T_WALL then
                 lurek.render.setColor(0.2, 0.2, 0.25, 1)
-                lurek.render.drawRect(tx, ty, TILE, TILE)
+                lurek.render.rectangle(tx, ty, TILE, TILE)
             elseif t == T_EXIT then
                 if player.keys_collected >= 3 then
                     lurek.render.setColor(0.1, 0.8, 0.2, 0.8)
                 else
                     lurek.render.setColor(0.1, 0.4, 0.15, 0.5)
                 end
-                lurek.render.drawRect(tx, ty, TILE, TILE)
+                lurek.render.rectangle(tx, ty, TILE, TILE)
             else
                 lurek.render.setColor(0.08, 0.12, 0.08, 1)
-                lurek.render.drawRect(tx, ty, TILE, TILE)
+                lurek.render.rectangle(tx, ty, TILE, TILE)
                 -- Grid lines
                 lurek.render.setColor(0.1, 0.15, 0.1, 1)
-                lurek.render.drawLine(tx, ty, tx + TILE, ty, 1)
-                lurek.render.drawLine(tx, ty, tx, ty + TILE, 1)
+                lurek.render.line(tx, ty, tx + TILE, ty, 1)
+                lurek.render.line(tx, ty, tx, ty + TILE, 1)
             end
         end
     end
@@ -638,21 +638,21 @@ lurek.render(function()
     -- Draw hide spots
     for _, hs in ipairs(hide_spots) do
         lurek.render.setColor(0.4, 0.28, 0.12, 0.9)
-        lurek.render.drawRect(hs.x + 2, hs.y + 2, hs.w - 4, hs.h - 4)
+        lurek.render.rectangle(hs.x + 2, hs.y + 2, hs.w - 4, hs.h - 4)
         -- Crate marks
         lurek.render.setColor(0.3, 0.2, 0.08, 1)
-        lurek.render.drawLine(hs.x + 4, hs.y + 4, hs.x + hs.w - 4, hs.y + hs.h - 4, 1)
-        lurek.render.drawLine(hs.x + hs.w - 4, hs.y + 4, hs.x + 4, hs.y + hs.h - 4, 1)
+        lurek.render.line(hs.x + 4, hs.y + 4, hs.x + hs.w - 4, hs.y + hs.h - 4, 1)
+        lurek.render.line(hs.x + hs.w - 4, hs.y + 4, hs.x + 4, hs.y + hs.h - 4, 1)
     end
 
     -- Draw keycards
     for _, kc in ipairs(keycards) do
         if not kc.collected then
             lurek.render.setColor(1.0, 0.9, 0.15, 1)
-            lurek.render.drawRect(kc.x - 6, kc.y - 4, 12, 8)
+            lurek.render.rectangle(kc.x - 6, kc.y - 4, 12, 8)
             -- Key notch
             lurek.render.setColor(0.8, 0.7, 0.1, 1)
-            lurek.render.drawRect(kc.x + 3, kc.y - 2, 4, 4)
+            lurek.render.rectangle(kc.x + 3, kc.y - 2, 4, 4)
         end
     end
 
@@ -689,8 +689,8 @@ lurek.render(function()
         lurek.render.setColor(cr, cg_col, cb, ca + 0.15)
         local la = g.dir - VISION_HALF_ANGLE
         local ra = g.dir + VISION_HALF_ANGLE
-        lurek.render.drawLine(g.x, g.y, g.x + math.cos(la) * cone_r, g.y + math.sin(la) * cone_r, 1)
-        lurek.render.drawLine(g.x, g.y, g.x + math.cos(ra) * cone_r, g.y + math.sin(ra) * cone_r, 1)
+        lurek.render.line(g.x, g.y, g.x + math.cos(la) * cone_r, g.y + math.sin(la) * cone_r, 1)
+        lurek.render.line(g.x, g.y, g.x + math.cos(ra) * cone_r, g.y + math.sin(ra) * cone_r, 1)
     end
 
     -- Draw guards
@@ -703,13 +703,13 @@ lurek.render(function()
         else
             lurek.render.setColor(0.8, 0.2, 0.2, 1)
         end
-        lurek.render.drawRect(g.x - 10, g.y - 10, 20, 20)
+        lurek.render.rectangle(g.x - 10, g.y - 10, 20, 20)
 
         -- Direction indicator
         lurek.render.setColor(1, 1, 1, 0.9)
         local dx = math.cos(g.dir) * 12
         local dy = math.sin(g.dir) * 12
-        lurek.render.drawLine(g.x, g.y, g.x + dx, g.y + dy, 2)
+        lurek.render.line(g.x, g.y, g.x + dx, g.y + dy, 2)
 
         -- Suspicion indicator above guard
         if g.suspicion > 5 then
@@ -718,7 +718,7 @@ lurek.render(function()
             local bx = g.x - bw / 2
             local by = g.y - 18
             lurek.render.setColor(0.3, 0.3, 0.3, 0.7)
-            lurek.render.drawRect(bx, by, bw, bh)
+            lurek.render.rectangle(bx, by, bw, bh)
             local fill = (g.suspicion / SUSPICION_ALERT) * bw
             if g.suspicion >= SUSPICION_ALERT then
                 lurek.render.setColor(1, 0.1, 0.1, 0.9)
@@ -727,7 +727,7 @@ lurek.render(function()
             else
                 lurek.render.setColor(0.2, 0.8, 0.2, 0.9)
             end
-            lurek.render.drawRect(bx, by, fill, bh)
+            lurek.render.rectangle(bx, by, fill, bh)
         end
 
         -- Exclamation mark when alert
@@ -744,10 +744,10 @@ lurek.render(function()
     if not player.hidden then
         if player.crouching then
             lurek.render.setColor(0.3, 0.7, 0.4, 0.8)
-            lurek.render.drawCircle(player.x, player.y, PLAYER_R - 2)
+            lurek.render.circle(player.x, player.y, PLAYER_R - 2)
         else
             lurek.render.setColor(0.3, 0.85, 0.4, 1)
-            lurek.render.drawCircle(player.x, player.y, PLAYER_R)
+            lurek.render.circle(player.x, player.y, PLAYER_R)
         end
     end
 
@@ -759,7 +759,7 @@ lurek.render(function()
     -- Alert flash overlay
     if alert_flash.alpha > 0 then
         lurek.render.setColor(1, 0.1, 0.05, alert_flash.alpha)
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
     end
 end)
 
@@ -796,7 +796,7 @@ function lurek.render_ui()
         local bx = SCREEN_W - bw - 10
         local by = 10
         lurek.render.setColor(0.3, 0.3, 0.3, 0.7)
-        lurek.render.drawRect(bx, by, bw, bh)
+        lurek.render.rectangle(bx, by, bw, bh)
         local fill = (susp_bar.value / SUSPICION_ALERT) * bw
         if susp_bar.value >= SUSPICION_ALERT then
             lurek.render.setColor(1, 0.1, 0.1, 1)
@@ -805,7 +805,7 @@ function lurek.render_ui()
         else
             lurek.render.setColor(0.2, 0.8, 0.2, 1)
         end
-        lurek.render.drawRect(bx, by, fill, bh)
+        lurek.render.rectangle(bx, by, fill, bh)
         lurek.render.setColor(0.8, 0.8, 0.8, 0.7)
         lurek.render.print("SUSPICION", bx, by + 12)
     end
@@ -831,7 +831,7 @@ function lurek.render_ui()
     -- Game over screen
     if game_state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
         lurek.render.setColor(1, 0.2, 0.15, 1)
         lurek.render.print("GAME OVER", SCREEN_W / 2 - 45, SCREEN_H / 2 - 30)
         lurek.render.setColor(0.8, 0.8, 0.8, 0.8)
@@ -841,7 +841,7 @@ function lurek.render_ui()
     -- Level complete screen
     if game_state == STATE.LEVEL_COMPLETE then
         lurek.render.setColor(0, 0, 0, 0.5)
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
         lurek.render.setColor(0.2, 0.9, 0.3, 1)
         if current_level >= #LEVELS then
             lurek.render.print("ALL LEVELS COMPLETE!", SCREEN_W / 2 - 75, SCREEN_H / 2 - 30)

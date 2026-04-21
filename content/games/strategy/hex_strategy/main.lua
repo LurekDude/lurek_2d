@@ -222,20 +222,20 @@ lurek.render(function()
         -- Flat-hex approximation using two overlapping rects (diamond)
         local hw = HEX_SIZE * 0.9
         local hh = HEX_SIZE * 0.78
-        lurek.render.drawRect(sx - hw/2, sy - hh/2, hw, hh, { color = col })
+        lurek.render.rectangle(sx - hw/2, sy - hh/2, hw, hh, { color = col })
 
         if selected and selected.q == h.q and selected.r == h.r then
-            lurek.render.drawRect(sx - hw/2 - 2, sy - hh/2 - 2, hw + 4, hh + 4, { color = {1,1,0.3,0.35} })
+            lurek.render.rectangle(sx - hw/2 - 2, sy - hh/2 - 2, hw + 4, hh + 4, { color = {1,1,0.3,0.35} })
         end
 
         -- City marker
         if h.city then
-            lurek.render.drawCircle(sx, sy, 8, { color = {1,0.85,0.2,1}, segments = 6 })
+            lurek.render.circle(sx, sy, 8, { color = {1,0.85,0.2,1}, segments = 6 })
         end
 
         -- Player border dot
         if h.owner == "player" and not h.city then
-            lurek.render.drawCircle(sx, sy, 5, { color = {0.4,0.7,1.0,0.9}, segments = 6 })
+            lurek.render.circle(sx, sy, 5, { color = {0.4,0.7,1.0,0.9}, segments = 6 })
         end
     end
 
@@ -245,24 +245,24 @@ end)
 
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.render_ui()
-    lurek.render.drawRect(0, 0, W, 44, { color = {0.06,0.08,0.08,0.92} })
-    lurek.render.drawText("Gold:" .. math.floor(resources.gold), 10, 8, { color = {1,0.85,0.2,1}, size = 13 })
-    lurek.render.drawText("Wood:" .. math.floor(resources.wood), 110, 8, { color = {0.5,0.8,0.3,1}, size = 13 })
-    lurek.render.drawText("Food:" .. math.floor(resources.food), 210, 8, { color = {0.85,0.55,0.2,1}, size = 13 })
-    lurek.render.drawText("Hexes:" .. owned, 310, 8, { color = {0.7,0.7,1,1}, size = 13 })
-    lurek.render.drawText("Turn:" .. turn_num, 410, 8, { color = {1,1,1,1}, size = 13 })
-    lurek.render.drawText("Score:" .. score, 510, 8, { color = {1,0.9,0.4,1}, size = 13 })
-    lurek.render.drawText("Click adj hex=expand(30g+10w)  C=city(50g+20w+20f)  N=next turn", 10, 26, { color = {0.4,0.4,0.4,1}, size = 11 })
+    lurek.render.rectangle(0, 0, W, 44, { color = {0.06,0.08,0.08,0.92} })
+    lurek.render.print("Gold:" .. math.floor(resources.gold), 10, 8, { color = {1,0.85,0.2,1}, size = 13 })
+    lurek.render.print("Wood:" .. math.floor(resources.wood), 110, 8, { color = {0.5,0.8,0.3,1}, size = 13 })
+    lurek.render.print("Food:" .. math.floor(resources.food), 210, 8, { color = {0.85,0.55,0.2,1}, size = 13 })
+    lurek.render.print("Hexes:" .. owned, 310, 8, { color = {0.7,0.7,1,1}, size = 13 })
+    lurek.render.print("Turn:" .. turn_num, 410, 8, { color = {1,1,1,1}, size = 13 })
+    lurek.render.print("Score:" .. score, 510, 8, { color = {1,0.9,0.4,1}, size = 13 })
+    lurek.render.print("Click adj hex=expand(30g+10w)  C=city(50g+20w+20f)  N=next turn", 10, 26, { color = {0.4,0.4,0.4,1}, size = 11 })
 
     if selected then
         local t = TERRAIN[selected.terrain]
         local lbl = t.label .. " — gold:" .. t.gold .. " wood:" .. t.wood .. " food:" .. t.food
         if selected.city then lbl = lbl .. " [CITY ×2]" end
-        lurek.render.drawText(lbl, 10, H - 20, { color = {0.7,0.9,1,1}, size = 12 })
+        lurek.render.print(lbl, 10, H - 20, { color = {0.7,0.9,1,1}, size = 12 })
     end
 
     if info_timer > 0 then
         local a = math.min(1.0, info_timer)
-        lurek.render.drawText(info_text, W/2 - 140, H/2 - 16, { color = {1,1,0.6,a}, size = 18 })
+        lurek.render.print(info_text, W/2 - 140, H/2 - 16, { color = {1,1,0.6,a}, size = 18 })
     end
 end

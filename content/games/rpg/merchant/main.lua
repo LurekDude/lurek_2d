@@ -439,31 +439,31 @@ lurek.render(function()
     local cam = lurek.camera.getPosition()
 
     -- Shop floor
-    lurek.render.drawRect(0, 450, SCREEN_W, 150, 0.25, 0.18, 0.12, 1)
+    lurek.render.rectangle(0, 450, SCREEN_W, 150, 0.25, 0.18, 0.12, 1)
     -- Counter
-    lurek.render.drawRect(60, 380, 300, 70, 0.35, 0.25, 0.15, 1)
-    lurek.render.drawRect(60, 375, 300, 8, 0.45, 0.35, 0.20, 1)
+    lurek.render.rectangle(60, 380, 300, 70, 0.35, 0.25, 0.15, 1)
+    lurek.render.rectangle(60, 375, 300, 8, 0.45, 0.35, 0.20, 1)
     -- Shelves background
-    lurek.render.drawRect(420, 100, 350, 340, 0.20, 0.15, 0.10, 1)
+    lurek.render.rectangle(420, 100, 350, 340, 0.20, 0.15, 0.10, 1)
     -- Shelf planks
     for row = 0, 2 do
         local sy = 140 + row * 110
-        lurek.render.drawRect(425, sy, 340, 6, 0.4, 0.3, 0.18, 1)
+        lurek.render.rectangle(425, sy, 340, 6, 0.4, 0.3, 0.18, 1)
     end
 
     -- Customer approach area
     if current_state == STATE.CUSTOMER and customer then
         local cx = customer.x or 150
         -- Customer body
-        lurek.render.drawRect(cx, 400, 30, 50, 0.65, 0.55, 0.40, 1)
+        lurek.render.rectangle(cx, 400, 30, 50, 0.65, 0.55, 0.40, 1)
         -- Customer head
-        lurek.render.drawCircle(cx + 15, 390, 12, 0.75, 0.65, 0.50, 1)
+        lurek.render.circle(cx + 15, 390, 12, 0.75, 0.65, 0.50, 1)
     end
 
     -- Particles (world-space)
     for _, p in ipairs(particles) do
         local alpha = clamp(p.life / p.max_life, 0, 1)
-        lurek.render.drawCircle(p.x, p.y, p.size, p.r, p.g, p.b, alpha)
+        lurek.render.circle(p.x, p.y, p.size, p.r, p.g, p.b, alpha)
     end
 end)
 
@@ -473,34 +473,34 @@ end)
 lurek.render_ui(function()
     -- ===== TITLE SCREEN =====
     if current_state == STATE.TITLE then
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0.12, 0.09, 0.06, 1)
-        lurek.render.drawText("THE MERCHANT", SCREEN_W / 2 - 140, 160, 36, 0.95, 0.85, 0.5, 1)
-        lurek.render.drawText("BUY LOW, SELL HIGH", SCREEN_W / 2 - 120, 220, 20, 0.7, 0.6, 0.4, 1)
-        lurek.render.drawText("Trade goods, serve customers, build your fortune", SCREEN_W / 2 - 210, 280, 14, 0.6, 0.5, 0.35, 1)
-        lurek.render.drawText("Press ENTER to start", SCREEN_W / 2 - 90, 400, 16, 0.8, 0.7, 0.4, 1)
-        lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4, 1)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.12, 0.09, 0.06, 1)
+        lurek.render.print("THE MERCHANT", SCREEN_W / 2 - 140, 160, 36, 0.95, 0.85, 0.5, 1)
+        lurek.render.print("BUY LOW, SELL HIGH", SCREEN_W / 2 - 120, 220, 20, 0.7, 0.6, 0.4, 1)
+        lurek.render.print("Trade goods, serve customers, build your fortune", SCREEN_W / 2 - 210, 280, 14, 0.6, 0.5, 0.35, 1)
+        lurek.render.print("Press ENTER to start", SCREEN_W / 2 - 90, 400, 16, 0.8, 0.7, 0.4, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4, 1)
         return
     end
 
     -- ===== GAME OVER =====
     if current_state == STATE.GAME_OVER then
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.05, 0.03, 1)
-        lurek.render.drawText("GAME OVER", SCREEN_W / 2 - 100, 140, 36, 0.9, 0.3, 0.2, 1)
-        lurek.render.drawText("Final Gold: " .. gold .. "g", SCREEN_W / 2 - 80, 220, 22, 1.0, 0.9, 0.3, 1)
-        lurek.render.drawText("Total Earned: " .. total_earned .. "g", SCREEN_W / 2 - 90, 260, 18, 0.8, 0.7, 0.3, 1)
-        lurek.render.drawText("Customers Served: " .. customer_served, SCREEN_W / 2 - 100, 300, 16, 0.5, 0.8, 0.5, 1)
-        lurek.render.drawText("Customers Missed: " .. customer_missed, SCREEN_W / 2 - 100, 325, 16, 0.8, 0.4, 0.4, 1)
-        lurek.render.drawText("Reputation: " .. string.format("%.0f%%", reputation * 100), SCREEN_W / 2 - 70, 365, 16, 0.7, 0.6, 0.9, 1)
-        lurek.render.drawText("Press ENTER to restart", SCREEN_W / 2 - 100, 430, 16, 0.6, 0.5, 0.4, 1)
-        lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4, 1)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.05, 0.03, 1)
+        lurek.render.print("GAME OVER", SCREEN_W / 2 - 100, 140, 36, 0.9, 0.3, 0.2, 1)
+        lurek.render.print("Final Gold: " .. gold .. "g", SCREEN_W / 2 - 80, 220, 22, 1.0, 0.9, 0.3, 1)
+        lurek.render.print("Total Earned: " .. total_earned .. "g", SCREEN_W / 2 - 90, 260, 18, 0.8, 0.7, 0.3, 1)
+        lurek.render.print("Customers Served: " .. customer_served, SCREEN_W / 2 - 100, 300, 16, 0.5, 0.8, 0.5, 1)
+        lurek.render.print("Customers Missed: " .. customer_missed, SCREEN_W / 2 - 100, 325, 16, 0.8, 0.4, 0.4, 1)
+        lurek.render.print("Reputation: " .. string.format("%.0f%%", reputation * 100), SCREEN_W / 2 - 70, 365, 16, 0.7, 0.6, 0.9, 1)
+        lurek.render.print("Press ENTER to restart", SCREEN_W / 2 - 100, 430, 16, 0.6, 0.5, 0.4, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4, 1)
         return
     end
 
     -- ===== LEDGER =====
     if current_state == STATE.LEDGER then
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0.10, 0.08, 0.05, 1)
-        lurek.render.drawText("SALES LEDGER", SCREEN_W / 2 - 80, 30, 24, 0.95, 0.85, 0.5, 1)
-        lurek.render.drawText("Press L or ESC to close", SCREEN_W / 2 - 100, 60, 12, 0.5, 0.5, 0.4, 1)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.10, 0.08, 0.05, 1)
+        lurek.render.print("SALES LEDGER", SCREEN_W / 2 - 80, 30, 24, 0.95, 0.85, 0.5, 1)
+        lurek.render.print("Press L or ESC to close", SCREEN_W / 2 - 100, 60, 12, 0.5, 0.5, 0.4, 1)
         local y = 100
         local start = math.max(1, #ledger - 18)
         for i = start, #ledger do
@@ -510,45 +510,45 @@ lurek.render_ui(function()
             if string.sub(entry.text, 1, 4) == "SELL" then cr, cg, cb = 1.0, 0.9, 0.3 end
             if string.sub(entry.text, 1, 4) == "CUST" then cr, cg, cb = 0.3, 1.0, 0.5 end
             if string.sub(entry.text, 1, 4) == "MISS" then cr, cg, cb = 0.9, 0.4, 0.3 end
-            lurek.render.drawText("[" .. entry.time .. "] " .. entry.text, 60, y, 14, cr, cg, cb, 1)
+            lurek.render.print("[" .. entry.time .. "] " .. entry.text, 60, y, 14, cr, cg, cb, 1)
             y = y + 22
         end
-        lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4, 1)
         return
     end
 
     -- ===== TRADING / CUSTOMER HUD =====
 
     -- Top bar
-    lurek.render.drawRect(0, 0, SCREEN_W, 40, 0.1, 0.08, 0.05, 0.9)
-    lurek.render.drawText("Gold: " .. math.floor(gold_display) .. "g", 15, 10, 18, 1.0, 0.9, 0.3, 1)
-    lurek.render.drawText("Day " .. day .. "/" .. TOTAL_DAYS, 200, 12, 16, 0.7, 0.6, 0.4, 1)
+    lurek.render.rectangle(0, 0, SCREEN_W, 40, 0.1, 0.08, 0.05, 0.9)
+    lurek.render.print("Gold: " .. math.floor(gold_display) .. "g", 15, 10, 18, 1.0, 0.9, 0.3, 1)
+    lurek.render.print("Day " .. day .. "/" .. TOTAL_DAYS, 200, 12, 16, 0.7, 0.6, 0.4, 1)
     -- Day progress bar
     local prog = day_timer / DAY_LENGTH
-    lurek.render.drawRect(320, 14, 150, 12, 0.2, 0.15, 0.1, 1)
-    lurek.render.drawRect(320, 14, 150 * prog, 12, 0.6, 0.5, 0.2, 1)
-    lurek.render.drawText("Rep: " .. string.format("%.0f%%", reputation * 100), 500, 12, 14, 0.7, 0.6, 0.9, 1)
+    lurek.render.rectangle(320, 14, 150, 12, 0.2, 0.15, 0.1, 1)
+    lurek.render.rectangle(320, 14, 150 * prog, 12, 0.6, 0.5, 0.2, 1)
+    lurek.render.print("Rep: " .. string.format("%.0f%%", reputation * 100), 500, 12, 14, 0.7, 0.6, 0.9, 1)
     local mode_text = sell_mode and "SELL MODE (S)" or "BUY MODE (S)"
     local mode_r = sell_mode and 1.0 or 0.3
     local mode_g = sell_mode and 0.6 or 0.8
     local mode_b = sell_mode and 0.2 or 1.0
-    lurek.render.drawText(mode_text, 640, 12, 14, mode_r, mode_g, mode_b, 1)
+    lurek.render.print(mode_text, 640, 12, 14, mode_r, mode_g, mode_b, 1)
 
     -- Shelf: items grouped by category
     local sx, sy = 420, 55
     local slot = 1
     for _, cat in ipairs(CATEGORIES) do
-        lurek.render.drawText(cat, sx, sy, 14, 0.8, 0.7, 0.5, 1)
+        lurek.render.print(cat, sx, sy, 14, 0.8, 0.7, 0.5, 1)
         sy = sy + 20
         for _, item in ipairs(ITEMS) do
             if item.cat == cat then
                 local stock = shelf_stock[item.id] or 0
                 local alpha = stock > 0 and 1.0 or 0.3
                 -- Item color swatch
-                lurek.render.drawRect(sx, sy, 10, 10, item.color[1], item.color[2], item.color[3], alpha)
+                lurek.render.rectangle(sx, sy, 10, 10, item.color[1], item.color[2], item.color[3], alpha)
                 local label = string.format("[%d] %s  %dg  stk:%d  %s",
                     slot, item.name, item.cost, stock, item.stat)
-                lurek.render.drawText(label, sx + 16, sy, 12, 0.8, 0.8, 0.7, alpha)
+                lurek.render.print(label, sx + 16, sy, 12, 0.8, 0.8, 0.7, alpha)
                 sy = sy + 18
                 slot = slot + 1
             end
@@ -557,8 +557,8 @@ lurek.render_ui(function()
     end
 
     -- Inventory panel
-    lurek.render.drawRect(10, 460, 380, 130, 0.12, 0.10, 0.07, 0.9)
-    lurek.render.drawText("YOUR INVENTORY", 20, 465, 14, 0.8, 0.7, 0.5, 1)
+    lurek.render.rectangle(10, 460, 380, 130, 0.12, 0.10, 0.07, 0.9)
+    lurek.render.print("YOUR INVENTORY", 20, 465, 14, 0.8, 0.7, 0.5, 1)
     local ix, iy = 20, 485
     local has_items = false
     for _, item in ipairs(ITEMS) do
@@ -566,47 +566,47 @@ lurek.render_ui(function()
         if count > 0 then
             has_items = true
             local sp = sell_price(item)
-            lurek.render.drawRect(ix, iy + 2, 8, 8, item.color[1], item.color[2], item.color[3], 1)
-            lurek.render.drawText(item.name .. " x" .. count .. " (sell:" .. sp .. "g)", ix + 14, iy, 12, 0.7, 0.7, 0.6, 1)
+            lurek.render.rectangle(ix, iy + 2, 8, 8, item.color[1], item.color[2], item.color[3], 1)
+            lurek.render.print(item.name .. " x" .. count .. " (sell:" .. sp .. "g)", ix + 14, iy, 12, 0.7, 0.7, 0.6, 1)
             iy = iy + 16
         end
     end
     if not has_items then
-        lurek.render.drawText("Empty — buy items from the shelf!", 20, 490, 12, 0.5, 0.4, 0.3, 1)
+        lurek.render.print("Empty — buy items from the shelf!", 20, 490, 12, 0.5, 0.4, 0.3, 1)
     end
 
     -- Customer panel
     if current_state == STATE.CUSTOMER and customer then
-        lurek.render.drawRect(10, 340, 380, 110, 0.18, 0.12, 0.08, 0.95)
-        lurek.render.drawText("CUSTOMER: " .. customer.name, 20, 348, 16, 0.9, 0.8, 0.5, 1)
+        lurek.render.rectangle(10, 340, 380, 110, 0.18, 0.12, 0.08, 0.95)
+        lurek.render.print("CUSTOMER: " .. customer.name, 20, 348, 16, 0.9, 0.8, 0.5, 1)
         local wanted = ITEMS[customer.item_id]
-        lurek.render.drawText("Wants: " .. wanted.name, 20, 370, 14, 0.8, 0.7, 0.5, 1)
+        lurek.render.print("Wants: " .. wanted.name, 20, 370, 14, 0.8, 0.7, 0.5, 1)
         local cp = customer_price(wanted)
-        lurek.render.drawText("Will pay: " .. cp .. "g", 20, 390, 14, 0.3, 0.9, 0.3, 1)
+        lurek.render.print("Will pay: " .. cp .. "g", 20, 390, 14, 0.3, 0.9, 0.3, 1)
         local have = (inventory[wanted.id] or 0) > 0
         if have then
-            lurek.render.drawText("You have it! Auto-selling...", 20, 412, 12, 0.4, 1.0, 0.5, 1)
+            lurek.render.print("You have it! Auto-selling...", 20, 412, 12, 0.4, 1.0, 0.5, 1)
         else
-            lurek.render.drawText("You don't have it!", 20, 412, 12, 0.9, 0.3, 0.3, 1)
+            lurek.render.print("You don't have it!", 20, 412, 12, 0.9, 0.3, 0.3, 1)
         end
         -- Timer bar
         local tp = clamp(customer.timer / 4.0, 0, 1)
-        lurek.render.drawRect(20, 432, 200, 8, 0.2, 0.15, 0.1, 1)
-        lurek.render.drawRect(20, 432, 200 * tp, 8, 0.9, 0.6, 0.1, 1)
+        lurek.render.rectangle(20, 432, 200, 8, 0.2, 0.15, 0.1, 1)
+        lurek.render.rectangle(20, 432, 200 * tp, 8, 0.9, 0.6, 0.1, 1)
     end
 
     -- Messages
     local my = 50
     for _, msg in ipairs(messages) do
         local alpha = clamp(msg.timer / 1.0, 0, 1)
-        lurek.render.drawText(msg.text, 15, my, 13, msg.color[1], msg.color[2], msg.color[3], alpha)
+        lurek.render.print(msg.text, 15, my, 13, msg.color[1], msg.color[2], msg.color[3], alpha)
         my = my + 18
     end
 
     -- Controls hint
-    lurek.render.drawText("[1-8] Buy/Sell  [A] Auto-buy  [S] Mode  [R] Restock  [L] Ledger  [ESC] Quit",
+    lurek.render.print("[1-8] Buy/Sell  [A] Auto-buy  [S] Mode  [R] Restock  [L] Ledger  [ESC] Quit",
         10, SCREEN_H - 18, 11, 0.4, 0.35, 0.3, 1)
 
     -- FPS
-    lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), SCREEN_W - 80, SCREEN_H - 18, 11, 0.4, 0.4, 0.4, 1)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), SCREEN_W - 80, SCREEN_H - 18, 11, 0.4, 0.4, 0.4, 1)
 end)

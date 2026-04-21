@@ -378,24 +378,24 @@ lurek.render(function()
                      or ter == T_CITY     and {0.3,0.3,0.45,1}
                      or                       {0.1,0.14,0.1,1}
             local hx, hy = hex_to_pixel(c, r)
-            lurek.render.drawRect(hx, hy, HEX_W - 2, HEX_H - 2, { color = col })
+            lurek.render.rectangle(hx, hy, HEX_W - 2, HEX_H - 2, { color = col })
         end
     end
 
     -- Reachable / attackable highlight
     for _, t in ipairs(reachable) do
         local hx, hy = hex_to_pixel(t.c, t.r)
-        lurek.render.drawRect(hx, hy, HEX_W-2, HEX_H-2, { color = {0.3,0.6,1.0,0.3} })
+        lurek.render.rectangle(hx, hy, HEX_W-2, HEX_H-2, { color = {0.3,0.6,1.0,0.3} })
     end
     for _, t in ipairs(attackable) do
         local hx, hy = hex_to_pixel(t.c, t.r)
-        lurek.render.drawRect(hx, hy, HEX_W-2, HEX_H-2, { color = {0.9,0.2,0.2,0.3} })
+        lurek.render.rectangle(hx, hy, HEX_W-2, HEX_H-2, { color = {0.9,0.2,0.2,0.3} })
     end
 
     -- Hover
     if hover_c >= 1 and hover_c <= COLS and hover_r >= 1 and hover_r <= ROWS then
         local hx, hy = hex_to_pixel(hover_c, hover_r)
-        lurek.render.drawRect(hx, hy, HEX_W-2, HEX_H-2, { color = {1,1,1,0.12} })
+        lurek.render.rectangle(hx, hy, HEX_W-2, HEX_H-2, { color = {1,1,1,0.12} })
     end
 
     -- Units
@@ -404,14 +404,14 @@ lurek.render(function()
         local hx, hy = hex_to_pixel(u.c, u.r)
         local col = u.team == "player" and {0.3,0.6,1.0,1} or {0.8,0.3,0.2,1}
         if u.moved and u.attacked then col[4] = 0.45 end
-        lurek.render.drawRect(hx + 5, hy + 5, HEX_W - 12, HEX_H - 12, { color = col })
-        lurek.render.drawText(u.icon, hx + 7, hy + 14, { color = {1,1,1,1}, size = 10 })
+        lurek.render.rectangle(hx + 5, hy + 5, HEX_W - 12, HEX_H - 12, { color = col })
+        lurek.render.print(u.icon, hx + 7, hy + 14, { color = {1,1,1,1}, size = 10 })
         -- HP
-        lurek.render.drawRect(hx + 2, hy + HEX_H - 10, HEX_W - 6, 5, { color = {0.2,0,0,1} })
-        lurek.render.drawRect(hx + 2, hy + HEX_H - 10, math.floor((HEX_W-6) * u.hp / u.maxHp), 5, { color = {0.2,0.8,0.2,1} })
+        lurek.render.rectangle(hx + 2, hy + HEX_H - 10, HEX_W - 6, 5, { color = {0.2,0,0,1} })
+        lurek.render.rectangle(hx + 2, hy + HEX_H - 10, math.floor((HEX_W-6) * u.hp / u.maxHp), 5, { color = {0.2,0.8,0.2,1} })
 
         if selected_unit and selected_unit.id == u.id then
-            lurek.render.drawRect(hx + 1, hy + 1, HEX_W-4, HEX_H-4, { color = {1,1,0.3,0.3} })
+            lurek.render.rectangle(hx + 1, hy + 1, HEX_W-4, HEX_H-4, { color = {1,1,0.3,0.3} })
         end
         ::skip::
     end
@@ -423,23 +423,23 @@ end)
 
 -- ── Render UI ─────────────────────────────────────────────
 lurek.render_ui(function()
-    lurek.render.drawRect(0, 0, W, OY - 4, { color = {0.08,0.08,0.06,1} })
+    lurek.render.rectangle(0, 0, W, OY - 4, { color = {0.08,0.08,0.06,1} })
     local turn_col = turn == "player" and {0.3,0.9,0.4,1} or {0.9,0.3,0.3,1}
-    lurek.render.drawText(turn == "player" and "YOUR TURN" or "ENEMY TURN", 12, 8, { color = turn_col, size = 16 })
-    lurek.render.drawText("Score: " .. score, 400, 8, { color = {1,1,1,1}, size = 14 })
-    lurek.render.drawText("Enter=end turn  Esc=quit", 600, 8, { color = {0.4,0.4,0.4,1}, size = 12 })
+    lurek.render.print(turn == "player" and "YOUR TURN" or "ENEMY TURN", 12, 8, { color = turn_col, size = 16 })
+    lurek.render.print("Score: " .. score, 400, 8, { color = {1,1,1,1}, size = 14 })
+    lurek.render.print("Enter=end turn  Esc=quit", 600, 8, { color = {0.4,0.4,0.4,1}, size = 12 })
 
     -- Combat log
     for i, msg in ipairs(log) do
         local a = math.min(1.0, msg.timer)
-        lurek.render.drawText(msg.t, 12, H - 12 - (i-1)*16, { color = {0.8,0.8,0.6,a}, size = 11 })
+        lurek.render.print(msg.t, 12, H - 12 - (i-1)*16, { color = {0.8,0.8,0.6,a}, size = 11 })
     end
 
     if state == "win" then
-        lurek.render.drawRect(240, 220, 400, 100, { color = {0,0,0,0.88} })
-        lurek.render.drawText("VICTORY!", 340, 248, { color = {1,0.9,0.2,1}, size = 36 })
+        lurek.render.rectangle(240, 220, 400, 100, { color = {0,0,0,0.88} })
+        lurek.render.print("VICTORY!", 340, 248, { color = {1,0.9,0.2,1}, size = 36 })
     elseif state == "lose" then
-        lurek.render.drawRect(240, 220, 400, 100, { color = {0,0,0,0.88} })
-        lurek.render.drawText("DEFEATED", 320, 248, { color = {0.9,0.2,0.2,1}, size = 34 })
+        lurek.render.rectangle(240, 220, 400, 100, { color = {0,0,0,0.88} })
+        lurek.render.print("DEFEATED", 320, 248, { color = {0.9,0.2,0.2,1}, size = 34 })
     end
 end)

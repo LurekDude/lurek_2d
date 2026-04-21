@@ -196,7 +196,7 @@ local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -255,7 +255,7 @@ local function draw_jungle(scroll_y)
             else
                 lurek.render.setColor(0.13, 0.26, 0.09, 1)
             end
-            lurek.render.drawRect("fill", px, py, TILE_SIZE, TILE_SIZE)
+            lurek.render.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
         end
     end
 end
@@ -716,7 +716,7 @@ end)
 lurek.render(function()
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.08, 0.18, 0.06, 1)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
         return
     end
 
@@ -733,7 +733,7 @@ lurek.render(function()
             else -- tree
                 lurek.render.setColor(0.10, 0.40, 0.10, 1)
             end
-            lurek.render.drawRect("fill", c.x, c.y, c.w, c.h)
+            lurek.render.rectangle("fill", c.x, c.y, c.w, c.h)
         end
     end
 
@@ -741,10 +741,10 @@ lurek.render(function()
     for _, p in ipairs(pows) do
         if not p.rescued then
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.drawRect("fill", p.x, p.y, POW_W, POW_H)
+            lurek.render.rectangle("fill", p.x, p.y, POW_W, POW_H)
             -- "P" indicator
             lurek.render.setColor(0.8, 0.2, 0.2, 1)
-            lurek.render.drawRect("fill", p.x + 3, p.y + 2, 6, 8)
+            lurek.render.rectangle("fill", p.x + 3, p.y + 2, 6, 8)
         end
     end
 
@@ -753,15 +753,15 @@ lurek.render(function()
         if e.alive then
             local c = ENEMY_COLORS[e.etype]
             lurek.render.setColor(c[1], c[2], c[3], 1)
-            lurek.render.drawRect("fill", e.x, e.y, ENEMY_W[e.etype], ENEMY_H[e.etype])
+            lurek.render.rectangle("fill", e.x, e.y, ENEMY_W[e.etype], ENEMY_H[e.etype])
             -- HP bar for bosses
             if e.etype == E_BOSS then
                 local bar_w = ENEMY_W[E_BOSS]
                 local hp_frac = e.hp / ENEMY_HP[E_BOSS]
                 lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-                lurek.render.drawRect("fill", e.x, e.y - 8, bar_w, 4)
+                lurek.render.rectangle("fill", e.x, e.y - 8, bar_w, 4)
                 lurek.render.setColor(1, 0.2, 0.2, 1)
-                lurek.render.drawRect("fill", e.x, e.y - 8, bar_w * hp_frac, 4)
+                lurek.render.rectangle("fill", e.x, e.y - 8, bar_w * hp_frac, 4)
             end
         end
     end
@@ -769,28 +769,28 @@ lurek.render(function()
     -- Enemy bullets
     lurek.render.setColor(1, 0.3, 0.1, 1)
     for _, b in ipairs(enemy_bullets) do
-        lurek.render.drawRect("fill", b.x - 3, b.y - 3, 6, 6)
+        lurek.render.rectangle("fill", b.x - 3, b.y - 3, 6, 6)
     end
 
     -- Player bullets
     lurek.render.setColor(1, 1, 0.4, 1)
     for _, b in ipairs(player_bullets) do
-        lurek.render.drawRect("fill", b.x, b.y, BULLET_W, BULLET_H)
+        lurek.render.rectangle("fill", b.x, b.y, BULLET_W, BULLET_H)
     end
 
     -- Grenades in flight
     lurek.render.setColor(0.3, 0.5, 0.1, 1)
     for _, g in ipairs(grenades_in_flight) do
-        lurek.render.drawRect("fill", g.x - 4, g.y - 4, 8, 8)
+        lurek.render.rectangle("fill", g.x - 4, g.y - 4, 8, 8)
     end
 
     -- Player
     if invuln_timer <= 0 or math.floor(invuln_timer * 10) % 2 == 0 then
         lurek.render.setColor(0.2, 0.6, 0.15, 1)
-        lurek.render.drawRect("fill", player.x, player.y, PLAYER_W, PLAYER_H)
+        lurek.render.rectangle("fill", player.x, player.y, PLAYER_W, PLAYER_H)
         -- Head
         lurek.render.setColor(0.25, 0.7, 0.2, 1)
-        lurek.render.drawRect("fill", player.x + 3, player.y - 4, 10, 6)
+        lurek.render.rectangle("fill", player.x + 3, player.y - 4, 10, 6)
     end
 
     -- Particles & score pops
@@ -827,7 +827,7 @@ function lurek.render_ui()
 
     -- HUD — top bar
     lurek.render.setColor(0, 0, 0, 0.5)
-    lurek.render.drawRect("fill", 0, 0, SCREEN_W, 24)
+    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 24)
 
     lurek.render.setColor(1, 1, 0.8, 1)
     lurek.render.print("SCORE: " .. score, 10, 4)

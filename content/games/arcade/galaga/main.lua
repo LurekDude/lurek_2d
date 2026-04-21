@@ -164,7 +164,7 @@ local function draw_stars()
         local sz = STAR_SIZES[layer]
         lurek.render.setColor(1, 1, 1, a)
         for _, s in ipairs(star_layers[layer]) do
-            lurek.render.drawRect("fill", s.x, s.y, sz, sz)
+            lurek.render.rectangle("fill", s.x, s.y, sz, sz)
         end
     end
 end
@@ -205,7 +205,7 @@ local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -828,7 +828,7 @@ lurek.render(function()
         for i = 1, FORM_ROWS do
             local cfg = ROW_CFG[i]
             lurek.render.setColor(cfg.color[1], cfg.color[2], cfg.color[3], 1)
-            lurek.render.drawRect("fill", SCREEN_W / 2 - 80, ty, ENEMY_W, ENEMY_H)
+            lurek.render.rectangle("fill", SCREEN_W / 2 - 80, ty, ENEMY_W, ENEMY_H)
             lurek.render.setColor(1, 1, 1, 1)
             local label = "= " .. tostring(cfg.pts) .. " PTS"
             if cfg.is_boss then label = label .. " (x2 HP)" end
@@ -846,16 +846,16 @@ lurek.render(function()
     for idx, e in ipairs(enemies) do
         if e.alive then
             lurek.render.setColor(e.color[1], e.color[2], e.color[3], 1)
-            lurek.render.drawRect("fill", e.x, e.y, ENEMY_W, ENEMY_H)
+            lurek.render.rectangle("fill", e.x, e.y, ENEMY_W, ENEMY_H)
             -- Boss indicator: small inner rect
             if e.is_boss then
                 lurek.render.setColor(1, 1, 1, 0.3)
-                lurek.render.drawRect("fill", e.x + 4, e.y + 4, ENEMY_W - 8, ENEMY_H - 8)
+                lurek.render.rectangle("fill", e.x + 4, e.y + 4, ENEMY_W - 8, ENEMY_H - 8)
             end
             -- Captured ship indicator on boss
             if e.captured_ship then
                 lurek.render.setColor(0.2, 0.6, 1.0, 0.7)
-                lurek.render.drawRect("fill", e.x + 2, e.y + ENEMY_H + 2, ENEMY_W - 4, 6)
+                lurek.render.rectangle("fill", e.x + 2, e.y + ENEMY_H + 2, ENEMY_W - 4, 6)
             end
         end
     end
@@ -865,7 +865,7 @@ lurek.render(function()
         local tb = tractor_beam
         local flash = math.sin(formation_sway_timer * 20) * 0.3 + 0.5
         lurek.render.setColor(0.3, 0.8, 1.0, flash)
-        lurek.render.drawRect("fill", tb.x, tb.y, TRACTOR_W, TRACTOR_H)
+        lurek.render.rectangle("fill", tb.x, tb.y, TRACTOR_W, TRACTOR_H)
     end
 
     -- Player ship(s)
@@ -874,21 +874,21 @@ lurek.render(function()
             -- Two ships side by side
             lurek.render.setColor(0.2, 0.6, 1.0, 1)
             -- Left ship
-            lurek.render.drawRect("fill", player.x - 10, player.y, PLAYER_W, PLAYER_H)
-            lurek.render.drawRect("fill",
+            lurek.render.rectangle("fill", player.x - 10, player.y, PLAYER_W, PLAYER_H)
+            lurek.render.rectangle("fill",
                 player.x - 10 + PLAYER_W / 2 - PLAYER_TURRET_W / 2,
                 player.y - PLAYER_TURRET_H,
                 PLAYER_TURRET_W, PLAYER_TURRET_H)
             -- Right ship
-            lurek.render.drawRect("fill", player.x + 10, player.y, PLAYER_W, PLAYER_H)
-            lurek.render.drawRect("fill",
+            lurek.render.rectangle("fill", player.x + 10, player.y, PLAYER_W, PLAYER_H)
+            lurek.render.rectangle("fill",
                 player.x + 10 + PLAYER_W / 2 - PLAYER_TURRET_W / 2,
                 player.y - PLAYER_TURRET_H,
                 PLAYER_TURRET_W, PLAYER_TURRET_H)
         else
             lurek.render.setColor(0.2, 0.6, 1.0, 1)
-            lurek.render.drawRect("fill", player.x, player.y, PLAYER_W, PLAYER_H)
-            lurek.render.drawRect("fill",
+            lurek.render.rectangle("fill", player.x, player.y, PLAYER_W, PLAYER_H)
+            lurek.render.rectangle("fill",
                 player.x + PLAYER_W / 2 - PLAYER_TURRET_W / 2,
                 player.y - PLAYER_TURRET_H,
                 PLAYER_TURRET_W, PLAYER_TURRET_H)
@@ -898,13 +898,13 @@ lurek.render(function()
     -- Player bullets
     lurek.render.setColor(1, 1, 0.3, 1)
     for _, b in ipairs(player_bullets) do
-        lurek.render.drawRect("fill", b.x, b.y, BULLET_W, BULLET_H)
+        lurek.render.rectangle("fill", b.x, b.y, BULLET_W, BULLET_H)
     end
 
     -- Enemy bullets
     lurek.render.setColor(1, 0.3, 0.3, 1)
     for _, b in ipairs(enemy_bullets) do
-        lurek.render.drawRect("fill", b.x, b.y, BULLET_W, BULLET_H)
+        lurek.render.rectangle("fill", b.x, b.y, BULLET_W, BULLET_H)
     end
 
     -- Particles

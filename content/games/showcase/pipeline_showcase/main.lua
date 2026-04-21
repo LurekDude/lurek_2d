@@ -392,13 +392,13 @@ lurek.render(function()
     -- Title screen
     if state == STATE_TITLE then
         local alpha = clamp(title_timer / TITLE_FADE_IN, 0, 1)
-        lurek.render.drawText("PIPELINE SHOWCASE", SCREEN_W / 2 - 160, SCREEN_H / 2 - 50, 32, 0.2 * alpha, 0.9 * alpha, 1.0 * alpha, alpha)
-        lurek.render.drawText("ENGINE CALLBACK FLOW", SCREEN_W / 2 - 140, SCREEN_H / 2, 20, 0.6 * alpha, 0.7 * alpha, 0.8 * alpha, alpha * 0.8)
+        lurek.render.print("PIPELINE SHOWCASE", SCREEN_W / 2 - 160, SCREEN_H / 2 - 50, 32, 0.2 * alpha, 0.9 * alpha, 1.0 * alpha, alpha)
+        lurek.render.print("ENGINE CALLBACK FLOW", SCREEN_W / 2 - 140, SCREEN_H / 2, 20, 0.6 * alpha, 0.7 * alpha, 0.8 * alpha, alpha * 0.8)
         local pulse = 0.5 + 0.5 * math.sin(title_timer * 3)
-        lurek.render.drawText("Press 1 / 2 / 3 to pick a scene", SCREEN_W / 2 - 140, SCREEN_H / 2 + 60, 14, 0.5, 0.5, 0.5, pulse)
+        lurek.render.print("Press 1 / 2 / 3 to pick a scene", SCREEN_W / 2 - 140, SCREEN_H / 2 + 60, 14, 0.5, 0.5, 0.5, pulse)
         -- Render particles
         for _, p in ipairs(particles) do
-            lurek.render.drawCircle(p.x, p.y, p.size, p.r, p.g, p.b, p.a)
+            lurek.render.circle(p.x, p.y, p.size, p.r, p.g, p.b, p.a)
         end
         return
     end
@@ -411,25 +411,25 @@ lurek.render(function()
     pipe_highlight[5] = 1.0
 
     -- Draw simulation area border
-    lurek.render.drawRect(SIM_X_LEFT - 2, SIM_Y_TOP - 2, SIM_X_RIGHT - SIM_X_LEFT + 4, SIM_Y_BOT - SIM_Y_TOP + 4, 0.15, 0.15, 0.2, 0.6)
+    lurek.render.rectangle(SIM_X_LEFT - 2, SIM_Y_TOP - 2, SIM_X_RIGHT - SIM_X_LEFT + 4, SIM_Y_BOT - SIM_Y_TOP + 4, 0.15, 0.15, 0.2, 0.6)
 
     -- Draw balls
     if state == STATE_SCENE_2 or state == STATE_SCENE_3 then
         for _, ball in ipairs(balls) do
-            lurek.render.drawCircle(ball.x, ball.y, ball.radius, ball.r, ball.g, ball.b, 0.9)
+            lurek.render.circle(ball.x, ball.y, ball.radius, ball.r, ball.g, ball.b, 0.9)
             -- Shadow
-            lurek.render.drawCircle(ball.x + 2, ball.y + 2, ball.radius, 0, 0, 0, 0.2)
+            lurek.render.circle(ball.x + 2, ball.y + 2, ball.radius, 0, 0, 0, 0.2)
         end
     end
 
     -- Scene 1: menu placeholder
     if state == STATE_SCENE_1 then
-        lurek.render.drawText("(Menu scene — no world render)", SCREEN_W / 2 - 120, SCREEN_H / 2, 16, 0.4, 0.4, 0.5, 0.6)
+        lurek.render.print("(Menu scene — no world render)", SCREEN_W / 2 - 120, SCREEN_H / 2, 16, 0.4, 0.4, 0.5, 0.6)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        lurek.render.drawCircle(p.x, p.y, p.size, p.r, p.g, p.b, p.a)
+        lurek.render.circle(p.x, p.y, p.size, p.r, p.g, p.b, p.a)
     end
 
     pipe_times_ms[5] = (lurek.timer.getTime() - t0) * 1000
@@ -458,9 +458,9 @@ lurek.render_ui(function()
         -- Connection arrow
         if i > 1 then
             local ax = bx - PIPE_GAP
-            lurek.render.drawRect(ax, by + PIPE_BOX_H / 2 - 1, PIPE_GAP, 2, 0.3, 0.3, 0.4, 0.6)
+            lurek.render.rectangle(ax, by + PIPE_BOX_H / 2 - 1, PIPE_GAP, 2, 0.3, 0.3, 0.4, 0.6)
             -- Arrow head
-            lurek.render.drawRect(bx - 4, by + PIPE_BOX_H / 2 - 3, 4, 6, 0.3, 0.3, 0.4, 0.6)
+            lurek.render.rectangle(bx - 4, by + PIPE_BOX_H / 2 - 3, 4, 6, 0.3, 0.3, 0.4, 0.6)
         end
 
         -- Box background
@@ -474,7 +474,7 @@ lurek.render_ui(function()
             bg_b = lerp(0.08, 0.2, h)
             bg_a = lerp(0.7, 0.95, h)
         end
-        lurek.render.drawRect(bx, by, PIPE_BOX_W, PIPE_BOX_H, bg_r, bg_g, bg_b, bg_a)
+        lurek.render.rectangle(bx, by, PIPE_BOX_W, PIPE_BOX_H, bg_r, bg_g, bg_b, bg_a)
 
         -- Box border
         local br, bg, bb = 0.25, 0.25, 0.35
@@ -483,39 +483,39 @@ lurek.render_ui(function()
         elseif not pipe_enabled[i] then
             br, bg, bb = 0.6, 0.2, 0.2
         end
-        lurek.render.drawRect(bx, by, PIPE_BOX_W, 1, br, bg, bb, 0.8)
-        lurek.render.drawRect(bx, by + PIPE_BOX_H - 1, PIPE_BOX_W, 1, br, bg, bb, 0.8)
-        lurek.render.drawRect(bx, by, 1, PIPE_BOX_H, br, bg, bb, 0.8)
-        lurek.render.drawRect(bx + PIPE_BOX_W - 1, by, 1, PIPE_BOX_H, br, bg, bb, 0.8)
+        lurek.render.rectangle(bx, by, PIPE_BOX_W, 1, br, bg, bb, 0.8)
+        lurek.render.rectangle(bx, by + PIPE_BOX_H - 1, PIPE_BOX_W, 1, br, bg, bb, 0.8)
+        lurek.render.rectangle(bx, by, 1, PIPE_BOX_H, br, bg, bb, 0.8)
+        lurek.render.rectangle(bx + PIPE_BOX_W - 1, by, 1, PIPE_BOX_H, br, bg, bb, 0.8)
 
         -- Label
         local lr, lg, lb = 0.5, 0.5, 0.6
         if not pipe_enabled[i] then lr, lg, lb = 0.5, 0.2, 0.2 end
         if fired and active then lr, lg, lb = 0.4, 1.0, 0.5 end
-        lurek.render.drawText(pipe_short[i], bx + 6, by + 4, 11, lr, lg, lb, 1.0)
+        lurek.render.print(pipe_short[i], bx + 6, by + 4, 11, lr, lg, lb, 1.0)
 
         -- Timing
         local time_str = string.format("%.2fms", pipe_times_ms[i])
-        lurek.render.drawText(time_str, bx + 6, by + 18, 9, 0.4, 0.4, 0.5, 0.7)
+        lurek.render.print(time_str, bx + 6, by + 18, 9, 0.4, 0.4, 0.5, 0.7)
 
         -- F-key toggle indicator
-        lurek.render.drawText("F" .. i, bx + PIPE_BOX_W - 22, by + 4, 9, 0.3, 0.3, 0.4, 0.5)
+        lurek.render.print("F" .. i, bx + PIPE_BOX_W - 22, by + 4, 9, 0.3, 0.3, 0.4, 0.5)
 
         -- Tween bar (animated timing indicator below box)
         local bar_w = tween_bars[i] * PIPE_BOX_W
         if bar_w > 1 then
-            lurek.render.drawRect(bx, by + PIPE_BOX_H + 2, bar_w, 3, 0.2, 0.7, 0.3, 0.6 * tween_bars[i])
+            lurek.render.rectangle(bx, by + PIPE_BOX_H + 2, bar_w, 3, 0.2, 0.7, 0.3, 0.6 * tween_bars[i])
         end
     end
 
     -- ── Execution order list ──
     local order_y = PIPE_Y + PIPE_BOX_H + 20
-    lurek.render.drawText("Execution Order:", 20, order_y, 12, 0.5, 0.6, 0.7, 0.8)
+    lurek.render.print("Execution Order:", 20, order_y, 12, 0.5, 0.6, 0.7, 0.8)
     local step = 1
     for i = 1, PIPE_COUNT do
         if is_pipe_active(i) then
             local color_g = pipe_fired[i] and 0.9 or 0.4
-            lurek.render.drawText(step .. ". " .. pipe_labels[i], 30, order_y + step * 16, 11, 0.3, color_g, 0.5, 0.8)
+            lurek.render.print(step .. ". " .. pipe_labels[i], 30, order_y + step * 16, 11, 0.3, color_g, 0.5, 0.8)
             step = step + 1
         end
     end
@@ -523,30 +523,30 @@ lurek.render_ui(function()
     -- ── Scene info panel ──
     local panel_x = SCREEN_W - 260
     local panel_y = PIPE_Y + PIPE_BOX_H + 20
-    lurek.render.drawRect(panel_x - 8, panel_y - 4, 256, 110, 0.08, 0.08, 0.12, 0.7)
+    lurek.render.rectangle(panel_x - 8, panel_y - 4, 256, 110, 0.08, 0.08, 0.12, 0.7)
 
     local sname = scene_names[state] or "Title"
     local sdesc = scene_descs[state] or ""
-    lurek.render.drawText("Scene: " .. sname, panel_x, panel_y, 14, 0.4, 0.8, 1.0, 1.0)
-    lurek.render.drawText(sdesc, panel_x, panel_y + 20, 10, 0.4, 0.5, 0.6, 0.7)
+    lurek.render.print("Scene: " .. sname, panel_x, panel_y, 14, 0.4, 0.8, 1.0, 1.0)
+    lurek.render.print(sdesc, panel_x, panel_y + 20, 10, 0.4, 0.5, 0.6, 0.7)
 
     -- dt values
-    lurek.render.drawText("dt values:", panel_x, panel_y + 42, 11, 0.5, 0.5, 0.6, 0.8)
+    lurek.render.print("dt values:", panel_x, panel_y + 42, 11, 0.5, 0.5, 0.6, 0.8)
     local dt_y = panel_y + 56
     for i = 2, 4 do
         if is_pipe_active(i) then
             local dtstr = string.format("%s: %.4fs", pipe_short[i], pipe_dt_values[i])
-            lurek.render.drawText(dtstr, panel_x + 8, dt_y, 10, 0.35, 0.55, 0.45, 0.7)
+            lurek.render.print(dtstr, panel_x + 8, dt_y, 10, 0.35, 0.55, 0.45, 0.7)
             dt_y = dt_y + 14
         end
     end
 
     -- ── Stats bar (bottom) ──
     local bar_y = SCREEN_H - 30
-    lurek.render.drawRect(0, bar_y - 4, SCREEN_W, 34, 0.05, 0.05, 0.08, 0.85)
+    lurek.render.rectangle(0, bar_y - 4, SCREEN_W, 34, 0.05, 0.05, 0.08, 0.85)
 
-    lurek.render.drawText("FPS: " .. fps, 12, bar_y, 12, 0.3, 0.8, 0.4, 0.9)
-    lurek.render.drawText("Frames: " .. total_frames, 100, bar_y, 12, 0.4, 0.5, 0.6, 0.8)
+    lurek.render.print("FPS: " .. fps, 12, bar_y, 12, 0.3, 0.8, 0.4, 0.9)
+    lurek.render.print("Frames: " .. total_frames, 100, bar_y, 12, 0.4, 0.5, 0.6, 0.8)
 
     -- Per-callback frame counts
     local cx = 240
@@ -555,16 +555,16 @@ lurek.render_ui(function()
         local cr = pipe_enabled[i] and 0.35 or 0.5
         local cg = pipe_enabled[i] and 0.55 or 0.2
         local cb = pipe_enabled[i] and 0.45 or 0.2
-        lurek.render.drawText(label, cx, bar_y, 10, cr, cg, cb, 0.7)
+        lurek.render.print(label, cx, bar_y, 10, cr, cg, cb, 0.7)
         cx = cx + 70
     end
 
     -- Scene selector hint
-    lurek.render.drawText("[1] Menu  [2] Sim  [3] Pause  |  F1-F6 toggle", 12, bar_y + 14, 10, 0.3, 0.3, 0.4, 0.5)
+    lurek.render.print("[1] Menu  [2] Sim  [3] Pause  |  F1-F6 toggle", 12, bar_y + 14, 10, 0.3, 0.3, 0.4, 0.5)
 
     -- Ball count for scene 2
     if state == STATE_SCENE_2 then
-        lurek.render.drawText("Balls: " .. #balls, SCREEN_W - 90, bar_y, 12, 0.4, 0.6, 0.8, 0.8)
+        lurek.render.print("Balls: " .. #balls, SCREEN_W - 90, bar_y, 12, 0.4, 0.6, 0.8, 0.8)
     end
 
     pipe_times_ms[6] = (lurek.timer.getTime() - t0) * 1000

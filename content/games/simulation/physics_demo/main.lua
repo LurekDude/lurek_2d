@@ -497,10 +497,10 @@ lurek.render(function()
 
   -- walls
   lurek.render.setColor(0.25, 0.25, 0.3, 1)
-  lurek.render.drawRectFill(0, 0, SCREEN_W, WALL_THICK)
-  lurek.render.drawRectFill(0, SCREEN_H - WALL_THICK, SCREEN_W, WALL_THICK)
-  lurek.render.drawRectFill(0, 0, WALL_THICK, SCREEN_H)
-  lurek.render.drawRectFill(SCREEN_W - WALL_THICK, 0, WALL_THICK, SCREEN_H)
+  lurek.render.rectangle(0, 0, SCREEN_W, WALL_THICK)
+  lurek.render.rectangle(0, SCREEN_H - WALL_THICK, SCREEN_W, WALL_THICK)
+  lurek.render.rectangle(0, 0, WALL_THICK, SCREEN_H)
+  lurek.render.rectangle(SCREEN_W - WALL_THICK, 0, WALL_THICK, SCREEN_H)
 
   -- ramps
   for _, ramp in ipairs(ramps) do
@@ -526,9 +526,9 @@ lurek.render(function()
     lurek.render.setColor(o.r, o.g, o.b, a)
 
     if o.shape == "circle" then
-      lurek.render.drawCircleFill(o.x, o.y, o.radius)
+      lurek.render.circleFill(o.x, o.y, o.radius)
     elseif o.shape == "rect" then
-      lurek.render.drawRectFill(o.x - o.w * 0.5, o.y - o.h * 0.5, o.w, o.h)
+      lurek.render.rectangle(o.x - o.w * 0.5, o.y - o.h * 0.5, o.w, o.h)
     elseif o.shape == "triangle" then
       local s = o.size
       lurek.render.drawTriangleFill(
@@ -541,14 +541,14 @@ lurek.render(function()
     -- pinned indicator
     if o.pinned then
       lurek.render.setColor(1, 1, 1, 0.5)
-      lurek.render.drawCircle(o.x, o.y, 5)
+      lurek.render.circle(o.x, o.y, 5)
     end
   end
 
   -- particles
   for _, p in ipairs(particles) do
     lurek.render.setColor(p.r, p.g, p.b, p.a)
-    lurek.render.drawCircleFill(p.x, p.y, p.size)
+    lurek.render.circleFill(p.x, p.y, p.size)
   end
 end)
 
@@ -558,11 +558,11 @@ lurek.render_ui(function()
     -- title screen
     local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
     lurek.render.setColor(0.3, 0.7, 1.0, 1)
-    lurek.render.drawText("PHYSICS DEMO", SCREEN_W * 0.5 - 120, SCREEN_H * 0.35, 36)
+    lurek.render.print("PHYSICS DEMO", SCREEN_W * 0.5 - 120, SCREEN_H * 0.35, 36)
     lurek.render.setColor(0.8, 0.8, 0.8, pulse)
-    lurek.render.drawText("PLAY WITH FORCES", SCREEN_W * 0.5 - 100, SCREEN_H * 0.5, 20)
+    lurek.render.print("PLAY WITH FORCES", SCREEN_W * 0.5 - 100, SCREEN_H * 0.5, 20)
     lurek.render.setColor(0.5, 0.5, 0.5, pulse * 0.8)
-    lurek.render.drawText("Click to Start", SCREEN_W * 0.5 - 60, SCREEN_H * 0.62, 16)
+    lurek.render.print("Click to Start", SCREEN_W * 0.5 - 60, SCREEN_H * 0.62, 16)
     return
   end
 
@@ -572,9 +572,9 @@ lurek.render_ui(function()
 
   -- top-left stats
   lurek.render.setColor(1, 1, 1, 0.9)
-  lurek.render.drawText(string.format("FPS: %d", fps), 10, 10, 14)
-  lurek.render.drawText(string.format("Objects: %d / %d", #objects, MAX_OBJECTS), 10, 28, 14)
-  lurek.render.drawText(string.format("Energy: %.0f", energy), 10, 46, 14)
+  lurek.render.print(string.format("FPS: %d", fps), 10, 10, 14)
+  lurek.render.print(string.format("Objects: %d / %d", #objects, MAX_OBJECTS), 10, 28, 14)
+  lurek.render.print(string.format("Energy: %.0f", energy), 10, 46, 14)
 
   -- indicators
   local y = 70
@@ -584,7 +584,7 @@ lurek.render_ui(function()
     else
       lurek.render.setColor(0.4, 0.4, 0.4, 0.5)
     end
-    lurek.render.drawText(label, 10, y, 13)
+    lurek.render.print(label, 10, y, 13)
     y = y + 16
   end
 
@@ -595,7 +595,7 @@ lurek.render_ui(function()
 
   -- shape selector
   lurek.render.setColor(0.7, 0.7, 0.7, 0.8)
-  lurek.render.drawText("Shape:", SCREEN_W - 180, 10, 14)
+  lurek.render.print("Shape:", SCREEN_W - 180, 10, 14)
   local shapes = { "Circle[1]", "Rect[2]", "Tri[3]" }
   for i, name in ipairs(shapes) do
     if i == spawn_type then
@@ -603,10 +603,10 @@ lurek.render_ui(function()
     else
       lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
     end
-    lurek.render.drawText(name, SCREEN_W - 180 + (i - 1) * 60, 28, 13)
+    lurek.render.print(name, SCREEN_W - 180 + (i - 1) * 60, 28, 13)
   end
 
   -- bottom help
   lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
-  lurek.render.drawText("R=Ramp  P=Pin  C=Clear  Click=Spawn/Drag  ESC=Quit", 10, SCREEN_H - 20, 12)
+  lurek.render.print("R=Ramp  P=Pin  C=Clear  Click=Spawn/Drag  ESC=Quit", 10, SCREEN_H - 20, 12)
 end)

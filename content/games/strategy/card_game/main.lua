@@ -719,7 +719,7 @@ lurek.render(function()
     local ox, oy = shake_x, shake_y
 
     -- Battlefield divider line
-    lurek.render.drawRect(50 + ox, 240 + oy, SCREEN_W - 100, 2, 0.25, 0.2, 0.35, 0.6)
+    lurek.render.rectangle(50 + ox, 240 + oy, SCREEN_W - 100, 2, 0.25, 0.2, 0.35, 0.6)
 
     -- Enemy field slots
     local total_w = MAX_FIELD * SLOT_W + (MAX_FIELD - 1) * SLOT_GAP
@@ -728,21 +728,21 @@ lurek.render(function()
         local sx = start_x + (i - 1) * (SLOT_W + SLOT_GAP) + ox
         local sy = FIELD_Y_ENEMY + oy
         -- Slot outline
-        lurek.render.drawRect(sx, sy, SLOT_W, SLOT_H, 0.15, 0.1, 0.2, 0.5)
+        lurek.render.rectangle(sx, sy, SLOT_W, SLOT_H, 0.15, 0.1, 0.2, 0.5)
         -- Creature
         if i <= #enemy.field then
             local c = enemy.field[i]
             local cx = sx + (c.slide_x or 0)
             -- Body
-            lurek.render.drawRect(cx + 5, sy + 10, SLOT_W - 10, SLOT_H - 20, c.color[1], c.color[2], c.color[3], 0.9)
+            lurek.render.rectangle(cx + 5, sy + 10, SLOT_W - 10, SLOT_H - 20, c.color[1], c.color[2], c.color[3], 0.9)
             -- Taunt indicator
             if c.taunt then
-                lurek.render.drawRect(cx + 2, sy + 5, SLOT_W - 4, SLOT_H - 10, 0.4, 0.5, 0.4, 0.3)
+                lurek.render.rectangle(cx + 2, sy + 5, SLOT_W - 4, SLOT_H - 10, 0.4, 0.5, 0.4, 0.3)
             end
             -- HP bar
             local hp_ratio = clamp(c.hp / c.max_hp, 0, 1)
-            lurek.render.drawRect(cx + 5, sy + SLOT_H - 12, SLOT_W - 10, 6, 0.2, 0.1, 0.1, 1)
-            lurek.render.drawRect(cx + 5, sy + SLOT_H - 12, (SLOT_W - 10) * hp_ratio, 6, 0.2, 0.8, 0.2, 1)
+            lurek.render.rectangle(cx + 5, sy + SLOT_H - 12, SLOT_W - 10, 6, 0.2, 0.1, 0.1, 1)
+            lurek.render.rectangle(cx + 5, sy + SLOT_H - 12, (SLOT_W - 10) * hp_ratio, 6, 0.2, 0.8, 0.2, 1)
         end
     end
 
@@ -751,34 +751,34 @@ lurek.render(function()
         local sx = start_x + (i - 1) * (SLOT_W + SLOT_GAP) + ox
         local sy = FIELD_Y_PLAYER + oy
         -- Slot outline
-        lurek.render.drawRect(sx, sy, SLOT_W, SLOT_H, 0.12, 0.1, 0.18, 0.5)
+        lurek.render.rectangle(sx, sy, SLOT_W, SLOT_H, 0.12, 0.1, 0.18, 0.5)
         -- Selected slot highlight
         if selected_card_idx and not selected_spell then
-            lurek.render.drawRect(sx, sy, SLOT_W, SLOT_H, 0.3, 0.3, 0.5, 0.15)
+            lurek.render.rectangle(sx, sy, SLOT_W, SLOT_H, 0.3, 0.3, 0.5, 0.15)
         end
         -- Creature
         if i <= #player.field then
             local c = player.field[i]
             local cx = sx + (c.slide_x or 0)
-            lurek.render.drawRect(cx + 5, sy + 10, SLOT_W - 10, SLOT_H - 20, c.color[1], c.color[2], c.color[3], 0.9)
+            lurek.render.rectangle(cx + 5, sy + 10, SLOT_W - 10, SLOT_H - 20, c.color[1], c.color[2], c.color[3], 0.9)
             if c.taunt then
-                lurek.render.drawRect(cx + 2, sy + 5, SLOT_W - 4, SLOT_H - 10, 0.4, 0.5, 0.4, 0.3)
+                lurek.render.rectangle(cx + 2, sy + 5, SLOT_W - 4, SLOT_H - 10, 0.4, 0.5, 0.4, 0.3)
             end
             -- Attack-ready indicator
             if c.can_attack then
-                lurek.render.drawRect(cx + SLOT_W / 2 - 15, sy + 2, 20, 4, 0.9, 0.8, 0.2, 0.7)
+                lurek.render.rectangle(cx + SLOT_W / 2 - 15, sy + 2, 20, 4, 0.9, 0.8, 0.2, 0.7)
             end
             -- HP bar
             local hp_ratio = clamp(c.hp / c.max_hp, 0, 1)
-            lurek.render.drawRect(cx + 5, sy + SLOT_H - 12, SLOT_W - 10, 6, 0.2, 0.1, 0.1, 1)
-            lurek.render.drawRect(cx + 5, sy + SLOT_H - 12, (SLOT_W - 10) * hp_ratio, 6, 0.2, 0.8, 0.2, 1)
+            lurek.render.rectangle(cx + 5, sy + SLOT_H - 12, SLOT_W - 10, 6, 0.2, 0.1, 0.1, 1)
+            lurek.render.rectangle(cx + 5, sy + SLOT_H - 12, (SLOT_W - 10) * hp_ratio, 6, 0.2, 0.8, 0.2, 1)
         end
     end
 
     -- Particles (world-space)
     for _, p in ipairs(particles) do
         local alpha = clamp(p.life / p.max_life, 0, 1)
-        lurek.render.drawCircle(p.x + ox, p.y + oy, p.size, p.r, p.g, p.b, alpha)
+        lurek.render.circle(p.x + ox, p.y + oy, p.size, p.r, p.g, p.b, alpha)
     end
 end)
 
@@ -788,29 +788,29 @@ end)
 lurek.render_ui(function()
     -- ===== TITLE =====
     if state == STATE_TITLE then
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.05, 0.1, 1)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.05, 0.1, 1)
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
-        lurek.render.drawText("CARD GAME", SCREEN_W / 2 - 110, 180, 36, 0.9, 0.7, 0.3, 1)
-        lurek.render.drawText("PLAY YOUR HAND", SCREEN_W / 2 - 95, 240, 20, 0.7, 0.5, 0.3, pulse)
-        lurek.render.drawText("Click or Space to start", SCREEN_W / 2 - 100, 340, 14, 0.5, 0.4, 0.5, 1)
-        lurek.render.drawText("Mouse1: select/play  |  Space: end turn  |  Esc: quit", SCREEN_W / 2 - 210, 380, 12, 0.4, 0.35, 0.45, 1)
-        lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.3, 0.3, 0.3, 1)
+        lurek.render.print("CARD GAME", SCREEN_W / 2 - 110, 180, 36, 0.9, 0.7, 0.3, 1)
+        lurek.render.print("PLAY YOUR HAND", SCREEN_W / 2 - 95, 240, 20, 0.7, 0.5, 0.3, pulse)
+        lurek.render.print("Click or Space to start", SCREEN_W / 2 - 100, 340, 14, 0.5, 0.4, 0.5, 1)
+        lurek.render.print("Mouse1: select/play  |  Space: end turn  |  Esc: quit", SCREEN_W / 2 - 210, 380, 12, 0.4, 0.35, 0.45, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.3, 0.3, 0.3, 1)
         return
     end
 
     -- ===== GAME OVER =====
     if state == STATE_GAME_OVER then
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0.06, 0.03, 0.08, 1)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.06, 0.03, 0.08, 1)
         if winner == "player" then
-            lurek.render.drawText("VICTORY!", SCREEN_W / 2 - 80, 180, 36, 0.3, 0.9, 0.4, 1)
-            lurek.render.drawText("You defeated the enemy!", SCREEN_W / 2 - 110, 240, 18, 0.5, 0.8, 0.5, 1)
+            lurek.render.print("VICTORY!", SCREEN_W / 2 - 80, 180, 36, 0.3, 0.9, 0.4, 1)
+            lurek.render.print("You defeated the enemy!", SCREEN_W / 2 - 110, 240, 18, 0.5, 0.8, 0.5, 1)
         else
-            lurek.render.drawText("DEFEAT", SCREEN_W / 2 - 65, 180, 36, 0.9, 0.2, 0.2, 1)
-            lurek.render.drawText("The enemy destroyed you!", SCREEN_W / 2 - 115, 240, 18, 0.8, 0.4, 0.4, 1)
+            lurek.render.print("DEFEAT", SCREEN_W / 2 - 65, 180, 36, 0.9, 0.2, 0.2, 1)
+            lurek.render.print("The enemy destroyed you!", SCREEN_W / 2 - 115, 240, 18, 0.8, 0.4, 0.4, 1)
         end
-        lurek.render.drawText("Turn " .. turn_number, SCREEN_W / 2 - 30, 290, 16, 0.6, 0.5, 0.7, 1)
-        lurek.render.drawText("Click or Space to restart", SCREEN_W / 2 - 105, 380, 14, 0.5, 0.4, 0.5, 1)
-        lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.3, 0.3, 0.3, 1)
+        lurek.render.print("Turn " .. turn_number, SCREEN_W / 2 - 30, 290, 16, 0.6, 0.5, 0.7, 1)
+        lurek.render.print("Click or Space to restart", SCREEN_W / 2 - 105, 380, 14, 0.5, 0.4, 0.5, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.3, 0.3, 0.3, 1)
         return
     end
 
@@ -819,54 +819,54 @@ lurek.render_ui(function()
     local turn_label = (state == STATE_PLAYER_TURN) and "YOUR TURN" or "ENEMY TURN"
     local turn_r = (state == STATE_PLAYER_TURN) and 0.3 or 0.9
     local turn_g = (state == STATE_PLAYER_TURN) and 0.8 or 0.3
-    lurek.render.drawText(turn_label, SCREEN_W / 2 - 50, 8, 18, turn_r, turn_g, 0.3, 1)
-    lurek.render.drawText("Turn " .. turn_number, SCREEN_W / 2 - 25, 30, 12, 0.5, 0.5, 0.6, 1)
+    lurek.render.print(turn_label, SCREEN_W / 2 - 50, 8, 18, turn_r, turn_g, 0.3, 1)
+    lurek.render.print("Turn " .. turn_number, SCREEN_W / 2 - 25, 30, 12, 0.5, 0.5, 0.6, 1)
 
     -- Player HP
-    lurek.render.drawText("HP", 15, SCREEN_H - 85, 14, 0.8, 0.3, 0.3, 1)
-    lurek.render.drawRect(40, SCREEN_H - 85, HP_BAR_W, HP_BAR_H, 0.2, 0.1, 0.1, 1)
+    lurek.render.print("HP", 15, SCREEN_H - 85, 14, 0.8, 0.3, 0.3, 1)
+    lurek.render.rectangle(40, SCREEN_H - 85, HP_BAR_W, HP_BAR_H, 0.2, 0.1, 0.1, 1)
     local p_hp_ratio = clamp(player.hp_display / START_HP, 0, 1)
-    lurek.render.drawRect(40, SCREEN_H - 85, HP_BAR_W * p_hp_ratio, HP_BAR_H, 0.8, 0.2, 0.2, 1)
-    lurek.render.drawText(string.format("%d/%d", math.max(0, player.hp), START_HP), 45, SCREEN_H - 84, 12, 1, 1, 1, 1)
+    lurek.render.rectangle(40, SCREEN_H - 85, HP_BAR_W * p_hp_ratio, HP_BAR_H, 0.8, 0.2, 0.2, 1)
+    lurek.render.print(string.format("%d/%d", math.max(0, player.hp), START_HP), 45, SCREEN_H - 84, 12, 1, 1, 1, 1)
 
     -- Player Mana
-    lurek.render.drawText("Mana", 15, SCREEN_H - 62, 14, 0.3, 0.4, 0.9, 1)
+    lurek.render.print("Mana", 15, SCREEN_H - 62, 14, 0.3, 0.4, 0.9, 1)
     for i = 1, player.max_mana do
         local mx = 60 + (i - 1) * 14
         local filled = (i <= player.mana)
         if filled then
-            lurek.render.drawCircle(mx, SCREEN_H - 52, 5, 0.3, 0.5, 1.0, 1)
+            lurek.render.circle(mx, SCREEN_H - 52, 5, 0.3, 0.5, 1.0, 1)
         else
-            lurek.render.drawCircle(mx, SCREEN_H - 52, 5, 0.15, 0.15, 0.3, 0.6)
+            lurek.render.circle(mx, SCREEN_H - 52, 5, 0.15, 0.15, 0.3, 0.6)
         end
     end
 
     -- Enemy HP
-    lurek.render.drawText("Enemy HP", 15, 10, 14, 0.8, 0.3, 0.3, 1)
-    lurek.render.drawRect(100, 10, HP_BAR_W, HP_BAR_H, 0.2, 0.1, 0.1, 1)
+    lurek.render.print("Enemy HP", 15, 10, 14, 0.8, 0.3, 0.3, 1)
+    lurek.render.rectangle(100, 10, HP_BAR_W, HP_BAR_H, 0.2, 0.1, 0.1, 1)
     local e_hp_ratio = clamp(enemy.hp_display / START_HP, 0, 1)
-    lurek.render.drawRect(100, 10, HP_BAR_W * e_hp_ratio, HP_BAR_H, 0.8, 0.2, 0.2, 1)
-    lurek.render.drawText(string.format("%d/%d", math.max(0, enemy.hp), START_HP), 105, 11, 12, 1, 1, 1, 1)
+    lurek.render.rectangle(100, 10, HP_BAR_W * e_hp_ratio, HP_BAR_H, 0.8, 0.2, 0.2, 1)
+    lurek.render.print(string.format("%d/%d", math.max(0, enemy.hp), START_HP), 105, 11, 12, 1, 1, 1, 1)
 
     -- Enemy mana
     for i = 1, enemy.max_mana do
         local mx = 100 + (i - 1) * 14
         local filled = (i <= enemy.mana)
         if filled then
-            lurek.render.drawCircle(mx, 35, 5, 0.3, 0.5, 1.0, 1)
+            lurek.render.circle(mx, 35, 5, 0.3, 0.5, 1.0, 1)
         else
-            lurek.render.drawCircle(mx, 35, 5, 0.15, 0.15, 0.3, 0.6)
+            lurek.render.circle(mx, 35, 5, 0.15, 0.15, 0.3, 0.6)
         end
     end
 
     -- Deck counts
-    lurek.render.drawText("Deck: " .. #player.deck, SCREEN_W - 90, SCREEN_H - 85, 12, 0.5, 0.5, 0.6, 1)
-    lurek.render.drawText("Enemy deck: " .. #enemy.deck, SCREEN_W - 110, 10, 12, 0.5, 0.5, 0.6, 1)
+    lurek.render.print("Deck: " .. #player.deck, SCREEN_W - 90, SCREEN_H - 85, 12, 0.5, 0.5, 0.6, 1)
+    lurek.render.print("Enemy deck: " .. #enemy.deck, SCREEN_W - 110, 10, 12, 0.5, 0.5, 0.6, 1)
 
     -- End Turn button hint
     if state == STATE_PLAYER_TURN then
-        lurek.render.drawRect(SCREEN_W - 130, SCREEN_H - 55, 110, 30, 0.2, 0.15, 0.3, 0.8)
-        lurek.render.drawText("SPACE: End Turn", SCREEN_W - 125, SCREEN_H - 50, 12, 0.8, 0.7, 0.4, 1)
+        lurek.render.rectangle(SCREEN_W - 130, SCREEN_H - 55, 110, 30, 0.2, 0.15, 0.3, 0.8)
+        lurek.render.print("SPACE: End Turn", SCREEN_W - 125, SCREEN_H - 50, 12, 0.8, 0.7, 0.4, 1)
     end
 
     -- ===== HAND =====
@@ -882,37 +882,37 @@ lurek.render_ui(function()
             local bg_r = sel and 0.3 or 0.12
             local bg_g = sel and 0.25 or 0.1
             local bg_b = sel and 0.4 or 0.18
-            lurek.render.drawRect(cx, cy, CARD_W, CARD_H, bg_r, bg_g, bg_b, 0.95)
+            lurek.render.rectangle(cx, cy, CARD_W, CARD_H, bg_r, bg_g, bg_b, 0.95)
             -- Card border
             local affordable = (card.cost <= player.mana)
             local br = affordable and 0.4 or 0.25
             local bg2 = affordable and 0.5 or 0.2
             local bb = affordable and 0.6 or 0.25
-            lurek.render.drawRect(cx, cy, CARD_W, 3, br, bg2, bb, 1)
-            lurek.render.drawRect(cx, cy + CARD_H - 3, CARD_W, 3, br, bg2, bb, 1)
+            lurek.render.rectangle(cx, cy, CARD_W, 3, br, bg2, bb, 1)
+            lurek.render.rectangle(cx, cy + CARD_H - 3, CARD_W, 3, br, bg2, bb, 1)
             -- Card color stripe
-            lurek.render.drawRect(cx + 5, cy + 8, CARD_W - 10, 30, card.color[1], card.color[2], card.color[3], 0.7)
+            lurek.render.rectangle(cx + 5, cy + 8, CARD_W - 10, 30, card.color[1], card.color[2], card.color[3], 0.7)
             -- Card name
-            lurek.render.drawText(card.name, cx + 5, cy + 42, 11, 0.9, 0.9, 0.9, 1)
+            lurek.render.print(card.name, cx + 5, cy + 42, 11, 0.9, 0.9, 0.9, 1)
             -- Cost
-            lurek.render.drawCircle(cx + CARD_W - 12, cy + 12, 8, 0.2, 0.3, 0.7, 1)
-            lurek.render.drawText(tostring(card.cost), cx + CARD_W - 16, cy + 6, 12, 1, 1, 1, 1)
+            lurek.render.circle(cx + CARD_W - 12, cy + 12, 8, 0.2, 0.3, 0.7, 1)
+            lurek.render.print(tostring(card.cost), cx + CARD_W - 16, cy + 6, 12, 1, 1, 1, 1)
             -- Stats
             if card.type == "creature" then
-                lurek.render.drawText(card.atk .. "/" .. card.hp, cx + 5, cy + 58, 14, 1.0, 0.9, 0.3, 1)
+                lurek.render.print(card.atk .. "/" .. card.hp, cx + 5, cy + 58, 14, 1.0, 0.9, 0.3, 1)
                 if card.taunt then
-                    lurek.render.drawText("taunt", cx + 5, cy + 76, 10, 0.4, 0.6, 0.4, 0.8)
+                    lurek.render.print("taunt", cx + 5, cy + 76, 10, 0.4, 0.6, 0.4, 0.8)
                 end
                 if card.revive then
-                    lurek.render.drawText("revive", cx + 5, cy + 76, 10, 0.9, 0.5, 0.2, 0.8)
+                    lurek.render.print("revive", cx + 5, cy + 76, 10, 0.9, 0.5, 0.2, 0.8)
                 end
             elseif card.type == "spell" then
-                lurek.render.drawText("SPELL", cx + 5, cy + 58, 10, 0.7, 0.5, 0.9, 1)
-                lurek.render.drawText(card.effect, cx + 5, cy + 72, 11, 0.8, 0.8, 0.8, 0.8)
+                lurek.render.print("SPELL", cx + 5, cy + 58, 10, 0.7, 0.5, 0.9, 1)
+                lurek.render.print(card.effect, cx + 5, cy + 72, 11, 0.8, 0.8, 0.8, 0.8)
             end
             -- Mana affordability overlay
             if not affordable then
-                lurek.render.drawRect(cx, cy, CARD_W, CARD_H, 0.0, 0.0, 0.0, 0.4)
+                lurek.render.rectangle(cx, cy, CARD_W, CARD_H, 0.0, 0.0, 0.0, 0.4)
             end
         end
     end
@@ -923,14 +923,14 @@ lurek.render_ui(function()
     -- Enemy creatures stats
     for i, c in ipairs(enemy.field) do
         local sx = fld_start_x + (i - 1) * (SLOT_W + SLOT_GAP)
-        lurek.render.drawText(c.name, sx + 3, FIELD_Y_ENEMY - 12, 9, 0.7, 0.6, 0.6, 1)
-        lurek.render.drawText(c.atk .. "/" .. c.hp, sx + 3, FIELD_Y_ENEMY + SLOT_H + 2, 11, 1.0, 0.8, 0.3, 1)
+        lurek.render.print(c.name, sx + 3, FIELD_Y_ENEMY - 12, 9, 0.7, 0.6, 0.6, 1)
+        lurek.render.print(c.atk .. "/" .. c.hp, sx + 3, FIELD_Y_ENEMY + SLOT_H + 2, 11, 1.0, 0.8, 0.3, 1)
     end
     -- Player creatures stats
     for i, c in ipairs(player.field) do
         local sx = fld_start_x + (i - 1) * (SLOT_W + SLOT_GAP)
-        lurek.render.drawText(c.name, sx + 3, FIELD_Y_PLAYER - 12, 9, 0.7, 0.7, 0.8, 1)
-        lurek.render.drawText(c.atk .. "/" .. c.hp, sx + 3, FIELD_Y_PLAYER + SLOT_H + 2, 11, 1.0, 0.8, 0.3, 1)
+        lurek.render.print(c.name, sx + 3, FIELD_Y_PLAYER - 12, 9, 0.7, 0.7, 0.8, 1)
+        lurek.render.print(c.atk .. "/" .. c.hp, sx + 3, FIELD_Y_PLAYER + SLOT_H + 2, 11, 1.0, 0.8, 0.3, 1)
     end
 
     -- Spell targeting hint
@@ -941,9 +941,9 @@ lurek.render_ui(function()
         elseif selected_spell.effect == "shield" then
             hint = "Click your creature to cast Shield"
         end
-        lurek.render.drawText(hint, SCREEN_W / 2 - 180, HAND_Y - 20, 12, 0.9, 0.7, 0.3, 1)
+        lurek.render.print(hint, SCREEN_W / 2 - 180, HAND_Y - 20, 12, 0.9, 0.7, 0.3, 1)
     end
 
     -- FPS
-    lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.3, 0.3, 0.3, 1)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.3, 0.3, 0.3, 1)
 end)

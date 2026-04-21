@@ -362,13 +362,13 @@ lurek.render(function()
         -- Selection highlight bar
         if i == selected then
             lurek.render.setColor(1.0, 1.0, 0.3, 0.12)
-            lurek.render.drawRectFill(START_X - 5, y - 3, END_X - START_X + RECT_W + 10, RECT_H + 6)
+            lurek.render.rectangle(START_X - 5, y - 3, END_X - START_X + RECT_W + 10, RECT_H + 6)
         end
 
         if current_prop == PROP_POSITION then
             local x = t.x or START_X
             lurek.render.setColor(c[1], c[2], c[3], 1.0)
-            lurek.render.drawRectFill(x, y, RECT_W, RECT_H)
+            lurek.render.rectangle(x, y, RECT_W, RECT_H)
 
         elseif current_prop == PROP_SCALE then
             local s = t.scale or 0.5
@@ -376,7 +376,7 @@ lurek.render(function()
             local h = RECT_H * s
             local cx = (START_X + END_X) / 2
             lurek.render.setColor(c[1], c[2], c[3], 1.0)
-            lurek.render.drawRectFill(cx - w / 2, y + RECT_H / 2 - h / 2, w, h)
+            lurek.render.rectangle(cx - w / 2, y + RECT_H / 2 - h / 2, w, h)
 
         elseif current_prop == PROP_ROTATION then
             local angle = t.angle or 0
@@ -385,25 +385,25 @@ lurek.render(function()
             local oy = math.sin(rad) * 10
             local cx = (START_X + END_X) / 2
             lurek.render.setColor(c[1], c[2], c[3], 1.0)
-            lurek.render.drawRectFill(cx + ox - RECT_W / 2, y + oy, RECT_W, RECT_H)
+            lurek.render.rectangle(cx + ox - RECT_W / 2, y + oy, RECT_W, RECT_H)
 
         elseif current_prop == PROP_ALPHA then
             local a = t.alpha or 0.2
             local cx = (START_X + END_X) / 2
             lurek.render.setColor(c[1], c[2], c[3], a)
-            lurek.render.drawRectFill(cx - RECT_W / 2, y, RECT_W, RECT_H)
+            lurek.render.rectangle(cx - RECT_W / 2, y, RECT_W, RECT_H)
 
         elseif current_prop == PROP_COLOR then
             local hue = t.hue or 0
             local r, g, b = hue_to_rgb(hue * 0.66)
             local cx = (START_X + END_X) / 2
             lurek.render.setColor(r, g, b, 1.0)
-            lurek.render.drawRectFill(cx - RECT_W / 2, y, RECT_W, RECT_H)
+            lurek.render.rectangle(cx - RECT_W / 2, y, RECT_W, RECT_H)
         end
 
         -- Track line (faint)
         lurek.render.setColor(0.2, 0.2, 0.3, 0.25)
-        lurek.render.drawLine(START_X, y + RECT_H / 2, END_X + RECT_W, y + RECT_H / 2)
+        lurek.render.line(START_X, y + RECT_H / 2, END_X + RECT_W, y + RECT_H / 2)
 
         ::continue::
     end
@@ -421,7 +421,7 @@ lurek.render_ui(function()
         local a = title_alpha
 
         lurek.render.setColor(0.12, 0.08, 0.2, a * 0.5)
-        lurek.render.drawRectFill(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1.0, 0.85, 0.4, a)
         lurek.render.print("TWEEN DEMO", SCREEN_W / 2 - 80, SCREEN_H / 2 - 50)
@@ -442,7 +442,7 @@ lurek.render_ui(function()
 
     -- ── Top bar ────────────────────────────────────────────
     lurek.render.setColor(0.0, 0.0, 0.0, 0.55)
-    lurek.render.drawRectFill(0, 0, SCREEN_W, 44)
+    lurek.render.rectangle(0, 0, SCREEN_W, 44)
 
     lurek.render.setColor(1.0, 0.9, 0.4, 1.0)
     lurek.render.print("Tween Demo", 12, 6)
@@ -484,18 +484,18 @@ lurek.render_ui(function()
 
     -- Background
     lurek.render.setColor(0.0, 0.0, 0.0, 0.4)
-    lurek.render.drawRectFill(gx - 8, gy - 22, gw + 16, gh + 34)
+    lurek.render.rectangle(gx - 8, gy - 22, gw + 16, gh + 34)
 
     -- Border
     lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-    lurek.render.drawRect(gx, gy, gw, gh)
+    lurek.render.rectangle(gx, gy, gw, gh)
 
     -- Grid lines
     lurek.render.setColor(0.2, 0.2, 0.3, 0.3)
     for gi = 1, 3 do
         local frac = gi / 4
-        lurek.render.drawLine(gx, gy + gh * (1 - frac), gx + gw, gy + gh * (1 - frac))
-        lurek.render.drawLine(gx + gw * frac, gy, gx + gw * frac, gy + gh)
+        lurek.render.line(gx, gy + gh * (1 - frac), gx + gw, gy + gh * (1 - frac))
+        lurek.render.line(gx + gw * frac, gy, gx + gw * frac, gy + gh)
     end
 
     -- Axis labels
@@ -517,7 +517,7 @@ lurek.render_ui(function()
             local t2 = (s + 1) / steps
             local v1 = sel_func(t1)
             local v2 = sel_func(t2)
-            lurek.render.drawLine(
+            lurek.render.line(
                 gx + t1 * gw, gy + gh - v1 * gh,
                 gx + t2 * gw, gy + gh - v2 * gh
             )
@@ -525,18 +525,18 @@ lurek.render_ui(function()
 
         -- Linear reference line (faint)
         lurek.render.setColor(0.3, 0.3, 0.4, 0.25)
-        lurek.render.drawLine(gx, gy + gh, gx + gw, gy)
+        lurek.render.line(gx, gy + gh, gx + gw, gy)
 
         -- Progress indicator dot
         local progress = clamp(elapsed / TWEEN_DURATION, 0, 1)
         local v = sel_func(progress)
         lurek.render.setColor(1.0, 1.0, 1.0, 1.0)
-        lurek.render.drawCircleFill(gx + progress * gw, gy + gh - v * gh, 5)
+        lurek.render.circleFill(gx + progress * gw, gy + gh - v * gh, 5)
 
         -- Crosshair lines at progress point
         lurek.render.setColor(1.0, 1.0, 1.0, 0.2)
-        lurek.render.drawLine(gx + progress * gw, gy, gx + progress * gw, gy + gh)
-        lurek.render.drawLine(gx, gy + gh - v * gh, gx + gw, gy + gh - v * gh)
+        lurek.render.line(gx + progress * gw, gy, gx + progress * gw, gy + gh)
+        lurek.render.line(gx, gy + gh - v * gh, gx + gw, gy + gh - v * gh)
     end
 
     -- Graph title: selected easing name
@@ -545,7 +545,7 @@ lurek.render_ui(function()
 
     -- ── Bottom controls bar ────────────────────────────────
     lurek.render.setColor(0.0, 0.0, 0.0, 0.45)
-    lurek.render.drawRectFill(0, SCREEN_H - 26, SCREEN_W, 26)
+    lurek.render.rectangle(0, SCREEN_H - 26, SCREEN_W, 26)
 
     lurek.render.setColor(0.5, 0.5, 0.6, 0.6)
     lurek.render.print(

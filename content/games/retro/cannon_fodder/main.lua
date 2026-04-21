@@ -569,34 +569,34 @@ lurek.render(function()
     -- Ground — dark jungle green gradient strips
     for row = 0, world_h, 40 do
         local shade = 0.12 + (row / world_h) * 0.06
-        lurek.draw.rectangle(ox, oy + row, world_w, 40, shade, shade + 0.08, 0.02)
+        lurek.render.rectangleangle(ox, oy + row, world_w, 40, shade, shade + 0.08, 0.02)
     end
 
     -- Trees — trunk + canopy
     for _, tr in ipairs(trees) do
         local tx, ty = tr.x + ox, tr.y + oy
         -- Trunk
-        lurek.draw.rectangle(tx - 3, ty, 6, tr.radius * 0.7, 0.35, 0.22, 0.1)
+        lurek.render.rectangleangle(tx - 3, ty, 6, tr.radius * 0.7, 0.35, 0.22, 0.1)
         -- Canopy
-        lurek.draw.circle(tx, ty, tr.radius, 0.08, 0.3, 0.06)
-        lurek.draw.circle(tx - 4, ty - 3, tr.radius * 0.7, 0.1, 0.35, 0.08)
+        lurek.render.circle(tx, ty, tr.radius, 0.08, 0.3, 0.06)
+        lurek.render.circle(tx - 4, ty - 3, tr.radius * 0.7, 0.1, 0.35, 0.08)
     end
 
     -- Flag
     if state == STATE.PLAYING or state == STATE.MISSION_COMPLETE then
         local fx, fy = flag.x + ox, flag.y + oy
         -- Pole
-        lurek.draw.rectangle(fx - 1, fy - 20, 3, 40, 0.7, 0.7, 0.7)
+        lurek.render.rectangleangle(fx - 1, fy - 20, 3, 40, 0.7, 0.7, 0.7)
         -- Flag cloth
-        lurek.draw.rectangle(fx + 2, fy - 18, 16, 10, 0.9, 0.2, 0.1)
+        lurek.render.rectangleangle(fx + 2, fy - 18, 16, 10, 0.9, 0.2, 0.1)
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
         if e.alive then
             local ex, ey = e.x + ox, e.y + oy
-            lurek.draw.circle(ex, ey, e.radius, 0.8, 0.15, 0.1)
-            lurek.draw.circle(ex, ey, e.radius - 2, 0.9, 0.25, 0.15)
+            lurek.render.circle(ex, ey, e.radius, 0.8, 0.15, 0.1)
+            lurek.render.circle(ex, ey, e.radius - 2, 0.9, 0.25, 0.15)
         end
     end
 
@@ -604,12 +604,12 @@ lurek.render(function()
     for idx, s in ipairs(soldiers) do
         if s.alive then
             local sx, sy = s.x + ox, s.y + oy
-            lurek.draw.circle(sx, sy, s.radius, 0.15, 0.55, 0.15)
-            lurek.draw.circle(sx, sy, s.radius - 2, 0.2, 0.65, 0.2)
+            lurek.render.circle(sx, sy, s.radius, 0.15, 0.55, 0.15)
+            lurek.render.circle(sx, sy, s.radius - 2, 0.2, 0.65, 0.2)
             -- Facing indicator
             local fdx = math.cos(facing_angle) * (s.radius + 3)
             local fdy = math.sin(facing_angle) * (s.radius + 3)
-            lurek.draw.circle(sx + fdx, sy + fdy, 2, 0.9, 0.9, 0.3)
+            lurek.render.circle(sx + fdx, sy + fdy, 2, 0.9, 0.9, 0.3)
         end
     end
 
@@ -617,9 +617,9 @@ lurek.render(function()
     for _, b in ipairs(bullets) do
         local bx, by = b.x + ox, b.y + oy
         if b.friendly then
-            lurek.draw.circle(bx, by, 2, 1.0, 0.9, 0.3)
+            lurek.render.circle(bx, by, 2, 1.0, 0.9, 0.3)
         else
-            lurek.draw.circle(bx, by, 2, 1.0, 0.3, 0.2)
+            lurek.render.circle(bx, by, 2, 1.0, 0.3, 0.2)
         end
     end
 
@@ -627,10 +627,10 @@ lurek.render(function()
     for _, gr in ipairs(grenades) do
         local gx, gy = gr.x + ox, gr.y + oy - math.max(0, gr.arc_height)
         -- Shadow
-        lurek.draw.circle(gr.x + ox, gr.y + oy, 3, 0.0, 0.0, 0.0)
+        lurek.render.circle(gr.x + ox, gr.y + oy, 3, 0.0, 0.0, 0.0)
         -- Grenade body
-        lurek.draw.circle(gx, gy, 4, 0.3, 0.35, 0.1)
-        lurek.draw.circle(gx, gy, 2, 0.5, 0.55, 0.2)
+        lurek.render.circle(gx, gy, 4, 0.3, 0.35, 0.1)
+        lurek.render.circle(gx, gy, 2, 0.5, 0.55, 0.2)
     end
 
     -- Particles
@@ -638,12 +638,12 @@ lurek.render(function()
         local px, py = p.x + ox, p.y + oy
         local alpha_factor = clamp(p.life / p.max_life, 0, 1)
         local sz = p.size * alpha_factor
-        lurek.draw.circle(px, py, sz, p.r, p.g, p.b)
+        lurek.render.circle(px, py, sz, p.r, p.g, p.b)
     end
 
     -- Explosion flash overlay
     if flash_alpha > 0 then
-        lurek.draw.rectangle(0, 0, 800, 600, 1.0, 0.9, 0.5, flash_alpha)
+        lurek.render.rectangleangle(0, 0, 800, 600, 1.0, 0.9, 0.5, flash_alpha)
     end
 end)
 
@@ -653,43 +653,43 @@ end)
 lurek.render_ui(function()
     if state == STATE.TITLE then
         -- Title screen
-        lurek.draw.rectangle(0, 0, 800, 600, 0.05, 0.08, 0.02)
-        lurek.draw.text("CANNON FODDER", 170, 180, 48, 0.9, 0.8, 0.2)
-        lurek.draw.text("WAR HAS NEVER BEEN SO MUCH FUN", 180, 260, 18, 0.7, 0.7, 0.6)
+        lurek.render.rectangleangle(0, 0, 800, 600, 0.05, 0.08, 0.02)
+        lurek.render.print("CANNON FODDER", 170, 180, 48, 0.9, 0.8, 0.2)
+        lurek.render.print("WAR HAS NEVER BEEN SO MUCH FUN", 180, 260, 18, 0.7, 0.7, 0.6)
 
         -- Blinking prompt
         if math.floor(title_blink_timer * 2) % 2 == 0 then
-            lurek.draw.text("Press SPACE to start", 280, 400, 20, 0.9, 0.9, 0.9)
+            lurek.render.print("Press SPACE to start", 280, 400, 20, 0.9, 0.9, 0.9)
         end
 
-        lurek.draw.text("WASD = Move   SPACE = Fire   G = Grenade", 180, 500, 14, 0.5, 0.5, 0.5)
+        lurek.render.print("WASD = Move   SPACE = Fire   G = Grenade", 180, 500, 14, 0.5, 0.5, 0.5)
         return
     end
 
     if state == STATE.GAME_OVER then
-        lurek.draw.rectangle(0, 0, 800, 600, 0.05, 0.02, 0.02, 0.85)
-        lurek.draw.text("GAME OVER", 260, 220, 48, 0.9, 0.2, 0.15)
-        lurek.draw.text("Final Score: " .. score, 300, 300, 24, 0.9, 0.9, 0.9)
+        lurek.render.rectangleangle(0, 0, 800, 600, 0.05, 0.02, 0.02, 0.85)
+        lurek.render.print("GAME OVER", 260, 220, 48, 0.9, 0.2, 0.15)
+        lurek.render.print("Final Score: " .. score, 300, 300, 24, 0.9, 0.9, 0.9)
         if math.floor(title_blink_timer * 2) % 2 == 0 then
-            lurek.draw.text("Press SPACE", 330, 400, 20, 0.8, 0.8, 0.8)
+            lurek.render.print("Press SPACE", 330, 400, 20, 0.8, 0.8, 0.8)
         end
         return
     end
 
     -- HUD background bar
-    lurek.draw.rectangle(0, 0, 800, 32, 0.0, 0.0, 0.0, 0.6)
+    lurek.render.rectangleangle(0, 0, 800, 32, 0.0, 0.0, 0.0, 0.6)
 
     -- Score
-    lurek.draw.text("SCORE: " .. score, 10, 6, 18, 0.9, 0.85, 0.3)
+    lurek.render.print("SCORE: " .. score, 10, 6, 18, 0.9, 0.85, 0.3)
 
     -- Mission
-    lurek.draw.text("MISSION " .. current_mission .. "/" .. #missions, 300, 6, 18, 0.9, 0.9, 0.9)
+    lurek.render.print("MISSION " .. current_mission .. "/" .. #missions, 300, 6, 18, 0.9, 0.9, 0.9)
 
     -- Grenades
-    lurek.draw.text("GRENADES: " .. grenade_count, 530, 6, 18, 0.6, 0.9, 0.4)
+    lurek.render.print("GRENADES: " .. grenade_count, 530, 6, 18, 0.6, 0.9, 0.4)
 
     -- Enemies remaining
-    lurek.draw.text("ENEMIES: " .. enemies_remaining, 680, 6, 14, 0.9, 0.4, 0.3)
+    lurek.render.print("ENEMIES: " .. enemies_remaining, 680, 6, 14, 0.9, 0.4, 0.3)
 
     -- Soldiers alive indicator (bottom left)
     local alive = 0
@@ -700,21 +700,21 @@ lurek.render_ui(function()
         local sx = 20 + (i - 1) * 22
         local sy = 575
         if i <= alive then
-            lurek.draw.circle(sx, sy, 7, 0.15, 0.6, 0.15)
+            lurek.render.circle(sx, sy, 7, 0.15, 0.6, 0.15)
         else
-            lurek.draw.circle(sx, sy, 7, 0.3, 0.1, 0.1)
-            lurek.draw.text("X", sx - 4, sy - 7, 14, 0.6, 0.2, 0.2)
+            lurek.render.circle(sx, sy, 7, 0.3, 0.1, 0.1)
+            lurek.render.print("X", sx - 4, sy - 7, 14, 0.6, 0.2, 0.2)
         end
     end
 
     -- FPS
     local fps = lurek.timer.getFPS()
-    lurek.draw.text("FPS: " .. fps, 730, 580, 12, 0.5, 0.5, 0.5)
+    lurek.render.print("FPS: " .. fps, 730, 580, 12, 0.5, 0.5, 0.5)
 
     -- Mission complete banner
     if state == STATE.MISSION_COMPLETE then
-        lurek.draw.rectangle(0, 230, 800, 80, 0.0, 0.0, 0.0, 0.75)
-        lurek.draw.text("MISSION " .. current_mission .. " COMPLETE!", 220, 250, 32, 0.2, 0.9, 0.3)
-        lurek.draw.text("+500 BONUS", 340, 290, 18, 0.9, 0.85, 0.3)
+        lurek.render.rectangleangle(0, 230, 800, 80, 0.0, 0.0, 0.0, 0.75)
+        lurek.render.print("MISSION " .. current_mission .. " COMPLETE!", 220, 250, 32, 0.2, 0.9, 0.3)
+        lurek.render.print("+500 BONUS", 340, 290, 18, 0.9, 0.85, 0.3)
     end
 end)

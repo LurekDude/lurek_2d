@@ -349,7 +349,7 @@ end)
 -- ── Render world ──────────────────────────────────────────
 lurek.render(function()
     -- Map background tint
-    lurek.render.drawRect(0, 0, W, H - ui_panel_h, { color = {0.08,0.14,0.08,1} })
+    lurek.render.rectangle(0, 0, W, H - ui_panel_h, { color = {0.08,0.14,0.08,1} })
 
     -- Resource nodes
     for _, node in ipairs(resource_nodes) do
@@ -357,7 +357,7 @@ lurek.render(function()
             local sx, sy = node.x - cam.x, node.y - cam.y
             if sx > -20 and sx < W and sy > -20 and sy < H then
                 local col = node.gold > 0 and {0.9,0.75,0.1,1} or {0.4,0.7,0.3,1}
-                lurek.render.drawCircle(sx, sy, 12, { color = col, segments = 8 })
+                lurek.render.circle(sx, sy, 12, { color = col, segments = 8 })
             end
         end
     end
@@ -371,19 +371,19 @@ lurek.render(function()
         if e.kind == BUILD then
             local col = e.btype == "base" and {0.2,0.5,0.8,1} or {0.4,0.6,0.3,1}
             local size = e.btype == "base" and 36 or 24
-            lurek.render.drawRect(sx - size/2, sy - size/2, size, size, { color = col })
+            lurek.render.rectangle(sx - size/2, sy - size/2, size, size, { color = col })
         elseif e.kind == UNIT then
             local col = e.team == "player" and {0.3,0.7,1.0,1} or {0.8,0.3,0.2,1}
-            lurek.render.drawCircle(sx, sy, 10, { color = col, segments = 8 })
+            lurek.render.circle(sx, sy, 10, { color = col, segments = 8 })
             -- HP bar
-            lurek.render.drawRect(sx - 10, sy - 16, 20, 3, { color = {0.3,0,0,1} })
-            lurek.render.drawRect(sx - 10, sy - 16, math.floor(20 * e.hp / e.maxHp), 3, { color = {0.2,0.8,0.2,1} })
+            lurek.render.rectangle(sx - 10, sy - 16, 20, 3, { color = {0.3,0,0,1} })
+            lurek.render.rectangle(sx - 10, sy - 16, math.floor(20 * e.hp / e.maxHp), 3, { color = {0.2,0.8,0.2,1} })
         end
 
         -- Selection ring
         for _, id in ipairs(selected) do
             if id == e.id then
-                lurek.render.drawCircle(sx, sy, 14, { color = {0.3,0.9,1.0,0.4}, segments = 10 })
+                lurek.render.circle(sx, sy, 14, { color = {0.3,0.9,1.0,0.4}, segments = 10 })
             end
         end
 
@@ -397,25 +397,25 @@ end)
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.render_ui()
     -- Panel
-    lurek.render.drawRect(0, H - ui_panel_h, W, ui_panel_h, { color = {0.1,0.1,0.1,0.9} })
+    lurek.render.rectangle(0, H - ui_panel_h, W, ui_panel_h, { color = {0.1,0.1,0.1,0.9} })
 
-    lurek.render.drawText("Gold: " .. math.floor(resources.gold), 10, H - ui_panel_h + 8, { color = {1,0.85,0.2,1}, size = 14 })
-    lurek.render.drawText("Wood: " .. math.floor(resources.wood), 130, H - ui_panel_h + 8, { color = {0.5,0.8,0.3,1}, size = 14 })
-    lurek.render.drawText("Wave: " .. wave .. "/5  Next: " .. math.floor(wave_timer) .. "s", 260, H - ui_panel_h + 8, { color = {0.8,0.6,0.6,1}, size = 14 })
-    lurek.render.drawText("Score: " .. score, 480, H - ui_panel_h + 8, { color = {1,1,1,1}, size = 14 })
-    lurek.render.drawText("T=train unit(50g)  WASD=camera  LMB=select  RMB=order", 10, H - ui_panel_h + 28, { color = {0.5,0.5,0.5,1}, size = 12 })
+    lurek.render.print("Gold: " .. math.floor(resources.gold), 10, H - ui_panel_h + 8, { color = {1,0.85,0.2,1}, size = 14 })
+    lurek.render.print("Wood: " .. math.floor(resources.wood), 130, H - ui_panel_h + 8, { color = {0.5,0.8,0.3,1}, size = 14 })
+    lurek.render.print("Wave: " .. wave .. "/5  Next: " .. math.floor(wave_timer) .. "s", 260, H - ui_panel_h + 8, { color = {0.8,0.6,0.6,1}, size = 14 })
+    lurek.render.print("Score: " .. score, 480, H - ui_panel_h + 8, { color = {1,1,1,1}, size = 14 })
+    lurek.render.print("T=train unit(50g)  WASD=camera  LMB=select  RMB=order", 10, H - ui_panel_h + 28, { color = {0.5,0.5,0.5,1}, size = 12 })
 
     if #selected > 0 then
-        lurek.render.drawText("Selected: " .. #selected .. " units", 10, H - ui_panel_h + 48, { color = {0.4,0.8,1.0,1}, size = 12 })
+        lurek.render.print("Selected: " .. #selected .. " units", 10, H - ui_panel_h + 48, { color = {0.4,0.8,1.0,1}, size = 12 })
     end
 
     if state == "gameover" then
-        lurek.render.drawRect(200, 200, 400, 120, { color = {0,0,0,0.85} })
-        lurek.render.drawText("BASE DESTROYED", 250, 225, { color = {0.9,0.2,0.2,1}, size = 28 })
-        lurek.render.drawText("Score: " .. score, 330, 270, { color = {1,1,1,1}, size = 18 })
+        lurek.render.rectangle(200, 200, 400, 120, { color = {0,0,0,0.85} })
+        lurek.render.print("BASE DESTROYED", 250, 225, { color = {0.9,0.2,0.2,1}, size = 28 })
+        lurek.render.print("Score: " .. score, 330, 270, { color = {1,1,1,1}, size = 18 })
     elseif state == "victory" then
-        lurek.render.drawRect(200, 200, 400, 120, { color = {0,0,0,0.85} })
-        lurek.render.drawText("VICTORY!", 290, 225, { color = {1,0.9,0.2,1}, size = 32 })
-        lurek.render.drawText("Score: " .. score, 330, 270, { color = {1,1,1,1}, size = 18 })
+        lurek.render.rectangle(200, 200, 400, 120, { color = {0,0,0,0.85} })
+        lurek.render.print("VICTORY!", 290, 225, { color = {1,0.9,0.2,1}, size = 32 })
+        lurek.render.print("Score: " .. score, 330, 270, { color = {1,1,1,1}, size = 18 })
     end
 end

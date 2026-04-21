@@ -441,81 +441,81 @@ end)
 lurek.render(function()
     -- Courtroom background walls
     lurek.render.setColor(0.25, 0.18, 0.12, 1)
-    lurek.render.drawRect("fill", 0, 0, 800, 600)
+    lurek.render.rectangle("fill", 0, 0, 800, 600)
 
     -- Wood paneling
     lurek.render.setColor(0.35, 0.22, 0.12, 1)
-    lurek.render.drawRect("fill", 0, 400, 800, 200)
+    lurek.render.rectangle("fill", 0, 400, 800, 200)
 
     -- Judge's bench (top center)
     lurek.render.setColor(0.4, 0.25, 0.1, 1)
-    lurek.render.drawRect("fill", 280, 40, 240, 80)
+    lurek.render.rectangle("fill", 280, 40, 240, 80)
     lurek.render.setColor(0.5, 0.32, 0.15, 1)
-    lurek.render.drawRect("fill", 290, 45, 220, 70)
+    lurek.render.rectangle("fill", 290, 45, 220, 70)
     -- Judge silhouette
     lurek.render.setColor(0.15, 0.1, 0.08, 1)
-    lurek.render.drawCircle("fill", 400, 55, 18)
-    lurek.render.drawRect("fill", 385, 73, 30, 35)
+    lurek.render.circle("fill", 400, 55, 18)
+    lurek.render.rectangle("fill", 385, 73, 30, 35)
     -- Gavel
     lurek.render.setColor(0.55, 0.35, 0.15, 1)
-    lurek.render.drawRect("fill", 440, 75, 25, 8)
-    lurek.render.drawRect("fill", 450, 65, 8, 20)
+    lurek.render.rectangle("fill", 440, 75, 25, 8)
+    lurek.render.rectangle("fill", 450, 65, 8, 20)
 
     -- Witness stand (right)
     lurek.render.setColor(0.38, 0.24, 0.12, 1)
-    lurek.render.drawRect("fill", 580, 150, 160, 120)
+    lurek.render.rectangle("fill", 580, 150, 160, 120)
     lurek.render.setColor(0.45, 0.3, 0.15, 1)
-    lurek.render.drawRect("fill", 590, 155, 140, 50)
+    lurek.render.rectangle("fill", 590, 155, 140, 50)
     -- Witness silhouette
     if state == "TESTIMONY" or state == "QUESTION" then
         lurek.render.setColor(0.2, 0.15, 0.1, 1)
-        lurek.render.drawCircle("fill", 660, 155, 20)
-        lurek.render.drawRect("fill", 645, 175, 30, 40)
+        lurek.render.circle("fill", 660, 155, 20)
+        lurek.render.rectangle("fill", 645, 175, 30, 40)
     end
 
     -- Defense desk (left)
     lurek.render.setColor(0.38, 0.24, 0.12, 1)
-    lurek.render.drawRect("fill", 40, 280, 200, 80)
+    lurek.render.rectangle("fill", 40, 280, 200, 80)
     lurek.render.setColor(0.45, 0.3, 0.15, 1)
-    lurek.render.drawRect("fill", 50, 285, 180, 35)
+    lurek.render.rectangle("fill", 50, 285, 180, 35)
     -- Defense attorney silhouette
     lurek.render.setColor(0.1, 0.15, 0.3, 1)
-    lurek.render.drawCircle("fill", 140, 275, 18)
-    lurek.render.drawRect("fill", 125, 293, 30, 40)
+    lurek.render.circle("fill", 140, 275, 18)
+    lurek.render.rectangle("fill", 125, 293, 30, 40)
 
     -- Prosecution desk (right lower)
     lurek.render.setColor(0.38, 0.24, 0.12, 1)
-    lurek.render.drawRect("fill", 540, 280, 200, 80)
+    lurek.render.rectangle("fill", 540, 280, 200, 80)
     lurek.render.setColor(0.45, 0.3, 0.15, 1)
-    lurek.render.drawRect("fill", 550, 285, 180, 35)
+    lurek.render.rectangle("fill", 550, 285, 180, 35)
     -- Prosecutor silhouette
     lurek.render.setColor(0.3, 0.1, 0.1, 1)
-    lurek.render.drawCircle("fill", 640, 275, 18)
-    lurek.render.drawRect("fill", 625, 293, 30, 40)
+    lurek.render.circle("fill", 640, 275, 18)
+    lurek.render.rectangle("fill", 625, 293, 30, 40)
 
     -- Gallery railing
     lurek.render.setColor(0.5, 0.33, 0.18, 1)
-    lurek.render.drawRect("fill", 0, 395, 800, 8)
+    lurek.render.rectangle("fill", 0, 395, 800, 8)
 
     -- Gallery audience silhouettes
     lurek.render.setColor(0.18, 0.13, 0.1, 0.7)
     for i = 0, 9 do
         local gx = 40 + i * 75
-        lurek.render.drawCircle("fill", gx, 430, 12)
-        lurek.render.drawRect("fill", gx - 10, 442, 20, 25)
+        lurek.render.circle("fill", gx, 430, 12)
+        lurek.render.rectangle("fill", gx - 10, 442, 20, 25)
     end
 
     -- Gavel sparks (particles)
     for _, s in ipairs(gavel_sparks) do
         local a = s.life / s.max_life
         lurek.render.setColor(1, 0.8, 0.2, a)
-        lurek.render.drawRect("fill", s.x - s.size/2, s.y - s.size/2, s.size, s.size)
+        lurek.render.rectangle("fill", s.x - s.size/2, s.y - s.size/2, s.size, s.size)
     end
 
     -- Flash effect overlay
     if flash_alpha > 0 then
         lurek.render.setColor(flash_color[1], flash_color[2], flash_color[3], flash_alpha * 0.4)
-        lurek.render.drawRect("fill", 0, 0, 800, 600)
+        lurek.render.rectangle("fill", 0, 0, 800, 600)
     end
 end)
 
@@ -559,38 +559,38 @@ lurek.render_ui(function()
         -- Confetti (particles)
         for _, c in ipairs(verdict_confetti) do
             lurek.render.setColor(c.r, c.g, c.b, 0.9)
-            lurek.render.drawRect("fill", c.x, c.y, c.size, c.size)
+            lurek.render.rectangle("fill", c.x, c.y, c.size, c.size)
         end
         return
     end
 
     -- Case info bar (top)
     lurek.render.setColor(0.1, 0.07, 0.05, 0.85)
-    lurek.render.drawRect("fill", 0, 0, 800, 32)
+    lurek.render.rectangle("fill", 0, 0, 800, 32)
     lurek.render.setColor(0.9, 0.75, 0.3, 1)
     lurek.render.print("Case " .. current_case .. ": " .. cases[current_case].name, 10, 8, 0, 0.9, 0.9)
 
     -- Jury meter bar (top right)
     local jury_x, jury_y, jury_w = 500, 6, 180
     lurek.render.setColor(0.3, 0.3, 0.3, 0.8)
-    lurek.render.drawRect("fill", jury_x, jury_y, jury_w, 18)
+    lurek.render.rectangle("fill", jury_x, jury_y, jury_w, 18)
     local fill_w = (jury_display / 100) * jury_w
     local jr = 0.2 + 0.6 * (1 - jury_display / 100)
     local jg = 0.3 + 0.7 * (jury_display / 100)
     lurek.render.setColor(jr, jg, 0.2, 1)
-    lurek.render.drawRect("fill", jury_x, jury_y, fill_w, 18)
+    lurek.render.rectangle("fill", jury_x, jury_y, fill_w, 18)
     lurek.render.setColor(1, 1, 1, 1)
     lurek.render.print("Jury: " .. math.floor(jury_display) .. "%", jury_x + 5, jury_y + 2, 0, 0.75, 0.75)
 
     -- Credibility bar (below jury)
     local cr_x, cr_y, cr_w = 695, 6, 95
     lurek.render.setColor(0.3, 0.3, 0.3, 0.8)
-    lurek.render.drawRect("fill", cr_x, cr_y, cr_w, 18)
+    lurek.render.rectangle("fill", cr_x, cr_y, cr_w, 18)
     local cr_fill = (cred_display / 100) * cr_w
     local cr_r = 0.2 + 0.8 * (1 - cred_display / 100)
     local cr_g = 0.8 * (cred_display / 100)
     lurek.render.setColor(cr_r, cr_g, 0.15, 1)
-    lurek.render.drawRect("fill", cr_x, cr_y, cr_fill, 18)
+    lurek.render.rectangle("fill", cr_x, cr_y, cr_fill, 18)
     lurek.render.setColor(1, 1, 1, 1)
     lurek.render.print("Cred:" .. math.floor(cred_display), cr_x + 3, cr_y + 2, 0, 0.7, 0.7)
 
@@ -602,9 +602,9 @@ lurek.render_ui(function()
 
     -- Main text box
     lurek.render.setColor(0.08, 0.06, 0.04, 0.92)
-    lurek.render.drawRect("fill", 40, 460, 720, 110)
+    lurek.render.rectangle("fill", 40, 460, 720, 110)
     lurek.render.setColor(0.6, 0.45, 0.2, 0.8)
-    lurek.render.drawRect("line", 40, 460, 720, 110)
+    lurek.render.rectangle("line", 40, 460, 720, 110)
 
     -- Speaker label
     if state == "TESTIMONY" and not question_mode and not objection_mode and objection_result == "" then
@@ -628,9 +628,9 @@ lurek.render_ui(function()
     -- Question mode choices
     if question_mode then
         lurek.render.setColor(0.1, 0.08, 0.05, 0.9)
-        lurek.render.drawRect("fill", 260, 300, 320, 140)
+        lurek.render.rectangle("fill", 260, 300, 320, 140)
         lurek.render.setColor(0.7, 0.55, 0.25, 0.9)
-        lurek.render.drawRect("line", 260, 300, 320, 140)
+        lurek.render.rectangle("line", 260, 300, 320, 140)
 
         lurek.render.setColor(1, 0.85, 0.3, 1)
         lurek.render.print("QUESTION WITNESS", 310, 308, 0, 1, 1)
@@ -645,9 +645,9 @@ lurek.render_ui(function()
     -- Objection mode evidence selection
     if objection_mode then
         lurek.render.setColor(0.15, 0.05, 0.02, 0.92)
-        lurek.render.drawRect("fill", 180, 180, 440, 180)
+        lurek.render.rectangle("fill", 180, 180, 440, 180)
         lurek.render.setColor(1, 0.4, 0.1, 0.9)
-        lurek.render.drawRect("line", 180, 180, 440, 180)
+        lurek.render.rectangle("line", 180, 180, 440, 180)
 
         lurek.render.setColor(1, 0.5, 0.15, 1)
         lurek.render.print("PRESENT EVIDENCE", 310, 188, 0, 1.1, 1.1)
@@ -664,9 +664,9 @@ lurek.render_ui(function()
     -- Evidence panel (toggle)
     if show_evidence and not objection_mode then
         lurek.render.setColor(0.08, 0.06, 0.04, 0.92)
-        lurek.render.drawRect("fill", 500, 40, 280, 200)
+        lurek.render.rectangle("fill", 500, 40, 280, 200)
         lurek.render.setColor(0.6, 0.45, 0.2, 0.8)
-        lurek.render.drawRect("line", 500, 40, 280, 200)
+        lurek.render.rectangle("line", 500, 40, 280, 200)
 
         lurek.render.setColor(1, 0.85, 0.3, 1)
         lurek.render.print("EVIDENCE", 590, 48, 0, 1, 1)
@@ -707,7 +707,7 @@ lurek.render_ui(function()
         -- Confetti (particles)
         for _, c in ipairs(verdict_confetti) do
             lurek.render.setColor(c.r, c.g, c.b, 0.9)
-            lurek.render.drawRect("fill", c.x, c.y, c.size, c.size)
+            lurek.render.rectangle("fill", c.x, c.y, c.size, c.size)
         end
     end
 end)

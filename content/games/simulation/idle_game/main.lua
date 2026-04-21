@@ -335,9 +335,9 @@ end)
 lurek.render(function()
     if state == STATE_TITLE then
         -- Title screen
-        lurek.render.drawText("IDLE GAME", W / 2 - 120, H / 3, { size = 48, color = {1, 0.85, 0.2, 1} })
-        lurek.render.drawText("CLICK YOUR WAY TO RICHES", W / 2 - 170, H / 3 + 60, { size = 20, color = {0.7, 0.7, 0.8, 1} })
-        lurek.render.drawText("[SPACE] to Start", W / 2 - 80, H * 2 / 3, { size = 18, color = {0.5, 0.5, 0.6, 1} })
+        lurek.render.print("IDLE GAME", W / 2 - 120, H / 3, { size = 48, color = {1, 0.85, 0.2, 1} })
+        lurek.render.print("CLICK YOUR WAY TO RICHES", W / 2 - 170, H / 3 + 60, { size = 20, color = {0.7, 0.7, 0.8, 1} })
+        lurek.render.print("[SPACE] to Start", W / 2 - 80, H * 2 / 3, { size = 18, color = {0.5, 0.5, 0.6, 1} })
         return
     end
 
@@ -350,32 +350,32 @@ lurek.render(function()
     local oy = by - (sy - bh) / 2
 
     -- Button glow
-    lurek.render.drawRect(ox - 4, oy - 4, sx + 8, sy + 8, { color = {1, 0.85, 0.2, 0.3}, filled = true })
+    lurek.render.rectangle(ox - 4, oy - 4, sx + 8, sy + 8, { color = {1, 0.85, 0.2, 0.3}, filled = true })
     -- Button body
-    lurek.render.drawRect(ox, oy, sx, sy, { color = {1, 0.75, 0.1, 1}, filled = true })
+    lurek.render.rectangle(ox, oy, sx, sy, { color = {1, 0.75, 0.1, 1}, filled = true })
     -- Button border
-    lurek.render.drawRect(ox, oy, sx, sy, { color = {1, 0.95, 0.5, 1}, filled = false })
+    lurek.render.rectangle(ox, oy, sx, sy, { color = {1, 0.95, 0.5, 1}, filled = false })
     -- Coin symbol
-    lurek.render.drawText("$", ox + sx / 2 - 14, oy + sy / 2 - 18, { size = 36, color = {0.1, 0.05, 0, 1} })
+    lurek.render.print("$", ox + sx / 2 - 14, oy + sy / 2 - 18, { size = 36, color = {0.1, 0.05, 0, 1} })
 
     -- Click particles (gold coins)
     for _, p in ipairs(particles) do
         local alpha = math.max(0, p.life)
-        lurek.render.drawRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size,
+        lurek.render.rectangle(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size,
             { color = {p.r, p.g, p.b, alpha}, filled = true })
     end
 
     -- Sparkles (purchase feedback)
     for _, s in ipairs(sparkles) do
         local alpha = math.max(0, s.life / 0.6)
-        lurek.render.drawRect(s.x - s.size / 2, s.y - s.size / 2, s.size, s.size,
+        lurek.render.rectangle(s.x - s.size / 2, s.y - s.size / 2, s.size, s.size,
             { color = {0.4, 1, 0.5, alpha}, filled = true })
     end
 
     -- Prestige explosion
     for _, e in ipairs(prestige_explosion) do
         local alpha = math.max(0, e.life / 1.5)
-        lurek.render.drawRect(e.x - e.size / 2, e.y - e.size / 2, e.size, e.size,
+        lurek.render.rectangle(e.x - e.size / 2, e.y - e.size / 2, e.size, e.size,
             { color = {e.r, e.g, e.b, alpha}, filled = true })
     end
 
@@ -383,9 +383,9 @@ lurek.render(function()
     local cy = H - 30
     for x = -20, W, 20 do
         local cx = x + conveyor_offset
-        lurek.render.drawRect(cx, cy, 10, 6, { color = {0.25, 0.22, 0.3, 0.6}, filled = true })
+        lurek.render.rectangle(cx, cy, 10, 6, { color = {0.25, 0.22, 0.3, 0.6}, filled = true })
     end
-    lurek.render.drawRect(0, cy - 2, W, 2, { color = {0.35, 0.3, 0.4, 0.8}, filled = true })
+    lurek.render.rectangle(0, cy - 2, W, 2, { color = {0.35, 0.3, 0.4, 0.8}, filled = true })
 end)
 
 -- ── Render UI: panels, stats, upgrades ──────────────────────────────────
@@ -394,21 +394,21 @@ lurek.render_ui(function()
 
     -- ── Gold display (top center) ───────────────────────────────────────
     local gold_color = gold_flash_timer > 0 and {1, 1, 0.5, 1} or {1, 0.85, 0.2, 1}
-    lurek.render.drawText("Gold: " .. fmt(display_gold), W / 2 - 80, 20, { size = 28, color = gold_color })
+    lurek.render.print("Gold: " .. fmt(display_gold), W / 2 - 80, 20, { size = 28, color = gold_color })
 
     -- ── Production rate ─────────────────────────────────────────────────
-    lurek.render.drawText(fmt(gold_per_second) .. "/s", W / 2 - 30, 55, { size = 16, color = {0.6, 0.8, 0.6, 1} })
+    lurek.render.print(fmt(gold_per_second) .. "/s", W / 2 - 30, 55, { size = 16, color = {0.6, 0.8, 0.6, 1} })
 
     -- ── Click power ─────────────────────────────────────────────────────
     local total_click = (base_click + click_power_bonus) * prestige_mult()
-    lurek.render.drawText("Click: +" .. fmt(total_click), W / 2 - 40, H / 2 + 50, { size = 14, color = {0.8, 0.8, 0.9, 1} })
-    lurek.render.drawText("[SPACE]", W / 2 - 28, H / 2 + 70, { size = 12, color = {0.5, 0.5, 0.6, 1} })
+    lurek.render.print("Click: +" .. fmt(total_click), W / 2 - 40, H / 2 + 50, { size = 14, color = {0.8, 0.8, 0.9, 1} })
+    lurek.render.print("[SPACE]", W / 2 - 28, H / 2 + 70, { size = 12, color = {0.5, 0.5, 0.6, 1} })
 
     -- ── Upgrade panel (right side) ──────────────────────────────────────
     local px, py = 560, 90
-    lurek.render.drawRect(px - 10, py - 10, 240, 450, { color = {0.12, 0.1, 0.16, 0.85}, filled = true })
-    lurek.render.drawRect(px - 10, py - 10, 240, 450, { color = {0.3, 0.25, 0.4, 0.8}, filled = false })
-    lurek.render.drawText("— PRODUCERS —", px + 30, py, { size = 14, color = {0.7, 0.7, 0.9, 1} })
+    lurek.render.rectangle(px - 10, py - 10, 240, 450, { color = {0.12, 0.1, 0.16, 0.85}, filled = true })
+    lurek.render.rectangle(px - 10, py - 10, 240, 450, { color = {0.3, 0.25, 0.4, 0.8}, filled = false })
+    lurek.render.print("— PRODUCERS —", px + 30, py, { size = 14, color = {0.7, 0.7, 0.9, 1} })
 
     for i, p in ipairs(producers) do
         local cost = get_cost(p.base_cost, p.owned)
@@ -418,14 +418,14 @@ lurek.render_ui(function()
         local cost_color = affordable and {0.4, 1, 0.4, 1} or {1, 0.4, 0.4, 1}
         local rate_display = p.rate * p.owned * prestige_mult()
 
-        lurek.render.drawText("[" .. string.upper(p.key) .. "] " .. p.name, px, cy, { size = 13, color = name_color })
-        lurek.render.drawText("Cost: " .. fmt(cost), px + 130, cy, { size = 11, color = cost_color })
-        lurek.render.drawText("x" .. p.owned .. "  +" .. fmt(rate_display) .. "/s", px, cy + 16, { size = 11, color = {0.6, 0.7, 0.6, 1} })
+        lurek.render.print("[" .. string.upper(p.key) .. "] " .. p.name, px, cy, { size = 13, color = name_color })
+        lurek.render.print("Cost: " .. fmt(cost), px + 130, cy, { size = 11, color = cost_color })
+        lurek.render.print("x" .. p.owned .. "  +" .. fmt(rate_display) .. "/s", px, cy + 16, { size = 11, color = {0.6, 0.7, 0.6, 1} })
     end
 
     -- ── Click upgrades ──────────────────────────────────────────────────
     local cuy = py + 300
-    lurek.render.drawText("— CLICK POWER —", px + 25, cuy, { size = 14, color = {0.7, 0.7, 0.9, 1} })
+    lurek.render.print("— CLICK POWER —", px + 25, cuy, { size = 14, color = {0.7, 0.7, 0.9, 1} })
 
     for i, u in ipairs(click_upgrades) do
         local cost = get_cost(u.base_cost, u.owned)
@@ -434,59 +434,59 @@ lurek.render_ui(function()
         local name_color = affordable and {0.9, 0.9, 1, 1} or {0.5, 0.5, 0.6, 1}
         local cost_color = affordable and {0.4, 1, 0.4, 1} or {1, 0.4, 0.4, 1}
 
-        lurek.render.drawText("[" .. string.upper(u.key) .. "] " .. u.name, px, uy, { size = 13, color = name_color })
-        lurek.render.drawText("Cost: " .. fmt(cost) .. "  x" .. u.owned, px + 130, uy, { size = 11, color = cost_color })
+        lurek.render.print("[" .. string.upper(u.key) .. "] " .. u.name, px, uy, { size = 13, color = name_color })
+        lurek.render.print("Cost: " .. fmt(cost) .. "  x" .. u.owned, px + 130, uy, { size = 11, color = cost_color })
     end
 
     -- ── Stats panel (left side) ─────────────────────────────────────────
     local sx, sy = 10, 90
-    lurek.render.drawRect(sx, sy - 10, 190, 170, { color = {0.12, 0.1, 0.16, 0.85}, filled = true })
-    lurek.render.drawRect(sx, sy - 10, 190, 170, { color = {0.3, 0.25, 0.4, 0.8}, filled = false })
-    lurek.render.drawText("— STATS —", sx + 50, sy, { size = 14, color = {0.7, 0.7, 0.9, 1} })
-    lurek.render.drawText("Total Earned: " .. fmt(total_gold_earned), sx + 10, sy + 25, { size = 12, color = {0.7, 0.7, 0.8, 1} })
-    lurek.render.drawText("Clicks: " .. total_clicks, sx + 10, sy + 45, { size = 12, color = {0.7, 0.7, 0.8, 1} })
-    lurek.render.drawText("Gold/s: " .. fmt(gold_per_second), sx + 10, sy + 65, { size = 12, color = {0.7, 0.7, 0.8, 1} })
-    lurek.render.drawText("Prestige: " .. prestige_level .. " (x" .. fmt(prestige_mult()) .. ")", sx + 10, sy + 85, { size = 12, color = {1, 0.85, 0.2, 1} })
+    lurek.render.rectangle(sx, sy - 10, 190, 170, { color = {0.12, 0.1, 0.16, 0.85}, filled = true })
+    lurek.render.rectangle(sx, sy - 10, 190, 170, { color = {0.3, 0.25, 0.4, 0.8}, filled = false })
+    lurek.render.print("— STATS —", sx + 50, sy, { size = 14, color = {0.7, 0.7, 0.9, 1} })
+    lurek.render.print("Total Earned: " .. fmt(total_gold_earned), sx + 10, sy + 25, { size = 12, color = {0.7, 0.7, 0.8, 1} })
+    lurek.render.print("Clicks: " .. total_clicks, sx + 10, sy + 45, { size = 12, color = {0.7, 0.7, 0.8, 1} })
+    lurek.render.print("Gold/s: " .. fmt(gold_per_second), sx + 10, sy + 65, { size = 12, color = {0.7, 0.7, 0.8, 1} })
+    lurek.render.print("Prestige: " .. prestige_level .. " (x" .. fmt(prestige_mult()) .. ")", sx + 10, sy + 85, { size = 12, color = {1, 0.85, 0.2, 1} })
 
     -- Prestige hint
     if gold >= 1000000 then
-        lurek.render.drawText("[P] PRESTIGE AVAILABLE!", sx + 10, sy + 115, { size = 13, color = {1, 0.5, 1, 1} })
+        lurek.render.print("[P] PRESTIGE AVAILABLE!", sx + 10, sy + 115, { size = 13, color = {1, 0.5, 1, 1} })
     else
         local pct = math.min(100, gold / 1000000 * 100)
-        lurek.render.drawText("Prestige at 1M (" .. string.format("%.1f%%", pct) .. ")", sx + 10, sy + 115, { size = 11, color = {0.5, 0.4, 0.6, 1} })
+        lurek.render.print("Prestige at 1M (" .. string.format("%.1f%%", pct) .. ")", sx + 10, sy + 115, { size = 11, color = {0.5, 0.4, 0.6, 1} })
     end
 
     -- ── Achievements (bottom-left) ──────────────────────────────────────
     local ax, ay = 10, 290
-    lurek.render.drawRect(ax, ay - 10, 190, 140, { color = {0.12, 0.1, 0.16, 0.85}, filled = true })
-    lurek.render.drawRect(ax, ay - 10, 190, 140, { color = {0.3, 0.25, 0.4, 0.8}, filled = false })
-    lurek.render.drawText("— ACHIEVEMENTS —", ax + 30, ay, { size = 14, color = {0.7, 0.7, 0.9, 1} })
+    lurek.render.rectangle(ax, ay - 10, 190, 140, { color = {0.12, 0.1, 0.16, 0.85}, filled = true })
+    lurek.render.rectangle(ax, ay - 10, 190, 140, { color = {0.3, 0.25, 0.4, 0.8}, filled = false })
+    lurek.render.print("— ACHIEVEMENTS —", ax + 30, ay, { size = 14, color = {0.7, 0.7, 0.9, 1} })
 
     for i, a in ipairs(achievements) do
         local badge_color = a.unlocked and {0.3, 1, 0.4, 1} or {0.35, 0.35, 0.4, 1}
         local icon = a.unlocked and "[*] " or "[ ] "
-        lurek.render.drawText(icon .. a.name, ax + 10, ay + 10 + i * 20, { size = 11, color = badge_color })
+        lurek.render.print(icon .. a.name, ax + 10, ay + 10 + i * 20, { size = 11, color = badge_color })
     end
 
     -- ── Achievement popup ───────────────────────────────────────────────
     if achievement_popup then
         local pop_alpha = math.min(1, achievement_popup_timer)
-        lurek.render.drawRect(W / 2 - 120, H - 70, 240, 40, { color = {0.15, 0.4, 0.15, pop_alpha * 0.9}, filled = true })
-        lurek.render.drawRect(W / 2 - 120, H - 70, 240, 40, { color = {0.3, 1, 0.4, pop_alpha}, filled = false })
-        lurek.render.drawText("Achievement: " .. achievement_popup, W / 2 - 100, H - 58, { size = 14, color = {0.3, 1, 0.4, pop_alpha} })
+        lurek.render.rectangle(W / 2 - 120, H - 70, 240, 40, { color = {0.15, 0.4, 0.15, pop_alpha * 0.9}, filled = true })
+        lurek.render.rectangle(W / 2 - 120, H - 70, 240, 40, { color = {0.3, 1, 0.4, pop_alpha}, filled = false })
+        lurek.render.print("Achievement: " .. achievement_popup, W / 2 - 100, H - 58, { size = 14, color = {0.3, 1, 0.4, pop_alpha} })
     end
 
     -- ── Prestige confirm overlay ────────────────────────────────────────
     if state == STATE_PRESTIGE then
-        lurek.render.drawRect(0, 0, W, H, { color = {0, 0, 0, 0.7}, filled = true })
-        lurek.render.drawRect(W / 2 - 180, H / 2 - 80, 360, 160, { color = {0.15, 0.1, 0.2, 1}, filled = true })
-        lurek.render.drawRect(W / 2 - 180, H / 2 - 80, 360, 160, { color = {1, 0.85, 0.2, 1}, filled = false })
-        lurek.render.drawText("PRESTIGE?", W / 2 - 60, H / 2 - 55, { size = 24, color = {1, 0.85, 0.2, 1} })
-        lurek.render.drawText("Reset all progress for", W / 2 - 90, H / 2 - 15, { size = 14, color = {0.8, 0.8, 0.9, 1} })
-        lurek.render.drawText("permanent 2x production!", W / 2 - 100, H / 2 + 5, { size = 14, color = {0.8, 0.8, 0.9, 1} })
-        lurek.render.drawText("[SPACE] Confirm    [ESC] Cancel", W / 2 - 120, H / 2 + 40, { size = 13, color = {0.6, 0.6, 0.7, 1} })
+        lurek.render.rectangle(0, 0, W, H, { color = {0, 0, 0, 0.7}, filled = true })
+        lurek.render.rectangle(W / 2 - 180, H / 2 - 80, 360, 160, { color = {0.15, 0.1, 0.2, 1}, filled = true })
+        lurek.render.rectangle(W / 2 - 180, H / 2 - 80, 360, 160, { color = {1, 0.85, 0.2, 1}, filled = false })
+        lurek.render.print("PRESTIGE?", W / 2 - 60, H / 2 - 55, { size = 24, color = {1, 0.85, 0.2, 1} })
+        lurek.render.print("Reset all progress for", W / 2 - 90, H / 2 - 15, { size = 14, color = {0.8, 0.8, 0.9, 1} })
+        lurek.render.print("permanent 2x production!", W / 2 - 100, H / 2 + 5, { size = 14, color = {0.8, 0.8, 0.9, 1} })
+        lurek.render.print("[SPACE] Confirm    [ESC] Cancel", W / 2 - 120, H / 2 + 40, { size = 13, color = {0.6, 0.6, 0.7, 1} })
     end
 
     -- ── FPS ─────────────────────────────────────────────────────────────
-    lurek.render.drawText("FPS: " .. lurek.timer.getFPS(), 5, 5, { size = 11, color = {0.4, 0.4, 0.5, 0.7} })
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 5, 5, { size = 11, color = {0.4, 0.4, 0.5, 0.7} })
 end)

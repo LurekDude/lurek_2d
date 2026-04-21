@@ -363,18 +363,18 @@ end
 
 local function renderHUD()
     local barW, barH, barX, barY = 200, 18, 20, 12
-    lurek.render.drawRect(barX, barY, barW, barH, { color = {0.2, 0.0, 0.0, 1.0} })
-    lurek.render.drawRect(barX, barY, math.floor(barW * hpBarDisplay.value), barH, { color = {0.1, 0.8, 0.2, 1.0} })
-    lurek.render.drawText("HP: " .. math.max(0, player.hp) .. "/" .. player.maxHp, barX + 4, barY + 2, { color = {1, 1, 1, 1}, size = 12 })
-    lurek.render.drawText("Gold: " .. player.gold, 240, 14, { color = {1.0, 0.85, 0.2, 1.0}, size = 14 })
-    lurek.render.drawText("F" .. player.floor .. " R" .. player.room, 340, 14, { color = {0.7, 0.7, 0.7, 1.0}, size = 14 })
+    lurek.render.rectangle(barX, barY, barW, barH, { color = {0.2, 0.0, 0.0, 1.0} })
+    lurek.render.rectangle(barX, barY, math.floor(barW * hpBarDisplay.value), barH, { color = {0.1, 0.8, 0.2, 1.0} })
+    lurek.render.print("HP: " .. math.max(0, player.hp) .. "/" .. player.maxHp, barX + 4, barY + 2, { color = {1, 1, 1, 1}, size = 12 })
+    lurek.render.print("Gold: " .. player.gold, 240, 14, { color = {1.0, 0.85, 0.2, 1.0}, size = 14 })
+    lurek.render.print("F" .. player.floor .. " R" .. player.room, 340, 14, { color = {0.7, 0.7, 0.7, 1.0}, size = 14 })
     local gs = getGearStats()
-    lurek.render.drawText(string.format("DMG:%d DEF:%d SPD:%d", gs.damage, gs.defense, gs.speed), 440, 14, { color = {0.6, 0.6, 0.8, 1.0}, size = 12 })
+    lurek.render.print(string.format("DMG:%d DEF:%d SPD:%d", gs.damage, gs.defense, gs.speed), 440, 14, { color = {0.6, 0.6, 0.8, 1.0}, size = 12 })
 end
 
 local function renderEquipmentSidebar()
     local sx, sy = 600, 80
-    lurek.render.drawText("== GEAR ==", sx, sy, { color = {0.8, 0.8, 0.6, 1.0}, size = 14 })
+    lurek.render.print("== GEAR ==", sx, sy, { color = {0.8, 0.8, 0.6, 1.0}, size = 14 })
     sy = sy + 22
     local slots = { "weapon", "armor", "helm", "boots", "accessory" }
     local labels = { weapon = "Weapon", armor = "Armor", helm = "Helm", boots = "Boots", accessory = "Ring" }
@@ -382,11 +382,11 @@ local function renderEquipmentSidebar()
         local item  = player.equipment[slot]
         local label = labels[slot] .. ": "
         if item then
-            lurek.render.drawText(label .. item.name, sx, sy, { color = item.rarity.color, size = 12 })
-            lurek.render.drawText("  +" .. item.stat .. " " .. item.statKey, sx, sy + 14, { color = {0.5, 0.5, 0.5, 1.0}, size = 11 })
+            lurek.render.print(label .. item.name, sx, sy, { color = item.rarity.color, size = 12 })
+            lurek.render.print("  +" .. item.stat .. " " .. item.statKey, sx, sy + 14, { color = {0.5, 0.5, 0.5, 1.0}, size = 11 })
             sy = sy + 32
         else
-            lurek.render.drawText(label .. "(empty)", sx, sy, { color = {0.4, 0.4, 0.4, 1.0}, size = 12 })
+            lurek.render.print(label .. "(empty)", sx, sy, { color = {0.4, 0.4, 0.4, 1.0}, size = 12 })
             sy = sy + 22
         end
     end
@@ -394,20 +394,20 @@ end
 
 local function renderTitle()
     local alpha = 0.5 + 0.5 * math.sin(titleBlink * 3)
-    lurek.render.drawText("LOOT RPG", 280, 180, { color = {1.0, 0.85, 0.2, 1.0}, size = 48 })
-    lurek.render.drawText("Dungeon Crawler", 310, 240, { color = {0.7, 0.7, 0.7, 1.0}, size = 20 })
-    lurek.render.drawText("Press SPACE to begin", 290, 340, { color = {1.0, 1.0, 1.0, alpha}, size = 18 })
-    lurek.render.drawText("Controls: SPACE=action  E=equip  B=buy potion  ESC=quit", 160, 500, { color = {0.5, 0.5, 0.5, 1.0}, size = 14 })
+    lurek.render.print("LOOT RPG", 280, 180, { color = {1.0, 0.85, 0.2, 1.0}, size = 48 })
+    lurek.render.print("Dungeon Crawler", 310, 240, { color = {0.7, 0.7, 0.7, 1.0}, size = 20 })
+    lurek.render.print("Press SPACE to begin", 290, 340, { color = {1.0, 1.0, 1.0, alpha}, size = 18 })
+    lurek.render.print("Controls: SPACE=action  E=equip  B=buy potion  ESC=quit", 160, 500, { color = {0.5, 0.5, 0.5, 1.0}, size = 14 })
 end
 
 local function renderCombat()
     renderHUD()
-    lurek.render.drawText(combat.enemyName, 300, 80, { color = {1.0, 0.3, 0.3, 1.0}, size = 22 })
+    lurek.render.print(combat.enemyName, 300, 80, { color = {1.0, 0.3, 0.3, 1.0}, size = 22 })
 
     local ePct = math.max(0, combat.enemyHp / combat.enemyMaxHp)
-    lurek.render.drawRect(300, 110, 200, 16, { color = {0.3, 0.0, 0.0, 1.0} })
-    lurek.render.drawRect(300, 110, math.floor(200 * ePct), 16, { color = {0.9, 0.2, 0.2, 1.0} })
-    lurek.render.drawText(combat.enemyHp .. "/" .. combat.enemyMaxHp, 310, 112, { color = {1, 1, 1, 1}, size = 12 })
+    lurek.render.rectangle(300, 110, 200, 16, { color = {0.3, 0.0, 0.0, 1.0} })
+    lurek.render.rectangle(300, 110, math.floor(200 * ePct), 16, { color = {0.9, 0.2, 0.2, 1.0} })
+    lurek.render.print(combat.enemyHp .. "/" .. combat.enemyMaxHp, 310, 112, { color = {1, 1, 1, 1}, size = 12 })
 
     local logY    = 160
     local startIdx = math.max(1, #combat.log - 11)
@@ -417,47 +417,47 @@ local function renderCombat()
         if string.find(combat.log[i], "dealt") and not string.find(combat.log[i], "You") then c = {1.0, 0.4, 0.4, 1.0} end
         if string.find(combat.log[i], "defeated")   then c = {1.0, 0.85, 0.2, 1.0} end
         if string.find(combat.log[i], "slain")      then c = {1.0, 0.0, 0.0, 1.0} end
-        lurek.render.drawText(combat.log[i], 50, logY, { color = c, size = 14 })
+        lurek.render.print(combat.log[i], 50, logY, { color = c, size = 14 })
         logY = logY + 18
     end
 
     if combat.done then
         if combat.won then
-            lurek.render.drawText("Victory! Press SPACE for loot", 250, 420, { color = {1.0, 0.85, 0.2, 1.0}, size = 18 })
+            lurek.render.print("Victory! Press SPACE for loot", 250, 420, { color = {1.0, 0.85, 0.2, 1.0}, size = 18 })
         else
-            lurek.render.drawText("Press SPACE to continue...", 270, 420, { color = {0.7, 0.7, 0.7, 1.0}, size = 18 })
+            lurek.render.print("Press SPACE to continue...", 270, 420, { color = {0.7, 0.7, 0.7, 1.0}, size = 18 })
         end
     else
-        lurek.render.drawText("Press SPACE to attack", 290, 420, { color = {1.0, 1.0, 1.0, 0.7}, size = 16 })
+        lurek.render.print("Press SPACE to attack", 290, 420, { color = {1.0, 1.0, 1.0, 0.7}, size = 16 })
     end
     renderEquipmentSidebar()
 end
 
 local function renderLoot()
     renderHUD()
-    lurek.render.drawText("== LOOT FOUND ==", 300, 80, { color = {1.0, 0.85, 0.2, lootGlow.alpha}, size = 24 })
+    lurek.render.print("== LOOT FOUND ==", 300, 80, { color = {1.0, 0.85, 0.2, lootGlow.alpha}, size = 24 })
 
     local y = 130
     for _, item in ipairs(pendingLoot) do
-        lurek.render.drawText(item.name, 200, y, { color = item.rarity.color, size = 16 })
-        lurek.render.drawText(item.statKey .. ": +" .. item.stat .. "  wt: " .. item.weight, 460, y, { color = {0.7, 0.7, 0.7, 1.0}, size = 14 })
+        lurek.render.print(item.name, 200, y, { color = item.rarity.color, size = 16 })
+        lurek.render.print(item.statKey .. ": +" .. item.stat .. "  wt: " .. item.weight, 460, y, { color = {0.7, 0.7, 0.7, 1.0}, size = 14 })
         y = y + 28
     end
 
-    lurek.render.drawText("Press SPACE to collect & continue", 230, 360, { color = {0.8, 0.8, 0.8, 1.0}, size = 16 })
-    lurek.render.drawText("Press E to collect & auto-equip",   240, 390, { color = {0.6, 0.8, 1.0, 1.0}, size = 16 })
-    lurek.render.drawText("Backpack: " .. string.format("%.1f", backpackWeight()) .. " / " .. player.maxWeight .. " kg", 260, 430, { color = {0.5, 0.5, 0.5, 1.0}, size = 14 })
+    lurek.render.print("Press SPACE to collect & continue", 230, 360, { color = {0.8, 0.8, 0.8, 1.0}, size = 16 })
+    lurek.render.print("Press E to collect & auto-equip",   240, 390, { color = {0.6, 0.8, 1.0, 1.0}, size = 16 })
+    lurek.render.print("Backpack: " .. string.format("%.1f", backpackWeight()) .. " / " .. player.maxWeight .. " kg", 260, 430, { color = {0.5, 0.5, 0.5, 1.0}, size = 14 })
     renderEquipmentSidebar()
 end
 
 local function renderRoom()
     renderHUD()
-    lurek.render.drawText("Floor " .. player.floor .. " — Room " .. player.room .. "/" .. player.roomsPerFloor, 260, 100, { color = {0.9, 0.9, 0.9, 1.0}, size = 22 })
-    lurek.render.drawText("Press SPACE to enter next room", 260, 160, { color = {0.7, 0.7, 0.7, 1.0}, size = 16 })
-    lurek.render.drawText("E = auto-equip best   B = buy potion (5g)", 210, 190, { color = {0.5, 0.5, 0.5, 1.0}, size = 14 })
+    lurek.render.print("Floor " .. player.floor .. " — Room " .. player.room .. "/" .. player.roomsPerFloor, 260, 100, { color = {0.9, 0.9, 0.9, 1.0}, size = 22 })
+    lurek.render.print("Press SPACE to enter next room", 260, 160, { color = {0.7, 0.7, 0.7, 1.0}, size = 16 })
+    lurek.render.print("E = auto-equip best   B = buy potion (5g)", 210, 190, { color = {0.5, 0.5, 0.5, 1.0}, size = 14 })
 
-    lurek.render.drawText("== BACKPACK ==", 50, 240, { color = {0.8, 0.8, 0.6, 1.0}, size = 16 })
-    lurek.render.drawText(string.format("Weight: %.1f / %.1f", backpackWeight(), player.maxWeight), 50, 260, { color = {0.6, 0.6, 0.6, 1.0}, size = 12 })
+    lurek.render.print("== BACKPACK ==", 50, 240, { color = {0.8, 0.8, 0.6, 1.0}, size = 16 })
+    lurek.render.print(string.format("Weight: %.1f / %.1f", backpackWeight(), player.maxWeight), 50, 260, { color = {0.6, 0.6, 0.6, 1.0}, size = 12 })
 
     local y = 285
     local visible  = 10
@@ -466,30 +466,30 @@ local function renderRoom()
         local item    = player.backpack[i]
         local equipped = (player.equipment[item.slot] == item)
         local prefix   = equipped and "[E] " or "    "
-        lurek.render.drawText(prefix .. item.name, 50, y, { color = item.rarity.color, size = 13 })
-        lurek.render.drawText(item.statKey .. ": +" .. item.stat, 280, y, { color = {0.6, 0.6, 0.6, 1.0}, size = 12 })
+        lurek.render.print(prefix .. item.name, 50, y, { color = item.rarity.color, size = 13 })
+        lurek.render.print(item.statKey .. ": +" .. item.stat, 280, y, { color = {0.6, 0.6, 0.6, 1.0}, size = 12 })
         y = y + 20
     end
     if #player.backpack > visible then
-        lurek.render.drawText("Up/Down to scroll", 50, y + 10, { color = {0.4, 0.4, 0.4, 1.0}, size = 11 })
+        lurek.render.print("Up/Down to scroll", 50, y + 10, { color = {0.4, 0.4, 0.4, 1.0}, size = 11 })
     end
     renderEquipmentSidebar()
 end
 
 local function renderGameOver()
-    lurek.render.drawText("GAME OVER", 300, 140, { color = {1.0, 0.2, 0.2, 1.0}, size = 36 })
+    lurek.render.print("GAME OVER", 300, 140, { color = {1.0, 0.2, 0.2, 1.0}, size = 36 })
     local cleared = (player.floor - 1) * player.roomsPerFloor + player.room
-    lurek.render.drawText("Floor: " .. player.floor .. "  Rooms cleared: " .. cleared, 240, 220, { color = {0.8, 0.8, 0.8, 1.0}, size = 16 })
-    lurek.render.drawText("Gold: " .. player.gold, 350, 250, { color = {1.0, 0.85, 0.2, 1.0}, size = 16 })
-    lurek.render.drawText("Items: " .. #player.backpack, 340, 280, { color = {0.7, 0.7, 0.7, 1.0}, size = 16 })
+    lurek.render.print("Floor: " .. player.floor .. "  Rooms cleared: " .. cleared, 240, 220, { color = {0.8, 0.8, 0.8, 1.0}, size = 16 })
+    lurek.render.print("Gold: " .. player.gold, 350, 250, { color = {1.0, 0.85, 0.2, 1.0}, size = 16 })
+    lurek.render.print("Items: " .. #player.backpack, 340, 280, { color = {0.7, 0.7, 0.7, 1.0}, size = 16 })
     local gs = getGearStats()
-    lurek.render.drawText(string.format("Final stats — DMG:%d DEF:%d SPD:%d HP+:%d", gs.damage, gs.defense, gs.speed, gs.hpBonus), 180, 320, { color = {0.6, 0.6, 0.6, 1.0}, size = 14 })
-    lurek.render.drawText("Press SPACE to return to title", 260, 400, { color = {1.0, 1.0, 1.0, 0.6}, size = 16 })
+    lurek.render.print(string.format("Final stats — DMG:%d DEF:%d SPD:%d HP+:%d", gs.damage, gs.defense, gs.speed, gs.hpBonus), 180, 320, { color = {0.6, 0.6, 0.6, 1.0}, size = 14 })
+    lurek.render.print("Press SPACE to return to title", 260, 400, { color = {1.0, 1.0, 1.0, 0.6}, size = 16 })
 end
 
 function lurek.render_ui()
     local fps = lurek.timer.getFPS()
-    lurek.render.drawText("FPS: " .. math.floor(fps), 720, 8, { color = {0.5, 0.5, 0.5, 1.0}, size = 12 })
+    lurek.render.print("FPS: " .. math.floor(fps), 720, 8, { color = {0.5, 0.5, 0.5, 1.0}, size = 12 })
 
     if state == STATE_TITLE     then renderTitle()
     elseif state == STATE_COMBAT   then renderCombat()

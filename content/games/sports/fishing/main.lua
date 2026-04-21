@@ -470,33 +470,33 @@ lurek.render(function()
   -- Water
   local water_r, water_g, water_b = 0.1, 0.2, 0.5
   if is_night then water_r, water_g, water_b = 0.03, 0.06, 0.15 end
-  lurek.draw.rect(0, WATER_Y, SCREEN_W, SCREEN_H - WATER_Y, water_r, water_g, water_b, 0.85)
+  lurek.render.rectangle(0, WATER_Y, SCREEN_W, SCREEN_H - WATER_Y, water_r, water_g, water_b, 0.85)
 
   -- Water surface line
-  lurek.draw.rect(0, WATER_Y - 2, SCREEN_W, 4, 0.3, 0.5, 0.8, 0.6)
+  lurek.render.rectangle(0, WATER_Y - 2, SCREEN_W, 4, 0.3, 0.5, 0.8, 0.6)
 
   -- Shore
-  lurek.draw.rect(0, WATER_Y - 10, SHORE_X + 10, SCREEN_H - WATER_Y + 10, 0.45, 0.35, 0.2, 1.0)
+  lurek.render.rectangle(0, WATER_Y - 10, SHORE_X + 10, SCREEN_H - WATER_Y + 10, 0.45, 0.35, 0.2, 1.0)
   -- Grass
-  lurek.draw.rect(0, WATER_Y - 15, SHORE_X + 15, 8, 0.2, 0.6, 0.2, 1.0)
+  lurek.render.rectangle(0, WATER_Y - 15, SHORE_X + 15, 8, 0.2, 0.6, 0.2, 1.0)
 
   -- Fisher (stick figure)
   -- Body
-  lurek.draw.rect(SHORE_X - 5, WATER_Y - 55, 6, 30, 0.3, 0.2, 0.1, 1.0)
+  lurek.render.rectangle(SHORE_X - 5, WATER_Y - 55, 6, 30, 0.3, 0.2, 0.1, 1.0)
   -- Head
-  lurek.draw.circle(SHORE_X - 2, WATER_Y - 62, 8, 0.9, 0.75, 0.6, 1.0)
+  lurek.render.circle(SHORE_X - 2, WATER_Y - 62, 8, 0.9, 0.75, 0.6, 1.0)
   -- Legs
-  lurek.draw.rect(SHORE_X - 8, WATER_Y - 25, 5, 20, 0.2, 0.15, 0.1, 1.0)
-  lurek.draw.rect(SHORE_X, WATER_Y - 25, 5, 20, 0.2, 0.15, 0.1, 1.0)
+  lurek.render.rectangle(SHORE_X - 8, WATER_Y - 25, 5, 20, 0.2, 0.15, 0.1, 1.0)
+  lurek.render.rectangle(SHORE_X, WATER_Y - 25, 5, 20, 0.2, 0.15, 0.1, 1.0)
   -- Rod
-  lurek.draw.line(SHORE_X, WATER_Y - 50, ROD_TIP_X, ROD_TIP_Y, 0.5, 0.35, 0.1, 1.0)
+  lurek.render.line(SHORE_X, WATER_Y - 50, ROD_TIP_X, ROD_TIP_Y, 0.5, 0.35, 0.1, 1.0)
 
   -- Fishing line + bobber
   if cast_x > 0 then
-    lurek.draw.line(ROD_TIP_X, ROD_TIP_Y, cast_x, bobber_y, 0.8, 0.8, 0.8, 0.6)
+    lurek.render.line(ROD_TIP_X, ROD_TIP_Y, cast_x, bobber_y, 0.8, 0.8, 0.8, 0.6)
     -- Bobber
-    lurek.draw.circle(cast_x, bobber_y, 5, 1.0, 0.2, 0.1, 1.0)
-    lurek.draw.circle(cast_x, bobber_y - 4, 3, 1.0, 1.0, 1.0, 1.0)
+    lurek.render.circle(cast_x, bobber_y, 5, 1.0, 0.2, 0.1, 1.0)
+    lurek.render.circle(cast_x, bobber_y - 4, 3, 1.0, 1.0, 1.0, 1.0)
   end
 
   -- Fish under water (visible when hooked in CATCHING)
@@ -504,39 +504,39 @@ lurek.render(function()
     local fc = hooked_fish.color
     local fy = WATER_Y + 30 + math.sin(day_timer * 5) * 8
     -- Fish body
-    lurek.draw.circle(fish_x, fy, 10, fc[1], fc[2], fc[3], 0.8)
+    lurek.render.circle(fish_x, fy, 10, fc[1], fc[2], fc[3], 0.8)
     -- Tail
-    lurek.draw.rect(fish_x + 8, fy - 5, 8, 10, fc[1] * 0.8, fc[2] * 0.8, fc[3] * 0.8, 0.7)
+    lurek.render.rectangle(fish_x + 8, fy - 5, 8, 10, fc[1] * 0.8, fc[2] * 0.8, fc[3] * 0.8, 0.7)
     -- Line to fish
-    lurek.draw.line(cast_x, bobber_y, fish_x, fy, 0.8, 0.8, 0.8, 0.4)
+    lurek.render.line(cast_x, bobber_y, fish_x, fy, 0.8, 0.8, 0.8, 0.4)
   end
 
   -- Bite indicator
   if state == STATE_FISHING and bite_active then
-    lurek.draw.text("!", cast_x - 3, bobber_y - 25, 1.0, 0.9, 0.0, 1.0)
+    lurek.render.print("!", cast_x - 3, bobber_y - 25, 1.0, 0.9, 0.0, 1.0)
   end
 
   -- Splash particles
   for _, p in ipairs(splash_particles) do
     local a = clamp(p.life / 0.5, 0, 1)
-    lurek.draw.circle(p.x, p.y, 2, 0.6, 0.8, 1.0, a)
+    lurek.render.circle(p.x, p.y, 2, 0.6, 0.8, 1.0, a)
   end
 
   -- Ripple particles
   for _, p in ipairs(ripple_particles) do
     local a = clamp(p.life / 0.6, 0, 1) * 0.5
-    lurek.draw.circle(p.x, p.y, p.radius, 0.5, 0.7, 1.0, a)
+    lurek.render.circle(p.x, p.y, p.radius, 0.5, 0.7, 1.0, a)
   end
 
   -- Sparkle particles
   for _, p in ipairs(sparkle_particles) do
     local a = clamp(p.life / 0.8, 0, 1)
-    lurek.draw.circle(p.x, p.y, p.size, 1.0, 1.0, 0.5, a)
+    lurek.render.circle(p.x, p.y, p.size, 1.0, 1.0, 0.5, a)
   end
 
   -- Rain particles
   for _, p in ipairs(rain_particles) do
-    lurek.draw.line(p.x, p.y, p.x - 1, p.y + 8, 0.5, 0.6, 0.9, 0.3)
+    lurek.render.line(p.x, p.y, p.x - 1, p.y + 8, 0.5, 0.6, 0.9, 0.3)
   end
 
   -- Night/day indicator stars
@@ -545,121 +545,121 @@ lurek.render(function()
       local sx = (i * 67 + 13) % SCREEN_W
       local sy = (i * 43 + 7) % (WATER_Y - 30)
       local flicker = 0.5 + 0.5 * math.sin(day_timer * 2 + i)
-      lurek.draw.circle(sx, sy, 1.5, 1.0, 1.0, 0.8, flicker)
+      lurek.render.circle(sx, sy, 1.5, 1.0, 1.0, 0.8, flicker)
     end
   end
 end)
 
 lurek.render_ui(function()
   local fps = lurek.timer.getFPS()
-  lurek.draw.text("FPS: " .. fps, SCREEN_W - 80, 10, 1, 1, 1, 0.5)
+  lurek.render.print("FPS: " .. fps, SCREEN_W - 80, 10, 1, 1, 1, 0.5)
 
   -- TITLE
   if state == STATE_TITLE then
-    lurek.draw.rect(150, 150, 500, 250, 0.0, 0.1, 0.3, 0.85)
-    lurek.draw.text("FISHING", 300, 200, 1.0, 1.0, 1.0, 1.0)
-    lurek.draw.text("PATIENCE REWARDED", 275, 250, 0.7, 0.85, 1.0, 0.9)
-    lurek.draw.text("Press SPACE to start", 290, 320, 0.8, 0.8, 0.8, 0.7)
+    lurek.render.rectangle(150, 150, 500, 250, 0.0, 0.1, 0.3, 0.85)
+    lurek.render.print("FISHING", 300, 200, 1.0, 1.0, 1.0, 1.0)
+    lurek.render.print("PATIENCE REWARDED", 275, 250, 0.7, 0.85, 1.0, 0.9)
+    lurek.render.print("Press SPACE to start", 290, 320, 0.8, 0.8, 0.8, 0.7)
     return
   end
 
   -- GAME OVER
   if state == STATE_GAMEOVER then
-    lurek.draw.rect(100, 120, 600, 350, 0.0, 0.05, 0.15, 0.9)
+    lurek.render.rectangle(100, 120, 600, 350, 0.0, 0.05, 0.15, 0.9)
     if game_won then
-      lurek.draw.text("YOU WIN!", 320, 150, 1.0, 0.9, 0.2, 1.0)
-      lurek.draw.text(win_reason, 200, 200, 0.9, 0.9, 0.9, 1.0)
+      lurek.render.print("YOU WIN!", 320, 150, 1.0, 0.9, 0.2, 1.0)
+      lurek.render.print(win_reason, 200, 200, 0.9, 0.9, 0.9, 1.0)
     else
-      lurek.draw.text("GAME OVER", 310, 150, 1.0, 0.3, 0.3, 1.0)
+      lurek.render.print("GAME OVER", 310, 150, 1.0, 0.3, 0.3, 1.0)
     end
-    lurek.draw.text("Fish caught: " .. #bucket, 300, 260, 0.8, 0.8, 0.8, 1.0)
-    lurek.draw.text("Total points: " .. total_points, 290, 290, 0.8, 0.8, 0.8, 1.0)
+    lurek.render.print("Fish caught: " .. #bucket, 300, 260, 0.8, 0.8, 0.8, 1.0)
+    lurek.render.print("Total points: " .. total_points, 290, 290, 0.8, 0.8, 0.8, 1.0)
     -- Show bucket summary
     local y_off = 320
     for i, f in ipairs(bucket) do
       if i <= 8 then
-        lurek.draw.text(f.name .. " (" .. f.points .. "pts)", 280, y_off, f.color[1], f.color[2], f.color[3], 0.9)
+        lurek.render.print(f.name .. " (" .. f.points .. "pts)", 280, y_off, f.color[1], f.color[2], f.color[3], 0.9)
         y_off = y_off + 20
       end
     end
     if #bucket > 8 then
-      lurek.draw.text("...and " .. (#bucket - 8) .. " more", 300, y_off, 0.6, 0.6, 0.6, 0.7)
+      lurek.render.print("...and " .. (#bucket - 8) .. " more", 300, y_off, 0.6, 0.6, 0.6, 0.7)
     end
-    lurek.draw.text("Press SPACE to return", 285, y_off + 30, 0.6, 0.6, 0.6, 0.6)
+    lurek.render.print("Press SPACE to return", 285, y_off + 30, 0.6, 0.6, 0.6, 0.6)
     return
   end
 
   -- BUCKET VIEW
   if state == STATE_BUCKET then
-    lurek.draw.rect(150, 80, 500, 440, 0.1, 0.08, 0.2, 0.9)
-    lurek.draw.text("BUCKET", 340, 100, 1.0, 1.0, 1.0, 1.0)
-    lurek.draw.text("Fish: " .. #bucket .. "/" .. WIN_COUNT .. "  Points: " .. total_points, 250, 135, 0.8, 0.8, 0.8, 1.0)
+    lurek.render.rectangle(150, 80, 500, 440, 0.1, 0.08, 0.2, 0.9)
+    lurek.render.print("BUCKET", 340, 100, 1.0, 1.0, 1.0, 1.0)
+    lurek.render.print("Fish: " .. #bucket .. "/" .. WIN_COUNT .. "  Points: " .. total_points, 250, 135, 0.8, 0.8, 0.8, 1.0)
     local y_off = 170
     for i, f in ipairs(bucket) do
-      lurek.draw.text(i .. ". " .. f.name .. "  +" .. f.points, 200, y_off, f.color[1], f.color[2], f.color[3], 0.9)
+      lurek.render.print(i .. ". " .. f.name .. "  +" .. f.points, 200, y_off, f.color[1], f.color[2], f.color[3], 0.9)
       y_off = y_off + 22
       if y_off > 490 then
-        lurek.draw.text("..." .. (#bucket - i) .. " more", 200, y_off, 0.5, 0.5, 0.5, 0.7)
+        lurek.render.print("..." .. (#bucket - i) .. " more", 200, y_off, 0.5, 0.5, 0.5, 0.7)
         break
       end
     end
-    lurek.draw.text("Press SPACE to continue", 275, 500, 0.6, 0.6, 0.6, 0.6)
+    lurek.render.print("Press SPACE to continue", 275, 500, 0.6, 0.6, 0.6, 0.6)
     return
   end
 
   -- HUD during FISHING / CATCHING
   -- Bait indicator
-  lurek.draw.text("Bait: " .. BAITS[bait_index].name, 10, 10, 1, 1, 1, 0.8)
+  lurek.render.print("Bait: " .. BAITS[bait_index].name, 10, 10, 1, 1, 1, 0.8)
   -- Bucket count
-  lurek.draw.text("Bucket: " .. #bucket .. "/" .. WIN_COUNT, 10, 30, 1, 1, 1, 0.8)
+  lurek.render.print("Bucket: " .. #bucket .. "/" .. WIN_COUNT, 10, 30, 1, 1, 1, 0.8)
   -- Points
-  lurek.draw.text("Points: " .. total_points, 10, 50, 1, 1, 0.5, 0.8)
+  lurek.render.print("Points: " .. total_points, 10, 50, 1, 1, 0.5, 0.8)
   -- Day/night
   local dn = is_night and "Night" or "Day"
-  lurek.draw.text(dn, SCREEN_W - 60, 30, 0.8, 0.8, 0.4, 0.7)
+  lurek.render.print(dn, SCREEN_W - 60, 30, 0.8, 0.8, 0.4, 0.7)
   -- Weather
   if raining then
-    lurek.draw.text("Rain", SCREEN_W - 60, 50, 0.5, 0.6, 0.9, 0.7)
+    lurek.render.print("Rain", SCREEN_W - 60, 50, 0.5, 0.6, 0.9, 0.7)
   end
 
   -- Power bar (while charging)
   if charging then
-    lurek.draw.rect(SCREEN_W / 2 - 100, SCREEN_H - 50, 200, 20, 0.2, 0.2, 0.2, 0.7)
+    lurek.render.rectangle(SCREEN_W / 2 - 100, SCREEN_H - 50, 200, 20, 0.2, 0.2, 0.2, 0.7)
     local pw = (power / 100) * 196
     local pr = power / 100
-    lurek.draw.rect(SCREEN_W / 2 - 98, SCREEN_H - 48, pw, 16, pr, 1.0 - pr * 0.5, 0.1, 0.9)
-    lurek.draw.text("POWER", SCREEN_W / 2 - 22, SCREEN_H - 48, 1, 1, 1, 0.9)
+    lurek.render.rectangle(SCREEN_W / 2 - 98, SCREEN_H - 48, pw, 16, pr, 1.0 - pr * 0.5, 0.1, 0.9)
+    lurek.render.print("POWER", SCREEN_W / 2 - 22, SCREEN_H - 48, 1, 1, 1, 0.9)
   end
 
   -- Tension bar (while catching)
   if state == STATE_CATCHING then
     local bar_x = SCREEN_W / 2 - 100
     local bar_y = SCREEN_H - 60
-    lurek.draw.rect(bar_x, bar_y, 200, 24, 0.15, 0.15, 0.15, 0.8)
+    lurek.render.rectangle(bar_x, bar_y, 200, 24, 0.15, 0.15, 0.15, 0.8)
     local tw = tension * 196
     local tr = tension
     local tg = 1.0 - tension
-    lurek.draw.rect(bar_x + 2, bar_y + 2, tw, 20, tr, tg, 0.1, 0.9)
+    lurek.render.rectangle(bar_x + 2, bar_y + 2, tw, 20, tr, tg, 0.1, 0.9)
     -- Snap danger zone
-    lurek.draw.rect(bar_x + 2 + TENSION_SNAP * 196, bar_y + 2, (1.0 - TENSION_SNAP) * 196, 20, 1.0, 0.0, 0.0, 0.2)
-    lurek.draw.text("TENSION", bar_x + 70, bar_y + 3, 1, 1, 1, 0.9)
+    lurek.render.rectangle(bar_x + 2 + TENSION_SNAP * 196, bar_y + 2, (1.0 - TENSION_SNAP) * 196, 20, 1.0, 0.0, 0.0, 0.2)
+    lurek.render.print("TENSION", bar_x + 70, bar_y + 3, 1, 1, 1, 0.9)
 
     -- Fish name
     if hooked_fish then
-      lurek.draw.text(hooked_fish.name, bar_x + 60, bar_y - 20, hooked_fish.color[1], hooked_fish.color[2], hooked_fish.color[3], 1.0)
+      lurek.render.print(hooked_fish.name, bar_x + 60, bar_y - 20, hooked_fish.color[1], hooked_fish.color[2], hooked_fish.color[3], 1.0)
     end
 
     -- Warning
     if tension > TENSION_SNAP then
       local blink = math.sin(day_timer * 10) > 0
       if blink then
-        lurek.draw.text("!! LINE STRAIN !!", SCREEN_W / 2 - 60, bar_y - 40, 1.0, 0.2, 0.1, 1.0)
+        lurek.render.print("!! LINE STRAIN !!", SCREEN_W / 2 - 60, bar_y - 40, 1.0, 0.2, 0.1, 1.0)
       end
     end
   end
 
   -- Message
   if message ~= "" then
-    lurek.draw.text(message, SCREEN_W / 2 - #message * 3.5, SCREEN_H / 2 - 80, 1.0, 1.0, 0.6, 0.9)
+    lurek.render.print(message, SCREEN_W / 2 - #message * 3.5, SCREEN_H / 2 - 80, 1.0, 1.0, 0.6, 0.9)
   end
 end)

@@ -674,24 +674,24 @@ lurek.render(function()
 
     -- Scene background
     lurek.render.setColor(scene_bg[1], scene_bg[2], scene_bg[3], 1)
-    lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+    lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
     -- Mood overlay: subtle gradient rectangles
     local t = lurek.timer.getTime()
     lurek.render.setColor(scene_bg[1] * 1.3, scene_bg[2] * 1.3, scene_bg[3] * 1.3, 0.3)
-    lurek.render.drawRect("fill", 0, 0, SCREEN_W, 80)
+    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 80)
 
     -- Ambient particles (floating motes)
     lurek.render.setColor(1, 1, 0.9, 0.15 + math.sin(t * 1.5) * 0.08)
     for i = 1, 6 do
         local mx = 80 + i * 120 + math.sin(t * 0.4 + i * 1.7) * 40
         local my = 120 + math.cos(t * 0.6 + i * 2.3) * 50
-        lurek.render.drawCircle("fill", mx, my, 2)
+        lurek.render.circle("fill", mx, my, 2)
     end
 
     -- Ground area
     lurek.render.setColor(scene_bg[1] * 0.6, scene_bg[2] * 0.6, scene_bg[3] * 0.6, 1)
-    lurek.render.drawRect("fill", 0, PORTRAIT_Y + PORTRAIT_H + 10, SCREEN_W, SCREEN_H - PORTRAIT_Y - PORTRAIT_H - 10)
+    lurek.render.rectangle("fill", 0, PORTRAIT_Y + PORTRAIT_H + 10, SCREEN_W, SCREEN_H - PORTRAIT_Y - PORTRAIT_H - 10)
 
     -- Character portraits (colored rectangles with name labels)
     for name, tw in pairs(portrait_tweens) do
@@ -702,20 +702,20 @@ lurek.render(function()
 
             -- Shadow
             lurek.render.setColor(0, 0, 0, 0.3 * tw.alpha)
-            lurek.render.drawRect("fill", px + 4, py + 4, PORTRAIT_W, PORTRAIT_H)
+            lurek.render.rectangle("fill", px + 4, py + 4, PORTRAIT_W, PORTRAIT_H)
 
             -- Body
             lurek.render.setColor(ch.color[1], ch.color[2], ch.color[3], tw.alpha)
-            lurek.render.drawRect("fill", px, py, PORTRAIT_W, PORTRAIT_H)
+            lurek.render.rectangle("fill", px, py, PORTRAIT_W, PORTRAIT_H)
 
             -- Inner highlight
             lurek.render.setColor(ch.color[1] * 1.3, ch.color[2] * 1.3, ch.color[3] * 1.3,
                                   tw.alpha * 0.5)
-            lurek.render.drawRect("fill", px + 8, py + 8, PORTRAIT_W - 16, 30)
+            lurek.render.rectangle("fill", px + 8, py + 8, PORTRAIT_W - 16, 30)
 
             -- Border
             lurek.render.setColor(1, 1, 1, tw.alpha * 0.4)
-            lurek.render.drawRect("line", px, py, PORTRAIT_W, PORTRAIT_H)
+            lurek.render.rectangle("line", px, py, PORTRAIT_W, PORTRAIT_H)
 
             -- Name label below portrait
             lurek.render.setColor(ch.color[1], ch.color[2], ch.color[3], tw.alpha)
@@ -727,7 +727,7 @@ lurek.render(function()
     for _, p in ipairs(particles) do
         local alpha = (p.life / p.max_life) * 0.8
         lurek.render.setColor(p.r, p.g, p.b, alpha)
-        lurek.render.drawCircle("fill", p.x, p.y, p.size)
+        lurek.render.circle("fill", p.x, p.y, p.size)
     end
 end)
 
@@ -746,7 +746,7 @@ lurek.render_ui(function()
     -- ── TITLE screen ──────────────────────────────────────────
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.08, 0.08, 0.14, 1)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         -- Title text
         lurek.render.setColor(0.5, 0.4, 0.9, title_alpha)
@@ -761,7 +761,7 @@ lurek.render_ui(function()
             local ch = CHARS[name]
             local px = 160 + (i - 1) * 200
             lurek.render.setColor(ch.color[1], ch.color[2], ch.color[3], title_alpha * 0.7)
-            lurek.render.drawRect("fill", px, preview_y, 60, 80)
+            lurek.render.rectangle("fill", px, preview_y, 60, 80)
             lurek.render.setColor(ch.color[1], ch.color[2], ch.color[3], title_alpha)
             lurek.render.print(ch.label, px + 5, preview_y + 85, 0, 0.8, 0.8)
         end
@@ -781,7 +781,7 @@ lurek.render_ui(function()
 
         -- Background tint
         lurek.render.setColor(ec.color[1] * 0.15, ec.color[2] * 0.15, ec.color[3] * 0.15, 1)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         -- Ending title
         lurek.render.setColor(ec.color[1], ec.color[2], ec.color[3], 1)
@@ -814,9 +814,9 @@ lurek.render_ui(function()
             lurek.render.print(string.format("%s: %d", name, affection[name]), 340, sum_y, 0, 0.9, 0.9)
             -- Affection bar
             lurek.render.setColor(ch.color[1], ch.color[2], ch.color[3], 0.3)
-            lurek.render.drawRect("fill", 430, sum_y + 2, 150, 12)
+            lurek.render.rectangle("fill", 430, sum_y + 2, 150, 12)
             lurek.render.setColor(ch.color[1], ch.color[2], ch.color[3], 0.8)
-            lurek.render.drawRect("fill", 430, sum_y + 2, 150 * (affection[name] / 100), 12)
+            lurek.render.rectangle("fill", 430, sum_y + 2, 150 * (affection[name] / 100), 12)
             sum_y = sum_y + 26
         end
 
@@ -824,7 +824,7 @@ lurek.render_ui(function()
         for _, p in ipairs(particles) do
             local alpha = (p.life / p.max_life) * 0.7
             lurek.render.setColor(p.r, p.g, p.b, alpha)
-            lurek.render.drawCircle("fill", p.x, p.y, p.size)
+            lurek.render.circle("fill", p.x, p.y, p.size)
         end
 
         lurek.render.setColor(0.7, 0.7, 0.8, 0.5 + math.sin(t * 3) * 0.3)
@@ -844,10 +844,10 @@ lurek.render_ui(function()
         lurek.render.print(name, 10, bar_y, 0, 0.65, 0.65)
         -- Bar background
         lurek.render.setColor(0.2, 0.2, 0.25, 0.5)
-        lurek.render.drawRect("fill", 55, bar_y + 2, 80, 8)
+        lurek.render.rectangle("fill", 55, bar_y + 2, 80, 8)
         -- Bar fill
         lurek.render.setColor(ch.color[1], ch.color[2], ch.color[3], 0.7)
-        lurek.render.drawRect("fill", 55, bar_y + 2, 80 * (affection[name] / 100), 8)
+        lurek.render.rectangle("fill", 55, bar_y + 2, 80 * (affection[name] / 100), 8)
         bar_y = bar_y + 16
     end
 
@@ -865,9 +865,9 @@ lurek.render_ui(function()
     if show_history then
         -- Semi-transparent background
         lurek.render.setColor(0, 0, 0, 0.8)
-        lurek.render.drawRect("fill", 30, 80, SCREEN_W - 60, 320)
+        lurek.render.rectangle("fill", 30, 80, SCREEN_W - 60, 320)
         lurek.render.setColor(0.4, 0.4, 0.5, 0.6)
-        lurek.render.drawRect("line", 30, 80, SCREEN_W - 60, 320)
+        lurek.render.rectangle("line", 30, 80, SCREEN_W - 60, 320)
 
         lurek.render.setColor(0.7, 0.7, 0.8, 0.9)
         lurek.render.print("— Dialog History (H to close) —", 270, 88, 0, 0.85, 0.85)
@@ -887,16 +887,16 @@ lurek.render_ui(function()
     if text_box_alpha > 0.02 then
         -- Box background
         lurek.render.setColor(0.04, 0.04, 0.07, text_box_alpha)
-        lurek.render.drawRect("fill", 0, DIALOG_BOX_Y, SCREEN_W, DIALOG_BOX_H)
+        lurek.render.rectangle("fill", 0, DIALOG_BOX_Y, SCREEN_W, DIALOG_BOX_H)
         -- Box top border
         lurek.render.setColor(0.35, 0.35, 0.45, text_box_alpha * 0.6)
-        lurek.render.drawRect("fill", 0, DIALOG_BOX_Y, SCREEN_W, 2)
+        lurek.render.rectangle("fill", 0, DIALOG_BOX_Y, SCREEN_W, 2)
 
         -- Speaker name tab
         if current_speaker ~= "" and current_speaker ~= "Narrator" then
             local sc = current_speaker_color
             lurek.render.setColor(sc[1] * 0.3, sc[2] * 0.3, sc[3] * 0.3, text_box_alpha * 0.9)
-            lurek.render.drawRect("fill", 20, DIALOG_BOX_Y - 26, #current_speaker * 11 + 16, 24)
+            lurek.render.rectangle("fill", 20, DIALOG_BOX_Y - 26, #current_speaker * 11 + 16, 24)
             lurek.render.setColor(sc[1], sc[2], sc[3], text_box_alpha)
             lurek.render.print(current_speaker, 28, DIALOG_BOX_Y - 22, 0, 0.95, 0.95)
         end
@@ -921,7 +921,7 @@ lurek.render_ui(function()
 
             -- Choice background
             lurek.render.setColor(0.12, 0.12, 0.18, pulse_alpha * 0.6)
-            lurek.render.drawRect("fill", 40, cy - 2, SCREEN_W - 80, 24)
+            lurek.render.rectangle("fill", 40, cy - 2, SCREEN_W - 80, 24)
 
             -- Number key indicator
             lurek.render.setColor(0.6, 0.5, 0.9, pulse_alpha)

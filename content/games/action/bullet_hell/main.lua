@@ -142,7 +142,7 @@ local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -658,7 +658,7 @@ lurek.render(function()
     if bomb_flash > 0 then
         local a = clamp(bomb_flash / 0.3, 0, 0.6)
         lurek.render.setColor(1, 1, 1, a)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
     end
 
     -- -----------------------------------------------------------------------
@@ -673,12 +673,12 @@ lurek.render(function()
         if visible then
             -- Ship body (triangle-ish using rects)
             lurek.render.setColor(0.3, 0.5, 1.0, 1)
-            lurek.render.drawRect("fill",
+            lurek.render.rectangle("fill",
                 player.x - PLAYER_SIZE / 2, player.y - PLAYER_SIZE / 2,
                 PLAYER_SIZE, PLAYER_SIZE)
             -- Nose
             lurek.render.setColor(0.5, 0.7, 1.0, 1)
-            lurek.render.drawRect("fill",
+            lurek.render.rectangle("fill",
                 player.x - 3, player.y - PLAYER_SIZE,
                 6, PLAYER_SIZE / 2)
 
@@ -686,13 +686,13 @@ lurek.render(function()
             local focused = lurek.input.down("focus")
             if focused then
                 lurek.render.setColor(1, 1, 1, 1)
-                lurek.render.drawCircle("fill", player.x, player.y, HITBOX_RADIUS + 1)
+                lurek.render.circle("fill", player.x, player.y, HITBOX_RADIUS + 1)
                 -- Graze radius indicator
                 lurek.render.setColor(1, 1, 1, 0.15)
-                lurek.render.drawCircle("line", player.x, player.y, GRAZE_RADIUS)
+                lurek.render.circle("line", player.x, player.y, GRAZE_RADIUS)
             else
                 lurek.render.setColor(1, 1, 1, 0.8)
-                lurek.render.drawCircle("fill", player.x, player.y, HITBOX_RADIUS)
+                lurek.render.circle("fill", player.x, player.y, HITBOX_RADIUS)
             end
         end
     end
@@ -702,7 +702,7 @@ lurek.render(function()
     -- -----------------------------------------------------------------------
     lurek.render.setColor(0.5, 0.8, 1.0, 1)
     for _, b in ipairs(player_bullets) do
-        lurek.render.drawRect("fill", b.x, b.y, BULLET_W, BULLET_H)
+        lurek.render.rectangle("fill", b.x, b.y, BULLET_W, BULLET_H)
     end
 
     -- -----------------------------------------------------------------------
@@ -714,19 +714,19 @@ lurek.render(function()
 
         if e.type == ENEMY_BOSS then
             -- Boss: larger shape with inner details
-            lurek.render.drawRect("fill", e.x - e.size / 2, e.y - e.size / 2, e.size, e.size)
+            lurek.render.rectangle("fill", e.x - e.size / 2, e.y - e.size / 2, e.size, e.size)
             lurek.render.setColor(c[1] * 0.5, c[2] * 0.5, c[3] * 0.5, 1)
-            lurek.render.drawRect("fill", e.x - e.size / 4, e.y - e.size / 4,
+            lurek.render.rectangle("fill", e.x - e.size / 4, e.y - e.size / 4,
                 e.size / 2, e.size / 2)
             -- HP bar
             local bar_w = e.size * 1.2
             local hp_frac = e.hp / e.max_hp
             lurek.render.setColor(0.3, 0.3, 0.3, 0.8)
-            lurek.render.drawRect("fill", e.x - bar_w / 2, e.y - e.size / 2 - 8, bar_w, 4)
+            lurek.render.rectangle("fill", e.x - bar_w / 2, e.y - e.size / 2 - 8, bar_w, 4)
             lurek.render.setColor(1, 0.2, 0.2, 1)
-            lurek.render.drawRect("fill", e.x - bar_w / 2, e.y - e.size / 2 - 8, bar_w * hp_frac, 4)
+            lurek.render.rectangle("fill", e.x - bar_w / 2, e.y - e.size / 2 - 8, bar_w * hp_frac, 4)
         else
-            lurek.render.drawRect("fill",
+            lurek.render.rectangle("fill",
                 e.x - e.size / 2, e.y - e.size / 2, e.size, e.size)
         end
     end
@@ -736,9 +736,9 @@ lurek.render(function()
     -- -----------------------------------------------------------------------
     for _, b in ipairs(enemy_bullets) do
         lurek.render.setColor(1, 0.3, 0.5, 0.9)
-        lurek.render.drawCircle("fill", b.x, b.y, ENEMY_BULLET_RAD)
+        lurek.render.circle("fill", b.x, b.y, ENEMY_BULLET_RAD)
         lurek.render.setColor(1, 0.8, 0.9, 0.5)
-        lurek.render.drawCircle("fill", b.x, b.y, ENEMY_BULLET_RAD - 1)
+        lurek.render.circle("fill", b.x, b.y, ENEMY_BULLET_RAD - 1)
     end
 
     -- -----------------------------------------------------------------------
@@ -752,7 +752,7 @@ lurek.render(function()
     -- -----------------------------------------------------------------------
     if current_state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
         lurek.render.setColor(1, 0.2, 0.2, 1)
         lurek.render.print("GAME OVER", SCREEN_W / 2 - 45, SCREEN_H / 2 - 40)
         lurek.render.setColor(1, 1, 1, 1)
@@ -784,13 +784,13 @@ lurek.render_ui(function()
     -- Lives
     lurek.render.setColor(0.3, 0.5, 1, 1)
     for l = 1, lives do
-        lurek.render.drawRect("fill", 10 + (l - 1) * 18, 30, 12, 12)
+        lurek.render.rectangle("fill", 10 + (l - 1) * 18, 30, 12, 12)
     end
 
     -- Bombs
     lurek.render.setColor(1, 0.8, 0, 1)
     for b = 1, bombs do
-        lurek.render.drawCircle("fill", 10 + (b - 1) * 18 + 6, 55, 5)
+        lurek.render.circle("fill", 10 + (b - 1) * 18 + 6, 55, 5)
     end
 
     -- Multiplier

@@ -557,15 +557,15 @@ lurek.render(function()
             local ty = (r - 1) * TILE + oy
             if t == T_GROUND then
                 lurek.render.setColor(0.45, 0.30, 0.15, 1)
-                lurek.render.drawRect(tx, ty, TILE, TILE)
+                lurek.render.rectangle(tx, ty, TILE, TILE)
             elseif t == T_PLATFORM then
                 lurek.render.setColor(0.55, 0.38, 0.18, 1)
-                lurek.render.drawRect(tx, ty, TILE, TILE)
+                lurek.render.rectangle(tx, ty, TILE, TILE)
             elseif t == T_SPIKE then
                 lurek.render.setColor(0.9, 0.1, 0.1, 1)
-                lurek.render.drawRect(tx, ty + TILE / 2, TILE, TILE / 2)
+                lurek.render.rectangle(tx, ty + TILE / 2, TILE, TILE / 2)
                 -- triangle top (simplified as smaller rect)
-                lurek.render.drawRect(tx + 3, ty + 2, TILE - 6, TILE / 2)
+                lurek.render.rectangle(tx + 3, ty + 2, TILE - 6, TILE / 2)
             end
         end
     end
@@ -573,14 +573,14 @@ lurek.render(function()
     -- Moving platforms
     lurek.render.setColor(0.6, 0.45, 0.2, 1)
     for _, mp in ipairs(moving_plats) do
-        lurek.render.drawRect(mp.x + ox, mp.y + oy, mp.w, mp.h)
+        lurek.render.rectangle(mp.x + ox, mp.y + oy, mp.w, mp.h)
     end
 
     -- Coins
     for _, c in ipairs(coins) do
         if c.alive then
             lurek.render.setColor(1.0, 0.85, 0.1, 1)
-            lurek.render.drawCircle(c.x + ox, c.y + oy, 5)
+            lurek.render.circle(c.x + ox, c.y + oy, 5)
         end
     end
 
@@ -588,11 +588,11 @@ lurek.render(function()
     for _, e in ipairs(enemies) do
         if e.alive then
             lurek.render.setColor(0.85, 0.15, 0.1, 1)
-            lurek.render.drawRect(e.x + ox, e.y + oy, e.w, e.h)
+            lurek.render.rectangle(e.x + ox, e.y + oy, e.w, e.h)
             -- Eyes
             lurek.render.setColor(1, 1, 1, 1)
             local ex = (e.vx > 0) and (e.x + 10) or (e.x + 3)
-            lurek.render.drawRect(ex + ox, e.y + 4 + oy, 3, 3)
+            lurek.render.rectangle(ex + ox, e.y + 4 + oy, 3, 3)
         end
     end
 
@@ -600,10 +600,10 @@ lurek.render(function()
     if goal then
         -- Pole
         lurek.render.setColor(0.6, 0.6, 0.6, 1)
-        lurek.render.drawRect(goal.x + 6 + ox, goal.y - 16 + oy, 3, TILE + 16)
+        lurek.render.rectangle(goal.x + 6 + ox, goal.y - 16 + oy, 3, TILE + 16)
         -- Flag
         lurek.render.setColor(0.1, 0.85, 0.2, 1)
-        lurek.render.drawRect(goal.x + 9 + ox, goal.y - 14 + oy, 10, 8)
+        lurek.render.rectangle(goal.x + 9 + ox, goal.y - 14 + oy, 10, 8)
     end
 
     -- Player
@@ -611,22 +611,22 @@ lurek.render(function()
     local py = player.y + oy
     -- Body
     lurek.render.setColor(0.2, 0.4, 0.9, 1)
-    lurek.render.drawRect(px, py, PLAYER_W, PLAYER_H)
+    lurek.render.rectangle(px, py, PLAYER_W, PLAYER_H)
     -- Eyes
     lurek.render.setColor(1, 1, 1, 1)
     if player.facing > 0 then
-        lurek.render.drawRect(px + 12, py + 6, 4, 4)
-        lurek.render.drawRect(px + 12, py + 6, 4, 4)
+        lurek.render.rectangle(px + 12, py + 6, 4, 4)
+        lurek.render.rectangle(px + 12, py + 6, 4, 4)
     else
-        lurek.render.drawRect(px + 4, py + 6, 4, 4)
-        lurek.render.drawRect(px + 4, py + 6, 4, 4)
+        lurek.render.rectangle(px + 4, py + 6, 4, 4)
+        lurek.render.rectangle(px + 4, py + 6, 4, 4)
     end
     -- Pupil
     lurek.render.setColor(0, 0, 0, 1)
     if player.facing > 0 then
-        lurek.render.drawRect(px + 14, py + 7, 2, 2)
+        lurek.render.rectangle(px + 14, py + 7, 2, 2)
     else
-        lurek.render.drawRect(px + 4, py + 7, 2, 2)
+        lurek.render.rectangle(px + 4, py + 7, 2, 2)
     end
 
     -- Particles (world space)
@@ -641,55 +641,55 @@ function lurek.render_ui()
     -- ── Title screen ──────────────────────────────────────────────────────
     if game_state == STATE.TITLE then
         lurek.render.setColor(0.2, 0.4, 0.9, 1)
-        lurek.render.drawText("CLASSIC PLATFORMER", SCREEN_W / 2 - 140, SCREEN_H / 2 - 60, 32)
+        lurek.render.print("CLASSIC PLATFORMER", SCREEN_W / 2 - 140, SCREEN_H / 2 - 60, 32)
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.drawText("PRESS ENTER", SCREEN_W / 2 - 80, SCREEN_H / 2 + 20, 20)
+            lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 80, SCREEN_H / 2 + 20, 20)
         end
         lurek.render.setColor(0.7, 0.7, 0.7, 1)
-        lurek.render.drawText("A/D or Arrows: Move  |  Space/W: Jump", SCREEN_W / 2 - 170, SCREEN_H / 2 + 70, 14)
+        lurek.render.print("A/D or Arrows: Move  |  Space/W: Jump", SCREEN_W / 2 - 170, SCREEN_H / 2 + 70, 14)
         return
     end
 
     -- ── HUD ───────────────────────────────────────────────────────────────
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.drawText("SCORE: " .. score, 10, 10, 18)
-    lurek.render.drawText("LIVES: " .. lives, 10, 34, 18)
-    lurek.render.drawText("LEVEL: " .. current_lvl .. "/" .. #LEVELS, 10, 58, 18)
+    lurek.render.print("SCORE: " .. score, 10, 10, 18)
+    lurek.render.print("LIVES: " .. lives, 10, 34, 18)
+    lurek.render.print("LEVEL: " .. current_lvl .. "/" .. #LEVELS, 10, 58, 18)
 
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.7, 0.7, 0.7, 0.7)
-    lurek.render.drawText("FPS: " .. fps, SCREEN_W - 90, 10, 14)
+    lurek.render.print("FPS: " .. fps, SCREEN_W - 90, 10, 14)
 
     -- Score popup
     if score_pop.alpha > 0.01 then
         lurek.render.setColor(1, 1, 0.2, score_pop.alpha)
-        lurek.render.drawText(score_pop.text, SCREEN_W / 2 - 20, score_pop.y, 20)
+        lurek.render.print(score_pop.text, SCREEN_W / 2 - 20, score_pop.y, 20)
     end
 
     -- ── Level complete banner ─────────────────────────────────────────────
     if game_state == STATE.LEVEL_COMPLETE then
         lurek.render.setColor(0, 0, 0, 0.5)
-        lurek.render.drawRect(0, SCREEN_H / 2 - 50, SCREEN_W, 100)
+        lurek.render.rectangle(0, SCREEN_H / 2 - 50, SCREEN_W, 100)
         lurek.render.setColor(1, 1, 1, banner.alpha)
-        lurek.render.drawText(banner.text, SCREEN_W / 2 - 100, SCREEN_H / 2 - 20, 28)
+        lurek.render.print(banner.text, SCREEN_W / 2 - 100, SCREEN_H / 2 - 20, 28)
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(0.8, 0.8, 0.8, banner.alpha)
-            lurek.render.drawText("PRESS ENTER", SCREEN_W / 2 - 70, SCREEN_H / 2 + 20, 18)
+            lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 70, SCREEN_H / 2 + 20, 18)
         end
     end
 
     -- ── Game over ─────────────────────────────────────────────────────────
     if game_state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
         lurek.render.setColor(0.9, 0.2, 0.2, 1)
-        lurek.render.drawText("GAME OVER", SCREEN_W / 2 - 90, SCREEN_H / 2 - 40, 32)
+        lurek.render.print("GAME OVER", SCREEN_W / 2 - 90, SCREEN_H / 2 - 40, 32)
         lurek.render.setColor(1, 1, 1, 1)
-        lurek.render.drawText("FINAL SCORE: " .. score, SCREEN_W / 2 - 80, SCREEN_H / 2 + 10, 20)
+        lurek.render.print("FINAL SCORE: " .. score, SCREEN_W / 2 - 80, SCREEN_H / 2 + 10, 20)
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(0.8, 0.8, 0.8, 1)
-            lurek.render.drawText("PRESS ENTER", SCREEN_W / 2 - 70, SCREEN_H / 2 + 50, 18)
+            lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 70, SCREEN_H / 2 + 50, 18)
         end
     end
 end

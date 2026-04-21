@@ -507,27 +507,27 @@ lurek.render(function()
         local di = DEPT_INFO[d]
         local c = di.color
         -- Background
-        lurek.render.drawRect(di.x, di.y, di.w, di.h, c[1] * 0.3, c[2] * 0.3, c[3] * 0.3, 0.8)
+        lurek.render.rectangle(di.x, di.y, di.w, di.h, c[1] * 0.3, c[2] * 0.3, c[3] * 0.3, 0.8)
         -- Border
-        lurek.render.drawRect(di.x, di.y, di.w, 2, c[1], c[2], c[3], 1)
-        lurek.render.drawRect(di.x, di.y + di.h - 2, di.w, 2, c[1], c[2], c[3], 1)
-        lurek.render.drawRect(di.x, di.y, 2, di.h, c[1], c[2], c[3], 1)
-        lurek.render.drawRect(di.x + di.w - 2, di.y, 2, di.h, c[1], c[2], c[3], 1)
+        lurek.render.rectangle(di.x, di.y, di.w, 2, c[1], c[2], c[3], 1)
+        lurek.render.rectangle(di.x, di.y + di.h - 2, di.w, 2, c[1], c[2], c[3], 1)
+        lurek.render.rectangle(di.x, di.y, 2, di.h, c[1], c[2], c[3], 1)
+        lurek.render.rectangle(di.x + di.w - 2, di.y, 2, di.h, c[1], c[2], c[3], 1)
 
         -- Department name
-        lurek.render.drawText(di.name, di.x + 6, di.y + 6, 14, c[1], c[2], c[3], 1)
+        lurek.render.print(di.name, di.x + 6, di.y + 6, 14, c[1], c[2], c[3], 1)
 
         -- Equipment level indicator
         for e = 1, departments[d].equip_level do
-            lurek.render.drawRect(di.x + di.w - 12 * e, di.y + 6, 8, 8, 1.0, 0.85, 0.2, 1)
+            lurek.render.rectangle(di.x + di.w - 12 * e, di.y + 6, 8, 8, 1.0, 0.85, 0.2, 1)
         end
 
         -- Queued patients
         for j, p in ipairs(departments[d].patients) do
             local px = di.x + 10 + (j - 1) * 18
             local py = di.y + 30
-            lurek.render.drawRect(px, py, 14, 14, 0.9, 0.9, 0.3, 0.8)
-            lurek.render.drawText(p.condition.name:sub(1, 1), px + 2, py + 1, 10, 0, 0, 0, 1)
+            lurek.render.rectangle(px, py, 14, 14, 0.9, 0.9, 0.3, 0.8)
+            lurek.render.print(p.condition.name:sub(1, 1), px + 2, py + 1, 10, 0, 0, 0, 1)
         end
 
         -- Doctors
@@ -535,26 +535,26 @@ lurek.render(function()
             local dx = di.x + 8 + (j - 1) * 24
             local dy = di.y + di.h - 30
             local da = doc.busy and 0.5 or 1.0
-            lurek.render.drawRect(dx, dy, 20, 20, 0.2, 0.6, 0.9, da)
-            lurek.render.drawText("D", dx + 5, dy + 3, 12, 1, 1, 1, da)
+            lurek.render.rectangle(dx, dy, 20, 20, 0.2, 0.6, 0.9, da)
+            lurek.render.print("D", dx + 5, dy + 3, 12, 1, 1, 1, da)
 
             -- Treatment progress bar
             if doc.busy and doc.patient then
                 local prog = doc.patient.displayProgress or doc.patient.treatProgress
-                lurek.render.drawRect(dx, dy - 8, 20, 4, 0.3, 0.3, 0.3, 1)
-                lurek.render.drawRect(dx, dy - 8, 20 * prog, 4, 0.2, 1.0, 0.3, 1)
+                lurek.render.rectangle(dx, dy - 8, 20, 4, 0.3, 0.3, 0.3, 1)
+                lurek.render.rectangle(dx, dy - 8, 20 * prog, 4, 0.2, 1.0, 0.3, 1)
             end
 
             -- Selection highlight
             if doc == selectedDoctor then
-                lurek.render.drawRect(dx - 2, dy - 2, 24, 24, 1, 1, 0, 0.5)
+                lurek.render.rectangle(dx - 2, dy - 2, 24, 24, 1, 1, 0, 0.5)
             end
         end
     end
 
     -- Draw waiting area background
-    lurek.render.drawRect(WAIT_X - 4, WAIT_Y - 24, WAIT_COLS * WAIT_CELL + 8, 90, 0.15, 0.15, 0.18, 0.8)
-    lurek.render.drawText("WAITING AREA", WAIT_X, WAIT_Y - 20, 12, 0.7, 0.7, 0.7, 1)
+    lurek.render.rectangle(WAIT_X - 4, WAIT_Y - 24, WAIT_COLS * WAIT_CELL + 8, 90, 0.15, 0.15, 0.18, 0.8)
+    lurek.render.print("WAITING AREA", WAIT_X, WAIT_Y - 20, 12, 0.7, 0.7, 0.7, 1)
 
     -- Draw waiting patients
     for i, p in ipairs(patients) do
@@ -569,12 +569,12 @@ lurek.render(function()
             if p.waitTime > HAPPY_WAIT then r, g, b = 0.9, 0.8, 0.2 end
             if p.waitTime > ANGRY_WAIT then r, g, b = 0.9, 0.3, 0.2 end
 
-            lurek.render.drawRect(px + 2, py + 2, WAIT_CELL - 4, WAIT_CELL - 4, r, g, b, 0.9)
-            lurek.render.drawText(p.condition.name:sub(1, 1), px + 8, py + 8, 12, 0, 0, 0, 1)
+            lurek.render.rectangle(px + 2, py + 2, WAIT_CELL - 4, WAIT_CELL - 4, r, g, b, 0.9)
+            lurek.render.print(p.condition.name:sub(1, 1), px + 8, py + 8, 12, 0, 0, 0, 1)
 
             -- Selection highlight
             if p == selectedPatient then
-                lurek.render.drawRect(px, py, WAIT_CELL, WAIT_CELL, 1, 1, 0, 0.4)
+                lurek.render.rectangle(px, py, WAIT_CELL, WAIT_CELL, 1, 1, 0, 0.4)
             end
         end
     end
@@ -582,7 +582,7 @@ lurek.render(function()
     -- Draw particles
     for _, p in ipairs(particles) do
         local a = math.max(0, p.life / p.maxLife)
-        lurek.render.drawRect(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size, p.r, p.g, p.b, a)
+        lurek.render.rectangle(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size, p.r, p.g, p.b, a)
     end
 end)
 
@@ -592,66 +592,66 @@ end)
 function lurek.render_ui()
     -- ---- TITLE SCREEN ----
     if current_state == STATE.TITLE then
-        lurek.render.drawText("MEDICAL SIM", 200, 180, 48, 0.9, 0.3, 0.3, 1)
-        lurek.render.drawText("SAVE LIVES", 260, 240, 28, 0.8, 0.8, 0.8, 1)
-        lurek.render.drawText("Click to start", 310, 340, 16, 0.6, 0.6, 0.6, 1)
-        lurek.render.drawText("1-4: Assign dept | H: Hire | E: Equip", 200, 400, 14, 0.5, 0.5, 0.5, 1)
+        lurek.render.print("MEDICAL SIM", 200, 180, 48, 0.9, 0.3, 0.3, 1)
+        lurek.render.print("SAVE LIVES", 260, 240, 28, 0.8, 0.8, 0.8, 1)
+        lurek.render.print("Click to start", 310, 340, 16, 0.6, 0.6, 0.6, 1)
+        lurek.render.print("1-4: Assign dept | H: Hire | E: Equip", 200, 400, 14, 0.5, 0.5, 0.5, 1)
         return
     end
 
     -- ---- VICTORY SCREEN ----
     if current_state == STATE.VICTORY then
-        lurek.render.drawText("VICTORY!", 280, 200, 44, 0.2, 1.0, 0.3, 1)
+        lurek.render.print("VICTORY!", 280, 200, 44, 0.2, 1.0, 0.3, 1)
         local msg = string.format("Treated %d patients — Rating: %.1f stars", totalTreated, calcRating())
-        lurek.render.drawText(msg, 180, 270, 18, 0.9, 0.9, 0.9, 1)
-        lurek.render.drawText("Click to return to title", 280, 360, 16, 0.6, 0.6, 0.6, 1)
+        lurek.render.print(msg, 180, 270, 18, 0.9, 0.9, 0.9, 1)
+        lurek.render.print("Click to return to title", 280, 360, 16, 0.6, 0.6, 0.6, 1)
         return
     end
 
     -- ---- GAME OVER SCREEN ----
     if current_state == STATE.GAME_OVER then
-        lurek.render.drawText("GAME OVER", 260, 200, 44, 0.9, 0.2, 0.2, 1)
+        lurek.render.print("GAME OVER", 260, 200, 44, 0.9, 0.2, 0.2, 1)
         local msg = string.format("Treated %d / %d — Rating: %.1f stars", totalTreated, GOAL_TREATED, calcRating())
-        lurek.render.drawText(msg, 190, 270, 18, 0.9, 0.9, 0.9, 1)
-        lurek.render.drawText("Click to return to title", 280, 360, 16, 0.6, 0.6, 0.6, 1)
+        lurek.render.print(msg, 190, 270, 18, 0.9, 0.9, 0.9, 1)
+        lurek.render.print("Click to return to title", 280, 360, 16, 0.6, 0.6, 0.6, 1)
         return
     end
 
     -- ---- HUD ----
     -- Top bar background
-    lurek.render.drawRect(0, 0, SCREEN_W, 28, 0.08, 0.08, 0.10, 0.9)
+    lurek.render.rectangle(0, 0, SCREEN_W, 28, 0.08, 0.08, 0.10, 0.9)
 
     -- Gold
-    lurek.render.drawText(string.format("Gold: %d", gold), 10, 6, 14, 1.0, 0.85, 0.2, 1)
+    lurek.render.print(string.format("Gold: %d", gold), 10, 6, 14, 1.0, 0.85, 0.2, 1)
 
     -- Rating (stars)
     local r = calcRating()
     local starStr = string.format("Rating: %.1f", r)
     local starColor = r >= 4 and {0.2, 1.0, 0.3} or (r >= 2.5 and {0.9, 0.8, 0.2} or {0.9, 0.2, 0.2})
-    lurek.render.drawText(starStr, 160, 6, 14, starColor[1], starColor[2], starColor[3], 1)
+    lurek.render.print(starStr, 160, 6, 14, starColor[1], starColor[2], starColor[3], 1)
 
     -- Patients treated
-    lurek.render.drawText(string.format("Treated: %d / %d", totalTreated, GOAL_TREATED), 340, 6, 14, 0.8, 0.8, 0.8, 1)
+    lurek.render.print(string.format("Treated: %d / %d", totalTreated, GOAL_TREATED), 340, 6, 14, 0.8, 0.8, 0.8, 1)
 
     -- Doctors count
-    lurek.render.drawText(string.format("Doctors: %d", #doctors), 530, 6, 14, 0.5, 0.7, 1.0, 1)
+    lurek.render.print(string.format("Doctors: %d", #doctors), 530, 6, 14, 0.5, 0.7, 1.0, 1)
 
     -- FPS
-    lurek.render.drawText(string.format("FPS: %d", fps), SCREEN_W - 80, 6, 14, 0.4, 0.4, 0.4, 1)
+    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, 6, 14, 0.4, 0.4, 0.4, 1)
 
     -- Bottom instructions
-    lurek.render.drawRect(0, SCREEN_H - 22, SCREEN_W, 22, 0.08, 0.08, 0.10, 0.8)
-    lurek.render.drawText("Click patient/doctor then 1-4 assign | H: Hire (100g) | E: Equip (200g) | Esc: Quit",
+    lurek.render.rectangle(0, SCREEN_H - 22, SCREEN_W, 22, 0.08, 0.08, 0.10, 0.8)
+    lurek.render.print("Click patient/doctor then 1-4 assign | H: Hire (100g) | E: Equip (200g) | Esc: Quit",
         10, SCREEN_H - 18, 12, 0.5, 0.5, 0.5, 1)
 
     -- Selection info
     if selectedPatient then
         local info = string.format("Selected: %s (wait %.0fs)", selectedPatient.condition.name, selectedPatient.waitTime)
-        lurek.render.drawText(info, 10, SCREEN_H - 42, 14, 1.0, 1.0, 0.4, 1)
+        lurek.render.print(info, 10, SCREEN_H - 42, 14, 1.0, 1.0, 0.4, 1)
     elseif selectedDoctor then
         local info = string.format("Selected: Doctor #%d [%s] %s",
             selectedDoctor.id, DEPT_INFO[selectedDoctor.dept].name,
             selectedDoctor.busy and "(busy)" or "(idle)")
-        lurek.render.drawText(info, 10, SCREEN_H - 42, 14, 0.4, 0.8, 1.0, 1)
+        lurek.render.print(info, 10, SCREEN_H - 42, 14, 0.4, 0.8, 1.0, 1)
     end
 end

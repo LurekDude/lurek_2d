@@ -450,11 +450,11 @@ end)
 --------------------------------------------------------------
 lurek.render(function()
     -- Ground
-    lurek.render.drawRect(ground.x, ground.y, ground.w, ground.h, {0.25, 0.35, 0.15, 1})
+    lurek.render.rectangle(ground.x, ground.y, ground.w, ground.h, {0.25, 0.35, 0.15, 1})
 
     -- Hills
     for _, h in ipairs(hills) do
-        lurek.render.drawRect(h.x, h.y, h.w, h.h, {0.3, 0.45, 0.2, 1})
+        lurek.render.rectangle(h.x, h.y, h.w, h.h, {0.3, 0.45, 0.2, 1})
     end
 
     if state == STATE_TITLE or state == STATE_GAME_OVER then
@@ -465,11 +465,11 @@ lurek.render(function()
     for _, t in ipairs(targets) do
         if t.alive then
             -- Outer ring (white)
-            lurek.render.drawCircle(t.x, t.y, t.radius, {1, 1, 1, 1})
+            lurek.render.circle(t.x, t.y, t.radius, {1, 1, 1, 1})
             -- Middle ring (blue)
-            lurek.render.drawCircle(t.x, t.y, t.radius * 0.65, {0.2, 0.4, 0.9, 1})
+            lurek.render.circle(t.x, t.y, t.radius * 0.65, {0.2, 0.4, 0.9, 1})
             -- Bullseye (red)
-            lurek.render.drawCircle(t.x, t.y, t.radius * 0.3, {0.9, 0.15, 0.1, 1})
+            lurek.render.circle(t.x, t.y, t.radius * 0.3, {0.9, 0.15, 0.1, 1})
         end
     end
 
@@ -479,20 +479,20 @@ lurek.render(function()
             local a = bullet.trail[i - 1]
             local b = bullet.trail[i]
             local alpha = i / #bullet.trail
-            lurek.render.drawLine(a.x, a.y, b.x, b.y, {1, 0.85, 0.3, alpha * 0.7})
+            lurek.render.line(a.x, a.y, b.x, b.y, {1, 0.85, 0.3, alpha * 0.7})
         end
     end
 
     -- Bullet
     if bullet then
-        lurek.render.drawCircle(bullet.x, bullet.y, 3, {1, 0.9, 0.2, 1})
+        lurek.render.circle(bullet.x, bullet.y, 3, {1, 0.9, 0.2, 1})
     end
 
     -- Particles
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
         local c = {p.color[1], p.color[2], p.color[3], alpha}
-        lurek.render.drawCircle(p.x, p.y, p.size, c)
+        lurek.render.circle(p.x, p.y, p.size, c)
     end
 
     -- Scope crosshair (only when aiming)
@@ -500,11 +500,11 @@ lurek.render(function()
         local ch_len = 18
         local ch_color = {0.1, 1, 0.2, 0.85}
         -- Horizontal
-        lurek.render.drawLine(scope_x - ch_len, scope_y, scope_x + ch_len, scope_y, ch_color)
+        lurek.render.line(scope_x - ch_len, scope_y, scope_x + ch_len, scope_y, ch_color)
         -- Vertical
-        lurek.render.drawLine(scope_x, scope_y - ch_len, scope_x, scope_y + ch_len, ch_color)
+        lurek.render.line(scope_x, scope_y - ch_len, scope_x, scope_y + ch_len, ch_color)
         -- Center dot
-        lurek.render.drawCircle(scope_x, scope_y, 2, {1, 0.2, 0.2, 0.9})
+        lurek.render.circle(scope_x, scope_y, 2, {1, 0.2, 0.2, 0.9})
     end
 end)
 
@@ -513,43 +513,43 @@ end)
 --------------------------------------------------------------
 function lurek.render_ui()
     if state == STATE_TITLE then
-        lurek.render.drawText("SNIPER", W / 2 - 80, H / 2 - 60, 48, {0.9, 0.85, 0.7, 1})
-        lurek.render.drawText("Ballistics Puzzle", W / 2 - 70, H / 2, 18, {0.7, 0.7, 0.6, 1})
+        lurek.render.print("SNIPER", W / 2 - 80, H / 2 - 60, 48, {0.9, 0.85, 0.7, 1})
+        lurek.render.print("Ballistics Puzzle", W / 2 - 70, H / 2, 18, {0.7, 0.7, 0.6, 1})
         local blink = math.abs(math.sin(sway_time * 2))
-        lurek.render.drawText("PRESS ENTER", W / 2 - 55, H / 2 + 60, 16, {1, 1, 1, blink})
+        lurek.render.print("PRESS ENTER", W / 2 - 55, H / 2 + 60, 16, {1, 1, 1, blink})
         return
     end
 
     if state == STATE_GAME_OVER then
-        lurek.render.drawText("FINAL SCORE: " .. total_score, W / 2 - 90, H / 2 - 80, 28, {1, 0.9, 0.3, 1})
+        lurek.render.print("FINAL SCORE: " .. total_score, W / 2 - 90, H / 2 - 80, 28, {1, 0.9, 0.3, 1})
         local rating = get_rating(total_score)
-        lurek.render.drawText("Rating: " .. rating, W / 2 - 80, H / 2 - 30, 22, {1, 1, 1, 1})
+        lurek.render.print("Rating: " .. rating, W / 2 - 80, H / 2 - 30, 22, {1, 1, 1, 1})
         local acc = 0
         if total_shots_fired > 0 then
             acc = math.floor(total_hits / total_shots_fired * 100)
         end
-        lurek.render.drawText("Accuracy: " .. acc .. "%", W / 2 - 50, H / 2 + 10, 18, {0.8, 0.8, 0.8, 1})
-        lurek.render.drawText("Shots: " .. total_shots_fired .. "  Hits: " .. total_hits,
+        lurek.render.print("Accuracy: " .. acc .. "%", W / 2 - 50, H / 2 + 10, 18, {0.8, 0.8, 0.8, 1})
+        lurek.render.print("Shots: " .. total_shots_fired .. "  Hits: " .. total_hits,
             W / 2 - 70, H / 2 + 40, 16, {0.7, 0.7, 0.7, 1})
         local blink = math.abs(math.sin(sway_time * 2))
-        lurek.render.drawText("PRESS ENTER TO RESTART", W / 2 - 95, H / 2 + 90, 16, {1, 1, 1, blink})
+        lurek.render.print("PRESS ENTER TO RESTART", W / 2 - 95, H / 2 + 90, 16, {1, 1, 1, blink})
         return
     end
 
     if state == STATE_ROUND_END then
         local rdef = round_defs[current_round]
-        lurek.render.drawText(rdef.name .. " Complete!", W / 2 - 100, H / 2 - 60, 22, {1, 0.9, 0.4, 1})
-        lurek.render.drawText("Round Score: " .. round_score, W / 2 - 65, H / 2 - 20, 20, {1, 1, 1, 1})
+        lurek.render.print(rdef.name .. " Complete!", W / 2 - 100, H / 2 - 60, 22, {1, 0.9, 0.4, 1})
+        lurek.render.print("Round Score: " .. round_score, W / 2 - 65, H / 2 - 20, 20, {1, 1, 1, 1})
         local acc = 0
         local fired = 5 - shots_left
         if fired > 0 then
             acc = math.floor(round_hits / fired * 100)
         end
-        lurek.render.drawText("Accuracy: " .. acc .. "%", W / 2 - 50, H / 2 + 15, 18, {0.8, 0.8, 0.8, 1})
+        lurek.render.print("Accuracy: " .. acc .. "%", W / 2 - 50, H / 2 + 15, 18, {0.8, 0.8, 0.8, 1})
         if current_round < 3 then
-            lurek.render.drawText("PRESS ENTER FOR NEXT ROUND", W / 2 - 110, H / 2 + 60, 16, {1, 1, 1, 1})
+            lurek.render.print("PRESS ENTER FOR NEXT ROUND", W / 2 - 110, H / 2 + 60, 16, {1, 1, 1, 1})
         else
-            lurek.render.drawText("PRESS ENTER FOR RESULTS", W / 2 - 100, H / 2 + 60, 16, {1, 1, 1, 1})
+            lurek.render.print("PRESS ENTER FOR RESULTS", W / 2 - 100, H / 2 + 60, 16, {1, 1, 1, 1})
         end
         return
     end
@@ -558,13 +558,13 @@ function lurek.render_ui()
     local rdef = round_defs[current_round]
 
     -- Round & shots
-    lurek.render.drawText(rdef.name, 10, 10, 16, {1, 1, 1, 0.9})
-    lurek.render.drawText("Shots: " .. shots_left, 10, 32, 14, {0.9, 0.9, 0.8, 1})
-    lurek.render.drawText("Score: " .. round_score, 10, 50, 14, {1, 0.9, 0.3, 1})
-    lurek.render.drawText("Total: " .. total_score, 10, 68, 14, {0.8, 0.8, 0.7, 1})
+    lurek.render.print(rdef.name, 10, 10, 16, {1, 1, 1, 0.9})
+    lurek.render.print("Shots: " .. shots_left, 10, 32, 14, {0.9, 0.9, 0.8, 1})
+    lurek.render.print("Score: " .. round_score, 10, 50, 14, {1, 0.9, 0.3, 1})
+    lurek.render.print("Total: " .. total_score, 10, 68, 14, {0.8, 0.8, 0.7, 1})
 
     -- Wind indicator
-    lurek.render.drawText(wind_display, W / 2 - 60, 10, 16, {0.6, 0.85, 1, 1})
+    lurek.render.print(wind_display, W / 2 - 60, 10, 16, {0.6, 0.85, 1, 1})
     -- Wind arrow
     local arrow_cx = W / 2
     local arrow_cy = 38
@@ -572,33 +572,33 @@ function lurek.render_ui()
     if math.abs(wind) > 2 then
         local dir = wind > 0 and 1 or -1
         local ax = arrow_cx + dir * arrow_len
-        lurek.render.drawLine(arrow_cx - dir * arrow_len, arrow_cy, ax, arrow_cy, {0.6, 0.85, 1, 0.9})
+        lurek.render.line(arrow_cx - dir * arrow_len, arrow_cy, ax, arrow_cy, {0.6, 0.85, 1, 0.9})
         -- Arrowhead
-        lurek.render.drawLine(ax, arrow_cy, ax - dir * 8, arrow_cy - 5, {0.6, 0.85, 1, 0.9})
-        lurek.render.drawLine(ax, arrow_cy, ax - dir * 8, arrow_cy + 5, {0.6, 0.85, 1, 0.9})
+        lurek.render.line(ax, arrow_cy, ax - dir * 8, arrow_cy - 5, {0.6, 0.85, 1, 0.9})
+        lurek.render.line(ax, arrow_cy, ax - dir * 8, arrow_cy + 5, {0.6, 0.85, 1, 0.9})
     end
 
     -- Breath indicator
     if breath_held then
         local pct = 1.0 - (breath_timer / BREATH_DURATION)
-        lurek.render.drawRect(W - 120, 10, 100 * pct, 10, {0.3, 0.9, 0.4, 0.8})
-        lurek.render.drawText("HOLDING BREATH", W - 120, 24, 12, {0.3, 0.9, 0.4, 1})
+        lurek.render.rectangle(W - 120, 10, 100 * pct, 10, {0.3, 0.9, 0.4, 0.8})
+        lurek.render.print("HOLDING BREATH", W - 120, 24, 12, {0.3, 0.9, 0.4, 1})
     elseif not breath_available then
-        lurek.render.drawText("Recovering...", W - 110, 10, 12, {0.8, 0.4, 0.3, 1})
+        lurek.render.print("Recovering...", W - 110, 10, 12, {0.8, 0.4, 0.3, 1})
     else
-        lurek.render.drawText("[Shift] Hold Breath", W - 130, 10, 12, {0.7, 0.7, 0.6, 0.7})
+        lurek.render.print("[Shift] Hold Breath", W - 130, 10, 12, {0.7, 0.7, 0.6, 0.7})
     end
 
     -- Target distance hint
     local ct = targets[current_target_idx]
     if ct and ct.alive then
         local d = math.floor(ct.x)
-        lurek.render.drawText("Range: " .. d .. "px", W - 130, H - 30, 14, {0.8, 0.8, 0.7, 0.8})
+        lurek.render.print("Range: " .. d .. "px", W - 130, H - 30, 14, {0.8, 0.8, 0.7, 0.8})
     end
 
     -- Score popup
     if score_popup then
         local c = {1, 1, 0.5, score_popup.alpha}
-        lurek.render.drawText(score_popup.text, score_popup.x - 30, score_popup.y, 18, c)
+        lurek.render.print(score_popup.text, score_popup.x - 30, score_popup.y, 18, c)
     end
 end
