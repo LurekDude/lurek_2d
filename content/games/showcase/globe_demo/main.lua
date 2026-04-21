@@ -12,7 +12,7 @@
 
 -- Capture the render API namespace BEFORE defining function lurek.render()
 -- (defining that callback overwrites lurek.render with the function itself).
-local gfx = lurek.render
+
 
 local SCREEN_W   = 1280
 local SCREEN_H   = 720
@@ -261,7 +261,7 @@ function lurek.init()
     lurek.input.bind("quit",  {"escape"})
 
     -- Set space-background color (fills screen automatically each frame)
-    gfx.setBackgroundColor(0.02, 0.02, 0.08)
+    lurek.render.setBackgroundColor(0.02, 0.02, 0.08)
 
     print("Globe demo loaded successfully.")
 end
@@ -385,8 +385,8 @@ function lurek.render()
     local cmd_count = cmds and #cmds or 0
 
     -- ── HUD strip ─────────────────────────────────────────────────────────
-    gfx.setColor(0.0, 0.0, 0.0, 0.65)
-    gfx.drawRect("fill", 0, 0, SCREEN_W, 32)
+    lurek.render.setColor(0.0, 0.0, 0.0, 0.65)
+    lurek.render.drawRect("fill", 0, 0, SCREEN_W, 32)
 
     local clat, clon, czoom = g:getCamera()
     local tod = g:getTimeOfDay()
@@ -398,32 +398,32 @@ function lurek.render()
     local hud_time = string.format("Time %02d:%02d  Provinces=%d  cmds=%d",
         tod_h, tod_m, g:provinceCount(), cmd_count)
 
-    gfx.setColor(0.9, 0.9, 0.9)
-    gfx.print(hud_cam,  10, 8, 14)
-    gfx.setColor(0.7, 0.9, 1.0)
-    gfx.print(hud_time, SCREEN_W - 380, 8, 14)
+    lurek.render.setColor(0.9, 0.9, 0.9)
+    lurek.render.print(hud_cam,  10, 8, 14)
+    lurek.render.setColor(0.7, 0.9, 1.0)
+    lurek.render.print(hud_time, SCREEN_W - 380, 8, 14)
 
     -- ── Province hover info ───────────────────────────────────────────────
     if hovered_id then
         local region = g:getProvinceAttr(hovered_id, "region") or "?"
         local hover_text = string.format("Province %d — %s", hovered_id, region)
-        gfx.setColor(0.0, 0.0, 0.0, 0.55)
-        gfx.drawRect("fill", 0, SCREEN_H - 32, 400, 32)
-        gfx.setColor(1.0, 0.9, 0.5)
-        gfx.print(hover_text, 10, SCREEN_H - 24, 14)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.55)
+        lurek.render.drawRect("fill", 0, SCREEN_H - 32, 400, 32)
+        lurek.render.setColor(1.0, 0.9, 0.5)
+        lurek.render.print(hover_text, 10, SCREEN_H - 24, 14)
     end
 
     -- ── Selected province popup ───────────────────────────────────────────
     if selected_id and hud_province ~= "" then
         local txt_w = 500
-        gfx.setColor(0.0, 0.0, 0.0, 0.72)
-        gfx.drawRect("fill", SCREEN_W/2 - txt_w/2, SCREEN_H - 60, txt_w, 28)
-        gfx.setColor(1.0, 0.85, 0.1)
-        gfx.print(hud_province, SCREEN_W/2 - txt_w/2 + 8, SCREEN_H - 54, 14)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.72)
+        lurek.render.drawRect("fill", SCREEN_W/2 - txt_w/2, SCREEN_H - 60, txt_w, 28)
+        lurek.render.setColor(1.0, 0.85, 0.1)
+        lurek.render.print(hud_province, SCREEN_W/2 - txt_w/2 + 8, SCREEN_H - 54, 14)
     end
 
     -- ── Controls reminder (bottom-right) ─────────────────────────────────
-    gfx.setColor(0.5, 0.5, 0.5, 0.8)
-    gfx.print("Drag: pan   Wheel: zoom   Click: select   Esc: quit",
+    lurek.render.setColor(0.5, 0.5, 0.5, 0.8)
+    lurek.render.print("Drag: pan   Wheel: zoom   Click: select   Esc: quit",
         SCREEN_W - 480, SCREEN_H - 20, 13)
 end
