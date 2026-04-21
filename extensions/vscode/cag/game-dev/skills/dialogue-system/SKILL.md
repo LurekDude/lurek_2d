@@ -119,25 +119,25 @@ local function draw_dialog()
     local sw, sh = 800, 600
     local bx, by, bw, bh = 20, sh - 140, sw - 40, 120
 
-    lurek.gfx.setColor(0, 0, 0, 0.85)
-    lurek.gfx.rectangle("fill", bx, by, bw, bh)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.rectangle("line", bx, by, bw, bh)
+    lurek.render.setColor(0, 0, 0, 0.85)
+    lurek.render.rectangle("fill", bx, by, bw, bh)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.rectangle("line", bx, by, bw, bh)
 
     -- Speaker name
     if node.speaker then
-        lurek.gfx.print(node.speaker, bx + 10, by + 6)
+        lurek.render.print(node.speaker, bx + 10, by + 6)
     end
 
     -- Typewriter text
     local visible = node.text:sub(1, dialog.char_index)
-    lurek.gfx.print(visible, bx + 10, by + 26)
+    lurek.render.print(visible, bx + 10, by + 26)
 
     -- Choices
     if node.choices and dialog.char_index >= #node.text then
         for i, c in ipairs(node.choices) do
             local prefix = (i == (dialog.choice_index or 1)) and "> " or "  "
-            lurek.gfx.print(prefix .. c.text, bx + 20, by + 50 + (i - 1) * 18)
+            lurek.render.print(prefix .. c.text, bx + 20, by + 50 + (i - 1) * 18)
         end
     end
 end

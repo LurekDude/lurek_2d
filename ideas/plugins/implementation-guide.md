@@ -521,8 +521,8 @@ Taking `tilemap` as an example:
    - Replace `use crate::math::*` → `use luna2d_core::math::*` (if core is a dep)
      OR re-implement needed math types locally
 4. **Refactor SharedState access**:
-   - `state.borrow().delta_time` → call `lurek.time.getDelta()` via Lua
-   - `state.borrow_mut().render_commands.push(...)` → call `lurek.gfx.drawQuad()` via Lua
+   - `state.borrow().delta_time` → call `lurek.timer.getDelta()` via Lua
+   - `state.borrow_mut().render_commands.push(...)` → call `lurek.render.drawQuad()` via Lua
 5. **Register in `register_all()`**:
    ```rust
    tilemap::register(lua, &luna)?;

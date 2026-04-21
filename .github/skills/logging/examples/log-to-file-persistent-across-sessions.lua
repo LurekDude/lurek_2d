@@ -2,8 +2,8 @@
 local LOG_FILE = "game.log"
 
 local function logToFile(level, msg)
-    local line = string.format("[%s] %.3f  %s\n", level, lurek.time.getTime(), msg)
-    lurek.fs.append(LOG_FILE, line)
+    local line = string.format("[%s] %.3f  %s\n", level, lurek.timer.getTime(), msg)
+    lurek.filesystem.append(LOG_FILE, line)
 end
 
 logToFile("INFO",  "Level 1 started")

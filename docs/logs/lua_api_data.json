@@ -10458,7 +10458,7 @@
         }
       },
       "automation": {
-        "description": "`lurek.simulator` — Automated input simulation via timed step scripts.",
+        "description": "`lurek.automation` — Automated input simulation via timed step scripts.",
         "source_file": "src/lua_api/automation_api.rs",
         "functions": [
           {
@@ -10934,7 +10934,7 @@
             "kind": "function",
             "owner_type": "",
             "description": "Enables or disables the highlight overlay hint.",
-            "full_doc": "Enables or disables the highlight overlay hint.\nWhen true, a game render pass can visualise the current simulated cursor/key\nposition by calling `lurek.simulator:isHighlightMode()`.\n@param enable : boolean\n@return nil",
+            "full_doc": "Enables or disables the highlight overlay hint.\nWhen true, a game render pass can visualise the current simulated cursor/key\nposition by calling `lurek.automation:isHighlightMode()`.\n@param enable : boolean\n@return nil",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(enable)",
@@ -11866,12 +11866,12 @@
         }
       },
       "collision": {
-        "description": "`lurek.collision` — Lightweight stateless geometric collision helpers.\n\nThese pure-math functions perform fast overlap detection without requiring a\nfull physics world. Suitable for RPG, puzzle, or visual-novel games that only\nneed simple overlap detection, not rigid-body simulation.\n\nAll functions are pure and stateless — the `_state` parameter is accepted only\nto match the standard `register()` contract.",
+        "description": "`lurek.physics` — Lightweight stateless geometric collision helpers.\n\nThese pure-math functions perform fast overlap detection without requiring a\nfull physics world. Suitable for RPG, puzzle, or visual-novel games that only\nneed simple overlap detection, not rigid-body simulation.\n\nAll functions are pure and stateless — the `_state` parameter is accepted only\nto match the standard `register()` contract.",
         "source_file": "src/lua_api/collision_api.rs",
         "functions": [
           {
             "name": "testAABB",
-            "lua_name": "lurek.collision.testAABB",
+            "lua_name": "lurek.physics.testAABB",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true when two axis-aligned bounding boxes overlap.",
@@ -11927,7 +11927,7 @@
           },
           {
             "name": "testCircles",
-            "lua_name": "lurek.collision.testCircles",
+            "lua_name": "lurek.physics.testCircles",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true when two circles overlap.",
@@ -11973,7 +11973,7 @@
           },
           {
             "name": "testPoint",
-            "lua_name": "lurek.collision.testPoint",
+            "lua_name": "lurek.physics.testPoint",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true when point (px, py) lies inside the AABB.",
@@ -12019,7 +12019,7 @@
           },
           {
             "name": "testCircleAABB",
-            "lua_name": "lurek.collision.testCircleAABB",
+            "lua_name": "lurek.physics.testCircleAABB",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true when a circle overlaps an AABB.",
@@ -16036,7 +16036,7 @@
             "kind": "function",
             "owner_type": "",
             "description": "Poll for pending Lua-dependent requests from TCP clients.",
-            "full_doc": "Poll for pending Lua-dependent requests from TCP clients.\nMust be called each frame from lurek.update(). Automatically records\nthe current frame delta from `lurek.time.getDelta()` into the performance\nbuffer — no manual `recordFrame()` call is needed.\n@return table|nil",
+            "full_doc": "Poll for pending Lua-dependent requests from TCP clients.\nMust be called each frame from lurek.update(). Automatically records\nthe current frame delta from `lurek.timer.getDelta()` into the performance\nbuffer — no manual `recordFrame()` call is needed.\n@return table|nil",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "()",
@@ -18548,7 +18548,7 @@
         }
       },
       "ecs": {
-        "description": "`lurek.entity` — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.\n\nWraps [`crate::ecs::Universe`] as `LuaUniverse` userdata. Supports spawn/kill,\nper-entity component CRUD, tag flags, named layers, queries, blueprints, and\ncomponent add/remove observer callbacks.",
+        "description": "`lurek.ecs` — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.\n\nWraps [`crate::ecs::Universe`] as `LuaUniverse` userdata. Supports spawn/kill,\nper-entity component CRUD, tag flags, named layers, queries, blueprints, and\ncomponent add/remove observer callbacks.",
         "source_file": "src/lua_api/ecs_api.rs",
         "functions": [
           {
@@ -22423,12 +22423,12 @@
         }
       },
       "engine": {
-        "description": "`lurek.engine` — Runtime engine metadata and introspection.\n\nExposes read-only properties about the running engine: version, target\nframe budget, memory usage, host platform, and total uptime.",
+        "description": "`lurek.runtime` — Runtime engine metadata and introspection.\n\nExposes read-only properties about the running engine: version, target\nframe budget, memory usage, host platform, and total uptime.",
         "source_file": "src/lua_api/engine_api.rs",
         "functions": [
           {
             "name": "getVersion",
-            "lua_name": "lurek.engine.getVersion",
+            "lua_name": "lurek.runtime.getVersion",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the engine version string (from `Cargo.toml`).",
@@ -22443,7 +22443,7 @@
           },
           {
             "name": "getFrameBudget",
-            "lua_name": "lurek.engine.getFrameBudget",
+            "lua_name": "lurek.runtime.getFrameBudget",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the target frame budget in milliseconds (default: 1000 / 60 ≈ 16.667 ms).",
@@ -22458,7 +22458,7 @@
           },
           {
             "name": "memoryUsage",
-            "lua_name": "lurek.engine.memoryUsage",
+            "lua_name": "lurek.runtime.memoryUsage",
             "kind": "function",
             "owner_type": "",
             "description": "Returns a table with `lua_bytes` (Lua GC heap usage in bytes) and",
@@ -22473,7 +22473,7 @@
           },
           {
             "name": "platform",
-            "lua_name": "lurek.engine.platform",
+            "lua_name": "lurek.runtime.platform",
             "kind": "function",
             "owner_type": "",
             "description": "Returns a string identifying the host operating system:",
@@ -22488,7 +22488,7 @@
           },
           {
             "name": "uptime",
-            "lua_name": "lurek.engine.uptime",
+            "lua_name": "lurek.runtime.uptime",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the total engine uptime in seconds (sum of all processed deltas).",
@@ -22503,7 +22503,7 @@
           },
           {
             "name": "fps",
-            "lua_name": "lurek.engine.fps",
+            "lua_name": "lurek.runtime.fps",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the current measured frames-per-second.",
@@ -22518,7 +22518,7 @@
           },
           {
             "name": "frameCount",
-            "lua_name": "lurek.engine.frameCount",
+            "lua_name": "lurek.runtime.frameCount",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the total number of frames processed since engine start.",
@@ -22533,7 +22533,7 @@
           },
           {
             "name": "isDebug",
-            "lua_name": "lurek.engine.isDebug",
+            "lua_name": "lurek.runtime.isDebug",
             "kind": "function",
             "owner_type": "",
             "description": "Returns `true` if the engine was compiled in debug mode.",
@@ -22548,7 +22548,7 @@
           },
           {
             "name": "setResourceBudget",
-            "lua_name": "lurek.engine.setResourceBudget",
+            "lua_name": "lurek.runtime.setResourceBudget",
             "kind": "function",
             "owner_type": "",
             "description": "Sets the maximum resident texture memory budget in bytes.",
@@ -22569,7 +22569,7 @@
           },
           {
             "name": "getResourceStats",
-            "lua_name": "lurek.engine.getResourceStats",
+            "lua_name": "lurek.runtime.getResourceStats",
             "kind": "function",
             "owner_type": "",
             "description": "Returns a table with resident resource memory statistics.",
@@ -22586,7 +22586,7 @@
         "classes": {}
       },
       "event": {
-        "description": "`lurek.signal` — Event queue polling and pub-sub signal dispatching.\n\nProvides `Signal` userdata for named-event pub-sub with once-fire handles,\nper-handle filter predicates, wildcard subscriptions, and integration with the\nengine event bus for built-in events (resize, focus, quit, etc.).",
+        "description": "`lurek.event` — Event queue polling and pub-sub signal dispatching.\n\nProvides `Signal` userdata for named-event pub-sub with once-fire handles,\nper-handle filter predicates, wildcard subscriptions, and integration with the\nengine event bus for built-in events (resize, focus, quit, etc.).",
         "source_file": "src/lua_api/event_api.rs",
         "functions": [
           {
@@ -22989,7 +22989,7 @@
         }
       },
       "filesystem": {
-        "description": "`lurek.fs` — Sandboxed file I/O, directory queries, and async asset loading.\n\nAll paths are resolved through the game's [`GameFS`] sandbox. Supports file\nread/write via `FileHandle`, bulk-data via `FileData`, ZIP archive mounting,\ndirectory listing, path manipulation, and per-file change watching.",
+        "description": "`lurek.filesystem` — Sandboxed file I/O, directory queries, and async asset loading.\n\nAll paths are resolved through the game's [`GameFS`] sandbox. Supports file\nread/write via `FileHandle`, bulk-data via `FileData`, ZIP archive mounting,\ndirectory listing, path manipulation, and per-file change watching.",
         "source_file": "src/lua_api/filesystem_api.rs",
         "functions": [
           {
@@ -23648,7 +23648,7 @@
             "kind": "function",
             "owner_type": "",
             "description": "Returns a sorted list of paths matching a simple wildcard pattern.",
-            "full_doc": "Returns a sorted list of paths matching a simple wildcard pattern.\n\n`*` matches any run of characters within a single path component;\n`?` matches exactly one character.  Patterns are relative to the game root.\nExample: `lurek.fs.glob(\"save/*.json\")`\n@param pattern : string\ntable  array of matching relative paths\n@return table",
+            "full_doc": "Returns a sorted list of paths matching a simple wildcard pattern.\n\n`*` matches any run of characters within a single path component;\n`?` matches exactly one character.  Patterns are relative to the game root.\nExample: `lurek.filesystem.glob(\"save/*.json\")`\n@param pattern : string\ntable  array of matching relative paths\n@return table",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(pattern)",
@@ -27388,7 +27388,7 @@
         }
       },
       "i18n": {
-        "description": "Registers the `lurek.localization.*` internationalization and localization API.\n\nThin Lua bridge that delegates to the [`localization`][crate::localization] domain module.\nAll translation tables, fallback logic, interpolation, and pluralization live\nin [`crate::localization`]; this file converts between Lua values and domain types.",
+        "description": "Registers the `lurek.i18n.*` internationalization and localization API.\n\nThin Lua bridge that delegates to the [`localization`][crate::localization] domain module.\nAll translation tables, fallback logic, interpolation, and pluralization live\nin [`crate::localization`]; this file converts between Lua values and domain types.",
         "source_file": "src/lua_api/i18n_api.rs",
         "functions": [
           {
@@ -28035,7 +28035,7 @@
         "classes": {}
       },
       "image": {
-        "description": "`lurek.img` — CPU-side pixel-level image manipulation.\n\nExposes `ImageData` (RGBA pixel buffers), `CompressedImageData` (DXT/BC/ETC),\n`LayeredImage` (multi-layer compositing), `ProvinceGrid` (colour-keyed region maps),\nand `PaletteLUT` (palette-swap look-up tables). All operations run on the CPU;\nupload to GPU is handled by the render layer.",
+        "description": "`lurek.image` — CPU-side pixel-level image manipulation.\n\nExposes `ImageData` (RGBA pixel buffers), `CompressedImageData` (DXT/BC/ETC),\n`LayeredImage` (multi-layer compositing), `ProvinceGrid` (colour-keyed region maps),\nand `PaletteLUT` (palette-swap look-up tables). All operations run on the CPU;\nupload to GPU is handled by the render layer.",
         "source_file": "src/lua_api/image_api.rs",
         "functions": [
           {
@@ -29403,7 +29403,7 @@
         }
       },
       "input": {
-        "description": "`lurek.keyboard` / `lurek.mouse` / `lurek.gamepad` / `lurek.touch` — Input state queries and cursor management.",
+        "description": "`lurek.input.keyboard` / `lurek.input.mouse` / `lurek.input.gamepad` / `lurek.input.touch` — Input state queries and cursor management.",
         "source_file": "src/lua_api/input_api.rs",
         "functions": [
           {
@@ -39044,7 +39044,7 @@
         }
       },
       "mods": {
-        "description": "`lurek.modding` - Mod discovery, dependency resolution, load ordering, and hot-reload.",
+        "description": "`lurek.mods` - Mod discovery, dependency resolution, load ordering, and hot-reload.",
         "source_file": "src/lua_api/mods_api.rs",
         "functions": [
           {
@@ -40589,7 +40589,7 @@
             "kind": "function",
             "owner_type": "",
             "description": "Creates a new parallax background layer from an options table.",
-            "full_doc": "Creates a new parallax background layer from an options table.\n\nRequired field — `texture`: a `LuaImage` returned by `lurek.graphic.newImage()`.\nOptional fields: `scroll_factor_x`, `scroll_factor_y`, `offset_x`, `offset_y`,\n`autoscroll_x`, `autoscroll_y`, `repeat_x`, `repeat_y`, `z`, `opacity`,\n`tint_r`, `tint_g`, `tint_b`, `tint_a`, `blend_mode`, `visible`,\n`scale_x`, `scale_y`.\n@param opts : table\n@return LuaParallaxLayer",
+            "full_doc": "Creates a new parallax background layer from an options table.\n\nRequired field — `texture`: a `LuaImage` returned by `lurek.render.newImage()`.\nOptional fields: `scroll_factor_x`, `scroll_factor_y`, `offset_x`, `offset_y`,\n`autoscroll_x`, `autoscroll_y`, `repeat_x`, `repeat_y`, `z`, `opacity`,\n`tint_r`, `tint_g`, `tint_b`, `tint_a`, `blend_mode`, `visible`,\n`scale_x`, `scale_y`.\n@param opts : table\n@return LuaParallaxLayer",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(opts)",
@@ -41436,7 +41436,7 @@
         }
       },
       "particle": {
-        "description": "`lurek.particles` — Emitter-based 2D particle systems and trail ribbons.",
+        "description": "`lurek.particle` — Emitter-based 2D particle systems and trail ribbons.",
         "source_file": "src/lua_api/particle_api.rs",
         "functions": [
           {
@@ -42804,7 +42804,7 @@
                 "kind": "method",
                 "owner_type": "ParticleSystem",
                 "description": "Attaches a sub-emitter that bursts when a particle dies.",
-                "full_doc": "Attaches a sub-emitter that bursts when a particle dies.\n\n`config_tbl` uses the same keys as `lurek.particles.new(opts)`.\n`burst_count` defaults to 1.\n@param config_tbl : table\n@param burst_count : number?\n@return nil",
+                "full_doc": "Attaches a sub-emitter that bursts when a particle dies.\n\n`config_tbl` uses the same keys as `lurek.particle.new(opts)`.\n`burst_count` defaults to 1.\n@param config_tbl : table\n@param burst_count : number?\n@return nil",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(config_tbl, [burst_count])",
@@ -43081,7 +43081,7 @@
         }
       },
       "pathfind": {
-        "description": "`lurek.pathfinding` — Grid-based A★, HPA★, flow field, and unit-aware navigation.",
+        "description": "`lurek.pathfind` — Grid-based A★, HPA★, flow field, and unit-aware navigation.",
         "source_file": "src/lua_api/pathfind_api.rs",
         "functions": [
           {
@@ -54479,7 +54479,7 @@
         }
       },
       "render": {
-        "description": "`lurek.graphic` — 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.",
+        "description": "`lurek.render` — 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.",
         "source_file": "src/lua_api/render_api.rs",
         "functions": [
           {
@@ -55086,7 +55086,7 @@
             "kind": "function",
             "owner_type": "",
             "description": "Draws a sequence of individually-styled text spans at `(x, y)`.",
-            "full_doc": "Draws a sequence of individually-styled text spans at `(x, y)`.\n\n`spans` is a list of tables, each with:\n  - `text`  — string content\n  - `r`, `g`, `b`, `a` — colour components as integers in `0..255`\n  - `scale` — font scale multiplier (default `1.0`)\nAll spans share the font set by the last `lurek.graphic.setFont()` call.\n# Usage\n```lua\nlurek.graphic.printRich(spans, x, y)\nlurek.graphic.printRich({{ text=\"Hello \", r=255, g=255, b=255, a=255, scale=1 },\n                         { text=\"world\",  r=255, g=100, b=100, a=255, scale=1.2 }}, 10, 10)\n```\n@param spans : table[]\n@param x : number\n@param y : number",
+            "full_doc": "Draws a sequence of individually-styled text spans at `(x, y)`.\n\n`spans` is a list of tables, each with:\n  - `text`  — string content\n  - `r`, `g`, `b`, `a` — colour components as integers in `0..255`\n  - `scale` — font scale multiplier (default `1.0`)\nAll spans share the font set by the last `lurek.render.setFont()` call.\n# Usage\n```lua\nlurek.render.printRich(spans, x, y)\nlurek.render.printRich({{ text=\"Hello \", r=255, g=255, b=255, a=255, scale=1 },\n                         { text=\"world\",  r=255, g=100, b=100, a=255, scale=1.2 }}, 10, 10)\n```\n@param spans : table[]\n@param x : number\n@param y : number",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(spans_table, x, y)",
@@ -58873,7 +58873,7 @@
         }
       },
       "save": {
-        "description": "`lurek.savegame` - Slot-based save/load system with collectors, schema versioning, and auto-save.",
+        "description": "`lurek.save` - Slot-based save/load system with collectors, schema versioning, and auto-save.",
         "source_file": "src/lua_api/save_api.rs",
         "functions": [
           {
@@ -60397,7 +60397,7 @@
         }
       },
       "serial": {
-        "description": "`lurek.codec` — Format-agnostic string serialization: JSON, TOML, and CSV.",
+        "description": "`lurek.serial` — Format-agnostic string serialization: JSON, TOML, and CSV.",
         "source_file": "src/lua_api/serial_api.rs",
         "functions": [
           {
@@ -61423,12 +61423,12 @@
         }
       },
       "system": {
-        "description": "`lurek.platform` — Platform queries: OS name, CPU count, memory size, power state,\npreferred locales, clipboard access, and safe URL opening.\n\nRegistered as `lurek.platform.*` in the Lua VM. Domain logic is minimal —\nmost functions delegate directly to `std` or `sysinfo`.",
+        "description": "`lurek.runtime` — Platform queries: OS name, CPU count, memory size, power state,\npreferred locales, clipboard access, and safe URL opening.\n\nRegistered as `lurek.runtime.*` in the Lua VM. Domain logic is minimal —\nmost functions delegate directly to `std` or `sysinfo`.",
         "source_file": "src/lua_api/system_api.rs",
         "functions": [
           {
             "name": "getOS",
-            "lua_name": "lurek.system.getOS",
+            "lua_name": "lurek.runtime.getOS",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the host operating system name ('Windows', 'Linux', 'macOS').",
@@ -61443,7 +61443,7 @@
           },
           {
             "name": "getVersion",
-            "lua_name": "lurek.system.getVersion",
+            "lua_name": "lurek.runtime.getVersion",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the Lurek2D engine version string.",
@@ -61458,7 +61458,7 @@
           },
           {
             "name": "getProcessorCount",
-            "lua_name": "lurek.system.getProcessorCount",
+            "lua_name": "lurek.runtime.getProcessorCount",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the number of logical CPU cores available.",
@@ -61473,7 +61473,7 @@
           },
           {
             "name": "getMemorySize",
-            "lua_name": "lurek.system.getMemorySize",
+            "lua_name": "lurek.runtime.getMemorySize",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the total amount of installed system RAM in megabytes.",
@@ -61488,7 +61488,7 @@
           },
           {
             "name": "openURL",
-            "lua_name": "lurek.system.openURL",
+            "lua_name": "lurek.runtime.openURL",
             "kind": "function",
             "owner_type": "",
             "description": "Opens a URL in the system's default browser.",
@@ -61509,7 +61509,7 @@
           },
           {
             "name": "getPreferredLocales",
-            "lua_name": "lurek.system.getPreferredLocales",
+            "lua_name": "lurek.runtime.getPreferredLocales",
             "kind": "function",
             "owner_type": "",
             "description": "Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').",
@@ -61524,7 +61524,7 @@
           },
           {
             "name": "getPowerInfo",
-            "lua_name": "lurek.system.getPowerInfo",
+            "lua_name": "lurek.runtime.getPowerInfo",
             "kind": "function",
             "owner_type": "",
             "description": "Returns battery state, percentage charged, and estimated time remaining.",
@@ -61539,7 +61539,7 @@
           },
           {
             "name": "getInfo",
-            "lua_name": "lurek.system.getInfo",
+            "lua_name": "lurek.runtime.getInfo",
             "kind": "function",
             "owner_type": "",
             "description": "Returns a table of system information including OS name, CPU model, and installed RAM.",
@@ -61554,7 +61554,7 @@
           },
           {
             "name": "getMessage",
-            "lua_name": "lurek.system.getMessage",
+            "lua_name": "lurek.runtime.getMessage",
             "kind": "function",
             "owner_type": "",
             "description": "Resolves a stable runtime message ID such as 'L001' to its human-readable text.",
@@ -61575,7 +61575,7 @@
           },
           {
             "name": "hasMessage",
-            "lua_name": "lurek.system.hasMessage",
+            "lua_name": "lurek.runtime.hasMessage",
             "kind": "function",
             "owner_type": "",
             "description": "Returns true when the runtime message catalog contains the given stable message ID.",
@@ -61596,7 +61596,7 @@
           },
           {
             "name": "getMessageCount",
-            "lua_name": "lurek.system.getMessageCount",
+            "lua_name": "lurek.runtime.getMessageCount",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the total number of message entries loaded into the runtime message catalog.",
@@ -61611,7 +61611,7 @@
           },
           {
             "name": "setClipboardText",
-            "lua_name": "lurek.system.setClipboardText",
+            "lua_name": "lurek.runtime.setClipboardText",
             "kind": "function",
             "owner_type": "",
             "description": "Replaces the system clipboard contents with the given string.",
@@ -61632,7 +61632,7 @@
           },
           {
             "name": "getClipboardText",
-            "lua_name": "lurek.system.getClipboardText",
+            "lua_name": "lurek.runtime.getClipboardText",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the current contents of the system clipboard.",
@@ -61647,7 +61647,7 @@
           },
           {
             "name": "setDebugOverlay",
-            "lua_name": "lurek.system.setDebugOverlay",
+            "lua_name": "lurek.runtime.setDebugOverlay",
             "kind": "function",
             "owner_type": "",
             "description": "Shows or hides the FPS/draw-call debug overlay.",
@@ -61668,7 +61668,7 @@
           },
           {
             "name": "getDebugOverlay",
-            "lua_name": "lurek.system.getDebugOverlay",
+            "lua_name": "lurek.runtime.getDebugOverlay",
             "kind": "function",
             "owner_type": "",
             "description": "Returns whether the debug overlay is currently visible.",
@@ -61683,7 +61683,7 @@
           },
           {
             "name": "setLogLevel",
-            "lua_name": "lurek.system.setLogLevel",
+            "lua_name": "lurek.runtime.setLogLevel",
             "kind": "function",
             "owner_type": "",
             "description": "Sets the minimum severity level for runtime log messages.",
@@ -61704,7 +61704,7 @@
           },
           {
             "name": "getLogLevel",
-            "lua_name": "lurek.system.getLogLevel",
+            "lua_name": "lurek.runtime.getLogLevel",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the name of the current minimum log level for runtime messages.",
@@ -61719,7 +61719,7 @@
           },
           {
             "name": "log",
-            "lua_name": "lurek.system.log",
+            "lua_name": "lurek.runtime.log",
             "kind": "function",
             "owner_type": "",
             "description": "Emit a log message from Lua at the specified level.",
@@ -61745,7 +61745,7 @@
           },
           {
             "name": "getLastError",
-            "lua_name": "lurek.system.getLastError",
+            "lua_name": "lurek.runtime.getLastError",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the last unhandled error message, or nil.",
@@ -61760,7 +61760,7 @@
           },
           {
             "name": "errorSnapshot",
-            "lua_name": "lurek.system.errorSnapshot",
+            "lua_name": "lurek.runtime.errorSnapshot",
             "kind": "function",
             "owner_type": "",
             "description": "Serialises an engine error message to a compact JSON string.",
@@ -61781,7 +61781,7 @@
           },
           {
             "name": "getArch",
-            "lua_name": "lurek.system.getArch",
+            "lua_name": "lurek.runtime.getArch",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the CPU architecture string for the current machine.",
@@ -61796,7 +61796,7 @@
           },
           {
             "name": "getEnv",
-            "lua_name": "lurek.system.getEnv",
+            "lua_name": "lurek.runtime.getEnv",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the value of an environment variable, or nil if not set.",
@@ -61811,7 +61811,7 @@
           },
           {
             "name": "getArgs",
-            "lua_name": "lurek.system.getArgs",
+            "lua_name": "lurek.runtime.getArgs",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the command-line arguments as a table.",
@@ -61826,7 +61826,7 @@
           },
           {
             "name": "parseArgs",
-            "lua_name": "lurek.system.parseArgs",
+            "lua_name": "lurek.runtime.parseArgs",
             "kind": "function",
             "owner_type": "",
             "description": "Parses a command-line argument string and returns a structured key/value table.",
@@ -61847,7 +61847,7 @@
           },
           {
             "name": "runBatch",
-            "lua_name": "lurek.system.runBatch",
+            "lua_name": "lurek.runtime.runBatch",
             "kind": "function",
             "owner_type": "",
             "description": "Runs a list of shell commands in parallel and returns immediately without blocking.",
@@ -61873,7 +61873,7 @@
           },
           {
             "name": "getBatchResults",
-            "lua_name": "lurek.system.getBatchResults",
+            "lua_name": "lurek.runtime.getBatchResults",
             "kind": "function",
             "owner_type": "",
             "description": "Returns the output table from the most recently completed runBatch call.",
@@ -67387,7 +67387,7 @@
         }
       },
       "timer": {
-        "description": "`lurek.time` - Frame timing, FPS tracking, and scheduled Lua callbacks.",
+        "description": "`lurek.timer` - Frame timing, FPS tracking, and scheduled Lua callbacks.",
         "source_file": "src/lua_api/timer_api.rs",
         "functions": [
           {
@@ -67630,7 +67630,7 @@
             "kind": "function",
             "owner_type": "",
             "description": "Schedules a one-shot callback that fires after `delay` wall-clock seconds,",
-            "full_doc": "Schedules a one-shot callback that fires after `delay` wall-clock seconds,\nunaffected by engine time scale. Call `lurek.time.tickRealTimers()` once\nper frame to poll for expired timers.\n@param delay : number   wall-clock seconds to wait\n@param func : function\n@return nil",
+            "full_doc": "Schedules a one-shot callback that fires after `delay` wall-clock seconds,\nunaffected by engine time scale. Call `lurek.timer.tickRealTimers()` once\nper frame to poll for expired timers.\n@param delay : number   wall-clock seconds to wait\n@param func : function\n@return nil",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(delay, func)",
@@ -67707,7 +67707,7 @@
             "kind": "function",
             "owner_type": "",
             "description": "Yields the current Lua coroutine for at least `seconds` wall-clock seconds.",
-            "full_doc": "Yields the current Lua coroutine for at least `seconds` wall-clock seconds.\nMust be called from within a `coroutine.wrap`'d or `coroutine.create`'d\nfunction. Call `lurek.time.tickWaits()` once per frame in `lurek.process`\nto resume expired waits.\n\n@param seconds : number\n@return nil",
+            "full_doc": "Yields the current Lua coroutine for at least `seconds` wall-clock seconds.\nMust be called from within a `coroutine.wrap`'d or `coroutine.create`'d\nfunction. Call `lurek.timer.tickWaits()` once per frame in `lurek.process`\nto resume expired waits.\n\n@param seconds : number\n@return nil",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(seconds)",
@@ -67728,7 +67728,7 @@
             "kind": "function",
             "owner_type": "",
             "description": "Yields the current Lua coroutine for at least `frames` engine frames.",
-            "full_doc": "Yields the current Lua coroutine for at least `frames` engine frames.\nMust be called from within a coroutine. Call `lurek.time.tickWaits()` once\nper frame to resume expired waits.\n\n@param frames : integer\n@return nil",
+            "full_doc": "Yields the current Lua coroutine for at least `frames` engine frames.\nMust be called from within a coroutine. Call `lurek.timer.tickWaits()` once\nper frame to resume expired waits.\n\n@param frames : integer\n@return nil",
             "params_doc": "",
             "returns_doc": "",
             "inferred_sig": "(frames)",

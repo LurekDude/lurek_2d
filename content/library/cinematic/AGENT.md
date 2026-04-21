@@ -5,13 +5,13 @@
 | **Tier**       | Tier 3 — Lunasome (pure Lua)                                                                                                                                                |
 | **Source**     | `library/cinematic/init.lua`                                                                                                                                                |
 | **Lua Tests**  | `tests/lua/library/test_library_cinematic.lua`                                                                                                                              |
-| **Depends on** | `lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.signal` (each clip kind degrades to a no-op when its binding is unavailable), `lurek.fs` + `lurek.codec` (TOML loader) |
+| **Depends on** | `lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.event` (each clip kind degrades to a no-op when its binding is unavailable), `lurek.filesystem` + `lurek.serial` (TOML loader) |
 | **Status**     | partial — core timeline works; per-frame tween easing is delegated to `lurek.tween`                                                                                         |
 
 ## Purpose
 
 Multi-track scrubbable cutscene timeline that composes engine primitives
-(`lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.signal`,
+(`lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.event`,
 `library.dialog`) into a single play / pause / seek / scrub / skip-to-label
 authoring surface. Distinct from `lurek.scene` (push/pop transitions) and
 `lurek.tween` (single-property forward-only tween).
@@ -63,8 +63,8 @@ All `lurek.*` consumer clips degrade gracefully:
   assignment when missing.
 - `lurek.camera` — `setPosition`, `setZoom`, `shake` calls are best-effort.
 - `lurek.audio` — `play(source, opts)` invocation; missing binding = no-op.
-- `lurek.signal` — `push(name, ...)`; missing binding = no-op.
-- `lurek.fs` + `lurek.codec` — only required for `M.fromToml`.
+- `lurek.event` — `push(name, ...)`; missing binding = no-op.
+- `lurek.filesystem` + `lurek.serial` — only required for `M.fromToml`.
 
 ## Status
 
@@ -88,5 +88,5 @@ camera moves, shake, dialog, and label skip.
 - **Branch timeline**: when the playhead crosses the branch `at`, the child
   timeline is `:play()`'d only if the predicate returns true. The parent
   always runs `child:update(dt)` while it exists.
-- The library does **not** call `lurek.time.Scheduler` — the timeline owns
+- The library does **not** call `lurek.timer.Scheduler` — the timeline owns
   its own clock driven by the caller's `dt`.

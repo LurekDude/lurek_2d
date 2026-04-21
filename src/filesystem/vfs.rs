@@ -639,7 +639,7 @@ impl GameFS {
     /// Reads file bytes from the VFS, searching mount layers newest-first before
     /// falling back to the base game directory.
     ///
-    /// Useful for `lurek.fs.load()` — returns raw bytes for Lua compilation.
+    /// Useful for `lurek.filesystem.load()` — returns raw bytes for Lua compilation.
     ///
     /// # Parameters
     /// - `path` — `&str`. Virtual path to the file.
@@ -893,7 +893,7 @@ impl GameFS {
     /// contents.
     ///
     /// Unlike [`get_info`], this method returns only the data needed for
-    /// `lurek.fs.stat`: file size, and booleans indicating whether the path is
+    /// `lurek.filesystem.stat`: file size, and booleans indicating whether the path is
     /// a regular file or a directory.
     ///
     /// # Parameters

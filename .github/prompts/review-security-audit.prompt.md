@@ -10,7 +10,7 @@ Security audit for Lurek2D Lua sandboxing, filesystem access, and input validati
 ## Inputs
 
 - `CHANGED_FILES` — list of Rust files that changed or are new
-- `THREAT_CONCERN` — specific concern to prioritize (e.g., "path traversal in `lurek.fs.read`", "arbitrary Lua module loading")
+- `THREAT_CONCERN` — specific concern to prioritize (e.g., "path traversal in `lurek.filesystem.read`", "arbitrary Lua module loading")
 
 ## Steps
 

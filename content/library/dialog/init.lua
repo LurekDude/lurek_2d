@@ -17,9 +17,9 @@
 -- @module library.dialog
 -- @status full
 -- @see lurek.patterns.newEventBus  optional event bus mirror returned by `seq:getEventBus()`
--- @see lurek.signal.newSignal      alternative scoped pub/sub backbone
--- @see lurek.localization.t        translate `say`/`choice` text fields before passing them in
--- @see lurek.codec.toJson          serialise/deserialise script node arrays for persistence
+-- @see lurek.event.newSignal      alternative scoped pub/sub backbone
+-- @see lurek.i18n.t        translate `say`/`choice` text fields before passing them in
+-- @see lurek.serial.toJson          serialise/deserialise script node arrays for persistence
 
 local M = {}
 

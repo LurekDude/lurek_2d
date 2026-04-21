@@ -3,19 +3,19 @@
 
 -- @description Covers suite: timer + math integration.
 describe("timer + math integration", function()
-    -- @covers lurek.time.getDelta
+    -- @covers lurek.timer.getDelta
     -- @covers lurek.math
     -- @covers lurek.math.pi
     -- @covers lurek.math.sin
     -- @description Verifies the referenced timer delta API returns a numeric value; this file is miscategorized and largely tests timer/math helpers rather than a real integration flow.
     it("getDelta returns a number", function()
-        local dt = lurek.time.getDelta()
+        local dt = lurek.timer.getDelta()
         expect_not_nil(dt, "getDelta returns a value")
         expect_true(type(dt) == "number", "dt is a number")
     end)
 
     -- @covers lurek.math
-    -- @covers lurek.time.getDelta
+    -- @covers lurek.timer.getDelta
     -- @description Verifies interpolation formulas produce the expected midpoint values for time-based motion.
     it("time-based interpolation with math", function()
         -- Simulate lerp between two values over time
@@ -34,7 +34,7 @@ describe("timer + math integration", function()
     end)
 
     -- @covers lurek.math.sin
-    -- @covers lurek.time.getDelta
+    -- @covers lurek.timer.getDelta
     -- @description Verifies sinusoidal math reaches the expected peak for a quarter-period time sample.
     it("oscillation with sin and time", function()
         -- Simulate oscillating value: sin(time * frequency)
@@ -46,7 +46,7 @@ describe("timer + math integration", function()
     end)
 
     -- @covers lurek.math
-    -- @covers lurek.time.getDelta
+    -- @covers lurek.timer.getDelta
     -- @description Verifies movement scaled by dt stays consistent across full-step and half-step updates.
     it("frame-rate independent movement", function()
         -- Simulate movement: position += speed * dt
@@ -68,7 +68,7 @@ end)
 -- @description Covers suite: timer + math easing.
 describe("timer + math easing", function()
     -- @covers lurek.math
-    -- @covers lurek.time.getDelta
+    -- @covers lurek.timer.getDelta
     -- @description Verifies a quadratic ease-in formula yields the expected midpoint value.
     it("ease-in quadratic", function()
         local t = 0.5
@@ -77,7 +77,7 @@ describe("timer + math easing", function()
     end)
 
     -- @covers lurek.math
-    -- @covers lurek.time.getDelta
+    -- @covers lurek.timer.getDelta
     -- @description Verifies a quadratic ease-out formula yields the expected midpoint value.
     it("ease-out quadratic", function()
         local t = 0.5
@@ -86,7 +86,7 @@ describe("timer + math easing", function()
     end)
 
     -- @covers lurek.math
-    -- @covers lurek.time.getDelta
+    -- @covers lurek.timer.getDelta
     -- @description Verifies a cubic ease-in-out formula reaches the expected value at the midpoint.
     it("ease-in-out cubic", function()
         local t = 0.5

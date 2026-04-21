@@ -21,7 +21,7 @@ cargo run -- content/games/arcade/frogger
 Navigate a frog from the bottom safe zone across 5 lanes of traffic, through a middle safe zone, then across 5 river lanes to reach one of 5 home slots at the top. Cars and trucks on the road kill the frog on contact. On the river, the frog must ride logs or turtle groups — falling in the water is fatal. Turtles periodically submerge, dumping the frog into the water. A bonus fly appears randomly in home slots for extra points. A countdown timer adds urgency — running out of time costs a life. Fill all 5 home slots to complete the level; each new level increases speeds. Three lives to start.
 
 ## APIs Used
-lurek.window, lurek.render, lurek.input, lurek.signal, lurek.time, lurek.camera, lurek.tween, lurek.particles
+lurek.window, lurek.render, lurek.input, lurek.event, lurek.timer, lurek.camera, lurek.tween, lurek.particle
 
 ## Changes from Original Demo
 ### Replaced

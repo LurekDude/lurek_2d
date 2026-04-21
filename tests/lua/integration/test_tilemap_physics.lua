@@ -5,8 +5,8 @@
 describe("integration: tilemap solid tiles as physics boundaries", function()
     -- @covers lurek.tilemap.newTileMap
     -- @covers lurek.physics.newBody
-    -- @covers lurek.pathfinding.newNavGrid
-    -- @covers lurek.pathfinding.newPathfinder
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
     -- @covers lurek.physics.destroyWorld
     -- @covers lurek.physics.newWorld
     -- @covers lurek.physics.step
@@ -63,7 +63,7 @@ end)
 -- @description Covers suite: integration: tilemap + pathfinding from solid tiles.
 describe("integration: tilemap + pathfinding from solid tiles", function()
     -- @covers lurek.tilemap.clearTile
-    -- @covers lurek.pathfinding.Pathfinder.findPath
+    -- @covers lurek.pathfind.Pathfinder.findPath
     -- @description Verifies solid tiles copied into a navgrid leave a traversable path only through the intended gap.
     it("creates navgrid from tilemap solids", function()
         local map = lurek.tilemap.newTileMap(32, 32, 16)
@@ -90,7 +90,7 @@ describe("integration: tilemap + pathfinding from solid tiles", function()
         map:clearTile(1, 11, 11)
 
         -- Create navgrid from tilemap (navgrid 1-based, tilemap 1-based)
-        local grid = lurek.pathfinding.newNavGrid(20, 20)
+        local grid = lurek.pathfind.newNavGrid(20, 20)
         for y = 0, 19 do
             for x = 0, 19 do
                 local gid = map:getTile(1, x+1, y+1)
@@ -101,7 +101,7 @@ describe("integration: tilemap + pathfinding from solid tiles", function()
         end
 
         -- Path from left to right should go through the gap
-        local finder = lurek.pathfinding.newPathfinder(grid)
+        local finder = lurek.pathfind.newPathfinder(grid)
         local path = finder:findPath(5, 10, 15, 10)
         expect_not_nil(path, "path found through gap")
         expect_true(#path > 0, "path has waypoints")

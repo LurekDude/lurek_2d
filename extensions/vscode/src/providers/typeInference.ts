@@ -318,7 +318,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
     ],
   },
   // ── entity types ──────────────────────────────────────────
-  "lurek.entity.new": {
+  "lurek.ecs.new": {
     typeName: "Entity",
     methods: [
       { name: "getId", sig: ":getId()", desc: "Returns entity ID" },

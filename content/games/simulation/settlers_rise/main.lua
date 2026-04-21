@@ -159,7 +159,7 @@ end
 -- ── Load ──────────────────────────────────────────────────────────────────
 function lurek.load()
     lurek.window.setTitle("Settlers Rise — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.25, 0.45, 0.2)
+    lurek.render.setBackgroundColor(0.25, 0.45, 0.2)
 
     gen_map(17)
 
@@ -225,11 +225,11 @@ function lurek.draw()
         for c = 1, MAP_COLS do
             local t  = tilemap[r][c]
             local tc = TILE_COLORS[t] or TILE_COLORS[0]
-            lurek.gfx.setColor(tc[1], tc[2], tc[3])
-            lurek.gfx.rectangle("fill", (c-1)*TILE, (r-1)*TILE, TILE, TILE)
+            lurek.render.setColor(tc[1], tc[2], tc[3])
+            lurek.render.rectangle("fill", (c-1)*TILE, (r-1)*TILE, TILE, TILE)
             -- subtle grid
-            lurek.gfx.setColor(0, 0, 0, 0.08)
-            lurek.gfx.rectangle("line", (c-1)*TILE, (r-1)*TILE, TILE, TILE)
+            lurek.render.setColor(0, 0, 0, 0.08)
+            lurek.render.rectangle("line", (c-1)*TILE, (r-1)*TILE, TILE, TILE)
         end
     end
 
@@ -238,30 +238,30 @@ function lurek.draw()
         local bx = (b.col-1)*TILE
         local by = (b.row-1)*TILE
         local bc = BUILD_COLORS[b.type] or {0.8,0.8,0.8}
-        lurek.gfx.setColor(bc[1], bc[2], bc[3])
-        lurek.gfx.rectangle("fill", bx + 6, by + 6, TILE - 12, TILE - 12)
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("line", bx + 6, by + 6, TILE - 12, TILE - 12)
+        lurek.render.setColor(bc[1], bc[2], bc[3])
+        lurek.render.rectangle("fill", bx + 6, by + 6, TILE - 12, TILE - 12)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("line", bx + 6, by + 6, TILE - 12, TILE - 12)
         -- Label
-        lurek.gfx.setColor(0, 0, 0, 0.8)
+        lurek.render.setColor(0, 0, 0, 0.8)
         local short = b.type:sub(1, 2)
-        lurek.gfx.print(short, bx + 14, by + 16)
+        lurek.render.print(short, bx + 14, by + 16)
         -- Produce progress bar
         if b.type ~= BTYPE.HQ then
             local pt  = PRODUCE_TIMES[b.type] or 1
             local prog = b.timer / pt
-            lurek.gfx.setColor(0.1, 0.8, 0.3, 0.9)
-            lurek.gfx.rectangle("fill", bx + 4, by + TILE - 8, (TILE - 8) * prog, 5)
+            lurek.render.setColor(0.1, 0.8, 0.3, 0.9)
+            lurek.render.rectangle("fill", bx + 4, by + TILE - 8, (TILE - 8) * prog, 5)
         end
     end
 
     -- Settlers
     for _, s in ipairs(settlers) do
-        lurek.gfx.setColor(0.95, 0.85, 0.55)
-        lurek.gfx.circle("fill", s.x, s.y, 5)
-        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.render.setColor(0.95, 0.85, 0.55)
+        lurek.render.circle("fill", s.x, s.y, 5)
+        lurek.render.setColor(0, 0, 0, 0.6)
         if s.carry then
-            lurek.gfx.print(s.carry:sub(1,2), s.x + 4, s.y - 10)
+            lurek.render.print(s.carry:sub(1,2), s.x + 4, s.y - 10)
         end
     end
 
@@ -271,26 +271,26 @@ function lurek.draw()
     local hr = math.floor(my / TILE) + 1
     if hr <= MAP_ROWS and my < MAP_ROWS * TILE then
         local can = can_build(hc, hr) and not building_at(hc, hr)
-        lurek.gfx.setColor(1, 1, 0, can and 0.35 or 0.15)
-        lurek.gfx.rectangle("fill", (hc-1)*TILE, (hr-1)*TILE, TILE, TILE)
+        lurek.render.setColor(1, 1, 0, can and 0.35 or 0.15)
+        lurek.render.rectangle("fill", (hc-1)*TILE, (hr-1)*TILE, TILE, TILE)
     end
 
     -- UI panel
-    lurek.gfx.setColor(0.12, 0.12, 0.12, 0.88)
-    lurek.gfx.rectangle("fill", 0, H - UI_H, W, UI_H)
-    lurek.gfx.setColor(0.9, 0.85, 0.55)
-    lurek.gfx.print(string.format("Wood:%d  Stone:%d  Food:%d  Logs:%d  Iron:%d",
+    lurek.render.setColor(0.12, 0.12, 0.12, 0.88)
+    lurek.render.rectangle("fill", 0, H - UI_H, W, UI_H)
+    lurek.render.setColor(0.9, 0.85, 0.55)
+    lurek.render.print(string.format("Wood:%d  Stone:%d  Food:%d  Logs:%d  Iron:%d",
         resources.wood, resources.stone, resources.food, resources.logs, resources.iron), 10, H - UI_H + 8)
     -- Selected build type
     local sel = BUILD_ORDER[build_index]
     local sc  = COSTS[sel]
-    lurek.gfx.setColor(0.7, 0.9, 1)
-    lurek.gfx.print(string.format("[Tab] Build: %s  (cost: wood%d stone%d)  [LMB place]",
+    lurek.render.setColor(0.7, 0.9, 1)
+    lurek.render.print(string.format("[Tab] Build: %s  (cost: wood%d stone%d)  [LMB place]",
         sel, sc.wood, sc.stone), 10, H - UI_H + 30)
 
     -- Settler count badge
-    lurek.gfx.setColor(0.2, 0.7, 0.4)
-    lurek.gfx.print("Settlers: " .. #settlers, W - 160, H - UI_H + 20)
+    lurek.render.setColor(0.2, 0.7, 0.4)
+    lurek.render.print("Settlers: " .. #settlers, W - 160, H - UI_H + 20)
 end
 
 -- ── Mousepressed ──────────────────────────────────────────────────────────
@@ -314,7 +314,7 @@ end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     if key == "tab" then
         build_index = (build_index % #BUILD_ORDER) + 1
     end

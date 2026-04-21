@@ -379,7 +379,7 @@ function lurek.init()
     lurek.input.bind("quit",    { "escape" })
 
     -- Dot pickup sparkle particles
-    sparks = lurek.particles.newSystem({
+    sparks = lurek.particle.newSystem({
         maxParticles = 200,
         emissionRate = 0,
         lifetimeMin  = 0.15, lifetimeMax = 0.4,
@@ -393,7 +393,7 @@ function lurek.init()
     })
 
     -- Ghost eaten burst particles
-    ghost_burst = lurek.particles.newSystem({
+    ghost_burst = lurek.particle.newSystem({
         maxParticles = 150,
         emissionRate = 0,
         lifetimeMin  = 0.2, lifetimeMax = 0.6,
@@ -429,7 +429,7 @@ end
 function lurek.process(dt)
     -- Global quit
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -445,7 +445,7 @@ function lurek.process(dt)
     end
 
     -- Pellet pulse (manual sine since tween loop is limited)
-    pellet_scale = 1.0 + 0.5 * math.abs(math.sin(lurek.time.getTime() * 4))
+    pellet_scale = 1.0 + 0.5 * math.abs(math.sin(lurek.timer.getTime() * 4))
 
     -- Title blink timer
     title_blink = title_blink + dt
@@ -856,7 +856,7 @@ function lurek.render_ui()
 
     -- ── FPS counter ───────────────────────────────────────────────────
     lurek.render.setColor(0.4, 0.4, 0.5)
-    lurek.render.print("FPS: " .. math.floor(lurek.time.getFPS()), 8, SCREEN_H - 18, 1)
+    lurek.render.print("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 18, 1)
 
     -- ── GAME OVER overlay ─────────────────────────────────────────────
     if game_state == STATE.GAME_OVER then

@@ -9,7 +9,7 @@ Write or update API reference documentation for lurek.* functions. Use when new 
 
 ## Inputs
 
-- `FUNCTIONS` — list of `lurek.*` functions to document (e.g., `lurek.gfx.setColor`, `lurek.audio.setLooping`)
+- `FUNCTIONS` — list of `lurek.*` functions to document (e.g., `lurek.render.setColor`, `lurek.audio.setLooping`)
 - `SOURCE_FILES` — corresponding Rust source files in `src/lua_api/` to read for accurate signatures
 
 ## Steps
@@ -18,7 +18,7 @@ Write or update API reference documentation for lurek.* functions. Use when new 
 2. Load skill `documentation/SKILL.md`
 3. For each function to document:
 4. Open `docs/API/lua-api.md`
-5. Find the correct sub-section (e.g., `## lurek.gfx`)
+5. Find the correct sub-section (e.g., `## lurek.render`)
 6. Write the entry following this format:
 7. `param` — type, range or valid values
 8. Returns: what Lua gets back (or nothing)

@@ -218,7 +218,7 @@ end)
 lurek.process(function(dt)
   -- Global quit
   if lurek.input.isPressed("escape") then
-    lurek.signal.quit()
+    lurek.event.quit()
     return
   end
 

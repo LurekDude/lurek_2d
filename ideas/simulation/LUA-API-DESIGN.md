@@ -38,7 +38,7 @@ Explicitly free the simulation. Happens automatically on GC if not called.
 Convenience: parse a TOML string (e.g., from `lurek.data.parseToml` or a file read) into a spec and create the simulation in one call.
 
 ```lua
-local source = lurek.fs.read("scenarios/factory.toml")
+local source = lurek.filesystem.read("scenarios/factory.toml")
 local sim, err = lurek.sim.load_toml(source)
 ```
 
@@ -304,7 +304,7 @@ lurek.sim.destroy(sim)
 ## 13. Example: Multi-run with Anomaly Comparison
 
 ```lua
-local spec = lurek.data.parseToml(lurek.fs.read("scenarios/factory.toml"))
+local spec = lurek.data.parseToml(lurek.filesystem.read("scenarios/factory.toml"))
 
 -- Baseline run
 local baseline, err = lurek.sim.load_toml(lurek.data.encodeToml(spec))

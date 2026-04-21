@@ -26,7 +26,7 @@ Resize panels with arrow keys, switch between five visual styles, and compare
 - `lurek.input.bind()` / `lurek.input.on()` — action-mapped controls for resize, style, grid, compare
 - `lurek.window.setTitle()` — dynamic title with style name, panel size, and FPS
 - `lurek.timer.getFPS()` — real-time frame rate display
-- `lurek.signal.quit()` — clean exit on Escape
+- `lurek.event.quit()` — clean exit on Escape
 
 ## Controls
 

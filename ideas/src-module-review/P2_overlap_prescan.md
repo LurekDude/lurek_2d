@@ -16,8 +16,8 @@ Severity column triage:
 |---|---|---|---|---|---|
 | 1 | `tween` | `animation` | Time-based property interpolation. | **HIGH** | `tween` advertises "property animation API" (animate any Lua field) and `animation` advertises "frame clips, named animations". `tween` likely contains easing curves; `animation` may also hold easing for tween-style frame blending. Confirm whether both depend on a shared `crate::math::easing` (good) or each duplicate easing constants (bad). |
 | 2 | `tween` | `effect` | Per-frame value interpolation (post-FX shader uniforms ramping). | MED | `effect` likely has its own colour/uniform LERP for postfx fades. Confirm whether `effect` calls `crate::tween` or owns its own LERP. |
-| 3 | `serial` | `save` | Binary serialization. | **HIGH** | `serial` exposes `lurek.codec.*` (LIMG, LSND, LMID format codecs); `save` exposes `lurek.savegame.*` slot-based persistence. Likely both write Lua table → bytes; check for a shared `crate::serial::table_to_bytes` versus a parallel implementation in `crate::save`. |
-| 4 | `serial` | `data` | Compression / encoding (`lurek.data.*` advertises "compression, hashing, encoding"; `lurek.codec.*` advertises "format serialization"). | MED | Likely overlap in base64/hex/zlib helpers. Confirm in `src/data/` and `src/serial/` for two copies of `encode_base64` / `compress_zlib`. |
+| 3 | `serial` | `save` | Binary serialization. | **HIGH** | `serial` exposes `lurek.serial.*` (LIMG, LSND, LMID format codecs); `save` exposes `lurek.save.*` slot-based persistence. Likely both write Lua table → bytes; check for a shared `crate::serial::table_to_bytes` versus a parallel implementation in `crate::save`. |
+| 4 | `serial` | `data` | Compression / encoding (`lurek.data.*` advertises "compression, hashing, encoding"; `lurek.serial.*` advertises "format serialization"). | MED | Likely overlap in base64/hex/zlib helpers. Confirm in `src/data/` and `src/serial/` for two copies of `encode_base64` / `compress_zlib`. |
 | 5 | `data` | `save` | Binary blob → file. | LOW | `save` may use `data::compress` to gzip slot data. Acceptable layering if so; flag if both wrap `flate2` directly. |
 | 6 | `math` | `procgen` | Random number generation. | **HIGH** | `math` ships RNG (Random userdata, vec/mat math, noise — `pub_fn=192`); `procgen` ships its own noise/rng for terrain/maze generation (`pub_struct=24`). Almost certainly two PRNG implementations or two `Perlin` modules. Confirm by grepping `src/procgen/` for `Rng`, `Perlin`, `Simplex`. |
 | 7 | `math` | `ai` | Steering / vector math. | LOW | `ai_api::LuaSteeringManager` performs vector arithmetic; should consume `crate::math::vec` not duplicate it. P6 verify. |
@@ -65,8 +65,8 @@ This is technically a *binding-layer* problem (P5-fs-pull-down sub-phase), but i
 
 Three modules carry overlapping serialization concerns:
 
-- `serial` — codec/format serialization (`lurek.codec.*`)
-- `save` — slot-based save/load (`lurek.savegame.*`)
+- `serial` — codec/format serialization (`lurek.serial.*`)
+- `save` — slot-based save/load (`lurek.save.*`)
 - `data` — binary buffers / compression / hashing / encoding (`lurek.data.*`)
 
 For P6: produce a **canonical serialization stack** — buffer (`data`) → codec (`serial`) → persistence (`save`) — and verify each layer only depends *downward*. Today's evidence is heuristic (no concrete duplication confirmed), but the surface-area overlap is high enough that a one-page architectural check is worth the time.

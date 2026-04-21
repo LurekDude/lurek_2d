@@ -9,5 +9,5 @@ function lurek.process(dt) state.update(dt) end
 function lurek.render()     state.draw()     end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
 end

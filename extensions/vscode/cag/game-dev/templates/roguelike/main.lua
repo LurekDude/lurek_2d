@@ -23,26 +23,26 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.05, 0.05, 0.08)
+    lurek.render.clear(0.05, 0.05, 0.08)
     -- Draw map
     for y = 1, #map do
         for x = 1, #map[1] do
             if map[y][x] == 1 then
-                lurek.gfx.setColor(0.3, 0.3, 0.35, 1)
-                lurek.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE, TILE)
+                lurek.render.setColor(0.3, 0.3, 0.35, 1)
+                lurek.render.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE, TILE)
             end
         end
     end
     -- Draw player
-    lurek.gfx.setColor(0.2, 0.8, 0.4, 1)
-    lurek.gfx.rectangle("fill", (player.gx - 1) * TILE, (player.gy - 1) * TILE, TILE, TILE)
+    lurek.render.setColor(0.2, 0.8, 0.4, 1)
+    lurek.render.rectangle("fill", (player.gx - 1) * TILE, (player.gy - 1) * TILE, TILE, TILE)
     -- UI
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Turn: " .. turn, 10, 580)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Turn: " .. turn, 10, 580)
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     local dx, dy = 0, 0
     if key == "left"  or key == "a" then dx = -1 end
     if key == "right" or key == "d" then dx =  1 end

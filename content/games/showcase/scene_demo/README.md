@@ -12,8 +12,8 @@ Scene state machine with enter/exit callbacks, three transition effects, and a c
 - `lurek.camera.new()` — gameplay camera with attach/detach
 - `lurek.window.setTitle()` — dynamic title per scene
 - `lurek.render.setBackgroundColor()` — unique background colour per scene
-- `lurek.signal.quit()` — clean exit from menu
-- `lurek.time.getFPS()` — FPS counter in debug overlay
+- `lurek.event.quit()` — clean exit from menu
+- `lurek.timer.getFPS()` — FPS counter in debug overlay
 
 ## How to Run
 

@@ -1,4 +1,4 @@
-//! `lurek.codec` — Format-agnostic string serialization: JSON, TOML, and CSV.
+//! `lurek.serial` — Format-agnostic string serialization: JSON, TOML, and CSV.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -22,7 +22,7 @@ fn parse_delimiter(delim: Option<String>) -> u8 {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.codec` API table with the Lua VM.
+/// Registers the `lurek.serial` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable

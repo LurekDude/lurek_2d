@@ -209,7 +209,7 @@ lurek.ready(function() end)
 ------------------------------------------------------------------------
 lurek.process(function(dt)
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -435,7 +435,7 @@ lurek.render_ui(function()
         lurek.render.print("DUNGEON CRAWLER", 220, 200, 36)
         lurek.render.setColor(0.7, 0.7, 0.8, 1)
         lurek.render.print("First-person grid dungeon with raycasting", 195, 270, 16)
-        local blink = math.sin(lurek.time.getTime() * 4) > 0
+        local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 1, 1)
             lurek.render.print("PRESS ENTER", 330, 380, 20)
@@ -589,5 +589,5 @@ lurek.render_ui(function()
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.5, 1)
-    lurek.render.print("FPS: " .. lurek.time.getFPS(), PX, 575, 11)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), PX, 575, 11)
 end)

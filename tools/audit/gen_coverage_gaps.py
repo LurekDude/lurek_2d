@@ -64,7 +64,7 @@ _INTERNAL_MODULES = {
     # DataFrame/serial internal format helpers
     "dataframe::serial", "dataframe::sql",
     "serial::csv", "serial::json", "serial::toml", "serial::yaml",
-    # Pathfinding internal algorithms (wrapped by lurek.pathfinding)
+    # Pathfinding internal algorithms (wrapped by lurek.pathfind)
     "pathfinding::astar", "pathfinding::graph_path", "pathfinding::hpa",
     # Procgen internal algorithms (wrapped by lurek.procgen)
     "procgen::cellular", "procgen::flood_fill", "procgen::noise_ext",
@@ -83,7 +83,7 @@ _INTERNAL_MODULES = {
     # Image serialization helper (internal; save is handled by lurek.image.save)
     "image::serial",
     "image::visualization",
-    # Localization internal helpers (wrapped by lurek.localization.*)
+    # Localization internal helpers (wrapped by lurek.i18n.*)
     "localization::interpolation", "localization::plural",
     "i18n::interpolation", "i18n::plural",
     # Log internal enabled_for check (not Lua-exposed)
@@ -140,7 +140,7 @@ _INTERNAL_MODULES = {
     # and discover_lobbies in network_api.rs; not a standalone Lua function
     "network::lobby",
     # Bidirectional A★ algorithm — bidirectional_astar is called inside
-    # lurek.pathfinding.findPathBidirectional in pathfind_api.rs
+    # lurek.pathfind.findPathBidirectional in pathfind_api.rs
     "pathfind::bidir",
     # Collision geometry primitives — test_point_aabb is an internal AABB check
     # used inside physics_api.rs closures; not exposed as a standalone Lua function

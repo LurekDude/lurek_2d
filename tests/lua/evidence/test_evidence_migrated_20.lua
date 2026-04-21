@@ -2,8 +2,8 @@
 -- Produces the migrated_20 evidence artifacts that feed the paired compare-only golden checks for legacy Rust baselines.
 
 local function evidence_output_dir()
-    local path = lurek.fs.getAppDir() .. "/tests/lua/golden/evidence_output/migrated_20"
-    lurek.fs.createDirectory(path)
+    local path = lurek.filesystem.getAppDir() .. "/tests/lua/golden/evidence_output/migrated_20"
+    lurek.filesystem.createDirectory(path)
     return path
 end
 
@@ -23,13 +23,13 @@ end
 
 -- @description Covers suite: Migrated Evidence Tests 20.
 describe("Migrated Evidence Tests 20", function()
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:setPixel
     -- @evidence file
     -- @description Builds a minimal 8x8 sprite fixture with a stable pixel pattern, writes the PNG artifact, and preserves an evidence source for the migrated_20 fixture golden comparison.
     it("generates fixture_sprite_8x8", function()
-        local img = lurek.img.newImageData(8, 8)
+        local img = lurek.image.newImageData(8, 8)
         img:fill(0, 0, 0, 0)
         img:setPixel(2, 2, 255, 255, 255, 255)
         img:setPixel(5, 2, 255, 255, 255, 255)
@@ -41,12 +41,12 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @evidence file
     -- @description Builds a 16x16 cross-shaped sprite fixture and writes it to PNG.
     it("generates fixture_sprite_16x16", function()
-        local img = lurek.img.newImageData(16, 16)
+        local img = lurek.image.newImageData(16, 16)
         for i = 0, 15 do
             img:setPixel(7, i, 255, 0, 0, 255)
             img:setPixel(8, i, 255, 0, 0, 255)
@@ -57,12 +57,12 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @evidence file
     -- @description Builds a radial-alpha 32x32 sprite fixture and writes it to PNG.
     it("generates fixture_sprite_32x32", function()
-        local img = lurek.img.newImageData(32, 32)
+        local img = lurek.image.newImageData(32, 32)
         for y = 0, 31 do
             for x = 0, 31 do
                 local dx = x - 15.5
@@ -76,12 +76,12 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @evidence file
     -- @description Builds a checkerboard 64x64 sprite fixture and writes it to PNG.
     it("generates fixture_sprite_64x64", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
             for x = 0, 63 do
                 local checker = (math.floor(x / 8) + math.floor(y / 8)) % 2 == 0
@@ -96,12 +96,12 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @evidence file
     -- @description Builds a 128x128 tileset fixture with colored tile cells and writes it to PNG.
     it("generates fixture_tileset_128x128", function()
-        local img = lurek.img.newImageData(128, 128)
+        local img = lurek.image.newImageData(128, 128)
         for ty = 0, 7 do
             for tx = 0, 7 do
                 local r = tx * 36
@@ -118,12 +118,12 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @evidence file
     -- @description Builds a horizontal RGB gradient fixture and writes it to PNG.
     it("generates fixture_gradient_horizontal", function()
-        local img = lurek.img.newImageData(256, 32)
+        local img = lurek.image.newImageData(256, 32)
         for y = 0, 31 do
             for x = 0, 255 do
                 img:setPixel(x, y, x, 0, 255 - x, 255)
@@ -133,12 +133,12 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @evidence file
     -- @description Builds a vertical RGB gradient fixture and writes it to PNG.
     it("generates fixture_gradient_vertical", function()
-        local img = lurek.img.newImageData(32, 256)
+        local img = lurek.image.newImageData(32, 256)
         for y = 0, 255 do
             for x = 0, 31 do
                 img:setPixel(x, y, 0, y, 255 - y, 255)
@@ -149,7 +149,7 @@ describe("Migrated Evidence Tests 20", function()
     end)
 
     local function draw_bezier_to_image(curves_data, w, h)
-        local bg = lurek.img.newImageData(w, h)
+        local bg = lurek.image.newImageData(w, h)
         bg:fill(25, 25, 25, 255)
 
         for _, cdata in ipairs(curves_data) do
@@ -375,14 +375,14 @@ describe("Migrated Evidence Tests 20", function()
 
     -- @covers lurek.math.newNoiseGenerator
     -- @covers lurek.math.simplexNoise
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @evidence file
     -- @description Generates a colored noise-based heightmap and writes the terrain visualization to PNG.
     it("generates evidence_noise_to_heightmap_render", function()
         local ng = lurek.math.newNoiseGenerator(7777)
         local size = 256
-        local img = lurek.img.newImageData(size, size)
+        local img = lurek.image.newImageData(size, size)
 
         for y = 0, size - 1 do
             for x = 0, size - 1 do
@@ -417,7 +417,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:brightness
     -- @covers ImageData:contrast
     -- @covers ImageData:grayscale
@@ -442,11 +442,11 @@ describe("Migrated Evidence Tests 20", function()
         local tile = 64
         local cols = 5
         local rows = 4
-        local canvas = lurek.img.newImageData(tile * cols, tile * rows)
+        local canvas = lurek.image.newImageData(tile * cols, tile * rows)
         canvas:fill(30, 30, 30, 255)
 
         local function make_base()
-            local img = lurek.img.newImageData(tile, tile)
+            local img = lurek.image.newImageData(tile, tile)
             for y = 0, tile - 1 do
                 for x = 0, tile - 1 do
                     img:setPixel(x, y, x * 4, y * 4, 128, 255)

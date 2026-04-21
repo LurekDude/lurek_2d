@@ -231,7 +231,7 @@ pub struct ScreenshotRequest {
 /// # Fields
 /// - `render_commands` — Queue of pending `RenderCommand` values, flushed each frame.
 /// - `current_color` — Active RGBA draw color `[r, g, b, a]`.
-/// - `background_color` — Screen clear color set by `lurek.graphic.setBackgroundColor`.
+/// - `background_color` — Screen clear color set by `lurek.render.setBackgroundColor`.
 /// - `textures` — Loaded texture pixel data, indexed by `Texture::id`.
 /// - `keys_down` — Set of currently held key name strings.
 /// - `mouse` — Mouse cursor position, button state, scroll, and cursor settings.
@@ -243,9 +243,9 @@ pub struct ScreenshotRequest {
 /// - `window_title` — Current window title string.
 /// - `mixer` — The rodio audio mixer managing all sound sources.
 /// - `game_dir` — Absolute path to the game directory.
-/// - `quit_requested` — Set to `true` by `lurek.signal.quit()` to end the game loop.
+/// - `quit_requested` — Set to `true` by `lurek.event.quit()` to end the game loop.
 /// - `exit_code` — Exit code to return when `quit_requested` is `true`.
-/// - `restart_requested` — Set to `true` by `lurek.signal.restart()` to trigger engine restart.
+/// - `restart_requested` — Set to `true` by `lurek.event.restart()` to trigger engine restart.
 /// - `line_width` — Current stroke width for outline draw commands.
 /// - `blend_mode` — Current blend mode for draw operations.
 /// - `fonts` — Loaded TTF fonts for text rendering.
@@ -276,7 +276,7 @@ pub struct SharedState {
     pub game_dir: PathBuf,
     pub quit_requested: bool,
     pub exit_code: i32,
-    /// Whether a restart was requested via `lurek.signal.restart()`.
+    /// Whether a restart was requested via `lurek.event.restart()`.
     pub restart_requested: bool,
     pub line_width: f32,
     /// Current blend mode for draw operations.
@@ -353,11 +353,11 @@ pub struct SharedState {
     pub midi_state: MidiState,
     /// Pending save request for the next fully rendered screen frame.
     ///
-    /// Set by `lurek.graphic.saveScreenshot` and consumed after a successful render.
+    /// Set by `lurek.render.saveScreenshot` and consumed after a successful render.
     pub pending_screenshot: Option<ScreenshotRequest>,
-    /// Active stencil mode — written by `lurek.graphic.setStencilMode`, read at render time.
+    /// Active stencil mode — written by `lurek.render.setStencilMode`, read at render time.
     pub stencil_mode: StencilMode,
-    /// Active depth test mode and write-enable flag — written by `lurek.graphic.setDepthMode`.
+    /// Active depth test mode and write-enable flag — written by `lurek.render.setDepthMode`.
     ///
     /// The first field is the comparison function; the second controls depth writes.
     pub depth_mode: (DepthMode, bool),

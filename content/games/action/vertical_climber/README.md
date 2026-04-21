@@ -32,4 +32,4 @@ The player automatically bounces when landing on platforms — there is no jump 
 
 ## APIs Used
 
-lurek.window, lurek.render, lurek.input, lurek.time, lurek.signal, lurek.particles, lurek.tween, lurek.camera
+lurek.window, lurek.render, lurek.input, lurek.timer, lurek.event, lurek.particle, lurek.tween, lurek.camera

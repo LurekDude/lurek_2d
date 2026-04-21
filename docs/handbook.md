@@ -154,9 +154,9 @@ end
 
 function lurek.draw()
     -- Per-frame render. Issue draw commands here.
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Move with → key", 20, 20)
-    lurek.gfx.rectangle("fill", state.x, state.y, 32, 32)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Move with → key", 20, 20)
+    lurek.render.rectangle("fill", state.x, state.y, 32, 32)
 end
 ```
 
@@ -183,12 +183,12 @@ Or build once and drag the `my_game/` folder onto the splash window. Browse the 
 ```lua
 function lurek.load()
     state = { x = 100, y = 100 }
-    state.player = lurek.gfx.newImage("player.png")
+    state.player = lurek.render.newImage("player.png")
     state.click   = lurek.audio.newSource("click.ogg", "static")
 end
 
 function lurek.draw()
-    lurek.gfx.draw(state.player, state.x, state.y)
+    lurek.render.draw(state.player, state.x, state.y)
 end
 
 function lurek.mousepressed(x, y, button)

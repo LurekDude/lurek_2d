@@ -20,7 +20,7 @@ cargo run -- content/games/arcade/space_invaders
 11×5 alien grid marches across the screen and descends. Destroy all aliens to advance waves. Use shields for cover. Watch for the UFO bonus!
 
 ## APIs Used
-lurek.window, lurek.render, lurek.input, lurek.signal, lurek.time, lurek.particles, lurek.tween, lurek.camera
+lurek.window, lurek.render, lurek.input, lurek.event, lurek.timer, lurek.particle, lurek.tween, lurek.camera
 
 ## Changes from Original Demo
 ### Replaced

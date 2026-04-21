@@ -5,6 +5,6 @@ let texture = state.borrow().load_texture(path)
 // Validate Lua input with a descriptive message:
 if width == 0 {
     return Err(LuaError::RuntimeError(
-        "lurek.gfx.newCanvas: width must be > 0".into()
+        "lurek.render.newCanvas: width must be > 0".into()
     ));
 }

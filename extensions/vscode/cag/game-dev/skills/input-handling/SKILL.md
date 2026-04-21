@@ -26,12 +26,12 @@ local function is_action_down(action)
     local b = bindings[action]
     if b.keys then
         for _, k in ipairs(b.keys) do
-            if lurek.keyboard.isDown(k) then return true end
+            if lurek.input.keyboard.isDown(k) then return true end
         end
     end
     if b.axes then
         for _, a in ipairs(b.axes) do
-            local val = lurek.gamepad.getAxis(1, a[1]) or 0
+            local val = lurek.input.gamepad.getAxis(1, a[1]) or 0
             if a[2] > 0 and val > DEADZONE then return true end
             if a[2] < 0 and val < -DEADZONE then return true end
         end
@@ -100,7 +100,7 @@ end
 local DEADZONE = 0.25
 
 local function get_stick(pad_id, axis)
-    local val = lurek.gamepad.getAxis(pad_id, axis) or 0
+    local val = lurek.input.gamepad.getAxis(pad_id, axis) or 0
     if math.abs(val) < DEADZONE then return 0 end
     -- Rescale to 0–1 range past deadzone
     local sign = val > 0 and 1 or -1

@@ -19,7 +19,7 @@ end
 
 --- Renders before/after waveforms side-by-side into a 800x200 PNG
 local function waveform_compare(sd_before, sd_after, label_before, label_after, path)
-    local img = lurek.img.newImageData(800, 200)
+    local img = lurek.image.newImageData(800, 200)
     img:fill(12, 14, 20, 255)
     -- Draw centre line
     for x = 0, 799 do
@@ -28,7 +28,7 @@ local function waveform_compare(sd_before, sd_after, label_before, label_after, 
     end
     sd_before:drawWaveform(img,   0, 0, 400, 200, 80, 180, 240, 255)
     sd_after:drawWaveform( img, 400, 0, 400, 200, 240, 140, 60, 255)
-    lurek.img.savePNG(img, path)
+    lurek.image.savePNG(img, path)
 end
 
 -- â”€â”€ Low-pass filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -125,7 +125,7 @@ describe("Evidence: lurek.audio filter sweep PNG", function()
         -- Produce 8 strips: cutoff = 200, 500, 1000, 2000, 4000, 6000, 8000, 10000 Hz
         local CUTS = {200, 500, 1000, 2000, 4000, 6000, 8000, 10000}
         local STRIP_W = 80
-        local img = lurek.img.newImageData(STRIP_W * #CUTS, 100)
+        local img = lurek.image.newImageData(STRIP_W * #CUTS, 100)
         img:fill(10, 10, 18, 255)
 
         for col, cut in ipairs(CUTS) do
@@ -137,7 +137,7 @@ describe("Evidence: lurek.audio filter sweep PNG", function()
             noise:drawWaveform(img, (col - 1) * STRIP_W, 0, STRIP_W, 100, r, 80, b, 255)
         end
 
-        lurek.img.savePNG(img, OUT .. "evidence_dsp_filter_sweep.png")
+        lurek.image.savePNG(img, OUT .. "evidence_dsp_filter_sweep.png")
     end)
 
 end)

@@ -257,7 +257,7 @@ lurek.init(function()
     cam = lurek.camera.new()
     math.randomseed(os.time())
 
-    lootSparkle = lurek.particles.newSystem({
+    lootSparkle = lurek.particle.newSystem({
         maxParticles = 60,
         emitRate     = 0,
         lifetime     = { 0.4, 1.0 },
@@ -269,7 +269,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    combatFlash = lurek.particles.newSystem({
+    combatFlash = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.15, 0.4 },
@@ -289,7 +289,7 @@ lurek.process(function(dt)
     if combatFlash then combatFlash:update(dt) end
 
     if lurek.input.isActionJustPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -488,7 +488,7 @@ local function renderGameOver()
 end
 
 lurek.render_ui(function()
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.drawText("FPS: " .. math.floor(fps), 720, 8, { color = {0.5, 0.5, 0.5, 1.0}, size = 12 })
 
     if state == STATE_TITLE     then renderTitle()

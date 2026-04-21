@@ -105,7 +105,7 @@ end
 -- ── Load ──────────────────────────────────────────────────────────────────
 function lurek.load()
     lurek.window.setTitle("Dungeon Eye — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.03, 0.02, 0.06)
+    lurek.render.setBackgroundColor(0.03, 0.02, 0.06)
 
     -- Define item types
     item.clearTypes()
@@ -257,20 +257,20 @@ function lurek.draw()
     raycaster:render()
 
     -- Floor
-    lurek.gfx.setColor(0.18, 0.14, 0.10)
-    lurek.gfx.rectangle("fill", VIEW_X, VIEW_Y + VIEW_H/2, VIEW_W, VIEW_H/2)
+    lurek.render.setColor(0.18, 0.14, 0.10)
+    lurek.render.rectangle("fill", VIEW_X, VIEW_Y + VIEW_H/2, VIEW_W, VIEW_H/2)
     -- Ceiling
-    lurek.gfx.setColor(0.06, 0.06, 0.12)
-    lurek.gfx.rectangle("fill", VIEW_X, VIEW_Y, VIEW_W, VIEW_H/2)
+    lurek.render.setColor(0.06, 0.06, 0.12)
+    lurek.render.rectangle("fill", VIEW_X, VIEW_Y, VIEW_W, VIEW_H/2)
 
     -- Draw raycaster strips
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.draw(raycaster, VIEW_X, VIEW_Y)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.draw(raycaster, VIEW_X, VIEW_Y)
 
     -- Movement flash
     if move_anim > 0 then
-        lurek.gfx.setColor(1, 1, 1, move_anim * 3)
-        lurek.gfx.rectangle("fill", VIEW_X, VIEW_Y, VIEW_W, VIEW_H)
+        lurek.render.setColor(1, 1, 1, move_anim * 3)
+        lurek.render.rectangle("fill", VIEW_X, VIEW_Y, VIEW_W, VIEW_H)
     end
 
     -- Minimap (top-right corner of view)
@@ -281,105 +281,105 @@ function lurek.draw()
         for rx = 1, MAP_W do
             local t = map_at(rx, ry)
             if t == 1 then
-                lurek.gfx.setColor(0.6, 0.6, 0.6, 0.85)
+                lurek.render.setColor(0.6, 0.6, 0.6, 0.85)
             elseif t == 5 then
-                lurek.gfx.setColor(0.1, 1, 0.4, 0.9)
+                lurek.render.setColor(0.1, 1, 0.4, 0.9)
             else
-                lurek.gfx.setColor(0.12, 0.1, 0.08, 0.7)
+                lurek.render.setColor(0.12, 0.1, 0.08, 0.7)
             end
-            lurek.gfx.rectangle("fill", mm_ox + (rx-1)*mm_scale, mm_oy + (ry-1)*mm_scale, mm_scale-1, mm_scale-1)
+            lurek.render.rectangle("fill", mm_ox + (rx-1)*mm_scale, mm_oy + (ry-1)*mm_scale, mm_scale-1, mm_scale-1)
         end
     end
     -- Player dot
-    lurek.gfx.setColor(1, 1, 0)
-    lurek.gfx.circle("fill",
+    lurek.render.setColor(1, 1, 0)
+    lurek.render.circle("fill",
         mm_ox + (player.mx-0.5)*mm_scale,
         mm_oy + (player.my-0.5)*mm_scale, 3)
     -- Enemy dots
     for _, e in ipairs(enemies) do
         if not e.dead then
-            lurek.gfx.setColor(1, 0.2, 0.2)
-            lurek.gfx.circle("fill", mm_ox + (e.mx-0.5)*mm_scale, mm_oy + (e.my-0.5)*mm_scale, 2)
+            lurek.render.setColor(1, 0.2, 0.2)
+            lurek.render.circle("fill", mm_ox + (e.mx-0.5)*mm_scale, mm_oy + (e.my-0.5)*mm_scale, 2)
         end
     end
 
     -- ── Right panel ─────────────────────────────────────────────────────
-    lurek.gfx.setColor(0.06, 0.04, 0.10)
-    lurek.gfx.rectangle("fill", PANEL_X, 0, W - PANEL_X, VIEW_H)
-    lurek.gfx.setColor(0.4, 0.3, 0.6)
-    lurek.gfx.rectangle("line", PANEL_X, 0, W - PANEL_X, VIEW_H)
+    lurek.render.setColor(0.06, 0.04, 0.10)
+    lurek.render.rectangle("fill", PANEL_X, 0, W - PANEL_X, VIEW_H)
+    lurek.render.setColor(0.4, 0.3, 0.6)
+    lurek.render.rectangle("line", PANEL_X, 0, W - PANEL_X, VIEW_H)
 
     -- HP bar
-    lurek.gfx.setColor(0.6, 0.1, 0.1)
-    lurek.gfx.rectangle("fill", PANEL_X + 8, 10, 120, 14)
+    lurek.render.setColor(0.6, 0.1, 0.1)
+    lurek.render.rectangle("fill", PANEL_X + 8, 10, 120, 14)
     local hp_frac = player.hp / player.max_hp
-    lurek.gfx.setColor(0.1, 0.8, 0.2)
-    lurek.gfx.rectangle("fill", PANEL_X + 8, 10, 120 * hp_frac, 14)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(string.format("HP %d/%d", player.hp, player.max_hp), PANEL_X + 12, 10)
+    lurek.render.setColor(0.1, 0.8, 0.2)
+    lurek.render.rectangle("fill", PANEL_X + 8, 10, 120 * hp_frac, 14)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(string.format("HP %d/%d", player.hp, player.max_hp), PANEL_X + 12, 10)
 
     -- Direction
-    lurek.gfx.setColor(0.8, 0.75, 0.55)
-    lurek.gfx.print("Facing: " .. DIR_NAME[player.dir], PANEL_X + 8, 32)
-    lurek.gfx.print(string.format("Pos: %d,%d", player.mx, player.my), PANEL_X + 8, 48)
+    lurek.render.setColor(0.8, 0.75, 0.55)
+    lurek.render.print("Facing: " .. DIR_NAME[player.dir], PANEL_X + 8, 32)
+    lurek.render.print(string.format("Pos: %d,%d", player.mx, player.my), PANEL_X + 8, 48)
 
     -- Inventory panel header
-    lurek.gfx.setColor(0.9, 0.8, 0.5)
-    lurek.gfx.print("Inventory [I]", PANEL_X + 8, 72)
+    lurek.render.setColor(0.9, 0.8, 0.5)
+    lurek.render.print("Inventory [I]", PANEL_X + 8, 72)
     local slots = inventory.getSlots(player.inv)
     local shown = 0
     for i, slot in ipairs(slots) do
         if slot then
-            lurek.gfx.setColor(show_inv and (i == inv_cursor and {1,1,0} or {0.8,0.8,0.7}) or {0.6,0.6,0.55})
-            lurek.gfx.print(string.format("%d. %s", i, slot.type_id), PANEL_X + 12, 86 + shown * 16)
+            lurek.render.setColor(show_inv and (i == inv_cursor and {1,1,0} or {0.8,0.8,0.7}) or {0.6,0.6,0.55})
+            lurek.render.print(string.format("%d. %s", i, slot.type_id), PANEL_X + 12, 86 + shown * 16)
             shown = shown + 1
         end
         if shown >= 10 then break end
     end
     if shown == 0 then
-        lurek.gfx.setColor(0.4, 0.4, 0.4)
-        lurek.gfx.print("(empty)", PANEL_X + 12, 90)
+        lurek.render.setColor(0.4, 0.4, 0.4)
+        lurek.render.print("(empty)", PANEL_X + 12, 90)
     end
 
     -- Use item hint
     if show_inv then
-        lurek.gfx.setColor(0.5, 1, 0.5)
-        lurek.gfx.print("[U] use  [Esc] close", PANEL_X + 8, VIEW_H - 24)
+        lurek.render.setColor(0.5, 1, 0.5)
+        lurek.render.print("[U] use  [Esc] close", PANEL_X + 8, VIEW_H - 24)
     end
 
     -- ── Bottom status strip ─────────────────────────────────────────────
-    lurek.gfx.setColor(0.04, 0.04, 0.08)
-    lurek.gfx.rectangle("fill", 0, STATUS_Y, W, H - STATUS_Y)
-    lurek.gfx.setColor(0.5, 0.45, 0.3)
-    lurek.gfx.line(0, STATUS_Y, W, STATUS_Y)
+    lurek.render.setColor(0.04, 0.04, 0.08)
+    lurek.render.rectangle("fill", 0, STATUS_Y, W, H - STATUS_Y)
+    lurek.render.setColor(0.5, 0.45, 0.3)
+    lurek.render.line(0, STATUS_Y, W, STATUS_Y)
 
     for i, msg in ipairs(player.log) do
         local alpha = 1 - (i-1) * 0.18
-        lurek.gfx.setColor(0.85, 0.8, 0.65, alpha)
-        lurek.gfx.print(msg, 10, STATUS_Y + 6 + (i-1) * 18)
+        lurek.render.setColor(0.85, 0.8, 0.65, alpha)
+        lurek.render.print(msg, 10, STATUS_Y + 6 + (i-1) * 18)
     end
 
     -- Combat overlay
     if state == STATE.COMBAT and combat_enemy then
-        lurek.gfx.setColor(0.7, 0.1, 0.1, 0.8)
-        lurek.gfx.rectangle("fill", VIEW_W/2 - 80, VIEW_H/2 - 20, 160, 40)
-        lurek.gfx.setColor(1, 0.3, 0.3)
-        lurek.gfx.print("COMBAT!", VIEW_W/2 - 32, VIEW_H/2 - 8, 0, 1.3)
+        lurek.render.setColor(0.7, 0.1, 0.1, 0.8)
+        lurek.render.rectangle("fill", VIEW_W/2 - 80, VIEW_H/2 - 20, 160, 40)
+        lurek.render.setColor(1, 0.3, 0.3)
+        lurek.render.print("COMBAT!", VIEW_W/2 - 32, VIEW_H/2 - 8, 0, 1.3)
     end
 
     -- Game over / win
     if state == STATE.DEAD or state == STATE.WIN then
-        lurek.gfx.setColor(0, 0, 0, 0.75)
-        lurek.gfx.rectangle("fill", VIEW_W/2 - 150, VIEW_H/2 - 36, 300, 72)
+        lurek.render.setColor(0, 0, 0, 0.75)
+        lurek.render.rectangle("fill", VIEW_W/2 - 150, VIEW_H/2 - 36, 300, 72)
         if state == STATE.WIN then
-            lurek.gfx.setColor(0.2, 1, 0.4)
-            lurek.gfx.print("YOU ESCAPED!", VIEW_W/2 - 60, VIEW_H/2 - 14, 0, 1.5)
+            lurek.render.setColor(0.2, 1, 0.4)
+            lurek.render.print("YOU ESCAPED!", VIEW_W/2 - 60, VIEW_H/2 - 14, 0, 1.5)
         else
-            lurek.gfx.setColor(1, 0.2, 0.2)
-            lurek.gfx.print("YOU DIED", VIEW_W/2 - 46, VIEW_H/2 - 14, 0, 1.5)
+            lurek.render.setColor(1, 0.2, 0.2)
+            lurek.render.print("YOU DIED", VIEW_W/2 - 46, VIEW_H/2 - 14, 0, 1.5)
         end
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Escape to quit", VIEW_W/2 - 52, VIEW_H/2 + 14)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Escape to quit", VIEW_W/2 - 52, VIEW_H/2 + 14)
     end
 end
 
@@ -389,7 +389,7 @@ function lurek.keypressed(key)
         if show_inv then
             show_inv = false
         else
-            lurek.signal.quit()
+            lurek.event.quit()
         end
     end
 

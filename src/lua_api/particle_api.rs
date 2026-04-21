@@ -1,4 +1,4 @@
-//! `lurek.particles` — Emitter-based 2D particle systems and trail ribbons.
+//! `lurek.particle` — Emitter-based 2D particle systems and trail ribbons.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1189,7 +1189,7 @@ impl LuaUserData for LuaParticleSystem {
         // -- addSubEmitter --
         /// Attaches a sub-emitter that bursts when a particle dies.
         ///
-        /// `config_tbl` uses the same keys as `lurek.particles.new(opts)`.
+        /// `config_tbl` uses the same keys as `lurek.particle.new(opts)`.
         /// `burst_count` defaults to 1.
         /// @param config_tbl : table
         /// @param burst_count : number?
@@ -1400,7 +1400,7 @@ impl LuaUserData for LuaTrail {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.particles` API table with the Lua VM.
+/// Registers the `lurek.particle` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable
@@ -1449,7 +1449,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- Flat wrapper helpers --
-    // These forward the flat `lurek.particles.X(ps, ...)` style to the OOP UserData methods.
+    // These forward the flat `lurek.particle.X(ps, ...)` style to the OOP UserData methods.
     // They accept (LuaAnyUserData, LuaMultiValue) and call the method via the registry.
     let flat_methods: &[&str] = &[
         "update",

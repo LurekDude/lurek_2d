@@ -12,7 +12,7 @@ are automatically removed on the next `update()`.
 
 This is a **coroutine-frame** scheduler: timing is measured in units of `dt`
 you pass to `:update(dt)`. For wall-clock one-shots / repeats use the engine
-`lurek.time.Scheduler` userdata (`:after`, `:every`, `:cancel`) instead.
+`lurek.timer.Scheduler` userdata (`:after`, `:every`, `:cancel`) instead.
 
 Usage:
 local scheduler = require("library.scheduler")
@@ -27,7 +27,7 @@ sched:update(dt)
 
 *11 functions, 0 module fields documented.*
 
-See: [`lurek.time.Scheduler`](../lua-api.md#lurektimescheduler)
+See: [`lurek.timer.Scheduler`](../lua-api.md#lurektimescheduler)
 
 ## Functions
 
@@ -44,7 +44,7 @@ Create a new coroutine scheduler. Manages a pool of coroutine tasks; each task c
 
 - *Scheduler* — A new scheduler handle.
 
-See: [`lurek.time.Scheduler`](../lua-api.md#lurektimescheduler)
+See: [`lurek.timer.Scheduler`](../lua-api.md#lurektimescheduler)
 
 ### `add(fn, name)`
 
@@ -112,7 +112,7 @@ Step all active tasks by dt seconds. Tasks whose wait time has elapsed are resum
 
 - *number* — Number of coroutine resumes performed this call.
 
-See: [`lurek.time.getDelta`](../lua-api.md#lurektimegetdelta)
+See: [`lurek.timer.getDelta`](../lua-api.md#lurektimegetdelta)
 
 ### `getCount()`
 

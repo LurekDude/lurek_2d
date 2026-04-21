@@ -19,12 +19,12 @@
 --   to receive `quest_started` / `quest_advanced` / `quest_completed` /
 --   `quest_failed` events.
 -- * Serialisation: `M.toJson(log)` / `M.fromJson(str)` round-trip the log
---   through `lurek.codec.toJson` / `lurek.codec.fromJson`.
--- * Persistence: register a custom collector with `lurek.savegame.SaveManager`
+--   through `lurek.serial.toJson` / `lurek.serial.fromJson`.
+-- * Persistence: register a custom collector with `lurek.save.SaveManager`
 --   that calls `M.toJson(log)` on save and `M.fromJson(str)` on load.
--- * Time-limited objectives: drive expiry from a `lurek.time.Scheduler` you
+-- * Time-limited objectives: drive expiry from a `lurek.timer.Scheduler` you
 --   create in your game loop (call `QuestLog:failQuest(id)` from the callback);
---   this library does not require `lurek.time` at runtime.
+--   this library does not require `lurek.timer` at runtime.
 --
 -- Usage:
 --   local quest = require("library.quest")
@@ -42,10 +42,10 @@
 -- @module library.quest
 -- @status full
 -- @see lurek.patterns.newEventBus
--- @see lurek.codec.toJson
--- @see lurek.codec.fromJson
--- @see lurek.savegame.SaveManager
--- @see lurek.time.Scheduler
+-- @see lurek.serial.toJson
+-- @see lurek.serial.fromJson
+-- @see lurek.save.SaveManager
+-- @see lurek.timer.Scheduler
 
 local M = {}
 
@@ -814,18 +814,18 @@ local function _table_to_quest(t)
     return q
 end
 
---- Encode a `QuestLog` to a JSON string via `lurek.codec.toJson`.
+--- Encode a `QuestLog` to a JSON string via `lurek.serial.toJson`.
 -- @tparam QuestLog log
 -- @treturn string JSON-encoded log.
--- @see lurek.codec.toJson
+-- @see lurek.serial.toJson
 function M.toJson(log)
-    assert(lurek and lurek.codec and lurek.codec.toJson,
-        "library.quest.toJson requires lurek.codec.toJson")
+    assert(lurek and lurek.serial and lurek.serial.toJson,
+        "library.quest.toJson requires lurek.serial.toJson")
     local quests = {}
     for _, id in ipairs(log._order) do
         quests[#quests+1] = _quest_to_table(log._quests[id])
     end
-    return lurek.codec.toJson({ quests = quests })
+    return lurek.serial.toJson({ quests = quests })
 end
 
 --- Decode a JSON-encoded log into a fresh `QuestLog`. The optional `into`
@@ -833,11 +833,11 @@ end
 -- @tparam string str JSON-encoded log produced by `M.toJson`.
 -- @tparam[opt] QuestLog into Existing log to populate; a new one is created when nil.
 -- @treturn QuestLog
--- @see lurek.codec.fromJson
+-- @see lurek.serial.fromJson
 function M.fromJson(str, into)
-    assert(lurek and lurek.codec and lurek.codec.fromJson,
-        "library.quest.fromJson requires lurek.codec.fromJson")
-    local data = lurek.codec.fromJson(str)
+    assert(lurek and lurek.serial and lurek.serial.fromJson,
+        "library.quest.fromJson requires lurek.serial.fromJson")
+    local data = lurek.serial.fromJson(str)
     local log = into or M.newQuestLog()
     log._quests = {}
     log._order = {}

@@ -4,7 +4,7 @@
 //! cryptographic hashing (MD5/SHA family), encoding (base64/hex),
 //! binary pack/unpack (`pack` module), and a windowed byte-buffer view (`dataview` module).
 //!
-//! Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module — see `lurek.codec`.
+//! Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module — see `lurek.serial`.
 
 /// Lurek2D Binary Pack Format — space-separated type-token serialization.
 pub mod bin_pack;

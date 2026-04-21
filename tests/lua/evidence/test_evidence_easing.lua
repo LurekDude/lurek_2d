@@ -36,7 +36,7 @@ describe("Evidence: Easing curves", function()
         local plotW = W - margin * 2
         local plotH = H - margin * 2
 
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         -- Dark background
         img:drawRect(0, 0, W, H, 30, 30, 40, 255)
 
@@ -67,7 +67,7 @@ describe("Evidence: Easing curves", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "easing_all_curves.png")
+        lurek.image.savePNG(img, OUT .. "easing_all_curves.png")
     end)
 
     -- @covers lurek.math.applyEasing
@@ -81,7 +81,7 @@ describe("Evidence: Easing curves", function()
         local saved = 0
 
         for _, name in ipairs(EASINGS) do
-            local img = lurek.img.newImageData(W, H)
+            local img = lurek.image.newImageData(W, H)
             img:drawRect(0, 0, W, H, 20, 20, 30, 255)
 
             -- Axis lines
@@ -102,7 +102,7 @@ describe("Evidence: Easing curves", function()
                 end
             end
 
-            lurek.img.savePNG(img, OUT .. "easing_" .. name .. ".png")
+            lurek.image.savePNG(img, OUT .. "easing_" .. name .. ".png")
             saved = saved + 1
         end
 

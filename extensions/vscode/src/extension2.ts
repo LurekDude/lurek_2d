@@ -404,7 +404,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const editor = vscode.window.activeTextEditor;
     if (editor) addWatchFromEditor(editor);
   });
-  registerCommand(context, "lurek.system.openMonitor", () => openSystemMonitor(context));
+  registerCommand(context, "lurek.runtime.openMonitor", () => openSystemMonitor(context));
   registerCommand(context, "lurek.api.usageReport", () => openApiUsageReport(context));
   registerCommand(context, "lurek.api.quickInsert", () => quickInsertLurekApi(apiData));
 

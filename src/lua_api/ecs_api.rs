@@ -1,4 +1,4 @@
-//! `lurek.entity` — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
+//! `lurek.ecs` — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
 //!
 //! Wraps [`crate::ecs::Universe`] as `LuaUniverse` userdata. Supports spawn/kill,
 //! per-entity component CRUD, tag flags, named layers, queries, blueprints, and
@@ -742,7 +742,7 @@ impl LuaUserData for LuaUniverse {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.entity` API table with the Lua VM.
+/// Registers the `lurek.ecs` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable

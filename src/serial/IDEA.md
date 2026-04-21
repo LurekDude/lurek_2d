@@ -13,7 +13,7 @@
 - **Last reviewed**: 2026-04-18 (UTC)
 - **Reviewer agent**: `developer` · Session: `src-module-review-20260418`
 - **Plugin tier candidacy**: `CORE-KEEP`
-- **LOC (rust only)**: ~1091 · **Public Lua surface**: `lurek.codec` — 10 fns / 0 userdata
+- **LOC (rust only)**: ~1091 · **Public Lua surface**: `lurek.serial` — 10 fns / 0 userdata
 - **Inbound non-`lua_api` callers**: `save` (toml round-trip), `data` (CsvOptions)
 - **Heavy dependencies**: `serde_json`, `toml`, `csv`, `rmp-serde`, `roxmltree`, `serde_yml` (dead), `indexmap`
 
@@ -21,7 +21,7 @@
 
 The `serial` module provides Lurek2D's format-agnostic text serialization and deserialization,
 centred on the `SerialValue` recursive enum that all format drivers convert to and from.
-It serves EngDev (Rust callers) and GameDev/Modder (via `lurek.codec.*`). It deliberately
+It serves EngDev (Rust callers) and GameDev/Modder (via `lurek.serial.*`). It deliberately
 performs no file I/O — callers supply strings and receive strings back. It is NOT a game-save
 system (`save` owns persistence) nor a binary asset packer.
 
@@ -45,7 +45,7 @@ system (`save` owns persistence) nor a binary asset packer.
 
 ## 5. Feature Ideas
 
-1. **[P2][FEAT]** `Unified codec dispatch` — A single `lurek.codec.encode(tbl, "json")` / `lurek.codec.decode(str, "json")` entry point alongside the format-specific functions. Easier to switch formats at runtime.
+1. **[P2][FEAT]** `Unified codec dispatch` — A single `lurek.serial.encode(tbl, "json")` / `lurek.serial.decode(str, "json")` entry point alongside the format-specific functions. Easier to switch formats at runtime.
    - Rationale: GameDev can pass format as a config value instead of branching in Lua.
    - Effort: S · Risk: low.
    - Competitor inspiration: LÖVE's `love.data.encode/decode` uses a single entry point with format param — [love2d.org/wiki/love.data.encode](https://love2d.org/wiki/love.data.encode).

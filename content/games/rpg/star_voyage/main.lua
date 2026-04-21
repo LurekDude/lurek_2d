@@ -106,7 +106,7 @@ local function dist2(ax,ay,bx,by) return (ax-bx)^2+(ay-by)^2 end
 -- ── Load ──────────────────────────────────────────────────────────────────
 function lurek.load()
     lurek.window.setTitle("Star Voyage — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.02, 0.02, 0.08)
+    lurek.render.setBackgroundColor(0.02, 0.02, 0.08)
 
     local rng = lurek.math.newRandomGenerator(99)
     for i = 1, STAR_COUNT do
@@ -184,8 +184,8 @@ function lurek.draw()
     for _, s in ipairs(stars) do
         local px = (s.wx - cam_x * (0.2 + s.layer * 0.15)) % W
         local py = (s.wy - cam_y * (0.2 + s.layer * 0.15)) % H
-        lurek.gfx.setColor(s.br, s.br, s.br)
-        lurek.gfx.circle("fill", px, py, s.r)
+        lurek.render.setColor(s.br, s.br, s.br)
+        lurek.render.circle("fill", px, py, s.r)
     end
 
     -- Planets
@@ -193,16 +193,16 @@ function lurek.draw()
         local sx, sy = world_to_screen(p.x, p.y)
         -- only draw if roughly on screen
         if sx > -80 and sx < W+80 and sy > -80 and sy < H+80 then
-            lurek.gfx.setColor(p.color[1] * 0.4, p.color[2] * 0.4, p.color[3] * 0.4)
-            lurek.gfx.circle("fill", sx, sy, p.r + 6)    -- atmosphere glow
-            lurek.gfx.setColor(p.color[1], p.color[2], p.color[3])
-            lurek.gfx.circle("fill", sx, sy, p.r)
+            lurek.render.setColor(p.color[1] * 0.4, p.color[2] * 0.4, p.color[3] * 0.4)
+            lurek.render.circle("fill", sx, sy, p.r + 6)    -- atmosphere glow
+            lurek.render.setColor(p.color[1], p.color[2], p.color[3])
+            lurek.render.circle("fill", sx, sy, p.r)
             if p.visited then
-                lurek.gfx.setColor(0.5, 1, 0.5, 0.7)
-                lurek.gfx.circle("line", sx, sy, p.r + 3)
+                lurek.render.setColor(0.5, 1, 0.5, 0.7)
+                lurek.render.circle("line", sx, sy, p.r + 3)
             end
-            lurek.gfx.setColor(1, 1, 1, 0.9)
-            lurek.gfx.print(p.name, sx - 35, sy + p.r + 4)
+            lurek.render.setColor(1, 1, 1, 0.9)
+            lurek.render.print(p.name, sx - 35, sy + p.r + 4)
         end
     end
 
@@ -210,9 +210,9 @@ function lurek.draw()
     local ss_x, ss_y = world_to_screen(ship.x, ship.y)
     local SA  = ship.angle
     local SZ  = 12
-    lurek.gfx.setColor(0.8, 0.9, 1)
+    lurek.render.setColor(0.8, 0.9, 1)
     -- Simple triangle ship
-    lurek.gfx.polygon("fill",
+    lurek.render.polygon("fill",
         ss_x + math.cos(SA)*SZ,     ss_y + math.sin(SA)*SZ,
         ss_x + math.cos(SA+2.4)*SZ*0.6, ss_y + math.sin(SA+2.4)*SZ*0.6,
         ss_x + math.cos(SA-2.4)*SZ*0.6, ss_y + math.sin(SA-2.4)*SZ*0.6
@@ -220,52 +220,52 @@ function lurek.draw()
 
     -- Dock prompt
     if active_planet and state == STATE.SPACE then
-        lurek.gfx.setColor(1, 1, 0, 0.9)
-        lurek.gfx.print("Press Space to dock at " .. active_planet.name, W/2 - 140, H - 44)
+        lurek.render.setColor(1, 1, 0, 0.9)
+        lurek.render.print("Press Space to dock at " .. active_planet.name, W/2 - 140, H - 44)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.55)
-    lurek.gfx.rectangle("fill", 0, 0, W, 26)
-    lurek.gfx.setColor(0.4, 0.8, 1)
-    lurek.gfx.print(string.format("Fuel: %d%%   Pos: (%d,%d)", math.floor(fuel), math.floor(ship.x), math.floor(ship.y)), 10, 5)
+    lurek.render.setColor(0, 0, 0, 0.55)
+    lurek.render.rectangle("fill", 0, 0, W, 26)
+    lurek.render.setColor(0.4, 0.8, 1)
+    lurek.render.print(string.format("Fuel: %d%%   Pos: (%d,%d)", math.floor(fuel), math.floor(ship.x), math.floor(ship.y)), 10, 5)
     local visited = 0; for _, p in ipairs(planets) do if p.visited then visited = visited + 1 end end
-    lurek.gfx.print(string.format("Worlds visited: %d / %d", visited, #planets), W - 220, 5)
+    lurek.render.print(string.format("Worlds visited: %d / %d", visited, #planets), W - 220, 5)
 
     -- Dialog overlay
     if state == STATE.DIALOG then
-        lurek.gfx.setColor(0.04, 0.06, 0.18, 0.92)
-        lurek.gfx.rectangle("fill", 20, H - 160, W - 40, 148)
-        lurek.gfx.setColor(0.4, 0.7, 1)
-        lurek.gfx.rectangle("line", 20, H - 160, W - 40, 148)
+        lurek.render.setColor(0.04, 0.06, 0.18, 0.92)
+        lurek.render.rectangle("fill", 20, H - 160, W - 40, 148)
+        lurek.render.setColor(0.4, 0.7, 1)
+        lurek.render.rectangle("line", 20, H - 160, W - 40, 148)
         -- Portrait placeholder
         if active_planet then
             local pc = active_planet.color
-            lurek.gfx.setColor(pc[1], pc[2], pc[3])
-            lurek.gfx.circle("fill", 58, H - 94, 30)
+            lurek.render.setColor(pc[1], pc[2], pc[3])
+            lurek.render.circle("fill", 58, H - 94, 30)
         end
-        lurek.gfx.setColor(0.4, 0.7, 1)
-        lurek.gfx.print(dlg_speaker, 96, H - 152)
-        lurek.gfx.setColor(0.9, 0.9, 1)
-        lurek.gfx.print(dlg_line, 96, H - 130, 0, 1, 1, 0, 0, 0, 0)
+        lurek.render.setColor(0.4, 0.7, 1)
+        lurek.render.print(dlg_speaker, 96, H - 152)
+        lurek.render.setColor(0.9, 0.9, 1)
+        lurek.render.print(dlg_line, 96, H - 130, 0, 1, 1, 0, 0, 0, 0)
         -- Choices
         if #dlg_choices > 0 then
             for i, opt in ipairs(dlg_choices) do
-                lurek.gfx.setColor(1, 1, 0)
-                lurek.gfx.print(i .. ". " .. opt, 96, H - 130 + (i-1)*20 + 16)
+                lurek.render.setColor(1, 1, 0)
+                lurek.render.print(i .. ". " .. opt, 96, H - 130 + (i-1)*20 + 16)
             end
-            lurek.gfx.setColor(0.5, 0.5, 0.5)
-            lurek.gfx.print("[1/2/3] choose", W - 180, H - 26)
+            lurek.render.setColor(0.5, 0.5, 0.5)
+            lurek.render.print("[1/2/3] choose", W - 180, H - 26)
         else
-            lurek.gfx.setColor(0.5, 0.5, 0.5)
-            lurek.gfx.print("[Space] continue", W - 200, H - 26)
+            lurek.render.setColor(0.5, 0.5, 0.5)
+            lurek.render.print("[Space] continue", W - 200, H - 26)
         end
     end
 end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     if state == STATE.SPACE then
         if key == "space" and active_planet then
             start_dialog(active_planet)

@@ -19,7 +19,7 @@ Compression (`compress` submodule) supports deflate, gzip, lz4, and zlib via the
 
 The `pack`/`unpack` functions provide a LÖVE2D-compatible binary pack format using format-string tokens (`b` byte, `i` / `I` signed/unsigned integers in various widths, `f` float, `d` double, `s` length-prefixed string, `z` null-terminated string, `c` fixed-length byte sequence). This API is used by network serialization and save-data encoding. The separate `bin_pack` module implements Lurek2D's own space-separated type-token serialization format for edge cases requiring human-readable binary encoding. `DataView` provides a windowed, read-only view into a byte slice without copying. `RingBuffer` is a generic fixed-capacity circular buffer useful for input history, debug logs, and event queues. `toml_convert` handles TOML string ↔ `toml::Value` conversion for the Lua bridge, and `msgpack` provides MessagePack serialization via `rmp-serde` using `serde_json::Value` as the intermediate representation.
 
-Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module under `lurek.codec`.
+Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module under `lurek.serial`.
 
 **Scope boundary**: Foundations tier. Depends only on external crates (flate2, lz4_flex, sha2, base64, hex, rmp-serde, toml). Lua bridge in `src/lua_api/data_api.rs`.
 

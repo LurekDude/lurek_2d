@@ -12,7 +12,7 @@ Many Lurek2D APIs pass headless tests by verifying:
 - It returns a non-nil value (`expect_not_nil(result)`)
 
 But this does NOT prove the API actually works. For example:
-- `lurek.gfx.rectangle("fill", 10, 10, 100, 50)` — passes headless but draws nothing
+- `lurek.render.rectangle("fill", 10, 10, 100, 50)` — passes headless but draws nothing
 - `lurek.light.newPointLight(100, 100, 200)` — returns an object but may not illuminate anything
 - `lurek.audio.play("sound.wav")` — returns a source handle but may not produce audio
 
@@ -41,10 +41,10 @@ APIs that produce visible output. Evidence: screenshot saved to disk, verified f
 
 ```lua
 -- Headless pixel evidence using Canvas
-local canvas = lurek.gfx.newCanvas(100, 100)
+local canvas = lurek.render.newCanvas(100, 100)
 canvas:renderTo(function()
-    lurek.gfx.setColor(1, 0, 0)
-    lurek.gfx.rectangle("fill", 0, 0, 100, 100)
+    lurek.render.setColor(1, 0, 0)
+    lurek.render.rectangle("fill", 0, 0, 100, 100)
 end)
 local r, g, b, a = canvas:getPixel(50, 50)
 expect_near(1.0, r, 0.01) -- red pixel confirms rectangle was drawn
@@ -104,12 +104,12 @@ APIs where behavior is proven by observable state changes.
 Expand existing Lua unit tests with state readback assertions:
 
 ```lua
--- @covers lurek.gfx.setColor
+-- @covers lurek.render.setColor
 -- @evidence state:color_changed
 describe("gfx.setColor changes state", function()
     it("stores the active color", function()
-        lurek.gfx.setColor(0.5, 0.3, 0.7, 1.0)
-        local r, g, b, a = lurek.gfx.getColor()
+        lurek.render.setColor(0.5, 0.3, 0.7, 1.0)
+        local r, g, b, a = lurek.render.getColor()
         expect_near(0.5, r, 0.01)
         expect_near(0.3, g, 0.01)
     end)
@@ -121,14 +121,14 @@ end)
 For modules that support Canvas:
 
 ```lua
--- @covers lurek.gfx.circle
+-- @covers lurek.render.circle
 -- @evidence pixel:canvas_readback
 describe("circle draws pixels", function()
     it("circle center has fill color", function()
-        local canvas = lurek.gfx.newCanvas(200, 200)
+        local canvas = lurek.render.newCanvas(200, 200)
         canvas:renderTo(function()
-            lurek.gfx.setColor(1, 0, 0, 1)
-            lurek.gfx.circle("fill", 100, 100, 50)
+            lurek.render.setColor(1, 0, 0, 1)
+            lurek.render.circle("fill", 100, 100, 50)
         end)
         local r, g, b, a = canvas:getPixel(100, 100)
         expect_near(1.0, r, 0.05, "circle center should be red")
@@ -204,13 +204,13 @@ The user specifically noted that the light system may not produce any visible ou
 | `lurek.light.newPointLight` | Illuminated pixels are brighter than non-illuminated |
 | `lurek.light.newSpotLight` | Cone of light visible in expected direction |
 | `lurek.light.setAmbient` | Changing ambient changes overall scene brightness |
-| `lurek.gfx.rectangle` / `circle` / `line` | Pixels at expected coordinates have expected color |
+| `lurek.render.rectangle` / `circle` / `line` | Pixels at expected coordinates have expected color |
 | `lurek.particle.newEmitter` + `emit` | Particles visible after N frames |
 | `Canvas:renderTo` | Canvas captures rendered content (canvas pixel readback — CAN be headless) |
-| `lurek.postfx.*` | Post-processing visibly changes output pixels |
+| `lurek.effect.*` | Post-processing visibly changes output pixels |
 | `Shader:send` | Custom shader produces expected pixel output |
 | `BlendMode` changes | Different blend modes produce different pixel values for same geometry |
-| `lurek.gfx.draw` (Texture) | Image pixels appear at correct screen location |
+| `lurek.render.draw` (Texture) | Image pixels appear at correct screen location |
 
 ---
 
@@ -271,7 +271,7 @@ Each light test:
 Headless (Canvas pixel readback):
 ```lua
 -- Verify at least 1 particle is drawn after emission
-local canvas = lurek.gfx.newCanvas(200, 200)
+local canvas = lurek.render.newCanvas(200, 200)
 local emitter = lurek.particle.newEmitter()
 emitter:setPosition(100, 100)
 emitter:setRate(100) -- 100 particles/sec
@@ -369,7 +369,7 @@ end)
 Canvas evidence for animation:
 ```lua
 -- Different frames draw different pixel regions
-local canvas = lurek.gfx.newCanvas(64, 64)
+local canvas = lurek.render.newCanvas(64, 64)
 -- Frame 0: draw top-left 32×32 region
 canvas:renderTo(function() anim:draw(0, 0) end)
 local r0, g0 = canvas:getPixel(16, 16)
@@ -407,14 +407,14 @@ end)
 Headless:
 ```lua
 -- Desaturate effect: red input → gray output
-local canvas_in = lurek.gfx.newCanvas(32, 32)
+local canvas_in = lurek.render.newCanvas(32, 32)
 canvas_in:renderTo(function()
-    lurek.gfx.setColor(1, 0, 0, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 32, 32)
+    lurek.render.setColor(1, 0, 0, 1)
+    lurek.render.rectangle("fill", 0, 0, 32, 32)
 end)
-local canvas_out = lurek.gfx.newCanvas(32, 32)
+local canvas_out = lurek.render.newCanvas(32, 32)
 canvas_out:renderTo(function()
-    local fx = lurek.postfx.new()
+    local fx = lurek.effect.new()
     fx:addDesaturate(1.0) -- fully desaturate
     fx:apply(canvas_in, canvas_out)
 end)
@@ -432,7 +432,7 @@ Runtime smoke tests for GPU-required effects (blur, bloom, chromatic aberration)
 
 ```lua
 -- Widget renders non-empty content
-local canvas = lurek.gfx.newCanvas(200, 50)
+local canvas = lurek.render.newCanvas(200, 50)
 canvas:renderTo(function()
     lurek.gui.button("Click Me", 10, 10, 180, 30)
 end)
@@ -525,7 +525,7 @@ Each light test:
 Headless (Canvas pixel readback):
 ```lua
 -- Verify at least 1 particle is drawn after emission
-local canvas = lurek.gfx.newCanvas(200, 200)
+local canvas = lurek.render.newCanvas(200, 200)
 local emitter = lurek.particle.newEmitter()
 emitter:setPosition(100, 100)
 emitter:setRate(100) -- 100 particles/sec
@@ -623,7 +623,7 @@ end)
 Canvas evidence for animation:
 ```lua
 -- Different frames draw different pixel regions
-local canvas = lurek.gfx.newCanvas(64, 64)
+local canvas = lurek.render.newCanvas(64, 64)
 -- Frame 0: draw top-left 32×32 region
 canvas:renderTo(function() anim:draw(0, 0) end)
 local r0, g0 = canvas:getPixel(16, 16)
@@ -661,14 +661,14 @@ end)
 Headless:
 ```lua
 -- Desaturate effect: red input → gray output
-local canvas_in = lurek.gfx.newCanvas(32, 32)
+local canvas_in = lurek.render.newCanvas(32, 32)
 canvas_in:renderTo(function()
-    lurek.gfx.setColor(1, 0, 0, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 32, 32)
+    lurek.render.setColor(1, 0, 0, 1)
+    lurek.render.rectangle("fill", 0, 0, 32, 32)
 end)
-local canvas_out = lurek.gfx.newCanvas(32, 32)
+local canvas_out = lurek.render.newCanvas(32, 32)
 canvas_out:renderTo(function()
-    local fx = lurek.postfx.new()
+    local fx = lurek.effect.new()
     fx:addDesaturate(1.0) -- fully desaturate
     fx:apply(canvas_in, canvas_out)
 end)
@@ -686,7 +686,7 @@ Runtime smoke tests for GPU-required effects (blur, bloom, chromatic aberration)
 
 ```lua
 -- Widget renders non-empty content
-local canvas = lurek.gfx.newCanvas(200, 50)
+local canvas = lurek.render.newCanvas(200, 50)
 canvas:renderTo(function()
     lurek.gui.button("Click Me", 10, 10, 180, 30)
 end)

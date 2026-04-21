@@ -288,7 +288,7 @@ local function damage_player(amount)
     dmg_flash_tw = lurek.tween.to(player, 0.3, { flash = 0 })
 
     if death_burst then
-        lurek.particles.emit(death_burst, player.x, player.y, 8)
+        lurek.particle.emit(death_burst, player.x, player.y, 8)
     end
 
     if player.hp <= 0 then
@@ -304,7 +304,7 @@ local function damage_enemy(e, amount)
         kills_total = kills_total + 1
         score = score + 100
         if death_burst then
-            lurek.particles.emit(death_burst, e.x, e.y, 15)
+            lurek.particle.emit(death_burst, e.x, e.y, 15)
         end
         return true -- dead
     end
@@ -324,7 +324,7 @@ local function do_melee()
         range = MELEE_RANGE, timer = 0.15,
     }
     if slash_sparks then
-        lurek.particles.emit(slash_sparks, player.x + player.facing_x * 20, player.y + player.facing_y * 20, 6)
+        lurek.particle.emit(slash_sparks, player.x + player.facing_x * 20, player.y + player.facing_y * 20, 6)
     end
 
     -- hit enemies in arc
@@ -537,7 +537,7 @@ end)
 --  lurek.ready — create particles & tweens after GPU init
 -- ══════════════════════════════════════════════════════════════════════════
 lurek.ready(function()
-    death_burst = lurek.particles.new({
+    death_burst = lurek.particle.new({
         maxParticles = 60,
         emitRate     = 0,
         lifetime     = { 0.3, 0.6 },
@@ -547,7 +547,7 @@ lurek.ready(function()
         sizes        = { 4, 1 },
     })
 
-    slash_sparks = lurek.particles.new({
+    slash_sparks = lurek.particle.new({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.1, 0.25 },
@@ -557,7 +557,7 @@ lurek.ready(function()
         sizes        = { 3, 1 },
     })
 
-    dash_trail = lurek.particles.new({
+    dash_trail = lurek.particle.new({
         maxParticles = 40,
         emitRate     = 0,
         lifetime     = { 0.15, 0.3 },
@@ -567,7 +567,7 @@ lurek.ready(function()
         sizes        = { 6, 2 },
     })
 
-    proj_sparks = lurek.particles.new({
+    proj_sparks = lurek.particle.new({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.1, 0.2 },
@@ -584,7 +584,7 @@ end)
 --  lurek.process — game logic each frame
 -- ══════════════════════════════════════════════════════════════════════════
 lurek.process(function(dt)
-    if lurek.input.pressed("quit") then lurek.signal.quit() end
+    if lurek.input.pressed("quit") then lurek.event.quit() end
 
     -- ── Title ─────────────────────────────────────────────────────────
     if state == STATE.TITLE then
@@ -628,7 +628,7 @@ lurek.process(function(dt)
         player.x = player.x + player.dash_dx * dt
         player.y = player.y + player.dash_dy * dt
         if dash_trail then
-            lurek.particles.emit(dash_trail, player.x, player.y, 3)
+            lurek.particle.emit(dash_trail, player.x, player.y, 3)
         end
         if player.dash_timer <= 0 then player.dashing = false end
     else
@@ -684,7 +684,7 @@ lurek.process(function(dt)
         end
 
         if hit then
-            if proj_sparks then lurek.particles.emit(proj_sparks, p.x, p.y, 8) end
+            if proj_sparks then lurek.particle.emit(proj_sparks, p.x, p.y, 8) end
             table.remove(projectiles, i)
         elseif p.traveled > RANGED_MAX_DIST or not point_in_arena(p.x, p.y) then
             table.remove(projectiles, i)
@@ -750,10 +750,10 @@ lurek.process(function(dt)
     end
 
     -- Update particles
-    if death_burst  then lurek.particles.update(death_burst, dt) end
-    if slash_sparks then lurek.particles.update(slash_sparks, dt) end
-    if dash_trail   then lurek.particles.update(dash_trail, dt) end
-    if proj_sparks  then lurek.particles.update(proj_sparks, dt) end
+    if death_burst  then lurek.particle.update(death_burst, dt) end
+    if slash_sparks then lurek.particle.update(slash_sparks, dt) end
+    if dash_trail   then lurek.particle.update(dash_trail, dt) end
+    if proj_sparks  then lurek.particle.update(proj_sparks, dt) end
 end)
 
 -- ══════════════════════════════════════════════════════════════════════════
@@ -882,17 +882,17 @@ lurek.render(function()
     end
 
     -- ── Particles ─────────────────────────────────────────────────────
-    if death_burst  then lurek.particles.draw(death_burst) end
-    if slash_sparks then lurek.particles.draw(slash_sparks) end
-    if dash_trail   then lurek.particles.draw(dash_trail) end
-    if proj_sparks  then lurek.particles.draw(proj_sparks) end
+    if death_burst  then lurek.particle.draw(death_burst) end
+    if slash_sparks then lurek.particle.draw(slash_sparks) end
+    if dash_trail   then lurek.particle.draw(dash_trail) end
+    if proj_sparks  then lurek.particle.draw(proj_sparks) end
 end)
 
 -- ══════════════════════════════════════════════════════════════════════════
 --  lurek.render_ui — screen-space HUD
 -- ══════════════════════════════════════════════════════════════════════════
 lurek.render_ui(function()
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
 
     -- ── Title screen ──────────────────────────────────────────────────
     if state == STATE.TITLE then

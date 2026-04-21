@@ -134,7 +134,7 @@ lurek.init(function()
     lurek.window.setTitle("Maze Defense — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.08, 0.05, 1.0)
 
-    particle_sys = lurek.particles.newSystem({
+    particle_sys = lurek.particle.newSystem({
         maxParticles = 60,
         emitRate     = 0,
         lifetime     = { 0.2, 0.5 },
@@ -153,7 +153,7 @@ end)
 lurek.process(function(dt)
     if particle_sys then particle_sys:update(dt) end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
 
     local mx, my = lurek.input.getMousePosition()
     hover_c, hover_r = mouse_to_cell(mx, my)

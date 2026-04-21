@@ -28,7 +28,7 @@ Add a new RenderCommand variant to the rendering pipeline.
 
 - [ ] RenderCommand variant is data-only (no logic)
 - [ ] Renderer processes command correctly
-- [ ] Lua binding follows `lurek.gfx.*` pattern
+- [ ] Lua binding follows `lurek.render.*` pattern
 - [ ] Tests pass, clippy clean
 
 ## Anti-patterns

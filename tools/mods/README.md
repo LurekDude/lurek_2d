@@ -24,4 +24,4 @@ mods/my_rpg_mod/
 └── README.md   ← usage stub
 ```
 
-See `docs/specs/mods.md` for the full `lurek.modding.*` API reference.
+See `docs/specs/mods.md` for the full `lurek.mods.*` API reference.

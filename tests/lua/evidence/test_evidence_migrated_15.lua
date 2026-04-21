@@ -7,38 +7,38 @@ describe("evidence: migrated 15", function()
         ensure_evidence_dir("migrated_15")
     end)
 
-    -- @covers lurek.img.newImageData
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.newImageData
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Creates a blank 64x64 image and saves it as baseline evidence for empty image allocation.
     it("evidence_image_new_blank", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         local path = OUT .. "new_blank_64x64.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Fills a small image with solid orange and saves the result as simple fill evidence.
     it("evidence_image_fill_solid", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         img:fill(255, 128, 0, 255)
         local path = OUT .. "fill_orange.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:setPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Paints crossing diagonal pixel patterns into an image and saves the result.
     it("evidence_image_set_pixel_pattern", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         img:fill(0, 0, 0, 255)
         for i = 0, 63 do
             img:setPixel(i, i, 255, 255, 0, 255)
@@ -47,20 +47,20 @@ describe("evidence: migrated 15", function()
             end
         end
         local path = OUT .. "diagonal_cross.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:drawLine
     -- @covers ImageData:drawRect
     -- @covers ImageData:drawCircle
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Builds a multi-shape scene from primitive drawing calls and saves the composed result.
     it("evidence_image_draw_shapes_combined", function()
-        local img = lurek.img.newImageData(256, 256)
+        local img = lurek.image.newImageData(256, 256)
         img:fill(20, 20, 40, 255)
         for i = 0, 255, 16 do
             img:drawLine(i, 0, i, 255, 40, 40, 60, 255)
@@ -82,56 +82,56 @@ describe("evidence: migrated 15", function()
         end
         img:drawRect(0, 220, 256, 36, 40, 120, 40, 255)
         local path = OUT .. "shapes_combined_scene.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:drawCircle
     -- @covers ImageData:paste
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Composites one sprite image onto a background several times and saves the resulting paste test.
     it("evidence_image_paste_composite", function()
-        local bg = lurek.img.newImageData(128, 128)
+        local bg = lurek.image.newImageData(128, 128)
         bg:fill(40, 40, 80, 255)
-        local sprite = lurek.img.newImageData(32, 32)
+        local sprite = lurek.image.newImageData(32, 32)
         sprite:drawCircle(16, 16, 14, 255, 200, 0, 255)
         bg:paste(sprite, 10, 10)
         bg:paste(sprite, 50, 30)
         bg:paste(sprite, 80, 70)
         local path = OUT .. "paste_composite.png"
-        lurek.img.savePNG(bg, path)
+        lurek.image.savePNG(bg, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:crop
     -- @covers ImageData:noise
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Copies an image and applies noise to the copy before saving the noisy variant.
     it("evidence_effect_noise", function()
-        local img = lurek.img.newImageData(128, 128)
+        local img = lurek.image.newImageData(128, 128)
         img:fill(128, 128, 128, 255)
         local noisy = img:crop(0, 0, 128, 128)
         noisy:noise(80)
         local path = OUT .. "noise_after.png"
-        lurek.img.savePNG(noisy, path)
+        lurek.image.savePNG(noisy, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @covers ImageData:crop
     -- @covers ImageData:flipHorizontal
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Builds a two-color image, flips it horizontally, and writes the mirrored result.
     it("evidence_effect_flip_horizontal", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
             for x = 0, 31 do img:setPixel(x, y, 255, 0, 0, 255) end
             for x = 32, 63 do img:setPixel(x, y, 0, 0, 255, 255) end
@@ -139,19 +139,19 @@ describe("evidence: migrated 15", function()
         local flipped = img:crop(0, 0, 64, 64)
         flipped:flipHorizontal()
         local path = OUT .. "flip_h_after.png"
-        lurek.img.savePNG(flipped, path)
+        lurek.image.savePNG(flipped, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @covers ImageData:crop
     -- @covers ImageData:flipVertical
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Builds a two-color image, flips it vertically, and writes the mirrored result.
     it("evidence_effect_flip_vertical", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         for y = 0, 31 do
             for x = 0, 63 do img:setPixel(x, y, 255, 0, 0, 255) end
         end
@@ -161,70 +161,70 @@ describe("evidence: migrated 15", function()
         local flipped = img:crop(0, 0, 64, 64)
         flipped:flipVertical()
         local path = OUT .. "flip_v_after.png"
-        lurek.img.savePNG(flipped, path)
+        lurek.image.savePNG(flipped, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:rotate90cw
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Rotates a rectangular image clockwise and saves the rotated artifact.
     it("evidence_effect_rotate", function()
-        local img = lurek.img.newImageData(64, 32)
+        local img = lurek.image.newImageData(64, 32)
         img:fill(255, 255, 0, 255)
         local rotated = img:rotate90cw()
         local path = OUT .. "rotate_90cw.png"
-        lurek.img.savePNG(rotated, path)
+        lurek.image.savePNG(rotated, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:drawRect
     -- @covers ImageData:crop
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Crops the central red square from a larger image and writes the cropped output.
     it("evidence_effect_crop", function()
-        local img = lurek.img.newImageData(128, 128)
+        local img = lurek.image.newImageData(128, 128)
         img:fill(200, 200, 200, 255)
         img:drawRect(32, 32, 64, 64, 255, 0, 0, 255)
         local cropped = img:crop(32, 32, 64, 64)
         local path = OUT .. "crop_center.png"
-        lurek.img.savePNG(cropped, path)
+        lurek.image.savePNG(cropped, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:drawCircle
     -- @covers ImageData:resizeNearest
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Upscales a small magenta image with a dark circle using nearest-neighbor resizing.
     it("evidence_effect_resize", function()
-        local img = lurek.img.newImageData(32, 32)
+        local img = lurek.image.newImageData(32, 32)
         img:fill(255, 0, 255, 255)
         img:drawCircle(16, 16, 10, 0, 0, 0, 255)
         local big = img:resizeNearest(128, 128)
         local path = OUT .. "resize_upscaled_128.png"
-        lurek.img.savePNG(big, path)
+        lurek.image.savePNG(big, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:crop
     -- @covers ImageData:mapPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Applies an alpha mask through mapPixel and saves the masked output.
     it("evidence_effect_alpha_mask", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         img:fill(0, 255, 0, 255)
-        local mask = lurek.img.newImageData(64, 64)
+        local mask = lurek.image.newImageData(64, 64)
         mask:fill(128, 128, 128, 128) -- 50% opacity
         local masked = img:crop(0, 0, 64, 64)
         -- missing specific multiply_alpha, we assume mapPixel
@@ -233,37 +233,37 @@ describe("evidence: migrated 15", function()
             return r, g, b, (a * ma) / 255
         end)
         local path = OUT .. "alpha_mask_50pct.png"
-        lurek.img.savePNG(masked, path)
+        lurek.image.savePNG(masked, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:drawCircle
     -- @covers ImageData:crop
     -- @covers ImageData:blur
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Applies a blur stage to a simple image-processing pipeline and saves the intermediate output.
     it("evidence_effect_pipeline", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         img:fill(100, 100, 100, 255)
         img:drawCircle(32, 32, 20, 200, 50, 50, 255)
         local blurred = img:crop(0, 0, 64, 64)
         blurred:blur(2.0)
         local path = OUT .. "pipeline_05_blur.png"
-        lurek.img.savePNG(blurred, path)
+        lurek.image.savePNG(blurred, path)
         expect_evidence_created(path)
     end)
 
     -- @covers lurek.math.perlinFast
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Colors Perlin noise into terrain bands and saves the resulting terrain map.
     it("evidence_math_noise_colored_terrain", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
             for x = 0, 63 do
                 local n = math.min(1, math.max(0, (lurek.math.perlinFast(x * 0.1, y * 0.1) + 1.0) * 0.5))
@@ -275,18 +275,18 @@ describe("evidence: migrated 15", function()
             end
         end
         local path = OUT .. "noise_terrain_map.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
     -- @covers lurek.math.simplex
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Samples simplex noise into a grayscale heightmap and writes the generated map image.
     it("evidence_math_generate_map", function()
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
             for x = 0, 63 do
                 local n = lurek.math.simplex(x * 0.1, y * 0.1)
@@ -295,7 +295,7 @@ describe("evidence: migrated 15", function()
             end
         end
         local path = OUT .. "generate_map.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 end)

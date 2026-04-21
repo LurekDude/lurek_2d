@@ -10,14 +10,14 @@
 |------|---------------|---------|
 | test_ai_physics.lua | ai + physics | Good |
 | test_tilemap_physics.lua | tilemap + physics | Good |
-| test_entity_ai.lua | entity + ai | Good |
+| test_ecs_ai.lua | entity + ai | Good |
 | test_compute_dataframe.lua | compute + dataframe | Good |
-| test_save_entity.lua | savegame + entity | Good |
+| test_save_ecs.lua | savegame + entity | Good |
 | test_math_physics.lua | math + physics | Good |
-| test_math_graphics.lua | math + graphics | Good |
+| test_math_render.lua | math + graphics | Good |
 | test_physics_timer.lua | physics + timer | Good |
 | test_timer_math.lua | timer + math | Good |
-| test_system.lua | system (single module) | **Misplaced** — should be unit test |
+| test_runtime_system.lua | system (single module) | **Misplaced** — should be unit test |
 | test_devtools.lua | devtools (single module) | **Misplaced** — should be unit test |
 | test_debugbridge.lua | debugbridge (single module) | **Misplaced** — should be unit test |
 | test_docs.lua | docs (single module) | **Misplaced** — should be unit test |
@@ -79,21 +79,21 @@ Natural couplings based on API design and game-dev patterns:
 
 ### Priority 1 — Core Game Patterns (8 tests)
 
-#### test_entity_physics.lua
+#### test_ecs_physics.lua
 ```
 Modules: entity + physics
 Scenario: Create entity → attach physics body → step world → verify entity position updated
 Tests: body-entity sync, collision events on entities, removing entity removes body
 ```
 
-#### test_entity_graphics.lua
+#### test_ecs_render.lua
 ```
 Modules: entity + graphics
 Scenario: Create entity → set sprite/draw component → verify draw commands generated
 Tests: entity position → draw position sync, visibility toggle, z-ordering
 ```
 
-#### test_scene_entity.lua
+#### test_scene_ecs.lua
 ```
 Modules: scene + entity
 Scenario: Create scene → add entity nodes → traverse hierarchy → verify parent-child transforms
@@ -114,7 +114,7 @@ Scenario: Create tilemap → set camera → query visible tiles
 Tests: camera scroll reveals different tiles, zoom changes tile count, culling works
 ```
 
-#### test_ai_pathfinding.lua
+#### test_ai_pathfind.lua
 ```
 Modules: ai + pathfinding
 Scenario: AI agent navigates grid using A* pathfinding
@@ -144,21 +144,21 @@ Scenario: Serialize data to JSON → write to file → read back → deserialize
 Tests: JSON round-trip via filesystem, TOML config loading, binary data write/read
 ```
 
-#### test_savegame_tilemap.lua
+#### test_save_tilemap.lua
 ```
 Modules: savegame + tilemap
 Scenario: Create tilemap → modify tiles → save → clear → load → verify tiles restored
 Tests: tile data persistence, layer state persistence, tilemap properties round-trip
 ```
 
-#### test_signal_entity.lua
+#### test_event_entity.lua
 ```
 Modules: signal + entity
 Scenario: Entity emits events → signal handlers respond
 Tests: entity created event, entity destroyed event, component added/removed events
 ```
 
-#### test_tilemap_pathfinding.lua
+#### test_tilemap_pathfind.lua
 ```
 Modules: tilemap + pathfinding
 Scenario: Convert tilemap to navigation grid → pathfind on it
@@ -181,7 +181,7 @@ Scenario: Tween camera position/zoom smoothly
 Tests: tween start → camera moves → tween complete; easing functions affect trajectory
 ```
 
-#### test_tween_entity.lua
+#### test_tween_ecs.lua
 ```
 Modules: tween + entity
 Scenario: Tween entity properties (position, scale, rotation)
@@ -195,14 +195,14 @@ Scenario: Particle emission rate based on timer
 Tests: emit N particles per second, emission stops when timer pauses, burst at time
 ```
 
-#### test_light_graphics.lua
+#### test_light_render.lua
 ```
 Modules: light + graphics
 Scenario: Light affects draw commands
 Tests: point light created → lights list contains it, ambient change updates state
 ```
 
-#### test_localization_ui.lua
+#### test_i18n_ui.lua
 ```
 Modules: localization + ui (if GUI text rendering available headless)
 Scenario: UI labels display localized text
@@ -217,7 +217,7 @@ Move the following from `integration/` to `unit/` (or merge into existing unit t
 
 | Current File | Action |
 |-------------|--------|
-| test_system.lua | Merge into test_system.lua unit test |
+| test_runtime_system.lua | Merge into test_runtime_system.lua unit test |
 | test_devtools.lua | Merge into test_devtools.lua unit test |
 | test_debugbridge.lua | Merge into test_debugbridge.lua unit test |
 | test_docs.lua | Merge into test_docs.lua unit test |
@@ -240,7 +240,7 @@ These tests cover deeper engine couplings, 3-way module interactions, and game-s
 
 ### Group A: Graphics Pipeline Integrations (9 tests)
 
-#### test_graphics_camera.lua
+#### test_render_camera.lua
 ```
 Modules: graphics + camera
 Scenario: Verify draw calls are viewport-transformed by active camera
@@ -264,7 +264,7 @@ Tests: draw plain rect → apply blur effect → pixel values have spread; color
 Evidence: Canvas pixel readback before/after effect application
 ```
 
-#### test_graphics_animation.lua
+#### test_render_animation.lua
 ```
 Modules: graphics + animation
 Scenario: Animation drives which sprite frame is drawn
@@ -352,7 +352,7 @@ Tests: streaming source reads chunks from filesystem without full load
 
 ### Group C: AI & World Simulation (5 tests)
 
-#### test_ai_entity_scene.lua
+#### test_ai_ecs_scene.lua
 ```
 Modules: ai + entity + scene (3-way)
 Scenario: AI agents are entities in a scene, AI drives entity transform
@@ -367,7 +367,7 @@ Tests: FSM transitions → signal emitted with state name; signal listeners upda
 Tests: signal order matches FSM transition order
 ```
 
-#### test_pathfinding_entity.lua
+#### test_pathfind_ecs.lua
 ```
 Modules: pathfinding + entity
 Scenario: Entities follow pathfinding-computed routes
@@ -394,7 +394,7 @@ Tests: AI agent entity moves → camera tracks → scene scroll correct; scene c
 
 ### Group D: Persistence & State (5 tests)
 
-#### test_savegame_entity_scene.lua
+#### test_save_ecs_scene.lua
 ```
 Modules: savegame + entity + scene (3-way)
 Scenario: Full scene with entities is saved and restored
@@ -523,10 +523,10 @@ Tests: solid tiles → ray hits; open tiles → ray passes through; render colum
 
 ```rust
 // Group A: Graphics Pipeline
-#[test] fn lua_integration_graphics_camera() { run_lua_test("integration/test_graphics_camera.lua"); }
+#[test] fn lua_integration_graphics_camera() { run_lua_test("integration/test_render_camera.lua"); }
 #[test] fn lua_integration_graphics_light() { run_lua_test("integration/test_graphics_light.lua"); }
 #[test] fn lua_integration_graphics_effect() { run_lua_test("integration/test_graphics_effect.lua"); }
-#[test] fn lua_integration_graphics_animation() { run_lua_test("integration/test_graphics_animation.lua"); }
+#[test] fn lua_integration_graphics_animation() { run_lua_test("integration/test_render_animation.lua"); }
 #[test] fn lua_integration_graphics_particle() { run_lua_test("integration/test_graphics_particle.lua"); }
 #[test] fn lua_integration_graphics_tilemap() { run_lua_test("integration/test_graphics_tilemap.lua"); }
 #[test] fn lua_integration_canvas_postfx() { run_lua_test("integration/test_canvas_postfx.lua"); }
@@ -538,13 +538,13 @@ Tests: solid tiles → ray hits; open tiles → ray passes through; render colum
 #[test] fn lua_integration_audio_data() { run_lua_test("integration/test_audio_data.lua"); }
 #[test] fn lua_integration_audio_filesystem() { run_lua_test("integration/test_audio_filesystem.lua"); }
 // Group C: AI
-#[test] fn lua_integration_ai_entity_scene() { run_lua_test("integration/test_ai_entity_scene.lua"); }
+#[test] fn lua_integration_ai_entity_scene() { run_lua_test("integration/test_ai_ecs_scene.lua"); }
 #[test] fn lua_integration_ai_signal() { run_lua_test("integration/test_ai_signal.lua"); }
-#[test] fn lua_integration_pathfinding_entity() { run_lua_test("integration/test_pathfinding_entity.lua"); }
+#[test] fn lua_integration_pathfinding_entity() { run_lua_test("integration/test_pathfind_ecs.lua"); }
 #[test] fn lua_integration_pathfinding_tilemap_entity() { run_lua_test("integration/test_pathfinding_tilemap_entity.lua"); }
 #[test] fn lua_integration_ai_scene_camera() { run_lua_test("integration/test_ai_scene_camera.lua"); }
 // Group D: Persistence
-#[test] fn lua_integration_savegame_entity_scene() { run_lua_test("integration/test_savegame_entity_scene.lua"); }
+#[test] fn lua_integration_savegame_entity_scene() { run_lua_test("integration/test_save_ecs_scene.lua"); }
 #[test] fn lua_integration_savegame_animation() { run_lua_test("integration/test_savegame_animation.lua"); }
 #[test] fn lua_integration_data_compute() { run_lua_test("integration/test_data_compute.lua"); }
 #[test] fn lua_integration_thread_filesystem() { run_lua_test("integration/test_thread_filesystem.lua"); }

@@ -233,28 +233,28 @@ lurek.init(function()
     lurek.input.addAction("quit",  {"escape"})
 
     -- Particle systems
-    dust_ps = lurek.particles.new({
+    dust_ps = lurek.particle.new({
         maxParticles = 20, lifetime = 0.3,
         speed = 30, spread = 3.14,
         sizeStart = 3, sizeEnd = 1,
         colorStart = {0.7, 0.6, 0.4, 0.8},
         colorEnd   = {0.7, 0.6, 0.4, 0.0},
     })
-    coin_ps = lurek.particles.new({
+    coin_ps = lurek.particle.new({
         maxParticles = 15, lifetime = 0.4,
         speed = 60, spread = 6.28,
         sizeStart = 3, sizeEnd = 1,
         colorStart = {1.0, 0.9, 0.2, 1.0},
         colorEnd   = {1.0, 0.9, 0.2, 0.0},
     })
-    stomp_ps = lurek.particles.new({
+    stomp_ps = lurek.particle.new({
         maxParticles = 12, lifetime = 0.35,
         speed = 50, spread = 3.14,
         sizeStart = 4, sizeEnd = 1,
         colorStart = {0.9, 0.3, 0.1, 0.9},
         colorEnd   = {0.5, 0.1, 0.0, 0.0},
     })
-    death_ps = lurek.particles.new({
+    death_ps = lurek.particle.new({
         maxParticles = 30, lifetime = 0.5,
         speed = 100, spread = 6.28,
         sizeStart = 4, sizeEnd = 2,
@@ -272,7 +272,7 @@ lurek.process(function(dt)
     title_blink = title_blink + dt
 
     if lurek.input.isActionJustPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -346,7 +346,7 @@ lurek.process(function(dt)
     if player.vy > 600 then player.vy = 600 end
 
     -- Update moving platforms
-    local time_now = lurek.time.getTime()
+    local time_now = lurek.timer.getTime()
     for _, mp in ipairs(moving_plats) do
         local old_x = mp.x
         mp.x = mp.base_x + math.sin(time_now * mp.speed + mp.phase) * mp.range
@@ -657,7 +657,7 @@ lurek.render_ui(function()
     lurek.render.drawText("LIVES: " .. lives, 10, 34, 18)
     lurek.render.drawText("LEVEL: " .. current_lvl .. "/" .. #LEVELS, 10, 58, 18)
 
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.7, 0.7, 0.7, 0.7)
     lurek.render.drawText("FPS: " .. fps, SCREEN_W - 90, 10, 14)
 

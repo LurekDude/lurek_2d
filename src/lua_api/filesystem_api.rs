@@ -1,4 +1,4 @@
-//! `lurek.fs` — Sandboxed file I/O, directory queries, and async asset loading.
+//! `lurek.filesystem` — Sandboxed file I/O, directory queries, and async asset loading.
 //!
 //! All paths are resolved through the game's [`GameFS`] sandbox. Supports file
 //! read/write via `FileHandle`, bulk-data via `FileData`, ZIP archive mounting,
@@ -147,7 +147,7 @@ impl LuaUserData for LuaFileHandle {
 
 /// Lua userdata wrapper around a [`ZipMount`].
 ///
-/// Obtained from `lurek.fs.mountZip(archive_path, prefix)`.
+/// Obtained from `lurek.filesystem.mountZip(archive_path, prefix)`.
 struct LuaZipMount {
     inner: ZipMount,
 }
@@ -194,7 +194,7 @@ impl LuaUserData for LuaZipMount {
 }
 
 // -------------------------------------------------------------------------------
-/// Registers the `lurek.fs` API table with the Lua VM.
+/// Registers the `lurek.filesystem` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable
@@ -649,7 +649,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// `*` matches any run of characters within a single path component;
     /// `?` matches exactly one character.  Patterns are relative to the game root.
     ///
-    /// Example: `lurek.fs.glob("save/*.json")`
+    /// Example: `lurek.filesystem.glob("save/*.json")`
     ///
     /// @param pattern : string
     /// table  array of matching relative paths

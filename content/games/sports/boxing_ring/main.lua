@@ -283,19 +283,19 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle: punch impact sparks
-    ps_impact = lurek.particles.newSystem({
+    ps_impact = lurek.particle.newSystem({
         maxParticles = 80, emissionRate = 0, lifetimeMin = 0.08, lifetimeMax = 0.22,
         speedMin = 100, speedMax = 240, direction = 0, spread = 6.28,
         sizes = { 3, 1 }, colors = { 1, 0.95, 0.5, 1, 1, 0.5, 0.1, 0 },
     })
     -- Particle: sweat drops
-    ps_sweat = lurek.particles.newSystem({
+    ps_sweat = lurek.particle.newSystem({
         maxParticles = 40, emissionRate = 0, lifetimeMin = 0.2, lifetimeMax = 0.5,
         speedMin = 30, speedMax = 80, direction = -1.57, spread = 1.2,
         gravityY = 200, sizes = { 2, 1 }, colors = { 0.6, 0.8, 1, 0.8, 0.4, 0.6, 1, 0 },
     })
     -- Particle: KO stars
-    ps_ko = lurek.particles.newSystem({
+    ps_ko = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0, lifetimeMin = 0.5, lifetimeMax = 1.2,
         speedMin = 40, speedMax = 120, direction = -1.57, spread = 3.14,
         sizes = { 5, 3, 1 }, colors = { 1, 1, 0.3, 1, 1, 0.8, 0.1, 0 },
@@ -321,7 +321,7 @@ end
 -- Process
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Update particles and tweens
     ps_impact:update(dt)
@@ -608,7 +608,7 @@ function lurek.render_ui()
         lurek.render.drawText("J=Jab  K=Hook  L=Uppercut  Space=Block", SCREEN_W * 0.5 - 170, 380, 14, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
         lurek.render.drawText("W=Duck  S=Lean back  A/D=Move", SCREEN_W * 0.5 - 130, 405, 14, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
         -- FPS
-        lurek.render.drawText("FPS: " .. tostring(lurek.time.getFPS()), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4)
+        lurek.render.drawText("FPS: " .. tostring(lurek.timer.getFPS()), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4)
         return
     end
 
@@ -643,7 +643,7 @@ function lurek.render_ui()
     if combo_count > 1 then
         lurek.render.drawText("Combo x" .. combo_count, SCREEN_W * 0.5 - 40, SCREEN_H - 24, 14, 1, 0.5, 0.2)
     end
-    lurek.render.drawText("FPS: " .. tostring(lurek.time.getFPS()), SCREEN_W - 80, SCREEN_H - 24, 12, 0.4, 0.4, 0.4)
+    lurek.render.drawText("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 24, 12, 0.4, 0.4, 0.4)
 
     -- Dodge indicator
     if player.dodge == DODGE_DUCK then

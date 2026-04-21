@@ -159,7 +159,7 @@ src/lua_api/blocksim_api.rs may import:
 - TOML scenario file loading via `lurek.data.parseToml`
 - Blueprint pattern implementations (saga, watchdog, canary, bulkhead)
 - Multi-run orchestration (base + variant, parallel runs via `lurek.thread`)
-- Monitor log export to files via `lurek.fs`
+- Monitor log export to files via `lurek.filesystem`
 - Post-run report generation via `lurek.dataframe`
 - Optional live dashboard via `lurek.ui` or `lurek.terminal`
 
@@ -181,7 +181,7 @@ This must not happen inside the tick loop. It runs after `lurek.sim.run()` compl
 - Composite drill-in UX
 - Dashboard panel layout
 
-This is always a separate concern. A Lurek2D frontend can use `lurek.gfx`, `lurek.ui`, or `lurek.scene`. An external frontend can consume exported JSON. Neither is part of the simulation kernel.
+This is always a separate concern. A Lurek2D frontend can use `lurek.render`, `lurek.ui`, or `lurek.scene`. An external frontend can consume exported JSON. Neither is part of the simulation kernel.
 
 ---
 

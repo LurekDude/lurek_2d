@@ -185,7 +185,7 @@ def transform_line(line: str) -> str | None:
         r"^(luna\.\w+[\.\:]\w+)\s*\(([^)]*)\)(.*)", content
     )
     if m_luna:
-        call_base = m_luna.group(1)       # e.g. `lurek.simulator.pause`
+        call_base = m_luna.group(1)       # e.g. `lurek.automation.pause`
         args_text = m_luna.group(2)       # e.g. `"menu_demo"` or `` or `name`
         remainder = m_luna.group(3).strip()  # e.g. `→ boolean  — description`
 

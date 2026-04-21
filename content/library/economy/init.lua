@@ -7,8 +7,8 @@
 --- @see lurek.math.clamp           value/capacity/minimum clamp helper used by `Resource:_clamp`
 --- @see lurek.math.lerp            useful for smoothing UI display of resource values
 --- @see lurek.math.round           round-trip helper when displaying integer-only resources
---- @see lurek.codec.toJson         serialise resources/rules/modifiers for save persistence
---- @see lurek.codec.fromJson       restore manager state from a JSON snapshot
+--- @see lurek.serial.toJson         serialise resources/rules/modifiers for save persistence
+--- @see lurek.serial.fromJson       restore manager state from a JSON snapshot
 --- @see lurek.patterns.newEventBus optional transaction event bus from `manager:getEventBus()`
 local M = {}
 

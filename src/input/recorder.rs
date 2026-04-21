@@ -22,7 +22,7 @@
 pub struct InputEvent {
     /// `"down"` for press, `"up"` for release.
     pub kind: String,
-    /// Key or button name as used in `lurek.keyboard` / `lurek.mouse`.
+    /// Key or button name as used in `lurek.input.keyboard` / `lurek.input.mouse`.
     pub name: String,
 }
 

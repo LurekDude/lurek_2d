@@ -27,7 +27,7 @@ end
 --- path_nodes: optional array of nodes from findPath
 --- positions: array of {x, y} parallel to nodes_arr
 local function draw_graph(nodes_arr, edges_idx, path_nodes, positions, iw, ih)
-    local img = lurek.img.newImageData(iw, ih)
+    local img = lurek.image.newImageData(iw, ih)
     img:fill(15, 20, 30, 255)
 
     -- Build set of path nodes by tostring key for highlighting
@@ -104,7 +104,7 @@ describe("Evidence: lurek.graph visual network PNG", function()
         local path_nodes  = path_result and path_result.nodes or nil
 
         local img = draw_graph(nodes, edge_def, path_nodes, positions, 240, 240)
-        lurek.img.savePNG(img, OUT .. "evidence_graph_ring.png")
+        lurek.image.savePNG(img, OUT .. "evidence_graph_ring.png")
     end)
 
     -- @covers Graph:findPath
@@ -142,7 +142,7 @@ describe("Evidence: lurek.graph visual network PNG", function()
         local path_nodes  = path_result and path_result.nodes or nil
 
         local img = draw_graph(nodes, edge_def, path_nodes, positions, 240, 240)
-        lurek.img.savePNG(img, OUT .. "evidence_graph_hub.png")
+        lurek.image.savePNG(img, OUT .. "evidence_graph_hub.png")
     end)
 end)
 

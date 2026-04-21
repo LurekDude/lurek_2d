@@ -10,7 +10,7 @@ describe("evidence: physics simulation", function()
     -- @covers lurek.physics.attachShape
     -- @covers World:step
     -- @covers Body:getPosition
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Simulates a small physics scene for one second and saves a PNG showing the final body positions.
     it("simulates bodies and writes position evidence image", function()
@@ -42,7 +42,7 @@ describe("evidence: physics simulation", function()
         end
 
         -- paint evidence image from body positions
-        local img = lurek.img.newImageData(256, 256)
+        local img = lurek.image.newImageData(256, 256)
         img:fill(20, 20, 40, 255)
 
         -- ground â€” white bar
@@ -76,7 +76,7 @@ describe("evidence: physics simulation", function()
             end
         end
 
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 end)

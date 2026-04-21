@@ -23,9 +23,9 @@ Fill the program slots with movement commands, then run to see your robot follow
 
 ## APIs Used
 - `lurek.render` — grid, robot, animated program bar
-- `lurek.particles` — step trail, win burst
+- `lurek.particle` — step trail, win burst
 - `lurek.input` — action-bound commands
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced

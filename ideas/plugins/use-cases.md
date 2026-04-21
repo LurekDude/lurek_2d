@@ -48,7 +48,7 @@ lurek.init(function()
 end)
 
 lurek.render(function()
-    lurek.gfx.clear(0.95, 0.95, 0.97)
+    lurek.render.clear(0.95, 0.95, 0.97)
     chart:draw()
 end)
 ```
@@ -132,8 +132,8 @@ lurek.process(function(dt)
 end)
 
 lurek.render(function()
-    lurek.gfx.clear(0.1, 0.1, 0.15)
-    lurek.gfx.drawText("Temperature: " .. temperature .. "°C", 100, 100)
+    lurek.render.clear(0.1, 0.1, 0.15)
+    lurek.render.drawText("Temperature: " .. temperature .. "°C", 100, 100)
     drawGauge(temperature, 0, 100, 400, 300, 150)
 end)
 ```
@@ -166,7 +166,7 @@ and spatial hashing.
 
 ### 2D CAD / Diagram Editors
 
-With `lurek.gfx` for rendering, `lurek.input` for interaction, and `lurek.graph` for
+With `lurek.render` for rendering, `lurek.input` for interaction, and `lurek.graph` for
 data structures, Lurek2D can power:
 - Circuit diagram editors
 - Flowchart tools
@@ -184,7 +184,7 @@ A headless-capable Lurek2D can render scenes and compare screenshots:
 -- Automated visual regression test
 lurek.init(function()
     render_complex_scene()
-    lurek.gfx.saveScreenshot("output/test_scene.png")
+    lurek.render.saveScreenshot("output/test_scene.png")
     lurek.window.close()
 end)
 ```

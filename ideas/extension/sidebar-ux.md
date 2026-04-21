@@ -59,7 +59,7 @@ No Lurek2D project detected.
 - **Thumbnail previews** for images/sprites
 - **Audio waveform** preview for sound files
 - **Search/filter** within asset tree
-- **Drag-and-drop** assets into editor to insert `lurek.gfx.newImage("path")`
+- **Drag-and-drop** assets into editor to insert `lurek.render.newImage("path")`
 - **Missing asset highlighting** — red marker on referenced-but-missing assets
 - **Asset usage count** — show how many Lua files reference each asset
 - **Asset size** — file size and dimensions for images

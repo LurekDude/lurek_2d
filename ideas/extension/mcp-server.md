@@ -174,7 +174,7 @@ Test plan:
   "description": "Get Lurek2D API documentation for a specific function or namespace",
   "hints": ["Use when user asks about lurek.* API", "Returns complete parameter info"],
   "examples": [
-    { "input": { "query": "lurek.gfx.circle" }, "output": "..." }
+    { "input": { "query": "lurek.render.circle" }, "output": "..." }
   ],
   "category": "documentation"
 }

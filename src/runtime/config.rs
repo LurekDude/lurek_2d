@@ -15,7 +15,7 @@
 //! - [`PerformanceConfig`] — target frame-rate cap (`fps_cap`).
 //!
 //! The `identity` field sets the name of the per-user save directory returned by
-//! `lurek.fs.getSaveDirectory()`.  If unset, the engine uses the game directory
+//! `lurek.filesystem.getSaveDirectory()`.  If unset, the engine uses the game directory
 //! name as a fallback.
 //!
 //! # Example `conf.toml`
@@ -146,30 +146,30 @@ pub struct WindowConfig {
 /// # Fields
 /// - `audio` — rodio audio subsystem (`lurek.audio`).
 /// - `physics` — rapier2d physics world (`lurek.physics`).
-/// - `graphics` — GPU render pipeline (`lurek.graphicphic`, `lurek.font`, `lurek.sprite`).
+/// - `graphics` — GPU render pipeline (`lurek.renderphic`, `lurek.font`, `lurek.sprite`).
 /// - `input` — keyboard / mouse / gamepad input (`lurek.input`).
-/// - `timer` — frame timer and scheduled callbacks (`lurek.time`).
-/// - `filesystem` — sandboxed game filesystem (`lurek.fs`).
+/// - `timer` — frame timer and scheduled callbacks (`lurek.timer`).
+/// - `filesystem` — sandboxed game filesystem (`lurek.filesystem`).
 /// - `window` — window state queries (`lurek.window`).
-/// - `particle` — 2D particle emitters (`lurek.particles`).
-/// - `image` — CPU-side image manipulation (`lurek.img`).
+/// - `particle` — 2D particle emitters (`lurek.particle`).
+/// - `image` — CPU-side image manipulation (`lurek.image`).
 /// - `gui` — retained-mode GUI widgets (`lurek.ui`).
-/// - `overlay` — fullscreen overlay and post-processing effects (`lurek.overlay`, `lurek.postfx`).
+/// - `overlay` — fullscreen overlay and post-processing effects (`lurek.effect`, `lurek.effect`).
 /// - `tilemap` — tile maps, tile sets, and map generation (`lurek.tilemap`).
 /// - `scene` — scene stack and transition management (`lurek.scene`).
-/// - `savegame` — save/load orchestration and schema versioning (`lurek.savegame`).
-/// - `entity` — lightweight ECS primitives (`lurek.entity`).
+/// - `savegame` — save/load orchestration and schema versioning (`lurek.save`).
+/// - `entity` — lightweight ECS primitives (`lurek.ecs`).
 /// - `ai` — FSMs, behaviour trees, and steering (`lurek.ai`, `lurek.steering`).
-/// - `pathfinding` — A★ and flow-field navigation grids (`lurek.pathfinding`).
+/// - `pathfinding` — A★ and flow-field navigation grids (`lurek.pathfind`).
 /// - `thread` — background Rust threads and `Channel` objects (`lurek.thread`).
 /// - `graph` — directed graphs and flow simulation (`lurek.graph`).
-/// - `data` — binary data helpers, encoding/compression, and serial (`lurek.data`, `lurek.codec`).
-/// - `compute` — dense numerical arrays and `DataFrame` (`lurek.gpu`, `lurek.dataframe`).
+/// - `data` — binary data helpers, encoding/compression, and serial (`lurek.data`, `lurek.serial`).
+/// - `compute` — dense numerical arrays and `DataFrame` (`lurek.compute`, `lurek.dataframe`).
 /// - `minimap` — minimap extraction and FOV masking (`lurek.minimap`).
-/// - `modding` — mod discovery and load ordering (`lurek.modding`).
+/// - `modding` — mod discovery and load ordering (`lurek.mods`).
 /// - `pipeline` — data transformation pipelines and pattern helpers (`lurek.pipeline`, `lurek.patterns`).
-/// - `system` — system information queries (`lurek.platform`).
-/// - `localization` — string localisation tables (`lurek.localization`).
+/// - `system` — system information queries (`lurek.runtime`).
+/// - `localization` — string localisation tables (`lurek.i18n`).
 /// - `debug` — debug bridge, doc server, and automation helpers (`lurek.debug`, `lurek.debugbridge`, `lurek.docs`, `lurek.automation`).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 /// # Fields

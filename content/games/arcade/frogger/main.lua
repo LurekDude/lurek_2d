@@ -357,7 +357,7 @@ function lurek.process(dt)
         if lurek.input.wasActionPressed("start") then
             start_game()
         end
-        if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+        if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
         return
     end
 
@@ -367,12 +367,12 @@ function lurek.process(dt)
             reset_homes()
             start_game()
         end
-        if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+        if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
         return
     end
 
     -- ── PLAYING ───────────────────────────────────────────────
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Respawn timer
     if frog.respawn_timer then
@@ -736,7 +736,7 @@ function lurek.render_ui()
         lurek.render.print("Fill all 5 home slots to win!", SCREEN_W / 2 - 120, 400, 1)
 
         -- Blink "PRESS ENTER"
-        local blink = math.sin(lurek.time.getTime() * 4) > 0
+        local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 0, 1)
             lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 70, 470, 1.5)
@@ -767,7 +767,7 @@ function lurek.render_ui()
             lurek.render.print("NEW HIGH SCORE!", SCREEN_W / 2 - 80, 360, 1.2)
         end
 
-        local blink = math.sin(lurek.time.getTime() * 4) > 0
+        local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 1, 0.9)
             lurek.render.print("PRESS ENTER TO RETRY", SCREEN_W / 2 - 110, 430, 1.2)
@@ -810,12 +810,12 @@ function lurek.render_ui()
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.render.print("FPS: " .. lurek.time.getFPS(), 10, SCREEN_H - 20, 0.8)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 0.8)
 end
 
 -- ---------------------------------------------------------------------------
 -- lurek.keypressed — discrete key events
 -- ---------------------------------------------------------------------------
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
 end

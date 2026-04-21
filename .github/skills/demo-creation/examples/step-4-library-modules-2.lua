@@ -5,5 +5,5 @@ function lurek.init()
     inv = inventory.new(20)
     -- then window + graphics setup
     lurek.window.setTitle("Loot Demo")
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
 end

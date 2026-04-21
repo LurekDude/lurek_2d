@@ -41,8 +41,8 @@ Power-ups drop from destroyed bricks (30% chance). Catch them with the paddle to
 - `lurek.window` — setTitle
 - `lurek.render` — setBackgroundColor, rectangle, circle, print (world + UI split)
 - `lurek.input` — bind, isActionDown, wasActionPressed
-- `lurek.time` — getFPS
-- `lurek.signal` — quit
-- `lurek.particles` — newSystem, emit, setColors, setSizes, setLifetime, setSpeed, setSpread
+- `lurek.timer` — getFPS
+- `lurek.event` — quit
+- `lurek.particle` — newSystem, emit, setColors, setSizes, setLifetime, setSpeed, setSpread
 - `lurek.tween` — to (level-complete flash)
 - `lurek.camera` — new

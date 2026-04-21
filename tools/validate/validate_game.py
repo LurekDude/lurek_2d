@@ -59,18 +59,18 @@ KNOWN_CALLBACKS = {
     "lurek.mousepressed", "lurek.mousereleased",
     "lurek.mousemoved", "lurek.wheelmoved",
     "lurek.touchpressed", "lurek.touchmoved", "lurek.touchreleased",
-    "lurek.gamepadpressed", "lurek.gamepadreleased",
-    "lurek.gamepadaxis", "lurek.textinput",
+    "lurek.input.gamepadpressed", "lurek.input.gamepadreleased",
+    "lurek.input.gamepadaxis", "lurek.textinput",
     "lurek.focus", "lurek.visible", "lurek.resize",
     "lurek.quit", "lurek.errhand",
 }
 
 # Known top-level luna properties (not functions)
 KNOWN_PROPERTIES = {
-    "lurek.graphics", "lurek.audio", "lurek.physics", "lurek.input",
+    "lurek.renders", "lurek.audio", "lurek.physics", "lurek.input",
     "lurek.timer", "lurek.filesystem", "lurek.math", "lurek.window",
-    "lurek.system", "lurek.event", "lurek.keyboard", "lurek.mouse",
-    "lurek.joystick", "lurek.gamepad", "lurek.touch", "lurek.sound",
+    "lurek.runtime", "lurek.event", "lurek.input.keyboard", "lurek.input.mouse",
+    "lurek.joystick", "lurek.input.gamepad", "lurek.input.touch", "lurek.sound",
     "lurek.data", "lurek.image", "lurek.thread", "lurek.compute",
     "lurek.dataframe", "lurek.ai", "lurek.graph", "lurek.particle",
     "lurek.tilemap",

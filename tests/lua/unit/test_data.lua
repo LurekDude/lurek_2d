@@ -621,7 +621,7 @@ describe("data.msgpack", function()
     it("produces a binary string shorter than JSON for integers", function()
         local data = { a = 1, b = 2, c = 3 }
         local bytes = lurek.data.toMsgPack(data)
-        local json  = lurek.codec.toJson(data, false)
+        local json  = lurek.serial.toJson(data, false)
         -- MessagePack should be more compact than JSON for this payload
         expect_equal(#bytes <= #json, true)
     end)

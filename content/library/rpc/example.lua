@@ -28,7 +28,7 @@ end
 
 local host_server, host_client = new_host_pair()
 
--- The library's _encode/_decode prefer lurek.codec but fall back to
+-- The library's _encode/_decode prefer lurek.serial but fall back to
 -- lurek.network.pack when codec is missing. Provide a minimal pack/unpack
 -- pair (passes the table through identity) so the example runs in any
 -- plain Lua VM that has no engine context.

@@ -41,9 +41,9 @@ Clear all dots to advance to the next level, where ghosts move faster. You start
 - `lurek.render` — draws the maze, Pac-Man (circle with wedge mouth), ghosts (rectangle body with circle head and eye pupils), dots, and power pellets.
 - `lurek.input` — action-bound directional controls.
 - `lurek.tween` — power pellet pulse animation, score pop effect.
-- `lurek.particles` — dot pickup sparkle, ghost eaten burst.
-- `lurek.time` — FPS counter, pellet pulse sine wave, frightened flash timing.
-- `lurek.signal` — clean shutdown on Escape.
+- `lurek.particle` — dot pickup sparkle, ghost eaten burst.
+- `lurek.timer` — FPS counter, pellet pulse sine wave, frightened flash timing.
+- `lurek.event` — clean shutdown on Escape.
 - `lurek.camera` — world-space camera attachment for maze rendering.
 
 **Lunasome (`content/library/`) modules**

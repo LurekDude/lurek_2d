@@ -47,7 +47,7 @@ end
 
 ```lua
 register_command("fps", function()
-    console_print("FPS: " .. tostring(lurek.time.getFPS()))
+    console_print("FPS: " .. tostring(lurek.timer.getFPS()))
 end, "Show current FPS")
 
 register_command("reload", function()
@@ -153,24 +153,24 @@ local function draw_console()
     local ch = 250  -- console height
 
     -- Background
-    lurek.gfx.setColor(0, 0, 0, 0.85)
-    lurek.gfx.rectangle("fill", 0, 0, sw, ch)
+    lurek.render.setColor(0, 0, 0, 0.85)
+    lurek.render.rectangle("fill", 0, 0, sw, ch)
 
     -- Log lines
-    lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
+    lurek.render.setColor(0.8, 0.8, 0.8, 1)
     local start = math.max(1, #console.log - 12)
     for i = start, #console.log do
         local y = (i - start) * 16 + 4
-        lurek.gfx.print(console.log[i], 8, y)
+        lurek.render.print(console.log[i], 8, y)
     end
 
     -- Input line
-    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
-    lurek.gfx.rectangle("fill", 0, ch - 22, sw, 22)
-    lurek.gfx.setColor(0, 1, 0, 1)
-    lurek.gfx.print("> " .. console.input .. "_", 8, ch - 20)
+    lurek.render.setColor(0.2, 0.2, 0.2, 1)
+    lurek.render.rectangle("fill", 0, ch - 22, sw, 22)
+    lurek.render.setColor(0, 1, 0, 1)
+    lurek.render.print("> " .. console.input .. "_", 8, ch - 20)
 
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
 end
 ```
 

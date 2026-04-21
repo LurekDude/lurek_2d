@@ -42,7 +42,7 @@ Patient satisfaction depends on wait time — patients who wait longer than 60 s
 
 ## APIs Used
 
-`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particles`, `lurek.tween`, `lurek.time`, `lurek.signal`
+`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particle`, `lurek.tween`, `lurek.timer`, `lurek.event`
 
 ## Changes from Original Demo
 

@@ -42,9 +42,9 @@ cargo run -- content/games/rpg/horror
 - `lurek.render` — drawRect, drawRectLines, drawCircle, drawLine, print, setColor, setBackgroundColor
 - `lurek.render_ui` — sanity bar, battery bar, key/note counters, messages, note overlay
 - `lurek.input` — addAction, wasActionPressed, isActionDown
-- `lurek.particles` — dust motes (flashlight), scare flash, key pickup glow
+- `lurek.particle` — dust motes (flashlight), scare flash, key pickup glow
 - `lurek.tween` — tween.update for animation timing
 - `lurek.camera` — setPosition for player-following camera with shake offset
 - `lurek.window` — setTitle with FPS display
-- `lurek.signal` — quit on escape
-- `lurek.time` — getFPS
+- `lurek.event` — quit on escape
+- `lurek.timer` — getFPS

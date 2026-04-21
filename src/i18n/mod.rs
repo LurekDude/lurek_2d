@@ -1,7 +1,7 @@
 //! Localization subsystem for Lurek2D.
 //!
 //! Provides translation catalog management and text formatting utilities
-//! exposed to Lua games via `lurek.localization.*`.
+//! exposed to Lua games via `lurek.i18n.*`.
 //!
 //! ## Architecture
 //!

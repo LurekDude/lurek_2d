@@ -540,7 +540,7 @@ end
 -- ---------------------------------------------------------------------------
 lurek.init(function()
     lurek.window.setTitle("Visual Novel — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
     camera = lurek.camera.new()
     title_alpha = 0
 end)
@@ -599,7 +599,7 @@ lurek.process(function(dt)
     end
 
     -- Quit
-    if lurek.input.isPressed(actions.quit) then lurek.signal.quit() end
+    if lurek.input.isPressed(actions.quit) then lurek.event.quit() end
 
     -- History toggle
     if lurek.input.isPressed(actions.history) then

@@ -3,7 +3,7 @@
 -- Builds a small 4-province map programmatically, sets adjacency,
 -- finds a route between provinces, and demonstrates faction map
 -- modes with a fixed colour function. No PNG load (that path requires
--- lurek.img); we use the public construction API instead.
+-- lurek.image); we use the public construction API instead.
 -- @module example.province_map
 
 local M = require("library.province_map")

@@ -415,7 +415,7 @@ end)
 -- lurek.process — game logic
 ------------------------------------------------------------------------
 lurek.process(function(dt)
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.window.setTitle("Creature Collector — Lurek2D | FPS: " .. math.floor(fps))
 
     update_particles(dt)
@@ -439,7 +439,7 @@ lurek.process(function(dt)
 
     -- quit
     if lurek.input.isActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

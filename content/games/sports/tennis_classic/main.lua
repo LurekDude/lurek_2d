@@ -185,7 +185,7 @@ local function award_point(winner)
             state = ST.MATCH_END
 
             if ace_particles then
-                lurek.particles.emit(ace_particles, CENTER_X, NET_Y, 40)
+                lurek.particle.emit(ace_particles, CENTER_X, NET_Y, 40)
             end
             return
         end
@@ -263,39 +263,39 @@ lurek.init(function()
     lurek.input.bind("quit", "escape")
 
     -- Particles
-    dust_particles = lurek.particles.newSystem(50)
-    lurek.particles.setLifetime(dust_particles, 0.2, 0.5)
-    lurek.particles.setSpeed(dust_particles, 20, 80)
-    lurek.particles.setColors(dust_particles, 0.8, 0.7, 0.5, 1.0, 0.8, 0.7, 0.5, 0.0)
-    lurek.particles.setSizes(dust_particles, 3, 1)
+    dust_particles = lurek.particle.newSystem(50)
+    lurek.particle.setLifetime(dust_particles, 0.2, 0.5)
+    lurek.particle.setSpeed(dust_particles, 20, 80)
+    lurek.particle.setColors(dust_particles, 0.8, 0.7, 0.5, 1.0, 0.8, 0.7, 0.5, 0.0)
+    lurek.particle.setSizes(dust_particles, 3, 1)
 
-    ace_particles = lurek.particles.newSystem(80)
-    lurek.particles.setLifetime(ace_particles, 0.3, 0.8)
-    lurek.particles.setSpeed(ace_particles, 50, 200)
-    lurek.particles.setColors(ace_particles, 1.0, 1.0, 0.0, 1.0, 1.0, 0.5, 0.0, 0.0)
-    lurek.particles.setSizes(ace_particles, 5, 1)
-    lurek.particles.setSpread(ace_particles, math.pi * 2)
+    ace_particles = lurek.particle.newSystem(80)
+    lurek.particle.setLifetime(ace_particles, 0.3, 0.8)
+    lurek.particle.setSpeed(ace_particles, 50, 200)
+    lurek.particle.setColors(ace_particles, 1.0, 1.0, 0.0, 1.0, 1.0, 0.5, 0.0, 0.0)
+    lurek.particle.setSizes(ace_particles, 5, 1)
+    lurek.particle.setSpread(ace_particles, math.pi * 2)
 
-    net_particles = lurek.particles.newSystem(30)
-    lurek.particles.setLifetime(net_particles, 0.1, 0.3)
-    lurek.particles.setSpeed(net_particles, 10, 40)
-    lurek.particles.setColors(net_particles, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0)
-    lurek.particles.setSizes(net_particles, 2, 1)
+    net_particles = lurek.particle.newSystem(30)
+    lurek.particle.setLifetime(net_particles, 0.1, 0.3)
+    lurek.particle.setSpeed(net_particles, 10, 40)
+    lurek.particle.setColors(net_particles, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0)
+    lurek.particle.setSizes(net_particles, 2, 1)
 end)
 
 -- ── Process ───────────────────────────────────────────────────────
 lurek.process(function(dt)
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
     title_timer = title_timer + dt
 
     -- Update particles
-    lurek.particles.update(dust_particles, dt)
-    lurek.particles.update(ace_particles, dt)
-    lurek.particles.update(net_particles, dt)
+    lurek.particle.update(dust_particles, dt)
+    lurek.particle.update(ace_particles, dt)
+    lurek.particle.update(net_particles, dt)
 
     -- Score popup fade
     if score_popup.alpha > 0 then
@@ -380,7 +380,7 @@ lurek.process(function(dt)
                     ball.bounced = false
                     last_hitter = 1
                     state = ST.PLAYING
-                    lurek.particles.emit(dust_particles, ball.x, ball.y, 8)
+                    lurek.particle.emit(dust_particles, ball.x, ball.y, 8)
                 end
 
                 if ball_height > math.pi then
@@ -403,7 +403,7 @@ lurek.process(function(dt)
                 ball.bounced = false
                 last_hitter = 2
                 state = ST.PLAYING
-                lurek.particles.emit(dust_particles, ball.x, ball.y, 8)
+                lurek.particle.emit(dust_particles, ball.x, ball.y, 8)
             end
         end
         return
@@ -435,7 +435,7 @@ lurek.process(function(dt)
             local spd_total = math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
             if spd_total < 100 then
                 -- Net fault
-                lurek.particles.emit(net_particles, ball.x, NET_Y, 15)
+                lurek.particle.emit(net_particles, ball.x, NET_Y, 15)
                 ball.active = false
                 award_point((last_hitter == 1) and 2 or 1)
                 return
@@ -481,7 +481,7 @@ lurek.process(function(dt)
             -- Ball in opponent half, first bounce
             if ball.y <= COURT_T + 5 then
                 ball.bounced = true
-                lurek.particles.emit(dust_particles, ball.x, ball.y, 5)
+                lurek.particle.emit(dust_particles, ball.x, ball.y, 5)
 
                 -- Service box check for serves
                 if serve_phase == 2 and last_hitter == 1 then
@@ -506,7 +506,7 @@ lurek.process(function(dt)
         if ball.vy > 0 and ball.y > NET_Y and not ball.bounced then
             if ball.y >= COURT_B - 5 then
                 ball.bounced = true
-                lurek.particles.emit(dust_particles, ball.x, ball.y, 5)
+                lurek.particle.emit(dust_particles, ball.x, ball.y, 5)
 
                 if serve_phase == 2 and last_hitter == 2 then
                     if not is_in_service_box(ball.x, ball.y, false) then
@@ -561,7 +561,7 @@ lurek.process(function(dt)
                     rally_count = rally_count + 1
                     aim_dir = 0
                     spin_type = 0
-                    lurek.particles.emit(dust_particles, ball.x, ball.y, 6)
+                    lurek.particle.emit(dust_particles, ball.x, ball.y, 6)
 
                     if rally_count >= 10 then
                         score_popup = { text = "Rally: " .. rally_count, alpha = 1.0, y = H / 2 - 40 }
@@ -603,7 +603,7 @@ lurek.process(function(dt)
                     serve_phase = 0
                     rally_count = rally_count + 1
                     ai_react_timer = 0
-                    lurek.particles.emit(dust_particles, ball.x, ball.y, 6)
+                    lurek.particle.emit(dust_particles, ball.x, ball.y, 6)
                 end
             end
         else
@@ -680,14 +680,14 @@ lurek.render(function()
     end
 
     -- Particles
-    lurek.particles.draw(dust_particles)
-    lurek.particles.draw(ace_particles)
-    lurek.particles.draw(net_particles)
+    lurek.particle.draw(dust_particles)
+    lurek.particle.draw(ace_particles)
+    lurek.particle.draw(net_particles)
 end)
 
 -- ── Render UI (screen-space: score, messages) ─────────────────────
 lurek.render_ui(function()
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
 
     if state == ST.TITLE then
         -- Title screen

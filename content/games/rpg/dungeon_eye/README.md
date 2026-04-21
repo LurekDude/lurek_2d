@@ -7,9 +7,9 @@ First-person dungeon crawler inspired by Eye of the Beholder (PC 1992). Navigate
 - `lurek.raycaster.new()` — first-person perspective raycaster viewport
 - `library.item` — item type definitions (`health_potion`, `sword`, `shield`, `magic_key`)
 - `library.inventory` — slot-based inventory management with `add`, `remove`, `getSlots`
-- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` / `lurek.gfx.print()` — minimap, UI panels, HUD
-- `lurek.gfx.draw()` — raycaster frame output
-- `lurek.signal.quit()` — clean exit
+- `lurek.render.rectangle()` / `lurek.render.circle()` / `lurek.render.print()` — minimap, UI panels, HUD
+- `lurek.render.draw()` — raycaster frame output
+- `lurek.event.quit()` — clean exit
 
 ## How to Run
 

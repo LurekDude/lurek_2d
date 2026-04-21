@@ -13,9 +13,9 @@ end
 describe("Evidence: combined procgen + pathfinding", function()
 
     -- @covers lurek.procgen.cellularAutomata
-    -- @covers lurek.pathfinding.newNavGrid
+    -- @covers lurek.pathfind.newNavGrid
     -- @covers NavGrid:setBlocked
-    -- @covers lurek.pathfinding.newPathfinder
+    -- @covers lurek.pathfind.newPathfinder
     -- @covers Pathfinder:findPath
     -- @evidence file
     -- @description Generates a cave map, mirrors it into a navigation grid, and writes a PNG showing the resulting path overlay.
@@ -27,7 +27,7 @@ describe("Evidence: combined procgen + pathfinding", function()
         local cave = lurek.procgen.cellularAutomata(GW, GH)
 
         -- 2. Build a NavGrid mirroring the cave walls
-        local grid = lurek.pathfinding.newNavGrid(GW, GH)
+        local grid = lurek.pathfind.newNavGrid(GW, GH)
         for gy = 1, GH do
             for gx = 1, GW do
                 local idx = (gy - 1) * GW + gx
@@ -38,11 +38,11 @@ describe("Evidence: combined procgen + pathfinding", function()
         end
 
         -- 3. Find a path from top-left to bottom-right
-        local pf   = lurek.pathfinding.newPathfinder(grid)
+        local pf   = lurek.pathfind.newPathfinder(grid)
         local path = pf:findPath(1, 1, GW, GH)
 
         -- 4. Render: cave cells
-        local img = lurek.img.newImageData(GW * SCALE, GH * SCALE)
+        local img = lurek.image.newImageData(GW * SCALE, GH * SCALE)
         img:drawRect(0, 0, GW * SCALE, GH * SCALE, 20, 20, 25, 255)
 
         for gy = 1, GH do
@@ -66,7 +66,7 @@ describe("Evidence: combined procgen + pathfinding", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "procgen_pathfinding.png")
+        lurek.image.savePNG(img, OUT .. "procgen_pathfinding.png")
     end)
 
 end)
@@ -88,7 +88,7 @@ describe("Evidence: combined noise + minimap", function()
         local ng = lurek.math.newNoiseGenerator(7)
         local mm = lurek.minimap.newMinimap(GRID, GRID, W, H)
 
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:drawRect(0, 0, W, H, 10, 10, 20, 255)
 
         for gy = 1, GRID do
@@ -116,7 +116,7 @@ describe("Evidence: combined noise + minimap", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "noise_minimap.png")
+        lurek.image.savePNG(img, OUT .. "noise_minimap.png")
     end)
 
 end)
@@ -157,7 +157,7 @@ describe("Evidence: combined terrain + raycaster", function()
 
         -- Render depth buffer image
         local IW, IH = NUM_RAYS * 3, 200
-        local img = lurek.img.newImageData(IW, IH)
+        local img = lurek.image.newImageData(IW, IH)
         img:drawRect(0, 0, IW, IH, 20, 20, 30, 255)
 
         for i, ray in ipairs(rays) do
@@ -171,7 +171,7 @@ describe("Evidence: combined terrain + raycaster", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "terrain_raycaster.png")
+        lurek.image.savePNG(img, OUT .. "terrain_raycaster.png")
     end)
 
 end)
@@ -181,7 +181,7 @@ describe("Evidence: combined tilemap + particles", function()
 
     -- @covers lurek.tilemap.newTileMap
     -- @covers TileMap:addLayer
-    -- @covers lurek.particles.newSystem
+    -- @covers lurek.particle.newSystem
     -- @covers ParticleSystem:setPosition
     -- @covers ParticleSystem:start
     -- @covers ParticleSystem:emit
@@ -199,7 +199,7 @@ describe("Evidence: combined tilemap + particles", function()
         tm:addLayer("ground", MAP_W, MAP_H)
 
         -- Render the tilemap manually (floor + borders)
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         for ty = 1, MAP_H do
             for tx = 1, MAP_W do
                 local px, py = (tx - 1) * TILE, (ty - 1) * TILE
@@ -213,7 +213,7 @@ describe("Evidence: combined tilemap + particles", function()
         end
 
         -- Emit particles from the centre and draw them as sparks
-        local sys = lurek.particles.newSystem()
+        local sys = lurek.particle.newSystem()
         local cx = math.floor(W / 2)
         local cy = math.floor(H / 2)
         sys:setPosition(cx, cy)
@@ -237,7 +237,7 @@ describe("Evidence: combined tilemap + particles", function()
         -- Mark emitter centre
         img:drawRect(cx - 2, cy - 2, 5, 5, 255, 255, 255, 255)
 
-        lurek.img.savePNG(img, OUT .. "tilemap_particles.png")
+        lurek.image.savePNG(img, OUT .. "tilemap_particles.png")
     end)
 
 end)

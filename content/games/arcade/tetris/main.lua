@@ -259,7 +259,7 @@ function lurek.init()
     lurek.input.bind("quit",      { "escape"     })
 
     -- Particle system for line-clear sparkles
-    sparks = lurek.particles.newSystem({
+    sparks = lurek.particle.newSystem({
         maxParticles  = 300,
         emissionRate  = 0,
         lifetimeMin   = 0.3,  lifetimeMax = 0.9,
@@ -288,7 +288,7 @@ end
 function lurek.process(dt)
     -- Global quit
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -402,8 +402,8 @@ end
 -- ===========================================================================
 function lurek.render()
     -- Apply screen shake offset
-    local sx_off = math.floor(shake_offset_x * math.sin(lurek.time.getTime() * 60))
-    local sy_off = math.floor(shake_offset_y * math.cos(lurek.time.getTime() * 47))
+    local sx_off = math.floor(shake_offset_x * math.sin(lurek.timer.getTime() * 60))
+    local sy_off = math.floor(shake_offset_y * math.cos(lurek.timer.getTime() * 47))
 
     -- Board border
     lurek.render.setColor(0.3, 0.3, 0.5)
@@ -553,7 +553,7 @@ function lurek.render_ui()
 
     -- ── Left sidebar: FPS ────────────────────────────────────────────
     lurek.render.setColor(0.4, 0.4, 0.5)
-    lurek.render.print("FPS: " .. math.floor(lurek.time.getFPS()), 8, SCREEN_H - 20, 1)
+    lurek.render.print("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 20, 1)
 
     -- ── Game over overlay ────────────────────────────────────────────
     if state == STATE.GAME_OVER then

@@ -1,4 +1,4 @@
-//! `lurek.savegame` - Slot-based save/load system with collectors, schema versioning, and auto-save.
+//! `lurek.save` - Slot-based save/load system with collectors, schema versioning, and auto-save.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -170,7 +170,7 @@ impl LuaSaveManager {
         let game_dir = self.state.borrow().game_dir.clone();
         GameFS::new(game_dir)
             .write_string(&path, &content)
-            .map_err(|e| LuaError::RuntimeError(format!("lurek.savegame:save: {}", e)))?;
+            .map_err(|e| LuaError::RuntimeError(format!("lurek.save:save: {}", e)))?;
         self.manager.clear_dirty();
         Ok(())
     }
@@ -182,7 +182,7 @@ impl LuaSaveManager {
             let game_dir = self.state.borrow().game_dir.clone();
             match GameFS::new(game_dir).read_string(&path) {
                 Ok(c) => c,
-                Err(e) => return Ok((false, Some(format!("lurek.savegame:load: {}", e)))),
+                Err(e) => return Ok((false, Some(format!("lurek.save:load: {}", e)))),
             }
         };
         // Handle compressed saves.
@@ -198,7 +198,7 @@ impl LuaSaveManager {
                 Err(e) => {
                     return Ok((
                         false,
-                        Some(format!("lurek.savegame:load: base64 decode: {}", e)),
+                        Some(format!("lurek.save:load: base64 decode: {}", e)),
                     ))
                 }
             };
@@ -206,13 +206,13 @@ impl LuaSaveManager {
                 Ok(bytes) => match String::from_utf8(bytes) {
                     Ok(s) => s,
                     Err(e) => {
-                        return Ok((false, Some(format!("lurek.savegame:load: utf8: {}", e))))
+                        return Ok((false, Some(format!("lurek.save:load: utf8: {}", e))))
                     }
                 },
                 Err(e) => {
                     return Ok((
                         false,
-                        Some(format!("lurek.savegame:load: decompress: {}", e)),
+                        Some(format!("lurek.save:load: decompress: {}", e)),
                     ))
                 }
             }
@@ -224,7 +224,7 @@ impl LuaSaveManager {
             Err(e) => {
                 return Ok((
                     false,
-                    Some(format!("lurek.savegame:load: corrupt save: {}", e)),
+                    Some(format!("lurek.save:load: corrupt save: {}", e)),
                 ))
             }
         };
@@ -243,7 +243,7 @@ impl LuaSaveManager {
         let game_dir = self.state.borrow().game_dir.clone();
         GameFS::new(game_dir)
             .remove(&path)
-            .map_err(|e| LuaError::RuntimeError(format!("lurek.savegame:delete: {}", e)))?;
+            .map_err(|e| LuaError::RuntimeError(format!("lurek.save:delete: {}", e)))?;
         Ok(())
     }
 
@@ -593,7 +593,7 @@ impl LuaUserData for LuaSaveManager {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.savegame` API table with the Lua VM.
+/// Registers the `lurek.save` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable

@@ -30,7 +30,7 @@ cargo run -- content/games/showcase/light_demo
 - `lurek.light.newOccluder()` — shadow-casting wall geometry
 - `lurek.light.setAmbient()` — global ambient light control
 - `lurek.light.advanceFlickers()` — per-frame flicker update
-- `lurek.particles.newSystem()` — torch flame and player glow particles
+- `lurek.particle.newSystem()` — torch flame and player glow particles
 - `lurek.tween.to()` — smooth ambient and color transitions
 - `lurek.input.bind()` — action-based input mapping
 - `lurek.camera.new()` — camera attach/detach for world-space rendering
@@ -42,4 +42,4 @@ Navigate a dark room with your light. Ten rectangular walls cast shadows from yo
 
 ## APIs Used
 
-`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.light`, `lurek.particles`, `lurek.tween`, `lurek.time`, `lurek.signal`
+`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.light`, `lurek.particle`, `lurek.tween`, `lurek.timer`, `lurek.event`

@@ -31,9 +31,9 @@ Pilot a ship through an asteroid field. Rotate with A/D and thrust with W to acc
 - `lurek.render` — draws ship triangle, asteroid polygon outlines, bullets, score pops, and overlays.
 - `lurek.input` — action-bound keyboard controls (rotate, thrust, fire).
 - `lurek.tween` — floating score pop fade animation.
-- `lurek.particles` — explosion bursts on asteroid destruction and thrust exhaust flame.
-- `lurek.time` — FPS counter and elapsed time.
-- `lurek.signal` — clean shutdown on Escape.
+- `lurek.particle` — explosion bursts on asteroid destruction and thrust exhaust flame.
+- `lurek.timer` — FPS counter and elapsed time.
+- `lurek.event` — clean shutdown on Escape.
 - `lurek.camera` — camera setup for 800×600 viewport.
 
 **Lunasome (`content/library/`) modules**

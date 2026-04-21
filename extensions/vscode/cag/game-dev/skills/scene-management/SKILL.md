@@ -15,16 +15,16 @@ Scene table pattern, transitions, scene stacking, preloading, and cleanup for mu
 ```lua
 local title_scene = {}
 function title_scene.load()
-    title_scene.bg = lurek.gfx.newImage("title_bg.png")
+    title_scene.bg = lurek.render.newImage("title_bg.png")
 end
 function title_scene.update(dt)
-    if lurek.keyboard.isDown("return") then
+    if lurek.input.keyboard.isDown("return") then
         switch_scene(game_scene)
     end
 end
 function title_scene.draw()
-    lurek.gfx.draw(title_scene.bg, 0, 0)
-    lurek.gfx.print("Press ENTER", 300, 400)
+    lurek.render.draw(title_scene.bg, 0, 0)
+    lurek.render.print("Press ENTER", 300, 400)
 end
 function title_scene.unload()
     title_scene.bg = nil
@@ -92,9 +92,9 @@ end
 
 local function draw_transition()
     if not transition.active then return end
-    lurek.gfx.setColor(0, 0, 0, transition.alpha)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 600)
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(0, 0, 0, transition.alpha)
+    lurek.render.rectangle("fill", 0, 0, 800, 600)
+    lurek.render.setColor(1, 1, 1, 1)
 end
 ```
 

@@ -433,7 +433,7 @@ function lurek.init()
     lurek.input.bind("start", {"return"})
 
     -- Particle: landing dust
-    dust_ps = lurek.particles.newSystem({
+    dust_ps = lurek.particle.newSystem({
         maxParticles = 40,
         emissionRate = 0,
         lifetimeMin  = 0.15,
@@ -448,7 +448,7 @@ function lurek.init()
     })
 
     -- Particle: coin collect sparkle
-    coin_ps = lurek.particles.newSystem({
+    coin_ps = lurek.particle.newSystem({
         maxParticles = 50,
         emissionRate = 0,
         lifetimeMin  = 0.2,
@@ -463,7 +463,7 @@ function lurek.init()
     })
 
     -- Particle: death poof
-    death_ps = lurek.particles.newSystem({
+    death_ps = lurek.particle.newSystem({
         maxParticles = 60,
         emissionRate = 0,
         lifetimeMin  = 0.3,
@@ -488,7 +488,7 @@ function lurek.process(dt)
     coin_ps:update(dt)
     death_ps:update(dt)
 
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     if scene == STATE.TITLE then
         title_blink = title_blink + dt
@@ -576,7 +576,7 @@ function lurek.render_ui()
         lurek.render.print("Double jump unlocks at 500m!", SCREEN_W / 2 - 120, 460, 1)
 
         lurek.render.setColor(0.4, 0.4, 0.4, 1)
-        lurek.render.print(tostring(lurek.time.getFPS()) .. " FPS", SCREEN_W - 80, SCREEN_H - 18, 1)
+        lurek.render.print(tostring(lurek.timer.getFPS()) .. " FPS", SCREEN_W - 80, SCREEN_H - 18, 1)
         return
     end
 
@@ -620,7 +620,7 @@ function lurek.render_ui()
     end
 
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
-    lurek.render.print(tostring(lurek.time.getFPS()) .. " FPS", 10, SCREEN_H - 18, 1)
+    lurek.render.print(tostring(lurek.timer.getFPS()) .. " FPS", 10, SCREEN_H - 18, 1)
 
     -- ── Death overlay ─────────────────────────────────────────────────────
     if scene == STATE.DEAD then
@@ -646,5 +646,5 @@ end
 
 -- ── keypressed (fallback) ─────────────────────────────────────────────────
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
 end

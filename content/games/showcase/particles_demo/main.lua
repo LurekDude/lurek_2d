@@ -303,7 +303,7 @@ lurek.process(function(dt)
 
     -- Quit
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

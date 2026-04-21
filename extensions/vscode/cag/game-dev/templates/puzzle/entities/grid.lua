@@ -42,14 +42,14 @@ function Grid:draw()
             local x = self.ox + (c - 1) * self.cellSize
             local y = self.oy + (r - 1) * self.cellSize
             if self.cells[r][c] == 1 then
-                lurek.gfx.setColor(0.3, 0.7, 0.9, 1)
+                lurek.render.setColor(0.3, 0.7, 0.9, 1)
             else
-                lurek.gfx.setColor(0.2, 0.2, 0.3, 1)
+                lurek.render.setColor(0.2, 0.2, 0.3, 1)
             end
-            lurek.gfx.rectangle("fill", x + 1, y + 1, self.cellSize - 2, self.cellSize - 2)
+            lurek.render.rectangle("fill", x + 1, y + 1, self.cellSize - 2, self.cellSize - 2)
         end
     end
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
 end
 
 return Grid

@@ -186,7 +186,7 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Confetti particles (background change)
-    ps_confetti = lurek.particles.newSystem({
+    ps_confetti = lurek.particle.newSystem({
         maxParticles = 200, emissionRate = 0,
         lifetimeMin = 0.5, lifetimeMax = 1.2,
         speedMin = 60, speedMax = 200, direction = -1.57, spread = 6.28,
@@ -196,7 +196,7 @@ function lurek.init()
     })
 
     -- Shape spawn burst particles
-    ps_spawn = lurek.particles.newSystem({
+    ps_spawn = lurek.particle.newSystem({
         maxParticles = 120, emissionRate = 0,
         lifetimeMin = 0.2, lifetimeMax = 0.5,
         speedMin = 40, speedMax = 140, direction = 0, spread = 6.28,
@@ -225,7 +225,7 @@ function lurek.process(dt)
     local sdt = dt * speed_mult
 
     -- Global quit
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Update particles & tweens
     ps_confetti:update(dt)
@@ -308,7 +308,7 @@ function lurek.render()
         return
     end
 
-    local time = lurek.time.getTime()
+    local time = lurek.timer.getTime()
 
     -- ── Sine-wave grid ────────────────────────────────────────
     for row = 0, GRID_ROWS - 1 do
@@ -405,7 +405,7 @@ end
 -- Render UI (screen space — HUD and text)
 -- ---------------------------------------------------------------------------
 function lurek.render_ui()
-    local time = lurek.time.getTime()
+    local time = lurek.timer.getTime()
 
     -- ── TITLE SCREEN ──────────────────────────────────────────
     if current_state == STATE.TITLE then
@@ -456,5 +456,5 @@ function lurek.render_ui()
 
     -- FPS (bottom right)
     lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
-    lurek.render.print("FPS: " .. tostring(lurek.time.getFPS()), SCREEN_W - 80, SCREEN_H - 24, 12)
+    lurek.render.print("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 24, 12)
 end

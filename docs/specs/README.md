@@ -106,7 +106,7 @@ Game-domain services. Imports Foundations + Core Runtime + Platform Services.
 | `animation`  | [animation.md](animation.md)   | Sprite animation: source-rect changes over time. Imports only `math`; headless-testable.               | —               |
 | `automation` | [automation.md](automation.md) | Automated input simulation for headless tests, QA replay, recorded sessions.                           | —               |
 | `ecs`        | [ecs.md](ecs.md)               | Entity-Component-System: identity / data / behaviour separation for runtime composition.               | —               |
-| `i18n`       | [i18n.md](i18n.md)             | Internationalisation and localisation; user-facing text in locale data files (`lurek.localization.*`). | —               |
+| `i18n`       | [i18n.md](i18n.md)             | Internationalisation and localisation; user-facing text in locale data files (`lurek.i18n.*`). | —               |
 | `minimap`    | [minimap.md](minimap.md)       | Grid-based minimap data model: fog of war, tracked objects, pings, viewport overlay.                   | `TIER-2-PLUGIN` |
 | `mods`       | [mods.md](mods.md)             | Mod-loading framework: virtual filesystem mounts + sandboxed runtime config.                           | `TIER-2-PLUGIN` |
 | `parallax`   | [parallax.md](parallax.md)     | Multi-layer scrolling backgrounds with camera-relative scroll factors and blend modes.                 | `TIER-2-PLUGIN` |

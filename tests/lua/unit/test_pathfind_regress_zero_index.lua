@@ -4,19 +4,19 @@
 
 -- @description Covers suite: UnitPathfinder regression — 0-index must return Lua error not panic.
 describe("UnitPathfinder regression: zero index", function()
-    -- @covers lurek.pathfinding.UnitPathfinder.findPath
+    -- @covers lurek.pathfind.UnitPathfinder.findPath
     it("findPath with x1=0 returns a Lua error (no panic)", function()
-        local grid = lurek.pathfinding.newNavGrid(10, 10)
-        local pf = lurek.pathfinding.newPathfinder(grid)
+        local grid = lurek.pathfind.newNavGrid(10, 10)
+        local pf = lurek.pathfind.newPathfinder(grid)
         expect_error(function()
             pf:findPath(0, 1, 5, 5)
         end)
     end)
 
-    -- @covers lurek.pathfinding.UnitPathfinder.findPathSmooth
+    -- @covers lurek.pathfind.UnitPathfinder.findPathSmooth
     it("findPathSmooth with y2=0 returns a Lua error (no panic)", function()
-        local grid = lurek.pathfinding.newNavGrid(10, 10)
-        local pf = lurek.pathfinding.newPathfinder(grid)
+        local grid = lurek.pathfind.newNavGrid(10, 10)
+        local pf = lurek.pathfind.newPathfinder(grid)
         expect_error(function()
             pf:findPathSmooth(1, 1, 5, 0)
         end)

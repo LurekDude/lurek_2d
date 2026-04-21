@@ -35,9 +35,9 @@ Command a combined-arms force across a hex grid. Move and attack with each unit 
 
 ## APIs Used
 - `lurek.render` — hex grid with terrain tinting, unit icons, move/attack overlays
-- `lurek.particles` — attack sparks, unit death burst, movement dust
+- `lurek.particle` — attack sparks, unit death burst, movement dust
 - `lurek.input` — action bindings for click and turn-end
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced

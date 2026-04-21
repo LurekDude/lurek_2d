@@ -1,12 +1,12 @@
 # `library.rpc`
 
 Enables calling functions on remote peers over ENet with automatic
-JSON serialisation via `lurek.codec`. Supports request/response,
+JSON serialisation via `lurek.serial`. Supports request/response,
 fire-and-forget, and broadcast patterns.
 
 ## RPC Protocol
 
-Messages are serialised via `lurek.codec.toJson` / `lurek.codec.fromJson`.
+Messages are serialised via `lurek.serial.toJson` / `lurek.serial.fromJson`.
 Three message types flow over the wire:
 
 - **rpc_call**: `{type="rpc_call", id=N, name="fn", args={...}}`
@@ -32,7 +32,7 @@ to reset to 1 if your application may exceed this range.
 
 *16 functions, 0 module fields documented.*
 
-See: [`lurek.network`](../lua-api.md#lureknetwork), [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson), [`lurek.codec.fromJson`](../lua-api.md#lurekcodecfromjson)
+See: [`lurek.network`](../lua-api.md#lureknetwork), [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson), [`lurek.serial.fromJson`](../lua-api.md#lurekcodecfromjson)
 
 ## Functions
 

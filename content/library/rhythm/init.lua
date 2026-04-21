@@ -6,15 +6,15 @@
 --   * `Clock`  — beat clock with BPM, swing, ramp, and audio-source binding.
 --   * `M.judge` — judgement window scoring for player input timing.
 --
--- The clock is independent of `lurek.time.Scheduler` (which is wall-time
+-- The clock is independent of `lurek.timer.Scheduler` (which is wall-time
 -- based) — beat math accounts for BPM ramps and audio source seeks.
 --
 -- @module library.rhythm
 -- @status full
 -- @see lurek.audio       Source playhead drives `M.fromAudio` and `:syncToAudio`
--- @see lurek.time        `getMicroTime` powers default `M.judge` hit time
--- @see lurek.signal      optional emit on `rhythm.bar`/`rhythm.beat`/`rhythm.miss`
--- @see lurek.savegame    `clock:dump` collector wiring
+-- @see lurek.timer        `getMicroTime` powers default `M.judge` hit time
+-- @see lurek.event      optional emit on `rhythm.bar`/`rhythm.beat`/`rhythm.miss`
+-- @see lurek.save    `clock:dump` collector wiring
 
 local M = {}
 
@@ -24,8 +24,8 @@ local floor, abs   = math.floor, math.abs
 -- ─── helpers ─────────────────────────────────────────────────────────────────
 
 local function _now()
-    if lurek and lurek.time and lurek.time.getMicroTime then
-        local ok, t = pcall(lurek.time.getMicroTime)
+    if lurek and lurek.timer and lurek.timer.getMicroTime then
+        local ok, t = pcall(lurek.timer.getMicroTime)
         if ok and type(t) == "number" then return t end
     end
     return os.clock()
@@ -147,15 +147,15 @@ function Clock:update(dt)
     local beat_int_now = floor(beat_now)
     if beat_int_now > self._last_beat_int then
         self._last_beat_int = beat_int_now
-        if lurek and lurek.signal and lurek.signal.push then
-            pcall(lurek.signal.push, "rhythm.beat", beat_int_now)
+        if lurek and lurek.event and lurek.event.push then
+            pcall(lurek.event.push, "rhythm.beat", beat_int_now)
         end
     end
     local bar_int_now = floor(beat_now / self._subdivision)
     if bar_int_now > self._last_bar_int then
         self._last_bar_int = bar_int_now
-        if lurek and lurek.signal and lurek.signal.push then
-            pcall(lurek.signal.push, "rhythm.bar", bar_int_now)
+        if lurek and lurek.event and lurek.event.push then
+            pcall(lurek.event.push, "rhythm.bar", bar_int_now)
         end
     end
 
@@ -319,7 +319,7 @@ end
 --- Judge a player input against the nearest beat at `division`.
 -- @param clock Clock
 -- @param division integer Beat subdivision (e.g. 4 = quarter notes, 8 = 8ths).
--- @param hit_time number? Time of the hit (defaults to now via `lurek.time`).
+-- @param hit_time number? Time of the hit (defaults to now via `lurek.timer`).
 -- @treturn string verdict — `"perfect" | "great" | "good" | "miss"`.
 -- @treturn number error_seconds — signed offset (negative = early).
 function M.judge(clock, division, hit_time)
@@ -339,8 +339,8 @@ function M.judge(clock, division, hit_time)
     if mag <= _windows.perfect then return "perfect", err_seconds end
     if mag <= _windows.great   then return "great",   err_seconds end
     if mag <= _windows.good    then return "good",    err_seconds end
-    if lurek and lurek.signal and lurek.signal.push then
-        pcall(lurek.signal.push, "rhythm.miss", err_seconds)
+    if lurek and lurek.event and lurek.event.push then
+        pcall(lurek.event.push, "rhythm.miss", err_seconds)
     end
     return "miss", err_seconds
 end

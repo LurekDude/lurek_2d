@@ -7,7 +7,7 @@
 - Lua API path(s): `src/lua_api/ai_api.rs`
 - Primary Lua namespace: `lurek.ai`
 - Rust test path(s): tests/rust/unit/ai_tests.rs, tests/rust/game/ai_tests.rs
-- Lua test path(s): tests/lua/unit/test_ai.lua, tests/lua/golden/test_ai_golden.lua, tests/lua/integration/test_entity_ai.lua, tests/lua/integration/test_ai_physics.lua, tests/lua/integration/test_ai_pathfinding.lua, tests/lua/integration/test_ai_entity_scene.lua, tests/lua/stress/test_ai_stress.lua
+- Lua test path(s): tests/lua/unit/test_ai.lua, tests/lua/golden/test_ai_golden.lua, tests/lua/integration/test_ecs_ai.lua, tests/lua/integration/test_ai_physics.lua, tests/lua/integration/test_ai_pathfind.lua, tests/lua/integration/test_ai_ecs_scene.lua, tests/lua/stress/test_ai_stress.lua
 
 ## Summary
 

@@ -17,7 +17,7 @@
 -- @covers LuaParallaxSet.update
 
 local function load_image()
-    return lurek.graphic.newImage("assets/icon.png")
+    return lurek.render.newImage("assets/icon.png")
 end
 
 -- @description Covers suite: parallax and camera modules exist together.

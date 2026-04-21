@@ -6,7 +6,7 @@
 | **Source**            | \library/inventory/init.lua\                                                                                                                                                                                                                    |
 | **Lua Tests**         | \	ests/lua/library/test_library_inventory.lua\                                                                                                                                                                                                  |
 | **Depends on**        | \lurek.*\ public API only                                                                                                                                                                                                                       |  | **Status** | full |
-| **Optional bindings** | `lurek.patterns.newEventBus` (change-event bus from `inv:getEventBus()`), `lurek.codec.toJson/fromJson` (save round-trip), `lurek.savegame.SaveManager` (recommended collector host), `lurek.data.deepCopy` (P4 lift target for `item:clone()`) |
+| **Optional bindings** | `lurek.patterns.newEventBus` (change-event bus from `inv:getEventBus()`), `lurek.serial.toJson/fromJson` (save round-trip), `lurek.save.SaveManager` (recommended collector host), `lurek.data.deepCopy` (P4 lift target for `item:clone()`) |
 ## Summary
 
 Slot-based item inventory system with typed containers, item stacking, named

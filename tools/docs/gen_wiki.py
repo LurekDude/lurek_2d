@@ -313,7 +313,7 @@ def gen_home() -> str:
     ```lua
     function lurek.load()
         lurek.window.setTitle("My Game")
-        lurek.graphics.setBackgroundColor(0.1, 0.1, 0.2)
+        lurek.renders.setBackgroundColor(0.1, 0.1, 0.2)
     end
 
     function lurek.update(dt)
@@ -321,8 +321,8 @@ def gen_home() -> str:
     end
 
     function lurek.draw()
-        lurek.graphics.setColor(1, 1, 1)
-        lurek.graphics.print("Hello, Lurek2D!", 300, 280, 3)
+        lurek.renders.setColor(1, 1, 1)
+        lurek.renders.print("Hello, Lurek2D!", 300, 280, 3)
     end
     ```
 
@@ -353,7 +353,7 @@ def gen_home() -> str:
     | Page | What it covers |
     |------|----------------|
     | [[API-Reference]] | Full Lurek2D cheatsheet — every `lurek.*` function on one page |
-    | [[Graphics-API]] | `lurek.graphics` — drawing, images, fonts, shaders, canvas |
+    | [[Graphics-API]] | `lurek.renders` — drawing, images, fonts, shaders, canvas |
     | [[Audio-API]] | `lurek.audio` — sources, playback, mixer, buses, MIDI |
     | [[Physics-API]] | `lurek.physics` — worlds, bodies, shapes, joints, raycasting |
     | [[Input-API]] | `lurek.input` / keyboard / mouse / gamepad / touch |
@@ -369,17 +369,17 @@ def gen_home() -> str:
     | [[Animation-API]] | `lurek.animation` — sprite-sheet frame animation |
     | [[Particle-API]] | `lurek.particle` — emitters, modifiers, keyframe |
     | [[FX-API]] | `lurek.fx` / `lurek.pipeline` — post-processing, render pipeline |
-    | [[Shader-Patterns]] | Custom WGSL shaders with `lurek.graphics.newShader` |
+    | [[Shader-Patterns]] | Custom WGSL shaders with `lurek.renders.newShader` |
 
     ### Game Systems
     | Page | What it covers |
     |------|----------------|
     | [[Tilemap-API]] | `lurek.tilemap` — tiles, layers, auto-tile, isometric/hex |
     | [[Scene-API]] | `lurek.scene` — scene stack, transitions, depth sorting |
-    | [[Entity-API]] | `lurek.entity` — ECS, components, tags, systems |
-    | [[Pathfinding-API]] | `lurek.pathfinding` — NavGrid, A\\*, flow fields |
+    | [[Entity-API]] | `lurek.ecs` — ECS, components, tags, systems |
+    | [[Pathfinding-API]] | `lurek.pathfind` — NavGrid, A\\*, flow fields |
     | [[AI-API]] | `lurek.ai` — FSM, behaviour trees, steering, GOAP, Q-learning |
-    | [[Savegame-API]] | `lurek.savegame` — save/load slots, versioned tables |
+    | [[Savegame-API]] | `lurek.save` — save/load slots, versioned tables |
 
     ### UI & Terminal
     | Page | What it covers |
@@ -399,7 +399,7 @@ def gen_home() -> str:
     ### Effects & Extras
     | Page | What it covers |
     |------|----------------|
-    | [[Modding-API]] | `lurek.modding` — mod loading, hot-reload |
+    | [[Modding-API]] | `lurek.mods` — mod loading, hot-reload |
     | [[Procgen-API]] | `lurek.procgen` — map generators, noise, cellular automata |
     | [[Advanced-APIs]] | Raycaster, Spine, Light, Minimap |
 
@@ -503,7 +503,7 @@ def gen_getting_started() -> str:
     ```lua
     function lurek.load()
         lurek.window.setTitle("My First Game")
-        lurek.graphics.setBackgroundColor(0.1, 0.1, 0.2)
+        lurek.renders.setBackgroundColor(0.1, 0.1, 0.2)
     end
 
     function lurek.update(dt)
@@ -511,8 +511,8 @@ def gen_getting_started() -> str:
     end
 
     function lurek.draw()
-        lurek.graphics.setColor(1, 1, 1)
-        lurek.graphics.print("Hello, Lurek2D!", 300, 280, 3)
+        lurek.renders.setColor(1, 1, 1)
+        lurek.renders.print("Hello, Lurek2D!", 300, 280, 3)
     end
     ```
 
@@ -620,7 +620,7 @@ def gen_your_first_game() -> str:
     function lurek.load()
         lurek.window.setTitle("My Platformer")
         lurek.window.setMode(800, 600)
-        lurek.graphics.setBackgroundColor(0.2, 0.3, 0.4)
+        lurek.renders.setBackgroundColor(0.2, 0.3, 0.4)
 
         -- Player state
         player = { x = 400, y = 300, speed = 200 }
@@ -631,16 +631,16 @@ def gen_your_first_game() -> str:
 
     ```lua
     function lurek.update(dt)
-        if lurek.keyboard.isDown("left", "a") then
+        if lurek.input.keyboard.isDown("left", "a") then
             player.x = player.x - player.speed * dt
         end
-        if lurek.keyboard.isDown("right", "d") then
+        if lurek.input.keyboard.isDown("right", "d") then
             player.x = player.x + player.speed * dt
         end
-        if lurek.keyboard.isDown("up", "w") then
+        if lurek.input.keyboard.isDown("up", "w") then
             player.y = player.y - player.speed * dt
         end
-        if lurek.keyboard.isDown("down", "s") then
+        if lurek.input.keyboard.isDown("down", "s") then
             player.y = player.y + player.speed * dt
         end
     end
@@ -651,12 +651,12 @@ def gen_your_first_game() -> str:
     ```lua
     function lurek.draw()
         -- Draw a white rectangle as the player
-        lurek.graphics.setColor(1, 1, 1)
-        lurek.graphics.rectangle("fill", player.x - 16, player.y - 16, 32, 32)
+        lurek.renders.setColor(1, 1, 1)
+        lurek.renders.rectangle("fill", player.x - 16, player.y - 16, 32, 32)
 
         -- Draw position text
-        lurek.graphics.setColor(0.8, 0.8, 0.8)
-        lurek.graphics.print(string.format("x: %.0f  y: %.0f", player.x, player.y), 10, 10)
+        lurek.renders.setColor(0.8, 0.8, 0.8)
+        lurek.renders.print(string.format("x: %.0f  y: %.0f", player.x, player.y), 10, 10)
     end
     ```
 
@@ -677,13 +677,13 @@ def gen_your_first_game() -> str:
     ```lua
     function lurek.load()
         lurek.window.setTitle("Sprite Demo")
-        sprite = lurek.graphics.newImage("player.png")
+        sprite = lurek.renders.newImage("player.png")
         player = { x = 400, y = 300, speed = 200 }
     end
 
     function lurek.draw()
-        lurek.graphics.setColor(1, 1, 1)
-        lurek.graphics.draw(sprite, player.x, player.y)
+        lurek.renders.setColor(1, 1, 1)
+        lurek.renders.draw(sprite, player.x, player.y)
     end
     ```
 
@@ -709,14 +709,14 @@ def gen_your_first_game() -> str:
 
     function lurek.draw()
         -- Draw ground
-        lurek.graphics.setColor(0.3, 0.7, 0.3)
+        lurek.renders.setColor(0.3, 0.7, 0.3)
         local gx, gy = ground:getPosition()
-        lurek.graphics.rectangle("fill", gx - 400, gy - 20, 800, 40)
+        lurek.renders.rectangle("fill", gx - 400, gy - 20, 800, 40)
 
         -- Draw ball
-        lurek.graphics.setColor(1, 0.5, 0.2)
+        lurek.renders.setColor(1, 0.5, 0.2)
         local bx, by = ball:getPosition()
-        lurek.graphics.circle("fill", bx, by, 20)
+        lurek.renders.circle("fill", bx, by, 20)
     end
     ```
 
@@ -810,8 +810,8 @@ def gen_project_structure() -> str:
     The engine sandboxes file access to your game folder. Load assets by relative path:
 
     ```lua
-    local img   = lurek.graphics.newImage("assets/player.png")
-    local font  = lurek.graphics.newFont("assets/font.ttf", 16)
+    local img   = lurek.renders.newImage("assets/player.png")
+    local font  = lurek.renders.newFont("assets/font.ttf", 16)
     local sound = lurek.audio.newSource("assets/jump.ogg", "static")
     ```
 
@@ -992,9 +992,9 @@ def gen_callbacks() -> str:
     ## Gamepad
 
     ```lua
-    function lurek.gamepadpressed(id, button)           end  -- id: number; button: string
-    function lurek.gamepadreleased(id, button)          end
-    function lurek.gamepadaxis(id, axis, value)         end  -- value: -1.0..1.0
+    function lurek.input.gamepadpressed(id, button)           end  -- id: number; button: string
+    function lurek.input.gamepadreleased(id, button)          end
+    function lurek.input.gamepadaxis(id, axis, value)         end  -- value: -1.0..1.0
     function lurek.joystickadded(id)                    end  -- device connected
     function lurek.joystickremoved(id)                  end  -- device disconnected
     ```
@@ -1204,14 +1204,14 @@ def gen_shader_patterns() -> str:
     return MANUAL_BANNER + dedent("""\
     # Shader Patterns
 
-    Lurek2D supports custom WGSL shaders via `lurek.graphics.newShader`.
+    Lurek2D supports custom WGSL shaders via `lurek.renders.newShader`.
 
     ---
 
     ## Creating a Shader
 
     ```lua
-    local shader = lurek.graphics.newShader([[
+    local shader = lurek.renders.newShader([[
         @group(0) @binding(0) var tex: texture_2d<f32>;
         @group(0) @binding(1) var samp: sampler;
 
@@ -1234,9 +1234,9 @@ def gen_shader_patterns() -> str:
 
     ```lua
     function lurek.draw()
-        lurek.graphics.setShader(shader)
-        lurek.graphics.draw(image, 0, 0)
-        lurek.graphics.setShader()  -- reset to default
+        lurek.renders.setShader(shader)
+        lurek.renders.draw(image, 0, 0)
+        lurek.renders.setShader()  -- reset to default
     end
     ```
 
@@ -1256,16 +1256,16 @@ def gen_shader_patterns() -> str:
     For screen-space effects, use `lurek.fx` with a canvas:
 
     ```lua
-    local canvas = lurek.graphics.newCanvas(1280, 720)
+    local canvas = lurek.renders.newCanvas(1280, 720)
     local blur   = lurek.fx.newEffect("blur", { radius = 4 })
 
     function lurek.draw()
-        lurek.graphics.setCanvas(canvas)
+        lurek.renders.setCanvas(canvas)
         -- draw scene ...
-        lurek.graphics.setCanvas()
+        lurek.renders.setCanvas()
 
         lurek.fx.apply(blur, canvas)
-        lurek.graphics.draw(canvas, 0, 0)
+        lurek.renders.draw(canvas, 0, 0)
     end
     ```
 
@@ -2398,7 +2398,7 @@ def gen_extension_mcp() -> str:
 
     Search the generated API reference for a query string.
 
-    **Input**: `{ query: string }` — e.g. `"lurek.graphics.draw"`, `"physics"`
+    **Input**: `{ query: string }` — e.g. `"lurek.renders.draw"`, `"physics"`
 
     **Behaviour**: Searches the generated API markdown file case-insensitively.
     Returns matching sections with context.

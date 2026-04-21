@@ -217,7 +217,7 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Page-complete flash (white sparks)
-    ps_complete = lurek.particles.newSystem({
+    ps_complete = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0,
         lifetimeMin = 0.3, lifetimeMax = 0.7,
         speedMin = 50, speedMax = 160, direction = 0, spread = 6.28,
@@ -226,7 +226,7 @@ function lurek.init()
     })
 
     -- Error flash (red sparks)
-    ps_flash = lurek.particles.newSystem({
+    ps_flash = lurek.particle.newSystem({
         maxParticles = 40, emissionRate = 0,
         lifetimeMin = 0.15, lifetimeMax = 0.4,
         speedMin = 30, speedMax = 100, direction = 0, spread = 6.28,
@@ -239,7 +239,7 @@ end
 -- Update
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Systems
     ps_complete:update(dt)
@@ -372,7 +372,7 @@ function lurek.keypressed(key)
 
     -- Complete state: any key quits
     if current_state == STATE_COMPLETE and key ~= "escape" then
-        lurek.signal.quit()
+        lurek.event.quit()
     end
 end
 
@@ -407,7 +407,7 @@ end
 -- Render UI — terminal grid, all pages, HUD
 -- ---------------------------------------------------------------------------
 function lurek.render_ui()
-    local fps  = lurek.time.getFPS()
+    local fps  = lurek.timer.getFPS()
     local pnum = current_page_num()
     local ox   = math.floor(page_offset_x)
 

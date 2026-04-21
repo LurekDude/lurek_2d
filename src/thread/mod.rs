@@ -16,7 +16,7 @@
 //!
 //! ## Threading constraint
 //! Worker VMs get a sandboxed subset of the `lurek.*` API — no graphics, audio, window,
-//! input, or physics modules. Only `lurek.thread.getChannel`, `lurek.fs.read` (read-only,
+//! input, or physics modules. Only `lurek.thread.getChannel`, `lurek.filesystem.read` (read-only,
 //! no `..` traversal), and the `arg` global table are available.
 //!
 //! All public items are documented. Lua bridge: `src/lua_api/thread_api.rs`.

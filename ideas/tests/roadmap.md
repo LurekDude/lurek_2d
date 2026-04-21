@@ -24,18 +24,18 @@
 
 ### 1.1 Add @covers Markers to Existing Tests
 Priority order (lowest coverage first):
-1. `test_system.lua` — add markers for all 22 system functions
+1. `test_runtime_system.lua` — add markers for all 22 system functions
 2. `test_math.lua` — add markers for Vec2, Mat3, trig, noise functions
 3. `test_log.lua` — add markers for all 13 log functions
-4. `test_localization.lua` — add markers for 27 functions
+4. `test_i18n.lua` — add markers for 27 functions
 5. `test_physics.lua` — add markers for Body, Joint, World methods
 6. `test_filesystem.lua` — add markers for File object methods
-7. `test_modding.lua` — add markers for ModManager methods
+7. `test_mods.lua` — add markers for ModManager methods
 8. All remaining unit test files — add markers incrementally
 
 ### 1.2 Fill Coverage Gaps
 Write new tests for functions with 0% marker coverage:
-1. `test_system.lua` — add tests for `getOS`, `getArch`, `getCPUCount`, `getClipboard`, etc.
+1. `test_runtime_system.lua` — add tests for `getOS`, `getArch`, `getCPUCount`, `getClipboard`, etc.
 2. `test_math.lua` — add tests for Vec2/Vec3 methods, Mat3 operations, noise functions
 3. `test_log.lua` — add tests for `setLevel`, `setFile`, `trace`, `warn`, `error`
 4. `test_network.lua` — add tests for HttpClient methods (mock if needed)
@@ -68,14 +68,14 @@ Add `describe("error handling", ...)` blocks to:
 ### 3.2 New Golden Tests (Priority Order)
 1. `test_data_golden.lua` — JSON/TOML round-trip determinism
 2. `test_serial_golden.lua` — binary encoding determinism
-3. `test_pathfinding_golden.lua` — A* path determinism on fixed grids
+3. `test_pathfind_golden_grid.lua` — A* path determinism on fixed grids
 4. `test_graph_golden.lua` — BFS/DFS/Dijkstra determinism
 5. `test_ai_golden.lua` — FSM transition traces
 6. `test_physics_golden.lua` — deterministic simulation (with tolerance)
 7. `test_dataframe_golden.lua` — column operation determinism
 8. `test_compute_golden.lua` — compute operation results
 9. `test_procgen_golden.lua` — seeded generation determinism
-10. `test_entity_golden.lua` — hierarchy operations
+10. `test_ecs_golden.lua` — hierarchy operations
 11. `test_tilemap_golden.lua` — tile queries
 
 **Gate**: ✅ DONE — 13 golden test files (12 new + animation_golden bonus). All registered in harness.rs.
@@ -86,31 +86,31 @@ Add `describe("error handling", ...)` blocks to:
 
 ### 4.1 Fix Misplaced Tests
 Move 4 single-module tests from integration/ to unit/:
-- test_system.lua, test_devtools.lua, test_debugbridge.lua, test_docs.lua
+- test_runtime_system.lua, test_devtools.lua, test_debugbridge.lua, test_docs.lua
 
 ### 4.2 New Integration Tests (Priority 1)
-1. test_entity_physics.lua
-2. test_entity_graphics.lua
-3. test_scene_entity.lua
+1. test_ecs_physics.lua
+2. test_ecs_render.lua
+3. test_scene_ecs.lua
 4. test_scene_camera.lua
 5. test_tilemap_camera.lua
-6. test_ai_pathfinding.lua
+6. test_ai_pathfind.lua
 7. test_input_camera.lua
 8. test_animation_timer.lua
 
 ### 4.3 New Integration Tests (Priority 2)
 9. test_data_filesystem.lua
-10. test_savegame_tilemap.lua
-11. test_signal_entity.lua
-12. test_tilemap_pathfinding.lua
+10. test_save_tilemap.lua
+11. test_event_entity.lua
+12. test_tilemap_pathfind.lua
 13. test_thread_data.lua
 
 ### 4.4 New Integration Tests (Priority 3)
 14. test_tween_camera.lua
-15. test_tween_entity.lua
+15. test_tween_ecs.lua
 16. test_particle_timer.lua
-17. test_light_graphics.lua
-18. test_localization_ui.lua
+17. test_light_render.lua
+18. test_i18n_ui.lua
 
 **Gate**: ✅ DONE — 43 integration tests total. All registered in harness.rs.
 

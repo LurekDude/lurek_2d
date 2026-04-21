@@ -6,10 +6,10 @@ Arcade top-down football inspired by Sensible Soccer (Amiga 1997). 5-a-side with
 
 - `lurek.input.bind()` / `lurek.input.isActionDown()` — action-mapped keyboard input
 - `lurek.input.wasActionPressed()` — discrete kick event
-- `lurek.gfx.circle()` / `lurek.gfx.rectangle()` / `lurek.gfx.line()` — pitch and player rendering
-- `lurek.gfx.print()` — score HUD and match clock
-- `lurek.gfx.setColor()` — team colour coding
-- `lurek.signal.quit()` — clean exit
+- `lurek.render.circle()` / `lurek.render.rectangle()` / `lurek.render.line()` — pitch and player rendering
+- `lurek.render.print()` — score HUD and match clock
+- `lurek.render.setColor()` — team colour coding
+- `lurek.event.quit()` — clean exit
 
 ## How to Run
 

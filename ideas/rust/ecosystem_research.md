@@ -131,7 +131,7 @@ Lurek2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 
 
 6. **Sprite batching** � Currently each `DrawImage` is an independent skia call. For performance with hundreds of sprites, caching a sprite sheet into a single Pixmap and UV-slicing would help. This is a custom implementation; no crate does it for the tiny-skia model.
 
-7. **Software pixel shaders** � Since we control the pixel buffer, Lua could define a per-pixel callback invoked on a region (like a `lurek.gfx.effect(fn, x, y, w, h)`). This would be a Lurek2D-specific innovation not available in hardware-accelerated engines.
+7. **Software pixel shaders** � Since we control the pixel buffer, Lua could define a per-pixel callback invoked on a region (like a `lurek.render.effect(fn, x, y, w, h)`). This would be a Lurek2D-specific innovation not available in hardware-accelerated engines.
 
 **Verdict on GPU upgrade:** Migrating to `wgpu` or `pixels` would deliver major framerate improvements (hardware acceleration vs. CPU painting) but would break the architecture fundamentally. This is a future major-version concern, not an incremental improvement. The current tiny-skia pipeline is coherent, testable, and cross-platform without native dependencies beyond a window.
 
@@ -282,7 +282,7 @@ Lurek2D does not have an ECS. The engine uses a flat shared state model (`Shared
    - Add `gilrs` to `Cargo.toml`
    - Poll `Gilrs::next_event()` in the game loop
    - Update `GamepadState` with button/axis values
-   - Expose as `lurek.gamepad.*`
+   - Expose as `lurek.input.gamepad.*`
 
 2. **Mouse wheel** � `minifb` exposes `Window::get_scroll_xy()` which returns `(f64, f64)`. This already exists in the dependency; just needs to be read in the event loop and propagated to `MouseState`.
 
@@ -363,7 +363,7 @@ Lurek2D has no animation system. The most impactful additions are:
 
 1. **Sprite sheet animation** � Slice a texture into frames (`frames: Vec<Rect>`), advance frame index by `fps * dt`, draw current frame. This is ~50 lines of Lua or Rust, no crate needed. Implement as a `Sprite` extension or a `lurek.animation.newAnim(image, frames, fps)` API.
 
-2. **Tweening** � Smoothly animate any numeric value over time: `lurek.animation.to(target_table, {x=200, y=300}, 1.5, "easeInOut")`. The `keyframe` crate provides easing curves. A tween manager can be implemented entirely in Lua using `lurek.time.getDelta()`.
+2. **Tweening** � Smoothly animate any numeric value over time: `lurek.animation.to(target_table, {x=200, y=300}, 1.5, "easeInOut")`. The `keyframe` crate provides easing curves. A tween manager can be implemented entirely in Lua using `lurek.timer.getDelta()`.
 
 3. **Spring animations** � `natura`'s spring model (critically damped spring) creates natural-feeling motion without keyframe data. Very useful for UI bouncing, camera snapping. Pure Rust, ~60 lines.
 
@@ -384,7 +384,7 @@ Lurek2D has no animation system. The most impactful additions are:
 
 **Lurek2D current state:**
 
-Lurek2D uses a hardcoded embedded bitmap font for `lurek.gfx.print()`. It renders ASCII characters only, at a fixed size, with no font choices. This is functional but limiting.
+Lurek2D uses a hardcoded embedded bitmap font for `lurek.render.print()`. It renders ASCII characters only, at a fixed size, with no font choices. This is functional but limiting.
 
 **What to implement:**
 
@@ -393,9 +393,9 @@ Lurek2D uses a hardcoded embedded bitmap font for `lurek.gfx.print()`. It render
    - Implement `FontAtlas` struct: loads font, rasterizes all printable ASCII at a given `px_size` into a tiny-skia `Pixmap` atlas
    - Store atlas as a `Texture` in the renderer
    - `RenderCommand::Print` variant gains a `font_id: u32` and `size: f32` field
-   - Expose via `lurek.gfx.newFont(path, size)` � handle, `lurek.gfx.print(text, x, y, font)`
+   - Expose via `lurek.render.newFont(path, size)` � handle, `lurek.render.print(text, x, y, font)`
 
-2. **Glyph metrics** � After adding fontdue, expose `lurek.gfx.getTextWidth(text, font)` and `lurek.gfx.getTextHeight(font)` for layout calculations.
+2. **Glyph metrics** � After adding fontdue, expose `lurek.render.getTextWidth(text, font)` and `lurek.render.getTextHeight(font)` for layout calculations.
 
 3. **Bitmap font parser (.fnt)** � `bmfont` crate parses Angelcode .fnt atlas format. This allows designers to use tools like Hiero or Littera to generate custom pixel-art fonts, which get loaded at runtime. Complements TTF for retro aesthetics.
 
@@ -482,7 +482,7 @@ Lurek2D has no UI library. In-game UI (health bars, buttons, menus) is built man
 **A) In-game UI for game developers:**
 - Simple panel/button/text primitives
 - Should work with the existing RenderCommand queue
-- Best approach: implement a `lurek.ui` Lua module built on top of existing `lurek.gfx.*` primitives
+- Best approach: implement a `lurek.ui` Lua module built on top of existing `lurek.render.*` primitives
 - No Rust crate needed � pure Lua
 
 **B) Developer tools / debug overlay:**
@@ -513,7 +513,7 @@ No AI subsystem exists. Game AI logic is implemented in Lua scripts.
 
 **What to add:**
 
-1. **Pathfinding** � The `pathfinding` crate's `astar` is pure Rust, no external dependencies, framework-independent. Exposing it to Lua as `lurek.pathfinding.astar(grid, start, goal)` would be high value for top-down RPGs, tower defense, etc.
+1. **Pathfinding** � The `pathfinding` crate's `astar` is pure Rust, no external dependencies, framework-independent. Exposing it to Lua as `lurek.pathfind.astar(grid, start, goal)` would be high value for top-down RPGs, tower defense, etc.
    - Input: a Lua table as 2D grid, start/goal as {x, y} tables
    - Output: a Lua array of {x, y} waypoints
    - Estimated implementation: 80 lines of Rust binding code
@@ -548,7 +548,7 @@ Lurek2D is a software renderer � it does not use GPU shaders. All shading is d
    - Color grading: LUT-based color remapping
    - Vignette: darken edges by distance from center
    - Pixelate: downsample, upsample
-   These can be exposed as `lurek.gfx.setPostProcess("grayscale")` or via a Lua-defined function invoked per-pixel.
+   These can be exposed as `lurek.render.setPostProcess("grayscale")` or via a Lua-defined function invoked per-pixel.
 
 2. **tiny-skia Paint operations** � `tiny-skia` supports `BlendMode` (multiple blend equations) and `FilterQuality`. No GPU needed; these are all CPU-side effects.
 
@@ -585,7 +585,7 @@ Lurek2D is a software renderer � it does not use GPU shaders. All shading is d
 
 5. **Profiling** � `profiling` crate adds `profiling::scope!("name")` annotations that integrate with Superluminal, Tracy, or Chrome tracing. Valuable for performance debugging.
 
-6. **pixel art tools loading** � `aseprite` crate loads `.ase`/`.aseprite` files including animation frames, layers, and tags. Since many pixel artists use pixel art tools, this would be valuable: `lurek.gfx.newAnimFrompixel art tools("hero.aseprite")`.
+6. **pixel art tools loading** � `aseprite` crate loads `.ase`/`.aseprite` files including animation frames, layers, and tags. Since many pixel artists use pixel art tools, this would be valuable: `lurek.render.newAnimFrompixel art tools("hero.aseprite")`.
 
 ---
 
@@ -626,7 +626,7 @@ The following is a prioritized backlog of features to add to Lurek2D, ordered by
 |---------|--------|--------|--------|---------------|
 | Mouse wheel support | 1h | High | Input | `minifb::Window::get_scroll_xy()` already exists |
 | Audio loop + pause/resume | 2h | High | Audio | `rodio::Sink::pause()` / `Sink::repeat_infinite()` |
-| Gamepad exposure to Lua | 4h | High | Input + Lua | Expose existing `GamepadState` via `lurek.gamepad.*` |
+| Gamepad exposure to Lua | 4h | High | Input + Lua | Expose existing `GamepadState` via `lurek.input.gamepad.*` |
 | Camera integration in renderer | 4h | High | Graphics | Apply `camera.view_matrix()` in `Renderer::flush()` |
 | Draw layer Z-ordering | 4h | High | Graphics | Add `RenderCommand::SetLayer(i32)`, sort in `flush()` |
 | gilrs gamepad polling | 8h | High | Input | Add `gilrs` crate, poll in game loop |
@@ -697,7 +697,7 @@ These features are well within Lurek2D's own design space and should be implemen
 3. **Easing functions** � 12 standard curves, pure math
 4. **Scene management skeleton** � A `lurek.scene` module that manages screen transitions
 5. **In-game debug overlay** � Print variables on screen without a full UI framework
-6. **Tween manager** � Supported by Lua tables + `lurek.time.getDelta()`
+6. **Tween manager** � Supported by Lua tables + `lurek.timer.getDelta()`
 7. **Basic steering AI** � Seek/flee/arrive implemented as `Vec2`-returning functions
 8. **9-slice rendering** � 9 `DrawImage` calls, no new RenderCommand needed
 9. **`lurek.math.clamp()`, `lerp()`, `map()` extensions** � Small but commonly needed

@@ -19,7 +19,7 @@ local id, meta = tbl:sample()
 
 *32 functions, 0 module fields documented.*
 
-See: [`lurek.math.newRandomGenerator`](../lua-api.md#lurekmathnewrandomgenerator) — default RNG source for sampling, [`lurek.codec.fromToml`](../lua-api.md#lurekcodecfromtoml) — designer-authored loot tables (`fromToml`), [`lurek.fs.read`](../lua-api.md#lurekfsread) — sandboxed file load for `fromToml`, [`lurek.savegame`](../lua-api.md#lureksavegame) — `Pity:save`/`restore` collector wiring
+See: [`lurek.math.newRandomGenerator`](../lua-api.md#lurekmathnewrandomgenerator) — default RNG source for sampling, [`lurek.serial.fromToml`](../lua-api.md#lurekcodecfromtoml) — designer-authored loot tables (`fromToml`), [`lurek.filesystem.read`](../lua-api.md#lurekfsread) — sandboxed file load for `fromToml`, [`lurek.save`](../lua-api.md#lureksavegame) — `Pity:save`/`restore` collector wiring
 
 ## Functions
 
@@ -61,7 +61,7 @@ Bulk-build a loot table from a list of `{id, weight, meta?}` entries.
 
 ### `fromToml(path)`
 
-Load a loot table from a TOML file via `lurek.fs.read` + `lurek.codec.fromToml`. The file must contain an `entries = [...]` array.
+Load a loot table from a TOML file via `lurek.filesystem.read` + `lurek.serial.fromToml`. The file must contain an `entries = [...]` array.
 
 **Parameters**
 

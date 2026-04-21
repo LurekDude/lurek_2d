@@ -1,22 +1,22 @@
--- Integration test: library.dialog × lurek.signal (runtime name for "lurek.event").
+-- Integration test: library.dialog × lurek.event (runtime name for "lurek.event").
 --
 -- Scope: Verifies that library.dialog sequencer events ("line", "choice",
--- "finished") can be routed through a `lurek.signal.newSignal()` instance
+-- "finished") can be routed through a `lurek.event.newSignal()` instance
 -- so that external observers subscribe to the engine signal layer rather
 -- than the library's local handler table. The bridge is a one-line forward
 -- (`seq:on(name, function(...) sig:emit(name, ...) end)`) representative
 -- of how a game wires dialog into engine-wide event plumbing.
 --
--- Fallback: lurek.event is registered as `lurek.signal` at runtime
+-- Fallback: lurek.event is registered as `lurek.event` at runtime
 -- (see P1 map). The Signal userdata is the engine's pub/sub primitive;
 -- no fallback was needed.
 --
 -- @covers library.dialog.newSequencer
--- @covers lurek.signal.newSignal
+-- @covers lurek.event.newSignal
 
 local dialog = require("library.dialog")
 
-describe("integration: library.dialog × lurek.signal", function()
+describe("integration: library.dialog × lurek.event", function()
 
     local function bridge(seq, sig, events)
         for _, name in ipairs(events) do
@@ -27,7 +27,7 @@ describe("integration: library.dialog × lurek.signal", function()
     -- @description A "line" handler attached via Signal:on receives speaker + text once typing finishes.
     it("line event fires through Signal with payload", function()
         local seq = dialog.newSequencer()
-        local sig = lurek.signal.newSignal()
+        local sig = lurek.event.newSignal()
         bridge(seq, sig, { "line", "finished" })
 
         local got_speaker, got_text
@@ -47,7 +47,7 @@ describe("integration: library.dialog × lurek.signal", function()
     -- @description Multiple Signal subscribers all receive the same dialog "line" event.
     it("multiple Signal subscribers each receive the event", function()
         local seq = dialog.newSequencer()
-        local sig = lurek.signal.newSignal()
+        local sig = lurek.event.newSignal()
         bridge(seq, sig, { "line" })
 
         local count_a, count_b = 0, 0
@@ -66,7 +66,7 @@ describe("integration: library.dialog × lurek.signal", function()
     -- @description "finished" event fires through Signal when the script completes.
     it("finished event fires through Signal at end of script", function()
         local seq = dialog.newSequencer()
-        local sig = lurek.signal.newSignal()
+        local sig = lurek.event.newSignal()
         bridge(seq, sig, { "line", "finished" })
 
         local finished = false
@@ -83,7 +83,7 @@ describe("integration: library.dialog × lurek.signal", function()
     -- @description Choice event delivered through Signal carries the dialog into the "choice" state.
     it("choice event fires through Signal when reaching a choice node", function()
         local seq = dialog.newSequencer()
-        local sig = lurek.signal.newSignal()
+        local sig = lurek.event.newSignal()
         bridge(seq, sig, { "choice" })
 
         local choice_fired = false
@@ -104,7 +104,7 @@ describe("integration: library.dialog × lurek.signal", function()
     -- no longer reach the Signal subscribers.
     it("seq:off stops further events from reaching Signal subscribers", function()
         local seq = dialog.newSequencer()
-        local sig = lurek.signal.newSignal()
+        local sig = lurek.event.newSignal()
         bridge(seq, sig, { "line" })
 
         local count = 0

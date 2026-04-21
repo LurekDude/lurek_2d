@@ -261,7 +261,7 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Confetti particles (language switch celebration)
-    ps_confetti = lurek.particles.newSystem({
+    ps_confetti = lurek.particle.newSystem({
         maxParticles = 300, emissionRate = 0,
         lifetimeMin = 0.5, lifetimeMax = 1.4,
         speedMin = 50, speedMax = 220, direction = -1.57, spread = 6.28,
@@ -302,7 +302,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
     -- Global quit
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Update systems
     ps_confetti:update(dt)
@@ -401,7 +401,7 @@ function lurek.render_ui()
     lurek.render.print(tr("language") .. ": " .. LANG_NAMES[current_lang], lang_x, 12, 18)
 
     -- FPS
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.6, 0.6, 0.6, 0.8)
     lurek.render.print(tr("fps_label") .. ": " .. tostring(fps), SCREEN_W - 110, 12, 14)
 

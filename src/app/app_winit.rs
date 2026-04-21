@@ -413,7 +413,7 @@ impl ApplicationHandler for LunaApp {
             }
 
             WindowEvent::RedrawRequested => {
-                // Check quit flag from Lua (e.g., lurek.signal.quit()).
+                // Check quit flag from Lua (e.g., lurek.event.quit()).
                 if let Some(state) = &self.state {
                     if state.borrow().quit_requested {
                         event_loop.exit();

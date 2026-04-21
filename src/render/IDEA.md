@@ -81,7 +81,7 @@ No GPU work happens inside a Lua closure.
 - `shader.rs`: 14 tests cover WGSL validation, uniform ordering, entry-point rewriting,
   plus pure-logic text helpers (`split_top_level_commas`, `find_matching_paren`,
   `consume_attribute`, `strip_leading_attributes`, `has_uniform`).
-- Overall Lua test coverage for `lurek.graphic.*` is low (42 missing per P4 matrix).
+- Overall Lua test coverage for `lurek.render.*` is low (42 missing per P4 matrix).
 
 ---
 
@@ -121,7 +121,7 @@ the parameter mapping into `src/effect/` and keeping `src/render/` free of effec
 
 The render module is **CORE-KEEP** — it cannot be extracted as an optional plugin.
 
-**Rationale**: Every game that runs on Lurek2D requires a GPU renderer; the `lurek.graphic.*`
+**Rationale**: Every game that runs on Lurek2D requires a GPU renderer; the `lurek.render.*`
 namespace is the primary visual output surface. Removing it would reduce the engine to a
 headless Lua runtime. The wgpu dependency is unavoidable for the engine's stated purpose
 (2D desktop games at 60 FPS on integrated GPUs). The postfx pipeline and custom shader
@@ -133,7 +133,7 @@ would add IPC overhead for zero user benefit.
 ## References
 
 - `docs/specs/render.md` — canonical module spec.
-- `src/lua_api/render_api.rs` — Lua bridge (registered as `lurek.graphic.*`).
+- `src/lua_api/render_api.rs` — Lua bridge (registered as `lurek.render.*`).
 - `src/effect/` — higher-level effect definitions (`ImageEffect`, `PostFxEffect`).
 - `src/pipeline/` — separate pipeline module (overlap candidate).
 - `docs/API/lua-api.md` — generated Lua API reference.

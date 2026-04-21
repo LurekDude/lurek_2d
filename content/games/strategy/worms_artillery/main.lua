@@ -122,7 +122,7 @@ end
 -- ── Load ──────────────────────────────────────────────────────────────────
 function lurek.load()
     lurek.window.setTitle("Worms Artillery — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.35, 0.6, 0.85)
+    lurek.render.setBackgroundColor(0.35, 0.6, 0.85)
 
     -- Generate terrain with fractal noise
     local ng = lurek.math.newNoiseGenerator(42)
@@ -212,41 +212,41 @@ end
 -- ── Draw ──────────────────────────────────────────────────────────────────
 function lurek.draw()
     -- Sky gradient (simple top strip)
-    lurek.gfx.setColor(0.35, 0.6, 0.85)
-    lurek.gfx.rectangle("fill", 0, 0, W, H)
+    lurek.render.setColor(0.35, 0.6, 0.85)
+    lurek.render.rectangle("fill", 0, 0, W, H)
 
     -- Terrain
-    lurek.gfx.setColor(0.28, 0.55, 0.18)
+    lurek.render.setColor(0.28, 0.55, 0.18)
     for c = 1, TERRAIN_COLS do
         local tx = (c-1) * COL_W
         local ty = terrain_y(c)
-        lurek.gfx.rectangle("fill", tx, ty, COL_W + 1, H - ty)
+        lurek.render.rectangle("fill", tx, ty, COL_W + 1, H - ty)
     end
     -- Terrain edge highlight
-    lurek.gfx.setColor(0.4, 0.7, 0.25)
+    lurek.render.setColor(0.4, 0.7, 0.25)
     for c = 1, TERRAIN_COLS - 1 do
-        lurek.gfx.line((c-1)*COL_W, terrain_y(c), c*COL_W, terrain_y(c+1))
+        lurek.render.line((c-1)*COL_W, terrain_y(c), c*COL_W, terrain_y(c+1))
     end
 
     -- Worms
     for ti, team in ipairs(teams) do
         for i, w in ipairs(team.worms) do
             if w.hp > 0 then
-                lurek.gfx.setColor(team.color[1], team.color[2], team.color[3])
-                lurek.gfx.circle("fill", w.x, w.y, WORM_R)
+                lurek.render.setColor(team.color[1], team.color[2], team.color[3])
+                lurek.render.circle("fill", w.x, w.y, WORM_R)
                 -- HP bar
-                lurek.gfx.setColor(0,0,0,0.7)
-                lurek.gfx.rectangle("fill", w.x - 14, w.y - 22, 28, 5)
-                lurek.gfx.setColor(0.1, 0.9, 0.1)
-                lurek.gfx.rectangle("fill", w.x - 14, w.y - 22, 28*(w.hp/100), 5)
+                lurek.render.setColor(0,0,0,0.7)
+                lurek.render.rectangle("fill", w.x - 14, w.y - 22, 28, 5)
+                lurek.render.setColor(0.1, 0.9, 0.1)
+                lurek.render.rectangle("fill", w.x - 14, w.y - 22, 28*(w.hp/100), 5)
                 -- Active marker
                 if ti == turn and i == active_worm and state == STATE.AIM then
-                    lurek.gfx.setColor(1, 1, 0)
-                    lurek.gfx.circle("line", w.x, w.y, WORM_R + 4)
+                    lurek.render.setColor(1, 1, 0)
+                    lurek.render.circle("line", w.x, w.y, WORM_R + 4)
                     -- Aim line
-                    lurek.gfx.setColor(1, 1, 0, 0.7)
+                    lurek.render.setColor(1, 1, 0, 0.7)
                     local len = 30 + (fire_power / POWER_MAX) * 40
-                    lurek.gfx.line(w.x, w.y,
+                    lurek.render.line(w.x, w.y,
                         w.x + math.cos(aim_angle)*len,
                         w.y + math.sin(aim_angle)*len)
                 end
@@ -256,59 +256,59 @@ function lurek.draw()
 
     -- Projectile
     if proj.active then
-        lurek.gfx.setColor(1, 0.8, 0.1)
-        lurek.gfx.circle("fill", proj.x, proj.y, PROJ_R)
+        lurek.render.setColor(1, 0.8, 0.1)
+        lurek.render.circle("fill", proj.x, proj.y, PROJ_R)
     end
 
     -- Explosion
     if state == STATE.EXPLODING and expl.r > 0 then
         local alpha = 1 - expl.t / expl.dur
-        lurek.gfx.setColor(1, 0.5, 0, alpha * 0.7)
-        lurek.gfx.circle("fill", expl.x, expl.y, expl.r)
-        lurek.gfx.setColor(1, 1, 0, alpha)
-        lurek.gfx.circle("line", expl.x, expl.y, expl.r)
+        lurek.render.setColor(1, 0.5, 0, alpha * 0.7)
+        lurek.render.circle("fill", expl.x, expl.y, expl.r)
+        lurek.render.setColor(1, 1, 0, alpha)
+        lurek.render.circle("line", expl.x, expl.y, expl.r)
     end
 
     -- Sparks
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.draw(sparks, 0, 0)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.draw(sparks, 0, 0)
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 0, 0, W, 28)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 0, 0, W, 28)
     local tc = teams[turn].color
-    lurek.gfx.setColor(tc[1], tc[2], tc[3])
-    lurek.gfx.print(string.format("%s — Power: %d  Wind: %+.0f  Time: %d",
+    lurek.render.setColor(tc[1], tc[2], tc[3])
+    lurek.render.print(string.format("%s — Power: %d  Wind: %+.0f  Time: %d",
         teams[turn].name, math.floor(fire_power), wind, math.max(0, math.ceil(turn_timer))), 10, 6)
     -- Team health totals
     for t = 1, 2 do
         local total = 0
         for _, w in ipairs(teams[t].worms) do total = total + w.hp end
         local c2 = teams[t].color
-        lurek.gfx.setColor(c2[1], c2[2], c2[3])
-        lurek.gfx.print(string.format("%s HP: %d", teams[t].name, total), W - 240 + (t-1)*120, 6)
+        lurek.render.setColor(c2[1], c2[2], c2[3])
+        lurek.render.print(string.format("%s HP: %d", teams[t].name, total), W - 240 + (t-1)*120, 6)
     end
 
     -- Wind arrow
-    lurek.gfx.setColor(1, 1, 1, 0.8)
+    lurek.render.setColor(1, 1, 1, 0.8)
     local wx = W/2
-    lurek.gfx.line(wx, H - 12, wx + wind * 0.5, H - 12)
+    lurek.render.line(wx, H - 12, wx + wind * 0.5, H - 12)
 
     -- Game over
     if state == STATE.OVER then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", W/2 - 160, H/2 - 30, 320, 60)
-        lurek.gfx.setColor(1, 1, 0)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", W/2 - 160, H/2 - 30, 320, 60)
+        lurek.render.setColor(1, 1, 0)
         local winner = (count_alive(1) > 0) and teams[1].name or teams[2].name
-        lurek.gfx.print(winner .. " wins!", W/2 - 55, H/2 - 10, 0, 1.4)
-        lurek.gfx.setColor(1,1,1)
-        lurek.gfx.print("Press R to restart or Esc to quit", W/2 - 130, H/2 + 18)
+        lurek.render.print(winner .. " wins!", W/2 - 55, H/2 - 10, 0, 1.4)
+        lurek.render.setColor(1,1,1)
+        lurek.render.print("Press R to restart or Esc to quit", W/2 - 130, H/2 + 18)
     end
 end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     if key == "r" and state == STATE.OVER then
         -- restart
         for c = 1, TERRAIN_COLS do terrain_h[c] = 0 end

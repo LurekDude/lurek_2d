@@ -2,7 +2,7 @@
 -- Run with: lua content/library/netstate/example.lua
 -- Demonstrates offline state tracking — set/get with versioning,
 -- per-key change callbacks, dirty tracking, deterministic hashing for
--- desync detection, and optional JSON snapshot via lurek.codec.
+-- desync detection, and optional JSON snapshot via lurek.serial.
 -- No real network required: pass nil for the host argument.
 -- @module example.netstate
 
@@ -66,13 +66,13 @@ mirror:set("score", 11)
 print(string.format("[example.netstate] after divergence match=%s",
     tostring(server:hashState() == mirror:hashState())))
 
--- ── 7. Optional JSON snapshot via lurek.codec (guarded) ───────────────────────
-local lurek_ok = pcall(function() return lurek and lurek.codec end)
-if lurek_ok and lurek and lurek.codec and lurek.codec.toJson then
+-- ── 7. Optional JSON snapshot via lurek.serial (guarded) ───────────────────────
+local lurek_ok = pcall(function() return lurek and lurek.serial end)
+if lurek_ok and lurek and lurek.serial and lurek.serial.toJson then
     local s = server:toJson()
     print(string.format("[example.netstate] JSON snapshot len=%d", s and #s or 0))
 else
-    -- Manual hand-rolled snapshot for environments without lurek.codec.
+    -- Manual hand-rolled snapshot for environments without lurek.serial.
     local all = server:getAll()
     local parts = {}
     for k, v in pairs(all) do

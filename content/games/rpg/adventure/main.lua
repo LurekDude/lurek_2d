@@ -317,21 +317,21 @@ lurek.init(function()
     lurek.input.addAction("quit",      {"escape"})
 
     -- Particle systems
-    sparkle_ps = lurek.particles.new({
+    sparkle_ps = lurek.particle.new({
         maxParticles = 25, lifetime = 0.6,
         speed = 40, spread = 6.28,
         sizeStart = 4, sizeEnd = 1,
         colorStart = {1.0, 0.95, 0.5, 1.0},
         colorEnd   = {1.0, 0.80, 0.2, 0.0},
     })
-    burst_ps = lurek.particles.new({
+    burst_ps = lurek.particle.new({
         maxParticles = 35, lifetime = 0.5,
         speed = 90, spread = 6.28,
         sizeStart = 6, sizeEnd = 2,
         colorStart = {1.0, 0.7, 0.2, 1.0},
         colorEnd   = {0.8, 0.3, 0.1, 0.0},
     })
-    dust_ps = lurek.particles.new({
+    dust_ps = lurek.particle.new({
         maxParticles = 20, lifetime = 0.8,
         speed = 30, spread = 3.14,
         sizeStart = 5, sizeEnd = 8,
@@ -358,7 +358,7 @@ lurek.process(function(dt)
             dialog.active = false
             game_state = STATE.EXPLORING
         else
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -492,7 +492,7 @@ lurek.process(function(dt)
     lurek.camera.setPosition(0, 0)
     local pal = get_palette()
     lurek.render.setBackgroundColor(pal.bg[1], pal.bg[2], pal.bg[3])
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.window.setTitle("The Lost Egg — Lurek2D [FPS: " .. fps .. "]")
 end)
 

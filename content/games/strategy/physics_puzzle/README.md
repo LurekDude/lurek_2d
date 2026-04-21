@@ -23,9 +23,9 @@ You have a limited budget of shapes per level. Place them strategically to redir
 
 ## APIs Used
 - `lurek.render` — shapes, ball, goal, walls, preview ghost
-- `lurek.particles` — ball trail, bounce sparks, win burst
+- `lurek.particle` — ball trail, bounce sparks, win burst
 - `lurek.input` — action bindings for placement, rotation, launch
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced

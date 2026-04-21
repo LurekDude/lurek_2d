@@ -626,7 +626,7 @@ end)
 -- ---------------------------------------------------------------------------
 lurek.process(function(dt)
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -825,7 +825,7 @@ lurek.render_ui(function()
         lurek.render.setColor(0.5, 0.45, 0.65, 0.8)
         lurek.render.print("A Cinematic Platformer", SCREEN_W / 2 - 90, 220)
 
-        lurek.render.setColor(0.6, 0.55, 0.75, 0.6 + 0.3 * math.sin(lurek.time.getTime() * 3))
+        lurek.render.setColor(0.6, 0.55, 0.75, 0.6 + 0.3 * math.sin(lurek.timer.getTime() * 3))
         lurek.render.print("Press ENTER to begin", SCREEN_W / 2 - 82, 340)
 
         lurek.render.setColor(0.4, 0.35, 0.5, 0.5)
@@ -848,7 +848,7 @@ lurek.render_ui(function()
             end
         end
 
-        lurek.render.setColor(0.4, 0.35, 0.5, 0.4 + 0.3 * math.sin(lurek.time.getTime() * 2))
+        lurek.render.setColor(0.4, 0.35, 0.5, 0.4 + 0.3 * math.sin(lurek.timer.getTime() * 2))
         lurek.render.print("Press ENTER to skip", SCREEN_W / 2 - 72, SCREEN_H - 60)
         return
     end
@@ -875,7 +875,7 @@ lurek.render_ui(function()
         lurek.render.setColor(0.9, 0.2, 0.2, 1)
         lurek.render.print("G A M E   O V E R", SCREEN_W / 2 - 80, SCREEN_H / 2 - 30)
 
-        lurek.render.setColor(0.7, 0.5, 0.5, 0.6 + 0.3 * math.sin(lurek.time.getTime() * 3))
+        lurek.render.setColor(0.7, 0.5, 0.5, 0.6 + 0.3 * math.sin(lurek.timer.getTime() * 3))
         lurek.render.print("Press ENTER to restart", SCREEN_W / 2 - 85, SCREEN_H / 2 + 20)
         return
     end
@@ -920,7 +920,7 @@ lurek.render_ui(function()
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.5, 0.4)
-    lurek.render.print(string.format("FPS: %d", lurek.time.getFPS()), 10, 36)
+    lurek.render.print(string.format("FPS: %d", lurek.timer.getFPS()), 10, 36)
 
     -- ── Fade overlay ───────────────────────────────────────────
     if fade_alpha > 0 then

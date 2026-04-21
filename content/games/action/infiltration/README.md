@@ -53,4 +53,4 @@ Hack doors (type 3) require a wire-matching sequence — press the correct numbe
 
 ## APIs Used
 
-lurek.window, lurek.render, lurek.input, lurek.time, lurek.signal, lurek.particles, lurek.tween
+lurek.window, lurek.render, lurek.input, lurek.timer, lurek.event, lurek.particle, lurek.tween

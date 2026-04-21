@@ -26,13 +26,13 @@ cargo run -- content/games/showcase/localization_demo
 
 - `lurek.input.bind()` — named action bindings for language switching and RTL toggle
 - `lurek.camera.new()` — camera setup for world/UI render split
-- `lurek.particles.newSystem()` — confetti burst on language switch
+- `lurek.particle.newSystem()` — confetti burst on language switch
 - `lurek.tween.to()` — text fade transitions and menu button slide animations
 - `lurek.render.print()` — localized text rendering across all UI elements
 - `lurek.render.drawRect()` — styled menu buttons with hover states
 - `lurek.render.setBackgroundColor()` — dark themed background
-- `lurek.time.getFPS()` — live FPS counter in header
-- `lurek.signal.quit()` — clean exit on Escape
+- `lurek.timer.getFPS()` — live FPS counter in header
+- `lurek.event.quit()` — clean exit on Escape
 - `lurek.window.setTitle()` — window title configuration
 
 ## Features
@@ -51,4 +51,4 @@ cargo run -- content/games/showcase/localization_demo
 
 ## APIs Used
 
-`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particles`, `lurek.tween`, `lurek.time`, `lurek.signal`
+`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particle`, `lurek.tween`, `lurek.timer`, `lurek.event`

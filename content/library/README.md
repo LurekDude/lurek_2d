@@ -46,7 +46,7 @@ The engine automatically adds the correct search paths so `require("library.*")`
 | `library.lobby`        | Pre-game lobby & room manager built on `lurek.network`                        | Full    |
 | `library.netstate`     | Authority-driven state replication & turn-based protocol on `lurek.network`   | Full    |
 | `library.patterns`     | **Deprecated 0.6.0** — proxy that forwards to `library.scheduler`             | Proxy   |
-| `library.province_map` | Province maps, Voronoi generation, map modes (wraps `lurek.img`)              | Full    |
+| `library.province_map` | Province maps, Voronoi generation, map modes (wraps `lurek.image`)              | Full    |
 | `library.quest`        | Quest tracking, objectives, and branching completion states                   | Stub    |
 | `library.rpc`          | Remote procedure calls over `lurek.network`                                   | Full    |
 | `library.scheduler`    | Pure-Lua coroutine scheduler driven by `:update(dt)` (was `library.patterns`) | Full    |
@@ -125,7 +125,7 @@ The engine automatically adds the correct search paths so `require("library.*")`
 | `library.dialog`       | Typewriter dialog sequencer with choices, waits, and call nodes                                                                                                  | ԝ� Full   |
 | `library.item`         | Item type catalog, pools, stacks, builders, and history                                                                                                          | ԝ� Full   |
 | `library.inventory`    | Containers, weighted bags, slots, and inventories                                                                                                                | ԝ� Full   |
-| `library.province_map` | Pure-Lua province grid, adjacency graph, BFS routing, map modes, and event bus; uses `lurek.img.newProvinceGrid` only inside `M.newFromPng` for fast PNG loading | Full      |
+| `library.province_map` | Pure-Lua province grid, adjacency graph, BFS routing, map modes, and event bus; uses `lurek.image.newProvinceGrid` only inside `M.newFromPng` for fast PNG loading | Full      |
 | `library.quest`        | Quest tracking, objectives, and branching completion states                                                                                                      | ���� Stub |
 | `library.battle`       | Turn-based battle system ��� combatants, actions, and turn order                                                                                                 | ���� Stub |
 | `library.stats`        | Character attributes, derived stats, and modifiers                                                                                                               | ���� Stub |

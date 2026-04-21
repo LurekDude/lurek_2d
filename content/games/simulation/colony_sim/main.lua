@@ -420,7 +420,7 @@ lurek.process(function(dt)
             state = "PLAYING"
         end
         if lurek.input.pressed("quit") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -442,7 +442,7 @@ lurek.process(function(dt)
             init_colonists()
         end
         if lurek.input.pressed("quit") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -502,7 +502,7 @@ lurek.process(function(dt)
 
     -- Input: quit
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
     end
 
     -- Update

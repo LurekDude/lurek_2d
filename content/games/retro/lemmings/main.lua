@@ -399,7 +399,7 @@ lurek.process(function(dt)
             load_level(level)
         end
         if lurek.input.isKeyPressed("escape") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -409,7 +409,7 @@ lurek.process(function(dt)
             state = STATE_TITLE
         end
         if lurek.input.isKeyPressed("escape") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -426,14 +426,14 @@ lurek.process(function(dt)
             end
         end
         if lurek.input.isKeyPressed("escape") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
 
     -- PLAYING
     if lurek.input.isKeyPressed("escape") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

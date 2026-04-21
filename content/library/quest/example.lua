@@ -2,7 +2,7 @@
 -- Run with: lua content/library/quest/example.lua
 -- Demonstrates a 2-stage quest with objective progress, journal
 -- entries, status transitions, and an event-bus observer that watches
--- lifecycle events. Optional JSON round-trip via lurek.codec is
+-- lifecycle events. Optional JSON round-trip via lurek.serial is
 -- exercised when available.
 -- @module example.quest
 
@@ -77,15 +77,15 @@ print(string.format("[example.quest] active=%d completed=%d failed=%d",
 print(string.format("[example.quest] bus event sequence: %s",
     table.concat(bus.log, ",")))
 
--- ── 6. Optional JSON round-trip via lurek.codec (guarded) ─────────────────────
-local lurek_ok = pcall(function() return lurek and lurek.codec end)
-if lurek_ok and lurek and lurek.codec and lurek.codec.toJson then
+-- ── 6. Optional JSON round-trip via lurek.serial (guarded) ─────────────────────
+local lurek_ok = pcall(function() return lurek and lurek.serial end)
+if lurek_ok and lurek and lurek.serial and lurek.serial.toJson then
     local s = M.toJson(log)
     local back = M.fromJson(s)
     print(string.format("[example.quest] JSON round-trip len=%d quests_back=%d",
         #s, back and #(back.quests or {}) or 0))
 else
-    print("[example.quest] lurek.codec unavailable; skipped JSON round-trip")
+    print("[example.quest] lurek.serial unavailable; skipped JSON round-trip")
 end
 
 print("[example.quest] done.")

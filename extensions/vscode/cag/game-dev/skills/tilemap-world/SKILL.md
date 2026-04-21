@@ -33,7 +33,7 @@ data = [0,0,0,1,1,1,0,0,...]
 local map = {}
 
 local function load_map(path)
-    local content = lurek.fs.read(path)
+    local content = lurek.filesystem.read(path)
     local data = lurek.data.decodeToml(content)
     map.width = data.map.width
     map.height = data.map.height
@@ -42,7 +42,7 @@ local function load_map(path)
     for _, layer in ipairs(data.layers) do
         map.layers[layer.name] = layer.data
     end
-    map.tileset = lurek.gfx.newImage("tileset.png")
+    map.tileset = lurek.render.newImage("tileset.png")
 end
 ```
 
@@ -54,7 +54,7 @@ local function get_tile_quad(tile_id, tileset_w)
     local cols = math.floor(tileset_w / ts)
     local col = (tile_id - 1) % cols
     local row = math.floor((tile_id - 1) / cols)
-    return lurek.gfx.newQuad(col * ts, row * ts, ts, ts, tileset_w, tileset_w)
+    return lurek.render.newQuad(col * ts, row * ts, ts, ts, tileset_w, tileset_w)
 end
 ```
 
@@ -77,7 +77,7 @@ local function draw_layer(layer_name, cam_x, cam_y, screen_w, screen_h)
             local tile_id = data[idx]
             if tile_id and tile_id > 0 then
                 local quad = get_tile_quad(tile_id, 256)
-                lurek.gfx.draw(map.tileset, quad, col * ts, row * ts)
+                lurek.render.draw(map.tileset, quad, col * ts, row * ts)
             end
         end
     end

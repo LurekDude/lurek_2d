@@ -1,4 +1,4 @@
-//! `lurek.img` — CPU-side pixel-level image manipulation.
+//! `lurek.image` — CPU-side pixel-level image manipulation.
 //!
 //! Exposes `ImageData` (RGBA pixel buffers), `CompressedImageData` (DXT/BC/ETC),
 //! `LayeredImage` (multi-layer compositing), `ProvinceGrid` (colour-keyed region maps),
@@ -316,7 +316,7 @@ impl LuaUserData for LuaCompressedImageData {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.img` API table with the Lua VM.
+/// Registers the `lurek.image` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable

@@ -5,7 +5,7 @@
 - Module group: `Platform Services`
 - Source path: `src/render/`
 - Lua API path(s): `src/lua_api/render_api.rs`
-- Primary Lua namespace: `lurek.graphic`
+- Primary Lua namespace: `lurek.render`
 - Rust test path(s): `src/render/` (inline `#[cfg(test)]` in canvas, decal_surface, draw_layer, font, image_effect, mesh, shader, shape), `src/render/renderer_tests.rs`, `src/render/postfx_pipeline_tests.rs`
 - Lua test path(s): none found in the workspace
 
@@ -17,9 +17,9 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 
 `GpuRenderer` manages the wgpu `Device`, `Queue`, `Surface`, swapchain configuration, and all resource pools (`SlotMap<TextureKey, Texture>`, `SlotMap<FontKey, Font>`, `SlotMap<ShaderKey, Shader>`, `SlotMap<CanvasKey, Canvas>`, etc.). `Canvas` implements off-screen render-to-texture for post-processing and minimap rendering. `Font` provides bitmap glyph lookup from embedded PNG sprite sheets (6 built-in sizes) with grid-based indexing. `Shader` wraps user-supplied WGSL with a uniform variable table updated each frame. `PostFxPipeline` orchestrates ping-pong texture passes for multi-pass post-processing.
 
-Additional `RenderCommand` variants have been added to the central enum, expanding the draw call surface for specialized rendering workloads. Blend mode options have been extended with new compositing modes accessible from Lua scripts via `lurek.graphic.*`, giving game developers finer control over how translucent sprites, UI layers, and post-processing effects composite together. The Lua namespace is the singular `lurek.graphic` (not `lurek.graphics`); this matches the binding registration in `src/lua_api/graphic_api.rs`.
+Additional `RenderCommand` variants have been added to the central enum, expanding the draw call surface for specialized rendering workloads. Blend mode options have been extended with new compositing modes accessible from Lua scripts via `lurek.render.*`, giving game developers finer control over how translucent sprites, UI layers, and post-processing effects composite together. The Lua namespace is the singular `lurek.render` (not `lurek.renders`); this matches the binding registration in `src/lua_api/graphic_api.rs`.
 
-**Scope boundary**: Platform Services tier. Depends on `math`, `runtime`, `image`, `wgpu`. Lua bridge in `src/lua_api/render_api.rs` (registered as `lurek.graphic.*`).
+**Scope boundary**: Platform Services tier. Depends on `math`, `runtime`, `image`, `wgpu`. Lua bridge in `src/lua_api/render_api.rs` (registered as `lurek.render.*`).
 
 ## Files
 
@@ -52,10 +52,10 @@ Additional `RenderCommand` variants have been added to the central enum, expandi
 - `Mesh` (`struct`, `mesh.rs`): Custom geometry mesh with per-vertex position, UV, and color data.
 - `PostFxTexture` (`struct`, `postfx_pipeline.rs`): Stores a wgpu texture and its default view together for convenience.
 - `PostFxPipeline` (`struct`, `postfx_pipeline.rs`): GPU post-processing pipeline.
-- `CompareMode` (`enum`, `renderer.rs`): Stencil comparison mode for `lurek.gfx.setStencilTest`.
-- `StencilAction` (`enum`, `renderer.rs`): Stencil write action for `lurek.gfx.stencil` and `lurek.gfx.setStencilMode`.
+- `CompareMode` (`enum`, `renderer.rs`): Stencil comparison mode for `lurek.render.setStencilTest`.
+- `StencilAction` (`enum`, `renderer.rs`): Stencil write action for `lurek.render.stencil` and `lurek.render.setStencilMode`.
 - `StencilMode` (`struct`, `renderer.rs`): Combined stencil rendering mode stored in `SharedState`.
-- `DepthMode` (`enum`, `renderer.rs`): Depth test comparison mode for `lurek.gfx.setDepthMode`.
+- `DepthMode` (`enum`, `renderer.rs`): Depth test comparison mode for `lurek.render.setDepthMode`.
 - `TextAlign` (`enum`, `renderer.rs`): Text alignment mode for formatted text printing.
 - `DrawMode` (`enum`, `renderer.rs`): Fill-versus-line enum used by vector primitives.
 - `BlendMode` (`enum`, `renderer.rs`): Public blend-policy enum used by queued draw operations.
@@ -65,7 +65,7 @@ Additional `RenderCommand` variants have been added to the central enum, expandi
 - `TextureData` (`struct`, `renderer.rs`): CPU-side pixel container handed off for GPU texture upload.
 - `ParticleRenderShape` (`enum`, `renderer.rs`): Geometric shape used when rendering a single untextured particle via `DrawParticleSystem`.
 - `ParticleInstance` (`struct`, `renderer.rs`): Per-particle render data for a single frame.
-- `DrawableKind` (`enum`, `renderer.rs`): Type discriminator for resources that can be passed to lurek.gfx.draw.
+- `DrawableKind` (`enum`, `renderer.rs`): Type discriminator for resources that can be passed to lurek.render.draw.
 - `PathSegment` (`enum`, `renderer.rs`): A single segment of a vector path, used with `RenderCommand::DrawPath`.
 - `GradientDirection` (`enum`, `renderer.rs`): Direction for a two-stop linear or radial gradient.
 - `HexOrientation` (`enum`, `renderer.rs`): Orientation for a hexagonal tile cell.
@@ -146,7 +146,7 @@ Additional `RenderCommand` variants have been added to the central enum, expandi
 ## Lua API Reference
 
 - Binding path(s): `src/lua_api/render_api.rs`
-- Namespace: `lurek.graphic`
+- Namespace: `lurek.render`
 
 ### Module Functions
 - `lurek.render.setColor`: Sets the current drawing color.

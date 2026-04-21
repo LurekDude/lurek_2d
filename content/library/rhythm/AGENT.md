@@ -5,7 +5,7 @@
 | **Tier**       | Tier 3 — Lunasome (pure Lua)                                                                                                                                                 |
 | **Source**     | `library/rhythm/init.lua`                                                                                                                                                    |
 | **Lua Tests**  | `tests/lua/library/test_library_rhythm.lua`                                                                                                                                  |
-| **Depends on** | `lurek.audio` (`Source:getPosition` for `fromAudio`/`syncToAudio`), `lurek.time.getMicroTime` (default `judge` time), `lurek.signal` (optional `rhythm.beat/bar/miss` emits) |
+| **Depends on** | `lurek.audio` (`Source:getPosition` for `fromAudio`/`syncToAudio`), `lurek.timer.getMicroTime` (default `judge` time), `lurek.event` (optional `rhythm.beat/bar/miss` emits) |
 | **Status**     | full                                                                                                                                                                         |
 
 ## Purpose
@@ -51,9 +51,9 @@ beat/bar/swing/judgement abstractions on top of audio sources and Δt timers.
 - **`lurek.audio` Source** — when constructed via `M.fromAudio`, the clock
   reads `Source:getPosition()` each `update` to stay phase-locked. If the
   binding is missing, the clock degrades to a wall-time clock.
-- **`lurek.time.getMicroTime`** — default `M.judge` hit time. Falls back to
+- **`lurek.timer.getMicroTime`** — default `M.judge` hit time. Falls back to
   `os.clock()` when missing.
-- **`lurek.signal`** — emits `rhythm.beat`, `rhythm.bar`, and `rhythm.miss`
+- **`lurek.event`** — emits `rhythm.beat`, `rhythm.bar`, and `rhythm.miss`
   events when present; entirely optional.
 
 ## Status

@@ -239,7 +239,7 @@ lurek.init(function()
     lurek.render.setBackgroundColor(0.06, 0.08, 0.12, 1.0)
     math.randomseed(os.time())
 
-    attack_sparks = lurek.particles.newSystem({
+    attack_sparks = lurek.particle.newSystem({
         maxParticles = 40,
         emitRate     = 0,
         lifetime     = { 0.1, 0.4 },
@@ -250,7 +250,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    death_burst = lurek.particles.newSystem({
+    death_burst = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.3, 0.7 },
@@ -261,7 +261,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    move_dust = lurek.particles.newSystem({
+    move_dust = lurek.particle.newSystem({
         maxParticles = 20,
         emitRate     = 0,
         lifetime     = { 0.2, 0.5 },
@@ -298,7 +298,7 @@ lurek.process(function(dt)
         if log_msgs[i].timer <= 0 then table.remove(log_msgs, i) end
     end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
     if state == "win" or state == "lose" then return end
 
     if state == "enemy_turn" then

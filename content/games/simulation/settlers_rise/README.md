@@ -8,9 +8,9 @@ Settlement-building simulation inspired by The Settlers 2 (Amiga 1998). Place pr
 - `lurek.math.newRandomGenerator()` — seeded terrain variation
 - `lurek.math.lerp()` — smooth settler movement interpolation
 - `lurek.pathfind.newGrid()` — grid-based walkability map for settlers
-- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` / `lurek.gfx.print()` — tile map, buildings, settlers, HUD
+- `lurek.render.rectangle()` / `lurek.render.circle()` / `lurek.render.print()` — tile map, buildings, settlers, HUD
 - `lurek.input.getPosition()` — hover-tile highlight under mouse cursor
-- `lurek.signal.quit()` — clean exit
+- `lurek.event.quit()` — clean exit
 
 ## How to Run
 

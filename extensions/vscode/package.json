@@ -356,7 +356,7 @@
         "title": "Open Performance Dashboard"
       },
       {
-        "command": "lurek.system.openMonitor",
+        "command": "lurek.runtime.openMonitor",
         "title": "Open System Monitor"
       },
       {

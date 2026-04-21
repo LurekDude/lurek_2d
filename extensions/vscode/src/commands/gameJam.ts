@@ -33,10 +33,10 @@ end
 
 function lurek.update(dt)
   -- Horizontal movement
-  if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
+  if lurek.input.keyboard.isDown("left") or lurek.input.keyboard.isDown("a") then
     player.x = player.x - player.speed * dt
   end
-  if lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
+  if lurek.input.keyboard.isDown("right") or lurek.input.keyboard.isDown("d") then
     player.x = player.x + player.speed * dt
   end
 
@@ -101,18 +101,18 @@ end
 function lurek.update(dt)
   local dx, dy = 0, 0
 
-  if lurek.keyboard.isDown("up") or lurek.keyboard.isDown("w") then
+  if lurek.input.keyboard.isDown("up") or lurek.input.keyboard.isDown("w") then
     dy = -1
     player.dir = "up"
-  elseif lurek.keyboard.isDown("down") or lurek.keyboard.isDown("s") then
+  elseif lurek.input.keyboard.isDown("down") or lurek.input.keyboard.isDown("s") then
     dy = 1
     player.dir = "down"
   end
 
-  if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
+  if lurek.input.keyboard.isDown("left") or lurek.input.keyboard.isDown("a") then
     dx = -1
     player.dir = "left"
-  elseif lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
+  elseif lurek.input.keyboard.isDown("right") or lurek.input.keyboard.isDown("d") then
     dx = 1
     player.dir = "right"
   end
@@ -191,17 +191,17 @@ end
 
 function lurek.update(dt)
   -- Player movement
-  if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
+  if lurek.input.keyboard.isDown("left") or lurek.input.keyboard.isDown("a") then
     player.x = player.x - player.speed * dt
   end
-  if lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
+  if lurek.input.keyboard.isDown("right") or lurek.input.keyboard.isDown("d") then
     player.x = player.x + player.speed * dt
   end
   player.x = math.max(0, math.min(player.x, 800 - player.w))
 
   -- Shooting
   shoot_timer = shoot_timer - dt
-  if lurek.keyboard.isDown("space") and shoot_timer <= 0 then
+  if lurek.input.keyboard.isDown("space") and shoot_timer <= 0 then
     table.insert(bullets, { x = player.x + player.w / 2 - 2, y = player.y - 8, w = 4, h = 8 })
     shoot_timer = shoot_cooldown
   end
@@ -460,7 +460,7 @@ function lurek.load()
 end
 
 function lurek.update(dt)
-  local mx, my = lurek.mouse.getPosition()
+  local mx, my = lurek.input.mouse.getPosition()
   local scene = scenes[current_scene]
   hover_choice = 0
 

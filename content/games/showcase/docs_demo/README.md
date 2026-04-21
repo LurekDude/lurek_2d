@@ -4,13 +4,13 @@ Interactive API documentation browser and viewer: navigate 12 `lurek.*` namespac
 
 ## What It Demonstrates
 
-- `lurek.gfx.rectangle()` / `lurek.gfx.print()` / `lurek.gfx.line()` — sidebar, panels, syntax-highlighted text
-- `lurek.particles.newSystem()` — page-turn sparkle and search-result highlight glow
+- `lurek.render.rectangle()` / `lurek.render.print()` / `lurek.render.line()` — sidebar, panels, syntax-highlighted text
+- `lurek.particle.newSystem()` — page-turn sparkle and search-result highlight glow
 - `lurek.tween.to()` / `lurek.tween.update()` — smooth sidebar scroll and panel slide transitions
 - `lurek.input.bind()` / `lurek.input.wasActionPressed()` — action-based navigation, search, bookmarks, history
 - `lurek.camera.attach()` / `lurek.camera.detach()` — camera setup for world/UI split
-- `lurek.window.setTitle()` / `lurek.gfx.setBackgroundColor()` — window configuration
-- `lurek.signal.quit()` — clean exit
+- `lurek.window.setTitle()` / `lurek.render.setBackgroundColor()` — window configuration
+- `lurek.event.quit()` — clean exit
 
 ## How to Run
 

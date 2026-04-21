@@ -297,8 +297,8 @@ The `province_grid.rs` source file introduces `ProvinceGrid`, a flat spatial ind
 ### New in 0.14.2
 
 - `ProvinceGrid` — new type in `province_grid.rs`. Flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Replaces the 2–8 s Lua `pixel_lookup` hash construction with ~15–30 ms Rust scan for 2400×1200 maps.
-- `lurek.img.newProvinceGrid(filename)` — registered in `image_api.rs`, returns `LuaProvinceGrid` userdata with `getWidth`, `getHeight`, `getAt`, `provinceCount`, `adjacencies` methods.
-- `content/library/province_map`: new `M.newFromPng(png_path, defs)` constructor uses `lurek.img.newProvinceGrid` when available; all prior constructors and logic unchanged.
+- `lurek.image.newProvinceGrid(filename)` — registered in `image_api.rs`, returns `LuaProvinceGrid` userdata with `getWidth`, `getHeight`, `getAt`, `provinceCount`, `adjacencies` methods.
+- `content/library/province_map`: new `M.newFromPng(png_path, defs)` constructor uses `lurek.image.newProvinceGrid` when available; all prior constructors and logic unchanged.
 ### New in 0.14.1
 
 - 11 pixel transforms now use `map_pixel_par` (rayon, 65 536-pixel threshold): `brightness`, `contrast`, `saturation`, `gamma`, `tint`, `grayscale`, `sepia`, `invert`, `threshold`, `posterize`, `fill`.

@@ -3,9 +3,9 @@
 --- Crafting system: recipes, ingredients, outputs, job queues, stations,
 --- craft skills, perk trees, upgrade trees, modifier pools, and recipe knowledge.
 --- Pure-Lua port of src/crafting/.
---- @see lurek.codec
+--- @see lurek.serial
 --- @see lurek.patterns
---- @see lurek.signal
+--- @see lurek.event
 --- @see lurek.log
 
 local M = {}

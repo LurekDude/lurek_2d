@@ -1,6 +1,6 @@
 -- tests/lua/integration/test_pathfind_graph.lua
--- Integration: lurek.pathfinding jpsGrid + graph_astar from procgen world graph
--- Namespaces: lurek.pathfinding + lurek.procgen
+-- Integration: lurek.pathfind jpsGrid + graph_astar from procgen world graph
+-- Namespaces: lurek.pathfind + lurek.procgen
 
 local init = require("tests/lua/init")
 describe, it, expect_equal, expect_near, expect_error, expect_true, expect_type, test_summary =
@@ -13,12 +13,12 @@ describe, it, expect_equal, expect_near, expect_error, expect_true, expect_type,
 describe("pathfinding.newJpsGrid", function()
 
     it("creates a JPS grid without error", function()
-        local g = lurek.pathfinding.newJpsGrid(12, 12)
+        local g = lurek.pathfind.newJpsGrid(12, 12)
         expect_type("userdata", g)
     end)
 
     it("setBlocked / isBlocked round-trip", function()
-        local g = lurek.pathfinding.newJpsGrid(8, 8)
+        local g = lurek.pathfind.newJpsGrid(8, 8)
         g:setBlocked(5, 3, true)
         expect_equal(true, g:isBlocked(5, 3))
         g:setBlocked(5, 3, false)
@@ -26,7 +26,7 @@ describe("pathfinding.newJpsGrid", function()
     end)
 
     it("findPath returns nil when start is blocked", function()
-        local g = lurek.pathfinding.newJpsGrid(6, 6)
+        local g = lurek.pathfind.newJpsGrid(6, 6)
         g:setBlocked(1, 1, true)
         local path = g:findPath(1, 1, 6, 6)
         -- Blocked start → no path
@@ -34,13 +34,13 @@ describe("pathfinding.newJpsGrid", function()
     end)
 
     it("findPath on open grid returns a path", function()
-        local g = lurek.pathfinding.newJpsGrid(10, 10)
+        local g = lurek.pathfind.newJpsGrid(10, 10)
         local path = g:findPath(1, 1, 8, 8)
         expect_true(path ~= nil, "expected a valid path on open grid")
     end)
 
     it("path cells have x and y fields", function()
-        local g = lurek.pathfinding.newJpsGrid(8, 8)
+        local g = lurek.pathfind.newJpsGrid(8, 8)
         local path = g:findPath(1, 1, 6, 6)
         if path and #path > 0 then
             expect_type("number", path[1].x)
@@ -49,7 +49,7 @@ describe("pathfinding.newJpsGrid", function()
     end)
 
     it("path starts and ends at expected coordinates", function()
-        local g = lurek.pathfinding.newJpsGrid(10, 10)
+        local g = lurek.pathfind.newJpsGrid(10, 10)
         local path = g:findPath(1, 1, 5, 5)
         if path and #path >= 2 then
             local first = path[1]
@@ -63,7 +63,7 @@ describe("pathfinding.newJpsGrid", function()
     end)
 
     it("blocking a cell removes it from the path", function()
-        local g = lurek.pathfinding.newJpsGrid(8, 8)
+        local g = lurek.pathfind.newJpsGrid(8, 8)
         -- Block cell (4, 4) which is on the diagonal from (1,1) to (7,7)
         g:setBlocked(4, 4, true)
         local path_blocked = g:findPath(1, 1, 7, 7)
@@ -75,8 +75,8 @@ describe("pathfinding.newJpsGrid", function()
     end)
 
     it("multiple independent grids don't share state", function()
-        local g1 = lurek.pathfinding.newJpsGrid(8, 8)
-        local g2 = lurek.pathfinding.newJpsGrid(8, 8)
+        local g1 = lurek.pathfind.newJpsGrid(8, 8)
+        local g2 = lurek.pathfind.newJpsGrid(8, 8)
         g1:setBlocked(3, 3, true)
         expect_equal(true, g1:isBlocked(3, 3))
         expect_equal(false, g2:isBlocked(3, 3))
@@ -118,7 +118,7 @@ describe("procgen worldGraph + JPS grid integration", function()
     it("room floors are navigable via JPS grid", function()
         local d = lurek.procgen.roomsDungeon({ width = 20, height = 16, max_rooms = 4, seed = 7 })
         -- Build a JPS grid from the dungeon's floor plan
-        local g = lurek.pathfinding.newJpsGrid(d.width, d.height)
+        local g = lurek.pathfind.newJpsGrid(d.width, d.height)
         for y = 1, d.height do
             for x = 1, d.width do
                 local idx = (y - 1) * d.width + x

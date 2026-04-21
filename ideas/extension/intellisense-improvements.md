@@ -65,12 +65,12 @@ This significantly exceeds the 12 providers documented in `02-intellisense-desig
 
 **New diagnostic ideas**:
 - **Missing `lurek.load()` callback** — warn if `main.lua` uses lurek.* but has no `lurek.load` callback
-- **Per-frame allocation warning** — flag `lurek.gfx.newImage()` or `lurek.audio.newSource()` inside `lurek.draw`/`lurek.update` callbacks
+- **Per-frame allocation warning** — flag `lurek.render.newImage()` or `lurek.audio.newSource()` inside `lurek.draw`/`lurek.update` callbacks
 - **Invalid key name** — flag `lurek.keypressed` using key strings not in the valid set
 - **Body type mismatch** — flag methods called on wrong body type (e.g. `setLinearVelocity` on static body)
 - **Missing `test_summary()`** — flag Lua test files that don't end with `test_summary()`
 - **Double borrow potential** — flag patterns that might cause Rc<RefCell> panics
-- **Entity nil check** — flag entity access without nil check after `lurek.entity.find()`
+- **Entity nil check** — flag entity access without nil check after `lurek.ecs.find()`
 - **Coord system warning** — flag negative Y assumptions (Lurek2D Y-axis goes down)
 
 ### 4. Contextual String Completion Enhancement
@@ -78,13 +78,13 @@ This significantly exceeds the 12 providers documented in `02-intellisense-desig
 **Current**: Key names are completed when typing inside `lurek.keypressed` etc.
 
 **New contextual completions**:
-- **Easing function names** when typing `lurek.time.tween(_, _, _, "` → show all easing names with preview
-- **Blend mode names** when typing `lurek.gfx.setBlendMode("` → show modes with visual description
+- **Easing function names** when typing `lurek.timer.tween(_, _, _, "` → show all easing names with preview
+- **Blend mode names** when typing `lurek.render.setBlendMode("` → show modes with visual description
 - **Physics body types** when typing `lurek.physics.newBody(_, _, _, "` → "static", "dynamic", "kinematic"
 - **Audio source types** when typing `lurek.audio.newSource(_, "` → "static", "stream"
 - **Filter modes** when typing `setFilter("` → "nearest", "linear" with explanation
-- **Draw modes** when typing `lurek.gfx.circle("` → "fill", "line" with explanation
-- **Event names** when typing `lurek.signal.on("` → list all engine event names
+- **Draw modes** when typing `lurek.render.circle("` → "fill", "line" with explanation
+- **Event names** when typing `lurek.event.on("` → list all engine event names
 
 ### 5. Easing Curve Visualization
 
@@ -120,7 +120,7 @@ Implementation: Generate a small embedded SVG or canvas in the hover markdown.
 - Workspace-wide `require()` resolution → jump to definition across files
 - Auto-import suggestions: typing a function name from another module → suggest `require()`
 - Show all references across the entire workspace, not just current file
-- Support `lurek.fs.load()` as a module import path
+- Support `lurek.filesystem.load()` as a module import path
 
 ### 8. Snippet Library Expansion
 
@@ -151,7 +151,7 @@ Implementation: Generate a small embedded SVG or canvas in the hover markdown.
 - Flag string concatenation in loops (suggest `table.concat`)
 - Flag `pairs()`/`ipairs()` on large tables inside `update()`
 - Flag creating closures inside hot loops
-- Flag `lurek.gfx.newImage()` called every frame
+- Flag `lurek.render.newImage()` called every frame
 - Suggest `local` for frequently accessed globals
 - Flag deep table nesting in tight loops
 

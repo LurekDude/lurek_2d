@@ -1,4 +1,4 @@
-//! `lurek.simulator` — Automated input simulation via timed step scripts.
+//! `lurek.automation` — Automated input simulation via timed step scripts.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -11,7 +11,7 @@ use crate::automation::{Action, Script, Simulator, Step};
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.simulator` API table with the Lua VM.
+/// Registers the `lurek.automation` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable
@@ -349,7 +349,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // ── setHighlightMode ──────────────────────────────────────────────────────────────
     /// Enables or disables the highlight overlay hint.
     /// When true, a game render pass can visualise the current simulated cursor/key
-    /// position by calling `lurek.simulator:isHighlightMode()`.
+    /// position by calling `lurek.automation:isHighlightMode()`.
     /// @param enable : boolean
     /// @return nil
     let sim = simulator.clone();

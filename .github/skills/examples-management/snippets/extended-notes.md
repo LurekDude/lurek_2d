@@ -59,7 +59,7 @@ Color component values must be in `[0.0, 1.0]` range — **never** `[0, 255]`:
 
 ### Rectangle Draw Mode
 
-`lurek.gfx.rectangle()` takes a string mode as its first arg — not a boolean:
+`lurek.render.rectangle()` takes a string mode as its first arg — not a boolean:
 
 > See [examples/rectangle-draw-mode.lua](examples/rectangle-draw-mode.lua) for the example.
 
@@ -72,7 +72,7 @@ Color component values must be in `[0.0, 1.0]` range — **never** `[0, 255]`:
 | Rule | `content/demos/` | `content/examples/` |
 |------|---------|------------|
 | `require()` | ❌ No — must be single-file, self-contained | ✅ May use `require("library.*")` for shipped Lunasome modules |
-| `os.*` / `io.*` system calls | ❌ Never — use `lurek.fs.*` for file access | ❌ Never |
+| `os.*` / `io.*` system calls | ❌ Never — use `lurek.filesystem.*` for file access | ❌ Never |
 | `conf.toml` | ✅ Required for each demo folder | ❌ Not applicable (single-file) |
 
 ### Example Coverage Workflow — 100% API Coverage Required
@@ -107,7 +107,7 @@ Or invoke via VS Code Copilot with:
 
 - One `.lua` file per `src/lua_api/<module>_api.rs` — exact 1:1 mapping
 - Every registered function *and* every method on every userdata type must appear as a **real call**, not a comment
-- Return values must be assigned or logged — `local x = lurek.time.getDelta()` not just `lurek.time.getDelta()`
+- Return values must be assigned or logged — `local x = lurek.timer.getDelta()` not just `lurek.timer.getDelta()`
 - The stub header `-- STUBS: N` must be removed after all stubs in that file are filled
 - `python tools/audit/example_coverage.py --report` must exit 0 before merge
 
@@ -118,19 +118,19 @@ Or invoke via VS Code Copilot with:
 | `ai` | `lurek.ai` | `content/examples/ai.lua` |
 | `animation` | `lurek.animation` | `content/examples/animation.lua` |
 | `audio` | `lurek.audio` | `content/examples/audio.lua` |
-| `ecs` | `lurek.entity` | `content/examples/entity.lua` |
-| `effect` | `lurek.overlay` | `content/examples/fx.lua` |
-| `filesystem` | `lurek.fs` | `content/examples/filesystem.lua` |
-| `i18n` | `lurek.localization` | `content/examples/localization.lua` |
-| `image` | `lurek.img` | `content/examples/image.lua` |
-| `input` | `lurek.keyboard` | `content/examples/input.lua` |
-| `mods` | `lurek.modding` | `content/examples/modding.lua` |
-| `pathfind` | `lurek.pathfinding` | `content/examples/pathfinding.lua` |
-| `render` | `lurek.graphic` | `content/examples/graphics.lua` |
-| `save` | `lurek.savegame` | `content/examples/savegame.lua` |
-| `serial` | `lurek.codec` | `content/examples/serial.lua` |
-| `system` | `lurek.platform` | `content/examples/system.lua` |
-| `timer` | `lurek.time` | `content/examples/timer.lua` |
+| `ecs` | `lurek.ecs` | `content/examples/entity.lua` |
+| `effect` | `lurek.effect` | `content/examples/fx.lua` |
+| `filesystem` | `lurek.filesystem` | `content/examples/filesystem.lua` |
+| `i18n` | `lurek.i18n` | `content/examples/localization.lua` |
+| `image` | `lurek.image` | `content/examples/image.lua` |
+| `input` | `lurek.input.keyboard` | `content/examples/input.lua` |
+| `mods` | `lurek.mods` | `content/examples/modding.lua` |
+| `pathfind` | `lurek.pathfind` | `content/examples/pathfinding.lua` |
+| `render` | `lurek.render` | `content/examples/graphics.lua` |
+| `save` | `lurek.save` | `content/examples/savegame.lua` |
+| `serial` | `lurek.serial` | `content/examples/serial.lua` |
+| `system` | `lurek.runtime` | `content/examples/runtime_platform.lua` |
+| `timer` | `lurek.timer` | `content/examples/timer.lua` |
 | `ui` | `lurek.ui` | `content/examples/gui.lua` |
 | All others | `lurek.<module>` | `content/examples/<module>.lua` |
 

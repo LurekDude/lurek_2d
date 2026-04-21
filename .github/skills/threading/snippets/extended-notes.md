@@ -1,7 +1,7 @@
 | `lurek.physics` | ❌ | Physics world is main-thread only |
 | `lurek.input` | ❌ | Input state is main-thread only |
 | `lurek.data` | ✅ Full | Compression, hashing, encoding |
-| `lurek.img` | ✅ Full | CPU-side pixel data only |
+| `lurek.image` | ✅ Full | CPU-side pixel data only |
 | Standard libs | Subset | No `os`, `io`, `loadfile`, `dofile` |
 
 ---

@@ -15,7 +15,7 @@
 -- @module library.item
 -- @status full
 -- @see lurek.math
--- @see lurek.codec.toJson
+-- @see lurek.serial.toJson
 --
 -- Note (P7 batch C, 0.6.0): the previous file split `M.newStack` and
 -- `M.newStackBuilder` into a base definition followed by a wrapper that

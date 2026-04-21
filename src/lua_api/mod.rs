@@ -10,13 +10,13 @@
 
 pub use crate::runtime::{ErrorInfo, FullscreenType, SharedState, WindowState};
 
-/// Registers the `lurek.signal.*` event queue and signal API.
+/// Registers the `lurek.event.*` event queue and signal API.
 pub mod event_api;
 
-/// Registers the `lurek.time.*` frame-timing API.
+/// Registers the `lurek.timer.*` frame-timing API.
 pub mod timer_api;
 
-/// Registers the `lurek.img.*` pixel-level image manipulation API.
+/// Registers the `lurek.image.*` pixel-level image manipulation API.
 pub mod image_api;
 
 /// Registers the `lurek.camera.*` Camera2D API.
@@ -30,37 +30,37 @@ pub mod thread_api;
 /// Registers the `lurek.tween.*` property animation API.
 pub mod tween_api;
 
-/// Registers the `lurek.simulator.*` automated input simulation API.
+/// Registers the `lurek.automation.*` automated input simulation API.
 pub mod automation_api;
 
-/// Registers the `lurek.keyboard` / `lurek.mouse` / `lurek.gamepad` / `lurek.touch` input API.
+/// Registers the `lurek.input.keyboard` / `lurek.input.mouse` / `lurek.input.gamepad` / `lurek.input.touch` input API.
 pub mod input_api;
 
-/// Registers the `lurek.savegame.*` slot-based save/load API.
+/// Registers the `lurek.save.*` slot-based save/load API.
 pub mod save_api;
 
 /// Registers the `lurek.data.*` binary data, compression, hashing, and encoding API.
 pub mod data_api;
 
-/// Registers the `lurek.entity.*` lightweight ECS API.
+/// Registers the `lurek.ecs.*` lightweight ECS API.
 pub mod ecs_api;
 
 /// Registers the `lurek.scene.*` scene stack and depth-sorter API.
 pub mod scene_api;
 
-/// Registers the `lurek.gpu.*` array computation API.
+/// Registers the `lurek.compute.*` array computation API.
 pub mod compute_api;
 
 /// Registers the `lurek.window.*` window management API.
 pub mod window_api;
 
-/// Registers the `lurek.modding.*` mod management API.
+/// Registers the `lurek.mods.*` mod management API.
 pub mod mods_api;
 
-/// Registers the `lurek.fs.*` sandboxed file I/O API.
+/// Registers the `lurek.filesystem.*` sandboxed file I/O API.
 pub mod filesystem_api;
 
-/// Registers the `lurek.codec.*` format serialization API.
+/// Registers the `lurek.serial.*` format serialization API.
 pub mod serial_api;
 
 /// Registers the `lurek.raycaster.*` DDA grid raycasting API.
@@ -78,7 +78,7 @@ pub mod network_api;
 /// Registers the `lurek.minimap.*` grid-based minimap API.
 pub mod minimap_api;
 
-/// Registers the `lurek.pathfinding.*` grid-based pathfinding API.
+/// Registers the `lurek.pathfind.*` grid-based pathfinding API.
 pub mod pathfind_api;
 
 /// Registers the `lurek.dataframe.*` tabular data API.
@@ -105,10 +105,10 @@ pub mod ai_api;
 /// Registers the `lurek.audio.*` audio playback, mixing, and MIDI API.
 pub mod audio_api;
 
-/// Registers the `lurek.postfx.*` post-processing and screen overlay API.
+/// Registers the `lurek.effect.*` post-processing and screen overlay API.
 pub mod effect_api;
 
-/// Registers the `lurek.particles.*` particle system and trail API.
+/// Registers the `lurek.particle.*` particle system and trail API.
 pub mod particle_api;
 
 /// Registers the `lurek.parallax.*` multi-layer parallax background API.
@@ -129,10 +129,10 @@ pub mod math_api;
 /// Registers the `lurek.physics.*` rigid-body physics API.
 pub mod physics_api;
 
-/// Registers the `lurek.collision.*` stateless geometric overlap helpers.
+/// Registers the `lurek.physics.*` stateless geometric overlap helpers.
 pub mod collision_api;
 
-/// Registers the `lurek.graphic.*` rendering and drawing API.
+/// Registers the `lurek.render.*` rendering and drawing API.
 pub mod render_api;
 
 /// Exposes low-level system queries (processor count, memory size, URL opening, locale, power).
@@ -144,13 +144,13 @@ pub mod devtools_api;
 /// Registers the `lurek.debugbridge.*` TCP debug server API.
 pub mod debugbridge_api;
 
-/// Registers the `lurek.localization.*` multi-locale string catalog API.
+/// Registers the `lurek.i18n.*` multi-locale string catalog API.
 pub mod i18n_api;
 
 /// Registers the `lurek.log.*` structured log level API.
 pub mod log_api;
 
-/// Registers the `lurek.engine.*` runtime engine metadata API.
+/// Registers the `lurek.runtime.*` runtime engine metadata API.
 pub mod engine_api;
 
 /// Registers the `lurek.docs.*` documentation management API.

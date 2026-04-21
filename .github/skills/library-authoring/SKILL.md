@@ -56,19 +56,19 @@ Renames or deletions must update **all** of the above in the same commit. Deprec
 
 | Stale doc name | Runtime name | Notes |
 |---|---|---|
-| `lurek.image` | `lurek.img` | image loading + atlases |
-| `lurek.serial` | `lurek.codec` | JSON / TOML / binary |
-| `lurek.save` | `lurek.savegame` | SaveManager, collectors |
-| `lurek.timer` | `lurek.time` | `Scheduler:after` / `:every` |
-| `lurek.ecs` | `lurek.entity` | entity / component store |
-| `lurek.mods` | `lurek.modding` | mod loader |
-| `lurek.filesystem` | `lurek.fs` | sandboxed file IO |
-| `lurek.pathfind` | `lurek.pathfinding` | A* / Dijkstra |
-| `lurek.effect` | `lurek.postfx` | post-process passes |
-| `lurek.particle` | `lurek.particles` | particle systems |
-| `lurek.render` | `lurek.graphic` | low-level draw queue |
-| `lurek.i18n` | `lurek.localization` | translations |
-| `lurek.system` | `lurek.platform` | OS / window info |
+| `lurek.image` | `lurek.image` | image loading + atlases |
+| `lurek.serial` | `lurek.serial` | JSON / TOML / binary |
+| `lurek.save` | `lurek.save` | SaveManager, collectors |
+| `lurek.timer` | `lurek.timer` | `Scheduler:after` / `:every` |
+| `lurek.ecs` | `lurek.ecs` | entity / component store |
+| `lurek.mods` | `lurek.mods` | mod loader |
+| `lurek.filesystem` | `lurek.filesystem` | sandboxed file IO |
+| `lurek.pathfind` | `lurek.pathfind` | A* / Dijkstra |
+| `lurek.effect` | `lurek.effect` | post-process passes |
+| `lurek.particle` | `lurek.particle` | particle systems |
+| `lurek.render` | `lurek.render` | low-level draw queue |
+| `lurek.i18n` | `lurek.i18n` | translations |
+| `lurek.runtime` | `lurek.runtime` | OS / window info |
 
 Always grep the actual `src/lua_api/mod.rs` registration before introducing a new dependency.
 
@@ -76,13 +76,13 @@ Always grep the actual `src/lua_api/mod.rs` registration before introducing a ne
 
 Library code is the **headless** layer of the stack. It must not require a window, GPU, or audio device just to `require("library.<name>")`. The following APIs are forbidden inside `init.lua` (they may appear only in `@see` cross-references and in `example.lua`):
 
-- `lurek.graphic.*` and any draw-call API
+- `lurek.render.*` and any draw-call API
 - `lurek.audio.play*` / device opening
 - `lurek.window.*` (size, title, cursor)
 - `lurek.input.*` polling at module load time
-- `lurek.postfx.*` shader passes
+- `lurek.effect.*` shader passes
 
-If a library needs to advertise rendering hooks, expose data (positions, sprite ids, colours) and document the consumer with `-- @see lurek.graphic.draw`.
+If a library needs to advertise rendering hooks, expose data (positions, sprite ids, colours) and document the consumer with `-- @see lurek.render.draw`.
 
 ### LDoc Tag Set (gen_lib_docs.py)
 

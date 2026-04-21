@@ -2,6 +2,6 @@
 function lurek.errorhandler(msg)
     -- Log to file + console before showing error screen
     print("UNHANDLED ERROR: " .. tostring(msg))
-    lurek.fs.append("errors.log", msg .. "\n")
+    lurek.filesystem.append("errors.log", msg .. "\n")
     return msg   -- return the message to display on error screen
 end

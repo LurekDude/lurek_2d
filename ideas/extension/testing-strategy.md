@@ -34,7 +34,7 @@ import { CompletionProvider } from '../../src/providers/completion';
 import { MockDocument, MockPosition } from '../mocks/vscode';
 
 describe('CompletionProvider', () => {
-  it('completes lurek.gfx.* methods', () => { ... });
+  it('completes lurek.render.* methods', () => { ... });
   it('completes builtins after lurek.', () => { ... });
   it('does not complete outside luna namespace', () => { ... });
   it('includes parameter snippets', () => { ... });

@@ -5,7 +5,7 @@
 - Module group: `Foundations`
 - Source path: `src/serial/`
 - Lua API path(s): `src/lua_api/serial_api.rs`
-- Primary Lua namespace: `lurek.codec`
+- Primary Lua namespace: `lurek.serial`
 - Rust test path(s): tests/rust/unit/serial_tests.rs; inline tests in src/serial/csv.rs, src/serial/json.rs, src/serial/toml.rs, src/serial/yaml.rs, src/serial/lua_table.rs, src/serial/msgpack.rs, src/serial/schema.rs, src/serial/xml.rs
 - Lua test path(s): tests/lua/unit/test_serial.lua
 
@@ -17,7 +17,7 @@ Format modules operate on `SerialValue`, converting to and from format-specific 
 
 The module performs no file I/O — callers supply strings, receive strings. File reading and writing is the responsibility of `filesystem`. The `save` module uses `serial::to_toml` and `from_toml` to serialize save collector outputs.
 
-**Scope boundary**: Foundations tier. Depends only on external crates (toml, serde_json, csv, rmp-serde, roxmltree, indexmap). Lua bridge in `src/lua_api/serial_api.rs` as `lurek.codec.*`.
+**Scope boundary**: Foundations tier. Depends only on external crates (toml, serde_json, csv, rmp-serde, roxmltree, indexmap). Lua bridge in `src/lua_api/serial_api.rs` as `lurek.serial.*`.
 
 ## Files
 
@@ -57,7 +57,7 @@ The module performs no file I/O — callers supply strings, receive strings. Fil
 ## Lua API Reference
 
 - Binding path(s): `src/lua_api/serial_api.rs`
-- Namespace: `lurek.codec`
+- Namespace: `lurek.serial`
 
 ### Module Functions
 - `lurek.serial.fromJson`: Parses a JSON string and returns a Lua table.

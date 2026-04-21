@@ -7,7 +7,7 @@
 - Lua API path(s): `src/lua_api/save_api.rs`
 - Primary Lua namespace: `lurek.save`
 - Rust test path(s): tests/rust/unit/savegame_tests.rs
-- Lua test path(s): tests/lua/unit/test_savegame.lua, tests/lua/stress/test_savegame_stress.lua, tests/lua/security/test_savegame_validation.lua, tests/lua/integration/test_save_entity.lua, tests/lua/integration/test_savegame_tilemap.lua, tests/lua/integration/test_savegame_entity_scene.lua
+- Lua test path(s): tests/lua/unit/test_save.lua, tests/lua/stress/test_save_stress.lua, tests/lua/security/test_save_validation.lua, tests/lua/integration/test_save_ecs.lua, tests/lua/integration/test_save_tilemap.lua, tests/lua/integration/test_save_ecs_scene.lua
 
 ## Summary
 

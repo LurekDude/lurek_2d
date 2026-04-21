@@ -471,7 +471,7 @@ lurek.process(function(delta)
   update_particles(transfer_particles, delta)
 
   if lurek.input.pressed("quit") then
-    lurek.signal.quit()
+    lurek.event.quit()
     return
   end
 

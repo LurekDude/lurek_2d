@@ -30,9 +30,9 @@ _MODULE_ORDER = [
 # Maps the internal json/module key → actual registered Lua namespace.
 # These modules register under a different name than their source folder.
 _LUA_NAMESPACE = {
-    "timer":      "time",       # lurek.time.* (registered as "time" in timer_api.rs)
-    "event":      "signal",     # lurek.signal.* (registered as "signal" in event_api.rs)
-    "automation": "simulator",  # lurek.simulator.* (registered as "simulator" in automation_api.rs)
+    "timer":      "time",       # lurek.timer.* (registered as "time" in timer_api.rs)
+    "event":      "signal",     # lurek.event.* (registered as "signal" in event_api.rs)
+    "automation": "simulator",  # lurek.automation.* (registered as "simulator" in automation_api.rs)
 }
 
 
@@ -149,9 +149,9 @@ def _callbacks():
         ("function lurek.mousepressed( x : number, y : number, button : number )", "Mouse button press."),
         ("function lurek.mousereleased( x : number, y : number, button : number )","Mouse button release."),
         ("function lurek.wheelmoved( x : number, y : number )",                    "Mouse wheel scroll."),
-        ("function lurek.gamepadpressed( id : number, button : string )",          "Gamepad button press."),
-        ("function lurek.gamepadreleased( id : number, button : string )",         "Gamepad button release."),
-        ("function lurek.gamepadaxis( id : number, axis : string, value : number )","Gamepad axis; value in -1..1."),
+        ("function lurek.input.gamepadpressed( id : number, button : string )",          "Gamepad button press."),
+        ("function lurek.input.gamepadreleased( id : number, button : string )",         "Gamepad button release."),
+        ("function lurek.input.gamepadaxis( id : number, axis : string, value : number )","Gamepad axis; value in -1..1."),
         ("function lurek.joystickadded( id : number )",                            "Gamepad connected."),
         ("function lurek.joystickremoved( id : number )",                          "Gamepad disconnected."),
         ("function lurek.touchpressed( id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch begin."),

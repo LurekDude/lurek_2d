@@ -3,7 +3,7 @@
 -- Demonstrates the coroutine-frame scheduler: spawning tasks that yield,
 -- driving them with update(dt), pausing/resuming, and observing status
 -- and errors. This is a pure-Lua scheduler measured in dt units; for
--- wall-clock one-shots use lurek.time.Scheduler instead.
+-- wall-clock one-shots use lurek.timer.Scheduler instead.
 -- @module example.scheduler
 
 local M = require("library.scheduler")

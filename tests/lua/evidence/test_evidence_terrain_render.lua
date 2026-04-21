@@ -9,7 +9,7 @@ describe("evidence: terrain render", function()
     -- @covers LuaTerrain:fillAll
     -- @covers LuaTerrain:fillCircle
     -- @covers LuaTerrain:toImageData
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Creates a 64x64 terrain, fills it solid, digs a circle,
     --              renders to RGBA bytes, and saves as a PNG evidence file.
@@ -30,9 +30,9 @@ describe("evidence: terrain render", function()
         expect_equal(64 * 64 * 4, #raw)
 
         -- Build an image from raw bytes and save.
-        local img = lurek.img.newImageData(64, 64)
+        local img = lurek.image.newImageData(64, 64)
         img:setRawData(raw)
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 end)

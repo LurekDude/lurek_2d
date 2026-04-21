@@ -203,9 +203,9 @@ export class EntityEditor extends WebviewEditor {
         let lua = '-- Entity factory functions\\nlocal entities = {}\\n\\n';
         for (const ent of entities) {
           lua += 'function entities.create' + ent.name.replace(/[^a-zA-Z0-9]/g,'') + '(x, y)\\n';
-          lua += '  local e = lurek.entity.spawn()\\n';
+          lua += '  local e = lurek.ecs.spawn()\\n';
           for (const [comp, data] of Object.entries(ent.components)) {
-            lua += '  lurek.entity.addComponent(e, "' + comp.toLowerCase() + '", {\\n';
+            lua += '  lurek.ecs.addComponent(e, "' + comp.toLowerCase() + '", {\\n';
             for (const [k, v] of Object.entries(data)) {
               if (typeof v === 'string') lua += '    ' + k + ' = "' + v + '",\\n';
               else if (typeof v === 'boolean') lua += '    ' + k + ' = ' + v + ',\\n';

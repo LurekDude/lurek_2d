@@ -29,4 +29,4 @@ cargo run -- content/games/retro/shadow_beast
 - Hit damage flash and death fade-to-black via tween system
 
 ## APIs Used
-lurek.window, lurek.render, lurek.input, lurek.signal, lurek.time, lurek.particles, lurek.tween, lurek.camera
+lurek.window, lurek.render, lurek.input, lurek.event, lurek.timer, lurek.particle, lurek.tween, lurek.camera

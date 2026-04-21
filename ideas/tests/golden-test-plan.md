@@ -20,7 +20,7 @@ tests/lua/golden/
 ├── test_math_golden.lua              (existing)
 ├── test_data_golden.lua              (NEW)
 ├── test_dataframe_golden.lua         (NEW)
-├── test_pathfinding_golden.lua       (NEW)
+├── test_pathfind_golden_grid.lua       (NEW)
 ├── test_graph_golden.lua             (NEW)
 ├── test_serial_golden.lua            (NEW)
 ├── test_compute_golden.lua           (NEW)
@@ -28,7 +28,7 @@ tests/lua/golden/
 ├── test_physics_golden.lua           (NEW)
 ├── test_tilemap_golden.lua           (NEW)
 ├── test_ai_golden.lua                (NEW)
-├── test_entity_golden.lua            (NEW)
+├── test_ecs_golden.lua            (NEW)
 └── expected/                         (baseline files)
     ├── math_constants.txt
     ├── data_json_roundtrip.txt
@@ -122,7 +122,7 @@ end
 
 ### 4. Pathfinding Golden (NEW)
 
-**File**: `test_pathfinding_golden.lua`
+**File**: `test_pathfind_golden_grid.lua`
 **Verifies**: A* produces identical paths on fixed grids
 
 | Test | Grid | Start→End | Expected Path |
@@ -211,7 +211,7 @@ end
 
 ### 11. Entity Hierarchy Golden (NEW)
 
-**File**: `test_entity_golden.lua`
+**File**: `test_ecs_golden.lua`
 **Verifies**: Entity component operations produce deterministic results
 
 | Test | Setup | Verify |
@@ -254,7 +254,7 @@ These golden tests cover graphics processing, post-effects, image transforms, an
 
 ### 13. Graphics Processing Golden (NEW)
 
-**File**: `tests/lua/golden/test_graphics_golden.lua`
+**File**: `tests/lua/golden/test_render_golden.lua`
 **Rust Golden**: `tests/rust/golden/expected/image/graphics_shapes.png`
 
 #### State Golden (Headless — Lua)
@@ -274,10 +274,10 @@ Verify draw-command queue contents after graphics calls:
 ```lua
 describe("graphics.rectangle pixel evidence", function()
     it("fills red rectangle at known position", function()
-        local canvas = lurek.gfx.newCanvas(64, 64)
+        local canvas = lurek.render.newCanvas(64, 64)
         canvas:renderTo(function()
-            lurek.gfx.setColor(1, 0, 0, 1)
-            lurek.gfx.rectangle("fill", 16, 16, 32, 32)
+            lurek.render.setColor(1, 0, 0, 1)
+            lurek.render.rectangle("fill", 16, 16, 32, 32)
         end)
         -- Inside rect — must be red
         local r, g, b, a = canvas:getPixel(32, 32)
@@ -438,7 +438,7 @@ Add to existing procgen plan:
 ### Registration in harness.rs (Phase 2)
 
 ```rust
-#[test] fn lua_golden_graphics() { run_lua_test("golden/test_graphics_golden.lua"); }
+#[test] fn lua_golden_graphics() { run_lua_test("golden/test_render_golden.lua"); }
 #[test] fn lua_golden_postfx() { run_lua_test("golden/test_postfx_golden.lua"); }
 #[test] fn lua_golden_image() { run_lua_test("golden/test_image_golden.lua"); }
 #[test] fn lua_golden_animation() { run_lua_test("golden/test_animation_golden.lua"); }

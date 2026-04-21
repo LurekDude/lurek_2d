@@ -5,7 +5,7 @@
 - Module group: `Platform Services`
 - Source path: `src/input/`
 - Lua API path(s): `src/lua_api/input_api.rs`
-- Primary Lua namespace: `lurek.keyboard`
+- Primary Lua namespace: `lurek.input.keyboard`
 - Rust test path(s): tests/rust/unit/input_tests.rs
 - Lua test path(s): tests/lua/unit/test_input.lua, tests/lua/integration/test_input_camera.lua
 
@@ -150,7 +150,7 @@ Additional source files extend the hardware input surface. `gamepad.rs` consolid
 ## Lua API Reference
 
 - Binding path(s): `src/lua_api/input_api.rs`
-- Namespace: `lurek.keyboard`
+- Namespace: `lurek.input.keyboard`
 
 ### Module Functions
 - `lurek.input.isDown`: Returns true if any of the given keys is currently held down.
@@ -252,4 +252,4 @@ Additional source files extend the hardware input surface. `gamepad.rs` consolid
 
 ### New in 0.14.1
 
-- `lurek.gamepad.vibrate(id, low_freq, high_freq, duration_ms)` — haptics stub. `low_freq` and `high_freq` clamped to `[0, 1]`, `duration_ms` clamped to `[0, ∞)`. Returns `false` (winit 0.30 has no haptics; ready for future support).
+- `lurek.input.gamepad.vibrate(id, low_freq, high_freq, duration_ms)` — haptics stub. `low_freq` and `high_freq` clamped to `[0, 1]`, `duration_ms` clamped to `[0, ∞)`. Returns `false` (winit 0.30 has no haptics; ready for future support).

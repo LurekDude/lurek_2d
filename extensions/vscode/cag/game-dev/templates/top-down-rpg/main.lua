@@ -18,9 +18,9 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.15, 0.2, 0.1)
+    lurek.render.clear(0.15, 0.2, 0.1)
     if scene == "title" then
-        lurek.gfx.print("Press ENTER to start", 300, 280)
+        lurek.render.print("Press ENTER to start", 300, 280)
     elseif scene == "game" then
         player:draw()
         hud:draw()
@@ -28,7 +28,7 @@ function lurek.render()
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     if key == "return" and scene == "title" then
         scene = "game"
     end

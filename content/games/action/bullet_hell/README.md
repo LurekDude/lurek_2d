@@ -27,4 +27,4 @@ cargo run -- content/games/action/bullet_hell
 - Score multiplier increases with grazes, resets on death
 
 ## APIs Used
-lurek.window, lurek.render, lurek.input, lurek.signal, lurek.time, lurek.particles, lurek.tween, lurek.camera
+lurek.window, lurek.render, lurek.input, lurek.event, lurek.timer, lurek.particle, lurek.tween, lurek.camera

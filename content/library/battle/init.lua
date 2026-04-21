@@ -4,7 +4,7 @@
 --- status effects, initiative, damage types, and combat resolution.
 --- Port of the Rust src/battle/ module.
 --- @see lurek.math
---- @see lurek.signal
+--- @see lurek.event
 --- @see lurek.log
 local M = {}
 

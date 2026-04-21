@@ -132,7 +132,7 @@ impl Action {
 /// `time` and `action` are required; all other fields default to `None` and
 /// are read only when relevant to the chosen action type.
 ///
-/// Steps are ordinarily declared in Lua via `lurek.simulator.load`, but can
+/// Steps are ordinarily declared in Lua via `lurek.automation.load`, but can
 /// also be constructed in Rust integration tests using [`Step::new`] plus
 /// direct field assignment.
 ///

@@ -291,7 +291,7 @@ lurek.input.on("resize_down", "pressed", function()
 end)
 
 lurek.input.on("quit", "pressed", function()
-    lurek.signal.quit()
+    lurek.event.quit()
 end)
 
 -- ── Callbacks ──────────────────────────────────────────────────────────

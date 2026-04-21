@@ -20,15 +20,15 @@ Fight through three increasingly difficult monsters. Each victory rewards a new 
 
 ## APIs Used
 - `lurek.render` / `lurek.render_ui` — card layout, HP bars, combat log
-- `lurek.particles` — hit flash, card play sparks
+- `lurek.particle` — hit flash, card play sparks
 - `lurek.tween` — HP bar animation
 - `lurek.input` — action bindings for card play and turn end
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced
 - Bare `lurek.render.drawRect` color blocks → structured card panels with type-coloured accent bars
-- Manual particle table → `lurek.particles.newSystem` with emit bursts
+- Manual particle table → `lurek.particle.newSystem` with emit bursts
 - Linear HP display → `lurek.tween.to` animated HP bars
 
 ### Added

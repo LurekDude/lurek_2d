@@ -28,7 +28,7 @@ description: "Load this skill when adding, modifying, or reviewing content in th
 - Example file self-contained requirement and comment style
 - Demo folder layout (conf.lua, main.lua, assets, README)
 - Examples ↔ API documentation pipeline integration
-- Smoke test support pattern (`--smoke` flag + `lurek.signal.quit()`)
+- Smoke test support pattern (`--smoke` flag + `lurek.event.quit()`)
 - `content/examples/README.md` and `content/demos/README.md` maintenance
 
 ### Two-Folder Model

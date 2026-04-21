@@ -45,8 +45,8 @@ cargo run -- content/games/retro/dungeon_crawler
 - `lurek.input` — bind, wasActionPressed, isActionDown
 - `lurek.camera` — viewport management
 - `lurek.window` — setTitle
-- `lurek.time` — getFPS, getTime, delta
-- `lurek.signal` — quit
+- `lurek.timer` — getFPS, getTime, delta
+- `lurek.event` — quit
 
 ## Changes from Original Demo
 

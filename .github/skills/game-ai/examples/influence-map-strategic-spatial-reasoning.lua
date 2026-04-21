@@ -1,4 +1,4 @@
-local imap = lurek.pathfinding.newInfluenceMap(40, 30, 16)
+local imap = lurek.pathfind.newInfluenceMap(40, 30, 16)
 
 -- Add named layers
 imap:addLayer("player_threat")

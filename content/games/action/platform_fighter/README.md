@@ -33,4 +33,4 @@ Two players fight on an arena with floating platforms. Each player starts with 3
 
 ## APIs Used
 
-lurek.window, lurek.render, lurek.input, lurek.time, lurek.signal, lurek.particles, lurek.tween, lurek.camera
+lurek.window, lurek.render, lurek.input, lurek.timer, lurek.event, lurek.particle, lurek.tween, lurek.camera

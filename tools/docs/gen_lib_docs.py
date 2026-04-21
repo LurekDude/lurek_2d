@@ -348,7 +348,7 @@ def _dedent_usage(usage: list[str]) -> list[str]:
 
 
 def _slug(target: str) -> str:
-    """``lurek.codec.toJson`` → ``lurekcodectojson``. Strips non-alphanumerics."""
+    """``lurek.serial.toJson`` → ``lurekcodectojson``. Strips non-alphanumerics."""
     return re.sub(r"[^a-z0-9]", "", target.lower())
 
 

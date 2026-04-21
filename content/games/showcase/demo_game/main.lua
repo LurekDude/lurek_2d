@@ -259,7 +259,7 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Explosion particles (target hit)
-    ps_explode = lurek.particles.newSystem({
+    ps_explode = lurek.particle.newSystem({
         maxParticles = 150, emissionRate = 0,
         lifetimeMin = 0.15, lifetimeMax = 0.4,
         speedMin = 80, speedMax = 220, direction = 0, spread = 6.28,
@@ -269,7 +269,7 @@ function lurek.init()
     })
 
     -- Ball trail particles
-    ps_trail = lurek.particles.newSystem({
+    ps_trail = lurek.particle.newSystem({
         maxParticles = 200, emissionRate = 0,
         lifetimeMin = 0.05, lifetimeMax = 0.2,
         speedMin = 10, speedMax = 40, direction = 0, spread = 6.28,
@@ -278,7 +278,7 @@ function lurek.init()
     })
 
     -- Power-up glow particles
-    ps_powerup = lurek.particles.newSystem({
+    ps_powerup = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0,
         lifetimeMin = 0.2, lifetimeMax = 0.5,
         speedMin = 30, speedMax = 80, direction = -1.57, spread = 1.2,
@@ -291,7 +291,7 @@ end
 -- Update
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Update particles
     ps_explode:update(dt)
@@ -345,7 +345,7 @@ function lurek.process(dt)
     end
 
     -- Update targets (sway)
-    local time = lurek.time.getTime()
+    local time = lurek.timer.getTime()
     for i = 1, #targets do
         local t = targets[i]
         if t.alive then
@@ -566,7 +566,7 @@ function lurek.render_ui()
         lurek.render.setColor(COL_SUBTITLE[1], COL_SUBTITLE[2], COL_SUBTITLE[3], 1)
         lurek.render.print("AIM AND FIRE", SCREEN_W / 2 - 75, SCREEN_H / 2, 20)
 
-        local blink = 0.5 + 0.5 * math.sin(lurek.time.getTime() * 4)
+        local blink = 0.5 + 0.5 * math.sin(lurek.timer.getTime() * 4)
         lurek.render.setColor(1, 1, 1, blink)
         lurek.render.print("Click to Start", SCREEN_W / 2 - 65, SCREEN_H / 2 + 60, 16)
         return
@@ -585,7 +585,7 @@ function lurek.render_ui()
         lurek.render.print("Accuracy: " .. tostring(accuracy) .. "%", SCREEN_W / 2 - 80, 240, 20)
         lurek.render.print("Best Combo: " .. tostring(best_combo) .. "x", SCREEN_W / 2 - 80, 280, 20)
 
-        local blink = 0.5 + 0.5 * math.sin(lurek.time.getTime() * 4)
+        local blink = 0.5 + 0.5 * math.sin(lurek.timer.getTime() * 4)
         lurek.render.setColor(1, 1, 1, blink)
         lurek.render.print("Click to Continue", SCREEN_W / 2 - 80, 360, 16)
         return
@@ -640,5 +640,5 @@ function lurek.render_ui()
 
     -- FPS
     lurek.render.setColor(0.6, 0.6, 0.6, 0.7)
-    lurek.render.print("FPS: " .. tostring(lurek.time.getFPS()), SCREEN_W - 80, SCREEN_H - 22, 12)
+    lurek.render.print("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 22, 12)
 end

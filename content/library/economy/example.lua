@@ -83,7 +83,7 @@ else
     print("  no lurek.patterns.newEventBus — bus disabled (pure-Lua mode)")
 end
 
-local ok_codec, codec = pcall(require, "lurek.codec")
+local ok_codec, codec = pcall(require, "lurek.serial")
 if ok_codec and codec and codec.toJson then
     local snap = {}
     for _, n in ipairs(mgr:getResourceNames()) do
@@ -95,7 +95,7 @@ else
     for _, n in ipairs(mgr:getResourceNames()) do
         parts[#parts+1] = string.format("%s=%.1f", n, mgr:getResource(n):getValue())
     end
-    print("  no lurek.codec — manual snapshot: { " .. table.concat(parts, ", ") .. " }")
+    print("  no lurek.serial — manual snapshot: { " .. table.concat(parts, ", ") .. " }")
 end
 
 print("[example.economy] done.")

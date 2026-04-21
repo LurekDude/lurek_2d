@@ -1,5 +1,5 @@
 -- Load image into CPU buffer
-local imgData = lurek.img.newImageData("tiles.png")
+local imgData = lurek.image.newImageData("tiles.png")
 
 -- Apply pixel-level filter
 imgData:mapPixel(function(x, y, r, g, b, a)
@@ -11,4 +11,4 @@ imgData:mapPixel(function(x, y, r, g, b, a)
 end)
 
 -- Upload to GPU
-local img = lurek.gfx.newImage(imgData)
+local img = lurek.render.newImage(imgData)

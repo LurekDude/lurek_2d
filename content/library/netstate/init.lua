@@ -21,7 +21,7 @@
 -- **Wire format**: state deltas and full-state snapshots are encoded with
 -- `lurek.network.pack` / `lurek.network.unpack` (MessagePack — the canonical
 -- ENet payload format). For human-readable persistence (e.g. write a snapshot
--- to disk for inspection), pair `:getAll()` with `lurek.codec.toJson`.
+-- to disk for inspection), pair `:getAll()` with `lurek.serial.toJson`.
 --
 -- **Hash helper**: `:hashState()` is a deterministic FNV-1a digest of all
 -- replicated keys/values; useful for desync detection. When a future
@@ -35,8 +35,8 @@
 -- @module library.netstate
 -- @status full
 -- @see lurek.network
--- @see lurek.codec.toJson
--- @see lurek.time.Scheduler
+-- @see lurek.serial.toJson
+-- @see lurek.timer.Scheduler
 local M = {}
 
 ---------------------------------------------------------------------------
@@ -696,19 +696,19 @@ function NetState:hashState()
     return _bit.band(h, 0xFFFFFFFF)
 end
 
---- Serialise the current state to a JSON string via `lurek.codec.toJson`.
+--- Serialise the current state to a JSON string via `lurek.serial.toJson`.
 --- Suitable for human-readable persistence (NOT for the wire — use the
 --- normal `:sync()` MessagePack path for peer-to-peer traffic).
 ---
---- Returns nil if `lurek.codec` is unavailable in this runtime.
+--- Returns nil if `lurek.serial` is unavailable in this runtime.
 ---
 --- @treturn string|nil  JSON snapshot of `:getAll()`, or nil.
---- @see lurek.codec.toJson
+--- @see lurek.serial.toJson
 function NetState:toJson()
-    if not (lurek and lurek.codec and type(lurek.codec.toJson) == "function") then
+    if not (lurek and lurek.serial and type(lurek.serial.toJson) == "function") then
         return nil
     end
-    local ok, s = pcall(lurek.codec.toJson, self:getAll())
+    local ok, s = pcall(lurek.serial.toJson, self:getAll())
     if not ok then return nil end
     return s
 end
@@ -721,12 +721,12 @@ end
 --- their own timer-based retry, e.g.:
 ---
 ---     ns:requestFullState()
----     local deadline = lurek.time.getTime() + 5.0
----     -- In process loop: if lurek.time.getTime() > deadline then retry or invoke
+---     local deadline = lurek.timer.getTime() + 5.0
+---     -- In process loop: if lurek.timer.getTime() > deadline then retry or invoke
 ---     --   ns:onFullStateTimeout callback
 ---
 --- @treturn boolean  False if this instance is the authority (no-op), true if sent.
---- @see lurek.time.getTime
+--- @see lurek.timer.getTime
 function NetState:requestFullState()
     if self._authority then return false end
     if not self._host then return false end

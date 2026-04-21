@@ -1,6 +1,6 @@
 function lurek.init()
-    local args = lurek.platform.getArgs()
+    local args = lurek.runtime.getArgs()
     if args["--smoke"] then
-        lurek.signal.quit()
+        lurek.event.quit()
     end
 end

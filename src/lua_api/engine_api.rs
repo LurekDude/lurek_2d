@@ -1,4 +1,4 @@
-//! `lurek.engine` — Runtime engine metadata and introspection.
+//! `lurek.runtime` — Runtime engine metadata and introspection.
 //!
 //! Exposes read-only properties about the running engine: version, target
 //! frame budget, memory usage, host platform, and total uptime.
@@ -8,7 +8,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-/// Registers the `lurek.engine.*` namespace.
+/// Registers the `lurek.runtime.*` namespace.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable

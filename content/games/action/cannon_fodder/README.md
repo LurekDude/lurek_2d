@@ -4,11 +4,11 @@ Top-down military squad action inspired by Cannon Fodder (Amiga). Lead four sold
 
 ## What It Demonstrates
 
-- `lurek.gfx.circle()` / `lurek.gfx.rectangle()` — soldiers, enemies, bullets, explosions
-- `lurek.gfx.print()` — HUD, squad count, score, alert indicator
+- `lurek.render.circle()` / `lurek.render.rectangle()` — soldiers, enemies, bullets, explosions
+- `lurek.render.print()` — HUD, squad count, score, alert indicator
 - `lurek.input.mousepressed()` — click-to-move squad orders
 - `lurek.math.newSpatialHash()` — broad-phase proximity for shoot-range queries
-- `lurek.signal.quit()` — clean exit
+- `lurek.event.quit()` — clean exit
 
 ## How to Run
 

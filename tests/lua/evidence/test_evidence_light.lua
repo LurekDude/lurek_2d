@@ -11,12 +11,12 @@ describe("Evidence: lurek.light API + PNG visualization", function()
     -- @covers LightSource:getPosition
     -- @covers LightSource:getRadius
     -- @covers LightSource:getColor
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Rasterizes a single point light's radial falloff into a PNG using the light's reported position, radius, and color.
     it("PNG: single point light with radial falloff", function()
         local W, H = 128, 128
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
 
         -- Create a light and read its properties
         local light = lurek.light.newLight(64, 64, 60)
@@ -39,7 +39,7 @@ describe("Evidence: lurek.light API + PNG visualization", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "light_single_falloff.png")
+        lurek.image.savePNG(img, OUT .. "light_single_falloff.png")
     end)
 
     -- @covers lurek.light.newLight
@@ -47,12 +47,12 @@ describe("Evidence: lurek.light API + PNG visualization", function()
     -- @covers LightSource:getPosition
     -- @covers LightSource:getRadius
     -- @covers LightSource:getColor
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Composites three colored point lights into one scene and saves the combined illumination as PNG evidence.
     it("PNG: multi-light scene with colored point lights", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
 
         local lights = {
             lurek.light.newLight(64,  64,  80),
@@ -84,7 +84,7 @@ describe("Evidence: lurek.light API + PNG visualization", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "light_multi_scene.png")
+        lurek.image.savePNG(img, OUT .. "light_multi_scene.png")
     end)
 
 end)

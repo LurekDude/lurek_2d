@@ -183,23 +183,23 @@ lurek.init(function()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle systems
-    ps_harvest = lurek.particles.newSystem({
+    ps_harvest = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0, lifetimeMin = 0.3, lifetimeMax = 0.7,
         speedMin = 40, speedMax = 120, direction = -1.57, spread = 1.5,
         gravityY = 80, sizes = { 4, 2, 0 },
         colors = { 1, 0.85, 0.2, 1, 1, 0.6, 0.1, 0 },
     })
-    ps_rain = lurek.particles.newSystem({
+    ps_rain = lurek.particle.newSystem({
         maxParticles = 200, emissionRate = 0, lifetimeMin = 0.4, lifetimeMax = 0.8,
         speedMin = 150, speedMax = 250, direction = 1.7, spread = 0.3,
         sizes = { 2, 1 }, colors = { 0.4, 0.6, 1, 0.7, 0.3, 0.5, 0.9, 0 },
     })
-    ps_growth = lurek.particles.newSystem({
+    ps_growth = lurek.particle.newSystem({
         maxParticles = 40, emissionRate = 0, lifetimeMin = 0.4, lifetimeMax = 0.8,
         speedMin = 15, speedMax = 40, direction = -1.57, spread = 1.0,
         sizes = { 3, 1 }, colors = { 0.5, 1, 0.4, 0.8, 0.3, 0.8, 0.2, 0 },
     })
-    ps_plant = lurek.particles.newSystem({
+    ps_plant = lurek.particle.newSystem({
         maxParticles = 30, emissionRate = 0, lifetimeMin = 0.2, lifetimeMax = 0.4,
         speedMin = 30, speedMax = 80, direction = -1.57, spread = 3.14,
         sizes = { 3, 2, 0 }, colors = { 0.6, 0.45, 0.2, 1, 0.4, 0.3, 0.15, 0 },
@@ -217,7 +217,7 @@ lurek.process(function(dt)
         if current_state == STATE.MARKET then
             current_state = STATE.PLAYING
         else
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -574,7 +574,7 @@ lurek.render_ui(function()
     end
 
     -- FPS
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.drawText(string.format("FPS: %d", fps), W - 75, 6, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
 
     -- Bottom bar — inventory

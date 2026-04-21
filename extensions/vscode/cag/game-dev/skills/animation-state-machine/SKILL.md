@@ -80,8 +80,8 @@ end
 function lurek.render()
     local def = anims[anim.state]
     local quad_index = def.frames[anim.frame]
-    -- Use lurek.gfx.draw with quad from sprite sheet
-    lurek.gfx.draw(spritesheet, quads[quad_index], player.x, player.y)
+    -- Use lurek.render.draw with quad from sprite sheet
+    lurek.render.draw(spritesheet, quads[quad_index], player.x, player.y)
 end
 ```
 

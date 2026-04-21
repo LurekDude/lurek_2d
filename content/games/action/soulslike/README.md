@@ -35,4 +35,4 @@ Fight a three-phase boss in a stone-walled arena. Every action costs stamina —
 
 ## APIs Used
 
-lurek.window, lurek.render, lurek.input, lurek.time, lurek.signal, lurek.particles, lurek.tween, lurek.camera
+lurek.window, lurek.render, lurek.input, lurek.timer, lurek.event, lurek.particle, lurek.tween, lurek.camera

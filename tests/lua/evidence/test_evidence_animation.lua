@@ -10,7 +10,7 @@ local OUT = "tests/lua/evidence/output/animation/"
 local function make_sprite_sheet()
     local FRAME_W, FRAME_H = 16, 16
     local COLS, ROWS = 4, 2
-    local img = lurek.img.newImageData(FRAME_W * COLS, FRAME_H * ROWS)
+    local img = lurek.image.newImageData(FRAME_W * COLS, FRAME_H * ROWS)
     img:fill(0, 0, 0, 0)
 
     local hues = {
@@ -70,7 +70,7 @@ describe("Evidence: lurek.animation addClipFromGrid quad selection", function()
         local frame_h = FH
         local out_cols = 4
         local out_scale = 4
-        local out = lurek.img.newImageData(
+        local out = lurek.image.newImageData(
             frame_w * out_cols * out_scale,
             frame_h * 2 * out_scale
         )
@@ -104,7 +104,7 @@ describe("Evidence: lurek.animation addClipFromGrid quad selection", function()
             end
         end
 
-        lurek.img.savePNG(out, OUT .. "evidence_animation_frame_grid.png")
+        lurek.image.savePNG(out, OUT .. "evidence_animation_frame_grid.png")
     end)
         local events = anim:pollEvents()
         local found_done = false
@@ -129,7 +129,7 @@ describe("Evidence: animation speed scaling visual", function()
     -- @description Renders a two-lane timing comparison that shows a 2x-speed clip advances through frame quads faster than the baseline clip.
     it("speed 2Ă— advances twice as fast â€” PNG evidence: speed_compare", function()
         local W = 120
-        local img = lurek.img.newImageData(W, 20)
+        local img = lurek.image.newImageData(W, 20)
         img:fill(20, 20, 20, 255)
 
         -- Normal speed: step through 4 frames of a 4fps clip over 1 second
@@ -165,7 +165,7 @@ describe("Evidence: animation speed scaling visual", function()
             img:setPixel(i * (math.floor(W / 30)), 15, 80, 180, val, 255)
         end
 
-        lurek.img.savePNG(img, OUT .. "evidence_animation_speed_compare.png")
+        lurek.image.savePNG(img, OUT .. "evidence_animation_speed_compare.png")
     end)
 end)
 test_summary()

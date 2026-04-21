@@ -31,7 +31,7 @@ describe("Evidence: Bezier curves", function()
     -- @description Samples a quadratic Bezier and saves a PNG showing both the curve and its control polygon.
     it("quadratic bezier (3 control points)", function()
         local W, H = 400, 300
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:drawRect(0, 0, W, H, 20, 20, 30, 255)
 
         local curve = lurek.math.newBezierCurve({50, 250, 200, 30, 350, 250})
@@ -51,7 +51,7 @@ describe("Evidence: Bezier curves", function()
         img:drawLine(50, 250, 200, 30, 80, 80, 80, 255)
         img:drawLine(200, 30, 350, 250, 80, 80, 80, 255)
 
-        lurek.img.savePNG(img, OUT .. "bezier_quadratic.png")
+        lurek.image.savePNG(img, OUT .. "bezier_quadratic.png")
     end)
 
     -- @covers lurek.math.newBezierCurve
@@ -62,7 +62,7 @@ describe("Evidence: Bezier curves", function()
     -- @description Samples a cubic Bezier and exports a PNG showing how four control points shape the final curve.
     it("cubic bezier (4 control points)", function()
         local W, H = 400, 300
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:drawRect(0, 0, W, H, 20, 20, 30, 255)
 
         local curve = lurek.math.newBezierCurve({30, 250, 100, 30, 300, 30, 370, 250})
@@ -81,7 +81,7 @@ describe("Evidence: Bezier curves", function()
         img:drawLine(100, 30, 300, 30, 80, 80, 80, 255)
         img:drawLine(300, 30, 370, 250, 80, 80, 80, 255)
 
-        lurek.img.savePNG(img, OUT .. "bezier_cubic.png")
+        lurek.image.savePNG(img, OUT .. "bezier_cubic.png")
     end)
 
     -- @covers lurek.math.newBezierCurve
@@ -92,7 +92,7 @@ describe("Evidence: Bezier curves", function()
     -- @description Draws a higher-order Bezier curve with seven control points to prove complex paths evaluate and render correctly.
     it("complex bezier (7 control points)", function()
         local W, H = 500, 400
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:drawRect(0, 0, W, H, 20, 20, 30, 255)
 
         local curve = lurek.math.newBezierCurve({
@@ -128,7 +128,7 @@ describe("Evidence: Bezier curves", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "bezier_complex.png")
+        lurek.image.savePNG(img, OUT .. "bezier_complex.png")
     end)
 
     -- @covers lurek.math.newBezierCurve
@@ -138,7 +138,7 @@ describe("Evidence: Bezier curves", function()
     -- @description Evaluates the derivative curve to render tangent vectors at multiple points along a cubic Bezier.
     it("derivative visualisation (tangent lines)", function()
         local W, H = 400, 300
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:drawRect(0, 0, W, H, 20, 20, 30, 255)
 
         local curve = lurek.math.newBezierCurve({30, 250, 100, 30, 300, 30, 370, 250})
@@ -176,7 +176,7 @@ describe("Evidence: Bezier curves", function()
 
         plot_control_points(img, curve)
 
-        lurek.img.savePNG(img, OUT .. "bezier_tangents.png")
+        lurek.image.savePNG(img, OUT .. "bezier_tangents.png")
     end)
 
 end)

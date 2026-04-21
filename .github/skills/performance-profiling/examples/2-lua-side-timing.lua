@@ -1,3 +1,3 @@
-local t = lurek.time.getTime()
+local t = lurek.timer.getTime()
 doExpensiveThing()
-print(string.format("%.2f ms", (lurek.time.getTime() - t) * 1000))
+print(string.format("%.2f ms", (lurek.timer.getTime() - t) * 1000))

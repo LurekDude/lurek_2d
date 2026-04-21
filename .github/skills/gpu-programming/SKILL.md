@@ -51,7 +51,7 @@ Lurek2D targets **wgpu 22**. No raw OpenGL path exists. All rendering goes throu
 1. Add variant to `RenderCommand` enum in `src/render/renderer.rs`
 2. Add execution arm in `src/render/gpu_renderer.rs` (match arm)
 3. Add Lua push function in `src/lua_api/render_api.rs`
-4. Add Lua BDD test in `tests/lua/unit/test_graphics.lua`
+4. Add Lua BDD test in `tests/lua/unit/test_render.lua`
 
 ### Shader Authoring (WGSL)
 ### Built-In Shaders
@@ -65,7 +65,7 @@ Two WGSL shaders are embedded in the binary:
 
 ### Custom User Shaders
 
-Users provide WGSL fragment (or vertex+fragment) source via `lurek.gfx.newShader`:
+Users provide WGSL fragment (or vertex+fragment) source via `lurek.render.newShader`:
 
 > See [snippets/custom-user-shaders.txt](snippets/custom-user-shaders.txt) for the example.
 
@@ -74,7 +74,7 @@ Users provide WGSL fragment (or vertex+fragment) source via `lurek.gfx.newShader
 - Access screen size via `luna_ScreenSize`, time via `luna_Time`
 - Return `vec4<f32>` (RGBA) from fragment shader
 - Do not declare bindings at group 0 (reserved for engine uniforms)
-- User uniforms go at group 2+; set via `lurek.gfx.sendShaderUniform(shader, name, value)`
+- User uniforms go at group 2+; set via `lurek.render.sendShaderUniform(shader, name, value)`
 
 ### Validation Errors
 

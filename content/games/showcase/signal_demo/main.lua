@@ -364,7 +364,7 @@ end)
 
 lurek.ready(function()
     -- Engine particle systems per signal type
-    hit_ps = lurek.particles.newSystem({
+    hit_ps = lurek.particle.newSystem({
         maxParticles = 200, emissionRate = 0,
         lifetimeMin = 0.3, lifetimeMax = 0.7,
         speedMin = 60, speedMax = 160,
@@ -373,7 +373,7 @@ lurek.ready(function()
         sizes = { 4, 3, 1.5, 0.5 },
         colors = { { 0.95, 0.25, 0.20 }, { 1.0, 0.5, 0.2 }, { 0.8, 0.1, 0.0, 0.0 } },
     })
-    score_ps = lurek.particles.newSystem({
+    score_ps = lurek.particle.newSystem({
         maxParticles = 150, emissionRate = 0,
         lifetimeMin = 0.4, lifetimeMax = 0.9,
         speedMin = 40, speedMax = 100,
@@ -382,7 +382,7 @@ lurek.ready(function()
         sizes = { 3, 2.5, 1, 0.3 },
         colors = { { 0.2, 1.0, 0.4 }, { 0.4, 0.9, 0.5 }, { 0.1, 0.6, 0.2, 0.0 } },
     })
-    level_ps = lurek.particles.newSystem({
+    level_ps = lurek.particle.newSystem({
         maxParticles = 300, emissionRate = 0,
         lifetimeMin = 0.5, lifetimeMax = 1.2,
         speedMin = 80, speedMax = 200,
@@ -391,7 +391,7 @@ lurek.ready(function()
         sizes = { 5, 4, 2, 0.5 },
         colors = { { 0.3, 0.5, 1.0 }, { 0.5, 0.7, 1.0 }, { 0.1, 0.2, 0.8, 0.0 } },
     })
-    combo_ps = lurek.particles.newSystem({
+    combo_ps = lurek.particle.newSystem({
         maxParticles = 250, emissionRate = 0,
         lifetimeMin = 0.4, lifetimeMax = 1.0,
         speedMin = 100, speedMax = 250,
@@ -408,7 +408,7 @@ end)
 -- Process
 -- ---------------------------------------------------------------------------
 lurek.process(function(dt)
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     if current_state == STATE.TITLE then
         title_timer = title_timer + dt
@@ -583,7 +583,7 @@ end)
 lurek.render_ui(function()
     if current_state == STATE.TITLE then return end
 
-    local fps = lurek.time.getFPS and lurek.time.getFPS() or 0
+    local fps = lurek.timer.getFPS and lurek.timer.getFPS() or 0
     lurek.render.drawText(string.format("FPS: %d", fps), SCREEN_W - 80, 8, 12,
         0.5, 0.5, 0.5, 0.6)
 

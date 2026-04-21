@@ -70,13 +70,13 @@ print("  hand by category: " .. table.concat(order, ", "))
 
 print("[example.cardgame] === Scenario 6: serialise card snapshot ===")
 
-local ok_codec, codec = pcall(require, "lurek.codec")
+local ok_codec, codec = pcall(require, "lurek.serial")
 if ok_codec and codec and codec.toJson then
     local snap = { type = creature.card_type, name = creature.name, stats = creature.stats }
     print("  codec.toJson: " .. codec.toJson(snap))
 else
     -- Pure-Lua fallback: minimal printable summary.
-    print(string.format("  no lurek.codec — snapshot summary: type=%s atk=%d hp=%d",
+    print(string.format("  no lurek.serial — snapshot summary: type=%s atk=%d hp=%d",
         creature.card_type, creature:getStat("attack"), creature:getStat("health")))
 end
 

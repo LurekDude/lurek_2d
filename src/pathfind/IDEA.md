@@ -2,7 +2,7 @@
 
 > Migrated from `ideas/features/pathfinding.md` and `ideas/performance/05-ai-pathfinding.md` (Part 2).
 > Status checked against `src/pathfind/` and `src/lua_api/pathfind_api.rs`.
-> Lua namespace: `lurek.pathfinding`.
+> Lua namespace: `lurek.pathfind`.
 
 ---
 

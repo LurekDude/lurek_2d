@@ -23,14 +23,14 @@ cargo run -- content/games/strategy/party_games
 
 ## APIs Used
 - `lurek.render` / `lurek.render_ui` — all game screens, overlays
-- `lurek.particles` — celebration burst, flash overlay
+- `lurek.particle` — celebration burst, flash overlay
 - `lurek.input` — action bindings for all player controls
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced
 - Single hardcoded mini-game → 4 rotating mini-games across 3 rounds
-- Hand-drawn rect flash → `lurek.particles` celebration burst
+- Hand-drawn rect flash → `lurek.particle` celebration burst
 - Hardcoded key polling → `lurek.input` action bindings
 
 ### Added

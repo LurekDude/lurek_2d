@@ -55,18 +55,18 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 - Turn-based: `lurek.update` may be empty (logic fires in `lurek.keypressed`)
 - Fog of war / FOV can be pure Lua arrays — no `lurek.physics` needed
 - Resolution: 800×640 to fit message log at bottom (6–8 line history strip)
-- `lurek.gfx.print()` with a small monospaced font for dungeon grid
+- `lurek.render.print()` with a small monospaced font for dungeon grid
 
 ### Card Game / Deck Builder
 - State machine: `MENU → DRAW → PLAY → RESOLVE → END`
-- Drag-and-drop: `lurek.mouse.getPosition()` + hit-test rectangle helpers
+- Drag-and-drop: `lurek.input.mouse.getPosition()` + hit-test rectangle helpers
 - Card data as Lua tables with `id`, `name`, `cost`, `effect` fields
 - `library.item` + `library.inventory` replace hand-rolled card tracking in richer demos
 
 ### Dialog / Visual Novel
 - Always use `library.dialog` — **do not reimplement** the sequencer
 - Dialog assets (portraits, backgrounds) go in `content/demos/<name>/assets/`
-- Text rendering uses `lurek.gfx.print()` inside a letterbox at bottom 25% of screen
+- Text rendering uses `lurek.render.print()` inside a letterbox at bottom 25% of screen
 - Keyboard `space`/`enter` advance; `up`/`down` select choice
 
 ### Horror / Stealth
@@ -76,19 +76,19 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 
 ### AI / Pathfinding
 - `lurek.ai.*` for FSM / behavior trees
-- `lurek.pathfinding.*` for A* grid navigation
-- `lurek.entity.*` for actor lifecycle management
+- `lurek.pathfind.*` for A* grid navigation
+- `lurek.ecs.*` for actor lifecycle management
 - Show debug overlay drawing: paths, FSM state labels
 
 ### Automation / Factory
 - `lurek.tilemap.*` for the grid world
-- `lurek.signal.*` for producer-consumer item queue across belts
+- `lurek.event.*` for producer-consumer item queue across belts
 - Keep entity count < 500 for 60 FPS on integrated GPU (design constraint B-03)
 
 ### RTS / Strategy
 - `lurek.camera.*` for pan/zoom; bind scroll to middle-mouse-drag
-- `lurek.pathfinding.*` for unit movement
-- Selection box: track drag start/end in `lurek.mousepressed`/`lurek.mousereleased`
+- `lurek.pathfind.*` for unit movement
+- Selection box: track drag start/end in `lurek.input.mousepressed`/`lurek.input.mousereleased`
 
 ---
 

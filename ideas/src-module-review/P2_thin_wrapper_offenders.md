@@ -54,7 +54,7 @@ Top offender modules (by escalation priority): `audio_api`, `docs_api`, `image_a
 
 | Function | Line range | Offence | Proposed move-to |
 |---|---|---|---|
-| `lurek.img.savePNG` | 432–450 | Calls `img.encode_png()` then performs `std::fs::create_dir_all` + `std::fs::write`. | `crate::image::ImageData::save_png(&self, path: &Path)` (mirror the `save_wav` proposal). |
+| `lurek.image.savePNG` | 432–450 | Calls `img.encode_png()` then performs `std::fs::create_dir_all` + `std::fs::write`. | `crate::image::ImageData::save_png(&self, path: &Path)` (mirror the `save_wav` proposal). |
 | `LuaImageData::mapPixels` (`add_method_mut`) | 583–607 | Double `for y in 0..h { for x in 0..w { ... } }` pixel loop calling a Lua callback per pixel. The loop itself is bridge concern (calling Lua), but the `(r,g,b,a)` tuple round-trip and partial-application live in the wrapper. | Acceptable to keep loop in wrapper (must call Lua) — but extract `crate::image::ImageData::for_each_pixel_mut(impl FnMut(u32,u32,Pixel)->Pixel)` so the wrapper is one call. |
 | `LuaImageData::mapPixel` | 920–940 | Same as `mapPixels`. | Same helper. |
 
@@ -73,7 +73,7 @@ Top offender modules (by escalation priority): `audio_api`, `docs_api`, `image_a
 
 ### `src/lua_api/render_api.rs` (4646 lines)
 
-- **`lurek.graphic.newFont` (PNG bitmap-font branch)** — lines 2255–2280. After failing to match a built-in default font, the closure does `std::fs::read(&full_path)` then computes `cell_w = (size * 0.6).round() as u32` and calls `Font::from_png_bytes`. Both the read and the cell-size heuristic should live in `crate::render::font` (e.g. `Font::load_png_with_size(path, size) -> Result<Font, _>`).
+- **`lurek.render.newFont` (PNG bitmap-font branch)** — lines 2255–2280. After failing to match a built-in default font, the closure does `std::fs::read(&full_path)` then computes `cell_w = (size * 0.6).round() as u32` and calls `Font::from_png_bytes`. Both the read and the cell-size heuristic should live in `crate::render::font` (e.g. `Font::load_png_with_size(path, size) -> Result<Font, _>`).
 - **`LuaImageData::mapPixels` analogue inside render_api**: lines 124–145 contain a `for py/px` pixel loop that iterates per-pixel through a callback. Same pattern as `image_api` — extract `for_each_pixel_mut` into the appropriate domain.
 - File is also the second-largest binding module (4.6 KLOC); even after logic moves, recommend a P5 split into `render_api/{font,canvas,shape,text,texture}.rs` submodules to keep each under the 1 KLOC informal cap.
 
@@ -88,7 +88,7 @@ Top offender modules (by escalation priority): `audio_api`, `docs_api`, `image_a
 
 ### `src/lua_api/system_api.rs` (634 lines)
 
-- **`lurek.platform.parseArgs`** (or the only large closure near line 488–535) — implements a full `--flag` / `--key=value` / `--key value` / `--` argv parser with index tracking (`while i < raw_args.len()`). Argv parsing is platform/system concern and should live as `crate::system::argv::parse(args: &[String]) -> ParsedArgs`.
+- **`lurek.runtime.parseArgs`** (or the only large closure near line 488–535) — implements a full `--flag` / `--key=value` / `--key value` / `--` argv parser with index tracking (`while i < raw_args.len()`). Argv parsing is platform/system concern and should live as `crate::system::argv::parse(args: &[String]) -> ParsedArgs`.
 
 ### `src/lua_api/dataframe_api.rs` (1360 lines)
 

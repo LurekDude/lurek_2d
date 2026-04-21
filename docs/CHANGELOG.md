@@ -80,10 +80,10 @@ All notable changes to Lurek2D are recorded here.
 ### Feature Batch — IDEA.md Items (runtime · timer) + Prompt hardening
 
 - **feat(runtime): `ModulesConfig::validate_and_fix` — expanded dependency rules** — Added validation for `animation` (requires `graphics`), `tilemap` (requires `graphics`), `raycaster` (requires `graphics`), `camera` (requires `graphics`), `globe` (requires `graphics`), `spine` (requires `graphics` and `animation`). Docstring updated with the full rule list.
-- **feat(lua_api): `lurek.time.delay(seconds)` helper** — Coroutine-based yield-for-duration sugar alias for `waitSeconds`; call from a coroutine to pause for `seconds` engine-time seconds. Registered in `src/lua_api/timer_api.rs`.
-- **test(lua): `afterNamed` replacement semantics BDD tests** — Added `afterNamed replacement` and `lurek.time.delay` describe blocks to `tests/lua/unit/test_timer.lua`.
+- **feat(lua_api): `lurek.timer.delay(seconds)` helper** — Coroutine-based yield-for-duration sugar alias for `waitSeconds`; call from a coroutine to pause for `seconds` engine-time seconds. Registered in `src/lua_api/timer_api.rs`.
+- **test(lua): `afterNamed` replacement semantics BDD tests** — Added `afterNamed replacement` and `lurek.timer.delay` describe blocks to `tests/lua/unit/test_timer.lua`.
 - **test(rust): `validate_and_fix` unit tests** — Added 9 new unit tests to `tests/rust/unit/runtime_tests.rs` covering all new module-dependency rules (animation, tilemap, raycaster, camera, globe, spine/graphics, spine/animation).
-- **docs(specs): runtime.md + timer.md** — `validate_and_fix` entry lists all 12 enforced rules; `lurek.time.delay` added to Lua API Reference section.
+- **docs(specs): runtime.md + timer.md** — `validate_and_fix` entry lists all 12 enforced rules; `lurek.timer.delay` added to Lua API Reference section.
 - **docs(idea): marked items DONE** — `src/runtime/IDEA.md` Gap 3, `src/timer/IDEA.md` afterNamed test and delay helper.
 - **chore(prompts): workflow prompt hardened** — `cargo check --tests` success gate added; harness.rs registration check and `gen_all_docs.py` anti-pattern made explicit in `Success Criteria` and `Anti-patterns`.
 
@@ -98,11 +98,11 @@ All notable changes to Lurek2D are recorded here.
 - **feat(runtime): `ErrorSnapshot` struct + `EngineError::snapshot()`** — serialises any `EngineError` to `{ message, code, category, recovery_hint }` via hand-rolled `to_json()`; zero external dependencies.
 - **feat(lua_api): `lurek.math.newCircle(x,y,r)`** — `LuaCircle` userdata with `area`, `perimeter`, `contains`, `intersects`, `aabb`, `x`, `y`, `radius` methods.
 - **feat(lua_api): `AabbTree:queryCircle` + `AabbTree:querySegment`** — new methods on `LuaAabbTree` exposing the two new query functions to Lua.
-- **feat(lua_api): `lurek.fs.stat(path)`** — returns `{ size, isFile, isDir }` table; rejects path traversal.
-- **feat(lua_api): `lurek.fs.createTempFile(prefix?)`** — returns relative path of new scratch file under `save/`.
+- **feat(lua_api): `lurek.filesystem.stat(path)`** — returns `{ size, isFile, isDir }` table; rejects path traversal.
+- **feat(lua_api): `lurek.filesystem.createTempFile(prefix?)`** — returns relative path of new scratch file under `save/`.
 - **feat(lua_api): `lurek.data.crc32(str)`** — integer CRC-32 in `[0, 2^32)` from a Lua string.
-- **feat(lua_api): `lurek.platform.errorSnapshot(msg)`** — JSON string with `message`, `code`, `category`, `recovery_hint` fields for test assertion and crash reporting.
-- **test(lua): BDD tests for all new APIs** — added describe/it blocks to `test_math.lua` (Circle, querySegment), `test_filesystem.lua` (stat, createTempFile), `test_data.lua` (crc32), `test_system.lua` (errorSnapshot).
+- **feat(lua_api): `lurek.runtime.errorSnapshot(msg)`** — JSON string with `message`, `code`, `category`, `recovery_hint` fields for test assertion and crash reporting.
+- **test(lua): BDD tests for all new APIs** — added describe/it blocks to `test_math.lua` (Circle, querySegment), `test_filesystem.lua` (stat, createTempFile), `test_data.lua` (crc32), `test_runtime_system.lua` (errorSnapshot).
 - **test(rust): unit tests for non-Lua-reachable internals** — appended new mod blocks to `math_tests.rs` (circle_tests, aabb_tree_query_tests), `filesystem_tests.rs` (stat_tests, create_temp_file_tests), `data_tests.rs` (crc32_tests), `runtime_tests.rs` (error_snapshot_tests).
 - **docs(idea): marked all 6 new items DONE** — `src/math/IDEA.md` (gaps 10+11), `src/filesystem/IDEA.md` (gaps 1+2, feat 1), `src/data/IDEA.md` (helper crc32), `src/runtime/IDEA.md` (feat 3).
 - **docs(specs): updated math.md, filesystem.md, data.md, runtime.md** — added Circle, AabbTree query methods, stat, createTempFile, crc32, ErrorSnapshot to Functions, Types, and Lua API Reference sections.
@@ -137,8 +137,8 @@ All notable changes to Lurek2D are recorded here.
 - **feat(runtime): ErrorCategory::Filesystem.** FileSystemError now maps to its own error category instead of System.
 - **feat(data): DataWriter write-cursor.** New `src/data/data_writer.rs` with typed write methods (u8/i8/u16/i16/u32/i32/f32/f64 LE/BE, length-prefixed strings, raw bytes), seek/tell, and buffer management. Companion to the read-only `DataView`.
 - **feat(lua_api): expose all new math functions.** `lurek.math.clamp`, `sign`, `smoothstep`, `inverseLerp`, `hslToRgb`, `fromHex`, `rgbToHsl`, `rectUnion`, `rectFromCenter`; `Vec2:fromAngle()`, `Vec2:reflect()`, `Vec3:splat()`; `Transform:decompose()`; easing `inOutElastic`/`inOutBounce`/`inOutBack`; `CatmullRom:addPoint()`/`removePoint()`.
-- **feat(lua_api): lurek.fs.listRecursive.** Exposes recursive directory listing to Lua.
-- **feat(lua_api): lurek.time afterFrames, everyFrames, updateFrames.** Frame-based scheduling callbacks for the Lua timer API.
+- **feat(lua_api): lurek.filesystem.listRecursive.** Exposes recursive directory listing to Lua.
+- **feat(lua_api): lurek.timer afterFrames, everyFrames, updateFrames.** Frame-based scheduling callbacks for the Lua timer API.
 - **feat(lua_api): lurek.data.newWriter + DataWriter userdata.** Write-cursor exposed to Lua with typed write methods, seek/tell, and `toBytes()` export.
 
 ### Test, Spec, Docs, and Examples Completion (0.15.0 follow-up)
@@ -210,7 +210,7 @@ All notable changes to Lurek2D are recorded here.
 
 ### Added
 - 5 new Lunasome libraries: `library.loot` (Walker–Vose alias RNG + drop DSL), `library.narrative` (Ink-flavoured branching narrative interpreter), `library.roguelike` (FOV + energy scheduler + Dijkstra goal-maps), `library.cinematic` (multi-track scrubbable cutscene timeline), `library.rhythm` (BPM-locked event sequencer over `lurek.audio`).
-- 5 cross-module integration tests under `tests/lua/integration/` pairing libraries with `lurek.event`, `lurek.codec`, `lurek.time`, `lurek.physics`, `lurek.tween`.
+- 5 cross-module integration tests under `tests/lua/integration/` pairing libraries with `lurek.event`, `lurek.serial`, `lurek.timer`, `lurek.physics`, `lurek.tween`.
 - `example.lua` for every Lunasome library (21 total).
 - New `library-authoring` skill in `.github/skills/`.
 - `tools/docs/gen_lib_docs.py` extended (+394 LOC) with 6 new LDoc tags (`@field`, `@tparam`, `@return`, `@see`, `@raise`, `@within`), `--check` mode, and aggregate output `docs/API/library-docs.md` (1,310 functions, 22 sections).
@@ -223,7 +223,7 @@ All notable changes to Lurek2D are recorded here.
 ### Fixed
 - `crafting/init.lua`: 5 silently-overwriting factory redefinitions removed.
 - `item/init.lua`: `newStack` and `newStackBuilder` duplicate redefinitions removed.
-- `doll/init.lua:405`: broken `lurek.gfx` reference fixed.
+- `doll/init.lua:405`: broken `lurek.render` reference fixed.
 - `rpc/init.lua`: bare `unpack(...)` replaced with `(table.unpack or unpack)` for `lua54` Cargo feature compatibility.
 - `province_map` README mislabelled "✨ Proxy" — corrected.
 ### Notes
@@ -299,8 +299,8 @@ All notable changes to Lurek2D are recorded here.
 - **app**: `.lurek` / `.luna` ZIP archive drag-and-drop support. Dragging an archive onto the engine window extracts it to a temporary directory and starts the game. Zip-slip path traversal protection enforced. Corresponding CLI detection fixed (was `.lunar`).
 - **runtime**: `SharedState` LRU texture eviction infrastructure: `resource_budget_bytes`, `frame_counter`, `texture_last_used` fields, `touch_texture()`, `evict_lru_resources()`, and `resource_memory_stats()` methods.
 - **runtime**: `L083_DROP_ARCHIVE` and `L084_DROP_ARCHIVE_FAIL` stable log message IDs added to `log_messages.rs`.
-- **engine Lua API**: `lurek.engine.setResourceBudget(bytes)` — configures maximum resident texture memory; `0` = unlimited (default).
-- **engine Lua API**: `lurek.engine.getResourceStats()` — returns `{texture_bytes, budget_bytes, texture_count}` for memory profiling.
+- **engine Lua API**: `lurek.runtime.setResourceBudget(bytes)` — configures maximum resident texture memory; `0` = unlimited (default).
+- **engine Lua API**: `lurek.runtime.getResourceStats()` — returns `{texture_bytes, budget_bytes, texture_count}` for memory profiling.
 
 ### Changed
 - **docs/specs**: `render.md`, `app.md`, `runtime.md`, and `audio.md` updated to reflect implemented features and MIDI disabled status.
@@ -321,9 +321,9 @@ All notable changes to Lurek2D are recorded here.
 - All API reference files regenerated: `docs/API/lua-api.md`, `rust-api.md`, `coverage_gaps.md`, `docs/logs/lua_api_data.json`, `rust_api_data.json`.
 
  Flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Each unique non-black RGB pixel is assigned a sequential province ID; pure-black becomes background (ID 0). Includes single-pass adjacency detection with per-pair border-pixel counts.
-- **image**: `lurek.img.newProvinceGrid(filename)` — load a province-colour PNG and get an O(1) coordinate-lookup + adjacency index. Replaces 2–8 s Lua hash-table construction with ~15–30 ms Rust scan for 2400×1200 / 3000-province maps.
+- **image**: `lurek.image.newProvinceGrid(filename)` — load a province-colour PNG and get an O(1) coordinate-lookup + adjacency index. Replaces 2–8 s Lua hash-table construction with ~15–30 ms Rust scan for 2400×1200 / 3000-province maps.
 - **image**: `ProvinceGrid` Lua userdata methods: `getWidth()`, `getHeight()`, `getAt(x, y)`, `provinceCount()`, `adjacencies()` (returns array of `{province_a, province_b, border_pixels}` tables).
-- **province_map library**: `M.newFromPng(png_path, defs?)` — engine-accelerated constructor that uses `lurek.img.newProvinceGrid` to build pixel index and populate adjacency edges in one call. All prior constructors and logic remain unchanged.
+- **province_map library**: `M.newFromPng(png_path, defs?)` — engine-accelerated constructor that uses `lurek.image.newProvinceGrid` to build pixel index and populate adjacency edges in one call. All prior constructors and logic remain unchanged.
 
 ## [0.16.0] — 2026-04-28
 ### Added
@@ -332,12 +332,12 @@ All notable changes to Lurek2D are recorded here.
 - **tilemap**: `LargeMapRenderer::new()` now initialises `viewport_w`/`viewport_h` to `0.0`; `visible_chunk_range()` returns the full map extent when the viewport dimensions are zero (safe default for headless tests).
 - **tilemap**: `mapgen.MapOrientation` gains two new variants — `Isometric` and `Hexagonal`. `tilemap:setOrientation("isometric")` / `"hexagonal"` are now accepted; `getOrientation` returns the matching string.
 - **tilemap**: `script:addStep(def)` now maps all eight `StepType` variants: `fillRandom`, `placeBlock`, `placeRandom`, `placeLine`, `floodFill`, `fillArea`, `drawPath`, `fillRect`. Extra step fields `direction`, `pathWidth`, `repeatCount`, `count`, `groupIndex`, `blockIndex`, `tileLayer` are read from the Lua table.
-- **timer**: `lurek.time.setPhysicsMaxSteps(n)` / `getPhysicsMaxSteps()` — configure the per-frame physics sub-step cap (clamped 1–64, default 8). The engine loop reads `SharedState.physics_max_steps` instead of the previous `let max_steps = 8` literal.
+- **timer**: `lurek.timer.setPhysicsMaxSteps(n)` / `getPhysicsMaxSteps()` — configure the per-frame physics sub-step cap (clamped 1–64, default 8). The engine loop reads `SharedState.physics_max_steps` instead of the previous `let max_steps = 8` literal.
 - **audio**: `MidiPlayer:setSampleRate(n)` / `getSampleRate()` — configurable PCM output sample rate (clamped 8 000–192 000 Hz, default 44 100).
 - **audio**: `MidiPlayer:setChannels(n)` / `getChannels()` — configurable PCM output channel count (clamped 1–2, default 2). `SamplesBuffer` construction now uses both fields instead of hardcoded literals.
 - **ai**: `GOAPPlanner:setMaxIterations(n)` / `getMaxIterations()` — configure the A* planning search cap (default 10 000; `0` = unlimited). Replaces the previous `let max_iterations = 10_000` local.
 - **terminal**: `lurek.terminal.getMaxCols()` / `getMaxRows()` — query the hard column and row limits (`512` / `256`) without needing access to Rust constants.
-- **automation**: `lurek.simulator.setStepLimit(name, n)` / `getStepLimit(name)` — configure the per-script step ceiling at runtime (clamped 1–`MAX_STEPS`, default `MAX_STEPS`). `Script.step_limit` replaces the previous module-wide `MAX_STEPS` cap inside `new()`.
+- **automation**: `lurek.automation.setStepLimit(name, n)` / `getStepLimit(name)` — configure the per-script step ceiling at runtime (clamped 1–`MAX_STEPS`, default `MAX_STEPS`). `Script.step_limit` replaces the previous module-wide `MAX_STEPS` cap inside `new()`.
 ### Changed
 - **audio**: `lurek.audio.newSoundData` now returns a `LuaError` on an unrecognised sample-rate argument instead of silently falling through to `44100`.
 - **render**: GPU geometry buffers emit `log::warn!` at ≥ 90 % capacity for `color_vertex_buffer`, `color_index_buffer`, `tex_vertex_buffer`, and `tex_index_buffer`.
@@ -357,7 +357,7 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.14.2] — 2026-04-18
 ### Added
-- **pathfind**: `lurek.pathfinding.findPathBidirectional(sx, sy, ex, ey)` — bidirectional A* search (meet-in-the-middle) for long paths on large grids. Added to `src/lua_api/pathfind_api.rs`.
+- **pathfind**: `lurek.pathfind.findPathBidirectional(sx, sy, ex, ey)` — bidirectional A* search (meet-in-the-middle) for long paths on large grids. Added to `src/lua_api/pathfind_api.rs`.
 - **dataframe**: `DataFrame::pivot_table(row_key, col_key, value_key, agg_fn)` and `LuaDataFrame:pivotTable(row_key, col_key, value_key, agg?)` — reshape long-format data to wide format. Aggregations: `"sum"`, `"mean"`, `"count"`, `"min"`, `"max"`.
 - **dataframe**: `df:rollingMean(col, window, result_col?)` / `df:rollingSum(col, window, result_col?)` — sliding-window statistics columns.
 - **dataframe**: `df:rank(col, order?, result_col?)` — rank column with ascending/descending order; order defaults to `"asc"`.
@@ -377,9 +377,9 @@ All notable changes to Lurek2D are recorded here.
 ### Added
 - **math**: `lurek.math.voronoi(points)` — Bowyer–Watson Delaunay triangulation → Voronoi dual. Input: array of `{x,y}` tables. Output: array of `{site={x,y}, vertices=[{x,y},...]}` tables. Near-duplicate sites (< 1e-5 apart) are deduplicated. Convex-hull cells are open.
 - **terminal**: `terminal:setCellSize(w, h)` — sets per-terminal cell pixel size override (clamped to ≥ 1). `terminal:getCellSize()` returns `{w, h}` table or `nil`. `terminal:resetCellSize()` reverts to font-derived sizing. `render` respects the override.
-- **automation**: `lurek.simulator.setHighlightMode(enable)` / `isHighlightMode()` — boolean hint for game-side replay overlays showing simulated cursor/key positions.
+- **automation**: `lurek.automation.setHighlightMode(enable)` / `isHighlightMode()` — boolean hint for game-side replay overlays showing simulated cursor/key positions.
 - **network**: `lurek.network.newHost` and `newServer` now accept `maxPeers` as the preferred peer-limit key (legacy `peers` alias retained).
-- **input**: `lurek.gamepad.vibrate(id, low_freq, high_freq, duration_ms)` — haptics stub. Parameters are clamped; returns `false` until winit haptics support lands.
+- **input**: `lurek.input.gamepad.vibrate(id, low_freq, high_freq, duration_ms)` — haptics stub. Parameters are clamped; returns `false` until winit haptics support lands.
 ### Changed
 - **image**: 11 CPU pixel transforms in `src/image/effects.rs` (`brightness`, `contrast`, `saturation`, `gamma`, `tint`, `grayscale`, `sepia`, `invert`, `threshold`, `posterize`, `fill`) now use `map_pixel_par` (rayon, 65 536-pixel threshold) for improved throughput on large textures.
 
@@ -387,8 +387,8 @@ All notable changes to Lurek2D are recorded here.
 ### Added
 - **data**: `lurek.data.toMsgPack(value)` / `fromMsgPack(bytes)` — MessagePack serialisation round-trip via `rmp-serde`. Accepts any Lua table or primitive; returns a byte-string.
 - **input**: `lurek.input.startRecording()` / `stopRecording()` / `loadRecording(path)` / `startPlayback(rec)` / `stopPlayback()` / `isRecording()` / `isPlayingBack()` / `getPlaybackFrame()` / `advancePlayback()` — full input recording and playback system. Recording is an `InputRecording` UserData with `:toJson()`, `:totalFrames()`, `:frameCount()`.
-- **filesystem**: `lurek.fs.mountZip(path, prefix?)` — mount a zip archive as a virtual filesystem prefix. Returns a `ZipMount` UserData with `:readFile(vpath)`, `:contains(vpath)`, `:listFiles()`, `:prefix()`. Path traversal is rejected.
-- **filesystem**: `lurek.fs.watchPath(path)` / `unwatchPath(path)` / `pollWatchers()` — lightweight filesystem polling watcher. `pollWatchers()` returns a table of changed paths since last poll.
+- **filesystem**: `lurek.filesystem.mountZip(path, prefix?)` — mount a zip archive as a virtual filesystem prefix. Returns a `ZipMount` UserData with `:readFile(vpath)`, `:contains(vpath)`, `:listFiles()`, `:prefix()`. Path traversal is rejected.
+- **filesystem**: `lurek.filesystem.watchPath(path)` / `unwatchPath(path)` / `pollWatchers()` — lightweight filesystem polling watcher. `pollWatchers()` returns a table of changed paths since last poll.
 - **sprite**: `lurek.sprite.parseAsepriteAtlas(json_str)` — parse Aseprite JSON atlas format (both array and hash modes). Returns a `SpriteAtlas` UserData identical to `parseAtlas`.
 - **sprite**: `SpriteAtlas:getFlipped(name, flip_x, flip_y)` — returns an `AtlasEntry` table with flipped UV coordinates for horizontal / vertical sprite mirroring.
 - **terminal**: `lurek.terminal.stripAnsi(text)` — removes ANSI escape sequences from a string.
@@ -396,7 +396,7 @@ All notable changes to Lurek2D are recorded here.
 - **terminal**: `lurek.terminal.printAnsi(term, col, row, text)` — renders an ANSI-coloured string to a `Terminal` UserData using parsed span colours.
 - **terminal**: `lurek.terminal.addCompletion(word)` / `removeCompletion(word)` / `clearCompletions()` / `getCompletions(prefix)` / `nextCompletion(prefix)` / `resetCompletion()` — tab-completion engine backed by `CompletionEngine`.
 - **postfx**: `PostFxStack:dedup()` — removes duplicate effect indices from the stack, returns count removed.
-- **postfx**: `lurek.postfx.setShaderErrorDisplay(enabled)` / `getShaderErrorDisplay()` — toggle in-window WGSL compile-error overlay.
+- **postfx**: `lurek.effect.setShaderErrorDisplay(enabled)` / `getShaderErrorDisplay()` — toggle in-window WGSL compile-error overlay.
 - **math**: `lurek.math.polygonIntersection(a, b)` — Sutherland-Hodgman polygon intersection. Both polygons are Lua arrays of `{x, y}` tables.
 - **math**: `lurek.math.polygonUnion(a, b)` — convex hull union of two polygons (exact for convex inputs).
 - **math**: `lurek.math.polygonDifference(a, b)` — approximate difference `A - B` using per-edge complement clipping.
@@ -433,21 +433,21 @@ All notable changes to Lurek2D are recorded here.
 - **scene**: `lurek.scene.transitions` subtable with four built-in transition factory functions: `fade(duration?)`, `slide(direction?, duration?)`, `wipe(duration?)`, `iris(duration?)`. Each returns `{type, duration}` compatible with `push`/`switchTo`/`pop` parameters.
 - **scene**: `lurek.scene.depth()` — alias for `getStackSize()`; returns the number of scenes currently on the stack.
 - **ecs**: `universe:addRelation(from, name, to)` / `universe:getRelated(from, name)` / `universe:removeRelation(from, name, to)` / `universe:clearRelations(from, name)` / `universe:hasRelation(from, name, to)` — directed named relationship links on `Universe`. Domain: `RelationshipManager.add_link` / `get_links` / `remove_link` / `clear_links` / `has_link` backed by `HashMap<(u32, String), Vec<u32>>`. Lua bindings in `src/lua_api/ecs_api.rs`.
-- **serial**: `lurek.codec.encodeMsgPack(tbl)` / `lurek.codec.decodeMsgPack(bytes)` — binary MessagePack encode/decode via `rmp-serde`. Compact binary payloads for save data and network messages.
-- **serial**: `lurek.codec.decodeXml(str)` — read-only XML parsing via `roxmltree`. Returns a nested Lua table: `{tag, attrs, text, children}`. Required for Tiled TMX map imports and third-party tool interop.
-- **serial**: `lurek.codec.validate(tbl, schema)` — schema validation. Returns `(true, nil)` on success or `(false, error_message)` on failure. Schema supports `type`, `required`, `min`, `max`, `minlen`, `maxlen`, `fields`, and `items`.
+- **serial**: `lurek.serial.encodeMsgPack(tbl)` / `lurek.serial.decodeMsgPack(bytes)` — binary MessagePack encode/decode via `rmp-serde`. Compact binary payloads for save data and network messages.
+- **serial**: `lurek.serial.decodeXml(str)` — read-only XML parsing via `roxmltree`. Returns a nested Lua table: `{tag, attrs, text, children}`. Required for Tiled TMX map imports and third-party tool interop.
+- **serial**: `lurek.serial.validate(tbl, schema)` — schema validation. Returns `(true, nil)` on success or `(false, error_message)` on failure. Schema supports `type`, `required`, `min`, `max`, `minlen`, `maxlen`, `fields`, and `items`.
 - **event**: `Signal:connect(pattern, fn)` — wildcard glob subscriptions. Patterns containing `*` or `?` match all emitted event names that satisfy the glob rule (`*` = any sequence, `?` = one char). Returns a disconnect handle.
 - **patterns**: `Trie` — string-key prefix-index trie with `insert`, `search`, `starts_with`, `prefix_search`, `remove`, `len`, `is_empty`. Foundations tier; no Lua binding.
 - **patterns**: `BiMap<K, V>` — bidirectional HashMap with `insert` (bijection-enforced), `get_by_key`, `get_by_value`, forward/reverse remove, `len`, `is_empty`, `clear`. Foundations tier; no Lua binding.
 - **data**: `ByteData:setBit(byte_offset, bit_offset, value)` — set or clear a single bit (bit_offset 0–7); errors if out of range.
 - **data**: `ByteData:getBit(byte_offset, bit_offset)` — read a single bit as a boolean.
 - **data**: `ByteData:readBits(byte_offset, bit_offset, count)` — read up to 32 bits LSB-first across byte boundaries into an integer.
-- **timer**: `lurek.time.waitSeconds(s)` / `lurek.time.waitFrames(n)` — yield the running coroutine until a wall-clock or frame-count deadline.
-- **timer**: `lurek.time.tickWaits()` — drives coroutine resumption; call once per frame from `lurek.process`.
+- **timer**: `lurek.timer.waitSeconds(s)` / `lurek.timer.waitFrames(n)` — yield the running coroutine until a wall-clock or frame-count deadline.
+- **timer**: `lurek.timer.tickWaits()` — drives coroutine resumption; call once per frame from `lurek.process`.
 
 ## [0.11.0] — 2026-04-15
 ### Added
-- **render**: `lurek.graphic.printRich(spans, x, y)` — draws a sequence of individually-styled text `TextSpan` objects at a common baseline position. Each span carries its own `r/g/b/a` colour and `scale` multiplier.
+- **render**: `lurek.render.printRich(spans, x, y)` — draws a sequence of individually-styled text `TextSpan` objects at a common baseline position. Each span carries its own `r/g/b/a` colour and `scale` multiplier.
 - **spine**: `LuaSkeletonAnimation:addEventKey(time, name, value?)` — adds a timed named event marker to an animation clip. Events are sorted automatically.
 - **spine**: `LuaSkeletonAnimation:getEvents(from, to)` — returns `{name, value}` pairs for all event markers whose timestamps fall in `(from, to]`.
 - **spine**: `LuaSkeleton:blendAnimation(anim, time, blend_weight?)` — evaluates a second animation and linearly blends it into the skeleton's current bone pose. Enables cross-fades between clips.
@@ -473,36 +473,36 @@ All notable changes to Lurek2D are recorded here.
 ### Added
 - **graph**: `graph:colorGraph()` — greedy graph coloring; returns `{node_id → color_int}` table using minimum colors.
 - **graph**: `graph:isBipartite()` — BFS two-coloring check; returns `true` if the graph has no odd cycles.
-- **i18n**: `lurek.localization.formatNumber(n, opts?)` — locale-aware number formatting with thousands grouping and decimal separator. `opts.decimals` (default 2).
-- **i18n**: `lurek.localization.formatDate(timestamp, fmt?)` — locale-aware date formatting from day-offset timestamp. Formats: `"short"` (default), `"long"`, `"iso"`.
-- **i18n**: `lurek.localization.tGender(key, gender, vars?)` — gender-sensitive translation via `.masculine`/`.feminine`/`.neutral` key suffixes with fallback to base key.
-- **i18n**: `lurek.localization.getLoadedLocales()` — returns array of all loaded locale codes.
+- **i18n**: `lurek.i18n.formatNumber(n, opts?)` — locale-aware number formatting with thousands grouping and decimal separator. `opts.decimals` (default 2).
+- **i18n**: `lurek.i18n.formatDate(timestamp, fmt?)` — locale-aware date formatting from day-offset timestamp. Formats: `"short"` (default), `"long"`, `"iso"`.
+- **i18n**: `lurek.i18n.tGender(key, gender, vars?)` — gender-sensitive translation via `.masculine`/`.feminine`/`.neutral` key suffixes with fallback to base key.
+- **i18n**: `lurek.i18n.getLoadedLocales()` — returns array of all loaded locale codes.
 - **camera**: `cam:followPath(points, duration)` — animates camera along a table of `{x,y}` waypoints; `cam:updatePath(dt)` advances it; `cam:stopPath()` cancels; `cam:pathProgress()` returns `[0,1]`.
 - **camera**: `cam:zoomTo(target_zoom, duration)` — smooth linear zoom tween; `cam:updateZoom(dt)` advances it; `cam:stopZoom()` cancels.
 - **camera**: `cam:setParallaxFactor(layer, factor)` / `cam:getParallaxFactor(layer)` / `cam:clearParallaxFactors()` — per-layer parallax scroll multipliers.
 - **light**: `light:addFlicker(min, max, hz)` — convenience flicker setter using intensity-multiplier range and Hz frequency; converts to `FlickerConfig.speed`/`strength`.
 - **light**: `light:transitionTo(target, duration)` — smooth linear transition of color, intensity, and radius; `light:updateTransition(dt)` advances it; `light:stopTransition()` cancels; `light:transitionProgress()` returns `[0,1]`.
 - **light**: `light:setCookie(path)` / `light:getCookie()` / `light:clearCookie()` — light cookie (gobo) texture path for projection masking.
-- **render**: `lurek.graphic.newLayer(name, z_order?)` — registers a named render layer with z-ordering.
-- **render**: `lurek.graphic.setLayer(name)` / `lurek.graphic.currentLayer()` — set and query the active named layer.
-- **render**: `lurek.graphic.setLayerVisible(name, bool)` / `lurek.graphic.isLayerVisible(name)` — toggle layer visibility.
-- **render**: `lurek.graphic.getLayerZOrder(name)` / `lurek.graphic.setLayerZOrder(name, z)` — read and update layer draw order.
+- **render**: `lurek.render.newLayer(name, z_order?)` — registers a named render layer with z-ordering.
+- **render**: `lurek.render.setLayer(name)` / `lurek.render.currentLayer()` — set and query the active named layer.
+- **render**: `lurek.render.setLayerVisible(name, bool)` / `lurek.render.isLayerVisible(name)` — toggle layer visibility.
+- **render**: `lurek.render.getLayerZOrder(name)` / `lurek.render.setLayerZOrder(name, z)` — read and update layer draw order.
 - **effect**: `stack:setFeedback(factor)` / `stack:getFeedback()` / `stack:clearFeedback()` — feedback loop intensity `[0,1]` for motion-trail / phosphor-persistence effects.
-- **effect**: `lurek.postfx.newTransition(kind, duration, color?)` — creates a `ScreenTransition` userdata. Kinds: `"fade"`, `"wipe"`, `"iris"`, `"dissolve"`. Methods: `play()`, `reverse()`, `update(dt)`, `progress()`, `isActive()`, `isDone()`, `kind()`, `color()`, `setColor(t)`.
+- **effect**: `lurek.effect.newTransition(kind, duration, color?)` — creates a `ScreenTransition` userdata. Kinds: `"fade"`, `"wipe"`, `"iris"`, `"dissolve"`. Methods: `play()`, `reverse()`, `update(dt)`, `progress()`, `isActive()`, `isDone()`, `kind()`, `color()`, `setColor(t)`.
 - New source files: `src/camera/path.rs` (`CameraPath`, `ZoomTween`), `src/light/transition.rs` (`LightTransition`), `src/effect/transition.rs` (`ScreenTransition`, `TransitionKind`).
 
 ## [0.10.1] — 2026-04-16
 ### Added
 - `lurek.math.polygonClip(polygon, nx, ny, d)` — Sutherland-Hodgman single half-plane polygon clip. Input and output are flat `{x1,y1,...}` tables.
-- `lurek.img.newPaletteLut()` — creates a `PaletteLUT` userdata; `lut:setColor(fr,fg,fb,fa, tr,tg,tb,ta)`, `lut:getColorCount()`, `lut:clear()`.
+- `lurek.image.newPaletteLut()` — creates a `PaletteLUT` userdata; `lut:setColor(fr,fg,fb,fa, tr,tg,tb,ta)`, `lut:getColorCount()`, `lut:clear()`.
 - `image:applyPaletteLut(lut)` — applies a `PaletteLUT` to every pixel of an `ImageData`.
 - `image:convolve(kernel_table, ksize)` — applies an arbitrary N×N convolution kernel to `ImageData` (ksize must be odd; edges clamped; alpha preserved).
 - `lurek.animation.newCurve()` — creates an `AnimCurve` with `addKeyframe(t,v)`, `eval(t)`, `setEasing(name)`, `keyframeCount()`, `clear()`. Easings: `step`, `linear`, `ease_in`, `ease_out`, `ease_in_out`.
 - `lurek.animation.newSyncGroup()` — creates an `AnimSyncGroup` with `add(key)`, `remove(key)`, `clear()`, `memberCount()`.
-- `lurek.fs.glob(pattern)` — lists files matching a `*`/`?` glob pattern within the game sandbox.
-- `lurek.fs.copy(src, dst)` — copies a file from the read sandbox into `save/`.
-- `lurek.fs.move(src, dst)` — moves a file within the `save/` sandbox.
-- `lurek.fs.removeDir(path)` — recursively removes a directory within the `save/` sandbox.
+- `lurek.filesystem.glob(pattern)` — lists files matching a `*`/`?` glob pattern within the game sandbox.
+- `lurek.filesystem.copy(src, dst)` — copies a file from the read sandbox into `save/`.
+- `lurek.filesystem.move(src, dst)` — moves a file within the `save/` sandbox.
+- `lurek.filesystem.removeDir(path)` — recursively removes a directory within the `save/` sandbox.
 - `lurek.terminal.pushScrollback(t, line)` / `getScrollback(t, offset, count)` / `scrollbackLen(t)` / `setScrollbackCap(t, cap)` — scrollback buffer for terminal output (default cap: 500).
 - `lurek.terminal.pushCmdHistory(t, cmd)` / `prevCmd(t)` / `nextCmd(t)` / `cmdHistoryLen(t)` / `clearCmdHistory(t)` — command history with cursor navigation.
 - `lurek.terminal.applyTheme(t, name)` — applies a named colour theme (`solarized_dark`, `solarized_light`, `monokai`, `dracula`, `nord`) by recolouring all grid cells.
@@ -526,12 +526,12 @@ All notable changes to Lurek2D are recorded here.
 
 
 ### Added
-- `lurek.modding.checkApiVersion(mod, host_version)` — returns `(bool, msg?)` for MAJOR/MINOR compatibility gating.
+- `lurek.mods.checkApiVersion(mod, host_version)` — returns `(bool, msg?)` for MAJOR/MINOR compatibility gating.
 - `ModInfo.api_version` — optional `"MAJOR.MINOR"` string; via `mod:getApiVersion()` / `mod:setApiVersion()`.
 - `ModInfo.capabilities` — `Vec<String>` permission list; via `mod:getCapabilities()` / `mod:setCapabilities()`.
 - `ModInfo.config_schema` — `Vec<(key, type_hint, default)>` declarative mod settings; via `mod:getConfigSchema()` / `mod:setConfigSchema()`.
-- `lurek.savegame` compression — `saveManager:setCompress(bool)` / `isCompressed()`: slot data is LZ4-compressed + base64-encoded when enabled; auto-detected on load.
-- `lurek.savegame.onBeforeSave(fn?)` / `onAfterLoad(fn?)` — lifecycle hooks fired with the slot name; pass `nil` to clear.
+- `lurek.save` compression — `saveManager:setCompress(bool)` / `isCompressed()`: slot data is LZ4-compressed + base64-encoded when enabled; auto-detected on load.
+- `lurek.save.onBeforeSave(fn?)` / `onAfterLoad(fn?)` — lifecycle hooks fired with the slot name; pass `nil` to clear.
 - `lurek.compute.fft(samples)` — Cooley-Tukey iterative radix-2 FFT; returns `{{re, im}, ...}` array.
 - `lurek.compute.ifft(freqs)` — IFFT with 1/N normalisation; returns real-part array.
 - `lurek.compute.fftMagnitude(samples)` — `|X[k]|` per bin.
@@ -559,7 +559,7 @@ All notable changes to Lurek2D are recorded here.
 - `Channel:pushTable(t)` / `Channel:popTable()` — serialise / deserialise Lua tables (including nested tables) through a thread channel using `ChannelValue::Table`.
 - `Channel:pushBytes(s)` / `Channel:popBytes()` — send and receive raw binary strings through a thread channel using `ChannelValue::Bytes`.
 - `lurek.thread` worker VMs now support `require()` via `package.path = "./?.lua;./?/init.lua"` set during worker init.
-- `lurek.thread` workers have read-only filesystem access via `lurek.fs.read(path)` with path-traversal guard.
+- `lurek.thread` workers have read-only filesystem access via `lurek.filesystem.read(path)` with path-traversal guard.
 - `lurek.tilemap.newLargeMapRenderer(tileW, tileH)` — creates a `LargeMapRenderer` for chunk-level occlusion culling on large tilemaps. `LargeMapRenderer` exposes `setMapData`, `setTile`, `getTile`, `getMapSize`, `setChunkSize`, `getChunkSize`, `setCamera`, `setViewport`, `getVisibleChunks`, `getTotalChunks`, `setLodEnabled`, `isLodEnabled`, `setLodThresholds`, `setTilesetColumns`, `getTilesetColumns`, `invalidateChunk`, `invalidateAll`.
 ### Fixed
 - `src/lua_api/tilemap_api.rs` — removed duplicate `use crate::tilemap::ldtk::load_ldtk;` import.
@@ -660,10 +660,10 @@ All notable changes to Lurek2D are recorded here.
 - **Lua tests (15)** — `unit/test_physics_zone.lua`, `unit/test_physics_terrain.lua`, `unit/test_physics_terrain_collapse.lua`, `unit/test_physics_cellular.lua`, `unit/test_physics_step_fixed.lua`, `integration/test_physics_worms.lua`, `integration/test_physics_tanks.lua`, `integration/test_physics_space.lua`, `integration/test_physics_world_sim.lua`, `evidence/test_evidence_terrain_render.lua`, `evidence/test_evidence_cellular_sand.lua`, `evidence/test_evidence_physics_zone_debug.lua`, `stress/test_stress_physics_zones.lua`, `stress/test_stress_physics_terrain.lua`, `stress/test_stress_physics_cellular.lua`. All registered in `tests/lua/harness.rs`.
 
 ### Added
-- **ECS: `queryNot(with, without)`** — New `Universe::query_not` domain method and `lurek.entity:queryNot(with_tbl, without_tbl)` Lua binding. Returns entities that have all components in `with` and none of the components in `without`.
+- **ECS: `queryNot(with, without)`** — New `Universe::query_not` domain method and `lurek.ecs:queryNot(with_tbl, without_tbl)` Lua binding. Returns entities that have all components in `with` and none of the components in `without`.
 - **ECS: system priority dispatch** — `addSystem(system, {priority=N})` accepts an optional opts table. Systems are now dispatched in ascending priority order during `update`, `render`, and `emit`. Zero is the default priority. Domain: `system_priorities: Vec<i32>` + `get_sorted_system_indices()` in `src/ecs/universe.rs`.
 - **ECS: component observers** — `onComponentAdded(name, fn)` and `onComponentRemoved(name, fn)` register observer callbacks. `flushObservers()` dispatches accumulated add/remove events collected from `set_component` and `remove_component`. Domain: `add_events`/`remove_events` event queues + `take_component_events()` in `src/ecs/universe.rs`; observer maps live in `src/lua_api/ecs_api.rs`.
-- **ECS: serialization round-trip** — `lurek.entity:serialize()` snapshots the world to a Lua table (entities, components, tags, layers, blueprint registry, bitmap_tags). `lurek.entity:deserialize(snapshot)` restores it. Domain: `serialize_to_table` / `deserialize_from_table` in `src/ecs/universe.rs`.
+- **ECS: serialization round-trip** — `lurek.ecs:serialize()` snapshots the world to a Lua table (entities, components, tags, layers, blueprint registry, bitmap_tags). `lurek.ecs:deserialize(snapshot)` restores it. Domain: `serialize_to_table` / `deserialize_from_table` in `src/ecs/universe.rs`.
 - **ECS: `spawnBulk(name, count, overrides?)`** — Spawns multiple entities from a blueprint in one call. Returns a table of entity IDs. Domain: `Universe::spawn_bulk` in `src/ecs/universe.rs`.
 - **Patterns: `RelationshipManager`** — Moved out of ECS-exclusive API; exposed as `lurek.patterns.newRelationshipManager()`. `LuaRelationshipManager` UserData with `defineType / removeType / typeNames / setValue / getValue / adjustValue / setLevel / getLevel / removePair / pairCount` methods. Domain struct stays in `src/ecs/relationships.rs`.
 - **Patterns: `Mediator`** — New `src/patterns/mediator.rs` domain type. `lurek.patterns.newMediator()` returns a `LuaMediator` with `on / off / send / broadcast / handlerCount / channels / removeChannel / clear` methods.
@@ -672,7 +672,7 @@ All notable changes to Lurek2D are recorded here.
 - **Scene: `getTransitionTypes()`** — Returns a table of all 10 transition type strings: `none, fade, left, right, up, down, wipe, iris, zoom, crossfade`.
 - **Scene: `serializeScene() / deserializeScene(snapshot)`** — Snapshot the active scene stack and all `setData` key/value pairs into a plain Lua table; restore them from the same table.
 - **`content/library/patterns/init.lua`** — New pure-Lua Lunasome module. `patterns.newScheduler()` provides a cooperative coroutine task runner with `add(fn) / remove(id) / pause(id) / resume(id) / update(dt) / getCount() / clear()`.
-- **Lua tests** — 12 new test files: `tests/lua/unit/test_entity_query_not.lua`, `test_entity_serialization.lua`, `test_entity_observers.lua`, `test_entity_system_priority.lua`, `test_entity_relationships.lua`, `test_patterns_mediator.lua`, `test_patterns_strategy.lua`, `test_patterns_collections.lua`, `test_scene_transitions_extended.lua`, `test_scene_serialization.lua`; `tests/lua/stress/test_entity_bulk_spawn.lua`, `test_scene_depth_sort.lua`. All registered in `tests/lua/harness.rs`.
+- **Lua tests** — 12 new test files: `tests/lua/unit/test_entity_query_not.lua`, `test_entity_serialization.lua`, `test_entity_observers.lua`, `test_entity_system_priority.lua`, `test_entity_relationships.lua`, `test_patterns_mediator.lua`, `test_patterns_strategy.lua`, `test_patterns_collections.lua`, `test_scene_transitions_extended.lua`, `test_scene_serialization.lua`; `tests/lua/stress/test_ecs_bulk_spawn.lua`, `test_scene_depth_sort.lua`. All registered in `tests/lua/harness.rs`.
 
 ## [0.8.1] — 2026-05-28
 ### Added
@@ -691,7 +691,7 @@ All notable changes to Lurek2D are recorded here.
 ### Added
 - **`lurek.procgen` expanded API** — 11 new Lua bindings: `bspDungeon(opts)`, `roomsDungeon(opts)`, `heightmap(opts)`, `wfcGenerate(opts)`, `lsystem(opts)`, `lsystemSegments(opts, angle, step)`, `generateName(samples, min, max, seed)`, `generateNames(samples, n, min, max, seed)`, `worldGraph(w, h, count, seed)`, `noiseMap(w, h, opts)`, `noiseMapParallel(w, h, opts)`.
 - **`lurek.math` expanded API** — `vec3(x,y,z)` / `Vec3(x,y,z)` constructors with `LuaVec3` UserData (fields: x/y/z; methods: length, lengthSquared, normalize, dot, cross, lerp, distance, add, sub, scale); `catmullRom(points)` → `LuaCatmullRom` with sample/sampleSegment/len; `hermite(p0x,p0y,p1x,p1y,m0x,m0y,m1x,m1y)` → `LuaHermite` with sample; free functions `lerp(a,b,t)` and `remap(v,in_min,in_max,out_min,out_max)`.
-- **`lurek.pathfinding` expanded API** — `newHexGrid(w, h, layout?)` → `LuaHexGrid` UserData with methods: setBlocked, setCost, isBlocked, findPath, lineOfSight, fieldOfView, rangeOfMovement, distance; `newJpsGrid(w, h)` → `LuaJpsGrid` UserData with setBlocked, isBlocked, findPath; `rangeMap(opts)` → table with cells/width/height for Dijkstra budget queries.
+- **`lurek.pathfind` expanded API** — `newHexGrid(w, h, layout?)` → `LuaHexGrid` UserData with methods: setBlocked, setCost, isBlocked, findPath, lineOfSight, fieldOfView, rangeOfMovement, distance; `newJpsGrid(w, h)` → `LuaJpsGrid` UserData with setBlocked, isBlocked, findPath; `rangeMap(opts)` → table with cells/width/height for Dijkstra budget queries.
 - **`lurek.graph` expanded API** — `mst()` method on Graph UserData (returns table of edge IDs via Kruskal); `astar(from_node, to_node)` method on Graph UserData (returns path table or nil).
 - **Internal** — `LSystem::new_from_pairs(axiom, rules, iterations)` constructor for owned-string rules; `RangeMap::reachable_cells_with_cost()` returning `Vec<(x, y, cost)>` triples.
 - **Lua tests** — 6 new integration test files: `test_pathfind_hexmap.lua`, `test_pathfind_graph.lua`, `test_math_pathfind.lua`, `test_procgen_ai.lua`, `test_pathfind_ai.lua`, `test_graph_pathfind.lua`; 1 new stress test: `test_procgen_stress.lua`. All registered in `tests/lua/harness.rs`.
@@ -717,10 +717,10 @@ All notable changes to Lurek2D are recorded here.
 - **Effect presets** — New `src/effect/presets.rs` with `EffectPreset`, `build_preset(name, w, h)`, `preset_names()`, and 5 named presets: `retro_tv`, `horror`, `dream`, `neon`, `sepia_age`.
 - **Water UV-distortion overlay** — New `src/effect/water_overlay.rs` with `WaterOverlayState { enabled, amplitude, frequency, speed, tint_r/g/b/strength, depth_r/g/b/strength, time }` and `update(dt)` / `reset()` methods. Integrated into `Overlay` struct in `src/effect/overlay.rs`.
 - **4 new image operations** — `ImageData::resize(w, h)` (bilinear), `blit(src, dx, dy)` (Porter-Duff over), `get_region(x, y, w, h)`, `diff(other) -> u32` added to `src/image/effects.rs`; `map_pixel_par<F>()` (rayon parallel, 65,536 px threshold) added to `src/image/image_data.rs`.
-- **`lurek.postfx` extended API** — `beginCapture()`, `endCapture()`, `apply()` on `LuaPostFxStack`; `newPresetStack(name, w?, h?)`; `getEffectTypes()` now returns 23 types. Registered in `src/lua_api/effect_api.rs`.
-- **`lurek.overlay` water API** — `setWater(amplitude, frequency, speed)`, `setWaterTint(r,g,b,strength)`, `setCustomShader(name?)`, `getWater() -> table` on `LuaOverlay`.
-- **`lurek.img` ImageData API** — `resize(w, h)`, `blit(src, dx, dy)`, `getRegion(x, y, w, h)`, `diff(other)`, `mapPixels(fn)` added to `impl mlua::UserData for ImageData` in `src/lua_api/image_api.rs`.
-- **Lua tests** — 4 new test files registered in `tests/lua/harness.rs`: `test_effect_overlay_water.lua`, `test_postfx_stack_extended.lua`, `test_image_extended.lua`, `test_evidence_postfx_types.lua`.
+- **`lurek.effect` extended API** — `beginCapture()`, `endCapture()`, `apply()` on `LuaPostFxStack`; `newPresetStack(name, w?, h?)`; `getEffectTypes()` now returns 23 types. Registered in `src/lua_api/effect_api.rs`.
+- **`lurek.effect` water API** — `setWater(amplitude, frequency, speed)`, `setWaterTint(r,g,b,strength)`, `setCustomShader(name?)`, `getWater() -> table` on `LuaOverlay`.
+- **`lurek.image` ImageData API** — `resize(w, h)`, `blit(src, dx, dy)`, `getRegion(x, y, w, h)`, `diff(other)`, `mapPixels(fn)` added to `impl mlua::UserData for ImageData` in `src/lua_api/image_api.rs`.
+- **Lua tests** — 4 new test files registered in `tests/lua/harness.rs`: `test_effect_overlay_water.lua`, `test_postfx_stack_extended.lua`, `test_image_extended.lua`, `test_evidence_effect_types.lua`.
 
 ## [0.7.27] — 2026-05-24
 ### Added
@@ -737,11 +737,11 @@ All notable changes to Lurek2D are recorded here.
 ### Added
 - **15 new `RenderCommand` variants** — `DrawQuadBezier`, `DrawCubicBezier`, `DrawPath`, `DrawGradientRect`, `DrawColoredPolygon`, `DrawIsoCubeTile`, `DrawHexTile`, `BeginSortGroup`, `PushSortKey`, `FlushSortGroup`, `DrawPhysicsDebug`, `DrawSpineSkeleton`, `DrawBevelRect`, `PushLayer`, `PopLayer` added to `src/render/renderer.rs` with 7 new support types: `PathSegment`, `GradientDirection`, `HexOrientation`, `BevelStyle`, `PhysicsDebugShape`, `PhysicsDebugConfig`, `SpineSlotDraw`.
 - **GPU renderer match arms** — `GpuRenderer::render_frame` in `src/render/gpu_renderer.rs` processes all 15 new variants. Bezier/path commands tessellate geometry on the CPU into `ColorVertex` batches; gradient rects use per-corner color vertices; iso cube tiles and hex tiles expand into polygon draws; physics debug iterates `PhysicsDebugShape` entries per shape type.
-- **`lurek.graphic.*` Lua bindings** — 13 new functions registered in `src/lua_api/render_api.rs`: `drawQuadBezier`, `drawCubicBezier`, `drawPath`, `drawGradientRect`, `drawColoredPolygon`, `drawIsoCubeTile`, `drawHexTile`, `beginSortGroup`, `pushSortKey`, `flushSortGroup`, `drawBevelRect`, `pushLayer`, `popLayer`.
+- **`lurek.render.*` Lua bindings** — 13 new functions registered in `src/lua_api/render_api.rs`: `drawQuadBezier`, `drawCubicBezier`, `drawPath`, `drawGradientRect`, `drawColoredPolygon`, `drawIsoCubeTile`, `drawHexTile`, `beginSortGroup`, `pushSortKey`, `flushSortGroup`, `drawBevelRect`, `pushLayer`, `popLayer`.
 - **`lurek.raycaster` extended factory API** — Three new `UserData` types and factory functions: `lurek.raycaster.newDoorManager()` → `DoorManager`; `lurek.raycaster.newHeightMap(w, h)` → `HeightMap`; `lurek.raycaster.newPointLight(x, y, r, g, b, radius, intensity)` → `PointLight`. Adds `DoorManager` methods: `addDoor`, `openDoor`, `closeDoor`, `update`, `getDoor`, `count`. `HeightMap` methods: `setFloor`, `setCeiling`, `floorAt`, `ceilingAt`. `PointLight` methods: `x`, `y`, `radius`, `intensity`, `color`, `set`.
 - **`PhysicsShapeSnapshot`** — New geometry-snapshot struct in `src/physics/world.rs`, exported via `src/physics/mod.rs`. `World::extract_shape_snapshots()` iterates all bodies and returns `Vec<PhysicsShapeSnapshot>` with no `crate::render` dependency, allowing the Lua API layer to convert without creating a cross-module circular dependency.
 - **`lurek.physics.drawDebugGpu`** — New Lua function in `src/lua_api/physics_api.rs` that extracts body shapes and pushes `RenderCommand::DrawPhysicsDebug` for GPU-accelerated physics debug visualisation. Accepts an optional config table to override `bodyColor`, `staticColor`, `sleepColor`, `sensorColor`, and `lineWidth`.
-- **Evidence tests** — Three new evidence test files: `tests/lua/evidence/test_evidence_raycaster_ext.lua` (8 tests: DoorManager, HeightMap, PointLight); `tests/lua/evidence/test_evidence_physics_debug_gpu.lua` (6 tests); `tests/lua/evidence/test_evidence_graphic_draw_cmds.lua` (18 tests for all new Lua graphic functions). Registered in `tests/lua/harness.rs`.
+- **Evidence tests** — Three new evidence test files: `tests/lua/evidence/test_evidence_raycaster_ext.lua` (8 tests: DoorManager, HeightMap, PointLight); `tests/lua/evidence/test_evidence_physics_debug_gpu.lua` (6 tests); `tests/lua/evidence/test_evidence_render_draw_cmds.lua` (18 tests for all new Lua graphic functions). Registered in `tests/lua/harness.rs`.
 
 ## [0.7.25] — 2026-05-22
 ### Added
@@ -749,9 +749,9 @@ All notable changes to Lurek2D are recorded here.
 - **Particle system — GPU batch rendering** — `RenderCommand::DrawParticleSystem` is now fully implemented in `GpuRenderer::render_frame`. Untextured particles are tessellated in one `append_color_draw` call (reducing per-particle draw overhead). `particle_api.rs render()` forwards untextured particles as a `DrawParticleSystem` batch and continues to expand textured particles individually.
 - **Particle system — Attractors** — `Attractor { x, y, strength, radius }` struct added to `src/particle/config.rs`. `ParticleSystem` gains `attractors: Vec<Attractor>` and three methods: `add_attractor(x, y, strength, radius)`, `clear_attractors()`, `attractor_count()`. New Lua methods: `addAttractor`, `clearAttractors`, `getAttractorCount`.
 - **Particle system — Bounce bounds** — `BounceBounds { x_min, x_max, y_min, y_max, restitution }` struct added to `config.rs`. `ParticleSystem` gains `bounce_bounds: Option<BounceBounds>` with `set_bounds(xmin, xmax, ymin, ymax, restitution)` and `clear_bounds()`. New Lua methods: `setBounds`, `clearBounds`.
-- **Particle system — warm_up** — `ParticleSystem::warm_up(seconds: f32)` pre-simulates the system; clamped to 30 s. Exposed as `lurek.particles:warmUp(seconds)`.
-- **Particle system — Sub-emitter death spawning** — `ParticleConfig` gains `death_emitter: Option<Box<ParticleConfig>>` and `death_burst_count: u32`. When particles die, their positions spawn sub-systems. `deathBurstCount` accepted in `lurek.particles.newSystem({})`.
-- **Particle shape config keys** — `shrapnelEdges`, `rayAspect`, `ringThickness` accepted in `lurek.particles.newSystem({})` opts table. Shape strings `"shrapnel"`, `"ray"`, `"puff"`, `"ring"`, `"capsule"` added to `setShape` / `getShape` / `newSystem` config.
+- **Particle system — warm_up** — `ParticleSystem::warm_up(seconds: f32)` pre-simulates the system; clamped to 30 s. Exposed as `lurek.particle:warmUp(seconds)`.
+- **Particle system — Sub-emitter death spawning** — `ParticleConfig` gains `death_emitter: Option<Box<ParticleConfig>>` and `death_burst_count: u32`. When particles die, their positions spawn sub-systems. `deathBurstCount` accepted in `lurek.particle.newSystem({})`.
+- **Particle shape config keys** — `shrapnelEdges`, `rayAspect`, `ringThickness` accepted in `lurek.particle.newSystem({})` opts table. Shape strings `"shrapnel"`, `"ray"`, `"puff"`, `"ring"`, `"capsule"` added to `setShape` / `getShape` / `newSystem` config.
 - **`toImage` method alias** — `ParticleSystem:toImage(w, h)` is a convenience alias for `drawToImage`.
 - **Particle system — per-particle shape seed** — `Particle` struct gains `shape_seed: u32` assigned at spawn, used by `Shrapnel` tessellation for deterministic polygon geometry.
 - **Tests** — New describe blocks in `tests/lua/unit/test_particle.lua` for: new shapes, warmUp, attractors, bounce bounds. New evidence tests in `tests/lua/evidence/test_evidence_particle.lua`: shape composite PNG, attractor PNG.
@@ -806,7 +806,7 @@ All notable changes to Lurek2D are recorded here.
 - **Lua test audit tooling** — Added `tools/audit/lua_test_structure_audit.py` plus audit README / quality-pipeline references to detect missing block descriptions, legacy `@description:` syntax, forbidden `@category` markers, and non-final `test_summary()` calls, with safe autofixes for the legacy syntax cases.
 - **Evidence/golden contract enforcement** — Added `tools/audit/lua_evidence_golden_contract_audit.py`, stripped non-artifact pre-checks out of mixed evidence suites, and documented that evidence files must contain artifact-producing cases only while Lua golden files remain compare-only.
 - **Lua golden migration** — Moved TOML / encode / hash baselines from `tests/rust/golden/expected/` into `tests/lua/golden/samples/migrated_rust/`, added Lua evidence sources plus compare-only Lua goldens for those artifacts, and removed the corresponding Rust golden harness coverage.
-- **System message catalog** — Exposed `lurek.platform.getMessage`, `lurek.platform.hasMessage`, and `lurek.platform.getMessageCount`, migrated the remaining Rust `messages_tests.rs` coverage into `tests/lua/unit/test_system.lua`, and deleted the obsolete Rust integration file.
+- **System message catalog** — Exposed `lurek.runtime.getMessage`, `lurek.runtime.hasMessage`, and `lurek.runtime.getMessageCount`, migrated the remaining Rust `messages_tests.rs` coverage into `tests/lua/unit/test_runtime_platform.lua`, and deleted the obsolete Rust integration file.
 - **Testing docs/skill sync** — Corrected the false auto-discovery guidance in `docs/architecture/test-framework.md` and `.github/skills/testing-rust/SKILL.md`; Lua files must be registered manually in `tests/lua/harness.rs`.
 - **Windows debug linking** — Removed the forced `/DEBUG:FASTLINK` MSVC linker flag from `.cargo/config.toml` because it caused unstable `lua_tests` links with unresolved externals on large debug test binaries.
 - **Debug profile stability** — Disabled `incremental` and removed `split-debuginfo = "packed"` from `[profile.dev]` after repeated incremental `lua_tests` rebuilds on Windows MSVC produced unresolved-internal-symbol linker failures.
@@ -814,12 +814,12 @@ All notable changes to Lurek2D are recorded here.
 - **Test migration Phase 5** — Expanded Lua BDD test coverage across 10 modules and deleted 3 fully-migrated Rust integration test files.
   - **Deleted RS files** (100% Lua-VM-only, all coverage now in Lua BDD layer): `fx_screen_tests.rs` (77 tests), `overlay_tests.rs` (78 tests), `window_tests.rs` (17 tests). Removed corresponding `mod` declarations from `tests/engine_tests.rs`.
   - **`test_terminal.lua`** — Added terminal low-level cell-method and widget-lookup tests: default cell values, clamped dimensions, setChar/setFg/setBg, print clipping, getCursor/setCursor, resize, getWidget(idx), findByTag, no-focus input.
-  - **`test_pathfinding.lua`** — Added FlowField RS-parity tests: isCalculated before/after calculate, getTargets, getCostToTarget, steer return types, multi-target calculate, lineOfSight, diagonalMode. +15 tests.
+  - **`test_pathfind.lua`** — Added FlowField RS-parity tests: isCalculated before/after calculate, getTargets, getCostToTarget, steer return types, multi-target calculate, lineOfSight, diagonalMode. +15 tests.
   - **`test_log.lua`** — Added sink-registry tests: addSink, removeSink, readMemory capacity, clearSinks. +5 tests.
   - **`test_patterns.lua`** — Added SimpleState edge-case tests (hasState false, update no-crash, getCurrent nil, clearAll+addState), plus CommandStack undo/redo cycle and getHistorySize. +7 new-passing tests.
   - **`test_scene.lua`** — Added DepthSorter RS-parity tests: add/sort/flush execute order, clear count, popTo falsy return, getStackSize height check. +6 tests.
   - **`test_tween.lua`** — Added easing-name resolution: string easing arg, cubicOut easing, near-zero-duration completion. +5 tests.
-  - **`test_localization.lua`** — Added interpolate single/multiple/unknown/double-brace and format helper tests. +8 tests.
+  - **`test_i18n.lua`** — Added interpolate single/multiple/unknown/double-brace and format helper tests. +8 tests.
   - **`test_dataframe.lua`** — Added CellValue nil/number/text/bool round-trips via `getValue`, Database addTable/getTable/listTables/removeTable CRUD. +8 tests.
   - **`test_compute.lua`** — Added zeros/ones shape-table form, range sequence, getShape on 2D array, zero-step range error. +7 tests.
   - **`test_graph.lua`** — Added addEdge invalid src/dst, removeNode error on bad id, getNodes count. +5 tests.
@@ -828,9 +828,9 @@ All notable changes to Lurek2D are recorded here.
 
 ### Changed
 - **Test migration Phase 4** — Fixed and expanded Lua BDD tests for 10 additional modules:
-  - `signal` — Stripped embedded UTF-8 BOM that caused a syntax error in `test_signal.lua`; 19/19 tests restored.
-  - `system` — Stripped BOM + fully rewrote `test_system.lua` to cover `lurek.platform.*`: getOS/getVersion/getArch/getProcessorCount/getMemorySize/getInfo table fields/clipboard round-trip/debug overlay toggle/log level round-trip/log/getLastError/getEnv/getArgs/parseArgs (flag+option+positional)/getPowerInfo/getPreferredLocales/openURL function-existence check/lurek.signal.quit surface check. 54 tests total (was broken syntax error).
-  - `fx` — Rewrote `test_fx.lua` to use the correct `lurek.postfx.*` / `lurek.overlay.*` namespace instead of the non-existent `lurek.effect.*`; corrected `stack:count()` → `stack:len()` and `stack:setEnabled(bool)` → `stack:setEnabled(pos, bool)`; expanded to 32/32 covering getEffectTypes/newEffect/newStack/newPass/newCustomEffect/PostFxEffect-setEnabled-isEnabled/PostFxStack-add-remove-clear-len-getEffect-getDimensions-resize.
+  - `signal` — Stripped embedded UTF-8 BOM that caused a syntax error in `test_event_signal.lua`; 19/19 tests restored.
+  - `system` — Stripped BOM + fully rewrote `test_runtime_system.lua` to cover `lurek.runtime.*`: getOS/getVersion/getArch/getProcessorCount/getMemorySize/getInfo table fields/clipboard round-trip/debug overlay toggle/log level round-trip/log/getLastError/getEnv/getArgs/parseArgs (flag+option+positional)/getPowerInfo/getPreferredLocales/openURL function-existence check/lurek.event.quit surface check. 54 tests total (was broken syntax error).
+  - `fx` — Rewrote `test_effect_api.lua` to use the correct `lurek.effect.*` / `lurek.effect.*` namespace instead of the non-existent `lurek.effect.*`; corrected `stack:count()` → `stack:len()` and `stack:setEnabled(bool)` → `stack:setEnabled(pos, bool)`; expanded to 32/32 covering getEffectTypes/newEffect/newStack/newPass/newCustomEffect/PostFxEffect-setEnabled-isEnabled/PostFxStack-add-remove-clear-len-getEffect-getDimensions-resize.
   - `camera` — Added setBounds/removeBounds/setTarget/clearTarget/setFollowSmooth/setDeadZone/setLookAhead tests; 28/28 (was 16/16).
   - `raycaster` — Added castRaysFlat/lineOfSight/projectSprite instance methods plus `lurek.raycaster.projectColumn` and `lurek.raycaster.distanceShade` module function tests; 28/28 (was 14/14).
   - `procgen` — Added voronoi determinism/edge cases (single-seed, fill=0/1 bounds, poissonDisk determinism, perlinNoise idempotence); 25/25 (was 19/19).
@@ -882,7 +882,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ## [0.7.15] — 2025-06-28
 ### Added
-- **GPU render stats exposed to Lua** (`src/lua_api/render_api.rs`): `lurek.graphics.getStats()` now returns GPU-level stats: `gpu_draw_calls`, `batched_draws`, `texture_switches`, `canvas_switches`, `shader_switches` alongside existing command-count stats.
+- **GPU render stats exposed to Lua** (`src/lua_api/render_api.rs`): `lurek.renders.getStats()` now returns GPU-level stats: `gpu_draw_calls`, `batched_draws`, `texture_switches`, `canvas_switches`, `shader_switches` alongside existing command-count stats.
 - **UI computed layout** (`src/ui/widget.rs`, `src/ui/context.rs`, `src/ui/render.rs`): `WidgetBase` now has `computed_rect: Rect` and `is_visible: bool` fields. `GuiContext::run_layout_pass()` propagates layout from parent to child widgets. `generate_render_commands()` calls layout pass automatically.
 - **widget:getRect() Lua API** (`src/lua_api/ui_api.rs`): New method returns computed `(x, y, width, height)` after layout.
 - **Raycaster SharedState wiring** (`src/runtime/shared_state.rs`, `src/lua_api/raycaster_api.rs`): `SharedState.raycaster_output` stores `RaycasterScene` built by raycaster API. Cleared each frame.
@@ -1021,7 +1021,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
   - **math**: Added `## Submodules` (15 submodule entries), `## Lua Examples`, `## Item Summary`, `## References`, `## Notes`.
   - **tween**: Added `## Submodules` (3 submodule entries), `## Lua Examples`, `## Item Summary`, `## References`, `## Notes`.
 - Updated AGENT.md for all 5 modules to the required 5-section format (H1, metadata table, `## Purpose`, `## Source Files`, `## Full Specification`):
-  - **render**: Fixed incorrect "No lurek.* bindings" note; added correct `lurek.graphic` metadata.
+  - **render**: Fixed incorrect "No lurek.* bindings" note; added correct `lurek.render` metadata.
   - **parallax**: Corrected H1 format; removed duplicate source file entries.
   - **runtime**: Removed stale `## Full Specification → app.md` pointer; fixed to point to `runtime.md`.
   - **math**: Rewrote from long-form to required 5-section format; removed stale `## Key Types` and `## Lua API Summary` sections.
@@ -1093,10 +1093,10 @@ Always update this file **in the same commit** as the change. Use the commit typ
   - `render_text()` and `bitmap_char()` deleted from `gpu_renderer.rs`.
 
 ### Added
-- `lurek.graphic.newFont(pixel_height)` — select a built-in bitmap font by pixel height (snaps to nearest available size). Accepts number or `"default"` string.
-- `lurek.graphic.getFontSizes()` — returns a table of available built-in font pixel heights `{5, 7, 10, 14, 18, 22}`.
-- `lurek.graphic.getDefaultFont(pixel_height?)` — returns a built-in font handle for the given size (default: 14).
-- `lurek.graphic.getFontCellWidth(font)` — returns the cell width of a monospaced bitmap font.
+- `lurek.render.newFont(pixel_height)` — select a built-in bitmap font by pixel height (snaps to nearest available size). Accepts number or `"default"` string.
+- `lurek.render.getFontSizes()` — returns a table of available built-in font pixel heights `{5, 7, 10, 14, 18, 22}`.
+- `lurek.render.getDefaultFont(pixel_height?)` — returns a built-in font handle for the given size (default: 14).
+- `lurek.render.getFontCellWidth(font)` — returns the cell width of a monospaced bitmap font.
 - Terminal `setFont(pixel_height)`, `getCellSize()`, `autoResize()` methods for bitmap font integration with auto-scaling window.
 - `Font::load_all_sizes()`, `Font::nearest_size()`, `Font::from_png_bytes()`, `Font::cell_width()`, `Font::has_box_drawing()` public API.
 - `SharedState::default_fonts: [Option<FontKey>; 6]` — all 6 built-in sizes pre-loaded at startup.
@@ -1119,9 +1119,9 @@ Always update this file **in the same commit** as the change. Use the commit typ
   - `docs/specs/` renamed 6 stale files to match actual module names (`engine→app`, `entity→ecs`, `localization→i18n`, `modding→mods`, `pathfinding→pathfind`, `savegame→save`).
   - Deleted 4 ghost specs for non-existent modules: `fx.md`, `graphic.md`, `gui.md`, `signal.md`.
   - Created 2 new specs: `docs/specs/render.md` (src/render/ GPU pipeline) and `docs/specs/runtime.md` (src/runtime/ Baseline substrate).
-  - Fixed all `lurek.gfx` → `lurek.graphic` namespace references across 12 spec files — the actual runtime namespace is `lurek.graphic` registered by `render_api.rs`.
+  - Fixed all `lurek.render` → `lurek.render` namespace references across 12 spec files — the actual runtime namespace is `lurek.render` registered by `render_api.rs`.
   - Updated source path fields in `camera.md`, `light.md`, `effect.md`, `graphics.md` to reflect `src/render/camera/`, `src/render/light/`, `src/render/effect/` after migration.
-  - Fixed `effect.md` Lua API field: `lurek.effect` → `lurek.overlay` / `lurek.postfx`.
+  - Fixed `effect.md` Lua API field: `lurek.effect` → `lurek.effect` / `lurek.effect`.
   - Updated `docs/specs/README.md` modules list from 38 stale links to 49 correct links.
   - Created `src/app/AGENT.md` and `src/graphics/AGENT.md` (previously missing).
   - Fixed `src/render/AGENT.md` and `src/runtime/AGENT.md` titles and content to reflect current module names.
@@ -1129,8 +1129,8 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **`tools/validate/validate_lua_api.py`** — fixed `check_register_signature` to skip `//` comment lines (prevented false-positives on `pub fn register()` text in `//!` docstrings); updated `check_module_registration` regex to handle `luna_table.set(...)` and `.clone()` variants.
 - **`src/lua_api/`** — added ~200 missing `/// @return type` annotations across `devtools_api.rs`, `docs_api.rs`, `i18n_api.rs`, `log_api.rs`, `minimap_api.rs`, `parallax_api.rs`, `particle_api.rs`, `patterns_api.rs`, `render_api.rs`, `system_api.rs`, `thread_api.rs`, `tilemap_api.rs`.
 - **`src/particle/emitter.rs`** — added missing `///` docstring on `pub fn draw_lifecycle_to_image`.
-- **`src/lua_api/mod.rs`** — fixed stale doc comment `lurek.gfx.*` → `lurek.graphic` on the `render_api` module declaration.
-- **`src/runtime/config.rs`** — fixed docstring L149: `lurek.gfx` → `lurek.graphic`.
+- **`src/lua_api/mod.rs`** — fixed stale doc comment `lurek.render.*` → `lurek.render` on the `render_api` module declaration.
+- **`src/runtime/config.rs`** — fixed docstring L149: `lurek.render` → `lurek.render`.
 - Regenerated `docs/API/lua-api.md`, `docs/API/rust-api.md`, `docs/API/lurek.lua`, `docs/API/coverage_gaps.md`.
 
 ---
@@ -1139,7 +1139,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 ### Added
 - **GPU render() methods** for `Minimap`, `TileMap`, `Overlay`, and `ParticleSystem` — four modules now support per-frame GPU rendering via `obj:render()` which pushes `RenderCommand`s to the render queue. Previously these modules only had CPU-based `draw_to_image()`.
   - `lurek.particle`: `ParticleSystem:render(ox?, oy?)` — expands particles into individual shape/image primitives (Rectangle, Circle, Triangle, Line, DrawImageEx, DrawQuad).
-  - `lurek.overlay`: `Overlay:render()` — emits screen-sized colored rectangles for flash, fade, lightning, and vignette effects with correct alpha animation.
+  - `lurek.effect`: `Overlay:render()` — emits screen-sized colored rectangles for flash, fade, lightning, and vignette effects with correct alpha animation.
   - `lurek.minimap`: `Minimap:render(x?, y?)` — draws terrain cells, objects, and markers as colored rectangles/circles at the given screen position.
   - `lurek.tilemap`: `TileMap:render(ox?, oy?)` — draws tile layers as colored rectangles with per-tile tints and visibility culling.
 - Domain-level `build_render_commands()` added to `Minimap`, `TileMap`, and `Overlay` for clean Lua API ↔ domain separation.
@@ -1154,7 +1154,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ## [0.6.33] — 2026-04-10
 ### Added
-- **VS Code extension — type inference** (`typeInference.ts`) — rewrote type inference engine: 25+ factory return types (Canvas, Image, Font, Shader, Entity, Timer, Tween, World, Body, ParticleSystem, etc.), dot-access now shows both fields and methods (fixes missing Canvas method completions), colon-access completions, OOP class instance tracking via `setmetatable`, module alias detection (`local gfx = lurek.graphics`), variable re-assignment tracking, hover provider showing type and factory origin.
+- **VS Code extension — type inference** (`typeInference.ts`) — rewrote type inference engine: 25+ factory return types (Canvas, Image, Font, Shader, Entity, Timer, Tween, World, Body, ParticleSystem, etc.), dot-access now shows both fields and methods (fixes missing Canvas method completions), colon-access completions, OOP class instance tracking via `setmetatable`, module alias detection (`local gfx = lurek.renders`), variable re-assignment tracking, hover provider showing type and factory origin.
 - **VS Code extension — diagnostics** (`diagnostics.ts`) — 4 new diagnostic rules (total now 13): per-frame allocation warning (newImage/newSource/newFont/newCanvas/newShader inside update/draw callbacks), missing `test_summary()` in test files, entity nil access without guard, colon-vs-dot method call suggestion.
 - **VS Code extension — debug adapter** (`luaDebugAdapter.ts`) — auto-detect game path from active editor (finds nearest `main.lua`), auto-detect engine binary from workspace `build/` folder, 4 launch configurations (Debug Game, Debug Current Demo, Debug with Stop on Entry, Attach to Running). Improved `luaDebugSession.ts` with `build/debug`/`build/release` binary scanning, increased retries from 3→5, delay from 500→800ms.
 - **VS Code extension — sidebar** (`sidebar.ts`) — Project Health section (main.lua/conf.lua detection, Lua file count, test folder detection), game status indicator in Run section, last test result display in Testing section, state tracking methods.
@@ -1180,17 +1180,17 @@ Always update this file **in the same commit** as the change. Use the commit typ
 ## [0.6.30] — 2026-04-10
 ### Fixed
 - **Namespace fixes** — six test files were using wrong `lurek.*` namespaces that would cause runtime nil-indexing errors:
-  - `test_font.lua` — `lurek.gfx.*` → `lurek.graphic.*` (19 occurrences)
-  - `test_shape.lua` — `lurek.gfx.*` → `lurek.graphic.*` (44 occurrences)
-  - `test_drawlayer.lua` — `lurek.sprite.*` → `lurek.graphic.*` (23 occurrences), `newDrawLayer` is registered in `graphic_api.rs`
+  - `test_font.lua` — `lurek.render.*` → `lurek.render.*` (19 occurrences)
+  - `test_shape.lua` — `lurek.render.*` → `lurek.render.*` (44 occurrences)
+  - `test_drawlayer.lua` — `lurek.sprite.*` → `lurek.render.*` (23 occurrences), `newDrawLayer` is registered in `graphic_api.rs`
   - `test_evidence_audio.lua` — `lurek.audio.setVolume(val)` / `getVolume()` → correct `setMasterVolume(val)` / `getMasterVolume()` (per-source `setVolume` requires a source key)
-  - `test_event.lua` — `describe("event.pump"…)` etc. → `describe("lurek.signal.pump"…)` to match actual namespace
+  - `test_event.lua` — `describe("event.pump"…)` etc. → `describe("lurek.event.pump"…)` to match actual namespace
   - `test_network.lua` — guarded `lurek.net.*` and `_G.enet` describe blocks with `if lurek.net then` / `if _G.enet then` since `lurek.net` is not a registered namespace; fixed `@covers` header to remove nonexistent `lurek.net.*` entries
 - **Evidence test assertion** — `test_evidence_particle.lua`: `sys:count() >= 0` (always-true) → `sys:count() > 0` after `emit(10)`
 - **Evidence test robustness** — `test_evidence_minimap.lua`: "setTerrain with 0-based coord errors" test replaced by "setTerrain out-of-range coordinate is rejected" (coord > grid_size) which is unambiguously out of bounds
 ### Changed
 - `test_event.lua` — added proper file-level header, removed BOM character from file start
-- `test_fx.lua` — updated header to clarify it is a focused smoke test that complements `test_postfx.lua`'s comprehensive coverage
+- `test_effect_api.lua` — updated header to clarify it is a focused smoke test that complements `test_effect_postfx.lua`'s comprehensive coverage
 - `test_drawlayer.lua` — added proper file-level header with headless-safe notice
 
 ## [0.6.29] — 2025-07-17
@@ -1200,45 +1200,45 @@ Always update this file **in the same commit** as the change. Use the commit typ
 ### Changed
 - **Evidence tests rewritten from JSON to real file output** — all 10 evidence test files that previously saved JSON metadata now produce actual PNG images or WAV audio files:
   - `test_evidence_canvas.lua` — renders canvas sizes and lifecycle as colored diagrams → `canvas_sizes.png`, `canvas_lifecycle.png`
-  - `test_evidence_graphic_drawing.lua` — renders primitives (rect, circle, line, dots) and color grid → `graphic_primitives.png`, `graphic_color_grid.png`
+  - `test_evidence_render_drawing.lua` — renders primitives (rect, circle, line, dots) and color grid → `graphic_primitives.png`, `graphic_color_grid.png`
   - `test_evidence_light.lua` — renders radial light falloff and multi-light RGB scene → `light_single_falloff.png`, `light_multi_scene.png`
   - `test_evidence_particle.lua` — renders emitter positions and burst visualization → `particle_positions.png`, `particle_emitter_burst.png`
-  - `test_evidence_postfx.lua` — applies ImageData filters and saves each effect → 7 PNG files (grayscale, invert, blur, sepia, effects strip, posterize+tint, saturation+flip)
+  - `test_evidence_effect_postfx.lua` — applies ImageData filters and saves each effect → 7 PNG files (grayscale, invert, blur, sepia, effects strip, posterize+tint, saturation+flip)
   - `test_evidence_minimap.lua` — renders terrain grid and fog-of-war → `minimap_terrain.png`, `minimap_fog.png`
   - `test_evidence_tilemap.lua` — renders tile grid and checkerboard pattern → `tilemap_grid.png`, `tilemap_checkerboard.png`
-  - `test_evidence_overlay.lua` — renders flash decay, fade-to-black, and combined effects → `overlay_flash.png`, `overlay_fade.png`, `overlay_combined.png`
+  - `test_evidence_effect_overlay.lua` — renders flash decay, fade-to-black, and combined effects → `overlay_flash.png`, `overlay_fade.png`, `overlay_combined.png`
   - `test_evidence_audio.lua` — generates sine wave, chord, sweep, and stereo ping-pong → 4 WAV files
   - `test_evidence_audio_bus.lua` — generates volume-scaled, pitch-shifted, and fade-out audio → 3 WAV files
 
 ## [0.6.28] — 2026-04-09
 ### Added
-- **`lurek.img.savePNG(imgdata, path)`** — new Lua API function that encodes an `ImageData` to PNG bytes and writes them to disk, auto-creating parent directories. (`src/lua_api/image_api.rs`)
+- **`lurek.image.savePNG(imgdata, path)`** — new Lua API function that encodes an `ImageData` to PNG bytes and writes them to disk, auto-creating parent directories. (`src/lua_api/image_api.rs`)
 - **Evidence test category** (`tests/lua/evidence/`) — 13 new Lua test files that verify observable API state and save real artefacts (PNG images, JSON dumps) to `tests/lua/evidence/output/` for human inspection:
   - `test_evidence_imagedata.lua` — pixel creation, setPixel/getPixel round-trip, fill, mapPixel, getString, encode("png"), savePNG, crop, resizeNearest, flipHorizontal, rotate90cw
   - `test_evidence_imagedata_effects.lua` — all 11 filter methods: grayscale, invert, sepia, brightness, threshold, posterize, tint, noise, blur, sharpen; saves effect PNGs
   - `test_evidence_canvas.lua` — Canvas lifecycle: newCanvas, getWidth/getHeight/getDimensions, release (true/false), typeOf, type, stale-key error, multiple independence; saves JSON metadata
-  - `test_evidence_graphic_drawing.lua` — `lurek.graphic` API surface: setColor/getColor, setBackgroundColor, getWidth/getHeight/getDimensions, clear, print, rectangle, circle, line, point, setLineWidth, push/pop transforms; saves JSON state
+  - `test_evidence_render_drawing.lua` — `lurek.render` API surface: setColor/getColor, setBackgroundColor, getWidth/getHeight/getDimensions, clear, print, rectangle, circle, line, point, setLineWidth, push/pop transforms; saves JSON state
   - `test_evidence_audio.lua` — master volume round-trip (0/0.65/1), setPosition, getActiveSourceCount, headless-safe newSource test; saves JSON
   - `test_evidence_audio_bus.lua` — bus newBus, setVolume/getVolume/setPitch/getPitch/getName/pause/resume round-trips, multiple-bus independence, source setBus; saves JSON
   - `test_evidence_light.lua` — LightSource position/radius/color/intensity/energy/falloff/shadow round-trips, multiple light independence; saves JSON
   - `test_evidence_particle.lua` — ParticleSystem count/isEmpty/start/stop/pause/resume/reset/getCount/setPosition/getPosition/type/release, newTrail; saves JSON
-  - `test_evidence_postfx.lua` — Effect getTypeName/isBuiltIn/isEnabled/getEffectType/type, Stack getWidth/getHeight/getDimensions/len/isEmpty, ImageEffect; saves JSON
+  - `test_evidence_effect_postfx.lua` — Effect getTypeName/isBuiltIn/isEnabled/getEffectType/type, Stack getWidth/getHeight/getDimensions/len/isEmpty, ImageEffect; saves JSON
   - `test_evidence_minimap.lua` — Minimap grid/display dimensions, getTerrain, isFogEnabled, getFogLevel, getObjectCount, getZoom, getCenter, getColorMode; saves JSON
   - `test_evidence_tilemap.lua` — TileSet and TileMap constructors, dimensions, getFirstGid, getLayerCount/Name/TileSetCount, fill, getTile/clearTile round-trip; saves JSON
   - `test_evidence_raycaster.lua` — Raycaster getCell/setCell/isBlocked, castRay hit/miss, castRays array, lineOfSight, projectColumn, distanceShade; saves a 128×64 depth-buffer PNG
-  - `test_evidence_overlay.lua` — Overlay getWidth/Height, isActive, triggerFlash/getFlashAlpha, triggerShake/getShakeOffset, triggerFade, triggerLightning/getLightningAlpha, clear, resize, setAmbientEnabled; saves JSON
+  - `test_evidence_effect_overlay.lua` — Overlay getWidth/Height, isActive, triggerFlash/getFlashAlpha, triggerShake/getShakeOffset, triggerFade, triggerLightning/getLightningAlpha, clear, resize, setAmbientEnabled; saves JSON
 - 13 corresponding `#[test]` entries under `// ─── Evidence Tests ───` section in `tests/lua/harness.rs`
 - `tests/lua/evidence/output/.gitignore` — auto-excludes all generated PNG and JSON artefacts from version control
 
 ### Removed
-- 8 broken evidence test files from `tests/lua/unit/` that called non-existent APIs (`lurek.gfx`, `c:renderTo()`, `c:getPixel()`):
+- 8 broken evidence test files from `tests/lua/unit/` that called non-existent APIs (`lurek.render`, `c:renderTo()`, `c:getPixel()`):
   `test_graphics_evidence.lua`, `test_audio_evidence.lua`, `test_light_evidence.lua`, `test_particle_evidence.lua`, `test_postfx_evidence.lua`, `test_minimap_evidence.lua`, `test_tilemap_evidence.lua`, `test_audio_integration_evidence.lua`
 - Corresponding 8 broken `lua_unit_*_evidence` harness entries replaced by 13 correct `lua_evidence_*` entries
 
 ## [0.6.27] — 2026-04-11
 ### Added
 - **Phase 6 evidence tests** — 8 new Lua test files proving that rendering and audio APIs produce actual observable output, not just API stubs:
-  - `tests/lua/unit/test_graphics_evidence.lua` — canvas pixel readback for all `lurek.gfx` primitives: rectangle, circle, triangle, polygon, setColor, background color, and out-of-bounds safety.
+  - `tests/lua/unit/test_graphics_evidence.lua` — canvas pixel readback for all `lurek.render` primitives: rectangle, circle, triangle, polygon, setColor, background color, and out-of-bounds safety.
   - `tests/lua/unit/test_audio_evidence.lua` — `lurek.audio.Source` state round-trips: volume (0/0.5/1/2), pitch (0.5/1/2), looping, 3D position, seek/tell, play/pause/stop state machine, getDuration, getChannelCount, and 10-source independence.
   - `tests/lua/unit/test_light_evidence.lua` — canvas pixel brightness proof: full ambient illumination, zero ambient darkness, point light near > far brightness, red-tinted light r > g/b, disabled vs enabled comparison, and getLightCount tracking.
   - `tests/lua/unit/test_particle_evidence.lua` — particle count via emit/getCount, lifetime expiry, reset, large color particles producing correct hue pixels on canvas, gravity displacement over time, and isActive/stop/start state.
@@ -1273,7 +1273,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ## [0.6.23] — 2026-04-10
 ### Fixed
-- Lua test/runtime compatibility: added `content/` package-path fallbacks for `require("library.*")`, refreshed `tests/lua/examples/test_examples.lua` for the current single-file `content/examples/*.lua` layout, and aligned Lua font/UI tests with the live `lurek.gfx` and `lurek.ui` APIs.
+- Lua test/runtime compatibility: added `content/` package-path fallbacks for `require("library.*")`, refreshed `tests/lua/examples/test_examples.lua` for the current single-file `content/examples/*.lua` layout, and aligned Lua font/UI tests with the live `lurek.render` and `lurek.ui` APIs.
 - **Quality: D-04/D-03/T-03/SP-03/SP-04/SP-05/A-03** — Audit pre-fixes across 14 modules:
   - **network**: D-04 stubs (host.rs), T-03 test_ prefixes; T-04 float asserts in network_tests.rs
   - **compute**: D-04 stubs (array.rs, ops.rs, compute_api.rs), T-03 prefixes
@@ -1289,7 +1289,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
   - **pathfinding**: D-04 stubs (5 files), T-03 (54 prefixes), A-03 AGENT.md trim, SP-03/SP-04/SP-05 fixes
   - **engine**: D-04 stubs (config.rs, resource_keys.rs), D-03 on 14 key structs + 4 types, T-03 (8 prefixes), SP-03/SP-05
   - **dataframe**: D-04 stubs (frame.rs×9, query.rs×2, serial.rs×2), T-03 (100 prefixes), T-04 (10 float asserts), SP-03
-  - **fx**: SP-04 (newPass/getEffectTypes API rows), SP-03 Summary trim, T-02 (test_fx.lua created + registered in harness.rs)
+  - **fx**: SP-04 (newPass/getEffectTypes API rows), SP-03 Summary trim, T-02 (test_effect_api.lua created + registered in harness.rs)
   → All 14 modules now at PRE (≤2E ≤2W); will auto-PASS when Developer resolves B-02/B-03
 
 ## [0.6.22] — 2026-04-09
@@ -1350,7 +1350,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
   - D-01: Added `//!` module header to `src/audio/dsp.rs`
   - A-02: Added `## Key Types` and `## Lua API Summary` tables to `src/ai/AGENT.md`, `src/animation/AGENT.md`, `src/audio/AGENT.md`, `src/automation/AGENT.md`, `src/camera/AGENT.md`
   - automation R-01: Corrected tier label in `src/automation/AGENT.md` from Tier 2 to Tier 1
-  - automation SP-04: Added `lurek.simulator.loadFromToml` row to `docs/specs/automation.md`
+  - automation SP-04: Added `lurek.automation.loadFromToml` row to `docs/specs/automation.md`
 - **Audit tool** (`tools/audit/audit_module.py`) — Fixed four bugs:
   - W-01: Wrong example file path (`examples/` → `content/examples/`)
   - W-03: Wrong demo path (`examples/` → `content/demos/`)
@@ -1386,7 +1386,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 ### Added
 - **`src/image/layers.rs`** � `ImageLayer` and `LayeredImage` types for compositing layer stacks with Porter-Duff "over" merge.
 - **`src/image/serial.rs`** � LIMG binary format: save/load `ImageData` and `LayeredImage` with zlib compression.
-- **Lua API** additions on `lurek.img`: `newLayeredImage`, `saveImage`, `loadImage`, `loadLayered`, and 14 `LayeredImage` userdata methods.
+- **Lua API** additions on `lurek.image`: `newLayeredImage`, `saveImage`, `loadImage`, `loadLayered`, and 14 `LayeredImage` userdata methods.
 - 19 new Rust tests in `tests/rust/unit/image_tests.rs` (62 total); new Lua BDD tests for layers and serialization.
 
 ## [0.6.15] � 2026-04-09
@@ -1465,8 +1465,8 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ### Fixed
 - **`src/lua_api/animation_api.rs`** — `register()` docstring changed from stale `lurek.tween` to correct `lurek.animation`; removed prohibited `# Parameters` rustdoc section (D-06, D-08 audit findings).
-- **`src/lua_api/compute_api.rs`** — module-level `//!` header and `register()` docstring updated from stale `lurek.gpu` to correct `lurek.compute`; removed prohibited `# Parameters` section from `register()` (D-06, D-08 audit findings).
-- **`src/lib.rs`** — two stale `(lurek.gpu)` references updated to `(lurek.compute)` in crate-level docs (D-06 finding).
+- **`src/lua_api/compute_api.rs`** — module-level `//!` header and `register()` docstring updated from stale `lurek.compute` to correct `lurek.compute`; removed prohibited `# Parameters` section from `register()` (D-06, D-08 audit findings).
+- **`src/lib.rs`** — two stale `(lurek.compute)` references updated to `(lurek.compute)` in crate-level docs (D-06 finding).
 - **`src/compute/array.rs`** — four production-code `.unwrap()` calls in `get_f64()` and `get_i32()` replaced with `.expect("byte slice invariant: offset validated by flat_index")` (Q-04 audit finding).
 - **`src/audio/AGENT.md`** — added missing `mod.rs` entry to Source Files table (A-04 audit finding).
 - **`src/camera/AGENT.md`** — added missing `mod.rs` entry to Source Files table (A-04 audit finding).
@@ -1571,8 +1571,8 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **`content/examples/` and `content/demos/` namespace and callback corrections** — resolved all stale API references introduced by the engine callback rename:
   - `content/examples/graphics.lua`, `content/examples/gui.lua`: replaced `lurek.draw =` with `lurek.render =` / `lurek.render_ui =`.
   - `content/examples/gui.lua`, `content/examples/network.lua`, `content/demos/retro/cannon_fodder/main.lua`: replaced `lurek.update =` with `lurek.process =`; removed broken `local _upd = lurek.update` chaining pattern.
-  - `content/demos/showcase/entity_showcase/main.lua`: replaced `lurek.timer.getFPS()` with `lurek.time.getFPS()`.
-  - **33 demo files**: replaced `lurek.load()` restart calls with `lurek.signal.restart()`.
+  - `content/demos/showcase/entity_showcase/main.lua`: replaced `lurek.timer.getFPS()` with `lurek.timer.getFPS()`.
+  - **33 demo files**: replaced `lurek.load()` restart calls with `lurek.event.restart()`.
   - **8 example files** (`animation.lua`, `automation.lua`, `input.lua`, `physics.lua`, `timer.lua` and section headers in 3 demos): updated stale `lurek.update` / `lurek.draw` references in comments and section headers to `lurek.process` / `lurek.render`.
 
 ### Changed
@@ -1601,11 +1601,11 @@ Always update this file **in the same commit** as the change. Use the commit typ
 ## [0.6.3] — 2026-04-13
 
 ### Removed
-- **`lurek.data.parseToml` / `lurek.data.encodeToml` removed** — `data` is a binary-only module. These functions have been moved to `lurek.codec` (`serial` module) which already provides `lurek.codec.fromToml` / `lurek.codec.toToml`. Lua scripts using `lurek.data.parseToml` or `lurek.data.encodeToml` must be updated to use `lurek.codec.fromToml` / `lurek.codec.toToml`.
+- **`lurek.data.parseToml` / `lurek.data.encodeToml` removed** — `data` is a binary-only module. These functions have been moved to `lurek.serial` (`serial` module) which already provides `lurek.serial.fromToml` / `lurek.serial.toToml`. Lua scripts using `lurek.data.parseToml` or `lurek.data.encodeToml` must be updated to use `lurek.serial.fromToml` / `lurek.serial.toToml`.
 - **`src/data/toml_convert.rs` removed from `pub mod` list** — the `data` module no longer exports TOML helpers. The equivalent functionality lives in `src/serial/toml.rs`.
 
 ### Changed
-- **`specs/data.md`** — removed all TOML references from Summary, architecture diagram, Source Files table, Lua API table, and Notes. The `serial` cross-reference entry now correctly states TOML is `serial`'s sole responsibility via `lurek.codec`.
+- **`specs/data.md`** — removed all TOML references from Summary, architecture diagram, Source Files table, Lua API table, and Notes. The `serial` cross-reference entry now correctly states TOML is `serial`'s sole responsibility via `lurek.serial`.
 - **`specs/log.md`** — clarified purpose as the **game developer's Lua logging tool** (not an engine-internal mechanism).
 - **`specs/devtools.md`** — clarified purpose as the **engine and game diagnostics toolkit for engine developers and advanced game developers**; reinforced `modules.debug = true` gate and non-production intent.
 - **`specs/debugbridge.md`** — clarified that it serves **both audiences**: game developers (via VS Code extension) and engine developers (via MCP server).
@@ -1613,7 +1613,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **`specs/spine.md`** — strengthened framing as an **independent skeletal/bone-hierarchy system**, explicitly distinct from `animation`.
 - **`specs/gui.md`** — added note that shared widget type names (`Button`, `Label`, `TextBox`) with `terminal` are **intentional design** — same conceptual interface, different renderers.
 - **`specs/terminal.md`** — added matching note that shared widget type names with `gui` are intentional.
-- **`specs/docs.md`** — `loadToml` dependency corrected from `lurek.data.parseToml` to `lurek.codec.fromToml`.
+- **`specs/docs.md`** — `loadToml` dependency corrected from `lurek.data.parseToml` to `lurek.serial.fromToml`.
 - **Generated docs** (`docs/API/lua-api.md`, `docs/API/lurek.lua`, `wiki/API-Reference.md`, `docs/logs/lua_api_data.json`) — `parseToml`/`encodeToml` entries removed from the `lurek.data` section.
 
 ## [0.6.2] — 2026-04-08
@@ -1631,7 +1631,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **`src/lua_api/log_api.rs` now calls through the domain module** — `log_api.rs` previously bypassed `src/log/mod.rs` and called `engine::log_messages` directly, leaving the domain module as unreachable dead code. `setLevel` and `getLevel` now call `crate::log::set_level()` / `crate::log::get_level()` so the architecture matches the intended `lua_api → domain → engine` layering.
 - **`tests/lua/harness.rs`: removed incorrect `#[ignore]` on `lua_test_log` and `lua_test_debugbridge`** — both `lurek.log` and `lurek.debugbridge` are registered in the test VM; the ignore attributes were wrong. Tests now run: 14/14 (`log`) and 18/18 (`debugbridge`) pass.
 - **`tests/lua/harness.rs`: updated `lua_test_docs` ignore reason** — the `docs` test is skipped because the quality-score baseline test fails, not because `lurek.docs` is unregistered.
-- **Generated API docs namespace corrections** — `lurek.timer`, `lurek.event`, and `lurek.automation` are internal module-folder key names; the actual registered Lua namespaces are `lurek.time`, `lurek.signal`, and `lurek.simulator`. Fixed in:
+- **Generated API docs namespace corrections** — `lurek.timer`, `lurek.event`, and `lurek.automation` are internal module-folder key names; the actual registered Lua namespaces are `lurek.timer`, `lurek.event`, and `lurek.automation`. Fixed in:
   - `docs/API/lua-api.md` (regenerated)
   - `docs/API/lurek.lua` LuaCATS stubs (regenerated)
   - `docs/logs/lua_api_data.json` (`lua_name` values)
@@ -1649,10 +1649,10 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **`lurek.debugbridge.recordFrame(dt)`** — removed from the public Lua API. Frame timing is now automatic.
 
 ### Changed
-- **`lurek.debugbridge.poll()` auto-records frame delta** — `poll()` now reads `lurek.time.getDelta()` each frame and feeds the result into `BridgeShared.frame_times`. `getPerformance()` continues to work unchanged; game scripts no longer need a manual `recordFrame(dt)` call alongside `poll()`. Scripts that called `recordFrame` must remove that call.
-- **Scope separation documented** — `specs/debugbridge.md` now includes an Ownership Rule section distinguishing `lurek.log` (engine stdout), `devtools.Logger` (in-game UI), and `debugbridge.print_history` (TCP external tools). `specs/devtools.md` now documents the frame-timing ownership rule: use `lurek.time` for basic fps/delta; use `devtools.frameStats` only for p50/p95/p99 percentile analysis.
+- **`lurek.debugbridge.poll()` auto-records frame delta** — `poll()` now reads `lurek.timer.getDelta()` each frame and feeds the result into `BridgeShared.frame_times`. `getPerformance()` continues to work unchanged; game scripts no longer need a manual `recordFrame(dt)` call alongside `poll()`. Scripts that called `recordFrame` must remove that call.
+- **Scope separation documented** — `specs/debugbridge.md` now includes an Ownership Rule section distinguishing `lurek.log` (engine stdout), `devtools.Logger` (in-game UI), and `debugbridge.print_history` (TCP external tools). `specs/devtools.md` now documents the frame-timing ownership rule: use `lurek.timer` for basic fps/delta; use `devtools.frameStats` only for p50/p95/p99 percentile analysis.
 - **`specs/timer.md`** — `Clock` is now documented as the canonical source for fps/delta in Lurek2D.
-- **`specs/event.md`** — Namespace Note added clarifying that `lurek.signal.push/poll` (FIFO EventQueue) and `lurek.signal.newSignal()` (pub-sub Signal) are independent primitives under the same namespace.
+- **`specs/event.md`** — Namespace Note added clarifying that `lurek.event.push/poll` (FIFO EventQueue) and `lurek.event.newSignal()` (pub-sub Signal) are independent primitives under the same namespace.
 - **`specs/patterns.md`** — When-to-use guidance added for `EventBus` vs `Signal`, `ServiceLocator` vs Lua tables, and `StateMachine` vs `automation.Simulator`.
 - **`specs/automation.md`** — See Also section added cross-referencing `timer::Scheduler` and `patterns::StateMachine`.
 - **`specs/log.md`** — Ownership boundary note added to References table.
@@ -1695,7 +1695,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ### Added
 - **`devtools` module** (`src/devtools/`) — New domain module providing: structured logger (`Logger`/`LogEntry`/`LogLevel`) with min-level filtering and category tagging; hierarchical profiler (`Profiler`/`ProfileZone`) with per-frame zone tracking; rolling frame-time stats (`FrameStats`/`FrameSnapshot`) with FPS, P50/P95/P99 percentiles; and file watcher (`FileWatcher`) for hot-reload polling. Exposed via `lurek.devtools.*` (gated by `modules.debug`). Spec: `specs/devtools.md`. Tests: `tests/rust/unit/devtools_tests.rs` (25 tests).
-- **`localization` module** (`src/localization/`) — New domain module providing: multi-locale string catalog (`Catalog`) with load/unload/translate/fallback/export; `{var}` and `{var:fmt}` interpolation (`interpolate`/`interpolate_pairs`); CLDR-based plural forms (`PluralForm`/`pluralize`/`pluralize_slavic`) for English and Slavic rulesets. Exposed via `lurek.localization.*` (gated by `modules.localization`). Spec: `specs/localization.md`. Tests: `tests/rust/unit/localization_tests.rs` (26 tests).
+- **`localization` module** (`src/localization/`) — New domain module providing: multi-locale string catalog (`Catalog`) with load/unload/translate/fallback/export; `{var}` and `{var:fmt}` interpolation (`interpolate`/`interpolate_pairs`); CLDR-based plural forms (`PluralForm`/`pluralize`/`pluralize_slavic`) for English and Slavic rulesets. Exposed via `lurek.i18n.*` (gated by `modules.localization`). Spec: `specs/localization.md`. Tests: `tests/rust/unit/localization_tests.rs` (26 tests).
 - **`patterns` module** (`src/patterns/`) — New domain module implementing six game-programming design patterns as pure-Rust types: `EventBus` (subscribe/drain-once/priority sort), `ObjectPool` (acquire/release/prewarm/capacity), `CommandStack` (push/undo/redo/batch), `ServiceLocator` (name→any register/unregister/has), `Factory` (type registry + aliases), `StateMachine` (states/transitions/guards/history/reachable). Exposed via `lurek.patterns.*` (gated by `modules.pipeline`). Spec: `specs/patterns.md`. Tests: `tests/rust/unit/patterns_tests.rs` (34 tests).
 - `src/devtools/AGENT.md`, `src/localization/AGENT.md`, `src/patterns/AGENT.md` — module overview files.
 

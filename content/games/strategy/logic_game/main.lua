@@ -123,7 +123,7 @@ lurek.init(function()
     lurek.window.setTitle("Logic Game — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.06, 0.12, 1.0)
 
-    step_particles = lurek.particles.newSystem({
+    step_particles = lurek.particle.newSystem({
         maxParticles = 16,
         emitRate     = 0,
         lifetime     = { 0.2, 0.5 },
@@ -134,7 +134,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    win_particles = lurek.particles.newSystem({
+    win_particles = lurek.particle.newSystem({
         maxParticles = 80,
         emitRate     = 0,
         lifetime     = { 0.4, 1.0 },
@@ -155,7 +155,7 @@ lurek.process(function(dt)
 
     if msg_timer > 0 then msg_timer = msg_timer - dt end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
 
     if run_done then
         if lurek.input.isActionJustPressed("reset") then

@@ -6,7 +6,7 @@
 --- module to operate.
 ---
 --- The optional `M.newFromPng(path, defs?)` constructor uses
---- `lurek.img.newProvinceGrid` to load and adjacency-scan a PNG colour
+--- `lurek.image.newProvinceGrid` to load and adjacency-scan a PNG colour
 --- map in a single Rust pass (see that function for details). All other
 --- entry points are pure Lua.
 ---
@@ -21,9 +21,9 @@
 --- source is `ProvinceMap.adjacency`; call `getNeighbors(id)` for a
 --- province's neighbour list (computed dynamically from edges).
 ---
---- @see lurek.img.newProvinceGrid
+--- @see lurek.image.newProvinceGrid
 --- @see lurek.graph.newGraph
---- @see lurek.codec.toJson
+--- @see lurek.serial.toJson
 
 local M = {}
 
@@ -1045,7 +1045,7 @@ end
 -- replaced by the engine grid (so `getProvinceAt` delegates to it), and all
 -- adjacency edges are pre-populated from the single Rust scan.
 --
--- Requires `lurek.img` to be available (Platform Services tier).
+-- Requires `lurek.image` to be available (Platform Services tier).
 --
 -- @tparam string png_path path relative to the game folder (e.g. "maps/europe.png")
 -- @tparam table defs optional list of province definition tables as accepted
@@ -1053,11 +1053,11 @@ end
 --                          factions, and other metadata. Pass nil to skip.
 -- @treturn ProvinceMap
 function M.newFromPng(png_path, defs)
-    assert(lurek and lurek.img and lurek.img.newProvinceGrid,
-        "province_map.newFromPng requires lurek.img.newProvinceGrid (engine support)")
+    assert(lurek and lurek.image and lurek.image.newProvinceGrid,
+        "province_map.newFromPng requires lurek.image.newProvinceGrid (engine support)")
 
     -- Load via the Rust engine — single O(w×h) scan, zero Lua table allocations.
-    local grid = lurek.img.newProvinceGrid(png_path)
+    local grid = lurek.image.newProvinceGrid(png_path)
     local w    = grid:getWidth()
     local h    = grid:getHeight()
 

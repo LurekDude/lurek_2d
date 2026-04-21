@@ -7,7 +7,7 @@ local OUT = "tests/lua/evidence/output/procgen/"
 describe("Evidence: Procedural generation", function()
 
     -- @covers lurek.procgen.cellularAutomata
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Runs cellular automata cave generation and saves a pixel-art visualization of walls and floors.
     it("visualises cellular automata cave map", function()
@@ -16,7 +16,7 @@ describe("Evidence: Procedural generation", function()
         local imgW, imgH = gw * scale, gh * scale
 
         local grid = lurek.procgen.cellularAutomata(gw, gh)
-        local img = lurek.img.newImageData(imgW, imgH)
+        local img = lurek.image.newImageData(imgW, imgH)
 
         -- Background
         img:drawRect(0, 0, imgW, imgH, 40, 40, 50, 255)
@@ -36,11 +36,11 @@ describe("Evidence: Procedural generation", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "procgen_cellular.png")
+        lurek.image.savePNG(img, OUT .. "procgen_cellular.png")
     end)
 
     -- @covers lurek.procgen.poissonDisk
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Generates Poisson-disk points and writes a dot plot showing the resulting distribution.
     it("visualises Poisson disk sampling", function()
@@ -48,7 +48,7 @@ describe("Evidence: Procedural generation", function()
         local minDist = 12
 
         local points = lurek.procgen.poissonDisk(W, H, minDist, 30, 42)
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
 
         -- Background
         img:drawRect(0, 0, W, H, 20, 20, 30, 255)
@@ -60,7 +60,7 @@ describe("Evidence: Procedural generation", function()
             img:drawCircle(px, py, 2, 100, 200, 255, 255)
         end
 
-        lurek.img.savePNG(img, OUT .. "procgen_poisson.png")
+        lurek.image.savePNG(img, OUT .. "procgen_poisson.png")
         -- Should have generated a reasonable number of points
     end)
 

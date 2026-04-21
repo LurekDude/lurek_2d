@@ -19,12 +19,12 @@
 -- @status full
 -- @see lurek.network
 -- @see lurek.patterns.newEventBus
--- @see lurek.codec.toJson
+-- @see lurek.serial.toJson
 --
 -- Wire format note: messages between peers are encoded with
 -- `lurek.network.pack` / `lurek.network.unpack` (MessagePack — the canonical
 -- ENet payload format). For human-readable persistence (e.g. saved lobby
--- state), use `lurek.codec.toJson` / `lurek.codec.fromJson`.
+-- state), use `lurek.serial.toJson` / `lurek.serial.fromJson`.
 local M = {}
 
 local log_info  = (lurek and lurek.log and lurek.log.info)  or function() end

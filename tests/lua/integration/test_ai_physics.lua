@@ -6,8 +6,8 @@ describe("integration: AI steering with physics bodies", function()
     -- @covers lurek.ai.SteeringManager.calculate
     -- @covers lurek.physics.step
     -- @covers lurek.ai.newSteeringManager
-    -- @covers lurek.pathfinding.newNavGrid
-    -- @covers lurek.pathfinding.newPathfinder
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
     -- @covers lurek.physics.getBody
     -- @covers lurek.physics.newBody
     -- @covers lurek.physics.newWorld
@@ -53,17 +53,17 @@ end)
 -- @description Covers suite: integration: AI pathfinding with navgrid.
 describe("integration: AI pathfinding with navgrid", function()
     -- @covers lurek.ai
-    -- @covers lurek.pathfinding.Pathfinder.findPath
+    -- @covers lurek.pathfind.Pathfinder.findPath
     -- @description Verifies the pathfinder returns a wall-avoiding route for AI navigation rather than crossing blocked navgrid cells.
     it("agent follows A* path", function()
-        local grid = lurek.pathfinding.newNavGrid(50, 50)
+        local grid = lurek.pathfind.newNavGrid(50, 50)
 
         -- Add wall
         for y = 10, 40 do
             grid:setBlocked(25, y, true)
         end
 
-        local pf = lurek.pathfinding.newPathfinder(grid)
+        local pf = lurek.pathfind.newPathfinder(grid)
         local path = pf:findPath(10, 25, 40, 25)
         expect_not_nil(path, "path found around wall")
         expect_true(#path > 15, "path goes around wall")

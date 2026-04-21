@@ -20,9 +20,9 @@ Enemies spawn from the left and march to the green base on the right. Build wall
 
 ## APIs Used
 - `lurek.render` — grid, enemy HP bars, bullet projectiles
-- `lurek.particles` — enemy death explosions
+- `lurek.particle` — enemy death explosions
 - `lurek.input` — mouse placement, action bindings
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced

@@ -163,7 +163,7 @@ def generate_report(
         "",
         "### High Priority",
         "1. **input → sub-namespaces**: Luna `input` merges keyboard/mouse/joystick/touch/sensor. "
-        "The Lua API already uses `lurek.keyboard`, `lurek.mouse` etc. — ensure Rust module "
+        "The Lua API already uses `lurek.input.keyboard`, `lurek.input.mouse` etc. — ensure Rust module "
         "structure reflects this if split is needed.",
         "2. **audio + sound overlap**: Two modules both deal with audio. Clarify boundaries "
         "(sound = decoding, audio = playback) or merge.",

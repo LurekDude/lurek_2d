@@ -49,7 +49,7 @@
 
 -- Helper: load a real texture for tests that require a LuaImage.
 local function load_image()
-    return lurek.graphic.newImage("assets/icon.png")
+    return lurek.render.newImage("assets/icon.png")
 end
 
 -- â”€â”€ Module existence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -711,7 +711,7 @@ end)
 
 -- Helper: create a layer backed by a real texture (used by merged satellite tests).
 local function make_layer()
-    local img = lurek.graphic.newImage("assets/icon.png")
+    local img = lurek.render.newImage("assets/icon.png")
     return lurek.parallax.newLayer({ texture = img })
 end
 

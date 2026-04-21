@@ -228,7 +228,7 @@ lurek.process(function(delta)
             set_message("Select ingredients with 1-6", 3)
         end
         if lurek.input.isActionJustPressed("escape") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -275,7 +275,7 @@ lurek.process(function(delta)
     -- ── Crafting ────────────────────────────────────────────────────────
 
     if lurek.input.isActionJustPressed("escape") then
-        lurek.signal.quit()
+        lurek.event.quit()
     end
 
     if lurek.input.isActionJustPressed("shop") then

@@ -1,6 +1,6 @@
 -- tests/lua/integration/test_graph_pathfind.lua
--- Integration: lurek.graph MST and A* with lurek.pathfinding.
--- Namespaces: lurek.graph + lurek.pathfinding
+-- Integration: lurek.graph MST and A* with lurek.pathfind.
+-- Namespaces: lurek.graph + lurek.pathfind
 
 local init = require("tests/lua/init")
 describe, it, expect_equal, expect_near, expect_error, expect_true, expect_type, test_summary =

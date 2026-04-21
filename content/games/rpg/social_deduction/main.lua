@@ -439,7 +439,7 @@ lurek.process(function(delta)
     frame_count = frame_count + 1
 
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

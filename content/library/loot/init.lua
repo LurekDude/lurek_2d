@@ -18,9 +18,9 @@
 -- @module library.loot
 -- @status full
 -- @see lurek.math.newRandomGenerator   default RNG source for sampling
--- @see lurek.codec.fromToml             designer-authored loot tables (`fromToml`)
--- @see lurek.fs.read                    sandboxed file load for `fromToml`
--- @see lurek.savegame                   `Pity:save`/`restore` collector wiring
+-- @see lurek.serial.fromToml             designer-authored loot tables (`fromToml`)
+-- @see lurek.filesystem.read                    sandboxed file load for `fromToml`
+-- @see lurek.save                   `Pity:save`/`restore` collector wiring
 
 local M = {}
 
@@ -131,22 +131,22 @@ function M.fromList(entries)
     return t
 end
 
---- Load a loot table from a TOML file via `lurek.fs.read` + `lurek.codec.fromToml`.
+--- Load a loot table from a TOML file via `lurek.filesystem.read` + `lurek.serial.fromToml`.
 -- The file must contain an `entries = [...]` array.
 -- @param path string Sandboxed game-path to a TOML file.
 -- @treturn LootTable
 -- @raise descriptive error on missing engine bindings or malformed file.
 function M.fromToml(path)
-    if type(lurek) ~= "table" or type(lurek.fs) ~= "table"
-       or type(lurek.fs.read) ~= "function" then
-        error("loot.fromToml: lurek.fs.read unavailable", 2)
+    if type(lurek) ~= "table" or type(lurek.filesystem) ~= "table"
+       or type(lurek.filesystem.read) ~= "function" then
+        error("loot.fromToml: lurek.filesystem.read unavailable", 2)
     end
-    if type(lurek.codec) ~= "table" or type(lurek.codec.fromToml) ~= "function" then
-        error("loot.fromToml: lurek.codec.fromToml unavailable", 2)
+    if type(lurek.serial) ~= "table" or type(lurek.serial.fromToml) ~= "function" then
+        error("loot.fromToml: lurek.serial.fromToml unavailable", 2)
     end
-    local ok_read, src = pcall(lurek.fs.read, path)
+    local ok_read, src = pcall(lurek.filesystem.read, path)
     if not ok_read then error("loot.fromToml: read failed: " .. tostring(src), 2) end
-    local ok_parse, data = pcall(lurek.codec.fromToml, src)
+    local ok_parse, data = pcall(lurek.serial.fromToml, src)
     if not ok_parse then error("loot.fromToml: parse failed: " .. tostring(data), 2) end
     if type(data) ~= "table" or type(data.entries) ~= "table" then
         error("loot.fromToml: expected top-level 'entries' array", 2)

@@ -1,4 +1,4 @@
-//! `lurek.time` - Frame timing, FPS tracking, and scheduled Lua callbacks.
+//! `lurek.timer` - Frame timing, FPS tracking, and scheduled Lua callbacks.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -357,7 +357,7 @@ impl LuaUserData for LuaScheduler {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.time` API table with the Lua VM.
+/// Registers the `lurek.timer` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable
@@ -527,7 +527,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- afterReal --
     /// Schedules a one-shot callback that fires after `delay` wall-clock seconds,
-    /// unaffected by engine time scale. Call `lurek.time.tickRealTimers()` once
+    /// unaffected by engine time scale. Call `lurek.timer.tickRealTimers()` once
     /// per frame to poll for expired timers.
     /// @param delay : number   wall-clock seconds to wait
     /// @param func : function
@@ -628,7 +628,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- waitSeconds --
     /// Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
     /// Must be called from within a `coroutine.wrap`'d or `coroutine.create`'d
-    /// function. Call `lurek.time.tickWaits()` once per frame in `lurek.process`
+    /// function. Call `lurek.timer.tickWaits()` once per frame in `lurek.process`
     /// to resume expired waits.
     ///
     /// @param seconds : number
@@ -644,7 +644,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let thread_val: LuaValue = running_fn.call(())?;
             if matches!(thread_val, LuaValue::Nil) {
                 return Err(LuaError::RuntimeError(
-                    "lurek.time.waitSeconds: must be called from within a coroutine".into(),
+                    "lurek.timer.waitSeconds: must be called from within a coroutine".into(),
                 ));
             }
             let key = lua.create_registry_value(thread_val)?;
@@ -657,7 +657,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- waitFrames --
     /// Yields the current Lua coroutine for at least `frames` engine frames.
-    /// Must be called from within a coroutine. Call `lurek.time.tickWaits()` once
+    /// Must be called from within a coroutine. Call `lurek.timer.tickWaits()` once
     /// per frame to resume expired waits.
     ///
     /// @param frames : integer
@@ -673,7 +673,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let thread_val: LuaValue = running_fn.call(())?;
             if matches!(thread_val, LuaValue::Nil) {
                 return Err(LuaError::RuntimeError(
-                    "lurek.time.waitFrames: must be called from within a coroutine".into(),
+                    "lurek.timer.waitFrames: must be called from within a coroutine".into(),
                 ));
             }
             let key = lua.create_registry_value(thread_val)?;
@@ -687,7 +687,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- tickWaits --
     /// Resumes all coroutines waiting via `waitSeconds` or `waitFrames` whose
     /// deadline or frame target has been reached. Call once per frame inside
-    /// `lurek.process` alongside `lurek.time.tickRealTimers()`.
+    /// `lurek.process` alongside `lurek.timer.tickRealTimers()`.
     ///
     /// integer  number of coroutines resumed
     let ws_tick = wait_secs;

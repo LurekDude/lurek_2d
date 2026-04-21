@@ -130,7 +130,7 @@ lurek.init(function()
     lurek.render.setBackgroundColor(0.06, 0.04, 0.12, 1.0)
     math.randomseed(os.time())
 
-    celebration_sys = lurek.particles.newSystem({
+    celebration_sys = lurek.particle.newSystem({
         maxParticles = 200,
         emitRate     = 0,
         lifetime     = { 0.5, 1.5 },
@@ -147,7 +147,7 @@ lurek.process(function(dt)
     if celebration_sys then celebration_sys:update(dt) end
     if flash_t > 0 then flash_t = flash_t - dt end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
 
     -- Menu
     if state == "menu" then

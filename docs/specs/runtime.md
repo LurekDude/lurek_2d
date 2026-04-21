@@ -5,7 +5,7 @@
 - Module group: `Core Runtime`
 - Source path: `src/runtime/`
 - Lua API path(s): None direct
-- Primary Lua namespace: `lurek.platform.setLogLevel`
+- Primary Lua namespace: `lurek.runtime.setLogLevel`
 - Rust test path(s): tests/rust/unit/window_tests.rs, tests/rust/ext/graphics_runtime_smoke_tests.rs, plus runtime-focused unit coverage embedded in src/runtime/messages.rs
 - Lua test path(s): tests/lua/config/test_config.lua, tests/lua/harness.rs
 
@@ -73,7 +73,7 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 - `EngineError::code` (`error.rs`): Returns the stable error code for this variant.
 - `EngineError::category` (`error.rs`): Returns the error category for this variant.
 - `EngineError::recovery_hint` (`error.rs`): Returns a human-readable recovery hint for this error variant.
-- `set_log_level` (`log_messages.rs`): Sets the global log level at runtime (called from `lurek.platform.setLogLevel`).
+- `set_log_level` (`log_messages.rs`): Sets the global log level at runtime (called from `lurek.runtime.setLogLevel`).
 - `get_log_level` (`log_messages.rs`): Returns the current log level name.
 - `MessageCatalog::from_toml` (`messages.rs`): Parse the embedded TOML source and build a flat ID → text map.
 - `MessageCatalog::get` (`messages.rs`): Look up the human-readable text for a message ID.
@@ -97,7 +97,7 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 
 ## Lua API Reference
 
-- Namespace: `lurek.platform.setLogLevel`
+- Namespace: `lurek.runtime.setLogLevel`
 
 ### New in 0.15.0
 
@@ -109,7 +109,7 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 
 `ErrorSnapshot` struct added to `src/runtime/error.rs`. Fields: `message: String`, `code: &'static str`, `category: &'static str`, `recovery_hint: &'static str`. `ErrorSnapshot::to_json()` serialises to a compact JSON object. `EngineError::snapshot()` constructs an `ErrorSnapshot` from any `EngineError`.
 
-Lua: `lurek.platform.errorSnapshot(message)` — wraps `message` as a `LuaError`, calls `.snapshot().to_json()`, and returns a JSON string with `message`, `code`, `category`, and `recovery_hint` fields.
+Lua: `lurek.runtime.errorSnapshot(message)` — wraps `message` as a `LuaError`, calls `.snapshot().to_json()`, and returns a JSON string with `message`, `code`, `category`, and `recovery_hint` fields.
 
 ## References
 

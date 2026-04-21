@@ -27,7 +27,7 @@ Three parallax background layers (mountains, trees, ground detail) scroll at dif
 
 ## APIs Used
 
-lurek.window, lurek.render, lurek.input, lurek.time, lurek.signal, lurek.particles, lurek.tween
+lurek.window, lurek.render, lurek.input, lurek.timer, lurek.event, lurek.particle, lurek.tween
 
 ## Notes
 

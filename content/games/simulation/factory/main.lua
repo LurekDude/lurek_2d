@@ -752,7 +752,7 @@ local function draw_hud()
     lurek.render.drawText("Speed: " .. speed_text, 660, 5, 12, 0.9, 0.9, 0.5, 1)
 
     -- FPS
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.drawText("FPS: " .. fps, SCREEN_W - 70, 5, 12, 0.5, 0.5, 0.5, 0.8)
 
     -- Bottom bar: placement mode
@@ -831,7 +831,7 @@ lurek.process(function(dt)
     game_time = game_time + dt
 
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

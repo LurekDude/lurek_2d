@@ -124,12 +124,12 @@ local function draw_craft_menu(recipes, selected)
     for i, r in ipairs(recipes) do
         local y = 50 + (i - 1) * 24
         local color = (i == selected) and {1,1,0} or {1,1,1}
-        lurek.gfx.setColor(color[1], color[2], color[3], 1)
+        lurek.render.setColor(color[1], color[2], color[3], 1)
         local out = r.outputs[1]
         local label = ITEMS[out.id].name .. " x" .. out.count
-        lurek.gfx.print(label, 60, y)
+        lurek.render.print(label, 60, y)
     end
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
 end
 ```
 

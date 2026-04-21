@@ -90,7 +90,7 @@ function lurek.init()
     lurek.input.bind("restart", {"r"})
 
     -- Particle system for paddle-hit sparks
-    sparks = lurek.particles.newSystem({
+    sparks = lurek.particle.newSystem({
         maxParticles   = 64,
         emissionRate   = 0,
         lifetime       = { 0.15, 0.4 },
@@ -294,7 +294,7 @@ function lurek.render_ui()
     lurek.render.print("P2: Up/Down", W - 112, H - 18, 1)
 
     -- FPS counter
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.3, 0.3, 0.3)
     lurek.render.print("FPS: " .. math.floor(fps), W - 80, 4, 1)
 end
@@ -303,6 +303,6 @@ end
 
 function lurek.keypressed(key)
     if key == "escape" then
-        lurek.signal.quit()
+        lurek.event.quit()
     end
 end

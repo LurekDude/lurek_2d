@@ -225,7 +225,7 @@ end)
 -- ============================================================================
 lurek.process(function(dt)
     if lurek.input.action_just_pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

@@ -523,7 +523,7 @@ end)
 -- ---------------------------------------------------------------------------
 lurek.process(function(dt)
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -965,7 +965,7 @@ lurek.render_ui(function()
     end
 
     -- FPS counter
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
     lurek.render.print("FPS: " .. tostring(math.floor(fps)), 10, SCREEN_H - 20)
 end)

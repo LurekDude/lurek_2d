@@ -66,10 +66,10 @@ end
 
 function lurek.render()
     local ox, oy = apply_shake(dt_global)
-    lurek.gfx.push()
-    lurek.gfx.translate(-cam.x + ox, -cam.y + oy)
+    lurek.render.push()
+    lurek.render.translate(-cam.x + ox, -cam.y + oy)
     -- draw world here
-    lurek.gfx.pop()
+    lurek.render.pop()
 end
 ```
 

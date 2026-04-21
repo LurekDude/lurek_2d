@@ -74,7 +74,7 @@ local function px(data, x, y, r, g, b, a)
 end
 
 local function make_character_frame1()
-    local d = lurek.img.newImageData(16, 16)
+    local d = lurek.image.newImageData(16, 16)
     -- Head (skin)
     for py = 1, 4 do for px_ = 5, 10 do px(d, px_, py, 255, 210, 170) end end
     -- Eyes
@@ -93,7 +93,7 @@ local function make_character_frame1()
 end
 
 local function make_character_frame2()
-    local d = lurek.img.newImageData(16, 16)
+    local d = lurek.image.newImageData(16, 16)
     -- Head (skin)
     for py = 1, 4 do for px_ = 5, 10 do px(d, px_, py, 255, 210, 170) end end
     -- Eyes
@@ -112,7 +112,7 @@ local function make_character_frame2()
 end
 
 local function make_coin_frame1()
-    local d = lurek.img.newImageData(8, 8)
+    local d = lurek.image.newImageData(8, 8)
     -- Circle-ish golden coin
     local cx, cy, r2 = 3.5, 3.5, 9
     for py = 0, 7 do
@@ -129,7 +129,7 @@ local function make_coin_frame1()
 end
 
 local function make_coin_frame2()
-    local d = lurek.img.newImageData(8, 8)
+    local d = lurek.image.newImageData(8, 8)
     -- Slightly narrower coin (simulated rotation)
     for py = 0, 7 do
         for px_ = 2, 5 do
@@ -144,7 +144,7 @@ local function make_coin_frame2()
 end
 
 local function make_tree()
-    local d = lurek.img.newImageData(16, 24)
+    local d = lurek.image.newImageData(16, 24)
     -- Trunk (brown)
     for py = 14, 23 do for px_ = 6, 9 do px(d, px_, py, 120, 80, 40) end end
     -- Canopy (green triangle)
@@ -163,7 +163,7 @@ local function make_tree()
 end
 
 local function make_heart()
-    local d = lurek.img.newImageData(8, 8)
+    local d = lurek.image.newImageData(8, 8)
     local pattern = {
         "..##.##.",
         ".######.",
@@ -186,7 +186,7 @@ local function make_heart()
 end
 
 local function make_star()
-    local d = lurek.img.newImageData(8, 8)
+    local d = lurek.image.newImageData(8, 8)
     local pattern = {
         "...#....",
         "..###...",
@@ -270,7 +270,7 @@ lurek.init(function()
     end
 
     -- Sparkle particle system
-    ps_sparkle = lurek.particles.newSystem({
+    ps_sparkle = lurek.particle.newSystem({
         maxParticles = 100,
         emissionRate = 0,
         lifetimeMin = 0.2, lifetimeMax = 0.6,
@@ -318,7 +318,7 @@ lurek.process(function(dt)
 
     -- Quit
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

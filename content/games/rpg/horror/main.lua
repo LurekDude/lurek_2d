@@ -253,21 +253,21 @@ lurek.init(function()
     lurek.input.addAction("quit",      {"escape"})
 
     -- Particle systems
-    dust_ps = lurek.particles.new({
+    dust_ps = lurek.particle.new({
         maxParticles = 30, lifetime = 1.2,
         speed = 15, spread = 6.28,
         sizeStart = 2, sizeEnd = 1,
         colorStart = {0.9, 0.85, 0.6, 0.4},
         colorEnd   = {0.7, 0.65, 0.4, 0.0},
     })
-    flash_ps = lurek.particles.new({
+    flash_ps = lurek.particle.new({
         maxParticles = 20, lifetime = 0.3,
         speed = 120, spread = 6.28,
         sizeStart = 8, sizeEnd = 2,
         colorStart = {1.0, 1.0, 1.0, 0.9},
         colorEnd   = {1.0, 0.9, 0.7, 0.0},
     })
-    glow_ps = lurek.particles.new({
+    glow_ps = lurek.particle.new({
         maxParticles = 15, lifetime = 0.8,
         speed = 25, spread = 6.28,
         sizeStart = 5, sizeEnd = 2,
@@ -304,9 +304,9 @@ lurek.process(function(dt)
             current_note = nil
             game_state = STATE.PLAYING
         elseif game_state == STATE.DEAD or game_state == STATE.WON then
-            lurek.signal.quit()
+            lurek.event.quit()
         else
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -576,7 +576,7 @@ lurek.process(function(dt)
         player.y - SCREEN_H / 2 + sy + distort_offset.y
     )
     lurek.render.setBackgroundColor(0.01, 0.01, 0.02)
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.window.setTitle("Horror — Lurek2D [FPS: " .. fps .. "]")
 end)
 

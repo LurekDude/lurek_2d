@@ -131,7 +131,7 @@ def _readme_md(mod_id: str, display_name: str, author: str, version: str) -> str
 
         Edit `main.lua` to add your game logic. See the
         [Lurek2D mod documentation](../../../../docs/specs/mods.md) for
-        the full `lurek.modding.*` API reference.
+        the full `lurek.mods.*` API reference.
     """)
 
 

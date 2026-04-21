@@ -3,37 +3,37 @@
 
 -- @description Covers suite: fuzz: nil arguments to core APIs.
 describe("fuzz: nil arguments to core APIs", function()
-    -- @covers lurek.gfx.setColor
+    -- @covers lurek.render.setColor
     -- @security nil-spam
     -- @security type-confusion
     -- @description Sends all-nil color channels to the renderer color setter to verify nil-spam is rejected with a Lua error instead of crashing native code.
-    it("lurek.gfx.setColor handles nil gracefully", function()
+    it("lurek.render.setColor handles nil gracefully", function()
         expect_error(function()
-            lurek.gfx.setColor(nil, nil, nil)
+            lurek.render.setColor(nil, nil, nil)
         end)
     end)
 
-    -- @covers lurek.gfx.rectangle
+    -- @covers lurek.render.rectangle
     -- @description Passes nil for every rectangle parameter to exercise draw-call argument validation and confirm the bad payload fails safely.
-    it("lurek.gfx.rectangle handles nil gracefully", function()
+    it("lurek.render.rectangle handles nil gracefully", function()
         expect_error(function()
-            lurek.gfx.rectangle(nil, nil, nil, nil, nil)
+            lurek.render.rectangle(nil, nil, nil, nil, nil)
         end)
     end)
 
-    -- @covers lurek.gfx.circle
+    -- @covers lurek.render.circle
     -- @description Uses nil coordinates and radius for circle drawing to probe the shape API against missing numeric inputs.
-    it("lurek.gfx.circle handles nil gracefully", function()
+    it("lurek.render.circle handles nil gracefully", function()
         expect_error(function()
-            lurek.gfx.circle(nil, nil, nil, nil)
+            lurek.render.circle(nil, nil, nil, nil)
         end)
     end)
 
-    -- @covers lurek.gfx.line
+    -- @covers lurek.render.line
     -- @description Floods the line primitive with nil endpoints to verify the graphics binding rejects invalid coordinates without unwinding into Rust.
-    it("lurek.gfx.line handles nil gracefully", function()
+    it("lurek.render.line handles nil gracefully", function()
         expect_error(function()
-            lurek.gfx.line(nil, nil, nil, nil)
+            lurek.render.line(nil, nil, nil, nil)
         end)
     end)
 end)
@@ -78,37 +78,37 @@ end)
 
 -- @description Covers suite: fuzz: wrong types to entity system.
 describe("fuzz: wrong types to entity system", function()
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @description Invokes entity component assignment with a nil entity id to verify ECS APIs guard against null-handle writes.
     it("universe:set with nil entity id", function()
-        local universe = lurek.entity.newUniverse()
+        local universe = lurek.ecs.newUniverse()
         expect_error(function()
             universe:set(nil, "key", "value")
         end)
     end)
 
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @description Reads a component through a nil entity id to ensure invalid lookup handles are rejected before any table or arena access.
     it("universe:get with nil entity id", function()
-        local universe = lurek.entity.newUniverse()
+        local universe = lurek.ecs.newUniverse()
         expect_error(function()
             universe:get(nil, "key")
         end)
     end)
 
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @description Attempts to delete a nil entity id to probe liveness checks on destructive ECS operations.
     it("universe:kill with nil entity id", function()
-        local universe = lurek.entity.newUniverse()
+        local universe = lurek.ecs.newUniverse()
         expect_error(function()
             universe:kill(nil)
         end)
     end)
 
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @description Queries liveness with a nil entity id so the API must reject the malformed handle instead of treating it as entity zero.
     it("universe:isAlive with nil entity id", function()
-        local universe = lurek.entity.newUniverse()
+        local universe = lurek.ecs.newUniverse()
         expect_error(function()
             universe:isAlive(nil)
         end)

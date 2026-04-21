@@ -475,7 +475,7 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Download stream particles (green data bits)
-    ps_download = lurek.particles.newSystem({
+    ps_download = lurek.particle.newSystem({
         maxParticles = 80, emissionRate = 0,
         lifetimeMin = 0.3, lifetimeMax = 0.8,
         speedMin = 40, speedMax = 120, direction = -1.57, spread = 1.0,
@@ -485,7 +485,7 @@ function lurek.init()
     })
 
     -- Trace alert sparks (red warning)
-    ps_trace = lurek.particles.newSystem({
+    ps_trace = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0,
         lifetimeMin = 0.2, lifetimeMax = 0.5,
         speedMin = 60, speedMax = 180, direction = 0, spread = 6.28,
@@ -500,7 +500,7 @@ end
 -- Update
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     ps_download:update(dt)
     ps_trace:update(dt)
@@ -667,7 +667,7 @@ end
 -- Render UI — terminal text, HUD, trace bar
 -- ---------------------------------------------------------------------------
 function lurek.render_ui()
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
 
     -- ── TITLE ─────────────────────────────────────────────────
     if current_state == STATE.TITLE then

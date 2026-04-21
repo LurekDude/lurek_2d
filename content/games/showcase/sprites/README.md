@@ -22,7 +22,7 @@ cargo run -- content/games/showcase/sprites
 
 ## Features
 
-- **Procedural pixel art** — Character (16×16), coins (8×8), trees (16×24), hearts (8×8), stars (8×8) all generated via `lurek.img.newImageData` + `setPixel`.
+- **Procedural pixel art** — Character (16×16), coins (8×8), trees (16×24), hearts (8×8), stars (8×8) all generated via `lurek.image.newImageData` + `setPixel`.
 - **Animation** — Character has 2 walk frames that alternate while moving; coins have 2 rotation frames.
 - **Collectibles** — 20 coins scattered randomly; overlap to collect (+1 score) with sparkle particles.
 - **Obstacles** — 5 trees block movement; draw order sorted by Y for pseudo-depth.

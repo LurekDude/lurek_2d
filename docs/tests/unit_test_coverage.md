@@ -175,58 +175,58 @@
 - `lurek.math.segmentIntersectsSegment`
   *(… 57 more)*
 
-### `lurek.graphics` — 91 still need `@tests`
+### `lurek.renders` — 91 still need `@tests`
 
-- `lurek.graphics.setColor`
-- `lurek.graphics.getColor`
-- `lurek.graphics.setBackgroundColor`
-- `lurek.graphics.getBackgroundColor`
-- `lurek.graphics.rectangle`
-- `lurek.graphics.circle`
-- `lurek.graphics.ellipse`
-- `lurek.graphics.triangle`
-- `lurek.graphics.line`
-- `lurek.graphics.polygon`
-- `lurek.graphics.arc`
-- `lurek.graphics.points`
-- `lurek.graphics.draw`
-- `lurek.graphics.drawq`
-- `lurek.graphics.print`
-- `lurek.graphics.printf`
-- `lurek.graphics.clear`
-- `lurek.graphics.setLineWidth`
-- `lurek.graphics.getLineWidth`
-- `lurek.graphics.setPointSize`
-- `lurek.graphics.getPointSize`
-- `lurek.graphics.setBlendMode`
-- `lurek.graphics.getBlendMode`
-- `lurek.graphics.newFont`
-- `lurek.graphics.setFont`
-- `lurek.graphics.getFont`
-- `lurek.graphics.getFontWidth`
-- `lurek.graphics.getFontHeight`
-- `lurek.graphics.getFontLineHeight`
-- `lurek.graphics.setFontLineHeight`
-- `lurek.graphics.getFontAscent`
-- `lurek.graphics.getFontDescent`
-- `lurek.graphics.getFontWrap`
-- `lurek.graphics.newImage`
-- `lurek.graphics.newCanvas`
-- `lurek.graphics.setCanvas`
-- `lurek.graphics.getCanvas`
-- `lurek.graphics.getCanvasSize`
-- `lurek.graphics.newSpriteBatch`
-- `lurek.graphics.newMesh`
-- `lurek.graphics.newShader`
-- `lurek.graphics.setShader`
-- `lurek.graphics.getShader`
-- `lurek.graphics.newQuad`
-- `lurek.graphics.push`
-- `lurek.graphics.pop`
-- `lurek.graphics.translate`
-- `lurek.graphics.rotate`
-- `lurek.graphics.scale`
-- `lurek.graphics.shear`
+- `lurek.renders.setColor`
+- `lurek.renders.getColor`
+- `lurek.renders.setBackgroundColor`
+- `lurek.renders.getBackgroundColor`
+- `lurek.renders.rectangle`
+- `lurek.renders.circle`
+- `lurek.renders.ellipse`
+- `lurek.renders.triangle`
+- `lurek.renders.line`
+- `lurek.renders.polygon`
+- `lurek.renders.arc`
+- `lurek.renders.points`
+- `lurek.renders.draw`
+- `lurek.renders.drawq`
+- `lurek.renders.print`
+- `lurek.renders.printf`
+- `lurek.renders.clear`
+- `lurek.renders.setLineWidth`
+- `lurek.renders.getLineWidth`
+- `lurek.renders.setPointSize`
+- `lurek.renders.getPointSize`
+- `lurek.renders.setBlendMode`
+- `lurek.renders.getBlendMode`
+- `lurek.renders.newFont`
+- `lurek.renders.setFont`
+- `lurek.renders.getFont`
+- `lurek.renders.getFontWidth`
+- `lurek.renders.getFontHeight`
+- `lurek.renders.getFontLineHeight`
+- `lurek.renders.setFontLineHeight`
+- `lurek.renders.getFontAscent`
+- `lurek.renders.getFontDescent`
+- `lurek.renders.getFontWrap`
+- `lurek.renders.newImage`
+- `lurek.renders.newCanvas`
+- `lurek.renders.setCanvas`
+- `lurek.renders.getCanvas`
+- `lurek.renders.getCanvasSize`
+- `lurek.renders.newSpriteBatch`
+- `lurek.renders.newMesh`
+- `lurek.renders.newShader`
+- `lurek.renders.setShader`
+- `lurek.renders.getShader`
+- `lurek.renders.newQuad`
+- `lurek.renders.push`
+- `lurek.renders.pop`
+- `lurek.renders.translate`
+- `lurek.renders.rotate`
+- `lurek.renders.scale`
+- `lurek.renders.shear`
   *(… 41 more)*
 
 ### `lurek.audio` — 63 still need `@tests`
@@ -533,26 +533,26 @@
 - `FileHandle:close`  *(method on FileHandle)*
 - `FileHandle:isEOF`  *(method on FileHandle)*
 
-### `lurek.localization` — 18 still need `@tests`
+### `lurek.i18n` — 18 still need `@tests`
 
-- `lurek.localization.unloadTable`
-- `lurek.localization.getLanguages`
-- `lurek.localization.setFallbacks`
-- `lurek.localization.getFallbacks`
-- `lurek.localization.hasKey`
-- `lurek.localization.getKeys`
-- `lurek.localization.setKey`
-- `lurek.localization.interpolate`
-- `lurek.localization.pluralFor`
-- `lurek.localization.onLanguageChange`
-- `lurek.localization.offChange`
-- `lurek.localization.keyCount`
-- `lurek.localization.categories`
-- `lurek.localization.keysInCategory`
-- `lurek.localization.search`
-- `lurek.localization.buildIndex`
-- `lurek.localization.searchIndexed`
-- `lurek.localization.mergeLocale`
+- `lurek.i18n.unloadTable`
+- `lurek.i18n.getLanguages`
+- `lurek.i18n.setFallbacks`
+- `lurek.i18n.getFallbacks`
+- `lurek.i18n.hasKey`
+- `lurek.i18n.getKeys`
+- `lurek.i18n.setKey`
+- `lurek.i18n.interpolate`
+- `lurek.i18n.pluralFor`
+- `lurek.i18n.onLanguageChange`
+- `lurek.i18n.offChange`
+- `lurek.i18n.keyCount`
+- `lurek.i18n.categories`
+- `lurek.i18n.keysInCategory`
+- `lurek.i18n.search`
+- `lurek.i18n.buildIndex`
+- `lurek.i18n.searchIndexed`
+- `lurek.i18n.mergeLocale`
 
 ### `lurek.tilemap` — 18 still need `@tests`
 
@@ -575,27 +575,27 @@
 - `MapBlock:getHeightInSegments`  *(method on MapBlock)*
 - `MapGroup:removeBlock`  *(method on MapGroup)*
 
-### `lurek.system` — 17 still need `@tests`
+### `lurek.runtime` — 17 still need `@tests`
 
-- `lurek.system.getProcessorCount`
-- `lurek.system.getMemorySize`
-- `lurek.system.openURL`
-- `lurek.system.getPreferredLocales`
-- `lurek.system.getPowerInfo`
-- `lurek.system.setDebugOverlay`
-- `lurek.system.getDebugOverlay`
-- `lurek.system.setLogLevel`
-- `lurek.system.getLogLevel`
-- `lurek.system.log`
-- `lurek.system.getLastError`
-- `lurek.system.getArch`
-- `lurek.system.getEnv`
-- `lurek.system.getArgs`
-- `lurek.system.parseArgs`
-- `lurek.system.runBatch`
-- `lurek.system.getBatchResults`
+- `lurek.runtime.getProcessorCount`
+- `lurek.runtime.getMemorySize`
+- `lurek.runtime.openURL`
+- `lurek.runtime.getPreferredLocales`
+- `lurek.runtime.getPowerInfo`
+- `lurek.runtime.setDebugOverlay`
+- `lurek.runtime.getDebugOverlay`
+- `lurek.runtime.setLogLevel`
+- `lurek.runtime.getLogLevel`
+- `lurek.runtime.log`
+- `lurek.runtime.getLastError`
+- `lurek.runtime.getArch`
+- `lurek.runtime.getEnv`
+- `lurek.runtime.getArgs`
+- `lurek.runtime.parseArgs`
+- `lurek.runtime.runBatch`
+- `lurek.runtime.getBatchResults`
 
-### `lurek.modding` — 15 still need `@tests`
+### `lurek.mods` — 15 still need `@tests`
 
 - `Mod:getHook`  *(method on Mod)*
 - `Mod:hasHook`  *(method on Mod)*
@@ -665,9 +665,9 @@
 - `Overlay:getFlashAlpha`  *(method on Overlay)*
 - `Overlay:getLightningAlpha`  *(method on Overlay)*
 
-### `lurek.pathfinding` — 13 still need `@tests`
+### `lurek.pathfind` — 13 still need `@tests`
 
-- `lurek.pathfinding.setThreadCount`
+- `lurek.pathfind.setThreadCount`
 - `NavGrid:loadFromString`  *(method on NavGrid)*
 - `NavGrid:saveToString`  *(method on NavGrid)*
 - `NavGrid:setChunkSize`  *(method on NavGrid)*
@@ -743,7 +743,7 @@
 - `Camera2D:setDeadZone`  *(method on Camera2D)*
 - `Camera2D:setLookAhead`  *(method on Camera2D)*
 
-### `lurek.savegame` — 7 still need `@tests`
+### `lurek.save` — 7 still need `@tests`
 
 - `SaveManager:collect`  *(method on SaveManager)*
 - `SaveManager:restore`  *(method on SaveManager)*
@@ -781,7 +781,7 @@
 - `lurek.log.readMemory`
 - `lurek.log.flushFile`
 
-### `lurek.entity` — 4 still need `@tests`
+### `lurek.ecs` — 4 still need `@tests`
 
 - `Universe:getEntities`  *(method on Universe)*
 - `Universe:bitmapUntag`  *(method on Universe)*
@@ -897,38 +897,38 @@
 - `lurek.math.outBounce`
   *(… 77 more)*
 
-### `lurek.graphics` — 91 zero-evidence
+### `lurek.renders` — 91 zero-evidence
 
-- `lurek.graphics.setColor`
-- `lurek.graphics.getColor`
-- `lurek.graphics.setBackgroundColor`
-- `lurek.graphics.getBackgroundColor`
-- `lurek.graphics.rectangle`
-- `lurek.graphics.circle`
-- `lurek.graphics.ellipse`
-- `lurek.graphics.triangle`
-- `lurek.graphics.line`
-- `lurek.graphics.polygon`
-- `lurek.graphics.arc`
-- `lurek.graphics.points`
-- `lurek.graphics.draw`
-- `lurek.graphics.drawq`
-- `lurek.graphics.print`
-- `lurek.graphics.printf`
-- `lurek.graphics.clear`
-- `lurek.graphics.setLineWidth`
-- `lurek.graphics.getLineWidth`
-- `lurek.graphics.setPointSize`
-- `lurek.graphics.getPointSize`
-- `lurek.graphics.setBlendMode`
-- `lurek.graphics.getBlendMode`
-- `lurek.graphics.newFont`
-- `lurek.graphics.setFont`
-- `lurek.graphics.getFont`
-- `lurek.graphics.getFontWidth`
-- `lurek.graphics.getFontHeight`
-- `lurek.graphics.getFontLineHeight`
-- `lurek.graphics.setFontLineHeight`
+- `lurek.renders.setColor`
+- `lurek.renders.getColor`
+- `lurek.renders.setBackgroundColor`
+- `lurek.renders.getBackgroundColor`
+- `lurek.renders.rectangle`
+- `lurek.renders.circle`
+- `lurek.renders.ellipse`
+- `lurek.renders.triangle`
+- `lurek.renders.line`
+- `lurek.renders.polygon`
+- `lurek.renders.arc`
+- `lurek.renders.points`
+- `lurek.renders.draw`
+- `lurek.renders.drawq`
+- `lurek.renders.print`
+- `lurek.renders.printf`
+- `lurek.renders.clear`
+- `lurek.renders.setLineWidth`
+- `lurek.renders.getLineWidth`
+- `lurek.renders.setPointSize`
+- `lurek.renders.getPointSize`
+- `lurek.renders.setBlendMode`
+- `lurek.renders.getBlendMode`
+- `lurek.renders.newFont`
+- `lurek.renders.setFont`
+- `lurek.renders.getFont`
+- `lurek.renders.getFontWidth`
+- `lurek.renders.getFontHeight`
+- `lurek.renders.getFontLineHeight`
+- `lurek.renders.setFontLineHeight`
   *(… 61 more)*
 
 ### `lurek.audio` — 63 zero-evidence
@@ -1158,26 +1158,26 @@
 - `FileHandle:close`  *(method on FileHandle)*
 - `FileHandle:isEOF`  *(method on FileHandle)*
 
-### `lurek.localization` — 18 zero-evidence
+### `lurek.i18n` — 18 zero-evidence
 
-- `lurek.localization.unloadTable`
-- `lurek.localization.getLanguages`
-- `lurek.localization.setFallbacks`
-- `lurek.localization.getFallbacks`
-- `lurek.localization.hasKey`
-- `lurek.localization.getKeys`
-- `lurek.localization.setKey`
-- `lurek.localization.interpolate`
-- `lurek.localization.pluralFor`
-- `lurek.localization.onLanguageChange`
-- `lurek.localization.offChange`
-- `lurek.localization.keyCount`
-- `lurek.localization.categories`
-- `lurek.localization.keysInCategory`
-- `lurek.localization.search`
-- `lurek.localization.buildIndex`
-- `lurek.localization.searchIndexed`
-- `lurek.localization.mergeLocale`
+- `lurek.i18n.unloadTable`
+- `lurek.i18n.getLanguages`
+- `lurek.i18n.setFallbacks`
+- `lurek.i18n.getFallbacks`
+- `lurek.i18n.hasKey`
+- `lurek.i18n.getKeys`
+- `lurek.i18n.setKey`
+- `lurek.i18n.interpolate`
+- `lurek.i18n.pluralFor`
+- `lurek.i18n.onLanguageChange`
+- `lurek.i18n.offChange`
+- `lurek.i18n.keyCount`
+- `lurek.i18n.categories`
+- `lurek.i18n.keysInCategory`
+- `lurek.i18n.search`
+- `lurek.i18n.buildIndex`
+- `lurek.i18n.searchIndexed`
+- `lurek.i18n.mergeLocale`
 
 ### `lurek.tilemap` — 18 zero-evidence
 
@@ -1200,27 +1200,27 @@
 - `MapBlock:getHeightInSegments`  *(method on MapBlock)*
 - `MapGroup:removeBlock`  *(method on MapGroup)*
 
-### `lurek.system` — 17 zero-evidence
+### `lurek.runtime` — 17 zero-evidence
 
-- `lurek.system.getProcessorCount`
-- `lurek.system.getMemorySize`
-- `lurek.system.openURL`
-- `lurek.system.getPreferredLocales`
-- `lurek.system.getPowerInfo`
-- `lurek.system.setDebugOverlay`
-- `lurek.system.getDebugOverlay`
-- `lurek.system.setLogLevel`
-- `lurek.system.getLogLevel`
-- `lurek.system.log`
-- `lurek.system.getLastError`
-- `lurek.system.getArch`
-- `lurek.system.getEnv`
-- `lurek.system.getArgs`
-- `lurek.system.parseArgs`
-- `lurek.system.runBatch`
-- `lurek.system.getBatchResults`
+- `lurek.runtime.getProcessorCount`
+- `lurek.runtime.getMemorySize`
+- `lurek.runtime.openURL`
+- `lurek.runtime.getPreferredLocales`
+- `lurek.runtime.getPowerInfo`
+- `lurek.runtime.setDebugOverlay`
+- `lurek.runtime.getDebugOverlay`
+- `lurek.runtime.setLogLevel`
+- `lurek.runtime.getLogLevel`
+- `lurek.runtime.log`
+- `lurek.runtime.getLastError`
+- `lurek.runtime.getArch`
+- `lurek.runtime.getEnv`
+- `lurek.runtime.getArgs`
+- `lurek.runtime.parseArgs`
+- `lurek.runtime.runBatch`
+- `lurek.runtime.getBatchResults`
 
-### `lurek.modding` — 15 zero-evidence
+### `lurek.mods` — 15 zero-evidence
 
 - `Mod:getHook`  *(method on Mod)*
 - `Mod:hasHook`  *(method on Mod)*
@@ -1290,9 +1290,9 @@
 - `Overlay:getFlashAlpha`  *(method on Overlay)*
 - `Overlay:getLightningAlpha`  *(method on Overlay)*
 
-### `lurek.pathfinding` — 13 zero-evidence
+### `lurek.pathfind` — 13 zero-evidence
 
-- `lurek.pathfinding.setThreadCount`
+- `lurek.pathfind.setThreadCount`
 - `NavGrid:loadFromString`  *(method on NavGrid)*
 - `NavGrid:saveToString`  *(method on NavGrid)*
 - `NavGrid:setChunkSize`  *(method on NavGrid)*
@@ -1354,7 +1354,7 @@
 - `Camera2D:setDeadZone`  *(method on Camera2D)*
 - `Camera2D:setLookAhead`  *(method on Camera2D)*
 
-### `lurek.savegame` — 7 zero-evidence
+### `lurek.save` — 7 zero-evidence
 
 - `SaveManager:collect`  *(method on SaveManager)*
 - `SaveManager:restore`  *(method on SaveManager)*
@@ -1392,7 +1392,7 @@
 - `lurek.log.readMemory`
 - `lurek.log.flushFile`
 
-### `lurek.entity` — 4 zero-evidence
+### `lurek.ecs` — 4 zero-evidence
 
 - `Universe:getEntities`  *(method on Universe)*
 - `Universe:bitmapUntag`  *(method on Universe)*

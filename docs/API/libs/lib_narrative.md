@@ -36,7 +36,7 @@ The court applauds. # music:fanfare
 
 *30 functions, 0 module fields documented.*
 
-See: [`lurek.fs.read`](../lua-api.md#lurekfsread) — load `.ink` files, [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson) — precompile / save state serialisation, [`lurek.savegame`](../lua-api.md#lureksavegame) — wire `story:save`/`resume` into a SaveManager, [`lurek.localization.t`](../lua-api.md#lureklocalizationt) — used by `M.localiseStory` for {loc:key} markers, [`lurek.signal`](../lua-api.md#lureksignal) — optional trace event sink
+See: [`lurek.filesystem.read`](../lua-api.md#lurekfsread) — load `.ink` files, [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson) — precompile / save state serialisation, [`lurek.save`](../lua-api.md#lureksavegame) — wire `story:save`/`resume` into a SaveManager, [`lurek.i18n.t`](../lua-api.md#lureklocalizationt) — used by `M.localiseStory` for {loc:key} markers, [`lurek.event`](../lua-api.md#lureksignal) — optional trace event sink
 
 ## Functions
 
@@ -58,7 +58,7 @@ Compile Ink-subset source into a Story program (not yet started).
 
 ### `loadFile(path)`
 
-Load and compile a .ink file via `lurek.fs.read`.
+Load and compile a .ink file via `lurek.filesystem.read`.
 
 **Parameters**
 
@@ -210,7 +210,7 @@ Profile the current story state (visits + var counts).
 
 ### `save()`
 
-Serialise full state (vars, visits, knot, pc) for `lurek.savegame`.
+Serialise full state (vars, visits, knot, pc) for `lurek.save`.
 
 ### `resume(state)`
 
@@ -230,4 +230,4 @@ Format a list of values as natural prose: "a, b, and c".
 
 ### `localiseStory(story, locale)`
 
-Attach a `{loc:KEY}` localisation pre-processor using `lurek.localization.t`.
+Attach a `{loc:KEY}` localisation pre-processor using `lurek.i18n.t`.

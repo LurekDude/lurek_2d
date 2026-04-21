@@ -512,7 +512,7 @@ lurek.process(function(dt)
         for i, ps in ipairs(pattern_order) do
             if lurek.input.pressed("pattern_" .. i) then switch_pattern(ps) end
         end
-        if lurek.input.pressed("quit") then lurek.signal.quit() end
+        if lurek.input.pressed("quit") then lurek.event.quit() end
         return
     end
 
@@ -520,7 +520,7 @@ lurek.process(function(dt)
     for i, ps in ipairs(pattern_order) do
         if lurek.input.pressed("pattern_" .. i) then switch_pattern(ps) end
     end
-    if lurek.input.pressed("quit") then lurek.signal.quit() end
+    if lurek.input.pressed("quit") then lurek.event.quit() end
 
     -- Tab slide tween
     tab_slide_x = lerp(tab_slide_x, tab_slide_target, dt * 10)

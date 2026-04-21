@@ -88,9 +88,9 @@ seq3:setSpeed(1000)
 seq3:start()
 for _ = 1, 10 do seq3:update(0.5); seq3:advance() end
 
-print("[example.dialog] === Scenario 6: serialise script via lurek.codec if available ===")
+print("[example.dialog] === Scenario 6: serialise script via lurek.serial if available ===")
 
-local ok_codec, codec = pcall(require, "lurek.codec")
+local ok_codec, codec = pcall(require, "lurek.serial")
 if ok_codec and codec and codec.toJson then
     local snapshot = { dialog.say("Alice", "round-trip"), dialog.wait(0.5) }
     local s = codec.toJson(snapshot)
@@ -100,7 +100,7 @@ if ok_codec and codec and codec.toJson then
         print(string.format("  codec.fromJson type[1]=%s", t[1] and t[1].type))
     end
 else
-    print("  no lurek.codec — script can be saved as a Lua table literal manually")
+    print("  no lurek.serial — script can be saved as a Lua table literal manually")
 end
 
 print("[example.dialog] done.")

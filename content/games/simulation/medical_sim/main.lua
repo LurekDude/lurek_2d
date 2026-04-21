@@ -302,10 +302,10 @@ end)
 -- Process
 -- ---------------------------------------------------------------------------
 lurek.process(function(dt)
-    fps = lurek.time.getFPS()
+    fps = lurek.timer.getFPS()
 
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

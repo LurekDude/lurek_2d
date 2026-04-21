@@ -136,14 +136,14 @@ lurek.init(function()
     lurek.window.setTitle("Hex Strategy — Lurek2D")
     lurek.render.setBackgroundColor(0.04, 0.06, 0.1, 1.0)
 
-    expand_burst = lurek.particles.newSystem({
+    expand_burst = lurek.particle.newSystem({
         maxParticles = 20,
         emitRate = 0, lifetime = {0.3,0.6}, speed = {20,70},
         startColor = {0.4,0.9,0.4,1}, endColor = {0.1,0.4,0.1,0},
         startSize = 4, endSize = 1, spread = math.pi*2
     })
 
-    city_sparkle = lurek.particles.newSystem({
+    city_sparkle = lurek.particle.newSystem({
         maxParticles = 16,
         emitRate = 0, lifetime = {0.4,0.8}, speed = {10,40},
         startColor = {1,0.9,0.3,1}, endColor = {0.8,0.5,0.0,0},
@@ -159,7 +159,7 @@ lurek.process(function(dt)
     if city_sparkle then city_sparkle:update(dt) end
     if info_timer > 0 then info_timer = info_timer - dt end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
     if lurek.input.isActionJustPressed("next_turn") then next_turn() return end
 
     local mx, my = lurek.input.getMousePosition()

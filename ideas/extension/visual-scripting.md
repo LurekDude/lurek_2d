@@ -63,10 +63,10 @@ No visual scripting files exist in vscode-extension/. No `lurek.scripting.*` API
 
 ### Phase 2: Engine API Blocks
 
-6. Add blocks for lurek.gfx.* (rectangle, circle, image, text)
+6. Add blocks for lurek.render.* (rectangle, circle, image, text)
 7. Add blocks for lurek.input.* (keypressed, mousepressed)
-8. Add blocks for lurek.time.* (after, every)
-9. Add blocks for lurek.entity.* (create, find, destroy)
+8. Add blocks for lurek.timer.* (after, every)
+9. Add blocks for lurek.ecs.* (create, find, destroy)
 10. Auto-generate blocks from api_data.json
 
 ### Phase 3: Debugging & Polish

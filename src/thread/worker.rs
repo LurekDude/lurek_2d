@@ -6,7 +6,7 @@
 //!
 //! ## Worker sandbox
 //! Workers receive a minimal `lurek.*` API surface: `lurek.thread.getChannel(name)`,
-//! `lurek.fs.read(path)` (read-only, no `..` traversal), and the `arg` global table.
+//! `lurek.filesystem.read(path)` (read-only, no `..` traversal), and the `arg` global table.
 //! Graphics, audio, window, input, physics, and any module touching `SharedState`
 //! are deliberately excluded.
 
@@ -170,8 +170,8 @@ impl LuaThread {
 /// - `lurek.thread.getChannel(name)` — access to named channels
 /// - `arg` — table of arguments passed to `thread:start(...)`
 ///
-/// Worker threads do NOT get: `lurek.graphic`, `lurek.audio`, `lurek.window`,
-/// `lurek.input`, `lurek.physics`, `lurek.particles`, or any module that
+/// Worker threads do NOT get: `lurek.render`, `lurek.audio`, `lurek.window`,
+/// `lurek.input`, `lurek.physics`, `lurek.particle`, or any module that
 /// touches `SharedState`.
 fn register_thread_safe_modules(
     lua: &mlua::Lua,
@@ -198,7 +198,7 @@ fn register_thread_safe_modules(
     )?;
     luna.set("thread", thread_table)?;
 
-    // ── lurek.fs (read-only, workers only) ──────────────────────────────────
+    // ── lurek.filesystem (read-only, workers only) ──────────────────────────────────
     // Workers get a minimal filesystem API limited to reading files.
     // Path traversal via ".." is blocked. Full GameFS sandbox is not available
     // in worker threads; paths are resolved relative to the process working dir.
@@ -208,7 +208,7 @@ fn register_thread_safe_modules(
         lua.create_function(|lua_ctx, path: String| {
             if path.contains("..") {
                 return Err(mlua::Error::RuntimeError(
-                    "lurek.fs.read: path traversal not allowed".to_string(),
+                    "lurek.filesystem.read: path traversal not allowed".to_string(),
                 ));
             }
             match std::fs::read_to_string(&path) {

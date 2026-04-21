@@ -103,7 +103,7 @@ fn lua_test_<module>() {
 
 ## Constraints
 
-- Lua tests **must not** call `lurek.gfx.draw*`, `lurek.audio.*`, or anything requiring a window
+- Lua tests **must not** call `lurek.render.draw*`, `lurek.audio.*`, or anything requiring a window
 - Tests must not write files outside `target/`
 - Every test file **must** end with `test_summary()`
 - New `lurek.*` API functions require at least one Lua test before merge

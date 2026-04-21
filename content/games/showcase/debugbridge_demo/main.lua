@@ -199,14 +199,14 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle: log message pulse (soft glow on new log)
-    ps_log_pulse = lurek.particles.newSystem({
+    ps_log_pulse = lurek.particle.newSystem({
         maxParticles = 30, emissionRate = 0, lifetimeMin = 0.2, lifetimeMax = 0.5,
         speedMin = 10, speedMax = 40, direction = -1.57, spread = 2.0,
         sizes = { 3, 1 }, colors = { 0.4, 0.8, 0.4, 0.8, 0.2, 0.5, 1.0, 0 },
     })
 
     -- Particle: breakpoint flash (red burst)
-    ps_breakpoint = lurek.particles.newSystem({
+    ps_breakpoint = lurek.particle.newSystem({
         maxParticles = 80, emissionRate = 0, lifetimeMin = 0.3, lifetimeMax = 0.8,
         speedMin = 40, speedMax = 140, direction = 0, spread = 6.28,
         gravityY = 30, sizes = { 4, 2, 0 },
@@ -231,7 +231,7 @@ end
 -- Process
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     ps_log_pulse:update(dt)
     ps_breakpoint:update(dt)
@@ -467,7 +467,7 @@ function lurek.render_ui()
     lurek.render.print("Filter: " .. LOG_NAMES[log_filter], 540, 14, 11)
 
     -- FPS
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
     lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, 14, 11)
 

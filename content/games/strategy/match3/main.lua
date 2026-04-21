@@ -222,19 +222,19 @@ lurek.init(function()
     lurek.render.setBackgroundColor(0.05, 0.04, 0.10, 1.0)
     math.randomseed(os.time())
 
-    match_sparks = lurek.particles.newSystem({
+    match_sparks = lurek.particle.newSystem({
         maxParticles = 60,
         emitRate = 0, lifetime = {0.2,0.5}, speed = {40,120},
         startColor = {1,1,0.3,1}, endColor = {0.7,0.2,0,0},
         startSize = 4, endSize = 1, spread = math.pi*2
     })
-    bomb_burst = lurek.particles.newSystem({
+    bomb_burst = lurek.particle.newSystem({
         maxParticles = 40,
         emitRate = 0, lifetime = {0.3,0.7}, speed = {60,200},
         startColor = {1,0.5,0.1,1}, endColor = {0.4,0,0,0},
         startSize = 7, endSize = 1, spread = math.pi*2
     })
-    drop_dust = lurek.particles.newSystem({
+    drop_dust = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate = 0, lifetime = {0.15,0.35}, speed = {5,20},
         startColor = {0.5,0.5,0.7,0.5}, endColor = {0.3,0.3,0.5,0},
@@ -250,7 +250,7 @@ lurek.process(function(dt)
     if bomb_burst   then bomb_burst:update(dt)   end
     if drop_dust    then drop_dust:update(dt)    end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
     if game_state == "gameover" or game_state == "win" then return end
 
     -- Swap animation

@@ -7,7 +7,7 @@
 - Lua API path(s): `src/lua_api/ui_api.rs`
 - Primary Lua namespace: `lurek.ui`
 - Rust test path(s): tests/rust/unit/gui_tests.rs
-- Lua test path(s): tests/lua/unit/test_gui.lua, tests/lua/unit/test_ui_layout.lua, tests/lua/integration/test_localization_ui.lua
+- Lua test path(s): tests/lua/unit/test_gui.lua, tests/lua/unit/test_ui_layout.lua, tests/lua/integration/test_i18n_ui.lua
 
 ## Summary
 

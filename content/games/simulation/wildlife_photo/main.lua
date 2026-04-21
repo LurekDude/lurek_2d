@@ -392,25 +392,25 @@ lurek.init(function()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle systems
-    ps_flash = lurek.particles.newSystem({
+    ps_flash = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0, lifetimeMin = 0.15, lifetimeMax = 0.4,
         speedMin = 80, speedMax = 200, direction = 0, spread = 6.28,
         sizes = { 6, 3, 0 },
         colors = { 1, 1, 0.9, 1, 1, 1, 0.7, 0 },
     })
-    ps_leaves = lurek.particles.newSystem({
+    ps_leaves = lurek.particle.newSystem({
         maxParticles = 40, emissionRate = 3, lifetimeMin = 2.0, lifetimeMax = 4.0,
         speedMin = 10, speedMax = 30, direction = 1.2, spread = 1.0,
         gravityY = 15, sizes = { 3, 2, 1 },
         colors = { 0.3, 0.6, 0.15, 0.6, 0.5, 0.7, 0.2, 0 },
     })
-    ps_firefly = lurek.particles.newSystem({
+    ps_firefly = lurek.particle.newSystem({
         maxParticles = 30, emissionRate = 0, lifetimeMin = 1.5, lifetimeMax = 3.0,
         speedMin = 5, speedMax = 15, direction = -1.57, spread = 3.14,
         sizes = { 3, 4, 2, 0 },
         colors = { 0.9, 0.95, 0.3, 0.8, 0.7, 0.9, 0.2, 0 },
     })
-    ps_footprint = lurek.particles.newSystem({
+    ps_footprint = lurek.particle.newSystem({
         maxParticles = 80, emissionRate = 0, lifetimeMin = 1.0, lifetimeMax = 2.5,
         speedMin = 0, speedMax = 2, direction = -1.57, spread = 0.3,
         sizes = { 2, 1, 0 },
@@ -429,7 +429,7 @@ lurek.process(function(dt)
         if current_state == STATES.ALBUM then
             current_state = STATES.EXPLORING
         else
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -756,7 +756,7 @@ lurek.render_ui(function()
     lurek.render.drawText(string.format("Journal: %d/8", species_count), 560, 5, { size = 14, color = { 0.5, 0.9, 0.5, 1 } })
 
     -- FPS
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.drawText(string.format("FPS: %d", fps), W - 70, 5, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
 
     -- Patience indicator

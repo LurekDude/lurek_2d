@@ -334,7 +334,7 @@ feat(blocksim): Phase 7 — advanced mechanics (batch, time window, warmup, ener
 | `library/blocksim/blueprints.lua` | saga, canary, bulkhead, watchdog, approval_flow, dlq_recovery patterns |
 | `library/blocksim/scenario.lua` | `scenario.load(path)`, `scenario.run_pair(base, variant)`, `scenario.multi_run(fn, n)` |
 | `library/blocksim/analytics.lua` | `analytics.compare(base, variant)`, `analytics.kpi(samples, rules)`, detection helpers |
-| `library/blocksim/reports.lua` | `reports.text(result)`, `reports.json(result)`, file export via `lurek.fs` |
+| `library/blocksim/reports.lua` | `reports.text(result)`, `reports.json(result)`, file export via `lurek.filesystem` |
 | `tests/lua/library/test_blocksim_lib.lua` | BDD tests for all library helpers |
 
 ### Modified files

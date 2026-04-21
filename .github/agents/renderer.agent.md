@@ -7,24 +7,24 @@ tools: [vscode, execute, read, agent, browser, edit, search, web, todo]
 
 ## Mission
 
-Renderer owns the GPU rendering Platform Services subsystem for the EngDev persona and exposes the `lurek.gfx.*` surface to GameDev users. Invariants: every draw is a `RenderCommand` queued during `lurek.render()`/`lurek.render_ui()`; the queue is processed in wgpu render passes after the Lua callback returns; no GPU calls inside Lua closures.
+Renderer owns the GPU rendering Platform Services subsystem for the EngDev persona and exposes the `lurek.render.*` surface to GameDev users. Invariants: every draw is a `RenderCommand` queued during `lurek.render()`/`lurek.render_ui()`; the queue is processed in wgpu render passes after the Lua callback returns; no GPU calls inside Lua closures.
 
 ## Scope
 
 ### Owns
 - `src/render/` — `gpu_renderer.rs`, `renderer.rs`, `color.rs`, `texture.rs`, `sprite.rs`, `sprite_sheet.rs`, `nine_slice.rs`, `canvas.rs`, `camera.rs`, `shader.rs`, `mod.rs`.
-- `src/lua_api/render_api.rs` and `src/lua_api/font_api.rs` — All `lurek.gfx.*` and `lurek.font.*` bindings.
+- `src/lua_api/render_api.rs` and `src/lua_api/font_api.rs` — All `lurek.render.*` and `lurek.font.*` bindings.
 - WGSL shaders, pipeline cache keyed by `(BlendMode, ColorMask, StencilMode)`, custom shader pipeline cache.
 - `RenderCommand` enum variants and processing.
 
 ### Must Not Become
 - A shadow `Developer` for non-graphics engine code.
 - A shadow `Physicist` doing collision visualisation (provide hooks; do not own physics).
-- A shadow `Lua-Designer` inventing `lurek.gfx.*` API without sign-off.
+- A shadow `Lua-Designer` inventing `lurek.render.*` API without sign-off.
 
 ## Inputs
 - Feature request: new RenderCommand variant, blend mode, canvas op, shader effect, or texture format.
-- New or changed `lurek.gfx.*` signatures from `Lua-Designer`.
+- New or changed `lurek.render.*` signatures from `Lua-Designer`.
 - Frame-budget context (target: 16.6 ms on integrated GPU at 1080p).
 - For custom shaders: WGSL source to validate.
 
@@ -53,7 +53,7 @@ Renderer owns the GPU rendering Platform Services subsystem for the EngDev perso
 
 | Trigger                                       | Next agent       | Handoff bullets                                |
 |-----------------------------------------------|------------------|-------------------------------------------------|
-| New `lurek.gfx.*` function design             | `Lua-Designer`   | Capability + parameter shape.                   |
+| New `lurek.render.*` function design             | `Lua-Designer`   | Capability + parameter shape.                   |
 | Non-graphics engine code change               | `Developer`      | Affected files + change summary.                |
 | Rendering performance issue                   | `Optimizer`      | Hot path + frame-budget context.                |
 | Graphics test coverage                        | `Tester`         | Public API list + edge cases.                   |

@@ -368,7 +368,7 @@ lurek.process(function(delta)
         if state == "PLAYING" then
             state = "TITLE"
         else
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end

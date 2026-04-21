@@ -7,11 +7,11 @@ Space exploration RPG inspired by Star Control 2 (PC 1994). Navigate a vast star
 - `library.dialog` — typewriter dialog sequencer with branching choices and call nodes
 - `lurek.math.newRandomGenerator()` — seeded star field placement
 - `lurek.math.lerp()` — smooth camera tracking
-- `lurek.gfx.polygon()` — triangle ship rendering
-- `lurek.gfx.circle()` — planets with atmosphere glow
-- `lurek.gfx.print()` / `lurek.gfx.rectangle()` — dialog box overlay and HUD
+- `lurek.render.polygon()` — triangle ship rendering
+- `lurek.render.circle()` — planets with atmosphere glow
+- `lurek.render.print()` / `lurek.render.rectangle()` — dialog box overlay and HUD
 - `lurek.input.isDown()` — thrust and rotation
-- `lurek.signal.quit()` — clean exit
+- `lurek.event.quit()` — clean exit
 
 ## How to Run
 

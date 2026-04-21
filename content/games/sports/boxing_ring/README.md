@@ -39,7 +39,7 @@ The AI cycles through idle, approach, attack, retreat, and block states. Difficu
 
 ## APIs Used
 
-`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particles`, `lurek.tween`, `lurek.time`, `lurek.signal`
+`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particle`, `lurek.tween`, `lurek.timer`, `lurek.event`
 
 ## Changes from Original Demo
 

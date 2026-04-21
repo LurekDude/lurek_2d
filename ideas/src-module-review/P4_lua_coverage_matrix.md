@@ -98,7 +98,7 @@ Per repo convention, `tests/lua/harness.rs` registers each Lua test file MANUALL
 
 ### 4.1 — Files on disk but NOT registered in harness (orphan tests — never run)
 
-- `tests/lua/unit/test_engine.lua`
+- `tests/lua/unit/test_runtime.lua`
 
 ### 4.2 — Harness references to files that DO NOT exist (broken `run_lua_test()` paths)
 
@@ -115,7 +115,7 @@ The disagreements that do exist are limitations of `test_coverage.py`, not bugs 
 1. **No COVERED/PARTIAL distinction.** The tool counts a name as covered if its lowercase substring appears anywhere in any `*.lua` test file. The P4 matrix's `PARTIAL` column (2517 names) calls out cases where the name appears but no `assert`/`expect_*` lives within ±3 lines. **Follow-up**: extend `test_coverage.py` with an optional `--strict` mode that distinguishes assertion-adjacent references from incidental ones (issue this as a tooling enhancement, NOT a P3-* blocker).
 2. **Substring false positives.** Short Lua names (e.g. `new`, `update`, `draw`, `set`, `get`) match almost every test file. The matrix inherits this — the COVERED/PARTIAL/MISSING totals over-count short-named methods. The MISSING column is unaffected (a name truly absent is truly absent). **Follow-up**: use the `owner_type` column from `gen_lua_api` to scope short-name searches to test files that mention the owner.
 3. **No per-file attribution.** Both the tool and this matrix only know whether a name is tested SOMEWHERE; they do not pinpoint which test file. P3-* developers needing this should `grep_search` for `<lua_name>` under `tests/lua/<module>/`.
-4. **`compute_api` registers as `lurek.compute`** (not `lurek.gpu` despite some doc references) — the matrix uses the registration name. This matches repo memory; no follow-up needed.
+4. **`compute_api` registers as `lurek.compute`** (not `lurek.compute` despite some doc references) — the matrix uses the registration name. This matches repo memory; no follow-up needed.
 5. **`data_api` and `dataframe_api` always-on** regardless of `ModulesConfig` flags — both modules appear in the matrix unconditionally. This matches repo memory; flag for P2 thin-wrapper audit, not P4.
 6. **Module name normalisation.** The tool maps `src/lua_api/<m>_api.rs` to module `<m>` (so `engine_api.rs` → `engine`, `system_api.rs` → `system`). The PLAN.md family table calls module B `engine` (file lives at `src/engine/`); families are assigned via `FAMILY` map in `p4_build_matrix.py` — manual and tool agree.
 

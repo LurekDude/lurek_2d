@@ -23,7 +23,7 @@ the turn and broadcasts the change. Clients receive turn events via `onTurn`.
 **Wire format**: state deltas and full-state snapshots are encoded with
 `lurek.network.pack` / `lurek.network.unpack` (MessagePack — the canonical
 ENet payload format). For human-readable persistence (e.g. write a snapshot
-to disk for inspection), pair `:getAll()` with `lurek.codec.toJson`.
+to disk for inspection), pair `:getAll()` with `lurek.serial.toJson`.
 
 **Hash helper**: `:hashState()` is a deterministic FNV-1a digest of all
 replicated keys/values; useful for desync detection. When a future
@@ -36,7 +36,7 @@ callback.
 
 *30 functions, 0 module fields documented.*
 
-See: [`lurek.network`](../lua-api.md#lureknetwork), [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson), [`lurek.time.Scheduler`](../lua-api.md#lurektimescheduler)
+See: [`lurek.network`](../lua-api.md#lureknetwork), [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson), [`lurek.timer.Scheduler`](../lua-api.md#lurektimescheduler)
 
 ## Functions
 
@@ -300,20 +300,20 @@ See: [`lurek.data.hash`](../lua-api.md#lurekdatahash)
 
 ### `toJson()`
 
-Serialise the current state to a JSON string via `lurek.codec.toJson`. Suitable for human-readable persistence (NOT for the wire — use the normal `:sync()` MessagePack path for peer-to-peer traffic). Returns nil if `lurek.codec` is unavailable in this runtime.
+Serialise the current state to a JSON string via `lurek.serial.toJson`. Suitable for human-readable persistence (NOT for the wire — use the normal `:sync()` MessagePack path for peer-to-peer traffic). Returns nil if `lurek.serial` is unavailable in this runtime.
 
 **Returns**
 
 - *string|nil* — JSON snapshot of `:getAll()`, or nil.
 
-See: [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson)
+See: [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson)
 
 ### `requestFullState()`
 
-Request a full state snapshot from the authority. Useful when a client joins mid-game. **Limitation**: This method has no built-in timeout. If the authority never responds, the client will not receive a snapshot. Callers should implement their own timer-based retry, e.g.: ns:requestFullState() local deadline = lurek.time.getTime() + 5.0 -- In process loop: if lurek.time.getTime() > deadline then retry or invoke --   ns:onFullStateTimeout callback
+Request a full state snapshot from the authority. Useful when a client joins mid-game. **Limitation**: This method has no built-in timeout. If the authority never responds, the client will not receive a snapshot. Callers should implement their own timer-based retry, e.g.: ns:requestFullState() local deadline = lurek.timer.getTime() + 5.0 -- In process loop: if lurek.timer.getTime() > deadline then retry or invoke --   ns:onFullStateTimeout callback
 
 **Returns**
 
 - *boolean* — False if this instance is the authority (no-op), true if sent.
 
-See: [`lurek.time.getTime`](../lua-api.md#lurektimegettime)
+See: [`lurek.timer.getTime`](../lua-api.md#lurektimegettime)

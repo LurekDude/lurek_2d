@@ -3,15 +3,15 @@
 **Tier**: 3 — Lunasome (Pure Lua)
 **Status**: full
 **Path**: `library/doll/`
-**Optional bindings**: `lurek.graphic` (caller-side renderer for `getDrawList()` entries), `lurek.img` (texture loader for `Part:setTexture`)
+**Optional bindings**: `lurek.render` (caller-side renderer for `getDrawList()` entries), `lurek.image` (texture loader for `Part:setTexture`)
 
 ## P7 batch B note
 
 The legacy `Doll:draw()` method previously dereferenced an undefined global
-`luna` and a non-existent namespace `lurek.gfx` (init.lua line 405). It is
+`luna` and a non-existent namespace `lurek.render` (init.lua line 405). It is
 now a deprecated one-time-warning no-op. Library code does not call render
 APIs directly — callers must iterate `Doll:getDrawList()` and dispatch the
-entries to `lurek.graphic` (or any other renderer) themselves.
+entries to `lurek.render` (or any other renderer) themselves.
 
 ## Responsibility
 
@@ -44,7 +44,7 @@ local drawList = doll:getDrawList()
 
 ## Dependencies
 
-- None (pure Lua, optionally calls `lurek.gfx` in `draw()`)
+- None (pure Lua, optionally calls `lurek.render` in `draw()`)
 
 ## Tests
 

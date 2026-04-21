@@ -32,9 +32,9 @@ Guide the snake around a 32×28 grid collecting food. Each food item adds a segm
 - `lurek.input` — action-bound WASD / arrow key controls.
 - `lurek.camera` — static viewport (good practice pattern).
 - `lurek.tween` — smooth score counter animation on food pickup.
-- `lurek.particles` — burst effect when eating food.
-- `lurek.time` — FPS counter in the HUD.
-- `lurek.signal` — clean shutdown on Escape.
+- `lurek.particle` — burst effect when eating food.
+- `lurek.timer` — FPS counter in the HUD.
+- `lurek.event` — clean shutdown on Escape.
 
 **Lunasome (`content/library/`) modules**
 

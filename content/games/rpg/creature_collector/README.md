@@ -55,8 +55,8 @@ Explore a 25×18 tile-based overworld with grass, water, trees, paths, and a hea
 - `lurek.input` — action-bound WASD movement and number key battle choices.
 - `lurek.window` — dynamic title with FPS counter.
 - `lurek.camera` — follows player on the overworld, resets for UI.
-- `lurek.time` — FPS counter and delta time.
-- `lurek.signal` — clean shutdown on Escape.
+- `lurek.timer` — FPS counter and delta time.
+- `lurek.event` — clean shutdown on Escape.
 
 **Visual effects (pure Lua)**
 

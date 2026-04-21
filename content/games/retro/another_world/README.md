@@ -30,4 +30,4 @@ cargo run -- content/games/retro/another_world
 - Atmospheric purple/dark palette with moon and silhouettes
 
 ## APIs Used
-lurek.window, lurek.render, lurek.input, lurek.signal, lurek.time, lurek.particles, lurek.tween, lurek.camera
+lurek.window, lurek.render, lurek.input, lurek.event, lurek.timer, lurek.particle, lurek.tween, lurek.camera

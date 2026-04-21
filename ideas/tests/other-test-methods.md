@@ -118,18 +118,18 @@ local function safe(fn, ...)
     end
 end
 
-describe("lurek.gfx nil/fuzz safety", function()
+describe("lurek.render nil/fuzz safety", function()
     it("rectangle rejects nil args without panic", function()
-        safe(lurek.gfx.rectangle, nil, nil, nil, nil, nil)
+        safe(lurek.render.rectangle, nil, nil, nil, nil, nil)
     end)
     it("rectangle rejects wrong types", function()
-        safe(lurek.gfx.rectangle, "fill", "not_a_number", "nope", 10, 10)
+        safe(lurek.render.rectangle, "fill", "not_a_number", "nope", 10, 10)
     end)
     it("rectangle with NaN dimensions", function()
-        safe(lurek.gfx.rectangle, "fill", 0/0, 0/0, 0/0, 0/0)
+        safe(lurek.render.rectangle, "fill", 0/0, 0/0, 0/0, 0/0)
     end)
     it("setColor with extreme values", function()
-        safe(lurek.gfx.setColor, math.huge, -math.huge, 2, -1)
+        safe(lurek.render.setColor, math.huge, -math.huge, 2, -1)
     end)
 end)
 
@@ -149,7 +149,7 @@ test_summary()
 
 Priority modules ranked by attack surface (see `ideas/tests/security-testing-plan.md`):
 1. `lurek.filesystem.*` — path traversal risk
-2. `lurek.gfx.*` — resource loading
+2. `lurek.render.*` — resource loading
 3. `lurek.audio.*` — file decoding
 4. `lurek.data.*` — parser injection
 5. `lurek.serial.*` — encryption inputs

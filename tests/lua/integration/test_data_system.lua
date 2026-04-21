@@ -8,9 +8,9 @@ describe("data + filesystem integration", function()
     -- @covers lurek.data.encodeToml
     -- @covers lurek.data.hash
     -- @covers lurek.data.parseToml
-    -- @covers lurek.platform.getClipboardText
-    -- @covers lurek.platform.getOS
-    -- @covers lurek.platform.setClipboardText
+    -- @covers lurek.runtime.getClipboardText
+    -- @covers lurek.runtime.getOS
+    -- @covers lurek.runtime.setClipboardText
     -- @description Verifies the data module alone can round-trip base64 text; this file is stored under integration but this test is effectively a single-module data check.
     it("can encode and decode data", function()
         -- Test basic data operations
@@ -82,24 +82,24 @@ end)
 
 -- @description Covers suite: system info integration.
 describe("system info integration", function()
-    -- @covers lurek.platform.getOS
-    -- @covers lurek.platform
+    -- @covers lurek.runtime.getOS
+    -- @covers lurek.runtime
     -- @description Verifies the platform module alone can report the host OS name; this file remains in integration but this test is effectively unit-scoped.
     it("system provides OS info", function()
-        if lurek.platform and lurek.platform.getOS then
-            local os_name = lurek.platform.getOS()
+        if lurek.runtime and lurek.runtime.getOS then
+            local os_name = lurek.runtime.getOS()
             expect_not_nil(os_name, "OS name exists")
             expect_true(type(os_name) == "string", "OS is string")
         end
     end)
 
-    -- @covers lurek.platform.setClipboardText
-    -- @covers lurek.platform.getClipboardText
+    -- @covers lurek.runtime.setClipboardText
+    -- @covers lurek.runtime.getClipboardText
     -- @description Verifies clipboard set/get behavior when available in the platform module, documenting that it is a single-module environmental check.
     it("system clipboard operations", function()
-        if lurek.platform and lurek.platform.setClipboardText then
-            lurek.platform.setClipboardText("Lurek2D test")
-            local text = lurek.platform.getClipboardText()
+        if lurek.runtime and lurek.runtime.setClipboardText then
+            lurek.runtime.setClipboardText("Lurek2D test")
+            local text = lurek.runtime.getClipboardText()
             -- Clipboard may or may not work in headless mode
             if text then
                 expect_equal("Lurek2D test", text, "clipboard round-trip")

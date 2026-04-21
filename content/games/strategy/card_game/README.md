@@ -55,4 +55,4 @@ cargo run -- content/games/strategy/card_game
 
 ## APIs Used
 
-`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particles`, `lurek.tween`, `lurek.timer`, `lurek.event`
+`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particle`, `lurek.tween`, `lurek.timer`, `lurek.event`

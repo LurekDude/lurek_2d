@@ -6,9 +6,9 @@ describe("validation: physics invalid args", function()
     -- @covers lurek.physics.step
     -- @security lurek.compute.zeros
     -- @security lurek.dataframe.newDataFrame
-    -- @security lurek.entity.newUniverse
+    -- @security lurek.ecs.newUniverse
     -- @security lurek.graph.newGraph
-    -- @security lurek.img.newImageData
+    -- @security lurek.image.newImageData
     -- @security lurek.physics.destroyWorld
     -- @security lurek.physics.newBody
     -- @security lurek.physics.newWorld
@@ -177,28 +177,28 @@ end)
 
 -- @description Covers suite: validation: entity invalid operations.
 describe("validation: entity invalid operations", function()
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @description Kills an entity id that was never allocated to confirm the ECS ignores invalid deletes without panicking.
     it("handles kill of nonexistent entity", function()
-        local universe = lurek.entity.newUniverse()
+        local universe = lurek.ecs.newUniverse()
         expect_no_error(function()
             universe:kill(99999)
         end, "kill nonexistent should not crash")
     end)
 
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @description Reads liveness after destroying an entity to verify dead ids stay invalid and do not resurrect through a getter.
     it("handles get on dead entity", function()
-        local universe = lurek.entity.newUniverse()
+        local universe = lurek.ecs.newUniverse()
         local id = universe:spawn()
         universe:kill(id)
         expect_false(universe:isAlive(id), "dead entity is not alive")
     end)
 
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @description Attempts to mutate components on a dead entity id to verify stale entity handles are rejected.
     it("handles set on dead entity", function()
-        local universe = lurek.entity.newUniverse()
+        local universe = lurek.ecs.newUniverse()
         local id = universe:spawn()
         universe:kill(id)
         expect_error(function()
@@ -209,20 +209,20 @@ end)
 
 -- @description Covers suite: validation: image invalid operations.
 describe("validation: image invalid operations", function()
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @description Creates a zero-by-zero image to ensure degenerate dimensions are handled without crashing the image allocator.
     it("handles zero-size image gracefully", function()
         -- Engine may accept zero-size image without error
         expect_no_error(function()
-            lurek.img.newImageData(0, 0)
+            lurek.image.newImageData(0, 0)
         end, "zero size image should not crash")
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @description Loads a missing image path to verify file-based image creation returns a Lua error for absent assets.
     it("rejects loading nonexistent file", function()
         expect_error(function()
-            lurek.img.newImageData("nonexistent_file.png")
+            lurek.image.newImageData("nonexistent_file.png")
         end, "nonexistent file should error")
     end)
 end)

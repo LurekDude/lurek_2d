@@ -8,7 +8,7 @@ describe("evidence: cellular sand simulation", function()
     -- @covers LuaCellular:fillRect
     -- @covers LuaCellular:stepN
     -- @covers LuaCellular:toImageData
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Places a layer of sand at the top of a 64x64 grid,
     --              steps 50 times, then renders and saves a PNG proving
@@ -39,9 +39,9 @@ describe("evidence: cellular sand simulation", function()
         local raw = sim:toImageData()
         expect_equal(W * H * 4, #raw)
 
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:setRawData(raw)
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 end)

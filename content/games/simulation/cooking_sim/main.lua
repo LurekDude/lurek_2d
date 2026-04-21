@@ -224,7 +224,7 @@ lurek.process(function(dt)
             start_day()
         end
         if lurek.input.isActionJustPressed("quit") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -248,7 +248,7 @@ lurek.process(function(dt)
             end
         end
         if lurek.input.isActionJustPressed("quit") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -263,7 +263,7 @@ lurek.process(function(dt)
             state = STATES.TITLE
         end
         if lurek.input.isActionJustPressed("quit") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end

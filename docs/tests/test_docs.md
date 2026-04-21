@@ -2904,9 +2904,9 @@
 
 **Uncovered Lua API functions** (3):
 
-- `lurek.entity.Universe:bitmapUntag`
-- `lurek.entity.Universe:getBitmapTagBit`
-- `lurek.entity.Universe:killRecursive`
+- `lurek.ecs.Universe:bitmapUntag`
+- `lurek.ecs.Universe:getBitmapTagBit`
+- `lurek.ecs.Universe:killRecursive`
 
 ### `filesystem` — 22/37 (59.5%)
 
@@ -2934,26 +2934,26 @@
 
 **Uncovered Lua API functions** (37):
 
-- `lurek.graphic.Font:getLineHeight`
-- `lurek.graphic.Font:setLineHeight`
-- `lurek.graphic.Font:getAscent`
-- `lurek.graphic.Font:getDescent`
-- `lurek.graphic.Font:getWrap`
-- `lurek.graphic.Mesh:getVertexCount`
-- `lurek.graphic.Mesh:getVertex`
-- `lurek.graphic.Mesh:setVertex`
-- `lurek.graphic.Shader:hasUniform`
-- `lurek.graphic.Quad:getTextureDimensions`
-- `lurek.graphic.lurek.graphic.getBackgroundColor`
-- `lurek.graphic.lurek.graphic.drawq`
-- `lurek.graphic.lurek.graphic.printf`
-- `lurek.graphic.lurek.graphic.setPointSize`
-- `lurek.graphic.lurek.graphic.getPointSize`
-- `lurek.graphic.lurek.graphic.getFontWrap`
-- `lurek.graphic.lurek.graphic.setCanvas`
-- `lurek.graphic.lurek.graphic.getCanvas`
-- `lurek.graphic.lurek.graphic.getCanvasSize`
-- `lurek.graphic.lurek.graphic.newSpriteBatch`
+- `lurek.render.Font:getLineHeight`
+- `lurek.render.Font:setLineHeight`
+- `lurek.render.Font:getAscent`
+- `lurek.render.Font:getDescent`
+- `lurek.render.Font:getWrap`
+- `lurek.render.Mesh:getVertexCount`
+- `lurek.render.Mesh:getVertex`
+- `lurek.render.Mesh:setVertex`
+- `lurek.render.Shader:hasUniform`
+- `lurek.render.Quad:getTextureDimensions`
+- `lurek.render.lurek.render.getBackgroundColor`
+- `lurek.render.lurek.render.drawq`
+- `lurek.render.lurek.render.printf`
+- `lurek.render.lurek.render.setPointSize`
+- `lurek.render.lurek.render.getPointSize`
+- `lurek.render.lurek.render.getFontWrap`
+- `lurek.render.lurek.render.setCanvas`
+- `lurek.render.lurek.render.getCanvas`
+- `lurek.render.lurek.render.getCanvasSize`
+- `lurek.render.lurek.render.newSpriteBatch`
 - *...and 17 more*
 
 ### `image` — 27/28 (96.4%)
@@ -2979,18 +2979,18 @@
 
 **Uncovered Lua API functions** (12):
 
-- `lurek.localization.lurek.localization.unloadTable`
-- `lurek.localization.lurek.localization.getLanguages`
-- `lurek.localization.lurek.localization.setFallbacks`
-- `lurek.localization.lurek.localization.getFallbacks`
-- `lurek.localization.lurek.localization.pluralFor`
-- `lurek.localization.lurek.localization.onLanguageChange`
-- `lurek.localization.lurek.localization.keyCount`
-- `lurek.localization.lurek.localization.categories`
-- `lurek.localization.lurek.localization.keysInCategory`
-- `lurek.localization.lurek.localization.buildIndex`
-- `lurek.localization.lurek.localization.searchIndexed`
-- `lurek.localization.lurek.localization.mergeLocale`
+- `lurek.i18n.lurek.i18n.unloadTable`
+- `lurek.i18n.lurek.i18n.getLanguages`
+- `lurek.i18n.lurek.i18n.setFallbacks`
+- `lurek.i18n.lurek.i18n.getFallbacks`
+- `lurek.i18n.lurek.i18n.pluralFor`
+- `lurek.i18n.lurek.i18n.onLanguageChange`
+- `lurek.i18n.lurek.i18n.keyCount`
+- `lurek.i18n.lurek.i18n.categories`
+- `lurek.i18n.lurek.i18n.keysInCategory`
+- `lurek.i18n.lurek.i18n.buildIndex`
+- `lurek.i18n.lurek.i18n.searchIndexed`
+- `lurek.i18n.lurek.i18n.mergeLocale`
 
 ### `log` — 7/13 (53.8%)
 
@@ -3035,21 +3035,21 @@
 
 **Uncovered Lua API functions** (15):
 
-- `lurek.modding.Mod:getHook`
-- `lurek.modding.Mod:hasHook`
-- `lurek.modding.Mod:getHookNames`
-- `lurek.modding.Mod:setConfig`
-- `lurek.modding.Mod:getConfig`
-- `lurek.modding.Mod:releaseRefs`
-- `lurek.modding.ModManager:validateDependencies`
-- `lurek.modding.ModManager:hasCircularDependencies`
-- `lurek.modding.ModManager:setLoadOrder`
-- `lurek.modding.ModManager:clearLoadOrder`
-- `lurek.modding.ModManager:scanFolder`
-- `lurek.modding.ModManager:getModPath`
-- `lurek.modding.ModManager:markForReload`
-- `lurek.modding.ModManager:getReloadQueue`
-- `lurek.modding.ModManager:clearReloadQueue`
+- `lurek.mods.Mod:getHook`
+- `lurek.mods.Mod:hasHook`
+- `lurek.mods.Mod:getHookNames`
+- `lurek.mods.Mod:setConfig`
+- `lurek.mods.Mod:getConfig`
+- `lurek.mods.Mod:releaseRefs`
+- `lurek.mods.ModManager:validateDependencies`
+- `lurek.mods.ModManager:hasCircularDependencies`
+- `lurek.mods.ModManager:setLoadOrder`
+- `lurek.mods.ModManager:clearLoadOrder`
+- `lurek.mods.ModManager:scanFolder`
+- `lurek.mods.ModManager:getModPath`
+- `lurek.mods.ModManager:markForReload`
+- `lurek.mods.ModManager:getReloadQueue`
+- `lurek.mods.ModManager:clearReloadQueue`
 
 ### `network` — 8/20 (40.0%)
 
@@ -3090,19 +3090,19 @@
 
 **Uncovered Lua API functions** (13):
 
-- `lurek.pathfinding.NavGrid:loadFromString`
-- `lurek.pathfinding.NavGrid:saveToString`
-- `lurek.pathfinding.NavGrid:setChunkSize`
-- `lurek.pathfinding.NavGrid:rebuildAbstract`
-- `lurek.pathfinding.NavGrid:setDirty`
-- `lurek.pathfinding.NavGrid:clearDirty`
-- `lurek.pathfinding.UnitPathfinder:getPathLength`
-- `lurek.pathfinding.UnitPathfinder:getPathCost`
-- `lurek.pathfinding.UnitPathfinder:setCacheEnabled`
-- `lurek.pathfinding.UnitPathfinder:setCacheMaxSize`
-- `lurek.pathfinding.FlowField:getDirectionAngle`
-- `lurek.pathfinding.FlowField:getTargets`
-- `lurek.pathfinding.lurek.pathfinding.setThreadCount`
+- `lurek.pathfind.NavGrid:loadFromString`
+- `lurek.pathfind.NavGrid:saveToString`
+- `lurek.pathfind.NavGrid:setChunkSize`
+- `lurek.pathfind.NavGrid:rebuildAbstract`
+- `lurek.pathfind.NavGrid:setDirty`
+- `lurek.pathfind.NavGrid:clearDirty`
+- `lurek.pathfind.UnitPathfinder:getPathLength`
+- `lurek.pathfind.UnitPathfinder:getPathCost`
+- `lurek.pathfind.UnitPathfinder:setCacheEnabled`
+- `lurek.pathfind.UnitPathfinder:setCacheMaxSize`
+- `lurek.pathfind.FlowField:getDirectionAngle`
+- `lurek.pathfind.FlowField:getTargets`
+- `lurek.pathfind.lurek.pathfind.setThreadCount`
 
 ### `patterns` — 86/103 (83.5%)
 
@@ -3176,7 +3176,7 @@
 
 **Uncovered Lua API functions** (1):
 
-- `lurek.savegame.SaveManager:getSlotInfo`
+- `lurek.save.SaveManager:getSlotInfo`
 
 ### `scene` — 33/33 (100.0%)
 
@@ -3190,20 +3190,20 @@
 
 **Uncovered Lua API functions** (14):
 
-- `lurek.system.lurek.system.getProcessorCount`
-- `lurek.system.lurek.system.getMemorySize`
-- `lurek.system.lurek.system.openURL`
-- `lurek.system.lurek.system.getPreferredLocales`
-- `lurek.system.lurek.system.getPowerInfo`
-- `lurek.system.lurek.system.setDebugOverlay`
-- `lurek.system.lurek.system.getDebugOverlay`
-- `lurek.system.lurek.system.getLastError`
-- `lurek.system.lurek.system.getArch`
-- `lurek.system.lurek.system.getEnv`
-- `lurek.system.lurek.system.getArgs`
-- `lurek.system.lurek.system.parseArgs`
-- `lurek.system.lurek.system.runBatch`
-- `lurek.system.lurek.system.getBatchResults`
+- `lurek.runtime.lurek.runtime.getProcessorCount`
+- `lurek.runtime.lurek.runtime.getMemorySize`
+- `lurek.runtime.lurek.runtime.openURL`
+- `lurek.runtime.lurek.runtime.getPreferredLocales`
+- `lurek.runtime.lurek.runtime.getPowerInfo`
+- `lurek.runtime.lurek.runtime.setDebugOverlay`
+- `lurek.runtime.lurek.runtime.getDebugOverlay`
+- `lurek.runtime.lurek.runtime.getLastError`
+- `lurek.runtime.lurek.runtime.getArch`
+- `lurek.runtime.lurek.runtime.getEnv`
+- `lurek.runtime.lurek.runtime.getArgs`
+- `lurek.runtime.lurek.runtime.parseArgs`
+- `lurek.runtime.lurek.runtime.runBatch`
+- `lurek.runtime.lurek.runtime.getBatchResults`
 
 ### `terminal` — 55/55 (100.0%)
 

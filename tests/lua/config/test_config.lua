@@ -1,8 +1,8 @@
 -- tests/lua/config/test_config.lua
 -- BDD tests for the lurek.conf(t) configuration API, focused on runtime reads and merged configuration visibility after boot.
 
--- @covers lurek.platform.getOS
--- @covers lurek.platform.getVersion
+-- @covers lurek.runtime.getOS
+-- @covers lurek.runtime.getVersion
 -- @covers lurek.window.getHeight
 -- @covers lurek.window.getTitle
 -- @covers lurek.window.getWidth
@@ -71,26 +71,26 @@ end)
 -- 3. Modules table
 -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
--- @description Covers suite: lurek.platform module flags.
-describe("lurek.platform module flags", function()
-    -- @covers lurek.platform
+-- @description Covers suite: lurek.runtime module flags.
+describe("lurek.runtime module flags", function()
+    -- @covers lurek.runtime
     -- @description Confirms the platform namespace itself is registered as a table before querying platform metadata.
-    it("lurek.platform is a table", function()
-        expect_type("table", lurek.platform)
+    it("lurek.runtime is a table", function()
+        expect_type("table", lurek.runtime)
     end)
 
-    -- @covers lurek.platform.getVersion
+    -- @covers lurek.runtime.getVersion
     -- @description Verifies that the platform version accessor returns a non-empty version string.
-    it("lurek.platform.getVersion returns a string", function()
-        local v = lurek.platform.getVersion()
+    it("lurek.runtime.getVersion returns a string", function()
+        local v = lurek.runtime.getVersion()
         expect_type("string", v)
         expect_equal(#v > 0, true)
     end)
 
-    -- @covers lurek.platform.getOS
+    -- @covers lurek.runtime.getOS
     -- @description Checks that the reported operating system name stays within the expected Windows, Linux, or macOS set.
-    it("lurek.platform.getOS returns a known platform string", function()
-        local os = lurek.platform.getOS()
+    it("lurek.runtime.getOS returns a known platform string", function()
+        local os = lurek.runtime.getOS()
         local valid = { Windows = true, Linux = true, macOS = true }
         expect_equal(valid[os] ~= nil, true)
     end)

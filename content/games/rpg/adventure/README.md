@@ -46,9 +46,9 @@ cargo run -- content/games/rpg/adventure
 - `lurek.render` — drawRect, drawRectLines, drawCircle, drawLine, print, setColor, setBackgroundColor
 - `lurek.render_ui` — inventory bar, dialog box, room name, control hints
 - `lurek.input` — addAction, wasActionPressed
-- `lurek.particles` — sparkle, burst, dust particle systems
+- `lurek.particle` — sparkle, burst, dust particle systems
 - `lurek.tween` — pickup float animation, tween.update
 - `lurek.camera` — setPosition
 - `lurek.window` — setTitle
-- `lurek.time` — getFPS, delta
-- `lurek.signal` — quit
+- `lurek.timer` — getFPS, delta
+- `lurek.event` — quit

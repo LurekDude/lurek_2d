@@ -40,7 +40,7 @@ end)
 ### Additional Tags
 
 ```lua
--- @covers lurek.graphics.saveScreenshot
+-- @covers lurek.renders.saveScreenshot
 -- @evidence file:save/screenshot.png
 -- @evidence log:screenshot saved
 describe("screenshot saving", function() ... end)
@@ -63,10 +63,10 @@ describe("screenshot saving", function() ... end)
 
 ### Before (current)
 ```lua
-describe("lurek.gfx color functions", function()
+describe("lurek.render color functions", function()
     it("setColor accepts 3 args", function()
         expect_no_error(function()
-            lurek.gfx.setColor(1, 0, 0)
+            lurek.render.setColor(1, 0, 0)
         end)
     end)
 end)
@@ -74,18 +74,18 @@ end)
 
 ### After (with markers)
 ```lua
--- @covers lurek.gfx.setColor
--- @covers lurek.gfx.setBackgroundColor
-describe("lurek.gfx color functions", function()
+-- @covers lurek.render.setColor
+-- @covers lurek.render.setBackgroundColor
+describe("lurek.render color functions", function()
     it("setColor accepts 3 args", function()
         expect_no_error(function()
-            lurek.gfx.setColor(1, 0, 0)
+            lurek.render.setColor(1, 0, 0)
         end)
     end)
 
     it("setBackgroundColor accepts 3 args", function()
         expect_no_error(function()
-            lurek.gfx.setBackgroundColor(0.1, 0.1, 0.1)
+            lurek.render.setBackgroundColor(0.1, 0.1, 0.1)
         end)
     end)
 end)
@@ -112,11 +112,11 @@ end)
 
 ### Evidence Test Example
 ```lua
--- @covers lurek.gfx.rectangle
+-- @covers lurek.render.rectangle
 -- @evidence log:RenderCommand::Rectangle
 describe("rectangle drawing", function()
     it("rectangle produces draw command", function()
-        lurek.gfx.rectangle("fill", 10, 10, 100, 50)
+        lurek.render.rectangle("fill", 10, 10, 100, 50)
         -- In headless mode, verify the draw command was queued
         -- Evidence: log output confirms RenderCommand was created
     end)

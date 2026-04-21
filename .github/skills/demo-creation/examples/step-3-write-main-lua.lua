@@ -12,7 +12,7 @@
 -- ── load ──────────────────────────────────────────────────────
 function lurek.init()
     lurek.window.setTitle("<Demo Title>")
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
     -- resource creation, world setup, initial state
 end
 
@@ -29,6 +29,6 @@ end
 
 -- ── keypressed ────────────────────────────────────────────────
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     -- discrete events: jump, restart, action
 end

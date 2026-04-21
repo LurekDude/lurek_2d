@@ -11,7 +11,7 @@
 //! All effects are CPU-only; no GPU dependency is required or used.
 //! Effects that work in-place take `&mut self`; effects that produce a new image take `&self`
 //! and return a new `ImageData`.  Apply effects after loading an image and before uploading
-//! to the GPU via `lurek.img.*`.
+//! to the GPU via `lurek.image.*`.
 //!
 //! ## Parallelism
 //!

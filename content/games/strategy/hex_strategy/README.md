@@ -29,9 +29,9 @@ You start at the center hex. Each turn you collect resources from all owned hexe
 
 ## APIs Used
 - `lurek.render` — hex grid using rect approximation, city markers, ownership tint
-- `lurek.particles` — expansion burst, city sparkle
+- `lurek.particle` — expansion burst, city sparkle
 - `lurek.input` — click selection and action bindings
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced

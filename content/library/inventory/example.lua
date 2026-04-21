@@ -80,7 +80,7 @@ end
 
 print("[example.inventory] === Scenario 6: codec round-trip of stack snapshot ===")
 
-local ok_codec, codec = pcall(require, "lurek.codec")
+local ok_codec, codec = pcall(require, "lurek.serial")
 if ok_codec and codec and codec.toJson then
     local snap = {
         potions = backpack:countItem("potion_of_healing"),
@@ -95,7 +95,7 @@ if ok_codec and codec and codec.toJson then
             tostring(t.potions), tostring(t.arrows)))
     end
 else
-    print(string.format("  no lurek.codec — snapshot: potions=%d arrows=%d weight=%.2f",
+    print(string.format("  no lurek.serial — snapshot: potions=%d arrows=%d weight=%.2f",
         backpack:countItem("potion_of_healing"),
         backpack:countItem("arrow"),
         backpack:getCurrentWeight()))

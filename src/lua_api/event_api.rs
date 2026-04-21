@@ -1,4 +1,4 @@
-//! `lurek.signal` — Event queue polling and pub-sub signal dispatching.
+//! `lurek.event` — Event queue polling and pub-sub signal dispatching.
 //!
 //! Provides `Signal` userdata for named-event pub-sub with once-fire handles,
 //! per-handle filter predicates, wildcard subscriptions, and integration with the
@@ -254,7 +254,7 @@ impl LuaUserData for LuaSignal {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.signal` API table with the Lua VM.
+/// Registers the `lurek.event` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable

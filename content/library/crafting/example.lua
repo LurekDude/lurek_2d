@@ -94,12 +94,12 @@ print(string.format("  shaped axe grid=%dx%d slots=%d",
 
 print("[example.crafting] === Scenario 6: serialise registry to JSON if codec is loadable ===")
 
-local ok_codec, codec = pcall(require, "lurek.codec")
+local ok_codec, codec = pcall(require, "lurek.serial")
 if ok_codec and codec and codec.toJson then
     local minimal = { ids = registry:ids(), count = registry:count() }
     print("  codec.toJson: " .. codec.toJson(minimal))
 else
-    print(string.format("  no lurek.codec — registry ids: %s",
+    print(string.format("  no lurek.serial — registry ids: %s",
         table.concat(registry:ids(), ", ")))
 end
 

@@ -248,35 +248,35 @@ lurek.init(function()
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle systems
-    dust_ps = lurek.particles.new({
+    dust_ps = lurek.particle.new({
         maxParticles = 15, lifetime = 0.25,
         speed = 25, spread = 3.14,
         sizeStart = 3, sizeEnd = 1,
         colorStart = {0.7, 0.6, 0.4, 0.7},
         colorEnd   = {0.7, 0.6, 0.4, 0.0},
     })
-    crumble_ps = lurek.particles.new({
+    crumble_ps = lurek.particle.new({
         maxParticles = 25, lifetime = 0.6,
         speed = 80, spread = 1.5,
         sizeStart = 4, sizeEnd = 2,
         colorStart = {0.55, 0.35, 0.15, 1.0},
         colorEnd   = {0.4,  0.25, 0.1,  0.0},
     })
-    spring_ps = lurek.particles.new({
+    spring_ps = lurek.particle.new({
         maxParticles = 20, lifetime = 0.4,
         speed = 60, spread = 6.28,
         sizeStart = 3, sizeEnd = 1,
         colorStart = {1.0, 0.95, 0.2, 0.9},
         colorEnd   = {1.0, 0.85, 0.0, 0.0},
     })
-    enemy_ps = lurek.particles.new({
+    enemy_ps = lurek.particle.new({
         maxParticles = 20, lifetime = 0.4,
         speed = 70, spread = 6.28,
         sizeStart = 4, sizeEnd = 1,
         colorStart = {1.0, 0.2, 0.1, 1.0},
         colorEnd   = {0.5, 0.0, 0.0, 0.0},
     })
-    bullet_ps = lurek.particles.new({
+    bullet_ps = lurek.particle.new({
         maxParticles = 10, lifetime = 0.2,
         speed = 40, spread = 6.28,
         sizeStart = 2, sizeEnd = 1,
@@ -294,7 +294,7 @@ lurek.process(function(dt)
     title_blink = title_blink + dt
 
     if lurek.input.isActionJustPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -615,7 +615,7 @@ end)
 
 -- ── Render UI (screen space) ──────────────────────────────────────────────
 lurek.render_ui(function()
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
 
     -- ── Title screen ──────────────────────────────────────────────────────
     if game_state == STATE.TITLE then

@@ -21,7 +21,7 @@ describe("Evidence: lurek.raycaster API contracts", function()
     -- @covers Raycaster:castRaysFlat
     -- @covers lurek.raycaster.distanceShade
     -- @covers lurek.raycaster.projectColumn
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Casts a full ray fan across a boxed room and saves the resulting depth buffer visualization as PNG evidence.
     it("saves raycaster depth-buffer as PNG evidence", function()
@@ -39,7 +39,7 @@ describe("Evidence: lurek.raycaster API contracts", function()
             rc:setCell(19, y, 1)
         end
 
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         local rays = rc:castRaysFlat(10.0, 10.0, 0.0, FOV, W, 40)
         for col = 0, W - 1 do
             local base = col * 5
@@ -58,7 +58,7 @@ describe("Evidence: lurek.raycaster API contracts", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "raycaster_depth.png")
+        lurek.image.savePNG(img, OUT .. "raycaster_depth.png")
     end)
 
 end)

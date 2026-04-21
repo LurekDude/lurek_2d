@@ -249,7 +249,7 @@ lurek.init(function()
     lurek.input.bind("quit",    {"escape"})
 
     -- Particle emitters
-    emp_particles = lurek.particles.new({
+    emp_particles = lurek.particle.new({
         max       = 60,
         lifetime  = {0.4, 0.8},
         speed     = {80, 160},
@@ -258,7 +258,7 @@ lurek.init(function()
         sizes     = {4, 1},
     })
 
-    hack_particles = lurek.particles.new({
+    hack_particles = lurek.particle.new({
         max       = 40,
         lifetime  = {0.2, 0.5},
         speed     = {40, 100},
@@ -277,7 +277,7 @@ end)
 lurek.process(function(dt)
     -- Quit
     if lurek.input.justPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -572,7 +572,7 @@ lurek.render(function()
                 render.drawRect(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
                 render.drawRect(px + 6, py + 6, TILE - 12, TILE - 12, C_TERMINAL[1], C_TERMINAL[2], C_TERMINAL[3], 1)
                 -- Blinking indicator
-                if math.floor(lurek.time.getTime() * 3) % 2 == 0 then
+                if math.floor(lurek.timer.getTime() * 3) % 2 == 0 then
                     render.drawRect(px + 14, py + 14, 12, 12, 0.0, 1.0, 0.3, 0.8)
                 end
 
@@ -583,7 +583,7 @@ lurek.render(function()
 
             elseif t == T_EXIT then
                 render.drawRect(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
-                local pulse = 0.5 + 0.5 * math.sin(lurek.time.getTime() * 4)
+                local pulse = 0.5 + 0.5 * math.sin(lurek.timer.getTime() * 4)
                 render.drawRect(px + 2, py + 2, TILE - 4, TILE - 4, C_EXIT[1] * pulse, C_EXIT[2] * pulse, C_EXIT[3] * pulse, 0.7)
             end
         end
@@ -725,7 +725,7 @@ lurek.render_ui(function()
     end
 
     -- FPS
-    render.drawText(string.format("FPS: %d", lurek.time.getFPS()), SCREEN_W - 80, SCREEN_H - 20, 12, 0.4, 0.4, 0.5, 0.6)
+    render.drawText(string.format("FPS: %d", lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 20, 12, 0.4, 0.4, 0.5, 0.6)
 
     -- Message
     if msg_timer > 0 then

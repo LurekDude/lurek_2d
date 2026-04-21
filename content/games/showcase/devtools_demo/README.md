@@ -4,13 +4,13 @@ Developer tools profiling showcase: toggle real-time FPS graphs, memory profiler
 
 ## What It Demonstrates
 
-- `lurek.gfx.circle()` / `lurek.gfx.rectangle()` / `lurek.gfx.line()` — drawing game objects and UI panels
-- `lurek.gfx.print()` — on-screen text for profiling overlays
-- `lurek.particles.newSystem()` — spawn burst and stress-test warning particles
+- `lurek.render.circle()` / `lurek.render.rectangle()` / `lurek.render.line()` — drawing game objects and UI panels
+- `lurek.render.print()` — on-screen text for profiling overlays
+- `lurek.particle.newSystem()` — spawn burst and stress-test warning particles
 - `lurek.tween.to()` / `lurek.tween.update()` — smooth panel slide-in/out animations
 - `lurek.input.bind()` / `lurek.input.wasActionPressed()` — action-based input for all toggles
-- `lurek.window.setTitle()` / `lurek.gfx.setBackgroundColor()` — window setup
-- `lurek.signal.quit()` — clean exit
+- `lurek.window.setTitle()` / `lurek.render.setBackgroundColor()` — window setup
+- `lurek.event.quit()` — clean exit
 
 ## How to Run
 

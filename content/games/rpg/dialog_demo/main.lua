@@ -367,7 +367,7 @@ end
 -- ── lurek.init ────────────────────────────────────────────────
 lurek.init(function()
     lurek.window.setTitle("Dialog Demo — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.1, 0.1, 0.15)
+    lurek.render.setBackgroundColor(0.1, 0.1, 0.15)
     title_alpha = 0
     title_prompt_alpha = 0
 end)
@@ -434,7 +434,7 @@ lurek.process(function(dt)
     end
 
     -- Quit
-    if lurek.input.isPressed(actions.quit) then lurek.signal.quit() end
+    if lurek.input.isPressed(actions.quit) then lurek.event.quit() end
 
     -- Skip typewriter
     if lurek.input.isPressed(actions.skip) then

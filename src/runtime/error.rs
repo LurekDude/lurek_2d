@@ -200,7 +200,7 @@ pub type EngineResult<T> = Result<T, EngineError>;
 ///
 /// This struct captures all fields of an [`EngineError`] needed for
 /// diagnostics: the human-readable message, numeric code, category name, and a
-/// recovery hint. Used by `lurek.platform.errorSnapshot()` and by the engine's
+/// recovery hint. Used by `lurek.runtime.errorSnapshot()` and by the engine's
 /// JSON crash reporter.
 ///
 /// # Fields

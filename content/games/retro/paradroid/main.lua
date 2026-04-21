@@ -5,7 +5,7 @@
 -- Controls: Arrow keys = move, Space = fire, E = transfer, Escape = quit
 -- ============================================================================
 
-local signal = lurek.signal
+local signal = lurek.event
 local input  = lurek.input
 local gfx    = lurek.render
 local tween  = lurek.tween

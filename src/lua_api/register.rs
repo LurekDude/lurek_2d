@@ -55,15 +55,15 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     let luna = lua.create_table()?;
     lua.globals().set("lurek", luna.clone())?;
 
-    // event: lurek.signal (always registered — mandatory API)
+    // event: lurek.event (always registered — mandatory API)
     event_api::register(&lua, &luna, state.clone())?;
 
-    // timer: lurek.time
+    // timer: lurek.timer
     if modules.timer {
         timer_api::register(&lua, &luna, state.clone())?;
     }
 
-    // image: lurek.img
+    // image: lurek.image
     if modules.image {
         image_api::register(&lua, &luna, state.clone())?;
     }
@@ -91,7 +91,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         thread_api::register(&lua, &luna, state.clone())?;
     }
 
-    // automation: lurek.simulator
+    // automation: lurek.automation
     if modules.debug {
         automation_api::register(&lua, &luna, state.clone())?;
     }
@@ -106,17 +106,17 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         debugbridge_api::register(&lua, &luna)?;
     }
 
-    // localization: lurek.localization
+    // localization: lurek.i18n
     if modules.localization {
         i18n_api::register(&lua, &luna, state.clone())?;
     }
 
-    // input: lurek.keyboard / lurek.mouse / lurek.gamepad / lurek.touch
+    // input: lurek.input.keyboard / lurek.input.mouse / lurek.input.gamepad / lurek.input.touch
     if modules.input {
         input_api::register(&lua, &luna, state.clone())?;
     }
 
-    // savegame: lurek.savegame (always registered — no config flag)
+    // savegame: lurek.save (always registered — no config flag)
     save_api::register(&lua, &luna, state.clone())?;
 
     // docs: lurek.docs (always registered — no config flag)
@@ -129,10 +129,10 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     // data: lurek.data (always registered — no config flag)
     data_api::register(&lua, &luna, state.clone())?;
 
-    // modding: lurek.modding (always registered — no config flag)
+    // modding: lurek.mods (always registered — no config flag)
     mods_api::register(&lua, &luna, state.clone())?;
 
-    // serial: lurek.codec (always registered — no config flag)
+    // serial: lurek.serial (always registered — no config flag)
     serial_api::register(&lua, &luna, state.clone())?;
 
     // dataframe: lurek.dataframe (always registered — no config flag)
@@ -141,12 +141,12 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     // light: lurek.light (always registered — no config flag)
     light_api::register(&lua, &luna, state.clone())?;
 
-    // filesystem: lurek.fs
+    // filesystem: lurek.filesystem
     if modules.filesystem {
         filesystem_api::register(&lua, &luna, state.clone())?;
     }
 
-    // entity: lurek.entity
+    // entity: lurek.ecs
     if modules.entity {
         ecs_api::register(&lua, &luna, state.clone())?;
     }
@@ -161,7 +161,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         scene_api::register(&lua, &luna, state.clone())?;
     }
 
-    // compute: lurek.gpu
+    // compute: lurek.compute
     if modules.compute {
         compute_api::register(&lua, &luna, state.clone())?;
     }
@@ -191,7 +191,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         minimap_api::register(&lua, &luna, state.clone())?;
     }
 
-    // pathfinding: lurek.pathfinding
+    // pathfinding: lurek.pathfind
     if modules.pathfinding {
         pathfind_api::register(&lua, &luna, state.clone())?;
     }
@@ -231,12 +231,12 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         audio_api::register(&lua, &luna, state.clone())?;
     }
 
-    // fx: lurek.postfx
+    // fx: lurek.effect
     if modules.overlay {
         effect_api::register(&lua, &luna, state.clone())?;
     }
 
-    // particle: lurek.particles
+    // particle: lurek.particle
     if modules.particle {
         particle_api::register(&lua, &luna, state.clone())?;
     }
@@ -259,7 +259,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     // math: lurek.math (always registered — mandatory)
     math_api::register(&lua, &luna, state.clone())?;
 
-    // system: lurek.platform (always registered — OS info, openURL, locales)
+    // system: lurek.runtime (always registered — OS info, openURL, locales)
     system_api::register(&lua, &luna, state.clone())?;
 
     // physics: lurek.physics
@@ -267,10 +267,10 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         physics_api::register(&lua, &luna, state.clone())?;
     }
 
-    // collision: lurek.collision (always on — pure math, no world needed)
+    // collision: lurek.physics (always on — pure math, no world needed)
     collision_api::register(&lua, &luna, state.clone())?;
 
-    // graphics: lurek.graphic
+    // graphics: lurek.render
     if modules.graphics {
         render_api::register(&lua, &luna, state.clone())?;
     }

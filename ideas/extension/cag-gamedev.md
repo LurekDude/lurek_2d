@@ -38,10 +38,10 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 
 **Improvement**:
 - Each agent should reference the lurek.* APIs relevant to its domain
-- `lua-scripter` should know about lurek.signal, lurek.time, lurek.entity
+- `lua-scripter` should know about lurek.event, lurek.timer, lurek.ecs
 - `level-designer` should know about lurek.tilemap, lurek.scene, lurek.physics
 - `audio-designer` should know about lurek.audio.* API
-- `visual-artist` should know about lurek.gfx, lurek.particles, lurek.animation
+- `visual-artist` should know about lurek.render, lurek.particle, lurek.animation
 - Include API examples in agent system prompts
 
 ### 2. Template Quality Assessment
@@ -53,15 +53,15 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 | minimal | main.lua + conf.lua | Should be < 20 lines |
 | game-loop | update/draw loop | Should demonstrate delta time |
 | platformer | physics + input | Should use lurek.physics |
-| rpg | entities + stats | Should use lurek.entity + library/stats |
+| rpg | entities + stats | Should use lurek.ecs + library/stats |
 | shooter | physics + spawn | Should demonstrate bullet pools |
 | puzzle | grid + input | Should demonstrate grid math |
 | roguelike | procedural gen | Should use lurek.math.noise |
 | visual-novel | dialog + choices | Should use library/dialog |
 | arcade | high score + lives | Should demonstrate lurek.data |
-| tower-defense | pathfinding + entities | Should use lurek.pathfinding |
+| tower-defense | pathfinding + entities | Should use lurek.pathfind |
 | game-jam | fast scaffold | Should be minimal + timer |
-| demo-scene | graphics showcase | Should use multiple lurek.gfx calls |
+| demo-scene | graphics showcase | Should use multiple lurek.render calls |
 
 **Action**: Verify each template actually uses the relevant lurek.* APIs and library/ modules.
 

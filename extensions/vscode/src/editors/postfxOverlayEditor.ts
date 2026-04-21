@@ -242,7 +242,7 @@ export class PostFxOverlayEditor extends WebviewEditor {
           const fogColor = g('fogColor').value;
           code = '-- Weather: ' + preset + '\\n';
           if (preset !== 'Clear') {
-            code += 'local weather = lurek.postfx.createWeather({\\n';
+            code += 'local weather = lurek.effect.createWeather({\\n';
             code += '  preset   = "' + preset.toLowerCase().replace(/ /g,'_') + '",\\n';
             code += '  intensity = ' + intensity.toFixed(2) + ',\\n';
             code += '  wind      = lurek.math.vec2(' + windX + ', ' + windY + '),\\n';
@@ -250,7 +250,7 @@ export class PostFxOverlayEditor extends WebviewEditor {
             code += '})\\n\\n';
             code += 'function lurek.update(dt)\\n  weather:update(dt)\\nend\\n';
             code += 'function lurek.draw()\\n  weather:draw()\\n';
-            if (fogDensity > 0) code += '  lurek.postfx.fog({ density=' + fogDensity.toFixed(2) + ', color=lurek.graphics.newColor("' + fogColor + '") })\\n';
+            if (fogDensity > 0) code += '  lurek.effect.fog({ density=' + fogDensity.toFixed(2) + ', color=lurek.graphics.newColor("' + fogColor + '") })\\n';
             code += 'end';
           } else {
             code += '-- No weather effects active';
@@ -264,7 +264,7 @@ export class PostFxOverlayEditor extends WebviewEditor {
           const stars = g('starsEnabled').checked;
           const speed = fv('todSpeed');
           code = '-- Time of Day Setup\\n';
-          code += 'local tod = lurek.postfx.createTimeOfDay({\\n';
+          code += 'local tod = lurek.effect.createTimeOfDay({\\n';
           code += '  hour         = ' + hour.toFixed(2) + ',\\n';
           code += '  sky_color    = lurek.graphics.newColor("' + sky + '"),\\n';
           code += '  sun_color    = lurek.graphics.newColor("' + sun + '"),\\n';
@@ -286,7 +286,7 @@ export class PostFxOverlayEditor extends WebviewEditor {
           const px = fv('pixelSize');
           const grain = fv('filmGrain');
           const bloom_ = fv('bloom');
-          code = '-- Screen PostFX\\nfunction lurek.draw()\\n  -- draw game\\n  local fx = lurek.postfx.begin()\\n';
+          code = '-- Screen PostFX\\nfunction lurek.draw()\\n  -- draw game\\n  local fx = lurek.effect.begin()\\n';
           if (vig > 0)    lines.push('  fx:vignette({ strength=' + vig.toFixed(2) + ', color=lurek.graphics.newColor("' + g('vignetteColor').value + '") })');
           if (scan > 0)   lines.push('  fx:scanlines({ alpha=' + scan.toFixed(2) + ' })');
           if (sat !== 1)  lines.push('  fx:saturation(' + sat.toFixed(2) + ')');
@@ -296,7 +296,7 @@ export class PostFxOverlayEditor extends WebviewEditor {
           if (px > 1)     lines.push('  fx:pixelate(' + px + ')');
           if (grain > 0)  lines.push('  fx:filmGrain(' + grain.toFixed(2) + ')');
           if (bloom_ > 0) lines.push('  fx:bloom({ threshold=0.7, strength=' + bloom_.toFixed(2) + ' })');
-          code += lines.join('\\n') + '\\n  lurek.postfx.finish(fx)\\nend';
+          code += lines.join('\\n') + '\\n  lurek.effect.finish(fx)\\nend';
         } else if (currentTab === 'shake') {
           const amp = fv('shakeAmplitude'), freq = fv('shakeFrequency');
           const dur = fv('shakeDuration'), decay = fv('shakeDecay');
@@ -321,7 +321,7 @@ export class PostFxOverlayEditor extends WebviewEditor {
           const pulse = g('overlayPulsate').checked;
           const speed = fv('overlayPulseSpeed');
           code = '-- Overlay: ' + preset + '\\n';
-          code += 'local overlay = lurek.postfx.createOverlay({\\n';
+          code += 'local overlay = lurek.effect.createOverlay({\\n';
           code += '  preset  = "' + preset.toLowerCase().replace(/ /g,'_') + '",\\n';
           code += '  color   = lurek.graphics.newColor("' + color + '"),\\n';
           code += '  alpha   = ' + alpha.toFixed(2) + ',\\n';

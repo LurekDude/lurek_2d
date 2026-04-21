@@ -5,7 +5,7 @@
 | **Tier**       | Tier 3 — Lunasome (pure Lua)                                                                                                                                    |
 | **Source**     | `library/narrative/init.lua`                                                                                                                                    |
 | **Lua Tests**  | `tests/lua/library/test_library_narrative.lua`                                                                                                                  |
-| **Depends on** | `lurek.fs.read` (loadFile), `lurek.codec` (precompile blobs), `lurek.localization.t` (optional), `lurek.log.debug` (trace), `lurek.savegame` (collector wiring) |
+| **Depends on** | `lurek.filesystem.read` (loadFile), `lurek.serial` (precompile blobs), `lurek.i18n.t` (optional), `lurek.log.debug` (trace), `lurek.save` (collector wiring) |
 | **Status**     | partial — usable Ink subset; full Ink parity is non-goal                                                                                                        |
 
 ## Purpose
@@ -19,7 +19,7 @@ substitution, tags, and visit counters. Coexists with `library.dialog`
 
 ### Loaders
 - `M.compile(source) -> Story`
-- `M.loadFile(path) -> Story` (uses `lurek.fs.read`)
+- `M.loadFile(path) -> Story` (uses `lurek.filesystem.read`)
 - `M.precompile(source) -> bytecode`
 - `M.fromBytecode(blob) -> Story`
 
@@ -47,7 +47,7 @@ substitution, tags, and visit counters. Coexists with `library.dialog`
 - `M.parseTagList(str)`
 - `M.weightedChoice(choices, rng)`
 - `M.formatList(values, conjunction?)`
-- `M.localiseStory(story, locale?)` — wraps `lurek.localization.t` over `{loc:key}` markers
+- `M.localiseStory(story, locale?)` — wraps `lurek.i18n.t` over `{loc:key}` markers
 
 ## Supported Ink Subset
 
@@ -66,11 +66,11 @@ VAR name = value         -- declare initial variable
 
 ## Dependencies
 
-- **`lurek.fs.read`** — reads `.ink` files for `M.loadFile`.
-- **`lurek.codec`** — caller may persist `precompile` output via JSON.
-- **`lurek.localization.t`** — only used if `M.localiseStory` is invoked.
+- **`lurek.filesystem.read`** — reads `.ink` files for `M.loadFile`.
+- **`lurek.serial`** — caller may persist `precompile` output via JSON.
+- **`lurek.i18n.t`** — only used if `M.localiseStory` is invoked.
 - **`lurek.log.debug`** — used when `story:trace(true)` is enabled.
-- **`lurek.savegame`** — caller wires `story:save()/resume()` collectors.
+- **`lurek.save`** — caller wires `story:save()/resume()` collectors.
 
 ## Status
 
@@ -93,7 +93,7 @@ choices, conditions, tags, and save/resume.
   story's `_vars` and `_fns` tables — host globals are not visible.
 - `story:save()` only persists scalar (number/string/boolean) variables;
   table-valued variables are skipped to keep the blob safely round-trippable
-  through `lurek.codec.toJson`.
+  through `lurek.serial.toJson`.
 - `M.localiseStory` is a thin wrapper — it translates `{loc:KEY}` markers
   found in already-substituted prose; richer i18n (gendered plurals, etc.)
-  belongs in `lurek.localization` itself.
+  belongs in `lurek.i18n` itself.

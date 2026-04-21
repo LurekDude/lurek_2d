@@ -49,4 +49,4 @@ cargo run -- content/games/showcase/patterns_demo
 
 ## APIs Used
 
-`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.timer`, `lurek.signal`
+`lurek.window`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.timer`, `lurek.event`

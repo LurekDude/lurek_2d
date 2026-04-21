@@ -24,7 +24,7 @@ end
 
 function play_state.update(dt)
     -- Game logic
-    if lurek.keyboard.isDown("escape") then
+    if lurek.input.keyboard.isDown("escape") then
         push_state(pause_state)
     end
 end
@@ -79,18 +79,18 @@ function pause_state.exit()
 end
 
 function pause_state.update(dt)
-    if lurek.keyboard.isDown("escape") then
+    if lurek.input.keyboard.isDown("escape") then
         pop_state()
     end
 end
 
 function pause_state.draw()
     -- Draw semi-transparent overlay
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 600)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("PAUSED", 370, 280)
-    lurek.gfx.print("Press ESC to resume", 310, 310)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 0, 0, 800, 600)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("PAUSED", 370, 280)
+    lurek.render.print("Press ESC to resume", 310, 310)
 end
 ```
 
@@ -126,19 +126,19 @@ end
 
 function gameover_state.update(dt)
     gameover_state.timer = gameover_state.timer + dt
-    if gameover_state.timer > 2 and lurek.keyboard.isDown("return") then
+    if gameover_state.timer > 2 and lurek.input.keyboard.isDown("return") then
         switch_state(title_state)
     end
 end
 
 function gameover_state.draw()
-    lurek.gfx.setColor(0.1, 0, 0, 0.9)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 600)
-    lurek.gfx.setColor(1, 0.2, 0.2, 1)
-    lurek.gfx.print("GAME OVER", 340, 260)
+    lurek.render.setColor(0.1, 0, 0, 0.9)
+    lurek.render.rectangle("fill", 0, 0, 800, 600)
+    lurek.render.setColor(1, 0.2, 0.2, 1)
+    lurek.render.print("GAME OVER", 340, 260)
     if gameover_state.timer > 2 then
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Press ENTER", 350, 300)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Press ENTER", 350, 300)
     end
 end
 ```

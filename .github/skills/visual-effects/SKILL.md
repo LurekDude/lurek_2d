@@ -30,7 +30,7 @@ description: "Load this skill when implementing visual post-processing effects, 
 - Built-in shader auto-uniforms (`luna_Time`, `luna_ScreenSize`)
 - Common effect recipes (blur, bloom, vignette, CRT, distortion)
 - Performance budget for full-screen passes on integrated GPU
-- CPU-side image filter via `lurek.img` (offline/load-time effects)
+- CPU-side image filter via `lurek.image` (offline/load-time effects)
 
 ---
 

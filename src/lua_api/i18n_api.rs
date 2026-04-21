@@ -1,4 +1,4 @@
-//! Registers the `lurek.localization.*` internationalization and localization API.
+//! Registers the `lurek.i18n.*` internationalization and localization API.
 //!
 //! Thin Lua bridge that delegates to the [`localization`][crate::localization] domain module.
 //! All translation tables, fallback logic, interpolation, and pluralization live
@@ -208,7 +208,7 @@ fn month_name_tables() -> ([&'static str; 12], [&'static str; 12]) {
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers `lurek.localization.*`.
+/// Registers `lurek.i18n.*`.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable

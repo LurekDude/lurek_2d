@@ -31,14 +31,14 @@ end
 -- @description Covers suite: Evidence: Canvas lifecycle + PNG visualization.
 describe("Evidence: Canvas lifecycle + PNG visualization", function()
 
-    -- @covers lurek.graphic.newCanvas
+    -- @covers lurek.render.newCanvas
     -- @covers Canvas:getDimensions
     -- @covers Canvas:release
     -- @evidence file
     -- @description Creates canvases of several sizes and renders scaled rectangles that visualize the reported dimensions in one PNG.
     it("PNG: canvas sizes visualized as colored rectangles", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(20, 20, 30, 255)
 
         local canvases = {
@@ -52,7 +52,7 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
         local y_off = 4
         for _, cfg in ipairs(canvases) do
             local cw, ch, r, g, b = cfg[1], cfg[2], cfg[3], cfg[4], cfg[5]
-            local c = lurek.graphic.newCanvas(cw, ch)
+            local c = lurek.render.newCanvas(cw, ch)
             local aw, ah = c:getDimensions()
             c:release()
             local scale = math.min(240 / aw, 30 / ah)
@@ -63,19 +63,19 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
             y_off = y_off + dh + 4
         end
 
-        lurek.img.savePNG(img, OUT .. "canvas_sizes.png")
+        lurek.image.savePNG(img, OUT .. "canvas_sizes.png")
     end)
 
-    -- @covers lurek.graphic.newCanvas
+    -- @covers lurek.render.newCanvas
     -- @covers Canvas:getWidth
     -- @covers Canvas:release
     -- @evidence file
     -- @description Draws a simple lifecycle diagram that encodes created, active, and released canvas states into file evidence.
     it("PNG: canvas lifecycle state diagram (created/active/released)", function()
-        local img = lurek.img.newImageData(128, 64)
+        local img = lurek.image.newImageData(128, 64)
         img:fill(30, 30, 40, 255)
 
-        local c = lurek.graphic.newCanvas(64, 64)
+        local c = lurek.render.newCanvas(64, 64)
         -- Created (green)
         draw_rect(img, 4, 4, 36, 56, 0, 200, 0, 255)
         -- Active (blue) â€” we read width to prove it's alive
@@ -85,7 +85,7 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
         c:release()
         draw_rect(img, 88, 4, 36, 56, 200, 0, 0, 255)
 
-        lurek.img.savePNG(img, OUT .. "canvas_lifecycle.png")
+        lurek.image.savePNG(img, OUT .. "canvas_lifecycle.png")
     end)
 
 end)

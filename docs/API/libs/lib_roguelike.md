@@ -12,7 +12,7 @@ All three subsystems are independent — pick what you need.
 
 *13 functions, 0 module fields documented.*
 
-See: [`lurek.tilemap`](../lua-api.md#lurektilemap) — attach FOV/GoalMap blockers via `:attachTilemap`, [`lurek.pathfinding`](../lua-api.md#lurekpathfinding) — preferred Dijkstra backend; in-Lua fallback used otherwise, [`lurek.math.bresenham`](../lua-api.md#lurekmathbresenham) — line-of-sight helper (re-exported as `M.bresenham`), [`lurek.savegame`](../lua-api.md#lureksavegame) — scheduler/FOV state collectors
+See: [`lurek.tilemap`](../lua-api.md#lurektilemap) — attach FOV/GoalMap blockers via `:attachTilemap`, [`lurek.pathfind`](../lua-api.md#lurekpathfinding) — preferred Dijkstra backend; in-Lua fallback used otherwise, [`lurek.math.bresenham`](../lua-api.md#lurekmathbresenham) — line-of-sight helper (re-exported as `M.bresenham`), [`lurek.save`](../lua-api.md#lureksavegame) — scheduler/FOV state collectors
 
 ## Functions
 

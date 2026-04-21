@@ -34,7 +34,7 @@ Waves add more centipede segments. All mushrooms are restored to full HP on deat
 
 ## APIs Used
 
-lurek.window, lurek.render, lurek.input, lurek.time, lurek.signal, lurek.particles, lurek.tween
+lurek.window, lurek.render, lurek.input, lurek.timer, lurek.event, lurek.particle, lurek.tween
 
 ## Changes from Original Demo
 

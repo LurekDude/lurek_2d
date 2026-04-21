@@ -145,7 +145,7 @@ describe("library.loot", function()
 
     describe("error paths", function()
         it("fromToml raises on missing engine bindings", function()
-            -- lurek.fs.read may not be wired in headless test VM — either way it must error
+            -- lurek.filesystem.read may not be wired in headless test VM — either way it must error
             -- on a path that does not exist or on missing binding.
             expect_error(function()
                 loot.fromToml("nonexistent_file_for_loot_test_xyz.toml")

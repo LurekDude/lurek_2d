@@ -44,7 +44,7 @@ fast_forward = false
 ### Lua assembly
 
 ```lua
-local cfg = lurek.data.parseToml(lurek.fs.read("scenarios/config.toml"))
+local cfg = lurek.data.parseToml(lurek.filesystem.read("scenarios/config.toml"))
 local sim = lurek.sim.create({ config = cfg.config, blocks = ..., edges = ... })
 ```
 
@@ -105,7 +105,7 @@ recovery_timeout  = 20
 Scenario scripts load the catalog and instantiate blocks by reference, overriding per-instance params:
 
 ```lua
-local catalog = lurek.data.parseToml(lurek.fs.read("catalogs/machines.toml"))
+local catalog = lurek.data.parseToml(lurek.filesystem.read("catalogs/machines.toml"))
 
 local function machine(id, overrides)
     local spec = lurek.table.deepcopy(catalog.blocks_by_id[id])
@@ -241,7 +241,7 @@ severity  = "warn"
 ### Lua assembly
 
 ```lua
-local monitors = lurek.data.parseToml(lurek.fs.read("scenarios/monitors.toml"))
+local monitors = lurek.data.parseToml(lurek.filesystem.read("scenarios/monitors.toml"))
 local sim = lurek.sim.create({
     blocks = ..., edges = ...,
     monitors = monitors.monitors,
@@ -298,7 +298,7 @@ value = 50
 ### Lua: scenario selection
 
 ```lua
-local profiles = lurek.data.parseToml(lurek.fs.read("catalogs/anomalies.toml"))
+local profiles = lurek.data.parseToml(lurek.filesystem.read("catalogs/anomalies.toml"))
 
 -- Baseline: no anomalies
 local base_sim = lurek.sim.create({ blocks = blocks, edges = edges, monitors = monitors })

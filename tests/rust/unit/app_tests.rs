@@ -130,7 +130,7 @@ mod app_tests {
 
         let lua = app.lua.as_ref().expect("Lua VM should be initialized");
         let reported_identity: String = lua
-            .load("return lurek.fs.getIdentity()")
+            .load("return lurek.filesystem.getIdentity()")
             .eval()
             .expect("filesystem identity should be readable from Lua");
         assert_eq!(reported_identity, "phase01-save");

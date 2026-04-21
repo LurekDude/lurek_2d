@@ -37,8 +37,8 @@ local jump_buffer  = 0
 function lurek.process(dt)
     -- Horizontal acceleration
     local ix = 0
-    if lurek.keyboard.isDown("left")  then ix = ix - 1 end
-    if lurek.keyboard.isDown("right") then ix = ix + 1 end
+    if lurek.input.keyboard.isDown("left")  then ix = ix - 1 end
+    if lurek.input.keyboard.isDown("right") then ix = ix + 1 end
 
     if ix ~= 0 then
         player.vx = player.vx + ix * ACCEL * dt

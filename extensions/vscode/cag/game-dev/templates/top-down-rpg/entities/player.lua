@@ -37,9 +37,9 @@ function Player:update(dt)
 end
 
 function Player:draw()
-    lurek.gfx.setColor(0.3, 0.6, 0.9, 1)
-    lurek.gfx.rectangle("fill", self.x - self.width / 2, self.y - self.height / 2, self.width, self.height)
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(0.3, 0.6, 0.9, 1)
+    lurek.render.rectangle("fill", self.x - self.width / 2, self.y - self.height / 2, self.width, self.height)
+    lurek.render.setColor(1, 1, 1, 1)
 end
 
 return Player

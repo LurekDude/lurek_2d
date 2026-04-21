@@ -13,7 +13,7 @@
 - **Last reviewed**: 2026-04-18 (UTC)
 - **Reviewer agent**: `developer` · Session: `src-module-review-20260418`
 - **Plugin tier candidacy**: `CORE-KEEP`
-- **LOC (rust only)**: ~1700 · **Public Lua surface**: `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, `lurek.touch` — ~45 fns / 0 userdata
+- **LOC (rust only)**: ~1700 · **Public Lua surface**: `lurek.input.keyboard`, `lurek.input.mouse`, `lurek.input.gamepad`, `lurek.input.touch` — ~45 fns / 0 userdata
 - **Inbound non-`lua_api` callers**: `app` (event dispatch), `runtime` (state init)
 - **Heavy dependencies**: `gilrs` (gamepad)
 
@@ -48,7 +48,7 @@ provides raw device state, not semantic "jump"/"fire" mappings.
    - Rationale: standard pattern that every game needs; reduces boilerplate.
    - Effort: M · Risk: low (pure Lua library candidate under `content/library/`).
    - Competitor inspiration: [Godot: InputMap — docs.godotengine.org/en/stable/classes/class_inputmap.html].
-2. **[P2][FEAT]** `lurek.gamepad.setVibration(id, left, right, duration)` — Rumble support.
+2. **[P2][FEAT]** `lurek.input.gamepad.setVibration(id, left, right, duration)` — Rumble support.
    - Rationale: haptic feedback is expected in modern gamepad games.
    - Effort: S · Risk: low (gilrs has `set_ff_state`).
    - Competitor inspiration: [LOVE2D: love.joystick.setVibration — love2d.org/wiki/Joystick:setVibration].
@@ -72,7 +72,7 @@ provides raw device state, not semantic "jump"/"fire" mappings.
 
 - **[P1][TEST-RUST]** Add Rust unit test for `gamepad::GamepadState` button/axis/hat operations (now added).
 - **[P1][TEST-RUST]** Add Rust unit test for `recorder::InputRecorder` recording/playback cycle (now added).
-- **[P2][TEST-LUA]** Add Lua BDD test for `lurek.keyboard.isDown`, `lurek.mouse.getPosition` under `tests/lua/input/`.
+- **[P2][TEST-LUA]** Add Lua BDD test for `lurek.input.keyboard.isDown`, `lurek.input.mouse.getPosition` under `tests/lua/input/`.
 - **[P2][TEST-RUST]** Add Rust unit test for `gamepad::GamepadMappings` string parsing.
 - **[P3][TEST-FUZZ]** Fuzz target candidate: `gamepad::GamepadMappings::load_from_string` with malformed SDL mapping strings.
 

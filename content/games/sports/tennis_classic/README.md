@@ -27,13 +27,13 @@ cargo run -- content/games/sports/tennis_classic
 - Full tennis scoring: 0/15/30/40, deuce, advantage, games, sets (tiebreak at 6-6), best-of-3 match
 - AI opponent with reaction delay that scales per set
 - `lurek.input.bind()` — action-based input for move/hit/quit
-- `lurek.particles.newSystem()` — ball impact dust, ace flash, net shake
+- `lurek.particle.newSystem()` — ball impact dust, ace flash, net shake
 - `lurek.tween.to()` — score popup, serve toss arc, ball speed trail
 - `lurek.camera.new()` — camera for court view
-- `lurek.time.getFPS()` / `lurek.time.getDelta()` — frame-rate display and delta timing
+- `lurek.timer.getFPS()` / `lurek.timer.getDelta()` — frame-rate display and delta timing
 - `lurek.window.setTitle()` — dynamic window title with score
 - `lurek.render.setBackgroundColor()` — grass-green background
-- `lurek.signal.quit()` — clean exit on Escape
+- `lurek.event.quit()` — clean exit on Escape
 - Render/render_ui split — court/players/ball in `render()`, score/HUD in `render_ui()`
 - TITLE → SERVING → PLAYING → POINT → SET_END → MATCH_END state machine
 

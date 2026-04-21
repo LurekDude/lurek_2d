@@ -11,10 +11,10 @@
 ---
 --- @see lurek.math.clamp
 --- @see lurek.math.lerp
---- @see lurek.codec.toJson
---- @see lurek.codec.fromJson
+--- @see lurek.serial.toJson
+--- @see lurek.serial.fromJson
 --- @see lurek.dataframe
---- @see lurek.savegame.SaveManager
+--- @see lurek.save.SaveManager
 
 local M = {}
 
@@ -962,25 +962,25 @@ end
 
 -- ── JSON helpers ───────────────────────────────────────────────────────────────
 
---- Encode a snapshot table to a JSON string via `lurek.codec.toJson`.
+--- Encode a snapshot table to a JSON string via `lurek.serial.toJson`.
 --- @tparam table snap Snapshot produced by `Sheet:snapshot`.
 --- @treturn string JSON-encoded snapshot.
---- @see lurek.codec.toJson
+--- @see lurek.serial.toJson
 function M.snapshotToJson(snap)
-    assert(lurek and lurek.codec and lurek.codec.toJson,
-        "library.stats.snapshotToJson requires lurek.codec.toJson")
-    return lurek.codec.toJson(snap)
+    assert(lurek and lurek.serial and lurek.serial.toJson,
+        "library.stats.snapshotToJson requires lurek.serial.toJson")
+    return lurek.serial.toJson(snap)
 end
 
---- Decode a JSON snapshot string back into a Lua table via `lurek.codec.fromJson`.
+--- Decode a JSON snapshot string back into a Lua table via `lurek.serial.fromJson`.
 --- The returned table can be passed to `Sheet:restore`.
 --- @tparam string str JSON-encoded snapshot.
 --- @treturn table Decoded snapshot.
---- @see lurek.codec.fromJson
+--- @see lurek.serial.fromJson
 function M.snapshotFromJson(str)
-    assert(lurek and lurek.codec and lurek.codec.fromJson,
-        "library.stats.snapshotFromJson requires lurek.codec.fromJson")
-    return lurek.codec.fromJson(str)
+    assert(lurek and lurek.serial and lurek.serial.fromJson,
+        "library.stats.snapshotFromJson requires lurek.serial.fromJson")
+    return lurek.serial.fromJson(str)
 end
 
 return M

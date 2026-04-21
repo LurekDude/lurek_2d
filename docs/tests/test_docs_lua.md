@@ -157,8 +157,8 @@
 
 **Uncovered Lua API functions** (2):
 
-- `lurek.engine.lurek.engine.setResourceBudget`
-- `lurek.engine.lurek.engine.getResourceStats`
+- `lurek.runtime.lurek.runtime.setResourceBudget`
+- `lurek.runtime.lurek.runtime.getResourceStats`
 
 ### `event` — 22/22 (100.0%)
 
@@ -409,8 +409,8 @@
 
 **Uncovered Lua API functions** (2):
 
-- `lurek.system.lurek.system.runBatch`
-- `lurek.system.lurek.system.getBatchResults`
+- `lurek.runtime.lurek.runtime.runBatch`
+- `lurek.runtime.lurek.runtime.getBatchResults`
 
 ### `terminal` — 69/82 (84.1%)
 

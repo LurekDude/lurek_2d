@@ -2665,139 +2665,139 @@ function lurek.audio.tell(id_val) end
 ---@return nil
 function lurek.audio.waveformToPng(input, output, width, height) end
 
----@class lurek.simulator
-lurek.simulator = {}
+---@class lurek.automation
+lurek.automation = {}
 
 --- Returns the name of the active script, or nil if idle.
 ---@return string?
-function lurek.simulator.getCurrentScript() end
+function lurek.automation.getCurrentScript() end
 
 --- Returns the index of the next step to be dispatched.
 ---@return integer
-function lurek.simulator.getCurrentStep() end
+function lurek.automation.getCurrentStep() end
 
 --- Returns seconds elapsed since playback started.
 ---@return number
-function lurek.simulator.getElapsedTime() end
+function lurek.automation.getElapsedTime() end
 
 --- Returns the current playback speed multiplier (default 1.0).
 ---@return number
-function lurek.simulator.getPlaybackSpeed() end
+function lurek.automation.getPlaybackSpeed() end
 
 --- Returns an array of all registered script names.
 ---@return table
-function lurek.simulator.getScripts() end
+function lurek.automation.getScripts() end
 
 --- Returns the total number of steps in the active script.
 ---@return integer
-function lurek.simulator.getStepCount() end
+function lurek.automation.getStepCount() end
 
 --- Returns the step limit for the named script, or nil if not found.
 ---@param name any
 ---@return integer?
-function lurek.simulator.getStepLimit(name) end
+function lurek.automation.getStepLimit(name) end
 
 --- Returns true if a macro with the given name has been saved.
 ---@param name any
 ---@return boolean
-function lurek.simulator.hasMacro(name) end
+function lurek.automation.hasMacro(name) end
 
 --- Returns true if a script with the given name is registered.
 ---@param name any
 ---@return boolean
-function lurek.simulator.hasScript(name) end
+function lurek.automation.hasScript(name) end
 
 --- Returns true if all steps in the active script have been dispatched.
 ---@return boolean
-function lurek.simulator.isComplete() end
+function lurek.automation.isComplete() end
 
 --- Returns whether the highlight overlay hint is active.
 ---@return boolean
-function lurek.simulator.isHighlightMode() end
+function lurek.automation.isHighlightMode() end
 
 --- Returns true if playback is currently paused.
 ---@return boolean
-function lurek.simulator.isPaused() end
+function lurek.automation.isPaused() end
 
 --- Returns true if the simulator is actively playing a script.
 ---@return boolean
-function lurek.simulator.isRunning() end
+function lurek.automation.isRunning() end
 
 --- Returns an array of all saved macro names.
 ---@return table
-function lurek.simulator.listMacros() end
+function lurek.automation.listMacros() end
 
 --- Loads a named script from a Lua data table containing a steps array.
 ---@param name any
 ---@param data any
 ---@return nil
-function lurek.simulator.load(name, data) end
+function lurek.automation.load(name, data) end
 
 --- Parses a TOML string and registers it as a named script.
 ---@param name any
 ---@param toml_str any
 ---@return nil
-function lurek.simulator.loadFromToml(name, toml_str) end
+function lurek.automation.loadFromToml(name, toml_str) end
 
 --- Pauses playback at the current step position.
 ---@return nil
-function lurek.simulator.pause() end
+function lurek.automation.pause() end
 
 --- Loads and starts playback of a previously saved macro.
 ---@param name any
 ---@return nil
-function lurek.simulator.playMacro(name) end
+function lurek.automation.playMacro(name) end
 
 --- Resumes playback from a paused position.
 ---@return nil
-function lurek.simulator.resume() end
+function lurek.automation.resume() end
 
 --- Saves a currently-loaded script under a macro name for fast replay.
 ---@param macro_name any
 ---@param script_name any
 ---@return nil
-function lurek.simulator.saveMacro(macro_name, script_name) end
+function lurek.automation.saveMacro(macro_name, script_name) end
 
 --- Enables or disables the highlight overlay hint.
 ---@param enable any
 ---@return nil
-function lurek.simulator.setHighlightMode(enable) end
+function lurek.automation.setHighlightMode(enable) end
 
 --- Sets the dt multiplier for script playback (0.5 = half speed, 2.0 = double).
 ---@param factor any
 ---@return nil
-function lurek.simulator.setPlaybackSpeed(factor) end
+function lurek.automation.setPlaybackSpeed(factor) end
 
 --- Sets the step limit for the named script (clamped to 1..MAX_STEPS).
 ---@param name any
 ---@param n any
 ---@return boolean
-function lurek.simulator.setStepLimit(name, n) end
+function lurek.automation.setStepLimit(name, n) end
 
 --- Starts playback of the named script from the beginning.
 ---@param name any
 ---@return nil
-function lurek.simulator.start(name) end
+function lurek.automation.start(name) end
 
 --- Stops playback and resets the simulator to idle.
 ---@return nil
-function lurek.simulator.stop() end
+function lurek.automation.stop() end
 
 --- Removes a loaded script by name, returning true if it existed.
 ---@param name any
 ---@return boolean
-function lurek.simulator.unload(name) end
+function lurek.automation.unload(name) end
 
 --- Advances the playback clock by `dt` seconds, dispatching due steps.
 ---@param dt any
 ---@return nil
-function lurek.simulator.update(dt) end
+function lurek.automation.update(dt) end
 
 --- Pauses playback advancement until predicate() returns true or timeout seconds elapse.
 ---@param predicate any
 ---@param timeout any
 ---@return nil
-function lurek.simulator.waitUntil(predicate, timeout) end
+function lurek.automation.waitUntil(predicate, timeout) end
 
 ---@class lurek.camera
 lurek.camera = {}
@@ -3013,8 +3013,8 @@ function Camera2D:zoomTo(target_zoom, duration) end
 ---@param vh any
 function lurek.camera.new(vw, vh) end
 
----@class lurek.collision
-lurek.collision = {}
+---@class lurek.physics
+lurek.physics = {}
 
 --- Returns true when two axis-aligned bounding boxes overlap.
 ---@param ax any
@@ -3026,7 +3026,7 @@ lurek.collision = {}
 ---@param bw any
 ---@param bh any
 ---@return boolean
-function lurek.collision.testAABB(ax, ay, aw, ah, bx, by, bw, bh) end
+function lurek.physics.testAABB(ax, ay, aw, ah, bx, by, bw, bh) end
 
 --- Returns true when a circle overlaps an AABB.
 ---@param cx any
@@ -3037,7 +3037,7 @@ function lurek.collision.testAABB(ax, ay, aw, ah, bx, by, bw, bh) end
 ---@param aw any
 ---@param ah any
 ---@return boolean
-function lurek.collision.testCircleAABB(cx, cy, cr, ax, ay, aw, ah) end
+function lurek.physics.testCircleAABB(cx, cy, cr, ax, ay, aw, ah) end
 
 --- Returns true when two circles overlap.
 ---@param ax any
@@ -3047,7 +3047,7 @@ function lurek.collision.testCircleAABB(cx, cy, cr, ax, ay, aw, ah) end
 ---@param by any
 ---@param br any
 ---@return boolean
-function lurek.collision.testCircles(ax, ay, ar, bx, by, br) end
+function lurek.physics.testCircles(ax, ay, ar, bx, by, br) end
 
 --- Returns true when point (px, py) lies inside the AABB.
 ---@param px any
@@ -3057,7 +3057,7 @@ function lurek.collision.testCircles(ax, ay, ar, bx, by, br) end
 ---@param aw any
 ---@param ah any
 ---@return boolean
-function lurek.collision.testPoint(px, py, ax, ay, aw, ah) end
+function lurek.physics.testPoint(px, py, ax, ay, aw, ah) end
 
 ---@class lurek.compute
 lurek.compute = {}
@@ -5637,51 +5637,51 @@ function lurek.effect.newTransition(kind, duration, color_tbl) end
 ---@return nil
 function lurek.effect.setShaderErrorDisplay(enabled) end
 
----@class lurek.engine
-lurek.engine = {}
+---@class lurek.runtime
+lurek.runtime = {}
 
 --- Returns the current measured frames-per-second.
 ---@return number
-function lurek.engine.fps() end
+function lurek.runtime.fps() end
 
 --- Returns the total number of frames processed since engine start.
 ---@return integer
-function lurek.engine.frameCount() end
+function lurek.runtime.frameCount() end
 
 --- Returns the target frame budget in milliseconds (default: 1000 / 60 ≈ 16.667 ms).
 ---@return number
-function lurek.engine.getFrameBudget() end
+function lurek.runtime.getFrameBudget() end
 
 --- Returns a table with resident resource memory statistics.
 ---@return table
-function lurek.engine.getResourceStats() end
+function lurek.runtime.getResourceStats() end
 
 --- Returns the engine version string (from `Cargo.toml`).
 ---@return string
-function lurek.engine.getVersion() end
+function lurek.runtime.getVersion() end
 
 --- Returns `true` if the engine was compiled in debug mode.
 ---@return boolean
-function lurek.engine.isDebug() end
+function lurek.runtime.isDebug() end
 
 --- Returns a table with `lua_bytes` (Lua GC heap usage in bytes) and
 ---@return table
-function lurek.engine.memoryUsage() end
+function lurek.runtime.memoryUsage() end
 
 --- Returns a string identifying the host operating system:
 ---@return string
-function lurek.engine.platform() end
+function lurek.runtime.platform() end
 
 --- Sets the maximum resident texture memory budget in bytes.
 ---@param budget_bytes any
-function lurek.engine.setResourceBudget(budget_bytes) end
+function lurek.runtime.setResourceBudget(budget_bytes) end
 
 --- Returns the total engine uptime in seconds (sum of all processed deltas).
 ---@return number
-function lurek.engine.uptime() end
+function lurek.runtime.uptime() end
 
----@class lurek.signal
-lurek.signal = {}
+---@class lurek.event
+lurek.event = {}
 
 --- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
 ---@class Signal
@@ -5726,63 +5726,63 @@ function Signal:typeOf(name) end
 
 --- Discards all pending events in the queue.
 ---@return nil
-function lurek.signal.clear() end
+function lurek.event.clear() end
 
 --- Clears all recorded event history.
 ---@return nil
-function lurek.signal.clearHistory() end
+function lurek.event.clearHistory() end
 
 --- Enables event history recording, keeping the last `capacity` pushed events.
 ---@param capacity any
 ---@return nil
-function lurek.signal.enableHistory(capacity) end
+function lurek.event.enableHistory(capacity) end
 
 --- Pushes an exit event, requesting the engine to stop.
 ---@param code? any (optional)
 ---@return nil
-function lurek.signal.exit(code) end
+function lurek.event.exit(code) end
 
 --- Moves all buffered deferred events into the main event queue and clears the buffer.
 ---@return table|nil
-function lurek.signal.flushDeferred() end
+function lurek.event.flushDeferred() end
 
 --- Returns an array of recent events as `{name, args}` tables.
 ---@return table
-function lurek.signal.getHistory() end
+function lurek.event.getHistory() end
 
 --- Creates a new pub-sub Signal dispatcher.
 ---@return Signal
-function lurek.signal.newSignal() end
+function lurek.event.newSignal() end
 
 --- Returns an iterator function that pops events from the queue.
 ---@return function
-function lurek.signal.poll() end
+function lurek.event.poll() end
 
 --- Syncs OS-level events into the queue (no-op in Lurek2D push model).
 ---@return nil
-function lurek.signal.pump() end
+function lurek.event.pump() end
 
 --- Adds an event item to the end of the event queue for processing.
 ---@param args any
-function lurek.signal.push(args) end
+function lurek.event.push(args) end
 
 --- Pushes a named event to the deferred buffer; it will not reach the main queue
 ---@param args any
 ---@return nil
-function lurek.signal.pushDeferred(args) end
+function lurek.event.pushDeferred(args) end
 
 --- Alias for `exit()` — requests the engine to stop at the end of the current frame.
 ---@return nil
-function lurek.signal.quit() end
+function lurek.event.quit() end
 
 --- Requests that the engine restart at the beginning of the next frame.
 ---@return nil
-function lurek.signal.restart() end
+function lurek.event.restart() end
 
 --- Blocks until the next event arrives or the optional timeout elapses.
 ---@param timeout? any (optional)
 ---@return string?
-function lurek.signal.wait(timeout) end
+function lurek.event.wait(timeout) end
 
 ---@class lurek.filesystem
 lurek.filesystem = {}
@@ -15278,119 +15278,119 @@ function lurek.sprite.parseAsepriteAtlas(json_str) end
 ---@return SpriteAtlas
 function lurek.sprite.parseAtlas(json_str) end
 
----@class lurek.system
-lurek.system = {}
+---@class lurek.runtime
+lurek.runtime = {}
 
 --- Serialises an engine error message to a compact JSON string.
 ---@param msg any
 ---@return string
-function lurek.system.errorSnapshot(msg) end
+function lurek.runtime.errorSnapshot(msg) end
 
 --- Returns the CPU architecture string for the current machine.
 ---@return string
-function lurek.system.getArch() end
+function lurek.runtime.getArch() end
 
 --- Returns the command-line arguments as a table.
 ---@return table
-function lurek.system.getArgs() end
+function lurek.runtime.getArgs() end
 
 --- Returns the output table from the most recently completed runBatch call.
 ---@param results any
 ---@return integer
-function lurek.system.getBatchResults(results) end
+function lurek.runtime.getBatchResults(results) end
 
 --- Returns the current contents of the system clipboard.
 ---@return string
-function lurek.system.getClipboardText() end
+function lurek.runtime.getClipboardText() end
 
 --- Returns whether the debug overlay is currently visible.
-function lurek.system.getDebugOverlay() end
+function lurek.runtime.getDebugOverlay() end
 
 --- Returns the value of an environment variable, or nil if not set.
 ---@param name any
-function lurek.system.getEnv(name) end
+function lurek.runtime.getEnv(name) end
 
 --- Returns a table of system information including OS name, CPU model, and installed RAM.
 ---@return table
-function lurek.system.getInfo() end
+function lurek.runtime.getInfo() end
 
 --- Returns the last unhandled error message, or nil.
 ---@return table?
-function lurek.system.getLastError() end
+function lurek.runtime.getLastError() end
 
 --- Returns the name of the current minimum log level for runtime messages.
-function lurek.system.getLogLevel() end
+function lurek.runtime.getLogLevel() end
 
 --- Returns the total amount of installed system RAM in megabytes.
 ---@return integer
-function lurek.system.getMemorySize() end
+function lurek.runtime.getMemorySize() end
 
 --- Resolves a stable runtime message ID such as 'L001' to its human-readable text.
 ---@param id any
 ---@return string
-function lurek.system.getMessage(id) end
+function lurek.runtime.getMessage(id) end
 
 --- Returns the total number of message entries loaded into the runtime message catalog.
 ---@return integer
-function lurek.system.getMessageCount() end
+function lurek.runtime.getMessageCount() end
 
 --- Returns the host operating system name ('Windows', 'Linux', 'macOS').
 ---@return string
-function lurek.system.getOS() end
+function lurek.runtime.getOS() end
 
 --- Returns battery state, percentage charged, and estimated time remaining.
 ---@return table
-function lurek.system.getPowerInfo() end
+function lurek.runtime.getPowerInfo() end
 
 --- Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
 ---@return table
-function lurek.system.getPreferredLocales() end
+function lurek.runtime.getPreferredLocales() end
 
 --- Returns the number of logical CPU cores available.
 ---@return integer
-function lurek.system.getProcessorCount() end
+function lurek.runtime.getProcessorCount() end
 
 --- Returns the Lurek2D engine version string.
 ---@return string
-function lurek.system.getVersion() end
+function lurek.runtime.getVersion() end
 
 --- Returns true when the runtime message catalog contains the given stable message ID.
 ---@param id any
 ---@return boolean
-function lurek.system.hasMessage(id) end
+function lurek.runtime.hasMessage(id) end
 
 --- Emit a log message from Lua at the specified level.
 ---@param level any
 ---@param message any
-function lurek.system.log(level, message) end
+function lurek.runtime.log(level, message) end
 
 --- Opens a URL in the system's default browser.
 ---@param url any
 ---@return boolean
-function lurek.system.openURL(url) end
+function lurek.runtime.openURL(url) end
 
 --- Parses a command-line argument string and returns a structured key/value table.
 ---@param args? any (optional)
 ---@return table
-function lurek.system.parseArgs(args) end
+function lurek.runtime.parseArgs(args) end
 
 --- Runs a list of shell commands in parallel and returns immediately without blocking.
 ---@param tasks any
 ---@param opts? any (optional)
 ---@return table
-function lurek.system.runBatch(tasks, opts) end
+function lurek.runtime.runBatch(tasks, opts) end
 
 --- Replaces the system clipboard contents with the given string.
 ---@param text any
-function lurek.system.setClipboardText(text) end
+function lurek.runtime.setClipboardText(text) end
 
 --- Shows or hides the FPS/draw-call debug overlay.
 ---@param enabled any
-function lurek.system.setDebugOverlay(enabled) end
+function lurek.runtime.setDebugOverlay(enabled) end
 
 --- Sets the minimum severity level for runtime log messages.
 ---@param level any
-function lurek.system.setLogLevel(level) end
+function lurek.runtime.setLogLevel(level) end
 
 ---@class lurek.terminal
 lurek.terminal = {}
@@ -16760,8 +16760,8 @@ function lurek.tilemap.toScreenHex(q, r, size) end
 ---@return number
 function lurek.tilemap.toScreenIso(tx, ty, tw, th) end
 
----@class lurek.time
-lurek.time = {}
+---@class lurek.timer
+lurek.timer = {}
 
 --- Lua-side wrapper around a [`Scheduler`] with per-event callback storage.
 ---@class Scheduler
@@ -16879,93 +16879,93 @@ function Scheduler:updateFrames() end
 ---@param delay any
 ---@param func any
 ---@return nil
-function lurek.time.afterReal(delay, func) end
+function lurek.timer.afterReal(delay, func) end
 
 --- Creates a new Scheduler loaded with a sequenced one-shot chain.
 ---@param steps any
 ---@return Scheduler
-function lurek.time.chain(steps) end
+function lurek.timer.chain(steps) end
 
 --- Returns the rolling-average frame delta time in seconds.
 ---@return number
-function lurek.time.getAverageDelta() end
+function lurek.timer.getAverageDelta() end
 
 --- Returns the delta time in seconds for the current frame.
 ---@return number
-function lurek.time.getDelta() end
+function lurek.timer.getDelta() end
 
 --- Returns the current frames-per-second measurement.
 ---@return number
-function lurek.time.getFPS() end
+function lurek.timer.getFPS() end
 
 --- Returns the total number of frames rendered since engine start.
 ---@return integer
-function lurek.time.getFrameCount() end
+function lurek.timer.getFrameCount() end
 
 --- Returns the high-resolution elapsed time since engine start in seconds.
 ---@return number
-function lurek.time.getMicroTime() end
+function lurek.timer.getMicroTime() end
 
 --- Returns the fixed timestep used by `process_physics` callbacks (seconds).
 ---@return number
-function lurek.time.getPhysicsDelta() end
+function lurek.timer.getPhysicsDelta() end
 
 --- Returns the maximum number of physics sub-steps allowed per frame.
 ---@return integer
-function lurek.time.getPhysicsMaxSteps() end
+function lurek.timer.getPhysicsMaxSteps() end
 
 --- Returns the exponential moving-average of frame deltas in seconds.
 ---@return number
-function lurek.time.getSmoothedDelta() end
+function lurek.timer.getSmoothedDelta() end
 
 --- Returns the total elapsed time since engine start in seconds.
 ---@return number
-function lurek.time.getTime() end
+function lurek.timer.getTime() end
 
 --- Creates a new independent Scheduler for managing timed callbacks.
 ---@return Scheduler
-function lurek.time.newScheduler() end
+function lurek.timer.newScheduler() end
 
 --- Sets the fixed timestep for `process_physics` callbacks (seconds).
 ---@param dt any
 ---@return nil
-function lurek.time.setPhysicsDelta(dt) end
+function lurek.timer.setPhysicsDelta(dt) end
 
 --- Sets the maximum number of physics sub-steps allowed per frame (clamped 1–64).
 ---@param n any
-function lurek.time.setPhysicsMaxSteps(n) end
+function lurek.timer.setPhysicsMaxSteps(n) end
 
 --- Sets the smoothing factor (alpha) for `getSmoothedDelta`. Must be in [0.01, 1.0].
 ---@param alpha any
 ---@return nil
-function lurek.time.setSmoothingFactor(alpha) end
+function lurek.timer.setSmoothingFactor(alpha) end
 
 --- Suspends execution for the given number of seconds.
 ---@param seconds any
 ---@return nil
-function lurek.time.sleep(seconds) end
+function lurek.timer.sleep(seconds) end
 
 --- Advances the timer by one frame, returning the delta time.
 ---@return number
-function lurek.time.step() end
+function lurek.timer.step() end
 
 --- Advances all real-time timers by one tick; called automatically each frame.
 ---@return table|nil
-function lurek.time.tickRealTimers() end
+function lurek.timer.tickRealTimers() end
 
 --- Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
 ---@return table|nil
-function lurek.time.tickWaits() end
+function lurek.timer.tickWaits() end
 
 --- Yields the current Lua coroutine for at least `frames` engine frames.
 ---@param frames any
 ---@return nil
-function lurek.time.waitFrames(frames) end
+function lurek.timer.waitFrames(frames) end
 
 --- Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
 ---@param seconds any
 ---@return nil
-function lurek.time.waitSeconds(seconds) end
+function lurek.timer.waitSeconds(seconds) end
 
 ---@class lurek.tween
 lurek.tween = {}

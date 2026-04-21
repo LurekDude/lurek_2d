@@ -20,13 +20,13 @@ end
 -- @description Test suite for Evidence: geometry shapes and queries
 describe("Evidence: geometry shapes and queries", function()
 
-    -- @covers lurek.img.newImageData
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.newImageData
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Draws a gallery of polygon outlines so basic vertex stepping and PNG export can be inspected visually.
     it("polygon gallery (triangle, quad, pentagon, hexagon)", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(20, 20, 30, 255)
         -- Draw regular polygons
         local shapes = {
@@ -53,16 +53,16 @@ describe("Evidence: geometry shapes and queries", function()
                 end
             end
         end
-        lurek.img.savePNG(img, OUT .. "shapes_polygon_gallery.png")
+        lurek.image.savePNG(img, OUT .. "shapes_polygon_gallery.png")
     end)
 
-    -- @covers lurek.img.newImageData
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.newImageData
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Paints filled circles and rectangles into one PNG to document simple raster-shape composition.
     it("filled primitives (circles and rectangles)", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(15, 15, 25, 255)
         -- Filled circles
         draw_dot(img, 64, 64, 30, 255, 80, 80)
@@ -74,16 +74,16 @@ describe("Evidence: geometry shapes and queries", function()
                 img:setPixel(x, y, 255, 200, 50, 255)
             end
         end
-        lurek.img.savePNG(img, OUT .. "shapes_filled_primitives.png")
+        lurek.image.savePNG(img, OUT .. "shapes_filled_primitives.png")
     end)
 
-    -- @covers lurek.img.newImageData
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.newImageData
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Renders an Archimedean spiral into a PNG so the generated parametric shape can be reviewed manually.
     it("spirals (Archimedean spiral)", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(10, 10, 20, 255)
         local cx, cy = 128, 128
         for i = 0, 1000 do
@@ -96,7 +96,7 @@ describe("Evidence: geometry shapes and queries", function()
                 img:setPixel(x, y, c, math.floor(c * 0.6), 255, 255)
             end
         end
-        lurek.img.savePNG(img, OUT .. "shapes_spirals.png")
+        lurek.image.savePNG(img, OUT .. "shapes_spirals.png")
     end)
         end)
     end)

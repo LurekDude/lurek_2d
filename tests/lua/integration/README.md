@@ -4,7 +4,7 @@ Tests that verify two or more `lurek.*` modules working together. Both namespace
 
 ## Naming
 
-`test_<module1>_<module2>.lua` — e.g. `test_physics_timer.lua`, `test_entity_ai.lua`
+`test_<module1>_<module2>.lua` — e.g. `test_physics_timer.lua`, `test_ecs_ai.lua`
 
 ## Rules
 

@@ -7,7 +7,7 @@
 - Lua API path(s): `src/lua_api/animation_api.rs`
 - Primary Lua namespace: `lurek.animation`
 - Rust test path(s): tests/rust/unit/animation_tests.rs
-- Lua test path(s): tests/lua/unit/test_animation.lua, tests/lua/stress/test_animation_stress.lua, tests/lua/integration/test_tween_animation.lua, tests/lua/integration/test_graphics_animation.lua, tests/lua/integration/test_animation_timer.lua, tests/lua/golden/test_animation_golden.lua
+- Lua test path(s): tests/lua/unit/test_animation.lua, tests/lua/stress/test_animation_stress.lua, tests/lua/integration/test_tween_animation.lua, tests/lua/integration/test_render_animation.lua, tests/lua/integration/test_animation_timer.lua, tests/lua/golden/test_animation_golden.lua
 
 ## Summary
 

@@ -21,10 +21,10 @@ Harvest gold and wood from resource nodes on the map. Train soldiers from your b
 
 ## APIs Used
 - `lurek.render` — map, units, buildings, resource nodes
-- `lurek.particles` — death explosions, selection feedback
+- `lurek.particle` — death explosions, selection feedback
 - `lurek.input` — action bindings for selection, ordering, training
 - `lurek.camera` (via manual cam offset)
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced

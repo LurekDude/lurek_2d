@@ -94,7 +94,7 @@ end
 -- ── Load ──────────────────────────────────────────────────────────────────
 function lurek.load()
     lurek.window.setTitle("Cannon Fodder — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.18, 0.32, 0.12)
+    lurek.render.setBackgroundColor(0.18, 0.32, 0.12)
 
     math.randomseed(os.time())
 
@@ -246,51 +246,51 @@ function lurek.draw()
         for col = 1, MAP_COLS do
             local t = tile_at(col, row)
             if t == 1 then
-                lurek.gfx.setColor(0.22, 0.38, 0.12)
-                lurek.gfx.rectangle("fill", (col-1)*TILE, (row-1)*TILE, TILE, TILE)
-                lurek.gfx.setColor(0.15, 0.26, 0.08)
-                lurek.gfx.rectangle("line", (col-1)*TILE, (row-1)*TILE, TILE, TILE)
+                lurek.render.setColor(0.22, 0.38, 0.12)
+                lurek.render.rectangle("fill", (col-1)*TILE, (row-1)*TILE, TILE, TILE)
+                lurek.render.setColor(0.15, 0.26, 0.08)
+                lurek.render.rectangle("line", (col-1)*TILE, (row-1)*TILE, TILE, TILE)
             end
         end
     end
 
     -- Squad target marker
-    lurek.gfx.setColor(1, 1, 0, 0.4)
-    lurek.gfx.circle("line", squad_target.x, squad_target.y, 14)
+    lurek.render.setColor(1, 1, 0, 0.4)
+    lurek.render.circle("line", squad_target.x, squad_target.y, 14)
 
     -- Enemies
     for _, e in ipairs(enemies) do
         local r = e.alert and 0.95 or 0.6
-        lurek.gfx.setColor(r, 0.15, 0.15)
-        lurek.gfx.circle("fill", e.x, e.y, ENEMY_R)
+        lurek.render.setColor(r, 0.15, 0.15)
+        lurek.render.circle("fill", e.x, e.y, ENEMY_R)
         if e.alert then
-            lurek.gfx.setColor(1, 0.4, 0)
-            lurek.gfx.print("!", e.x - 2, e.y - ENEMY_R - 14)
+            lurek.render.setColor(1, 0.4, 0)
+            lurek.render.print("!", e.x - 2, e.y - ENEMY_R - 14)
         end
         -- HP pips
         for pip = 1, e.hp do
-            lurek.gfx.setColor(0.1, 0.9, 0.1)
-            lurek.gfx.rectangle("fill", e.x - 8 + (pip-1)*9, e.y - ENEMY_R - 8, 7, 4)
+            lurek.render.setColor(0.1, 0.9, 0.1)
+            lurek.render.rectangle("fill", e.x - 8 + (pip-1)*9, e.y - ENEMY_R - 8, 7, 4)
         end
     end
 
     -- Soldiers
     for i, s in ipairs(soldiers) do
-        lurek.gfx.setColor(0.2, 0.6, 0.95)
-        lurek.gfx.circle("fill", s.x, s.y, SOLDIER_R)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print(tostring(i), s.x - 3, s.y - 5)
+        lurek.render.setColor(0.2, 0.6, 0.95)
+        lurek.render.circle("fill", s.x, s.y, SOLDIER_R)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print(tostring(i), s.x - 3, s.y - 5)
         -- HP pips
         for pip = 1, s.hp do
-            lurek.gfx.setColor(0.1, 0.9, 0.1)
-            lurek.gfx.rectangle("fill", s.x - 12 + (pip-1)*9, s.y - SOLDIER_R - 8, 7, 4)
+            lurek.render.setColor(0.1, 0.9, 0.1)
+            lurek.render.rectangle("fill", s.x - 12 + (pip-1)*9, s.y - SOLDIER_R - 8, 7, 4)
         end
     end
 
     -- Bullets
-    lurek.gfx.setColor(1, 1, 0.3)
+    lurek.render.setColor(1, 1, 0.3)
     for _, b in ipairs(bullets) do
-        lurek.gfx.circle("fill", b.x, b.y, BULLET_R)
+        lurek.render.circle("fill", b.x, b.y, BULLET_R)
     end
 
     -- Explosions
@@ -298,32 +298,32 @@ function lurek.draw()
         local prog = ex.t / ex.dur
         local r2   = prog * 30
         local alpha = 1 - prog
-        lurek.gfx.setColor(1, 0.5, 0.1, alpha)
-        lurek.gfx.circle("fill", ex.x, ex.y, r2)
-        lurek.gfx.setColor(1, 1, 0, alpha * 0.6)
-        lurek.gfx.circle("line", ex.x, ex.y, r2)
+        lurek.render.setColor(1, 0.5, 0.1, alpha)
+        lurek.render.circle("fill", ex.x, ex.y, r2)
+        lurek.render.setColor(1, 1, 0, alpha * 0.6)
+        lurek.render.circle("line", ex.x, ex.y, r2)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.55)
-    lurek.gfx.rectangle("fill", 0, 0, W, 26)
-    lurek.gfx.setColor(0.2, 0.6, 0.95)
-    lurek.gfx.print(string.format("Squad: %d   Enemies: %d   Score: %d", #soldiers, #enemies, score), 10, 5)
+    lurek.render.setColor(0, 0, 0, 0.55)
+    lurek.render.rectangle("fill", 0, 0, W, 26)
+    lurek.render.setColor(0.2, 0.6, 0.95)
+    lurek.render.print(string.format("Squad: %d   Enemies: %d   Score: %d", #soldiers, #enemies, score), 10, 5)
 
     if state == STATE.WIN then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", W/2 - 140, H/2 - 30, 280, 60)
-        lurek.gfx.setColor(0.2, 1, 0.4)
-        lurek.gfx.print("MISSION COMPLETE!", W/2 - 90, H/2 - 10, 0, 1.4)
-        lurek.gfx.setColor(1,1,1)
-        lurek.gfx.print(string.format("Score: %d  (Esc to quit)", score), W/2 - 90, H/2 + 16)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", W/2 - 140, H/2 - 30, 280, 60)
+        lurek.render.setColor(0.2, 1, 0.4)
+        lurek.render.print("MISSION COMPLETE!", W/2 - 90, H/2 - 10, 0, 1.4)
+        lurek.render.setColor(1,1,1)
+        lurek.render.print(string.format("Score: %d  (Esc to quit)", score), W/2 - 90, H/2 + 16)
     elseif state == STATE.LOSE then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", W/2 - 120, H/2 - 30, 240, 60)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("SQUAD ELIMINATED", W/2 - 85, H/2 - 10, 0, 1.4)
-        lurek.gfx.setColor(1,1,1)
-        lurek.gfx.print("Esc to quit", W/2 - 40, H/2 + 16)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", W/2 - 120, H/2 - 30, 240, 60)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("SQUAD ELIMINATED", W/2 - 85, H/2 - 10, 0, 1.4)
+        lurek.render.setColor(1,1,1)
+        lurek.render.print("Esc to quit", W/2 - 40, H/2 + 16)
     end
 end
 
@@ -339,5 +339,5 @@ end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
 end

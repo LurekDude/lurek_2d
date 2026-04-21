@@ -60,7 +60,7 @@ local choices  = {}
 
 function lurek.init()
     lurek.window.setTitle("Dialog Demo")
-    lurek.gfx.setBackgroundColor(0.06, 0.06, 0.06)
+    lurek.render.setBackgroundColor(0.06, 0.06, 0.06)
 
     -- Build sequence
     seq = dialog.newSequencer()
@@ -99,17 +99,17 @@ end
 
 function lurek.render()
     -- dialog box at bottom 25% of screen
-    lurek.gfx.setColor(0, 0, 0, 0.8)
-    lurek.gfx.rectangle("fill", 20, 450, 760, 140)
-    lurek.gfx.setColor(0.9, 0.9, 0.9)
-    lurek.gfx.print(current_speaker .. ": " .. current_line, 30, 465)
+    lurek.render.setColor(0, 0, 0, 0.8)
+    lurek.render.rectangle("fill", 20, 450, 760, 140)
+    lurek.render.setColor(0.9, 0.9, 0.9)
+    lurek.render.print(current_speaker .. ": " .. current_line, 30, 465)
     for i, opt in ipairs(choices) do
-        lurek.gfx.print(i .. ". " .. opt, 40, 480 + i * 20)
+        lurek.render.print(i .. ". " .. opt, 40, 480 + i * 20)
     end
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     if key == "space" or key == "return" then
         if #choices == 0 then seq:advance() end
     end
@@ -131,7 +131,7 @@ local world_drops = {}
 
 function lurek.init()
     lurek.window.setTitle("Loot RPG")
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
 
     -- Define item types (do this once in lurek.load)
     item.clearTypes()
@@ -175,27 +175,27 @@ end
 function lurek.render()
     -- draw world drops
     for _, d in ipairs(world_drops) do
-        lurek.gfx.setColor(1, 0.8, 0.2)
-        lurek.gfx.circle("fill", d.x, d.y, 8)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print(d.inst.type_id, d.x + 10, d.y - 6)
+        lurek.render.setColor(1, 0.8, 0.2)
+        lurek.render.circle("fill", d.x, d.y, 8)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print(d.inst.type_id, d.x + 10, d.y - 6)
     end
 
     -- draw inventory sidebar
-    lurek.gfx.setColor(0.1, 0.1, 0.2, 0.9)
-    lurek.gfx.rectangle("fill", 620, 10, 170, 300)
-    lurek.gfx.setColor(0.8, 0.8, 1)
-    lurek.gfx.print("Inventory", 630, 16)
+    lurek.render.setColor(0.1, 0.1, 0.2, 0.9)
+    lurek.render.rectangle("fill", 620, 10, 170, 300)
+    lurek.render.setColor(0.8, 0.8, 1)
+    lurek.render.print("Inventory", 630, 16)
     local slots = inventory.getSlots(player_inv)
     for i, slot in ipairs(slots) do
         if slot then
-            lurek.gfx.print(slot.type_id, 630, 16 + i * 18)
+            lurek.render.print(slot.type_id, 630, 16 + i * 18)
         end
     end
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
 end
 ```
 

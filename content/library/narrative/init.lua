@@ -34,11 +34,11 @@
 --
 -- @module library.narrative
 -- @status partial
--- @see lurek.fs.read         load `.ink` files
--- @see lurek.codec.toJson    precompile / save state serialisation
--- @see lurek.savegame        wire `story:save`/`resume` into a SaveManager
--- @see lurek.localization.t  used by `M.localiseStory` for {loc:key} markers
--- @see lurek.signal          optional trace event sink
+-- @see lurek.filesystem.read         load `.ink` files
+-- @see lurek.serial.toJson    precompile / save state serialisation
+-- @see lurek.save        wire `story:save`/`resume` into a SaveManager
+-- @see lurek.i18n.t  used by `M.localiseStory` for {loc:key} markers
+-- @see lurek.event          optional trace event sink
 
 local M = {}
 
@@ -248,15 +248,15 @@ function M.compile(source)
     return _new_story(prog)
 end
 
---- Load and compile a .ink file via `lurek.fs.read`.
+--- Load and compile a .ink file via `lurek.filesystem.read`.
 -- @param path string
 -- @treturn Story
 function M.loadFile(path)
-    if type(lurek) ~= "table" or type(lurek.fs) ~= "table"
-       or type(lurek.fs.read) ~= "function" then
-        error("narrative.loadFile: lurek.fs.read unavailable", 2)
+    if type(lurek) ~= "table" or type(lurek.filesystem) ~= "table"
+       or type(lurek.filesystem.read) ~= "function" then
+        error("narrative.loadFile: lurek.filesystem.read unavailable", 2)
     end
-    local ok, src = pcall(lurek.fs.read, path)
+    local ok, src = pcall(lurek.filesystem.read, path)
     if not ok then error("narrative.loadFile: "..tostring(src), 2) end
     return M.compile(src)
 end
@@ -541,7 +541,7 @@ function Story:dumpProfile()
     }
 end
 
---- Serialise full state (vars, visits, knot, pc) for `lurek.savegame`.
+--- Serialise full state (vars, visits, knot, pc) for `lurek.save`.
 function Story:save()
     local vars = {}
     for k, v in pairs(self._vars) do
@@ -607,13 +607,13 @@ function M.formatList(values, conjunction)
     return table.concat(out, ", ") .. ", " .. conjunction .. " " .. tostring(values[n])
 end
 
---- Attach a `{loc:KEY}` localisation pre-processor using `lurek.localization.t`.
+--- Attach a `{loc:KEY}` localisation pre-processor using `lurek.i18n.t`.
 function M.localiseStory(story, locale)
-    if not (lurek and lurek.localization and lurek.localization.t) then
+    if not (lurek and lurek.i18n and lurek.i18n.t) then
         return story
     end
-    if locale and lurek.localization.setLanguage then
-        pcall(lurek.localization.setLanguage, locale)
+    if locale and lurek.i18n.setLanguage then
+        pcall(lurek.i18n.setLanguage, locale)
     end
     -- Wrap continue to translate {loc:key} markers post-substitution.
     local orig = story.continue
@@ -621,7 +621,7 @@ function M.localiseStory(story, locale)
         local line, tags = orig(self)
         if line then
             line = (line:gsub("{loc:([%w_%.]+)}", function(k)
-                local ok, v = pcall(lurek.localization.t, k)
+                local ok, v = pcall(lurek.i18n.t, k)
                 return ok and v or k
             end))
         end

@@ -40,7 +40,7 @@ Security audits Lurek2D for the EngDev, GameTest, and EngTest personas: memory s
 ## Workflow
 1. Identify the target attack surfaces (sandbox init, `GameFS`, `unsafe` blocks, Lua boundary validation); load [skill: error-handling](.github/skills/error-handling/SKILL.md) and [skill: lua-scripting](.github/skills/lua-scripting/SKILL.md).
 2. Walk the threat model: stdlib access (`mlua::StdLib::NONE`), path traversal (`GameFS::resolve()` canonicalises and prefix-checks), memory corruption (`unsafe` audit), resource exhaustion, RefCell double-borrow, type confusion, error leakage.
-3. Run the Lua sandbox checklist as adversarial probes (`print(os)`, `print(io)`, `print(dofile)`, `lurek.fs.read("../../../etc/passwd")`, etc.) and use [tool: validate_lua_api](tools/validate/validate_lua_api.py) for boundary checks.
+3. Run the Lua sandbox checklist as adversarial probes (`print(os)`, `print(io)`, `print(dofile)`, `lurek.filesystem.read("../../../etc/passwd")`, etc.) and use [tool: validate_lua_api](tools/validate/validate_lua_api.py) for boundary checks.
 4. For every `unsafe` block, verify the `// SAFETY:` comment is specific and verifiable.
 5. Self-review: are you proposing security theatre (validation that does not actually prevent the attack)? Have you checked for borrow-mut-across-callback patterns?
 6. Write findings with severity, attack scenario, file:line, remediation, CWE if applicable.

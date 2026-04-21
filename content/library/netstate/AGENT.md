@@ -5,7 +5,7 @@
 | **Tier**       | Tier 3 — Lunasome (pure Lua, no Rust dependencies)                                                       |
 | **Source**     | `library/netstate/init.lua`                                                                              |
 | **Lua Tests**  | `tests/lua/library/test_library_netstate.lua`                                                            |
-| **Depends on** | `lurek.network` (mandatory for online mode), `lurek.codec` (optional, `:toJson`), `lurek.log` (optional) |
+| **Depends on** | `lurek.network` (mandatory for online mode), `lurek.serial` (optional, `:toJson`), `lurek.log` (optional) |
 | **Status**     | Full                                                                                                     |
 
 ## Summary
@@ -35,7 +35,7 @@ State deltas (`action="delta"`), full snapshots (`action="full"`), full-state
 requests (`action="full_request"`), and turn changes (`action="turn"`) are
 encoded with `lurek.network.pack` (MessagePack — the canonical ENet payload
 format). For human-readable persistence (snapshots written to disk) call
-`:toJson()`, which delegates to `lurek.codec.toJson`.
+`:toJson()`, which delegates to `lurek.serial.toJson`.
 
 ## Architecture
 
@@ -64,7 +64,7 @@ NetState methods:
   requestFullState() → ok    (no built-in timeout)
   onFullStateTimeout(fn)     (caller-driven)
   hashState() → number       (FNV-1a 32-bit, desync detection)
-  toJson() → string|nil      (uses lurek.codec.toJson when available)
+  toJson() → string|nil      (uses lurek.serial.toJson when available)
 
 Turn-based:
   setTurnOrder({peer_id, ...}) / beginTurn() / endTurn() / getCurrentTurn()
@@ -96,7 +96,7 @@ Logging:
   exceeded — useful in scripted stress where the dirty set could grow
   unbounded between syncs.
 - **`requestFullState` has no built-in timeout** — use `onFullStateTimeout` or
-  `lurek.time.Scheduler:after(...)` to drive a retry.
+  `lurek.timer.Scheduler:after(...)` to drive a retry.
 - **`:hashState()` is not a cryptographic hash** — it is a deterministic
   FNV-1a digest sufficient for desync detection. Will delegate to
   `lurek.data.hash` once that P4 lift candidate lands.

@@ -21,11 +21,11 @@ Player states: **not-ready** (default on join) → **ready** (via setReady).
 Wire format note: messages between peers are encoded with
 `lurek.network.pack` / `lurek.network.unpack` (MessagePack — the canonical
 ENet payload format). For human-readable persistence (e.g. saved lobby
-state), use `lurek.codec.toJson` / `lurek.codec.fromJson`.
+state), use `lurek.serial.toJson` / `lurek.serial.fromJson`.
 
 *23 functions, 0 module fields documented.*
 
-See: [`lurek.network`](../lua-api.md#lureknetwork), [`lurek.patterns.newEventBus`](../lua-api.md#lurekpatternsneweventbus), [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson)
+See: [`lurek.network`](../lua-api.md#lureknetwork), [`lurek.patterns.newEventBus`](../lua-api.md#lurekpatternsneweventbus), [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson)
 
 ## Functions
 

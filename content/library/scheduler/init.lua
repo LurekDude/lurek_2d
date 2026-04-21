@@ -10,7 +10,7 @@
 --
 -- This is a **coroutine-frame** scheduler: timing is measured in units of `dt`
 -- you pass to `:update(dt)`. For wall-clock one-shots / repeats use the engine
--- `lurek.time.Scheduler` userdata (`:after`, `:every`, `:cancel`) instead.
+-- `lurek.timer.Scheduler` userdata (`:after`, `:every`, `:cancel`) instead.
 --
 -- Usage:
 --   local scheduler = require("library.scheduler")
@@ -25,7 +25,7 @@
 --
 -- @module library.scheduler
 -- @status full
--- @see lurek.time.Scheduler
+-- @see lurek.timer.Scheduler
 
 local M = {}
 
@@ -76,7 +76,7 @@ end
 -- @tparam[opt] table opts  Options table.
 -- @tparam[opt=1000] number opts.max_iterations  Max coroutine resumes per `update()`.
 -- @treturn Scheduler  A new scheduler handle.
--- @see lurek.time.Scheduler
+-- @see lurek.timer.Scheduler
 function M.newScheduler(opts)
     opts = opts or {}
 
@@ -204,7 +204,7 @@ function M.newScheduler(opts)
     --
     -- @tparam number dt  Delta time in seconds (must be >= 0).
     -- @treturn number  Number of coroutine resumes performed this call.
-    -- @see lurek.time.getDelta
+    -- @see lurek.timer.getDelta
     function sched:update(dt)
         if type(dt) ~= "number" then
             error("scheduler.Scheduler:update() — dt must be a number, got " .. type(dt), 2)

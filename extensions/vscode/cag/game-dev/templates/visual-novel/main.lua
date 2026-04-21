@@ -16,16 +16,16 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.08, 0.06, 0.12)
+    lurek.render.clear(0.08, 0.06, 0.12)
     -- Background area
-    lurek.gfx.setColor(0.15, 0.1, 0.2, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 400)
+    lurek.render.setColor(0.15, 0.1, 0.2, 1)
+    lurek.render.rectangle("fill", 0, 0, 800, 400)
     -- Dialog box
     dialog:draw()
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     if key == "space" or key == "return" then
         dialog:advance()
     end

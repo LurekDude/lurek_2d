@@ -26,7 +26,7 @@ Draw call count is the primary render budget variable on integrated GPUs.
 
 ### Texture atlas
 
-Pack small sprites into a single large texture. Use `lurek.gfx.newQuad()` to define sub-regions. This keeps SpriteBatch at exactly 1 draw call regardless of sprite count.
+Pack small sprites into a single large texture. Use `lurek.render.newQuad()` to define sub-regions. This keeps SpriteBatch at exactly 1 draw call regardless of sprite count.
 
 ---
 

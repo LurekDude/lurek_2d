@@ -291,13 +291,13 @@ lurek.process(function(dt)
             gold_display = 0
             cavein_timer = 0
         end
-        if lurek.input.wasPressed("quit") then lurek.signal.quit() end
+        if lurek.input.wasPressed("quit") then lurek.event.quit() end
         return
     end
 
     if state == "GAME_OVER" or state == "VICTORY" then
         if lurek.input.wasPressed("confirm") then state = "TITLE" end
-        if lurek.input.wasPressed("quit") then lurek.signal.quit() end
+        if lurek.input.wasPressed("quit") then lurek.event.quit() end
         return
     end
 
@@ -316,7 +316,7 @@ lurek.process(function(dt)
     end
 
     -- MINING state
-    if lurek.input.wasPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasPressed("quit") then lurek.event.quit() end
 
     -- Movement
     if lurek.input.wasPressed("move_up")    then try_move(0, -1) end

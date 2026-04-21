@@ -13,7 +13,7 @@ describe("Evidence: Spine skeleton", function()
     -- @covers Skeleton:setPosition
     -- @covers Skeleton:updateWorldTransforms
     -- @covers Skeleton:drawToImage
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Builds a simple humanoid skeleton, updates transforms, and writes a stick-figure PNG showing the resulting hierarchy.
     it("renders a stick figure skeleton", function()
@@ -38,7 +38,7 @@ describe("Evidence: Spine skeleton", function()
         sk:updateWorldTransforms()
 
         local img = sk:drawToImage(256, 256)
-        lurek.img.savePNG(img, OUT .. "skeleton_stick_figure.png")
+        lurek.image.savePNG(img, OUT .. "skeleton_stick_figure.png")
     end)
 
     -- @covers lurek.spine.newSkeleton
@@ -48,7 +48,7 @@ describe("Evidence: Spine skeleton", function()
     -- @covers Skeleton:updateWorldTransforms
     -- @covers Skeleton:getBoneWorld
     -- @covers Skeleton:drawToImage
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Queries a bone's world transform after building a tiny hierarchy and saves a PNG of the resulting skeleton.
     it("demonstrates bone world-transform queries", function()
@@ -64,7 +64,7 @@ describe("Evidence: Spine skeleton", function()
         end
 
         local img = sk:drawToImage(128, 128)
-        lurek.img.savePNG(img, OUT .. "bone_operations.png")
+        lurek.image.savePNG(img, OUT .. "bone_operations.png")
     end)
 
 end)

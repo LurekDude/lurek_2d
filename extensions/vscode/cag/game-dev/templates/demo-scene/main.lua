@@ -18,17 +18,17 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.08, 0.08, 0.12)
+    lurek.render.clear(0.08, 0.08, 0.12)
     local s = scenes[current]
     if s and s.draw then s.draw() end
     -- Scene indicator
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
-    lurek.gfx.print("Scene " .. current .. "/" .. #scenes .. " — Press 1-" .. #scenes .. " to switch", 10, 580)
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(0.6, 0.6, 0.6, 1)
+    lurek.render.print("Scene " .. current .. "/" .. #scenes .. " — Press 1-" .. #scenes .. " to switch", 10, 580)
+    lurek.render.setColor(1, 1, 1, 1)
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     local n = tonumber(key)
     if n and n >= 1 and n <= #scenes then
         current = n

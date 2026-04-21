@@ -13,7 +13,7 @@ describe("integration: compute statistics to dataframe", function()
     -- @covers lurek.data.decompress
     -- @covers lurek.data.encode
     -- @covers lurek.data.hash
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @description Verifies statistics computed from multiple arrays can be assembled into dataframe rows without losing count, sum, mean, or min/max values.
     it("compute array stats populate dataframe", function()
         -- Create arrays with known distributions
@@ -63,12 +63,12 @@ end)
 -- @description Covers suite: integration: image data to compute array.
 describe("integration: image data to compute array", function()
     -- @covers lurek.compute.fromTable
-    -- @covers lurek.img.ImageData.getPixel
+    -- @covers lurek.image.ImageData.getPixel
     -- @description Verifies pixel data extracted from image storage can be loaded into a compute array and analyzed with aggregate operations.
     it("image pixel data can be analyzed with compute", function()
         -- Create a gradient image
         local width, height = 16, 16
-        local img = lurek.img.newImageData(width, height)
+        local img = lurek.image.newImageData(width, height)
 
         -- Set pixels with gradient
         for y = 0, height - 1 do

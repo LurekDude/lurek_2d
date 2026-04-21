@@ -38,7 +38,7 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         root.addChild(lbl)
 
         local img = lurek.ui.drawToImage(W, H)
-        lurek.img.savePNG(img, OUT .. "button_states.png")
+        lurek.image.savePNG(img, OUT .. "button_states.png")
         expect_evidence_created(OUT .. "button_states.png")
 
         root.removeChild(lbl)
@@ -73,7 +73,7 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         root.addChild(sp)
 
         local img = lurek.ui.drawToImage(W, H)
-        lurek.img.savePNG(img, OUT .. "hud_bars.png")
+        lurek.image.savePNG(img, OUT .. "hud_bars.png")
         expect_evidence_created(OUT .. "hud_bars.png")
 
         root.removeChild(sp)
@@ -115,7 +115,7 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         panel.addChild(slider)
 
         local img = lurek.ui.drawToImage(W, H)
-        lurek.img.savePNG(img, OUT .. "panel_layout.png")
+        lurek.image.savePNG(img, OUT .. "panel_layout.png")
         expect_evidence_created(OUT .. "panel_layout.png")
 
         root.removeChild(panel)

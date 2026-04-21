@@ -96,7 +96,7 @@ describe("Evidence: lurek.audio waveform PNG", function()
         }
         local IMG_W = 800
         local LANE_H = 80
-        local img = lurek.img.newImageData(IMG_W, LANE_H * #WAVES)
+        local img = lurek.image.newImageData(IMG_W, LANE_H * #WAVES)
         img:fill(12, 14, 20, 255)
 
         -- Draw separator lines
@@ -112,7 +112,7 @@ describe("Evidence: lurek.audio waveform PNG", function()
             waveform_strip(img, sd, i - 1, #WAVES, w.col)
         end
 
-        lurek.img.savePNG(img, OUT .. "evidence_audio_waves.png")
+        lurek.image.savePNG(img, OUT .. "evidence_audio_waves.png")
     end)
 
     -- @covers lurek.audio.saveWAV

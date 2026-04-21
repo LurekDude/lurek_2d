@@ -130,7 +130,7 @@ pub struct Simulator {
     /// cursor position and key state for each simulated step.
     ///
     /// The engine does not render this overlay itself; the flag is a hint for the
-    /// Lua script that calls `lurek.simulator:isHighlightMode()`.
+    /// Lua script that calls `lurek.automation:isHighlightMode()`.
     highlight_mode: bool,
 }
 
@@ -478,7 +478,7 @@ impl Simulator {
     /// When `true`, a game-side render pass is expected to draw a highlight
     /// showing the current simulated cursor/key position.  The engine does
     /// not render this overlay; the flag is a hint exposed via
-    /// `lurek.simulator:isHighlightMode()`.
+    /// `lurek.automation:isHighlightMode()`.
     ///
     /// # Parameters
     /// - `enable` â€” `bool`.

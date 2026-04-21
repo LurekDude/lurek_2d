@@ -7,7 +7,7 @@
 - Lua API path(s): `src/lua_api/tween_api.rs`
 - Primary Lua namespace: `lurek.tween`
 - Rust test path(s): tests/rust/unit/tween_tests.rs
-- Lua test path(s): tests/lua/unit/test_tween.lua, tests/lua/stress/test_tween_stress.lua, tests/lua/integration/test_tween_entity.lua, tests/lua/integration/test_tween_camera.lua, tests/lua/integration/test_tween_animation.lua
+- Lua test path(s): tests/lua/unit/test_tween.lua, tests/lua/stress/test_tween_stress.lua, tests/lua/integration/test_tween_ecs.lua, tests/lua/integration/test_tween_camera.lua, tests/lua/integration/test_tween_animation.lua
 
 ## Summary
 

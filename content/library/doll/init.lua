@@ -6,14 +6,14 @@
 --
 -- The library never calls rendering APIs directly; it produces a sorted
 -- draw list via `Doll:getDrawList()` that the caller hands to its renderer
--- (typically `lurek.graphic`). The legacy `Doll:draw()` method is retained
+-- (typically `lurek.render`). The legacy `Doll:draw()` method is retained
 -- as a deprecated no-op for source compatibility.
 --
 -- @module library.doll
 -- @status full
--- @see lurek.graphic       caller-side renderer that consumes `getDrawList()` entries
--- @see lurek.img           image/texture loader for `Part:setTexture()`
--- @see lurek.codec.toJson  serialise template + part state for persistence
+-- @see lurek.render       caller-side renderer that consumes `getDrawList()` entries
+-- @see lurek.image           image/texture loader for `Part:setTexture()`
+-- @see lurek.serial.toJson  serialise template + part state for persistence
 
 local M = {}
 
@@ -411,21 +411,21 @@ function M.newDoll(template)
     --- Deprecated convenience draw shim — retained only as a no-op.
     --
     -- The original implementation referenced an undefined global (`luna`)
-    -- and a non-existent namespace (`lurek.gfx`), so the call chain was a
+    -- and a non-existent namespace (`lurek.render`), so the call chain was a
     -- silent no-op in every build. Library code must not call rendering
     -- APIs directly (per `library.*` conventions), so the correct path
     -- now is for the caller to iterate `Doll:getDrawList()` and dispatch
-    -- the entries to `lurek.graphic` (or any other renderer) themselves.
+    -- the entries to `lurek.render` (or any other renderer) themselves.
     --
     -- This method emits a one-time warning on first invocation and then
     -- returns immediately. It will be removed in a future major bump.
     --
-    -- @deprecated use `Doll:getDrawList()` and dispatch to `lurek.graphic` in caller code
-    -- @see lurek.graphic
+    -- @deprecated use `Doll:getDrawList()` and dispatch to `lurek.render` in caller code
+    -- @see lurek.render
     function doll:draw()
         if not _draw_warned then
             _draw_warned = true
-            _logWarn("Doll:draw() is a deprecated no-op; iterate getDrawList() and call your renderer (e.g. lurek.graphic) from caller code")
+            _logWarn("Doll:draw() is a deprecated no-op; iterate getDrawList() and call your renderer (e.g. lurek.render) from caller code")
         end
         return
     end

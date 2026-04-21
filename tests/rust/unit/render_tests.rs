@@ -640,11 +640,11 @@ mod postfx_pipeline_tests {
 // exercise private WGSL-parsing helpers (validate_wgsl, prepare_fragment_source_for_wrapper,
 // split_top_level_commas, find_matching_paren, consume_attribute, strip_leading_attributes,
 // build_custom_color_shader_source, build_custom_texture_shader_source). User-visible
-// shader behaviour is covered by tests/lua/unit/test_postfx.lua and the content/examples/
+// shader behaviour is covered by tests/lua/unit/test_effect_postfx.lua and the content/examples/
 // shader examples exercised by tests/lua/content/.
 //
 // NOTE: dropped 9 internal-only tests from src/render/gpu_renderer.rs  they
 // exercise private wgpu-pipeline helpers (normalize_scissor, color_write_mask_bits,
 // parse_filter_mode, uniform_bytes, depth_stencil_state). User-visible rendering
 // behaviour is covered by tests/rust/golden/ frame-capture tests and the
-// lurek.graphic.* Lua tests in tests/lua/unit/test_rendering.lua.
+// lurek.render.* Lua tests in tests/lua/unit/test_render_pipeline.lua.

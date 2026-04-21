@@ -5,7 +5,7 @@
 - Module group: `Core Runtime`
 - Source path: `src/timer/`
 - Lua API path(s): `src/lua_api/timer_api.rs`
-- Primary Lua namespace: `lurek.time`
+- Primary Lua namespace: `lurek.timer`
 - Rust test path(s): tests/rust/unit/timer_tests.rs, tests/fixtures/timer_api_fixture.rs, plus inline unit coverage in src/timer/scheduler.rs
 - Lua test path(s): tests/lua/unit/test_timer.lua, tests/lua/stress/test_timer_stress.lua, tests/lua/integration/test_timer_math.lua, tests/lua/integration/test_physics_timer.lua, tests/lua/integration/test_particle_timer.lua, tests/lua/integration/test_audio_timer.lua, tests/lua/integration/test_animation_timer.lua
 
@@ -19,7 +19,7 @@ The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-
 
 `sleep(seconds)` pauses the calling OS thread and is intended only for worker VM threads (from `lurek.thread`); calling it from the main VM blocks the engine's frame loop and is therefore prohibited in the Lua API documentation.
 
-The timer module has been extended with physics step controls: `setPhysicsMaxSteps` and `getPhysicsMaxSteps` allow game scripts to configure the maximum number of physics sub-steps the engine processes in a single frame, preventing spiral-of-death behavior when frame time spikes. Schedule improvements to `lurek.time.schedule` provide more expressive deferred callback registration patterns for scripts that need fine-grained timing control.
+The timer module has been extended with physics step controls: `setPhysicsMaxSteps` and `getPhysicsMaxSteps` allow game scripts to configure the maximum number of physics sub-steps the engine processes in a single frame, preventing spiral-of-death behavior when frame time spikes. Schedule improvements to `lurek.timer.schedule` provide more expressive deferred callback registration patterns for scripts that need fine-grained timing control.
 
 **Scope boundary**: Core Runtime tier. Depends only on `runtime`. Lua bridge in `src/lua_api/timer_api.rs`.
 
@@ -75,7 +75,7 @@ The timer module has been extended with physics step controls: `setPhysicsMaxSte
 ## Lua API Reference
 
 - Binding path(s): `src/lua_api/timer_api.rs`
-- Namespace: `lurek.time`
+- Namespace: `lurek.timer`
 
 ### Module Functions
 - `lurek.timer.getDelta`: Returns the delta time in seconds for the current frame.

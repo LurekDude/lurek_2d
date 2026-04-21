@@ -3,16 +3,16 @@
 --           migrated_rust/{compress,data,encode,hash} outputs.
 
 local function ensure_dir(path)
-    lurek.fs.createDirectory(path)
+    lurek.filesystem.createDirectory(path)
 end
 
 local function write_text(path, text)
-    lurek.fs.write(path, text)
+    lurek.filesystem.write(path, text)
     expect_evidence_created(path)
 end
 
 local function write_bytes(path, data)
-    lurek.fs.write(path, data)
+    lurek.filesystem.write(path, data)
     expect_evidence_created(path)
 end
 
@@ -81,14 +81,14 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("dataframe") .. "dataframe_golden.txt", text)
     end)
 
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @covers World:spawn
     -- @covers World:isAlive
     -- @covers World:getEntityCount
     -- @evidence file
     -- @description Spawns one entity in a fresh Universe, records its stable ID, alive flag, and total live count, and writes entity_golden.txt for compare-only entity golden verification.
     it("writes entity_golden.txt", function()
-        local world = lurek.entity.newUniverse()
+        local world = lurek.ecs.newUniverse()
         local entity = world:spawn()
         local text = table.concat({
             "entity_id=" .. tostring(entity),

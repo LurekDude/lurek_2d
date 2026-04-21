@@ -5,12 +5,12 @@ Screen overlay effects showcase demonstrating weather particles, time-of-day tin
 ## What It Demonstrates
 
 - `lurek.input.bind()` — action-mapped keys for weather toggles, time cycling, fog/vignette, intensity
-- `lurek.particles.newSystem()` — rain, snow, hail, dust, leaves, ash, pollen, fog motes as particle systems
+- `lurek.particle.newSystem()` — rain, snow, hail, dust, leaves, ash, pollen, fog motes as particle systems
 - `lurek.tween.to()` — smooth time-of-day color transitions and intensity changes
 - `lurek.camera.attach()` / `lurek.camera.detach()` — camera for scene, detached for HUD
-- `lurek.gfx.setBackgroundColor()` — dynamic sky color based on time of day
+- `lurek.render.setBackgroundColor()` — dynamic sky color based on time of day
 - `lurek.window.setTitle()` — window title with active overlay count
-- `lurek.signal.quit()` — clean exit on Escape
+- `lurek.event.quit()` — clean exit on Escape
 
 ## How to Run
 

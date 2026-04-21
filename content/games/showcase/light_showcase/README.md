@@ -42,4 +42,4 @@ cargo run -- content/games/showcase/light_showcase
 
 ## APIs Used
 
-`lurek.light`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particles`, `lurek.tween`, `lurek.timer`, `lurek.window`, `lurek.signal`
+`lurek.light`, `lurek.render`, `lurek.input`, `lurek.camera`, `lurek.particle`, `lurek.tween`, `lurek.timer`, `lurek.window`, `lurek.event`

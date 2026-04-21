@@ -39,7 +39,7 @@ The `app` module is the engine's lifecycle orchestrator and sits at the Edge/Int
 2. **[P1][GAP]** `app.rs is 3100+ lines` — Too large to navigate; mixes GPU init, event dispatch, game loop, splash screen, and auto-collect passes.
    - Why: Violates single-responsibility; makes targeted changes risky.
 3. **[P2][GAP]** `No frame profiling hooks` — No way to measure per-callback timing (process, render, physics) from within the engine.
-   - Why: Performance debugging requires external tools; cannot expose frame breakdown to `lurek.platform`.
+   - Why: Performance debugging requires external tools; cannot expose frame breakdown to `lurek.runtime`.
 
 ## 5. Feature Ideas
 
@@ -52,7 +52,7 @@ The `app` module is the engine's lifecycle orchestrator and sits at the Edge/Int
    - Rationale: 3100+ lines is unmanageable. Extraction is mechanical and low-risk.
    - Effort: M · Risk: low.
 
-3. **[P2][FEAT]** `Frame profiling hooks` — Record per-callback wall-clock timing (process, render, physics, fixedUpdate) and expose via `lurek.platform.getFrameProfile()`.
+3. **[P2][FEAT]** `Frame profiling hooks` — Record per-callback wall-clock timing (process, render, physics, fixedUpdate) and expose via `lurek.runtime.getFrameProfile()`.
    - Rationale: Enables in-game performance overlays and automated perf regression tests.
    - Effort: S · Risk: low.
    - Competitor inspiration: `[Godot: Performance.get_monitor(TIME_PROCESS, TIME_PHYSICS_PROCESS)]`.

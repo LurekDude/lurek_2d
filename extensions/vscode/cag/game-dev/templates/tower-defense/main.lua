@@ -96,30 +96,30 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.1, 0.15, 0.1)
+    lurek.render.clear(0.1, 0.15, 0.1)
 
     -- Draw path
-    lurek.gfx.setColor(0.3, 0.3, 0.25, 1)
+    lurek.render.setColor(0.3, 0.3, 0.25, 1)
     for i = 1, #path - 1 do
-        lurek.gfx.line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y)
+        lurek.render.line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y)
     end
 
     -- Draw towers
     for _, t in ipairs(towers) do
-        lurek.gfx.setColor(0.2, 0.6, 1, 1)
-        lurek.gfx.rectangle("fill", t.x - 12, t.y - 12, 24, 24)
+        lurek.render.setColor(0.2, 0.6, 1, 1)
+        lurek.render.rectangle("fill", t.x - 12, t.y - 12, 24, 24)
     end
 
     -- Draw enemies
     for _, e in ipairs(enemies) do
-        lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
-        lurek.gfx.circle("fill", e.x, e.y, 8)
+        lurek.render.setColor(0.9, 0.2, 0.2, 1)
+        lurek.render.circle("fill", e.x, e.y, 8)
     end
 
     -- UI
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives, 10, 10)
-    lurek.gfx.print("Click to place tower (" .. TOWER_COST .. "g)", 10, 580)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives, 10, 10)
+    lurek.render.print("Click to place tower (" .. TOWER_COST .. "g)", 10, 580)
 end
 
 function lurek.mousepressed(x, y, btn)
@@ -130,5 +130,5 @@ function lurek.mousepressed(x, y, btn)
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
 end

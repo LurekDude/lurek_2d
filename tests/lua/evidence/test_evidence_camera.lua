@@ -9,7 +9,7 @@ local PI  = math.pi
 --- Draw a mini world onto an ImageData then apply camera transforms for a viewport.
 --- Returns an ImageData of size vwĂ—vh.
 local function render_world_through_cam(cam, world_w, world_h, vw, vh)
-    local img = lurek.img.newImageData(vw, vh)
+    local img = lurek.image.newImageData(vw, vh)
     img:fill(15, 20, 35, 255)
 
     -- draw a grid in world space
@@ -70,7 +70,7 @@ describe("Evidence: lurek.camera zoom and coordinate transforms", function()
         local VW, VH = 160, 120
         local WW, WH = 320, 240
 
-        local img = lurek.img.newImageData(VW * 2 + 4, VH)
+        local img = lurek.image.newImageData(VW * 2 + 4, VH)
         img:fill(8, 8, 16, 255)
 
         -- Zoom 1Ă—
@@ -101,7 +101,7 @@ describe("Evidence: lurek.camera zoom and coordinate transforms", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "evidence_camera_zoom_compare.png")
+        lurek.image.savePNG(img, OUT .. "evidence_camera_zoom_compare.png")
     end)
 end)
 
@@ -127,7 +127,7 @@ describe("Evidence: lurek.camera rotation", function()
         cam:setRotation(PI / 6)  -- 30Â°
 
         local img = render_world_through_cam(cam, WW, WH, VW, VH)
-        lurek.img.savePNG(img, OUT .. "evidence_camera_rotation.png")
+        lurek.image.savePNG(img, OUT .. "evidence_camera_rotation.png")
     end)
 end)
 
@@ -144,7 +144,7 @@ describe("Evidence: lurek.camera follow behaviour", function()
     -- @description Moves a synthetic target along a path and records the camera trail to show smooth follow behavior over time.
     it("setTarget causes camera to track â€” PNG evidence: follow_trail", function()
         local VW, VH = 200, 80
-        local img = lurek.img.newImageData(VW, VH)
+        local img = lurek.image.newImageData(VW, VH)
         img:fill(12, 15, 25, 255)
 
         local cam = lurek.camera.newCamera()
@@ -168,7 +168,7 @@ describe("Evidence: lurek.camera follow behaviour", function()
             img:setPixel(px, py, 100, 220, 180, 255)
         end
 
-        lurek.img.savePNG(img, OUT .. "evidence_camera_follow_trail.png")
+        lurek.image.savePNG(img, OUT .. "evidence_camera_follow_trail.png")
     end)
 end)
 
@@ -183,7 +183,7 @@ describe("Evidence: lurek.camera shake", function()
     -- @description Applies a short shake effect and plots the resulting camera offsets into a PNG trail.
     it("shake causes non-zero offset â€” PNG evidence: shake_trail", function()
         local VW, VH = 200, 60
-        local img = lurek.img.newImageData(VW, VH)
+        local img = lurek.image.newImageData(VW, VH)
         img:fill(10, 10, 20, 255)
 
         local cam = lurek.camera.newCamera()
@@ -200,7 +200,7 @@ describe("Evidence: lurek.camera shake", function()
             img:setPixel(px, py, 255, 180, 60, 255)
         end
 
-        lurek.img.savePNG(img, OUT .. "evidence_camera_shake_trail.png")
+        lurek.image.savePNG(img, OUT .. "evidence_camera_shake_trail.png")
     end)
 end)
 test_summary()

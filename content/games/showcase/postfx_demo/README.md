@@ -35,12 +35,12 @@ cargo run -- content/games/showcase/postfx_demo
 - Effect stacking — all 10 effects can be active simultaneously
 - `lurek.input.bind()` — action-based input mapping for all toggles
 - `lurek.tween.to()` — smooth intensity transitions on +/- adjust
-- `lurek.particles.newSystem()` — toggle flash and intensity sparkle particles
+- `lurek.particle.newSystem()` — toggle flash and intensity sparkle particles
 - `lurek.camera.new()` — camera attach/detach for world-space rendering
-- `lurek.time.getFPS()` / `lurek.time.getTime()` — FPS display and animation timing
+- `lurek.timer.getFPS()` / `lurek.timer.getTime()` — FPS display and animation timing
 - `lurek.window.setTitle()` — custom window title
 - `lurek.render.setBackgroundColor()` — dark background
-- `lurek.signal.quit()` — clean exit
+- `lurek.event.quit()` — clean exit
 - Render/render_ui split — base scene + effects in `render()`, HUD/effect list in `render_ui()`
 - Title → Running state machine with animated effect preview on title screen
 

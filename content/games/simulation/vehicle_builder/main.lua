@@ -273,13 +273,13 @@ lurek.process(function(dt)
     -- Quit
     if lurek.input.isActionJustPressed("quit") then
         if current_state == STATE.BUILDING then
-            lurek.signal.quit()
+            lurek.event.quit()
         elseif current_state == STATE.TESTING then
             current_state = STATE.RESULTS
         elseif current_state == STATE.RESULTS then
             current_state = STATE.BUILDING
         elseif current_state == STATE.TITLE then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end

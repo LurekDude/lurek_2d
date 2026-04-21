@@ -12,90 +12,90 @@ describe("evidence: imagedata creation and manipulation", function()
         OUT = evidence_output_dir("image")
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Paints a handful of explicit pixels and saves the result to prove direct pixel writes persist into PNG output.
     it("creates basic pixel-painted image", function()
-        local img = lurek.img.newImageData(16, 16)
+        local img = lurek.image.newImageData(16, 16)
         img:setPixel(0,  0,  255, 0,   0,   255)
         img:setPixel(1,  0,  0,   255, 0,   255)
         img:setPixel(2,  0,  0,   0,   255, 255)
         img:setPixel(15, 15, 128, 64,  32,  200)
         local path = OUT .. "imagedata_basic.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Fills an image with one solid color and writes the result as basic fill evidence.
     it("creates fill image", function()
-        local img = lurek.img.newImageData(16, 16)
+        local img = lurek.image.newImageData(16, 16)
         img:fill(100, 150, 200, 255)
         local path = OUT .. "imagedata_fill.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:mapPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Applies a per-pixel inversion callback through mapPixel and writes the transformed image to disk.
     it("creates mapPixel inverted image", function()
-        local img = lurek.img.newImageData(16, 16)
+        local img = lurek.image.newImageData(16, 16)
         img:fill(50, 100, 150, 255)
         img:mapPixel(function(x, y, r, g, b, a)
             return 255 - r, 255 - g, 255 - b, a
         end)
         local path = OUT .. "imagedata_mapped.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:crop
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Crops a sub-region from a solid image and saves the resulting child image as evidence.
     it("creates cropped sub-image", function()
-        local img = lurek.img.newImageData(16, 16)
+        local img = lurek.image.newImageData(16, 16)
         img:fill(200, 100, 50, 255)
         local sub = img:crop(4, 4, 6, 6)
         local path = OUT .. "imagedata_cropped.png"
-        lurek.img.savePNG(sub, path)
+        lurek.image.savePNG(sub, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:resizeNearest
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Upscales a tiny image with nearest-neighbor sampling and saves the enlarged result.
     it("creates resized image", function()
-        local img = lurek.img.newImageData(4, 4)
+        local img = lurek.image.newImageData(4, 4)
         img:fill(255, 0, 0, 255)
         local big = img:resizeNearest(16, 16)
         local path = OUT .. "imagedata_resized.png"
-        lurek.img.savePNG(big, path)
+        lurek.image.savePNG(big, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:setPixel
     -- @covers ImageData:flipHorizontal
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Builds a two-color split image, flips it horizontally, and writes the mirrored result.
     it("creates horizontally flipped image", function()
-        local img = lurek.img.newImageData(8, 8)
+        local img = lurek.image.newImageData(8, 8)
         img:fill(0, 0, 0, 255)
         -- left half red, right half blue
         for y = 0, 7 do
@@ -104,22 +104,22 @@ describe("evidence: imagedata creation and manipulation", function()
         end
         img:flipHorizontal()
         local path = OUT .. "imagedata_flipped.png"
-        lurek.img.savePNG(img, path)
+        lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:fill
     -- @covers ImageData:rotate90cw
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Rotates a non-square image clockwise and saves the rotated output.
     it("creates rotated image", function()
-        local img = lurek.img.newImageData(4, 8)
+        local img = lurek.image.newImageData(4, 8)
         img:fill(255, 128, 0, 255)
         local rotated = img:rotate90cw()
         local path = OUT .. "imagedata_rotated.png"
-        lurek.img.savePNG(rotated, path)
+        lurek.image.savePNG(rotated, path)
         expect_evidence_created(path)
     end)
 end)

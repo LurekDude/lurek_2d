@@ -32,9 +32,9 @@ suite("TypeInference — FACTORY_TYPES registry", () => {
     assert.strictEqual(FACTORY_TYPES["lurek.graphics.newFont"].typeName, "Font");
   });
 
-  test("contains Entity type from lurek.entity.new", () => {
-    assert.ok(FACTORY_TYPES["lurek.entity.new"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.entity.new"].typeName, "Entity");
+  test("contains Entity type from lurek.ecs.new", () => {
+    assert.ok(FACTORY_TYPES["lurek.ecs.new"]);
+    assert.strictEqual(FACTORY_TYPES["lurek.ecs.new"].typeName, "Entity");
   });
 
   test("contains World type from lurek.physics.newWorld", () => {

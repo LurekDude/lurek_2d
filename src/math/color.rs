@@ -9,7 +9,7 @@
 
 /// RGBA color stored as `f32` components in the range `[0.0, 1.0]`.
 ///
-/// Used everywhere the API accepts a color: `lurek.graphic.setColor`, sprite tints,
+/// Used everywhere the API accepts a color: `lurek.render.setColor`, sprite tints,
 /// background color, etc.
 ///
 /// # Fields

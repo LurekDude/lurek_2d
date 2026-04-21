@@ -6,13 +6,13 @@ This script finds Lua function registrations (lurek.module.function( ... ))
 in inline comments and converts them to proper /// docstrings.
 
 Transformations:
-  // lurek.graphics.setColor(r, g, b, a?)
+  // lurek.renders.setColor(r, g, b, a?)
   ->
   /// Sets the drawing color for subsequent draw commands.
   ///
   /// Parameters: r, g, b, a (float 0.0-1.0, alpha optional)
   ///
-  /// Lua API: lurek.graphics.setColor(r, g, b [, a])
+  /// Lua API: lurek.renders.setColor(r, g, b [, a])
 """
 
 import re

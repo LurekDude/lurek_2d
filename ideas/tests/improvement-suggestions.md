@@ -98,7 +98,7 @@ end)
 describe("entity system", function()
     local world
     before_each(function()
-        world = lurek.entity.newWorld()
+        world = lurek.ecs.newWorld()
     end)
     after_each(function()
         if world then world:destroy() end
@@ -156,9 +156,9 @@ pending("MIDI support requires SoundFont loading")
 **Recommendation**: Add a `measure()` helper to `tests/lua/init.lua`:
 ```lua
 function measure(name, count, fn)
-    local start = lurek.time.getTime()
+    local start = lurek.timer.getTime()
     fn()
-    local elapsed = lurek.time.getTime() - start
+    local elapsed = lurek.timer.getTime() - start
     local ops_per_sec = count / elapsed
     print(string.format("[PERF] %s: %d ops in %.3fs (%.0f ops/sec)",
         name, count, elapsed, ops_per_sec))
@@ -173,10 +173,10 @@ end
 **Recommendation**: Use `Canvas:renderTo` + `Canvas:getPixel` for headless visual verification:
 ```lua
 -- Draw red rectangle and verify red pixels exist
-local canvas = lurek.gfx.newCanvas(100, 100)
+local canvas = lurek.render.newCanvas(100, 100)
 canvas:renderTo(function()
-    lurek.gfx.setColor(1, 0, 0)
-    lurek.gfx.rectangle("fill", 0, 0, 100, 100)
+    lurek.render.setColor(1, 0, 0)
+    lurek.render.rectangle("fill", 0, 0, 100, 100)
 end)
 local r, g, b, a = canvas:getPixel(50, 50)
 expect_near(1.0, r, 0.01) -- red pixel proves rectangle was drawn
@@ -211,7 +211,7 @@ function make_test_world()
 end
 
 function make_test_grid(w, h)
-    local grid = lurek.pathfinding.newGrid(w, h)
+    local grid = lurek.pathfind.newGrid(w, h)
     return grid
 end
 ```

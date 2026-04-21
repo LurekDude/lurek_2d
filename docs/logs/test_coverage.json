@@ -28305,28 +28305,28 @@
       },
       {
         "module": "collision",
-        "lua_name": "lurek.collision.testAABB",
+        "lua_name": "lurek.physics.testAABB",
         "kind": "function",
         "file": "src/lua_api/collision_api.rs",
         "line": 36
       },
       {
         "module": "collision",
-        "lua_name": "lurek.collision.testCircles",
+        "lua_name": "lurek.physics.testCircles",
         "kind": "function",
         "file": "src/lua_api/collision_api.rs",
         "line": 57
       },
       {
         "module": "collision",
-        "lua_name": "lurek.collision.testPoint",
+        "lua_name": "lurek.physics.testPoint",
         "kind": "function",
         "file": "src/lua_api/collision_api.rs",
         "line": 77
       },
       {
         "module": "collision",
-        "lua_name": "lurek.collision.testCircleAABB",
+        "lua_name": "lurek.physics.testCircleAABB",
         "kind": "function",
         "file": "src/lua_api/collision_api.rs",
         "line": 98
@@ -31658,56 +31658,56 @@
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.getVersion",
+        "lua_name": "lurek.runtime.getVersion",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 22
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.getFrameBudget",
+        "lua_name": "lurek.runtime.getFrameBudget",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 30
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.memoryUsage",
+        "lua_name": "lurek.runtime.memoryUsage",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 39
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.platform",
+        "lua_name": "lurek.runtime.platform",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 54
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.uptime",
+        "lua_name": "lurek.runtime.uptime",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 74
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.fps",
+        "lua_name": "lurek.runtime.fps",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 83
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.frameCount",
+        "lua_name": "lurek.runtime.frameCount",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 92
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.isDebug",
+        "lua_name": "lurek.runtime.isDebug",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 100
@@ -43320,168 +43320,168 @@
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getOS",
+        "lua_name": "lurek.runtime.getOS",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 150
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getVersion",
+        "lua_name": "lurek.runtime.getVersion",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 172
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getProcessorCount",
+        "lua_name": "lurek.runtime.getProcessorCount",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 180
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getMemorySize",
+        "lua_name": "lurek.runtime.getMemorySize",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 189
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.openURL",
+        "lua_name": "lurek.runtime.openURL",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 198
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getPreferredLocales",
+        "lua_name": "lurek.runtime.getPreferredLocales",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 207
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getPowerInfo",
+        "lua_name": "lurek.runtime.getPowerInfo",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 217
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getInfo",
+        "lua_name": "lurek.runtime.getInfo",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 229
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getMessage",
+        "lua_name": "lurek.runtime.getMessage",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 266
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.hasMessage",
+        "lua_name": "lurek.runtime.hasMessage",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 275
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getMessageCount",
+        "lua_name": "lurek.runtime.getMessageCount",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 283
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.setClipboardText",
+        "lua_name": "lurek.runtime.setClipboardText",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 291
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getClipboardText",
+        "lua_name": "lurek.runtime.getClipboardText",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 311
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.setDebugOverlay",
+        "lua_name": "lurek.runtime.setDebugOverlay",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 335
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getDebugOverlay",
+        "lua_name": "lurek.runtime.getDebugOverlay",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 346
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.setLogLevel",
+        "lua_name": "lurek.runtime.setLogLevel",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 360
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getLogLevel",
+        "lua_name": "lurek.runtime.getLogLevel",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 372
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.log",
+        "lua_name": "lurek.runtime.log",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 382
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getLastError",
+        "lua_name": "lurek.runtime.getLastError",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 404
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.errorSnapshot",
+        "lua_name": "lurek.runtime.errorSnapshot",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 436
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getArch",
+        "lua_name": "lurek.runtime.getArch",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 449
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getEnv",
+        "lua_name": "lurek.runtime.getEnv",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 458
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getArgs",
+        "lua_name": "lurek.runtime.getArgs",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 469
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.parseArgs",
+        "lua_name": "lurek.runtime.parseArgs",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 487
@@ -48782,14 +48782,14 @@
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.setResourceBudget",
+        "lua_name": "lurek.runtime.setResourceBudget",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 114
       },
       {
         "module": "engine",
-        "lua_name": "lurek.engine.getResourceStats",
+        "lua_name": "lurek.runtime.getResourceStats",
         "kind": "function",
         "file": "src/lua_api/engine_api.rs",
         "line": 132
@@ -49986,14 +49986,14 @@
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.runBatch",
+        "lua_name": "lurek.runtime.runBatch",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 556
       },
       {
         "module": "system",
-        "lua_name": "lurek.system.getBatchResults",
+        "lua_name": "lurek.runtime.getBatchResults",
         "kind": "function",
         "file": "src/lua_api/system_api.rs",
         "line": 609

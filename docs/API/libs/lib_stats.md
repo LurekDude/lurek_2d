@@ -800,7 +800,7 @@ Restore sheet state from a snapshot previously created by Sheet:snapshot.
 
 ### `snapshotToJson(snap)`
 
-Encode a snapshot table to a JSON string via `lurek.codec.toJson`.
+Encode a snapshot table to a JSON string via `lurek.serial.toJson`.
 
 **Parameters**
 
@@ -810,11 +810,11 @@ Encode a snapshot table to a JSON string via `lurek.codec.toJson`.
 
 - *string* — JSON-encoded snapshot.
 
-See: [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson)
+See: [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson)
 
 ### `snapshotFromJson(str)`
 
-Decode a JSON snapshot string back into a Lua table via `lurek.codec.fromJson`. The returned table can be passed to `Sheet:restore`.
+Decode a JSON snapshot string back into a Lua table via `lurek.serial.fromJson`. The returned table can be passed to `Sheet:restore`.
 
 **Parameters**
 
@@ -824,4 +824,4 @@ Decode a JSON snapshot string back into a Lua table via `lurek.codec.fromJson`. 
 
 - *table* — Decoded snapshot.
 
-See: [`lurek.codec.fromJson`](../lua-api.md#lurekcodecfromjson)
+See: [`lurek.serial.fromJson`](../lua-api.md#lurekcodecfromjson)

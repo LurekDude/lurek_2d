@@ -249,7 +249,7 @@ scenes.menu = {
         if lurek.input.wasActionPressed("confirm") then
             if menu_index == 1 then switch_scene("gameplay")
             elseif menu_index == 2 then switch_scene("settings")
-            elseif menu_index == 3 then lurek.signal.quit()
+            elseif menu_index == 3 then lurek.event.quit()
             end
         end
     end,
@@ -688,7 +688,7 @@ function lurek.process(dt)
     end
 
     -- Global controls (always active)
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     if lurek.input.wasActionPressed("cycle_trans") then
         transition_type = transition_type + 1

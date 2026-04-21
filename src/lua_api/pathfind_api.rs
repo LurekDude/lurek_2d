@@ -1,4 +1,4 @@
-//! `lurek.pathfinding` — Grid-based A★, HPA★, flow field, and unit-aware navigation.
+//! `lurek.pathfind` — Grid-based A★, HPA★, flow field, and unit-aware navigation.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1179,7 +1179,7 @@ impl LuaUserData for LuaJpsGrid {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.pathfinding` API table with the Lua VM.
+/// Registers the `lurek.pathfind` API table with the Lua VM.
 ///
 /// @param lua : &Lua
 /// @param luna : &LuaTable

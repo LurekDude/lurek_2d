@@ -92,18 +92,18 @@ export class ApiReferenceEditor extends WebviewEditor {
             { name: 'lurek.graphics.newImage', sig: 'lurek.graphics.newImage(path)', desc: 'Load an image from file and return texture handle.', params: ['path: file path relative to game dir'], returns: 'Image' },
           ]
         },
-        'lurek.keyboard': {
+        'lurek.input.keyboard': {
           desc: 'Keyboard input state and key queries.',
           funcs: [
-            { name: 'lurek.keyboard.isDown', sig: 'lurek.keyboard.isDown(key)', desc: 'Check if a key is currently held down.', params: ['key: key name ("space", "a", "left", etc.)'], returns: 'boolean' },
-            { name: 'lurek.keyboard.isUp', sig: 'lurek.keyboard.isUp(key)', desc: 'Check if a key is not pressed.', params: ['key: key name'], returns: 'boolean' },
+            { name: 'lurek.input.keyboard.isDown', sig: 'lurek.input.keyboard.isDown(key)', desc: 'Check if a key is currently held down.', params: ['key: key name ("space", "a", "left", etc.)'], returns: 'boolean' },
+            { name: 'lurek.input.keyboard.isUp', sig: 'lurek.input.keyboard.isUp(key)', desc: 'Check if a key is not pressed.', params: ['key: key name'], returns: 'boolean' },
           ]
         },
-        'lurek.mouse': {
+        'lurek.input.mouse': {
           desc: 'Mouse position and button queries.',
           funcs: [
-            { name: 'lurek.mouse.getPosition', sig: 'lurek.mouse.getPosition()', desc: 'Get current mouse position.', params: [], returns: 'x, y' },
-            { name: 'lurek.mouse.isDown', sig: 'lurek.mouse.isDown(button)', desc: 'Check if a mouse button is held.', params: ['button: 1=left, 2=right, 3=middle'], returns: 'boolean' },
+            { name: 'lurek.input.mouse.getPosition', sig: 'lurek.input.mouse.getPosition()', desc: 'Get current mouse position.', params: [], returns: 'x, y' },
+            { name: 'lurek.input.mouse.isDown', sig: 'lurek.input.mouse.isDown(button)', desc: 'Check if a mouse button is held.', params: ['button: 1=left, 2=right, 3=middle'], returns: 'boolean' },
           ]
         },
         'lurek.audio': {

@@ -194,7 +194,7 @@ function lurek.init()
     lurek.input.bind("quit",         { "escape"      })
 
     -- Explosion particles
-    explosions = lurek.particles.newSystem({
+    explosions = lurek.particle.newSystem({
         maxParticles = 400,
         emissionRate = 0,
         lifetimeMin  = 0.3, lifetimeMax = 1.0,
@@ -210,7 +210,7 @@ function lurek.init()
     })
 
     -- Thrust flame particles
-    thrust_sparks = lurek.particles.newSystem({
+    thrust_sparks = lurek.particle.newSystem({
         maxParticles = 150,
         emissionRate = 0,
         lifetimeMin  = 0.1, lifetimeMax = 0.4,
@@ -243,7 +243,7 @@ end
 function lurek.process(dt)
     -- Global quit
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -533,7 +533,7 @@ function lurek.render_ui()
 
     -- FPS — bottom left
     lurek.render.setColor(0.4, 0.4, 0.5)
-    lurek.render.print("FPS: " .. math.floor(lurek.time.getFPS()), 8, SCREEN_H - 20, 1)
+    lurek.render.print("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 20, 1)
 
     -- ── GAME OVER OVERLAY ─────────────────────────────────────────────
     if state == STATE.GAME_OVER then

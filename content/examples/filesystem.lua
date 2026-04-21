@@ -416,12 +416,12 @@ for _, f in ipairs(files) do print(" -", f) end
 -- relative names returned by listFiles.
 print("mounted at prefix:", zm:prefix())  -- "pack/"
 -- =============================================================================
--- New in 0.15.0: lurek.fs.listRecursive
+-- New in 0.15.0: lurek.filesystem.listRecursive
 -- =============================================================================
 
 -- listRecursive returns all files under a directory tree as a flat list.
 -- It raises an error if the path contains '..' (sandbox protection).
-local ok, result = pcall(lurek.fs.listRecursive, "save/")
+local ok, result = pcall(lurek.filesystem.listRecursive, "save/")
 if ok then
   print(string.format("listRecursive found %d entries in save/", #result))
   for _, path in ipairs(result) do
@@ -432,29 +432,29 @@ else
 end
 
 -- Traversal attempts are rejected with an error:
-local ok2, err2 = pcall(lurek.fs.listRecursive, "save/../..")
+local ok2, err2 = pcall(lurek.filesystem.listRecursive, "save/../..")
 print("traversal blocked: " .. tostring(not ok2) .. " err: " .. tostring(err2))
 
 -- =============================================================================
--- New in 0.15.0: lurek.fs.stat
+-- New in 0.15.0: lurek.filesystem.stat
 -- =============================================================================
 
 -- Write a file so stat has something to inspect.
-lurek.fs.write("save/demo_stat.txt", "hello world")
-local info = lurek.fs.stat("save/demo_stat.txt")
+lurek.filesystem.write("save/demo_stat.txt", "hello world")
+local info = lurek.filesystem.stat("save/demo_stat.txt")
 print(string.format("stat size=%d  isFile=%s  isDir=%s",
   info.size, tostring(info.isFile), tostring(info.isDir)))
 
 -- Attempting to stat a non-existent or traversal path raises an error:
-local ok3, err3 = pcall(lurek.fs.stat, "../../etc/passwd")
+local ok3, err3 = pcall(lurek.filesystem.stat, "../../etc/passwd")
 print("stat traversal blocked: " .. tostring(not ok3))
 
 -- =============================================================================
--- New in 0.15.0: lurek.fs.createTempFile
+-- New in 0.15.0: lurek.filesystem.createTempFile
 -- =============================================================================
 
-local tmp1 = lurek.fs.createTempFile("demo_")
-local tmp2 = lurek.fs.createTempFile("demo_")
+local tmp1 = lurek.filesystem.createTempFile("demo_")
+local tmp2 = lurek.filesystem.createTempFile("demo_")
 print("temp1: " .. tmp1)
 print("temp2: " .. tmp2)
 print("unique: " .. tostring(tmp1 ~= tmp2))

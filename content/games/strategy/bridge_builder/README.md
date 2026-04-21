@@ -42,8 +42,8 @@ Press T to test: a vehicle drives across from left to right. Beams change color 
 - `lurek.window` — sets the window title
 - `lurek.render` — canyon terrain, beams, nodes, vehicle, river
 - `lurek.input` — action-based key and mouse bindings
-- `lurek.time` — delta time for simulation and animation
+- `lurek.timer` — delta time for simulation and animation
 - `lurek.camera` — world-space camera for the canyon view
-- `lurek.signal` — quit handling
-- `lurek.particles` — construction sparks, beam break debris, vehicle splash, success confetti
+- `lurek.event` — quit handling
+- `lurek.particle` — construction sparks, beam break debris, vehicle splash, success confetti
 - `lurek.tween` — stress color transitions, vehicle crossing progress, score counter animation

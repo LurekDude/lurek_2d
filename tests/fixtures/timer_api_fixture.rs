@@ -16,7 +16,7 @@ use std::rc::Rc;
 /// Lua-side wrapper around a [`Scheduler`].
 ///
 /// Represents a scheduled event manager. Create one with
-/// `lurek.time.newScheduler()` and call `scheduler:step(dt)` every frame.
+/// `lurek.timer.newScheduler()` and call `scheduler:step(dt)` every frame.
 pub struct LuaScheduler {
     inner: Scheduler,
     callback_key: Option<LuaRegistryKey>,
@@ -92,7 +92,7 @@ impl LuaUserData for LuaScheduler {
 // register
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Registers the `lurek.time` API table with the Lua VM.
+/// Registers the `lurek.timer` API table with the Lua VM.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

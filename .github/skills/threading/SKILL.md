@@ -37,7 +37,7 @@ Lurek2D uses **one Lua VM per thread**. Worker threads cannot share `SharedState
 
 > See [snippets/threading-model.txt](snippets/threading-model.txt) for the example.
 
-**Key consequence**: The main thread is the only thread that can call `lurek.gfx.*`, `lurek.audio.*`, `lurek.physics.*`, and `lurek.input.*`. Workers send results back via `Channel` and the main thread applies them.
+**Key consequence**: The main thread is the only thread that can call `lurek.render.*`, `lurek.audio.*`, `lurek.physics.*`, and `lurek.input.*`. Workers send results back via `Channel` and the main thread applies them.
 
 ---
 
@@ -84,10 +84,10 @@ Worker threads get an isolated VM with only these `lurek.*` modules available:
 |--------|---------------------|-------|
 | `lurek.math` | ✅ Full | Safe (pure computation) |
 | `lurek.thread` | ✅ Full | Channels, thread control |
-| `lurek.time` | ✅ Read-only | `lurek.time.getTime()`, `lurek.time.getDelta()` |
-| `lurek.fs` | ✅ Read-only | File reads only; no write |
-| `lurek.platform` | ✅ Read-only | OS info, `getProcessorCount()` |
-| `lurek.gfx` | ❌ | GPU resources are main-thread only |
+| `lurek.timer` | ✅ Read-only | `lurek.timer.getTime()`, `lurek.timer.getDelta()` |
+| `lurek.filesystem` | ✅ Read-only | File reads only; no write |
+| `lurek.runtime` | ✅ Read-only | OS info, `getProcessorCount()` |
+| `lurek.render` | ❌ | GPU resources are main-thread only |
 
 > See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.
 

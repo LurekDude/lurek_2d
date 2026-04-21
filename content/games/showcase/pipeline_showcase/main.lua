@@ -250,7 +250,7 @@ lurek.process(function(dt)
         if lurek.input.isActionPressed("scene_1") then switch_scene(STATE_SCENE_1) end
         if lurek.input.isActionPressed("scene_2") then switch_scene(STATE_SCENE_2) end
         if lurek.input.isActionPressed("scene_3") then switch_scene(STATE_SCENE_3) end
-        if lurek.input.isActionPressed("quit") then lurek.signal.quit() end
+        if lurek.input.isActionPressed("quit") then lurek.event.quit() end
         return
     end
 
@@ -258,7 +258,7 @@ lurek.process(function(dt)
     if lurek.input.isActionPressed("scene_1") then switch_scene(STATE_SCENE_1) end
     if lurek.input.isActionPressed("scene_2") then switch_scene(STATE_SCENE_2) end
     if lurek.input.isActionPressed("scene_3") then switch_scene(STATE_SCENE_3) end
-    if lurek.input.isActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.isActionPressed("quit") then lurek.event.quit() end
 
     -- Input: toggle callbacks
     for i = 1, 6 do

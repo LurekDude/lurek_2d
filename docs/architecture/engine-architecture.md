@@ -590,7 +590,7 @@ Defined in `src/runtime/resource_keys.rs`:
 
 ### Lifecycle
 
-1. **Create** — Lua calls `lurek.graphics.newImage("path")` →
+1. **Create** — Lua calls `lurek.renders.newImage("path")` →
    `lua_api` loads image via `src/image/`, creates GPU texture via renderer,
    stores in SlotMap, returns key to Lua as userdata.
 2. **Use** — Lua passes key to draw functions → `RenderCommand` stores key →
@@ -694,7 +694,7 @@ in the domain module. Extract a `pub fn` on the domain type and call it.
 ```
 App::new() → create_lua_vm()
   └─ lua_api::register_all(lua, lurek_table, state)
-       ├─ graphics_api::register()      → lurek.graphics.*
+       ├─ graphics_api::register()      → lurek.renders.*
        ├─ physics_api::register()       → lurek.physics.*
        ├─ audio_api::register()         → lurek.audio.*
        ├─ input_api::register()         → lurek.input.*

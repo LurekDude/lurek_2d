@@ -6,7 +6,7 @@ describe("integration: scene camera viewport operations", function()
     -- @covers lurek.camera.Camera2D.setPosition
     -- @covers lurek.camera.Camera2D.getPosition
     -- @covers lurek.camera.newCamera
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @description Verifies camera position round-trips correctly; this specific test is effectively single-module camera coverage despite the file name.
     it("camera position changes are stored correctly", function()
         local cam = lurek.camera.newCamera()
@@ -39,10 +39,10 @@ describe("integration: scene camera viewport operations", function()
     end)
 
     -- @covers lurek.camera.Camera2D.setPosition
-    -- @covers lurek.entity.Universe.get
+    -- @covers lurek.ecs.Universe.get
     -- @description Verifies camera follow logic can copy a tracked entity position into the camera.
     it("camera follows tracked entity position", function()
-        local universe = lurek.entity.newUniverse()
+        local universe = lurek.ecs.newUniverse()
         local cam = lurek.camera.newCamera()
 
         local player = universe:spawn()

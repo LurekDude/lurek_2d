@@ -105,7 +105,7 @@ function lurek.init()
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle system — burst when eating food
-    food_particles = lurek.particles.newSystem({
+    food_particles = lurek.particle.newSystem({
         maxParticles = 120,
         emissionRate = 0,
         lifetimeMin  = 0.2,  lifetimeMax = 0.55,
@@ -142,7 +142,7 @@ end
 function lurek.process(dt)
     -- Quit action (all states)
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -322,7 +322,7 @@ function lurek.render_ui()
 
     -- FPS counter (bottom-left)
     lurek.render.setColor(0.4, 0.4, 0.4)
-    lurek.render.print("FPS: " .. math.floor(lurek.time.getFPS()), 4, SCREEN_H - 18, 1)
+    lurek.render.print("FPS: " .. math.floor(lurek.timer.getFPS()), 4, SCREEN_H - 18, 1)
 
     -- Controls hint (bottom-right)
     lurek.render.setColor(0.35, 0.35, 0.35)

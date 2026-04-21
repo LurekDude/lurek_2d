@@ -837,7 +837,7 @@ Resolve a colour for each province using the given map mode. Returns a table map
 
 ### `newFromPng(png_path, defs)`
 
-Build a ProvinceMap from a PNG province-colour map using the Rust engine. This replaces the Lua `setPixel` loop + `detectAdjacency` pass with a single Rust O(w×h) scan. For a 2400×1200 map with 3000 provinces the typical speedup is 100×–300× vs the pure-Lua path (from ~2–8 s down to ~15–30 ms). Each unique non-black RGB pixel in the PNG is automatically assigned a sequential province ID starting at 1. Pure-black pixels (0, 0, 0) become background (ID 0). The returned ProvinceMap has its `pixel_lookup` field replaced by the engine grid (so `getProvinceAt` delegates to it), and all adjacency edges are pre-populated from the single Rust scan. Requires `lurek.img` to be available (Platform Services tier). by `M.loadFromDefinitions` — used to attach names, factions, and other metadata. Pass nil to skip.
+Build a ProvinceMap from a PNG province-colour map using the Rust engine. This replaces the Lua `setPixel` loop + `detectAdjacency` pass with a single Rust O(w×h) scan. For a 2400×1200 map with 3000 provinces the typical speedup is 100×–300× vs the pure-Lua path (from ~2–8 s down to ~15–30 ms). Each unique non-black RGB pixel in the PNG is automatically assigned a sequential province ID starting at 1. Pure-black pixels (0, 0, 0) become background (ID 0). The returned ProvinceMap has its `pixel_lookup` field replaced by the engine grid (so `getProvinceAt` delegates to it), and all adjacency edges are pre-populated from the single Rust scan. Requires `lurek.image` to be available (Platform Services tier). by `M.loadFromDefinitions` — used to attach names, factions, and other metadata. Pass nil to skip.
 
 **Parameters**
 

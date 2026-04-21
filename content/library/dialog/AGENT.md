@@ -8,7 +8,7 @@
 | **Depends on**        | `lurek.*` public API only                                                                                                                                                                |
 | **Test count**        | 40 tests, 40 passing                                                                                                                                                                     |
 | **Status**            | full                                                                                                                                                                                     |
-| **Optional bindings** | `lurek.patterns.newEventBus` (mirrors events to a bus when present), `lurek.localization.t` (recommended for translatable line text), `lurek.codec.toJson/fromJson` (script persistence) |
+| **Optional bindings** | `lurek.patterns.newEventBus` (mirrors events to a bus when present), `lurek.i18n.t` (recommended for translatable line text), `lurek.serial.toJson/fromJson` (script persistence) |
 
 ## Summary
 

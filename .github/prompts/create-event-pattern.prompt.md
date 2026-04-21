@@ -22,8 +22,8 @@ description: The prompt finishes when every Success Criteria item below is check
 7. Document the event contract (what args, when fired)
 8. **Implement integration**
 9. For engine events: push to EventQueue from `engine/app.rs`
-10. For game events: push from Lua via `lurek.signal.push(name, ...args)`
-11. For signals: emit from Lua via `lurek.signal.emit(name, ...args)`
+10. For game events: push from Lua via `lurek.event.push(name, ...args)`
+11. For signals: emit from Lua via `lurek.event.emit(name, ...args)`
 12. **Write tests**
 
 ## Success Criteria

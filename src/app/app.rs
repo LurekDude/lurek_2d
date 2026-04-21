@@ -586,7 +586,7 @@ impl LunaApp {
 
         let state = Rc::new(RefCell::new(shared_state));
 
-        // Load the embedded bitmap default fonts before Lua starts — all lurek.graphic.print()
+        // Load the embedded bitmap default fonts before Lua starts — all lurek.render.print()
         // calls without an active font will use these instead of the bitmap fallback.
         state.borrow_mut().load_default_fonts();
 
@@ -2334,7 +2334,7 @@ impl ApplicationHandler for LunaApp {
                     return;
                 }
 
-                // Check quit flag from Lua (e.g., lurek.signal.quit()).
+                // Check quit flag from Lua (e.g., lurek.event.quit()).
                 if let Some(state) = &self.state {
                     if state.borrow().quit_requested {
                         event_loop.exit();

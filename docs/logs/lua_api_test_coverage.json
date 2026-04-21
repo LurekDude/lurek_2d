@@ -32,10 +32,10 @@
         }
       ],
       "test_files": [
-        "tests/lua/integration/test_ai_entity_scene.lua",
-        "tests/lua/integration/test_ai_pathfinding.lua",
+        "tests/lua/integration/test_ai_ecs_scene.lua",
+        "tests/lua/integration/test_ai_pathfind.lua",
         "tests/lua/integration/test_ai_physics.lua",
-        "tests/lua/integration/test_entity_ai.lua",
+        "tests/lua/integration/test_ecs_ai.lua",
         "tests/lua/unit/test_ai.lua"
       ]
     },
@@ -318,7 +318,7 @@
         "tests/lua/integration/test_data_compute.lua",
         "tests/lua/integration/test_data_filesystem.lua",
         "tests/lua/integration/test_data_system.lua",
-        "tests/lua/integration/test_save_entity.lua",
+        "tests/lua/integration/test_save_ecs.lua",
         "tests/lua/integration/test_thread_data.lua",
         "tests/lua/unit/test_data.lua"
       ]
@@ -588,7 +588,7 @@
         }
       ],
       "test_files": [
-        "tests/lua/golden/test_entity_golden.lua"
+        "tests/lua/golden/test_ecs_golden.lua"
       ]
     },
     "effect": {
@@ -630,8 +630,8 @@
         }
       ],
       "test_files": [
-        "tests/lua/unit/test_overlay.lua",
-        "tests/lua/unit/test_postfx.lua"
+        "tests/lua/unit/test_effect_overlay.lua",
+        "tests/lua/unit/test_effect_postfx.lua"
       ]
     },
     "event": {
@@ -720,7 +720,7 @@
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
-        "tests/lua/integration/test_light_graphics.lua",
+        "tests/lua/integration/test_light_render.lua",
         "tests/lua/unit/test_light.lua"
       ]
     },
@@ -943,7 +943,7 @@
       ],
       "test_files": [
         "tests/lua/golden/test_math_golden.lua",
-        "tests/lua/integration/test_math_graphics.lua",
+        "tests/lua/integration/test_math_render.lua",
         "tests/lua/integration/test_math_physics.lua",
         "tests/lua/integration/test_timer_math.lua",
         "tests/lua/unit/test_math.lua",
@@ -1435,7 +1435,7 @@
       "test_files": [
         "tests/lua/evidence/test_evidence_physics.lua",
         "tests/lua/integration/test_ai_physics.lua",
-        "tests/lua/integration/test_entity_physics.lua",
+        "tests/lua/integration/test_ecs_physics.lua",
         "tests/lua/integration/test_math_physics.lua",
         "tests/lua/integration/test_physics_timer.lua",
         "tests/lua/integration/test_tilemap_physics.lua",
@@ -1865,19 +1865,19 @@
       "coverage_pct": 86.4,
       "uncovered": [
         {
-          "lua_name": "lurek.system.log",
+          "lua_name": "lurek.runtime.log",
           "kind": "function",
           "file": "src/lua_api/system_api.rs",
           "line": 379
         },
         {
-          "lua_name": "lurek.system.runBatch",
+          "lua_name": "lurek.runtime.runBatch",
           "kind": "function",
           "file": "src/lua_api/system_api.rs",
           "line": 538
         },
         {
-          "lua_name": "lurek.system.getBatchResults",
+          "lua_name": "lurek.runtime.getBatchResults",
           "kind": "function",
           "file": "src/lua_api/system_api.rs",
           "line": 591
@@ -2040,7 +2040,7 @@
       ],
       "test_files": [
         "tests/lua/integration/test_tilemap_physics.lua",
-        "tests/lua/unit/test_pathfinding.lua",
+        "tests/lua/unit/test_pathfind.lua",
         "tests/lua/unit/test_tilemap.lua"
       ]
     },
@@ -2374,22 +2374,22 @@
     {
       "file": "tests/lua/config/test_config.lua",
       "line": 1,
-      "marker": "lurek.platform.getOS"
+      "marker": "lurek.runtime.getOS"
     },
     {
       "file": "tests/lua/config/test_config.lua",
       "line": 2,
-      "marker": "lurek.platform.getVersion"
+      "marker": "lurek.runtime.getVersion"
     },
     {
       "file": "tests/lua/evidence/test_evidence_imagedata.lua",
       "line": 6,
-      "marker": "lurek.img.newImageData"
+      "marker": "lurek.image.newImageData"
     },
     {
       "file": "tests/lua/evidence/test_evidence_imagedata.lua",
       "line": 7,
-      "marker": "lurek.img.savePNG"
+      "marker": "lurek.image.savePNG"
     },
     {
       "file": "tests/lua/evidence/test_evidence_imagedata.lua",
@@ -2507,12 +2507,12 @@
       "marker": "DataFrame:addColumn"
     },
     {
-      "file": "tests/lua/golden/test_entity_golden.lua",
+      "file": "tests/lua/golden/test_ecs_golden.lua",
       "line": 3,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/golden/test_entity_golden.lua",
+      "file": "tests/lua/golden/test_ecs_golden.lua",
       "line": 5,
       "marker": "Universe:setPosition"
     },
@@ -2532,34 +2532,34 @@
       "marker": "lurek.serial.hexEncode"
     },
     {
-      "file": "tests/lua/integration/test_ai_entity_scene.lua",
+      "file": "tests/lua/integration/test_ai_ecs_scene.lua",
       "line": 4,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_ai_entity_scene.lua",
+      "file": "tests/lua/integration/test_ai_ecs_scene.lua",
       "line": 5,
       "marker": "lurek.scene.newScene"
     },
     {
-      "file": "tests/lua/integration/test_ai_pathfinding.lua",
+      "file": "tests/lua/integration/test_ai_pathfind.lua",
       "line": 4,
-      "marker": "lurek.pathfinding.newNavGrid"
+      "marker": "lurek.pathfind.newNavGrid"
     },
     {
-      "file": "tests/lua/integration/test_ai_pathfinding.lua",
+      "file": "tests/lua/integration/test_ai_pathfind.lua",
       "line": 5,
-      "marker": "lurek.pathfinding.newPathfinder"
+      "marker": "lurek.pathfind.newPathfinder"
     },
     {
       "file": "tests/lua/integration/test_ai_physics.lua",
       "line": 4,
-      "marker": "lurek.pathfinding.newNavGrid"
+      "marker": "lurek.pathfind.newNavGrid"
     },
     {
       "file": "tests/lua/integration/test_ai_physics.lua",
       "line": 5,
-      "marker": "lurek.pathfinding.newPathfinder"
+      "marker": "lurek.pathfind.newPathfinder"
     },
     {
       "file": "tests/lua/integration/test_animation_timer.lua",
@@ -2574,7 +2574,7 @@
     {
       "file": "tests/lua/integration/test_compute_dataframe.lua",
       "line": 12,
-      "marker": "lurek.img.newImageData"
+      "marker": "lurek.image.newImageData"
     },
     {
       "file": "tests/lua/integration/test_data_compute.lua",
@@ -2584,17 +2584,17 @@
     {
       "file": "tests/lua/integration/test_data_system.lua",
       "line": 6,
-      "marker": "lurek.platform.getClipboardText"
+      "marker": "lurek.runtime.getClipboardText"
     },
     {
       "file": "tests/lua/integration/test_data_system.lua",
       "line": 7,
-      "marker": "lurek.platform.getOS"
+      "marker": "lurek.runtime.getOS"
     },
     {
       "file": "tests/lua/integration/test_data_system.lua",
       "line": 8,
-      "marker": "lurek.platform.setClipboardText"
+      "marker": "lurek.runtime.setClipboardText"
     },
     {
       "file": "tests/lua/integration/test_devtools.lua",
@@ -2669,50 +2669,50 @@
     {
       "file": "tests/lua/integration/test_drawlayer.lua",
       "line": 3,
-      "marker": "lurek.gfx.newDrawLayer"
+      "marker": "lurek.render.newDrawLayer"
     },
     {
-      "file": "tests/lua/integration/test_entity_ai.lua",
+      "file": "tests/lua/integration/test_ecs_ai.lua",
       "line": 4,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_entity_graphics.lua",
+      "file": "tests/lua/integration/test_ecs_render.lua",
       "line": 3,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_entity_graphics.lua",
+      "file": "tests/lua/integration/test_ecs_render.lua",
       "line": 4,
-      "marker": "lurek.gfx.setColor"
+      "marker": "lurek.render.setColor"
     },
     {
-      "file": "tests/lua/integration/test_entity_graphics.lua",
+      "file": "tests/lua/integration/test_ecs_render.lua",
       "line": 5,
-      "marker": "lurek.gfx.rectangle"
+      "marker": "lurek.render.rectangle"
     },
     {
-      "file": "tests/lua/integration/test_entity_physics.lua",
+      "file": "tests/lua/integration/test_ecs_physics.lua",
       "line": 3,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_graphics_animation.lua",
+      "file": "tests/lua/integration/test_render_animation.lua",
       "line": 3,
-      "marker": "lurek.gfx.rectangle"
+      "marker": "lurek.render.rectangle"
     },
     {
-      "file": "tests/lua/integration/test_graphics_animation.lua",
+      "file": "tests/lua/integration/test_render_animation.lua",
       "line": 4,
       "marker": "lurek.animation.newTimeline"
     },
     {
-      "file": "tests/lua/integration/test_graphics_camera.lua",
+      "file": "tests/lua/integration/test_render_camera.lua",
       "line": 3,
-      "marker": "lurek.gfx.rectangle"
+      "marker": "lurek.render.rectangle"
     },
     {
-      "file": "tests/lua/integration/test_graphics_camera.lua",
+      "file": "tests/lua/integration/test_render_camera.lua",
       "line": 4,
       "marker": "lurek.camera.newCamera"
     },
@@ -2727,57 +2727,57 @@
       "marker": "lurek.input.getMousePosition"
     },
     {
-      "file": "tests/lua/integration/test_light_graphics.lua",
+      "file": "tests/lua/integration/test_light_render.lua",
       "line": 4,
       "marker": "lurek.light.setPosition"
     },
     {
-      "file": "tests/lua/integration/test_light_graphics.lua",
+      "file": "tests/lua/integration/test_light_render.lua",
       "line": 5,
       "marker": "lurek.light.setRadius"
     },
     {
-      "file": "tests/lua/integration/test_light_graphics.lua",
+      "file": "tests/lua/integration/test_light_render.lua",
       "line": 6,
       "marker": "lurek.light.setColor"
     },
     {
-      "file": "tests/lua/integration/test_light_graphics.lua",
+      "file": "tests/lua/integration/test_light_render.lua",
       "line": 7,
       "marker": "lurek.light.setIntensity"
     },
     {
-      "file": "tests/lua/integration/test_light_graphics.lua",
+      "file": "tests/lua/integration/test_light_render.lua",
       "line": 8,
-      "marker": "lurek.gfx.setColor"
+      "marker": "lurek.render.setColor"
     },
     {
-      "file": "tests/lua/integration/test_light_graphics.lua",
+      "file": "tests/lua/integration/test_light_render.lua",
       "line": 9,
-      "marker": "lurek.gfx.rectangle"
+      "marker": "lurek.render.rectangle"
     },
     {
-      "file": "tests/lua/integration/test_localization_ui.lua",
+      "file": "tests/lua/integration/test_i18n_ui.lua",
       "line": 3,
-      "marker": "lurek.localization.load"
+      "marker": "lurek.i18n.load"
     },
     {
-      "file": "tests/lua/integration/test_localization_ui.lua",
+      "file": "tests/lua/integration/test_i18n_ui.lua",
       "line": 4,
-      "marker": "lurek.localization.get"
+      "marker": "lurek.i18n.get"
     },
     {
-      "file": "tests/lua/integration/test_localization_ui.lua",
+      "file": "tests/lua/integration/test_i18n_ui.lua",
       "line": 5,
-      "marker": "lurek.localization.setLocale"
+      "marker": "lurek.i18n.setLocale"
     },
     {
-      "file": "tests/lua/integration/test_localization_ui.lua",
+      "file": "tests/lua/integration/test_i18n_ui.lua",
       "line": 6,
       "marker": "lurek.ui.newLabel"
     },
     {
-      "file": "tests/lua/integration/test_localization_ui.lua",
+      "file": "tests/lua/integration/test_i18n_ui.lua",
       "line": 7,
       "marker": "lurek.ui.setText"
     },
@@ -2792,14 +2792,14 @@
       "marker": "lurek.particle.newEmitter"
     },
     {
-      "file": "tests/lua/integration/test_pathfinding_entity.lua",
+      "file": "tests/lua/integration/test_pathfind_ecs.lua",
       "line": 3,
-      "marker": "lurek.pathfinding.newGrid"
+      "marker": "lurek.pathfind.newGrid"
     },
     {
-      "file": "tests/lua/integration/test_pathfinding_entity.lua",
+      "file": "tests/lua/integration/test_pathfind_ecs.lua",
       "line": 4,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
       "file": "tests/lua/integration/test_procgen_tilemap.lua",
@@ -2812,47 +2812,47 @@
       "marker": "lurek.tilemap.newTilemap"
     },
     {
-      "file": "tests/lua/integration/test_save_entity.lua",
+      "file": "tests/lua/integration/test_save_ecs.lua",
       "line": 4,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_save_entity.lua",
+      "file": "tests/lua/integration/test_save_ecs.lua",
       "line": 5,
-      "marker": "lurek.savegame.newSaveManager"
+      "marker": "lurek.save.newSaveManager"
     },
     {
-      "file": "tests/lua/integration/test_savegame_entity_scene.lua",
+      "file": "tests/lua/integration/test_save_ecs_scene.lua",
       "line": 3,
-      "marker": "lurek.savegame.newSaveManager"
+      "marker": "lurek.save.newSaveManager"
     },
     {
-      "file": "tests/lua/integration/test_savegame_entity_scene.lua",
+      "file": "tests/lua/integration/test_save_ecs_scene.lua",
       "line": 4,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_savegame_entity_scene.lua",
+      "file": "tests/lua/integration/test_save_ecs_scene.lua",
       "line": 5,
       "marker": "lurek.scene.newScene"
     },
     {
-      "file": "tests/lua/integration/test_savegame_tilemap.lua",
+      "file": "tests/lua/integration/test_save_tilemap.lua",
       "line": 3,
-      "marker": "lurek.savegame.newSaveManager"
+      "marker": "lurek.save.newSaveManager"
     },
     {
-      "file": "tests/lua/integration/test_savegame_tilemap.lua",
+      "file": "tests/lua/integration/test_save_tilemap.lua",
       "line": 4,
       "marker": "lurek.tilemap.newTilemap"
     },
     {
-      "file": "tests/lua/integration/test_savegame_tilemap.lua",
+      "file": "tests/lua/integration/test_save_tilemap.lua",
       "line": 5,
       "marker": "lurek.tilemap.setTile"
     },
     {
-      "file": "tests/lua/integration/test_savegame_tilemap.lua",
+      "file": "tests/lua/integration/test_save_tilemap.lua",
       "line": 6,
       "marker": "lurek.tilemap.getTile"
     },
@@ -2864,62 +2864,62 @@
     {
       "file": "tests/lua/integration/test_scene_camera.lua",
       "line": 4,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_scene_entity.lua",
+      "file": "tests/lua/integration/test_scene_ecs.lua",
       "line": 3,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_scene_entity.lua",
+      "file": "tests/lua/integration/test_scene_ecs.lua",
       "line": 4,
       "marker": "lurek.scene.newScene"
     },
     {
-      "file": "tests/lua/integration/test_signal_entity.lua",
+      "file": "tests/lua/integration/test_event_entity.lua",
       "line": 3,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
-      "file": "tests/lua/integration/test_signal_entity.lua",
+      "file": "tests/lua/integration/test_event_entity.lua",
       "line": 4,
-      "marker": "lurek.signal.new"
+      "marker": "lurek.event.new"
     },
     {
-      "file": "tests/lua/integration/test_system.lua",
+      "file": "tests/lua/integration/test_runtime_system.lua",
       "line": 1,
-      "marker": "lurek.platform.clipboard"
+      "marker": "lurek.runtime.clipboard"
     },
     {
-      "file": "tests/lua/integration/test_system.lua",
+      "file": "tests/lua/integration/test_runtime_system.lua",
       "line": 2,
-      "marker": "lurek.platform.getClipboardText"
+      "marker": "lurek.runtime.getClipboardText"
     },
     {
-      "file": "tests/lua/integration/test_system.lua",
+      "file": "tests/lua/integration/test_runtime_system.lua",
       "line": 3,
-      "marker": "lurek.platform.getInfo"
+      "marker": "lurek.runtime.getInfo"
     },
     {
-      "file": "tests/lua/integration/test_system.lua",
+      "file": "tests/lua/integration/test_runtime_system.lua",
       "line": 4,
-      "marker": "lurek.platform.getOS"
+      "marker": "lurek.runtime.getOS"
     },
     {
-      "file": "tests/lua/integration/test_system.lua",
+      "file": "tests/lua/integration/test_runtime_system.lua",
       "line": 5,
-      "marker": "lurek.platform.getVersion"
+      "marker": "lurek.runtime.getVersion"
     },
     {
-      "file": "tests/lua/integration/test_system.lua",
+      "file": "tests/lua/integration/test_runtime_system.lua",
       "line": 6,
-      "marker": "lurek.platform.setClipboardText"
+      "marker": "lurek.runtime.setClipboardText"
     },
     {
-      "file": "tests/lua/integration/test_system.lua",
+      "file": "tests/lua/integration/test_runtime_system.lua",
       "line": 7,
-      "marker": "lurek.signal.quit"
+      "marker": "lurek.event.quit"
     },
     {
       "file": "tests/lua/integration/test_tilemap_camera.lua",
@@ -2942,39 +2942,39 @@
       "marker": "lurek.camera.newCamera"
     },
     {
-      "file": "tests/lua/integration/test_tilemap_pathfinding.lua",
+      "file": "tests/lua/integration/test_tilemap_pathfind.lua",
       "line": 3,
       "marker": "lurek.tilemap.newTilemap"
     },
     {
-      "file": "tests/lua/integration/test_tilemap_pathfinding.lua",
+      "file": "tests/lua/integration/test_tilemap_pathfind.lua",
       "line": 4,
       "marker": "lurek.tilemap.setTile"
     },
     {
-      "file": "tests/lua/integration/test_tilemap_pathfinding.lua",
+      "file": "tests/lua/integration/test_tilemap_pathfind.lua",
       "line": 5,
       "marker": "lurek.tilemap.getTile"
     },
     {
-      "file": "tests/lua/integration/test_tilemap_pathfinding.lua",
+      "file": "tests/lua/integration/test_tilemap_pathfind.lua",
       "line": 6,
-      "marker": "lurek.pathfinding.newNavGrid"
+      "marker": "lurek.pathfind.newNavGrid"
     },
     {
-      "file": "tests/lua/integration/test_tilemap_pathfinding.lua",
+      "file": "tests/lua/integration/test_tilemap_pathfind.lua",
       "line": 7,
-      "marker": "lurek.pathfinding.newPathfinder"
+      "marker": "lurek.pathfind.newPathfinder"
     },
     {
       "file": "tests/lua/integration/test_tilemap_physics.lua",
       "line": 3,
-      "marker": "lurek.pathfinding.newNavGrid"
+      "marker": "lurek.pathfind.newNavGrid"
     },
     {
       "file": "tests/lua/integration/test_tilemap_physics.lua",
       "line": 4,
-      "marker": "lurek.pathfinding.newPathfinder"
+      "marker": "lurek.pathfind.newPathfinder"
     },
     {
       "file": "tests/lua/integration/test_timer_math.lua",
@@ -2984,7 +2984,7 @@
     {
       "file": "tests/lua/integration/test_timer_math.lua",
       "line": 3,
-      "marker": "lurek.time.getDelta"
+      "marker": "lurek.timer.getDelta"
     },
     {
       "file": "tests/lua/integration/test_tween_animation.lua",
@@ -3007,24 +3007,24 @@
       "marker": "lurek.camera.newCamera"
     },
     {
-      "file": "tests/lua/integration/test_tween_entity.lua",
+      "file": "tests/lua/integration/test_tween_ecs.lua",
       "line": 3,
       "marker": "lurek.tween.newTween"
     },
     {
-      "file": "tests/lua/integration/test_tween_entity.lua",
+      "file": "tests/lua/integration/test_tween_ecs.lua",
       "line": 4,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
       "file": "tests/lua/unit/test_ai.lua",
       "line": 25,
-      "marker": "lurek.pathfinding.newPathFlowField"
+      "marker": "lurek.pathfind.newPathFlowField"
     },
     {
       "file": "tests/lua/unit/test_ai.lua",
       "line": 26,
-      "marker": "lurek.pathfinding.newPathGrid"
+      "marker": "lurek.pathfind.newPathGrid"
     },
     {
       "file": "tests/lua/unit/test_animation.lua",
@@ -3129,87 +3129,87 @@
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 2,
-      "marker": "lurek.simulator.getCurrentScript"
+      "marker": "lurek.automation.getCurrentScript"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 3,
-      "marker": "lurek.simulator.getCurrentStep"
+      "marker": "lurek.automation.getCurrentStep"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 4,
-      "marker": "lurek.simulator.getElapsedTime"
+      "marker": "lurek.automation.getElapsedTime"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 5,
-      "marker": "lurek.simulator.getScripts"
+      "marker": "lurek.automation.getScripts"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 6,
-      "marker": "lurek.simulator.getStepCount"
+      "marker": "lurek.automation.getStepCount"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 7,
-      "marker": "lurek.simulator.hasScript"
+      "marker": "lurek.automation.hasScript"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 8,
-      "marker": "lurek.simulator.isComplete"
+      "marker": "lurek.automation.isComplete"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 9,
-      "marker": "lurek.simulator.isPaused"
+      "marker": "lurek.automation.isPaused"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 10,
-      "marker": "lurek.simulator.isRunning"
+      "marker": "lurek.automation.isRunning"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 11,
-      "marker": "lurek.simulator.load"
+      "marker": "lurek.automation.load"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 12,
-      "marker": "lurek.simulator.loadFromToml"
+      "marker": "lurek.automation.loadFromToml"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 13,
-      "marker": "lurek.simulator.pause"
+      "marker": "lurek.automation.pause"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 14,
-      "marker": "lurek.simulator.resume"
+      "marker": "lurek.automation.resume"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 15,
-      "marker": "lurek.simulator.start"
+      "marker": "lurek.automation.start"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 16,
-      "marker": "lurek.simulator.stop"
+      "marker": "lurek.automation.stop"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 17,
-      "marker": "lurek.simulator.unload"
+      "marker": "lurek.automation.unload"
     },
     {
       "file": "tests/lua/unit/test_automation.lua",
       "line": 18,
-      "marker": "lurek.simulator.update"
+      "marker": "lurek.automation.update"
     },
     {
       "file": "tests/lua/unit/test_battle.lua",
@@ -3394,357 +3394,357 @@
     {
       "file": "tests/lua/unit/test_drawlayer.lua",
       "line": 4,
-      "marker": "lurek.graphic.newDrawLayer"
+      "marker": "lurek.render.newDrawLayer"
     },
     {
-      "file": "tests/lua/unit/test_entity.lua",
+      "file": "tests/lua/unit/test_ecs.lua",
       "line": 3,
-      "marker": "lurek.entity.newUniverse"
+      "marker": "lurek.ecs.newUniverse"
     },
     {
       "file": "tests/lua/unit/test_event.lua",
       "line": 4,
-      "marker": "lurek.signal.clear"
+      "marker": "lurek.event.clear"
     },
     {
       "file": "tests/lua/unit/test_event.lua",
       "line": 5,
-      "marker": "lurek.signal.pump"
+      "marker": "lurek.event.pump"
     },
     {
       "file": "tests/lua/unit/test_event.lua",
       "line": 6,
-      "marker": "lurek.signal.push"
+      "marker": "lurek.event.push"
     },
     {
       "file": "tests/lua/unit/test_event.lua",
       "line": 7,
-      "marker": "lurek.signal.restart"
+      "marker": "lurek.event.restart"
     },
     {
       "file": "tests/lua/unit/test_event.lua",
       "line": 8,
-      "marker": "lurek.signal.wait"
+      "marker": "lurek.event.wait"
     },
     {
       "file": "tests/lua/unit/test_event.lua",
       "line": 9,
-      "marker": "lurek.signal.newSignal"
+      "marker": "lurek.event.newSignal"
     },
     {
       "file": "tests/lua/unit/test_event.lua",
       "line": 10,
-      "marker": "lurek.signal.poll"
+      "marker": "lurek.event.poll"
     },
     {
       "file": "tests/lua/unit/test_event.lua",
       "line": 11,
-      "marker": "lurek.signal.quit"
+      "marker": "lurek.event.quit"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 6,
-      "marker": "lurek.fs.read"
+      "marker": "lurek.filesystem.read"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 7,
-      "marker": "lurek.fs.write"
+      "marker": "lurek.filesystem.write"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 8,
-      "marker": "lurek.fs.exists"
+      "marker": "lurek.filesystem.exists"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 9,
-      "marker": "lurek.fs.append"
+      "marker": "lurek.filesystem.append"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 10,
-      "marker": "lurek.fs.remove"
+      "marker": "lurek.filesystem.remove"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 11,
-      "marker": "lurek.fs.openFile"
+      "marker": "lurek.filesystem.openFile"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 12,
-      "marker": "lurek.fs.newFileData"
+      "marker": "lurek.filesystem.newFileData"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 13,
-      "marker": "lurek.fs.getDirectoryItems"
+      "marker": "lurek.filesystem.getDirectoryItems"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 14,
-      "marker": "lurek.fs.isFile"
+      "marker": "lurek.filesystem.isFile"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 15,
-      "marker": "lurek.fs.isDirectory"
+      "marker": "lurek.filesystem.isDirectory"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 16,
-      "marker": "lurek.fs.createDirectory"
+      "marker": "lurek.filesystem.createDirectory"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 17,
-      "marker": "lurek.fs.getInfo"
+      "marker": "lurek.filesystem.getInfo"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 18,
-      "marker": "lurek.fs.getSource"
+      "marker": "lurek.filesystem.getSource"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 19,
-      "marker": "lurek.fs.getSaveDirectory"
+      "marker": "lurek.filesystem.getSaveDirectory"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 20,
-      "marker": "lurek.fs.getWorkingDirectory"
+      "marker": "lurek.filesystem.getWorkingDirectory"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 21,
-      "marker": "lurek.fs.getUserDirectory"
+      "marker": "lurek.filesystem.getUserDirectory"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 22,
-      "marker": "lurek.fs.getIdentity"
+      "marker": "lurek.filesystem.getIdentity"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 23,
-      "marker": "lurek.fs.setIdentity"
+      "marker": "lurek.filesystem.setIdentity"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 24,
-      "marker": "lurek.fs.lines"
+      "marker": "lurek.filesystem.lines"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 25,
-      "marker": "lurek.fs.readAsync"
+      "marker": "lurek.filesystem.readAsync"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 26,
-      "marker": "lurek.fs.pollAsync"
+      "marker": "lurek.filesystem.pollAsync"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 27,
-      "marker": "lurek.fs.mount"
+      "marker": "lurek.filesystem.mount"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 28,
-      "marker": "lurek.fs.unmount"
+      "marker": "lurek.filesystem.unmount"
     },
     {
       "file": "tests/lua/unit/test_filesystem.lua",
       "line": 29,
-      "marker": "lurek.fs.load"
+      "marker": "lurek.filesystem.load"
     },
     {
       "file": "tests/lua/unit/test_font.lua",
       "line": 2,
-      "marker": "lurek.graphic.getFont"
+      "marker": "lurek.render.getFont"
     },
     {
       "file": "tests/lua/unit/test_font.lua",
       "line": 3,
-      "marker": "lurek.graphic.getFontHeight"
+      "marker": "lurek.render.getFontHeight"
     },
     {
       "file": "tests/lua/unit/test_font.lua",
       "line": 4,
-      "marker": "lurek.graphic.getFontWidth"
+      "marker": "lurek.render.getFontWidth"
     },
     {
       "file": "tests/lua/unit/test_font.lua",
       "line": 5,
-      "marker": "lurek.graphic.newFont"
+      "marker": "lurek.render.newFont"
     },
     {
       "file": "tests/lua/unit/test_font.lua",
       "line": 6,
-      "marker": "lurek.graphic.setFont"
+      "marker": "lurek.render.setFont"
     },
     {
-      "file": "tests/lua/unit/test_fx.lua",
+      "file": "tests/lua/unit/test_effect_api.lua",
       "line": 5,
-      "marker": "lurek.postfx.getEffectTypes"
+      "marker": "lurek.effect.getEffectTypes"
     },
     {
-      "file": "tests/lua/unit/test_fx.lua",
+      "file": "tests/lua/unit/test_effect_api.lua",
       "line": 6,
-      "marker": "lurek.postfx.newEffect"
+      "marker": "lurek.effect.newEffect"
     },
     {
-      "file": "tests/lua/unit/test_fx.lua",
+      "file": "tests/lua/unit/test_effect_api.lua",
       "line": 7,
-      "marker": "lurek.postfx.newStack"
+      "marker": "lurek.effect.newStack"
     },
     {
-      "file": "tests/lua/unit/test_fx.lua",
+      "file": "tests/lua/unit/test_effect_api.lua",
       "line": 8,
-      "marker": "lurek.postfx.newPass"
+      "marker": "lurek.effect.newPass"
     },
     {
-      "file": "tests/lua/unit/test_fx.lua",
+      "file": "tests/lua/unit/test_effect_api.lua",
       "line": 9,
-      "marker": "lurek.postfx.newCustomEffect"
+      "marker": "lurek.effect.newCustomEffect"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 2,
-      "marker": "lurek.graphic.captureScreenshot"
+      "marker": "lurek.render.captureScreenshot"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 3,
-      "marker": "lurek.graphic.circle"
+      "marker": "lurek.render.circle"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 4,
-      "marker": "lurek.graphic.clearStencil"
+      "marker": "lurek.render.clearStencil"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 5,
-      "marker": "lurek.graphic.draw"
+      "marker": "lurek.render.draw"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 6,
-      "marker": "lurek.graphic.drawNineSlice"
+      "marker": "lurek.render.drawNineSlice"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 7,
-      "marker": "lurek.graphic.ellipse"
+      "marker": "lurek.render.ellipse"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 8,
-      "marker": "lurek.graphic.getDepthMode"
+      "marker": "lurek.render.getDepthMode"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 9,
-      "marker": "lurek.graphic.getDimensions"
+      "marker": "lurek.render.getDimensions"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 10,
-      "marker": "lurek.graphic.getFontAscent"
+      "marker": "lurek.render.getFontAscent"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 11,
-      "marker": "lurek.graphic.getFontDescent"
+      "marker": "lurek.render.getFontDescent"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 12,
-      "marker": "lurek.graphic.getFontLineHeight"
+      "marker": "lurek.render.getFontLineHeight"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 13,
-      "marker": "lurek.graphic.getLineWidth"
+      "marker": "lurek.render.getLineWidth"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 14,
-      "marker": "lurek.graphic.getStencilMode"
+      "marker": "lurek.render.getStencilMode"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 15,
-      "marker": "lurek.graphic.line"
+      "marker": "lurek.render.line"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 16,
-      "marker": "lurek.graphic.newImage"
+      "marker": "lurek.render.newImage"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 17,
-      "marker": "lurek.graphic.newNineSlice"
+      "marker": "lurek.render.newNineSlice"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 18,
-      "marker": "lurek.graphic.polygon"
+      "marker": "lurek.render.polygon"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 19,
-      "marker": "lurek.graphic.print"
+      "marker": "lurek.render.print"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 20,
-      "marker": "lurek.graphic.rectangle"
+      "marker": "lurek.render.rectangle"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 21,
-      "marker": "lurek.graphic.saveScreenshot"
+      "marker": "lurek.render.saveScreenshot"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 22,
-      "marker": "lurek.graphic.setBackgroundColor"
+      "marker": "lurek.render.setBackgroundColor"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 23,
-      "marker": "lurek.graphic.setColor"
+      "marker": "lurek.render.setColor"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 24,
-      "marker": "lurek.graphic.setDepthMode"
+      "marker": "lurek.render.setDepthMode"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 25,
-      "marker": "lurek.graphic.setFontLineHeight"
+      "marker": "lurek.render.setFontLineHeight"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 26,
-      "marker": "lurek.graphic.setLineWidth"
+      "marker": "lurek.render.setLineWidth"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 27,
-      "marker": "lurek.graphic.setStencilMode"
+      "marker": "lurek.render.setStencilMode"
     },
     {
-      "file": "tests/lua/unit/test_graphics.lua",
+      "file": "tests/lua/unit/test_render.lua",
       "line": 28,
-      "marker": "lurek.graphic.triangle"
+      "marker": "lurek.render.triangle"
     },
     {
       "file": "tests/lua/unit/test_gui.lua",
@@ -4009,432 +4009,432 @@
     {
       "file": "tests/lua/unit/test_image.lua",
       "line": 1,
-      "marker": "lurek.img.isCompressed"
+      "marker": "lurek.image.isCompressed"
     },
     {
       "file": "tests/lua/unit/test_image.lua",
       "line": 2,
-      "marker": "lurek.img.loadImage"
+      "marker": "lurek.image.loadImage"
     },
     {
       "file": "tests/lua/unit/test_image.lua",
       "line": 3,
-      "marker": "lurek.img.loadLayered"
+      "marker": "lurek.image.loadLayered"
     },
     {
       "file": "tests/lua/unit/test_image.lua",
       "line": 4,
-      "marker": "lurek.img.newCompressedData"
+      "marker": "lurek.image.newCompressedData"
     },
     {
       "file": "tests/lua/unit/test_image.lua",
       "line": 5,
-      "marker": "lurek.img.newImageData"
+      "marker": "lurek.image.newImageData"
     },
     {
       "file": "tests/lua/unit/test_image.lua",
       "line": 6,
-      "marker": "lurek.img.newLayeredImage"
+      "marker": "lurek.image.newLayeredImage"
     },
     {
       "file": "tests/lua/unit/test_image.lua",
       "line": 7,
-      "marker": "lurek.img.saveImage"
+      "marker": "lurek.image.saveImage"
     },
     {
       "file": "tests/lua/unit/test_image.lua",
       "line": 8,
-      "marker": "lurek.img.saveLayered"
+      "marker": "lurek.image.saveLayered"
     },
     {
       "file": "tests/lua/unit/test_image_effect.lua",
       "line": 6,
-      "marker": "lurek.postfx.loadImageEffect"
+      "marker": "lurek.effect.loadImageEffect"
     },
     {
       "file": "tests/lua/unit/test_image_effect.lua",
       "line": 7,
-      "marker": "lurek.postfx.newImageEffect"
+      "marker": "lurek.effect.newImageEffect"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 2,
-      "marker": "lurek.gamepad.getAxis"
+      "marker": "lurek.input.gamepad.getAxis"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 3,
-      "marker": "lurek.gamepad.getAxisCount"
+      "marker": "lurek.input.gamepad.getAxisCount"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 4,
-      "marker": "lurek.gamepad.getButtonCount"
+      "marker": "lurek.input.gamepad.getButtonCount"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 5,
-      "marker": "lurek.gamepad.getCount"
+      "marker": "lurek.input.gamepad.getCount"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 6,
-      "marker": "lurek.gamepad.getGUID"
+      "marker": "lurek.input.gamepad.getGUID"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 7,
-      "marker": "lurek.gamepad.getGamepadMappingString"
+      "marker": "lurek.input.gamepad.getGamepadMappingString"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 8,
-      "marker": "lurek.gamepad.getHat"
+      "marker": "lurek.input.gamepad.getHat"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 9,
-      "marker": "lurek.gamepad.getJoystickCount"
+      "marker": "lurek.input.gamepad.getJoystickCount"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 10,
-      "marker": "lurek.gamepad.getJoysticks"
+      "marker": "lurek.input.gamepad.getJoysticks"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 11,
-      "marker": "lurek.gamepad.getName"
+      "marker": "lurek.input.gamepad.getName"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 12,
-      "marker": "lurek.gamepad.isConnected"
+      "marker": "lurek.input.gamepad.isConnected"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 13,
-      "marker": "lurek.gamepad.isDown"
+      "marker": "lurek.input.gamepad.isDown"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 14,
-      "marker": "lurek.gamepad.isGamepad"
+      "marker": "lurek.input.gamepad.isGamepad"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 15,
-      "marker": "lurek.gamepad.isVibrationSupported"
+      "marker": "lurek.input.gamepad.isVibrationSupported"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 16,
-      "marker": "lurek.gamepad.loadGamepadMappings"
+      "marker": "lurek.input.gamepad.loadGamepadMappings"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 17,
-      "marker": "lurek.gamepad.saveGamepadMappings"
+      "marker": "lurek.input.gamepad.saveGamepadMappings"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 18,
-      "marker": "lurek.gamepad.setGamepadMapping"
+      "marker": "lurek.input.gamepad.setGamepadMapping"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 19,
-      "marker": "lurek.gamepad.setVibration"
+      "marker": "lurek.input.gamepad.setVibration"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 20,
-      "marker": "lurek.keyboard.getKeyFromScancode"
+      "marker": "lurek.input.keyboard.getKeyFromScancode"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 21,
-      "marker": "lurek.keyboard.getScancodeFromKey"
+      "marker": "lurek.input.keyboard.getScancodeFromKey"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 22,
-      "marker": "lurek.keyboard.hasKeyRepeat"
+      "marker": "lurek.input.keyboard.hasKeyRepeat"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 23,
-      "marker": "lurek.keyboard.hasTextInput"
+      "marker": "lurek.input.keyboard.hasTextInput"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 24,
-      "marker": "lurek.keyboard.isDown"
+      "marker": "lurek.input.keyboard.isDown"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 25,
-      "marker": "lurek.keyboard.isModifierActive"
+      "marker": "lurek.input.keyboard.isModifierActive"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 26,
-      "marker": "lurek.keyboard.isScancodeDown"
+      "marker": "lurek.input.keyboard.isScancodeDown"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 27,
-      "marker": "lurek.keyboard.setKeyRepeat"
+      "marker": "lurek.input.keyboard.setKeyRepeat"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 28,
-      "marker": "lurek.keyboard.setTextInput"
+      "marker": "lurek.input.keyboard.setTextInput"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 29,
-      "marker": "lurek.mouse.getCursor"
+      "marker": "lurek.input.mouse.getCursor"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 30,
-      "marker": "lurek.mouse.getPosition"
+      "marker": "lurek.input.mouse.getPosition"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 31,
-      "marker": "lurek.mouse.getSystemCursor"
+      "marker": "lurek.input.mouse.getSystemCursor"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 32,
-      "marker": "lurek.mouse.getX"
+      "marker": "lurek.input.mouse.getX"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 33,
-      "marker": "lurek.mouse.getY"
+      "marker": "lurek.input.mouse.getY"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 34,
-      "marker": "lurek.mouse.isCursorSupported"
+      "marker": "lurek.input.mouse.isCursorSupported"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 35,
-      "marker": "lurek.mouse.isDown"
+      "marker": "lurek.input.mouse.isDown"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 36,
-      "marker": "lurek.mouse.setCursor"
+      "marker": "lurek.input.mouse.setCursor"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 37,
-      "marker": "lurek.touch.getPosition"
+      "marker": "lurek.input.touch.getPosition"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 38,
-      "marker": "lurek.touch.getPressure"
+      "marker": "lurek.input.touch.getPressure"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 39,
-      "marker": "lurek.touch.getTouchCount"
+      "marker": "lurek.input.touch.getTouchCount"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 40,
-      "marker": "lurek.touch.getTouches"
+      "marker": "lurek.input.touch.getTouches"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 43,
-      "marker": "lurek.mouse.setVisible"
+      "marker": "lurek.input.mouse.setVisible"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 44,
-      "marker": "lurek.mouse.isVisible"
+      "marker": "lurek.input.mouse.isVisible"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 45,
-      "marker": "lurek.mouse.setGrabbed"
+      "marker": "lurek.input.mouse.setGrabbed"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 46,
-      "marker": "lurek.mouse.isGrabbed"
+      "marker": "lurek.input.mouse.isGrabbed"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 47,
-      "marker": "lurek.mouse.setRelativeMode"
+      "marker": "lurek.input.mouse.setRelativeMode"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 48,
-      "marker": "lurek.mouse.getRelativeMode"
+      "marker": "lurek.input.mouse.getRelativeMode"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 49,
-      "marker": "lurek.mouse.setPosition"
+      "marker": "lurek.input.mouse.setPosition"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 50,
-      "marker": "lurek.mouse.getWheelDelta"
+      "marker": "lurek.input.mouse.getWheelDelta"
     },
     {
       "file": "tests/lua/unit/test_input.lua",
       "line": 51,
-      "marker": "lurek.mouse.newCursor"
+      "marker": "lurek.input.mouse.newCursor"
     },
     {
       "file": "tests/lua/unit/test_joystick_ext.lua",
       "line": 3,
-      "marker": "lurek.gamepad.getBackgroundEvents"
+      "marker": "lurek.input.gamepad.getBackgroundEvents"
     },
     {
       "file": "tests/lua/unit/test_joystick_ext.lua",
       "line": 4,
-      "marker": "lurek.gamepad.setBackgroundEvents"
+      "marker": "lurek.input.gamepad.setBackgroundEvents"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 7,
-      "marker": "lurek.localization.loadTable"
+      "marker": "lurek.i18n.loadTable"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 8,
-      "marker": "lurek.localization.unloadTable"
+      "marker": "lurek.i18n.unloadTable"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 9,
-      "marker": "lurek.localization.setLanguage"
+      "marker": "lurek.i18n.setLanguage"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 10,
-      "marker": "lurek.localization.getLanguage"
+      "marker": "lurek.i18n.getLanguage"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 11,
-      "marker": "lurek.localization.getLanguages"
+      "marker": "lurek.i18n.getLanguages"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 12,
-      "marker": "lurek.localization.getAvailableLanguages"
+      "marker": "lurek.i18n.getAvailableLanguages"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 13,
-      "marker": "lurek.localization.hasLanguage"
+      "marker": "lurek.i18n.hasLanguage"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 14,
-      "marker": "lurek.localization.setFallbacks"
+      "marker": "lurek.i18n.setFallbacks"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 15,
-      "marker": "lurek.localization.getFallbacks"
+      "marker": "lurek.i18n.getFallbacks"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 16,
-      "marker": "lurek.localization.setBase"
+      "marker": "lurek.i18n.setBase"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 17,
-      "marker": "lurek.localization.getBase"
+      "marker": "lurek.i18n.getBase"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 18,
-      "marker": "lurek.localization.t"
+      "marker": "lurek.i18n.t"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 19,
-      "marker": "lurek.localization.hasKey"
+      "marker": "lurek.i18n.hasKey"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 20,
-      "marker": "lurek.localization.getKeys"
+      "marker": "lurek.i18n.getKeys"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 21,
-      "marker": "lurek.localization.setKey"
+      "marker": "lurek.i18n.setKey"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 22,
-      "marker": "lurek.localization.interpolate"
+      "marker": "lurek.i18n.interpolate"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 23,
-      "marker": "lurek.localization.pluralFor"
+      "marker": "lurek.i18n.pluralFor"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 24,
-      "marker": "lurek.localization.onChange"
+      "marker": "lurek.i18n.onChange"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 25,
-      "marker": "lurek.localization.offChange"
+      "marker": "lurek.i18n.offChange"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 26,
-      "marker": "lurek.localization.keyCount"
+      "marker": "lurek.i18n.keyCount"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 27,
-      "marker": "lurek.localization.categories"
+      "marker": "lurek.i18n.categories"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 28,
-      "marker": "lurek.localization.keysInCategory"
+      "marker": "lurek.i18n.keysInCategory"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 29,
-      "marker": "lurek.localization.search"
+      "marker": "lurek.i18n.search"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 30,
-      "marker": "lurek.localization.buildIndex"
+      "marker": "lurek.i18n.buildIndex"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 31,
-      "marker": "lurek.localization.searchIndexed"
+      "marker": "lurek.i18n.searchIndexed"
     },
     {
-      "file": "tests/lua/unit/test_localization.lua",
+      "file": "tests/lua/unit/test_i18n.lua",
       "line": 32,
-      "marker": "lurek.localization.mergeLocale"
+      "marker": "lurek.i18n.mergeLocale"
     },
     {
       "file": "tests/lua/unit/test_math.lua",
@@ -4452,14 +4452,14 @@
       "marker": "lurek.math.huge"
     },
     {
-      "file": "tests/lua/unit/test_modding.lua",
+      "file": "tests/lua/unit/test_mods.lua",
       "line": 6,
-      "marker": "lurek.modding.newMod"
+      "marker": "lurek.mods.newMod"
     },
     {
-      "file": "tests/lua/unit/test_modding.lua",
+      "file": "tests/lua/unit/test_mods.lua",
       "line": 7,
-      "marker": "lurek.modding.newModManager"
+      "marker": "lurek.mods.newModManager"
     },
     {
       "file": "tests/lua/unit/test_network_constants.lua",
@@ -4484,332 +4484,332 @@
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 1,
-      "marker": "lurek.particles.clone"
+      "marker": "lurek.particle.clone"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 2,
-      "marker": "lurek.particles.emit"
+      "marker": "lurek.particle.emit"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 3,
-      "marker": "lurek.particles.getBufferSize"
+      "marker": "lurek.particle.getBufferSize"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 4,
-      "marker": "lurek.particles.getColors"
+      "marker": "lurek.particle.getColors"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 5,
-      "marker": "lurek.particles.getCount"
+      "marker": "lurek.particle.getCount"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 6,
-      "marker": "lurek.particles.getDirection"
+      "marker": "lurek.particle.getDirection"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 7,
-      "marker": "lurek.particles.getEmissionArea"
+      "marker": "lurek.particle.getEmissionArea"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 8,
-      "marker": "lurek.particles.getEmissionRate"
+      "marker": "lurek.particle.getEmissionRate"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 9,
-      "marker": "lurek.particles.getEmitterLifetime"
+      "marker": "lurek.particle.getEmitterLifetime"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 10,
-      "marker": "lurek.particles.getGravity"
+      "marker": "lurek.particle.getGravity"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 11,
-      "marker": "lurek.particles.getInsertMode"
+      "marker": "lurek.particle.getInsertMode"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 12,
-      "marker": "lurek.particles.getLinearAcceleration"
+      "marker": "lurek.particle.getLinearAcceleration"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 13,
-      "marker": "lurek.particles.getLinearDamping"
+      "marker": "lurek.particle.getLinearDamping"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 14,
-      "marker": "lurek.particles.getOffset"
+      "marker": "lurek.particle.getOffset"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 15,
-      "marker": "lurek.particles.getParticleLifetime"
+      "marker": "lurek.particle.getParticleLifetime"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 16,
-      "marker": "lurek.particles.getPosition"
+      "marker": "lurek.particle.getPosition"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 17,
-      "marker": "lurek.particles.getRadialAcceleration"
+      "marker": "lurek.particle.getRadialAcceleration"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 18,
-      "marker": "lurek.particles.getRotation"
+      "marker": "lurek.particle.getRotation"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 19,
-      "marker": "lurek.particles.getSizeVariation"
+      "marker": "lurek.particle.getSizeVariation"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 20,
-      "marker": "lurek.particles.getSizes"
+      "marker": "lurek.particle.getSizes"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 21,
-      "marker": "lurek.particles.getSpeed"
+      "marker": "lurek.particle.getSpeed"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 22,
-      "marker": "lurek.particles.getSpin"
+      "marker": "lurek.particle.getSpin"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 23,
-      "marker": "lurek.particles.getSpinVariation"
+      "marker": "lurek.particle.getSpinVariation"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 24,
-      "marker": "lurek.particles.getSpread"
+      "marker": "lurek.particle.getSpread"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 25,
-      "marker": "lurek.particles.getTangentialAcceleration"
+      "marker": "lurek.particle.getTangentialAcceleration"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 26,
-      "marker": "lurek.particles.hasRelativeRotation"
+      "marker": "lurek.particle.hasRelativeRotation"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 27,
-      "marker": "lurek.particles.isActive"
+      "marker": "lurek.particle.isActive"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 28,
-      "marker": "lurek.particles.isEmpty"
+      "marker": "lurek.particle.isEmpty"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 29,
-      "marker": "lurek.particles.isFull"
+      "marker": "lurek.particle.isFull"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 30,
-      "marker": "lurek.particles.isPaused"
+      "marker": "lurek.particle.isPaused"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 31,
-      "marker": "lurek.particles.isStopped"
+      "marker": "lurek.particle.isStopped"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 32,
-      "marker": "lurek.particles.moveTo"
+      "marker": "lurek.particle.moveTo"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 33,
-      "marker": "lurek.particles.newSystem"
+      "marker": "lurek.particle.newSystem"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 34,
-      "marker": "lurek.particles.pause"
+      "marker": "lurek.particle.pause"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 35,
-      "marker": "lurek.particles.release"
+      "marker": "lurek.particle.release"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 36,
-      "marker": "lurek.particles.reset"
+      "marker": "lurek.particle.reset"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 37,
-      "marker": "lurek.particles.setBufferSize"
+      "marker": "lurek.particle.setBufferSize"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 38,
-      "marker": "lurek.particles.setColors"
+      "marker": "lurek.particle.setColors"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 39,
-      "marker": "lurek.particles.setDirection"
+      "marker": "lurek.particle.setDirection"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 40,
-      "marker": "lurek.particles.setEmissionArea"
+      "marker": "lurek.particle.setEmissionArea"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 41,
-      "marker": "lurek.particles.setEmissionRate"
+      "marker": "lurek.particle.setEmissionRate"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 42,
-      "marker": "lurek.particles.setEmitterLifetime"
+      "marker": "lurek.particle.setEmitterLifetime"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 43,
-      "marker": "lurek.particles.setInsertMode"
+      "marker": "lurek.particle.setInsertMode"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 44,
-      "marker": "lurek.particles.setLinearAcceleration"
+      "marker": "lurek.particle.setLinearAcceleration"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 45,
-      "marker": "lurek.particles.setLinearDamping"
+      "marker": "lurek.particle.setLinearDamping"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 46,
-      "marker": "lurek.particles.setOffset"
+      "marker": "lurek.particle.setOffset"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 47,
-      "marker": "lurek.particles.setParticleLifetime"
+      "marker": "lurek.particle.setParticleLifetime"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 48,
-      "marker": "lurek.particles.setPosition"
+      "marker": "lurek.particle.setPosition"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 49,
-      "marker": "lurek.particles.setRadialAcceleration"
+      "marker": "lurek.particle.setRadialAcceleration"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 50,
-      "marker": "lurek.particles.setRelativeRotation"
+      "marker": "lurek.particle.setRelativeRotation"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 51,
-      "marker": "lurek.particles.setRotation"
+      "marker": "lurek.particle.setRotation"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 52,
-      "marker": "lurek.particles.setSizeVariation"
+      "marker": "lurek.particle.setSizeVariation"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 53,
-      "marker": "lurek.particles.setSizes"
+      "marker": "lurek.particle.setSizes"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 54,
-      "marker": "lurek.particles.setSpeed"
+      "marker": "lurek.particle.setSpeed"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 55,
-      "marker": "lurek.particles.setSpin"
+      "marker": "lurek.particle.setSpin"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 56,
-      "marker": "lurek.particles.setSpinVariation"
+      "marker": "lurek.particle.setSpinVariation"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 57,
-      "marker": "lurek.particles.setSpread"
+      "marker": "lurek.particle.setSpread"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 58,
-      "marker": "lurek.particles.setTangentialAcceleration"
+      "marker": "lurek.particle.setTangentialAcceleration"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 59,
-      "marker": "lurek.particles.start"
+      "marker": "lurek.particle.start"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 60,
-      "marker": "lurek.particles.stop"
+      "marker": "lurek.particle.stop"
     },
     {
       "file": "tests/lua/unit/test_particle.lua",
       "line": 61,
-      "marker": "lurek.particles.update"
+      "marker": "lurek.particle.update"
     },
     {
-      "file": "tests/lua/unit/test_pathfinding.lua",
+      "file": "tests/lua/unit/test_pathfind.lua",
       "line": 7,
-      "marker": "lurek.pathfinding.getThreadCount"
+      "marker": "lurek.pathfind.getThreadCount"
     },
     {
-      "file": "tests/lua/unit/test_pathfinding.lua",
+      "file": "tests/lua/unit/test_pathfind.lua",
       "line": 8,
-      "marker": "lurek.pathfinding.newFlowField"
+      "marker": "lurek.pathfind.newFlowField"
     },
     {
-      "file": "tests/lua/unit/test_pathfinding.lua",
+      "file": "tests/lua/unit/test_pathfind.lua",
       "line": 9,
-      "marker": "lurek.pathfinding.newNavGrid"
+      "marker": "lurek.pathfind.newNavGrid"
     },
     {
-      "file": "tests/lua/unit/test_pathfinding.lua",
+      "file": "tests/lua/unit/test_pathfind.lua",
       "line": 10,
-      "marker": "lurek.pathfinding.newNavGridFromTileMap"
+      "marker": "lurek.pathfind.newNavGridFromTileMap"
     },
     {
-      "file": "tests/lua/unit/test_pathfinding.lua",
+      "file": "tests/lua/unit/test_pathfind.lua",
       "line": 11,
-      "marker": "lurek.pathfinding.newPathfinder"
+      "marker": "lurek.pathfind.newPathfinder"
     },
     {
       "file": "tests/lua/unit/test_physics.lua",
@@ -4892,154 +4892,154 @@
       "marker": "lurek.physics.getJointType"
     },
     {
-      "file": "tests/lua/unit/test_savegame.lua",
+      "file": "tests/lua/unit/test_save.lua",
       "line": 6,
-      "marker": "lurek.savegame.newSaveManager"
+      "marker": "lurek.save.newSaveManager"
     },
     {
       "file": "tests/lua/unit/test_serial.lua",
       "line": 1,
-      "marker": "lurek.codec.fromCsv"
+      "marker": "lurek.serial.fromCsv"
     },
     {
       "file": "tests/lua/unit/test_serial.lua",
       "line": 2,
-      "marker": "lurek.codec.fromJson"
+      "marker": "lurek.serial.fromJson"
     },
     {
       "file": "tests/lua/unit/test_serial.lua",
       "line": 3,
-      "marker": "lurek.codec.fromToml"
+      "marker": "lurek.serial.fromToml"
     },
     {
       "file": "tests/lua/unit/test_serial.lua",
       "line": 4,
-      "marker": "lurek.codec.toCsv"
+      "marker": "lurek.serial.toCsv"
     },
     {
       "file": "tests/lua/unit/test_serial.lua",
       "line": 5,
-      "marker": "lurek.codec.toJson"
+      "marker": "lurek.serial.toJson"
     },
     {
       "file": "tests/lua/unit/test_serial.lua",
       "line": 6,
-      "marker": "lurek.codec.toToml"
+      "marker": "lurek.serial.toToml"
     },
     {
       "file": "tests/lua/unit/test_shape.lua",
       "line": 3,
-      "marker": "lurek.graphic.newShape"
+      "marker": "lurek.render.newShape"
     },
     {
-      "file": "tests/lua/unit/test_signal.lua",
+      "file": "tests/lua/unit/test_event_signal.lua",
       "line": 1,
-      "marker": "lurek.signal.newSignal"
+      "marker": "lurek.event.newSignal"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 4,
-      "marker": "lurek.platform.getOS"
+      "marker": "lurek.runtime.getOS"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 5,
-      "marker": "lurek.platform.getVersion"
+      "marker": "lurek.runtime.getVersion"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 6,
-      "marker": "lurek.platform.getArch"
+      "marker": "lurek.runtime.getArch"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 7,
-      "marker": "lurek.platform.getProcessorCount"
+      "marker": "lurek.runtime.getProcessorCount"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 8,
-      "marker": "lurek.platform.getMemorySize"
+      "marker": "lurek.runtime.getMemorySize"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 9,
-      "marker": "lurek.platform.getInfo"
+      "marker": "lurek.runtime.getInfo"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 10,
-      "marker": "lurek.platform.getClipboardText"
+      "marker": "lurek.runtime.getClipboardText"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 11,
-      "marker": "lurek.platform.setClipboardText"
+      "marker": "lurek.runtime.setClipboardText"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 12,
-      "marker": "lurek.platform.setDebugOverlay"
+      "marker": "lurek.runtime.setDebugOverlay"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 13,
-      "marker": "lurek.platform.getDebugOverlay"
+      "marker": "lurek.runtime.getDebugOverlay"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 14,
-      "marker": "lurek.platform.setLogLevel"
+      "marker": "lurek.runtime.setLogLevel"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 15,
-      "marker": "lurek.platform.getLogLevel"
+      "marker": "lurek.runtime.getLogLevel"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 16,
-      "marker": "lurek.platform.log"
+      "marker": "lurek.runtime.log"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 17,
-      "marker": "lurek.platform.getLastError"
+      "marker": "lurek.runtime.getLastError"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 18,
-      "marker": "lurek.platform.getEnv"
+      "marker": "lurek.runtime.getEnv"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 19,
-      "marker": "lurek.platform.getArgs"
+      "marker": "lurek.runtime.getArgs"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 20,
-      "marker": "lurek.platform.parseArgs"
+      "marker": "lurek.runtime.parseArgs"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 21,
-      "marker": "lurek.platform.getPowerInfo"
+      "marker": "lurek.runtime.getPowerInfo"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 22,
-      "marker": "lurek.platform.getPreferredLocales"
+      "marker": "lurek.runtime.getPreferredLocales"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 23,
-      "marker": "lurek.platform.openURL"
+      "marker": "lurek.runtime.openURL"
     },
     {
-      "file": "tests/lua/unit/test_system.lua",
+      "file": "tests/lua/unit/test_runtime_platform.lua",
       "line": 24,
-      "marker": "lurek.signal.quit"
+      "marker": "lurek.event.quit"
     },
     {
       "file": "tests/lua/unit/test_tilemap.lua",
@@ -5064,57 +5064,57 @@
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 1,
-      "marker": "lurek.time.getAverageDelta"
+      "marker": "lurek.timer.getAverageDelta"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 2,
-      "marker": "lurek.time.getDelta"
+      "marker": "lurek.timer.getDelta"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 3,
-      "marker": "lurek.time.getFrameCount"
+      "marker": "lurek.timer.getFrameCount"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 4,
-      "marker": "lurek.time.getFPS"
+      "marker": "lurek.timer.getFPS"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 5,
-      "marker": "lurek.time.getMicroTime"
+      "marker": "lurek.timer.getMicroTime"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 6,
-      "marker": "lurek.time.getPhysicsDelta"
+      "marker": "lurek.timer.getPhysicsDelta"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 7,
-      "marker": "lurek.time.getTime"
+      "marker": "lurek.timer.getTime"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 8,
-      "marker": "lurek.time.setPhysicsDelta"
+      "marker": "lurek.timer.setPhysicsDelta"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 9,
-      "marker": "lurek.time.sleep"
+      "marker": "lurek.timer.sleep"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 10,
-      "marker": "lurek.time.step"
+      "marker": "lurek.timer.step"
     },
     {
       "file": "tests/lua/unit/test_timer.lua",
       "line": 11,
-      "marker": "lurek.time.newScheduler"
+      "marker": "lurek.timer.newScheduler"
     },
     {
       "file": "tests/lua/unit/test_tween.lua",

@@ -19,7 +19,7 @@
 //! - [`decal_surface`] — persistent surface for accumulated decal stamps
 //! - [`image_effect`] — per-image shader-effect pass descriptor
 //!
-//! All public items are documented. Lua bridge: `src/lua_api/render_api.rs` (registered as `lurek.graphics.*`).
+//! All public items are documented. Lua bridge: `src/lua_api/render_api.rs` (registered as `lurek.renders.*`).
 
 /// Off-screen render targets (canvases) for deferred compositing.
 pub mod canvas;

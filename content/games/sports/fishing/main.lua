@@ -224,7 +224,7 @@ lurek.process(function(delta)
 
   -- Quit
   if lurek.input.isPressed("quit") then
-    lurek.signal.quit()
+    lurek.event.quit()
     return
   end
 

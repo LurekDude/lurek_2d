@@ -16,7 +16,7 @@ seq:start()
 
 *26 functions, 0 module fields documented.*
 
-See: [`lurek.patterns.newEventBus`](../lua-api.md#lurekpatternsneweventbus) — optional event bus mirror returned by `seq:getEventBus()`, [`lurek.signal.newSignal`](../lua-api.md#lureksignalnewsignal) — alternative scoped pub/sub backbone, [`lurek.localization.t`](../lua-api.md#lureklocalizationt) — translate `say`/`choice` text fields before passing them in, [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson) — serialise/deserialise script node arrays for persistence
+See: [`lurek.patterns.newEventBus`](../lua-api.md#lurekpatternsneweventbus) — optional event bus mirror returned by `seq:getEventBus()`, [`lurek.event.newSignal`](../lua-api.md#lureksignalnewsignal) — alternative scoped pub/sub backbone, [`lurek.i18n.t`](../lua-api.md#lureklocalizationt) — translate `say`/`choice` text fields before passing them in, [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson) — serialise/deserialise script node arrays for persistence
 
 ## Functions
 

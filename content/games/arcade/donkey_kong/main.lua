@@ -257,7 +257,7 @@ function lurek.init()
     cam:setPosition(SCREEN_W / 2, SCREEN_H / 2)
 
     -- Particle systems
-    sparks = lurek.particles.newSystem({
+    sparks = lurek.particle.newSystem({
         maxParticles  = 60,
         emissionRate  = 0,
         lifetimeMin   = 0.25,
@@ -271,7 +271,7 @@ function lurek.init()
         colors        = {1, 0.6, 0.1, 1,  1, 0.2, 0.0, 0}
     })
 
-    dust = lurek.particles.newSystem({
+    dust = lurek.particle.newSystem({
         maxParticles  = 30,
         emissionRate  = 0,
         lifetimeMin   = 0.15,
@@ -298,7 +298,7 @@ function lurek.process(dt)
 
     -- Quit
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -723,7 +723,7 @@ local function draw_hammer_pickup()
     if hammer.collected then return end
     if not hammer_spawn then return end
     local x, y = hammer_spawn.x, hammer_spawn.y
-    local pulse = 0.7 + 0.3 * math.sin(lurek.time.getTime() * 6)
+    local pulse = 0.7 + 0.3 * math.sin(lurek.timer.getTime() * 6)
     -- Handle
     lurek.render.setColor(0.6, 0.4, 0.2, pulse)
     lurek.render.rectangle("fill", x + 4, y + 4, 4, 10)
@@ -849,7 +849,7 @@ function lurek.render_ui()
 
         -- FPS
         lurek.render.setColor(0.4, 0.4, 0.5, 1)
-        lurek.render.print("FPS: " .. lurek.time.getFPS(), 4, 4, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
         return
     end
 
@@ -861,7 +861,7 @@ function lurek.render_ui()
         lurek.render.print("Press SPACE", SCREEN_W / 2 - 55, SCREEN_H / 2 + 50, 1)
 
         lurek.render.setColor(0.4, 0.4, 0.5, 1)
-        lurek.render.print("FPS: " .. lurek.time.getFPS(), 4, 4, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
         return
     end
 
@@ -872,7 +872,7 @@ function lurek.render_ui()
         lurek.render.print("Score: " .. score .. "   Wave: " .. wave, SCREEN_W / 2 - 80, 60, 1.2)
 
         lurek.render.setColor(0.4, 0.4, 0.5, 1)
-        lurek.render.print("FPS: " .. lurek.time.getFPS(), 4, 4, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
         return
     end
 
@@ -902,5 +902,5 @@ function lurek.render_ui()
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.5, 1)
-    lurek.render.print("FPS: " .. lurek.time.getFPS(), 4, SCREEN_H - 16, 1)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 16, 1)
 end

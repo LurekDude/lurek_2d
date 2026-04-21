@@ -19,12 +19,12 @@ All other transitions are rejected and return false.
 to receive `quest_started` / `quest_advanced` / `quest_completed` /
 `quest_failed` events.
 * Serialisation: `M.toJson(log)` / `M.fromJson(str)` round-trip the log
-through `lurek.codec.toJson` / `lurek.codec.fromJson`.
-* Persistence: register a custom collector with `lurek.savegame.SaveManager`
+through `lurek.serial.toJson` / `lurek.serial.fromJson`.
+* Persistence: register a custom collector with `lurek.save.SaveManager`
 that calls `M.toJson(log)` on save and `M.fromJson(str)` on load.
-* Time-limited objectives: drive expiry from a `lurek.time.Scheduler` you
+* Time-limited objectives: drive expiry from a `lurek.timer.Scheduler` you
 create in your game loop (call `QuestLog:failQuest(id)` from the callback);
-this library does not require `lurek.time` at runtime.
+this library does not require `lurek.timer` at runtime.
 
 Usage:
 local quest = require("library.quest")
@@ -41,7 +41,7 @@ log:advanceObjective("tutorial", "talk_npc", 1)
 
 *56 functions, 0 module fields documented.*
 
-See: [`lurek.patterns.newEventBus`](../lua-api.md#lurekpatternsneweventbus), [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson), [`lurek.codec.fromJson`](../lua-api.md#lurekcodecfromjson), [`lurek.savegame.SaveManager`](../lua-api.md#lureksavegamesavemanager), [`lurek.time.Scheduler`](../lua-api.md#lurektimescheduler)
+See: [`lurek.patterns.newEventBus`](../lua-api.md#lurekpatternsneweventbus), [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson), [`lurek.serial.fromJson`](../lua-api.md#lurekcodecfromjson), [`lurek.save.SaveManager`](../lua-api.md#lureksavegamesavemanager), [`lurek.timer.Scheduler`](../lua-api.md#lurektimescheduler)
 
 ## Functions
 
@@ -587,7 +587,7 @@ Remove a tag from this objective. Returns true if the tag was present.
 
 ### `toJson(log)`
 
-Encode a `QuestLog` to a JSON string via `lurek.codec.toJson`.
+Encode a `QuestLog` to a JSON string via `lurek.serial.toJson`.
 
 **Parameters**
 
@@ -597,7 +597,7 @@ Encode a `QuestLog` to a JSON string via `lurek.codec.toJson`.
 
 - *string* — JSON-encoded log.
 
-See: [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson)
+See: [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson)
 
 ### `fromJson(str, into)`
 
@@ -612,4 +612,4 @@ Decode a JSON-encoded log into a fresh `QuestLog`. The optional `into` argument 
 
 - *QuestLog*
 
-See: [`lurek.codec.fromJson`](../lua-api.md#lurekcodecfromjson)
+See: [`lurek.serial.fromJson`](../lua-api.md#lurekcodecfromjson)

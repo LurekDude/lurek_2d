@@ -10,11 +10,11 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.1, 0.1, 0.15)
+    lurek.render.clear(0.1, 0.1, 0.15)
     Events.emit("game:draw")
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     Events.emit("input:keypressed", key)
 end

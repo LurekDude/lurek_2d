@@ -139,7 +139,7 @@
 **Concept**: Collect and visualize game session data from test runs.
 
 **Features**:
-- Track events from lurek.signal.emit() during play sessions
+- Track events from lurek.event.emit() during play sessions
 - Show event frequency, timing, and distribution
 - Player path visualization (death map, progression funnel)
 - Auto-detect difficulty spikes

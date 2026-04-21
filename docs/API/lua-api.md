@@ -9,14 +9,14 @@
 
 - [`lurek.window`](#window) — 50 fn
 - [`lurek.input`](#input) — 69 fn, 3 classes
-- [`lurek.time`](#timer) — 21 fn, 1 class
+- [`lurek.timer`](#timer) — 21 fn, 1 class
 - [`lurek.math`](#math) — 106 fn, 12 classes
 - [`lurek.audio`](#audio) — 99 fn, 6 classes
 - [`lurek.physics`](#physics) — 19 fn, 6 classes
 - [`lurek.filesystem`](#filesystem) — 35 fn, 3 classes
 - [`lurek.particle`](#particle) — 2 fn, 2 classes
-- [`lurek.signal`](#event) — 14 fn, 1 class
-- [`lurek.system`](#system) — 26 fn
+- [`lurek.event`](#event) — 14 fn, 1 class
+- [`lurek.runtime`](#system) — 26 fn
 - [`lurek.thread`](#thread) — 5 fn, 4 classes
 - [`lurek.ai`](#ai) — 34 fn, 27 classes
 - [`lurek.compute`](#compute) — 11 fn, 1 class
@@ -32,13 +32,13 @@
 - [`lurek.docs`](#docs) — 25 fn, 5 classes
 - [`lurek.patterns`](#patterns) — 20 fn, 20 classes
 - [`lurek.animation`](#animation) — 6 fn, 5 classes
-- [`lurek.simulator`](#automation) — 28 fn
+- [`lurek.automation`](#automation) — 28 fn
 - [`lurek.camera`](#camera) — 1 fn, 1 class
-- [`lurek.collision`](#collision) — 4 fn
+- [`lurek.physics`](#collision) — 4 fn
 - [`lurek.devtools`](#devtools) — 40 fn, 2 classes
 - [`lurek.ecs`](#ecs) — 1 fn, 1 class
 - [`lurek.effect`](#effect) — 11 fn, 5 classes
-- [`lurek.engine`](#engine) — 10 fn
+- [`lurek.runtime`](#engine) — 10 fn
 - [`lurek.globe`](#globe) — 6 fn, 2 classes
 - [`lurek.i18n`](#i18n) — 31 fn
 - [`lurek.light`](#light) — 18 fn, 2 classes
@@ -74,9 +74,9 @@ function lurek.textinput( text : string )  -- Unicode character typed.
 function lurek.mousepressed( x : number, y : number, button : number )  -- Mouse button press.
 function lurek.mousereleased( x : number, y : number, button : number )  -- Mouse button release.
 function lurek.wheelmoved( x : number, y : number )  -- Mouse wheel scroll.
-function lurek.gamepadpressed( id : number, button : string )  -- Gamepad button press.
-function lurek.gamepadreleased( id : number, button : string )  -- Gamepad button release.
-function lurek.gamepadaxis( id : number, axis : string, value : number )  -- Gamepad axis; value in -1..1.
+function lurek.input.gamepadpressed( id : number, button : string )  -- Gamepad button press.
+function lurek.input.gamepadreleased( id : number, button : string )  -- Gamepad button release.
+function lurek.input.gamepadaxis( id : number, axis : string, value : number )  -- Gamepad axis; value in -1..1.
 function lurek.joystickadded( id : number )  -- Gamepad connected.
 function lurek.joystickremoved( id : number )  -- Gamepad disconnected.
 function lurek.touchpressed( id, x : number, y : number, dx : number, dy : number, pressure : number )  -- Touch begin.
@@ -154,7 +154,7 @@ lurek.window.toPixels( value : number ) -> number  -- Converts a device-independ
 
 ## `lurek.input` {#input}
 
-> `lurek.keyboard` / `lurek.mouse` / `lurek.gamepad` / `lurek.touch` — Input state queries and cursor management.
+> `lurek.input.keyboard` / `lurek.input.mouse` / `lurek.input.gamepad` / `lurek.input.touch` — Input state queries and cursor management.
 
 *Coverage: 81/81 items documented (100%)*
 
@@ -265,34 +265,34 @@ InputRecording:totalFrames() -> integer  -- Returns the total frame count when r
 
 ---
 
-## `lurek.time` {#timer}
+## `lurek.timer` {#timer}
 
-> `lurek.time` - Frame timing, FPS tracking, and scheduled Lua callbacks.
+> `lurek.timer` - Frame timing, FPS tracking, and scheduled Lua callbacks.
 
 *Coverage: 43/43 items documented (100%)*
 
 ```lua
-lurek.time.afterReal( delay : number, func : function ) -> nil  -- Schedules a one-shot callback that fires after `delay` wall-clock seconds,
-lurek.time.chain( steps : table ) -> Scheduler  -- Creates a new Scheduler loaded with a sequenced one-shot chain
-lurek.time.getAverageDelta() -> number  -- Returns the rolling-average frame delta time in seconds
-lurek.time.getDelta() -> number  -- Returns the delta time in seconds for the current frame
-lurek.time.getFPS() -> number  -- Returns the current frames-per-second measurement
-lurek.time.getFrameCount() -> integer  -- Returns the total number of frames rendered since engine start
-lurek.time.getMicroTime() -> number  -- Returns the high-resolution elapsed time since engine start in seconds
-lurek.time.getPhysicsDelta() -> number  -- Returns the fixed timestep used by `process_physics` callbacks (seconds)
-lurek.time.getPhysicsMaxSteps() -> integer  -- Returns the maximum number of physics sub-steps allowed per frame
-lurek.time.getSmoothedDelta() -> number  -- Returns the exponential moving-average of frame deltas in seconds
-lurek.time.getTime() -> number  -- Returns the total elapsed time since engine start in seconds
-lurek.time.newScheduler() -> Scheduler  -- Creates a new independent Scheduler for managing timed callbacks
-lurek.time.setPhysicsDelta( dt : number ) -> nil  -- Sets the fixed timestep for `process_physics` callbacks (seconds)
-lurek.time.setPhysicsMaxSteps( n : integer )  -- Sets the maximum number of physics sub-steps allowed per frame (clamped 1–64)
-lurek.time.setSmoothingFactor( alpha : number ) -> nil  -- Sets the smoothing factor (alpha) for `getSmoothedDelta`. Must be in [0.01, 1.0]
-lurek.time.sleep( seconds : number ) -> nil  -- Suspends execution for the given number of seconds
-lurek.time.step() -> number  -- Advances the timer by one frame, returning the delta time
-lurek.time.tickRealTimers() -> table|nil  -- Advances all real-time timers by one tick; called automatically each frame
-lurek.time.tickWaits() -> table|nil  -- Advances all `lurek.timer.wait()` coroutines by one tick; called each frame
-lurek.time.waitFrames( frames : integer ) -> nil  -- Yields the current Lua coroutine for at least `frames` engine frames
-lurek.time.waitSeconds( seconds : number ) -> nil  -- Yields the current Lua coroutine for at least `seconds` wall-clock seconds
+lurek.timer.afterReal( delay : number, func : function ) -> nil  -- Schedules a one-shot callback that fires after `delay` wall-clock seconds,
+lurek.timer.chain( steps : table ) -> Scheduler  -- Creates a new Scheduler loaded with a sequenced one-shot chain
+lurek.timer.getAverageDelta() -> number  -- Returns the rolling-average frame delta time in seconds
+lurek.timer.getDelta() -> number  -- Returns the delta time in seconds for the current frame
+lurek.timer.getFPS() -> number  -- Returns the current frames-per-second measurement
+lurek.timer.getFrameCount() -> integer  -- Returns the total number of frames rendered since engine start
+lurek.timer.getMicroTime() -> number  -- Returns the high-resolution elapsed time since engine start in seconds
+lurek.timer.getPhysicsDelta() -> number  -- Returns the fixed timestep used by `process_physics` callbacks (seconds)
+lurek.timer.getPhysicsMaxSteps() -> integer  -- Returns the maximum number of physics sub-steps allowed per frame
+lurek.timer.getSmoothedDelta() -> number  -- Returns the exponential moving-average of frame deltas in seconds
+lurek.timer.getTime() -> number  -- Returns the total elapsed time since engine start in seconds
+lurek.timer.newScheduler() -> Scheduler  -- Creates a new independent Scheduler for managing timed callbacks
+lurek.timer.setPhysicsDelta( dt : number ) -> nil  -- Sets the fixed timestep for `process_physics` callbacks (seconds)
+lurek.timer.setPhysicsMaxSteps( n : integer )  -- Sets the maximum number of physics sub-steps allowed per frame (clamped 1–64)
+lurek.timer.setSmoothingFactor( alpha : number ) -> nil  -- Sets the smoothing factor (alpha) for `getSmoothedDelta`. Must be in [0.01, 1.0]
+lurek.timer.sleep( seconds : number ) -> nil  -- Suspends execution for the given number of seconds
+lurek.timer.step() -> number  -- Advances the timer by one frame, returning the delta time
+lurek.timer.tickRealTimers() -> table|nil  -- Advances all real-time timers by one tick; called automatically each frame
+lurek.timer.tickWaits() -> table|nil  -- Advances all `lurek.timer.wait()` coroutines by one tick; called each frame
+lurek.timer.waitFrames( frames : integer ) -> nil  -- Yields the current Lua coroutine for at least `frames` engine frames
+lurek.timer.waitSeconds( seconds : number ) -> nil  -- Yields the current Lua coroutine for at least `seconds` wall-clock seconds
 ```
 
 ### `Scheduler`
@@ -1108,7 +1108,7 @@ Zone:setPriority( priority : integer ) -> nil  -- Sets the zone priority; higher
 
 ## `lurek.filesystem` {#filesystem}
 
-> `lurek.fs` — Sandboxed file I/O, directory queries, and async asset loading.
+> `lurek.filesystem` — Sandboxed file I/O, directory queries, and async asset loading.
 >
 > All paths are resolved through the game's [`GameFS`] sandbox. Supports file
 > read/write via `FileHandle`, bulk-data via `FileData`, ZIP archive mounting,
@@ -1196,7 +1196,7 @@ ZipMount:readFile( virtual_path : string ) -> string  -- Reads a file from the Z
 
 ## `lurek.particle` {#particle}
 
-> `lurek.particles` — Emitter-based 2D particle systems and trail ribbons.
+> `lurek.particle` — Emitter-based 2D particle systems and trail ribbons.
 
 *Coverage: 86/86 items documented (100%)*
 
@@ -1305,9 +1305,9 @@ Trail:update( dt : number ) -> nil  -- Ages trail points and removes expired one
 
 ---
 
-## `lurek.signal` {#event}
+## `lurek.event` {#event}
 
-> `lurek.signal` — Event queue polling and pub-sub signal dispatching.
+> `lurek.event` — Event queue polling and pub-sub signal dispatching.
 >
 > Provides `Signal` userdata for named-event pub-sub with once-fire handles,
 > per-handle filter predicates, wildcard subscriptions, and integration with the
@@ -1316,20 +1316,20 @@ Trail:update( dt : number ) -> nil  -- Ages trail points and removes expired one
 *Coverage: 22/22 items documented (100%)*
 
 ```lua
-lurek.signal.clear() -> nil  -- Discards all pending events in the queue
-lurek.signal.clearHistory() -> nil  -- Clears all recorded event history
-lurek.signal.enableHistory( capacity : integer ) -> nil  -- Enables event history recording, keeping the last `capacity` pushed events
-lurek.signal.exit( code : integer? ) -> nil  -- Pushes an exit event, requesting the engine to stop
-lurek.signal.flushDeferred() -> table|nil  -- Moves all buffered deferred events into the main event queue and clears the buffer
-lurek.signal.getHistory() -> table  -- Returns an array of recent events as `{name, args}` tables
-lurek.signal.newSignal() -> Signal  -- Creates a new pub-sub Signal dispatcher
-lurek.signal.poll() -> function  -- Returns an iterator function that pops events from the queue
-lurek.signal.pump() -> nil  -- Syncs OS-level events into the queue (no-op in Lurek2D push model)
-lurek.signal.push( args : MultiValue )  -- Adds an event item to the end of the event queue for processing
-lurek.signal.pushDeferred( name : string ) -> nil  -- Pushes a named event to the deferred buffer; it will not reach the main queue
-lurek.signal.quit() -> nil  -- Alias for `exit()` — requests the engine to stop at the end of the current frame
-lurek.signal.restart() -> nil  -- Requests that the engine restart at the beginning of the next frame
-lurek.signal.wait( timeout : number? ) -> string?  -- Blocks until the next event arrives or the optional timeout elapses
+lurek.event.clear() -> nil  -- Discards all pending events in the queue
+lurek.event.clearHistory() -> nil  -- Clears all recorded event history
+lurek.event.enableHistory( capacity : integer ) -> nil  -- Enables event history recording, keeping the last `capacity` pushed events
+lurek.event.exit( code : integer? ) -> nil  -- Pushes an exit event, requesting the engine to stop
+lurek.event.flushDeferred() -> table|nil  -- Moves all buffered deferred events into the main event queue and clears the buffer
+lurek.event.getHistory() -> table  -- Returns an array of recent events as `{name, args}` tables
+lurek.event.newSignal() -> Signal  -- Creates a new pub-sub Signal dispatcher
+lurek.event.poll() -> function  -- Returns an iterator function that pops events from the queue
+lurek.event.pump() -> nil  -- Syncs OS-level events into the queue (no-op in Lurek2D push model)
+lurek.event.push( args : MultiValue )  -- Adds an event item to the end of the event queue for processing
+lurek.event.pushDeferred( name : string ) -> nil  -- Pushes a named event to the deferred buffer; it will not reach the main queue
+lurek.event.quit() -> nil  -- Alias for `exit()` — requests the engine to stop at the end of the current frame
+lurek.event.restart() -> nil  -- Requests that the engine restart at the beginning of the next frame
+lurek.event.wait( timeout : number? ) -> string?  -- Blocks until the next event arrives or the optional timeout elapses
 ```
 
 ### `Signal`
@@ -1349,43 +1349,43 @@ Signal:typeOf( name : string ) -> boolean  -- Returns true if the given type nam
 
 ---
 
-## `lurek.system` {#system}
+## `lurek.runtime` {#system}
 
-> `lurek.platform` — Platform queries: OS name, CPU count, memory size, power state,
+> `lurek.runtime` — Platform queries: OS name, CPU count, memory size, power state,
 > preferred locales, clipboard access, and safe URL opening.
 >
-> Registered as `lurek.platform.*` in the Lua VM. Domain logic is minimal —
+> Registered as `lurek.runtime.*` in the Lua VM. Domain logic is minimal —
 > most functions delegate directly to `std` or `sysinfo`.
 
 *Coverage: 26/26 items documented (100%)*
 
 ```lua
-lurek.system.errorSnapshot( err : string ) -> string  -- Serialises an engine error message to a compact JSON string
-lurek.system.getArch() -> string  -- Returns the CPU architecture string for the current machine
-lurek.system.getArgs() -> table  -- Returns the command-line arguments as a table
-lurek.system.getBatchResults( results : table ) -> integer  -- Returns the output table from the most recently completed runBatch call
-lurek.system.getClipboardText() -> string  -- Returns the current contents of the system clipboard
-lurek.system.getDebugOverlay()  -- Returns whether the debug overlay is currently visible
-lurek.system.getEnv()  -- Returns the value of an environment variable, or nil if not set
-lurek.system.getInfo() -> table  -- Returns a table of system information including OS name, CPU model, and installed RAM
-lurek.system.getLastError() -> table?  -- Returns the last unhandled error message, or nil
-lurek.system.getLogLevel()  -- Returns the name of the current minimum log level for runtime messages
-lurek.system.getMemorySize() -> integer  -- Returns the total amount of installed system RAM in megabytes
-lurek.system.getMessage( id : string ) -> string  -- Resolves a stable runtime message ID such as 'L001' to its human-readable text
-lurek.system.getMessageCount() -> integer  -- Returns the total number of message entries loaded into the runtime message catalog
-lurek.system.getOS() -> string  -- Returns the host operating system name ('Windows', 'Linux', 'macOS')
-lurek.system.getPowerInfo() -> table  -- Returns battery state, percentage charged, and estimated time remaining
-lurek.system.getPreferredLocales() -> table  -- Returns an ordered list of the user's preferred locale strings (e.g. 'en-US')
-lurek.system.getProcessorCount() -> integer  -- Returns the number of logical CPU cores available
-lurek.system.getVersion() -> string  -- Returns the Lurek2D engine version string
-lurek.system.hasMessage( id : string ) -> boolean  -- Returns true when the runtime message catalog contains the given stable message ID
-lurek.system.log( level : string, message : string )  -- Emit a log message from Lua at the specified level
-lurek.system.openURL( url : string ) -> boolean  -- Opens a URL in the system's default browser
-lurek.system.parseArgs( args : table? ) -> table  -- Parses a command-line argument string and returns a structured key/value table
-lurek.system.runBatch( tasks : table, opts : table? ) -> table  -- Runs a list of shell commands in parallel and returns immediately without blocking
-lurek.system.setClipboardText( text : string )  -- Replaces the system clipboard contents with the given string
-lurek.system.setDebugOverlay( enabled : boolean )  -- Shows or hides the FPS/draw-call debug overlay
-lurek.system.setLogLevel( level : string )  -- Sets the minimum severity level for runtime log messages
+lurek.runtime.errorSnapshot( err : string ) -> string  -- Serialises an engine error message to a compact JSON string
+lurek.runtime.getArch() -> string  -- Returns the CPU architecture string for the current machine
+lurek.runtime.getArgs() -> table  -- Returns the command-line arguments as a table
+lurek.runtime.getBatchResults( results : table ) -> integer  -- Returns the output table from the most recently completed runBatch call
+lurek.runtime.getClipboardText() -> string  -- Returns the current contents of the system clipboard
+lurek.runtime.getDebugOverlay()  -- Returns whether the debug overlay is currently visible
+lurek.runtime.getEnv()  -- Returns the value of an environment variable, or nil if not set
+lurek.runtime.getInfo() -> table  -- Returns a table of system information including OS name, CPU model, and installed RAM
+lurek.runtime.getLastError() -> table?  -- Returns the last unhandled error message, or nil
+lurek.runtime.getLogLevel()  -- Returns the name of the current minimum log level for runtime messages
+lurek.runtime.getMemorySize() -> integer  -- Returns the total amount of installed system RAM in megabytes
+lurek.runtime.getMessage( id : string ) -> string  -- Resolves a stable runtime message ID such as 'L001' to its human-readable text
+lurek.runtime.getMessageCount() -> integer  -- Returns the total number of message entries loaded into the runtime message catalog
+lurek.runtime.getOS() -> string  -- Returns the host operating system name ('Windows', 'Linux', 'macOS')
+lurek.runtime.getPowerInfo() -> table  -- Returns battery state, percentage charged, and estimated time remaining
+lurek.runtime.getPreferredLocales() -> table  -- Returns an ordered list of the user's preferred locale strings (e.g. 'en-US')
+lurek.runtime.getProcessorCount() -> integer  -- Returns the number of logical CPU cores available
+lurek.runtime.getVersion() -> string  -- Returns the Lurek2D engine version string
+lurek.runtime.hasMessage( id : string ) -> boolean  -- Returns true when the runtime message catalog contains the given stable message ID
+lurek.runtime.log( level : string, message : string )  -- Emit a log message from Lua at the specified level
+lurek.runtime.openURL( url : string ) -> boolean  -- Opens a URL in the system's default browser
+lurek.runtime.parseArgs( args : table? ) -> table  -- Parses a command-line argument string and returns a structured key/value table
+lurek.runtime.runBatch( tasks : table, opts : table? ) -> table  -- Runs a list of shell commands in parallel and returns immediately without blocking
+lurek.runtime.setClipboardText( text : string )  -- Replaces the system clipboard contents with the given string
+lurek.runtime.setDebugOverlay( enabled : boolean )  -- Shows or hides the FPS/draw-call debug overlay
+lurek.runtime.setLogLevel( level : string )  -- Sets the minimum severity level for runtime log messages
 ```
 
 ---
@@ -2204,7 +2204,7 @@ mlua:setByte( offset : integer, value : integer ) -> nil  -- Set a byte at the s
 
 ## `lurek.image` {#image}
 
-> `lurek.img` — CPU-side pixel-level image manipulation.
+> `lurek.image` — CPU-side pixel-level image manipulation.
 >
 > Exposes `ImageData` (RGBA pixel buffers), `CompressedImageData` (DXT/BC/ETC),
 > `LayeredImage` (multi-layer compositing), `ProvinceGrid` (colour-keyed region maps),
@@ -3437,41 +3437,41 @@ BlendLayerSet:setWeight( name : string, weight : number ) -> boolean  -- Sets th
 
 ---
 
-## `lurek.simulator` {#automation}
+## `lurek.automation` {#automation}
 
-> `lurek.simulator` — Automated input simulation via timed step scripts.
+> `lurek.automation` — Automated input simulation via timed step scripts.
 
 *Coverage: 28/28 items documented (100%)*
 
 ```lua
-lurek.simulator.getCurrentScript() -> string?  -- Returns the name of the active script, or nil if idle
-lurek.simulator.getCurrentStep() -> integer  -- Returns the index of the next step to be dispatched
-lurek.simulator.getElapsedTime() -> number  -- Returns seconds elapsed since playback started
-lurek.simulator.getPlaybackSpeed() -> number  -- Returns the current playback speed multiplier (default 1.0)
-lurek.simulator.getScripts() -> table  -- Returns an array of all registered script names
-lurek.simulator.getStepCount() -> integer  -- Returns the total number of steps in the active script
-lurek.simulator.getStepLimit( name : string ) -> integer?  -- Returns the step limit for the named script, or nil if not found
-lurek.simulator.hasMacro( name : string ) -> boolean  -- Returns true if a macro with the given name has been saved
-lurek.simulator.hasScript( name : string ) -> boolean  -- Returns true if a script with the given name is registered
-lurek.simulator.isComplete() -> boolean  -- Returns true if all steps in the active script have been dispatched
-lurek.simulator.isHighlightMode() -> boolean  -- Returns whether the highlight overlay hint is active
-lurek.simulator.isPaused() -> boolean  -- Returns true if playback is currently paused
-lurek.simulator.isRunning() -> boolean  -- Returns true if the simulator is actively playing a script
-lurek.simulator.listMacros() -> table  -- Returns an array of all saved macro names
-lurek.simulator.load( name : string, data : table ) -> nil  -- Loads a named script from a Lua data table containing a steps array
-lurek.simulator.loadFromToml( name : string, toml_str : string ) -> nil  -- Parses a TOML string and registers it as a named script
-lurek.simulator.pause() -> nil  -- Pauses playback at the current step position
-lurek.simulator.playMacro( name : string ) -> nil  -- Loads and starts playback of a previously saved macro
-lurek.simulator.resume() -> nil  -- Resumes playback from a paused position
-lurek.simulator.saveMacro( macro_name : string, script_name : string ) -> nil  -- Saves a currently-loaded script under a macro name for fast replay
-lurek.simulator.setHighlightMode( enable : boolean ) -> nil  -- Enables or disables the highlight overlay hint
-lurek.simulator.setPlaybackSpeed( factor : number ) -> nil  -- Sets the dt multiplier for script playback (0.5 = half speed, 2.0 = double)
-lurek.simulator.setStepLimit( name : string, n : integer ) -> boolean  -- Sets the step limit for the named script (clamped to 1..MAX_STEPS)
-lurek.simulator.start( name : string ) -> nil  -- Starts playback of the named script from the beginning
-lurek.simulator.stop() -> nil  -- Stops playback and resets the simulator to idle
-lurek.simulator.unload( name : string ) -> boolean  -- Removes a loaded script by name, returning true if it existed
-lurek.simulator.update( dt : number ) -> nil  -- Advances the playback clock by `dt` seconds, dispatching due steps
-lurek.simulator.waitUntil( predicate : function, timeout : number ) -> nil  -- Pauses playback advancement until predicate() returns true or timeout seconds elapse
+lurek.automation.getCurrentScript() -> string?  -- Returns the name of the active script, or nil if idle
+lurek.automation.getCurrentStep() -> integer  -- Returns the index of the next step to be dispatched
+lurek.automation.getElapsedTime() -> number  -- Returns seconds elapsed since playback started
+lurek.automation.getPlaybackSpeed() -> number  -- Returns the current playback speed multiplier (default 1.0)
+lurek.automation.getScripts() -> table  -- Returns an array of all registered script names
+lurek.automation.getStepCount() -> integer  -- Returns the total number of steps in the active script
+lurek.automation.getStepLimit( name : string ) -> integer?  -- Returns the step limit for the named script, or nil if not found
+lurek.automation.hasMacro( name : string ) -> boolean  -- Returns true if a macro with the given name has been saved
+lurek.automation.hasScript( name : string ) -> boolean  -- Returns true if a script with the given name is registered
+lurek.automation.isComplete() -> boolean  -- Returns true if all steps in the active script have been dispatched
+lurek.automation.isHighlightMode() -> boolean  -- Returns whether the highlight overlay hint is active
+lurek.automation.isPaused() -> boolean  -- Returns true if playback is currently paused
+lurek.automation.isRunning() -> boolean  -- Returns true if the simulator is actively playing a script
+lurek.automation.listMacros() -> table  -- Returns an array of all saved macro names
+lurek.automation.load( name : string, data : table ) -> nil  -- Loads a named script from a Lua data table containing a steps array
+lurek.automation.loadFromToml( name : string, toml_str : string ) -> nil  -- Parses a TOML string and registers it as a named script
+lurek.automation.pause() -> nil  -- Pauses playback at the current step position
+lurek.automation.playMacro( name : string ) -> nil  -- Loads and starts playback of a previously saved macro
+lurek.automation.resume() -> nil  -- Resumes playback from a paused position
+lurek.automation.saveMacro( macro_name : string, script_name : string ) -> nil  -- Saves a currently-loaded script under a macro name for fast replay
+lurek.automation.setHighlightMode( enable : boolean ) -> nil  -- Enables or disables the highlight overlay hint
+lurek.automation.setPlaybackSpeed( factor : number ) -> nil  -- Sets the dt multiplier for script playback (0.5 = half speed, 2.0 = double)
+lurek.automation.setStepLimit( name : string, n : integer ) -> boolean  -- Sets the step limit for the named script (clamped to 1..MAX_STEPS)
+lurek.automation.start( name : string ) -> nil  -- Starts playback of the named script from the beginning
+lurek.automation.stop() -> nil  -- Stops playback and resets the simulator to idle
+lurek.automation.unload( name : string ) -> boolean  -- Removes a loaded script by name, returning true if it existed
+lurek.automation.update( dt : number ) -> nil  -- Advances the playback clock by `dt` seconds, dispatching due steps
+lurek.automation.waitUntil( predicate : function, timeout : number ) -> nil  -- Pauses playback advancement until predicate() returns true or timeout seconds elapse
 ```
 
 ---
@@ -3539,9 +3539,9 @@ Camera2D:zoomTo( target_zoom : number, duration : number ) -> nil  -- Smoothly t
 
 ---
 
-## `lurek.collision` {#collision}
+## `lurek.physics` {#collision}
 
-> `lurek.collision` — Lightweight stateless geometric collision helpers.
+> `lurek.physics` — Lightweight stateless geometric collision helpers.
 >
 > These pure-math functions perform fast overlap detection without requiring a
 > full physics world. Suitable for RPG, puzzle, or visual-novel games that only
@@ -3550,10 +3550,10 @@ Camera2D:zoomTo( target_zoom : number, duration : number ) -> nil  -- Smoothly t
 *Coverage: 4/4 items documented (100%)*
 
 ```lua
-lurek.collision.testAABB( ax : number, ay : number, aw : number, ah : number, bx : number, by : number, bw : number, bh : number ) -> boolean  -- Returns true when two axis-aligned bounding boxes overlap
-lurek.collision.testCircleAABB( cx : number, cy : number, cr : number, ax : number, ay : number, aw : number, ah : number ) -> boolean  -- Returns true when a circle overlaps an AABB
-lurek.collision.testCircles( ax : number, ay : number, ar : number, bx : number, by : number, br : number ) -> boolean  -- Returns true when two circles overlap
-lurek.collision.testPoint( px : number, py : number, ax : number, ay : number, aw : number, ah : number ) -> boolean  -- Returns true when point (px, py) lies inside the AABB
+lurek.physics.testAABB( ax : number, ay : number, aw : number, ah : number, bx : number, by : number, bw : number, bh : number ) -> boolean  -- Returns true when two axis-aligned bounding boxes overlap
+lurek.physics.testCircleAABB( cx : number, cy : number, cr : number, ax : number, ay : number, aw : number, ah : number ) -> boolean  -- Returns true when a circle overlaps an AABB
+lurek.physics.testCircles( ax : number, ay : number, ar : number, bx : number, by : number, br : number ) -> boolean  -- Returns true when two circles overlap
+lurek.physics.testPoint( px : number, py : number, ax : number, ay : number, aw : number, ah : number ) -> boolean  -- Returns true when point (px, py) lies inside the AABB
 ```
 
 ---
@@ -3637,7 +3637,7 @@ ReplConsole:len() -> integer  -- Returns the number of history entries
 
 ## `lurek.ecs` {#ecs}
 
-> `lurek.entity` — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
+> `lurek.ecs` — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
 >
 > Wraps [`crate::ecs::Universe`] as `LuaUniverse` userdata. Supports spawn/kill,
 > per-entity component CRUD, tag flags, named layers, queries, blueprints, and
@@ -3905,9 +3905,9 @@ mlua:update( dt : number ) -> boolean  -- Advances the transition by `dt` second
 
 ---
 
-## `lurek.engine` {#engine}
+## `lurek.runtime` {#engine}
 
-> `lurek.engine` — Runtime engine metadata and introspection.
+> `lurek.runtime` — Runtime engine metadata and introspection.
 >
 > Exposes read-only properties about the running engine: version, target
 > frame budget, memory usage, host platform, and total uptime.
@@ -3915,16 +3915,16 @@ mlua:update( dt : number ) -> boolean  -- Advances the transition by `dt` second
 *Coverage: 10/10 items documented (100%)*
 
 ```lua
-lurek.engine.fps() -> number  -- Returns the current measured frames-per-second
-lurek.engine.frameCount() -> integer  -- Returns the total number of frames processed since engine start
-lurek.engine.getFrameBudget() -> number  -- Returns the target frame budget in milliseconds (default: 1000 / 60 ≈ 16.667 ms)
-lurek.engine.getResourceStats() -> table  -- Returns a table with resident resource memory statistics
-lurek.engine.getVersion() -> string  -- Returns the engine version string (from `Cargo.toml`)
-lurek.engine.isDebug() -> boolean  -- Returns `true` if the engine was compiled in debug mode
-lurek.engine.memoryUsage() -> table  -- Returns a table with `lua_bytes` (Lua GC heap usage in bytes) and
-lurek.engine.platform() -> string  -- Returns a string identifying the host operating system:
-lurek.engine.setResourceBudget( budget_bytes : integer )  -- Sets the maximum resident texture memory budget in bytes
-lurek.engine.uptime() -> number  -- Returns the total engine uptime in seconds (sum of all processed deltas)
+lurek.runtime.fps() -> number  -- Returns the current measured frames-per-second
+lurek.runtime.frameCount() -> integer  -- Returns the total number of frames processed since engine start
+lurek.runtime.getFrameBudget() -> number  -- Returns the target frame budget in milliseconds (default: 1000 / 60 ≈ 16.667 ms)
+lurek.runtime.getResourceStats() -> table  -- Returns a table with resident resource memory statistics
+lurek.runtime.getVersion() -> string  -- Returns the engine version string (from `Cargo.toml`)
+lurek.runtime.isDebug() -> boolean  -- Returns `true` if the engine was compiled in debug mode
+lurek.runtime.memoryUsage() -> table  -- Returns a table with `lua_bytes` (Lua GC heap usage in bytes) and
+lurek.runtime.platform() -> string  -- Returns a string identifying the host operating system:
+lurek.runtime.setResourceBudget( budget_bytes : integer )  -- Sets the maximum resident texture memory budget in bytes
+lurek.runtime.uptime() -> number  -- Returns the total engine uptime in seconds (sum of all processed deltas)
 ```
 
 ---
@@ -4012,7 +4012,7 @@ GlobeRegistry:remove( name : string ) -> boolean  -- Remove a globe by name
 
 ## `lurek.i18n` {#i18n}
 
-> Registers the `lurek.localization.*` internationalization and localization API.
+> Registers the `lurek.i18n.*` internationalization and localization API.
 >
 > Thin Lua bridge that delegates to the [`localization`][crate::localization] domain module.
 > All translation tables, fallback logic, interpolation, and pluralization live
@@ -4173,7 +4173,7 @@ Occluder:setVertices( vertices : table ) -> nil  -- Replaces the polygon vertice
 
 ## `lurek.mods` {#mods}
 
-> `lurek.modding` - Mod discovery, dependency resolution, load ordering, and hot-reload.
+> `lurek.mods` - Mod discovery, dependency resolution, load ordering, and hot-reload.
 
 *Coverage: 40/40 items documented (100%)*
 
@@ -4375,7 +4375,7 @@ ParallaxSet:update( dt : number ) -> nil  -- Advances the autoscroll accumulator
 
 ## `lurek.pathfind` {#pathfind}
 
-> `lurek.pathfinding` — Grid-based A★, HPA★, flow field, and unit-aware navigation.
+> `lurek.pathfind` — Grid-based A★, HPA★, flow field, and unit-aware navigation.
 
 *Coverage: 73/73 items documented (100%)*
 
@@ -4720,7 +4720,7 @@ SpriteManager:typeOf() -> string  -- Returns the type string "SpriteManager"
 
 ## `lurek.render` {#render}
 
-> `lurek.graphic` — 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
+> `lurek.render` — 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
 
 *Coverage: 183/183 items documented (100%)*
 
@@ -4991,7 +4991,7 @@ SpriteBatch:typeOf() -> string  -- Returns the type name of this object
 
 ## `lurek.save` {#save}
 
-> `lurek.savegame` - Slot-based save/load system with collectors, schema versioning, and auto-save.
+> `lurek.save` - Slot-based save/load system with collectors, schema versioning, and auto-save.
 
 *Coverage: 23/23 items documented (100%)*
 
@@ -5032,7 +5032,7 @@ SaveManager:update( dt : number ) -> string?  -- Advances the auto-save timer, r
 
 ## `lurek.serial` {#serial}
 
-> `lurek.codec` — Format-agnostic string serialization: JSON, TOML, and CSV.
+> `lurek.serial` — Format-agnostic string serialization: JSON, TOML, and CSV.
 
 *Coverage: 10/10 items documented (100%)*
 

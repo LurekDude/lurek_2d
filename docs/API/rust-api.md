@@ -583,7 +583,7 @@ pub struct App  // Entry point for the Lurek2D engine. Owns the game loop, GPU r
 
 ### `app::debug_overlay`
 
-> Renders green text on a semi-transparent background in the top-right corner of the screen. Can be toggled at runtime via F12 or `lurek.platform.setDebugOverlay()`.
+> Renders green text on a semi-transparent background in the top-right corner of the screen. Can be toggled at runtime via F12 or `lurek.runtime.setDebugOverlay()`.
 
 *[src/app/debug_overlay.rs](src/app/debug_overlay.rs) — 1/1 documented (100%)*
 
@@ -759,7 +759,7 @@ pub fn waveform_to_png()  // Renders the amplitude waveform of `input_wav` to a 
 
 ### `automation`
 
-> Automated input simulation via timed step scripts.  The `automation` module provides the [`Simulator`] engine for loading and playing back named [`Script`] objects. Each script contains an ordered sequence of timed [`Step`] records that inject synthetic input events (key presses, mouse movements, text input, etc.) into the Lurek2D [`EventQueue`](crate::event::EventQueue) during game updates.  Primary use-cases are headless integration tests, QA regression replay, speedrun verification, and recorded developer input sessions.  ## Module structure  | Sub-module | Exported types | Purpose | |---|---|---| | `step` | [`Action`], [`Step`] | Enum of 8 action kinds; per-step record with 12 fields | | `script` | [`Script`] | Named, time-sorted, MAX_STEPS-capped step container | | `simulator` | [`Simulator`] | Playback engine driven by the `lurek.simulator.*` Lua API |  ## Quick-start (Lua)  ```lua -- Load and start a script local steps = {     { time = 0.1, action = "keypress", key = "space" },     { time = 0.5, action = "mousepress", x = 100, y = 200 }, } lurek.simulator.load("demo", steps) lurek.simulator.start("demo")  -- Advance playback each frame function lurek.update(dt)     lurek.simulator.update(dt)     if lurek.simulator.isComplete() then         lurek.simulator.stop()     end end ```  ## Tier  `automation` is a **Tier 2 — Engine Extension** module. It may import `math`, `engine`, and all Tier 1 modules (`event`, `input`, etc.). It must not import other Tier 2 modules.
+> Automated input simulation via timed step scripts.  The `automation` module provides the [`Simulator`] engine for loading and playing back named [`Script`] objects. Each script contains an ordered sequence of timed [`Step`] records that inject synthetic input events (key presses, mouse movements, text input, etc.) into the Lurek2D [`EventQueue`](crate::event::EventQueue) during game updates.  Primary use-cases are headless integration tests, QA regression replay, speedrun verification, and recorded developer input sessions.  ## Module structure  | Sub-module | Exported types | Purpose | |---|---|---| | `step` | [`Action`], [`Step`] | Enum of 8 action kinds; per-step record with 12 fields | | `script` | [`Script`] | Named, time-sorted, MAX_STEPS-capped step container | | `simulator` | [`Simulator`] | Playback engine driven by the `lurek.automation.*` Lua API |  ## Quick-start (Lua)  ```lua -- Load and start a script local steps = {     { time = 0.1, action = "keypress", key = "space" },     { time = 0.5, action = "mousepress", x = 100, y = 200 }, } lurek.automation.load("demo", steps) lurek.automation.start("demo")  -- Advance playback each frame function lurek.update(dt)     lurek.automation.update(dt)     if lurek.automation.isComplete() then         lurek.automation.stop()     end end ```  ## Tier  `automation` is a **Tier 2 — Engine Extension** module. It may import `math`, `engine`, and all Tier 1 modules (`event`, `input`, etc.). It must not import other Tier 2 modules.
 
 *[src/automation/mod.rs](src/automation/mod.rs) — 0/3 documented (0%)*
 
@@ -845,7 +845,7 @@ pub struct ZoomTween  // Smoothly transitions a camera zoom level from a start v
 
 ### `camera::types`
 
-> Camera types for 2D viewport control.  Provides the original [`Camera`] (used by `SharedState` for the flat `lurek.graphic.setCamera()` API) and the new Phase 24 [`Camera2D`] with smooth follow, dead zone, bounds clamping, and screen-shake.
+> Camera types for 2D viewport control.  Provides the original [`Camera`] (used by `SharedState` for the flat `lurek.render.setCamera()` API) and the new Phase 24 [`Camera2D`] with smooth follow, dead zone, bounds clamping, and screen-shake.
 
 *[src/camera/types.rs](src/camera/types.rs) — 2/2 documented (100%)*
 
@@ -881,7 +881,7 @@ pub struct ViewportScale  // Virtual resolution with automatic graphics stack ma
 
 ### `compute`
 
-> Provides [`array::NdArray`] for 1D/2D/3D row-major arrays with `f32`, `f64`, and `i32` element types. Used by the `lurek.gpu` Lua module. Despite the GPU namespace, all computation is CPU-bound; the name reflects the intended use for heavy numerical workloads (signal processing, matrix math, convolution).  ## Subsystem inventory - [`array`] — [`NdArray`]: storage, shape, slice, reshape, element access - [`ops`] — element-wise arithmetic and axis reductions (sum, mean, min, max) - [`spatial`] — 2D convolution, max/average pooling, distance transforms - [`analytics`] — autocorrelation, moving average, normalization, histogram - [`linalg`] — dot/matmul, Gaussian solver, LU decomposition, eigenvalue (power iteration) - [`fft`] — iterative Cooley-Tukey radix-2 FFT and inverse FFT  Lua bridge: `src/lua_api/compute_api.rs` as `lurek.gpu.*`.
+> Provides [`array::NdArray`] for 1D/2D/3D row-major arrays with `f32`, `f64`, and `i32` element types. Used by the `lurek.compute` Lua module. Despite the GPU namespace, all computation is CPU-bound; the name reflects the intended use for heavy numerical workloads (signal processing, matrix math, convolution).  ## Subsystem inventory - [`array`] — [`NdArray`]: storage, shape, slice, reshape, element access - [`ops`] — element-wise arithmetic and axis reductions (sum, mean, min, max) - [`spatial`] — 2D convolution, max/average pooling, distance transforms - [`analytics`] — autocorrelation, moving average, normalization, histogram - [`linalg`] — dot/matmul, Gaussian solver, LU decomposition, eigenvalue (power iteration) - [`fft`] — iterative Cooley-Tukey radix-2 FFT and inverse FFT  Lua bridge: `src/lua_api/compute_api.rs` as `lurek.compute.*`.
 
 *[src/compute/mod.rs](src/compute/mod.rs) — 6/6 documented (100%)*
 
@@ -1040,7 +1040,7 @@ pub fn set_region()  // Copy a source 2D array into a target 2D array at positio
 
 ### `data`
 
-> Binary data manipulation, compression, hashing, encoding, and pack/unpack.  Provides `ByteData` for raw byte buffers, plus compression (deflate/gzip/lz4/zlib), cryptographic hashing (MD5/SHA family), encoding (base64/hex), binary pack/unpack (`pack` module), and a windowed byte-buffer view (`dataview` module).  Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module — see `lurek.codec`.
+> Binary data manipulation, compression, hashing, encoding, and pack/unpack.  Provides `ByteData` for raw byte buffers, plus compression (deflate/gzip/lz4/zlib), cryptographic hashing (MD5/SHA family), encoding (base64/hex), binary pack/unpack (`pack` module), and a windowed byte-buffer view (`dataview` module).  Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module — see `lurek.serial`.
 
 *[src/data/mod.rs](src/data/mod.rs) — 11/11 documented (100%)*
 
@@ -1606,7 +1606,7 @@ pub enum TransitionKind  // The visual style of a screen transition.
 
 ### `effect::water_overlay`
 
-> Water surface overlay with UV distortion and depth-tint controls.  `WaterOverlayState` drives a full-screen water-distortion effect rendered in the `lurek.overlay.water.*` Lua API. Unlike the weather sub-system it does **not** spawn CPU particles — the distortion is entirely shader-based, so `update` only advances the internal time accumulator used to animate the wave pattern.
+> Water surface overlay with UV distortion and depth-tint controls.  `WaterOverlayState` drives a full-screen water-distortion effect rendered in the `lurek.effect.water.*` Lua API. Unlike the weather sub-system it does **not** spawn CPU particles — the distortion is entirely shader-based, so `update` only advances the internal time accumulator used to animate the wave pattern.
 
 *[src/effect/water_overlay.rs](src/effect/water_overlay.rs) — 1/1 documented (100%)*
 
@@ -2029,7 +2029,7 @@ pub struct PathResult  // Result of a successful pathfinding query.  # Fields - 
 
 ### `i18n`
 
-> Localization subsystem for Lurek2D.  Provides translation catalog management and text formatting utilities exposed to Lua games via `lurek.localization.*`.  ## Architecture  | Component | Type | Purpose | |---|---|---| | Catalog | [`Catalog`] | Multi-locale string table with dot-path keys and fallback chains | | Interpolation | [`interpolate`] | `{variable}` substitution in translation strings | | Plural forms | [`pluralize`] | CLDR-style count-based plural form selection |  This module is a **Tier 2** Engine Extension.  It has no runtime dependencies on GraphicsState, PhysicsWorld, or other subsystems.  ## Source files | File | Contents | |---|---| | `catalog.rs` | [`Catalog`], [`CatalogError`] | | `interpolation.rs` | [`interpolate`], [`interpolate_pairs`] | | `plural.rs` | [`PluralForm`], [`pluralize`], [`pluralize_slavic`] |
+> Localization subsystem for Lurek2D.  Provides translation catalog management and text formatting utilities exposed to Lua games via `lurek.i18n.*`.  ## Architecture  | Component | Type | Purpose | |---|---|---| | Catalog | [`Catalog`] | Multi-locale string table with dot-path keys and fallback chains | | Interpolation | [`interpolate`] | `{variable}` substitution in translation strings | | Plural forms | [`pluralize`] | CLDR-style count-based plural form selection |  This module is a **Tier 2** Engine Extension.  It has no runtime dependencies on GraphicsState, PhysicsWorld, or other subsystems.  ## Source files | File | Contents | |---|---| | `catalog.rs` | [`Catalog`], [`CatalogError`] | | `interpolation.rs` | [`interpolate`], [`interpolate_pairs`] | | `plural.rs` | [`PluralForm`], [`pluralize`], [`pluralize_slavic`] |
 
 *[src/i18n/mod.rs](src/i18n/mod.rs) — 3/3 documented (100%)*
 
@@ -4300,7 +4300,7 @@ pub fn field_of_view()  // Computes a visibility polygon by casting rays at segm
 
 ### `render`
 
-> GPU rendering layer backed by wgpu 22.  Implements a deferred `RenderCommand` queue: Lua callbacks push draw commands into `SharedState::pending_commands` during `lurek.render()` / `lurek.render_ui()`; after all callbacks return, [`gpu_renderer::GpuRenderer::render_frame()`] processes the queue, batches compatible draw calls, and presents the swapchain surface. No GPU work is done inside a Lua closure.  ## Subsystem inventory - [`renderer`] — `RenderCommand` enum, draw enums, and texture data types - [`gpu_renderer`] — [`GpuRenderer`]: wgpu device, queue, surface, resource pools - [`canvas`] — [`Canvas`]: off-screen render-to-texture for post-processing - [`font`] — [`Font`]: fontdue glyph rasterization and GPU atlas management - [`shader`] — [`Shader`]: user-supplied WGSL with uniform variable table - [`shape`] — compound vector shape builder for batched drawing - [`mesh`] — custom vertex geometry with per-vertex position, UV, and color - [`postfx_pipeline`] — ping-pong texture passes for multi-pass post-processing - [`draw_layer`] — Z-ordered draw layer for painter's-algorithm sorting - [`decal_surface`] — persistent surface for accumulated decal stamps - [`image_effect`] — per-image shader-effect pass descriptor  All public items are documented. Lua bridge: `src/lua_api/render_api.rs` (registered as `lurek.graphics.*`).
+> GPU rendering layer backed by wgpu 22.  Implements a deferred `RenderCommand` queue: Lua callbacks push draw commands into `SharedState::pending_commands` during `lurek.render()` / `lurek.render_ui()`; after all callbacks return, [`gpu_renderer::GpuRenderer::render_frame()`] processes the queue, batches compatible draw calls, and presents the swapchain surface. No GPU work is done inside a Lua closure.  ## Subsystem inventory - [`renderer`] — `RenderCommand` enum, draw enums, and texture data types - [`gpu_renderer`] — [`GpuRenderer`]: wgpu device, queue, surface, resource pools - [`canvas`] — [`Canvas`]: off-screen render-to-texture for post-processing - [`font`] — [`Font`]: fontdue glyph rasterization and GPU atlas management - [`shader`] — [`Shader`]: user-supplied WGSL with uniform variable table - [`shape`] — compound vector shape builder for batched drawing - [`mesh`] — custom vertex geometry with per-vertex position, UV, and color - [`postfx_pipeline`] — ping-pong texture passes for multi-pass post-processing - [`draw_layer`] — Z-ordered draw layer for painter's-algorithm sorting - [`decal_surface`] — persistent surface for accumulated decal stamps - [`image_effect`] — per-image shader-effect pass descriptor  All public items are documented. Lua bridge: `src/lua_api/render_api.rs` (registered as `lurek.renders.*`).
 
 *[src/render/mod.rs](src/render/mod.rs) — 11/11 documented (100%)*
 
@@ -4424,16 +4424,16 @@ pub struct TextSpan  // RenderCommand.  # Variants - `SetColor` — SetColor var
 pub struct TextureData  // Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.  # Fi...
 pub enum BevelStyle  // Visual style for a bevelled rectangle.  # Variants - `Raised` — Raised 3-D appearance (...
 pub enum BlendMode  // Blending mode for draw operations. Consult the module-level documentation for the broad...
-pub enum CompareMode  // Stencil comparison mode for `lurek.graphic.setStencilTest`.  # Variants - `Equal` — Equ...
-pub enum DepthMode  // Depth test comparison mode for `lurek.graphic.setDepthMode`.  # Variants - `Always` — A...
+pub enum CompareMode  // Stencil comparison mode for `lurek.render.setStencilTest`.  # Variants - `Equal` — Equ...
+pub enum DepthMode  // Depth test comparison mode for `lurek.render.setDepthMode`.  # Variants - `Always` — A...
 pub enum DrawMode  // Whether a shape is drawn filled or as an outline.  # Variants - `Fill` — Draw shapes as...
-pub enum DrawableKind  // Type discriminator for resources that can be passed to lurek.graphic.draw.  Used to dis...
+pub enum DrawableKind  // Type discriminator for resources that can be passed to lurek.render.draw.  Used to dis...
 pub enum GradientDirection  // Direction for a two-stop linear or radial gradient.  # Variants - `Horizontal` — Gradie...
 pub enum HexOrientation  // Orientation for a hexagonal tile cell.  # Variants - `PointyTop` — Pointy-top hexagon (...
 pub enum ParticleRenderShape  // Geometric shape used when rendering a single untextured particle via `DrawParticleSyste...
 pub enum PathSegment  // A single segment of a vector path, used with `RenderCommand::DrawPath`.  # Variants - `...
 pub enum RenderCommand  // Enqueues a typed draw or state command into the per-frame GPU render queue.
-pub enum StencilAction  // Stencil write action for `lurek.graphic.stencil` and `lurek.graphic.setStencilMode`.  #...
+pub enum StencilAction  // Stencil write action for `lurek.render.stencil` and `lurek.render.setStencilMode`.  #...
 pub enum TextAlign  // Text alignment mode for formatted text printing.  # Variants - `Left` — Left variant. -...
 ```
 
@@ -4481,7 +4481,7 @@ pub mod shared_state  // Central shared runtime state: SharedState, WindowState,
 
 ### `runtime::config`
 
-> Engine configuration loaded from `conf.toml` (preferred) or `conf.lua` (legacy).  When the engine starts it looks for `conf.toml` first; if absent it falls back to `conf.lua` for backward compatibility.  Missing fields fall back to built-in defaults so authors only need to specify the settings they actually want to change.  # Structure  [`Config`] is the top-level container and contains five nested structs: - [`WindowConfig`] — window geometry, title, display placement, and decoration options. - [`GraphicsConfig`] — GPU backend selection and power preference, resolved at startup. - [`ModulesConfig`] — boolean feature-flags for optional engine subsystems (audio,   physics, graphics, etc.).  Disabling a module avoids the startup cost and prevents   the matching `lurek.*` API calls from being registered. - [`PerformanceConfig`] — target frame-rate cap (`fps_cap`).  The `identity` field sets the name of the per-user save directory returned by `lurek.fs.getSaveDirectory()`.  If unset, the engine uses the game directory name as a fallback.  # Example `conf.toml`  ```toml [window] title  = "My Game" width  = 1280 height = 720 vsync  = true  # GPU backend: "auto" | "dx12" | "vulkan" | "metal" [graphics] backend = "auto" power_preference = "high" ```
+> Engine configuration loaded from `conf.toml` (preferred) or `conf.lua` (legacy).  When the engine starts it looks for `conf.toml` first; if absent it falls back to `conf.lua` for backward compatibility.  Missing fields fall back to built-in defaults so authors only need to specify the settings they actually want to change.  # Structure  [`Config`] is the top-level container and contains five nested structs: - [`WindowConfig`] — window geometry, title, display placement, and decoration options. - [`GraphicsConfig`] — GPU backend selection and power preference, resolved at startup. - [`ModulesConfig`] — boolean feature-flags for optional engine subsystems (audio,   physics, graphics, etc.).  Disabling a module avoids the startup cost and prevents   the matching `lurek.*` API calls from being registered. - [`PerformanceConfig`] — target frame-rate cap (`fps_cap`).  The `identity` field sets the name of the per-user save directory returned by `lurek.filesystem.getSaveDirectory()`.  If unset, the engine uses the game directory name as a fallback.  # Example `conf.toml`  ```toml [window] title  = "My Game" width  = 1280 height = 720 vsync  = true  # GPU backend: "auto" | "dx12" | "vulkan" | "metal" [graphics] backend = "auto" power_preference = "high" ```
 
 *[src/runtime/config.rs](src/runtime/config.rs) — 5/5 documented (100%)*
 
@@ -4778,7 +4778,7 @@ pub const UP03  // Stable ID for "unit pathfinding failed between grid positions
 pub const VR01  // Stable ID for "Voronoi diagram computed from seed points".
 pub const VR02  // Stable ID for "Voronoi region processing step completed".
 pub fn get_log_level()  // Returns the current log level name. This accessor incurs no allocation; call it freely ...
-pub fn set_log_level()  // Sets the global log level at runtime (called from `lurek.platform.setLogLevel`).  # Par...
+pub fn set_log_level()  // Sets the global log level at runtime (called from `lurek.runtime.setLogLevel`).  # Par...
 ```
 
 ### `runtime::messages`
@@ -5238,7 +5238,7 @@ pub enum WidgetKind  // Concrete widget type discriminant.  # Variants - `Label`
 
 ### `thread`
 
-> Background threading infrastructure for Lua game scripts.  This module is part of Lurek2D's **Core Runtime** tier and provides the primitives for running CPU-intensive Lua work off the main thread. Because LuaJIT VMs cannot share state across OS threads (design constraint **B-04**), each background thread runs an isolated VM communicating through [`Channel`] objects.  ## Subsystem inventory - [`channel`] — [`Channel`]: thread-safe MPMC queue for `ChannelValue` (nil, bool,   number, string, serialized table, bytes). Supports blocking `demand()` with timeout. - [`worker`] — [`LuaThread`]: spawns an OS thread with its own `mlua::Lua` VM,   captures errors in `ThreadState::Error`, exposes `wait()` and `get_error()`. - [`pool`] — [`ThreadPool`]: manages N persistent workers sharing input/output channels. - [`promise`] — [`Promise`]: one-shot background computation returning a single result   via a dedicated `__promise_result` channel.  ## Threading constraint Worker VMs get a sandboxed subset of the `lurek.*` API — no graphics, audio, window, input, or physics modules. Only `lurek.thread.getChannel`, `lurek.fs.read` (read-only, no `..` traversal), and the `arg` global table are available.  All public items are documented. Lua bridge: `src/lua_api/thread_api.rs`.
+> Background threading infrastructure for Lua game scripts.  This module is part of Lurek2D's **Core Runtime** tier and provides the primitives for running CPU-intensive Lua work off the main thread. Because LuaJIT VMs cannot share state across OS threads (design constraint **B-04**), each background thread runs an isolated VM communicating through [`Channel`] objects.  ## Subsystem inventory - [`channel`] — [`Channel`]: thread-safe MPMC queue for `ChannelValue` (nil, bool,   number, string, serialized table, bytes). Supports blocking `demand()` with timeout. - [`worker`] — [`LuaThread`]: spawns an OS thread with its own `mlua::Lua` VM,   captures errors in `ThreadState::Error`, exposes `wait()` and `get_error()`. - [`pool`] — [`ThreadPool`]: manages N persistent workers sharing input/output channels. - [`promise`] — [`Promise`]: one-shot background computation returning a single result   via a dedicated `__promise_result` channel.  ## Threading constraint Worker VMs get a sandboxed subset of the `lurek.*` API — no graphics, audio, window, input, or physics modules. Only `lurek.thread.getChannel`, `lurek.filesystem.read` (read-only, no `..` traversal), and the `arg` global table are available.  All public items are documented. Lua bridge: `src/lua_api/thread_api.rs`.
 
 *[src/thread/mod.rs](src/thread/mod.rs) — 4/4 documented (100%)*
 
@@ -5286,7 +5286,7 @@ pub enum PromiseState  // Execution state of a [`Promise`].  # Variants - `Pendi
 
 ### `thread::worker`
 
-> Background Lua thread with independent VM.  Each [`LuaThread`] spawns an OS thread running its own `mlua::Lua` instance. Communication with the main thread happens exclusively through [`Channel`] objects — no Lua state is shared across threads (design constraint **B-04**).  ## Worker sandbox Workers receive a minimal `lurek.*` API surface: `lurek.thread.getChannel(name)`, `lurek.fs.read(path)` (read-only, no `..` traversal), and the `arg` global table. Graphics, audio, window, input, physics, and any module touching `SharedState` are deliberately excluded.
+> Background Lua thread with independent VM.  Each [`LuaThread`] spawns an OS thread running its own `mlua::Lua` instance. Communication with the main thread happens exclusively through [`Channel`] objects — no Lua state is shared across threads (design constraint **B-04**).  ## Worker sandbox Workers receive a minimal `lurek.*` API surface: `lurek.thread.getChannel(name)`, `lurek.filesystem.read(path)` (read-only, no `..` traversal), and the `arg` global table. Graphics, audio, window, input, physics, and any module touching `SharedState` are deliberately excluded.
 
 *[src/thread/worker.rs](src/thread/worker.rs) — 2/2 documented (100%)*
 

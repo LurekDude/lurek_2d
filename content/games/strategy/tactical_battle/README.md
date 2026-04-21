@@ -19,9 +19,9 @@ Command a squad of Soldiers, Archers, Knights, and Mages across a grid map. Fore
 
 ## APIs Used
 - `lurek.render` — grid, terrain overlay, move/attack highlights, unit icons
-- `lurek.particles` — attack sparks, death burst, movement dust
+- `lurek.particle` — attack sparks, death burst, movement dust
 - `lurek.input` — action-bound click and turn-end
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced

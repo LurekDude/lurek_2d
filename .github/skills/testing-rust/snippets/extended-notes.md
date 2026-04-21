@@ -94,12 +94,12 @@ The framework is provided by `tests/lua/init.lua` and loaded automatically. Do n
 
 | Available in Lua tests | Not available |
 |---|---|
-| `lurek.math.*` | `lurek.gfx.draw*` (no GPU) |
+| `lurek.math.*` | `lurek.render.draw*` (no GPU) |
 | `lurek.physics.*` | `lurek.audio.newSource` (no audio device) |
-| `lurek.time.*` | Any API that calls `winit` window methods |
+| `lurek.timer.*` | Any API that calls `winit` window methods |
 | `lurek.input.*` (state, no events) | `lurek.window.setSize` |
 | `lurek.ecs.*` | Rendering commands |
-| `lurek.data.*`, `lurek.savegame.*` | — |
+| `lurek.data.*`, `lurek.save.*` | — |
 | `lurek.tilemap.*`, `lurek.ai.*` | — |
 | Built-in Lua: `math.*`, `string.*`, `table.*` | — |
 

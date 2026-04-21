@@ -235,7 +235,7 @@ function lurek.init()
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle: enemy death burst
-    death_burst = lurek.particles.newSystem({
+    death_burst = lurek.particle.newSystem({
         maxParticles = 120,
         emissionRate = 0,
         lifetimeMin  = 0.15,
@@ -250,7 +250,7 @@ function lurek.init()
     })
 
     -- Particle: XP pickup sparkle
-    xp_sparkle = lurek.particles.newSystem({
+    xp_sparkle = lurek.particle.newSystem({
         maxParticles = 60,
         emissionRate = 0,
         lifetimeMin  = 0.2,
@@ -265,7 +265,7 @@ function lurek.init()
     })
 
     -- Particle: level up flash
-    levelup_flash = lurek.particles.newSystem({
+    levelup_flash = lurek.particle.newSystem({
         maxParticles = 100,
         emissionRate = 0,
         lifetimeMin  = 0.3,
@@ -286,7 +286,7 @@ end
 -- ── Process ───────────────────────────────────────────────────────────────
 function lurek.process(dt)
     if lurek.input.isPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -588,7 +588,7 @@ end
 
 -- ── Render UI (screen space — NOT affected by camera) ─────────────────────
 function lurek.render_ui()
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
 
     -- ── TITLE ─────────────────────────────────────────────────────────
     if current_state == STATE.TITLE then

@@ -6,15 +6,15 @@ local OUT = "tests/lua/evidence/output/image/"
 -- @description Covers suite: Evidence: ImageData drawing methods.
 describe("Evidence: ImageData drawing methods", function()
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:drawRect
     -- @covers ImageData:getPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Renders a grid of colored rectangles and saves the result to prove rect drawing affects stored pixels.
     it("drawRect - grid of colored rectangles", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:drawRect(0, 0, W, H, 20, 20, 30, 255)
 
         local colors = {
@@ -35,20 +35,20 @@ describe("Evidence: ImageData drawing methods", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "drawing_rects.png")
+        lurek.image.savePNG(img, OUT .. "drawing_rects.png")
         -- Verify a drawn pixel
         local r, g, b, a = img:getPixel(3, 3)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:drawLine
     -- @covers ImageData:getPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Draws a radial star of lines from the image center and exports the result for manual inspection.
     it("drawLine - star pattern from center", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:drawRect(0, 0, W, H, 10, 10, 20, 255)
 
         local cx, cy = 128, 128
@@ -61,20 +61,20 @@ describe("Evidence: ImageData drawing methods", function()
             img:drawLine(cx, cy, ex, ey, hue, 255 - hue, 128, 255)
         end
 
-        lurek.img.savePNG(img, OUT .. "drawing_lines.png")
+        lurek.image.savePNG(img, OUT .. "drawing_lines.png")
         -- Center pixel should have been drawn
         local r, g, b, a = img:getPixel(128, 128)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:drawCircle
     -- @covers ImageData:getPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Renders concentric circles of different colors to cover circle rasterization and center-pixel updates.
     it("drawCircle - concentric circles", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:drawRect(0, 0, W, H, 10, 10, 20, 255)
 
         local cx, cy = 128, 128
@@ -88,22 +88,22 @@ describe("Evidence: ImageData drawing methods", function()
             img:drawCircle(cx, cy, radius, c[1], c[2], c[3], 255)
         end
 
-        lurek.img.savePNG(img, OUT .. "drawing_circles.png")
+        lurek.image.savePNG(img, OUT .. "drawing_circles.png")
         -- Center pixel should be the innermost circle color
         local r, g, b, a = img:getPixel(128, 128)
     end)
 
-    -- @covers lurek.img.newImageData
+    -- @covers lurek.image.newImageData
     -- @covers ImageData:drawRect
     -- @covers ImageData:drawCircle
     -- @covers ImageData:drawLine
     -- @covers ImageData:setPixel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Combines rectangles, circles, lines, and direct pixels into one scene to prove the drawing helpers compose correctly.
     it("combined scene with all drawing methods", function()
         local W, H = 512, 512
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
 
         -- Sky gradient background
         for y = 0, H - 1 do
@@ -155,7 +155,7 @@ describe("Evidence: ImageData drawing methods", function()
         img:drawLine(50, 380, 200, 380, 160, 140, 100, 255)
         img:drawLine(50, 375, 200, 375, 160, 140, 100, 255)
 
-        lurek.img.savePNG(img, OUT .. "drawing_combined.png")
+        lurek.image.savePNG(img, OUT .. "drawing_combined.png")
     end)
 
 end)

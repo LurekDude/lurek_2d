@@ -36,14 +36,14 @@ describe("Evidence: lurek.tilemap API + PNG visualization", function()
     -- @covers lurek.tilemap.newTileMap
     -- @covers TileMap:addLayer
     -- @covers TileMap:fill
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Builds a handcrafted multi-GID tile pattern and saves the resulting colorized grid as tilemap evidence.
     it("PNG: tilemap grid with 6 different tile GIDs", function()
         local TILE = 8  -- pixel size per tile in output
         local MAP_W, MAP_H = 16, 12
         local W, H = MAP_W * TILE, MAP_H * TILE
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(0, 0, 0, 255)
 
         local tm = lurek.tilemap.newTileMap(16, 16)
@@ -83,20 +83,20 @@ describe("Evidence: lurek.tilemap API + PNG visualization", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "tilemap_grid.png")
+        lurek.image.savePNG(img, OUT .. "tilemap_grid.png")
     end)
 
     -- @covers lurek.tilemap.newTileMap
     -- @covers TileMap:addLayer
     -- @covers TileMap:getLayerName
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Paints a checkerboard layer and saves the resulting image as a second tilemap reference output.
     it("PNG: checkerboard tilemap pattern", function()
         local TILE = 8
         local MAP_W, MAP_H = 16, 16
         local W, H = MAP_W * TILE, MAP_H * TILE
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
 
         local tm = lurek.tilemap.newTileMap(16, 16)
         tm:addLayer("checker", MAP_W, MAP_H)
@@ -112,7 +112,7 @@ describe("Evidence: lurek.tilemap API + PNG visualization", function()
 
         -- Verify API: layer name and count work
 
-        lurek.img.savePNG(img, OUT .. "tilemap_checkerboard.png")
+        lurek.image.savePNG(img, OUT .. "tilemap_checkerboard.png")
     end)
 
 end)

@@ -240,19 +240,19 @@ lurek.init(function()
     lurek.render.setBackgroundColor(0.07, 0.07, 0.05, 1.0)
     math.randomseed(os.time())
 
-    attack_sparks = lurek.particles.newSystem({
+    attack_sparks = lurek.particle.newSystem({
         maxParticles = 40,
         emitRate = 0, lifetime = {0.2,0.5}, speed = {40,120},
         startColor = {1,0.6,0.1,1}, endColor = {0.6,0.1,0,0},
         startSize = 4, endSize = 1, spread = math.pi*2
     })
-    death_sparks = lurek.particles.newSystem({
+    death_sparks = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate = 0, lifetime = {0.3,0.7}, speed = {60,200},
         startColor = {0.9,0.3,0.1,1}, endColor = {0.3,0,0,0},
         startSize = 6, endSize = 1, spread = math.pi*2
     })
-    move_dust = lurek.particles.newSystem({
+    move_dust = lurek.particle.newSystem({
         maxParticles = 16,
         emitRate = 0, lifetime = {0.2,0.4}, speed = {8,25},
         startColor = {0.6,0.5,0.3,0.5}, endColor = {0.4,0.3,0.2,0},
@@ -281,7 +281,7 @@ lurek.process(function(dt)
         if log[i].timer <= 0 then table.remove(log, i) end
     end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
     if state == "win" or state == "lose" then return end
 
     if state == "enemy_turn" then enemy_ai(dt) return end

@@ -1,5 +1,5 @@
 lua.draw() callback:
-  → Lua calls lurek.gfx.drawImage(img, x, y)
+  → Lua calls lurek.render.drawImage(img, x, y)
   → lua_api pushes RenderCommand::DrawImage { ... } into SharedState::render_commands
 
 After lurek.draw() returns:

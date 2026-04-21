@@ -275,22 +275,22 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle systems
-    ps_impact = lurek.particles.newSystem({
+    ps_impact = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0, lifetimeMin = 0.1, lifetimeMax = 0.25,
         speedMin = 80, speedMax = 160, direction = 0, spread = 6.28,
         sizes = { 2, 1 }, colors = { 1, 0.9, 0.3, 1, 1, 0.4, 0.1, 0 },
     })
-    ps_explode = lurek.particles.newSystem({
+    ps_explode = lurek.particle.newSystem({
         maxParticles = 120, emissionRate = 0, lifetimeMin = 0.2, lifetimeMax = 0.5,
         speedMin = 60, speedMax = 200, direction = 0, spread = 6.28,
         gravityY = 120, sizes = { 4, 2, 0 }, colors = { 1, 0.6, 0.1, 1, 0.8, 0.2, 0, 0 },
     })
-    ps_beam = lurek.particles.newSystem({
+    ps_beam = lurek.particle.newSystem({
         maxParticles = 80, emissionRate = 0, lifetimeMin = 0.05, lifetimeMax = 0.15,
         speedMin = 30, speedMax = 80, direction = 0, spread = 6.28,
         sizes = { 3, 1 }, colors = { 0.4, 0.85, 1, 1, 0.2, 0.5, 1, 0 },
     })
-    ps_pickup = lurek.particles.newSystem({
+    ps_pickup = lurek.particle.newSystem({
         maxParticles = 40, emissionRate = 0, lifetimeMin = 0.3, lifetimeMax = 0.6,
         speedMin = 40, speedMax = 100, direction = -1.57, spread = 1.0,
         sizes = { 3, 1 }, colors = { 1, 1, 0.5, 1, 0.5, 1, 0.3, 0 },
@@ -301,7 +301,7 @@ end
 -- Update
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Particle updates
     ps_impact:update(dt)
@@ -619,7 +619,7 @@ function lurek.render()
         lurek.render.print("TURRICAN", SCREEN_W / 2 - 100, SCREEN_H / 3, 4)
         lurek.render.setColor(0.7, 0.7, 0.8, 1)
         lurek.render.print("A Lurek2D Tribute", SCREEN_W / 2 - 80, SCREEN_H / 3 + 60, 1.5)
-        lurek.render.setColor(0.9, 0.9, 0.5, math.abs(math.sin(lurek.time.getTime() * 2.5)))
+        lurek.render.setColor(0.9, 0.9, 0.5, math.abs(math.sin(lurek.timer.getTime() * 2.5)))
         lurek.render.print("PRESS F OR SPACE TO START", SCREEN_W / 2 - 120, SCREEN_H / 2 + 40, 1.5)
         lurek.render.setColor(0.5, 0.5, 0.6, 1)
         lurek.render.print("Inspired by Manfred Trenz (1990)", SCREEN_W / 2 - 120, SCREEN_H - 80, 1)
@@ -815,5 +815,5 @@ function lurek.render_ui()
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
-    lurek.render.print("FPS: " .. lurek.time.getFPS(), SCREEN_W - 90, SCREEN_H - 20, 1)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), SCREEN_W - 90, SCREEN_H - 20, 1)
 end

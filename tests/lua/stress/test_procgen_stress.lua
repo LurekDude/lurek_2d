@@ -168,20 +168,20 @@ end)
 describe("pathfinding stress: hexGrid large map", function()
 
     it("hexGrid 100×100 findPath completes", function()
-        local g = lurek.pathfinding.newHexGrid(100, 100)
+        local g = lurek.pathfind.newHexGrid(100, 100)
         local path = g:findPath(1, 1, 100, 100)
         expect_true(path == nil or #path > 0, "should find path or return nil")
     end)
 
     it("hexGrid 50×50 fieldOfView radius=20 completes", function()
-        local g = lurek.pathfinding.newHexGrid(50, 50)
+        local g = lurek.pathfind.newHexGrid(50, 50)
         local fov = g:fieldOfView(25, 25, 20)
         expect_type("table", fov)
         expect_true(#fov > 0, "FOV should cover some cells")
     end)
 
     it("rangeMap 50×50 with budget 15 completes", function()
-        local r = lurek.pathfinding.rangeMap({
+        local r = lurek.pathfind.rangeMap({
             width = 50, height = 50,
             origin_x = 25, origin_y = 25,
             budget = 15.0

@@ -14,7 +14,7 @@
 Record, replay, and script deterministic input sequences for automated game
 testing. Provides `Script` (TOML-defined step list), `Step` (single input event),
 and `Simulator` (playback engine with play/pause/stop/record/macro management).
-Lua namespace: `lurek.simulator`.
+Lua namespace: `lurek.automation`.
 
 ## Existing Strengths
 

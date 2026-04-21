@@ -157,7 +157,7 @@ lurek.init(function()
     lurek.render.setBackgroundColor(0.05, 0.08, 0.12, 1.0)
     math.randomseed(os.time())
 
-    ball_trail = lurek.particles.newSystem({
+    ball_trail = lurek.particle.newSystem({
         maxParticles = 40,
         emitRate     = 0,
         lifetime     = { 0.1, 0.3 },
@@ -168,7 +168,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    win_burst = lurek.particles.newSystem({
+    win_burst = lurek.particle.newSystem({
         maxParticles = 80,
         emitRate     = 0,
         lifetime     = { 0.4, 1.2 },
@@ -179,7 +179,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    bounce_sparks = lurek.particles.newSystem({
+    bounce_sparks = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.1, 0.3 },
@@ -203,7 +203,7 @@ lurek.process(function(dt)
     if win_burst     then win_burst:update(dt)     end
     if bounce_sparks then bounce_sparks:update(dt) end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
 
     local mx, my = lurek.input.getMousePosition()
     preview.x = mx

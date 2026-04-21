@@ -11,7 +11,7 @@
 
 ## Summary
 
-The `compute` module provides Lurek2D's dense N-dimensional numerical array library, exposed to Lua scripts as `lurek.compute.*` (the bridge in `src/lua_api/compute_api.rs` registers the table under that name; an earlier `lurek.gpu` alias is no longer current). All computation runs on the CPU — the name reflects its intended use for matrix operations, signal processing, and numerical workloads that would otherwise require GPU compute shaders.
+The `compute` module provides Lurek2D's dense N-dimensional numerical array library, exposed to Lua scripts as `lurek.compute.*` (the bridge in `src/lua_api/compute_api.rs` registers the table under that name; an earlier `lurek.compute` alias is no longer current). All computation runs on the CPU — the name reflects its intended use for matrix operations, signal processing, and numerical workloads that would otherwise require GPU compute shaders.
 
 The core type is `NdArray`, a row-major array supporting 1D, 2D, and 3D shapes with three element types: `f32`, `f64`, and `i32` (discriminated by the `DataType` enum). Construction: `new(shape, dtype)`, `zeros`, `ones`, `from_flat_data`. Access: `get(indices)`, `set(indices, value)`, `slice(ranges)`. Shape inspection: `shape()`, `ndim()`, `numel()`, `reshape(new_shape)`.
 

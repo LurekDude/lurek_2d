@@ -278,7 +278,7 @@ lurek.input.on("zoom_out", "pressed", function()
 end)
 
 lurek.input.on("quit", "pressed", function()
-    lurek.signal.quit()
+    lurek.event.quit()
 end)
 
 -- ── Callbacks ──────────────────────────────────────────────────────────

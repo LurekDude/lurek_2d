@@ -25,8 +25,8 @@ describe("lurek.ai module exists", function()
     -- @covers lurek.ai.newSucceeder
     -- @covers lurek.ai.newUtilityAI
     -- @covers lurek.ai.newWorld
-    -- @covers lurek.pathfinding.newPathFlowField
-    -- @covers lurek.pathfinding.newPathGrid
+    -- @covers lurek.pathfind.newPathFlowField
+    -- @covers lurek.pathfind.newPathGrid
     -- @description Checks that the AI namespace itself is registered as a Lua table.
     it("lurek.ai is a table", function()
         expect_type("table", lurek.ai)
@@ -57,14 +57,14 @@ describe("lurek.ai module exists", function()
         expect_type("function", lurek.ai.newSteeringManager)
     end)
 
-    -- @description Verifies path-grid creation lives under lurek.pathfinding rather than the AI namespace.
+    -- @description Verifies path-grid creation lives under lurek.pathfind rather than the AI namespace.
     it("has no newPathGrid factory (moved to pathfinding)", function()
-        expect_type("function", lurek.pathfinding.newPathGrid)
+        expect_type("function", lurek.pathfind.newPathGrid)
     end)
 
-    -- @description Verifies flow-field creation lives under lurek.pathfinding rather than the AI namespace.
+    -- @description Verifies flow-field creation lives under lurek.pathfind rather than the AI namespace.
     it("has no newFlowField factory (moved to pathfinding)", function()
-        expect_type("function", lurek.pathfinding.newPathFlowField)
+        expect_type("function", lurek.pathfind.newPathFlowField)
     end)
 
     -- @description Confirms the Q-learning factory is exported as a function.
@@ -876,13 +876,13 @@ end)
 describe("lurek.ai PathGrid", function()
     -- @description Confirms path-grid userdata reports the expected runtime type string.
     it("type returns PathGrid", function()
-        local g = lurek.pathfinding.newPathGrid(10, 10, 32)
+        local g = lurek.pathfind.newPathGrid(10, 10, 32)
         expect_equal("PathGrid", g:type())
     end)
 
     -- @description Verifies width, height, and cell-size accessors reflect the constructor arguments.
     it("getWidth / getHeight / getCellSize", function()
-        local g = lurek.pathfinding.newPathGrid(8, 6, 16)
+        local g = lurek.pathfind.newPathGrid(8, 6, 16)
         expect_equal(8, g:getWidth())
         expect_equal(6, g:getHeight())
         expect_near(16, g:getCellSize(), 0.01)
@@ -890,14 +890,14 @@ describe("lurek.ai PathGrid", function()
 
     -- @description Verifies a newly created path grid starts with every cell walkable.
     it("all cells walkable by default", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
         expect_true(g:isWalkable(1, 1))
         expect_true(g:isWalkable(5, 5))
     end)
 
     -- @description Toggles walkability for a single cell and verifies both the blocked and restored states round-trip correctly.
     it("setWalkable / isWalkable (1-based)", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
         g:setWalkable(3, 3, false)
         expect_false(g:isWalkable(3, 3))
         g:setWalkable(3, 3, true)
@@ -906,14 +906,14 @@ describe("lurek.ai PathGrid", function()
 
     -- @description Writes a custom traversal cost into one cell and verifies it round-trips through the getter.
     it("setCost / getCost (1-based)", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
         g:setCost(2, 2, 3.5)
         expect_near(3.5, g:getCost(2, 2), 0.01)
     end)
 
     -- @description Requests a path across an open grid and verifies the result is a non-empty waypoint table.
     it("findPath returns a table for open grid", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
         local path = g:findPath(1, 1, 5, 5)
         expect_not_nil(path, "path should exist")
         expect_type("table", path)
@@ -922,7 +922,7 @@ describe("lurek.ai PathGrid", function()
 
     -- @description Verifies each returned waypoint exposes x and y fields for coordinate access.
     it("findPath entries have x and y fields", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
         local path = g:findPath(1, 1, 3, 3)
         expect_not_nil(path)
         local first = path[1]
@@ -932,7 +932,7 @@ describe("lurek.ai PathGrid", function()
 
     -- @description Blocks the only middle cell in a corridor and verifies pathfinding returns nil when no route exists.
     it("findPath returns nil for blocked path", function()
-        local g = lurek.pathfinding.newPathGrid(3, 1, 10)
+        local g = lurek.pathfind.newPathGrid(3, 1, 10)
         g:setWalkable(2, 1, false)
         local path = g:findPath(1, 1, 3, 1)
         expect_nil(path, "blocked path should be nil")
@@ -940,7 +940,7 @@ describe("lurek.ai PathGrid", function()
 
     -- @description Verifies smoothed pathfinding returns a table on an open grid.
     it("findPathSmoothed returns a table", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
         local path = g:findPathSmoothed(1, 1, 5, 5)
         expect_not_nil(path)
         expect_type("table", path)
@@ -948,7 +948,7 @@ describe("lurek.ai PathGrid", function()
 
     -- @description Verifies asking for a path from a cell to itself still returns a valid path object.
     it("findPath same start and goal", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
         local path = g:findPath(3, 3, 3, 3)
         expect_not_nil(path)
     end)
@@ -961,30 +961,30 @@ end)
 describe("lurek.ai FlowField", function()
     -- @description Confirms flow-field userdata reports the expected runtime type string.
     it("type returns FlowField", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
-        local ff = lurek.pathfinding.newPathFlowField(g)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
+        local ff = lurek.pathfind.newPathFlowField(g)
         expect_equal("FlowField", ff:type())
     end)
 
     -- @description Verifies flow-field dimensions mirror those of the underlying grid.
     it("getWidth / getHeight", function()
-        local g = lurek.pathfinding.newPathGrid(8, 6, 10)
-        local ff = lurek.pathfinding.newPathFlowField(g)
+        local g = lurek.pathfind.newPathGrid(8, 6, 10)
+        local ff = lurek.pathfind.newPathFlowField(g)
         expect_equal(8, ff:getWidth())
         expect_equal(6, ff:getHeight())
     end)
 
     -- @description Verifies new flow fields start without a goal set.
     it("hasGoal returns false initially", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
-        local ff = lurek.pathfinding.newPathFlowField(g)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
+        local ff = lurek.pathfind.newPathFlowField(g)
         expect_false(ff:hasGoal())
     end)
 
     -- @description Sets a goal and verifies both the hasGoal flag and returned goal coordinates update correctly.
     it("setGoal / hasGoal / getGoal (1-based)", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
-        local ff = lurek.pathfinding.newPathFlowField(g)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
+        local ff = lurek.pathfind.newPathFlowField(g)
         ff:setGoal(3, 4)
         expect_true(ff:hasGoal())
         local gx, gy = ff:getGoal()
@@ -994,8 +994,8 @@ describe("lurek.ai FlowField", function()
 
     -- @description Queries a directional vector after setting a goal and verifies both components are numeric.
     it("getDirection returns two numbers", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
-        local ff = lurek.pathfinding.newPathFlowField(g)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
+        local ff = lurek.pathfind.newPathFlowField(g)
         ff:setGoal(3, 3)
         local dx, dy = ff:getDirection(1, 1)
         expect_type("number", dx)
@@ -1004,8 +1004,8 @@ describe("lurek.ai FlowField", function()
 
     -- @description Queries flow-field distance after setting a goal and verifies the returned distance is numeric.
     it("getDistance returns a number", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
-        local ff = lurek.pathfinding.newPathFlowField(g)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
+        local ff = lurek.pathfind.newPathFlowField(g)
         ff:setGoal(3, 3)
         local d = ff:getDistance(1, 1)
         expect_type("number", d)
@@ -1013,8 +1013,8 @@ describe("lurek.ai FlowField", function()
 
     -- @description Verifies goal queries return nil values before any goal has been configured.
     it("getGoal returns nil before setGoal", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
-        local ff = lurek.pathfinding.newPathFlowField(g)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
+        local ff = lurek.pathfind.newPathFlowField(g)
         local gx, gy = ff:getGoal()
         expect_nil(gx)
         expect_nil(gy)
@@ -1022,8 +1022,8 @@ describe("lurek.ai FlowField", function()
 
     -- @description Verifies the computed distance at the goal cell itself is approximately zero.
     it("distance at goal is zero", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
-        local ff = lurek.pathfinding.newPathFlowField(g)
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
+        local ff = lurek.pathfind.newPathFlowField(g)
         ff:setGoal(3, 3)
         local d = ff:getDistance(3, 3)
         expect_near(0, d, 0.01)
@@ -1650,13 +1650,13 @@ describe("lurek.ai type system", function()
 
     -- @description Confirms PathGrid userdata returns the correct type string.
     it("PathGrid:type() returns PathGrid", function()
-        expect_equal("PathGrid", lurek.pathfinding.newPathGrid(5, 5, 10):type())
+        expect_equal("PathGrid", lurek.pathfind.newPathGrid(5, 5, 10):type())
     end)
 
     -- @description Confirms FlowField userdata returns the correct type string.
     it("FlowField:type() returns FlowField", function()
-        local g = lurek.pathfinding.newPathGrid(5, 5, 10)
-        expect_equal("FlowField", lurek.pathfinding.newPathFlowField(g):type())
+        local g = lurek.pathfind.newPathGrid(5, 5, 10)
+        expect_equal("FlowField", lurek.pathfind.newPathFlowField(g):type())
     end)
 
     -- @description Confirms QLearner userdata returns the correct type string.

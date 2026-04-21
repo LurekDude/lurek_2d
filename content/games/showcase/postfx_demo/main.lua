@@ -363,7 +363,7 @@ function lurek.init()
     end
 
     -- Toggle flash particles (burst on effect toggle)
-    toggle_particles = lurek.particles.newSystem({
+    toggle_particles = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0,
         lifetimeMin = 0.2, lifetimeMax = 0.5,
         speedMin = 60, speedMax = 160,
@@ -374,7 +374,7 @@ function lurek.init()
     })
 
     -- Intensity change sparkle particles
-    sparkle_particles = lurek.particles.newSystem({
+    sparkle_particles = lurek.particle.newSystem({
         maxParticles = 40, emissionRate = 0,
         lifetimeMin = 0.15, lifetimeMax = 0.4,
         speedMin = 30, speedMax = 80,
@@ -396,7 +396,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
     -- Quit
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Update subsystems
     lurek.tween.update(dt)
@@ -473,7 +473,7 @@ end
 function lurek.render()
     camera:attach()
 
-    local time = lurek.time.getTime()
+    local time = lurek.timer.getTime()
 
     -- ── TITLE ─────────────────────────────────────────────────
     if current_state == STATE.TITLE then
@@ -514,7 +514,7 @@ end
 -- Render UI (screen space — HUD, effect list, controls)
 -- ---------------------------------------------------------------------------
 function lurek.render_ui()
-    local time = lurek.time.getTime()
+    local time = lurek.timer.getTime()
 
     -- ── TITLE SCREEN ──────────────────────────────────────────
     if current_state == STATE.TITLE then
@@ -543,7 +543,7 @@ function lurek.render_ui()
     lurek.render.setColor(0.0, 0.0, 0.0, 0.4)
     lurek.render.drawRect("fill", 8, 8, 90, 20)
     lurek.render.setColor(0.8, 0.8, 0.8, 0.8)
-    lurek.render.print(string.format("FPS: %d", lurek.time.getFPS()), 14, 10, 14)
+    lurek.render.print(string.format("FPS: %d", lurek.timer.getFPS()), 14, 10, 14)
 
     -- Effect list panel (right side)
     local panel_x = SCREEN_W - 210

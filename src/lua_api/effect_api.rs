@@ -1395,7 +1395,7 @@ impl LuaUserData for LuaOverlay {
 
 /// Lua-side wrapper around a [`crate::effect::ScreenTransition`].
 ///
-/// Obtained via `lurek.postfx.newTransition(kind, duration, color?)`.
+/// Obtained via `lurek.effect.newTransition(kind, duration, color?)`.
 pub struct LuaScreenTransition {
     inner: crate::effect::ScreenTransition,
 }

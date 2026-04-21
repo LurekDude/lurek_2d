@@ -51,7 +51,7 @@ describe("lurek.docs", function()
     -- @covers lurek.docs.scan
     -- @covers lurek.docs.ApiCatalog.getEntries
     -- @description Verifies the docs scan can retrieve entries for a specific module.
-    it("scan should find lurek.gfx functions", function()
+    it("scan should find lurek.render functions", function()
         local catalog = lurek.docs.scan()
         local entries = catalog:getEntries("graphics")
         expect_not_nil(entries, "getEntries('graphics') should return a table")
@@ -169,7 +169,7 @@ describe("lurek.docs", function()
         local catalog = lurek.docs.scan()
         local results = catalog:search("graphics")
         expect_not_nil(results, "search should return results")
-        -- At least lurek.gfx.* functions contain 'graphics' in qualified name
+        -- At least lurek.render.* functions contain 'graphics' in qualified name
         expect_true(#results > 0, "should find graphics entries")
     end)
 

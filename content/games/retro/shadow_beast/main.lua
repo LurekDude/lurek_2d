@@ -247,7 +247,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.init()
     lurek.window.setTitle("Shadow of the Beast — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.05, 0.02, 0.15)
+    lurek.render.setBackgroundColor(0.05, 0.02, 0.15)
     lurek.window.showFPS(true)
 
     lurek.input.bind("left", "a")
@@ -666,7 +666,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -736,7 +736,7 @@ function lurek.render_ui()
         lurek.render.setColor(0.5, 0.4, 0.6, 0.7)
         lurek.render.drawText("A/D  Move   |   SPACE  Jump   |   F  Attack", SCREEN_W / 2 - 180, 340, 14)
         -- Prompt
-        local pulse = 0.5 + 0.5 * math.abs(math.sin(lurek.time.getTime() * 2.5))
+        local pulse = 0.5 + 0.5 * math.abs(math.sin(lurek.timer.getTime() * 2.5))
         lurek.render.setColor(0.8, 0.6, 0.9, pulse)
         lurek.render.drawText("Press ENTER to begin", SCREEN_W / 2 - 90, 420, 18)
 
@@ -767,7 +767,7 @@ function lurek.render_ui()
 
         -- Boss warning
         if boss_active then
-            local flash = math.abs(math.sin(lurek.time.getTime() * 4))
+            local flash = math.abs(math.sin(lurek.timer.getTime() * 4))
             lurek.render.setColor(1.0, 0.2, 0.1, flash * 0.8)
             lurek.render.drawText("!! BOSS !!", SCREEN_W / 2 - 40, 50, 20)
         end
@@ -784,7 +784,7 @@ function lurek.render_ui()
         lurek.render.drawText("Score: " .. score, SCREEN_W / 2 - 50, 280, 20)
         lurek.render.drawText("Distance: " .. math.floor(distance), SCREEN_W / 2 - 70, 310, 16)
 
-        local pulse = 0.5 + 0.5 * math.abs(math.sin(lurek.time.getTime() * 2.5))
+        local pulse = 0.5 + 0.5 * math.abs(math.sin(lurek.timer.getTime() * 2.5))
         lurek.render.setColor(0.6, 0.5, 0.7, pulse)
         lurek.render.drawText("Press ENTER to try again", SCREEN_W / 2 - 110, 380, 18)
     end

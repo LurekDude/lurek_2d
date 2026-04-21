@@ -555,7 +555,7 @@ This is purely an encoding library � NOT a hex grid library. Hex grid function
 **PNG-focused expansion** � the user wants full PNG workflow:
 - **Load PNG** � already supported via `image` crate (keep)
 - **Save PNG** � add `ImageData:save(path)` using `image::save_buffer()` with PNG encoder
-- **Screenshot to PNG** � add `lurek.gfx.captureScreenshot(path)` that reads the framebuffer and saves to PNG
+- **Screenshot to PNG** � add `lurek.render.captureScreenshot(path)` that reads the framebuffer and saves to PNG
 - **Pixel-by-pixel access** � already implemented (`get_pixel`, `set_pixel`), ensure it works for loaded PNGs
 - **Raw byte access** � already implemented (`as_bytes`), document for advanced users
 
@@ -739,7 +739,7 @@ Total expansion: ~650-850 SLoC of additional noise/procgen algorithms.
 |---|---|---|
 | JSON | serde_json 1 | **KEEP** � read and write JSON files |
 | TOML | � | **ADD `toml` 0.8** � preferred config format (Tier 1) |
-| Lua tables | mlua native | **KEEP** � `lurek.fs.load()` for Lua data files |
+| Lua tables | mlua native | **KEEP** � `lurek.filesystem.load()` for Lua data files |
 | Binary dump | � | **ADD NATIVE** � simple binary serialization |
 
 **Serialization API surface**:
@@ -749,7 +749,7 @@ Total expansion: ~650-850 SLoC of additional noise/procgen algorithms.
 - `lurek.data.parseToml(string) � table` � TOML string to Lua table
 - `lurek.data.encodeBinary(table) � ByteData` � simple binary dump (native, ~200 SLoC)
 - `lurek.data.decodeBinary(ByteData) � table` � binary load
-- `lurek.fs.load(path)` � load and execute Lua file, return its result table
+- `lurek.filesystem.load(path)` � load and execute Lua file, return its result table
 
 **Binary dump format** (native implementation):
 A simple tagged binary format for game save data. Type-length-value encoding:
@@ -822,10 +822,10 @@ Simple clipboard (copy/paste text) via `arboard` is enough. No need for advanced
 - Disk I/O read/write bytes per process
 
 **Lua API surface**:
-- `lurek.platform.getCpuUsage() � number` � overall CPU utilization % (0-100)
-- `lurek.platform.getMemoryUsage() � number, number` � used MB, total MB
-- `lurek.platform.getProcessMemory() � number` � engine process memory in MB
-- `lurek.platform.getFrameTime() � number` � last frame duration in ms (already in timer)
+- `lurek.runtime.getCpuUsage() � number` � overall CPU utilization % (0-100)
+- `lurek.runtime.getMemoryUsage() � number, number` � used MB, total MB
+- `lurek.runtime.getProcessMemory() � number` � engine process memory in MB
+- `lurek.runtime.getFrameTime() � number` � last frame duration in ms (already in timer)
 
 **Why keep sysinfo**: Despite being ~200-400 KB, it's the only maintained crate for live CPU/memory utilization metrics on all three desktop platforms. The alternatives (`num_cpus`, `std::env`) provide only static info, not utilization.
 

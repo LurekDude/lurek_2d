@@ -111,14 +111,14 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     /// Poll for pending Lua-dependent requests from TCP clients.
     /// Must be called each frame from lurek.update(). Automatically records
-    /// the current frame delta from `lurek.time.getDelta()` into the performance
+    /// the current frame delta from `lurek.timer.getDelta()` into the performance
     /// buffer — no manual `recordFrame()` call is needed.
     let sh = shared.clone();
     /// @return table|nil
     db.set(
         "poll",
         lua.create_function(move |lua, ()| {
-            // Auto-record frame time from lurek.time.getDelta — no manual call needed.
+            // Auto-record frame time from lurek.timer.getDelta — no manual call needed.
             if let Ok(luna_tbl) = lua.globals().get::<_, LuaTable>("luna") {
                 if let Ok(time_tbl) = luna_tbl.get::<_, LuaTable>("time") {
                     if let Ok(get_delta) = time_tbl.get::<_, LuaFunction>("getDelta") {

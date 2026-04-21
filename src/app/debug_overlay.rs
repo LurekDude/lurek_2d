@@ -1,7 +1,7 @@
 //! Debug overlay for displaying FPS and draw call statistics.
 //!
 //! Renders green text on a semi-transparent background in the top-right corner
-//! of the screen. Can be toggled at runtime via F12 or `lurek.platform.setDebugOverlay()`.
+//! of the screen. Can be toggled at runtime via F12 or `lurek.runtime.setDebugOverlay()`.
 
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::resource_keys::FontKey;

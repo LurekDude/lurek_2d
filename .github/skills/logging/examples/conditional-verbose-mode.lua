@@ -4,7 +4,7 @@ function lurek.conf(t)
 end
 
 -- main.lua: enable verbose logging via a flag file
-local VERBOSE = lurek.fs.exists("debug.flag")
+local VERBOSE = lurek.filesystem.exists("debug.flag")
 
 local function dbg(msg)
     if VERBOSE then print("[DBG] " .. msg) end

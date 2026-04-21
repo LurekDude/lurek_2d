@@ -157,13 +157,13 @@ lurek.process(function(dt)
 
     if state == STATE_VICTORY then
         if lurek.input.isActionJustPressed("quit") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
 
     if lurek.input.isActionJustPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

@@ -15,13 +15,13 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.05, 0.05, 0.1)
+    lurek.render.clear(0.05, 0.05, 0.1)
     player:draw()
     bullets:draw()
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Score: " .. score, 10, 10)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Score: " .. score, 10, 10)
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
 end

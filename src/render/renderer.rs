@@ -15,7 +15,7 @@ use crate::runtime::resource_keys::{
 };
 use std::collections::HashMap;
 
-/// Stencil comparison mode for `lurek.graphic.setStencilTest`.
+/// Stencil comparison mode for `lurek.render.setStencilTest`.
 ///
 /// # Variants
 /// - `Equal` — Equal variant.
@@ -46,7 +46,7 @@ pub enum CompareMode {
     Never,
 }
 
-/// Stencil write action for `lurek.graphic.stencil` and `lurek.graphic.setStencilMode`.
+/// Stencil write action for `lurek.render.stencil` and `lurek.render.setStencilMode`.
 ///
 /// # Variants
 /// - `Keep` — Keep variant.
@@ -108,7 +108,7 @@ impl Default for StencilMode {
     }
 }
 
-/// Depth test comparison mode for `lurek.graphic.setDepthMode`.
+/// Depth test comparison mode for `lurek.render.setDepthMode`.
 ///
 /// # Variants
 /// - `Always` — Always variant.
@@ -1149,7 +1149,7 @@ pub struct ParticleInstance {
     pub quad_tex_dims: Option<(f32, f32)>,
 }
 
-/// Type discriminator for resources that can be passed to lurek.graphic.draw.
+/// Type discriminator for resources that can be passed to lurek.render.draw.
 ///
 /// Used to dispatch the polymorphic draw(drawable, ...) Lua API to the
 /// correct RenderCommand variant based on resource type.

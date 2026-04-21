@@ -1,7 +1,7 @@
 //! Dense N-dimensional numerical arrays with NumPy-style operations.
 //!
 //! Provides [`array::NdArray`] for 1D/2D/3D row-major arrays with `f32`, `f64`,
-//! and `i32` element types. Used by the `lurek.gpu` Lua module. Despite the GPU namespace,
+//! and `i32` element types. Used by the `lurek.compute` Lua module. Despite the GPU namespace,
 //! all computation is CPU-bound; the name reflects the intended use for heavy
 //! numerical workloads (signal processing, matrix math, convolution).
 //!
@@ -13,7 +13,7 @@
 //! - [`linalg`] — dot/matmul, Gaussian solver, LU decomposition, eigenvalue (power iteration)
 //! - [`fft`] — iterative Cooley-Tukey radix-2 FFT and inverse FFT
 //!
-//! Lua bridge: `src/lua_api/compute_api.rs` as `lurek.gpu.*`.
+//! Lua bridge: `src/lua_api/compute_api.rs` as `lurek.compute.*`.
 
 /// Statistical analytics, signal processing, and normalisation.
 pub mod analytics;

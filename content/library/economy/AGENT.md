@@ -7,7 +7,7 @@
 | **Lua Tests**         | `tests/lua/library/test_library_economy.lua`                                                                                                                                                                              |
 | **Depends on**        | `lurek.*` public API only                                                                                                                                                                                                 |
 | **Status**            | full                                                                                                                                                                                                                      |
-| **Optional bindings** | `lurek.math.clamp` (delegated by `Resource:_clamp` when available), `lurek.codec.toJson/fromJson` (recommended for save serialisation), `lurek.patterns.newEventBus` (transaction event bus from `manager:getEventBus()`) |
+| **Optional bindings** | `lurek.math.clamp` (delegated by `Resource:_clamp` when available), `lurek.serial.toJson/fromJson` (recommended for save serialisation), `lurek.patterns.newEventBus` (transaction event bus from `manager:getEventBus()`) |
 
 ## Summary
 

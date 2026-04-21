@@ -13,12 +13,12 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.12, 0.12, 0.18)
+    lurek.render.clear(0.12, 0.12, 0.18)
     grid:draw()
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Moves: " .. moves, 10, 10)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Moves: " .. moves, 10, 10)
     if won then
-        lurek.gfx.print("You Win!", 250, 280)
+        lurek.render.print("You Win!", 250, 280)
     end
 end
 
@@ -34,7 +34,7 @@ function lurek.mousepressed(x, y, btn)
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     if key == "r" then
         grid = Grid.new(8, 8, 60)
         moves = 0

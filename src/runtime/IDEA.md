@@ -15,7 +15,7 @@
 - **Last reviewed**: 2026-04-18 (UTC)
 - **Reviewer agent**: `developer` · Session: `src-module-review-20260418`
 - **Plugin tier candidacy**: `CORE-KEEP`
-- **LOC (rust only)**: ~3170 · **Public Lua surface**: `lurek.platform.setLogLevel` — 1 fn / 0 userdata
+- **LOC (rust only)**: ~3170 · **Public Lua surface**: `lurek.runtime.setLogLevel` — 1 fn / 0 userdata
 - **Inbound non-`lua_api` callers**: every module in the engine (dependency root)
 - **Heavy dependencies**: `mlua` (config loading), `slotmap`, `thiserror`, `toml`, `log`
 
@@ -52,7 +52,7 @@ The `runtime` module is the dependency tree's root — every other Rust module i
    - Rationale: Prevents GPU OOM on integrated GPUs (Player on Intel UHD / AMD APU).
    - Effort: M · Risk: low.
 
-3. ~~**[P3][FEAT]** `Serialisable error snapshots` — Serialize `ErrorInfo` (code + category + message + hint) to JSON for crash reporting or test assertion.~~ ✅ **DONE** — Added `ErrorSnapshot` struct + `EngineError::snapshot()` + `lurek.platform.errorSnapshot(msg)` Lua binding.
+3. ~~**[P3][FEAT]** `Serialisable error snapshots` — Serialize `ErrorInfo` (code + category + message + hint) to JSON for crash reporting or test assertion.~~ ✅ **DONE** — Added `ErrorSnapshot` struct + `EngineError::snapshot()` + `lurek.runtime.errorSnapshot(msg)` Lua binding.
    - ~~Rationale: Enables automated game testing (GameTest, EngTest) to assert on specific error codes.~~
    - ~~Effort: S · Risk: low.~~
    - ~~Competitor inspiration: `[Solar2D: runtime errors include errorType and errorMessage fields in JSON event objects]`.~~
@@ -73,7 +73,7 @@ The `runtime` module is the dependency tree's root — every other Rust module i
 - **[P1][TEST-RUST]** Add Rust unit tests for `EngineError` code/category/hint mapping — DONE in this session.
 - **[P1][TEST-RUST]** Add Rust unit tests for `log_messages` ID format and `get_log_level` — DONE in this session.
 - **[P2][TEST-RUST]** Add Rust unit tests for `Config::load_from_conf_toml` TOML merge logic (non-Lua-reachable internal).
-- ~~**[P3][TEST-LUA]** Add Lua BDD tests for `lurek.platform.setLogLevel` / `getLogLevel`.~~ ✅ **DONE** — Tests present in `tests/lua/unit/test_system.lua`.
+- ~~**[P3][TEST-LUA]** Add Lua BDD tests for `lurek.runtime.setLogLevel` / `getLogLevel`.~~ ✅ **DONE** — Tests present in `tests/lua/unit/test_runtime_platform.lua`.
 
 ## 8. TODO(dedup): Cross-Module Overlap
 

@@ -284,7 +284,7 @@ lurek.process(function(dt)
             state = STATE_PLAYING
             return
         end
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 

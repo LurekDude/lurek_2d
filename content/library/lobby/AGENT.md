@@ -30,7 +30,7 @@ Works in two modes:
 Lobby messages are encoded with `lurek.network.pack` / `lurek.network.unpack`
 (MessagePack — the canonical ENet payload format). For human-readable
 persistence (e.g. saving lobby snapshots to disk) use
-`lurek.codec.toJson` / `lurek.codec.fromJson` outside of the wire path.
+`lurek.serial.toJson` / `lurek.serial.fromJson` outside of the wire path.
 
 ## Events
 
@@ -100,7 +100,7 @@ Room (internal):
 - `joinRoom` accepts an optional `password`; rooms without a password ignore
   the parameter.
 - Wire-format layer (`lurek.network.pack`) is binary MessagePack — do not mix
-  with `lurek.codec.toJson` payloads on the same channel.
+  with `lurek.serial.toJson` payloads on the same channel.
 
 ## Lua API Reference
 

@@ -20,14 +20,14 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
     -- @covers Minimap:setTerrainColor
     -- @covers Minimap:setTerrain
     -- @covers Minimap:getTerrain
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Paints several terrain classes into a minimap and writes the resulting tile-colored overview as PNG evidence.
     it("PNG: terrain grid rendered as colored cells", function()
         local GRID = 16
         local CELL = 8
         local W, H = GRID * CELL, GRID * CELL
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(0, 0, 0, 255)
 
         local mm = lurek.minimap.newMinimap(GRID, GRID, W, H)
@@ -69,7 +69,7 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "minimap_terrain.png")
+        lurek.image.savePNG(img, OUT .. "minimap_terrain.png")
     end)
 
     -- @covers lurek.minimap.newMinimap
@@ -77,14 +77,14 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
     -- @covers Minimap:setTerrain
     -- @covers Minimap:setFogLevel
     -- @covers Minimap:getFogLevel
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Writes a fog-of-war gradient over a base terrain image to show how minimap fog levels affect visible brightness.
     it("PNG: fog-of-war overlay on terrain", function()
         local GRID = 16
         local CELL = 8
         local W, H = GRID * CELL, GRID * CELL
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
 
         local mm = lurek.minimap.newMinimap(GRID, GRID, W, H)
         mm:setFogEnabled(true)
@@ -114,7 +114,7 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "minimap_fog.png")
+        lurek.image.savePNG(img, OUT .. "minimap_fog.png")
     end)
 
 end)

@@ -137,13 +137,13 @@ lurek.init(function()
     lurek.input.bind("start",  {"return"})
     lurek.input.bind("quit",   {"escape"})
 
-    brick_ps = lurek.particles.newSystem(200)
+    brick_ps = lurek.particle.newSystem(200)
     brick_ps:setLifetime(0.3, 0.6)
     brick_ps:setSpeed(60, 150)
     brick_ps:setSpread(math.pi*2)
     brick_ps:setSizes(4, 1)
 
-    hit_ps = lurek.particles.newSystem(50)
+    hit_ps = lurek.particle.newSystem(50)
     hit_ps:setLifetime(0.1, 0.25)
     hit_ps:setSpeed(40, 100)
     hit_ps:setSpread(math.pi)
@@ -156,7 +156,7 @@ end)
 -- ── Process ───────────────────────────────────────────────────────────────
 lurek.process(function(dt)
     blink = blink + dt
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit(); return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit(); return end
 
     brick_ps:update(dt)
     hit_ps:update(dt)
@@ -316,7 +316,7 @@ end)
 
 -- ── Render UI ─────────────────────────────────────────────────────────────
 lurek.render_ui(function()
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     local a = math.sin(blink*3)*0.5+0.5
 
     if state == STATE.TITLE then

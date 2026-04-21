@@ -14,7 +14,7 @@ use std::sync::atomic::{AtomicU8, Ordering};
 /// 0 = Off, 1 = Error, 2 = Warn, 3 = Info, 4 = Debug, 5 = Trace.
 static LOG_LEVEL_OVERRIDE: AtomicU8 = AtomicU8::new(0); // 0 = not overridden
 
-/// Sets the global log level at runtime (called from `lurek.platform.setLogLevel`).
+/// Sets the global log level at runtime (called from `lurek.runtime.setLogLevel`).
 ///
 /// # Parameters
 /// - `level` — `&str`.

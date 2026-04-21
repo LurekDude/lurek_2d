@@ -367,7 +367,7 @@ lurek.process(function(dt)
     -- Victory screen
     if state == STATE_VICTORY then
         if lurek.input.isActionJustPressed("quit") then
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end
@@ -377,7 +377,7 @@ lurek.process(function(dt)
         if shopOpen then
             shopOpen = false
         else
-            lurek.signal.quit()
+            lurek.event.quit()
         end
         return
     end

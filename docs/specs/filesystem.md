@@ -21,7 +21,7 @@ Write operations are always routed to the save-data directory (if configured) ra
 
 The module also provides the `MountPoint` abstraction for overlaying read-only archive or zip mounts on top of the base file system, used by the `mods` module to load mod content packages.
 
-Two additional types expand the runtime I/O surface. `FileWatcher` (from `watcher.rs`) is a polling-based change detector that Lua scripts can use to react to file modifications at development time, created via `lurek.fs.newWatcher()`. `ZipArchive` adds first-class ZIP archive support: files inside a `.zip` can be listed and read without extracting them to disk, created via `lurek.fs.newZip()`. Both types expose full Lua method sets through `lurek.filesystem.*`.
+Two additional types expand the runtime I/O surface. `FileWatcher` (from `watcher.rs`) is a polling-based change detector that Lua scripts can use to react to file modifications at development time, created via `lurek.filesystem.newWatcher()`. `ZipArchive` adds first-class ZIP archive support: files inside a `.zip` can be listed and read without extracting them to disk, created via `lurek.filesystem.newZip()`. Both types expose full Lua method sets through `lurek.filesystem.*`.
 
 **Scope boundary**: Core Runtime tier. Depends on `runtime` for error types. Lua bridge in `src/lua_api/filesystem_api.rs`.
 
@@ -186,9 +186,9 @@ Two additional types expand the runtime I/O surface. `FileWatcher` (from `watche
 
 ### New in 0.15.0 (Lua API)
 
-- `lurek.fs.listRecursive(path)` — Recursively lists all files under `path` (relative to the game root). Returns a flat array of path strings. Raises a Lua error on path-traversal attempts (`..` in path) or if the directory cannot be read.
-- `lurek.fs.stat(path)` — Returns a table `{ size: integer, isFile: boolean, isDir: boolean }` for the file or directory at `path` (sandboxed). Raises on path-traversal or missing entry.
-- `lurek.fs.createTempFile(prefix?)` — Creates an empty scratch file under `save/` and returns its relative path. Each call generates a unique name. `prefix` is sanitised (alphanumeric, `_`, `-`; max 32 chars).
+- `lurek.filesystem.listRecursive(path)` — Recursively lists all files under `path` (relative to the game root). Returns a flat array of path strings. Raises a Lua error on path-traversal attempts (`..` in path) or if the directory cannot be read.
+- `lurek.filesystem.stat(path)` — Returns a table `{ size: integer, isFile: boolean, isDir: boolean }` for the file or directory at `path` (sandboxed). Raises on path-traversal or missing entry.
+- `lurek.filesystem.createTempFile(prefix?)` — Creates an empty scratch file under `save/` and returns its relative path. Each call generates a unique name. `prefix` is sanitised (alphanumeric, `_`, `-`; max 32 chars).
 
 ## References
 

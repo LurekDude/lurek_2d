@@ -171,7 +171,7 @@ local function collide_platforms(f, dt)
                 f.jumps_left = MAX_JUMPS
                 -- Landing dust
                 if not was_grounded and land_dust_ps then
-                    lurek.particles.emit(land_dust_ps, f.x + FIGHTER_W * 0.5, plat.y, 5)
+                    lurek.particle.emit(land_dust_ps, f.x + FIGHTER_W * 0.5, plat.y, 5)
                 end
                 break
             end
@@ -241,7 +241,7 @@ local function check_melee_hit(attacker, defender)
         if hit_burst_ps then
             local hx = (attacker.x + defender.x) * 0.5 + FIGHTER_W * 0.5
             local hy = (attacker.y + defender.y) * 0.5 + FIGHTER_H * 0.5
-            lurek.particles.emit(hit_burst_ps, hx, hy, 12)
+            lurek.particle.emit(hit_burst_ps, hx, hy, 12)
         end
     end
 end
@@ -270,7 +270,7 @@ local function check_projectile_hits()
                         lurek.tween.to(0.4, function(t) dmg_flash_p2 = 1.0 - t end)
                     end
                     if hit_burst_ps then
-                        lurek.particles.emit(hit_burst_ps, proj.x, proj.y, 10)
+                        lurek.particle.emit(hit_burst_ps, proj.x, proj.y, 10)
                     end
                     table.insert(to_remove, i)
                     break
@@ -290,7 +290,7 @@ local function check_blast_zones(f)
     if cx < BLAST_LEFT or cx > BLAST_RIGHT or cy < BLAST_TOP or cy > BLAST_BOTTOM then
         -- KO explosion
         if ko_explode_ps then
-            lurek.particles.emit(ko_explode_ps, clamp(f.x, 0, SCREEN_W), clamp(f.y, 0, SCREEN_H), 30)
+            lurek.particle.emit(ko_explode_ps, clamp(f.x, 0, SCREEN_W), clamp(f.y, 0, SCREEN_H), 30)
         end
         f.stocks = f.stocks - 1
         if f.stocks > 0 then
@@ -392,7 +392,7 @@ lurek.init(function()
     lurek.input.action("start", {"return"})
 
     -- Particle systems
-    hit_burst_ps = lurek.particles.new({
+    hit_burst_ps = lurek.particle.new({
         max        = 60,
         lifetime   = {0.15, 0.35},
         speed      = {100, 300},
@@ -400,7 +400,7 @@ lurek.init(function()
         colors     = {{1,1,0.3,1},{1,0.5,0,0}},
         sizes      = {4, 1},
     })
-    ko_explode_ps = lurek.particles.new({
+    ko_explode_ps = lurek.particle.new({
         max        = 80,
         lifetime   = {0.3, 0.8},
         speed      = {80, 250},
@@ -408,7 +408,7 @@ lurek.init(function()
         colors     = {{1,0.8,0.2,1},{1,0.2,0,0}},
         sizes      = {8, 2},
     })
-    land_dust_ps = lurek.particles.new({
+    land_dust_ps = lurek.particle.new({
         max        = 30,
         lifetime   = {0.1, 0.3},
         speed      = {20, 60},
@@ -416,7 +416,7 @@ lurek.init(function()
         colors     = {{0.7,0.65,0.5,0.7},{0.5,0.5,0.4,0}},
         sizes      = {3, 1},
     })
-    proj_trail_ps = lurek.particles.new({
+    proj_trail_ps = lurek.particle.new({
         max        = 100,
         lifetime   = {0.1, 0.25},
         speed      = {5, 20},
@@ -435,12 +435,12 @@ end)
 lurek.process(function(dt)
     -- Quit
     if lurek.input.pressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
     -- FPS in title
-    local fps = lurek.time.fps()
+    local fps = lurek.timer.fps()
     lurek.window.setTitle("Platform Fighter — Lurek2D | FPS: " .. fps)
 
     -- ── TITLE state ──────────────────────────────────────────────────
@@ -479,7 +479,7 @@ lurek.process(function(dt)
             proj.life = proj.life - dt
             -- Trail particles
             if proj_trail_ps then
-                lurek.particles.emit(proj_trail_ps, proj.x + PROJECTILE_SIZE * 0.5,
+                lurek.particle.emit(proj_trail_ps, proj.x + PROJECTILE_SIZE * 0.5,
                                      proj.y + PROJECTILE_SIZE * 0.5, 1)
             end
             if proj.life <= 0 or proj.x < BLAST_LEFT or proj.x > BLAST_RIGHT then

@@ -2613,17 +2613,17 @@ Find all runs of consecutive integer stat values with length >= min_run. Useful 
 
 Lurek2D cinematic library — multi-track scrubbable cutscene timeline.
 
-Sequences `lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.signal`,
+Sequences `lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.event`,
 and `library.dialog` clips into a single time-positioned timeline that
 supports play/pause/seek/scrub/skip-to-label/branch.
 
 Each track is a sorted list of clips: `{at, duration, kind, params,
 on_apply, on_revert}`. The timeline owns its own clock — it does not use
-`lurek.time.Scheduler`.
+`lurek.timer.Scheduler`.
 
 *20 functions, 0 module fields documented.*
 
-See: [`lurek.tween`](lua-api.md#lurektween) — backbone for `track:tween` clips, [`lurek.camera`](lua-api.md#lurekcamera) — consumed by `track:cameraTo` / `track:shake`, [`lurek.audio`](lua-api.md#lurekaudio) — consumed by `track:audio` (one-shot fire), [`lurek.signal`](lua-api.md#lureksignal) — consumed by `track:signal`, [`lurek.fs`](lua-api.md#lurekfs) — timeline TOML loader (`fromToml`), [`lurek.codec`](lua-api.md#lurekcodec) — JSON serialisation for `tl:export`, [`lurek.savegame`](lua-api.md#lureksavegame) — collector wiring for export/restore
+See: [`lurek.tween`](lua-api.md#lurektween) — backbone for `track:tween` clips, [`lurek.camera`](lua-api.md#lurekcamera) — consumed by `track:cameraTo` / `track:shake`, [`lurek.audio`](lua-api.md#lurekaudio) — consumed by `track:audio` (one-shot fire), [`lurek.event`](lua-api.md#lureksignal) — consumed by `track:signal`, [`lurek.filesystem`](lua-api.md#lurekfs) — timeline TOML loader (`fromToml`), [`lurek.serial`](lua-api.md#lurekcodec) — JSON serialisation for `tl:export`, [`lurek.save`](lua-api.md#lureksavegame) — collector wiring for export/restore
 
 ### Functions
 
@@ -2657,7 +2657,7 @@ Audio clip — fires once forward only.
 
 #### `signal(at, name, ...)`
 
-Signal clip — emits via `lurek.signal.push` (or queues for later read).
+Signal clip — emits via `lurek.event.push` (or queues for later read).
 
 #### `call(at, fn, opts)`
 
@@ -2685,7 +2685,7 @@ Create a new timeline.
 
 #### `fromToml(path)`
 
-Load a timeline from a TOML file via `lurek.fs.read` + `lurek.codec.fromToml`.
+Load a timeline from a TOML file via `lurek.filesystem.read` + `lurek.serial.fromToml`.
 
 #### `fromTable(spec)`
 
@@ -4872,7 +4872,7 @@ seq:start()
 
 *26 functions, 0 module fields documented.*
 
-See: [`lurek.patterns.newEventBus`](lua-api.md#lurekpatternsneweventbus) — optional event bus mirror returned by `seq:getEventBus()`, [`lurek.signal.newSignal`](lua-api.md#lureksignalnewsignal) — alternative scoped pub/sub backbone, [`lurek.localization.t`](lua-api.md#lureklocalizationt) — translate `say`/`choice` text fields before passing them in, [`lurek.codec.toJson`](lua-api.md#lurekcodectojson) — serialise/deserialise script node arrays for persistence
+See: [`lurek.patterns.newEventBus`](lua-api.md#lurekpatternsneweventbus) — optional event bus mirror returned by `seq:getEventBus()`, [`lurek.event.newSignal`](lua-api.md#lureksignalnewsignal) — alternative scoped pub/sub backbone, [`lurek.i18n.t`](lua-api.md#lureklocalizationt) — translate `say`/`choice` text fields before passing them in, [`lurek.serial.toJson`](lua-api.md#lurekcodectojson) — serialise/deserialise script node arrays for persistence
 
 ### Functions
 
@@ -5120,12 +5120,12 @@ purely visual composition with draw ordering.
 
 The library never calls rendering APIs directly; it produces a sorted
 draw list via `Doll:getDrawList()` that the caller hands to its renderer
-(typically `lurek.graphic`). The legacy `Doll:draw()` method is retained
+(typically `lurek.render`). The legacy `Doll:draw()` method is retained
 as a deprecated no-op for source compatibility.
 
 *25 functions, 0 module fields documented.*
 
-See: [`lurek.graphic`](lua-api.md#lurekgraphic) — caller-side renderer that consumes `getDrawList()` entries, [`lurek.img`](lua-api.md#lurekimg) — image/texture loader for `Part:setTexture()`, [`lurek.codec.toJson`](lua-api.md#lurekcodectojson) — serialise template + part state for persistence
+See: [`lurek.render`](lua-api.md#lurekgraphic) — caller-side renderer that consumes `getDrawList()` entries, [`lurek.image`](lua-api.md#lurekimg) — image/texture loader for `Part:setTexture()`, [`lurek.serial.toJson`](lua-api.md#lurekcodectojson) — serialise template + part state for persistence
 
 ### Functions
 
@@ -5296,9 +5296,9 @@ Compute world-transform draw list sorted by drawOrder. Each entry: {socketName, 
 
 #### `draw()` *(deprecated)*
 
-Deprecated convenience draw shim — retained only as a no-op. The original implementation referenced an undefined global (`luna`) and a non-existent namespace (`lurek.gfx`), so the call chain was a silent no-op in every build. Library code must not call rendering APIs directly (per `library.*` conventions), so the correct path now is for the caller to iterate `Doll:getDrawList()` and dispatch the entries to `lurek.graphic` (or any other renderer) themselves. This method emits a one-time warning on first invocation and then returns immediately. It will be removed in a future major bump.
+Deprecated convenience draw shim — retained only as a no-op. The original implementation referenced an undefined global (`luna`) and a non-existent namespace (`lurek.render`), so the call chain was a silent no-op in every build. Library code must not call rendering APIs directly (per `library.*` conventions), so the correct path now is for the caller to iterate `Doll:getDrawList()` and dispatch the entries to `lurek.render` (or any other renderer) themselves. This method emits a one-time warning on first invocation and then returns immediately. It will be removed in a future major bump.
 
-See: [`lurek.graphic`](lua-api.md#lurekgraphic)
+See: [`lurek.render`](lua-api.md#lurekgraphic)
 
 #### `getAbsoluteScale(entry)`
 
@@ -6464,7 +6464,7 @@ bag:addItem(sword, 1)
 
 *90 functions, 0 module fields documented.*
 
-See: [`lurek.codec.toJson`](lua-api.md#lurekcodectojson) — serialise inventory snapshots for save round-trip, [`lurek.codec.fromJson`](lua-api.md#lurekcodecfromjson) — restore inventory snapshots, [`lurek.savegame.SaveManager`](lua-api.md#lureksavegamesavemanager) — register inventory state via a SaveManager collector, [`lurek.patterns.newEventBus`](lua-api.md#lurekpatternsneweventbus) — optional change-event bus from `inv:getEventBus()`, [`lurek.data.deepCopy`](lua-api.md#lurekdatadeepcopy) — P4 lift candidate — `item:clone()` will delegate when available
+See: [`lurek.serial.toJson`](lua-api.md#lurekcodectojson) — serialise inventory snapshots for save round-trip, [`lurek.serial.fromJson`](lua-api.md#lurekcodecfromjson) — restore inventory snapshots, [`lurek.save.SaveManager`](lua-api.md#lureksavegamesavemanager) — register inventory state via a SaveManager collector, [`lurek.patterns.newEventBus`](lua-api.md#lurekpatternsneweventbus) — optional change-event bus from `inv:getEventBus()`, [`lurek.data.deepCopy`](lua-api.md#lurekdatadeepcopy) — P4 lift candidate — `item:clone()` will delegate when available
 
 ### Functions
 
@@ -7388,7 +7388,7 @@ original definitions in this revision; functional behaviour is unchanged.
 
 *138 functions, 0 module fields documented.*
 
-See: [`lurek.math`](lua-api.md#lurekmath), [`lurek.codec.toJson`](lua-api.md#lurekcodectojson)
+See: [`lurek.math`](lua-api.md#lurekmath), [`lurek.serial.toJson`](lua-api.md#lurekcodectojson)
 
 ### Functions
 
@@ -8770,11 +8770,11 @@ Player states: **not-ready** (default on join) → **ready** (via setReady).
 Wire format note: messages between peers are encoded with
 `lurek.network.pack` / `lurek.network.unpack` (MessagePack — the canonical
 ENet payload format). For human-readable persistence (e.g. saved lobby
-state), use `lurek.codec.toJson` / `lurek.codec.fromJson`.
+state), use `lurek.serial.toJson` / `lurek.serial.fromJson`.
 
 *23 functions, 0 module fields documented.*
 
-See: [`lurek.network`](lua-api.md#lureknetwork), [`lurek.patterns.newEventBus`](lua-api.md#lurekpatternsneweventbus), [`lurek.codec.toJson`](lua-api.md#lurekcodectojson)
+See: [`lurek.network`](lua-api.md#lureknetwork), [`lurek.patterns.newEventBus`](lua-api.md#lurekpatternsneweventbus), [`lurek.serial.toJson`](lua-api.md#lurekcodectojson)
 
 ### Functions
 
@@ -9036,7 +9036,7 @@ local id, meta = tbl:sample()
 
 *32 functions, 0 module fields documented.*
 
-See: [`lurek.math.newRandomGenerator`](lua-api.md#lurekmathnewrandomgenerator) — default RNG source for sampling, [`lurek.codec.fromToml`](lua-api.md#lurekcodecfromtoml) — designer-authored loot tables (`fromToml`), [`lurek.fs.read`](lua-api.md#lurekfsread) — sandboxed file load for `fromToml`, [`lurek.savegame`](lua-api.md#lureksavegame) — `Pity:save`/`restore` collector wiring
+See: [`lurek.math.newRandomGenerator`](lua-api.md#lurekmathnewrandomgenerator) — default RNG source for sampling, [`lurek.serial.fromToml`](lua-api.md#lurekcodecfromtoml) — designer-authored loot tables (`fromToml`), [`lurek.filesystem.read`](lua-api.md#lurekfsread) — sandboxed file load for `fromToml`, [`lurek.save`](lua-api.md#lureksavegame) — `Pity:save`/`restore` collector wiring
 
 ### Functions
 
@@ -9078,7 +9078,7 @@ Bulk-build a loot table from a list of `{id, weight, meta?}` entries.
 
 #### `fromToml(path)`
 
-Load a loot table from a TOML file via `lurek.fs.read` + `lurek.codec.fromToml`. The file must contain an `entries = [...]` array.
+Load a loot table from a TOML file via `lurek.filesystem.read` + `lurek.serial.fromToml`. The file must contain an `entries = [...]` array.
 
 **Parameters**
 
@@ -9432,7 +9432,7 @@ The court applauds. # music:fanfare
 
 *30 functions, 0 module fields documented.*
 
-See: [`lurek.fs.read`](lua-api.md#lurekfsread) — load `.ink` files, [`lurek.codec.toJson`](lua-api.md#lurekcodectojson) — precompile / save state serialisation, [`lurek.savegame`](lua-api.md#lureksavegame) — wire `story:save`/`resume` into a SaveManager, [`lurek.localization.t`](lua-api.md#lureklocalizationt) — used by `M.localiseStory` for {loc:key} markers, [`lurek.signal`](lua-api.md#lureksignal) — optional trace event sink
+See: [`lurek.filesystem.read`](lua-api.md#lurekfsread) — load `.ink` files, [`lurek.serial.toJson`](lua-api.md#lurekcodectojson) — precompile / save state serialisation, [`lurek.save`](lua-api.md#lureksavegame) — wire `story:save`/`resume` into a SaveManager, [`lurek.i18n.t`](lua-api.md#lureklocalizationt) — used by `M.localiseStory` for {loc:key} markers, [`lurek.event`](lua-api.md#lureksignal) — optional trace event sink
 
 ### Functions
 
@@ -9454,7 +9454,7 @@ Compile Ink-subset source into a Story program (not yet started).
 
 #### `loadFile(path)`
 
-Load and compile a .ink file via `lurek.fs.read`.
+Load and compile a .ink file via `lurek.filesystem.read`.
 
 **Parameters**
 
@@ -9606,7 +9606,7 @@ Profile the current story state (visits + var counts).
 
 #### `save()`
 
-Serialise full state (vars, visits, knot, pc) for `lurek.savegame`.
+Serialise full state (vars, visits, knot, pc) for `lurek.save`.
 
 #### `resume(state)`
 
@@ -9626,7 +9626,7 @@ Format a list of values as natural prose: "a, b, and c".
 
 #### `localiseStory(story, locale)`
 
-Attach a `{loc:KEY}` localisation pre-processor using `lurek.localization.t`.
+Attach a `{loc:KEY}` localisation pre-processor using `lurek.i18n.t`.
 
 ---
 
@@ -9655,7 +9655,7 @@ the turn and broadcasts the change. Clients receive turn events via `onTurn`.
 **Wire format**: state deltas and full-state snapshots are encoded with
 `lurek.network.pack` / `lurek.network.unpack` (MessagePack — the canonical
 ENet payload format). For human-readable persistence (e.g. write a snapshot
-to disk for inspection), pair `:getAll()` with `lurek.codec.toJson`.
+to disk for inspection), pair `:getAll()` with `lurek.serial.toJson`.
 
 **Hash helper**: `:hashState()` is a deterministic FNV-1a digest of all
 replicated keys/values; useful for desync detection. When a future
@@ -9668,7 +9668,7 @@ callback.
 
 *30 functions, 0 module fields documented.*
 
-See: [`lurek.network`](lua-api.md#lureknetwork), [`lurek.codec.toJson`](lua-api.md#lurekcodectojson), [`lurek.time.Scheduler`](lua-api.md#lurektimescheduler)
+See: [`lurek.network`](lua-api.md#lureknetwork), [`lurek.serial.toJson`](lua-api.md#lurekcodectojson), [`lurek.timer.Scheduler`](lua-api.md#lurektimescheduler)
 
 ### Functions
 
@@ -9932,23 +9932,23 @@ See: [`lurek.data.hash`](lua-api.md#lurekdatahash)
 
 #### `toJson()`
 
-Serialise the current state to a JSON string via `lurek.codec.toJson`. Suitable for human-readable persistence (NOT for the wire — use the normal `:sync()` MessagePack path for peer-to-peer traffic). Returns nil if `lurek.codec` is unavailable in this runtime.
+Serialise the current state to a JSON string via `lurek.serial.toJson`. Suitable for human-readable persistence (NOT for the wire — use the normal `:sync()` MessagePack path for peer-to-peer traffic). Returns nil if `lurek.serial` is unavailable in this runtime.
 
 **Returns**
 
 - *string|nil* — JSON snapshot of `:getAll()`, or nil.
 
-See: [`lurek.codec.toJson`](lua-api.md#lurekcodectojson)
+See: [`lurek.serial.toJson`](lua-api.md#lurekcodectojson)
 
 #### `requestFullState()`
 
-Request a full state snapshot from the authority. Useful when a client joins mid-game. **Limitation**: This method has no built-in timeout. If the authority never responds, the client will not receive a snapshot. Callers should implement their own timer-based retry, e.g.: ns:requestFullState() local deadline = lurek.time.getTime() + 5.0 -- In process loop: if lurek.time.getTime() > deadline then retry or invoke --   ns:onFullStateTimeout callback
+Request a full state snapshot from the authority. Useful when a client joins mid-game. **Limitation**: This method has no built-in timeout. If the authority never responds, the client will not receive a snapshot. Callers should implement their own timer-based retry, e.g.: ns:requestFullState() local deadline = lurek.timer.getTime() + 5.0 -- In process loop: if lurek.timer.getTime() > deadline then retry or invoke --   ns:onFullStateTimeout callback
 
 **Returns**
 
 - *boolean* — False if this instance is the authority (no-op), true if sent.
 
-See: [`lurek.time.getTime`](lua-api.md#lurektimegettime)
+See: [`lurek.timer.getTime`](lua-api.md#lurektimegettime)
 
 ---
 
@@ -10808,7 +10808,7 @@ Resolve a colour for each province using the given map mode. Returns a table map
 
 #### `newFromPng(png_path, defs)`
 
-Build a ProvinceMap from a PNG province-colour map using the Rust engine. This replaces the Lua `setPixel` loop + `detectAdjacency` pass with a single Rust O(w×h) scan. For a 2400×1200 map with 3000 provinces the typical speedup is 100×–300× vs the pure-Lua path (from ~2–8 s down to ~15–30 ms). Each unique non-black RGB pixel in the PNG is automatically assigned a sequential province ID starting at 1. Pure-black pixels (0, 0, 0) become background (ID 0). The returned ProvinceMap has its `pixel_lookup` field replaced by the engine grid (so `getProvinceAt` delegates to it), and all adjacency edges are pre-populated from the single Rust scan. Requires `lurek.img` to be available (Platform Services tier). by `M.loadFromDefinitions` — used to attach names, factions, and other metadata. Pass nil to skip.
+Build a ProvinceMap from a PNG province-colour map using the Rust engine. This replaces the Lua `setPixel` loop + `detectAdjacency` pass with a single Rust O(w×h) scan. For a 2400×1200 map with 3000 provinces the typical speedup is 100×–300× vs the pure-Lua path (from ~2–8 s down to ~15–30 ms). Each unique non-black RGB pixel in the PNG is automatically assigned a sequential province ID starting at 1. Pure-black pixels (0, 0, 0) become background (ID 0). The returned ProvinceMap has its `pixel_lookup` field replaced by the engine grid (so `getProvinceAt` delegates to it), and all adjacency edges are pre-populated from the single Rust scan. Requires `lurek.image` to be available (Platform Services tier). by `M.loadFromDefinitions` — used to attach names, factions, and other metadata. Pass nil to skip.
 
 **Parameters**
 
@@ -10842,12 +10842,12 @@ All other transitions are rejected and return false.
 to receive `quest_started` / `quest_advanced` / `quest_completed` /
 `quest_failed` events.
 * Serialisation: `M.toJson(log)` / `M.fromJson(str)` round-trip the log
-through `lurek.codec.toJson` / `lurek.codec.fromJson`.
-* Persistence: register a custom collector with `lurek.savegame.SaveManager`
+through `lurek.serial.toJson` / `lurek.serial.fromJson`.
+* Persistence: register a custom collector with `lurek.save.SaveManager`
 that calls `M.toJson(log)` on save and `M.fromJson(str)` on load.
-* Time-limited objectives: drive expiry from a `lurek.time.Scheduler` you
+* Time-limited objectives: drive expiry from a `lurek.timer.Scheduler` you
 create in your game loop (call `QuestLog:failQuest(id)` from the callback);
-this library does not require `lurek.time` at runtime.
+this library does not require `lurek.timer` at runtime.
 
 Usage:
 local quest = require("library.quest")
@@ -10864,7 +10864,7 @@ log:advanceObjective("tutorial", "talk_npc", 1)
 
 *56 functions, 0 module fields documented.*
 
-See: [`lurek.patterns.newEventBus`](lua-api.md#lurekpatternsneweventbus), [`lurek.codec.toJson`](lua-api.md#lurekcodectojson), [`lurek.codec.fromJson`](lua-api.md#lurekcodecfromjson), [`lurek.savegame.SaveManager`](lua-api.md#lureksavegamesavemanager), [`lurek.time.Scheduler`](lua-api.md#lurektimescheduler)
+See: [`lurek.patterns.newEventBus`](lua-api.md#lurekpatternsneweventbus), [`lurek.serial.toJson`](lua-api.md#lurekcodectojson), [`lurek.serial.fromJson`](lua-api.md#lurekcodecfromjson), [`lurek.save.SaveManager`](lua-api.md#lureksavegamesavemanager), [`lurek.timer.Scheduler`](lua-api.md#lurektimescheduler)
 
 ### Functions
 
@@ -11410,7 +11410,7 @@ Remove a tag from this objective. Returns true if the tag was present.
 
 #### `toJson(log)`
 
-Encode a `QuestLog` to a JSON string via `lurek.codec.toJson`.
+Encode a `QuestLog` to a JSON string via `lurek.serial.toJson`.
 
 **Parameters**
 
@@ -11420,7 +11420,7 @@ Encode a `QuestLog` to a JSON string via `lurek.codec.toJson`.
 
 - *string* — JSON-encoded log.
 
-See: [`lurek.codec.toJson`](lua-api.md#lurekcodectojson)
+See: [`lurek.serial.toJson`](lua-api.md#lurekcodectojson)
 
 #### `fromJson(str, into)`
 
@@ -11435,7 +11435,7 @@ Decode a JSON-encoded log into a fresh `QuestLog`. The optional `into` argument 
 
 - *QuestLog*
 
-See: [`lurek.codec.fromJson`](lua-api.md#lurekcodecfromjson)
+See: [`lurek.serial.fromJson`](lua-api.md#lurekcodecfromjson)
 
 ---
 
@@ -11449,12 +11449,12 @@ music-reactive levels. Two main pieces:
 * `Clock`  — beat clock with BPM, swing, ramp, and audio-source binding.
 * `M.judge` — judgement window scoring for player input timing.
 
-The clock is independent of `lurek.time.Scheduler` (which is wall-time
+The clock is independent of `lurek.timer.Scheduler` (which is wall-time
 based) — beat math accounts for BPM ramps and audio source seeks.
 
 *4 functions, 0 module fields documented.*
 
-See: [`lurek.audio`](lua-api.md#lurekaudio) — Source playhead drives `M.fromAudio` and `:syncToAudio`, [`lurek.time`](lua-api.md#lurektime) — `getMicroTime` powers default `M.judge` hit time, [`lurek.signal`](lua-api.md#lureksignal) — optional emit on `rhythm.bar`/`rhythm.beat`/`rhythm.miss`, [`lurek.savegame`](lua-api.md#lureksavegame) — `clock:dump` collector wiring
+See: [`lurek.audio`](lua-api.md#lurekaudio) — Source playhead drives `M.fromAudio` and `:syncToAudio`, [`lurek.timer`](lua-api.md#lurektime) — `getMicroTime` powers default `M.judge` hit time, [`lurek.event`](lua-api.md#lureksignal) — optional emit on `rhythm.bar`/`rhythm.beat`/`rhythm.miss`, [`lurek.save`](lua-api.md#lureksavegame) — `clock:dump` collector wiring
 
 ### Functions
 
@@ -11478,7 +11478,7 @@ Judge a player input against the nearest beat at `division`.
 
 - `clock` *Clock*
 - `division` *integer* — Beat subdivision (e.g. 4 = quarter notes, 8 = 8ths).
-- `hit_time` *number?* — Time of the hit (defaults to now via `lurek.time`).
+- `hit_time` *number?* — Time of the hit (defaults to now via `lurek.timer`).
 
 **Returns**
 
@@ -11501,7 +11501,7 @@ All three subsystems are independent — pick what you need.
 
 *13 functions, 0 module fields documented.*
 
-See: [`lurek.tilemap`](lua-api.md#lurektilemap) — attach FOV/GoalMap blockers via `:attachTilemap`, [`lurek.pathfinding`](lua-api.md#lurekpathfinding) — preferred Dijkstra backend; in-Lua fallback used otherwise, [`lurek.math.bresenham`](lua-api.md#lurekmathbresenham) — line-of-sight helper (re-exported as `M.bresenham`), [`lurek.savegame`](lua-api.md#lureksavegame) — scheduler/FOV state collectors
+See: [`lurek.tilemap`](lua-api.md#lurektilemap) — attach FOV/GoalMap blockers via `:attachTilemap`, [`lurek.pathfind`](lua-api.md#lurekpathfinding) — preferred Dijkstra backend; in-Lua fallback used otherwise, [`lurek.math.bresenham`](lua-api.md#lurekmathbresenham) — line-of-sight helper (re-exported as `M.bresenham`), [`lurek.save`](lua-api.md#lureksavegame) — scheduler/FOV state collectors
 
 ### Functions
 
@@ -11574,12 +11574,12 @@ True if `fov` reports an unbroken line from (x0,y0) to (x1,y1) is visible.
 ## `library.rpc`
 
 Enables calling functions on remote peers over ENet with automatic
-JSON serialisation via `lurek.codec`. Supports request/response,
+JSON serialisation via `lurek.serial`. Supports request/response,
 fire-and-forget, and broadcast patterns.
 
 ## RPC Protocol
 
-Messages are serialised via `lurek.codec.toJson` / `lurek.codec.fromJson`.
+Messages are serialised via `lurek.serial.toJson` / `lurek.serial.fromJson`.
 Three message types flow over the wire:
 
 - **rpc_call**: `{type="rpc_call", id=N, name="fn", args={...}}`
@@ -11605,7 +11605,7 @@ to reset to 1 if your application may exceed this range.
 
 *16 functions, 0 module fields documented.*
 
-See: [`lurek.network`](lua-api.md#lureknetwork), [`lurek.codec.toJson`](lua-api.md#lurekcodectojson), [`lurek.codec.fromJson`](lua-api.md#lurekcodecfromjson)
+See: [`lurek.network`](lua-api.md#lureknetwork), [`lurek.serial.toJson`](lua-api.md#lurekcodectojson), [`lurek.serial.fromJson`](lua-api.md#lurekcodecfromjson)
 
 ### Functions
 
@@ -11764,7 +11764,7 @@ are automatically removed on the next `update()`.
 
 This is a **coroutine-frame** scheduler: timing is measured in units of `dt`
 you pass to `:update(dt)`. For wall-clock one-shots / repeats use the engine
-`lurek.time.Scheduler` userdata (`:after`, `:every`, `:cancel`) instead.
+`lurek.timer.Scheduler` userdata (`:after`, `:every`, `:cancel`) instead.
 
 Usage:
 local scheduler = require("library.scheduler")
@@ -11779,7 +11779,7 @@ sched:update(dt)
 
 *11 functions, 0 module fields documented.*
 
-See: [`lurek.time.Scheduler`](lua-api.md#lurektimescheduler)
+See: [`lurek.timer.Scheduler`](lua-api.md#lurektimescheduler)
 
 ### Functions
 
@@ -11796,7 +11796,7 @@ Create a new coroutine scheduler. Manages a pool of coroutine tasks; each task c
 
 - *Scheduler* — A new scheduler handle.
 
-See: [`lurek.time.Scheduler`](lua-api.md#lurektimescheduler)
+See: [`lurek.timer.Scheduler`](lua-api.md#lurektimescheduler)
 
 #### `add(fn, name)`
 
@@ -11864,7 +11864,7 @@ Step all active tasks by dt seconds. Tasks whose wait time has elapsed are resum
 
 - *number* — Number of coroutine resumes performed this call.
 
-See: [`lurek.time.getDelta`](lua-api.md#lurektimegetdelta)
+See: [`lurek.timer.getDelta`](lua-api.md#lurektimegetdelta)
 
 #### `getCount()`
 
@@ -12694,7 +12694,7 @@ Restore sheet state from a snapshot previously created by Sheet:snapshot.
 
 #### `snapshotToJson(snap)`
 
-Encode a snapshot table to a JSON string via `lurek.codec.toJson`.
+Encode a snapshot table to a JSON string via `lurek.serial.toJson`.
 
 **Parameters**
 
@@ -12704,11 +12704,11 @@ Encode a snapshot table to a JSON string via `lurek.codec.toJson`.
 
 - *string* — JSON-encoded snapshot.
 
-See: [`lurek.codec.toJson`](lua-api.md#lurekcodectojson)
+See: [`lurek.serial.toJson`](lua-api.md#lurekcodectojson)
 
 #### `snapshotFromJson(str)`
 
-Decode a JSON snapshot string back into a Lua table via `lurek.codec.fromJson`. The returned table can be passed to `Sheet:restore`.
+Decode a JSON snapshot string back into a Lua table via `lurek.serial.fromJson`. The returned table can be passed to `Sheet:restore`.
 
 **Parameters**
 
@@ -12718,6 +12718,6 @@ Decode a JSON snapshot string back into a Lua table via `lurek.codec.fromJson`. 
 
 - *table* — Decoded snapshot.
 
-See: [`lurek.codec.fromJson`](lua-api.md#lurekcodecfromjson)
+See: [`lurek.serial.fromJson`](lua-api.md#lurekcodecfromjson)
 
 ---

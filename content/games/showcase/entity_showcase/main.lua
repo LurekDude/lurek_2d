@@ -380,7 +380,7 @@ lurek.process(function(dt)
         if lurek.input.pressed("chapter_4") then switch_chapter(STATE_CH4) end
         if lurek.input.pressed("chapter_5") then switch_chapter(STATE_CH5) end
         if lurek.input.pressed("chapter_6") then switch_chapter(STATE_CH6) end
-        if lurek.input.pressed("quit") then lurek.signal.quit() end
+        if lurek.input.pressed("quit") then lurek.event.quit() end
         return
     end
 
@@ -391,7 +391,7 @@ lurek.process(function(dt)
     if lurek.input.pressed("chapter_4") then switch_chapter(STATE_CH4) end
     if lurek.input.pressed("chapter_5") then switch_chapter(STATE_CH5) end
     if lurek.input.pressed("chapter_6") then switch_chapter(STATE_CH6) end
-    if lurek.input.pressed("quit") then lurek.signal.quit() end
+    if lurek.input.pressed("quit") then lurek.event.quit() end
 
     -- Panel tween
     panel_offset = lerp(panel_offset, panel_offset_target, dt * PANEL_SLIDE_SPEED)

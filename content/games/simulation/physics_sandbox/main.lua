@@ -618,7 +618,7 @@ local function process_sandbox(dt)
 
     -- quit
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
     end
 
     -- physics
@@ -761,7 +761,7 @@ end)
 lurek.render_ui(function()
     if current_state ~= STATE.SANDBOX then return end
 
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     local count = math.floor(obj_count_display + 0.5)
     local spring_count = #springs
 

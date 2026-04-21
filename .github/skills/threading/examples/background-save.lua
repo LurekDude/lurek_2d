@@ -5,7 +5,7 @@ local saver = lurek.thread.newThread([[
     while true do
         local json = ch:demand()
         if json == nil then break end
-        lurek.fs.write("save.json", json)
+        lurek.filesystem.write("save.json", json)
     end
 ]])
 saver:start(saveChannel)

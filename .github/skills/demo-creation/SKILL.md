@@ -82,11 +82,11 @@ Add module flags only when the demo actually needs them:
 **Mandatory invariants:**
 - All state in module-level `local` variables — no globals except callbacks
 - `lurek.window.setTitle()` called first in `lurek.load()`
-- `lurek.gfx.setBackgroundColor()` called in `lurek.load()`
+- `lurek.render.setBackgroundColor()` called in `lurek.load()`
 - Movement multiplied by `dt` for frame-rate independence
-- `escape` → `lurek.signal.quit()` always present in `lurek.keypressed`
+- `escape` → `lurek.event.quit()` always present in `lurek.keypressed`
 - All 4 callbacks defined, even if `update` is empty
-- No `print()` — use `lurek.gfx.print()` for on-screen text, `lurek.log.debug()` for diagnostics
+- No `print()` — use `lurek.render.print()` for on-screen text, `lurek.log.debug()` for diagnostics
 
 
 > See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.

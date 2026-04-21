@@ -257,11 +257,11 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 1. Update `sysinfo` version to `"0.38"` with `default-features = false, features = ["system"]`.
 2. Rewrite CPU/memory queries to use new API.
 3. Add CPU utilization % and memory utilization % queries (replacing static CPU count / memory size).
-4. Add Lua bindings: `lurek.platform.getCpuUsage()`, `lurek.platform.getMemoryUsage()`, `lurek.platform.getProcessMemory()`.
-5. Keep backwards-compatible: `lurek.platform.getProcessorCount()` and `lurek.platform.getMemorySize()` still work.
+4. Add Lua bindings: `lurek.runtime.getCpuUsage()`, `lurek.runtime.getMemoryUsage()`, `lurek.runtime.getProcessMemory()`.
+5. Keep backwards-compatible: `lurek.runtime.getProcessorCount()` and `lurek.runtime.getMemorySize()` still work.
 6. Run `cargo test system`.
 
-**Acceptance gate**: `lurek.platform.getCpuUsage()` returns a percentage. `lurek.platform.getMemoryUsage()` returns used/total. Tests pass.
+**Acceptance gate**: `lurek.runtime.getCpuUsage()` returns a percentage. `lurek.runtime.getMemoryUsage()` returns used/total. Tests pass.
 
 ---
 
@@ -629,7 +629,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 **Steps**:
 1. Add **PNG saving**: `ImageData:save(path)` using `image::save_buffer()`. ~20 SLoC.
 2. Add **PNG encoding to memory**: `ImageData:encode("png") � ByteData`. ~30 SLoC.
-3. Add **screenshot capture**: `lurek.gfx.captureScreenshot(path)` that reads the GPU framebuffer and saves to PNG. ~50 SLoC.
+3. Add **screenshot capture**: `lurek.render.captureScreenshot(path)` that reads the GPU framebuffer and saves to PNG. ~50 SLoC.
 4. Add **sub-image extraction**: `ImageData:getSubImage(x, y, w, h)`. ~20 SLoC.
 5. Add **image paste/blit**: `ImageData:paste(source, x, y)`. ~20 SLoC.
 6. Add **clone**: `ImageData:clone()`. ~10 SLoC.

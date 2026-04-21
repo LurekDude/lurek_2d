@@ -151,7 +151,7 @@ lurek.init(function()
     lurek.window.setTitle("RTS — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.12, 0.06, 1.0)
 
-    death_sparks = lurek.particles.newSystem({
+    death_sparks = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.2, 0.6 },
@@ -162,7 +162,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    select_ring = lurek.particles.newSystem({
+    select_ring = lurek.particle.newSystem({
         maxParticles = 20,
         emitRate     = 0,
         lifetime     = { 0.3, 0.5 },
@@ -182,7 +182,7 @@ lurek.process(function(dt)
     if death_sparks then death_sparks:update(dt) end
     if select_ring  then select_ring:update(dt)  end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
     if state ~= "play" then return end
 
     -- Camera scroll

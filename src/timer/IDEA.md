@@ -28,7 +28,7 @@ The `timer` module owns time measurement (`Clock`) and deferred/repeating event 
 
 ## 4. Gap List
 
-1. ~~**[P3][GAP]** No `after_frames(n)` — scheduling by frame count (useful for VFX sequencing at fixed step).~~ ✅ **DONE** — Added `after_frames(n)`, `every_frames(n, count)`, and `update_frames()` to `Scheduler` + `lurek.time` Lua bindings.
+1. ~~**[P3][GAP]** No `after_frames(n)` — scheduling by frame count (useful for VFX sequencing at fixed step).~~ ✅ **DONE** — Added `after_frames(n)`, `every_frames(n, count)`, and `update_frames()` to `Scheduler` + `lurek.timer` Lua bindings.
    - ~~Why: GameDev must convert frame count to seconds manually, which breaks if `time_scale` changes.~~
 
 ## 5. Feature Ideas
@@ -54,7 +54,7 @@ TODO(dedup): tween::TweenManager — both `Scheduler` and `TweenManager` track "
 
 ## 9. TODO(helper): Engine-Level Helper Candidates
 
-~~TODO(helper): `lurek.timer.delay(seconds)` — coroutine-based yield-for-duration sugar wrapping `after` + resume, for sequential cutscene scripting.~~ ✅ **DONE** — Added `lurek.time.delay(seconds)` as a semantic alias for `waitSeconds` in `src/lua_api/timer_api.rs`.
+~~TODO(helper): `lurek.timer.delay(seconds)` — coroutine-based yield-for-duration sugar wrapping `after` + resume, for sequential cutscene scripting.~~ ✅ **DONE** — Added `lurek.timer.delay(seconds)` as a semantic alias for `waitSeconds` in `src/lua_api/timer_api.rs`.
 
 ## 10. TODO(plugin): Plugin Candidacy Proposal
 

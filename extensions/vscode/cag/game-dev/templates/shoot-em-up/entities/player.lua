@@ -31,9 +31,9 @@ function Player:update(dt, bullets)
 end
 
 function Player:draw()
-    lurek.gfx.setColor(0.2, 0.8, 1, 1)
-    lurek.gfx.rectangle("fill", self.x, self.y, self.width, self.height)
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(0.2, 0.8, 1, 1)
+    lurek.render.rectangle("fill", self.x, self.y, self.width, self.height)
+    lurek.render.setColor(1, 1, 1, 1)
 end
 
 return Player

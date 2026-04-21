@@ -48,9 +48,9 @@ end
 
 function DialogRunner:draw()
     if self.finished then
-        lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
-        lurek.gfx.print("~ End ~", 360, 480)
-        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.render.setColor(0.6, 0.6, 0.6, 1)
+        lurek.render.print("~ End ~", 360, 480)
+        lurek.render.setColor(1, 1, 1, 1)
         return
     end
 
@@ -58,25 +58,25 @@ function DialogRunner:draw()
     if not line then return end
 
     -- Dialog box
-    lurek.gfx.setColor(0, 0, 0, 0.8)
-    lurek.gfx.rectangle("fill", 20, 420, 760, 160)
-    lurek.gfx.setColor(0.5, 0.4, 0.7, 1)
-    lurek.gfx.rectangle("line", 20, 420, 760, 160)
+    lurek.render.setColor(0, 0, 0, 0.8)
+    lurek.render.rectangle("fill", 20, 420, 760, 160)
+    lurek.render.setColor(0.5, 0.4, 0.7, 1)
+    lurek.render.rectangle("line", 20, 420, 760, 160)
 
     -- Speaker name
-    lurek.gfx.setColor(0.9, 0.7, 1, 1)
-    lurek.gfx.print(line.speaker, 40, 430)
+    lurek.render.setColor(0.9, 0.7, 1, 1)
+    lurek.render.print(line.speaker, 40, 430)
 
     -- Typewriter text
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
     local visible = string.sub(line.text, 1, math.floor(self.char_count))
-    lurek.gfx.print(visible, 40, 460)
+    lurek.render.print(visible, 40, 460)
 
     -- Continue indicator
     if self.line_done then
-        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-        lurek.gfx.print("▼", 750, 560)
-        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.render.setColor(0.7, 0.7, 0.7, 1)
+        lurek.render.print("▼", 750, 560)
+        lurek.render.setColor(1, 1, 1, 1)
     end
 end
 

@@ -263,7 +263,7 @@ var luna = new Lurek2D();
 lurek.Init("conf.toml");
 lurek.Eval(@"
     lurek.init(function()
-        lurek.gfx.setBackgroundColor(0.2, 0.2, 0.3)
+        lurek.render.setBackgroundColor(0.2, 0.2, 0.3)
     end)
 ");
 
@@ -299,12 +299,12 @@ Electron apps that want native 2D rendering performance.
 │  No audio device                         │
 │                                          │
 │  Lua VM with:                            │
-│   ✓ lurek.math, lurek.data, lurek.fs        │
+│   ✓ lurek.math, lurek.data, lurek.filesystem        │
 │   ✓ lurek.dataframe, lurek.pipeline        │
 │   ✓ lurek.graph, lurek.ai (logic only)     │
 │   ✓ lurek.serial, lurek.event              │
-│   ✗ lurek.gfx, lurek.audio, lurek.window    │
-│   ✗ lurek.keyboard, lurek.mouse            │
+│   ✗ lurek.render, lurek.audio, lurek.window    │
+│   ✗ lurek.input.keyboard, lurek.input.mouse            │
 └──────────────────────────────────────────┘
 ```
 
@@ -321,7 +321,7 @@ Electron apps that want native 2D rendering performance.
 -- headless_report.lua — runs without a window
 local df = lurek.dataframe.fromCSV("sales_2024.csv")
 local summary = df:groupBy("region"):sum("revenue")
-lurek.fs.write("report.json", summary:to_json())
+lurek.filesystem.write("report.json", summary:to_json())
 print("Report generated: " .. summary:rowCount() .. " regions")
 ```
 

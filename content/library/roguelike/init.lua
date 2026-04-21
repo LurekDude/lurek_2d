@@ -11,9 +11,9 @@
 -- @module library.roguelike
 -- @status full
 -- @see lurek.tilemap          attach FOV/GoalMap blockers via `:attachTilemap`
--- @see lurek.pathfinding      preferred Dijkstra backend; in-Lua fallback used otherwise
+-- @see lurek.pathfind      preferred Dijkstra backend; in-Lua fallback used otherwise
 -- @see lurek.math.bresenham   line-of-sight helper (re-exported as `M.bresenham`)
--- @see lurek.savegame         scheduler/FOV state collectors
+-- @see lurek.save         scheduler/FOV state collectors
 
 local M = {}
 
@@ -441,8 +441,8 @@ function GoalMap:bake()
     if #self._sources == 0 then
         error("GoalMap:bake: no sources set", 2)
     end
-    -- Try lurek.pathfinding façade first (P1 advertised but signature varies).
-    local lp = lurek and lurek.pathfinding
+    -- Try lurek.pathfind façade first (P1 advertised but signature varies).
+    local lp = lurek and lurek.pathfind
     if type(lp) == "table" and type(lp.dijkstra) == "function" then
         local ok, dist = pcall(function()
             return lp.dijkstra({

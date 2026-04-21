@@ -364,7 +364,7 @@ function lurek.init()
     lurek.input.bind("confirm",{ "return", "kp_enter" })
 
     -- Construction sparks
-    sparks_ps = lurek.particles.newSystem({
+    sparks_ps = lurek.particle.newSystem({
         maxParticles = 100,
         emissionRate = 0,
         lifetimeMin  = 0.15, lifetimeMax = 0.5,
@@ -380,7 +380,7 @@ function lurek.init()
     })
 
     -- Beam break debris
-    debris_ps = lurek.particles.newSystem({
+    debris_ps = lurek.particle.newSystem({
         maxParticles = 200,
         emissionRate = 0,
         lifetimeMin  = 0.4, lifetimeMax = 1.2,
@@ -396,7 +396,7 @@ function lurek.init()
     })
 
     -- Water splash
-    splash_ps = lurek.particles.newSystem({
+    splash_ps = lurek.particle.newSystem({
         maxParticles = 150,
         emissionRate = 0,
         lifetimeMin  = 0.3, lifetimeMax = 1.0,
@@ -412,7 +412,7 @@ function lurek.init()
     })
 
     -- Success confetti
-    confetti_ps = lurek.particles.newSystem({
+    confetti_ps = lurek.particle.newSystem({
         maxParticles = 300,
         emissionRate = 0,
         lifetimeMin  = 1.0, lifetimeMax = 3.0,
@@ -444,7 +444,7 @@ function lurek.process(dt)
             state = STATE.LEVEL_SELECT
             return
         end
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -718,7 +718,7 @@ end
 --  lurek.render_ui() — HUD overlay (budget, tools, stress info, menus)
 -- ===========================================================================
 function lurek.render_ui()
-    local dt_str = string.format("FPS: %d", lurek.time.getFPS())
+    local dt_str = string.format("FPS: %d", lurek.timer.getFPS())
     lurek.render.setColor(1, 1, 1, 0.4)
     lurek.render.print(dt_str, SCREEN_W - 80, 4, 1.0)
 

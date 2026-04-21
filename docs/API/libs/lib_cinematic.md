@@ -2,17 +2,17 @@
 
 Lurek2D cinematic library — multi-track scrubbable cutscene timeline.
 
-Sequences `lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.signal`,
+Sequences `lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.event`,
 and `library.dialog` clips into a single time-positioned timeline that
 supports play/pause/seek/scrub/skip-to-label/branch.
 
 Each track is a sorted list of clips: `{at, duration, kind, params,
 on_apply, on_revert}`. The timeline owns its own clock — it does not use
-`lurek.time.Scheduler`.
+`lurek.timer.Scheduler`.
 
 *20 functions, 0 module fields documented.*
 
-See: [`lurek.tween`](../lua-api.md#lurektween) — backbone for `track:tween` clips, [`lurek.camera`](../lua-api.md#lurekcamera) — consumed by `track:cameraTo` / `track:shake`, [`lurek.audio`](../lua-api.md#lurekaudio) — consumed by `track:audio` (one-shot fire), [`lurek.signal`](../lua-api.md#lureksignal) — consumed by `track:signal`, [`lurek.fs`](../lua-api.md#lurekfs) — timeline TOML loader (`fromToml`), [`lurek.codec`](../lua-api.md#lurekcodec) — JSON serialisation for `tl:export`, [`lurek.savegame`](../lua-api.md#lureksavegame) — collector wiring for export/restore
+See: [`lurek.tween`](../lua-api.md#lurektween) — backbone for `track:tween` clips, [`lurek.camera`](../lua-api.md#lurekcamera) — consumed by `track:cameraTo` / `track:shake`, [`lurek.audio`](../lua-api.md#lurekaudio) — consumed by `track:audio` (one-shot fire), [`lurek.event`](../lua-api.md#lureksignal) — consumed by `track:signal`, [`lurek.filesystem`](../lua-api.md#lurekfs) — timeline TOML loader (`fromToml`), [`lurek.serial`](../lua-api.md#lurekcodec) — JSON serialisation for `tl:export`, [`lurek.save`](../lua-api.md#lureksavegame) — collector wiring for export/restore
 
 ## Functions
 
@@ -46,7 +46,7 @@ Audio clip — fires once forward only.
 
 ### `signal(at, name, ...)`
 
-Signal clip — emits via `lurek.signal.push` (or queues for later read).
+Signal clip — emits via `lurek.event.push` (or queues for later read).
 
 ### `call(at, fn, opts)`
 
@@ -74,7 +74,7 @@ Create a new timeline.
 
 ### `fromToml(path)`
 
-Load a timeline from a TOML file via `lurek.fs.read` + `lurek.codec.fromToml`.
+Load a timeline from a TOML file via `lurek.filesystem.read` + `lurek.serial.fromToml`.
 
 ### `fromTable(spec)`
 

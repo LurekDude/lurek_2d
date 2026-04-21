@@ -27,7 +27,7 @@ Window size is 960 × 540 to give the tall level layout room to breathe.
 
 ## APIs Used
 
-`lurek.window`, `lurek.render`, `lurek.input`, `lurek.time`, `lurek.signal`, `lurek.camera`, `lurek.particles`, `lurek.tween`
+`lurek.window`, `lurek.render`, `lurek.input`, `lurek.timer`, `lurek.event`, `lurek.camera`, `lurek.particle`, `lurek.tween`
 
 ## Changes from Original Demo
 

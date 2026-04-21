@@ -582,14 +582,14 @@ function checkMissingTestSummary(
 // ── Rule 12: Entity nil access after find ─────────────────────
 
 /**
- * Warns when a lurek.entity.find() result is used without nil-checking.
+ * Warns when a lurek.ecs.find() result is used without nil-checking.
  * entity.find() can return nil, so accessing methods directly is unsafe.
  */
 function checkEntityNilAccess(text: string): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
     const lines = text.split('\n');
 
-    // Detect pattern: local X = lurek.entity.find(...) \n X:method() or X.method without if X then
+    // Detect pattern: local X = lurek.ecs.find(...) \n X:method() or X.method without if X then
     const findPattern = /\blocal\s+(\w+)\s*=\s*lurek\.entity\.find\s*\(/g;
 
     for (let i = 0; i < lines.length; i++) {
@@ -616,7 +616,7 @@ function checkEntityNilAccess(text: string): vscode.Diagnostic[] {
                     const range = new vscode.Range(j, col, j, col + varName.length);
                     const diag = new vscode.Diagnostic(
                         range,
-                        `'${varName}' from lurek.entity.find() may be nil. Consider adding: if ${varName} then`,
+                        `'${varName}' from lurek.ecs.find() may be nil. Consider adding: if ${varName} then`,
                         vscode.DiagnosticSeverity.Information,
                     );
                     diag.code = 'lurek.entityNilAccess';

@@ -151,7 +151,7 @@ function lurek.init()
         torch_lights[i] = t
 
         -- Torch flame particles
-        local ps = lurek.particles.newSystem({
+        local ps = lurek.particle.newSystem({
             maxParticles = 40, emissionRate = 20,
             lifetimeMin = 0.2, lifetimeMax = 0.6,
             speedMin = 10, speedMax = 40,
@@ -164,7 +164,7 @@ function lurek.init()
     end
 
     -- Player glow particles
-    glow_particles = lurek.particles.newSystem({
+    glow_particles = lurek.particle.newSystem({
         maxParticles = 30, emissionRate = 15,
         lifetimeMin = 0.3, lifetimeMax = 0.8,
         speedMin = 5, speedMax = 25,
@@ -203,7 +203,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
     -- Global quit
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Update tweens & flickers
     lurek.tween.update(dt)
@@ -422,7 +422,7 @@ end
 -- Render UI (screen space — HUD, controls, stats)
 -- ---------------------------------------------------------------------------
 function lurek.render_ui()
-    local time = lurek.time.getTime()
+    local time = lurek.timer.getTime()
 
     -- ── TITLE SCREEN ──────────────────────────────────────────
     if current_state == STATE.TITLE then
@@ -501,5 +501,5 @@ function lurek.render_ui()
 
     -- FPS (top-right)
     lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.render.print("FPS: " .. tostring(lurek.time.getFPS()), SCREEN_W - 80, 12, 12)
+    lurek.render.print("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, 12, 12)
 end

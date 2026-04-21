@@ -5,7 +5,7 @@
 | **Tier**       | Tier 3 — Lunasome (pure Lua)                                                                                                            |
 | **Source**     | `library/roguelike/init.lua`                                                                                                            |
 | **Lua Tests**  | `tests/lua/library/test_library_roguelike.lua`                                                                                          |
-| **Depends on** | `lurek.tilemap` (optional, via `:attachTilemap`), `lurek.pathfinding` (optional Dijkstra backend), `lurek.math.bresenham` (re-exported) |
+| **Depends on** | `lurek.tilemap` (optional, via `:attachTilemap`), `lurek.pathfind` (optional Dijkstra backend), `lurek.math.bresenham` (re-exported) |
 | **Status**     | full                                                                                                                                    |
 
 ## Purpose
@@ -49,7 +49,7 @@ into a real roguelike. Each subsystem is independent.
 - **`lurek.tilemap`** — `:attachTilemap` consumes the user's tilemap. The
   binding is duck-typed: any object with `:getTile(layer, x, y)` works, as
   do plain `tilemap[layer][y][x]` Lua tables.
-- **`lurek.pathfinding`** — `GoalMap:bake` prefers `lurek.pathfinding.dijkstra`
+- **`lurek.pathfind`** — `GoalMap:bake` prefers `lurek.pathfind.dijkstra`
   when it exists; otherwise falls back to an in-Lua BFS.
 - **`lurek.math.bresenham`** — preferred backend for `M.bresenham`; same
   fallback strategy.
@@ -72,8 +72,8 @@ two monsters, and a goal-map-driven hunt loop.
 - **Scheduler is action-cost based**, not Δt: actors accumulate energy at
   `speed` per tick; the actor with the highest energy >= 100 acts and
   forfeits 100 energy. This is fundamentally different from
-  `lurek.time.Scheduler` (real-time `:every(seconds)`).
+  `lurek.timer.Scheduler` (real-time `:every(seconds)`).
 - **GoalMap fallback** uses 4-neighbour BFS — fine for square maps up to ~120²
-  on LuaJIT. For larger maps, install `lurek.pathfinding.dijkstra`.
+  on LuaJIT. For larger maps, install `lurek.pathfind.dijkstra`.
 - Use `Fov:resetExplored()` between levels; `_explored` accumulates across
   recomputes by design.

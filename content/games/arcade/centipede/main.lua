@@ -295,7 +295,7 @@ function lurek.init()
     lurek.input.bind("quit",    {"escape"})
 
     -- Particle systems
-    sparks = lurek.particles.newSystem({
+    sparks = lurek.particle.newSystem({
         maxParticles  = 80,
         emissionRate  = 0,
         lifetimeMin   = 0.2,
@@ -309,7 +309,7 @@ function lurek.init()
         colors        = {0.2, 0.8, 0.2, 1,  0.2, 0.8, 0.2, 0},
     })
 
-    burst = lurek.particles.newSystem({
+    burst = lurek.particle.newSystem({
         maxParticles  = 60,
         emissionRate  = 0,
         lifetimeMin   = 0.15,
@@ -323,7 +323,7 @@ function lurek.init()
         colors        = {1, 0.4, 0.1, 1,  1, 0.8, 0.2, 0},
     })
 
-    spider_sparks = lurek.particles.newSystem({
+    spider_sparks = lurek.particle.newSystem({
         maxParticles  = 50,
         emissionRate  = 0,
         lifetimeMin   = 0.2,
@@ -787,7 +787,7 @@ function lurek.render_ui()
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
-    lurek.render.print(tostring(lurek.time.getFPS()) .. " FPS", SCREEN_W - 80, SCREEN_H - 18, 1)
+    lurek.render.print(tostring(lurek.timer.getFPS()) .. " FPS", SCREEN_W - 80, SCREEN_H - 18, 1)
 
     if state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.6)
@@ -807,5 +807,5 @@ end
 
 -- ── keypressed ────────────────────────────────────────────────────────────
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
 end

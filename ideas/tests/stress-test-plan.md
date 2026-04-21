@@ -13,8 +13,8 @@
 | test_physics_collision_stress.lua | physics | Collision pair throughput | Pairs/sec |
 | test_compute_stress.lua | compute | Parallel task dispatch | Tasks/sec |
 | test_dataframe_stress.lua | dataframe | Large dataset operations | Rows/sec |
-| test_pathfinding_stress.lua | pathfinding | Large grid A* | Paths/sec |
-| test_entity_stress.lua | entity | Mass entity create/destroy | Entities/sec |
+| test_pathfind_stress.lua | pathfinding | Large grid A* | Paths/sec |
+| test_ecs_stress.lua | entity | Mass entity create/destroy | Entities/sec |
 | test_particle_stress.lua | particle | Mass particle emission | Particles/frame |
 | test_graph_stress.lua | graph | Large graph traversal | Nodes/sec |
 | test_data_stress.lua | data | JSON/MessagePack throughput | Encode-decode/sec |
@@ -35,13 +35,13 @@ animation, camera, savegame, scene, ai, timer, signal, filesystem, serial, procg
 describe("stress: <module> <operation>", function()
     it("<operation> × <count> completes in <budget>", function()
         local COUNT = 10000
-        local start = lurek.time.getTime()
+        local start = lurek.timer.getTime()
 
         for i = 1, COUNT do
             -- operation under test
         end
 
-        local elapsed = lurek.time.getTime() - start
+        local elapsed = lurek.timer.getTime() - start
         local ops_per_sec = COUNT / elapsed
 
         print(string.format("[STRESS] %s: %d ops in %.3fs (%.0f ops/sec)",
@@ -93,7 +93,7 @@ Budget: 5s total
 Metric: transforms/sec
 ```
 
-### 4. test_savegame_stress.lua
+### 4. test_save_stress.lua
 ```
 Operations:
 - Create large game state (1000 entities, each with 5 components)
@@ -115,7 +115,7 @@ Budget: 5s total
 Metric: timer ticks/sec
 ```
 
-### 6. test_signal_stress.lua
+### 6. test_event_stress.lua
 ```
 Operations:
 - Register 1000 listeners on same signal
@@ -212,9 +212,9 @@ Metric: light updates/sec, queries/sec
 ```lua
 -- Performance measurement helper
 function measure(name, count, fn)
-    local start = lurek.time.getTime()
+    local start = lurek.timer.getTime()
     fn()
-    local elapsed = lurek.time.getTime() - start
+    local elapsed = lurek.timer.getTime() - start
     local ops_per_sec = count / elapsed
     print(string.format("[PERF] %s: %d ops in %.3fs (%.0f ops/sec)",
         name, count, elapsed, ops_per_sec))
@@ -399,7 +399,7 @@ GPU future note: Resize, convolution, and composite are prime GPU-accelerate tar
 #### test_stress_pathfinding_large.lua
 ```
 Target: A* on large grids (CPU-bound, GPU BFS experimental candidate)
-Operations (expand existing test_pathfinding_stress.lua):
+Operations (expand existing test_pathfind_stress.lua):
 - 1000×1000 grid A* pathfinding × 100 random start/end pairs
 - Simultaneous: 100 paths on 200×200 grid in same frame (multi-agent)
 - Incremental: partial paths (10% of grid) prioritized × 10000

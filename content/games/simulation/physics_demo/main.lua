@@ -398,7 +398,7 @@ lurek.init(function()
 
   -- quit
   lurek.input.bind("key_escape", function()
-    lurek.signal.quit()
+    lurek.event.quit()
   end)
 end)
 

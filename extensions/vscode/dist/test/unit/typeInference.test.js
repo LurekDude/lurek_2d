@@ -318,7 +318,7 @@ var FACTORY_TYPES = {
     ]
   },
   // ── entity types ──────────────────────────────────────────
-  "lurek.entity.new": {
+  "lurek.ecs.new": {
     typeName: "Entity",
     methods: [
       { name: "getId", sig: ":getId()", desc: "Returns entity ID" },
@@ -741,9 +741,9 @@ suite("TypeInference \u2014 FACTORY_TYPES registry", () => {
     assert.ok(FACTORY_TYPES["lurek.graphics.newFont"]);
     assert.strictEqual(FACTORY_TYPES["lurek.graphics.newFont"].typeName, "Font");
   });
-  test("contains Entity type from lurek.entity.new", () => {
-    assert.ok(FACTORY_TYPES["lurek.entity.new"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.entity.new"].typeName, "Entity");
+  test("contains Entity type from lurek.ecs.new", () => {
+    assert.ok(FACTORY_TYPES["lurek.ecs.new"]);
+    assert.strictEqual(FACTORY_TYPES["lurek.ecs.new"].typeName, "Entity");
   });
   test("contains World type from lurek.physics.newWorld", () => {
     assert.ok(FACTORY_TYPES["lurek.physics.newWorld"]);

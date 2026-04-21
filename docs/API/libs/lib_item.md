@@ -21,7 +21,7 @@ original definitions in this revision; functional behaviour is unchanged.
 
 *138 functions, 0 module fields documented.*
 
-See: [`lurek.math`](../lua-api.md#lurekmath), [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson)
+See: [`lurek.math`](../lua-api.md#lurekmath), [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson)
 
 ## Functions
 

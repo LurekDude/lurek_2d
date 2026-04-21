@@ -5,7 +5,7 @@
 --- Pure-Lua port of src/cardgame/.
 --- @see lurek.math
 --- @see lurek.tween
---- @see lurek.signal
+--- @see lurek.event
 --- @see lurek.log
 
 local M = {}

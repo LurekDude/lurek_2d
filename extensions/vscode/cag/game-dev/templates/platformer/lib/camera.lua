@@ -11,12 +11,12 @@ function Camera:follow(target, dt)
 end
 
 function Camera:apply()
-    lurek.gfx.push()
-    lurek.gfx.translate(-self.x, -self.y)
+    lurek.render.push()
+    lurek.render.translate(-self.x, -self.y)
 end
 
 function Camera:reset()
-    lurek.gfx.pop()
+    lurek.render.pop()
 end
 
 return Camera

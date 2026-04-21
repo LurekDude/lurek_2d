@@ -9,7 +9,7 @@
 | R-03 | Plugin crashes host process | HIGH | HIGH | HIGH | Plugins run in-process; crash = process crash. Validate inputs aggressively. Consider optional sandboxing in Phase 4 |
 | R-04 | Plugin version mismatch silently corrupts state | MEDIUM | CRITICAL | HIGH | Mandatory `LUNA_PLUGIN_API_VERSION` check at load time; reject on mismatch |
 | R-05 | Workspace refactor breaks 200+ existing tests | HIGH | MEDIUM | HIGH | Phase 1 is pure refactor — all tests must pass before proceeding. CI gate. |
-| R-06 | Plugin cannot access SharedState for drawing | CERTAIN | MEDIUM | MEDIUM | Phase 2: plugins call `lurek.gfx.*` via Lua; Phase 3: host vtable if needed |
+| R-06 | Plugin cannot access SharedState for drawing | CERTAIN | MEDIUM | MEDIUM | Phase 2: plugins call `lurek.render.*` via Lua; Phase 3: host vtable if needed |
 | R-07 | Cross-platform DLL naming/loading differences | MEDIUM | LOW | LOW | Abstracted in `PluginLoader` with OS-specific filename mapping |
 | R-08 | Binary size increases due to duplicated mlua | MEDIUM | LOW | LOW | Plugins use `mlua/module` (no vendored LuaJIT); symbols resolve from host |
 | R-09 | Plugin load order affects lurek.* namespace conflicts | LOW | MEDIUM | LOW | First-loaded wins; warn on namespace collision; document in conf.toml |
@@ -48,11 +48,11 @@ upstream.
 
 ### A3 — Plugins Do Not Need Direct GPU Access (Phase 2)
 
-**Assumption**: For the initial plugin system, calling `lurek.gfx.drawQuad()`,
-`lurek.gfx.drawSprite()`, etc. via Lua is sufficient for plugin rendering.
+**Assumption**: For the initial plugin system, calling `lurek.render.drawQuad()`,
+`lurek.render.drawSprite()`, etc. via Lua is sufficient for plugin rendering.
 
 **Basis**: Tier 2 modules already do this today — `tilemap_api.rs`, `scene_api.rs` etc.
-build Lua tables and call back into `lurek.gfx.*`.
+build Lua tables and call back into `lurek.render.*`.
 
 **Risk if wrong**: Some advanced plugins (custom shaders, compute pipelines) may need
 direct `wgpu` access. This is deferred to Phase 4 (C-ABI host vtable).

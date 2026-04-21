@@ -1,6 +1,6 @@
 -- tests/lua/integration/test_pathfind_ai.lua
--- Integration: lurek.pathfinding hex/jps grids used with AI-style logic.
--- Namespaces: lurek.pathfinding + lurek.ai
+-- Integration: lurek.pathfind hex/jps grids used with AI-style logic.
+-- Namespaces: lurek.pathfind + lurek.ai
 
 local init = require("tests/lua/init")
 describe, it, expect_equal, expect_near, expect_error, expect_true, expect_type, test_summary =
@@ -13,7 +13,7 @@ describe, it, expect_equal, expect_near, expect_error, expect_true, expect_type,
 describe("hexGrid + AI turn-based movement", function()
 
     it("AI unit can find path to target", function()
-        local map = lurek.pathfinding.newHexGrid(12, 12)
+        local map = lurek.pathfind.newHexGrid(12, 12)
         -- Simulate AI agent at (1,1) targeting (10,10)
         local path = map:findPath(1, 1, 10, 10)
         expect_true(path ~= nil, "AI should find a path on open map")
@@ -21,7 +21,7 @@ describe("hexGrid + AI turn-based movement", function()
     end)
 
     it("AI units compute their movement range with budget", function()
-        local map = lurek.pathfinding.newHexGrid(10, 10)
+        local map = lurek.pathfind.newHexGrid(10, 10)
         -- Typical turn-based unit with movement of 3
         local reachable = map:rangeOfMovement(5, 5, 3.0)
         expect_type("table", reachable)
@@ -30,7 +30,7 @@ describe("hexGrid + AI turn-based movement", function()
     end)
 
     it("AI units check line of sight before shooting", function()
-        local map = lurek.pathfinding.newHexGrid(10, 10)
+        local map = lurek.pathfind.newHexGrid(10, 10)
         local los_clear = map:lineOfSight(1, 1, 5, 5)
         expect_equal(true, los_clear, "open map should have LOS")
 
@@ -43,7 +43,7 @@ describe("hexGrid + AI turn-based movement", function()
     end)
 
     it("AI computes FOV for visibility grid", function()
-        local map = lurek.pathfinding.newHexGrid(10, 10)
+        local map = lurek.pathfind.newHexGrid(10, 10)
         local visible = map:fieldOfView(5, 5, 3)
         expect_type("table", visible)
         -- FOV with radius 3 on open map should see many cells
@@ -51,7 +51,7 @@ describe("hexGrid + AI turn-based movement", function()
     end)
 
     it("enemy AI chooses closest walkable cell to player", function()
-        local map = lurek.pathfinding.newHexGrid(10, 10)
+        local map = lurek.pathfind.newHexGrid(10, 10)
         local player = { col = 8, row = 8 }
         local enemies = {
             { col = 1, row = 1 },
@@ -74,7 +74,7 @@ describe("hexGrid + AI turn-based movement", function()
     end)
 
     it("AI blocked by terrain uses alternative path", function()
-        local map = lurek.pathfinding.newHexGrid(8, 8)
+        local map = lurek.pathfind.newHexGrid(8, 8)
         -- Block direct corridor from (1,4) to (8,4)
         for col = 2, 7 do map:setBlocked(col, 4, true) end
         local path_direct = map:findPath(1, 4, 8, 4)
@@ -94,14 +94,14 @@ end)
 describe("jpsGrid + AI real-time movement", function()
 
     it("AI pathfinding request returns a route", function()
-        local map = lurek.pathfinding.newJpsGrid(20, 20)
+        local map = lurek.pathfind.newJpsGrid(20, 20)
         local path = map:findPath(1, 1, 18, 18)
         expect_true(path ~= nil or true, "should return path or nil without crash")
     end)
 
     it("shorter path when obstacles removed", function()
-        local open = lurek.pathfinding.newJpsGrid(10, 10)
-        local blocked = lurek.pathfinding.newJpsGrid(10, 10)
+        local open = lurek.pathfind.newJpsGrid(10, 10)
+        local blocked = lurek.pathfind.newJpsGrid(10, 10)
         -- Add obstacles in blocked version
         for y = 2, 8 do blocked:setBlocked(5, y, true) end
         local path_open    = open:findPath(1, 5, 9, 5)
@@ -113,7 +113,7 @@ describe("jpsGrid + AI real-time movement", function()
     end)
 
     it("AI can place multiple units without conflicts", function()
-        local map = lurek.pathfinding.newJpsGrid(10, 10)
+        local map = lurek.pathfind.newJpsGrid(10, 10)
         -- Simulate 3 AI units with different start/end positions
         local routes = {
             map:findPath(1, 1, 10, 10),
@@ -132,7 +132,7 @@ end)
 describe("rangeMap + AI tactical analysis", function()
 
     it("AI identifies cells within movement budget", function()
-        local result = lurek.pathfinding.rangeMap({
+        local result = lurek.pathfind.rangeMap({
             width = 10, height = 10,
             origin_x = 5, origin_y = 5,
             budget = 2.0
@@ -149,8 +149,8 @@ describe("rangeMap + AI tactical analysis", function()
                 costs[(y - 1) * 10 + x] = (x == 5) and 10.0 or 1.0
             end
         end
-        local cheap = lurek.pathfinding.rangeMap({ width = 10, height = 10, origin_x = 3, origin_y = 5, budget = 3.0 })
-        local expensive = lurek.pathfinding.rangeMap({
+        local cheap = lurek.pathfind.rangeMap({ width = 10, height = 10, origin_x = 3, origin_y = 5, budget = 3.0 })
+        local expensive = lurek.pathfind.rangeMap({
             width = 10, height = 10,
             costs = costs,
             origin_x = 3, origin_y = 5,
@@ -171,7 +171,7 @@ describe("rangeMap + AI tactical analysis", function()
                 end
             end
         end
-        local result = lurek.pathfinding.rangeMap({
+        local result = lurek.pathfind.rangeMap({
             width = 8, height = 8,
             blocked = blocked,
             origin_x = 4, origin_y = 4,

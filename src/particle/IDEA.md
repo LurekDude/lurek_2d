@@ -121,7 +121,7 @@ TODO(plugin): TIER-1-PLUGIN — particle system is a self-contained feature with
 
 > Migrated from `ideas/features/particle.md` and `ideas/performance/03-particle-audio.md` (particle section).
 > Status checked against `src/particle/` and `src/lua_api/particle_api.rs`.
-> Lua namespace: `lurek.particles`.
+> Lua namespace: `lurek.particle`.
 
 ---
 

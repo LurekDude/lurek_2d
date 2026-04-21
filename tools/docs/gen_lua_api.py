@@ -64,7 +64,7 @@ def _collect_docstring_above(lines: List[str], line_idx: int) -> str:
             # Skip the `let s = state.clone();` bridge lines common in lurek2d API files
             pass
         elif stripped.startswith("//") and not stripped.startswith("///"):
-            # Skip plain // comments (e.g. // lurek.graphics.X(…) inline signature notes)
+            # Skip plain // comments (e.g. // lurek.renders.X(…) inline signature notes)
             pass
         else:
             break

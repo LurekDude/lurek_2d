@@ -1,22 +1,22 @@
 --- Lurek2D cinematic library — multi-track scrubbable cutscene timeline.
 --
--- Sequences `lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.signal`,
+-- Sequences `lurek.tween`, `lurek.camera`, `lurek.audio`, `lurek.event`,
 -- and `library.dialog` clips into a single time-positioned timeline that
 -- supports play/pause/seek/scrub/skip-to-label/branch.
 --
 -- Each track is a sorted list of clips: `{at, duration, kind, params,
 -- on_apply, on_revert}`. The timeline owns its own clock — it does not use
--- `lurek.time.Scheduler`.
+-- `lurek.timer.Scheduler`.
 --
 -- @module library.cinematic
 -- @status partial
 -- @see lurek.tween         backbone for `track:tween` clips
 -- @see lurek.camera        consumed by `track:cameraTo` / `track:shake`
 -- @see lurek.audio         consumed by `track:audio` (one-shot fire)
--- @see lurek.signal        consumed by `track:signal`
--- @see lurek.fs            timeline TOML loader (`fromToml`)
--- @see lurek.codec         JSON serialisation for `tl:export`
--- @see lurek.savegame      collector wiring for export/restore
+-- @see lurek.event        consumed by `track:signal`
+-- @see lurek.filesystem            timeline TOML loader (`fromToml`)
+-- @see lurek.serial         JSON serialisation for `tl:export`
+-- @see lurek.save      collector wiring for export/restore
 
 local M = {}
 local table_unpack = table.unpack or unpack
@@ -138,13 +138,13 @@ function Track:audio(at, source, opts)
     })
 end
 
---- Signal clip — emits via `lurek.signal.push` (or queues for later read).
+--- Signal clip — emits via `lurek.event.push` (or queues for later read).
 function Track:signal(at, name, ...)
     local args = { ... }
     return _push(self, {
         kind = "signal", at = at, duration = 0, name = name, args = args,
         on_apply = function(clip)
-            local s = lurek and lurek.signal
+            local s = lurek and lurek.event
             if s and s.push then pcall(s.push, clip.name, table_unpack(clip.args)) end
         end,
         reversible = false,
@@ -209,17 +209,17 @@ function M.newTimeline(opts)
     return tl
 end
 
---- Load a timeline from a TOML file via `lurek.fs.read` + `lurek.codec.fromToml`.
+--- Load a timeline from a TOML file via `lurek.filesystem.read` + `lurek.serial.fromToml`.
 function M.fromToml(path)
-    if not (lurek and lurek.fs and lurek.fs.read) then
-        error("cinematic.fromToml: lurek.fs.read unavailable", 2)
+    if not (lurek and lurek.filesystem and lurek.filesystem.read) then
+        error("cinematic.fromToml: lurek.filesystem.read unavailable", 2)
     end
-    if not (lurek.codec and lurek.codec.fromToml) then
-        error("cinematic.fromToml: lurek.codec.fromToml unavailable", 2)
+    if not (lurek.serial and lurek.serial.fromToml) then
+        error("cinematic.fromToml: lurek.serial.fromToml unavailable", 2)
     end
-    local ok, src = pcall(lurek.fs.read, path)
+    local ok, src = pcall(lurek.filesystem.read, path)
     if not ok then error("cinematic.fromToml: "..tostring(src), 2) end
-    local ok2, data = pcall(lurek.codec.fromToml, src)
+    local ok2, data = pcall(lurek.serial.fromToml, src)
     if not ok2 then error("cinematic.fromToml: "..tostring(data), 2) end
     return M.fromTable(data)
 end

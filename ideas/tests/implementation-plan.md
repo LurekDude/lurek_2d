@@ -35,13 +35,13 @@
 ### 2.1 Unit Tests (Batch 1 — Lowest Coverage)
 | File | Functions to annotate | Est. effort |
 |------|----------------------|-------------|
-| `test_system.lua` | 22 | Small |
+| `test_runtime_system.lua` | 22 | Small |
 | `test_math.lua` | 66 (Vec2/Vec3/Mat3/trig/noise) | Medium |
 | `test_log.lua` | 13 | Small |
-| `test_localization.lua` | 27 | Small |
+| `test_i18n.lua` | 27 | Small |
 | `test_physics.lua` | 50 (Body/Joint/World/Shape) | Medium |
 | `test_filesystem.lua` | 25 | Small |
-| `test_modding.lua` | 22 | Small |
+| `test_mods.lua` | 22 | Small |
 | `test_network.lua` | 20 | Small |
 
 ### 2.2 Unit Tests (Batch 2 — Medium Coverage)
@@ -68,13 +68,13 @@ All remaining unit test files — add markers to verify 100% marker coverage for
 |------|-----------------|-----------------|--------|
 | `tests/lua/golden/test_data_golden.lua` | data | JSON/TOML parse → format roundtrip | ✅ done |
 | `tests/lua/golden/test_serial_golden.lua` | serial | Binary encode/decode exact bytes | ✅ done |
-| `tests/lua/golden/test_pathfinding_golden.lua` | pathfinding | A* on fixed grid → exact path | ✅ done |
+| `tests/lua/golden/test_pathfind_golden_grid.lua` | pathfinding | A* on fixed grid → exact path | ✅ done |
 | `tests/lua/golden/test_graph_golden.lua` | graph | BFS/DFS/Dijkstra → exact traversal | ✅ done |
 | `tests/lua/golden/test_ai_golden.lua` | ai | FSM transition trace | ✅ done |
 | `tests/lua/golden/test_physics_golden.lua` | physics | Simulation with fixed dt → near positions | ✅ done |
 | `tests/lua/golden/test_compute_golden.lua` | compute | Matrix ops → exact results | ✅ done |
 | `tests/lua/golden/test_procgen_golden.lua` | procgen | Seeded generation → exact output | ✅ done |
-| `tests/lua/golden/test_entity_golden.lua` | entity | Hierarchy → exact JSON tree | ✅ done |
+| `tests/lua/golden/test_ecs_golden.lua` | entity | Hierarchy → exact JSON tree | ✅ done |
 | `tests/lua/golden/test_tilemap_golden.lua` | tilemap | Tile queries → exact results | ✅ done |
 | `tests/lua/golden/test_dataframe_golden.lua` | dataframe | Column operations → exact results | ✅ done |
 | `tests/lua/golden/test_animation_golden.lua` | animation | Frame sequence deterministic | ✅ done (bonus) |
@@ -83,24 +83,24 @@ All remaining unit test files — add markers to verify 100% marker coverage for
 ### 3.2 Integration Tests ✅ DONE — all 18 planned files created (43 total)
 | File | Modules tested | Scenarios | Status |
 |------|---------------|-----------|
-| `test_entity_physics.lua` | entity + physics | Bodies parented to entities, physics-driven movement |
-| `test_entity_graphics.lua` | entity + graphics | Entity render, sprite attachment, visibility |
-| `test_scene_entity.lua` | scene + entity | Scene add/remove entities, scene transitions |
+| `test_ecs_physics.lua` | entity + physics | Bodies parented to entities, physics-driven movement |
+| `test_ecs_render.lua` | entity + graphics | Entity render, sprite attachment, visibility |
+| `test_scene_ecs.lua` | scene + entity | Scene add/remove entities, scene transitions |
 | `test_scene_camera.lua` | scene + camera | Camera follows scene entities, scene viewport |
 | `test_tilemap_camera.lua` | tilemap + camera | Camera scrolls tilemap, tile culling |
-| `test_ai_pathfinding.lua` | ai + pathfinding | AI agent follows computed path |
+| `test_ai_pathfind.lua` | ai + pathfinding | AI agent follows computed path |
 | `test_input_camera.lua` | input + camera | Screen-to-world coordinate transform |
 | `test_animation_timer.lua` | animation + timer | Timer-driven animation playback |
 | `test_data_filesystem.lua` | data + filesystem | Save JSON to file, load it back |
-| `test_savegame_tilemap.lua` | savegame + tilemap | Save map state, restore it |
-| `test_signal_entity.lua` | signal + entity | Entities emit/receive signals |
-| `test_tilemap_pathfinding.lua` | tilemap + pathfinding | Grid from tilemap, pathfind on it |
+| `test_save_tilemap.lua` | savegame + tilemap | Save map state, restore it |
+| `test_event_entity.lua` | signal + entity | Entities emit/receive signals |
+| `test_tilemap_pathfind.lua` | tilemap + pathfinding | Grid from tilemap, pathfind on it |
 | `test_thread_data.lua` | thread + data | Cross-thread data via Channel |
 | `test_tween_camera.lua` | tween + camera | Smooth camera pan/zoom |
-| `test_tween_entity.lua` | tween + entity | Tweened entity position/rotation |
+| `test_tween_ecs.lua` | tween + entity | Tweened entity position/rotation |
 | `test_particle_timer.lua` | particle + timer | Timed particle bursts |
-| `test_light_graphics.lua` | light + graphics | Lights affect draw colors (Canvas readback) |
-| `test_localization_ui.lua` | localization + ui | Localized text in UI elements |
+| `test_light_render.lua` | light + graphics | Lights affect draw colors (Canvas readback) |
+| `test_i18n_ui.lua` | localization + ui | Localized text in UI elements |
 
 ### 3.3 Stress Tests ✅ DONE — all 13 planned + 2 bonus files created (27 total)
 | File | Target | Metric | Status |
@@ -108,9 +108,9 @@ All remaining unit test files — add markers to verify 100% marker coverage for
 | `test_ai_stress.lua` | AI FSM/BT evaluate | 10k evals/sec | ✅ done |
 | `test_scene_stress.lua` | Scene add/remove | 1k scenes/sec | ✅ done |
 | `test_camera_stress.lua` | Camera update | 50k updates/sec | ✅ done |
-| `test_savegame_stress.lua` | Save/Load cycle | 100 cycles/sec | ✅ done |
+| `test_save_stress.lua` | Save/Load cycle | 100 cycles/sec | ✅ done |
 | `test_timer_stress.lua` | Timer create/fire | 10k timers/sec | ✅ done |
-| `test_signal_stress.lua` | Signal emit | 50k emits/sec | ✅ done |
+| `test_event_stress.lua` | Signal emit | 50k emits/sec | ✅ done |
 | `test_animation_stress.lua` | Animation update | 10k updates/sec | ✅ done |
 | `test_serial_stress.lua` | Serialize/deserialize | 5k cycles/sec | ✅ done |
 | `test_tween_stress.lua` | Active tweens | 10k tweens/sec | ✅ done |
@@ -118,7 +118,7 @@ All remaining unit test files — add markers to verify 100% marker coverage for
 | `test_patterns_stress.lua` | Pattern evaluate | 50k evals/sec | ✅ done |
 | `test_filesystem_stress.lua` | File write/read | 1k ops/sec | ✅ done |
 | `test_light_stress.lua` | Light add/remove | 5k ops/sec | ✅ done |
-| `test_graphics_stress.lua` | Draw call throughput | Various | ✅ done (bonus) |
+| `test_render_stress.lua` | Draw call throughput | Various | ✅ done (bonus) |
 | `test_thread_stress.lua` | Thread channel throughput | Various | ✅ done (bonus) |
 
 ---
@@ -134,7 +134,7 @@ For every new `.lua` test file, add a corresponding entry in `tests/lua/harness.
 // ... etc
 
 // Integration tests
-#[test] fn lua_test_integration_entity_physics() { run_lua_test("integration/test_entity_physics.lua"); }
+#[test] fn lua_test_integration_entity_physics() { run_lua_test("integration/test_ecs_physics.lua"); }
 // ... etc
 
 // Stress tests

@@ -3,9 +3,9 @@ local effectShader  -- WGSL shader that reads from the canvas
 
 function lurek.init()
     local w, h = lurek.window.getWidth(), lurek.window.getHeight()
-    sceneCanvas = lurek.gfx.newCanvas(w, h)
+    sceneCanvas = lurek.render.newCanvas(w, h)
 
-    effectShader = lurek.gfx.newShader([[
+    effectShader = lurek.render.newShader([[
         @group(0) @binding(0) var tex: texture_2d<f32>;
         @group(0) @binding(1) var smp: sampler;
 
@@ -25,13 +25,13 @@ end
 
 function lurek.render()
     -- Phase 1: render scene to canvas
-    lurek.gfx.setCanvas(sceneCanvas)
-    lurek.gfx.clear()
+    lurek.render.setCanvas(sceneCanvas)
+    lurek.render.clear()
     drawScene()           -- all normal draw calls go here
-    lurek.gfx.setCanvas(nil)
+    lurek.render.setCanvas(nil)
 
     -- Phase 2: draw canvas through effect shader
-    lurek.gfx.setShader(effectShader)
-    lurek.gfx.draw(sceneCanvas, 0, 0)
-    lurek.gfx.setShader(nil)
+    lurek.render.setShader(effectShader)
+    lurek.render.draw(sceneCanvas, 0, 0)
+    lurek.render.setShader(nil)
 end

@@ -450,7 +450,7 @@ export class DevToolsProvider
       case "Performance":
         return [
           new SidebarItem("Open Performance Dashboard", vscode.TreeItemCollapsibleState.None, "lurek.perf.openDashboard", "dashboard"),
-          new SidebarItem("System Monitor", vscode.TreeItemCollapsibleState.None, "lurek.system.openMonitor", "pulse"),
+          new SidebarItem("System Monitor", vscode.TreeItemCollapsibleState.None, "lurek.runtime.openMonitor", "pulse"),
           new SidebarItem("API Usage Report", vscode.TreeItemCollapsibleState.None, "lurek.api.usageReport", "graph"),
           new SidebarItem("Open Hot Reload History", vscode.TreeItemCollapsibleState.None, "lurek.perf.openHotReload", "history"),
           new SidebarItem("Clear History", vscode.TreeItemCollapsibleState.None, "lurek.perf.clearHistory", "clear-all"),

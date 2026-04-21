@@ -1,6 +1,6 @@
 content/examples/
 ├── physics.lua        — lurek.physics.* API example
-├── graphics.lua       — lurek.gfx.* example
-├── timer.lua          — lurek.time.* example
+├── graphics.lua       — lurek.render.* example
+├── timer.lua          — lurek.timer.* example
 ├── audio.lua          — lurek.audio.* example
 └── ...                — one .lua per API namespace

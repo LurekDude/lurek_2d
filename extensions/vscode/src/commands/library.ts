@@ -121,16 +121,16 @@ end`,
     code: `local player = { x = 400, y = 300, speed = 200 }
 
 function lurek.update(dt)
-  if lurek.keyboard.isDown("w") or lurek.keyboard.isDown("up") then
+  if lurek.input.keyboard.isDown("w") or lurek.input.keyboard.isDown("up") then
     player.y = player.y - player.speed * dt
   end
-  if lurek.keyboard.isDown("s") or lurek.keyboard.isDown("down") then
+  if lurek.input.keyboard.isDown("s") or lurek.input.keyboard.isDown("down") then
     player.y = player.y + player.speed * dt
   end
-  if lurek.keyboard.isDown("a") or lurek.keyboard.isDown("left") then
+  if lurek.input.keyboard.isDown("a") or lurek.input.keyboard.isDown("left") then
     player.x = player.x - player.speed * dt
   end
-  if lurek.keyboard.isDown("d") or lurek.keyboard.isDown("right") then
+  if lurek.input.keyboard.isDown("d") or lurek.input.keyboard.isDown("right") then
     player.x = player.x + player.speed * dt
   end
 end`,
@@ -141,7 +141,7 @@ end`,
     code: `local player = { x = 400, y = 300, angle = 0 }
 
 function lurek.update(dt)
-  local mx, my = lurek.mouse.getPosition()
+  local mx, my = lurek.input.mouse.getPosition()
   player.angle = math.atan2(my - player.y, mx - player.x)
 end
 
@@ -160,7 +160,7 @@ end`,
     code: `local player = { x = 400, y = 300, speed = 200 }
 
 function lurek.update(dt)
-  local axes = lurek.gamepad.getAxes(1)
+  local axes = lurek.input.gamepad.getAxes(1)
   if axes then
     local deadzone = 0.2
     if math.abs(axes.leftx) > deadzone then
@@ -223,8 +223,8 @@ local ground_y = 500
 
 function lurek.update(dt)
   -- Horizontal
-  if lurek.keyboard.isDown("left") then player.vx = -moveSpeed
-  elseif lurek.keyboard.isDown("right") then player.vx = moveSpeed
+  if lurek.input.keyboard.isDown("left") then player.vx = -moveSpeed
+  elseif lurek.input.keyboard.isDown("right") then player.vx = moveSpeed
   else player.vx = player.vx * friction end
 
   -- Gravity
@@ -257,10 +257,10 @@ end`,
 
 function lurek.update(dt)
   local ix, iy = 0, 0
-  if lurek.keyboard.isDown("w") then iy = iy - 1 end
-  if lurek.keyboard.isDown("s") then iy = iy + 1 end
-  if lurek.keyboard.isDown("a") then ix = ix - 1 end
-  if lurek.keyboard.isDown("d") then ix = ix + 1 end
+  if lurek.input.keyboard.isDown("w") then iy = iy - 1 end
+  if lurek.input.keyboard.isDown("s") then iy = iy + 1 end
+  if lurek.input.keyboard.isDown("a") then ix = ix - 1 end
+  if lurek.input.keyboard.isDown("d") then ix = ix + 1 end
 
   -- Normalize
   local len = math.sqrt(ix * ix + iy * iy)

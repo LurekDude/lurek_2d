@@ -488,7 +488,7 @@ lurek.ready(function() end)
 -- ── lurek.process ─────────────────────────────────────────────
 lurek.process(function(dt)
     if lurek.input.wasActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -816,13 +816,13 @@ lurek.render_ui(function()
         lurek.render.print("Wolfenstein 3D-style raycaster with 6 wall types", 225, 230, 16)
         lurek.render.print("WASD = Move/Strafe   Q/E = Rotate   Space = Fire", 220, 260, 14)
         lurek.render.print("F1-F3 = Weather   Esc = Quit", 320, 285, 14)
-        local blink = math.sin(lurek.time.getTime() * 4) > 0
+        local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 1, 1)
             lurek.render.print("PRESS ENTER", 395, 360, 22)
         end
         lurek.render.setColor(0.3, 0.3, 0.4, 1)
-        lurek.render.print("FPS: " .. lurek.time.getFPS(), 10, SCREEN_H - 20, 12)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
         return
     end
 
@@ -832,13 +832,13 @@ lurek.render_ui(function()
         lurek.render.print("GAME OVER", 350, 200, 36)
         lurek.render.setColor(0.9, 0.9, 1, 1)
         lurek.render.print("Score: " .. score, 420, 260, 20)
-        local blink = math.sin(lurek.time.getTime() * 4) > 0
+        local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 1, 1)
             lurek.render.print("PRESS ENTER TO RESTART", 340, 330, 18)
         end
         lurek.render.setColor(0.3, 0.3, 0.4, 1)
-        lurek.render.print("FPS: " .. lurek.time.getFPS(), 10, SCREEN_H - 20, 12)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
         return
     end
 
@@ -968,5 +968,5 @@ lurek.render_ui(function()
 
     -- FPS
     lurek.render.setColor(0.3, 0.3, 0.4, 1)
-    lurek.render.print("FPS: " .. lurek.time.getFPS(), 10, SCREEN_H - 20, 12)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
 end)

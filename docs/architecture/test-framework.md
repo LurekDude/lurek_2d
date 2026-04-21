@@ -206,7 +206,7 @@ tests/
     │
     ├── unit/                        One file per engine module (lurek.* API surface)
     │   ├── test_math.lua
-    │   ├── test_graphics.lua
+    │   ├── test_render.lua
     │   ├── test_audio.lua
     │   ├── test_physics.lua
     │   ├── test_input.lua
@@ -243,7 +243,7 @@ tests/
     │   │   Name format: test_<moduleA>_<moduleB>.lua
     │   ├── test_ai_physics.lua
     │   ├── test_ecs_ai.lua
-    │   ├── test_math_graphics.lua
+    │   ├── test_math_render.lua
     │   ├── test_math_physics.lua
     │   ├── test_physics_timer.lua
     │   ├── test_save_ecs.lua
@@ -537,11 +537,11 @@ An integration test **must** exercise at least two distinct `lurek.*` module nam
 
 ```lua
 -- tests/lua/integration/test_physics_timer.lua
--- Integration: lurek.physics + lurek.time (two distinct namespaces)
+-- Integration: lurek.physics + lurek.timer (two distinct namespaces)
 
 describe("physics + timer integration", function()
     it("should simulate body movement over elapsed time", function()
-        -- uses lurek.physics AND lurek.time
+        -- uses lurek.physics AND lurek.timer
     end)
 end)
 
@@ -715,7 +715,7 @@ Returns `(Rc<RefCell<SharedState>>, Lua)` — a SharedState + Lua VM pair for st
 ### Lua Tests
 
 - File naming: `test_<module>.lua`
-- `describe()` blocks named after the API namespace: `"lurek.math"`, `"lurek.gfx"`
+- `describe()` blocks named after the API namespace: `"lurek.math"`, `"lurek.render"`
 - `it()` blocks use natural language: `"should return zero for empty input"`
 
 ---
@@ -1038,7 +1038,7 @@ Every valid evidence test follows this four-step structure:
 
 ```
 1. CREATE   — instantiate module object via lurek.* API
-              e.g. lurek.particles.newSystem(), lurek.minimap.new()
+              e.g. lurek.particle.newSystem(), lurek.minimap.new()
 2. CONFIGURE — set up the module via its Lua API methods
               e.g. sys:setRate(50), mm:setFogLevel(x, y, 2)
 3. EXECUTE   — run module logic to advance state
@@ -1061,23 +1061,23 @@ Every valid evidence test follows this four-step structure:
 ```lua
 -- WRONG: tests nothing — draws shapes manually without touching any module API
 it("polygon gallery", function()
-    local img = lurek.img.newImageData(256, 256)
+    local img = lurek.image.newImageData(256, 256)
     img:fill(20, 20, 30, 255)
     for _, s in ipairs(shapes) do
         for i = 0, s.sides - 1 do
             -- ... manual trig + setPixel loop ...
         end                              -- no lurek.* domain module called!
     end
-    lurek.img.savePNG(img, OUT .. "shapes.png")  -- proves nothing about any module
+    lurek.image.savePNG(img, OUT .. "shapes.png")  -- proves nothing about any module
 end)
 
 -- WRONG: only tests newImageData and setPixel — not any domain module
 it("gradient fills the image", function()
-    local img = lurek.img.newImageData(256, 256)
+    local img = lurek.image.newImageData(256, 256)
     for y = 0, 255 do
         for x = 0, 255 do img:setPixel(x, y, x, y, 128, 255) end
     end
-    lurek.img.savePNG(img, OUT .. "gradient.png")
+    lurek.image.savePNG(img, OUT .. "gradient.png")
 end)
 ```
 
@@ -1086,11 +1086,11 @@ end)
 ```lua
 -- RIGHT: particle system is the subject; drawToImage proves it works
 it("emitter spawns particles after update", function()
-    local sys = lurek.particles.newSystem()      -- 1. CREATE via API
+    local sys = lurek.particle.newSystem()      -- 1. CREATE via API
     sys:setRate(50)                              -- 2. CONFIGURE via API
     for _ = 1, 30 do sys:update(1/60) end        -- 3. EXECUTE via API
     local img = sys:drawToImage(256, 256)        -- 4. DUMP module output
-    lurek.img.savePNG(img, OUT .. "emitter_basic.png")
+    lurek.image.savePNG(img, OUT .. "emitter_basic.png")
     expect_evidence_created(OUT .. "emitter_basic.png")
 end)
 
@@ -1099,12 +1099,12 @@ it("A-star path from (0,0) to (19,19)", function()
     local grid = lurek.pathfind.newGrid(20, 20)  -- 1. CREATE
     grid:setWalkable(10, 5, false)               -- 2. CONFIGURE
     local path = grid:findPath(0, 0, 19, 19)    -- 3. EXECUTE
-    local img = lurek.img.newImageData(200, 200) -- 4. DUMP: visualize API result
+    local img = lurek.image.newImageData(200, 200) -- 4. DUMP: visualize API result
     img:fill(40, 40, 40, 255)
     for _, pt in ipairs(path) do
         img:setPixel(pt.x * 10, pt.y * 10, 0, 255, 0, 255)
     end
-    lurek.img.savePNG(img, OUT .. "pathfind_astar.png")
+    lurek.image.savePNG(img, OUT .. "pathfind_astar.png")
     expect_evidence_created(OUT .. "pathfind_astar.png")
 end)
 ```
@@ -1154,7 +1154,7 @@ The `measure()` function in `tests/lua/init.lua` standardizes stress-test timing
 ```lua
 -- measure(name, count, fn) returns elapsed, ops_per_sec and prints a [PERF] line
 local elapsed, ops = measure("entity_create", 10000, function()
-    for i = 1, 10000 do lurek.entity.newEntity() end
+    for i = 1, 10000 do lurek.ecs.newEntity() end
 end)
 expect_less(elapsed, 2.0, "10k entity creates must finish under 2s")
 ```
@@ -1213,7 +1213,7 @@ Three-way integration tests (three modules exercised in one test) are the highes
 tests/lua/integration/test_<primary>_<secondary>[_<tertiary>].lua
 ```
 
-Example: `test_ai_entity_scene.lua` tests `lurek.ai`, `lurek.entity`, and `lurek.scene` in one scenario.
+Example: `test_ai_ecs_scene.lua` tests `lurek.ai`, `lurek.ecs`, and `lurek.scene` in one scenario.
 
 ---
 

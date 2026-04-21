@@ -20,7 +20,7 @@ cargo run -- content/games/arcade/pong
 Two paddles, one ball. Ball speeds up on each hit. Angle varies based on where the ball hits the paddle.
 
 ## APIs Used
-lurek.window, lurek.render, lurek.input, lurek.signal, lurek.time, lurek.particles, lurek.tween
+lurek.window, lurek.render, lurek.input, lurek.event, lurek.timer, lurek.particle, lurek.tween
 
 ## Changes from Original Demo
 ### Replaced

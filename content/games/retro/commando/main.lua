@@ -429,7 +429,7 @@ end)
 lurek.process(function(dt)
     -- Quit
     if lurek.input.isKeyPressed("escape") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -841,7 +841,7 @@ lurek.render_ui(function()
     lurek.render.setColor(0.7, 0.8, 1, 1)
     lurek.render.print("DIST: " .. math.floor(distance), 530, 4)
 
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.5, 0.5, 0.5, 0.8)
     lurek.render.print("FPS: " .. fps, SCREEN_W - 80, 4)
 

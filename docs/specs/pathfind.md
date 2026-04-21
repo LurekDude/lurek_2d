@@ -7,7 +7,7 @@
 - Lua API path(s): `src/lua_api/pathfind_api.rs`
 - Primary Lua namespace: `lurek.pathfind`
 - Rust test path(s): tests/rust/unit/pathfinding_tests.rs
-- Lua test path(s): tests/lua/unit/test_pathfinding.lua, tests/lua/stress/test_pathfinding_stress.lua, tests/lua/golden/test_pathfinding_golden.lua, tests/lua/integration/test_tilemap_pathfinding.lua, tests/lua/integration/test_pathfinding_entity.lua, tests/lua/integration/test_ai_pathfinding.lua
+- Lua test path(s): tests/lua/unit/test_pathfind.lua, tests/lua/stress/test_pathfind_stress.lua, tests/lua/golden/test_pathfind_golden_grid.lua, tests/lua/integration/test_tilemap_pathfind.lua, tests/lua/integration/test_pathfind_ecs.lua, tests/lua/integration/test_ai_pathfind.lua
 
 ## Summary
 

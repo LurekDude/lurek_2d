@@ -8,12 +8,12 @@ purely visual composition with draw ordering.
 
 The library never calls rendering APIs directly; it produces a sorted
 draw list via `Doll:getDrawList()` that the caller hands to its renderer
-(typically `lurek.graphic`). The legacy `Doll:draw()` method is retained
+(typically `lurek.render`). The legacy `Doll:draw()` method is retained
 as a deprecated no-op for source compatibility.
 
 *25 functions, 0 module fields documented.*
 
-See: [`lurek.graphic`](../lua-api.md#lurekgraphic) — caller-side renderer that consumes `getDrawList()` entries, [`lurek.img`](../lua-api.md#lurekimg) — image/texture loader for `Part:setTexture()`, [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson) — serialise template + part state for persistence
+See: [`lurek.render`](../lua-api.md#lurekgraphic) — caller-side renderer that consumes `getDrawList()` entries, [`lurek.image`](../lua-api.md#lurekimg) — image/texture loader for `Part:setTexture()`, [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson) — serialise template + part state for persistence
 
 ## Functions
 
@@ -184,9 +184,9 @@ Compute world-transform draw list sorted by drawOrder. Each entry: {socketName, 
 
 ### `draw()` *(deprecated)*
 
-Deprecated convenience draw shim — retained only as a no-op. The original implementation referenced an undefined global (`luna`) and a non-existent namespace (`lurek.gfx`), so the call chain was a silent no-op in every build. Library code must not call rendering APIs directly (per `library.*` conventions), so the correct path now is for the caller to iterate `Doll:getDrawList()` and dispatch the entries to `lurek.graphic` (or any other renderer) themselves. This method emits a one-time warning on first invocation and then returns immediately. It will be removed in a future major bump.
+Deprecated convenience draw shim — retained only as a no-op. The original implementation referenced an undefined global (`luna`) and a non-existent namespace (`lurek.render`), so the call chain was a silent no-op in every build. Library code must not call rendering APIs directly (per `library.*` conventions), so the correct path now is for the caller to iterate `Doll:getDrawList()` and dispatch the entries to `lurek.render` (or any other renderer) themselves. This method emits a one-time warning on first invocation and then returns immediately. It will be removed in a future major bump.
 
-See: [`lurek.graphic`](../lua-api.md#lurekgraphic)
+See: [`lurek.render`](../lua-api.md#lurekgraphic)
 
 ### `getAbsoluteScale(entry)`
 

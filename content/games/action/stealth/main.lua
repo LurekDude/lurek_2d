@@ -319,21 +319,21 @@ lurek.init(function()
     lurek.input.addAction("quit",     {"escape"})
 
     -- Particle systems
-    noise_ps = lurek.particles.new({
+    noise_ps = lurek.particle.new({
         maxParticles = 30, lifetime = 0.6,
         speed = 50, spread = 6.28,
         sizeStart = 6, sizeEnd = 12,
         colorStart = {0.8, 0.8, 0.6, 0.4},
         colorEnd   = {0.8, 0.8, 0.6, 0.0},
     })
-    alert_ps = lurek.particles.new({
+    alert_ps = lurek.particle.new({
         maxParticles = 20, lifetime = 0.4,
         speed = 80, spread = 6.28,
         sizeStart = 4, sizeEnd = 2,
         colorStart = {1.0, 0.3, 0.1, 1.0},
         colorEnd   = {1.0, 0.1, 0.0, 0.0},
     })
-    sparkle_ps = lurek.particles.new({
+    sparkle_ps = lurek.particle.new({
         maxParticles = 15, lifetime = 0.5,
         speed = 60, spread = 6.28,
         sizeStart = 3, sizeEnd = 1,
@@ -350,7 +350,7 @@ end)
 lurek.process(function(dt)
     -- Quit
     if lurek.input.isActionJustPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -599,7 +599,7 @@ lurek.process(function(dt)
     lurek.camera.setPosition(0, 0)
 
     -- FPS in title
-    local fps = lurek.time.getFPS()
+    local fps = lurek.timer.getFPS()
     lurek.window.setTitle("Stealth — Lurek2D [FPS: " .. fps .. "]")
 end)
 

@@ -9,8 +9,8 @@ Adversarial tests for sandbox enforcement, nil spam, path traversal, and resourc
 ## Coverage
 
 - Lua sandbox: disallowed globals, Lua FFI restrictions
-- `lurek.fs` path-traversal guard
-- `lurek.savegame` validation against corrupt/path-traversal data
+- `lurek.filesystem` path-traversal guard
+- `lurek.save` validation against corrupt/path-traversal data
 - TOML/config injection
 
 ## Harness

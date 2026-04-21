@@ -40,7 +40,7 @@ Lua-Designer owns the public `lurek.*` Lua API surface for GameDev and Modder us
 ## Workflow
 1. Read the existing `lurek.*` surface in `src/lua_api/` and `docs/API/lua-api.md`; load [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md) and [skill: lua-scripting](.github/skills/lua-scripting/SKILL.md).
 2. Draft the usage example **first** to expose awkward names or parameter order before locking the signature.
-3. Write the signature with sensible defaults; check consistency against `lurek.gfx`, `lurek.audio`, `lurek.physics` aliases (`dt`, `x, y`, `w, h`, `r, g, b, a`, `key`, `btn`).
+3. Write the signature with sensible defaults; check consistency against `lurek.render`, `lurek.audio`, `lurek.physics` aliases (`dt`, `x, y`, `w, h`, `r, g, b, a`, `key`, `btn`).
 4. Run [tool: validate_lua_api](tools/validate/validate_lua_api.py) on the example.
 5. Self-review: could a Copilot agent call this without a clarifying question? If no, redesign.
 6. Update `docs/specs/<module>.md` Lua API section and add a migration note when applicable; regenerate the reference via [tool: gen_lua_api](tools/docs/gen_lua_api.py).

@@ -14,13 +14,13 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.2, 0.6, 0.9)
+    lurek.render.clear(0.2, 0.6, 0.9)
     camera:apply()
     player:draw()
     camera:reset()
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     player:keypressed(key)
 end

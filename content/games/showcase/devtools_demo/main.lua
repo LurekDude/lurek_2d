@@ -152,20 +152,20 @@ end
 -- ── Initialization ─────────────────────────────────────────────────────────
 function lurek.init()
     lurek.window.setTitle("Devtools Demo — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.1)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.1)
     bind_inputs()
 
     -- Pre-fill frame history
     for i = 1, HISTORY_SIZE do frame_history[i] = 16.67 end
 
     -- Particle systems
-    ps_spawn = lurek.particles.newSystem({
+    ps_spawn = lurek.particle.newSystem({
         maxParticles = 60, emissionRate = 0,
         lifetimeMin = 0.3, lifetimeMax = 0.6,
         speedMin = 40, speedMax = 100, direction = -1.57, spread = 3.14,
         sizes = { 3, 1 }, colors = { 0.3, 0.7, 1, 1, 0.1, 0.3, 0.8, 0 },
     })
-    ps_stress = lurek.particles.newSystem({
+    ps_stress = lurek.particle.newSystem({
         maxParticles = 100, emissionRate = 0,
         lifetimeMin = 0.5, lifetimeMax = 1.0,
         speedMin = 20, speedMax = 60, direction = -1.57, spread = 6.28,
@@ -213,7 +213,7 @@ function lurek.process(dt)
     end
 
     -- ── RUNNING — input ────────────────────────────────────────
-    if lurek.input.wasActionPressed("quit") then lurek.signal.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     if lurek.input.wasActionPressed("toggle_fps") then
         show_fps = not show_fps
@@ -316,12 +316,12 @@ function lurek.render()
 
     if current_state == STATE.TITLE then
         -- Title screen
-        lurek.gfx.setColor(0.3, 0.6, 1.0, title_alpha)
-        lurek.gfx.print("DEVTOOLS DEMO", SCREEN_W * 0.5 - 120, SCREEN_H * 0.3)
-        lurek.gfx.setColor(0.5, 0.8, 1.0, title_alpha * 0.7)
-        lurek.gfx.print("PROFILING & DIAGNOSTICS", SCREEN_W * 0.5 - 140, SCREEN_H * 0.3 + 32)
-        lurek.gfx.setColor(0.7, 0.7, 0.7, title_alpha * 0.5)
-        lurek.gfx.print("Press SPACE or TAB to start", SCREEN_W * 0.5 - 130, SCREEN_H * 0.6)
+        lurek.render.setColor(0.3, 0.6, 1.0, title_alpha)
+        lurek.render.print("DEVTOOLS DEMO", SCREEN_W * 0.5 - 120, SCREEN_H * 0.3)
+        lurek.render.setColor(0.5, 0.8, 1.0, title_alpha * 0.7)
+        lurek.render.print("PROFILING & DIAGNOSTICS", SCREEN_W * 0.5 - 140, SCREEN_H * 0.3 + 32)
+        lurek.render.setColor(0.7, 0.7, 0.7, title_alpha * 0.5)
+        lurek.render.print("Press SPACE or TAB to start", SCREEN_W * 0.5 - 130, SCREEN_H * 0.6)
         draw_call_count = draw_call_count + 3
         return
     end
@@ -329,13 +329,13 @@ function lurek.render()
     -- Draw balls
     for i = 1, #balls do
         local b = balls[i]
-        lurek.gfx.setColor(b.cr, b.cg, b.cb, 0.9)
-        lurek.gfx.circle("fill", b.x, b.y, b.r)
+        lurek.render.setColor(b.cr, b.cg, b.cb, 0.9)
+        lurek.render.circle("fill", b.x, b.y, b.r)
         draw_call_count = draw_call_count + 1
     end
 
     -- Particles
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
     ps_spawn:draw()
     ps_stress:draw()
     draw_call_count = draw_call_count + 2
@@ -350,20 +350,20 @@ function lurek.render_ui()
     -- ── F1: FPS overlay ────────────────────────────────────────
     if show_fps or panel_offsets[1] > -PANEL_W then
         local px = SCREEN_W - PANEL_W - PANEL_MARGIN + panel_offsets[1]
-        lurek.gfx.setColor(0.0, 0.0, 0.0, 0.75)
-        lurek.gfx.rectangle("fill", px, py, PANEL_W, PANEL_H)
-        lurek.gfx.setColor(0.3, 0.8, 1.0, 1)
-        lurek.gfx.print(string.format("FPS: %d  (%.2f ms)", fps_value, frame_time_ms), px + 8, py + 6)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.75)
+        lurek.render.rectangle("fill", px, py, PANEL_W, PANEL_H)
+        lurek.render.setColor(0.3, 0.8, 1.0, 1)
+        lurek.render.print(string.format("FPS: %d  (%.2f ms)", fps_value, frame_time_ms), px + 8, py + 6)
 
         -- Frame time graph (line)
         local gx, gy, gw, gh = px + 8, py + 28, PANEL_W - 16, PANEL_H - 38
-        lurek.gfx.setColor(0.15, 0.15, 0.2, 0.8)
-        lurek.gfx.rectangle("fill", gx, gy, gw, gh)
+        lurek.render.setColor(0.15, 0.15, 0.2, 0.8)
+        lurek.render.rectangle("fill", gx, gy, gw, gh)
 
         -- 16ms reference line
         local ref_y = gy + gh - (16 / 33) * gh
-        lurek.gfx.setColor(0.5, 0.5, 0.2, 0.5)
-        lurek.gfx.line(gx, ref_y, gx + gw, ref_y)
+        lurek.render.setColor(0.5, 0.5, 0.2, 0.5)
+        lurek.render.line(gx, ref_y, gx + gw, ref_y)
 
         -- Graph lines
         local step = gw / HISTORY_SIZE
@@ -377,8 +377,8 @@ function lurek.render_ui()
             local x1 = gx + (j - 1) * step
             local y1 = gy + gh - v1 * gh
             local r, g, b, a = heatmap_color(frame_history[idx_curr] or 16.67)
-            lurek.gfx.setColor(r, g, b, a)
-            lurek.gfx.line(x0, y0, x1, y1)
+            lurek.render.setColor(r, g, b, a)
+            lurek.render.line(x0, y0, x1, y1)
         end
         draw_call_count = draw_call_count + HISTORY_SIZE + 4
     end
@@ -387,21 +387,21 @@ function lurek.render_ui()
     py = py + PANEL_H + PANEL_MARGIN
     if show_memory or panel_offsets[2] > -PANEL_W then
         local px = SCREEN_W - PANEL_W - PANEL_MARGIN + panel_offsets[2]
-        lurek.gfx.setColor(0.0, 0.0, 0.0, 0.75)
-        lurek.gfx.rectangle("fill", px, py, PANEL_W, 90)
-        lurek.gfx.setColor(0.2, 0.9, 0.4, 1)
-        lurek.gfx.print(string.format("Objects: %d", mem_objects), px + 8, py + 6)
-        lurek.gfx.print(string.format("Est: %.1f KB / Peak: %.1f KB", mem_bytes_est / 1024, peak_mem_bytes / 1024), px + 8, py + 24)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.75)
+        lurek.render.rectangle("fill", px, py, PANEL_W, 90)
+        lurek.render.setColor(0.2, 0.9, 0.4, 1)
+        lurek.render.print(string.format("Objects: %d", mem_objects), px + 8, py + 6)
+        lurek.render.print(string.format("Est: %.1f KB / Peak: %.1f KB", mem_bytes_est / 1024, peak_mem_bytes / 1024), px + 8, py + 24)
 
         -- Usage bar
         local bar_x, bar_y, bar_w, bar_h = px + 8, py + 48, PANEL_W - 16, 16
         local fill = clamp(mem_bytes_est / math.max(peak_mem_bytes, 1), 0, 1)
-        lurek.gfx.setColor(0.15, 0.15, 0.2, 1)
-        lurek.gfx.rectangle("fill", bar_x, bar_y, bar_w, bar_h)
-        lurek.gfx.setColor(0.2, 0.8, 0.4, 0.9)
-        lurek.gfx.rectangle("fill", bar_x, bar_y, bar_w * fill, bar_h)
-        lurek.gfx.setColor(0.3, 0.9, 0.5, 1)
-        lurek.gfx.print(string.format("%.0f%%", fill * 100), bar_x + bar_w * 0.5 - 12, py + 70)
+        lurek.render.setColor(0.15, 0.15, 0.2, 1)
+        lurek.render.rectangle("fill", bar_x, bar_y, bar_w, bar_h)
+        lurek.render.setColor(0.2, 0.8, 0.4, 0.9)
+        lurek.render.rectangle("fill", bar_x, bar_y, bar_w * fill, bar_h)
+        lurek.render.setColor(0.3, 0.9, 0.5, 1)
+        lurek.render.print(string.format("%.0f%%", fill * 100), bar_x + bar_w * 0.5 - 12, py + 70)
         draw_call_count = draw_call_count + 7
     end
 
@@ -411,20 +411,20 @@ function lurek.render_ui()
         local px = SCREEN_W - PANEL_W - PANEL_MARGIN + panel_offsets[3]
         local rows = math.min(#balls, 8)
         local h = 28 + rows * 16
-        lurek.gfx.setColor(0.0, 0.0, 0.0, 0.75)
-        lurek.gfx.rectangle("fill", px, py, PANEL_W, h)
-        lurek.gfx.setColor(1.0, 0.8, 0.3, 1)
-        lurek.gfx.print(string.format("Entities: %d", #balls), px + 8, py + 6)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.75)
+        lurek.render.rectangle("fill", px, py, PANEL_W, h)
+        lurek.render.setColor(1.0, 0.8, 0.3, 1)
+        lurek.render.print(string.format("Entities: %d", #balls), px + 8, py + 6)
 
         for j = 1, rows do
             local b = balls[j]
             local txt = string.format("#%d  (%.0f,%.0f) v=(%.0f,%.0f)", j, b.x, b.y, b.vx, b.vy)
-            lurek.gfx.setColor(0.8, 0.8, 0.7, 0.85)
-            lurek.gfx.print(txt, px + 8, py + 12 + j * 16)
+            lurek.render.setColor(0.8, 0.8, 0.7, 0.85)
+            lurek.render.print(txt, px + 8, py + 12 + j * 16)
         end
         if #balls > 8 then
-            lurek.gfx.setColor(0.6, 0.6, 0.5, 0.6)
-            lurek.gfx.print(string.format("... +%d more", #balls - 8), px + 8, py + 12 + (rows + 1) * 16)
+            lurek.render.setColor(0.6, 0.6, 0.5, 0.6)
+            lurek.render.print(string.format("... +%d more", #balls - 8), px + 8, py + 12 + (rows + 1) * 16)
         end
         draw_call_count = draw_call_count + rows + 3
     end
@@ -434,18 +434,18 @@ function lurek.render_ui()
         local px = PANEL_MARGIN + panel_offsets[4]
         local hm_w, hm_h = 240, 40
         local hm_y = SCREEN_H - hm_h - PANEL_MARGIN
-        lurek.gfx.setColor(0.0, 0.0, 0.0, 0.75)
-        lurek.gfx.rectangle("fill", px, hm_y, hm_w, hm_h)
-        lurek.gfx.setColor(0.9, 0.9, 0.9, 1)
-        lurek.gfx.print("Frame Heatmap", px + 4, hm_y + 2)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.75)
+        lurek.render.rectangle("fill", px, hm_y, hm_w, hm_h)
+        lurek.render.setColor(0.9, 0.9, 0.9, 1)
+        lurek.render.print("Frame Heatmap", px + 4, hm_y + 2)
 
         local block_w = hm_w / 60
         for j = 1, 60 do
             local idx = ((frame_index - 2 + (j - 1) * 4) % HISTORY_SIZE) + 1
             local ms = frame_history[idx] or 16.67
             local r, g, b, a = heatmap_color(ms)
-            lurek.gfx.setColor(r, g, b, a)
-            lurek.gfx.rectangle("fill", px + (j - 1) * block_w, hm_y + 18, block_w - 1, 18)
+            lurek.render.setColor(r, g, b, a)
+            lurek.render.rectangle("fill", px + (j - 1) * block_w, hm_y + 18, block_w - 1, 18)
         end
         draw_call_count = draw_call_count + 62
     end
@@ -454,35 +454,35 @@ function lurek.render_ui()
     if show_drawcalls or panel_offsets[5] > -PANEL_W then
         local px = PANEL_MARGIN + panel_offsets[5]
         local dc_y = SCREEN_H - 90 - PANEL_MARGIN
-        lurek.gfx.setColor(0.0, 0.0, 0.0, 0.75)
-        lurek.gfx.rectangle("fill", px, dc_y, 200, 40)
-        lurek.gfx.setColor(1.0, 0.5, 0.2, 1)
-        lurek.gfx.print(string.format("Draw calls: %d", draw_call_count), px + 8, dc_y + 6)
-        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.7)
-        lurek.gfx.print(string.format("Balls: %d | Particles: 2", #balls), px + 8, dc_y + 22)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.75)
+        lurek.render.rectangle("fill", px, dc_y, 200, 40)
+        lurek.render.setColor(1.0, 0.5, 0.2, 1)
+        lurek.render.print(string.format("Draw calls: %d", draw_call_count), px + 8, dc_y + 6)
+        lurek.render.setColor(0.8, 0.8, 0.8, 0.7)
+        lurek.render.print(string.format("Balls: %d | Particles: 2", #balls), px + 8, dc_y + 22)
         draw_call_count = draw_call_count + 4
     end
 
     -- ── Slow-mo indicator ──────────────────────────────────────
     if time_scale < 1.0 then
-        lurek.gfx.setColor(1, 0.3, 0.3, 0.9)
-        lurek.gfx.print(string.format("SLOW-MO (%.2fx)", time_scale), PANEL_MARGIN, PANEL_MARGIN)
+        lurek.render.setColor(1, 0.3, 0.3, 0.9)
+        lurek.render.print(string.format("SLOW-MO (%.2fx)", time_scale), PANEL_MARGIN, PANEL_MARGIN)
     end
 
     -- ── Export overlay ─────────────────────────────────────────
     if export_text then
-        lurek.gfx.setColor(0.0, 0.0, 0.0, 0.85)
-        lurek.gfx.rectangle("fill", SCREEN_W * 0.5 - 180, SCREEN_H * 0.5 - 60, 360, 120)
-        lurek.gfx.setColor(0.2, 1.0, 0.6, 1)
-        lurek.gfx.print(export_text, SCREEN_W * 0.5 - 170, SCREEN_H * 0.5 - 50)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.85)
+        lurek.render.rectangle("fill", SCREEN_W * 0.5 - 180, SCREEN_H * 0.5 - 60, 360, 120)
+        lurek.render.setColor(0.2, 1.0, 0.6, 1)
+        lurek.render.print(export_text, SCREEN_W * 0.5 - 170, SCREEN_H * 0.5 - 50)
     end
 
     -- ── Bottom HUD ─────────────────────────────────────────────
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.gfx.print(
+    lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
+    lurek.render.print(
         "F1:FPS  F2:Mem  F3:Inspector  F4:Heatmap  F5:DrawCalls  Tab:Cycle  Space:+10  S:+200  M:SlowMo  E:Export",
         8, SCREEN_H - 18
     )
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 0.5)
-    lurek.gfx.print(string.format("FPS: %d", fps_value), SCREEN_W - 70, 4)
+    lurek.render.setColor(0.6, 0.6, 0.6, 0.5)
+    lurek.render.print(string.format("FPS: %d", fps_value), SCREEN_W - 70, 4)
 end

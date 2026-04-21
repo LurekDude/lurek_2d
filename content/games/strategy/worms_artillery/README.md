@@ -8,10 +8,10 @@ Turn-based artillery game inspired by Worms (Amiga 1998). Two teams take turns f
 - `lurek.math.newRandomGenerator()` — seeded RNG for team placement
 - `lurek.math.distance()` / `lurek.math.lerp()` — blast radius damage and explosion scaling
 - `lurek.particle.newSystem()` — spark burst on explosion
-- `lurek.gfx.circle()` / `lurek.gfx.rectangle()` / `lurek.gfx.line()` — worms, terrain, aim indicator
-- `lurek.gfx.print()` — HUD (team name, power, wind, timer)
+- `lurek.render.circle()` / `lurek.render.rectangle()` / `lurek.render.line()` — worms, terrain, aim indicator
+- `lurek.render.print()` — HUD (team name, power, wind, timer)
 - `lurek.input.isDown()` — hold keys to adjust aim angle and power
-- `lurek.signal.quit()` — clean exit
+- `lurek.event.quit()` — clean exit
 
 ## How to Run
 

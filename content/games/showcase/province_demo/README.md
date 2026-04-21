@@ -4,10 +4,10 @@ Procedural Voronoi-like province map generator with terrain, ownership, fog of w
 
 ## What It Demonstrates
 
-- `lurek.gfx.setBackgroundColor()` — dark background for map contrast
-- `lurek.gfx.rectangle()` — grid-based province cell rendering
-- `lurek.gfx.line()` — pathfinding route and province border drawing
-- `lurek.gfx.print()` — stats panel, detail panel, HUD overlays
+- `lurek.render.setBackgroundColor()` — dark background for map contrast
+- `lurek.render.rectangle()` — grid-based province cell rendering
+- `lurek.render.line()` — pathfinding route and province border drawing
+- `lurek.render.print()` — stats panel, detail panel, HUD overlays
 - `lurek.input.bind()` — action-mapped controls for mode cycling, fog, generation
 - `lurek.input.actionPressed()` — polling bound actions each frame
 - `lurek.camera.attach()` / `lurek.camera.detach()` — world-space map rendering

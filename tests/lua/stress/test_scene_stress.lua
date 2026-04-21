@@ -3,7 +3,7 @@
 
 -- @description Covers suite: stress: massive entity spawn and kill.
 describe("stress: massive entity spawn and kill", function()
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @covers Universe:spawn
     -- @covers Universe:kill
     -- @stress Creates and destroys 5000 one-off entities inside a measured loop.
@@ -12,7 +12,7 @@ describe("stress: massive entity spawn and kill", function()
         local COUNT = 5000
 
         local elapsed = measure("entity spawn+kill x" .. COUNT, COUNT, function()
-            local universe = lurek.entity.newUniverse()
+            local universe = lurek.ecs.newUniverse()
             local id = universe:spawn()
             universe:kill(id)
         end)
@@ -20,7 +20,7 @@ describe("stress: massive entity spawn and kill", function()
         expect_true(elapsed < 10.0, "entity lifecycle budget: " .. elapsed .. "s")
     end)
 
-    -- @covers lurek.entity.newUniverse
+    -- @covers lurek.ecs.newUniverse
     -- @covers Universe:spawn
     -- @covers Universe:set
     -- @covers Universe:get
@@ -28,7 +28,7 @@ describe("stress: massive entity spawn and kill", function()
     -- @description Stresses component write and read throughput across a moderate entity pool by separating bulk writes from a full verification read pass.
     it("spawn 1000 entities, set+get 5 components each: <10s", function()
         local COUNT      = 1000
-        local universe   = lurek.entity.newUniverse()
+        local universe   = lurek.ecs.newUniverse()
         local ids        = {}
 
         for i = 1, COUNT do

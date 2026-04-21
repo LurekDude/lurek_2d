@@ -9,13 +9,13 @@ Full-screen terminal UI character creation wizard with box-drawing borders, colo
 - `lurek.render.drawLine()` — CRT-style scanline overlay
 - `lurek.input.bind()` — action-based navigation (up/down/confirm/back/next_stat/quit)
 - `lurek.textinput()` — character-by-character name entry
-- `lurek.particles.newSystem()` — page-complete flash and celebration effects
+- `lurek.particle.newSystem()` — page-complete flash and celebration effects
 - `lurek.tween.to()` — cursor blink, page transitions, stat bar fill animation
 - `lurek.camera.new()` — world-space rendering with camera attach/detach
 - `lurek.window.setTitle()` — dynamic window title
 - `lurek.render.setBackgroundColor()` — black terminal background
-- `lurek.signal.quit()` — escape to exit
-- `lurek.time.getFPS()` — FPS counter in HUD
+- `lurek.event.quit()` — escape to exit
+- `lurek.timer.getFPS()` — FPS counter in HUD
 
 ## How to Run
 

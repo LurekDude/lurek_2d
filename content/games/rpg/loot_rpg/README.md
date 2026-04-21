@@ -18,4 +18,4 @@ Dungeon crawler loot game built with Lurek2D.
 - Weight-limited backpack
 
 ## APIs Used
-lurek.render, lurek.render_ui, lurek.input, lurek.tween, lurek.particles, lurek.camera, lurek.window, lurek.time, lurek.signal
+lurek.render, lurek.render_ui, lurek.input, lurek.tween, lurek.particle, lurek.camera, lurek.window, lurek.timer, lurek.event

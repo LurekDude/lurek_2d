@@ -29,9 +29,9 @@ Enemies walk the pre-drawn path from left to right. Place towers on any non-path
 
 ## APIs Used
 - `lurek.render` — hex grid, towers, enemies, bullets, HP bars
-- `lurek.particles` — hit sparks, death burst, tower placement flash
+- `lurek.particle` — hit sparks, death burst, tower placement flash
 - `lurek.input` — action bindings for placement, type cycling, wave start
-- `lurek.window`, `lurek.signal`
+- `lurek.window`, `lurek.event`
 
 ## Changes from Original Demo
 ### Replaced

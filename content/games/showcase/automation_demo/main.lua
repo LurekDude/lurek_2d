@@ -399,7 +399,7 @@ lurek.process(function(dt)
     end
 
     if lurek.input.isActionPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
     end
 end)
 

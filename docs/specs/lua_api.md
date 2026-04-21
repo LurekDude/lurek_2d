@@ -26,23 +26,23 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `ai_api.rs`: Registers the lurek.ai namespace and translates Lua calls into the AI module's Rust types and operations.
 - `animation_api.rs`: Registers lurek.animation and exposes animation playback and clip-facing wrappers.
 - `audio_api.rs`: Registers lurek.audio and wraps mixer, source, bus, and related audio-facing objects.
-- `automation_api.rs`: Registers lurek.simulator and bridges scripted input playback into the automation module.
+- `automation_api.rs`: Registers lurek.automation and bridges scripted input playback into the automation module.
 - `camera_api.rs`: Registers lurek.camera and exposes camera creation and manipulation.
-- `collision_api.rs`: `lurek.collision` — Lightweight stateless geometric collision helpers.
+- `collision_api.rs`: `lurek.physics` — Lightweight stateless geometric collision helpers.
 - `compute_api.rs`: Registers lurek.compute and bridges array or compute-oriented operations into Lua.
 - `data_api.rs`: Registers lurek.data and exposes binary, encoding, hashing, and related data utilities.
 - `dataframe_api.rs`: Registers lurek.dataframe and wraps tabular data operations for Lua.
 - `debugbridge_api.rs`: Registers lurek.debugbridge and exposes the runtime debug TCP bridge to Lua code and tooling.
 - `devtools_api.rs`: Registers lurek.devtools and wraps runtime diagnostics helpers such as logging, profiling, frame stats, and watchers.
 - `docs_api.rs`: Registers lurek.docs and exposes runtime documentation catalogs, schema validation, and export helpers.
-- `ecs_api.rs`: Registers lurek.entity and bridges ECS world and entity operations.
+- `ecs_api.rs`: Registers lurek.ecs and bridges ECS world and entity operations.
 - `effect_api.rs`: Registers effect-related Lua APIs for post-processing and visual effects.
-- `engine_api.rs`: `lurek.engine` — Runtime engine metadata and introspection.
-- `event_api.rs`: Registers lurek.signal and exposes event queue and signal-style communication helpers.
-- `filesystem_api.rs`: Registers lurek.fs and enforces sandboxed file-system operations at the Lua boundary.
+- `engine_api.rs`: `lurek.runtime` — Runtime engine metadata and introspection.
+- `event_api.rs`: Registers lurek.event and exposes event queue and signal-style communication helpers.
+- `filesystem_api.rs`: Registers lurek.filesystem and enforces sandboxed file-system operations at the Lua boundary.
 - `graph_api.rs`: Registers lurek.graph and bridges graph construction and traversal features.
 - `i18n_api.rs`: Registers localization APIs for translated string catalogs and language lookup.
-- `image_api.rs`: Registers lurek.img and wraps CPU-side image-data operations.
+- `image_api.rs`: Registers lurek.image and wraps CPU-side image-data operations.
 - `input_api.rs`: Registers keyboard, mouse, gamepad, and touch input namespaces from the engine input state.
 - `light_api.rs`: Registers lurek.light and exposes the lighting system to Lua.
 - `log_api.rs`: Registers lurek.log and exposes structured logging calls at the scripting layer.
@@ -50,27 +50,27 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `math_api.rs`: Registers lurek.math and bridges engine math helpers, interpolation, and utility functions.
 - `minimap_api.rs`: Registers lurek.minimap and exposes the minimap feature system.
 - `mod.rs`: Creates and configures the Lua VM, opens the allowed standard libraries, removes unsafe globals, and registers the enabled lurek.* namespaces. This is the composition root for scripting.
-- `mods_api.rs`: Registers lurek.modding and bridges mod discovery and load-order tooling.
+- `mods_api.rs`: Registers lurek.mods and bridges mod discovery and load-order tooling.
 - `network_api.rs`: Registers lurek.network and exposes multiplayer or transport-facing operations.
 - `parallax_api.rs`: Registers lurek.parallax and wraps layered scrolling background support.
-- `particle_api.rs`: Registers lurek.particles and exposes emitters and particle-system behavior.
-- `pathfind_api.rs`: Registers lurek.pathfinding and bridges pathfinding data and queries.
+- `particle_api.rs`: Registers lurek.particle and exposes emitters and particle-system behavior.
+- `pathfind_api.rs`: Registers lurek.pathfind and bridges pathfinding data and queries.
 - `patterns_api.rs`: Registers lurek.patterns and exposes reusable design-pattern helpers.
 - `physics_api.rs`: Registers lurek.physics and wraps physics world, bodies, shapes, joints, and queries.
 - `pipeline_api.rs`: Registers lurek.pipeline and exposes DAG workflow orchestration to Lua.
 - `procgen_api.rs`: Registers lurek.procgen and bridges procedural-generation utilities.
 - `raycaster_api.rs`: Registers lurek.raycaster and exposes retro 2.5D raycasting features.
 - `render_api.rs`: Registers the main 2D drawing APIs and resource wrappers used for graphics, canvases, shaders, meshes, and sprite batches.
-- `save_api.rs`: Registers lurek.savegame and exposes save-slot and persistence helpers.
+- `save_api.rs`: Registers lurek.save and exposes save-slot and persistence helpers.
 - `scene_api.rs`: Registers lurek.scene and bridges scene stack and transition management.
-- `serial_api.rs`: Registers lurek.codec and exposes JSON, TOML, and CSV serialization helpers.
+- `serial_api.rs`: Registers lurek.serial and exposes JSON, TOML, and CSV serialization helpers.
 - `spine_api.rs`: Registers lurek.spine and wraps skeletal animation types and operations.
 - `sprite_api.rs`: `lurek.sprite` — Sprite-sheet UV layout, named frame groups, atlas parsing, and RPGMaker character-sheet helpers.
-- `system_api.rs`: Registers lurek.platform and exposes OS and platform query helpers.
+- `system_api.rs`: Registers lurek.runtime and exposes OS and platform query helpers.
 - `terminal_api.rs`: Registers lurek.terminal and exposes terminal-style UI and grid features.
 - `thread_api.rs`: Registers lurek.thread and bridges background worker threads and channels.
 - `tilemap_api.rs`: Registers lurek.tilemap and exposes map, layer, and coordinate helpers.
-- `timer_api.rs`: Registers lurek.time and is the gold-standard example for Lua API docstring and registration style.
+- `timer_api.rs`: Registers lurek.timer and is the gold-standard example for Lua API docstring and registration style.
 - `tween_api.rs`: Registers lurek.tween and exposes easing-driven property animation.
 - `ui_api.rs`: Registers lurek.ui and wraps retained-mode widget systems.
 - `window_api.rs`: Registers lurek.window and exposes window-management and display queries.

@@ -22,9 +22,9 @@
 | Module | pub_fn | pub_struct | Reason | Verify |
 |---|---:|---:|---|---|
 | `app` | 13 | 4 | Engine boot/main loop owner — no `lurek.*` namespace; bootstraps the VM, then never re-enters Lua land. | ✅ by design |
-| `automation` | 38 | 3 | **Has** a Lua surface (`lurek.simulator` via `automation_api.rs`). Module name → file name match is via `automation_api.rs`. | ✅ surface present |
+| `automation` | 38 | 3 | **Has** a Lua surface (`lurek.automation` via `automation_api.rs`). Module name → file name match is via `automation_api.rs`. | ✅ surface present |
 | `bin` | 0 | 0 | `src/bin/` contains binary main shims; no library exports. | ✅ by design |
-| `runtime` | 29 | 25 | Houses `ModulesConfig`, `SharedState`, `WindowState`, `ErrorInfo` consumed via `lua_api/mod.rs` re-exports plus `engine_api.rs` (`lurek.engine.*`). | ✅ surface via `engine_api` |
+| `runtime` | 29 | 25 | Houses `ModulesConfig`, `SharedState`, `WindowState`, `ErrorInfo` consumed via `lua_api/mod.rs` re-exports plus `engine_api.rs` (`lurek.runtime.*`). | ✅ surface via `engine_api` |
 
 ## The 49-row matrix
 
@@ -37,7 +37,7 @@
 | automation | 38 | 3 | 1 | automation_api.rs | 1 | 0 | 0 | 1 | `modules.debug` | Free-fn surface only (`startRecord`, etc.); confirm no missing simulator setters. |
 | bin | 0 | 0 | 0 | — | — | — | — | 0 | none | Binary shims only. |
 | camera | 85 | 9 | 1 | camera_api.rs | 1 | 41 | 0 | 42 | `modules.camera` | OK; one set + Camera2D userdata. |
-| compute | 108 | 2 | 1 | compute_api.rs | 14 | 63 | 0 | 77 | `modules.compute` | **Verify**: registers as `luna.set("compute", tbl)` (line 1105) — old memory said docs claim `lurek.gpu`. Bridge says `lurek.gpu.*` but actual table is `compute`. **Confirmed mismatch persists.** |
+| compute | 108 | 2 | 1 | compute_api.rs | 14 | 63 | 0 | 77 | `modules.compute` | **Verify**: registers as `luna.set("compute", tbl)` (line 1105) — old memory said docs claim `lurek.compute`. Bridge says `lurek.compute.*` but actual table is `compute`. **Confirmed mismatch persists.** |
 | data | 53 | 4 | 5 | data_api.rs | 1 | 27 | 0 | 28 | **always** | Always registered in `mod.rs:265` (no `if modules.data` guard despite `pub data: bool` field on `ModulesConfig`). |
 | dataframe | 93 | 2 | 3 | dataframe_api.rs | 1 | 81 | 0 | 82 | **always** | Always registered (`mod.rs:283`). **No `dataframe` field on `ModulesConfig`** — flag is implicit. |
 | debugbridge | 9 | 4 | 0 | debugbridge_api.rs | 5 | 0 | 0 | 5 | `modules.debug` | OK. |
@@ -66,7 +66,7 @@
 | procgen | 59 | 24 | 3 | procgen_api.rs | 91 | 0 | 0 | 91 | `modules.procgen` | OK; entirely free-fn surface. |
 | raycaster | 75 | 20 | 2 | raycaster_api.rs | 26 | 51 | 0 | 77 | `modules.raycaster` | OK. |
 | render | 57 | 23 | 16 | render_api.rs | 11 | 82 | 0 | 93 | `modules.graphics` | OK. **Verify enum exposure**: 16 `pub enum`s suggests several blend/wrap/format enums; confirm Lua-side strings cover all variants. |
-| runtime | 29 | 25 | 3 | (engine_api.rs) | 6 | 0 | 0 | 6 | **always** | `engine_api` registers `lurek.engine.*`. `WindowState`/`SharedState` are infrastructure only. |
+| runtime | 29 | 25 | 3 | (engine_api.rs) | 6 | 0 | 0 | 6 | **always** | `engine_api` registers `lurek.runtime.*`. `WindowState`/`SharedState` are infrastructure only. |
 | save | 39 | 4 | 2 | save_api.rs | 8 | 25 | 0 | 33 | **always (`savegame`)** | Always registered (`mod.rs:255`); `modules.savegame` field exists but is unused at registration time. |
 | scene | 57 | 5 | 3 | scene_api.rs | 16 | 8 | 0 | 24 | `modules.scene` | OK. |
 | serial | 14 | 1 | 1 | serial_api.rs | 1 | 0 | 0 | 1 | **always (`codec`)** | One free-fn registration; verify all codecs (LIMG, LSND, etc.) are reachable through that single `set` (likely sub-table). |
@@ -115,14 +115,14 @@ Negative deltas (`docs`, `render`, `devtools`) mean the wrapper exposes more set
 
 ### `src/graphic` vs `src/graphics` duplication
 
-**STATUS: RESOLVED.** Neither directory exists in the current `src/` tree. The repository has a single rendering surface at `src/render/` with the Lua binding at `src/lua_api/render_api.rs` registering `lurek.graphic.*`. The old memory ("render surface duplication" — `src/graphic` + `src/graphics`) is **stale**; record an updated repo memory.
+**STATUS: RESOLVED.** Neither directory exists in the current `src/` tree. The repository has a single rendering surface at `src/render/` with the Lua binding at `src/lua_api/render_api.rs` registering `lurek.render.*`. The old memory ("render surface duplication" — `src/graphic` + `src/graphics`) is **stale**; record an updated repo memory.
 
 Evidence:
 - `list_dir src/` shows: `render/` only (no `graphic/`, no `graphics/`).
 - `file_search "src/graphic*/**"` returns no matches.
 - `src/lib.rs` re-exports `render` (the active module) and `src/lua_api/mod.rs:380` registers `render_api` under flag `modules.graphics` — a single source of truth.
 
-The memory predates the **`refactor/src-migration-v2`** branch consolidation; it should be overwritten with: "Render surface lives at `src/render/` only; binding `src/lua_api/render_api.rs` registers as `lurek.graphic`. The old `graphic/`/`graphics/` split was eliminated by the v2 src migration."
+The memory predates the **`refactor/src-migration-v2`** branch consolidation; it should be overwritten with: "Render surface lives at `src/render/` only; binding `src/lua_api/render_api.rs` registers as `lurek.render`. The old `graphic/`/`graphics/` split was eliminated by the v2 src migration."
 
 ### `data_api` / `dataframe_api` / `compute_api` gating vs `ModulesConfig`
 
@@ -132,7 +132,7 @@ Confirmed against `src/runtime/config.rs` (lines 184–230) and `src/lua_api/mod
 |---|---|---|---|
 | `data_api` | `pub data: bool` (line 204) | **Always registered** at `mod.rs:265` (`data_api::register(...)` with no `if`). | **MISMATCH** — flag exists, never consulted. |
 | `dataframe_api` | **No `dataframe` field** | **Always registered** at `mod.rs:283`. | **MISMATCH** — no flag exists, but `ModulesConfig` documentation may claim gating. |
-| `compute_api` | `pub compute: bool` (line 205) | Gated correctly: `if modules.compute { compute_api::register(...) }` at `mod.rs:298`. The registered table name is `"compute"` (`compute_api.rs:1105`), **not `"gpu"`** as some docs / module docstring (`mod.rs:64` says `lurek.gpu.*`) suggest. | **DOC MISMATCH** — table name is `compute`, doc string claims `lurek.gpu`. |
+| `compute_api` | `pub compute: bool` (line 205) | Gated correctly: `if modules.compute { compute_api::register(...) }` at `mod.rs:298`. The registered table name is `"compute"` (`compute_api.rs:1105`), **not `"gpu"`** as some docs / module docstring (`mod.rs:64` says `lurek.compute.*`) suggest. | **DOC MISMATCH** — table name is `compute`, doc string claims `lurek.compute`. |
 
 **Recommendation for P5**:
 1. Either honour `modules.data` (wrap `data_api::register` in `if modules.data {}`) or drop the field. Pick one and update `docs/specs/data.md`.

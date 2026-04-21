@@ -14,7 +14,7 @@
 - **No bare `unpack(...)`** — write `local unpack = table.unpack or unpack` once at module top, then `unpack(t)`. Bare `unpack` breaks under the `lua54` Cargo feature.
 - All locals declared at module top — no late `local` inside hot loops.
 - No metatable surgery on tables returned from `lurek.*` — wrap them.
-- Use `lurek.math.lerp/clamp/remap`, `lurek.codec.toJson/fromJson`, `lurek.data.deepCopy` etc. before reaching for a private helper. Mark TODOs that should be lifted to Rust with `-- TODO(lift): see work/library-overhaul-20260418/reports/P4_lift_candidates.md`.
+- Use `lurek.math.lerp/clamp/remap`, `lurek.serial.toJson/fromJson`, `lurek.data.deepCopy` etc. before reaching for a private helper. Mark TODOs that should be lifted to Rust with `-- TODO(lift): see work/library-overhaul-20260418/reports/P4_lift_candidates.md`.
 
 ### Doc Generator Workflow
 

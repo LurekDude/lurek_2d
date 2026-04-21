@@ -2,15 +2,15 @@
 --- @status full
 --- @description Pure-Lua Remote Procedure Call library built on `lurek.network`.
 --- Enables calling functions on remote peers over ENet with automatic
---- JSON serialisation via `lurek.codec`. Supports request/response,
+--- JSON serialisation via `lurek.serial`. Supports request/response,
 --- fire-and-forget, and broadcast patterns.
 --- @see lurek.network
---- @see lurek.codec.toJson
---- @see lurek.codec.fromJson
+--- @see lurek.serial.toJson
+--- @see lurek.serial.fromJson
 ---
 --- ## RPC Protocol
 ---
---- Messages are serialised via `lurek.codec.toJson` / `lurek.codec.fromJson`.
+--- Messages are serialised via `lurek.serial.toJson` / `lurek.serial.fromJson`.
 --- Three message types flow over the wire:
 ---
 --- - **rpc_call**: `{type="rpc_call", id=N, name="fn", args={...}}`
@@ -40,18 +40,18 @@ local M = {}
 -- Cache once at module load so per-call dispatch stays branchless.
 local _unpack = table.unpack or unpack
 
--- Encode/decode helpers: prefer `lurek.codec.toJson/fromJson` (per P1 map);
+-- Encode/decode helpers: prefer `lurek.serial.toJson/fromJson` (per P1 map);
 -- fall back to `lurek.network.pack/unpack` (MessagePack) when codec is
 -- unavailable in the host VM (e.g. headless test contexts).
 local function _encode(t)
-    if lurek and lurek.codec and lurek.codec.toJson then
-        return lurek.codec.toJson(t)
+    if lurek and lurek.serial and lurek.serial.toJson then
+        return lurek.serial.toJson(t)
     end
     return lurek.network.pack(t)
 end
 local function _decode(s)
-    if lurek and lurek.codec and lurek.codec.fromJson then
-        return lurek.codec.fromJson(s)
+    if lurek and lurek.serial and lurek.serial.fromJson then
+        return lurek.serial.fromJson(s)
     end
     return lurek.network.unpack(s)
 end

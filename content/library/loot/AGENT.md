@@ -5,7 +5,7 @@
 | **Tier**       | Tier 3 — Lunasome (pure Lua)                                                                                 |
 | **Source**     | `library/loot/init.lua`                                                                                      |
 | **Lua Tests**  | `tests/lua/library/test_library_loot.lua`                                                                    |
-| **Depends on** | `lurek.math.newRandomGenerator` (sampling), `lurek.codec.fromToml` + `lurek.fs.read` (TOML loader, optional) |
+| **Depends on** | `lurek.math.newRandomGenerator` (sampling), `lurek.serial.fromToml` + `lurek.filesystem.read` (TOML loader, optional) |
 | **Status**     | full                                                                                                         |
 
 ## Purpose
@@ -20,7 +20,7 @@ needs of RPGs and roguelikes.
 ### `LootTable`
 - `M.newTable()` — empty table
 - `M.fromList({{id, weight, meta?}, ...})`
-- `M.fromToml(path)` — load via `lurek.fs.read` + `lurek.codec.fromToml`
+- `M.fromToml(path)` — load via `lurek.filesystem.read` + `lurek.serial.fromToml`
 - `M.merge(t1, t2, ...)` — combine, summing weights of duplicate ids
 - `tbl:add(id, weight, meta?)`
 - `tbl:remove(id)`
@@ -55,8 +55,8 @@ needs of RPGs and roguelikes.
 ## Dependencies
 
 - **`lurek.math.newRandomGenerator`** — module RNG default (lazy resolved; falls back to `math.random` if the binding is unavailable, e.g. headless host).
-- **`lurek.codec.fromToml`** — TOML parser used by `M.fromToml` (optional).
-- **`lurek.fs.read`** — sandboxed file read used by `M.fromToml` (optional).
+- **`lurek.serial.fromToml`** — TOML parser used by `M.fromToml` (optional).
+- **`lurek.filesystem.read`** — sandboxed file read used by `M.fromToml` (optional).
 
 ## Status
 

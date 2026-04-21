@@ -14,7 +14,7 @@ bag:addItem(sword, 1)
 
 *90 functions, 0 module fields documented.*
 
-See: [`lurek.codec.toJson`](../lua-api.md#lurekcodectojson) — serialise inventory snapshots for save round-trip, [`lurek.codec.fromJson`](../lua-api.md#lurekcodecfromjson) — restore inventory snapshots, [`lurek.savegame.SaveManager`](../lua-api.md#lureksavegamesavemanager) — register inventory state via a SaveManager collector, [`lurek.patterns.newEventBus`](../lua-api.md#lurekpatternsneweventbus) — optional change-event bus from `inv:getEventBus()`, [`lurek.data.deepCopy`](../lua-api.md#lurekdatadeepcopy) — P4 lift candidate — `item:clone()` will delegate when available
+See: [`lurek.serial.toJson`](../lua-api.md#lurekcodectojson) — serialise inventory snapshots for save round-trip, [`lurek.serial.fromJson`](../lua-api.md#lurekcodecfromjson) — restore inventory snapshots, [`lurek.save.SaveManager`](../lua-api.md#lureksavegamesavemanager) — register inventory state via a SaveManager collector, [`lurek.patterns.newEventBus`](../lua-api.md#lurekpatternsneweventbus) — optional change-event bus from `inv:getEventBus()`, [`lurek.data.deepCopy`](../lua-api.md#lurekdatadeepcopy) — P4 lift candidate — `item:clone()` will delegate when available
 
 ## Functions
 

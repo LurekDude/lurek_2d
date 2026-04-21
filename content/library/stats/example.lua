@@ -2,7 +2,7 @@
 -- Run with: lua content/library/stats/example.lua
 -- Demonstrates stat sheets: defining attributes, applying buffs,
 -- ticking durations, snapshot/restore, and optional JSON round-trip
--- via lurek.codec.
+-- via lurek.serial.
 -- @module example.stats
 
 local M = require("library.stats")
@@ -61,15 +61,15 @@ print(string.format("[example.stats] post-mutate hp=%d", hero:get("hp")))
 hero:restore(snap)
 print(string.format("[example.stats] post-restore hp=%d (snapshot reverted)", hero:get("hp")))
 
--- ── 8. Optional JSON snapshot via lurek.codec (guarded) ───────────────────────
-local lurek_ok = pcall(function() return lurek and lurek.codec end)
-if lurek_ok and lurek and lurek.codec and lurek.codec.toJson then
+-- ── 8. Optional JSON snapshot via lurek.serial (guarded) ───────────────────────
+local lurek_ok = pcall(function() return lurek and lurek.serial end)
+if lurek_ok and lurek and lurek.serial and lurek.serial.toJson then
     local s    = M.snapshotToJson(snap)
     local back = M.snapshotFromJson(s)
     print(string.format("[example.stats] JSON snapshot len=%d xp_back=%s",
         #s, tostring(back and back.xp)))
 else
-    print("[example.stats] lurek.codec unavailable; in-memory snapshot only")
+    print("[example.stats] lurek.serial unavailable; in-memory snapshot only")
 end
 
 print("[example.stats] done.")

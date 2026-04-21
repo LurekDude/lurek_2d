@@ -23,11 +23,11 @@ Create `main.lua` anywhere:
 
 ```lua
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.1, 0.1, 0.2)
+    lurek.render.setBackgroundColor(0.1, 0.1, 0.2)
 end
 
 function lurek.render()
-    lurek.gfx.print("Hello, Lurek2D!", 100, 100)
+    lurek.render.print("Hello, Lurek2D!", 100, 100)
 end
 ```
 
@@ -111,15 +111,15 @@ Lurek2D ships 46 Rust modules organized in four tiers. All are MIT-licensed firs
 All bindings live under `lurek.*`:
 
 ```
-lurek.gfx       lurek.audio      lurek.sound     lurek.physics    lurek.input
-lurek.keyboard  lurek.mouse      lurek.gamepad   lurek.touch      lurek.camera
+lurek.render       lurek.audio      lurek.sound     lurek.physics    lurek.input
+lurek.input.keyboard  lurek.input.mouse      lurek.input.gamepad   lurek.input.touch      lurek.camera
 lurek.anim      lurek.particle   lurek.tilemap   lurek.scene      lurek.ai
-lurek.path      lurek.entity     lurek.thread    lurek.event      lurek.signal
-lurek.fs        lurek.data       lurek.serial    lurek.img        lurek.compute
-lurek.math      lurek.time       lurek.window    lurek.tween      lurek.gui
-lurek.terminal  lurek.overlay    lurek.light     lurek.postfx     lurek.fx
-lurek.minimap   lurek.network    lurek.modding   lurek.savegame   lurek.procgen
-lurek.platform  lurek.locale     lurek.patterns  lurek.devtools   lurek.log
+lurek.path      lurek.ecs     lurek.thread    lurek.event      lurek.event
+lurek.filesystem        lurek.data       lurek.serial    lurek.image        lurek.compute
+lurek.math      lurek.timer       lurek.window    lurek.tween      lurek.gui
+lurek.terminal  lurek.effect    lurek.light     lurek.effect     lurek.fx
+lurek.minimap   lurek.network    lurek.mods   lurek.save   lurek.procgen
+lurek.runtime  lurek.locale     lurek.patterns  lurek.devtools   lurek.log
 ```
 
 Every callback is optional. An empty `main.lua` is a valid Lurek2D program.

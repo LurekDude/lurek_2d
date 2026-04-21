@@ -87,7 +87,7 @@ NEW_METHODS = '''
     };
 
     for (const line of lines) {
-      // Module header: ## `lurek.graphics` {#graphics}
+      // Module header: ## `lurek.renders` {#graphics}
       const modMatch = line.match(/^## [`']?lurek\\.([\\w]+)[`']?/);
       if (modMatch) {
         finishModule();
@@ -107,7 +107,7 @@ NEW_METHODS = '''
         continue;
       }
 
-      // Module description from blockquote: > `lurek.gfx` — 2D drawing...
+      // Module description from blockquote: > `lurek.render` — 2D drawing...
       if (currentModule && line.startsWith(">") && !currentModule.description) {
         const desc = line.replace(/^>\s*`[^`]*`\s*—\s*/, "").trim();
         if (desc) currentModule.description = desc;

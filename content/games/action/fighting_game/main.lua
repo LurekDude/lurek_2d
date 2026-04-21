@@ -136,7 +136,7 @@ local function try_hit(attacker, defender)
             defender.meter = math.min(METER_MAX, defender.meter + METER_ON_BLOCK)
             if block_sparks then
                 local sx = (attacker.facing == 1) and (defender.x) or (defender.x + FIGHTER_W)
-                lurek.particles.emit(block_sparks, sx, defender.y + FIGHTER_H * 0.5, 8)
+                lurek.particle.emit(block_sparks, sx, defender.y + FIGHTER_H * 0.5, 8)
             end
             trigger_shake(SHAKE_LIGHT)
         else
@@ -159,10 +159,10 @@ local function try_hit(attacker, defender)
             -- Particles
             if hit_sparks then
                 local sx = (attacker.facing == 1) and (defender.x) or (defender.x + FIGHTER_W)
-                lurek.particles.emit(hit_sparks, sx, defender.y + FIGHTER_H * 0.4, 12)
+                lurek.particle.emit(hit_sparks, sx, defender.y + FIGHTER_H * 0.4, 12)
             end
             if atk == SUPER and super_flash then
-                lurek.particles.emit(super_flash, (attacker.x + defender.x) * 0.5 + FIGHTER_W * 0.5,
+                lurek.particle.emit(super_flash, (attacker.x + defender.x) * 0.5 + FIGHTER_W * 0.5,
                     attacker.y + FIGHTER_H * 0.5, 20)
             end
 
@@ -291,7 +291,7 @@ end
 -- ── lurek.init ────────────────────────────────────────────────────────────
 function lurek.init()
     lurek.window.setTitle("Fighting Game — Lurek2D")
-    lurek.gfx.setBackgroundColor(0.08, 0.05, 0.15)
+    lurek.render.setBackgroundColor(0.08, 0.05, 0.15)
 
     -- Input actions
     lurek.input.addAction("left",  {"a", "left"})
@@ -304,7 +304,7 @@ function lurek.init()
     lurek.input.addAction("quit",  {"escape"})
 
     -- Particles — hit sparks (orange)
-    hit_sparks = lurek.particles.new({
+    hit_sparks = lurek.particle.new({
         maxParticles  = 60,
         emissionRate  = 0,
         lifetime      = {0.15, 0.35},
@@ -316,7 +316,7 @@ function lurek.init()
     })
 
     -- Block sparks (blue)
-    block_sparks = lurek.particles.new({
+    block_sparks = lurek.particle.new({
         maxParticles  = 40,
         emissionRate  = 0,
         lifetime      = {0.1, 0.25},
@@ -328,7 +328,7 @@ function lurek.init()
     })
 
     -- Super flash (yellow)
-    super_flash = lurek.particles.new({
+    super_flash = lurek.particle.new({
         maxParticles  = 80,
         emissionRate  = 0,
         lifetime      = {0.2, 0.5},
@@ -339,7 +339,7 @@ function lurek.init()
         sizes          = {6, 2},
     })
 
-    lurek.time.setTargetFPS(60)
+    lurek.timer.setTargetFPS(60)
     reset_fighters()
 end
 
@@ -361,7 +361,7 @@ function lurek.process(dt)
 
     -- Quit
     if lurek.input.isActionJustPressed("quit") then
-        lurek.signal.quit()
+        lurek.event.quit()
         return
     end
 
@@ -441,9 +441,9 @@ function lurek.process(dt)
     try_hit(p2, p1)
 
     -- Particles update
-    lurek.particles.update(hit_sparks, dt)
-    lurek.particles.update(block_sparks, dt)
-    lurek.particles.update(super_flash, dt)
+    lurek.particle.update(hit_sparks, dt)
+    lurek.particle.update(block_sparks, dt)
+    lurek.particle.update(super_flash, dt)
 
     -- Check KO
     if p2.hp <= 0 then
@@ -551,9 +551,9 @@ function lurek.render()
     draw_fighter(p2, 0.9, 0.2, 0.2,  1.0, 0.5, 0.2)    -- red body, orange accent
 
     -- Particles
-    lurek.particles.draw(hit_sparks)
-    lurek.particles.draw(block_sparks)
-    lurek.particles.draw(super_flash)
+    lurek.particle.draw(hit_sparks)
+    lurek.particle.draw(block_sparks)
+    lurek.particle.draw(super_flash)
 end
 
 -- ── lurek.render_ui ──────────────────────────────────────────────────────
@@ -578,7 +578,7 @@ function lurek.render_ui()
         lurek.render.print("H = Block   Q = Super   ESC = Quit", 200, 455)
 
         lurek.render.setColor(0.4, 0.4, 0.4, 1)
-        lurek.render.print("FPS: " .. lurek.time.getFPS(), 4, SCREEN_H - 18)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 18)
         return
     end
 
@@ -694,5 +694,5 @@ function lurek.render_ui()
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
-    lurek.render.print("FPS: " .. lurek.time.getFPS(), 4, SCREEN_H - 18)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 18)
 end

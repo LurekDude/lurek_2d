@@ -1,7 +1,7 @@
 //! Water surface overlay with UV distortion and depth-tint controls.
 //!
 //! `WaterOverlayState` drives a full-screen water-distortion effect rendered
-//! in the `lurek.overlay.water.*` Lua API. Unlike the weather sub-system it
+//! in the `lurek.effect.water.*` Lua API. Unlike the weather sub-system it
 //! does **not** spawn CPU particles — the distortion is entirely shader-based,
 //! so `update` only advances the internal time accumulator used to animate
 //! the wave pattern.

@@ -45,28 +45,28 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.clear(0.05, 0.05, 0.1)
+    lurek.render.clear(0.05, 0.05, 0.1)
 
     -- Ball
-    lurek.gfx.setColor(1, 0.9, 0.2, 1)
-    lurek.gfx.circle("fill", ball.x, ball.y, ball.r)
+    lurek.render.setColor(1, 0.9, 0.2, 1)
+    lurek.render.circle("fill", ball.x, ball.y, ball.r)
 
     -- Paddle
-    lurek.gfx.setColor(0.2, 0.7, 1, 1)
-    lurek.gfx.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
+    lurek.render.setColor(0.2, 0.7, 1, 1)
+    lurek.render.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
 
     -- UI
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Score: " .. score, 10, 10)
-    lurek.gfx.print("Lives: " .. lives, 710, 10)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Score: " .. score, 10, 10)
+    lurek.render.print("Lives: " .. lives, 710, 10)
 
     if state == "gameover" then
-        lurek.gfx.print("GAME OVER - Press R to restart", 260, 280)
+        lurek.render.print("GAME OVER - Press R to restart", 260, 280)
     end
 end
 
 function lurek.keypressed(key)
-    if key == "escape" then lurek.signal.quit() end
+    if key == "escape" then lurek.event.quit() end
     if key == "r" and state == "gameover" then
         score = 0
         lives = 3

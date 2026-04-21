@@ -25,7 +25,7 @@ Lurek2D is a 2D game engine written in Rust that loads and executes Lua game scr
 - **LuaJIT hints** - Warns about LuaJIT-specific pitfalls (64-bit integers, goto scoping, etc.)
 - **Type inference** - Infers return types from `lurek.*` constructors (newImage, newBody, etc.)
 - **LuaCATS support** - Parses `---@class`, `---@param`, `---@return` annotations for user types
-- **Asset path completion** - Autocomplete file paths in `lurek.graphics.newImage()` and similar
+- **Asset path completion** - Autocomplete file paths in `lurek.renders.newImage()` and similar
 
 ### Debugging (16 commands)
 

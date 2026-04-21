@@ -127,4 +127,4 @@ Individual scripts can now carry per-script step limits via `Script::set_step_li
 
 - `Simulator.highlight_mode: bool` (default `false`) — hint flag for game-side replay overlays.
 - `Simulator::set_highlight_mode(enable: bool)` / `is_highlight_mode() -> bool`.
-- Lua: `lurek.simulator.setHighlightMode(enable)` / `isHighlightMode()`.
+- Lua: `lurek.automation.setHighlightMode(enable)` / `isHighlightMode()`.

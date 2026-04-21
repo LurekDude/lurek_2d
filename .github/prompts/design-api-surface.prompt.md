@@ -9,7 +9,7 @@ Design a new lurek.* Lua API surface. Use when adding a new function or module t
 
 ## Inputs
 
-- `DOMAIN` — which sub-namespace is affected (e.g., `lurek.gfx`, `lurek.audio`, `lurek.input`)
+- `DOMAIN` — which sub-namespace is affected (e.g., `lurek.render`, `lurek.audio`, `lurek.input`)
 - `USE_CASE` — describe the game developer scenario this API serves (e.g., "draw a sprite with rotation")
 - `REFERENCE_EQUIVALENT` — optional reference-engine equivalent for inspiration (never copy the signature verbatim)
 

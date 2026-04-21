@@ -12,7 +12,7 @@ use crate::runtime::resource_keys::TextureKey;
 
 /// A batch of sprites sharing a single texture, drawn in one GPU call.
 ///
-/// Created via `lurek.graphic.newSpriteBatch(image_id, max_sprites?)`.
+/// Created via `lurek.render.newSpriteBatch(image_id, max_sprites?)`.
 /// Use `add()` to queue sprites and the engine draws them all at once.
 ///
 /// # Fields

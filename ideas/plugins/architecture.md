@@ -139,7 +139,7 @@ loads each plugin DLL, finds the `luaopen_<name>` symbol, and passes in _its own
 │  │  lurek.tilemap    │  │  lurek.report        │       │
 │  │  lurek.scene      │  │  lurek.analytics     │       │
 │  │  lurek.ai         │  │  lurek.workflow      │       │
-│  │  lurek.particles  │  │  ...                │       │
+│  │  lurek.particle  │  │  ...                │       │
 │  │  ...             │  │                     │       │
 │  └─────────────────┘  └─────────────────────┘       │
 └──────────────────────────────────────────────────────┘
@@ -307,10 +307,10 @@ Core `lua_api` modules receive `Rc<RefCell<SharedState>>`. Plugins loaded as DLL
 Plugin does not access `SharedState`. It only uses `lua_State*` to:
 - Create tables and functions
 - Read/write Lua globals and `lurek.*` subtables
-- Call existing `lurek.*` functions from within Rust (via `lurek.gfx.draw(...)`)
+- Call existing `lurek.*` functions from within Rust (via `lurek.render.draw(...)`)
 
 This covers 90% of use cases. A tilemap plugin doesn't need `SharedState` directly —
-it manages its own grid data and calls `lurek.gfx.drawQuad()` to render tiles.
+it manages its own grid data and calls `lurek.render.drawQuad()` to render tiles.
 
 #### Solution 2 — Serialized State Snapshot (Phase 3)
 
@@ -360,24 +360,24 @@ These form the minimal runtime. A script with just these is a complete app:
 |--------|-----------------|---------------|
 | engine | (internal) | SharedState, Config, App — cannot be external |
 | math | lurek.math | Leaf dependency, used everywhere |
-| graphics | lurek.gfx | Core renderer — plugins draw via it |
+| graphics | lurek.render | Core renderer — plugins draw via it |
 | audio | lurek.audio | Core audio — plugins play via it |
 | physics | lurek.physics | Core physics — fundamental subsystem |
-| input | lurek.keyboard/mouse/gamepad | Core input — cannot be deferred |
-| timer | lurek.time | Frame timing — fundamental |
+| input | lurek.input.keyboard/mouse/gamepad | Core input — cannot be deferred |
+| timer | lurek.timer | Frame timing — fundamental |
 | window | lurek.window | Window state — fundamental |
 | camera | lurek.camera | View transform — needed by renderer |
-| filesystem | lurek.fs | Sandboxed I/O — needed before plugins load |
-| event | lurek.signal | Event bus — inter-module communication |
-| image | lurek.img | CPU image ops — used by texture loading |
+| filesystem | lurek.filesystem | Sandboxed I/O — needed before plugins load |
+| event | lurek.event | Event bus — inter-module communication |
+| image | lurek.image | CPU image ops — used by texture loading |
 | data | lurek.data | Binary data — used by serialization |
-| serial | lurek.codec | Format I/O — used by config loading |
-| entity | lurek.entity | ECS — used by many higher modules |
-| savegame | lurek.savegame | Save/load — core lifecycle |
+| serial | lurek.serial | Format I/O — used by config loading |
+| entity | lurek.ecs | ECS — used by many higher modules |
+| savegame | lurek.save | Save/load — core lifecycle |
 | log | lurek.log | Logging — must be available immediately |
-| system | lurek.platform | OS queries — boot-time |
-| modding | lurek.modding | Mod discovery — affects asset search |
-| localization | lurek.localization | L10n — needed early |
+| system | lurek.runtime | OS queries — boot-time |
+| modding | lurek.mods | Mod discovery — affects asset search |
+| localization | lurek.i18n | L10n — needed early |
 | thread | lurek.thread | Workers — core concurrency |
 | animation | lurek.tween | Sprite animation — tight gfx coupling |
 | light | lurek.light | 2D lighting — tight gfx coupling |
@@ -386,13 +386,13 @@ These form the minimal runtime. A script with just these is a complete app:
 
 | Module | lurek.* namespace | Justification |
 |--------|-----------------|---------------|
-| particle | lurek.particles | Visual effect — not required for all apps |
+| particle | lurek.particle | Visual effect — not required for all apps |
 | tilemap | lurek.tilemap | Genre-specific (RPG, strategy) |
 | scene | lurek.scene | Scene management — optional pattern |
 | gui | lurek.ui | Retained UI — many games use immediate |
-| overlay/fx | lurek.postfx | Post-processing — optional visual layer |
+| overlay/fx | lurek.effect | Post-processing — optional visual layer |
 | minimap | lurek.minimap | Genre-specific |
-| pathfinding | lurek.pathfinding | Genre-specific (RPG, RTS) |
+| pathfinding | lurek.pathfind | Genre-specific (RPG, RTS) |
 | ai | lurek.ai | Genre-specific |
 | graph | lurek.graph | Specialized data structure |
 | pipeline | lurek.pipeline | DAG orchestration |

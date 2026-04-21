@@ -26,7 +26,7 @@ Create one or more new Lurek2D demo projects in content/demos/. Generates conf.t
 
 - [ ] `cargo run -- content/demos/<name>` runs without errors
 - [ ] All 4 callbacks are defined in `main.lua`
-- [ ] `escape` quits via `lurek.signal.quit()`
+- [ ] `escape` quits via `lurek.event.quit()`
 - [ ] No undeclared globals, no bare `print()` calls
 - [ ] `screen.png` exists and is non-empty
 - [ ] `content/demos/README.md` table row and detail block both added

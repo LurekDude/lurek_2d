@@ -1,5 +1,5 @@
 -- test_evidence_particle.lua
--- Evidence test: lurek.particles API + renders particle positions to PNG
+-- Evidence test: lurek.particle API + renders particle positions to PNG
 -- Produces: particle_positions.png, particle_emitter_burst.png
 
 local OUT = "tests/lua/evidence/output/particle/"
@@ -16,19 +16,19 @@ local function draw_dot(img, cx, cy, radius, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: lurek.particles API + PNG visualization.
-describe("Evidence: lurek.particles API + PNG visualization", function()
-    -- @covers lurek.particles.newSystem
+-- @description Covers suite: Evidence: lurek.particle API + PNG visualization.
+describe("Evidence: lurek.particle API + PNG visualization", function()
+    -- @covers lurek.particle.newSystem
     -- @covers ParticleSystem:setPosition
     -- @covers ParticleSystem:start
     -- @covers ParticleSystem:emit
     -- @covers ParticleSystem:getPosition
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Places several emitters, emits particles from each, and writes a PNG showing their simulated positions and spread.
     it("PNG: particle emitter positions as colored dots", function()
         local W, H = 256, 256
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(10, 10, 20, 255)
 
         -- Create multiple emitters at different positions
@@ -48,7 +48,7 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
             {192, 192},
         }
         for i = 1, #positions do
-            local sys = lurek.particles.newSystem()
+            local sys = lurek.particle.newSystem()
             sys:setPosition(positions[i][1], positions[i][2])
             sys:start()
             sys:emit(30)
@@ -74,23 +74,23 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
             end
         end
 
-        lurek.img.savePNG(img, OUT .. "particle_positions.png")
+        lurek.image.savePNG(img, OUT .. "particle_positions.png")
     end)
 
-    -- @covers lurek.particles.newSystem
+    -- @covers lurek.particle.newSystem
     -- @covers ParticleSystem:setPosition
     -- @covers ParticleSystem:start
     -- @covers ParticleSystem:emit
     -- @covers ParticleSystem:count
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Emits several particle bursts over time and writes concentric ring evidence showing the successive burst radii.
     it("PNG: burst emission visualized over time", function()
         local W, H = 128, 128
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(5, 5, 15, 255)
 
-        local sys = lurek.particles.newSystem()
+        local sys = lurek.particle.newSystem()
         sys:setPosition(64, 64)
         sys:start()
 
@@ -114,21 +114,21 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
         -- Mark center emitter
         draw_dot(img, 64, 64, 4, 255, 255, 255)
 
-        lurek.img.savePNG(img, OUT .. "particle_emitter_burst.png")
+        lurek.image.savePNG(img, OUT .. "particle_emitter_burst.png")
     end)
 
-    -- @covers lurek.particles.newSystem
+    -- @covers lurek.particle.newSystem
     -- @covers ParticleSystem:setShape
     -- @covers ParticleSystem:warmUp
     -- @covers ParticleSystem:toImage
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Creates one system per new shape (shrapnel, ray, puff, ring, capsule),
     -- warms each up, renders via toImage(), and writes the composite as a PNG.
     -- If any shape's tessellation code was deleted, its column of the output PNG would differ.
     it("PNG: new shapes rendered via toImage", function()
         local W, H = 256, 64
-        local img = lurek.img.newImageData(W, H)
+        local img = lurek.image.newImageData(W, H)
         img:fill(10, 10, 20, 255)
 
         local shapes = { "shrapnel", "ray", "puff", "ring", "capsule" }
@@ -137,7 +137,7 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
         local tile_h = 64
 
         for i, shape_name in ipairs(shapes) do
-            local ps = lurek.particles.newSystem({
+            local ps = lurek.particle.newSystem({
                 maxParticles = 80,
                 emissionRate = 100,
                 shape = shape_name,
@@ -160,18 +160,18 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
                     end
                 end
             end
-            lurek.particles.release(ps)
+            lurek.particle.release(ps)
         end
 
-        lurek.img.savePNG(img, OUT .. "particle_new_shapes.png")
+        lurek.image.savePNG(img, OUT .. "particle_new_shapes.png")
     end)
 
-    -- @covers lurek.particles.newSystem
+    -- @covers lurek.particle.newSystem
     -- @covers ParticleSystem:addAttractor
     -- @covers ParticleSystem:start
     -- @covers ParticleSystem:update
     -- @covers ParticleSystem:toImage
-    -- @covers lurek.img.savePNG
+    -- @covers lurek.image.savePNG
     -- @evidence file
     -- @description Emits circle particles, adds a central attractor pulling all particles
     -- inward, simulates 1 second, and saves the result via toImage().
@@ -179,7 +179,7 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
     -- in the output PNG would be more spread-out.
     it("PNG: attractor pulls particles to center", function()
         local W, H = 128, 128
-        local ps = lurek.particles.newSystem({
+        local ps = lurek.particle.newSystem({
             maxParticles = 150,
             emissionRate = 200,
             shape = "circle",
@@ -198,8 +198,8 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
             ps:update(0.05)
         end
         local img = ps:toImage(W, H)
-        lurek.img.savePNG(img, OUT .. "particle_attractor.png")
-        lurek.particles.release(ps)
+        lurek.image.savePNG(img, OUT .. "particle_attractor.png")
+        lurek.particle.release(ps)
     end)
 
 end)

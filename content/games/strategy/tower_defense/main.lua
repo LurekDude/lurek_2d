@@ -139,7 +139,7 @@ lurek.init(function()
     lurek.render.setBackgroundColor(0.05, 0.08, 0.05, 1.0)
     math.randomseed(os.time())
 
-    hit_sparks = lurek.particles.newSystem({
+    hit_sparks = lurek.particle.newSystem({
         maxParticles = 40,
         emitRate     = 0,
         lifetime     = { 0.1, 0.3 },
@@ -150,7 +150,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    death_burst = lurek.particles.newSystem({
+    death_burst = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.2, 0.6 },
@@ -161,7 +161,7 @@ lurek.init(function()
         spread       = math.pi * 2,
     })
 
-    place_flash = lurek.particles.newSystem({
+    place_flash = lurek.particle.newSystem({
         maxParticles = 12,
         emitRate     = 0,
         lifetime     = { 0.2, 0.4 },
@@ -179,7 +179,7 @@ lurek.process(function(dt)
     if death_burst then death_burst:update(dt) end
     if place_flash then place_flash:update(dt) end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.signal.quit() return end
+    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
     if game_state == "gameover" or game_state == "victory" then return end
 
     local mx, my = lurek.input.getMousePosition()
