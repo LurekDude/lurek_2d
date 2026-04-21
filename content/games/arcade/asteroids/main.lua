@@ -17,6 +17,9 @@
 -- ============================================================================
 
 -- ── Constants ─────────────────────────────────────────────────────────────
+-- Capture lurek.render API table before `function lurek.render()` shadows it.
+local gfx = lurek.render
+
 local SCREEN_W, SCREEN_H = 800, 600
 local SHIP_TURN_SPEED     = 5.0       -- radians / second
 local SHIP_THRUST         = 280       -- acceleration px/s²
@@ -180,7 +183,7 @@ end
 -- ===========================================================================
 function lurek.init()
     lurek.window.setTitle("Asteroids — Lurek2D")
-    lurek.render.setBackgroundColor(0.0, 0.0, 0.02)
+    gfx.setBackgroundColor(0.0, 0.0, 0.02)
 
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
@@ -420,18 +423,18 @@ function lurek.render()
     for _, a in ipairs(asteroids) do
         -- Color by size
         if a.size == "large" then
-            lurek.render.setColor(0.6, 0.6, 0.6)
+            gfx.setColor(0.6, 0.6, 0.6)
         elseif a.size == "medium" then
-            lurek.render.setColor(0.7, 0.7, 0.5)
+            gfx.setColor(0.7, 0.7, 0.5)
         else
-            lurek.render.setColor(0.8, 0.8, 0.6)
+            gfx.setColor(0.8, 0.8, 0.6)
         end
 
         -- Draw irregular polygon outline
         local v = a.verts
         for k = 1, #v do
             local k2 = (k % #v) + 1
-            lurek.render.line(
+            gfx.line(
                 a.x + v[k][1],  a.y + v[k][2],
                 a.x + v[k2][1], a.y + v[k2][2]
             )
@@ -439,9 +442,9 @@ function lurek.render()
     end
 
     -- ── Bullets ───────────────────────────────────────────────────────
-    lurek.render.setColor(1.0, 1.0, 0.8)
+    gfx.setColor(1.0, 1.0, 0.8)
     for _, b in ipairs(bullets) do
-        lurek.render.circle("fill", b.x, b.y, 2)
+        gfx.circle("fill", b.x, b.y, 2)
     end
 
     -- ── Ship ──────────────────────────────────────────────────────────
@@ -456,10 +459,10 @@ function lurek.render()
             local nx, ny, lx, ly, rx, ry = ship_triangle()
 
             -- Ship body (white triangle)
-            lurek.render.setColor(1.0, 1.0, 1.0)
-            lurek.render.line(nx, ny, lx, ly)
-            lurek.render.line(lx, ly, rx, ry)
-            lurek.render.line(rx, ry, nx, ny)
+            gfx.setColor(1.0, 1.0, 1.0)
+            gfx.line(nx, ny, lx, ly)
+            gfx.line(lx, ly, rx, ry)
+            gfx.line(rx, ry, nx, ny)
 
             -- Thrust exhaust flame
             if ship.thrusting then
@@ -469,17 +472,17 @@ function lurek.render()
                 local tail_x = mid_x + math.cos(ship.angle + math.pi) * flame_len
                 local tail_y = mid_y + math.sin(ship.angle + math.pi) * flame_len
 
-                lurek.render.setColor(0.3, 0.6, 1.0, 0.9)
-                lurek.render.line(lx, ly, tail_x, tail_y)
-                lurek.render.line(rx, ry, tail_x, tail_y)
+                gfx.setColor(0.3, 0.6, 1.0, 0.9)
+                gfx.line(lx, ly, tail_x, tail_y)
+                gfx.line(rx, ry, tail_x, tail_y)
             end
         end
     end
 
     -- ── Score pops ────────────────────────────────────────────────────
     for _, pop in ipairs(score_pops) do
-        lurek.render.setColor(1.0, 1.0, 0.3, pop.alpha)
-        lurek.render.print(tostring(pop.value), pop.x - 10, pop.y + pop.dy, 1.5)
+        gfx.setColor(1.0, 1.0, 0.3, pop.alpha)
+        gfx.print(tostring(pop.value), pop.x - 10, pop.y + pop.dy, 1.5)
     end
 
     -- ── Particles (explosions + thrust) are drawn by their systems ───
@@ -491,63 +494,63 @@ end
 function lurek.render_ui()
     -- ── TITLE SCREEN ──────────────────────────────────────────────────
     if state == STATE.TITLE then
-        lurek.render.setColor(1.0, 1.0, 1.0)
-        lurek.render.print("A S T E R O I D S", SCREEN_W / 2 - 150, 160, 4)
+        gfx.setColor(1.0, 1.0, 1.0)
+        gfx.print("A S T E R O I D S", SCREEN_W / 2 - 150, 160, 4)
 
-        lurek.render.setColor(0.6, 0.6, 0.7)
-        lurek.render.print("Navigate the asteroid field and survive", SCREEN_W / 2 - 170, 230, 1.5)
+        gfx.setColor(0.6, 0.6, 0.7)
+        gfx.print("Navigate the asteroid field and survive", SCREEN_W / 2 - 170, 230, 1.5)
 
         -- Blinking prompt
         if math.floor(title_blink * 2) % 2 == 0 then
-            lurek.render.setColor(1, 1, 1)
-            lurek.render.print("PRESS ENTER TO START", SCREEN_W / 2 - 120, 320, 2)
+            gfx.setColor(1, 1, 1)
+            gfx.print("PRESS ENTER TO START", SCREEN_W / 2 - 120, 320, 2)
         end
 
         -- Controls preview
-        lurek.render.setColor(0.4, 0.4, 0.5)
-        lurek.render.print("A/←  D/→  Rotate",   240, 420, 1.3)
-        lurek.render.print("W/↑       Thrust",    240, 440, 1.3)
-        lurek.render.print("Space     Fire",      240, 460, 1.3)
-        lurek.render.print("Escape    Quit",      240, 480, 1.3)
+        gfx.setColor(0.4, 0.4, 0.5)
+        gfx.print("A/←  D/→  Rotate",   240, 420, 1.3)
+        gfx.print("W/↑       Thrust",    240, 440, 1.3)
+        gfx.print("Space     Fire",      240, 460, 1.3)
+        gfx.print("Escape    Quit",      240, 480, 1.3)
         return
     end
 
     -- ── HUD (always visible during play and game-over) ────────────────
     -- Score — top left
-    lurek.render.setColor(1, 1, 1)
-    lurek.render.print("SCORE  " .. tostring(score), 16, 12, 2)
+    gfx.setColor(1, 1, 1)
+    gfx.print("SCORE  " .. tostring(score), 16, 12, 2)
 
     -- Wave — top center
-    lurek.render.setColor(0.6, 0.6, 0.7)
-    lurek.render.print("WAVE " .. tostring(wave), SCREEN_W / 2 - 30, 12, 1.8)
+    gfx.setColor(0.6, 0.6, 0.7)
+    gfx.print("WAVE " .. tostring(wave), SCREEN_W / 2 - 30, 12, 1.8)
 
     -- Lives — top right (draw small ship icons)
     for l = 1, lives do
         local lx = SCREEN_W - 30 - (l - 1) * 22
         local ly = 20
-        lurek.render.setColor(1, 1, 1)
-        lurek.render.line(lx, ly - 8, lx - 5, ly + 6)
-        lurek.render.line(lx - 5, ly + 6, lx + 5, ly + 6)
-        lurek.render.line(lx + 5, ly + 6, lx, ly - 8)
+        gfx.setColor(1, 1, 1)
+        gfx.line(lx, ly - 8, lx - 5, ly + 6)
+        gfx.line(lx - 5, ly + 6, lx + 5, ly + 6)
+        gfx.line(lx + 5, ly + 6, lx, ly - 8)
     end
 
     -- FPS — bottom left
-    lurek.render.setColor(0.4, 0.4, 0.5)
-    lurek.render.print("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 20, 1)
+    gfx.setColor(0.4, 0.4, 0.5)
+    gfx.print("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 20, 1)
 
     -- ── GAME OVER OVERLAY ─────────────────────────────────────────────
     if state == STATE.GAME_OVER then
-        lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        gfx.setColor(0, 0, 0, 0.7)
+        gfx.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
-        lurek.render.setColor(1, 0.2, 0.2)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 100, SCREEN_H / 2 - 50, 3.5)
+        gfx.setColor(1, 0.2, 0.2)
+        gfx.print("GAME OVER", SCREEN_W / 2 - 100, SCREEN_H / 2 - 50, 3.5)
 
-        lurek.render.setColor(1, 1, 1)
-        lurek.render.print("Final Score: " .. tostring(score), SCREEN_W / 2 - 80, SCREEN_H / 2 + 10, 2)
-        lurek.render.print("Wave: " .. tostring(wave), SCREEN_W / 2 - 40, SCREEN_H / 2 + 40, 2)
+        gfx.setColor(1, 1, 1)
+        gfx.print("Final Score: " .. tostring(score), SCREEN_W / 2 - 80, SCREEN_H / 2 + 10, 2)
+        gfx.print("Wave: " .. tostring(wave), SCREEN_W / 2 - 40, SCREEN_H / 2 + 40, 2)
 
-        lurek.render.setColor(0.7, 0.7, 0.7)
-        lurek.render.print("Press R to restart", SCREEN_W / 2 - 100, SCREEN_H / 2 + 90, 2)
+        gfx.setColor(0.7, 0.7, 0.7)
+        gfx.print("Press R to restart", SCREEN_W / 2 - 100, SCREEN_H / 2 + 90, 2)
     end
 end

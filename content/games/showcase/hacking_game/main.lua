@@ -14,6 +14,9 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+-- Capture lurek.render API table before `function lurek.render()` shadows it.
+local gfx = lurek.render
+
 local SCREEN_W, SCREEN_H = 800, 600
 local LINE_H     = 16
 local MAX_LINES  = 32
@@ -468,7 +471,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.init()
     lurek.window.setTitle("Hacking Game — Lurek2D")
-    lurek.render.setBackgroundColor(0, 0, 0)
+    gfx.setBackgroundColor(0, 0, 0)
 
     lurek.input.bind("quit", { "escape" })
 
@@ -632,9 +635,9 @@ function lurek.render()
     camera:attach()
 
     -- CRT scanlines
-    lurek.render.setColor(COL_SCANLINE[1], COL_SCANLINE[2], COL_SCANLINE[3], COL_SCANLINE[4])
+    gfx.setColor(COL_SCANLINE[1], COL_SCANLINE[2], COL_SCANLINE[3], COL_SCANLINE[4])
     for y = 0, SCREEN_H, 3 do
-        lurek.render.drawLine(0, y, SCREEN_W, y)
+        gfx.drawLine(0, y, SCREEN_W, y)
     end
 
     -- Title state: matrix rain
@@ -644,21 +647,21 @@ function lurek.render()
                 local cy = col.y + (j - 1) * LINE_H
                 if cy >= 0 and cy < SCREEN_H then
                     local brightness = 1.0 - (j / col.len) * 0.8
-                    lurek.render.setColor(0, brightness, brightness * 0.3, 0.8)
-                    lurek.render.drawText(ch, col.x, cy)
+                    gfx.setColor(0, brightness, brightness * 0.3, 0.8)
+                    gfx.drawText(ch, col.x, cy)
                 end
             end
         end
     end
 
     -- Particles (world space)
-    lurek.render.setColor(1, 1, 1, 1)
+    gfx.setColor(1, 1, 1, 1)
     ps_download:draw()
     ps_trace:draw()
 
     -- Slight CRT flicker overlay
-    lurek.render.setColor(0, 0.02, 0, (1.0 - flicker_alpha) * 0.3)
-    lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H)
+    gfx.setColor(0, 0.02, 0, (1.0 - flicker_alpha) * 0.3)
+    gfx.drawRect(0, 0, SCREEN_W, SCREEN_H)
 
     camera:detach()
 end
@@ -671,13 +674,13 @@ function lurek.render_ui()
 
     -- ── TITLE ─────────────────────────────────────────────────
     if current_state == STATE.TITLE then
-        lurek.render.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 1)
-        lurek.render.drawText("H A C K I N G   G A M E", SCREEN_W / 2 - 110, SCREEN_H / 2 - 60)
-        lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 1)
-        lurek.render.drawText("[ Press any key to begin ]", SCREEN_W / 2 - 115, SCREEN_H / 2 + 10)
-        lurek.render.drawText("Lurek2D Showcase", SCREEN_W / 2 - 65, SCREEN_H / 2 + 50)
-        lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.5)
-        lurek.render.drawText(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20)
+        gfx.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 1)
+        gfx.drawText("H A C K I N G   G A M E", SCREEN_W / 2 - 110, SCREEN_H / 2 - 60)
+        gfx.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 1)
+        gfx.drawText("[ Press any key to begin ]", SCREEN_W / 2 - 115, SCREEN_H / 2 + 10)
+        gfx.drawText("Lurek2D Showcase", SCREEN_W / 2 - 65, SCREEN_H / 2 + 50)
+        gfx.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.5)
+        gfx.drawText(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20)
         return
     end
 
@@ -685,29 +688,29 @@ function lurek.render_ui()
     local start_y = 10
     for i, line in ipairs(terminal_lines) do
         local c = line.color or COL_GREEN
-        lurek.render.setColor(c[1], c[2], c[3], flicker_alpha)
-        lurek.render.drawText(line.text, 10, start_y + (i - 1) * LINE_H)
+        gfx.setColor(c[1], c[2], c[3], flicker_alpha)
+        gfx.drawText(line.text, 10, start_y + (i - 1) * LINE_H)
     end
 
     -- ── INPUT LINE ────────────────────────────────────────────
     if current_state == STATE.PLAYING then
         local input_y = start_y + #terminal_lines * LINE_H + 4
-        lurek.render.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 1)
+        gfx.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 1)
         local display = PROMPT .. input_buffer
         if cursor_visible then display = display .. "█" end
-        lurek.render.drawText(display, 10, input_y)
+        gfx.drawText(display, 10, input_y)
     end
 
     -- ── GAME OVER ─────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
         local gy = start_y + #terminal_lines * LINE_H + 30
-        lurek.render.setColor(COL_RED[1], COL_RED[2], COL_RED[3], 1)
-        lurek.render.drawText("██ TRACED — GAME OVER ██", SCREEN_W / 2 - 105, gy)
-        lurek.render.setColor(COL_YELLOW[1], COL_YELLOW[2], COL_YELLOW[3], 1)
-        lurek.render.drawText("Final score: " .. score, SCREEN_W / 2 - 55, gy + 25)
-        lurek.render.drawText("Files: " .. #downloaded_files, SCREEN_W / 2 - 35, gy + 45)
-        lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 1)
-        lurek.render.drawText("[ Press R to restart ]", SCREEN_W / 2 - 90, gy + 75)
+        gfx.setColor(COL_RED[1], COL_RED[2], COL_RED[3], 1)
+        gfx.drawText("██ TRACED — GAME OVER ██", SCREEN_W / 2 - 105, gy)
+        gfx.setColor(COL_YELLOW[1], COL_YELLOW[2], COL_YELLOW[3], 1)
+        gfx.drawText("Final score: " .. score, SCREEN_W / 2 - 55, gy + 25)
+        gfx.drawText("Files: " .. #downloaded_files, SCREEN_W / 2 - 35, gy + 45)
+        gfx.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 1)
+        gfx.drawText("[ Press R to restart ]", SCREEN_W / 2 - 90, gy + 75)
     end
 
     -- ── HUD: Trace bar ────────────────────────────────────────
@@ -716,8 +719,8 @@ function lurek.render_ui()
         local pct = trace_timer / (TRACE_TIME + proxy_bonus)
 
         -- Background
-        lurek.render.setColor(0.15, 0.15, 0.15, 0.8)
-        lurek.render.drawRect(bar_x, bar_y, bar_w, bar_h)
+        gfx.setColor(0.15, 0.15, 0.15, 0.8)
+        gfx.drawRect(bar_x, bar_y, bar_w, bar_h)
 
         -- Fill (red when low, yellow when mid, green when high)
         local r, g
@@ -726,33 +729,33 @@ function lurek.render_ui()
         else r, g = 1, 0.1 end
 
         local pulse = trace_bar_pulse.value
-        lurek.render.setColor(r + pulse * 0.3, g * (1 - pulse * 0.3), 0, 0.9)
-        lurek.render.drawRect(bar_x, bar_y, bar_w * pct, bar_h)
+        gfx.setColor(r + pulse * 0.3, g * (1 - pulse * 0.3), 0, 0.9)
+        gfx.drawRect(bar_x, bar_y, bar_w * pct, bar_h)
 
         -- Border
-        lurek.render.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 0.6)
-        lurek.render.drawRect(bar_x, bar_y, bar_w, 1)
-        lurek.render.drawRect(bar_x, bar_y + bar_h, bar_w, 1)
-        lurek.render.drawRect(bar_x, bar_y, 1, bar_h)
-        lurek.render.drawRect(bar_x + bar_w, bar_y, 1, bar_h)
+        gfx.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 0.6)
+        gfx.drawRect(bar_x, bar_y, bar_w, 1)
+        gfx.drawRect(bar_x, bar_y + bar_h, bar_w, 1)
+        gfx.drawRect(bar_x, bar_y, 1, bar_h)
+        gfx.drawRect(bar_x + bar_w, bar_y, 1, bar_h)
 
         -- Label
-        lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3], 1)
-        lurek.render.drawText(string.format("TRACE: %.0fs", trace_timer), bar_x, bar_y + bar_h + 3)
+        gfx.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3], 1)
+        gfx.drawText(string.format("TRACE: %.0fs", trace_timer), bar_x, bar_y + bar_h + 3)
     end
 
     -- ── HUD: Mission / Score / FPS ────────────────────────────
-    lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.7)
-    lurek.render.drawText(string.format("Score: %d", score), 10, SCREEN_H - 20)
+    gfx.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.7)
+    gfx.drawText(string.format("Score: %d", score), 10, SCREEN_H - 20)
     if MISSIONS[current_mission] then
-        lurek.render.drawText("Mission " .. current_mission .. "/" .. #MISSIONS, 150, SCREEN_H - 20)
+        gfx.drawText("Mission " .. current_mission .. "/" .. #MISSIONS, 150, SCREEN_H - 20)
     else
-        lurek.render.drawText("ALL MISSIONS COMPLETE", 150, SCREEN_H - 20)
+        gfx.drawText("ALL MISSIONS COMPLETE", 150, SCREEN_H - 20)
     end
     if proxy_active then
-        lurek.render.setColor(COL_CYAN[1], COL_CYAN[2], COL_CYAN[3], 0.7)
-        lurek.render.drawText("[PROXY]", 370, SCREEN_H - 20)
+        gfx.setColor(COL_CYAN[1], COL_CYAN[2], COL_CYAN[3], 0.7)
+        gfx.drawText("[PROXY]", 370, SCREEN_H - 20)
     end
-    lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.5)
-    lurek.render.drawText(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20)
+    gfx.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.5)
+    gfx.drawText(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20)
 end

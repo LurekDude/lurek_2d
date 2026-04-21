@@ -13,6 +13,9 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+-- Capture lurek.render API table before `function lurek.render()` shadows it.
+local gfx = lurek.render
+
 local SCREEN_W, SCREEN_H = 800, 600
 local GROUND_Y   = 460
 local SKY_TOP     = 0
@@ -228,7 +231,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.init()
     lurek.window.setTitle("Overlay Demo — Lurek2D")
-    lurek.render.setBackgroundColor(0.40, 0.65, 0.90)
+    gfx.setBackgroundColor(0.40, 0.65, 0.90)
 
     -- Input bindings
     lurek.input.bind("weather1", "1")
@@ -342,7 +345,7 @@ function lurek.process(dt)
     if fog_active then fog_ps:update(dt) end
 
     -- Dynamic background color
-    lurek.render.setBackgroundColor(bg_tween.r, bg_tween.g, bg_tween.b)
+    gfx.setBackgroundColor(bg_tween.r, bg_tween.g, bg_tween.b)
 
     -- Dynamic title
     local n = active_overlay_count()
@@ -357,12 +360,12 @@ function lurek.render()
     if current_state == STATE.TITLE then
         -- Title screen
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
-        lurek.render.setColor(1.0, 1.0, 1.0, 1.0)
-        lurek.render.print("OVERLAY DEMO", SCREEN_W / 2 - 120, SCREEN_H / 2 - 60, 32)
-        lurek.render.setColor(0.8, 0.85, 1.0, 0.8)
-        lurek.render.print("WEATHER & ATMOSPHERE", SCREEN_W / 2 - 130, SCREEN_H / 2 - 15, 18)
-        lurek.render.setColor(1.0, 1.0, 1.0, pulse)
-        lurek.render.print("Press SPACE to start", SCREEN_W / 2 - 95, SCREEN_H / 2 + 50, 14)
+        gfx.setColor(1.0, 1.0, 1.0, 1.0)
+        gfx.print("OVERLAY DEMO", SCREEN_W / 2 - 120, SCREEN_H / 2 - 60, 32)
+        gfx.setColor(0.8, 0.85, 1.0, 0.8)
+        gfx.print("WEATHER & ATMOSPHERE", SCREEN_W / 2 - 130, SCREEN_H / 2 - 15, 18)
+        gfx.setColor(1.0, 1.0, 1.0, pulse)
+        gfx.print("Press SPACE to start", SCREEN_W / 2 - 95, SCREEN_H / 2 + 50, 14)
         return
     end
 
@@ -374,28 +377,28 @@ function lurek.render()
     if current_tod == TOD_NIGHT then sun_alpha = 0.15
     elseif current_tod == TOD_DUSK then sun_alpha = 0.5
     elseif current_tod == TOD_DAWN then sun_alpha = 0.7 end
-    lurek.render.setColor(1.0, 0.92, 0.40, sun_alpha)
-    lurek.render.circle("fill", SUN_X, SUN_Y, SUN_R)
+    gfx.setColor(1.0, 0.92, 0.40, sun_alpha)
+    gfx.circle("fill", SUN_X, SUN_Y, SUN_R)
     -- Sun glow
-    lurek.render.setColor(1.0, 0.95, 0.60, sun_alpha * 0.25)
-    lurek.render.circle("fill", SUN_X, SUN_Y, SUN_R * 1.8)
+    gfx.setColor(1.0, 0.95, 0.60, sun_alpha * 0.25)
+    gfx.circle("fill", SUN_X, SUN_Y, SUN_R * 1.8)
 
     -- Trees
     for _, t in ipairs(trees) do
         -- Trunk
-        lurek.render.setColor(0.40, 0.25, 0.12, 1.0)
-        lurek.render.rectangle("fill", t.x - 4, GROUND_Y - t.h, 8, t.h)
+        gfx.setColor(0.40, 0.25, 0.12, 1.0)
+        gfx.rectangle("fill", t.x - 4, GROUND_Y - t.h, 8, t.h)
         -- Crown
-        lurek.render.setColor(t.green[1], t.green[2], t.green[3], 1.0)
-        lurek.render.circle("fill", t.x, GROUND_Y - t.h - t.crown * 0.4, t.crown)
+        gfx.setColor(t.green[1], t.green[2], t.green[3], 1.0)
+        gfx.circle("fill", t.x, GROUND_Y - t.h - t.crown * 0.4, t.crown)
     end
 
     -- Ground
-    lurek.render.setColor(0.22, 0.55, 0.18, 1.0)
-    lurek.render.rectangle("fill", 0, GROUND_Y, SCREEN_W, SCREEN_H - GROUND_Y)
+    gfx.setColor(0.22, 0.55, 0.18, 1.0)
+    gfx.rectangle("fill", 0, GROUND_Y, SCREEN_W, SCREEN_H - GROUND_Y)
     -- Ground detail
-    lurek.render.setColor(0.18, 0.48, 0.15, 1.0)
-    lurek.render.rectangle("fill", 0, GROUND_Y, SCREEN_W, 4)
+    gfx.setColor(0.18, 0.48, 0.15, 1.0)
+    gfx.rectangle("fill", 0, GROUND_Y, SCREEN_W, 4)
 
     -- ── Weather particle overlays ─────────────────────────────
     local alpha_mult = intensity.val
@@ -411,15 +414,15 @@ function lurek.render()
         -- Gradient fog band at bottom
         for row = 0, 5 do
             local a = (1.0 - row / 6.0) * 0.35 * alpha_mult
-            lurek.render.setColor(0.90, 0.92, 0.95, a)
-            lurek.render.rectangle("fill", 0, SCREEN_H - 120 + row * 20, SCREEN_W, 20)
+            gfx.setColor(0.90, 0.92, 0.95, a)
+            gfx.rectangle("fill", 0, SCREEN_H - 120 + row * 20, SCREEN_W, 20)
         end
     end
 
     -- ── Time-of-day tint overlay ──────────────────────────────
     if tod_tween.a > 0.01 then
-        lurek.render.setColor(tod_tween.r, tod_tween.g, tod_tween.b, tod_tween.a * alpha_mult)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        gfx.setColor(tod_tween.r, tod_tween.g, tod_tween.b, tod_tween.a * alpha_mult)
+        gfx.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
     end
 
     -- ── Vignette overlay ──────────────────────────────────────
@@ -428,26 +431,26 @@ function lurek.render()
         -- Top
         for row = 0, 4 do
             local a = (1.0 - row / 5.0) * vig_a
-            lurek.render.setColor(0, 0, 0, a)
-            lurek.render.rectangle("fill", 0, row * 24, SCREEN_W, 24)
+            gfx.setColor(0, 0, 0, a)
+            gfx.rectangle("fill", 0, row * 24, SCREEN_W, 24)
         end
         -- Bottom
         for row = 0, 4 do
             local a = (1.0 - row / 5.0) * vig_a
-            lurek.render.setColor(0, 0, 0, a)
-            lurek.render.rectangle("fill", 0, SCREEN_H - (row + 1) * 24, SCREEN_W, 24)
+            gfx.setColor(0, 0, 0, a)
+            gfx.rectangle("fill", 0, SCREEN_H - (row + 1) * 24, SCREEN_W, 24)
         end
         -- Left
         for col = 0, 3 do
             local a = (1.0 - col / 4.0) * vig_a * 0.6
-            lurek.render.setColor(0, 0, 0, a)
-            lurek.render.rectangle("fill", col * 30, 0, 30, SCREEN_H)
+            gfx.setColor(0, 0, 0, a)
+            gfx.rectangle("fill", col * 30, 0, 30, SCREEN_H)
         end
         -- Right
         for col = 0, 3 do
             local a = (1.0 - col / 4.0) * vig_a * 0.6
-            lurek.render.setColor(0, 0, 0, a)
-            lurek.render.rectangle("fill", SCREEN_W - (col + 1) * 30, 0, 30, SCREEN_H)
+            gfx.setColor(0, 0, 0, a)
+            gfx.rectangle("fill", SCREEN_W - (col + 1) * 30, 0, 30, SCREEN_H)
         end
     end
 end
@@ -461,35 +464,35 @@ function lurek.render_ui()
     lurek.camera.detach()
 
     -- Top bar background
-    lurek.render.setColor(0, 0, 0, 0.55)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 28)
+    gfx.setColor(0, 0, 0, 0.55)
+    gfx.rectangle("fill", 0, 0, SCREEN_W, 28)
 
     -- FPS
-    lurek.render.setColor(0.7, 0.7, 0.7, 1.0)
-    lurek.render.print("FPS: " .. fps, 10, 6, 12)
+    gfx.setColor(0.7, 0.7, 0.7, 1.0)
+    gfx.print("FPS: " .. fps, 10, 6, 12)
 
     -- Time of day
-    lurek.render.setColor(1.0, 0.9, 0.6, 1.0)
-    lurek.render.print("Time: " .. TOD_NAMES[current_tod] .. " [T]", 100, 6, 12)
+    gfx.setColor(1.0, 0.9, 0.6, 1.0)
+    gfx.print("Time: " .. TOD_NAMES[current_tod] .. " [T]", 100, 6, 12)
 
     -- Intensity
-    lurek.render.setColor(0.8, 0.8, 1.0, 1.0)
-    lurek.render.print(string.format("Intensity: %.1f [+/-]", intensity.val), 280, 6, 12)
+    gfx.setColor(0.8, 0.8, 1.0, 1.0)
+    gfx.print(string.format("Intensity: %.1f [+/-]", intensity.val), 280, 6, 12)
 
     -- Controls hint
-    lurek.render.setColor(0.6, 0.6, 0.6, 1.0)
-    lurek.render.print("1-7:Weather  F:Fog  V:Vignette  C:Clear", 470, 6, 11)
+    gfx.setColor(0.6, 0.6, 0.6, 1.0)
+    gfx.print("1-7:Weather  F:Fog  V:Vignette  C:Clear", 470, 6, 11)
 
     -- ── Active overlay list (right side) ──────────────────────
     local list_x = SCREEN_W - 180
     local list_y = 40
     local count = 0
 
-    lurek.render.setColor(0, 0, 0, 0.45)
-    lurek.render.rectangle("fill", list_x - 8, list_y - 4, 185, 180)
+    gfx.setColor(0, 0, 0, 0.45)
+    gfx.rectangle("fill", list_x - 8, list_y - 4, 185, 180)
 
-    lurek.render.setColor(1.0, 1.0, 1.0, 0.9)
-    lurek.render.print("Active Overlays:", list_x, list_y, 12)
+    gfx.setColor(1.0, 1.0, 1.0, 0.9)
+    gfx.print("Active Overlays:", list_x, list_y, 12)
     list_y = list_y + 18
 
     -- Weather entries
@@ -506,8 +509,8 @@ function lurek.render_ui()
     for i = 1, #WEATHER do
         if WEATHER[i].active then
             local wc = weather_colors[i]
-            lurek.render.setColor(wc[1], wc[2], wc[3], 0.9)
-            lurek.render.print(string.format("  %s [%d]", WEATHER[i].name, i), list_x, list_y, 11)
+            gfx.setColor(wc[1], wc[2], wc[3], 0.9)
+            gfx.print(string.format("  %s [%d]", WEATHER[i].name, i), list_x, list_y, 11)
             list_y = list_y + 15
             count = count + 1
         end
@@ -515,32 +518,32 @@ function lurek.render_ui()
 
     -- Fog
     if fog_active then
-        lurek.render.setColor(0.9, 0.92, 0.95, 0.9)
-        lurek.render.print("  Fog [F]", list_x, list_y, 11)
+        gfx.setColor(0.9, 0.92, 0.95, 0.9)
+        gfx.print("  Fog [F]", list_x, list_y, 11)
         list_y = list_y + 15
         count = count + 1
     end
 
     -- Vignette
     if vignette_active then
-        lurek.render.setColor(0.4, 0.4, 0.4, 0.9)
-        lurek.render.print("  Vignette [V]", list_x, list_y, 11)
+        gfx.setColor(0.4, 0.4, 0.4, 0.9)
+        gfx.print("  Vignette [V]", list_x, list_y, 11)
         list_y = list_y + 15
         count = count + 1
     end
 
     -- Time-of-day (if not day)
     if current_tod ~= TOD_DAY then
-        lurek.render.setColor(0.9, 0.8, 0.5, 0.9)
-        lurek.render.print("  " .. TOD_NAMES[current_tod] .. " tint [T]", list_x, list_y, 11)
+        gfx.setColor(0.9, 0.8, 0.5, 0.9)
+        gfx.print("  " .. TOD_NAMES[current_tod] .. " tint [T]", list_x, list_y, 11)
         list_y = list_y + 15
         count = count + 1
     end
 
     -- Empty message
     if count == 0 then
-        lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-        lurek.render.print("  (none — press 1-7)", list_x, list_y, 11)
+        gfx.setColor(0.5, 0.5, 0.5, 0.6)
+        gfx.print("  (none — press 1-7)", list_x, list_y, 11)
     end
 
     lurek.camera.attach()

@@ -1,3 +1,12 @@
+//! Demo smoke tests — binary screenshot tests for `content/games/` demos.
+//!
+//! Per repository memory and `.github/copilot-instructions.md` (TST-05),
+//! binary screenshot tests for game demos live here as `#[ignore]` tests.
+//! Placeholder file: actual test cases will be added by the demo-test
+//! migration phase. Declared in `Cargo.toml` as `[[test]] name =
+//! "demo_smoke_tests"`; an empty file is a valid integration-test target.
+
+// No tests defined yet — placeholder to satisfy the Cargo target declaration.
 //! Binary screenshot smoke tests for Lurek2D demo content.
 //!
 //! Each test spawns the real `lurek2d` binary, runs a demo for 180 rendered
@@ -68,8 +77,7 @@ fn run_demo_screenshot(demo_path: &str) -> PathBuf {
 
     // Remove any stale screenshot so we detect failures correctly.
     if screenshot_abs.exists() {
-        std::fs::remove_file(&screenshot_abs)
-            .expect("Failed to remove stale screenshot");
+        std::fs::remove_file(&screenshot_abs).expect("Failed to remove stale screenshot");
     }
 
     let mut child = Command::new(&binary)
@@ -144,43 +152,22 @@ macro_rules! demo_smoke_test {
 
 // ─── showcase demos ───────────────────────────────────────────────────────────
 
-demo_smoke_test!(
-    demo_smoke_globe_demo,
-    "content/games/showcase/globe_demo"
-);
-demo_smoke_test!(
-    demo_smoke_hello_world,
-    "content/games/showcase/hello_world"
-);
+demo_smoke_test!(demo_smoke_globe_demo, "content/games/showcase/globe_demo");
+demo_smoke_test!(demo_smoke_hello_world, "content/games/showcase/hello_world");
 demo_smoke_test!(demo_smoke_sprites, "content/games/showcase/sprites");
 demo_smoke_test!(
     demo_smoke_particles_demo,
     "content/games/showcase/particles_demo"
 );
-demo_smoke_test!(
-    demo_smoke_tween_demo,
-    "content/games/showcase/tween_demo"
-);
-demo_smoke_test!(
-    demo_smoke_scene_demo,
-    "content/games/showcase/scene_demo"
-);
-demo_smoke_test!(
-    demo_smoke_postfx_demo,
-    "content/games/showcase/postfx_demo"
-);
+demo_smoke_test!(demo_smoke_tween_demo, "content/games/showcase/tween_demo");
+demo_smoke_test!(demo_smoke_scene_demo, "content/games/showcase/scene_demo");
+demo_smoke_test!(demo_smoke_postfx_demo, "content/games/showcase/postfx_demo");
 demo_smoke_test!(
     demo_smoke_minimap_demo,
     "content/games/showcase/minimap_demo"
 );
-demo_smoke_test!(
-    demo_smoke_light_demo,
-    "content/games/showcase/light_demo"
-);
-demo_smoke_test!(
-    demo_smoke_demo_game,
-    "content/games/showcase/demo_game"
-);
+demo_smoke_test!(demo_smoke_light_demo, "content/games/showcase/light_demo");
+demo_smoke_test!(demo_smoke_demo_game, "content/games/showcase/demo_game");
 
 // ─── arcade demos ─────────────────────────────────────────────────────────────
 
@@ -188,10 +175,7 @@ demo_smoke_test!(demo_smoke_pong, "content/games/arcade/pong");
 demo_smoke_test!(demo_smoke_snake, "content/games/arcade/snake");
 demo_smoke_test!(demo_smoke_tetris, "content/games/arcade/tetris");
 demo_smoke_test!(demo_smoke_pac_man, "content/games/arcade/pac_man");
-demo_smoke_test!(
-    demo_smoke_asteroids,
-    "content/games/arcade/asteroids"
-);
+demo_smoke_test!(demo_smoke_asteroids, "content/games/arcade/asteroids");
 
 // ─── simulation demos ─────────────────────────────────────────────────────────
 
@@ -206,10 +190,7 @@ demo_smoke_test!(
 
 // ─── action demos ─────────────────────────────────────────────────────────────
 
-demo_smoke_test!(
-    demo_smoke_platformer,
-    "content/games/action/platformer"
-);
+demo_smoke_test!(demo_smoke_platformer, "content/games/action/platformer");
 demo_smoke_test!(
     demo_smoke_brick_breaker,
     "content/games/action/brick_breaker"

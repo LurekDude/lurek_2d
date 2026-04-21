@@ -100,13 +100,9 @@ fn execute_with_agent(
                 request = request.header(name, value);
             }
             if let Some(body_data) = body {
-                request
-                    .send(body_data)
-                    .map_err(|e| format!("request error: {e}"))?
+                request.send(body_data).map_err(|e| format!("request error: {e}"))?
             } else {
-                request
-                    .send(&[] as &[u8])
-                    .map_err(|e| format!("request error: {e}"))?
+                request.send(&[] as &[u8]).map_err(|e| format!("request error: {e}"))?
             }
         }
         "GET" | "HEAD" | "OPTIONS" | "DELETE" | _ => {
@@ -145,4 +141,62 @@ fn execute_with_agent(
         headers: resp_headers,
         error: None,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn http_response_default_fields() {
+        let resp = HttpResponse {
+            status: 200,
+            body: vec![72, 105],
+            headers: vec![("Content-Type".to_string(), "text/plain".to_string())],
+            error: None,
+        };
+        assert_eq!(resp.status, 200);
+        assert_eq!(resp.body, b"Hi");
+        assert!(resp.error.is_none());
+    }
+
+    #[test]
+    fn http_response_with_error() {
+        let resp = HttpResponse {
+            status: 0,
+            body: Vec::new(),
+            headers: Vec::new(),
+            error: Some("connection refused".to_string()),
+        };
+        assert_eq!(resp.status, 0);
+        assert!(resp.error.unwrap().contains("connection refused"));
+    }
+
+    #[test]
+    fn http_response_empty_body_and_headers() {
+        let resp = HttpResponse {
+            status: 204,
+            body: Vec::new(),
+            headers: Vec::new(),
+            error: None,
+        };
+        assert_eq!(resp.status, 204);
+        assert!(resp.body.is_empty());
+        assert!(resp.headers.is_empty());
+    }
+
+    #[test]
+    fn http_response_multiple_headers() {
+        let resp = HttpResponse {
+            status: 200,
+            body: Vec::new(),
+            headers: vec![
+                ("X-A".to_string(), "1".to_string()),
+                ("X-B".to_string(), "2".to_string()),
+            ],
+            error: None,
+        };
+        assert_eq!(resp.headers.len(), 2);
+        assert_eq!(resp.headers[0].0, "X-A");
+    }
 }

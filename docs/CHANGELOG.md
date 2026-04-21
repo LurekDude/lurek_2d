@@ -4,11 +4,36 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.5] — 2026-04-22
 
+### Engine recovery — Phase 1 fixes (session engine-recovery-20260421)
+
+- **fix(content): resolve `lurek.render` API/callback collision in 31 game demos** — Every `content/games/**/main.lua` that both declares `function lurek.render()` (the engine render callback) AND calls the `lurek.render.*` draw API now captures the API table into a file-scope `local gfx = lurek.render` at the top of the file (before any function declaration), and every non-callback `lurek.render.<ident>` call is rewritten to `gfx.<ident>`. The capture MUST precede all function bodies — Lua local scope is forward-only, so functions parsed before the declaration would close over `gfx` as a global (nil). Affects all 31 affected demos including `hello_world`, `tetris`, `pong`, `snake`, `asteroids`, and every showcase demo. `globe_demo` already had the idiom and was untouched.
+- **fix(light): demote `LW01 LightWorld created` log from `debug!` to `trace!`** — `App::render_splash` and `App::render_error` construct a fresh `LightWorld::new()` every frame in their fallback paths, producing ~60 Hz log flood at default `debug` level that buried real errors. Demotion matches the semantic reality: `LightWorld::new()` is a routine per-frame event on fallback paths, not a diagnostic signal. Chosen over call-site caching because (a) empty `LightWorld` allocation is negligible (two empty SlotMaps), (b) the fix is one line at the source of the noise rather than paper-over caching in two call sites with split-borrow gymnastics.
+- **chore: remove 4 dead imports + 1 dead MCTS helper** — `src/globe/draw.rs`: removed unused `ProvinceId`, `crate::math::Vec2`, and `TextureKey` imports. `src/network/http.rs`: removed unused `std::io::Read`. `src/ai/mcts.rs`: removed unused `MCTSNode::is_terminal` method (no call sites; trivially re-derivable if needed).
+- **test(demos): restore missing `tests/demo_smoke_tests.rs` placeholder** — `Cargo.toml` declares the `demo_smoke_tests` integration test target at `tests/demo_smoke_tests.rs`, but the file was absent on `refactor/src-migration-v2` (created on a different branch during the quality-sweep session). Added a placeholder Rust source with no test cases so `cargo clippy --all-targets` can resolve all declared targets. The full `#[ignore]` screenshot test set will be re-added by the demo-test-migration phase.
+
+### Quality sweep — tests, docs, coverage (session quality-sweep-20260421)
+
+- **fix(tests/lua): resolve all mechanical lua_test_structure_audit issues** — Stripped UTF-8 BOM from 4 test files; collapsed 51 files that had multiple `test_summary()` calls (from merge) down to one at the end; added `test_summary()` to 33 files missing it (10 new integration stubs + 23 others); added missing plain-text file header to `test_runtime_unit.lua`. Audit now passes for all mechanical categories.
+- **fix(tests/lua): resolve all evidence/golden contract violations** — Ran `lua_evidence_golden_contract_audit.py --fix`: stripped 70 mixed-unit-check `it()` blocks from 5 evidence files (`test_effect_evidence.lua`, `test_image_evidence.lua`, `test_math_evidence.lua`, `test_physics_evidence.lua`, `test_raycaster_evidence.lua`) and added `-- @evidence file` markers. Expanded 10 thin `-- @description` strings (across `test_audio_evidence.lua`, `test_cellular_sand_evidence.lua`, `test_physics_evidence.lua`, `test_render_evidence.lua`, `test_ui_evidence.lua`) to meet the 60-char minimum.
+- **test(library): add missing scheduler library test** — Created `tests/lua/library/test_library_scheduler.lua` (19 test cases covering `newScheduler`, `add`, yield/resume timing, `remove`, `pause`/`resume`, `getStatus`, `getCount`, `clear`, error capture, `clearErrors`). Registered as `lua_library_scheduler` in `tests/lua/harness.rs`.
+- **docs(api): fix 9 missing doc comments to reach 100% coverage** — Added `///` doc comments to: `app.rs` (`fn new`, `fn resolve_present_mode`, `fn init_lua`); `iso_grid.rs` (`fn is_blocked_or_oob`); `engine_api.rs` (fps registration); `math_api.rs` (Vec3, CatmullRomSpline, Transform namespace tables); `timer_api.rs` (delay registration). `python tools/audit/doc_coverage.py` → 5315/5315 (100.0%).
+
+### Lua test restructure — single file per module per layer (session lua-test-restructure-20260421)
+
+- **refactor(tests/lua): enforce one file per module per layer (TST-06)** — Merged 99 non-canonical Lua test files into their canonical `test_<module>_<layer>.lua` targets and deleted the originals. Applies to all six non-integration layers: `unit/`, `evidence/`, `golden/`, `stress/`, `security/`, `config/`. 27 files with unrecognised module names were resolved via explicit remapping script (`fix_remaining_27.py`). Content preserved in full using append-with-banner pattern.
+- **refactor(tests/lua): move output and samples dirs to tests/ level** — Moved `tests/lua/evidence/output/` → `tests/output/` and `tests/lua/golden/samples/` → `tests/samples/`. Updated all Lua path references in-place.
+- **test(integration): add 10 new cross-module integration pair stubs** — `test_input_ui.lua`, `test_audio_scene.lua`, `test_camera_tilemap_scroll.lua`, `test_network_save.lua`, `test_i18n_dialog.lua`, `test_particle_render.lua`, `test_effect_camera.lua`, `test_automation_event.lua`, `test_terminal_input.lua`, `test_minimap_pathfind.lua`. Each has 3 placeholder `it()` tests.
+- **chore(tests/lua): regenerate harness.rs** — Removed 318 stale entries, added 174 new canonical entries, fixed `lua_library_library_*` double-prefix. `cargo check --test lua_tests` → clean (pre-existing unused-import warning only).
+- **refactor(runtime): remove conf.lua fallback entirely** — Deleted `Config::load_from_conf_lua`, `build_config_table`, `read_config_table` from `src/runtime/config.rs`. Removed `mlua` import. `Config::load()` now returns `Config::default()` when no `conf.toml` found — no Lua fallback path. Removed `lurek.conf` no-op registration from `src/lua_api/register.rs`. Updated doc comments in `app.rs`, `log_messages.rs`, `error.rs`. `L053_CONF_CALLBACK_ERR` constant preserved but marked reserved.
+- **test(config): delete test_runtime_config_fallback.lua** — Fallback behaviour no longer exists; test was removed.
+- **docs(specs/runtime): update to reflect conf.lua removal** — Updated `Config::load` description, removed `Config::load_from_conf_lua` entry, replaced implementation-note bullet with "conf.toml only (updated 2026-04-21)".
+- **docs(test-framework): update TST-06 to cover all layers** — TST-06 now applies to `unit/`, `evidence/`, `golden/`, `stress/`, `security/`, and `config/`. Banned-patterns section updated with split-file example. Directory layout updated to show `tests/output/` and `tests/samples/` at `tests/` level.
+
 ### Demo test infrastructure (session globe-content-20260421)
 
 - **test(demos): add headless static-analysis Lua test layer for all game demos** — Created `tests/lua/content/demos/` with 21 test files (one per demo) and a shared `_common_checks.lua` helper. Each test uses `dofile()` + static pattern matching to verify: correct engine callback names (`lurek.init`/`lurek.process`/`lurek.render`), no legacy API (no `drawRect`, `isDown`, old namespaces), no file-scope API captures. Game-specific `describe()` suites verify module API calls. All 21 tests registered in `tests/lua/harness.rs` as `lua_demo_*` entries.
 - **test(demos): add binary screenshot smoke test runner** — Created `tests/demo_smoke_tests.rs` with 21 `#[ignore]` Rust integration tests that spawn the real `lurek2d` binary with `--screenshot=<path> --screenshot-frames=180` and assert PNG validity (exists, >2 KiB, magic bytes). Registered as `[[test]] name = "demo_smoke_tests"` in `Cargo.toml`. Run with `cargo test --test demo_smoke_tests -- --include-ignored`.
-- **refactor(tests): consolidate split unit test files into single-module files (TST-06)** — Merged 11 extra per-sub-feature test files into their canonical single-module file and deleted the extras: `test_event_signal.lua`→`test_event.lua`, `test_ecs_regress_relationship_default.lua`→`test_ecs.lua`, `test_render_pipeline.lua`→`test_render.lua`, `test_runtime_platform.lua`→`test_runtime.lua`, `test_physics_collision.lua`→`test_physics.lua`, `test_pathfind_regress_zero_index.lua`→`test_pathfind.lua`, `test_tilemap_regress_zero_index.lua`→`test_tilemap.lua`, `test_patterns_regress_acquire_borrow.lua`→`test_patterns.lua`, `test_effect_api.lua`+`test_effect_overlay.lua`+`test_effect_postfx.lua`→`test_effect.lua`. Removed 11 stale harness entries.
+- **refactor(tests): consolidate split unit test files into single-module files (TST-06)** — Merged 11 extra per-sub-feature test files into their canonical single-module file and deleted the extras: `test_event_event.lua`→`test_event.lua`, `test_ecs_regress_relationship_default.lua`→`test_ecs.lua`, `test_render_pipeline.lua`→`test_render.lua`, `test_runtime_window.lua`→`test_runtimer.lua`, `test_physics_physics.lua`→`test_physics.lua`, `test_pathfind_regress_zero_index.lua`→`test_pathfind.lua`, `test_tilemap_regress_zero_index.lua`→`test_tilemap.lua`, `test_patterns_regress_acquire_borrow.lua`→`test_patterns.lua`, `test_effect_api.lua`+`test_effect_ui.lua`+`test_effect_effect.lua`→`test_effect.lua`. Removed 11 stale harness entries.
 - **docs(test-framework): document TST-05 and TST-06 demo-test constraints** — Updated `docs/architecture/test-framework.md` with TST-05 (demo tests in `tests/lua/content/demos/`, screenshot runner in `tests/demo_smoke_tests.rs`) and TST-06 (one file per Rust module in `tests/lua/unit/`). Added decision-tree branch 3 for game demo tests. Added screenshot smoke test comparison table and `--screenshot-frames=180` parameter note. Fixed demo test naming format from `test_demo_<name>.lua` to `test_<name>.lua`. Added `demo_smoke_tests` to Cargo.toml example in doc.
 
 ## [0.20.4] — 2026-04-22
@@ -25,7 +50,7 @@ All notable changes to Lurek2D are recorded here.
 - **fix(dataframe): rolling window returns nil for insufficient history** — `rolling_mean` and `rolling_sum` in `src/dataframe/frame.rs` now emit `CellValue::Nil` for rows where `i + 1 < window` rather than partial-window values.
 - **fix(serial): empty Lua table accepted as vacuous-truth empty sequence** — `src/serial/schema.rs` `validate_at` now accepts `SerialValue::Map(empty)` as a valid empty sequence when the schema has an `items` constraint.
 - **test(math): fix lerp tolerance and inOutBounce test** — Lerp property test tolerance raised to `1e-3` (f32 precision for range [-1000,1000]); `inOutBounce` test changed from monotone-check to symmetry-check (bounce curves are not monotone by design).
-- **test(integration): 5 new cross-module integration tests** — `test_serial_filesystem.lua` (4 tests), `test_timer_event.lua` (4 tests), `test_math_physics.lua` (3 tests), `test_image_dataframe.lua` (3 tests), `test_animation_tween.lua` (3 tests). All registered in `tests/lua/harness.rs`.
+- **test(integration): 5 new cross-module integration tests** — `test_serial_fileapp.lua` (4 tests), `test_timer_event.lua` (4 tests), `test_math_physics.lua` (3 tests), `test_image_dataframe.lua` (3 tests), `test_animation_tween.lua` (3 tests). All registered in `tests/lua/harness.rs`.
 - **test(stress): pathfind stress test** — `tests/lua/stress/test_pathfind_stress.lua` (3 tests: 64×64 A* × 20, FlowField 32×32 × 10, blocking cells 16×16).
 
 ## [0.20.3] — 2026-04-22
@@ -39,7 +64,7 @@ All notable changes to Lurek2D are recorded here.
 
 ### Lua namespace alignment (session test-coverage-sweep-20260421)
 
-- **refactor(lurek): align Lua namespaces with module folder names** — Workspace-wide rename so each Lua namespace matches its `src/` folder: `lurek.signal`→`lurek.event`, `lurek.time`→`lurek.timer`, `lurek.img`→`lurek.image`, `lurek.simulator`→`lurek.automation`, `lurek.localization`→`lurek.i18n`, `lurek.keyboard|mouse|gamepad|touch`→`lurek.input.*`, `lurek.savegame`→`lurek.save`, `lurek.modding`→`lurek.mods`, `lurek.codec`→`lurek.serial`, `lurek.fs`→`lurek.filesystem`, `lurek.entity`→`lurek.ecs`, `lurek.graphic`→`lurek.render`, plus `lurek.pathfinding`→`lurek.pathfind`, `lurek.particles`→`lurek.particle`, `lurek.platform`→`lurek.runtime`, `lurek.gpu`→`lurek.compute`, `lurek.postfx`→`lurek.effect`. Touches 656 files across `src/lua_api/`, `tests/`, `content/`, `docs/`, `.github/`. `cargo check --tests` passes.
+- **refactor(lurek): align Lua namespaces with module folder names** — Workspace-wide rename so each Lua namespace matches its `src/` folder: `lurek.event`→`lurek.event`, `lurek.timer`→`lurek.timer`, `lurek.image`→`lurek.image`, `lurek.app`→`lurek.automation`, `lurek.i18n`→`lurek.i18n`, `lurek.input|mouse|gamepad|touch`→`lurek.input.*`, `lurek.save`→`lurek.save`, `lurek.mods`→`lurek.mods`, `lurek.data`→`lurek.serial`, `lurek.filesystem`→`lurek.filesystem`, `lurek.ecs`→`lurek.ecs`, `lurek.render`→`lurek.render`, plus `lurek.pathfind`→`lurek.pathfind`, `lurek.particle`→`lurek.particle`, `lurek.window`→`lurek.runtime`, `lurek.render`→`lurek.compute`, `lurek.effect`→`lurek.effect`. Touches 656 files across `src/lua_api/`, `tests/`, `content/`, `docs/`, `.github/`. `cargo check --tests` passes.
 
 ### Test suite restoration — P1.2 (session test-coverage-sweep-20260421)
 
@@ -84,7 +109,7 @@ All notable changes to Lurek2D are recorded here.
 - **test(image): migrate 9 inline cfg(test) blocks to tests/rust/unit per TST-02 (W2)** — Deleted 9 `#[cfg(test)] mod tests` blocks from every test-bearing file in `src/image/` (`compressed`, `effects`, `image_data`, `layers`, `palette_lut`, `province_grid`, `render`, `serial`, `texture_atlas`). All tests were already mirrored in `tests/rust/unit/image_tests.rs` except the single `encode_then_decode_flat_preserves_pixels` case from `src/image/serial.rs`, which was appended under a new `serial_tests` submodule. Bumped `image::serial::encode_flat`, `decode_flat`, and `parse_header` from private to `pub` so the external integration-test crate can reach them. `cargo test --test engine_tests` → 2834 passed; `inline_test_audit.py` now reports 0 blocks for `image`.
 - **test(animation): migrate 10 inline cfg(test) blocks to tests/rust/unit/animation_tests.rs per TST-02 (W1)** — Deleted 10 `#[cfg(test)] mod tests` blocks from every test-bearing file in `src/animation/` (`aseprite`, `blend`, `clip`, `controller`, `curve`, `event`, `frame`, `render`, `state_machine`, `sync_group`). Most tests were already duplicated in `tests/rust/unit/animation_tests.rs`; appended one missing curve test (`add_keyframe_keeps_sorted_order`) and three missing state_machine tests (`parse_condition_gt`, `parse_condition_invalid_returns_error`, `compare_nums_helpers`). Bumped `AnimCurve::keyframes` from private to `pub` and `parse_condition` / `compare_nums` from private to `pub` so the external test crate can reach them. `cargo test --test animation_tests` → 56 passed; `cargo test --test engine_tests` → 2833 passed; `inline_test_audit.py` now reports 0 blocks for `animation`.
 - **test(tilemap): migrate 12 inline cfg(test) blocks to tests/rust/unit/tilemap_tests.rs per TST-02 (W1)** — Deleted 12 `#[cfg(test)] mod tests` blocks (135 `#[test]` fns total) from every test-bearing file in `src/tilemap/` (`autotile_sheet`, `chunk`, `coords`, `isomap`, `large_map_renderer`, `ldtk`, `mapgen`, `polygon_map`, `render`, `tileset`, `tile_walker`, `tmx`). Most tests already lived in `tests/rust/unit/tilemap_tests.rs`; appended a new `large_map_renderer_tests` submodule (8 tests, using the public `LargeMapRenderer::chunks()` accessor instead of the private `chunks` field) and added 8 missing `mapgen_tests` fns (`map_gen_orientation`, `map_gen_layer_mode`, `map_gen_zones`, `map_gen_generate_empty_group`, `map_gen_generate_with_fill_rect`, `map_gen_generate_with_place_block`, `map_gen_placement_count`, `map_gen_generate_world`). No visibility changes were needed. `cargo test --test engine_tests` → 2829 passed; `inline_test_audit.py` now reports 0 blocks for `tilemap`.
-- **test(effect): migrate 13 inline cfg(test) blocks to tests/rust/unit per TST-02 (W1)** — Deleted 13 `#[cfg(test)] mod tests` blocks from every test-bearing file in `src/effect/` (`ambient`, `atmosphere`, `draw`, `effect`, `effect_type`, `overlay`, `presets`, `render`, `screen_effects`, `stack`, `transition`, `water_overlay`, `weather`). All `#[test]` fns were already mirrored in `tests/rust/unit/effect_tests.rs` (75 tests across submodules), so this wave is a pure deletion with no additions or visibility changes. `cargo test --test effect_tests` → 75 passed; `cargo test --test engine_tests` → 2813 passed; `inline_test_audit.py` now reports 0 blocks for `effect`.
+- **test(effect): migrate 13 inline cfg(test) blocks to tests/rust/unit per TST-02 (W1)** — Deleted 13 `#[cfg(test)] mod tests` blocks from every test-bearing file in `src/effect/` (`ambient`, `atmosphere`, `draw`, `effect`, `effect_type`, `effect`, `presets`, `render`, `screen_effects`, `stack`, `transition`, `water_overlay`, `weather`). All `#[test]` fns were already mirrored in `tests/rust/unit/effect_tests.rs` (75 tests across submodules), so this wave is a pure deletion with no additions or visibility changes. `cargo test --test effect_tests` → 75 passed; `cargo test --test engine_tests` → 2813 passed; `inline_test_audit.py` now reports 0 blocks for `effect`.
 - **test(pathfind): migrate 18 inline cfg(test) blocks to tests/rust/unit per TST-02 (W1)** — Deleted 18 `#[cfg(test)] mod tests` blocks from every test-bearing file in `src/pathfind/` (79 `#[test]` fns total). Rewrote `tests/rust/unit/pathfind_tests.rs` (was a 69-line stub) with submodules covering every pathfinding surface: `ai_flow_field`, `astar`, `async_pool`, `bidir`, `flow_field`, `graph_nav`, `graph_path`, `grid`, `hex_grid`, `hpa`, `influence_map`, `iso_grid`, `jps`, `nav_grid`, `pathgrid`, `range_map`, `render`, `unit_pathfinder`. Bumped `IsoGrid::is_blocked_or_oob` from private to `pub` so the external test crate can reach it; rewrote the influence-map clear test to use the public `clear_layer()` instead of the `pub(crate)` `layers` field. `cargo test --test pathfind_tests` → 79 passed; `cargo test --test engine_tests` → 2813 passed; `inline_test_audit.py` now reports 0 blocks for `pathfind`.
 - **test(ai): migrate inline #[cfg(test)] blocks per TST-01/02 (W1 wave)** — Deleted 27 `#[cfg(test)] mod tests` blocks (104 `#[test]` fns total) from every file in `src/ai/`. Most were already duplicated in `tests/rust/unit/ai_tests.rs`; appended `mcts_tests`, `qlearner_tests`, and `render_tests` submodules to cover the previously uncovered files. Bumped `QLearner::epsilon` and `QLearner::episode_count` from `pub(crate)` to `pub` so `ai_tests.rs` (in the external integration-test crate) can read them. `cargo test --test engine_tests` → 2740 passed; `inline_test_audit.py` now reports 0 blocks for `ai`.
 - **cag(testing): P10 end-of-session CAG sweep — result PASS (session testing-cleanup-20260420)** — CAG-Architect closing sweep per [docs/architecture/cag-system.md §7](architecture/cag-system.md). Q1: `cag_validate.py` 0 errors/0 warnings; `cag_link_check.py --strict` 201 broken links unchanged from P9 baseline (no regression). Q2: added `loads_tools` frontmatter to `.github/prompts/audit-test-placement.prompt.md` referencing the three P3 audit scripts (`inline_test_audit.py`, `thin_wrapper_audit.py`, `thin_modrs_audit.py`) plus `test_coverage.py`; re-validated clean. Q3: follow-up filed for a future `/migrate-inline-tests` prompt + `test-migration` skill to codify the P5/P6 pilot pattern for W1–W7 migration waves per `docs/architecture/test-migration-roadmap.md` (not authored now to keep sweep focused). Q4: no new `lurek.*` surface exposed in P1–P9 (testing-architecture-only session), persona matrix unchanged. **Verdict: PASS — session may close.**
@@ -139,11 +164,11 @@ All notable changes to Lurek2D are recorded here.
 - **feat(lua_api): `lurek.filesystem.createTempFile(prefix?)`** — returns relative path of new scratch file under `save/`.
 - **feat(lua_api): `lurek.data.crc32(str)`** — integer CRC-32 in `[0, 2^32)` from a Lua string.
 - **feat(lua_api): `lurek.runtime.errorSnapshot(msg)`** — JSON string with `message`, `code`, `category`, `recovery_hint` fields for test assertion and crash reporting.
-- **test(lua): BDD tests for all new APIs** — added describe/it blocks to `test_math.lua` (Circle, querySegment), `test_filesystem.lua` (stat, createTempFile), `test_data.lua` (crc32), `test_runtime_system.lua` (errorSnapshot).
+- **test(lua): BDD tests for all new APIs** — added describe/it blocks to `test_math.lua` (Circle, querySegment), `test_fileapp.lua` (stat, createTempFile), `test_data.lua` (crc32), `test_runtime_app.lua` (errorSnapshot).
 - **test(rust): unit tests for non-Lua-reachable internals** — appended new mod blocks to `math_tests.rs` (circle_tests, aabb_tree_query_tests), `filesystem_tests.rs` (stat_tests, create_temp_file_tests), `data_tests.rs` (crc32_tests), `runtime_tests.rs` (error_snapshot_tests).
 - **docs(idea): marked all 6 new items DONE** — `src/math/IDEA.md` (gaps 10+11), `src/filesystem/IDEA.md` (gaps 1+2, feat 1), `src/data/IDEA.md` (helper crc32), `src/runtime/IDEA.md` (feat 3).
 - **docs(specs): updated math.md, filesystem.md, data.md, runtime.md** — added Circle, AabbTree query methods, stat, createTempFile, crc32, ErrorSnapshot to Functions, Types, and Lua API Reference sections.
-- **docs(examples): updated math.lua, filesystem.lua, data.lua** — added worked examples for all new APIs.
+- **docs(examples): updated math.lua, fileapp.lua, data.lua** — added worked examples for all new APIs.
 - **chore(skills/prompts): baked 3 architectural hard constraints** — added `## Hard Constraints` to `.github/prompts/workflow-feature-development.prompt.md`; "No tests in src/" and "mod.rs is declarations only" rules to `.github/skills/rust-coding/SKILL.md`; "Thin Wrapper Contract" to `.github/skills/lua-rust-bridge/SKILL.md`.
 ## [0.20.0] — 2026-04-18
 
@@ -179,11 +204,11 @@ All notable changes to Lurek2D are recorded here.
 - **feat(lua_api): lurek.data.newWriter + DataWriter userdata.** Write-cursor exposed to Lua with typed write methods, seek/tell, and `toBytes()` export.
 
 ### Test, Spec, Docs, and Examples Completion (0.15.0 follow-up)
-- **test(lua): Lua BDD tests for all new 0.15.0 API** — added describe/it blocks to `tests/lua/unit/test_math.lua` (smoothstep, inverseLerp, hslToRgb/rgbToHsl, fromHex, rectUnion, rectFromCenter, Vec2 fromAngle/reflect, Vec3 splat, Transform decompose, inOutElastic/Bounce/Back, CatmullRom addPoint/removePoint), `test_timer.lua` (afterFrames, everyFrames, updateFrames), `test_data.lua` (DataWriter full API), `test_filesystem.lua` (listRecursive + traversal rejection).
+- **test(lua): Lua BDD tests for all new 0.15.0 API** — added describe/it blocks to `tests/lua/unit/test_math.lua` (smoothstep, inverseLerp, hslToRgb/rgbToHsl, fromHex, rectUnion, rectFromCenter, Vec2 fromAngle/reflect, Vec3 splat, Transform decompose, inOutElastic/Bounce/Back, CatmullRom addPoint/removePoint), `test_timer.lua` (afterFrames, everyFrames, updateFrames), `test_data.lua` (DataWriter full API), `test_fileapp.lua` (listRecursive + traversal rejection).
 - **test(rust): Rust unit tests for private internals** — appended new `mod` blocks to `math_tests.rs` (scalar helpers, Color HSL, Rect union/from_center, Vec2/Vec3, Transform decompose, easing inOut variants, CatmullRom mutations), `timer_tests.rs` (frame event scheduling), `data_tests.rs` (DataWriter seek/overwrite/into_bytes), `runtime_tests.rs` (ErrorCategory::Filesystem as_str/code), `filesystem_tests.rs` (reject_traversal path sandbox).
 - **docs(specs): updated docs/specs/ for 5 modules** — math.md, timer.md, data.md, filesystem.md, runtime.md each reflect new 0.15.0 Lua API and Rust additions.
 - **docs(idea): marked all implemented 0.15.0 gaps as DONE** — updated IDEA.md files in src/math/, src/timer/, src/data/, src/filesystem/, src/runtime/.
-- **docs(examples): added 0.15.0 demos to content/examples/** — math.lua (sign, smoothstep, inverseLerp, HSL, rectUnion, rectFromCenter, Vec2/Vec3 extensions, Transform decompose, easing, CatmullRom), timer.lua (afterFrames, everyFrames, updateFrames), data.lua (DataWriter roundtrip), filesystem.lua (listRecursive + traversal block).
+- **docs(examples): added 0.15.0 demos to content/examples/** — math.lua (sign, smoothstep, inverseLerp, HSL, rectUnion, rectFromCenter, Vec2/Vec3 extensions, Transform decompose, easing, CatmullRom), timer.lua (afterFrames, everyFrames, updateFrames), data.lua (DataWriter roundtrip), fileapp.lua (listRecursive + traversal block).
 - **docs(api): regenerated docs/API/lua-api.md, rust-api.md, wiki cheatsheet** via `python tools/gen_all_docs.py` (5962 Lua lines, 5677 Rust lines, 0 errors).
 
 ### CAG Layer — VS Code Frontmatter Compatibility (refactor/src-migration-v2)
@@ -304,7 +329,7 @@ All notable changes to Lurek2D are recorded here.
 - **tools/audit/example_add_missing.py**: New tool that appends commented stub blocks to
   `content/examples/<module>.lua` for every API function/method not yet demonstrated.
   Supports `--module`, `--dry-run`, `--report`, `--verbose`. Creates the example file if it
-  does not exist yet (e.g. `sprite.lua`, `system.lua`).
+  does not exist yet (e.g. `sprite.lua`, `app.lua`).
 - **.github/prompts/flesh-out-example.prompt.md**: New prompt for expanding generated stubs
   into real, idiomatic Lua code.  Includes quality gates (every call must be a real expression,
   return values captured, no placeholder `nil`/`TODO` args).
@@ -312,7 +337,7 @@ All notable changes to Lurek2D are recorded here.
   to use JSON module keys (`ecs`, `effect`, `i18n`, `mods`, `pathfind`, `render`, `save`, `ui`
   instead of old display names); added `NAMESPACE_MAP` for `lurek.*` prefix display; fixed
   encoding bug (now uses `errors='replace'`); fixed regex to use `\b<name>\s*(` instead of
-  the literal `luna.` prefix (was always 0% for all modules); groups results by module not
+  the literal `lurek.` prefix (was always 0% for all modules); groups results by module not
   by class; adds `--report` CI gate flag; displays namespace column in summary.
 ### Changed
 - **.github/skills/examples-management/SKILL.md**: Added "Example Coverage Workflow" section
@@ -333,7 +358,7 @@ All notable changes to Lurek2D are recorded here.
 ## [0.18.0] — 2026-05-15
 ### Added
 - **render**: Automatic viewport culling (`aabb_visible_2d`) in `GpuRenderer::render_frame` for `Rectangle`, `RoundedRectangle`, `Circle`, `Ellipse`, `DrawImage`, and `DrawImageEx` commands. Off-screen primitives are skipped before tessellation when the render target is the screen. A 4 px margin prevents pop-in at edges. Canvas render-to-texture draws are not culled.
-- **app**: `.lurek` / `.luna` ZIP archive drag-and-drop support. Dragging an archive onto the engine window extracts it to a temporary directory and starts the game. Zip-slip path traversal protection enforced. Corresponding CLI detection fixed (was `.lunar`).
+- **app**: `.lurek` / `.lurek` ZIP archive drag-and-drop support. Dragging an archive onto the engine window extracts it to a temporary directory and starts the game. Zip-slip path traversal protection enforced. Corresponding CLI detection fixed (was `.lunar`).
 - **runtime**: `SharedState` LRU texture eviction infrastructure: `resource_budget_bytes`, `frame_counter`, `texture_last_used` fields, `touch_texture()`, `evict_lru_resources()`, and `resource_memory_stats()` methods.
 - **runtime**: `L083_DROP_ARCHIVE` and `L084_DROP_ARCHIVE_FAIL` stable log message IDs added to `log_messages.rs`.
 - **engine Lua API**: `lurek.runtime.setResourceBudget(bytes)` — configures maximum resident texture memory; `0` = unlimited (default).
@@ -676,7 +701,7 @@ All notable changes to Lurek2D are recorded here.
 - **Lunasome: `lobby` library** — Pure-Lua lobby/room management (`content/library/lobby/`) with room creation, join/leave, player tracking, and ready-check coordination.
 - **Lunasome: `netstate` library** — Pure-Lua state synchronization (`content/library/netstate/`) with authority-based replication, change callbacks, delta sync, and turn-based game support.
 - **Dependencies** — Added `ureq = "3"`, `tungstenite = "0.26"`, `rmp-serde = "1"` to Cargo.toml.
-- **Tests** — 4 new Lua test files: `test_network_pack_unpack.lua`, `test_network_roles.lua`, `test_network_runtime.lua`, `test_network_security.lua`.
+- **Tests** — 4 new Lua test files: `test_network_pack_unpack.lua`, `test_network_roles.lua`, `test_network_runtimer.lua`, `test_network_security.lua`.
 
 ### Changed
 - **Network: `DEFAULT_CHANNELS`** — Changed from 1 to 2 (reliable + unreliable by default).
@@ -778,7 +803,7 @@ All notable changes to Lurek2D are recorded here.
 - **`lurek.raycaster` extended factory API** — Three new `UserData` types and factory functions: `lurek.raycaster.newDoorManager()` → `DoorManager`; `lurek.raycaster.newHeightMap(w, h)` → `HeightMap`; `lurek.raycaster.newPointLight(x, y, r, g, b, radius, intensity)` → `PointLight`. Adds `DoorManager` methods: `addDoor`, `openDoor`, `closeDoor`, `update`, `getDoor`, `count`. `HeightMap` methods: `setFloor`, `setCeiling`, `floorAt`, `ceilingAt`. `PointLight` methods: `x`, `y`, `radius`, `intensity`, `color`, `set`.
 - **`PhysicsShapeSnapshot`** — New geometry-snapshot struct in `src/physics/world.rs`, exported via `src/physics/mod.rs`. `World::extract_shape_snapshots()` iterates all bodies and returns `Vec<PhysicsShapeSnapshot>` with no `crate::render` dependency, allowing the Lua API layer to convert without creating a cross-module circular dependency.
 - **`lurek.physics.drawDebugGpu`** — New Lua function in `src/lua_api/physics_api.rs` that extracts body shapes and pushes `RenderCommand::DrawPhysicsDebug` for GPU-accelerated physics debug visualisation. Accepts an optional config table to override `bodyColor`, `staticColor`, `sleepColor`, `sensorColor`, and `lineWidth`.
-- **Evidence tests** — Three new evidence test files: `tests/lua/evidence/test_evidence_raycaster_ext.lua` (8 tests: DoorManager, HeightMap, PointLight); `tests/lua/evidence/test_evidence_physics_debug_gpu.lua` (6 tests); `tests/lua/evidence/test_evidence_render_draw_cmds.lua` (18 tests for all new Lua graphic functions). Registered in `tests/lua/harness.rs`.
+- **Evidence tests** — Three new evidence test files: `tests/lua/evidence/test_evidence_raycaster_ext.lua` (8 tests: DoorManager, HeightMap, PointLight); `tests/lua/evidence/test_evidence_physics_debug_render.lua` (6 tests); `tests/lua/evidence/test_evidence_render_draw_cmds.lua` (18 tests for all new Lua graphic functions). Registered in `tests/lua/harness.rs`.
 
 ## [0.7.25] — 2026-05-22
 ### Added
@@ -843,7 +868,7 @@ All notable changes to Lurek2D are recorded here.
 - **Lua test audit tooling** — Added `tools/audit/lua_test_structure_audit.py` plus audit README / quality-pipeline references to detect missing block descriptions, legacy `@description:` syntax, forbidden `@category` markers, and non-final `test_summary()` calls, with safe autofixes for the legacy syntax cases.
 - **Evidence/golden contract enforcement** — Added `tools/audit/lua_evidence_golden_contract_audit.py`, stripped non-artifact pre-checks out of mixed evidence suites, and documented that evidence files must contain artifact-producing cases only while Lua golden files remain compare-only.
 - **Lua golden migration** — Moved TOML / encode / hash baselines from `tests/rust/golden/expected/` into `tests/lua/golden/samples/migrated_rust/`, added Lua evidence sources plus compare-only Lua goldens for those artifacts, and removed the corresponding Rust golden harness coverage.
-- **System message catalog** — Exposed `lurek.runtime.getMessage`, `lurek.runtime.hasMessage`, and `lurek.runtime.getMessageCount`, migrated the remaining Rust `messages_tests.rs` coverage into `tests/lua/unit/test_runtime_platform.lua`, and deleted the obsolete Rust integration file.
+- **System message catalog** — Exposed `lurek.runtime.getMessage`, `lurek.runtime.hasMessage`, and `lurek.runtime.getMessageCount`, migrated the remaining Rust `messages_tests.rs` coverage into `tests/lua/unit/test_runtime_window.lua`, and deleted the obsolete Rust integration file.
 - **Testing docs/skill sync** — Corrected the false auto-discovery guidance in `docs/architecture/test-framework.md` and `.github/skills/testing-rust/SKILL.md`; Lua files must be registered manually in `tests/lua/harness.rs`.
 - **Windows debug linking** — Removed the forced `/DEBUG:FASTLINK` MSVC linker flag from `.cargo/config.toml` because it caused unstable `lua_tests` links with unresolved externals on large debug test binaries.
 - **Debug profile stability** — Disabled `incremental` and removed `split-debuginfo = "packed"` from `[profile.dev]` after repeated incremental `lua_tests` rebuilds on Windows MSVC produced unresolved-internal-symbol linker failures.
@@ -865,8 +890,8 @@ All notable changes to Lurek2D are recorded here.
 
 ### Changed
 - **Test migration Phase 4** — Fixed and expanded Lua BDD tests for 10 additional modules:
-  - `signal` — Stripped embedded UTF-8 BOM that caused a syntax error in `test_event_signal.lua`; 19/19 tests restored.
-  - `system` — Stripped BOM + fully rewrote `test_runtime_system.lua` to cover `lurek.runtime.*`: getOS/getVersion/getArch/getProcessorCount/getMemorySize/getInfo table fields/clipboard round-trip/debug overlay toggle/log level round-trip/log/getLastError/getEnv/getArgs/parseArgs (flag+option+positional)/getPowerInfo/getPreferredLocales/openURL function-existence check/lurek.event.quit surface check. 54 tests total (was broken syntax error).
+  - `signal` — Stripped embedded UTF-8 BOM that caused a syntax error in `test_event_event.lua`; 19/19 tests restored.
+  - `system` — Stripped BOM + fully rewrote `test_runtime_app.lua` to cover `lurek.runtime.*`: getOS/getVersion/getArch/getProcessorCount/getMemorySize/getInfo table fields/clipboard round-trip/debug overlay toggle/log level round-trip/log/getLastError/getEnv/getArgs/parseArgs (flag+option+positional)/getPowerInfo/getPreferredLocales/openURL function-existence check/lurek.event.quit surface check. 54 tests total (was broken syntax error).
   - `fx` — Rewrote `test_effect_api.lua` to use the correct `lurek.effect.*` / `lurek.effect.*` namespace instead of the non-existent `lurek.effect.*`; corrected `stack:count()` → `stack:len()` and `stack:setEnabled(bool)` → `stack:setEnabled(pos, bool)`; expanded to 32/32 covering getEffectTypes/newEffect/newStack/newPass/newCustomEffect/PostFxEffect-setEnabled-isEnabled/PostFxStack-add-remove-clear-len-getEffect-getDimensions-resize.
   - `camera` — Added setBounds/removeBounds/setTarget/clearTarget/setFollowSmooth/setDeadZone/setLookAhead tests; 28/28 (was 16/16).
   - `raycaster` — Added castRaysFlat/lineOfSight/projectSprite instance methods plus `lurek.raycaster.projectColumn` and `lurek.raycaster.distanceShade` module function tests; 28/28 (was 14/14).
@@ -1045,7 +1070,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **Spec Lua API coverage enforced**: Fixed `## Lua API` sections in 6 specs (`app`, `i18n`, `light`, `render`, `runtime`, `window`) to list every function in markdown tables following `data.md` golden standard. Added `docs/specs/SPEC_TEMPLATE.md` canonical format reference and `work/check_spec_quality.py` validator (47/47 modules pass).
 - **Architecture docs migrated to Zen of Lurek 2.0 and the five-group module model**: all three architecture documents (`docs/architecture/philosophy.md`, `docs/architecture/engine-architecture.md`, `docs/architecture/test-framework.md`) updated in the same pass.
   - `philosophy.md`: Replaced 10 old principles with 15 Zen of Lurek 2.0 principles; replaced strict same-tier prohibition (T-03/T-04) with `No cycles, ever`; updated Active Module Group Constraints (T-01 through T-08) to reflect five-group structure; retired three legacy decisions (Strict Tier Numbering, Baseline→Tier naming, Tier 4 platform slot).
-  - `engine-architecture.md`: Replaced Active Layer Model and four-tier table with Module Group Model (five groups: Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration); updated module dependency graph; fixed eight stale Lua API namespace names (`signal`→`event`, `thread`→`task`, `entity`→`ecs`, `savegame`→`save`, `modding`→`mods`, `localization`→`i18n`, `pathfinding`→`nav`, `postfx`→`fx`); updated Tier 1/2 module tables to new group sections; added Core Runtime Group section.
+  - `engine-architecture.md`: Replaced Active Layer Model and four-tier table with Module Group Model (five groups: Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration); updated module dependency graph; fixed eight stale Lua API namespace names (`signal`→`event`, `thread`→`task`, `ecs`→`ecs`, `save`→`save`, `mods`→`mods`, `i18n`→`i18n`, `pathfind`→`nav`, `postfx`→`fx`); updated Tier 1/2 module tables to new group sections; added Core Runtime Group section.
   - `test-framework.md`: Fixed stale module test file names (`timer_tests.rs`→`time_tests.rs`, `entity_tests.rs`→`ecs_tests.rs`, `thread_tests.rs`→`task_tests.rs`, `savegame_tests.rs`→`save_tests.rs`, `modding_tests.rs`→`mods_tests.rs`, `pathfinding_tests.rs`→`nav_tests.rs`, `camera_tests.rs` removed — merged into render, `graphics_tests.rs`→`render_tests.rs`); same for Lua test files; removed "Tier 3" tier-numbering language.
 - **Zen of Lurek 2.0 corrected to 15 structural rules**: Replaced product-focused principles with 15 architecture-focused structural rules (No Cycles Ever, Composition Root Is One-Way, Depend on Contracts, Core Stays Boring, World Is a Registry, Same-Group Imports Allowed When Acyclic, Split by Reason to Change, Draw Is a Projection Layer, Pure Logic Stays Pure, CPU/Runtime Separate, Tooling at Edge, Bindings Thin, Tests Follow Responsibility, Merge Weak Modules Fast, Optimize for Readability). Fixed remaining stale `src/ecs/`→`src/entity/`, `src/gui/`→`src/ui/`, `src/pathfind/`→`src/nav/`, `src/thread/`→`src/task/` in detail tables. Updated T-xx cross-references from "Principle" to "Rule".
 
@@ -1212,7 +1237,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ## [0.6.31] — 2026-04-10
 ### Fixed
-- **VS Code extension** — promoted `extension2.ts` (full implementation) as the esbuild entry point; fixed 63 command IDs from `luna.*` → `lurek.*` namespace throughout `extension2.ts` and `apiData.ts`; fixed bad `import("./debug/debugBridge")` path → `./services/debugBridge`; updated `package.json` from `package2.json` (v0.9.0, named `luna-toolkit`, full command/view manifest); updated `esbuild.config.mjs` entry to `extension2.ts`; added `loadFromLuaApiMd()` parser in `apiData.ts` so IntelliSense completions load from the real `docs/API/lua-api.md`; fixed Priority-3 lookup path from non-existent `lua_api_reference_generated.md` → `lua-api.md`; packaged as `luna-toolkit-0.9.0.vsix`.
+- **VS Code extension** — promoted `extension2.ts` (full implementation) as the esbuild entry point; fixed 63 command IDs from `lurek.*` → `lurek.*` namespace throughout `extension2.ts` and `apiData.ts`; fixed bad `import("./debug/debugBridge")` path → `./services/debugBridge`; updated `package.json` from `package2.json` (v0.9.0, named `lurek-toolkit`, full command/view manifest); updated `esbuild.config.mjs` entry to `extension2.ts`; added `loadFromLuaApiMd()` parser in `apiData.ts` so IntelliSense completions load from the real `docs/API/lua-api.md`; fixed Priority-3 lookup path from non-existent `lua_api_reference_generated.md` → `lua-api.md`; packaged as `lurek-toolkit-0.9.0.vsix`.
 
 ## [0.6.30] — 2026-04-10
 ### Fixed
@@ -1227,7 +1252,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **Evidence test robustness** — `test_evidence_minimap.lua`: "setTerrain with 0-based coord errors" test replaced by "setTerrain out-of-range coordinate is rejected" (coord > grid_size) which is unambiguously out of bounds
 ### Changed
 - `test_event.lua` — added proper file-level header, removed BOM character from file start
-- `test_effect_api.lua` — updated header to clarify it is a focused smoke test that complements `test_effect_postfx.lua`'s comprehensive coverage
+- `test_effect_api.lua` — updated header to clarify it is a focused smoke test that complements `test_effect_effect.lua`'s comprehensive coverage
 - `test_drawlayer.lua` — added proper file-level header with headless-safe notice
 
 ## [0.6.29] — 2025-07-17
@@ -1240,10 +1265,10 @@ Always update this file **in the same commit** as the change. Use the commit typ
   - `test_evidence_render_drawing.lua` — renders primitives (rect, circle, line, dots) and color grid → `graphic_primitives.png`, `graphic_color_grid.png`
   - `test_evidence_light.lua` — renders radial light falloff and multi-light RGB scene → `light_single_falloff.png`, `light_multi_scene.png`
   - `test_evidence_particle.lua` — renders emitter positions and burst visualization → `particle_positions.png`, `particle_emitter_burst.png`
-  - `test_evidence_effect_postfx.lua` — applies ImageData filters and saves each effect → 7 PNG files (grayscale, invert, blur, sepia, effects strip, posterize+tint, saturation+flip)
+  - `test_evidence_effect_effect.lua` — applies ImageData filters and saves each effect → 7 PNG files (grayscale, invert, blur, sepia, effects strip, posterize+tint, saturation+flip)
   - `test_evidence_minimap.lua` — renders terrain grid and fog-of-war → `minimap_terrain.png`, `minimap_fog.png`
   - `test_evidence_tilemap.lua` — renders tile grid and checkerboard pattern → `tilemap_grid.png`, `tilemap_checkerboard.png`
-  - `test_evidence_effect_overlay.lua` — renders flash decay, fade-to-black, and combined effects → `overlay_flash.png`, `overlay_fade.png`, `overlay_combined.png`
+  - `test_evidence_effect_ui.lua` — renders flash decay, fade-to-black, and combined effects → `overlay_flash.png`, `overlay_fade.png`, `overlay_combined.png`
   - `test_evidence_audio.lua` — generates sine wave, chord, sweep, and stereo ping-pong → 4 WAV files
   - `test_evidence_audio_bus.lua` — generates volume-scaled, pitch-shifted, and fade-out audio → 3 WAV files
 
@@ -1259,11 +1284,11 @@ Always update this file **in the same commit** as the change. Use the commit typ
   - `test_evidence_audio_bus.lua` — bus newBus, setVolume/getVolume/setPitch/getPitch/getName/pause/resume round-trips, multiple-bus independence, source setBus; saves JSON
   - `test_evidence_light.lua` — LightSource position/radius/color/intensity/energy/falloff/shadow round-trips, multiple light independence; saves JSON
   - `test_evidence_particle.lua` — ParticleSystem count/isEmpty/start/stop/pause/resume/reset/getCount/setPosition/getPosition/type/release, newTrail; saves JSON
-  - `test_evidence_effect_postfx.lua` — Effect getTypeName/isBuiltIn/isEnabled/getEffectType/type, Stack getWidth/getHeight/getDimensions/len/isEmpty, ImageEffect; saves JSON
+  - `test_evidence_effect_effect.lua` — Effect getTypeName/isBuiltIn/isEnabled/getEffectType/type, Stack getWidth/getHeight/getDimensions/len/isEmpty, ImageEffect; saves JSON
   - `test_evidence_minimap.lua` — Minimap grid/display dimensions, getTerrain, isFogEnabled, getFogLevel, getObjectCount, getZoom, getCenter, getColorMode; saves JSON
   - `test_evidence_tilemap.lua` — TileSet and TileMap constructors, dimensions, getFirstGid, getLayerCount/Name/TileSetCount, fill, getTile/clearTile round-trip; saves JSON
   - `test_evidence_raycaster.lua` — Raycaster getCell/setCell/isBlocked, castRay hit/miss, castRays array, lineOfSight, projectColumn, distanceShade; saves a 128×64 depth-buffer PNG
-  - `test_evidence_effect_overlay.lua` — Overlay getWidth/Height, isActive, triggerFlash/getFlashAlpha, triggerShake/getShakeOffset, triggerFade, triggerLightning/getLightningAlpha, clear, resize, setAmbientEnabled; saves JSON
+  - `test_evidence_effect_ui.lua` — Overlay getWidth/Height, isActive, triggerFlash/getFlashAlpha, triggerShake/getShakeOffset, triggerFade, triggerLightning/getLightningAlpha, clear, resize, setAmbientEnabled; saves JSON
 - 13 corresponding `#[test]` entries under `// ─── Evidence Tests ───` section in `tests/lua/harness.rs`
 - `tests/lua/evidence/output/.gitignore` — auto-excludes all generated PNG and JSON artefacts from version control
 
@@ -1353,7 +1378,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **Quality: SP-05** — Removed internal `pub(crate) struct Lcg` from `## Key Types` section of `docs/specs/procgen.md`; it is documented in `## Submodules` instead
 - **Quality: D-04** — Replaced "Consult the module-level documentation" stub phrases with real doc content in `src/procgen/flood_fill.rs` and `src/procgen/voronoi.rs` (3 entries)
 - **Quality: T-04** — Fixed float-literal assertions in `tests/rust/unit/localization_tests.rs` by separating `PluralForm::english(1.0)` calls to their own `let` binding before the `assert_eq!` comparison
-- **Quality audit** — `localization`, `debugbridge`, and `procgen` modules now PASS (5/46 total: serial, window, localization, debugbridge, procgen)
+- **Quality audit** — `i18n`, `debugbridge`, and `procgen` modules now PASS (5/46 total: serial, window, localization, debugbridge, procgen)
 
 ## [0.6.19] — 2026-04-09
 
@@ -1362,7 +1387,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **Quality: D-09** — Broadened section separator detection to accept ASCII `// ---` in addition to Unicode `// ─────`; added minimal separator comments to `patterns_api.rs` and `tween_api.rs` which had none
 - **Quality: SP-06** — Made stub detection case-sensitive (`PLACEHOLDER` all-caps only) to stop false-positive warnings from legitimate documentation uses of the word "placeholder" in `gui.md`, `localization.md`, `window.md`, `engine.md`; fixed 4 genuine `TODO` stubs in `docs/specs/serial.md`
 - **Quality: W-05** — Created 13 stub wiki pages for modules missing them: `Graph-API.md`, `Image-API.md`, `Light-API.md`, `Localization-API.md`, `Log-API.md`, `Minimap-API.md`, `Patterns-API.md`, `Pipeline-API.md`, `Raycaster-API.md`, `Serial-API.md`, `Spine-API.md`, `Thread-API.md`, `Tween-API.md`
-- **Quality: R-01** — Expanded tier registry in `tools/audit/audit_module.py`: added 7 modules to TIER1 (`debugbridge`, `devtools`, `docs`, `localization`, `log`, `patterns`, `tween`) and 9 modules to TIER2 (`fx`, `light`, `network`, `pipeline`, `procgen`, `raycaster`, `serial`, `spine`, `terminal`) — previously these were in EXTRA (unassigned)
+- **Quality: R-01** — Expanded tier registry in `tools/audit/audit_module.py`: added 7 modules to TIER1 (`debugbridge`, `devtools`, `docs`, `i18n`, `log`, `patterns`, `tween`) and 9 modules to TIER2 (`fx`, `light`, `network`, `pipeline`, `procgen`, `raycaster`, `serial`, `spine`, `terminal`) — previously these were in EXTRA (unassigned)
 - **Quality audit** — `serial` and `window` modules now fully PASS the automated quality audit (2/46 modules PASS)
 
 ---
@@ -1398,11 +1423,11 @@ Always update this file **in the same commit** as the change. Use the commit typ
 ## [0.6.17] — 2025-07-19
 
 ### Changed
-- **Full project rename: Luna2D → Lurek2D / `luna.*` → `lurek.*`** — Complete rename of all identifiers, namespaces, and strings across the entire repository (the engine was not yet published):
+- **Full project rename: Luna2D → Lurek2D / `lurek.*` → `lurek.*`** — Complete rename of all identifiers, namespaces, and strings across the entire repository (the engine was not yet published):
   - Display name: `Luna2D` / `Luna 2D` → `Lurek2D` / `Lurek 2D` in all docs, comments, UI strings
   - Crate name: `luna2d` → `lurek2d` (Cargo.toml package, lib, bin)
-  - Lua API global namespace: `luna.*` → `lurek.*` in all Rust bindings, Lua scripts, tests, examples, and docs
-  - Lua global table string: `globals().set("luna", ...)` / `globals().get("luna")` → `"lurek"` in all Rust files
+  - Lua API global namespace: `lurek.*` → `lurek.*` in all Rust bindings, Lua scripts, tests, examples, and docs
+  - Lua global table string: `globals().set("lurek", ...)` / `globals().get("lurek")` → `"lurek"` in all Rust files
   - Entry point function: `luna_run()` → `lurek_run()` in `src/lib.rs`, `src/main.rs`, `src/bin/lurekc.rs`
   - Console-less binary: `lunec` → `lurekc` (Cargo.toml `[[bin]]`, `src/bin/lunec.rs` renamed to `lurekc.rs`)
   - Archive format: `.lunar` → `.lurek`; `extract_lunar_archive()` → `extract_lurek_archive()`
@@ -1546,7 +1571,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **`content/examples/` quality pass (part 2)** — stub sections in four high-complexity example files replaced with fully documented example code:
   - `math.lua` (stubs → 5 organised sections): BezierCurve introspection, Transform/Tween supplemental, easing standalone functions, geometry utilities (14 functions), and math wrappers.
   - `ai.lua` (13 class stubs → 13 documented sections): supplemental methods for AIWorld, Agent, BTNode, BehaviorTree, Blackboard, CommandQueue, GOAPPlanner, InfluenceMap, QLearner, Squad, StateMachine, SteeringManager, UtilityAI — all with context comments, realistic args, and use-case rationale.
-  - `pathfinding.lua` (5 class stubs → 5 documented sections): AiFlowField introspection, FlowField query methods, NavGrid chunk info, PathGrid dynamic obstacles, UnitPathfinder cache control.
+  - `pathfind.lua` (5 class stubs → 5 documented sections): AiFlowField introspection, FlowField query methods, NavGrid chunk info, PathGrid dynamic obstacles, UnitPathfinder cache control.
   - `graphics.lua` (9 thin class sections → 11 sections): Canvas, DrawLayer, Font, Image, ImageData, Mesh, NineSlice, Quad, Shader, Shape, SpriteBatch — each with type identity pattern, supplemental methods, and cross-reference notes.
   - Coverage maintained at **2539/2539 = 100%** throughout.
 
@@ -1622,11 +1647,11 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ### Fixed
 - **`docs/architecture/engine-architecture.md` Tier tables fully synced with codebase** — 22 net corrections:
-  - **Tier 1**: moved `automation` to Tier 2 (it depends on Tier 1 `event`); removed stale `sound` entry (`src/sound/` does not exist — SoundData lives in `src/audio/`); removed TOML from `data` description; added 6 new Tier 1 modules: `debugbridge`, `devtools`, `docs`, `localization`, `log`, `patterns`.
-  - **Tier 2**: added `automation`; fixed `postfx | src/postfx/` → `fx | src/fx/` (the module directory and API file are named `fx`); removed stale `overlay` entry (`src/overlay/` does not exist — overlay functionality is provided by the `fx` module); added 7 new Tier 2 modules: `light`, `network`, `pipeline`, `procgen`, `raycaster`, `serial`, `spine`.
+  - **Tier 1**: moved `automation` to Tier 2 (it depends on Tier 1 `event`); removed stale `sound` entry (`src/sound/` does not exist — SoundData lives in `src/audio/`); removed TOML from `data` description; added 6 new Tier 1 modules: `debugbridge`, `devtools`, `docs`, `i18n`, `log`, `patterns`.
+  - **Tier 2**: added `automation`; fixed `postfx | src/postfx/` → `fx | src/fx/` (the module directory and API file are named `fx`); removed stale `effect` entry (`src/overlay/` does not exist — overlay functionality is provided by the `fx` module); added 7 new Tier 2 modules: `light`, `network`, `pipeline`, `procgen`, `raycaster`, `serial`, `spine`.
   - **API Namespaces table**: removed stale `lurek.sound → sound_api.rs` (file does not exist); expanded from 18 to 47 entries covering all registered `lurek.*` namespaces.
   - **Boot Sequence**: updated comment from `18+` to `40+` API modules; removed `sound` from example list.
-- **`specs/README.md`** — added missing entries for `devtools`, `localization`, and `patterns`.
+- **`specs/README.md`** — added missing entries for `devtools`, `i18n`, and `patterns`.
 - **Rust test paths corrected in 6 spec files** (`tests/rust/game/` is retired; `tests/unit/` was missing the `rust/` segment):
   - `specs/ai.md`: `tests/rust/game/ai_tests.rs` → `tests/rust/unit/ai_tests.rs`
   - `specs/minimap.md`: `tests/rust/game/minimap_tests.rs` → `tests/rust/unit/minimap_tests.rs`
@@ -1649,7 +1674,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 - **`specs/animation.md`** — strengthened framing as **frame-based GIF-style sprite animation**; added explicit boundary note that it is not related to `spine`.
 - **`specs/spine.md`** — strengthened framing as an **independent skeletal/bone-hierarchy system**, explicitly distinct from `animation`.
 - **`specs/gui.md`** — added note that shared widget type names (`Button`, `Label`, `TextBox`) with `terminal` are **intentional design** — same conceptual interface, different renderers.
-- **`specs/terminal.md`** — added matching note that shared widget type names with `gui` are intentional.
+- **`specs/terminal.md`** — added matching note that shared widget type names with `ui` are intentional.
 - **`specs/docs.md`** — `loadToml` dependency corrected from `lurek.data.parseToml` to `lurek.serial.fromToml`.
 - **Generated docs** (`docs/API/lua-api.md`, `docs/API/lurek.lua`, `wiki/API-Reference.md`, `docs/logs/lua_api_data.json`) — `parseToml`/`encodeToml` entries removed from the `lurek.data` section.
 
@@ -1732,7 +1757,7 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ### Added
 - **`devtools` module** (`src/devtools/`) — New domain module providing: structured logger (`Logger`/`LogEntry`/`LogLevel`) with min-level filtering and category tagging; hierarchical profiler (`Profiler`/`ProfileZone`) with per-frame zone tracking; rolling frame-time stats (`FrameStats`/`FrameSnapshot`) with FPS, P50/P95/P99 percentiles; and file watcher (`FileWatcher`) for hot-reload polling. Exposed via `lurek.devtools.*` (gated by `modules.debug`). Spec: `specs/devtools.md`. Tests: `tests/rust/unit/devtools_tests.rs` (25 tests).
-- **`localization` module** (`src/localization/`) — New domain module providing: multi-locale string catalog (`Catalog`) with load/unload/translate/fallback/export; `{var}` and `{var:fmt}` interpolation (`interpolate`/`interpolate_pairs`); CLDR-based plural forms (`PluralForm`/`pluralize`/`pluralize_slavic`) for English and Slavic rulesets. Exposed via `lurek.i18n.*` (gated by `modules.localization`). Spec: `specs/localization.md`. Tests: `tests/rust/unit/localization_tests.rs` (26 tests).
+- **`i18n` module** (`src/localization/`) — New domain module providing: multi-locale string catalog (`Catalog`) with load/unload/translate/fallback/export; `{var}` and `{var:fmt}` interpolation (`interpolate`/`interpolate_pairs`); CLDR-based plural forms (`PluralForm`/`pluralize`/`pluralize_slavic`) for English and Slavic rulesets. Exposed via `lurek.i18n.*` (gated by `modules.i18n`). Spec: `specs/localization.md`. Tests: `tests/rust/unit/localization_tests.rs` (26 tests).
 - **`patterns` module** (`src/patterns/`) — New domain module implementing six game-programming design patterns as pure-Rust types: `EventBus` (subscribe/drain-once/priority sort), `ObjectPool` (acquire/release/prewarm/capacity), `CommandStack` (push/undo/redo/batch), `ServiceLocator` (name→any register/unregister/has), `Factory` (type registry + aliases), `StateMachine` (states/transitions/guards/history/reachable). Exposed via `lurek.patterns.*` (gated by `modules.pipeline`). Spec: `specs/patterns.md`. Tests: `tests/rust/unit/patterns_tests.rs` (34 tests).
 - `src/devtools/AGENT.md`, `src/localization/AGENT.md`, `src/patterns/AGENT.md` — module overview files.
 

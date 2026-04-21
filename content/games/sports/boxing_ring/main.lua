@@ -14,6 +14,9 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+-- Capture lurek.render API table before `function lurek.render()` shadows it.
+local gfx = lurek.render
+
 local SCREEN_W, SCREEN_H = 800, 600
 local RING_LEFT   = 100
 local RING_RIGHT  = 700
@@ -268,7 +271,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.init()
     lurek.window.setTitle("Boxing Ring — Lurek2D")
-    lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
+    gfx.setBackgroundColor(0.05, 0.05, 0.08)
 
     lurek.input.bind("left",     { "a" })
     lurek.input.bind("right",    { "d" })
@@ -503,15 +506,15 @@ end
 -- ---------------------------------------------------------------------------
 local function draw_ring()
     -- Floor
-    lurek.render.drawRect(RING_LEFT, RING_FLOOR, RING_RIGHT - RING_LEFT, 8,
+    gfx.drawRect(RING_LEFT, RING_FLOOR, RING_RIGHT - RING_LEFT, 8,
         COL_RING_FLOOR[1], COL_RING_FLOOR[2], COL_RING_FLOOR[3])
     -- Corner posts
-    lurek.render.drawRect(RING_LEFT - 6, RING_TOP, 12, RING_FLOOR - RING_TOP + 8, 0.5, 0.4, 0.3)
-    lurek.render.drawRect(RING_RIGHT - 6, RING_TOP, 12, RING_FLOOR - RING_TOP + 8, 0.5, 0.4, 0.3)
+    gfx.drawRect(RING_LEFT - 6, RING_TOP, 12, RING_FLOOR - RING_TOP + 8, 0.5, 0.4, 0.3)
+    gfx.drawRect(RING_RIGHT - 6, RING_TOP, 12, RING_FLOOR - RING_TOP + 8, 0.5, 0.4, 0.3)
     -- Ropes (3 lines each side)
     for i = 1, 3 do
         local ry = RING_TOP + (RING_FLOOR - RING_TOP) * (i / 4)
-        lurek.render.drawRect(RING_LEFT, ry - 1, RING_RIGHT - RING_LEFT, 3,
+        gfx.drawRect(RING_LEFT, ry - 1, RING_RIGHT - RING_LEFT, 3,
             COL_ROPE[1], COL_ROPE[2], COL_ROPE[3])
     end
 end
@@ -531,11 +534,11 @@ local function draw_fighter(f, col_body, col_glove)
     if f.dodge == DODGE_DUCK then bh = FIGHTER_H - 20 end
 
     -- Body
-    lurek.render.drawRect(fx + 8, fy + (FIGHTER_H - bh), FIGHTER_W - 16, bh,
+    gfx.drawRect(fx + 8, fy + (FIGHTER_H - bh), FIGHTER_W - 16, bh,
         col_body[1], col_body[2], col_body[3])
     -- Head
     local head_size = 16
-    lurek.render.drawRect(fx + (FIGHTER_W - head_size) * 0.5, fy + (FIGHTER_H - bh) - head_size - 2, head_size, head_size,
+    gfx.drawRect(fx + (FIGHTER_W - head_size) * 0.5, fy + (FIGHTER_H - bh) - head_size - 2, head_size, head_size,
         col_body[1] * 1.2, col_body[2] * 1.2, col_body[3] * 1.2)
 
     -- Gloves
@@ -553,7 +556,7 @@ local function draw_fighter(f, col_body, col_glove)
         glove_y = fy + (FIGHTER_H - bh) + 2
     end
 
-    lurek.render.drawRect(glove_x, glove_y, 12, 12,
+    gfx.drawRect(glove_x, glove_y, 12, 12,
         col_glove[1], col_glove[2], col_glove[3])
 end
 
@@ -564,8 +567,8 @@ function lurek.render()
     if current_state == STATE.TITLE then
         draw_ring()
         -- Silhouette fighters
-        lurek.render.drawRect(RING_LEFT + 80, RING_FLOOR - FIGHTER_H, FIGHTER_W, FIGHTER_H, 0.15, 0.25, 0.55, 0.5)
-        lurek.render.drawRect(RING_RIGHT - 120, RING_FLOOR - FIGHTER_H, FIGHTER_W, FIGHTER_H, 0.55, 0.15, 0.12, 0.5)
+        gfx.drawRect(RING_LEFT + 80, RING_FLOOR - FIGHTER_H, FIGHTER_W, FIGHTER_H, 0.15, 0.25, 0.55, 0.5)
+        gfx.drawRect(RING_RIGHT - 120, RING_FLOOR - FIGHTER_H, FIGHTER_W, FIGHTER_H, 0.55, 0.15, 0.12, 0.5)
         camera:detach()
         return
     end
@@ -588,100 +591,100 @@ end
 -- ---------------------------------------------------------------------------
 local function draw_bar(x, y, w, h, value, max_val, r, g, b)
     -- Background
-    lurek.render.drawRect(x, y, w, h, 0.2, 0.2, 0.2, 0.8)
+    gfx.drawRect(x, y, w, h, 0.2, 0.2, 0.2, 0.8)
     -- Fill
     local frac = clamp(value / max_val, 0, 1)
-    lurek.render.drawRect(x, y, w * frac, h, r, g, b)
+    gfx.drawRect(x, y, w * frac, h, r, g, b)
     -- Border
-    lurek.render.drawRect(x, y, w, 1, 1, 1, 1, 0.3)
-    lurek.render.drawRect(x, y + h - 1, w, 1, 1, 1, 1, 0.3)
-    lurek.render.drawRect(x, y, 1, h, 1, 1, 1, 0.3)
-    lurek.render.drawRect(x + w - 1, y, 1, h, 1, 1, 1, 0.3)
+    gfx.drawRect(x, y, w, 1, 1, 1, 1, 0.3)
+    gfx.drawRect(x, y + h - 1, w, 1, 1, 1, 1, 0.3)
+    gfx.drawRect(x, y, 1, h, 1, 1, 1, 0.3)
+    gfx.drawRect(x + w - 1, y, 1, h, 1, 1, 1, 0.3)
 end
 
 function lurek.render_ui()
     -- ── TITLE ─────────────────────────────────────────────────
     if current_state == STATE.TITLE then
-        lurek.render.drawText("BOXING RING", SCREEN_W * 0.5 - 100, 140, 36, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-        lurek.render.drawText("FIGHT NIGHT", SCREEN_W * 0.5 - 85, 190, 22, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.drawText("Press J or SPACE to start", SCREEN_W * 0.5 - 110, 340, 16, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
-        lurek.render.drawText("J=Jab  K=Hook  L=Uppercut  Space=Block", SCREEN_W * 0.5 - 170, 380, 14, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
-        lurek.render.drawText("W=Duck  S=Lean back  A/D=Move", SCREEN_W * 0.5 - 130, 405, 14, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
+        gfx.drawText("BOXING RING", SCREEN_W * 0.5 - 100, 140, 36, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
+        gfx.drawText("FIGHT NIGHT", SCREEN_W * 0.5 - 85, 190, 22, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
+        gfx.drawText("Press J or SPACE to start", SCREEN_W * 0.5 - 110, 340, 16, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
+        gfx.drawText("J=Jab  K=Hook  L=Uppercut  Space=Block", SCREEN_W * 0.5 - 170, 380, 14, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
+        gfx.drawText("W=Duck  S=Lean back  A/D=Move", SCREEN_W * 0.5 - 130, 405, 14, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
         -- FPS
-        lurek.render.drawText("FPS: " .. tostring(lurek.timer.getFPS()), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4)
+        gfx.drawText("FPS: " .. tostring(lurek.timer.getFPS()), 10, SCREEN_H - 20, 12, 0.4, 0.4, 0.4)
         return
     end
 
     -- ── HUD (FIGHT + ROUND_END + GAME_OVER) ──────────────────
     -- Top bar background
-    lurek.render.drawRect(0, 0, SCREEN_W, 55, COL_HUD_BG[1], COL_HUD_BG[2], COL_HUD_BG[3], COL_HUD_BG[4])
+    gfx.drawRect(0, 0, SCREEN_W, 55, COL_HUD_BG[1], COL_HUD_BG[2], COL_HUD_BG[3], COL_HUD_BG[4])
 
     -- Player HP (left side)
-    lurek.render.drawText("PLAYER", 10, 4, 12, COL_PLAYER[1], COL_PLAYER[2], COL_PLAYER[3])
+    gfx.drawText("PLAYER", 10, 4, 12, COL_PLAYER[1], COL_PLAYER[2], COL_PLAYER[3])
     local hp_col = hp_display.player > 30 and COL_HP_GREEN or COL_HP_RED
     draw_bar(10, 18, 200, 14, hp_display.player, MAX_HP, hp_col[1], hp_col[2], hp_col[3])
     -- Player stamina
     draw_bar(10, 36, 160, 8, player.stamina, MAX_STAMINA, COL_STAMINA[1], COL_STAMINA[2], COL_STAMINA[3])
 
     -- Opponent HP (right side)
-    lurek.render.drawText("OPPONENT", SCREEN_W - 85, 4, 12, COL_OPPONENT[1], COL_OPPONENT[2], COL_OPPONENT[3])
+    gfx.drawText("OPPONENT", SCREEN_W - 85, 4, 12, COL_OPPONENT[1], COL_OPPONENT[2], COL_OPPONENT[3])
     local ohp_col = hp_display.opponent > 30 and COL_HP_GREEN or COL_HP_RED
     draw_bar(SCREEN_W - 210, 18, 200, 14, hp_display.opponent, MAX_HP, ohp_col[1], ohp_col[2], ohp_col[3])
     -- Opponent stamina
     draw_bar(SCREEN_W - 170, 36, 160, 8, opponent.stamina, MAX_STAMINA, COL_STAMINA[1], COL_STAMINA[2], COL_STAMINA[3])
 
     -- Round info (center)
-    lurek.render.drawText("Round " .. round_num .. "/" .. MAX_ROUNDS, SCREEN_W * 0.5 - 35, 4, 14, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
+    gfx.drawText("Round " .. round_num .. "/" .. MAX_ROUNDS, SCREEN_W * 0.5 - 35, 4, 14, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
     local timer_str = string.format("%d", math.ceil(math.max(0, round_timer)))
-    lurek.render.drawText(timer_str, SCREEN_W * 0.5 - 8, 22, 20, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
+    gfx.drawText(timer_str, SCREEN_W * 0.5 - 8, 22, 20, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
     -- Wins
-    lurek.render.drawText(round_wins[1] .. " - " .. round_wins[2], SCREEN_W * 0.5 - 12, 44, 10, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
+    gfx.drawText(round_wins[1] .. " - " .. round_wins[2], SCREEN_W * 0.5 - 12, 44, 10, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
 
     -- Bottom bar: score, combo, FPS
-    lurek.render.drawRect(0, SCREEN_H - 30, SCREEN_W, 30, COL_HUD_BG[1], COL_HUD_BG[2], COL_HUD_BG[3], COL_HUD_BG[4])
-    lurek.render.drawText("Score: " .. total_score, 10, SCREEN_H - 24, 14, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
+    gfx.drawRect(0, SCREEN_H - 30, SCREEN_W, 30, COL_HUD_BG[1], COL_HUD_BG[2], COL_HUD_BG[3], COL_HUD_BG[4])
+    gfx.drawText("Score: " .. total_score, 10, SCREEN_H - 24, 14, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
     if combo_count > 1 then
-        lurek.render.drawText("Combo x" .. combo_count, SCREEN_W * 0.5 - 40, SCREEN_H - 24, 14, 1, 0.5, 0.2)
+        gfx.drawText("Combo x" .. combo_count, SCREEN_W * 0.5 - 40, SCREEN_H - 24, 14, 1, 0.5, 0.2)
     end
-    lurek.render.drawText("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 24, 12, 0.4, 0.4, 0.4)
+    gfx.drawText("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 24, 12, 0.4, 0.4, 0.4)
 
     -- Dodge indicator
     if player.dodge == DODGE_DUCK then
-        lurek.render.drawText("DUCK!", player.x + 5, player.y - 20, 12, 0.3, 1, 0.3)
+        gfx.drawText("DUCK!", player.x + 5, player.y - 20, 12, 0.3, 1, 0.3)
     elseif player.dodge == DODGE_LEAN then
-        lurek.render.drawText("LEAN!", player.x + 5, player.y - 20, 12, 0.3, 0.8, 1)
+        gfx.drawText("LEAN!", player.x + 5, player.y - 20, 12, 0.3, 0.8, 1)
     end
 
     -- Block indicator
     if player.blocking then
-        lurek.render.drawText("BLOCK", player.x + 2, player.y - 20, 12, 0.9, 0.9, 0.3)
+        gfx.drawText("BLOCK", player.x + 2, player.y - 20, 12, 0.9, 0.9, 0.3)
     end
 
     -- ── ROUND END overlay ─────────────────────────────────────
     if current_state == STATE.ROUND_END then
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0, 0, 0, 0.5)
+        gfx.drawRect(0, 0, SCREEN_W, SCREEN_H, 0, 0, 0, 0.5)
         if ko_winner then
             local ko_text = ko_winner == "player" and "KNOCKOUT! YOU WIN!" or "KNOCKOUT! YOU LOSE!"
             local ko_col = ko_winner == "player" and COL_HP_GREEN or COL_HP_RED
-            lurek.render.drawText(ko_text, SCREEN_W * 0.5 - 120, 200, 28, ko_col[1], ko_col[2], ko_col[3])
+            gfx.drawText(ko_text, SCREEN_W * 0.5 - 120, 200, 28, ko_col[1], ko_col[2], ko_col[3])
         else
             local rd_text = round_dmg[1] >= round_dmg[2] and "ROUND TO PLAYER!" or "ROUND TO OPPONENT!"
-            lurek.render.drawText(rd_text, SCREEN_W * 0.5 - 110, 200, 24, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
+            gfx.drawText(rd_text, SCREEN_W * 0.5 - 110, 200, 24, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
         end
-        lurek.render.drawText("Damage: " .. round_dmg[1] .. " vs " .. round_dmg[2], SCREEN_W * 0.5 - 70, 250, 16, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.drawText("Press J or SPACE to continue", SCREEN_W * 0.5 - 120, 310, 16, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
+        gfx.drawText("Damage: " .. round_dmg[1] .. " vs " .. round_dmg[2], SCREEN_W * 0.5 - 70, 250, 16, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
+        gfx.drawText("Press J or SPACE to continue", SCREEN_W * 0.5 - 120, 310, 16, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
     end
 
     -- ── GAME OVER overlay ─────────────────────────────────────
     if current_state == STATE.GAME_OVER then
-        lurek.render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0, 0, 0, 0.6)
+        gfx.drawRect(0, 0, SCREEN_W, SCREEN_H, 0, 0, 0, 0.6)
         local winner = round_wins[1] > round_wins[2] and "YOU WIN!" or (round_wins[1] < round_wins[2] and "YOU LOSE!" or "DRAW!")
         local w_col  = round_wins[1] > round_wins[2] and COL_HP_GREEN or (round_wins[1] < round_wins[2] and COL_HP_RED or COL_GOLD)
-        lurek.render.drawText("FIGHT OVER", SCREEN_W * 0.5 - 80, 160, 30, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.drawText(winner, SCREEN_W * 0.5 - 60, 210, 28, w_col[1], w_col[2], w_col[3])
-        lurek.render.drawText("Rounds: " .. round_wins[1] .. " - " .. round_wins[2], SCREEN_W * 0.5 - 55, 260, 16, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.drawText("Score: " .. total_score, SCREEN_W * 0.5 - 40, 290, 16, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-        lurek.render.drawText("Best combo: " .. best_combo, SCREEN_W * 0.5 - 55, 315, 14, 1, 0.5, 0.2)
-        lurek.render.drawText("Press J or SPACE for title", SCREEN_W * 0.5 - 110, 370, 16, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
+        gfx.drawText("FIGHT OVER", SCREEN_W * 0.5 - 80, 160, 30, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
+        gfx.drawText(winner, SCREEN_W * 0.5 - 60, 210, 28, w_col[1], w_col[2], w_col[3])
+        gfx.drawText("Rounds: " .. round_wins[1] .. " - " .. round_wins[2], SCREEN_W * 0.5 - 55, 260, 16, COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
+        gfx.drawText("Score: " .. total_score, SCREEN_W * 0.5 - 40, 290, 16, COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
+        gfx.drawText("Best combo: " .. best_combo, SCREEN_W * 0.5 - 55, 315, 14, 1, 0.5, 0.2)
+        gfx.drawText("Press J or SPACE for title", SCREEN_W * 0.5 - 110, 370, 16, COL_GRAY[1], COL_GRAY[2], COL_GRAY[3])
     end
 end

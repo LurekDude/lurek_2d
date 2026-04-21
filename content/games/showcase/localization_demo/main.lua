@@ -14,6 +14,9 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+-- Capture lurek.render API table before `function lurek.render()` shadows it.
+local gfx = lurek.render
+
 local SCREEN_W, SCREEN_H = 800, 600
 
 local STATE_TITLE    = "TITLE"
@@ -246,7 +249,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.init()
     lurek.window.setTitle("Localization Demo — Lurek2D")
-    lurek.render.setBackgroundColor(0.08, 0.06, 0.1)
+    gfx.setBackgroundColor(0.08, 0.06, 0.1)
 
     -- Input bindings
     lurek.input.bind("lang1", { "1" })
@@ -361,20 +364,20 @@ function lurek.render()
         local cy = SCREEN_H / 2 - 60
         local pulse = 0.85 + 0.15 * math.sin(title_timer * 2.5)
 
-        lurek.render.setColor(0.3, 0.7, 1.0, title_alpha.a * pulse * title_scale.s)
-        lurek.render.print("LOCALIZATION DEMO", cx - 160, cy, 32)
+        gfx.setColor(0.3, 0.7, 1.0, title_alpha.a * pulse * title_scale.s)
+        gfx.print("LOCALIZATION DEMO", cx - 160, cy, 32)
 
-        lurek.render.setColor(0.8, 0.6, 1.0, subtitle_alpha.a * pulse)
-        lurek.render.print("SPEAK EVERY LANGUAGE", cx - 130, cy + 50, 20)
+        gfx.setColor(0.8, 0.6, 1.0, subtitle_alpha.a * pulse)
+        gfx.print("SPEAK EVERY LANGUAGE", cx - 130, cy + 50, 20)
 
         -- Blinking prompt
         if math.floor(title_timer * 2) % 2 == 0 then
-            lurek.render.setColor(0.6, 0.6, 0.6, title_alpha.a * 0.8)
-            lurek.render.print("Press ENTER", cx - 55, cy + 130, 16)
+            gfx.setColor(0.6, 0.6, 0.6, title_alpha.a * 0.8)
+            gfx.print("Press ENTER", cx - 55, cy + 130, 16)
         end
     else
         -- Particles in world space
-        lurek.render.setColor(1, 1, 1, 1)
+        gfx.setColor(1, 1, 1, 1)
         ps_confetti:draw()
     end
 
@@ -392,28 +395,28 @@ function lurek.render_ui()
     local x_dir  = rtl_mode and -1 or 1
 
     -- ── Header bar ────────────────────────────────────────────
-    lurek.render.setColor(0.12, 0.10, 0.16, 0.95)
-    lurek.render.drawRect("fill", 0, 0, SCREEN_W, 44)
+    gfx.setColor(0.12, 0.10, 0.16, 0.95)
+    gfx.drawRect("fill", 0, 0, SCREEN_W, 44)
 
     -- Language name
-    lurek.render.setColor(0.4, 0.85, 1.0, fade)
+    gfx.setColor(0.4, 0.85, 1.0, fade)
     local lang_x = rtl_mode and (SCREEN_W - 20) or 20
-    lurek.render.print(tr("language") .. ": " .. LANG_NAMES[current_lang], lang_x, 12, 18)
+    gfx.print(tr("language") .. ": " .. LANG_NAMES[current_lang], lang_x, 12, 18)
 
     -- FPS
     local fps = lurek.timer.getFPS()
-    lurek.render.setColor(0.6, 0.6, 0.6, 0.8)
-    lurek.render.print(tr("fps_label") .. ": " .. tostring(fps), SCREEN_W - 110, 12, 14)
+    gfx.setColor(0.6, 0.6, 0.6, 0.8)
+    gfx.print(tr("fps_label") .. ": " .. tostring(fps), SCREEN_W - 110, 12, 14)
 
     -- Key hints
-    lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.render.print("1:EN  2:FR  3:ES  4:PL  R:RTL", SCREEN_W / 2 - 100, 14, 12)
+    gfx.setColor(0.5, 0.5, 0.5, 0.6)
+    gfx.print("1:EN  2:FR  3:ES  4:PL  R:RTL", SCREEN_W / 2 - 100, 14, 12)
 
     -- ── Welcome banner ────────────────────────────────────────
     local welcome_text = tr_interp("welcome", { name = player_name })
-    lurek.render.setColor(1.0, 0.9, 0.5, fade)
+    gfx.setColor(1.0, 0.9, 0.5, fade)
     local welcome_x = rtl_mode and (SCREEN_W - 60) or 60
-    lurek.render.print(welcome_text, welcome_x, 60, 22)
+    gfx.print(welcome_text, welcome_x, 60, 22)
 
     -- ── Menu buttons ──────────────────────────────────────────
     for i, btn in ipairs(menu_buttons) do
@@ -422,20 +425,20 @@ function lurek.render_ui()
 
         -- Button background
         if btn.hover then
-            lurek.render.setColor(0.25, 0.20, 0.35, btn.alpha * fade)
+            gfx.setColor(0.25, 0.20, 0.35, btn.alpha * fade)
         else
-            lurek.render.setColor(0.15, 0.12, 0.22, btn.alpha * fade)
+            gfx.setColor(0.15, 0.12, 0.22, btn.alpha * fade)
         end
-        lurek.render.drawRect("fill", bx, btn.y - 18, bw, bh, 6)
+        gfx.drawRect("fill", bx, btn.y - 18, bw, bh, 6)
 
         -- Button border
-        lurek.render.setColor(0.4, 0.3, 0.6, btn.alpha * fade * 0.6)
-        lurek.render.drawRect("line", bx, btn.y - 18, bw, bh, 6)
+        gfx.setColor(0.4, 0.3, 0.6, btn.alpha * fade * 0.6)
+        gfx.drawRect("line", bx, btn.y - 18, bw, bh, 6)
 
         -- Button text
-        lurek.render.setColor(0.9, 0.85, 1.0, btn.alpha * fade)
+        gfx.setColor(0.9, 0.85, 1.0, btn.alpha * fade)
         local label = tr(btn.label_key)
-        lurek.render.print(label, bx + 20, btn.y - 8, 18)
+        gfx.print(label, bx + 20, btn.y - 8, 18)
     end
 
     -- ── Left column: localization info ────────────────────────
@@ -443,34 +446,34 @@ function lurek.render_ui()
     local cy = 100
 
     -- Time display
-    lurek.render.setColor(0.7, 0.7, 0.9, fade)
-    lurek.render.print(tr("time_label") .. ": " .. format_time(clock_seconds + 43200), col_x, cy, 16)
+    gfx.setColor(0.7, 0.7, 0.9, fade)
+    gfx.print(tr("time_label") .. ": " .. format_time(clock_seconds + 43200), col_x, cy, 16)
     cy = cy + 30
 
     -- Number formatting
     local big_number = 1234.56
-    lurek.render.setColor(0.7, 0.9, 0.7, fade)
-    lurek.render.print("Number: " .. format_number(big_number), col_x, cy, 16)
+    gfx.setColor(0.7, 0.9, 0.7, fade)
+    gfx.print("Number: " .. format_number(big_number), col_x, cy, 16)
     cy = cy + 30
 
     -- Pluralization
     local count = item_counts[item_index]
-    lurek.render.setColor(0.9, 0.7, 0.5, fade)
-    lurek.render.print(tr("items_label") .. ": " .. plural(count), col_x, cy, 16)
+    gfx.setColor(0.9, 0.7, 0.5, fade)
+    gfx.print(tr("items_label") .. ": " .. plural(count), col_x, cy, 16)
     cy = cy + 30
 
     -- Interpolation demo
-    lurek.render.setColor(0.9, 0.8, 0.6, fade)
-    lurek.render.print(tr_interp("welcome", { name = "Player1" }), col_x, cy, 14)
+    gfx.setColor(0.9, 0.8, 0.6, fade)
+    gfx.print(tr_interp("welcome", { name = "Player1" }), col_x, cy, 14)
     cy = cy + 25
-    lurek.render.print(tr_interp("welcome", { name = "世界" }), col_x, cy, 14)
+    gfx.print(tr_interp("welcome", { name = "世界" }), col_x, cy, 14)
     cy = cy + 40
 
     -- ── Additional labels showcase ────────────────────────────
     local labels = { "score", "level", "health", "controls", "inventory", "mission", "paused" }
-    lurek.render.setColor(0.6, 0.6, 0.8, fade * 0.9)
+    gfx.setColor(0.6, 0.6, 0.8, fade * 0.9)
     for _, key in ipairs(labels) do
-        lurek.render.print(key .. " → " .. tr(key), col_x, cy, 13)
+        gfx.print(key .. " → " .. tr(key), col_x, cy, 13)
         cy = cy + 20
     end
 
@@ -481,19 +484,19 @@ function lurek.render_ui()
     for _, key in ipairs(dialog_keys) do
         local label = tr(key)
         local bw = #label * 9 + 20
-        lurek.render.setColor(0.2, 0.18, 0.28, fade)
-        lurek.render.drawRect("fill", dx, cy, bw, 26, 4)
-        lurek.render.setColor(0.4, 0.35, 0.55, fade * 0.7)
-        lurek.render.drawRect("line", dx, cy, bw, 26, 4)
-        lurek.render.setColor(0.85, 0.8, 0.95, fade)
-        lurek.render.print(label, dx + 10, cy + 5, 13)
+        gfx.setColor(0.2, 0.18, 0.28, fade)
+        gfx.drawRect("fill", dx, cy, bw, 26, 4)
+        gfx.setColor(0.4, 0.35, 0.55, fade * 0.7)
+        gfx.drawRect("line", dx, cy, bw, 26, 4)
+        gfx.setColor(0.85, 0.8, 0.95, fade)
+        gfx.print(label, dx + 10, cy + 5, 13)
         dx = dx + bw + 8
     end
 
     -- ── RTL indicator ─────────────────────────────────────────
     if rtl_mode then
-        lurek.render.setColor(1.0, 0.6, 0.2, 0.9)
-        lurek.render.print("◀ " .. tr("rtl_hint") .. " ▶", SCREEN_W / 2 - 60, SCREEN_H - 80, 16)
+        gfx.setColor(1.0, 0.6, 0.2, 0.9)
+        gfx.print("◀ " .. tr("rtl_hint") .. " ▶", SCREEN_W / 2 - 60, SCREEN_H - 80, 16)
     end
 
     -- ── Coverage meter ────────────────────────────────────────
@@ -504,31 +507,31 @@ function lurek.render_ui()
     local bar_x = SCREEN_W - bar_w - 30
     local bar_y = SCREEN_H - 50
 
-    lurek.render.setColor(0.15, 0.12, 0.2, 0.9)
-    lurek.render.drawRect("fill", bar_x - 4, bar_y - 20, bar_w + 8, 46, 6)
+    gfx.setColor(0.15, 0.12, 0.2, 0.9)
+    gfx.drawRect("fill", bar_x - 4, bar_y - 20, bar_w + 8, 46, 6)
 
-    lurek.render.setColor(0.5, 0.5, 0.6, fade * 0.8)
-    lurek.render.print(tr("coverage") .. ": " .. translated .. "/" .. total .. " (" .. pct .. "%)", bar_x, bar_y - 16, 12)
+    gfx.setColor(0.5, 0.5, 0.6, fade * 0.8)
+    gfx.print(tr("coverage") .. ": " .. translated .. "/" .. total .. " (" .. pct .. "%)", bar_x, bar_y - 16, 12)
 
     -- Bar background
-    lurek.render.setColor(0.2, 0.2, 0.3, 0.8)
-    lurek.render.drawRect("fill", bar_x, bar_y, bar_w, bar_h, 3)
+    gfx.setColor(0.2, 0.2, 0.3, 0.8)
+    gfx.drawRect("fill", bar_x, bar_y, bar_w, bar_h, 3)
 
     -- Bar fill
     local fill_w = math.floor(bar_w * translated / total)
     if pct == 100 then
-        lurek.render.setColor(0.2, 1.0, 0.4, fade)
+        gfx.setColor(0.2, 1.0, 0.4, fade)
     else
-        lurek.render.setColor(0.9, 0.7, 0.2, fade)
+        gfx.setColor(0.9, 0.7, 0.2, fade)
     end
-    lurek.render.drawRect("fill", bar_x, bar_y, fill_w, bar_h, 3)
+    gfx.drawRect("fill", bar_x, bar_y, fill_w, bar_h, 3)
 
     -- ── Missing key demo ──────────────────────────────────────
     local missing_text = tr("nonexistent_key")
     if missing_text:find("MISSING") then
-        lurek.render.setColor(1.0, 0.3, 0.3, fade * 0.9)
+        gfx.setColor(1.0, 0.3, 0.3, fade * 0.9)
     else
-        lurek.render.setColor(0.8, 0.8, 0.8, fade)
+        gfx.setColor(0.8, 0.8, 0.8, fade)
     end
-    lurek.render.print(missing_text, bar_x, bar_y + 20, 11)
+    gfx.print(missing_text, bar_x, bar_y + 20, 11)
 end

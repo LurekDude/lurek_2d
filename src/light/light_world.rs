@@ -43,7 +43,10 @@ impl LightWorld {
     ///
     /// Defaults: ambient = (0.1, 0.1, 0.1, 1.0), enabled = false, max_lights = 64.
     pub fn new() -> Self {
-        log_msg!(debug, LW01_LIGHT_WORLD_INIT);
+        // Logged at trace!: LightWorld construction is routine (called per-frame
+        // on the splash/error fallback paths in `App::render_splash` /
+        // `App::render_error`) rather than a notable diagnostic event.
+        log_msg!(trace, LW01_LIGHT_WORLD_INIT);
         Self {
             lights: SlotMap::with_key(),
             occluders: SlotMap::with_key(),

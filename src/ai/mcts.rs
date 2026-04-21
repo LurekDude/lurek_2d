@@ -99,9 +99,7 @@ impl MCTSNode {
 
     /// UCT score for this node.
     fn uct(&self, parent_visits: u32, c: f32) -> f64 {
-        if self.visits == 0 {
-            return f64::INFINITY;
-        }
+        if self.visits == 0 { return f64::INFINITY; }
         let q = self.total_score / self.visits as f64;
         let u = c as f64 * ((parent_visits as f64).ln() / self.visits as f64).sqrt();
         q + u
@@ -110,11 +108,6 @@ impl MCTSNode {
     /// Returns `true` if all child actions have been tried.
     fn is_fully_expanded(&self) -> bool {
         self.untried_actions.is_empty()
-    }
-
-    /// Returns `true` when the node is a terminal with no children and no untried actions.
-    fn is_terminal(&self) -> bool {
-        self.children.is_empty() && self.untried_actions.is_empty()
     }
 }
 
@@ -149,20 +142,14 @@ impl MCTSEngine {
     /// `Self`.
     pub fn new(config: MCTSConfig) -> Self {
         let rng = config.seed;
-        Self {
-            config,
-            arena: Vec::new(),
-            rng,
-        }
+        Self { config, arena: Vec::new(), rng }
     }
 
     /// Returns a reference to the current configuration.
     ///
     /// # Returns
     /// `&MCTSConfig`.
-    pub fn config(&self) -> &MCTSConfig {
-        &self.config
-    }
+    pub fn config(&self) -> &MCTSConfig { &self.config }
 
     /// Runs MCTS from `root_state` and returns the best action index, or `None`
     /// if no actions are available from the root.
@@ -195,9 +182,7 @@ impl MCTSEngine {
     {
         self.arena.clear();
         let root_actions = get_actions(&root_state);
-        if root_actions.is_empty() {
-            return None;
-        }
+        if root_actions.is_empty() { return None; }
         self.arena.push(MCTSNode::new(None, None, root_actions));
 
         for _ in 0..self.config.iterations {
@@ -216,8 +201,7 @@ impl MCTSEngine {
 
         // Choose child of root with highest visit count
         let root = &self.arena[0];
-        root.children
-            .iter()
+        root.children.iter()
             .max_by_key(|&&c| self.arena[c].visits)
             .and_then(|&c| self.arena[c].action)
     }
@@ -235,12 +219,9 @@ impl MCTSEngine {
             }
             let parent_visits = node.visits;
             let c = self.config.uct_c;
-            let best_child = *node
-                .children
-                .iter()
+            let best_child = *node.children.iter()
                 .max_by(|&&a, &&b| {
-                    self.arena[a]
-                        .uct(parent_visits, c)
+                    self.arena[a].uct(parent_visits, c)
                         .partial_cmp(&self.arena[b].uct(parent_visits, c))
                         .unwrap()
                 })
@@ -272,8 +253,7 @@ impl MCTSEngine {
         let new_state = apply_action(&state, action);
         let child_actions = get_actions(&new_state);
         let child_idx = self.arena.len();
-        self.arena
-            .push(MCTSNode::new(Some(node_idx), Some(action), child_actions));
+        self.arena.push(MCTSNode::new(Some(node_idx), Some(action), child_actions));
         self.arena[node_idx].children.push(child_idx);
         (child_idx, new_state)
     }
@@ -295,9 +275,7 @@ impl MCTSEngine {
         let mut cur = state.clone();
         for _ in 0..self.config.rollout_depth {
             let actions = get_actions(&cur);
-            if actions.is_empty() {
-                break;
-            }
+            if actions.is_empty() { break; }
             let i = self.rand_usize(actions.len());
             cur = apply_action(&cur, actions[i]);
         }
@@ -322,5 +300,22 @@ impl MCTSEngine {
         self.rng ^= self.rng >> 7;
         self.rng ^= self.rng << 17;
         (self.rng as usize) % n
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_engine_has_config() {
+        let cfg = MCTSConfig {
+            iterations: 50,
+            uct_c: 1.414,
+            rollout_depth: 5,
+            seed: 42,
+        };
+        let e = MCTSEngine::new(cfg);
+        assert_eq!(e.config().iterations, 50);
     }
 }
