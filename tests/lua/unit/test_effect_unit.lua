@@ -144,7 +144,8 @@ describe("LuaOverlay water does not affect non-water state", function()
         expect_equal(w1.speed, w2.speed)
     end)
 end)
-
+
+
 
 -- [merged from test_effect_api.lua]
 -- tests/lua/unit/test_effect_api.lua
@@ -157,11 +158,11 @@ end)
 -- ============================================================
 -- @description Verifies the postfx namespace tables and public constructor/helper functions are exposed with the expected Lua types.
 describe("lurek.effect module", function()
-    -- @covers lurek.effect.getEffectTypes
-    -- @covers lurek.effect.newEffect
-    -- @covers lurek.effect.newStack
-    -- @covers lurek.effect.newPass
-    -- @covers lurek.effect.newCustomEffect
+    -- @tests lurek.effect.getEffectTypes
+    -- @tests lurek.effect.newEffect
+    -- @tests lurek.effect.newStack
+    -- @tests lurek.effect.newPass
+    -- @tests lurek.effect.newCustomEffect
     -- @description Asserts that lurek.effect exists and is exposed as a Lua table.
     it("is a table", function()
         expect_type("table", lurek.effect)
@@ -394,7 +395,8 @@ describe("lurek.effect.newStack", function()
         local retrieved = stack:getEffect(1)
         expect_not_nil(retrieved)
     end)
-end)
+end)
+
 
 
 -- [merged from test_effect_effect.lua]
@@ -402,11 +404,11 @@ end)
 
 -- @description Covers suite: lurek.effect module exists.
 describe("lurek.effect module exists", function()
-    -- @covers lurek.effect
-    -- @covers lurek.effect.getEffectTypes
-    -- @covers lurek.effect.newEffect
-    -- @covers lurek.effect.newPass
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect
+    -- @tests lurek.effect.getEffectTypes
+    -- @tests lurek.effect.newEffect
+    -- @tests lurek.effect.newPass
+    -- @tests lurek.effect.newStack
     -- @description Verifies the effect namespace is available as a Lua table.
     it("lurek.effect is a table", function()
         expect_type("table", lurek.effect)
@@ -415,25 +417,25 @@ end)
 
 -- @description Covers suite: lurek.effect factory functions.
 describe("lurek.effect factory functions", function()
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies newEffect is exposed.
     it("newEffect is a function", function()
         expect_type("function", lurek.effect.newEffect)
     end)
 
-    -- @covers lurek.effect.newPass
+    -- @tests lurek.effect.newPass
     -- @description Verifies newPass is exposed.
     it("newPass is a function", function()
         expect_type("function", lurek.effect.newPass)
     end)
 
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies newStack is exposed.
     it("newStack is a function", function()
         expect_type("function", lurek.effect.newStack)
     end)
 
-    -- @covers lurek.effect.getEffectTypes
+    -- @tests lurek.effect.getEffectTypes
     -- @description Verifies getEffectTypes is exposed.
     it("getEffectTypes is a function", function()
         expect_type("function", lurek.effect.getEffectTypes)
@@ -442,7 +444,7 @@ end)
 
 -- @description Covers suite: lurek.effect.newEffect built-in types.
 describe("lurek.effect.newEffect built-in types", function()
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies newEffect constructs a built-in bloom effect.
     it("creates bloom effect", function()
         local e = lurek.effect.newEffect("bloom")
@@ -450,49 +452,49 @@ describe("lurek.effect.newEffect built-in types", function()
         expect_equal(e:isBuiltIn(), true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies newEffect constructs a blur effect.
     it("creates blur effect", function()
         local e = lurek.effect.newEffect("blur")
         expect_equal(e:getEffectType(), "blur")
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies newEffect constructs a crt effect.
     it("creates crt effect", function()
         local e = lurek.effect.newEffect("crt")
         expect_equal(e:getEffectType(), "crt")
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies newEffect constructs a godrays effect.
     it("creates godrays effect", function()
         local e = lurek.effect.newEffect("godrays")
         expect_equal(e:getEffectType(), "godrays")
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies newEffect constructs a vignette effect.
     it("creates vignette effect", function()
         local e = lurek.effect.newEffect("vignette")
         expect_equal(e:getEffectType(), "vignette")
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies newEffect constructs a colourgrade effect.
     it("creates colourgrade effect", function()
         local e = lurek.effect.newEffect("colourgrade")
         expect_equal(e:getEffectType(), "colourgrade")
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies newEffect constructs a chromatic effect.
     it("creates chromatic effect", function()
         local e = lurek.effect.newEffect("chromatic")
         expect_equal(e:getEffectType(), "chromatic")
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies invalid effect names raise an error.
     it("rejects invalid effect type", function()
         expect_error(function()
@@ -503,7 +505,7 @@ end)
 
 -- @description Covers suite: lurek.effect.newPass custom effects.
 describe("lurek.effect.newPass custom effects", function()
-    -- @covers lurek.effect.newPass
+    -- @tests lurek.effect.newPass
     -- @description Verifies newPass constructs a custom non-built-in pass.
     it("creates custom pass", function()
         local p = lurek.effect.newPass(1)
@@ -514,7 +516,7 @@ end)
 
 -- @description Covers suite: lurek.effect.getEffectTypes.
 describe("lurek.effect.getEffectTypes", function()
-    -- @covers lurek.effect.getEffectTypes
+    -- @tests lurek.effect.getEffectTypes
     -- @description Verifies getEffectTypes returns the registered effect-type list.
     it("returns table of 15 types", function()
         local types = lurek.effect.getEffectTypes()
@@ -522,7 +524,7 @@ describe("lurek.effect.getEffectTypes", function()
         expect_equal(#types, 15)
     end)
 
-    -- @covers lurek.effect.getEffectTypes
+    -- @tests lurek.effect.getEffectTypes
     -- @description Verifies bloom appears in the effect-type list.
     it("contains bloom", function()
         local types = lurek.effect.getEffectTypes()
@@ -536,14 +538,14 @@ end)
 
 -- @description Covers suite: PostFxEffect parameters.
 describe("PostFxEffect parameters", function()
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies bloom exposes a threshold parameter by default.
     it("bloom has default threshold", function()
         local bloom = lurek.effect.newEffect("bloom")
         expect_equal(bloom:hasParameter("threshold"), true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies getParameter returns a stored parameter value.
     it("getParameter returns value", function()
         local bloom = lurek.effect.newEffect("bloom")
@@ -551,7 +553,7 @@ describe("PostFxEffect parameters", function()
         expect_type("number", t)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setParameter mutates a named effect parameter.
     it("setParameter changes value", function()
         local bloom = lurek.effect.newEffect("bloom")
@@ -560,7 +562,7 @@ describe("PostFxEffect parameters", function()
         expect_equal(math.abs(v - 0.5) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies getParameter falls back to the provided default for missing keys.
     it("getParameter uses default for missing", function()
         local bloom = lurek.effect.newEffect("bloom")
@@ -568,7 +570,7 @@ describe("PostFxEffect parameters", function()
         expect_equal(math.abs(v - 42.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies getParameterNames returns a populated name list.
     it("getParameterNames returns sorted list", function()
         local bloom = lurek.effect.newEffect("bloom")
@@ -580,7 +582,7 @@ end)
 
 -- @description Covers suite: PostFxEffect convenience setters.
 describe("PostFxEffect convenience setters", function()
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setThreshold updates the threshold parameter.
     it("setThreshold works", function()
         local bloom = lurek.effect.newEffect("bloom")
@@ -588,7 +590,7 @@ describe("PostFxEffect convenience setters", function()
         expect_equal(math.abs(bloom:getParameter("threshold") - 0.8) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setIntensity updates the intensity parameter.
     it("setIntensity works", function()
         local bloom = lurek.effect.newEffect("bloom")
@@ -596,7 +598,7 @@ describe("PostFxEffect convenience setters", function()
         expect_equal(math.abs(bloom:getParameter("intensity") - 2.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setRadius updates the blur radius parameter.
     it("setRadius works on blur", function()
         local blur = lurek.effect.newEffect("blur")
@@ -604,7 +606,7 @@ describe("PostFxEffect convenience setters", function()
         expect_equal(math.abs(blur:getParameter("radius") - 5.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setStrength updates the vignette strength parameter.
     it("setStrength works on vignette", function()
         local vig = lurek.effect.newEffect("vignette")
@@ -612,7 +614,7 @@ describe("PostFxEffect convenience setters", function()
         expect_equal(math.abs(vig:getParameter("strength") - 0.8) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setScanlineStrength updates the CRT scanline parameter.
     it("setScanlineStrength works on crt", function()
         local crt = lurek.effect.newEffect("crt")
@@ -620,7 +622,7 @@ describe("PostFxEffect convenience setters", function()
         expect_equal(math.abs(crt:getParameter("scanline_strength") - 0.4) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setOffset updates the chromatic aberration offset.
     it("setOffset works on chromatic", function()
         local chr = lurek.effect.newEffect("chromatic")
@@ -628,7 +630,7 @@ describe("PostFxEffect convenience setters", function()
         expect_equal(math.abs(chr:getParameter("offset") - 3.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setBrightness updates the colourgrade brightness parameter.
     it("setBrightness works on colourgrade", function()
         local cg = lurek.effect.newEffect("colourgrade")
@@ -636,7 +638,7 @@ describe("PostFxEffect convenience setters", function()
         expect_equal(math.abs(cg:getParameter("brightness") - 1.5) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setContrast updates the colourgrade contrast parameter.
     it("setContrast works on colourgrade", function()
         local cg = lurek.effect.newEffect("colourgrade")
@@ -644,7 +646,7 @@ describe("PostFxEffect convenience setters", function()
         expect_equal(math.abs(cg:getParameter("contrast") - 0.9) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setSaturation updates the colourgrade saturation parameter.
     it("setSaturation works on colourgrade", function()
         local cg = lurek.effect.newEffect("colourgrade")
@@ -655,14 +657,14 @@ end)
 
 -- @description Covers suite: PostFxEffect enable/disable.
 describe("PostFxEffect enable/disable", function()
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies effects start enabled.
     it("is enabled by default", function()
         local bloom = lurek.effect.newEffect("bloom")
         expect_equal(bloom:isEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setEnabled(false) disables the effect.
     it("setEnabled false", function()
         local bloom = lurek.effect.newEffect("bloom")
@@ -670,7 +672,7 @@ describe("PostFxEffect enable/disable", function()
         expect_equal(bloom:isEnabled(), false)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies setEnabled(true) re-enables an effect.
     it("setEnabled true after false", function()
         local bloom = lurek.effect.newEffect("bloom")
@@ -682,14 +684,14 @@ end)
 
 -- @description Covers suite: PostFxEffect type() method.
 describe("PostFxEffect type() method", function()
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies built-in effects report the PostFxEffect userdata type.
     it("returns PostFxEffect", function()
         local bloom = lurek.effect.newEffect("bloom")
         expect_equal(bloom:type(), "PostFxEffect")
     end)
 
-    -- @covers lurek.effect.newPass
+    -- @tests lurek.effect.newPass
     -- @description Verifies custom passes also report the PostFxEffect userdata type.
     it("custom pass also returns PostFxEffect", function()
         local pass = lurek.effect.newPass(1)
@@ -699,7 +701,7 @@ end)
 
 -- @description Covers suite: lurek.effect.newStack.
 describe("lurek.effect.newStack", function()
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies newStack uses the default 800x600 dimensions.
     it("creates stack with default dimensions", function()
         local stack = lurek.effect.newStack()
@@ -707,7 +709,7 @@ describe("lurek.effect.newStack", function()
         expect_equal(stack:getHeight(), 600)
     end)
 
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies newStack accepts custom dimensions.
     it("creates stack with custom dimensions", function()
         local stack = lurek.effect.newStack(1920, 1080)
@@ -715,14 +717,14 @@ describe("lurek.effect.newStack", function()
         expect_equal(stack:getHeight(), 1080)
     end)
 
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies new stacks start empty.
     it("starts empty", function()
         local stack = lurek.effect.newStack()
         expect_equal(stack:getEffectCount(), 0)
     end)
 
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies stack:type reports PostFxStack.
     it("type is PostFxStack", function()
         local stack = lurek.effect.newStack()
@@ -732,7 +734,7 @@ end)
 
 -- @description Covers suite: PostFxStack add/remove.
 describe("PostFxStack add/remove", function()
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies add increments the active effect count.
     it("add increases count", function()
         local stack = lurek.effect.newStack()
@@ -741,7 +743,7 @@ describe("PostFxStack add/remove", function()
         expect_equal(stack:getEffectCount(), 1)
     end)
 
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies multiple add calls accumulate in the stack.
     it("add multiple effects", function()
         local stack = lurek.effect.newStack()
@@ -751,7 +753,7 @@ describe("PostFxStack add/remove", function()
         expect_equal(stack:getEffectCount(), 3)
     end)
 
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies remove decreases the active effect count.
     it("remove decreases count", function()
         local stack = lurek.effect.newStack()
@@ -764,7 +766,7 @@ end)
 
 -- @description Covers suite: PostFxStack insert.
 describe("PostFxStack insert", function()
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies insert places an effect at the requested index.
     it("insert at position 1", function()
         local stack = lurek.effect.newStack()
@@ -781,7 +783,7 @@ end)
 
 -- @description Covers suite: PostFxStack dimensions.
 describe("PostFxStack dimensions", function()
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies getDimensions returns width and height together.
     it("getDimensions returns both", function()
         local stack = lurek.effect.newStack(800, 600)
@@ -790,7 +792,7 @@ describe("PostFxStack dimensions", function()
         expect_equal(h, 600)
     end)
 
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies resize updates the stack dimensions.
     it("resize changes dimensions", function()
         local stack = lurek.effect.newStack(800, 600)
@@ -802,7 +804,7 @@ end)
 
 -- @description Covers suite: PostFxStack capturing state.
 describe("PostFxStack capturing state", function()
-    -- @covers lurek.effect.newStack
+    -- @tests lurek.effect.newStack
     -- @description Verifies stacks are not capturing by default.
     it("not capturing by default", function()
         local stack = lurek.effect.newStack()
@@ -814,63 +816,63 @@ end)
 
 -- @description Covers suite: New effect types â€” construction and defaults.
 describe("New effect types â€” construction and defaults", function()
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies pixelate defaults block_size to 4.0.
     it("pixelate has block_size default 4.0", function()
         local e = lurek.effect.newEffect("pixelate")
         expect_equal(math.abs(e:getParameter("block_size") - 4.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies sepia defaults strength to 1.0.
     it("sepia has strength default 1.0", function()
         local e = lurek.effect.newEffect("sepia")
         expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies grayscale is treated as a built-in effect.
     it("grayscale is built-in", function()
         local e = lurek.effect.newEffect("grayscale")
         expect_equal(e:isBuiltIn(), true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies invert defaults strength to 1.0.
     it("invert has strength default 1.0", function()
         local e = lurek.effect.newEffect("invert")
         expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies scanlines defaults spacing to 4.0.
     it("scanlines has spacing default 4.0", function()
         local e = lurek.effect.newEffect("scanlines")
         expect_equal(math.abs(e:getParameter("spacing") - 4.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies edgedetect defaults strength to 1.0.
     it("edgedetect has strength default 1.0", function()
         local e = lurek.effect.newEffect("edgedetect")
         expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies hueshift defaults angle to 0.0.
     it("hueshift has angle default 0.0", function()
         local e = lurek.effect.newEffect("hueshift")
         expect_equal(math.abs(e:getParameter("angle") - 0.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies noise defaults strength to 0.1.
     it("noise has strength default 0.1", function()
         local e = lurek.effect.newEffect("noise")
         expect_equal(math.abs(e:getParameter("strength") - 0.1) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
+    -- @tests lurek.effect.newEffect
     -- @description Verifies each newly added effect type reports its own type name.
     it("all new types round-trip through getEffectType", function()
         local names = {"pixelate","sepia","grayscale","invert","scanlines","edgedetect","hueshift","noise"}
@@ -882,7 +884,7 @@ describe("New effect types â€” construction and defaults", function()
         expect_equal(all_ok, true)
     end)
 
-    -- @covers lurek.effect.getEffectTypes
+    -- @tests lurek.effect.getEffectTypes
     -- @description Verifies the effect-type list includes every new built-in effect.
     it("getEffectTypes includes all new types", function()
         local types = lurek.effect.getEffectTypes()
@@ -983,7 +985,8 @@ describe("lurek.effect.getEffectTypes (new types)", function()
         end
     end)
 end)
-
+
+
 
 
 
@@ -993,7 +996,7 @@ end)
 
 -- tests/lua/unit/test_effect_overlay.lua
 -- BDD tests for the lurek.effect.* screen-effect effect API.
--- @covers lurek.effect.newOverlay
+-- @tests lurek.effect.newOverlay
 
 require("tests/lua/init")
 
@@ -1003,9 +1006,9 @@ require("tests/lua/init")
 
 -- @description Covers suite: lurek.effect factory.
 describe("lurek.effect factory", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.getWidth
-    -- @covers Overlay.getHeight
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.getWidth
+    -- @tests Overlay.getHeight
     -- @description Creates an overlay with explicit dimensions and verifies the stored width and height.
     it("creates an overlay with custom dimensions", function()
         local ov = lurek.effect.newOverlay(1024, 768)
@@ -1013,9 +1016,9 @@ describe("lurek.effect factory", function()
         expect_equal(ov:getHeight(), 768)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.getWidth
-    -- @covers Overlay.getHeight
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.getWidth
+    -- @tests Overlay.getHeight
     -- @description Verifies the effect factory uses the default dimensions when none are provided.
     it("creates an overlay with default dimensions", function()
         local ov = lurek.effect.newOverlay()
@@ -1023,8 +1026,8 @@ describe("lurek.effect factory", function()
         expect_equal(ov:getHeight(), 600)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.getDimensions
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.getDimensions
     -- @description Confirms getDimensions returns the effect size as a width-height tuple.
     it("returns dimensions as tuple", function()
         local ov = lurek.effect.newOverlay(640, 480)
@@ -1040,32 +1043,32 @@ end)
 
 -- @description Covers suite: overlay type.
 describe("overlay type", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.type
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.type
     -- @description Verifies overlay userdata reports its concrete type name.
     it("reports type as Overlay", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:type(), "Overlay")
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.typeOf
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.typeOf
     -- @description Confirms overlays identify as Object through the shared type hierarchy.
     it("typeOf Object returns true", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:typeOf("Object"), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.typeOf
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.typeOf
     -- @description Confirms overlays identify as Overlay through typeOf.
     it("typeOf Overlay returns true", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:typeOf("Overlay"), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.typeOf
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.typeOf
     -- @description Verifies typeOf rejects unrelated type names.
     it("typeOf unrelated returns false", function()
         local ov = lurek.effect.newOverlay()
@@ -1079,18 +1082,18 @@ end)
 
 -- @description Covers suite: overlay core.
 describe("overlay core", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.isActive
     -- @description Verifies a newly created overlay starts inactive.
     it("starts inactive", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isActive(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.resize
-    -- @covers Overlay.getWidth
-    -- @covers Overlay.getHeight
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.resize
+    -- @tests Overlay.getWidth
+    -- @tests Overlay.getHeight
     -- @description Resizes an overlay and verifies the width and height accessors reflect the new size.
     it("resize updates dimensions", function()
         local ov = lurek.effect.newOverlay(800, 600)
@@ -1099,9 +1102,9 @@ describe("overlay core", function()
         expect_equal(ov:getHeight(), 1080)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.update
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.update
+    -- @tests Overlay.isActive
     -- @description Updates an empty overlay and verifies it remains inactive without error.
     it("update does not error on empty overlay", function()
         local ov = lurek.effect.newOverlay()
@@ -1109,21 +1112,21 @@ describe("overlay core", function()
         expect_equal(ov:isActive(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.draw
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.draw
     -- @description Ensures drawing an empty overlay does not raise an error.
     it("draw does not error", function()
         local ov = lurek.effect.newOverlay()
         ov:draw()
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWeatherEnabled
-    -- @covers Overlay.setFogEnabled
-    -- @covers Overlay.setVignetteEnabled
-    -- @covers Overlay.setAmbientEnabled
-    -- @covers Overlay.clear
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWeatherEnabled
+    -- @tests Overlay.setFogEnabled
+    -- @tests Overlay.setVignetteEnabled
+    -- @tests Overlay.setAmbientEnabled
+    -- @tests Overlay.clear
+    -- @tests Overlay.isActive
     -- @description Activates several effect subsystems, clears them, and verifies the effect becomes inactive.
     it("clear resets all effects", function()
         local ov = lurek.effect.newOverlay()
@@ -1143,10 +1146,10 @@ end)
 
 -- @description Covers suite: overlay ambient.
 describe("overlay ambient", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setAmbientEnabled
-    -- @covers Overlay.isAmbientEnabled
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setAmbientEnabled
+    -- @tests Overlay.isAmbientEnabled
+    -- @tests Overlay.isActive
     -- @description Enables ambient lighting and verifies both the ambient flag and overall activity state.
     it("enables ambient lighting", function()
         local ov = lurek.effect.newOverlay()
@@ -1155,9 +1158,9 @@ describe("overlay ambient", function()
         expect_equal(ov:isActive(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setAmbientEnabled
-    -- @covers Overlay.isAmbientEnabled
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setAmbientEnabled
+    -- @tests Overlay.isAmbientEnabled
     -- @description Disables ambient lighting after enabling it and verifies the flag is cleared.
     it("disables ambient lighting", function()
         local ov = lurek.effect.newOverlay()
@@ -1166,9 +1169,9 @@ describe("overlay ambient", function()
         expect_equal(ov:isAmbientEnabled(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setAmbientColor
-    -- @covers Overlay.getAmbientColor
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setAmbientColor
+    -- @tests Overlay.getAmbientColor
     -- @description Stores an ambient color with alpha and verifies the returned RGBA channels.
     it("sets and gets ambient color with alpha", function()
         local ov = lurek.effect.newOverlay()
@@ -1180,9 +1183,9 @@ describe("overlay ambient", function()
         expect_near(a, 0.6, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setAmbientColor
-    -- @covers Overlay.getAmbientColor
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setAmbientColor
+    -- @tests Overlay.getAmbientColor
     -- @description Verifies ambient color defaults the alpha channel to 1.0 when omitted.
     it("ambient color alpha defaults to 1.0", function()
         local ov = lurek.effect.newOverlay()
@@ -1191,9 +1194,9 @@ describe("overlay ambient", function()
         expect_near(a, 1.0, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setTimeOfDay
-    -- @covers Overlay.getTimeOfDay
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setTimeOfDay
+    -- @tests Overlay.getTimeOfDay
     -- @description Sets the time-of-day value and verifies it round-trips through the getter.
     it("sets and gets time of day", function()
         local ov = lurek.effect.newOverlay()
@@ -1201,11 +1204,11 @@ describe("overlay ambient", function()
         expect_near(ov:getTimeOfDay(), 6.5, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setAmbientEnabled
-    -- @covers Overlay.setTimeOfDay
-    -- @covers Overlay.update
-    -- @covers Overlay.getAmbientColor
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setAmbientEnabled
+    -- @tests Overlay.setTimeOfDay
+    -- @tests Overlay.update
+    -- @tests Overlay.getAmbientColor
     -- @description Updates an ambient-enabled overlay at night and verifies the generated ambient tint matches the night preset.
     it("update applies time-of-day color when ambient enabled", function()
         local ov = lurek.effect.newOverlay()
@@ -1219,11 +1222,11 @@ describe("overlay ambient", function()
         expect_near(b, 0.3, 0.01)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setAmbientEnabled
-    -- @covers Overlay.setTimeOfDay
-    -- @covers Overlay.update
-    -- @covers Overlay.getAmbientColor
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setAmbientEnabled
+    -- @tests Overlay.setTimeOfDay
+    -- @tests Overlay.update
+    -- @tests Overlay.getAmbientColor
     -- @description Updates an ambient-enabled overlay at noon and verifies the generated ambient tint matches the daytime preset.
     it("time-of-day noon produces bright color", function()
         local ov = lurek.effect.newOverlay()
@@ -1243,9 +1246,9 @@ end)
 
 -- @description Covers suite: overlay weather.
 describe("overlay weather", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWeatherEnabled
-    -- @covers Overlay.isWeatherEnabled
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWeatherEnabled
+    -- @tests Overlay.isWeatherEnabled
     -- @description Enables the weather system and verifies the weather-enabled flag.
     it("enables weather", function()
         local ov = lurek.effect.newOverlay()
@@ -1253,9 +1256,9 @@ describe("overlay weather", function()
         expect_equal(ov:isWeatherEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWeather
-    -- @covers Overlay.getWeather
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWeather
+    -- @tests Overlay.getWeather
     -- @description Sets the active weather type and verifies it can be read back.
     it("sets weather type", function()
         local ov = lurek.effect.newOverlay()
@@ -1263,9 +1266,9 @@ describe("overlay weather", function()
         expect_equal(ov:getWeather(), "rain")
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWeather
-    -- @covers Overlay.getWeather
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWeather
+    -- @tests Overlay.getWeather
     -- @description Iterates through every supported weather mode and verifies each round-trips through the getter.
     it("roundtrips all weather types", function()
         local ov = lurek.effect.newOverlay()
@@ -1276,8 +1279,8 @@ describe("overlay weather", function()
         end
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWeather
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWeather
     -- @description Verifies setWeather rejects an unsupported weather type.
     it("rejects invalid weather type", function()
         local ov = lurek.effect.newOverlay()
@@ -1286,9 +1289,9 @@ describe("overlay weather", function()
         end)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWeatherIntensity
-    -- @covers Overlay.getWeatherIntensity
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWeatherIntensity
+    -- @tests Overlay.getWeatherIntensity
     -- @description Sets the weather intensity and verifies the floating-point value round-trips.
     it("sets and gets weather intensity", function()
         local ov = lurek.effect.newOverlay()
@@ -1296,9 +1299,9 @@ describe("overlay weather", function()
         expect_near(ov:getWeatherIntensity(), 0.8, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWindDirection
-    -- @covers Overlay.getWindDirection
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWindDirection
+    -- @tests Overlay.getWindDirection
     -- @description Sets the wind direction and verifies the stored angle.
     it("sets and gets wind direction", function()
         local ov = lurek.effect.newOverlay()
@@ -1306,9 +1309,9 @@ describe("overlay weather", function()
         expect_near(ov:getWindDirection(), 1.57, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWindSpeed
-    -- @covers Overlay.getWindSpeed
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWindSpeed
+    -- @tests Overlay.getWindSpeed
     -- @description Sets the wind speed and verifies the stored magnitude.
     it("sets and gets wind speed", function()
         local ov = lurek.effect.newOverlay()
@@ -1323,9 +1326,9 @@ end)
 
 -- @description Covers suite: overlay flash.
 describe("overlay flash", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.isFlashing
-    -- @covers Overlay.flash
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.isFlashing
+    -- @tests Overlay.flash
     -- @description Triggers a screen flash and verifies the flashing state becomes active.
     it("triggers a flash", function()
         local ov = lurek.effect.newOverlay()
@@ -1334,10 +1337,10 @@ describe("overlay flash", function()
         expect_equal(ov:isFlashing(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.flash
-    -- @covers Overlay.update
-    -- @covers Overlay.isFlashing
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.flash
+    -- @tests Overlay.update
+    -- @tests Overlay.isFlashing
     -- @description Uses the default flash alpha and duration and verifies the flash clears after enough simulated time.
     it("flash with default alpha and duration", function()
         local ov = lurek.effect.newOverlay()
@@ -1348,10 +1351,10 @@ describe("overlay flash", function()
         expect_equal(ov:isFlashing(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.flash
-    -- @covers Overlay.update
-    -- @covers Overlay.isFlashing
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.flash
+    -- @tests Overlay.update
+    -- @tests Overlay.isFlashing
     -- @description Verifies a flash stops once the update delta exceeds its explicit duration.
     it("flash completes after duration", function()
         local ov = lurek.effect.newOverlay()
@@ -1360,9 +1363,9 @@ describe("overlay flash", function()
         expect_equal(ov:isFlashing(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.flash
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.flash
+    -- @tests Overlay.isActive
     -- @description Confirms triggering a flash marks the effect as active.
     it("flash activates isActive", function()
         local ov = lurek.effect.newOverlay()
@@ -1377,9 +1380,9 @@ end)
 
 -- @description Covers suite: overlay shake.
 describe("overlay shake", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.isShaking
-    -- @covers Overlay.shake
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.isShaking
+    -- @tests Overlay.shake
     -- @description Triggers screen shake and verifies the shaking state becomes active.
     it("triggers a shake", function()
         local ov = lurek.effect.newOverlay()
@@ -1388,10 +1391,10 @@ describe("overlay shake", function()
         expect_equal(ov:isShaking(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.shake
-    -- @covers Overlay.update
-    -- @covers Overlay.isShaking
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.shake
+    -- @tests Overlay.update
+    -- @tests Overlay.isShaking
     -- @description Uses the default shake duration and verifies the effect ends after advancing time.
     it("shake with default duration", function()
         local ov = lurek.effect.newOverlay()
@@ -1402,10 +1405,10 @@ describe("overlay shake", function()
         expect_equal(ov:isShaking(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.shake
-    -- @covers Overlay.update
-    -- @covers Overlay.getShakeOffset
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.shake
+    -- @tests Overlay.update
+    -- @tests Overlay.getShakeOffset
     -- @description Verifies active shake produces a non-zero camera offset after updating.
     it("shake produces non-zero offset", function()
         local ov = lurek.effect.newOverlay()
@@ -1417,10 +1420,10 @@ describe("overlay shake", function()
         expect_equal(total > 0, true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.shake
-    -- @covers Overlay.update
-    -- @covers Overlay.getShakeOffset
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.shake
+    -- @tests Overlay.update
+    -- @tests Overlay.getShakeOffset
     -- @description Verifies shake offsets return to zero once the shake duration has elapsed.
     it("shake offset returns to zero after completion", function()
         local ov = lurek.effect.newOverlay()
@@ -1438,9 +1441,9 @@ end)
 
 -- @description Covers suite: overlay fade.
 describe("overlay fade", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.isFading
-    -- @covers Overlay.fade
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.isFading
+    -- @tests Overlay.fade
     -- @description Triggers a screen fade and verifies the fading state becomes active.
     it("triggers a fade", function()
         local ov = lurek.effect.newOverlay()
@@ -1449,10 +1452,10 @@ describe("overlay fade", function()
         expect_equal(ov:isFading(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.fade
-    -- @covers Overlay.update
-    -- @covers Overlay.isFading
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.fade
+    -- @tests Overlay.update
+    -- @tests Overlay.isFading
     -- @description Uses the default fade alpha and duration and verifies the effect completes after enough time passes.
     it("fade with defaults", function()
         local ov = lurek.effect.newOverlay()
@@ -1463,10 +1466,10 @@ describe("overlay fade", function()
         expect_equal(ov:isFading(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.fade
-    -- @covers Overlay.update
-    -- @covers Overlay.isFading
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.fade
+    -- @tests Overlay.update
+    -- @tests Overlay.isFading
     -- @description Verifies a fade clears after an explicit short duration.
     it("fade completes after duration", function()
         local ov = lurek.effect.newOverlay()
@@ -1482,10 +1485,10 @@ end)
 
 -- @description Covers suite: overlay clouds.
 describe("overlay clouds", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setCloudShadows
-    -- @covers Overlay.isCloudShadowsEnabled
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setCloudShadows
+    -- @tests Overlay.isCloudShadowsEnabled
+    -- @tests Overlay.isActive
     -- @description Enables cloud shadows and verifies both the cloud-shadow flag and overall active state.
     it("enables cloud shadows", function()
         local ov = lurek.effect.newOverlay()
@@ -1494,9 +1497,9 @@ describe("overlay clouds", function()
         expect_equal(ov:isActive(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setCloudShadows
-    -- @covers Overlay.isCloudShadowsEnabled
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setCloudShadows
+    -- @tests Overlay.isCloudShadowsEnabled
     -- @description Disables cloud shadows after enabling them and verifies the flag is cleared.
     it("disables cloud shadows", function()
         local ov = lurek.effect.newOverlay()
@@ -1505,9 +1508,9 @@ describe("overlay clouds", function()
         expect_equal(ov:isCloudShadowsEnabled(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setCloudCount
-    -- @covers Overlay.getCloudCount
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setCloudCount
+    -- @tests Overlay.getCloudCount
     -- @description Sets the number of simulated clouds and verifies the value round-trips.
     it("sets and gets cloud count", function()
         local ov = lurek.effect.newOverlay()
@@ -1515,9 +1518,9 @@ describe("overlay clouds", function()
         expect_equal(ov:getCloudCount(), 12)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setCloudSpeed
-    -- @covers Overlay.getCloudSpeed
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setCloudSpeed
+    -- @tests Overlay.getCloudSpeed
     -- @description Sets the cloud movement speed and verifies the stored value.
     it("sets and gets cloud speed", function()
         local ov = lurek.effect.newOverlay()
@@ -1525,9 +1528,9 @@ describe("overlay clouds", function()
         expect_near(ov:getCloudSpeed(), 35.0, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setCloudScale
-    -- @covers Overlay.getCloudScale
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setCloudScale
+    -- @tests Overlay.getCloudScale
     -- @description Sets the cloud scale and verifies the getter returns the new scale.
     it("sets and gets cloud scale", function()
         local ov = lurek.effect.newOverlay()
@@ -1535,9 +1538,9 @@ describe("overlay clouds", function()
         expect_near(ov:getCloudScale(), 2.5, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setCloudOpacity
-    -- @covers Overlay.getCloudOpacity
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setCloudOpacity
+    -- @tests Overlay.getCloudOpacity
     -- @description Sets the cloud opacity and verifies the getter returns the configured opacity.
     it("sets and gets cloud opacity", function()
         local ov = lurek.effect.newOverlay()
@@ -1552,9 +1555,9 @@ end)
 
 -- @description Covers suite: overlay fog.
 describe("overlay fog", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setFogEnabled
-    -- @covers Overlay.isFogEnabled
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setFogEnabled
+    -- @tests Overlay.isFogEnabled
     -- @description Enables atmospheric fog and verifies the fog-enabled flag.
     it("enables fog", function()
         local ov = lurek.effect.newOverlay()
@@ -1562,9 +1565,9 @@ describe("overlay fog", function()
         expect_equal(ov:isFogEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setFogDensity
-    -- @covers Overlay.getFogDensity
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setFogDensity
+    -- @tests Overlay.getFogDensity
     -- @description Sets the fog density and verifies the floating-point value round-trips.
     it("sets and gets fog density", function()
         local ov = lurek.effect.newOverlay()
@@ -1572,9 +1575,9 @@ describe("overlay fog", function()
         expect_near(ov:getFogDensity(), 0.7, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setFogColor
-    -- @covers Overlay.getFogColor
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setFogColor
+    -- @tests Overlay.getFogColor
     -- @description Stores a fog color with alpha and verifies all returned channels.
     it("sets and gets fog color", function()
         local ov = lurek.effect.newOverlay()
@@ -1586,9 +1589,9 @@ describe("overlay fog", function()
         expect_near(a, 0.9, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setFogColor
-    -- @covers Overlay.getFogColor
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setFogColor
+    -- @tests Overlay.getFogColor
     -- @description Verifies fog color defaults the alpha channel to 1.0 when omitted.
     it("fog color alpha defaults to 1.0", function()
         local ov = lurek.effect.newOverlay()
@@ -1604,9 +1607,9 @@ end)
 
 -- @description Covers suite: overlay heat haze.
 describe("overlay heat haze", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setHeatHazeEnabled
-    -- @covers Overlay.isHeatHazeEnabled
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setHeatHazeEnabled
+    -- @tests Overlay.isHeatHazeEnabled
     -- @description Enables heat haze and verifies the effect flag is set.
     it("enables heat haze", function()
         local ov = lurek.effect.newOverlay()
@@ -1614,9 +1617,9 @@ describe("overlay heat haze", function()
         expect_equal(ov:isHeatHazeEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setHeatHazeIntensity
-    -- @covers Overlay.getHeatHazeIntensity
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setHeatHazeIntensity
+    -- @tests Overlay.getHeatHazeIntensity
     -- @description Sets the heat haze intensity and verifies the value round-trips.
     it("sets and gets intensity", function()
         local ov = lurek.effect.newOverlay()
@@ -1631,9 +1634,9 @@ end)
 
 -- @description Covers suite: overlay vignette.
 describe("overlay vignette", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setVignetteEnabled
-    -- @covers Overlay.isVignetteEnabled
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setVignetteEnabled
+    -- @tests Overlay.isVignetteEnabled
     -- @description Enables vignette rendering and verifies the effect flag is set.
     it("enables vignette", function()
         local ov = lurek.effect.newOverlay()
@@ -1641,9 +1644,9 @@ describe("overlay vignette", function()
         expect_equal(ov:isVignetteEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setVignetteStrength
-    -- @covers Overlay.getVignetteStrength
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setVignetteStrength
+    -- @tests Overlay.getVignetteStrength
     -- @description Sets the vignette strength and verifies the value round-trips.
     it("sets and gets strength", function()
         local ov = lurek.effect.newOverlay()
@@ -1658,9 +1661,9 @@ end)
 
 -- @description Covers suite: overlay film grain.
 describe("overlay film grain", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setFilmGrainEnabled
-    -- @covers Overlay.isFilmGrainEnabled
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setFilmGrainEnabled
+    -- @tests Overlay.isFilmGrainEnabled
     -- @description Enables film grain and verifies the effect flag is set.
     it("enables film grain", function()
         local ov = lurek.effect.newOverlay()
@@ -1668,9 +1671,9 @@ describe("overlay film grain", function()
         expect_equal(ov:isFilmGrainEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setFilmGrainIntensity
-    -- @covers Overlay.getFilmGrainIntensity
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setFilmGrainIntensity
+    -- @tests Overlay.getFilmGrainIntensity
     -- @description Sets the film grain intensity and verifies the value round-trips.
     it("sets and gets intensity", function()
         local ov = lurek.effect.newOverlay()
@@ -1685,9 +1688,9 @@ end)
 
 -- @description Covers suite: overlay lightning.
 describe("overlay lightning", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.triggerLightning
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.triggerLightning
+    -- @tests Overlay.isActive
     -- @description Triggers a lightning effect and verifies the effect becomes active.
     it("triggers lightning", function()
         local ov = lurek.effect.newOverlay()
@@ -1696,9 +1699,9 @@ describe("overlay lightning", function()
         expect_equal(ov:isActive(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setLightningColor
-    -- @covers Overlay.getLightningColor
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setLightningColor
+    -- @tests Overlay.getLightningColor
     -- @description Stores a lightning flash color with alpha and verifies all returned channels.
     it("sets and gets lightning color", function()
         local ov = lurek.effect.newOverlay()
@@ -1710,9 +1713,9 @@ describe("overlay lightning", function()
         expect_near(a, 0.7, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setLightningColor
-    -- @covers Overlay.getLightningColor
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setLightningColor
+    -- @tests Overlay.getLightningColor
     -- @description Verifies lightning color defaults the alpha channel to 0.8 when omitted.
     it("lightning color alpha defaults to 0.8", function()
         local ov = lurek.effect.newOverlay()
@@ -1728,12 +1731,12 @@ end)
 
 -- @description Covers suite: overlay combined.
 describe("overlay combined", function()
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWeatherEnabled
-    -- @covers Overlay.setFogEnabled
-    -- @covers Overlay.setVignetteEnabled
-    -- @covers Overlay.flash
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWeatherEnabled
+    -- @tests Overlay.setFogEnabled
+    -- @tests Overlay.setVignetteEnabled
+    -- @tests Overlay.flash
+    -- @tests Overlay.isActive
     -- @description Activates several effect subsystems together and verifies they coexist in the expected active state.
     it("multiple effects active simultaneously", function()
         local ov = lurek.effect.newOverlay()
@@ -1748,20 +1751,20 @@ describe("overlay combined", function()
         expect_equal(ov:isFlashing(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.setWeatherEnabled
-    -- @covers Overlay.setFogEnabled
-    -- @covers Overlay.setVignetteEnabled
-    -- @covers Overlay.setFilmGrainEnabled
-    -- @covers Overlay.setHeatHazeEnabled
-    -- @covers Overlay.setCloudShadows
-    -- @covers Overlay.setAmbientEnabled
-    -- @covers Overlay.flash
-    -- @covers Overlay.shake
-    -- @covers Overlay.fade
-    -- @covers Overlay.triggerLightning
-    -- @covers Overlay.clear
-    -- @covers Overlay.isActive
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.setWeatherEnabled
+    -- @tests Overlay.setFogEnabled
+    -- @tests Overlay.setVignetteEnabled
+    -- @tests Overlay.setFilmGrainEnabled
+    -- @tests Overlay.setHeatHazeEnabled
+    -- @tests Overlay.setCloudShadows
+    -- @tests Overlay.setAmbientEnabled
+    -- @tests Overlay.flash
+    -- @tests Overlay.shake
+    -- @tests Overlay.fade
+    -- @tests Overlay.triggerLightning
+    -- @tests Overlay.clear
+    -- @tests Overlay.isActive
     -- @description Populates every major overlay effect, clears the effect, and verifies all activity is removed.
     it("clear removes all active effects", function()
         local ov = lurek.effect.newOverlay()
@@ -1781,12 +1784,12 @@ describe("overlay combined", function()
         expect_equal(ov:isActive(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @covers Overlay.flash
-    -- @covers Overlay.shake
-    -- @covers Overlay.update
-    -- @covers Overlay.isFlashing
-    -- @covers Overlay.isShaking
+    -- @tests lurek.effect.newOverlay
+    -- @tests Overlay.flash
+    -- @tests Overlay.shake
+    -- @tests Overlay.update
+    -- @tests Overlay.isFlashing
+    -- @tests Overlay.isShaking
     -- @description Advances multiple timed effects in one update step and verifies both effects expire together.
     it("update advances multiple timed effects", function()
         local ov = lurek.effect.newOverlay()
@@ -1805,49 +1808,924 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.effect.newTransition
+    -- @tests lurek.effect.newTransition
     it("covers lurek.effect.newTransition", function()
         -- TODO: Implement test for lurek.effect.newTransition
     end)
 
-    -- @covers PostFxStack:add
+    -- @tests PostFxStack:add
     it("covers PostFxStack:add", function()
         -- TODO: Implement test for PostFxStack:add
     end)
 
-    -- @covers PostFxStack:getEnabledEffects
+    -- @tests PostFxStack:getEnabledEffects
     it("covers PostFxStack:getEnabledEffects", function()
         -- TODO: Implement test for PostFxStack:getEnabledEffects
     end)
 
-    -- @covers PostFxStack:len
+    -- @tests PostFxStack:len
     it("covers PostFxStack:len", function()
         -- TODO: Implement test for PostFxStack:len
     end)
 
-    -- @covers PostFxStack:setFeedback
+    -- @tests PostFxStack:setFeedback
     it("covers PostFxStack:setFeedback", function()
         -- TODO: Implement test for PostFxStack:setFeedback
     end)
 
-    -- @covers PostFxStack:getFeedback
+    -- @tests PostFxStack:getFeedback
     it("covers PostFxStack:getFeedback", function()
         -- TODO: Implement test for PostFxStack:getFeedback
     end)
 
-    -- @covers PostFxStack:clearFeedback
+    -- @tests PostFxStack:clearFeedback
     it("covers PostFxStack:clearFeedback", function()
         -- TODO: Implement test for PostFxStack:clearFeedback
     end)
 
-    -- @covers ImageEffect:removeByIndex
+    -- @tests ImageEffect:removeByIndex
     it("covers ImageEffect:removeByIndex", function()
         -- TODO: Implement test for ImageEffect:removeByIndex
     end)
 
-    -- @covers ImageEffect:removeByName
+    -- @tests ImageEffect:removeByName
     it("covers ImageEffect:removeByName", function()
         -- TODO: Implement test for ImageEffect:removeByName
     end)
 
+end)
+
+describe("Missing explicit test for lurek.effect.newPresetStack", function()
+    it("lurek.effect.newPresetStack works", function()
+        -- @tests lurek.effect.newPresetStack
+        -- TODO: add assertion for lurek.effect.newPresetStack
+    end)
+end)
+
+describe("Missing explicit test for lurek.effect.setShaderErrorDisplay", function()
+    it("lurek.effect.setShaderErrorDisplay works", function()
+        -- @tests lurek.effect.setShaderErrorDisplay
+        -- TODO: add assertion for lurek.effect.setShaderErrorDisplay
+    end)
+end)
+
+describe("Missing explicit test for lurek.effect.getShaderErrorDisplay", function()
+    it("lurek.effect.getShaderErrorDisplay works", function()
+        -- @tests lurek.effect.getShaderErrorDisplay
+        -- TODO: add assertion for lurek.effect.getShaderErrorDisplay
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:getTypeName", function()
+    it("PostFxEffect:getTypeName works", function()
+        -- @tests PostFxEffect:getTypeName
+        -- TODO: add assertion for PostFxEffect:getTypeName
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:isBuiltIn", function()
+    it("PostFxEffect:isBuiltIn works", function()
+        -- @tests PostFxEffect:isBuiltIn
+        -- TODO: add assertion for PostFxEffect:isBuiltIn
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:isEnabled", function()
+    it("PostFxEffect:isEnabled works", function()
+        -- @tests PostFxEffect:isEnabled
+        -- TODO: add assertion for PostFxEffect:isEnabled
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setEnabled", function()
+    it("PostFxEffect:setEnabled works", function()
+        -- @tests PostFxEffect:setEnabled
+        -- TODO: add assertion for PostFxEffect:setEnabled
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setParameter", function()
+    it("PostFxEffect:setParameter works", function()
+        -- @tests PostFxEffect:setParameter
+        -- TODO: add assertion for PostFxEffect:setParameter
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:hasParameter", function()
+    it("PostFxEffect:hasParameter works", function()
+        -- @tests PostFxEffect:hasParameter
+        -- TODO: add assertion for PostFxEffect:hasParameter
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:getParameterNames", function()
+    it("PostFxEffect:getParameterNames works", function()
+        -- @tests PostFxEffect:getParameterNames
+        -- TODO: add assertion for PostFxEffect:getParameterNames
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:getEffectType", function()
+    it("PostFxEffect:getEffectType works", function()
+        -- @tests PostFxEffect:getEffectType
+        -- TODO: add assertion for PostFxEffect:getEffectType
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:getType", function()
+    it("PostFxEffect:getType works", function()
+        -- @tests PostFxEffect:getType
+        -- TODO: add assertion for PostFxEffect:getType
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:type", function()
+    it("PostFxEffect:type works", function()
+        -- @tests PostFxEffect:type
+        -- TODO: add assertion for PostFxEffect:type
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:typeOf", function()
+    it("PostFxEffect:typeOf works", function()
+        -- @tests PostFxEffect:typeOf
+        -- TODO: add assertion for PostFxEffect:typeOf
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setThreshold", function()
+    it("PostFxEffect:setThreshold works", function()
+        -- @tests PostFxEffect:setThreshold
+        -- TODO: add assertion for PostFxEffect:setThreshold
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setIntensity", function()
+    it("PostFxEffect:setIntensity works", function()
+        -- @tests PostFxEffect:setIntensity
+        -- TODO: add assertion for PostFxEffect:setIntensity
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setRadius", function()
+    it("PostFxEffect:setRadius works", function()
+        -- @tests PostFxEffect:setRadius
+        -- TODO: add assertion for PostFxEffect:setRadius
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setStrength", function()
+    it("PostFxEffect:setStrength works", function()
+        -- @tests PostFxEffect:setStrength
+        -- TODO: add assertion for PostFxEffect:setStrength
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setScanlineStrength", function()
+    it("PostFxEffect:setScanlineStrength works", function()
+        -- @tests PostFxEffect:setScanlineStrength
+        -- TODO: add assertion for PostFxEffect:setScanlineStrength
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setOffset", function()
+    it("PostFxEffect:setOffset works", function()
+        -- @tests PostFxEffect:setOffset
+        -- TODO: add assertion for PostFxEffect:setOffset
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setBrightness", function()
+    it("PostFxEffect:setBrightness works", function()
+        -- @tests PostFxEffect:setBrightness
+        -- TODO: add assertion for PostFxEffect:setBrightness
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setContrast", function()
+    it("PostFxEffect:setContrast works", function()
+        -- @tests PostFxEffect:setContrast
+        -- TODO: add assertion for PostFxEffect:setContrast
+    end)
+end)
+
+describe("Missing explicit test for PostFxEffect:setSaturation", function()
+    it("PostFxEffect:setSaturation works", function()
+        -- @tests PostFxEffect:setSaturation
+        -- TODO: add assertion for PostFxEffect:setSaturation
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:remove", function()
+    it("PostFxStack:remove works", function()
+        -- @tests PostFxStack:remove
+        -- TODO: add assertion for PostFxStack:remove
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:isEnabled", function()
+    it("PostFxStack:isEnabled works", function()
+        -- @tests PostFxStack:isEnabled
+        -- TODO: add assertion for PostFxStack:isEnabled
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:getEffectCount", function()
+    it("PostFxStack:getEffectCount works", function()
+        -- @tests PostFxStack:getEffectCount
+        -- TODO: add assertion for PostFxStack:getEffectCount
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:getEffect", function()
+    it("PostFxStack:getEffect works", function()
+        -- @tests PostFxStack:getEffect
+        -- TODO: add assertion for PostFxStack:getEffect
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:getWidth", function()
+    it("PostFxStack:getWidth works", function()
+        -- @tests PostFxStack:getWidth
+        -- TODO: add assertion for PostFxStack:getWidth
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:getHeight", function()
+    it("PostFxStack:getHeight works", function()
+        -- @tests PostFxStack:getHeight
+        -- TODO: add assertion for PostFxStack:getHeight
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:getDimensions", function()
+    it("PostFxStack:getDimensions works", function()
+        -- @tests PostFxStack:getDimensions
+        -- TODO: add assertion for PostFxStack:getDimensions
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:resize", function()
+    it("PostFxStack:resize works", function()
+        -- @tests PostFxStack:resize
+        -- TODO: add assertion for PostFxStack:resize
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:isEmpty", function()
+    it("PostFxStack:isEmpty works", function()
+        -- @tests PostFxStack:isEmpty
+        -- TODO: add assertion for PostFxStack:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:clear", function()
+    it("PostFxStack:clear works", function()
+        -- @tests PostFxStack:clear
+        -- TODO: add assertion for PostFxStack:clear
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:dedup", function()
+    it("PostFxStack:dedup works", function()
+        -- @tests PostFxStack:dedup
+        -- TODO: add assertion for PostFxStack:dedup
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:isCapturing", function()
+    it("PostFxStack:isCapturing works", function()
+        -- @tests PostFxStack:isCapturing
+        -- TODO: add assertion for PostFxStack:isCapturing
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:beginCapture", function()
+    it("PostFxStack:beginCapture works", function()
+        -- @tests PostFxStack:beginCapture
+        -- TODO: add assertion for PostFxStack:beginCapture
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:endCapture", function()
+    it("PostFxStack:endCapture works", function()
+        -- @tests PostFxStack:endCapture
+        -- TODO: add assertion for PostFxStack:endCapture
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:apply", function()
+    it("PostFxStack:apply works", function()
+        -- @tests PostFxStack:apply
+        -- TODO: add assertion for PostFxStack:apply
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:type", function()
+    it("PostFxStack:type works", function()
+        -- @tests PostFxStack:type
+        -- TODO: add assertion for PostFxStack:type
+    end)
+end)
+
+describe("Missing explicit test for PostFxStack:typeOf", function()
+    it("PostFxStack:typeOf works", function()
+        -- @tests PostFxStack:typeOf
+        -- TODO: add assertion for PostFxStack:typeOf
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:addEffect", function()
+    it("ImageEffect:addEffect works", function()
+        -- @tests ImageEffect:addEffect
+        -- TODO: add assertion for ImageEffect:addEffect
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:getEffect", function()
+    it("ImageEffect:getEffect works", function()
+        -- @tests ImageEffect:getEffect
+        -- TODO: add assertion for ImageEffect:getEffect
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:removeEffect", function()
+    it("ImageEffect:removeEffect works", function()
+        -- @tests ImageEffect:removeEffect
+        -- TODO: add assertion for ImageEffect:removeEffect
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:clearEffects", function()
+    it("ImageEffect:clearEffects works", function()
+        -- @tests ImageEffect:clearEffects
+        -- TODO: add assertion for ImageEffect:clearEffects
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:clear", function()
+    it("ImageEffect:clear works", function()
+        -- @tests ImageEffect:clear
+        -- TODO: add assertion for ImageEffect:clear
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:effectCount", function()
+    it("ImageEffect:effectCount works", function()
+        -- @tests ImageEffect:effectCount
+        -- TODO: add assertion for ImageEffect:effectCount
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:getEffectCount", function()
+    it("ImageEffect:getEffectCount works", function()
+        -- @tests ImageEffect:getEffectCount
+        -- TODO: add assertion for ImageEffect:getEffectCount
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:clone", function()
+    it("ImageEffect:clone works", function()
+        -- @tests ImageEffect:clone
+        -- TODO: add assertion for ImageEffect:clone
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:save", function()
+    it("ImageEffect:save works", function()
+        -- @tests ImageEffect:save
+        -- TODO: add assertion for ImageEffect:save
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:type", function()
+    it("ImageEffect:type works", function()
+        -- @tests ImageEffect:type
+        -- TODO: add assertion for ImageEffect:type
+    end)
+end)
+
+describe("Missing explicit test for ImageEffect:typeOf", function()
+    it("ImageEffect:typeOf works", function()
+        -- @tests ImageEffect:typeOf
+        -- TODO: add assertion for ImageEffect:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Overlay:update", function()
+    it("Overlay:update works", function()
+        -- @tests Overlay:update
+        -- TODO: add assertion for Overlay:update
+    end)
+end)
+
+describe("Missing explicit test for Overlay:triggerLightning", function()
+    it("Overlay:triggerLightning works", function()
+        -- @tests Overlay:triggerLightning
+        -- TODO: add assertion for Overlay:triggerLightning
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getShakeOffset", function()
+    it("Overlay:getShakeOffset works", function()
+        -- @tests Overlay:getShakeOffset
+        -- TODO: add assertion for Overlay:getShakeOffset
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isActive", function()
+    it("Overlay:isActive works", function()
+        -- @tests Overlay:isActive
+        -- TODO: add assertion for Overlay:isActive
+    end)
+end)
+
+describe("Missing explicit test for Overlay:clear", function()
+    it("Overlay:clear works", function()
+        -- @tests Overlay:clear
+        -- TODO: add assertion for Overlay:clear
+    end)
+end)
+
+describe("Missing explicit test for Overlay:resize", function()
+    it("Overlay:resize works", function()
+        -- @tests Overlay:resize
+        -- TODO: add assertion for Overlay:resize
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getWidth", function()
+    it("Overlay:getWidth works", function()
+        -- @tests Overlay:getWidth
+        -- TODO: add assertion for Overlay:getWidth
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getHeight", function()
+    it("Overlay:getHeight works", function()
+        -- @tests Overlay:getHeight
+        -- TODO: add assertion for Overlay:getHeight
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getDimensions", function()
+    it("Overlay:getDimensions works", function()
+        -- @tests Overlay:getDimensions
+        -- TODO: add assertion for Overlay:getDimensions
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getFlashAlpha", function()
+    it("Overlay:getFlashAlpha works", function()
+        -- @tests Overlay:getFlashAlpha
+        -- TODO: add assertion for Overlay:getFlashAlpha
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getLightningAlpha", function()
+    it("Overlay:getLightningAlpha works", function()
+        -- @tests Overlay:getLightningAlpha
+        -- TODO: add assertion for Overlay:getLightningAlpha
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setAmbientEnabled", function()
+    it("Overlay:setAmbientEnabled works", function()
+        -- @tests Overlay:setAmbientEnabled
+        -- TODO: add assertion for Overlay:setAmbientEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isAmbientEnabled", function()
+    it("Overlay:isAmbientEnabled works", function()
+        -- @tests Overlay:isAmbientEnabled
+        -- TODO: add assertion for Overlay:isAmbientEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getAmbientColor", function()
+    it("Overlay:getAmbientColor works", function()
+        -- @tests Overlay:getAmbientColor
+        -- TODO: add assertion for Overlay:getAmbientColor
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setTimeOfDay", function()
+    it("Overlay:setTimeOfDay works", function()
+        -- @tests Overlay:setTimeOfDay
+        -- TODO: add assertion for Overlay:setTimeOfDay
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getTimeOfDay", function()
+    it("Overlay:getTimeOfDay works", function()
+        -- @tests Overlay:getTimeOfDay
+        -- TODO: add assertion for Overlay:getTimeOfDay
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setFogEnabled", function()
+    it("Overlay:setFogEnabled works", function()
+        -- @tests Overlay:setFogEnabled
+        -- TODO: add assertion for Overlay:setFogEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isFogEnabled", function()
+    it("Overlay:isFogEnabled works", function()
+        -- @tests Overlay:isFogEnabled
+        -- TODO: add assertion for Overlay:isFogEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setFogDensity", function()
+    it("Overlay:setFogDensity works", function()
+        -- @tests Overlay:setFogDensity
+        -- TODO: add assertion for Overlay:setFogDensity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getFogDensity", function()
+    it("Overlay:getFogDensity works", function()
+        -- @tests Overlay:getFogDensity
+        -- TODO: add assertion for Overlay:getFogDensity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getFogColor", function()
+    it("Overlay:getFogColor works", function()
+        -- @tests Overlay:getFogColor
+        -- TODO: add assertion for Overlay:getFogColor
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setHeatHazeEnabled", function()
+    it("Overlay:setHeatHazeEnabled works", function()
+        -- @tests Overlay:setHeatHazeEnabled
+        -- TODO: add assertion for Overlay:setHeatHazeEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isHeatHazeEnabled", function()
+    it("Overlay:isHeatHazeEnabled works", function()
+        -- @tests Overlay:isHeatHazeEnabled
+        -- TODO: add assertion for Overlay:isHeatHazeEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setHeatHazeIntensity", function()
+    it("Overlay:setHeatHazeIntensity works", function()
+        -- @tests Overlay:setHeatHazeIntensity
+        -- TODO: add assertion for Overlay:setHeatHazeIntensity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getHeatHazeIntensity", function()
+    it("Overlay:getHeatHazeIntensity works", function()
+        -- @tests Overlay:getHeatHazeIntensity
+        -- TODO: add assertion for Overlay:getHeatHazeIntensity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setVignetteEnabled", function()
+    it("Overlay:setVignetteEnabled works", function()
+        -- @tests Overlay:setVignetteEnabled
+        -- TODO: add assertion for Overlay:setVignetteEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isVignetteEnabled", function()
+    it("Overlay:isVignetteEnabled works", function()
+        -- @tests Overlay:isVignetteEnabled
+        -- TODO: add assertion for Overlay:isVignetteEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setVignetteStrength", function()
+    it("Overlay:setVignetteStrength works", function()
+        -- @tests Overlay:setVignetteStrength
+        -- TODO: add assertion for Overlay:setVignetteStrength
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getVignetteStrength", function()
+    it("Overlay:getVignetteStrength works", function()
+        -- @tests Overlay:getVignetteStrength
+        -- TODO: add assertion for Overlay:getVignetteStrength
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setFilmGrainEnabled", function()
+    it("Overlay:setFilmGrainEnabled works", function()
+        -- @tests Overlay:setFilmGrainEnabled
+        -- TODO: add assertion for Overlay:setFilmGrainEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isFilmGrainEnabled", function()
+    it("Overlay:isFilmGrainEnabled works", function()
+        -- @tests Overlay:isFilmGrainEnabled
+        -- TODO: add assertion for Overlay:isFilmGrainEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setFilmGrainIntensity", function()
+    it("Overlay:setFilmGrainIntensity works", function()
+        -- @tests Overlay:setFilmGrainIntensity
+        -- TODO: add assertion for Overlay:setFilmGrainIntensity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getFilmGrainIntensity", function()
+    it("Overlay:getFilmGrainIntensity works", function()
+        -- @tests Overlay:getFilmGrainIntensity
+        -- TODO: add assertion for Overlay:getFilmGrainIntensity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setCloudShadows", function()
+    it("Overlay:setCloudShadows works", function()
+        -- @tests Overlay:setCloudShadows
+        -- TODO: add assertion for Overlay:setCloudShadows
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isCloudShadowsEnabled", function()
+    it("Overlay:isCloudShadowsEnabled works", function()
+        -- @tests Overlay:isCloudShadowsEnabled
+        -- TODO: add assertion for Overlay:isCloudShadowsEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setCloudCount", function()
+    it("Overlay:setCloudCount works", function()
+        -- @tests Overlay:setCloudCount
+        -- TODO: add assertion for Overlay:setCloudCount
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getCloudCount", function()
+    it("Overlay:getCloudCount works", function()
+        -- @tests Overlay:getCloudCount
+        -- TODO: add assertion for Overlay:getCloudCount
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setCloudSpeed", function()
+    it("Overlay:setCloudSpeed works", function()
+        -- @tests Overlay:setCloudSpeed
+        -- TODO: add assertion for Overlay:setCloudSpeed
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getCloudSpeed", function()
+    it("Overlay:getCloudSpeed works", function()
+        -- @tests Overlay:getCloudSpeed
+        -- TODO: add assertion for Overlay:getCloudSpeed
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setCloudScale", function()
+    it("Overlay:setCloudScale works", function()
+        -- @tests Overlay:setCloudScale
+        -- TODO: add assertion for Overlay:setCloudScale
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getCloudScale", function()
+    it("Overlay:getCloudScale works", function()
+        -- @tests Overlay:getCloudScale
+        -- TODO: add assertion for Overlay:getCloudScale
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setCloudOpacity", function()
+    it("Overlay:setCloudOpacity works", function()
+        -- @tests Overlay:setCloudOpacity
+        -- TODO: add assertion for Overlay:setCloudOpacity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getCloudOpacity", function()
+    it("Overlay:getCloudOpacity works", function()
+        -- @tests Overlay:getCloudOpacity
+        -- TODO: add assertion for Overlay:getCloudOpacity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setWeatherEnabled", function()
+    it("Overlay:setWeatherEnabled works", function()
+        -- @tests Overlay:setWeatherEnabled
+        -- TODO: add assertion for Overlay:setWeatherEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isWeatherEnabled", function()
+    it("Overlay:isWeatherEnabled works", function()
+        -- @tests Overlay:isWeatherEnabled
+        -- TODO: add assertion for Overlay:isWeatherEnabled
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setWeather", function()
+    it("Overlay:setWeather works", function()
+        -- @tests Overlay:setWeather
+        -- TODO: add assertion for Overlay:setWeather
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getWeather", function()
+    it("Overlay:getWeather works", function()
+        -- @tests Overlay:getWeather
+        -- TODO: add assertion for Overlay:getWeather
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setWeatherIntensity", function()
+    it("Overlay:setWeatherIntensity works", function()
+        -- @tests Overlay:setWeatherIntensity
+        -- TODO: add assertion for Overlay:setWeatherIntensity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getWeatherIntensity", function()
+    it("Overlay:getWeatherIntensity works", function()
+        -- @tests Overlay:getWeatherIntensity
+        -- TODO: add assertion for Overlay:getWeatherIntensity
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setWindDirection", function()
+    it("Overlay:setWindDirection works", function()
+        -- @tests Overlay:setWindDirection
+        -- TODO: add assertion for Overlay:setWindDirection
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getWindDirection", function()
+    it("Overlay:getWindDirection works", function()
+        -- @tests Overlay:getWindDirection
+        -- TODO: add assertion for Overlay:getWindDirection
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setWindSpeed", function()
+    it("Overlay:setWindSpeed works", function()
+        -- @tests Overlay:setWindSpeed
+        -- TODO: add assertion for Overlay:setWindSpeed
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getWindSpeed", function()
+    it("Overlay:getWindSpeed works", function()
+        -- @tests Overlay:getWindSpeed
+        -- TODO: add assertion for Overlay:getWindSpeed
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getLightningColor", function()
+    it("Overlay:getLightningColor works", function()
+        -- @tests Overlay:getLightningColor
+        -- TODO: add assertion for Overlay:getLightningColor
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isFlashing", function()
+    it("Overlay:isFlashing works", function()
+        -- @tests Overlay:isFlashing
+        -- TODO: add assertion for Overlay:isFlashing
+    end)
+end)
+
+describe("Missing explicit test for Overlay:shake", function()
+    it("Overlay:shake works", function()
+        -- @tests Overlay:shake
+        -- TODO: add assertion for Overlay:shake
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isShaking", function()
+    it("Overlay:isShaking works", function()
+        -- @tests Overlay:isShaking
+        -- TODO: add assertion for Overlay:isShaking
+    end)
+end)
+
+describe("Missing explicit test for Overlay:isFading", function()
+    it("Overlay:isFading works", function()
+        -- @tests Overlay:isFading
+        -- TODO: add assertion for Overlay:isFading
+    end)
+end)
+
+describe("Missing explicit test for Overlay:drawToImage", function()
+    it("Overlay:drawToImage works", function()
+        -- @tests Overlay:drawToImage
+        -- TODO: add assertion for Overlay:drawToImage
+    end)
+end)
+
+describe("Missing explicit test for Overlay:setCustomShader", function()
+    it("Overlay:setCustomShader works", function()
+        -- @tests Overlay:setCustomShader
+        -- TODO: add assertion for Overlay:setCustomShader
+    end)
+end)
+
+describe("Missing explicit test for Overlay:getWater", function()
+    it("Overlay:getWater works", function()
+        -- @tests Overlay:getWater
+        -- TODO: add assertion for Overlay:getWater
+    end)
+end)
+
+describe("Missing explicit test for Overlay:type", function()
+    it("Overlay:type works", function()
+        -- @tests Overlay:type
+        -- TODO: add assertion for Overlay:type
+    end)
+end)
+
+describe("Missing explicit test for Overlay:typeOf", function()
+    it("Overlay:typeOf works", function()
+        -- @tests Overlay:typeOf
+        -- TODO: add assertion for Overlay:typeOf
+    end)
+end)
+
+describe("Missing explicit test for mlua:play", function()
+    it("mlua:play works", function()
+        -- @tests mlua:play
+        -- TODO: add assertion for mlua:play
+    end)
+end)
+
+describe("Missing explicit test for mlua:reverse", function()
+    it("mlua:reverse works", function()
+        -- @tests mlua:reverse
+        -- TODO: add assertion for mlua:reverse
+    end)
+end)
+
+describe("Missing explicit test for mlua:update", function()
+    it("mlua:update works", function()
+        -- @tests mlua:update
+        -- TODO: add assertion for mlua:update
+    end)
+end)
+
+describe("Missing explicit test for mlua:progress", function()
+    it("mlua:progress works", function()
+        -- @tests mlua:progress
+        -- TODO: add assertion for mlua:progress
+    end)
+end)
+
+describe("Missing explicit test for mlua:isActive", function()
+    it("mlua:isActive works", function()
+        -- @tests mlua:isActive
+        -- TODO: add assertion for mlua:isActive
+    end)
+end)
+
+describe("Missing explicit test for mlua:isDone", function()
+    it("mlua:isDone works", function()
+        -- @tests mlua:isDone
+        -- TODO: add assertion for mlua:isDone
+    end)
+end)
+
+describe("Missing explicit test for mlua:kind", function()
+    it("mlua:kind works", function()
+        -- @tests mlua:kind
+        -- TODO: add assertion for mlua:kind
+    end)
+end)
+
+describe("Missing explicit test for mlua:color", function()
+    it("mlua:color works", function()
+        -- @tests mlua:color
+        -- TODO: add assertion for mlua:color
+    end)
+end)
+
+describe("Missing explicit test for mlua:setColor", function()
+    it("mlua:setColor works", function()
+        -- @tests mlua:setColor
+        -- TODO: add assertion for mlua:setColor
+    end)
+end)
+
+describe("Missing explicit test for mlua:type", function()
+    it("mlua:type works", function()
+        -- @tests mlua:type
+        -- TODO: add assertion for mlua:type
+    end)
+end)
+
+describe("Missing explicit test for mlua:typeOf", function()
+    it("mlua:typeOf works", function()
+        -- @tests mlua:typeOf
+        -- TODO: add assertion for mlua:typeOf
+    end)
 end)

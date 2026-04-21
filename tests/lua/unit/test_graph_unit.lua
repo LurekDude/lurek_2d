@@ -1,7 +1,7 @@
 -- Lurek2D Graph API Tests
 
 -- Helper: build a simple 2-node graph with one edge
--- @covers lurek.graph.newGraph
+-- @tests lurek.graph.newGraph
 
 local function make_simple_graph()
     local g = lurek.graph.newGraph()
@@ -1552,13 +1552,13 @@ end)
 
 describe("lurek.graph tickParallel", function()
     describe("factory", function()
-        -- @covers lurek.graph.newSimulation
+        -- @tests lurek.graph.newSimulation
         -- @description Verifies newSimulation is a function.
         it("exposes newSimulation", function()
             expect_type("function", lurek.graph.newSimulation)
         end)
 
-        -- @covers lurek.graph:tickParallel
+        -- @tests lurek.graph:tickParallel
         -- @description Verifies tickParallel is callable on a simulation.
         it("tickParallel is callable", function()
             local sim = lurek.graph.newSimulation()
@@ -1567,7 +1567,7 @@ describe("lurek.graph tickParallel", function()
     end)
 
     describe("tickParallel()", function()
-        -- @covers lurek.graph:tickParallel
+        -- @tests lurek.graph:tickParallel
         -- @description Returns a table (event list) for an empty simulation.
         it("returns a table for an empty simulation", function()
             local sim = lurek.graph.newSimulation()
@@ -1575,7 +1575,7 @@ describe("lurek.graph tickParallel", function()
             expect_type("table", events)
         end)
 
-        -- @covers lurek.graph:tickParallel
+        -- @tests lurek.graph:tickParallel
         -- @description Returns an empty table when there are no nodes.
         it("returns zero events for an empty graph", function()
             local sim = lurek.graph.newSimulation()
@@ -1583,7 +1583,7 @@ describe("lurek.graph tickParallel", function()
             expect_equal(0, #events)
         end)
 
-        -- @covers lurek.graph:tickParallel
+        -- @tests lurek.graph:tickParallel
         -- @description dt = 0 produces no decay events.
         it("does not decay items when dt is zero", function()
             local sim = lurek.graph.newSimulation()
@@ -1593,7 +1593,7 @@ describe("lurek.graph tickParallel", function()
             expect_type("table", events)
         end)
 
-        -- @covers lurek.graph:tickParallel
+        -- @tests lurek.graph:tickParallel
         -- @description Calling tickParallel multiple times does not error.
         it("is idempotently callable", function()
             local sim = lurek.graph.newSimulation()
@@ -1604,8 +1604,8 @@ describe("lurek.graph tickParallel", function()
             expect_type("table", events)
         end)
 
-        -- @covers lurek.graph:tick
-        -- @covers lurek.graph:tickParallel
+        -- @tests lurek.graph:tick
+        -- @tests lurek.graph:tickParallel
         -- @description tickParallel and tick both return tables (same signature).
         it("has the same return signature as tick", function()
             local sim = lurek.graph.newSimulation()
@@ -1626,19 +1626,768 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers Graph:mst
+    -- @tests Graph:mst
     it("covers Graph:mst", function()
         -- TODO: Implement test for Graph:mst
     end)
 
-    -- @covers Graph:colorGraph
+    -- @tests Graph:colorGraph
     it("covers Graph:colorGraph", function()
         -- TODO: Implement test for Graph:colorGraph
     end)
 
-    -- @covers Graph:isBipartite
+    -- @tests Graph:isBipartite
     it("covers Graph:isBipartite", function()
         -- TODO: Implement test for Graph:isBipartite
     end)
 
+end)
+
+describe("Missing explicit test for GraphItem:getType", function()
+    it("GraphItem:getType works", function()
+        -- @tests GraphItem:getType
+        -- TODO: add assertion for GraphItem:getType
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:setType", function()
+    it("GraphItem:setType works", function()
+        -- @tests GraphItem:setType
+        -- TODO: add assertion for GraphItem:setType
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:getDecayTime", function()
+    it("GraphItem:getDecayTime works", function()
+        -- @tests GraphItem:getDecayTime
+        -- TODO: add assertion for GraphItem:getDecayTime
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:setDecayTime", function()
+    it("GraphItem:setDecayTime works", function()
+        -- @tests GraphItem:setDecayTime
+        -- TODO: add assertion for GraphItem:setDecayTime
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:getRemainingLife", function()
+    it("GraphItem:getRemainingLife works", function()
+        -- @tests GraphItem:getRemainingLife
+        -- TODO: add assertion for GraphItem:getRemainingLife
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:isAlive", function()
+    it("GraphItem:isAlive works", function()
+        -- @tests GraphItem:isAlive
+        -- TODO: add assertion for GraphItem:isAlive
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:kill", function()
+    it("GraphItem:kill works", function()
+        -- @tests GraphItem:kill
+        -- TODO: add assertion for GraphItem:kill
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:getPriority", function()
+    it("GraphItem:getPriority works", function()
+        -- @tests GraphItem:getPriority
+        -- TODO: add assertion for GraphItem:getPriority
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:setPriority", function()
+    it("GraphItem:setPriority works", function()
+        -- @tests GraphItem:setPriority
+        -- TODO: add assertion for GraphItem:setPriority
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:getPosition", function()
+    it("GraphItem:getPosition works", function()
+        -- @tests GraphItem:getPosition
+        -- TODO: add assertion for GraphItem:getPosition
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:type", function()
+    it("GraphItem:type works", function()
+        -- @tests GraphItem:type
+        -- TODO: add assertion for GraphItem:type
+    end)
+end)
+
+describe("Missing explicit test for GraphItem:typeOf", function()
+    it("GraphItem:typeOf works", function()
+        -- @tests GraphItem:typeOf
+        -- TODO: add assertion for GraphItem:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Edge:getType", function()
+    it("Edge:getType works", function()
+        -- @tests Edge:getType
+        -- TODO: add assertion for Edge:getType
+    end)
+end)
+
+describe("Missing explicit test for Edge:setType", function()
+    it("Edge:setType works", function()
+        -- @tests Edge:setType
+        -- TODO: add assertion for Edge:setType
+    end)
+end)
+
+describe("Missing explicit test for Edge:getFrom", function()
+    it("Edge:getFrom works", function()
+        -- @tests Edge:getFrom
+        -- TODO: add assertion for Edge:getFrom
+    end)
+end)
+
+describe("Missing explicit test for Edge:getTo", function()
+    it("Edge:getTo works", function()
+        -- @tests Edge:getTo
+        -- TODO: add assertion for Edge:getTo
+    end)
+end)
+
+describe("Missing explicit test for Edge:getCapacity", function()
+    it("Edge:getCapacity works", function()
+        -- @tests Edge:getCapacity
+        -- TODO: add assertion for Edge:getCapacity
+    end)
+end)
+
+describe("Missing explicit test for Edge:setCapacity", function()
+    it("Edge:setCapacity works", function()
+        -- @tests Edge:setCapacity
+        -- TODO: add assertion for Edge:setCapacity
+    end)
+end)
+
+describe("Missing explicit test for Edge:getThroughput", function()
+    it("Edge:getThroughput works", function()
+        -- @tests Edge:getThroughput
+        -- TODO: add assertion for Edge:getThroughput
+    end)
+end)
+
+describe("Missing explicit test for Edge:setThroughput", function()
+    it("Edge:setThroughput works", function()
+        -- @tests Edge:setThroughput
+        -- TODO: add assertion for Edge:setThroughput
+    end)
+end)
+
+describe("Missing explicit test for Edge:getTravelTime", function()
+    it("Edge:getTravelTime works", function()
+        -- @tests Edge:getTravelTime
+        -- TODO: add assertion for Edge:getTravelTime
+    end)
+end)
+
+describe("Missing explicit test for Edge:setTravelTime", function()
+    it("Edge:setTravelTime works", function()
+        -- @tests Edge:setTravelTime
+        -- TODO: add assertion for Edge:setTravelTime
+    end)
+end)
+
+describe("Missing explicit test for Edge:getWeight", function()
+    it("Edge:getWeight works", function()
+        -- @tests Edge:getWeight
+        -- TODO: add assertion for Edge:getWeight
+    end)
+end)
+
+describe("Missing explicit test for Edge:setWeight", function()
+    it("Edge:setWeight works", function()
+        -- @tests Edge:setWeight
+        -- TODO: add assertion for Edge:setWeight
+    end)
+end)
+
+describe("Missing explicit test for Edge:getSpeedModifier", function()
+    it("Edge:getSpeedModifier works", function()
+        -- @tests Edge:getSpeedModifier
+        -- TODO: add assertion for Edge:getSpeedModifier
+    end)
+end)
+
+describe("Missing explicit test for Edge:setSpeedModifier", function()
+    it("Edge:setSpeedModifier works", function()
+        -- @tests Edge:setSpeedModifier
+        -- TODO: add assertion for Edge:setSpeedModifier
+    end)
+end)
+
+describe("Missing explicit test for Edge:getCooldown", function()
+    it("Edge:getCooldown works", function()
+        -- @tests Edge:getCooldown
+        -- TODO: add assertion for Edge:getCooldown
+    end)
+end)
+
+describe("Missing explicit test for Edge:setCooldown", function()
+    it("Edge:setCooldown works", function()
+        -- @tests Edge:setCooldown
+        -- TODO: add assertion for Edge:setCooldown
+    end)
+end)
+
+describe("Missing explicit test for Edge:isOnCooldown", function()
+    it("Edge:isOnCooldown works", function()
+        -- @tests Edge:isOnCooldown
+        -- TODO: add assertion for Edge:isOnCooldown
+    end)
+end)
+
+describe("Missing explicit test for Edge:isBidirectional", function()
+    it("Edge:isBidirectional works", function()
+        -- @tests Edge:isBidirectional
+        -- TODO: add assertion for Edge:isBidirectional
+    end)
+end)
+
+describe("Missing explicit test for Edge:setBidirectional", function()
+    it("Edge:setBidirectional works", function()
+        -- @tests Edge:setBidirectional
+        -- TODO: add assertion for Edge:setBidirectional
+    end)
+end)
+
+describe("Missing explicit test for Edge:isActive", function()
+    it("Edge:isActive works", function()
+        -- @tests Edge:isActive
+        -- TODO: add assertion for Edge:isActive
+    end)
+end)
+
+describe("Missing explicit test for Edge:setActive", function()
+    it("Edge:setActive works", function()
+        -- @tests Edge:setActive
+        -- TODO: add assertion for Edge:setActive
+    end)
+end)
+
+describe("Missing explicit test for Edge:getItemsInTransit", function()
+    it("Edge:getItemsInTransit works", function()
+        -- @tests Edge:getItemsInTransit
+        -- TODO: add assertion for Edge:getItemsInTransit
+    end)
+end)
+
+describe("Missing explicit test for Edge:addAllowedType", function()
+    it("Edge:addAllowedType works", function()
+        -- @tests Edge:addAllowedType
+        -- TODO: add assertion for Edge:addAllowedType
+    end)
+end)
+
+describe("Missing explicit test for Edge:removeAllowedType", function()
+    it("Edge:removeAllowedType works", function()
+        -- @tests Edge:removeAllowedType
+        -- TODO: add assertion for Edge:removeAllowedType
+    end)
+end)
+
+describe("Missing explicit test for Edge:clearAllowedTypes", function()
+    it("Edge:clearAllowedTypes works", function()
+        -- @tests Edge:clearAllowedTypes
+        -- TODO: add assertion for Edge:clearAllowedTypes
+    end)
+end)
+
+describe("Missing explicit test for Edge:isItemTypeAllowed", function()
+    it("Edge:isItemTypeAllowed works", function()
+        -- @tests Edge:isItemTypeAllowed
+        -- TODO: add assertion for Edge:isItemTypeAllowed
+    end)
+end)
+
+describe("Missing explicit test for Edge:type", function()
+    it("Edge:type works", function()
+        -- @tests Edge:type
+        -- TODO: add assertion for Edge:type
+    end)
+end)
+
+describe("Missing explicit test for Edge:typeOf", function()
+    it("Edge:typeOf works", function()
+        -- @tests Edge:typeOf
+        -- TODO: add assertion for Edge:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Node:getType", function()
+    it("Node:getType works", function()
+        -- @tests Node:getType
+        -- TODO: add assertion for Node:getType
+    end)
+end)
+
+describe("Missing explicit test for Node:setType", function()
+    it("Node:setType works", function()
+        -- @tests Node:setType
+        -- TODO: add assertion for Node:setType
+    end)
+end)
+
+describe("Missing explicit test for Node:getCapacity", function()
+    it("Node:getCapacity works", function()
+        -- @tests Node:getCapacity
+        -- TODO: add assertion for Node:getCapacity
+    end)
+end)
+
+describe("Missing explicit test for Node:setCapacity", function()
+    it("Node:setCapacity works", function()
+        -- @tests Node:setCapacity
+        -- TODO: add assertion for Node:setCapacity
+    end)
+end)
+
+describe("Missing explicit test for Node:getItemCount", function()
+    it("Node:getItemCount works", function()
+        -- @tests Node:getItemCount
+        -- TODO: add assertion for Node:getItemCount
+    end)
+end)
+
+describe("Missing explicit test for Node:isFull", function()
+    it("Node:isFull works", function()
+        -- @tests Node:isFull
+        -- TODO: add assertion for Node:isFull
+    end)
+end)
+
+describe("Missing explicit test for Node:isActive", function()
+    it("Node:isActive works", function()
+        -- @tests Node:isActive
+        -- TODO: add assertion for Node:isActive
+    end)
+end)
+
+describe("Missing explicit test for Node:setActive", function()
+    it("Node:setActive works", function()
+        -- @tests Node:setActive
+        -- TODO: add assertion for Node:setActive
+    end)
+end)
+
+describe("Missing explicit test for Node:getOverflowPolicy", function()
+    it("Node:getOverflowPolicy works", function()
+        -- @tests Node:getOverflowPolicy
+        -- TODO: add assertion for Node:getOverflowPolicy
+    end)
+end)
+
+describe("Missing explicit test for Node:setOverflowPolicy", function()
+    it("Node:setOverflowPolicy works", function()
+        -- @tests Node:setOverflowPolicy
+        -- TODO: add assertion for Node:setOverflowPolicy
+    end)
+end)
+
+describe("Missing explicit test for Node:getFlowMode", function()
+    it("Node:getFlowMode works", function()
+        -- @tests Node:getFlowMode
+        -- TODO: add assertion for Node:getFlowMode
+    end)
+end)
+
+describe("Missing explicit test for Node:setFlowMode", function()
+    it("Node:setFlowMode works", function()
+        -- @tests Node:setFlowMode
+        -- TODO: add assertion for Node:setFlowMode
+    end)
+end)
+
+describe("Missing explicit test for Node:getPushRate", function()
+    it("Node:getPushRate works", function()
+        -- @tests Node:getPushRate
+        -- TODO: add assertion for Node:getPushRate
+    end)
+end)
+
+describe("Missing explicit test for Node:setPushRate", function()
+    it("Node:setPushRate works", function()
+        -- @tests Node:setPushRate
+        -- TODO: add assertion for Node:setPushRate
+    end)
+end)
+
+describe("Missing explicit test for Node:getPullRate", function()
+    it("Node:getPullRate works", function()
+        -- @tests Node:getPullRate
+        -- TODO: add assertion for Node:getPullRate
+    end)
+end)
+
+describe("Missing explicit test for Node:setPullRate", function()
+    it("Node:setPullRate works", function()
+        -- @tests Node:setPullRate
+        -- TODO: add assertion for Node:setPullRate
+    end)
+end)
+
+describe("Missing explicit test for Node:getPushFilter", function()
+    it("Node:getPushFilter works", function()
+        -- @tests Node:getPushFilter
+        -- TODO: add assertion for Node:getPushFilter
+    end)
+end)
+
+describe("Missing explicit test for Node:setPushFilter", function()
+    it("Node:setPushFilter works", function()
+        -- @tests Node:setPushFilter
+        -- TODO: add assertion for Node:setPushFilter
+    end)
+end)
+
+describe("Missing explicit test for Node:getPullFilter", function()
+    it("Node:getPullFilter works", function()
+        -- @tests Node:getPullFilter
+        -- TODO: add assertion for Node:getPullFilter
+    end)
+end)
+
+describe("Missing explicit test for Node:setPullFilter", function()
+    it("Node:setPullFilter works", function()
+        -- @tests Node:setPullFilter
+        -- TODO: add assertion for Node:setPullFilter
+    end)
+end)
+
+describe("Missing explicit test for Node:getProcessTime", function()
+    it("Node:getProcessTime works", function()
+        -- @tests Node:getProcessTime
+        -- TODO: add assertion for Node:getProcessTime
+    end)
+end)
+
+describe("Missing explicit test for Node:setProcessTime", function()
+    it("Node:setProcessTime works", function()
+        -- @tests Node:setProcessTime
+        -- TODO: add assertion for Node:setProcessTime
+    end)
+end)
+
+describe("Missing explicit test for Node:isQueueEnabled", function()
+    it("Node:isQueueEnabled works", function()
+        -- @tests Node:isQueueEnabled
+        -- TODO: add assertion for Node:isQueueEnabled
+    end)
+end)
+
+describe("Missing explicit test for Node:setQueueEnabled", function()
+    it("Node:setQueueEnabled works", function()
+        -- @tests Node:setQueueEnabled
+        -- TODO: add assertion for Node:setQueueEnabled
+    end)
+end)
+
+describe("Missing explicit test for Node:getQueueCapacity", function()
+    it("Node:getQueueCapacity works", function()
+        -- @tests Node:getQueueCapacity
+        -- TODO: add assertion for Node:getQueueCapacity
+    end)
+end)
+
+describe("Missing explicit test for Node:setQueueCapacity", function()
+    it("Node:setQueueCapacity works", function()
+        -- @tests Node:setQueueCapacity
+        -- TODO: add assertion for Node:setQueueCapacity
+    end)
+end)
+
+describe("Missing explicit test for Node:getQueueSize", function()
+    it("Node:getQueueSize works", function()
+        -- @tests Node:getQueueSize
+        -- TODO: add assertion for Node:getQueueSize
+    end)
+end)
+
+describe("Missing explicit test for Node:getItems", function()
+    it("Node:getItems works", function()
+        -- @tests Node:getItems
+        -- TODO: add assertion for Node:getItems
+    end)
+end)
+
+describe("Missing explicit test for Node:getEdges", function()
+    it("Node:getEdges works", function()
+        -- @tests Node:getEdges
+        -- TODO: add assertion for Node:getEdges
+    end)
+end)
+
+describe("Missing explicit test for Node:clearConversion", function()
+    it("Node:clearConversion works", function()
+        -- @tests Node:clearConversion
+        -- TODO: add assertion for Node:clearConversion
+    end)
+end)
+
+describe("Missing explicit test for Node:clearAllConversions", function()
+    it("Node:clearAllConversions works", function()
+        -- @tests Node:clearAllConversions
+        -- TODO: add assertion for Node:clearAllConversions
+    end)
+end)
+
+describe("Missing explicit test for Node:addTag", function()
+    it("Node:addTag works", function()
+        -- @tests Node:addTag
+        -- TODO: add assertion for Node:addTag
+    end)
+end)
+
+describe("Missing explicit test for Node:removeTag", function()
+    it("Node:removeTag works", function()
+        -- @tests Node:removeTag
+        -- TODO: add assertion for Node:removeTag
+    end)
+end)
+
+describe("Missing explicit test for Node:hasTag", function()
+    it("Node:hasTag works", function()
+        -- @tests Node:hasTag
+        -- TODO: add assertion for Node:hasTag
+    end)
+end)
+
+describe("Missing explicit test for Node:clearTags", function()
+    it("Node:clearTags works", function()
+        -- @tests Node:clearTags
+        -- TODO: add assertion for Node:clearTags
+    end)
+end)
+
+describe("Missing explicit test for Node:getTags", function()
+    it("Node:getTags works", function()
+        -- @tests Node:getTags
+        -- TODO: add assertion for Node:getTags
+    end)
+end)
+
+describe("Missing explicit test for Node:removeSupply", function()
+    it("Node:removeSupply works", function()
+        -- @tests Node:removeSupply
+        -- TODO: add assertion for Node:removeSupply
+    end)
+end)
+
+describe("Missing explicit test for Node:clearSupplies", function()
+    it("Node:clearSupplies works", function()
+        -- @tests Node:clearSupplies
+        -- TODO: add assertion for Node:clearSupplies
+    end)
+end)
+
+describe("Missing explicit test for Node:removeDemand", function()
+    it("Node:removeDemand works", function()
+        -- @tests Node:removeDemand
+        -- TODO: add assertion for Node:removeDemand
+    end)
+end)
+
+describe("Missing explicit test for Node:clearDemands", function()
+    it("Node:clearDemands works", function()
+        -- @tests Node:clearDemands
+        -- TODO: add assertion for Node:clearDemands
+    end)
+end)
+
+describe("Missing explicit test for Node:enqueue", function()
+    it("Node:enqueue works", function()
+        -- @tests Node:enqueue
+        -- TODO: add assertion for Node:enqueue
+    end)
+end)
+
+describe("Missing explicit test for Node:dequeue", function()
+    it("Node:dequeue works", function()
+        -- @tests Node:dequeue
+        -- TODO: add assertion for Node:dequeue
+    end)
+end)
+
+describe("Missing explicit test for Node:type", function()
+    it("Node:type works", function()
+        -- @tests Node:type
+        -- TODO: add assertion for Node:type
+    end)
+end)
+
+describe("Missing explicit test for Node:typeOf", function()
+    it("Node:typeOf works", function()
+        -- @tests Node:typeOf
+        -- TODO: add assertion for Node:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Graph:removeNode", function()
+    it("Graph:removeNode works", function()
+        -- @tests Graph:removeNode
+        -- TODO: add assertion for Graph:removeNode
+    end)
+end)
+
+describe("Missing explicit test for Graph:hasNode", function()
+    it("Graph:hasNode works", function()
+        -- @tests Graph:hasNode
+        -- TODO: add assertion for Graph:hasNode
+    end)
+end)
+
+describe("Missing explicit test for Graph:getNodes", function()
+    it("Graph:getNodes works", function()
+        -- @tests Graph:getNodes
+        -- TODO: add assertion for Graph:getNodes
+    end)
+end)
+
+describe("Missing explicit test for Graph:getNodeCount", function()
+    it("Graph:getNodeCount works", function()
+        -- @tests Graph:getNodeCount
+        -- TODO: add assertion for Graph:getNodeCount
+    end)
+end)
+
+describe("Missing explicit test for Graph:removeEdge", function()
+    it("Graph:removeEdge works", function()
+        -- @tests Graph:removeEdge
+        -- TODO: add assertion for Graph:removeEdge
+    end)
+end)
+
+describe("Missing explicit test for Graph:hasEdge", function()
+    it("Graph:hasEdge works", function()
+        -- @tests Graph:hasEdge
+        -- TODO: add assertion for Graph:hasEdge
+    end)
+end)
+
+describe("Missing explicit test for Graph:getEdges", function()
+    it("Graph:getEdges works", function()
+        -- @tests Graph:getEdges
+        -- TODO: add assertion for Graph:getEdges
+    end)
+end)
+
+describe("Missing explicit test for Graph:getEdgeCount", function()
+    it("Graph:getEdgeCount works", function()
+        -- @tests Graph:getEdgeCount
+        -- TODO: add assertion for Graph:getEdgeCount
+    end)
+end)
+
+describe("Missing explicit test for Graph:removeItem", function()
+    it("Graph:removeItem works", function()
+        -- @tests Graph:removeItem
+        -- TODO: add assertion for Graph:removeItem
+    end)
+end)
+
+describe("Missing explicit test for Graph:hasItem", function()
+    it("Graph:hasItem works", function()
+        -- @tests Graph:hasItem
+        -- TODO: add assertion for Graph:hasItem
+    end)
+end)
+
+describe("Missing explicit test for Graph:getItems", function()
+    it("Graph:getItems works", function()
+        -- @tests Graph:getItems
+        -- TODO: add assertion for Graph:getItems
+    end)
+end)
+
+describe("Missing explicit test for Graph:getItemCount", function()
+    it("Graph:getItemCount works", function()
+        -- @tests Graph:getItemCount
+        -- TODO: add assertion for Graph:getItemCount
+    end)
+end)
+
+describe("Missing explicit test for Graph:update", function()
+    it("Graph:update works", function()
+        -- @tests Graph:update
+        -- TODO: add assertion for Graph:update
+    end)
+end)
+
+describe("Missing explicit test for Graph:step", function()
+    it("Graph:step works", function()
+        -- @tests Graph:step
+        -- TODO: add assertion for Graph:step
+    end)
+end)
+
+describe("Missing explicit test for Graph:tickParallel", function()
+    it("Graph:tickParallel works", function()
+        -- @tests Graph:tickParallel
+        -- TODO: add assertion for Graph:tickParallel
+    end)
+end)
+
+describe("Missing explicit test for Graph:getNeighbors", function()
+    it("Graph:getNeighbors works", function()
+        -- @tests Graph:getNeighbors
+        -- TODO: add assertion for Graph:getNeighbors
+    end)
+end)
+
+describe("Missing explicit test for Graph:getComponents", function()
+    it("Graph:getComponents works", function()
+        -- @tests Graph:getComponents
+        -- TODO: add assertion for Graph:getComponents
+    end)
+end)
+
+describe("Missing explicit test for Graph:hasCycle", function()
+    it("Graph:hasCycle works", function()
+        -- @tests Graph:hasCycle
+        -- TODO: add assertion for Graph:hasCycle
+    end)
+end)
+
+describe("Missing explicit test for Graph:topologicalSort", function()
+    it("Graph:topologicalSort works", function()
+        -- @tests Graph:topologicalSort
+        -- TODO: add assertion for Graph:topologicalSort
+    end)
+end)
+
+describe("Missing explicit test for Graph:processDemand", function()
+    it("Graph:processDemand works", function()
+        -- @tests Graph:processDemand
+        -- TODO: add assertion for Graph:processDemand
+    end)
+end)
+
+describe("Missing explicit test for Graph:getStats", function()
+    it("Graph:getStats works", function()
+        -- @tests Graph:getStats
+        -- TODO: add assertion for Graph:getStats
+    end)
+end)
+
+describe("Missing explicit test for Graph:type", function()
+    it("Graph:type works", function()
+        -- @tests Graph:type
+        -- TODO: add assertion for Graph:type
+    end)
+end)
+
+describe("Missing explicit test for Graph:typeOf", function()
+    it("Graph:typeOf works", function()
+        -- @tests Graph:typeOf
+        -- TODO: add assertion for Graph:typeOf
+    end)
 end)

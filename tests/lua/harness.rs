@@ -1307,3 +1307,8 @@ fn lua_unit_engine_unit() {
 fn lua_unit_system_unit() {
     run_lua_test("unit/test_system_unit.lua");
 }
+
+#[test]
+fn lua_unit_collision_unit() {
+    run_lua_test("unit/test_collision_unit.lua");
+}

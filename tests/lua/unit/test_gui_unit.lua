@@ -8,58 +8,58 @@
 -- =========================================================================
 -- @description Verifies that the lurek.ui namespace exists and exposes every tested factory, focus helper, root accessor, theme helper, routing entry point, toast helper, update hook, and draw hook.
 describe("lurek.ui module exists", function()
-    -- @covers lurek.ui.addToast
-    -- @covers lurek.ui.clearFocus
-    -- @covers lurek.ui.draw
-    -- @covers lurek.ui.focusNext
-    -- @covers lurek.ui.focusPrev
-    -- @covers lurek.ui.getFocus
-    -- @covers lurek.ui.getRoot
-    -- @covers lurek.ui.getTheme
-    -- @covers lurek.ui.getToastCount
-    -- @covers lurek.ui.getWidgetCount
-    -- @covers lurek.ui.keypressed
-    -- @covers lurek.ui.mousemoved
-    -- @covers lurek.ui.mousepressed
-    -- @covers lurek.ui.mousereleased
-    -- @covers lurek.ui.newAccordion
-    -- @covers lurek.ui.newButton
-    -- @covers lurek.ui.newCheckbox
-    -- @covers lurek.ui.newColorPicker
-    -- @covers lurek.ui.newComboBox
-    -- @covers lurek.ui.newDialog
-    -- @covers lurek.ui.newDockPanel
-    -- @covers lurek.ui.newImageWidget
-    -- @covers lurek.ui.newLabel
-    -- @covers lurek.ui.newLayout
-    -- @covers lurek.ui.newList
-    -- @covers lurek.ui.newMenuBar
-    -- @covers lurek.ui.newMenuItem
-    -- @covers lurek.ui.newNinePatch
-    -- @covers lurek.ui.newPanel
-    -- @covers lurek.ui.newProgressBar
-    -- @covers lurek.ui.newRadioButton
-    -- @covers lurek.ui.newScrollBar
-    -- @covers lurek.ui.newScrollPanel
-    -- @covers lurek.ui.newSeparator
-    -- @covers lurek.ui.newSlider
-    -- @covers lurek.ui.newSpacer
-    -- @covers lurek.ui.newSplitPanel
-    -- @covers lurek.ui.newStatusBar
-    -- @covers lurek.ui.newTabBar
-    -- @covers lurek.ui.newTable
-    -- @covers lurek.ui.newTextInput
-    -- @covers lurek.ui.newTheme
-    -- @covers lurek.ui.newToast
-    -- @covers lurek.ui.newToolbar
-    -- @covers lurek.ui.newTooltipPanel
-    -- @covers lurek.ui.newTreeView
-    -- @covers lurek.ui.newWindow
-    -- @covers lurek.ui.setFocus
-    -- @covers lurek.ui.setTheme
-    -- @covers lurek.ui.textinput
-    -- @covers lurek.ui.update
-    -- @covers lurek.ui.wheelmoved
+    -- @tests lurek.ui.addToast
+    -- @tests lurek.ui.clearFocus
+    -- @tests lurek.ui.draw
+    -- @tests lurek.ui.focusNext
+    -- @tests lurek.ui.focusPrev
+    -- @tests lurek.ui.getFocus
+    -- @tests lurek.ui.getRoot
+    -- @tests lurek.ui.getTheme
+    -- @tests lurek.ui.getToastCount
+    -- @tests lurek.ui.getWidgetCount
+    -- @tests lurek.ui.keypressed
+    -- @tests lurek.ui.mousemoved
+    -- @tests lurek.ui.mousepressed
+    -- @tests lurek.ui.mousereleased
+    -- @tests lurek.ui.newAccordion
+    -- @tests lurek.ui.newButton
+    -- @tests lurek.ui.newCheckbox
+    -- @tests lurek.ui.newColorPicker
+    -- @tests lurek.ui.newComboBox
+    -- @tests lurek.ui.newDialog
+    -- @tests lurek.ui.newDockPanel
+    -- @tests lurek.ui.newImageWidget
+    -- @tests lurek.ui.newLabel
+    -- @tests lurek.ui.newLayout
+    -- @tests lurek.ui.newList
+    -- @tests lurek.ui.newMenuBar
+    -- @tests lurek.ui.newMenuItem
+    -- @tests lurek.ui.newNinePatch
+    -- @tests lurek.ui.newPanel
+    -- @tests lurek.ui.newProgressBar
+    -- @tests lurek.ui.newRadioButton
+    -- @tests lurek.ui.newScrollBar
+    -- @tests lurek.ui.newScrollPanel
+    -- @tests lurek.ui.newSeparator
+    -- @tests lurek.ui.newSlider
+    -- @tests lurek.ui.newSpacer
+    -- @tests lurek.ui.newSplitPanel
+    -- @tests lurek.ui.newStatusBar
+    -- @tests lurek.ui.newTabBar
+    -- @tests lurek.ui.newTable
+    -- @tests lurek.ui.newTextInput
+    -- @tests lurek.ui.newTheme
+    -- @tests lurek.ui.newToast
+    -- @tests lurek.ui.newToolbar
+    -- @tests lurek.ui.newTooltipPanel
+    -- @tests lurek.ui.newTreeView
+    -- @tests lurek.ui.newWindow
+    -- @tests lurek.ui.setFocus
+    -- @tests lurek.ui.setTheme
+    -- @tests lurek.ui.textinput
+    -- @tests lurek.ui.update
+    -- @tests lurek.ui.wheelmoved
     -- @description Confirms the top-level lurek.ui namespace is a Lua table.
     it("lurek.ui is a table", function()
         expect_type("table", lurek.ui)
@@ -1938,27 +1938,27 @@ end)
 -- =========================================================================
 
 describe("lurek.ui.newSpinBox factory", function()
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description Verifies newSpinBox is exposed on the lurek.ui table.
     it("is callable", function()
         expect_equal(type(lurek.ui.newSpinBox), "function")
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description newSpinBox returns a table with the expected methods.
     it("returns a table", function()
         local sb = lurek.ui.newSpinBox(0, 100)
         expect_equal(type(sb), "table")
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description getValue returns min after creation.
     it("getValue returns min after creation", function()
         local sb = lurek.ui.newSpinBox(10, 50)
         expect_equal(sb.getValue(), 10)
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description increment advances value.
     it("increment changes value", function()
         local sb = lurek.ui.newSpinBox(0, 100)
@@ -1966,7 +1966,7 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_equal(sb.getValue() > 0, true)
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description decrement at min stays at min.
     it("decrement at min stays at min", function()
         local sb = lurek.ui.newSpinBox(5, 20)
@@ -1974,7 +1974,7 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_equal(sb.getValue(), 5)
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description setRange is callable without error.
     it("setRange is callable without error", function()
         local sb = lurek.ui.newSpinBox(0, 10)
@@ -1982,7 +1982,7 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_equal(true, true)
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description increment advances value by the step amount set via setStep.
     -- Migrated from Rust spin_box_increment_respects_step.
     it("increment advances value by custom step", function()
@@ -1992,7 +1992,7 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_near(2.0, sb.getValue(), 0.001)
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description increment clamps at max when step overshoots the upper bound.
     -- Migrated from Rust spin_box_increment_clamps_at_max.
     it("increment clamps at max when step overshoots", function()
@@ -2002,7 +2002,7 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_near(10.0, sb.getValue(), 0.001)
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description setValue clamps to max when the supplied value exceeds the range.
     -- Migrated from Rust spin_box_set_value_clamps_to_range.
     it("setValue clamps to max when value exceeds range", function()
@@ -2011,7 +2011,7 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_near(100.0, sb.getValue(), 0.001)
     end)
 
-    -- @covers lurek.ui.newSpinBox
+    -- @tests lurek.ui.newSpinBox
     -- @description setValue clamps to min when the supplied value is below the range.
     -- Migrated from Rust spin_box_set_value_clamps_to_range.
     it("setValue clamps to min when value is below range", function()
@@ -2022,27 +2022,27 @@ describe("lurek.ui.newSpinBox factory", function()
 end)
 
 describe("lurek.ui.newSwitch factory", function()
-    -- @covers lurek.ui.newSwitch
+    -- @tests lurek.ui.newSwitch
     -- @description Verifies newSwitch is exposed on the lurek.ui table.
     it("is callable", function()
         expect_equal(type(lurek.ui.newSwitch), "function")
     end)
 
-    -- @covers lurek.ui.newSwitch
+    -- @tests lurek.ui.newSwitch
     -- @description newSwitch returns a table.
     it("returns a table", function()
         local sw = lurek.ui.newSwitch(false)
         expect_equal(type(sw), "table")
     end)
 
-    -- @covers lurek.ui.newSwitch
+    -- @tests lurek.ui.newSwitch
     -- @description isOn returns false when created off.
     it("isOn returns false when created off", function()
         local sw = lurek.ui.newSwitch(false)
         expect_equal(sw.isOn(), false)
     end)
 
-    -- @covers lurek.ui.newSwitch
+    -- @tests lurek.ui.newSwitch
     -- @description setOn(true) flips state.
     it("setOn(true) flips state", function()
         local sw = lurek.ui.newSwitch(false)
@@ -2050,7 +2050,7 @@ describe("lurek.ui.newSwitch factory", function()
         expect_equal(sw.isOn(), true)
     end)
 
-    -- @covers lurek.ui.newSwitch
+    -- @tests lurek.ui.newSwitch
     -- @description toggle flips on -> off -> on.
     it("toggle flips state back and forth", function()
         local sw = lurek.ui.newSwitch(true)
@@ -2062,41 +2062,41 @@ describe("lurek.ui.newSwitch factory", function()
 end)
 
 describe("lurek.ui.newBadge factory", function()
-    -- @covers lurek.ui.newBadge
+    -- @tests lurek.ui.newBadge
     -- @description Verifies newBadge is exposed on the lurek.ui table.
     it("is callable", function()
         expect_equal(type(lurek.ui.newBadge), "function")
     end)
 
-    -- @covers lurek.ui.newBadge
+    -- @tests lurek.ui.newBadge
     -- @description newBadge returns a table.
     it("returns a table", function()
         local b = lurek.ui.newBadge(3)
         expect_equal(type(b), "table")
     end)
 
-    -- @covers lurek.ui.newBadge
+    -- @tests lurek.ui.newBadge
     -- @description getCount returns the initial count.
     it("getCount returns initial count", function()
         local b = lurek.ui.newBadge(7)
         expect_equal(b.getCount(), 7)
     end)
 
-    -- @covers lurek.ui.newBadge
+    -- @tests lurek.ui.newBadge
     -- @description getDisplayText returns count string below cap.
     it("getDisplayText returns count string below cap", function()
         local b = lurek.ui.newBadge(5)
         expect_equal(b.getDisplayText(), "5")
     end)
 
-    -- @covers lurek.ui.newBadge
+    -- @tests lurek.ui.newBadge
     -- @description getDisplayText shows plus notation when over cap.
     it("getDisplayText shows plus notation when over cap", function()
         local b = lurek.ui.newBadge(200)
         expect_equal(b.getDisplayText(), "99+")
     end)
 
-    -- @covers lurek.ui.newBadge
+    -- @tests lurek.ui.newBadge
     -- @description setCount updates count.
     it("setCount updates count", function()
         local b = lurek.ui.newBadge(0)
@@ -2104,7 +2104,7 @@ describe("lurek.ui.newBadge factory", function()
         expect_equal(b.getCount(), 42)
     end)
 
-    -- @covers lurek.ui.newBadge
+    -- @tests lurek.ui.newBadge
     -- @description getDisplayText shows exact count at the cap boundary (99 → "99", not "99+").
     -- Migrated from Rust badge_display_text_at_max_shows_count.
     it("getDisplayText shows exact count at cap boundary", function()
@@ -2118,7 +2118,7 @@ end)
 -- =========================================================================
 
 describe("lurek.ui default theme and viewport helpers", function()
-    -- @covers lurek.ui.setDefaultTheme
+    -- @tests lurek.ui.setDefaultTheme
     -- @description setDefaultTheme is callable without error.
     it("setDefaultTheme is callable", function()
         expect_equal(type(lurek.ui.setDefaultTheme), "function")
@@ -2126,7 +2126,7 @@ describe("lurek.ui default theme and viewport helpers", function()
         expect_equal(true, true)
     end)
 
-    -- @covers lurek.ui.setViewport
+    -- @tests lurek.ui.setViewport
     -- @description setViewport is callable without error.
     it("setViewport is callable", function()
         expect_equal(type(lurek.ui.setViewport), "function")
@@ -2134,7 +2134,7 @@ describe("lurek.ui default theme and viewport helpers", function()
         expect_equal(true, true)
     end)
 
-    -- @covers lurek.ui.flushCache
+    -- @tests lurek.ui.flushCache
     -- @description flushCache returns a boolean.
     it("flushCache returns boolean", function()
         expect_equal(type(lurek.ui.flushCache), "function")
@@ -2142,7 +2142,7 @@ describe("lurek.ui default theme and viewport helpers", function()
         expect_equal(type(result), "boolean")
     end)
 
-    -- @covers lurek.ui.flushCache
+    -- @tests lurek.ui.flushCache
     -- @description flushCache returns false on second consecutive call.
     it("flushCache returns false on second consecutive call", function()
         lurek.ui.flushCache()

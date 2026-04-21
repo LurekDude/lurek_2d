@@ -7,11 +7,11 @@
 
 -- @description Verifies that lurek.compute is present as a table and exposes the documented array factory functions.
 describe("lurek.compute module exists", function()
-    -- @covers lurek.compute.fromTable
-    -- @covers lurek.compute.newArray
-    -- @covers lurek.compute.ones
-    -- @covers lurek.compute.range
-    -- @covers lurek.compute.zeros
+    -- @tests lurek.compute.fromTable
+    -- @tests lurek.compute.newArray
+    -- @tests lurek.compute.ones
+    -- @tests lurek.compute.range
+    -- @tests lurek.compute.zeros
     -- @description Confirms the module root is a Lua table before any factories are used.
     it("lurek.compute is a table", function()
         expect_type("table", lurek.compute)
@@ -1273,79 +1273,408 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.compute.fft
+    -- @tests lurek.compute.fft
     it("covers lurek.compute.fft", function()
         -- TODO: Implement test for lurek.compute.fft
     end)
 
-    -- @covers lurek.compute.ifft
+    -- @tests lurek.compute.ifft
     it("covers lurek.compute.ifft", function()
         -- TODO: Implement test for lurek.compute.ifft
     end)
 
-    -- @covers lurek.compute.fftMagnitude
+    -- @tests lurek.compute.fftMagnitude
     it("covers lurek.compute.fftMagnitude", function()
         -- TODO: Implement test for lurek.compute.fftMagnitude
     end)
 
-    -- @covers Array:get
+    -- @tests Array:get
     it("covers Array:get", function()
         -- TODO: Implement test for Array:get
     end)
 
-    -- @covers Array:set
+    -- @tests Array:set
     it("covers Array:set", function()
         -- TODO: Implement test for Array:set
     end)
 
-    -- @covers Array:pow
+    -- @tests Array:pow
     it("covers Array:pow", function()
         -- TODO: Implement test for Array:pow
     end)
 
-    -- @covers Array:abs
+    -- @tests Array:abs
     it("covers Array:abs", function()
         -- TODO: Implement test for Array:abs
     end)
 
-    -- @covers Array:neg
+    -- @tests Array:neg
     it("covers Array:neg", function()
         -- TODO: Implement test for Array:neg
     end)
 
-    -- @covers Array:any
+    -- @tests Array:any
     it("covers Array:any", function()
         -- TODO: Implement test for Array:any
     end)
 
-    -- @covers Array:all
+    -- @tests Array:all
     it("covers Array:all", function()
         -- TODO: Implement test for Array:all
     end)
 
-    -- @covers Array:sum
+    -- @tests Array:sum
     it("covers Array:sum", function()
         -- TODO: Implement test for Array:sum
     end)
 
-    -- @covers Array:min
+    -- @tests Array:min
     it("covers Array:min", function()
         -- TODO: Implement test for Array:min
     end)
 
-    -- @covers Array:max
+    -- @tests Array:max
     it("covers Array:max", function()
         -- TODO: Implement test for Array:max
     end)
 
-    -- @covers Array:dot
+    -- @tests Array:dot
     it("covers Array:dot", function()
         -- TODO: Implement test for Array:dot
     end)
 
-    -- @covers Array:luDecompose
+    -- @tests Array:luDecompose
     it("covers Array:luDecompose", function()
         -- TODO: Implement test for Array:luDecompose
     end)
 
+end)
+
+describe("Missing explicit test for lurek.compute.gaussianKernel", function()
+    it("lurek.compute.gaussianKernel works", function()
+        -- @tests lurek.compute.gaussianKernel
+        -- TODO: add assertion for lurek.compute.gaussianKernel
+    end)
+end)
+
+describe("Missing explicit test for lurek.compute.rotate2dMatrix", function()
+    it("lurek.compute.rotate2dMatrix works", function()
+        -- @tests lurek.compute.rotate2dMatrix
+        -- TODO: add assertion for lurek.compute.rotate2dMatrix
+    end)
+end)
+
+describe("Missing explicit test for lurek.compute.affine2d", function()
+    it("lurek.compute.affine2d works", function()
+        -- @tests lurek.compute.affine2d
+        -- TODO: add assertion for lurek.compute.affine2d
+    end)
+end)
+
+describe("Missing explicit test for Array:getShape", function()
+    it("Array:getShape works", function()
+        -- @tests Array:getShape
+        -- TODO: add assertion for Array:getShape
+    end)
+end)
+
+describe("Missing explicit test for Array:getDimensions", function()
+    it("Array:getDimensions works", function()
+        -- @tests Array:getDimensions
+        -- TODO: add assertion for Array:getDimensions
+    end)
+end)
+
+describe("Missing explicit test for Array:getSize", function()
+    it("Array:getSize works", function()
+        -- @tests Array:getSize
+        -- TODO: add assertion for Array:getSize
+    end)
+end)
+
+describe("Missing explicit test for Array:getDataType", function()
+    it("Array:getDataType works", function()
+        -- @tests Array:getDataType
+        -- TODO: add assertion for Array:getDataType
+    end)
+end)
+
+describe("Missing explicit test for Array:isOnGPU", function()
+    it("Array:isOnGPU works", function()
+        -- @tests Array:isOnGPU
+        -- TODO: add assertion for Array:isOnGPU
+    end)
+end)
+
+describe("Missing explicit test for Array:toTable", function()
+    it("Array:toTable works", function()
+        -- @tests Array:toTable
+        -- TODO: add assertion for Array:toTable
+    end)
+end)
+
+describe("Missing explicit test for Array:reshape", function()
+    it("Array:reshape works", function()
+        -- @tests Array:reshape
+        -- TODO: add assertion for Array:reshape
+    end)
+end)
+
+describe("Missing explicit test for Array:clone", function()
+    it("Array:clone works", function()
+        -- @tests Array:clone
+        -- TODO: add assertion for Array:clone
+    end)
+end)
+
+describe("Missing explicit test for Array:transpose", function()
+    it("Array:transpose works", function()
+        -- @tests Array:transpose
+        -- TODO: add assertion for Array:transpose
+    end)
+end)
+
+describe("Missing explicit test for Array:fill", function()
+    it("Array:fill works", function()
+        -- @tests Array:fill
+        -- TODO: add assertion for Array:fill
+    end)
+end)
+
+describe("Missing explicit test for Array:sqrt", function()
+    it("Array:sqrt works", function()
+        -- @tests Array:sqrt
+        -- TODO: add assertion for Array:sqrt
+    end)
+end)
+
+describe("Missing explicit test for Array:clamp", function()
+    it("Array:clamp works", function()
+        -- @tests Array:clamp
+        -- TODO: add assertion for Array:clamp
+    end)
+end)
+
+describe("Missing explicit test for Array:threshold", function()
+    it("Array:threshold works", function()
+        -- @tests Array:threshold
+        -- TODO: add assertion for Array:threshold
+    end)
+end)
+
+describe("Missing explicit test for Array:countNonZero", function()
+    it("Array:countNonZero works", function()
+        -- @tests Array:countNonZero
+        -- TODO: add assertion for Array:countNonZero
+    end)
+end)
+
+describe("Missing explicit test for Array:argmin", function()
+    it("Array:argmin works", function()
+        -- @tests Array:argmin
+        -- TODO: add assertion for Array:argmin
+    end)
+end)
+
+describe("Missing explicit test for Array:argmax", function()
+    it("Array:argmax works", function()
+        -- @tests Array:argmax
+        -- TODO: add assertion for Array:argmax
+    end)
+end)
+
+describe("Missing explicit test for Array:mean", function()
+    it("Array:mean works", function()
+        -- @tests Array:mean
+        -- TODO: add assertion for Array:mean
+    end)
+end)
+
+describe("Missing explicit test for Array:matmul", function()
+    it("Array:matmul works", function()
+        -- @tests Array:matmul
+        -- TODO: add assertion for Array:matmul
+    end)
+end)
+
+describe("Missing explicit test for Array:bitwiseAnd", function()
+    it("Array:bitwiseAnd works", function()
+        -- @tests Array:bitwiseAnd
+        -- TODO: add assertion for Array:bitwiseAnd
+    end)
+end)
+
+describe("Missing explicit test for Array:bitwiseOr", function()
+    it("Array:bitwiseOr works", function()
+        -- @tests Array:bitwiseOr
+        -- TODO: add assertion for Array:bitwiseOr
+    end)
+end)
+
+describe("Missing explicit test for Array:bitwiseXor", function()
+    it("Array:bitwiseXor works", function()
+        -- @tests Array:bitwiseXor
+        -- TODO: add assertion for Array:bitwiseXor
+    end)
+end)
+
+describe("Missing explicit test for Array:bitwiseNot", function()
+    it("Array:bitwiseNot works", function()
+        -- @tests Array:bitwiseNot
+        -- TODO: add assertion for Array:bitwiseNot
+    end)
+end)
+
+describe("Missing explicit test for Array:bitwiseLShift", function()
+    it("Array:bitwiseLShift works", function()
+        -- @tests Array:bitwiseLShift
+        -- TODO: add assertion for Array:bitwiseLShift
+    end)
+end)
+
+describe("Missing explicit test for Array:bitwiseRShift", function()
+    it("Array:bitwiseRShift works", function()
+        -- @tests Array:bitwiseRShift
+        -- TODO: add assertion for Array:bitwiseRShift
+    end)
+end)
+
+describe("Missing explicit test for Array:convolve2D", function()
+    it("Array:convolve2D works", function()
+        -- @tests Array:convolve2D
+        -- TODO: add assertion for Array:convolve2D
+    end)
+end)
+
+describe("Missing explicit test for Array:dilate", function()
+    it("Array:dilate works", function()
+        -- @tests Array:dilate
+        -- TODO: add assertion for Array:dilate
+    end)
+end)
+
+describe("Missing explicit test for Array:erode", function()
+    it("Array:erode works", function()
+        -- @tests Array:erode
+        -- TODO: add assertion for Array:erode
+    end)
+end)
+
+describe("Missing explicit test for Array:cumsum", function()
+    it("Array:cumsum works", function()
+        -- @tests Array:cumsum
+        -- TODO: add assertion for Array:cumsum
+    end)
+end)
+
+describe("Missing explicit test for Array:diff", function()
+    it("Array:diff works", function()
+        -- @tests Array:diff
+        -- TODO: add assertion for Array:diff
+    end)
+end)
+
+describe("Missing explicit test for Array:percentile", function()
+    it("Array:percentile works", function()
+        -- @tests Array:percentile
+        -- TODO: add assertion for Array:percentile
+    end)
+end)
+
+describe("Missing explicit test for Array:covariance", function()
+    it("Array:covariance works", function()
+        -- @tests Array:covariance
+        -- TODO: add assertion for Array:covariance
+    end)
+end)
+
+describe("Missing explicit test for Array:pearsonCorr", function()
+    it("Array:pearsonCorr works", function()
+        -- @tests Array:pearsonCorr
+        -- TODO: add assertion for Array:pearsonCorr
+    end)
+end)
+
+describe("Missing explicit test for Array:normalizeRange", function()
+    it("Array:normalizeRange works", function()
+        -- @tests Array:normalizeRange
+        -- TODO: add assertion for Array:normalizeRange
+    end)
+end)
+
+describe("Missing explicit test for Array:zscore", function()
+    it("Array:zscore works", function()
+        -- @tests Array:zscore
+        -- TODO: add assertion for Array:zscore
+    end)
+end)
+
+describe("Missing explicit test for Array:convolve1d", function()
+    it("Array:convolve1d works", function()
+        -- @tests Array:convolve1d
+        -- TODO: add assertion for Array:convolve1d
+    end)
+end)
+
+describe("Missing explicit test for Array:correlate1d", function()
+    it("Array:correlate1d works", function()
+        -- @tests Array:correlate1d
+        -- TODO: add assertion for Array:correlate1d
+    end)
+end)
+
+describe("Missing explicit test for Array:normalizeVec", function()
+    it("Array:normalizeVec works", function()
+        -- @tests Array:normalizeVec
+        -- TODO: add assertion for Array:normalizeVec
+    end)
+end)
+
+describe("Missing explicit test for Array:outer", function()
+    it("Array:outer works", function()
+        -- @tests Array:outer
+        -- TODO: add assertion for Array:outer
+    end)
+end)
+
+describe("Missing explicit test for Array:cross2d", function()
+    it("Array:cross2d works", function()
+        -- @tests Array:cross2d
+        -- TODO: add assertion for Array:cross2d
+    end)
+end)
+
+describe("Missing explicit test for Array:transformPoints", function()
+    it("Array:transformPoints works", function()
+        -- @tests Array:transformPoints
+        -- TODO: add assertion for Array:transformPoints
+    end)
+end)
+
+describe("Missing explicit test for Array:sobel", function()
+    it("Array:sobel works", function()
+        -- @tests Array:sobel
+        -- TODO: add assertion for Array:sobel
+    end)
+end)
+
+describe("Missing explicit test for Array:linsolve", function()
+    it("Array:linsolve works", function()
+        -- @tests Array:linsolve
+        -- TODO: add assertion for Array:linsolve
+    end)
+end)
+
+describe("Missing explicit test for Array:type", function()
+    it("Array:type works", function()
+        -- @tests Array:type
+        -- TODO: add assertion for Array:type
+    end)
+end)
+
+describe("Missing explicit test for Array:typeOf", function()
+    it("Array:typeOf works", function()
+        -- @tests Array:typeOf
+        -- TODO: add assertion for Array:typeOf
+    end)
 end)

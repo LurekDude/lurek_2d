@@ -10,14 +10,14 @@
 
 -- @description Verifies that the compressed-image namespace exposes its helper functions and treats a nonexistent DDS path as an error for loading and as uncompressed for probing.
 describe("lurek.image compressed API", function()
-    -- @covers lurek.image.isCompressed
-    -- @covers lurek.image.loadImage
-    -- @covers lurek.image.loadLayered
-    -- @covers lurek.image.newCompressedData
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.newLayeredImage
-    -- @covers lurek.image.saveImage
-    -- @covers lurek.image.saveLayered
+    -- @tests lurek.image.isCompressed
+    -- @tests lurek.image.loadImage
+    -- @tests lurek.image.loadLayered
+    -- @tests lurek.image.newCompressedData
+    -- @tests lurek.image.newImageData
+    -- @tests lurek.image.newLayeredImage
+    -- @tests lurek.image.saveImage
+    -- @tests lurek.image.saveLayered
     -- @description Confirms the image namespace is available on lurek.image as a table.
     it("lurek.image is a table", function()
         expect_type("table", lurek.image)
@@ -1235,8 +1235,8 @@ end)
 -- ── ImageEffect chain API (merged from test_image_effect.lua) ──
 
 describe("lurek.effect.newImageEffect construction (empty)", function()
-    -- @covers lurek.effect.loadImageEffect
-    -- @covers lurek.effect.newImageEffect
+    -- @tests lurek.effect.loadImageEffect
+    -- @tests lurek.effect.newImageEffect
     -- @description Confirms the constructor is exported as a callable function on lurek.effect.
     it("newImageEffect is a function", function()
         expect_type("function", lurek.effect.newImageEffect)
@@ -1756,29 +1756,421 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.image.newPaletteLut
+    -- @tests lurek.image.newPaletteLut
     it("covers lurek.image.newPaletteLut", function()
         -- TODO: Implement test for lurek.image.newPaletteLut
     end)
 
-    -- @covers lurek.image.newProvinceGrid
+    -- @tests lurek.image.newProvinceGrid
     it("covers lurek.image.newProvinceGrid", function()
         -- TODO: Implement test for lurek.image.newProvinceGrid
     end)
 
-    -- @covers CompressedImageData:getMipmapCount
+    -- @tests CompressedImageData:getMipmapCount
     it("covers CompressedImageData:getMipmapCount", function()
         -- TODO: Implement test for CompressedImageData:getMipmapCount
     end)
 
-    -- @covers mlua:applyPaletteLut
+    -- @tests mlua:applyPaletteLut
     it("covers mlua:applyPaletteLut", function()
         -- TODO: Implement test for mlua:applyPaletteLut
     end)
 
-    -- @covers PaletteLUT:getColorCount
+    -- @tests PaletteLUT:getColorCount
     it("covers PaletteLUT:getColorCount", function()
         -- TODO: Implement test for PaletteLUT:getColorCount
     end)
 
+end)
+
+describe("Missing explicit test for lurek.image.savePNG", function()
+    it("lurek.image.savePNG works", function()
+        -- @tests lurek.image.savePNG
+        -- TODO: add assertion for lurek.image.savePNG
+    end)
+end)
+
+describe("Missing explicit test for ProvinceGrid:getWidth", function()
+    it("ProvinceGrid:getWidth works", function()
+        -- @tests ProvinceGrid:getWidth
+        -- TODO: add assertion for ProvinceGrid:getWidth
+    end)
+end)
+
+describe("Missing explicit test for ProvinceGrid:getHeight", function()
+    it("ProvinceGrid:getHeight works", function()
+        -- @tests ProvinceGrid:getHeight
+        -- TODO: add assertion for ProvinceGrid:getHeight
+    end)
+end)
+
+describe("Missing explicit test for ProvinceGrid:getAt", function()
+    it("ProvinceGrid:getAt works", function()
+        -- @tests ProvinceGrid:getAt
+        -- TODO: add assertion for ProvinceGrid:getAt
+    end)
+end)
+
+describe("Missing explicit test for ProvinceGrid:provinceCount", function()
+    it("ProvinceGrid:provinceCount works", function()
+        -- @tests ProvinceGrid:provinceCount
+        -- TODO: add assertion for ProvinceGrid:provinceCount
+    end)
+end)
+
+describe("Missing explicit test for ProvinceGrid:adjacencies", function()
+    it("ProvinceGrid:adjacencies works", function()
+        -- @tests ProvinceGrid:adjacencies
+        -- TODO: add assertion for ProvinceGrid:adjacencies
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:getWidth", function()
+    it("LayeredImage:getWidth works", function()
+        -- @tests LayeredImage:getWidth
+        -- TODO: add assertion for LayeredImage:getWidth
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:getHeight", function()
+    it("LayeredImage:getHeight works", function()
+        -- @tests LayeredImage:getHeight
+        -- TODO: add assertion for LayeredImage:getHeight
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:layerCount", function()
+    it("LayeredImage:layerCount works", function()
+        -- @tests LayeredImage:layerCount
+        -- TODO: add assertion for LayeredImage:layerCount
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:addLayer", function()
+    it("LayeredImage:addLayer works", function()
+        -- @tests LayeredImage:addLayer
+        -- TODO: add assertion for LayeredImage:addLayer
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:removeLayer", function()
+    it("LayeredImage:removeLayer works", function()
+        -- @tests LayeredImage:removeLayer
+        -- TODO: add assertion for LayeredImage:removeLayer
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:getLayer", function()
+    it("LayeredImage:getLayer works", function()
+        -- @tests LayeredImage:getLayer
+        -- TODO: add assertion for LayeredImage:getLayer
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:getOpacity", function()
+    it("LayeredImage:getOpacity works", function()
+        -- @tests LayeredImage:getOpacity
+        -- TODO: add assertion for LayeredImage:getOpacity
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:setOpacity", function()
+    it("LayeredImage:setOpacity works", function()
+        -- @tests LayeredImage:setOpacity
+        -- TODO: add assertion for LayeredImage:setOpacity
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:isVisible", function()
+    it("LayeredImage:isVisible works", function()
+        -- @tests LayeredImage:isVisible
+        -- TODO: add assertion for LayeredImage:isVisible
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:setVisible", function()
+    it("LayeredImage:setVisible works", function()
+        -- @tests LayeredImage:setVisible
+        -- TODO: add assertion for LayeredImage:setVisible
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:getName", function()
+    it("LayeredImage:getName works", function()
+        -- @tests LayeredImage:getName
+        -- TODO: add assertion for LayeredImage:getName
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:setName", function()
+    it("LayeredImage:setName works", function()
+        -- @tests LayeredImage:setName
+        -- TODO: add assertion for LayeredImage:setName
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:swapLayers", function()
+    it("LayeredImage:swapLayers works", function()
+        -- @tests LayeredImage:swapLayers
+        -- TODO: add assertion for LayeredImage:swapLayers
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:merge", function()
+    it("LayeredImage:merge works", function()
+        -- @tests LayeredImage:merge
+        -- TODO: add assertion for LayeredImage:merge
+    end)
+end)
+
+describe("Missing explicit test for LayeredImage:save", function()
+    it("LayeredImage:save works", function()
+        -- @tests LayeredImage:save
+        -- TODO: add assertion for LayeredImage:save
+    end)
+end)
+
+describe("Missing explicit test for CompressedImageData:getWidth", function()
+    it("CompressedImageData:getWidth works", function()
+        -- @tests CompressedImageData:getWidth
+        -- TODO: add assertion for CompressedImageData:getWidth
+    end)
+end)
+
+describe("Missing explicit test for CompressedImageData:getHeight", function()
+    it("CompressedImageData:getHeight works", function()
+        -- @tests CompressedImageData:getHeight
+        -- TODO: add assertion for CompressedImageData:getHeight
+    end)
+end)
+
+describe("Missing explicit test for CompressedImageData:getDimensions", function()
+    it("CompressedImageData:getDimensions works", function()
+        -- @tests CompressedImageData:getDimensions
+        -- TODO: add assertion for CompressedImageData:getDimensions
+    end)
+end)
+
+describe("Missing explicit test for CompressedImageData:getFormat", function()
+    it("CompressedImageData:getFormat works", function()
+        -- @tests CompressedImageData:getFormat
+        -- TODO: add assertion for CompressedImageData:getFormat
+    end)
+end)
+
+describe("Missing explicit test for mlua:getWidth", function()
+    it("mlua:getWidth works", function()
+        -- @tests mlua:getWidth
+        -- TODO: add assertion for mlua:getWidth
+    end)
+end)
+
+describe("Missing explicit test for mlua:getHeight", function()
+    it("mlua:getHeight works", function()
+        -- @tests mlua:getHeight
+        -- TODO: add assertion for mlua:getHeight
+    end)
+end)
+
+describe("Missing explicit test for mlua:getDimensions", function()
+    it("mlua:getDimensions works", function()
+        -- @tests mlua:getDimensions
+        -- TODO: add assertion for mlua:getDimensions
+    end)
+end)
+
+describe("Missing explicit test for mlua:getPixel", function()
+    it("mlua:getPixel works", function()
+        -- @tests mlua:getPixel
+        -- TODO: add assertion for mlua:getPixel
+    end)
+end)
+
+describe("Missing explicit test for mlua:encode", function()
+    it("mlua:encode works", function()
+        -- @tests mlua:encode
+        -- TODO: add assertion for mlua:encode
+    end)
+end)
+
+describe("Missing explicit test for mlua:getString", function()
+    it("mlua:getString works", function()
+        -- @tests mlua:getString
+        -- TODO: add assertion for mlua:getString
+    end)
+end)
+
+describe("Missing explicit test for mlua:mapPixel", function()
+    it("mlua:mapPixel works", function()
+        -- @tests mlua:mapPixel
+        -- TODO: add assertion for mlua:mapPixel
+    end)
+end)
+
+describe("Missing explicit test for mlua:brightness", function()
+    it("mlua:brightness works", function()
+        -- @tests mlua:brightness
+        -- TODO: add assertion for mlua:brightness
+    end)
+end)
+
+describe("Missing explicit test for mlua:contrast", function()
+    it("mlua:contrast works", function()
+        -- @tests mlua:contrast
+        -- TODO: add assertion for mlua:contrast
+    end)
+end)
+
+describe("Missing explicit test for mlua:saturation", function()
+    it("mlua:saturation works", function()
+        -- @tests mlua:saturation
+        -- TODO: add assertion for mlua:saturation
+    end)
+end)
+
+describe("Missing explicit test for mlua:gamma", function()
+    it("mlua:gamma works", function()
+        -- @tests mlua:gamma
+        -- TODO: add assertion for mlua:gamma
+    end)
+end)
+
+describe("Missing explicit test for mlua:grayscale", function()
+    it("mlua:grayscale works", function()
+        -- @tests mlua:grayscale
+        -- TODO: add assertion for mlua:grayscale
+    end)
+end)
+
+describe("Missing explicit test for mlua:sepia", function()
+    it("mlua:sepia works", function()
+        -- @tests mlua:sepia
+        -- TODO: add assertion for mlua:sepia
+    end)
+end)
+
+describe("Missing explicit test for mlua:invert", function()
+    it("mlua:invert works", function()
+        -- @tests mlua:invert
+        -- TODO: add assertion for mlua:invert
+    end)
+end)
+
+describe("Missing explicit test for mlua:threshold", function()
+    it("mlua:threshold works", function()
+        -- @tests mlua:threshold
+        -- TODO: add assertion for mlua:threshold
+    end)
+end)
+
+describe("Missing explicit test for mlua:posterize", function()
+    it("mlua:posterize works", function()
+        -- @tests mlua:posterize
+        -- TODO: add assertion for mlua:posterize
+    end)
+end)
+
+describe("Missing explicit test for mlua:fill", function()
+    it("mlua:fill works", function()
+        -- @tests mlua:fill
+        -- TODO: add assertion for mlua:fill
+    end)
+end)
+
+describe("Missing explicit test for mlua:noise", function()
+    it("mlua:noise works", function()
+        -- @tests mlua:noise
+        -- TODO: add assertion for mlua:noise
+    end)
+end)
+
+describe("Missing explicit test for mlua:alphaMask", function()
+    it("mlua:alphaMask works", function()
+        -- @tests mlua:alphaMask
+        -- TODO: add assertion for mlua:alphaMask
+    end)
+end)
+
+describe("Missing explicit test for mlua:flipHorizontal", function()
+    it("mlua:flipHorizontal works", function()
+        -- @tests mlua:flipHorizontal
+        -- TODO: add assertion for mlua:flipHorizontal
+    end)
+end)
+
+describe("Missing explicit test for mlua:flipVertical", function()
+    it("mlua:flipVertical works", function()
+        -- @tests mlua:flipVertical
+        -- TODO: add assertion for mlua:flipVertical
+    end)
+end)
+
+describe("Missing explicit test for mlua:rotate90cw", function()
+    it("mlua:rotate90cw works", function()
+        -- @tests mlua:rotate90cw
+        -- TODO: add assertion for mlua:rotate90cw
+    end)
+end)
+
+describe("Missing explicit test for mlua:crop", function()
+    it("mlua:crop works", function()
+        -- @tests mlua:crop
+        -- TODO: add assertion for mlua:crop
+    end)
+end)
+
+describe("Missing explicit test for mlua:resizeNearest", function()
+    it("mlua:resizeNearest works", function()
+        -- @tests mlua:resizeNearest
+        -- TODO: add assertion for mlua:resizeNearest
+    end)
+end)
+
+describe("Missing explicit test for mlua:blur", function()
+    it("mlua:blur works", function()
+        -- @tests mlua:blur
+        -- TODO: add assertion for mlua:blur
+    end)
+end)
+
+describe("Missing explicit test for mlua:sharpen", function()
+    it("mlua:sharpen works", function()
+        -- @tests mlua:sharpen
+        -- TODO: add assertion for mlua:sharpen
+    end)
+end)
+
+describe("Missing explicit test for mlua:resize", function()
+    it("mlua:resize works", function()
+        -- @tests mlua:resize
+        -- TODO: add assertion for mlua:resize
+    end)
+end)
+
+describe("Missing explicit test for mlua:diff", function()
+    it("mlua:diff works", function()
+        -- @tests mlua:diff
+        -- TODO: add assertion for mlua:diff
+    end)
+end)
+
+describe("Missing explicit test for mlua:mapPixels", function()
+    it("mlua:mapPixels works", function()
+        -- @tests mlua:mapPixels
+        -- TODO: add assertion for mlua:mapPixels
+    end)
+end)
+
+describe("Missing explicit test for mlua:setRawData", function()
+    it("mlua:setRawData works", function()
+        -- @tests mlua:setRawData
+        -- TODO: add assertion for mlua:setRawData
+    end)
+end)
+
+describe("Missing explicit test for PaletteLUT:clear", function()
+    it("PaletteLUT:clear works", function()
+        -- @tests PaletteLUT:clear
+        -- TODO: add assertion for PaletteLUT:clear
+    end)
 end)

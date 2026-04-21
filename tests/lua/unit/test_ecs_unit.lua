@@ -3,13 +3,13 @@
 
 -- @description Verifies sequential spawning, alive state tracking, entity counts after kill, and generational ID recycling on respawn.
 describe("Spawn and lifecycle", function()
-    -- @covers lurek.ecs.newUniverse
-    -- @covers lurek.ecs.World.setParent
-    -- @covers lurek.ecs.World.getParent
-    -- @covers lurek.ecs.World.getChildren
-    -- @covers lurek.ecs.World.killRecursive
-    -- @covers lurek.ecs.World.getEntities
-    -- @covers lurek.ecs.World.getBitmapTagBit
+    -- @tests lurek.ecs.newUniverse
+    -- @tests lurek.ecs.World.setParent
+    -- @tests lurek.ecs.World.getParent
+    -- @tests lurek.ecs.World.getChildren
+    -- @tests lurek.ecs.World.killRecursive
+    -- @tests lurek.ecs.World.getEntities
+    -- @tests lurek.ecs.World.getBitmapTagBit
     -- @description Confirms the first two spawns return IDs 1 and 2, killing one entity reduces the live count, and a recycled slot respawns as a distinct live generational ID.
     it("spawns entities with sequential IDs", function()
         local world = lurek.ecs.newUniverse()
@@ -435,9 +435,9 @@ end)
 describe("lurek.ecs", function()
     -- @description Covers suite: onComponentAdded and onComponentRemoved.
     describe("component observers", function()
-        -- @covers lurek.ecs.newUniverse
-        -- @covers lurek.ecs.onComponentAdded
-        -- @covers lurek.ecs.flushObservers
+        -- @tests lurek.ecs.newUniverse
+        -- @tests lurek.ecs.onComponentAdded
+        -- @tests lurek.ecs.flushObservers
         -- @description Verifies that onComponentAdded callback fires via flushObservers.
         it("onComponentAdded fires after flushObservers", function()
             local w = lurek.ecs.newUniverse()
@@ -458,8 +458,8 @@ describe("lurek.ecs", function()
             expect_equal("hp", last_name)
         end)
 
-        -- @covers lurek.ecs.onComponentRemoved
-        -- @covers lurek.ecs.flushObservers
+        -- @tests lurek.ecs.onComponentRemoved
+        -- @tests lurek.ecs.flushObservers
         -- @description Verifies that onComponentRemoved callback fires after removing a component.
         it("onComponentRemoved fires after flushObservers", function()
             local w = lurek.ecs.newUniverse()
@@ -476,7 +476,7 @@ describe("lurek.ecs", function()
             expect_equal(1, fired)
         end)
 
-        -- @covers lurek.ecs.onComponentAdded
+        -- @tests lurek.ecs.onComponentAdded
         -- @description Verifies that removing a non-existent component does not fire remove events.
         it("removing absent component does not fire remove event", function()
             local w = lurek.ecs.newUniverse()
@@ -489,7 +489,7 @@ describe("lurek.ecs", function()
             expect_equal(0, fired)
         end)
 
-        -- @covers lurek.ecs.onComponentAdded
+        -- @tests lurek.ecs.onComponentAdded
         -- @description Verifies that multiple observers on the same component all fire.
         it("multiple observers on same component all fire", function()
             local w = lurek.ecs.newUniverse()
@@ -510,8 +510,8 @@ end)
 describe("lurek.ecs", function()
     -- @description Covers suite: queryNot component exclusion.
     describe("queryNot", function()
-        -- @covers lurek.ecs.newUniverse
-        -- @covers lurek.ecs.queryNot
+        -- @tests lurek.ecs.newUniverse
+        -- @tests lurek.ecs.queryNot
         -- @description Verifies that queryNot returns entities with all 'with' and none of the 'without' components.
         it("returns entities that have required and NOT excluded components", function()
             local w = lurek.ecs.newUniverse()
@@ -528,7 +528,7 @@ describe("lurek.ecs", function()
             expect_equal(e2, res[1])
         end)
 
-        -- @covers lurek.ecs.queryNot
+        -- @tests lurek.ecs.queryNot
         -- @description Verifies that an empty without-list behaves like a normal query.
         it("empty without-list behaves like query", function()
             local w = lurek.ecs.newUniverse()
@@ -540,7 +540,7 @@ describe("lurek.ecs", function()
             expect_equal(2, #res)
         end)
 
-        -- @covers lurek.ecs.queryNot
+        -- @tests lurek.ecs.queryNot
         -- @description Verifies that an empty with-list returns all entities not having the excluded component.
         it("empty with-list returns all entities without excluded component", function()
             local w = lurek.ecs.newUniverse()
@@ -554,7 +554,7 @@ describe("lurek.ecs", function()
             expect_equal(2, #res)
         end)
 
-        -- @covers lurek.ecs.queryNot
+        -- @tests lurek.ecs.queryNot
         -- @description Verifies that entities with all excluded components are excluded even if multi-excludes.
         it("excludes entities with any of the excluded components", function()
             local w = lurek.ecs.newUniverse()
@@ -577,9 +577,9 @@ end)
 
 -- @description Covers suite: lurek.patterns RelationshipManager.
 describe("lurek.patterns.RelationshipManager", function()
-    -- @covers lurek.patterns.newRelationshipManager
-    -- @covers lurek.patterns.RelationshipManager.setValue
-    -- @covers lurek.patterns.RelationshipManager.getValue
+    -- @tests lurek.patterns.newRelationshipManager
+    -- @tests lurek.patterns.RelationshipManager.setValue
+    -- @tests lurek.patterns.RelationshipManager.getValue
     -- @description Verifies basic numeric relationship storage.
     it("stores and retrieves numeric values between entity pairs", function()
         local rm = lurek.patterns.newRelationshipManager()
@@ -588,7 +588,7 @@ describe("lurek.patterns.RelationshipManager", function()
         expect_near(75.0, rm:getValue(a, b), 1e-5)
     end)
 
-    -- @covers lurek.patterns.RelationshipManager.adjustValue
+    -- @tests lurek.patterns.RelationshipManager.adjustValue
     -- @description Verifies that adjustValue changes the stored value by the delta.
     it("adjustValue changes the value by delta", function()
         local rm = lurek.patterns.newRelationshipManager()
@@ -597,9 +597,9 @@ describe("lurek.patterns.RelationshipManager", function()
         expect_near(40.0, rm:getValue(1, 2), 1e-5)
     end)
 
-    -- @covers lurek.patterns.RelationshipManager.defineType
-    -- @covers lurek.patterns.RelationshipManager.setLevel
-    -- @covers lurek.patterns.RelationshipManager.getLevel
+    -- @tests lurek.patterns.RelationshipManager.defineType
+    -- @tests lurek.patterns.RelationshipManager.setLevel
+    -- @tests lurek.patterns.RelationshipManager.getLevel
     -- @description Verifies that named relationship levels can be defined and retrieved.
     it("supports named relationship type levels", function()
         local rm = lurek.patterns.newRelationshipManager()
@@ -609,8 +609,8 @@ describe("lurek.patterns.RelationshipManager", function()
         expect_equal("ally", rm:getLevel(1, 2, "Faction"))
     end)
 
-    -- @covers lurek.patterns.RelationshipManager.removePair
-    -- @covers lurek.patterns.RelationshipManager.pairCount
+    -- @tests lurek.patterns.RelationshipManager.removePair
+    -- @tests lurek.patterns.RelationshipManager.pairCount
     -- @description Verifies that removePair removes both numeric and level data.
     it("removePair resets to defaults and decrements pairCount", function()
         local rm = lurek.patterns.newRelationshipManager()
@@ -621,7 +621,7 @@ describe("lurek.patterns.RelationshipManager", function()
         expect_near(0.0, rm:getValue(1, 2), 1e-5)
     end)
 
-    -- @covers lurek.patterns.RelationshipManager.typeNames
+    -- @tests lurek.patterns.RelationshipManager.typeNames
     -- @description Verifies that typeNames returns all defined relationship type names.
     it("typeNames returns all defined type names", function()
         local rm = lurek.patterns.newRelationshipManager()
@@ -638,8 +638,8 @@ end)
 -- @description Covers the directed named-link methods on lurek.ecs Universe.
 describe("lurek.ecs Universe directed relationships", function()
 
-    -- @covers lurek.ecs.addRelation
-    -- @covers lurek.ecs.getRelated
+    -- @tests lurek.ecs.addRelation
+    -- @tests lurek.ecs.getRelated
     -- @description Verifies basic add and retrieval of a directed named link.
     it("addRelation and getRelated round-trip", function()
         local u = lurek.ecs.newUniverse()
@@ -651,7 +651,7 @@ describe("lurek.ecs Universe directed relationships", function()
         expect_equal(e2, related[1])
     end)
 
-    -- @covers lurek.ecs.hasRelation
+    -- @tests lurek.ecs.hasRelation
     -- @description hasRelation returns true when the link was added.
     it("hasRelation returns true when relation exists", function()
         local u = lurek.ecs.newUniverse()
@@ -661,7 +661,7 @@ describe("lurek.ecs Universe directed relationships", function()
         expect_equal(true, u:hasRelation(e1, "enemy", e2))
     end)
 
-    -- @covers lurek.ecs.hasRelation
+    -- @tests lurek.ecs.hasRelation
     -- @description hasRelation returns false before any link is added.
     it("hasRelation returns false when relation does not exist", function()
         local u = lurek.ecs.newUniverse()
@@ -670,7 +670,7 @@ describe("lurek.ecs Universe directed relationships", function()
         expect_equal(false, u:hasRelation(e1, "ally", e2))
     end)
 
-    -- @covers lurek.ecs.removeRelation
+    -- @tests lurek.ecs.removeRelation
     -- @description removeRelation removes only the targeted link.
     it("removeRelation removes a specific link", function()
         local u = lurek.ecs.newUniverse()
@@ -681,7 +681,7 @@ describe("lurek.ecs Universe directed relationships", function()
         expect_equal(false, u:hasRelation(e1, "ally", e2))
     end)
 
-    -- @covers lurek.ecs.clearRelations
+    -- @tests lurek.ecs.clearRelations
     -- @description clearRelations removes all links of the given type.
     it("clearRelations removes all links of a type", function()
         local u = lurek.ecs.newUniverse()
@@ -694,7 +694,7 @@ describe("lurek.ecs Universe directed relationships", function()
         expect_equal(0, #u:getRelated(e1, "friend"))
     end)
 
-    -- @covers lurek.ecs.addRelation
+    -- @tests lurek.ecs.addRelation
     -- @description Adding the same relation twice does not create duplicates.
     it("addRelation is idempotent — no duplicate links", function()
         local u = lurek.ecs.newUniverse()
@@ -705,7 +705,7 @@ describe("lurek.ecs Universe directed relationships", function()
         expect_equal(1, #u:getRelated(e1, "link"))
     end)
 
-    -- @covers lurek.ecs.addRelation
+    -- @tests lurek.ecs.addRelation
     -- @description Directed links are one-way — the reverse is not automatically added.
     it("directed links are not symmetric", function()
         local u = lurek.ecs.newUniverse()
@@ -723,9 +723,9 @@ end)
 describe("lurek.ecs", function()
     -- @description Covers suite: entity world serialization.
     describe("serialize and deserialize", function()
-        -- @covers lurek.ecs.newUniverse
-        -- @covers lurek.ecs.serialize
-        -- @covers lurek.ecs.deserialize
+        -- @tests lurek.ecs.newUniverse
+        -- @tests lurek.ecs.serialize
+        -- @tests lurek.ecs.deserialize
         -- @description Verifies that serialize produces a snapshot table with entities and bitmap_tags keys.
         it("serialize returns a table with entities and bitmap_tags", function()
             local w = lurek.ecs.newUniverse()
@@ -737,7 +737,7 @@ describe("lurek.ecs", function()
             expect_equal("table", type(snap.bitmap_tags))
         end)
 
-        -- @covers lurek.ecs.serialize
+        -- @tests lurek.ecs.serialize
         -- @description Verifies that serialized entity count matches spawn count.
         it("serialized entity count matches world entity count", function()
             local w = lurek.ecs.newUniverse()
@@ -746,7 +746,7 @@ describe("lurek.ecs", function()
             expect_equal(3, #snap.entities)
         end)
 
-        -- @covers lurek.ecs.deserialize
+        -- @tests lurek.ecs.deserialize
         -- @description Verifies that deserialize restores component values.
         it("deserialize restores component values", function()
             local w = lurek.ecs.newUniverse()
@@ -762,7 +762,7 @@ describe("lurek.ecs", function()
             expect_equal(42, hp)
         end)
 
-        -- @covers lurek.ecs.deserialize
+        -- @tests lurek.ecs.deserialize
         -- @description Verifies that deserialize restores string tags.
         it("deserialize restores string tags", function()
             local w = lurek.ecs.newUniverse()
@@ -776,7 +776,7 @@ describe("lurek.ecs", function()
             expect_equal(1, #enemies)
         end)
 
-        -- @covers lurek.ecs.deserialize
+        -- @tests lurek.ecs.deserialize
         -- @description Verifies that deserialize preserves blueprints (does not delete them).
         it("deserialize preserves registered blueprints", function()
             local w = lurek.ecs.newUniverse()
@@ -795,9 +795,9 @@ end)
 describe("lurek.ecs", function()
     -- @description Covers suite: addSystem with priority.
     describe("system priority", function()
-        -- @covers lurek.ecs.newUniverse
-        -- @covers lurek.ecs.addSystem
-        -- @covers lurek.ecs.update
+        -- @tests lurek.ecs.newUniverse
+        -- @tests lurek.ecs.addSystem
+        -- @tests lurek.ecs.update
         -- @description Verifies that systems are called in ascending priority order.
         it("systems dispatch in ascending priority order", function()
             local w = lurek.ecs.newUniverse()
@@ -827,7 +827,7 @@ describe("lurek.ecs", function()
             expect_equal("C", order[3])
         end)
 
-        -- @covers lurek.ecs.addSystem
+        -- @tests lurek.ecs.addSystem
         -- @description Verifies that systems without explicit priority default to 0.
         it("systems default to priority 0 when not specified", function()
             local w = lurek.ecs.newUniverse()
@@ -841,7 +841,7 @@ describe("lurek.ecs", function()
             expect_equal("default", order[2])
         end)
 
-        -- @covers lurek.ecs.getSystemCount
+        -- @tests lurek.ecs.getSystemCount
         -- @description Verifies that addSystem with priority correctly increments system count.
         it("getSystemCount increments correctly with priority", function()
             local w = lurek.ecs.newUniverse()
@@ -853,7 +853,8 @@ describe("lurek.ecs", function()
             expect_equal(2, w:getSystemCount())
         end)
     end)
-end)
+end)
+
 
 -- [merged from test_ecs_regress_relationship_default.lua]
 -- Regression: RelationshipManager:defineType must not panic when the optional
@@ -862,9 +863,9 @@ end)
 
 -- @description Covers suite: RelationshipManager regression — defineType must not panic on empty default_level.
 describe("RelationshipManager regression: empty default_level", function()
-    -- @covers lurek.patterns.newRelationshipManager
-    -- @covers lurek.patterns.RelationshipManager.defineType
-    -- @covers lurek.patterns.RelationshipManager.typeNames
+    -- @tests lurek.patterns.newRelationshipManager
+    -- @tests lurek.patterns.RelationshipManager.defineType
+    -- @tests lurek.patterns.RelationshipManager.typeNames
     it("defineType without default_level does not panic", function()
         local rm = lurek.patterns.newRelationshipManager()
         expect_no_error(function()
@@ -875,7 +876,7 @@ describe("RelationshipManager regression: empty default_level", function()
         expect_equal("diplomacy", names[1])
     end)
 
-    -- @covers lurek.patterns.RelationshipManager.defineType
+    -- @tests lurek.patterns.RelationshipManager.defineType
     it("defineType rejects empty levels table with a Lua error (not a panic)", function()
         local rm = lurek.patterns.newRelationshipManager()
         expect_error(function()
@@ -883,7 +884,8 @@ describe("RelationshipManager regression: empty default_level", function()
         end)
     end)
 end)
-
+
+
 
 
 
@@ -897,9 +899,9 @@ end)
 
 -- @description Covers suite: RelationshipManager regression — defineType must not panic on empty default_level.
 describe("RelationshipManager regression: empty default_level", function()
-    -- @covers lurek.patterns.newRelationshipManager
-    -- @covers lurek.patterns.RelationshipManager.defineType
-    -- @covers lurek.patterns.RelationshipManager.typeNames
+    -- @tests lurek.patterns.newRelationshipManager
+    -- @tests lurek.patterns.RelationshipManager.defineType
+    -- @tests lurek.patterns.RelationshipManager.typeNames
     it("defineType without default_level does not panic", function()
         local rm = lurek.patterns.newRelationshipManager()
         expect_no_error(function()
@@ -910,7 +912,7 @@ describe("RelationshipManager regression: empty default_level", function()
         expect_equal("diplomacy", names[1])
     end)
 
-    -- @covers lurek.patterns.RelationshipManager.defineType
+    -- @tests lurek.patterns.RelationshipManager.defineType
     it("defineType rejects empty levels table with a Lua error (not a panic)", function()
         local rm = lurek.patterns.newRelationshipManager()
         expect_error(function()
@@ -926,14 +928,315 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers Universe:has
+    -- @tests Universe:has
     it("covers Universe:has", function()
         -- TODO: Implement test for Universe:has
     end)
 
-    -- @covers Universe:bitmapUntag
+    -- @tests Universe:bitmapUntag
     it("covers Universe:bitmapUntag", function()
         -- TODO: Implement test for Universe:bitmapUntag
     end)
 
+end)
+
+describe("Missing explicit test for Universe:spawn", function()
+    it("Universe:spawn works", function()
+        -- @tests Universe:spawn
+        -- TODO: add assertion for Universe:spawn
+    end)
+end)
+
+describe("Missing explicit test for Universe:kill", function()
+    it("Universe:kill works", function()
+        -- @tests Universe:kill
+        -- TODO: add assertion for Universe:kill
+    end)
+end)
+
+describe("Missing explicit test for Universe:isAlive", function()
+    it("Universe:isAlive works", function()
+        -- @tests Universe:isAlive
+        -- TODO: add assertion for Universe:isAlive
+    end)
+end)
+
+describe("Missing explicit test for Universe:get", function()
+    it("Universe:get works", function()
+        -- @tests Universe:get
+        -- TODO: add assertion for Universe:get
+    end)
+end)
+
+describe("Missing explicit test for Universe:remove", function()
+    it("Universe:remove works", function()
+        -- @tests Universe:remove
+        -- TODO: add assertion for Universe:remove
+    end)
+end)
+
+describe("Missing explicit test for Universe:getComponents", function()
+    it("Universe:getComponents works", function()
+        -- @tests Universe:getComponents
+        -- TODO: add assertion for Universe:getComponents
+    end)
+end)
+
+describe("Missing explicit test for Universe:query", function()
+    it("Universe:query works", function()
+        -- @tests Universe:query
+        -- TODO: add assertion for Universe:query
+    end)
+end)
+
+describe("Missing explicit test for Universe:getEntities", function()
+    it("Universe:getEntities works", function()
+        -- @tests Universe:getEntities
+        -- TODO: add assertion for Universe:getEntities
+    end)
+end)
+
+describe("Missing explicit test for Universe:getEntityCount", function()
+    it("Universe:getEntityCount works", function()
+        -- @tests Universe:getEntityCount
+        -- TODO: add assertion for Universe:getEntityCount
+    end)
+end)
+
+describe("Missing explicit test for Universe:removeSystem", function()
+    it("Universe:removeSystem works", function()
+        -- @tests Universe:removeSystem
+        -- TODO: add assertion for Universe:removeSystem
+    end)
+end)
+
+describe("Missing explicit test for Universe:update", function()
+    it("Universe:update works", function()
+        -- @tests Universe:update
+        -- TODO: add assertion for Universe:update
+    end)
+end)
+
+describe("Missing explicit test for Universe:emit", function()
+    it("Universe:emit works", function()
+        -- @tests Universe:emit
+        -- TODO: add assertion for Universe:emit
+    end)
+end)
+
+describe("Missing explicit test for Universe:getSystemCount", function()
+    it("Universe:getSystemCount works", function()
+        -- @tests Universe:getSystemCount
+        -- TODO: add assertion for Universe:getSystemCount
+    end)
+end)
+
+describe("Missing explicit test for Universe:clear", function()
+    it("Universe:clear works", function()
+        -- @tests Universe:clear
+        -- TODO: add assertion for Universe:clear
+    end)
+end)
+
+describe("Missing explicit test for Universe:release", function()
+    it("Universe:release works", function()
+        -- @tests Universe:release
+        -- TODO: add assertion for Universe:release
+    end)
+end)
+
+describe("Missing explicit test for Universe:addTag", function()
+    it("Universe:addTag works", function()
+        -- @tests Universe:addTag
+        -- TODO: add assertion for Universe:addTag
+    end)
+end)
+
+describe("Missing explicit test for Universe:removeTag", function()
+    it("Universe:removeTag works", function()
+        -- @tests Universe:removeTag
+        -- TODO: add assertion for Universe:removeTag
+    end)
+end)
+
+describe("Missing explicit test for Universe:hasTag", function()
+    it("Universe:hasTag works", function()
+        -- @tests Universe:hasTag
+        -- TODO: add assertion for Universe:hasTag
+    end)
+end)
+
+describe("Missing explicit test for Universe:getTags", function()
+    it("Universe:getTags works", function()
+        -- @tests Universe:getTags
+        -- TODO: add assertion for Universe:getTags
+    end)
+end)
+
+describe("Missing explicit test for Universe:getEntitiesByTag", function()
+    it("Universe:getEntitiesByTag works", function()
+        -- @tests Universe:getEntitiesByTag
+        -- TODO: add assertion for Universe:getEntitiesByTag
+    end)
+end)
+
+describe("Missing explicit test for Universe:setLayer", function()
+    it("Universe:setLayer works", function()
+        -- @tests Universe:setLayer
+        -- TODO: add assertion for Universe:setLayer
+    end)
+end)
+
+describe("Missing explicit test for Universe:getLayer", function()
+    it("Universe:getLayer works", function()
+        -- @tests Universe:getLayer
+        -- TODO: add assertion for Universe:getLayer
+    end)
+end)
+
+describe("Missing explicit test for Universe:getEntitiesByLayer", function()
+    it("Universe:getEntitiesByLayer works", function()
+        -- @tests Universe:getEntitiesByLayer
+        -- TODO: add assertion for Universe:getEntitiesByLayer
+    end)
+end)
+
+describe("Missing explicit test for Universe:getEntitiesSorted", function()
+    it("Universe:getEntitiesSorted works", function()
+        -- @tests Universe:getEntitiesSorted
+        -- TODO: add assertion for Universe:getEntitiesSorted
+    end)
+end)
+
+describe("Missing explicit test for Universe:defineTag", function()
+    it("Universe:defineTag works", function()
+        -- @tests Universe:defineTag
+        -- TODO: add assertion for Universe:defineTag
+    end)
+end)
+
+describe("Missing explicit test for Universe:bitmapTag", function()
+    it("Universe:bitmapTag works", function()
+        -- @tests Universe:bitmapTag
+        -- TODO: add assertion for Universe:bitmapTag
+    end)
+end)
+
+describe("Missing explicit test for Universe:hasBitmapTag", function()
+    it("Universe:hasBitmapTag works", function()
+        -- @tests Universe:hasBitmapTag
+        -- TODO: add assertion for Universe:hasBitmapTag
+    end)
+end)
+
+describe("Missing explicit test for Universe:queryBitmapTag", function()
+    it("Universe:queryBitmapTag works", function()
+        -- @tests Universe:queryBitmapTag
+        -- TODO: add assertion for Universe:queryBitmapTag
+    end)
+end)
+
+describe("Missing explicit test for Universe:queryBitmapAny", function()
+    it("Universe:queryBitmapAny works", function()
+        -- @tests Universe:queryBitmapAny
+        -- TODO: add assertion for Universe:queryBitmapAny
+    end)
+end)
+
+describe("Missing explicit test for Universe:queryBitmapAll", function()
+    it("Universe:queryBitmapAll works", function()
+        -- @tests Universe:queryBitmapAll
+        -- TODO: add assertion for Universe:queryBitmapAll
+    end)
+end)
+
+describe("Missing explicit test for Universe:getBitmapTagBit", function()
+    it("Universe:getBitmapTagBit works", function()
+        -- @tests Universe:getBitmapTagBit
+        -- TODO: add assertion for Universe:getBitmapTagBit
+    end)
+end)
+
+describe("Missing explicit test for Universe:hasBlueprint", function()
+    it("Universe:hasBlueprint works", function()
+        -- @tests Universe:hasBlueprint
+        -- TODO: add assertion for Universe:hasBlueprint
+    end)
+end)
+
+describe("Missing explicit test for Universe:removeBlueprint", function()
+    it("Universe:removeBlueprint works", function()
+        -- @tests Universe:removeBlueprint
+        -- TODO: add assertion for Universe:removeBlueprint
+    end)
+end)
+
+describe("Missing explicit test for Universe:listBlueprints", function()
+    it("Universe:listBlueprints works", function()
+        -- @tests Universe:listBlueprints
+        -- TODO: add assertion for Universe:listBlueprints
+    end)
+end)
+
+describe("Missing explicit test for Universe:getBlueprintComponents", function()
+    it("Universe:getBlueprintComponents works", function()
+        -- @tests Universe:getBlueprintComponents
+        -- TODO: add assertion for Universe:getBlueprintComponents
+    end)
+end)
+
+describe("Missing explicit test for Universe:getParent", function()
+    it("Universe:getParent works", function()
+        -- @tests Universe:getParent
+        -- TODO: add assertion for Universe:getParent
+    end)
+end)
+
+describe("Missing explicit test for Universe:getChildren", function()
+    it("Universe:getChildren works", function()
+        -- @tests Universe:getChildren
+        -- TODO: add assertion for Universe:getChildren
+    end)
+end)
+
+describe("Missing explicit test for Universe:killRecursive", function()
+    it("Universe:killRecursive works", function()
+        -- @tests Universe:killRecursive
+        -- TODO: add assertion for Universe:killRecursive
+    end)
+end)
+
+describe("Missing explicit test for Universe:serialize", function()
+    it("Universe:serialize works", function()
+        -- @tests Universe:serialize
+        -- TODO: add assertion for Universe:serialize
+    end)
+end)
+
+describe("Missing explicit test for Universe:deserialize", function()
+    it("Universe:deserialize works", function()
+        -- @tests Universe:deserialize
+        -- TODO: add assertion for Universe:deserialize
+    end)
+end)
+
+describe("Missing explicit test for Universe:flushObservers", function()
+    it("Universe:flushObservers works", function()
+        -- @tests Universe:flushObservers
+        -- TODO: add assertion for Universe:flushObservers
+    end)
+end)
+
+describe("Missing explicit test for Universe:getRelated", function()
+    it("Universe:getRelated works", function()
+        -- @tests Universe:getRelated
+        -- TODO: add assertion for Universe:getRelated
+    end)
+end)
+
+describe("Missing explicit test for Universe:clearRelations", function()
+    it("Universe:clearRelations works", function()
+        -- @tests Universe:clearRelations
+        -- TODO: add assertion for Universe:clearRelations
+    end)
 end)

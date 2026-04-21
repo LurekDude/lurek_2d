@@ -3,7 +3,7 @@
 -- @description Verifies the math namespace exposes the pi constant and that its numeric value matches the expected approximation.
 describe("lurek.math constants", function()
     -- @description Confirms pi is present and is within 0.0001 of 3.14159265358979.
-    -- @covers lurek.math.pi
+    -- @tests lurek.math.pi
     it("has pi", function()
         expect_not_nil(lurek.math.pi, "pi exists")
         expect_near(3.14159265358979, lurek.math.pi, 0.0001, "pi value")
@@ -843,7 +843,7 @@ end)
 
 -- @description Factory and type checks.
 describe("lurek.math.aabbTree factory", function()
-  -- @covers lurek.math.aabbTree
+  -- @tests lurek.math.aabbTree
   it("aabbTree is a function", function()
     expect_type("function", lurek.math.aabbTree)
   end)
@@ -869,7 +869,7 @@ end)
 
 -- @description Insert and contains.
 describe("AabbTree insert / contains", function()
-  -- @covers lurek.math.aabbTree
+  -- @tests lurek.math.aabbTree
   -- @description After inserting one entry, len should be 1.
   it("len increments after insert", function()
     local t = lurek.math.aabbTree()
@@ -910,7 +910,7 @@ end)
 
 -- @description Remove.
 describe("AabbTree remove", function()
-  -- @covers lurek.math.aabbTree
+  -- @tests lurek.math.aabbTree
   -- @description remove returns true for a known id.
   it("remove returns true for known id", function()
     local t = lurek.math.aabbTree()
@@ -944,7 +944,7 @@ end)
 
 -- @description query rectangle overlap.
 describe("AabbTree query", function()
-  -- @covers lurek.math.aabbTree
+  -- @tests lurek.math.aabbTree
   -- @description A query that overlaps a single entry returns that id.
   it("query returns overlapping id", function()
     local t = lurek.math.aabbTree()
@@ -984,7 +984,7 @@ end)
 
 -- @description queryPoint.
 describe("AabbTree queryPoint", function()
-  -- @covers lurek.math.aabbTree
+  -- @tests lurek.math.aabbTree
   -- @description A point inside an AABB returns that entry's id.
   it("queryPoint finds containing entry", function()
     local t = lurek.math.aabbTree()
@@ -1013,7 +1013,7 @@ end)
 
 -- @description update.
 describe("AabbTree update", function()
-  -- @covers lurek.math.aabbTree
+  -- @tests lurek.math.aabbTree
   -- @description update returns false for an unknown id.
   it("update returns false for unknown id", function()
     local t = lurek.math.aabbTree()
@@ -1042,7 +1042,7 @@ end)
 
 -- @description clear.
 describe("AabbTree clear", function()
-  -- @covers lurek.math.aabbTree
+  -- @tests lurek.math.aabbTree
   -- @description After clear, len is 0 and isEmpty is true.
   it("clear resets len to 0", function()
     local t = lurek.math.aabbTree()
@@ -1065,7 +1065,7 @@ end)
 
 -- @description Edge cases and stress.
 describe("AabbTree edge cases", function()
-  -- @covers lurek.math.aabbTree
+  -- @tests lurek.math.aabbTree
   -- @description Single-entry tree: query with the exact AABB returns the id.
   it("single entry exact AABB match", function()
     local t = lurek.math.aabbTree()
@@ -1221,8 +1221,8 @@ end
 
 -- @description Covers suite: property: trig identities.
 describe("property: trig identities", function()
-    -- @covers lurek.math.sin
-    -- @covers lurek.math.cos
+    -- @tests lurek.math.sin
+    -- @tests lurek.math.cos
     -- @description Generates 100 deterministic angles in [-10, 10] and checks that sin(x)^2 + cos(x)^2 stays within 1e-6 of 1.0 for each sample.
     it("sin^2(x) + cos^2(x) = 1 for 100 values", function()
         local angles = test_values(100, -10, 10)
@@ -1235,7 +1235,7 @@ describe("property: trig identities", function()
         end
     end)
 
-    -- @covers lurek.math.sin
+    -- @tests lurek.math.sin
     -- @description Reuses the deterministic angle set in [-10, 10] to verify the odd-function identity sin(-x) = -sin(x) across 100 samples.
     it("sin(-x) = -sin(x) for 100 values (odd function)", function()
         local angles = test_values(100, -10, 10)
@@ -1247,7 +1247,7 @@ describe("property: trig identities", function()
         end
     end)
 
-    -- @covers lurek.math.cos
+    -- @tests lurek.math.cos
     -- @description Reuses the deterministic angle set in [-10, 10] to verify the even-function identity cos(-x) = cos(x) across 100 samples.
     it("cos(-x) = cos(x) for 100 values (even function)", function()
         local angles = test_values(100, -10, 10)
@@ -1262,7 +1262,7 @@ end)
 
 -- @description Covers suite: property: sqrt invariants.
 describe("property: sqrt invariants", function()
-    -- @covers lurek.math.sqrt
+    -- @tests lurek.math.sqrt
     -- @description Samples 100 positive values from 0.001 to 10000 and verifies squaring sqrt(x) reconstructs x within a magnitude-scaled tolerance.
     it("sqrt(x)^2 = x for 100 positive values", function()
         local vals = test_values(100, 0.001, 10000)
@@ -1273,7 +1273,7 @@ describe("property: sqrt invariants", function()
         end
     end)
 
-    -- @covers lurek.math.sqrt
+    -- @tests lurek.math.sqrt
     -- @description Splits 100 positive samples into 50 pairs and checks the multiplicative identity sqrt(a*b) = sqrt(a) * sqrt(b) for each pair.
     it("sqrt(a*b) = sqrt(a) * sqrt(b) for 50 pairs", function()
         local vals = test_values(100, 0.01, 100)
@@ -1290,7 +1290,7 @@ end)
 
 -- @description Covers suite: property: exp/log invariants.
 describe("property: exp/log invariants", function()
-    -- @covers lurek.math.exp
+    -- @tests lurek.math.exp
     -- @description Uses 50 deterministic value pairs in [-3, 3] and verifies exp(a + b) matches exp(a) * exp(b) with scaled floating-point tolerance.
     it("exp(a+b) = exp(a) * exp(b) for 50 pairs", function()
         local vals = test_values(100, -3, 3)
@@ -1307,7 +1307,7 @@ end)
 
 -- @description Covers suite: property: Vec2 operations.
 describe("property: Vec2 operations", function()
-    -- @covers lurek.math.Vec2
+    -- @tests lurek.math.Vec2
     -- @description Builds 50 deterministic Vec2 pairs and compares v1 + v2 against v2 + v1 component-wise to validate vector addition commutativity.
     it("vec2 add is commutative for 50 pairs", function()
         local vals = test_values(200, -1000, 1000)
@@ -1326,8 +1326,8 @@ describe("property: Vec2 operations", function()
         end
     end)
 
-    -- @covers lurek.math.Vec2
-    -- @covers lurek.math.Vec2.length
+    -- @tests lurek.math.Vec2
+    -- @tests lurek.math.Vec2.length
     -- @description Creates 100 Vec2 samples from deterministic coordinates and verifies each computed length is non-negative.
     it("vec2 length is non-negative for 100 values", function()
         local vals = test_values(200, -1000, 1000)
@@ -1339,9 +1339,9 @@ describe("property: Vec2 operations", function()
         end
     end)
 
-    -- @covers lurek.math.Vec2
-    -- @covers lurek.math.Vec2.normalized
-    -- @covers lurek.math.Vec2.length
+    -- @tests lurek.math.Vec2
+    -- @tests lurek.math.Vec2.normalized
+    -- @tests lurek.math.Vec2.length
     -- @description Filters out near-zero vectors, normalizes the remaining 100 deterministic samples, and checks the resulting vectors stay unit length within 1e-6.
     it("normalized vec2 has length 1 for non-zero vectors", function()
         local vals = test_values(200, -100, 100)
@@ -1358,7 +1358,7 @@ end)
 
 -- @description Covers suite: property: lerp interpolation.
 describe("property: lerp interpolation", function()
-    -- @covers lurek.math.lerp
+    -- @tests lurek.math.lerp
     -- @description Checks 50 deterministic scalar pairs and verifies lerp returns the first endpoint at t=0 and the second endpoint at t=1.
     it("lerp(a, b, 0) = a and lerp(a, b, 1) = b", function()
         local vals = test_values(100, -1000, 1000)
@@ -1373,7 +1373,7 @@ describe("property: lerp interpolation", function()
         end
     end)
 
-    -- @covers lurek.math.lerp
+    -- @tests lurek.math.lerp
     -- @description Steps t from 0.01 to 1.00 for a fixed increasing range from 10 to 100 and verifies each lerp sample is at least as large as the previous one.
     it("lerp is monotonic for t in [0,1]", function()
         local a, b = 10, 100
@@ -1389,7 +1389,7 @@ end)
 -- ── Voronoi ───────────────────────────────────────────────────────────────────
 
 describe("lurek.math.voronoi type", function()
-  -- @covers lurek.math.voronoi
+  -- @tests lurek.math.voronoi
   it("voronoi is a function", function()
     expect_type("function", lurek.math.voronoi)
   end)
@@ -1401,7 +1401,7 @@ describe("lurek.math.voronoi type", function()
 end)
 
 describe("lurek.math.voronoi empty input", function()
-  -- @covers lurek.math.voronoi
+  -- @tests lurek.math.voronoi
   it("empty input returns empty table", function()
     local cells = lurek.math.voronoi({})
     expect_equal(0, #cells)
@@ -1409,7 +1409,7 @@ describe("lurek.math.voronoi empty input", function()
 end)
 
 describe("lurek.math.voronoi cell count", function()
-  -- @covers lurek.math.voronoi
+  -- @tests lurek.math.voronoi
   it("returns one cell per unique site", function()
     local pts = {{x=0,y=0},{x=1,y=0},{x=0.5,y=1},{x=0.5,y=0.5}}
     local cells = lurek.math.voronoi(pts)
@@ -1424,7 +1424,7 @@ describe("lurek.math.voronoi cell count", function()
 end)
 
 describe("lurek.math.voronoi cell structure", function()
-  -- @covers lurek.math.voronoi
+  -- @tests lurek.math.voronoi
   it("each cell has a site table", function()
     local pts = {{x=0,y=0},{x=1,y=0},{x=0.5,y=1}}
     local cells = lurek.math.voronoi(pts)
@@ -1452,7 +1452,7 @@ describe("lurek.math.voronoi cell structure", function()
 end)
 
 describe("lurek.math.voronoi vertex coordinates", function()
-  -- @covers lurek.math.voronoi
+  -- @tests lurek.math.voronoi
   it("vertex entries have x and y as numbers", function()
     local pts = {
       {x=0,y=0},{x=2,y=0},{x=1,y=2},{x=1,y=0.5}
@@ -1472,7 +1472,7 @@ describe("lurek.math.voronoi vertex coordinates", function()
 end)
 
 describe("lurek.math.voronoi near-duplicate deduplication", function()
-  -- @covers lurek.math.voronoi
+  -- @tests lurek.math.voronoi
   it("near-coincident points are merged into fewer cells", function()
     -- Two points separated by 1e-7 should deduplicate to 1 effective site
     local pts = {
@@ -1488,22 +1488,22 @@ end)
 -- ── smoothstep ────────────────────────────────────────────────────────────────
 -- @description Tests for the lurek.math.smoothstep function.
 describe("lurek.math.smoothstep", function()
-  -- @covers lurek.math.smoothstep
+  -- @tests lurek.math.smoothstep
   -- @description x <= e0 returns 0.
   it("x <= e0 returns 0", function()
     expect_equal(0, lurek.math.smoothstep(0, 1, -0.5))
   end)
-  -- @covers lurek.math.smoothstep
+  -- @tests lurek.math.smoothstep
   -- @description x >= e1 returns 1.
   it("x >= e1 returns 1", function()
     expect_equal(1, lurek.math.smoothstep(0, 1, 2))
   end)
-  -- @covers lurek.math.smoothstep
+  -- @tests lurek.math.smoothstep
   -- @description midpoint returns 0.5.
   it("midpoint returns 0.5", function()
     expect_near(0.5, lurek.math.smoothstep(0, 1, 0.5), 1e-5)
   end)
-  -- @covers lurek.math.smoothstep
+  -- @tests lurek.math.smoothstep
   -- @description result is between 0 and 1 for interior x.
   it("interior result is in [0,1]", function()
     local v = lurek.math.smoothstep(0, 1, 0.3)
@@ -1514,17 +1514,17 @@ end)
 -- ── inverseLerp ───────────────────────────────────────────────────────────────
 -- @description Tests for the lurek.math.inverseLerp function.
 describe("lurek.math.inverseLerp", function()
-  -- @covers lurek.math.inverseLerp
+  -- @tests lurek.math.inverseLerp
   -- @description returns 0 at start of range.
   it("returns 0 at start", function()
     expect_equal(0, lurek.math.inverseLerp(0, 10, 0))
   end)
-  -- @covers lurek.math.inverseLerp
+  -- @tests lurek.math.inverseLerp
   -- @description returns 1 at end of range.
   it("returns 1 at end", function()
     expect_equal(1, lurek.math.inverseLerp(0, 10, 10))
   end)
-  -- @covers lurek.math.inverseLerp
+  -- @tests lurek.math.inverseLerp
   -- @description returns 0.5 at midpoint.
   it("returns 0.5 at midpoint", function()
     expect_near(0.5, lurek.math.inverseLerp(0, 10, 5), 1e-5)
@@ -1534,7 +1534,7 @@ end)
 -- ── hslToRgb / rgbToHsl ───────────────────────────────────────────────────────
 -- @description Tests for the lurek.math.hslToRgb and lurek.math.rgbToHsl functions.
 describe("lurek.math hslToRgb and rgbToHsl", function()
-  -- @covers lurek.math.hslToRgb
+  -- @tests lurek.math.hslToRgb
   -- @description hsl(0,0,1) is white: r=g=b=1.
   it("hslToRgb white is (1,1,1,1)", function()
     local r, g, b, a = lurek.math.hslToRgb(0, 0, 1.0)
@@ -1543,7 +1543,7 @@ describe("lurek.math hslToRgb and rgbToHsl", function()
     expect_near(1.0, b, 1e-5)
     expect_near(1.0, a, 1e-5)
   end)
-  -- @covers lurek.math.hslToRgb
+  -- @tests lurek.math.hslToRgb
   -- @description hsl(0,0,0) is black: r=g=b=0.
   it("hslToRgb black is (0,0,0)", function()
     local r, g, b = lurek.math.hslToRgb(0, 0, 0.0)
@@ -1551,7 +1551,7 @@ describe("lurek.math hslToRgb and rgbToHsl", function()
     expect_near(0.0, g, 1e-5)
     expect_near(0.0, b, 1e-5)
   end)
-  -- @covers lurek.math.rgbToHsl
+  -- @tests lurek.math.rgbToHsl
   -- @description pure red (1,0,0) gives hsl(0, 1, 0.5).
   it("rgbToHsl red gives (0, 1, 0.5)", function()
     local h, s, l = lurek.math.rgbToHsl(1.0, 0.0, 0.0)
@@ -1559,8 +1559,8 @@ describe("lurek.math hslToRgb and rgbToHsl", function()
     expect_near(1.0, s, 1e-5)
     expect_near(0.5, l, 1e-5)
   end)
-  -- @covers lurek.math.hslToRgb
-  -- @covers lurek.math.rgbToHsl
+  -- @tests lurek.math.hslToRgb
+  -- @tests lurek.math.rgbToHsl
   -- @description roundtrip: rgb → hsl → rgb preserves the original colour.
   it("hslToRgb/rgbToHsl roundtrip preserves colour", function()
     local r0, g0, b0 = 0.3, 0.6, 0.9
@@ -1575,7 +1575,7 @@ end)
 -- ── fromHex ───────────────────────────────────────────────────────────────────
 -- @description Tests for the lurek.math.fromHex colour parser.
 describe("lurek.math.fromHex", function()
-  -- @covers lurek.math.fromHex
+  -- @tests lurek.math.fromHex
   -- @description #ffffff parses to (1,1,1,1).
   it("parses #ffffff as white", function()
     local r, g, b, a = lurek.math.fromHex("#ffffff")
@@ -1584,7 +1584,7 @@ describe("lurek.math.fromHex", function()
     expect_near(1.0, b, 1e-5)
     expect_near(1.0, a, 1e-5)
   end)
-  -- @covers lurek.math.fromHex
+  -- @tests lurek.math.fromHex
   -- @description #000000 parses to (0,0,0,1).
   it("parses #000000 as black", function()
     local r, g, b, a = lurek.math.fromHex("#000000")
@@ -1593,7 +1593,7 @@ describe("lurek.math.fromHex", function()
     expect_near(0.0, b, 1e-5)
     expect_near(1.0, a, 1e-5)
   end)
-  -- @covers lurek.math.fromHex
+  -- @tests lurek.math.fromHex
   -- @description invalid hex string returns nil.
   it("invalid hex returns nil", function()
     local r = lurek.math.fromHex("notahex")
@@ -1604,7 +1604,7 @@ end)
 -- ── rectUnion ─────────────────────────────────────────────────────────────────
 -- @description Tests for the lurek.math.rectUnion function.
 describe("lurek.math.rectUnion", function()
-  -- @covers lurek.math.rectUnion
+  -- @tests lurek.math.rectUnion
   -- @description union of two identical rects is that same rect.
   it("union of equal rects is that rect", function()
     local x, y, w, h = lurek.math.rectUnion(0, 0, 10, 10, 0, 0, 10, 10)
@@ -1613,7 +1613,7 @@ describe("lurek.math.rectUnion", function()
     expect_equal(10, w)
     expect_equal(10, h)
   end)
-  -- @covers lurek.math.rectUnion
+  -- @tests lurek.math.rectUnion
   -- @description union of two side-by-side rects spans both.
   it("union of adjacent rects spans both", function()
     local x, y, w, h = lurek.math.rectUnion(0, 0, 5, 5, 5, 0, 5, 5)
@@ -1622,7 +1622,7 @@ describe("lurek.math.rectUnion", function()
     expect_equal(10, w)
     expect_equal(5, h)
   end)
-  -- @covers lurek.math.rectUnion
+  -- @tests lurek.math.rectUnion
   -- @description union returns 4 number values.
   it("returns four numbers", function()
     local x, y, w, h = lurek.math.rectUnion(1, 2, 3, 4, 5, 6, 7, 8)
@@ -1636,7 +1636,7 @@ end)
 -- ── rectFromCenter ────────────────────────────────────────────────────────────
 -- @description Tests for the lurek.math.rectFromCenter function.
 describe("lurek.math.rectFromCenter", function()
-  -- @covers lurek.math.rectFromCenter
+  -- @tests lurek.math.rectFromCenter
   -- @description top-left corner equals center minus half-size.
   it("top-left is center minus half-size", function()
     local x, y, w, h = lurek.math.rectFromCenter(10, 10, 4, 6)
@@ -1645,7 +1645,7 @@ describe("lurek.math.rectFromCenter", function()
     expect_equal(4, w)
     expect_equal(6, h)
   end)
-  -- @covers lurek.math.rectFromCenter
+  -- @tests lurek.math.rectFromCenter
   -- @description size (w,h) is preserved unchanged.
   it("size is preserved", function()
     local _, _, w, h = lurek.math.rectFromCenter(0, 0, 8, 12)
@@ -1657,28 +1657,28 @@ end)
 -- ── Vec2:fromAngle / reflect ──────────────────────────────────────────────────
 -- @description Tests for Vec2:fromAngle and Vec2:reflect.
 describe("lurek.math Vec2 fromAngle and reflect", function()
-  -- @covers lurek.math.Vec2.fromAngle
+  -- @tests lurek.math.Vec2.fromAngle
   -- @description fromAngle(0) points in the +X direction.
   it("fromAngle(0) returns unit +X", function()
     local v = lurek.math.vec2(0, 0).fromAngle(0)
     expect_near(1.0, v.x, 1e-5)
     expect_near(0.0, v.y, 1e-5)
   end)
-  -- @covers lurek.math.Vec2.fromAngle
+  -- @tests lurek.math.Vec2.fromAngle
   -- @description fromAngle(pi/2) points in the +Y direction.
   it("fromAngle(pi/2) returns unit +Y", function()
     local v = lurek.math.vec2(0, 0).fromAngle(math.pi / 2)
     expect_near(0.0, v.x, 1e-5)
     expect_near(1.0, v.y, 1e-5)
   end)
-  -- @covers lurek.math.Vec2.fromAngle
+  -- @tests lurek.math.Vec2.fromAngle
   -- @description result has unit length.
   it("fromAngle result is unit length", function()
     local v = lurek.math.vec2(0, 0).fromAngle(1.23)
     local len = math.sqrt(v.x * v.x + v.y * v.y)
     expect_near(1.0, len, 1e-5)
   end)
-  -- @covers lurek.math.Vec2.reflect
+  -- @tests lurek.math.Vec2.reflect
   -- @description reflecting (1,-1) off a horizontal normal (0,1) gives (1,1).
   it("reflect off horizontal normal", function()
     local v = lurek.math.Vec2(1, -1)
@@ -1687,7 +1687,7 @@ describe("lurek.math Vec2 fromAngle and reflect", function()
     expect_near(1.0, r.x, 1e-5)
     expect_near(1.0, r.y, 1e-5)
   end)
-  -- @covers lurek.math.Vec2.reflect
+  -- @tests lurek.math.Vec2.reflect
   -- @description reflecting a vector along its normal returns the negative vector.
   it("reflect parallel to normal flips sign", function()
     local v = lurek.math.Vec2(0, -1)
@@ -1701,7 +1701,7 @@ end)
 -- ── Vec3:splat ────────────────────────────────────────────────────────────────
 -- @description Tests for Vec3:splat constructor.
 describe("lurek.math Vec3 splat", function()
-  -- @covers lurek.math.Vec3.splat
+  -- @tests lurek.math.Vec3.splat
   -- @description splat(5) creates Vec3 with all components equal to 5.
   it("splat(5) gives Vec3(5,5,5)", function()
     local v = lurek.math.Vec3.splat(5)
@@ -1709,7 +1709,7 @@ describe("lurek.math Vec3 splat", function()
     expect_equal(5, v.y)
     expect_equal(5, v.z)
   end)
-  -- @covers lurek.math.Vec3.splat
+  -- @tests lurek.math.Vec3.splat
   -- @description splat(0) creates a zero vector.
   it("splat(0) gives zero Vec3", function()
     local v = lurek.math.Vec3.splat(0)
@@ -1722,7 +1722,7 @@ end)
 -- ── Transform:decompose ───────────────────────────────────────────────────────
 -- @description Tests for Transform:decompose returning (tx, ty, angle, sx, sy).
 describe("lurek.math Transform decompose", function()
-  -- @covers lurek.math.Transform.decompose
+  -- @tests lurek.math.Transform.decompose
   -- @description decompose returns exactly 5 number values.
   it("decompose returns 5 numbers", function()
     local t = lurek.math.Transform.new()
@@ -1733,7 +1733,7 @@ describe("lurek.math Transform decompose", function()
     expect_type("number", sx)
     expect_type("number", sy)
   end)
-  -- @covers lurek.math.Transform.decompose
+  -- @tests lurek.math.Transform.decompose
   -- @description identity transform decomposes to (0, 0, 0, 1, 1).
   it("identity decomposes to (0,0,0,1,1)", function()
     local t = lurek.math.Transform.new()
@@ -1749,26 +1749,26 @@ end)
 -- ── easing: inOutElastic / inOutBounce / inOutBack ───────────────────────────
 -- @description Tests for the inOutElastic, inOutBounce, inOutBack easing functions.
 describe("lurek.math easing inOut variants", function()
-  -- @covers lurek.math.inOutElastic
+  -- @tests lurek.math.inOutElastic
   -- @description inOutElastic returns 0 at t=0 and 1 at t=1.
   it("inOutElastic boundary values", function()
     expect_near(0.0, lurek.math.inOutElastic(0), 1e-5)
     expect_near(1.0, lurek.math.inOutElastic(1), 1e-5)
   end)
-  -- @covers lurek.math.inOutElastic
+  -- @tests lurek.math.inOutElastic
   -- @description inOutElastic is symmetric: f(1-t) == 1 - f(t).
   it("inOutElastic is symmetric", function()
     local lo = lurek.math.inOutElastic(0.25)
     local hi = lurek.math.inOutElastic(0.75)
     expect_near(1.0 - lo, hi, 1e-5)
   end)
-  -- @covers lurek.math.inOutBounce
+  -- @tests lurek.math.inOutBounce
   -- @description inOutBounce returns 0 at t=0 and 1 at t=1.
   it("inOutBounce boundary values", function()
     expect_near(0.0, lurek.math.inOutBounce(0), 1e-5)
     expect_near(1.0, lurek.math.inOutBounce(1), 1e-5)
   end)
-  -- @covers lurek.math.inOutBounce
+  -- @tests lurek.math.inOutBounce
   -- @description inOutBounce has the expected symmetry: f(1-t) ~= 1 - f(t).
   -- Note: bounce easings are NOT monotone by design — they bounce back.
   it("inOutBounce is symmetric", function()
@@ -1779,7 +1779,7 @@ describe("lurek.math easing inOut variants", function()
       expect_near(1 - ft, f1t, 1e-5, "inOutBounce symmetric at t=" .. t)
     end
   end)
-  -- @covers lurek.math.inOutBack
+  -- @tests lurek.math.inOutBack
   -- @description inOutBack returns 0 at t=0 and 1 at t=1.
   it("inOutBack boundary values", function()
     expect_near(0.0, lurek.math.inOutBack(0), 1e-5)
@@ -1790,7 +1790,7 @@ end)
 -- ── CatmullRomSpline: addPoint / removePoint ──────────────────────────────────
 -- @description Tests for CatmullRomSpline addPoint and removePoint methods.
 describe("lurek.math CatmullRomSpline addPoint and removePoint", function()
-  -- @covers lurek.math.CatmullRomSpline.addPoint
+  -- @tests lurek.math.CatmullRomSpline.addPoint
   -- @description adding two points increases count to 2.
   it("addPoint increases point count", function()
     local s = lurek.math.CatmullRomSpline.new()
@@ -1798,7 +1798,7 @@ describe("lurek.math CatmullRomSpline addPoint and removePoint", function()
     s:addPoint(1, 1)
     expect_equal(2, s:count())
   end)
-  -- @covers lurek.math.CatmullRomSpline.removePoint
+  -- @tests lurek.math.CatmullRomSpline.removePoint
   -- @description removePoint(2) removes the second point, reducing count by 1.
   it("removePoint reduces count by 1", function()
     local s = lurek.math.CatmullRomSpline.new()
@@ -1808,7 +1808,7 @@ describe("lurek.math CatmullRomSpline addPoint and removePoint", function()
     s:removePoint(2)
     expect_equal(2, s:count())
   end)
-  -- @covers lurek.math.CatmullRomSpline.removePoint
+  -- @tests lurek.math.CatmullRomSpline.removePoint
   -- @description removePoint with out-of-range index leaves count unchanged.
   it("removePoint out-of-range is safe", function()
     local s = lurek.math.CatmullRomSpline.new()
@@ -1816,8 +1816,8 @@ describe("lurek.math CatmullRomSpline addPoint and removePoint", function()
     s:removePoint(99)
     expect_equal(1, s:count())
   end)
-  -- @covers lurek.math.CatmullRomSpline.addPoint
-  -- @covers lurek.math.CatmullRomSpline.removePoint
+  -- @tests lurek.math.CatmullRomSpline.addPoint
+  -- @tests lurek.math.CatmullRomSpline.removePoint
   -- @description add then remove all points leaves an empty spline.
   it("adding then removing all points gives empty spline", function()
     local s = lurek.math.CatmullRomSpline.new()
@@ -1909,239 +1909,1205 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.math.fbm
+    -- @tests lurek.math.fbm
     it("covers lurek.math.fbm", function()
         -- TODO: Implement test for lurek.math.fbm
     end)
 
-    -- @covers lurek.math.inQuart
+    -- @tests lurek.math.inQuart
     it("covers lurek.math.inQuart", function()
         -- TODO: Implement test for lurek.math.inQuart
     end)
 
-    -- @covers lurek.math.outQuart
+    -- @tests lurek.math.outQuart
     it("covers lurek.math.outQuart", function()
         -- TODO: Implement test for lurek.math.outQuart
     end)
 
-    -- @covers lurek.math.inOutQuart
+    -- @tests lurek.math.inOutQuart
     it("covers lurek.math.inOutQuart", function()
         -- TODO: Implement test for lurek.math.inOutQuart
     end)
 
-    -- @covers lurek.math.inOutExpo
+    -- @tests lurek.math.inOutExpo
     it("covers lurek.math.inOutExpo", function()
         -- TODO: Implement test for lurek.math.inOutExpo
     end)
 
-    -- @covers lurek.math.inBounce
+    -- @tests lurek.math.inBounce
     it("covers lurek.math.inBounce", function()
         -- TODO: Implement test for lurek.math.inBounce
     end)
 
-    -- @covers lurek.math.circleIntersectsLine
+    -- @tests lurek.math.circleIntersectsLine
     it("covers lurek.math.circleIntersectsLine", function()
         -- TODO: Implement test for lurek.math.circleIntersectsLine
     end)
 
-    -- @covers lurek.math.circleIntersectsSegment
+    -- @tests lurek.math.circleIntersectsSegment
     it("covers lurek.math.circleIntersectsSegment", function()
         -- TODO: Implement test for lurek.math.circleIntersectsSegment
     end)
 
-    -- @covers lurek.math.closestPointOnSegment
+    -- @tests lurek.math.closestPointOnSegment
     it("covers lurek.math.closestPointOnSegment", function()
         -- TODO: Implement test for lurek.math.closestPointOnSegment
     end)
 
-    -- @covers lurek.math.convexHull
+    -- @tests lurek.math.convexHull
     it("covers lurek.math.convexHull", function()
         -- TODO: Implement test for lurek.math.convexHull
     end)
 
-    -- @covers lurek.math.delaunayTriangulate
+    -- @tests lurek.math.delaunayTriangulate
     it("covers lurek.math.delaunayTriangulate", function()
         -- TODO: Implement test for lurek.math.delaunayTriangulate
     end)
 
-    -- @covers lurek.math.lineIntersect
+    -- @tests lurek.math.lineIntersect
     it("covers lurek.math.lineIntersect", function()
         -- TODO: Implement test for lurek.math.lineIntersect
     end)
 
-    -- @covers lurek.math.pointInPolygon
+    -- @tests lurek.math.pointInPolygon
     it("covers lurek.math.pointInPolygon", function()
         -- TODO: Implement test for lurek.math.pointInPolygon
     end)
 
-    -- @covers lurek.math.polygonArea
+    -- @tests lurek.math.polygonArea
     it("covers lurek.math.polygonArea", function()
         -- TODO: Implement test for lurek.math.polygonArea
     end)
 
-    -- @covers lurek.math.polygonCentroid
+    -- @tests lurek.math.polygonCentroid
     it("covers lurek.math.polygonCentroid", function()
         -- TODO: Implement test for lurek.math.polygonCentroid
     end)
 
-    -- @covers lurek.math.segmentIntersectsSegment
+    -- @tests lurek.math.segmentIntersectsSegment
     it("covers lurek.math.segmentIntersectsSegment", function()
         -- TODO: Implement test for lurek.math.segmentIntersectsSegment
     end)
 
-    -- @covers lurek.math.rad
+    -- @tests lurek.math.rad
     it("covers lurek.math.rad", function()
         -- TODO: Implement test for lurek.math.rad
     end)
 
-    -- @covers lurek.math.deg
+    -- @tests lurek.math.deg
     it("covers lurek.math.deg", function()
         -- TODO: Implement test for lurek.math.deg
     end)
 
-    -- @covers lurek.math.tan
+    -- @tests lurek.math.tan
     it("covers lurek.math.tan", function()
         -- TODO: Implement test for lurek.math.tan
     end)
 
-    -- @covers lurek.math.log
+    -- @tests lurek.math.log
     it("covers lurek.math.log", function()
         -- TODO: Implement test for lurek.math.log
     end)
 
-    -- @covers lurek.math.pow
+    -- @tests lurek.math.pow
     it("covers lurek.math.pow", function()
         -- TODO: Implement test for lurek.math.pow
     end)
 
-    -- @covers lurek.math.fmod
+    -- @tests lurek.math.fmod
     it("covers lurek.math.fmod", function()
         -- TODO: Implement test for lurek.math.fmod
     end)
 
-    -- @covers lurek.math.polygonClip
+    -- @tests lurek.math.polygonClip
     it("covers lurek.math.polygonClip", function()
         -- TODO: Implement test for lurek.math.polygonClip
     end)
 
-    -- @covers Vec2:dot
+    -- @tests Vec2:dot
     it("covers Vec2:dot", function()
         -- TODO: Implement test for Vec2:dot
     end)
 
-    -- @covers Vec2:x
+    -- @tests Vec2:x
     it("covers Vec2:x", function()
         -- TODO: Implement test for Vec2:x
     end)
 
-    -- @covers Vec2:y
+    -- @tests Vec2:y
     it("covers Vec2:y", function()
         -- TODO: Implement test for Vec2:y
     end)
 
-    -- @covers Vec3:dot
+    -- @tests Vec3:dot
     it("covers Vec3:dot", function()
         -- TODO: Implement test for Vec3:dot
     end)
 
-    -- @covers Vec3:add
+    -- @tests Vec3:add
     it("covers Vec3:add", function()
         -- TODO: Implement test for Vec3:add
     end)
 
-    -- @covers Vec3:sub
+    -- @tests Vec3:sub
     it("covers Vec3:sub", function()
         -- TODO: Implement test for Vec3:sub
     end)
 
-    -- @covers CatmullRom:len
+    -- @tests CatmullRom:len
     it("covers CatmullRom:len", function()
         -- TODO: Implement test for CatmullRom:len
     end)
 
-    -- @covers RandomGenerator:getSeed
+    -- @tests RandomGenerator:getSeed
     it("covers RandomGenerator:getSeed", function()
         -- TODO: Implement test for RandomGenerator:getSeed
     end)
 
-    -- @covers Transform:shear
+    -- @tests Transform:shear
     it("covers Transform:shear", function()
         -- TODO: Implement test for Transform:shear
     end)
 
-    -- @covers Transform:getMatrix
+    -- @tests Transform:getMatrix
     it("covers Transform:getMatrix", function()
         -- TODO: Implement test for Transform:getMatrix
     end)
 
-    -- @covers BezierCurve:removeControlPoint
+    -- @tests BezierCurve:removeControlPoint
     it("covers BezierCurve:removeControlPoint", function()
         -- TODO: Implement test for BezierCurve:removeControlPoint
     end)
 
-    -- @covers Tween:getAllValues
+    -- @tests Tween:getAllValues
     it("covers Tween:getAllValues", function()
         -- TODO: Implement test for Tween:getAllValues
     end)
 
-    -- @covers Tween:getValueCount
+    -- @tests Tween:getValueCount
     it("covers Tween:getValueCount", function()
         -- TODO: Implement test for Tween:getValueCount
     end)
 
-    -- @covers Tween:getClock
+    -- @tests Tween:getClock
     it("covers Tween:getClock", function()
         -- TODO: Implement test for Tween:getClock
     end)
 
-    -- @covers Tween:set
+    -- @tests Tween:set
     it("covers Tween:set", function()
         -- TODO: Implement test for Tween:set
     end)
 
-    -- @covers Tween:addValue
+    -- @tests Tween:addValue
     it("covers Tween:addValue", function()
         -- TODO: Implement test for Tween:addValue
     end)
 
-    -- @covers NoiseGenerator:perlin1d
+    -- @tests NoiseGenerator:perlin1d
     it("covers NoiseGenerator:perlin1d", function()
         -- TODO: Implement test for NoiseGenerator:perlin1d
     end)
 
-    -- @covers NoiseGenerator:perlin4d
+    -- @tests NoiseGenerator:perlin4d
     it("covers NoiseGenerator:perlin4d", function()
         -- TODO: Implement test for NoiseGenerator:perlin4d
     end)
 
-    -- @covers NoiseGenerator:simplex1d
+    -- @tests NoiseGenerator:simplex1d
     it("covers NoiseGenerator:simplex1d", function()
         -- TODO: Implement test for NoiseGenerator:simplex1d
     end)
 
-    -- @covers NoiseGenerator:simplex3d
+    -- @tests NoiseGenerator:simplex3d
     it("covers NoiseGenerator:simplex3d", function()
         -- TODO: Implement test for NoiseGenerator:simplex3d
     end)
 
-    -- @covers NoiseGenerator:getSeed
+    -- @tests NoiseGenerator:getSeed
     it("covers NoiseGenerator:getSeed", function()
         -- TODO: Implement test for NoiseGenerator:getSeed
     end)
 
-    -- @covers Circle:x
+    -- @tests Circle:x
     it("covers Circle:x", function()
         -- TODO: Implement test for Circle:x
     end)
 
-    -- @covers Circle:y
+    -- @tests Circle:y
     it("covers Circle:y", function()
         -- TODO: Implement test for Circle:y
     end)
 
-    -- @covers AabbTree:len
+    -- @tests AabbTree:len
     it("covers AabbTree:len", function()
         -- TODO: Implement test for AabbTree:len
     end)
 
+end)
+
+describe("Missing explicit test for lurek.math.newRandomGenerator", function()
+    it("lurek.math.newRandomGenerator works", function()
+        -- @tests lurek.math.newRandomGenerator
+        -- TODO: add assertion for lurek.math.newRandomGenerator
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.newTransform", function()
+    it("lurek.math.newTransform works", function()
+        -- @tests lurek.math.newTransform
+        -- TODO: add assertion for lurek.math.newTransform
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.newBezierCurve", function()
+    it("lurek.math.newBezierCurve works", function()
+        -- @tests lurek.math.newBezierCurve
+        -- TODO: add assertion for lurek.math.newBezierCurve
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.newTween", function()
+    it("lurek.math.newTween works", function()
+        -- @tests lurek.math.newTween
+        -- TODO: add assertion for lurek.math.newTween
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.newSpatialHash", function()
+    it("lurek.math.newSpatialHash works", function()
+        -- @tests lurek.math.newSpatialHash
+        -- TODO: add assertion for lurek.math.newSpatialHash
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.newNoiseGenerator", function()
+    it("lurek.math.newNoiseGenerator works", function()
+        -- @tests lurek.math.newNoiseGenerator
+        -- TODO: add assertion for lurek.math.newNoiseGenerator
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.perlin2d", function()
+    it("lurek.math.perlin2d works", function()
+        -- @tests lurek.math.perlin2d
+        -- TODO: add assertion for lurek.math.perlin2d
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.perlin3d", function()
+    it("lurek.math.perlin3d works", function()
+        -- @tests lurek.math.perlin3d
+        -- TODO: add assertion for lurek.math.perlin3d
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.simplex2d", function()
+    it("lurek.math.simplex2d works", function()
+        -- @tests lurek.math.simplex2d
+        -- TODO: add assertion for lurek.math.simplex2d
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.applyEasing", function()
+    it("lurek.math.applyEasing works", function()
+        -- @tests lurek.math.applyEasing
+        -- TODO: add assertion for lurek.math.applyEasing
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.linear", function()
+    it("lurek.math.linear works", function()
+        -- @tests lurek.math.linear
+        -- TODO: add assertion for lurek.math.linear
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inQuad", function()
+    it("lurek.math.inQuad works", function()
+        -- @tests lurek.math.inQuad
+        -- TODO: add assertion for lurek.math.inQuad
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.outQuad", function()
+    it("lurek.math.outQuad works", function()
+        -- @tests lurek.math.outQuad
+        -- TODO: add assertion for lurek.math.outQuad
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inOutQuad", function()
+    it("lurek.math.inOutQuad works", function()
+        -- @tests lurek.math.inOutQuad
+        -- TODO: add assertion for lurek.math.inOutQuad
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inCubic", function()
+    it("lurek.math.inCubic works", function()
+        -- @tests lurek.math.inCubic
+        -- TODO: add assertion for lurek.math.inCubic
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.outCubic", function()
+    it("lurek.math.outCubic works", function()
+        -- @tests lurek.math.outCubic
+        -- TODO: add assertion for lurek.math.outCubic
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inOutCubic", function()
+    it("lurek.math.inOutCubic works", function()
+        -- @tests lurek.math.inOutCubic
+        -- TODO: add assertion for lurek.math.inOutCubic
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inSine", function()
+    it("lurek.math.inSine works", function()
+        -- @tests lurek.math.inSine
+        -- TODO: add assertion for lurek.math.inSine
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.outSine", function()
+    it("lurek.math.outSine works", function()
+        -- @tests lurek.math.outSine
+        -- TODO: add assertion for lurek.math.outSine
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inOutSine", function()
+    it("lurek.math.inOutSine works", function()
+        -- @tests lurek.math.inOutSine
+        -- TODO: add assertion for lurek.math.inOutSine
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inExpo", function()
+    it("lurek.math.inExpo works", function()
+        -- @tests lurek.math.inExpo
+        -- TODO: add assertion for lurek.math.inExpo
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.outExpo", function()
+    it("lurek.math.outExpo works", function()
+        -- @tests lurek.math.outExpo
+        -- TODO: add assertion for lurek.math.outExpo
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inElastic", function()
+    it("lurek.math.inElastic works", function()
+        -- @tests lurek.math.inElastic
+        -- TODO: add assertion for lurek.math.inElastic
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.outElastic", function()
+    it("lurek.math.outElastic works", function()
+        -- @tests lurek.math.outElastic
+        -- TODO: add assertion for lurek.math.outElastic
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.outBounce", function()
+    it("lurek.math.outBounce works", function()
+        -- @tests lurek.math.outBounce
+        -- TODO: add assertion for lurek.math.outBounce
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.inBack", function()
+    it("lurek.math.inBack works", function()
+        -- @tests lurek.math.inBack
+        -- TODO: add assertion for lurek.math.inBack
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.outBack", function()
+    it("lurek.math.outBack works", function()
+        -- @tests lurek.math.outBack
+        -- TODO: add assertion for lurek.math.outBack
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.triangulate", function()
+    it("lurek.math.triangulate works", function()
+        -- @tests lurek.math.triangulate
+        -- TODO: add assertion for lurek.math.triangulate
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.isConvex", function()
+    it("lurek.math.isConvex works", function()
+        -- @tests lurek.math.isConvex
+        -- TODO: add assertion for lurek.math.isConvex
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.gammaToLinear", function()
+    it("lurek.math.gammaToLinear works", function()
+        -- @tests lurek.math.gammaToLinear
+        -- TODO: add assertion for lurek.math.gammaToLinear
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.linearToGamma", function()
+    it("lurek.math.linearToGamma works", function()
+        -- @tests lurek.math.linearToGamma
+        -- TODO: add assertion for lurek.math.linearToGamma
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.angleBetween", function()
+    it("lurek.math.angleBetween works", function()
+        -- @tests lurek.math.angleBetween
+        -- TODO: add assertion for lurek.math.angleBetween
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.circleContainsPoint", function()
+    it("lurek.math.circleContainsPoint works", function()
+        -- @tests lurek.math.circleContainsPoint
+        -- TODO: add assertion for lurek.math.circleContainsPoint
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.circleIntersectsCircle", function()
+    it("lurek.math.circleIntersectsCircle works", function()
+        -- @tests lurek.math.circleIntersectsCircle
+        -- TODO: add assertion for lurek.math.circleIntersectsCircle
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.bresenham", function()
+    it("lurek.math.bresenham works", function()
+        -- @tests lurek.math.bresenham
+        -- TODO: add assertion for lurek.math.bresenham
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.asin", function()
+    it("lurek.math.asin works", function()
+        -- @tests lurek.math.asin
+        -- TODO: add assertion for lurek.math.asin
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.acos", function()
+    it("lurek.math.acos works", function()
+        -- @tests lurek.math.acos
+        -- TODO: add assertion for lurek.math.acos
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.atan", function()
+    it("lurek.math.atan works", function()
+        -- @tests lurek.math.atan
+        -- TODO: add assertion for lurek.math.atan
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.atan2", function()
+    it("lurek.math.atan2 works", function()
+        -- @tests lurek.math.atan2
+        -- TODO: add assertion for lurek.math.atan2
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.abs", function()
+    it("lurek.math.abs works", function()
+        -- @tests lurek.math.abs
+        -- TODO: add assertion for lurek.math.abs
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.floor", function()
+    it("lurek.math.floor works", function()
+        -- @tests lurek.math.floor
+        -- TODO: add assertion for lurek.math.floor
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.ceil", function()
+    it("lurek.math.ceil works", function()
+        -- @tests lurek.math.ceil
+        -- TODO: add assertion for lurek.math.ceil
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.round", function()
+    it("lurek.math.round works", function()
+        -- @tests lurek.math.round
+        -- TODO: add assertion for lurek.math.round
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.min", function()
+    it("lurek.math.min works", function()
+        -- @tests lurek.math.min
+        -- TODO: add assertion for lurek.math.min
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.max", function()
+    it("lurek.math.max works", function()
+        -- @tests lurek.math.max
+        -- TODO: add assertion for lurek.math.max
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.clamp", function()
+    it("lurek.math.clamp works", function()
+        -- @tests lurek.math.clamp
+        -- TODO: add assertion for lurek.math.clamp
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.sign", function()
+    it("lurek.math.sign works", function()
+        -- @tests lurek.math.sign
+        -- TODO: add assertion for lurek.math.sign
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.distance", function()
+    it("lurek.math.distance works", function()
+        -- @tests lurek.math.distance
+        -- TODO: add assertion for lurek.math.distance
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.distanceSq", function()
+    it("lurek.math.distanceSq works", function()
+        -- @tests lurek.math.distanceSq
+        -- TODO: add assertion for lurek.math.distanceSq
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.random", function()
+    it("lurek.math.random works", function()
+        -- @tests lurek.math.random
+        -- TODO: add assertion for lurek.math.random
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.randomInt", function()
+    it("lurek.math.randomInt works", function()
+        -- @tests lurek.math.randomInt
+        -- TODO: add assertion for lurek.math.randomInt
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.simplexNoise", function()
+    it("lurek.math.simplexNoise works", function()
+        -- @tests lurek.math.simplexNoise
+        -- TODO: add assertion for lurek.math.simplexNoise
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.vec2", function()
+    it("lurek.math.vec2 works", function()
+        -- @tests lurek.math.vec2
+        -- TODO: add assertion for lurek.math.vec2
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.vec3", function()
+    it("lurek.math.vec3 works", function()
+        -- @tests lurek.math.vec3
+        -- TODO: add assertion for lurek.math.vec3
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.Vec3", function()
+    it("lurek.math.Vec3 works", function()
+        -- @tests lurek.math.Vec3
+        -- TODO: add assertion for lurek.math.Vec3
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.catmullRom", function()
+    it("lurek.math.catmullRom works", function()
+        -- @tests lurek.math.catmullRom
+        -- TODO: add assertion for lurek.math.catmullRom
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.hermite", function()
+    it("lurek.math.hermite works", function()
+        -- @tests lurek.math.hermite
+        -- TODO: add assertion for lurek.math.hermite
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.remap", function()
+    it("lurek.math.remap works", function()
+        -- @tests lurek.math.remap
+        -- TODO: add assertion for lurek.math.remap
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.clamp", function()
+    it("lurek.math.clamp works", function()
+        -- @tests lurek.math.clamp
+        -- TODO: add assertion for lurek.math.clamp
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.sign", function()
+    it("lurek.math.sign works", function()
+        -- @tests lurek.math.sign
+        -- TODO: add assertion for lurek.math.sign
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.newCircle", function()
+    it("lurek.math.newCircle works", function()
+        -- @tests lurek.math.newCircle
+        -- TODO: add assertion for lurek.math.newCircle
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.polygonIntersection", function()
+    it("lurek.math.polygonIntersection works", function()
+        -- @tests lurek.math.polygonIntersection
+        -- TODO: add assertion for lurek.math.polygonIntersection
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.polygonUnion", function()
+    it("lurek.math.polygonUnion works", function()
+        -- @tests lurek.math.polygonUnion
+        -- TODO: add assertion for lurek.math.polygonUnion
+    end)
+end)
+
+describe("Missing explicit test for lurek.math.polygonDifference", function()
+    it("lurek.math.polygonDifference works", function()
+        -- @tests lurek.math.polygonDifference
+        -- TODO: add assertion for lurek.math.polygonDifference
+    end)
+end)
+
+describe("Missing explicit test for Vec2:length", function()
+    it("Vec2:length works", function()
+        -- @tests Vec2:length
+        -- TODO: add assertion for Vec2:length
+    end)
+end)
+
+describe("Missing explicit test for Vec2:lengthSquared", function()
+    it("Vec2:lengthSquared works", function()
+        -- @tests Vec2:lengthSquared
+        -- TODO: add assertion for Vec2:lengthSquared
+    end)
+end)
+
+describe("Missing explicit test for Vec2:normalize", function()
+    it("Vec2:normalize works", function()
+        -- @tests Vec2:normalize
+        -- TODO: add assertion for Vec2:normalize
+    end)
+end)
+
+describe("Missing explicit test for Vec2:normalized", function()
+    it("Vec2:normalized works", function()
+        -- @tests Vec2:normalized
+        -- TODO: add assertion for Vec2:normalized
+    end)
+end)
+
+describe("Missing explicit test for Vec2:lerp", function()
+    it("Vec2:lerp works", function()
+        -- @tests Vec2:lerp
+        -- TODO: add assertion for Vec2:lerp
+    end)
+end)
+
+describe("Missing explicit test for Vec2:distance", function()
+    it("Vec2:distance works", function()
+        -- @tests Vec2:distance
+        -- TODO: add assertion for Vec2:distance
+    end)
+end)
+
+describe("Missing explicit test for Vec2:angle", function()
+    it("Vec2:angle works", function()
+        -- @tests Vec2:angle
+        -- TODO: add assertion for Vec2:angle
+    end)
+end)
+
+describe("Missing explicit test for Vec2:rotate", function()
+    it("Vec2:rotate works", function()
+        -- @tests Vec2:rotate
+        -- TODO: add assertion for Vec2:rotate
+    end)
+end)
+
+describe("Missing explicit test for Vec2:perpendicular", function()
+    it("Vec2:perpendicular works", function()
+        -- @tests Vec2:perpendicular
+        -- TODO: add assertion for Vec2:perpendicular
+    end)
+end)
+
+describe("Missing explicit test for Vec2:cross", function()
+    it("Vec2:cross works", function()
+        -- @tests Vec2:cross
+        -- TODO: add assertion for Vec2:cross
+    end)
+end)
+
+describe("Missing explicit test for Vec2:reflect", function()
+    it("Vec2:reflect works", function()
+        -- @tests Vec2:reflect
+        -- TODO: add assertion for Vec2:reflect
+    end)
+end)
+
+describe("Missing explicit test for Vec3:length", function()
+    it("Vec3:length works", function()
+        -- @tests Vec3:length
+        -- TODO: add assertion for Vec3:length
+    end)
+end)
+
+describe("Missing explicit test for Vec3:lengthSquared", function()
+    it("Vec3:lengthSquared works", function()
+        -- @tests Vec3:lengthSquared
+        -- TODO: add assertion for Vec3:lengthSquared
+    end)
+end)
+
+describe("Missing explicit test for Vec3:normalize", function()
+    it("Vec3:normalize works", function()
+        -- @tests Vec3:normalize
+        -- TODO: add assertion for Vec3:normalize
+    end)
+end)
+
+describe("Missing explicit test for Vec3:cross", function()
+    it("Vec3:cross works", function()
+        -- @tests Vec3:cross
+        -- TODO: add assertion for Vec3:cross
+    end)
+end)
+
+describe("Missing explicit test for Vec3:lerp", function()
+    it("Vec3:lerp works", function()
+        -- @tests Vec3:lerp
+        -- TODO: add assertion for Vec3:lerp
+    end)
+end)
+
+describe("Missing explicit test for Vec3:distance", function()
+    it("Vec3:distance works", function()
+        -- @tests Vec3:distance
+        -- TODO: add assertion for Vec3:distance
+    end)
+end)
+
+describe("Missing explicit test for Vec3:scale", function()
+    it("Vec3:scale works", function()
+        -- @tests Vec3:scale
+        -- TODO: add assertion for Vec3:scale
+    end)
+end)
+
+describe("Missing explicit test for CatmullRom:sample", function()
+    it("CatmullRom:sample works", function()
+        -- @tests CatmullRom:sample
+        -- TODO: add assertion for CatmullRom:sample
+    end)
+end)
+
+describe("Missing explicit test for CatmullRom:sampleSegment", function()
+    it("CatmullRom:sampleSegment works", function()
+        -- @tests CatmullRom:sampleSegment
+        -- TODO: add assertion for CatmullRom:sampleSegment
+    end)
+end)
+
+describe("Missing explicit test for CatmullRom:addPoint", function()
+    it("CatmullRom:addPoint works", function()
+        -- @tests CatmullRom:addPoint
+        -- TODO: add assertion for CatmullRom:addPoint
+    end)
+end)
+
+describe("Missing explicit test for CatmullRom:removePoint", function()
+    it("CatmullRom:removePoint works", function()
+        -- @tests CatmullRom:removePoint
+        -- TODO: add assertion for CatmullRom:removePoint
+    end)
+end)
+
+describe("Missing explicit test for Hermite:sample", function()
+    it("Hermite:sample works", function()
+        -- @tests Hermite:sample
+        -- TODO: add assertion for Hermite:sample
+    end)
+end)
+
+describe("Missing explicit test for RandomGenerator:random", function()
+    it("RandomGenerator:random works", function()
+        -- @tests RandomGenerator:random
+        -- TODO: add assertion for RandomGenerator:random
+    end)
+end)
+
+describe("Missing explicit test for RandomGenerator:randomFloat", function()
+    it("RandomGenerator:randomFloat works", function()
+        -- @tests RandomGenerator:randomFloat
+        -- TODO: add assertion for RandomGenerator:randomFloat
+    end)
+end)
+
+describe("Missing explicit test for RandomGenerator:randomInt", function()
+    it("RandomGenerator:randomInt works", function()
+        -- @tests RandomGenerator:randomInt
+        -- TODO: add assertion for RandomGenerator:randomInt
+    end)
+end)
+
+describe("Missing explicit test for RandomGenerator:setSeed", function()
+    it("RandomGenerator:setSeed works", function()
+        -- @tests RandomGenerator:setSeed
+        -- TODO: add assertion for RandomGenerator:setSeed
+    end)
+end)
+
+describe("Missing explicit test for RandomGenerator:getState", function()
+    it("RandomGenerator:getState works", function()
+        -- @tests RandomGenerator:getState
+        -- TODO: add assertion for RandomGenerator:getState
+    end)
+end)
+
+describe("Missing explicit test for RandomGenerator:setState", function()
+    it("RandomGenerator:setState works", function()
+        -- @tests RandomGenerator:setState
+        -- TODO: add assertion for RandomGenerator:setState
+    end)
+end)
+
+describe("Missing explicit test for Transform:translate", function()
+    it("Transform:translate works", function()
+        -- @tests Transform:translate
+        -- TODO: add assertion for Transform:translate
+    end)
+end)
+
+describe("Missing explicit test for Transform:rotate", function()
+    it("Transform:rotate works", function()
+        -- @tests Transform:rotate
+        -- TODO: add assertion for Transform:rotate
+    end)
+end)
+
+describe("Missing explicit test for Transform:scale", function()
+    it("Transform:scale works", function()
+        -- @tests Transform:scale
+        -- TODO: add assertion for Transform:scale
+    end)
+end)
+
+describe("Missing explicit test for Transform:reset", function()
+    it("Transform:reset works", function()
+        -- @tests Transform:reset
+        -- TODO: add assertion for Transform:reset
+    end)
+end)
+
+describe("Missing explicit test for Transform:transformPoint", function()
+    it("Transform:transformPoint works", function()
+        -- @tests Transform:transformPoint
+        -- TODO: add assertion for Transform:transformPoint
+    end)
+end)
+
+describe("Missing explicit test for Transform:inverseTransformPoint", function()
+    it("Transform:inverseTransformPoint works", function()
+        -- @tests Transform:inverseTransformPoint
+        -- TODO: add assertion for Transform:inverseTransformPoint
+    end)
+end)
+
+describe("Missing explicit test for Transform:inverse", function()
+    it("Transform:inverse works", function()
+        -- @tests Transform:inverse
+        -- TODO: add assertion for Transform:inverse
+    end)
+end)
+
+describe("Missing explicit test for Transform:clone", function()
+    it("Transform:clone works", function()
+        -- @tests Transform:clone
+        -- TODO: add assertion for Transform:clone
+    end)
+end)
+
+describe("Missing explicit test for Transform:decompose", function()
+    it("Transform:decompose works", function()
+        -- @tests Transform:decompose
+        -- TODO: add assertion for Transform:decompose
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:evaluate", function()
+    it("BezierCurve:evaluate works", function()
+        -- @tests BezierCurve:evaluate
+        -- TODO: add assertion for BezierCurve:evaluate
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:render", function()
+    it("BezierCurve:render works", function()
+        -- @tests BezierCurve:render
+        -- TODO: add assertion for BezierCurve:render
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:getDerivative", function()
+    it("BezierCurve:getDerivative works", function()
+        -- @tests BezierCurve:getDerivative
+        -- TODO: add assertion for BezierCurve:getDerivative
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:getControlPoint", function()
+    it("BezierCurve:getControlPoint works", function()
+        -- @tests BezierCurve:getControlPoint
+        -- TODO: add assertion for BezierCurve:getControlPoint
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:getControlPointCount", function()
+    it("BezierCurve:getControlPointCount works", function()
+        -- @tests BezierCurve:getControlPointCount
+        -- TODO: add assertion for BezierCurve:getControlPointCount
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:length", function()
+    it("BezierCurve:length works", function()
+        -- @tests BezierCurve:length
+        -- TODO: add assertion for BezierCurve:length
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:translate", function()
+    it("BezierCurve:translate works", function()
+        -- @tests BezierCurve:translate
+        -- TODO: add assertion for BezierCurve:translate
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:rotate", function()
+    it("BezierCurve:rotate works", function()
+        -- @tests BezierCurve:rotate
+        -- TODO: add assertion for BezierCurve:rotate
+    end)
+end)
+
+describe("Missing explicit test for BezierCurve:scale", function()
+    it("BezierCurve:scale works", function()
+        -- @tests BezierCurve:scale
+        -- TODO: add assertion for BezierCurve:scale
+    end)
+end)
+
+describe("Missing explicit test for Tween:update", function()
+    it("Tween:update works", function()
+        -- @tests Tween:update
+        -- TODO: add assertion for Tween:update
+    end)
+end)
+
+describe("Missing explicit test for Tween:reset", function()
+    it("Tween:reset works", function()
+        -- @tests Tween:reset
+        -- TODO: add assertion for Tween:reset
+    end)
+end)
+
+describe("Missing explicit test for Tween:getValue", function()
+    it("Tween:getValue works", function()
+        -- @tests Tween:getValue
+        -- TODO: add assertion for Tween:getValue
+    end)
+end)
+
+describe("Missing explicit test for Tween:isComplete", function()
+    it("Tween:isComplete works", function()
+        -- @tests Tween:isComplete
+        -- TODO: add assertion for Tween:isComplete
+    end)
+end)
+
+describe("Missing explicit test for Tween:getEasingName", function()
+    it("Tween:getEasingName works", function()
+        -- @tests Tween:getEasingName
+        -- TODO: add assertion for Tween:getEasingName
+    end)
+end)
+
+describe("Missing explicit test for Tween:getDuration", function()
+    it("Tween:getDuration works", function()
+        -- @tests Tween:getDuration
+        -- TODO: add assertion for Tween:getDuration
+    end)
+end)
+
+describe("Missing explicit test for Tween:getTime", function()
+    it("Tween:getTime works", function()
+        -- @tests Tween:getTime
+        -- TODO: add assertion for Tween:getTime
+    end)
+end)
+
+describe("Missing explicit test for Tween:setTime", function()
+    it("Tween:setTime works", function()
+        -- @tests Tween:setTime
+        -- TODO: add assertion for Tween:setTime
+    end)
+end)
+
+describe("Missing explicit test for SpatialHash:remove", function()
+    it("SpatialHash:remove works", function()
+        -- @tests SpatialHash:remove
+        -- TODO: add assertion for SpatialHash:remove
+    end)
+end)
+
+describe("Missing explicit test for SpatialHash:clear", function()
+    it("SpatialHash:clear works", function()
+        -- @tests SpatialHash:clear
+        -- TODO: add assertion for SpatialHash:clear
+    end)
+end)
+
+describe("Missing explicit test for SpatialHash:getCellSize", function()
+    it("SpatialHash:getCellSize works", function()
+        -- @tests SpatialHash:getCellSize
+        -- TODO: add assertion for SpatialHash:getCellSize
+    end)
+end)
+
+describe("Missing explicit test for SpatialHash:getItemCount", function()
+    it("SpatialHash:getItemCount works", function()
+        -- @tests SpatialHash:getItemCount
+        -- TODO: add assertion for SpatialHash:getItemCount
+    end)
+end)
+
+describe("Missing explicit test for NoiseGenerator:perlin2d", function()
+    it("NoiseGenerator:perlin2d works", function()
+        -- @tests NoiseGenerator:perlin2d
+        -- TODO: add assertion for NoiseGenerator:perlin2d
+    end)
+end)
+
+describe("Missing explicit test for NoiseGenerator:perlin3d", function()
+    it("NoiseGenerator:perlin3d works", function()
+        -- @tests NoiseGenerator:perlin3d
+        -- TODO: add assertion for NoiseGenerator:perlin3d
+    end)
+end)
+
+describe("Missing explicit test for NoiseGenerator:simplex2d", function()
+    it("NoiseGenerator:simplex2d works", function()
+        -- @tests NoiseGenerator:simplex2d
+        -- TODO: add assertion for NoiseGenerator:simplex2d
+    end)
+end)
+
+describe("Missing explicit test for NoiseGenerator:setSeed", function()
+    it("NoiseGenerator:setSeed works", function()
+        -- @tests NoiseGenerator:setSeed
+        -- TODO: add assertion for NoiseGenerator:setSeed
+    end)
+end)
+
+describe("Missing explicit test for Circle:area", function()
+    it("Circle:area works", function()
+        -- @tests Circle:area
+        -- TODO: add assertion for Circle:area
+    end)
+end)
+
+describe("Missing explicit test for Circle:perimeter", function()
+    it("Circle:perimeter works", function()
+        -- @tests Circle:perimeter
+        -- TODO: add assertion for Circle:perimeter
+    end)
+end)
+
+describe("Missing explicit test for Circle:contains", function()
+    it("Circle:contains works", function()
+        -- @tests Circle:contains
+        -- TODO: add assertion for Circle:contains
+    end)
+end)
+
+describe("Missing explicit test for Circle:intersects", function()
+    it("Circle:intersects works", function()
+        -- @tests Circle:intersects
+        -- TODO: add assertion for Circle:intersects
+    end)
+end)
+
+describe("Missing explicit test for Circle:aabb", function()
+    it("Circle:aabb works", function()
+        -- @tests Circle:aabb
+        -- TODO: add assertion for Circle:aabb
+    end)
+end)
+
+describe("Missing explicit test for Circle:radius", function()
+    it("Circle:radius works", function()
+        -- @tests Circle:radius
+        -- TODO: add assertion for Circle:radius
+    end)
+end)
+
+describe("Missing explicit test for AabbTree:remove", function()
+    it("AabbTree:remove works", function()
+        -- @tests AabbTree:remove
+        -- TODO: add assertion for AabbTree:remove
+    end)
+end)
+
+describe("Missing explicit test for AabbTree:queryPoint", function()
+    it("AabbTree:queryPoint works", function()
+        -- @tests AabbTree:queryPoint
+        -- TODO: add assertion for AabbTree:queryPoint
+    end)
+end)
+
+describe("Missing explicit test for AabbTree:contains", function()
+    it("AabbTree:contains works", function()
+        -- @tests AabbTree:contains
+        -- TODO: add assertion for AabbTree:contains
+    end)
+end)
+
+describe("Missing explicit test for AabbTree:isEmpty", function()
+    it("AabbTree:isEmpty works", function()
+        -- @tests AabbTree:isEmpty
+        -- TODO: add assertion for AabbTree:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for AabbTree:clear", function()
+    it("AabbTree:clear works", function()
+        -- @tests AabbTree:clear
+        -- TODO: add assertion for AabbTree:clear
+    end)
 end)

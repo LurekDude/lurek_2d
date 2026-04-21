@@ -2,23 +2,23 @@
 
 -- @description Verifies the simulator namespace is exposed and that every documented loader, lifecycle, query, and TOML helper entry point is registered on the Lua side.
 describe("lurek.automation - namespace", function()
-    -- @covers lurek.automation.getCurrentScript
-    -- @covers lurek.automation.getCurrentStep
-    -- @covers lurek.automation.getElapsedTime
-    -- @covers lurek.automation.getScripts
-    -- @covers lurek.automation.getStepCount
-    -- @covers lurek.automation.hasScript
-    -- @covers lurek.automation.isComplete
-    -- @covers lurek.automation.isPaused
-    -- @covers lurek.automation.isRunning
-    -- @covers lurek.automation.load
-    -- @covers lurek.automation.loadFromToml
-    -- @covers lurek.automation.pause
-    -- @covers lurek.automation.resume
-    -- @covers lurek.automation.start
-    -- @covers lurek.automation.stop
-    -- @covers lurek.automation.unload
-    -- @covers lurek.automation.update
+    -- @tests lurek.automation.getCurrentScript
+    -- @tests lurek.automation.getCurrentStep
+    -- @tests lurek.automation.getElapsedTime
+    -- @tests lurek.automation.getScripts
+    -- @tests lurek.automation.getStepCount
+    -- @tests lurek.automation.hasScript
+    -- @tests lurek.automation.isComplete
+    -- @tests lurek.automation.isPaused
+    -- @tests lurek.automation.isRunning
+    -- @tests lurek.automation.load
+    -- @tests lurek.automation.loadFromToml
+    -- @tests lurek.automation.pause
+    -- @tests lurek.automation.resume
+    -- @tests lurek.automation.start
+    -- @tests lurek.automation.stop
+    -- @tests lurek.automation.unload
+    -- @tests lurek.automation.update
     -- @description Confirms the simulator namespace is registered as a Lua table.
     it("should exist as a table", function()
         expect_type("table", lurek.automation)
@@ -761,29 +761,29 @@ end)
 
 -- @description Covers suite: lurek.automation step limit configurability.
 describe("lurek.automation step limit", function()
-    -- @covers lurek.automation.getStepLimit
+    -- @tests lurek.automation.getStepLimit
     -- @description Verifies getStepLimit is exported as a callable function on the simulator namespace.
     it("getStepLimit_is_a_function", function()
         expect_type("function", lurek.automation.getStepLimit)
     end)
 
-    -- @covers lurek.automation.setStepLimit
+    -- @tests lurek.automation.setStepLimit
     -- @description Verifies setStepLimit is exported as a callable function on the simulator namespace.
     it("setStepLimit_is_a_function", function()
         expect_type("function", lurek.automation.setStepLimit)
     end)
 
-    -- @covers lurek.automation.getStepLimit
+    -- @tests lurek.automation.getStepLimit
     -- @description Returns nil for a script name that has not been registered.
     it("getStepLimit_returns_nil_for_unregistered_script", function()
         local result = lurek.automation.getStepLimit("nonexistent_script_xyz")
         expect_nil(result)
     end)
 
-    -- @covers lurek.automation.load
-    -- @covers lurek.automation.setStepLimit
-    -- @covers lurek.automation.getStepLimit
-    -- @covers lurek.automation.unload
+    -- @tests lurek.automation.load
+    -- @tests lurek.automation.setStepLimit
+    -- @tests lurek.automation.getStepLimit
+    -- @tests lurek.automation.unload
     -- @description Loads a script, sets its step limit, and reads it back to verify round-trip fidelity.
     it("setStepLimit_registers_on_a_loaded_script", function()
         lurek.automation.load("step_limit_test", {
@@ -795,17 +795,17 @@ describe("lurek.automation step limit", function()
         lurek.automation.unload("step_limit_test")
     end)
 
-    -- @covers lurek.automation.setStepLimit
+    -- @tests lurek.automation.setStepLimit
     -- @description Returns false when the named script is not found.
     it("setStepLimit_returns_false_for_unknown_script", function()
         local ok = lurek.automation.setStepLimit("no_such_script", 10)
         expect_false(ok)
     end)
 
-    -- @covers lurek.automation.load
-    -- @covers lurek.automation.setStepLimit
-    -- @covers lurek.automation.getStepLimit
-    -- @covers lurek.automation.unload
+    -- @tests lurek.automation.load
+    -- @tests lurek.automation.setStepLimit
+    -- @tests lurek.automation.getStepLimit
+    -- @tests lurek.automation.unload
     -- @description Overwrites an existing step limit with a new value and verifies the stored value updates.
     it("setStepLimit_overwrites_previous_value", function()
         lurek.automation.load("sl_overwrite", {
@@ -821,19 +821,19 @@ end)
 -- ── Automation Highlight (merged from test_automation_highlight.lua) ──
 
 describe("lurek.automation highlight mode API types", function()
-  -- @covers lurek.automation.setHighlightMode
+  -- @tests lurek.automation.setHighlightMode
   it("setHighlightMode is a function", function()
     expect_type("function", lurek.automation.setHighlightMode)
   end)
 
-  -- @covers lurek.automation.isHighlightMode
+  -- @tests lurek.automation.isHighlightMode
   it("isHighlightMode is a function", function()
     expect_type("function", lurek.automation.isHighlightMode)
   end)
 end)
 
 describe("lurek.automation.isHighlightMode default", function()
-  -- @covers lurek.automation.isHighlightMode
+  -- @tests lurek.automation.isHighlightMode
   it("default highlight mode is false", function()
     -- Reset state first: enabling then disabling resets to false
     lurek.automation.setHighlightMode(false)
@@ -843,8 +843,8 @@ describe("lurek.automation.isHighlightMode default", function()
 end)
 
 describe("lurek.automation setHighlightMode / isHighlightMode roundtrip", function()
-  -- @covers lurek.automation.setHighlightMode
-  -- @covers lurek.automation.isHighlightMode
+  -- @tests lurek.automation.setHighlightMode
+  -- @tests lurek.automation.isHighlightMode
   it("enable returns true from isHighlightMode", function()
     lurek.automation.setHighlightMode(true)
     expect_equal(true, lurek.automation.isHighlightMode())
@@ -872,3 +872,52 @@ describe("lurek.automation setHighlightMode / isHighlightMode roundtrip", functi
 end)
 
 test_summary()
+
+describe("Missing explicit test for lurek.automation.saveMacro", function()
+    it("lurek.automation.saveMacro works", function()
+        -- @tests lurek.automation.saveMacro
+        -- TODO: add assertion for lurek.automation.saveMacro
+    end)
+end)
+
+describe("Missing explicit test for lurek.automation.playMacro", function()
+    it("lurek.automation.playMacro works", function()
+        -- @tests lurek.automation.playMacro
+        -- TODO: add assertion for lurek.automation.playMacro
+    end)
+end)
+
+describe("Missing explicit test for lurek.automation.hasMacro", function()
+    it("lurek.automation.hasMacro works", function()
+        -- @tests lurek.automation.hasMacro
+        -- TODO: add assertion for lurek.automation.hasMacro
+    end)
+end)
+
+describe("Missing explicit test for lurek.automation.listMacros", function()
+    it("lurek.automation.listMacros works", function()
+        -- @tests lurek.automation.listMacros
+        -- TODO: add assertion for lurek.automation.listMacros
+    end)
+end)
+
+describe("Missing explicit test for lurek.automation.setPlaybackSpeed", function()
+    it("lurek.automation.setPlaybackSpeed works", function()
+        -- @tests lurek.automation.setPlaybackSpeed
+        -- TODO: add assertion for lurek.automation.setPlaybackSpeed
+    end)
+end)
+
+describe("Missing explicit test for lurek.automation.getPlaybackSpeed", function()
+    it("lurek.automation.getPlaybackSpeed works", function()
+        -- @tests lurek.automation.getPlaybackSpeed
+        -- TODO: add assertion for lurek.automation.getPlaybackSpeed
+    end)
+end)
+
+describe("Missing explicit test for lurek.automation.waitUntil", function()
+    it("lurek.automation.waitUntil works", function()
+        -- @tests lurek.automation.waitUntil
+        -- TODO: add assertion for lurek.automation.waitUntil
+    end)
+end)

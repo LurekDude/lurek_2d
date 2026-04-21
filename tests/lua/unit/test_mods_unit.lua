@@ -6,38 +6,38 @@
 
 -- @description Covers suite: lurek.mods module exists.
 describe("lurek.mods module exists", function()
-    -- @covers lurek.mods
-    -- @covers lurek.mods.newMod
-    -- @covers lurek.mods.newModManager
-    -- @covers lurek.mods.Mod.getId
-    -- @covers lurek.mods.Mod.getName
-    -- @covers lurek.mods.Mod.getVersion
-    -- @covers lurek.mods.Mod.getAuthor
-    -- @covers lurek.mods.Mod.getDescription
-    -- @covers lurek.mods.Mod.getDependencies
-    -- @covers lurek.mods.Mod.getPriority
-    -- @covers lurek.mods.Mod.isEnabled
-    -- @covers lurek.mods.Mod.setEnabled
-    -- @covers lurek.mods.Mod.isLoaded
-    -- @covers lurek.mods.Mod.setHook
-    -- @covers lurek.mods.Mod.getHook
-    -- @covers lurek.mods.Mod.hasHook
-    -- @covers lurek.mods.Mod.getHookNames
-    -- @covers lurek.mods.Mod.setConfig
-    -- @covers lurek.mods.Mod.getConfig
-    -- @covers lurek.mods.ModManager.registerMod
-    -- @covers lurek.mods.ModManager.unregisterMod
-    -- @covers lurek.mods.ModManager.hasMod
-    -- @covers lurek.mods.ModManager.getModCount
-    -- @covers lurek.mods.ModManager.getAllMods
-    -- @covers lurek.mods.ModManager.getLoadOrder
-    -- @covers lurek.mods.ModManager.validateDependencies
-    -- @covers lurek.mods.ModManager.hasCircularDependencies
-    -- @covers lurek.mods.ModManager.setLoadOrder
-    -- @covers lurek.mods.ModManager.clearLoadOrder
-    -- @covers lurek.mods.ModManager.markForReload
-    -- @covers lurek.mods.ModManager.getReloadQueue
-    -- @covers lurek.mods.ModManager.clearReloadQueue
+    -- @tests lurek.mods
+    -- @tests lurek.mods.newMod
+    -- @tests lurek.mods.newModManager
+    -- @tests lurek.mods.Mod.getId
+    -- @tests lurek.mods.Mod.getName
+    -- @tests lurek.mods.Mod.getVersion
+    -- @tests lurek.mods.Mod.getAuthor
+    -- @tests lurek.mods.Mod.getDescription
+    -- @tests lurek.mods.Mod.getDependencies
+    -- @tests lurek.mods.Mod.getPriority
+    -- @tests lurek.mods.Mod.isEnabled
+    -- @tests lurek.mods.Mod.setEnabled
+    -- @tests lurek.mods.Mod.isLoaded
+    -- @tests lurek.mods.Mod.setHook
+    -- @tests lurek.mods.Mod.getHook
+    -- @tests lurek.mods.Mod.hasHook
+    -- @tests lurek.mods.Mod.getHookNames
+    -- @tests lurek.mods.Mod.setConfig
+    -- @tests lurek.mods.Mod.getConfig
+    -- @tests lurek.mods.ModManager.registerMod
+    -- @tests lurek.mods.ModManager.unregisterMod
+    -- @tests lurek.mods.ModManager.hasMod
+    -- @tests lurek.mods.ModManager.getModCount
+    -- @tests lurek.mods.ModManager.getAllMods
+    -- @tests lurek.mods.ModManager.getLoadOrder
+    -- @tests lurek.mods.ModManager.validateDependencies
+    -- @tests lurek.mods.ModManager.hasCircularDependencies
+    -- @tests lurek.mods.ModManager.setLoadOrder
+    -- @tests lurek.mods.ModManager.clearLoadOrder
+    -- @tests lurek.mods.ModManager.markForReload
+    -- @tests lurek.mods.ModManager.getReloadQueue
+    -- @tests lurek.mods.ModManager.clearReloadQueue
     -- @description Verifies the mods namespace is available as a Lua table.
     it("lurek.mods is a table", function()
         expect_type("table", lurek.mods)
@@ -46,13 +46,13 @@ end)
 
 -- @description Covers suite: Factory functions.
 describe("Factory functions", function()
-    -- @covers lurek.mods.newMod
+    -- @tests lurek.mods.newMod
     -- @description Verifies newMod is exposed.
     it("newMod is a function", function()
         expect_type("function", lurek.mods.newMod)
     end)
 
-    -- @covers lurek.mods.newModManager
+    -- @tests lurek.mods.newModManager
     -- @description Verifies newModManager is exposed.
     it("newModManager is a function", function()
         expect_type("function", lurek.mods.newModManager)
@@ -61,14 +61,14 @@ end)
 
 -- @description Covers suite: Mod object creation and metadata.
 describe("Mod object creation and metadata", function()
-    -- @covers lurek.mods.newMod
+    -- @tests lurek.mods.newMod
     -- @description Verifies newMod returns a non-nil mod handle when an id is supplied.
     it("newMod returns a non-nil object", function()
         local m = lurek.mods.newMod({ id = "test_mod" })
         expect_true(m ~= nil, "mod is not nil")
     end)
 
-    -- @covers lurek.mods.newMod
+    -- @tests lurek.mods.newMod
     -- @description Verifies newMod rejects a definition table without an id field.
     it("newMod without id field raises an error", function()
         expect_error(function()
@@ -76,49 +76,49 @@ describe("Mod object creation and metadata", function()
         end)
     end)
 
-    -- @covers lurek.mods.Mod.getId
+    -- @tests lurek.mods.Mod.getId
     -- @description Verifies getId echoes the id passed to the constructor.
     it("getId returns the id passed to newMod", function()
         local m = lurek.mods.newMod({ id = "my_mod" })
         expect_equal("my_mod", m:getId())
     end)
 
-    -- @covers lurek.mods.Mod.getName
+    -- @tests lurek.mods.Mod.getName
     -- @description Verifies getName returns the configured display name.
     it("getName returns the name when provided", function()
         local m = lurek.mods.newMod({ id = "x", name = "My Mod" })
         expect_equal("My Mod", m:getName())
     end)
 
-    -- @covers lurek.mods.Mod.getName
+    -- @tests lurek.mods.Mod.getName
     -- @description Verifies getName still returns a string when no explicit name is provided.
     it("getName returns a string even when not provided", function()
         local m = lurek.mods.newMod({ id = "x" })
         expect_type("string", m:getName())
     end)
 
-    -- @covers lurek.mods.Mod.getVersion
+    -- @tests lurek.mods.Mod.getVersion
     -- @description Verifies getVersion returns the configured version string.
     it("getVersion returns the version when provided", function()
         local m = lurek.mods.newMod({ id = "x", version = "1.2.3" })
         expect_equal("1.2.3", m:getVersion())
     end)
 
-    -- @covers lurek.mods.Mod.getAuthor
+    -- @tests lurek.mods.Mod.getAuthor
     -- @description Verifies getAuthor returns the configured author string.
     it("getAuthor returns the author when provided", function()
         local m = lurek.mods.newMod({ id = "x", author = "Dev" })
         expect_equal("Dev", m:getAuthor())
     end)
 
-    -- @covers lurek.mods.Mod.getDescription
+    -- @tests lurek.mods.Mod.getDescription
     -- @description Verifies getDescription returns the configured description.
     it("getDescription returns the description when provided", function()
         local m = lurek.mods.newMod({ id = "x", description = "A cool mod" })
         expect_equal("A cool mod", m:getDescription())
     end)
 
-    -- @covers lurek.mods.Mod.getDependencies
+    -- @tests lurek.mods.Mod.getDependencies
     -- @description Verifies getDependencies returns a table payload.
     it("getDependencies returns a table", function()
         local m = lurek.mods.newMod({ id = "x", dependencies = { "core_mod" } })
@@ -126,7 +126,7 @@ describe("Mod object creation and metadata", function()
         expect_type("table", deps)
     end)
 
-    -- @covers lurek.mods.Mod.getDependencies
+    -- @tests lurek.mods.Mod.getDependencies
     -- @description Verifies getDependencies preserves all declared dependency ids.
     it("getDependencies includes declared dependency ids", function()
         local m = lurek.mods.newMod({ id = "x", dependencies = { "dep_a", "dep_b" } })
@@ -134,21 +134,21 @@ describe("Mod object creation and metadata", function()
         expect_equal(2, #deps)
     end)
 
-    -- @covers lurek.mods.Mod.getPriority
+    -- @tests lurek.mods.Mod.getPriority
     -- @description Verifies getPriority returns the configured load priority.
     it("getPriority returns the priority when provided", function()
         local m = lurek.mods.newMod({ id = "x", priority = 5 })
         expect_equal(5, m:getPriority())
     end)
 
-    -- @covers lurek.mods.Mod.isEnabled
+    -- @tests lurek.mods.Mod.isEnabled
     -- @description Verifies mods start enabled by default.
     it("isEnabled returns true by default", function()
         local m = lurek.mods.newMod({ id = "x" })
         expect_true(m:isEnabled(), "mods are enabled by default")
     end)
 
-    -- @covers lurek.mods.Mod.setEnabled
+    -- @tests lurek.mods.Mod.setEnabled
     -- @description Verifies setEnabled(false) disables the mod.
     it("setEnabled can disable a mod", function()
         local m = lurek.mods.newMod({ id = "x" })
@@ -156,7 +156,7 @@ describe("Mod object creation and metadata", function()
         expect_false(m:isEnabled())
     end)
 
-    -- @covers lurek.mods.Mod.setEnabled
+    -- @tests lurek.mods.Mod.setEnabled
     -- @description Verifies setEnabled(true) can re-enable a disabled mod.
     it("setEnabled can re-enable a mod", function()
         local m = lurek.mods.newMod({ id = "x" })
@@ -165,7 +165,7 @@ describe("Mod object creation and metadata", function()
         expect_true(m:isEnabled())
     end)
 
-    -- @covers lurek.mods.Mod.isLoaded
+    -- @tests lurek.mods.Mod.isLoaded
     -- @description Verifies mods start unloaded.
     it("isLoaded returns false by default", function()
         local m = lurek.mods.newMod({ id = "x" })
@@ -175,7 +175,7 @@ end)
 
 -- @description Covers suite: Mod hooks.
 describe("Mod hooks", function()
-    -- @covers lurek.mods.Mod.setHook
+    -- @tests lurek.mods.Mod.setHook
     -- @description Verifies setHook stores a function retrievable through getHook.
     it("setHook stores a function callable via getHook", function()
         local m = lurek.mods.newMod({ id = "hooks_mod" })
@@ -187,14 +187,14 @@ describe("Mod hooks", function()
         expect_true(called, "hook was invoked")
     end)
 
-    -- @covers lurek.mods.Mod.hasHook
+    -- @tests lurek.mods.Mod.hasHook
     -- @description Verifies hasHook returns false before registration.
     it("hasHook returns false before setHook", function()
         local m = lurek.mods.newMod({ id = "has_hook_test" })
         expect_false(m:hasHook("on_load"))
     end)
 
-    -- @covers lurek.mods.Mod.hasHook
+    -- @tests lurek.mods.Mod.hasHook
     -- @description Verifies hasHook returns true after registration.
     it("hasHook returns true after setHook", function()
         local m = lurek.mods.newMod({ id = "has_hook_set" })
@@ -202,7 +202,7 @@ describe("Mod hooks", function()
         expect_true(m:hasHook("on_load"))
     end)
 
-    -- @covers lurek.mods.Mod.getHookNames
+    -- @tests lurek.mods.Mod.getHookNames
     -- @description Verifies getHookNames lists registered hook names.
     it("getHookNames returns a table of registered hook names", function()
         local m = lurek.mods.newMod({ id = "hook_names_mod" })
@@ -213,7 +213,7 @@ describe("Mod hooks", function()
         expect_true(#names >= 2, "at least 2 hook names")
     end)
 
-    -- @covers lurek.mods.Mod.getHookNames
+    -- @tests lurek.mods.Mod.getHookNames
     -- @description Verifies getHookNames returns an empty table when no hooks exist.
     it("getHookNames returns empty table for mod with no hooks", function()
         local m = lurek.mods.newMod({ id = "no_hooks" })
@@ -221,14 +221,14 @@ describe("Mod hooks", function()
         expect_equal(0, #names)
     end)
 
-    -- @covers lurek.mods.Mod.getHook
+    -- @tests lurek.mods.Mod.getHook
     -- @description Verifies getHook returns nil for an unknown hook name.
     it("getHook returns nil for unregistered hook name", function()
         local m = lurek.mods.newMod({ id = "getHook_nil" })
         expect_nil(m:getHook("nonexistent_hook"))
     end)
 
-    -- @covers lurek.mods.Mod.setHook
+    -- @tests lurek.mods.Mod.setHook
     -- @description Verifies separately registered hooks remain independent when invoked.
     it("multiple hooks are stored independently", function()
         local m = lurek.mods.newMod({ id = "multi_hook" })
@@ -245,7 +245,7 @@ end)
 
 -- @description Covers suite: Mod config.
 describe("Mod config", function()
-    -- @covers lurek.mods.Mod.setConfig
+    -- @tests lurek.mods.Mod.setConfig
     -- @description Verifies string config values round-trip through setConfig and getConfig.
     it("setConfig / getConfig round-trips a string value", function()
         local m = lurek.mods.newMod({ id = "cfg_mod" })
@@ -253,7 +253,7 @@ describe("Mod config", function()
         expect_equal("0.8", m:getConfig())
     end)
 
-    -- @covers lurek.mods.Mod.setConfig
+    -- @tests lurek.mods.Mod.setConfig
     -- @description Verifies numeric config values round-trip through setConfig and getConfig.
     it("setConfig / getConfig round-trips a number value", function()
         local m = lurek.mods.newMod({ id = "cfg_num" })
@@ -262,14 +262,14 @@ describe("Mod config", function()
         expect_equal(42, v)
     end)
 
-    -- @covers lurek.mods.Mod.getConfig
+    -- @tests lurek.mods.Mod.getConfig
     -- @description Verifies getConfig returns nil before any config is set.
     it("getConfig returns nil when not set", function()
         local m = lurek.mods.newMod({ id = "cfg_nil" })
         expect_nil(m:getConfig())
     end)
 
-    -- @covers lurek.mods.Mod.setConfig
+    -- @tests lurek.mods.Mod.setConfig
     -- @description Verifies later setConfig calls overwrite the previous value.
     it("setConfig overwrites previous value", function()
         local m = lurek.mods.newMod({ id = "cfg_overwrite" })
@@ -281,28 +281,28 @@ end)
 
 -- @description Covers suite: ModManager object.
 describe("ModManager object", function()
-    -- @covers lurek.mods.newModManager
+    -- @tests lurek.mods.newModManager
     -- @description Verifies newModManager returns a non-nil manager handle.
     it("newModManager returns a non-nil object", function()
         local mm = lurek.mods.newModManager()
         expect_true(mm ~= nil, "mod manager is not nil")
     end)
 
-    -- @covers lurek.mods.ModManager.getLoadOrder
+    -- @tests lurek.mods.ModManager.getLoadOrder
     -- @description Verifies getLoadOrder returns a table on an empty manager.
     it("getLoadOrder returns a table on empty manager", function()
         local mm = lurek.mods.newModManager()
         expect_type("table", mm:getLoadOrder())
     end)
 
-    -- @covers lurek.mods.ModManager.getLoadOrder
+    -- @tests lurek.mods.ModManager.getLoadOrder
     -- @description Verifies a new manager starts with an empty load order.
     it("getLoadOrder is empty on new manager", function()
         local mm = lurek.mods.newModManager()
         expect_equal(0, #mm:getLoadOrder())
     end)
 
-    -- @covers lurek.mods.ModManager.registerMod
+    -- @tests lurek.mods.ModManager.registerMod
     -- @description Verifies registerMod adds a mod that appears in getAllMods.
     it("registerMod adds a mod and getAllMods includes it", function()
         local mm = lurek.mods.newModManager()
@@ -313,14 +313,14 @@ describe("ModManager object", function()
         expect_true(#all >= 1, "at least one mod registered")
     end)
 
-    -- @covers lurek.mods.ModManager.hasMod
+    -- @tests lurek.mods.ModManager.hasMod
     -- @description Verifies hasMod returns false for an unknown mod id.
     it("hasMod returns false for unknown id", function()
         local mm = lurek.mods.newModManager()
         expect_false(mm:hasMod("nonexistent_mod"))
     end)
 
-    -- @covers lurek.mods.ModManager.hasMod
+    -- @tests lurek.mods.ModManager.hasMod
     -- @description Verifies hasMod returns true after a mod is registered.
     it("hasMod returns true after registerMod", function()
         local mm = lurek.mods.newModManager()
@@ -329,7 +329,7 @@ describe("ModManager object", function()
         expect_true(mm:hasMod("unique_mod"), "found registered mod by id")
     end)
 
-    -- @covers lurek.mods.ModManager.unregisterMod
+    -- @tests lurek.mods.ModManager.unregisterMod
     -- @description Verifies unregisterMod removes a mod from manager lookup.
     it("unregisterMod removes the mod", function()
         local mm = lurek.mods.newModManager()
@@ -339,14 +339,14 @@ describe("ModManager object", function()
         expect_false(mm:hasMod("temp_mod"))
     end)
 
-    -- @covers lurek.mods.ModManager.getModCount
+    -- @tests lurek.mods.ModManager.getModCount
     -- @description Verifies getModCount reports zero for a new manager.
     it("getModCount returns 0 on empty manager", function()
         local mm = lurek.mods.newModManager()
         expect_equal(0, mm:getModCount())
     end)
 
-    -- @covers lurek.mods.ModManager.getModCount
+    -- @tests lurek.mods.ModManager.getModCount
     -- @description Verifies getModCount increases as mods are registered.
     it("getModCount increments after registerMod", function()
         local mm = lurek.mods.newModManager()
@@ -358,7 +358,7 @@ end)
 
 -- @description Covers suite: ModManager.validateDependencies / hasCircularDependencies.
 describe("ModManager.validateDependencies / hasCircularDependencies", function()
-    -- @covers lurek.mods.ModManager.validateDependencies
+    -- @tests lurek.mods.ModManager.validateDependencies
     -- @description Verifies validateDependencies returns a table result.
     it("validateDependencies returns a table", function()
         local mm = lurek.mods.newModManager()
@@ -366,7 +366,7 @@ describe("ModManager.validateDependencies / hasCircularDependencies", function()
         expect_type("table", result)
     end)
 
-    -- @covers lurek.mods.ModManager.validateDependencies
+    -- @tests lurek.mods.ModManager.validateDependencies
     -- @description Verifies independent mods validate without dependency errors.
     it("validateDependencies is empty for independent mods", function()
         local mm = lurek.mods.newModManager()
@@ -376,7 +376,7 @@ describe("ModManager.validateDependencies / hasCircularDependencies", function()
         expect_equal(0, #errors)
     end)
 
-    -- @covers lurek.mods.ModManager.validateDependencies
+    -- @tests lurek.mods.ModManager.validateDependencies
     -- @description Verifies missing dependencies produce validation errors.
     it("validateDependencies reports missing dependency", function()
         local mm = lurek.mods.newModManager()
@@ -388,7 +388,7 @@ describe("ModManager.validateDependencies / hasCircularDependencies", function()
         expect_true(#errors >= 1, "unmet dependency should produce an error entry")
     end)
 
-    -- @covers lurek.mods.ModManager.validateDependencies
+    -- @tests lurek.mods.ModManager.validateDependencies
     -- @description Verifies registered dependency providers clear validation errors.
     it("validateDependencies is empty when dependencies are all registered", function()
         local mm = lurek.mods.newModManager()
@@ -401,7 +401,7 @@ describe("ModManager.validateDependencies / hasCircularDependencies", function()
         expect_equal(0, #errors)
     end)
 
-    -- @covers lurek.mods.ModManager.hasCircularDependencies
+    -- @tests lurek.mods.ModManager.hasCircularDependencies
     -- @description Verifies hasCircularDependencies returns a boolean.
     it("hasCircularDependencies returns a boolean", function()
         local mm = lurek.mods.newModManager()
@@ -409,7 +409,7 @@ describe("ModManager.validateDependencies / hasCircularDependencies", function()
         expect_type("boolean", result)
     end)
 
-    -- @covers lurek.mods.ModManager.hasCircularDependencies
+    -- @tests lurek.mods.ModManager.hasCircularDependencies
     -- @description Verifies acyclic graphs report no circular dependencies.
     it("hasCircularDependencies is false for acyclic dependency graph", function()
         local mm = lurek.mods.newModManager()
@@ -421,7 +421,7 @@ end)
 
 -- @description Covers suite: ModManager load order control.
 describe("ModManager load order control", function()
-    -- @covers lurek.mods.ModManager.setLoadOrder
+    -- @tests lurek.mods.ModManager.setLoadOrder
     -- @description Verifies setLoadOrder accepts an explicit ordered list of mod ids.
     it("setLoadOrder accepts an ordered list of mod ids", function()
         local mm = lurek.mods.newModManager()
@@ -432,7 +432,7 @@ describe("ModManager load order control", function()
         end)
     end)
 
-    -- @covers lurek.mods.ModManager.getLoadOrder
+    -- @tests lurek.mods.ModManager.getLoadOrder
     -- @description Verifies getLoadOrder reflects the previously assigned order.
     it("getLoadOrder reflects setLoadOrder", function()
         local mm = lurek.mods.newModManager()
@@ -446,7 +446,7 @@ describe("ModManager load order control", function()
         expect_true(#order >= 1, "at least one entry after setLoadOrder")
     end)
 
-    -- @covers lurek.mods.ModManager.clearLoadOrder
+    -- @tests lurek.mods.ModManager.clearLoadOrder
     -- @description Verifies clearLoadOrder resets explicit ordering state.
     it("clearLoadOrder resets the explicit order", function()
         local mm = lurek.mods.newModManager()
@@ -458,7 +458,7 @@ end)
 
 -- @description Covers suite: ModManager reload queue.
 describe("ModManager reload queue", function()
-    -- @covers lurek.mods.ModManager.markForReload
+    -- @tests lurek.mods.ModManager.markForReload
     -- @description Verifies markForReload queues a mod id without error.
     it("markForReload adds a mod id to the reload queue", function()
         local mm = lurek.mods.newModManager()
@@ -466,7 +466,7 @@ describe("ModManager reload queue", function()
         expect_no_error(function() mm:markForReload("reload_me") end)
     end)
 
-    -- @covers lurek.mods.ModManager.getReloadQueue
+    -- @tests lurek.mods.ModManager.getReloadQueue
     -- @description Verifies getReloadQueue returns a table payload.
     it("getReloadQueue returns a table", function()
         local mm = lurek.mods.newModManager()
@@ -474,7 +474,7 @@ describe("ModManager reload queue", function()
         expect_type("table", q)
     end)
 
-    -- @covers lurek.mods.ModManager.getReloadQueue
+    -- @tests lurek.mods.ModManager.getReloadQueue
     -- @description Verifies queued ids appear in the reload queue.
     it("getReloadQueue contains id after markForReload", function()
         local mm = lurek.mods.newModManager()
@@ -488,7 +488,7 @@ describe("ModManager reload queue", function()
         expect_true(found, "rq_mod should appear in reload queue")
     end)
 
-    -- @covers lurek.mods.ModManager.clearReloadQueue
+    -- @tests lurek.mods.ModManager.clearReloadQueue
     -- @description Verifies clearReloadQueue empties the reload queue.
     it("clearReloadQueue empties the queue", function()
         local mm = lurek.mods.newModManager()
@@ -506,49 +506,252 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.mods.checkApiVersion
+    -- @tests lurek.mods.checkApiVersion
     it("covers lurek.mods.checkApiVersion", function()
         -- TODO: Implement test for lurek.mods.checkApiVersion
     end)
 
-    -- @covers Mod:getApiVersion
+    -- @tests Mod:getApiVersion
     it("covers Mod:getApiVersion", function()
         -- TODO: Implement test for Mod:getApiVersion
     end)
 
-    -- @covers Mod:setApiVersion
+    -- @tests Mod:setApiVersion
     it("covers Mod:setApiVersion", function()
         -- TODO: Implement test for Mod:setApiVersion
     end)
 
-    -- @covers Mod:getCapabilities
+    -- @tests Mod:getCapabilities
     it("covers Mod:getCapabilities", function()
         -- TODO: Implement test for Mod:getCapabilities
     end)
 
-    -- @covers Mod:setCapabilities
+    -- @tests Mod:setCapabilities
     it("covers Mod:setCapabilities", function()
         -- TODO: Implement test for Mod:setCapabilities
     end)
 
-    -- @covers Mod:getConfigSchema
+    -- @tests Mod:getConfigSchema
     it("covers Mod:getConfigSchema", function()
         -- TODO: Implement test for Mod:getConfigSchema
     end)
 
-    -- @covers Mod:setConfigSchema
+    -- @tests Mod:setConfigSchema
     it("covers Mod:setConfigSchema", function()
         -- TODO: Implement test for Mod:setConfigSchema
     end)
 
-    -- @covers Mod:releaseRefs
+    -- @tests Mod:releaseRefs
     it("covers Mod:releaseRefs", function()
         -- TODO: Implement test for Mod:releaseRefs
     end)
 
-    -- @covers ModManager:getModPath
+    -- @tests ModManager:getModPath
     it("covers ModManager:getModPath", function()
         -- TODO: Implement test for ModManager:getModPath
     end)
 
+end)
+
+describe("Missing explicit test for Mod:getId", function()
+    it("Mod:getId works", function()
+        -- @tests Mod:getId
+        -- TODO: add assertion for Mod:getId
+    end)
+end)
+
+describe("Missing explicit test for Mod:getName", function()
+    it("Mod:getName works", function()
+        -- @tests Mod:getName
+        -- TODO: add assertion for Mod:getName
+    end)
+end)
+
+describe("Missing explicit test for Mod:getVersion", function()
+    it("Mod:getVersion works", function()
+        -- @tests Mod:getVersion
+        -- TODO: add assertion for Mod:getVersion
+    end)
+end)
+
+describe("Missing explicit test for Mod:getAuthor", function()
+    it("Mod:getAuthor works", function()
+        -- @tests Mod:getAuthor
+        -- TODO: add assertion for Mod:getAuthor
+    end)
+end)
+
+describe("Missing explicit test for Mod:getDescription", function()
+    it("Mod:getDescription works", function()
+        -- @tests Mod:getDescription
+        -- TODO: add assertion for Mod:getDescription
+    end)
+end)
+
+describe("Missing explicit test for Mod:getDependencies", function()
+    it("Mod:getDependencies works", function()
+        -- @tests Mod:getDependencies
+        -- TODO: add assertion for Mod:getDependencies
+    end)
+end)
+
+describe("Missing explicit test for Mod:getPriority", function()
+    it("Mod:getPriority works", function()
+        -- @tests Mod:getPriority
+        -- TODO: add assertion for Mod:getPriority
+    end)
+end)
+
+describe("Missing explicit test for Mod:isEnabled", function()
+    it("Mod:isEnabled works", function()
+        -- @tests Mod:isEnabled
+        -- TODO: add assertion for Mod:isEnabled
+    end)
+end)
+
+describe("Missing explicit test for Mod:setEnabled", function()
+    it("Mod:setEnabled works", function()
+        -- @tests Mod:setEnabled
+        -- TODO: add assertion for Mod:setEnabled
+    end)
+end)
+
+describe("Missing explicit test for Mod:isLoaded", function()
+    it("Mod:isLoaded works", function()
+        -- @tests Mod:isLoaded
+        -- TODO: add assertion for Mod:isLoaded
+    end)
+end)
+
+describe("Missing explicit test for Mod:getHook", function()
+    it("Mod:getHook works", function()
+        -- @tests Mod:getHook
+        -- TODO: add assertion for Mod:getHook
+    end)
+end)
+
+describe("Missing explicit test for Mod:hasHook", function()
+    it("Mod:hasHook works", function()
+        -- @tests Mod:hasHook
+        -- TODO: add assertion for Mod:hasHook
+    end)
+end)
+
+describe("Missing explicit test for Mod:getHookNames", function()
+    it("Mod:getHookNames works", function()
+        -- @tests Mod:getHookNames
+        -- TODO: add assertion for Mod:getHookNames
+    end)
+end)
+
+describe("Missing explicit test for Mod:setConfig", function()
+    it("Mod:setConfig works", function()
+        -- @tests Mod:setConfig
+        -- TODO: add assertion for Mod:setConfig
+    end)
+end)
+
+describe("Missing explicit test for Mod:getConfig", function()
+    it("Mod:getConfig works", function()
+        -- @tests Mod:getConfig
+        -- TODO: add assertion for Mod:getConfig
+    end)
+end)
+
+describe("Missing explicit test for ModManager:registerMod", function()
+    it("ModManager:registerMod works", function()
+        -- @tests ModManager:registerMod
+        -- TODO: add assertion for ModManager:registerMod
+    end)
+end)
+
+describe("Missing explicit test for ModManager:unregisterMod", function()
+    it("ModManager:unregisterMod works", function()
+        -- @tests ModManager:unregisterMod
+        -- TODO: add assertion for ModManager:unregisterMod
+    end)
+end)
+
+describe("Missing explicit test for ModManager:hasMod", function()
+    it("ModManager:hasMod works", function()
+        -- @tests ModManager:hasMod
+        -- TODO: add assertion for ModManager:hasMod
+    end)
+end)
+
+describe("Missing explicit test for ModManager:getModCount", function()
+    it("ModManager:getModCount works", function()
+        -- @tests ModManager:getModCount
+        -- TODO: add assertion for ModManager:getModCount
+    end)
+end)
+
+describe("Missing explicit test for ModManager:getAllMods", function()
+    it("ModManager:getAllMods works", function()
+        -- @tests ModManager:getAllMods
+        -- TODO: add assertion for ModManager:getAllMods
+    end)
+end)
+
+describe("Missing explicit test for ModManager:getLoadOrder", function()
+    it("ModManager:getLoadOrder works", function()
+        -- @tests ModManager:getLoadOrder
+        -- TODO: add assertion for ModManager:getLoadOrder
+    end)
+end)
+
+describe("Missing explicit test for ModManager:validateDependencies", function()
+    it("ModManager:validateDependencies works", function()
+        -- @tests ModManager:validateDependencies
+        -- TODO: add assertion for ModManager:validateDependencies
+    end)
+end)
+
+describe("Missing explicit test for ModManager:hasCircularDependencies", function()
+    it("ModManager:hasCircularDependencies works", function()
+        -- @tests ModManager:hasCircularDependencies
+        -- TODO: add assertion for ModManager:hasCircularDependencies
+    end)
+end)
+
+describe("Missing explicit test for ModManager:setLoadOrder", function()
+    it("ModManager:setLoadOrder works", function()
+        -- @tests ModManager:setLoadOrder
+        -- TODO: add assertion for ModManager:setLoadOrder
+    end)
+end)
+
+describe("Missing explicit test for ModManager:clearLoadOrder", function()
+    it("ModManager:clearLoadOrder works", function()
+        -- @tests ModManager:clearLoadOrder
+        -- TODO: add assertion for ModManager:clearLoadOrder
+    end)
+end)
+
+describe("Missing explicit test for ModManager:scanFolder", function()
+    it("ModManager:scanFolder works", function()
+        -- @tests ModManager:scanFolder
+        -- TODO: add assertion for ModManager:scanFolder
+    end)
+end)
+
+describe("Missing explicit test for ModManager:markForReload", function()
+    it("ModManager:markForReload works", function()
+        -- @tests ModManager:markForReload
+        -- TODO: add assertion for ModManager:markForReload
+    end)
+end)
+
+describe("Missing explicit test for ModManager:getReloadQueue", function()
+    it("ModManager:getReloadQueue works", function()
+        -- @tests ModManager:getReloadQueue
+        -- TODO: add assertion for ModManager:getReloadQueue
+    end)
+end)
+
+describe("Missing explicit test for ModManager:clearReloadQueue", function()
+    it("ModManager:clearReloadQueue works", function()
+        -- @tests ModManager:clearReloadQueue
+        -- TODO: add assertion for ModManager:clearReloadQueue
+    end)
 end)

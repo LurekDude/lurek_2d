@@ -1,5 +1,5 @@
 -- Dialog API integration tests
--- @covers lurek.dialog.newSequencer
+-- @tests lurek.dialog.newSequencer
 
 local total, passed, failed = 0, 0, 0
 

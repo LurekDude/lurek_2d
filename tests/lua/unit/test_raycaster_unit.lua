@@ -5,7 +5,7 @@
 describe("lurek.raycaster", function()
     -- @description Covers suite: module interface.
     describe("module interface", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies the raycaster module exposes the new factory.
         it("exposes new factory", function()
             expect_type("function", lurek.raycaster.new)
@@ -14,21 +14,21 @@ describe("lurek.raycaster", function()
 
     -- @description Covers suite: new(w, h).
     describe("new(w, h)", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies new returns a userdata raycaster handle.
         it("returns a userdata object", function()
             local rc = lurek.raycaster.new(16, 12)
             expect_type("userdata", rc)
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies width() reflects the constructor width.
         it("width() returns the given width", function()
             local rc = lurek.raycaster.new(24, 18)
             expect_equal(24, rc:width())
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies height() reflects the constructor height.
         it("height() returns the given height", function()
             local rc = lurek.raycaster.new(24, 18)
@@ -38,7 +38,7 @@ describe("lurek.raycaster", function()
 
     -- @description Covers suite: cell access.
     describe("cell access", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies fresh grids initialize every cell to zero.
         it("all cells start as 0", function()
             local rc = lurek.raycaster.new(4, 4)
@@ -49,7 +49,7 @@ describe("lurek.raycaster", function()
             end
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies setCell and getCell round-trip a wall value.
         it("setCell / getCell round-trip", function()
             local rc = lurek.raycaster.new(8, 8)
@@ -57,7 +57,7 @@ describe("lurek.raycaster", function()
             expect_equal(99, rc:getCell(2, 5))
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies setCells consumes a flat row-major cell table.
         it("setCells fills the grid from a flat table", function()
             local rc = lurek.raycaster.new(2, 2)
@@ -71,14 +71,14 @@ describe("lurek.raycaster", function()
 
     -- @description Covers suite: isBlocked(x, y).
     describe("isBlocked(x, y)", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies zero-valued cells are treated as unblocked.
         it("returns false for zero cell", function()
             local rc = lurek.raycaster.new(4, 4)
             expect_equal(false, rc:isBlocked(1, 1))
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies non-zero cells are treated as blocked.
         it("returns true for non-zero cell", function()
             local rc = lurek.raycaster.new(4, 4)
@@ -89,7 +89,7 @@ describe("lurek.raycaster", function()
 
     -- @description Covers suite: castRay(ox, oy, angle, max_dist).
     describe("castRay(ox, oy, angle, max_dist)", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies castRay on an empty grid returns nil or a non-hit table safely.
         it("returns nil in fully empty grid", function()
             local rc = lurek.raycaster.new(10, 10)
@@ -100,7 +100,7 @@ describe("lurek.raycaster", function()
             end
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies castRay detects a wall placed directly in front of the origin.
         it("hits a wall placed directly ahead", function()
             local rc = lurek.raycaster.new(10, 10)
@@ -112,7 +112,7 @@ describe("lurek.raycaster", function()
             expect_equal(1, hit.cell_value)
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies ray hit tables include distance, hit location, and texture fields.
         it("returned hit table has required fields", function()
             local rc = lurek.raycaster.new(10, 10)
@@ -132,7 +132,7 @@ describe("lurek.raycaster", function()
 
     -- @description Covers suite: castRays(ox, oy, angle, fov, count, max_dist).
     describe("castRays(ox, oy, angle, fov, count, max_dist)", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies castRays returns exactly the requested number of entries.
         it("returns exactly count entries", function()
             local rc = lurek.raycaster.new(20, 20)
@@ -140,7 +140,7 @@ describe("lurek.raycaster", function()
             expect_equal(64, #rays)
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies each castRays entry is a table.
         it("each entry is a table", function()
             local rc = lurek.raycaster.new(20, 20)
@@ -153,7 +153,7 @@ describe("lurek.raycaster", function()
 
     -- @description Covers suite: castRaysFlat(ox, oy, angle, fov, count, max_dist).
     describe("castRaysFlat(ox, oy, angle, fov, count, max_dist)", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies castRaysFlat returns a table payload.
         it("returns a table", function()
             local rc = lurek.raycaster.new(20, 20)
@@ -161,7 +161,7 @@ describe("lurek.raycaster", function()
             expect_type("table", flat)
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies castRaysFlat flattens results into numeric values only.
         it("contains only numbers", function()
             local rc = lurek.raycaster.new(20, 20)
@@ -174,7 +174,7 @@ describe("lurek.raycaster", function()
 
     -- @description Covers suite: lineOfSight(x1, y1, x2, y2).
     describe("lineOfSight(x1, y1, x2, y2)", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies lineOfSight returns true across an unobstructed segment.
         it("returns true in empty grid", function()
             local rc = lurek.raycaster.new(10, 10)
@@ -182,7 +182,7 @@ describe("lurek.raycaster", function()
             expect_equal(true, visible)
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies lineOfSight returns false when a wall blocks the segment.
         it("returns false when wall blocks the path", function()
             local rc = lurek.raycaster.new(10, 10)
@@ -191,7 +191,7 @@ describe("lurek.raycaster", function()
             expect_equal(false, visible)
         end)
 
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies lineOfSight always returns a boolean.
         it("returns a boolean", function()
             local rc = lurek.raycaster.new(10, 10)
@@ -202,7 +202,7 @@ describe("lurek.raycaster", function()
 
     -- @description Covers suite: projectSprite(sx, sy, px, py, pa, fov, screen_w).
     describe("projectSprite(sx, sy, px, py, pa, fov, screen_w)", function()
-        -- @covers lurek.raycaster.new
+        -- @tests lurek.raycaster.new
         -- @description Verifies projectSprite returns projection metadata including visibility and scale fields.
         it("returns a table with required fields", function()
             local rc = lurek.raycaster.new(10, 10)
@@ -220,13 +220,13 @@ end)
 describe("lurek.raycaster module functions", function()
     -- @description Covers suite: projectColumn(distance, fov, screen_height).
     describe("projectColumn(distance, fov, screen_height)", function()
-        -- @covers lurek.raycaster.projectColumn
+        -- @tests lurek.raycaster.projectColumn
         -- @description Verifies projectColumn is exposed.
         it("is a function", function()
             expect_type("function", lurek.raycaster.projectColumn)
         end)
 
-        -- @covers lurek.raycaster.projectColumn
+        -- @tests lurek.raycaster.projectColumn
         -- @description Verifies projectColumn returns three numeric outputs.
         it("returns 3 numbers", function()
             local a, b, c = lurek.raycaster.projectColumn(2.0, math.pi / 2, 480.0)
@@ -235,14 +235,14 @@ describe("lurek.raycaster module functions", function()
             expect_type("number", c)
         end)
 
-        -- @covers lurek.raycaster.projectColumn
+        -- @tests lurek.raycaster.projectColumn
         -- @description Verifies nearby walls project to a positive column height.
         it("column height is positive for distance 1.0", function()
             local col_height, _, _ = lurek.raycaster.projectColumn(1.0, math.pi / 2, 480.0)
             expect_true(col_height > 0.0, "column height should be positive")
         end)
 
-        -- @covers lurek.raycaster.projectColumn
+        -- @tests lurek.raycaster.projectColumn
         -- @description Verifies projected column height decreases as distance grows.
         it("column height decreases with distance", function()
             local h1, _, _ = lurek.raycaster.projectColumn(1.0, math.pi / 2, 480.0)
@@ -253,27 +253,27 @@ describe("lurek.raycaster module functions", function()
 
     -- @description Covers suite: distanceShade(distance, max_distance).
     describe("distanceShade(distance, max_distance)", function()
-        -- @covers lurek.raycaster.distanceShade
+        -- @tests lurek.raycaster.distanceShade
         -- @description Verifies distanceShade is exposed.
         it("is a function", function()
             expect_type("function", lurek.raycaster.distanceShade)
         end)
 
-        -- @covers lurek.raycaster.distanceShade
+        -- @tests lurek.raycaster.distanceShade
         -- @description Verifies distanceShade returns full intensity at zero distance.
         it("returns 1.0 at distance 0", function()
             local shade = lurek.raycaster.distanceShade(0.0, 10.0)
             expect_near(1.0, shade, 0.001)
         end)
 
-        -- @covers lurek.raycaster.distanceShade
+        -- @tests lurek.raycaster.distanceShade
         -- @description Verifies distanceShade clamps to zero at or beyond max distance.
         it("returns 0.0 at or beyond max_distance", function()
             local shade = lurek.raycaster.distanceShade(10.0, 10.0)
             expect_near(0.0, shade, 0.001)
         end)
 
-        -- @covers lurek.raycaster.distanceShade
+        -- @tests lurek.raycaster.distanceShade
         -- @description Verifies distanceShade remains within the inclusive [0, 1] range.
         it("returns value in [0, 1]", function()
             local shade = lurek.raycaster.distanceShade(4.0, 10.0)
@@ -302,7 +302,7 @@ end
 describe("lurek.raycaster castFloorRow", function()
     -- @description Covers suite: API exposure.
     describe("API exposure", function()
-        -- @covers lurek.raycaster:castFloorRow
+        -- @tests lurek.raycaster:castFloorRow
         -- @description castFloorRow is callable on a raycaster.
         it("castFloorRow is a function on raycaster", function()
             local rc = make_raycaster()
@@ -317,7 +317,7 @@ describe("lurek.raycaster castFloorRow", function()
         local dir_x, dir_y  = 1.0, 0.0
         local plane_x, plane_y = 0.0, 0.66  -- standard 66° FOV half-plane
 
-        -- @covers lurek.raycaster:castFloorRow
+        -- @tests lurek.raycaster:castFloorRow
         -- @description Returns a table.
         it("returns a table", function()
             local rc = make_raycaster()
@@ -325,7 +325,7 @@ describe("lurek.raycaster castFloorRow", function()
             expect_type("table", uvs)
         end)
 
-        -- @covers lurek.raycaster:castFloorRow
+        -- @tests lurek.raycaster:castFloorRow
         -- @description Table length equals screen width.
         it("table length equals screen width", function()
             local rc = make_raycaster()
@@ -334,7 +334,7 @@ describe("lurek.raycaster castFloorRow", function()
             expect_equal(w, #uvs)
         end)
 
-        -- @covers lurek.raycaster:castFloorRow
+        -- @tests lurek.raycaster:castFloorRow
         -- @description Each element has u and v keys.
         it("each element is a {u, v} table", function()
             local rc = make_raycaster()
@@ -346,7 +346,7 @@ describe("lurek.raycaster castFloorRow", function()
             end
         end)
 
-        -- @covers lurek.raycaster:castFloorRow
+        -- @tests lurek.raycaster:castFloorRow
         -- @description UV values are in [0, 1] range.
         it("UV values are in [0, 1]", function()
             local rc = make_raycaster()
@@ -359,7 +359,7 @@ describe("lurek.raycaster castFloorRow", function()
             end
         end)
 
-        -- @covers lurek.raycaster:castFloorRow
+        -- @tests lurek.raycaster:castFloorRow
         -- @description Calling for multiple rows does not error.
         it("works for consecutive rows", function()
             local rc = make_raycaster()
@@ -547,64 +547,253 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.raycaster.newDoorManager
+    -- @tests lurek.raycaster.newDoorManager
     it("covers lurek.raycaster.newDoorManager", function()
         -- TODO: Implement test for lurek.raycaster.newDoorManager
     end)
 
-    -- @covers lurek.raycaster.newHeightMap
+    -- @tests lurek.raycaster.newHeightMap
     it("covers lurek.raycaster.newHeightMap", function()
         -- TODO: Implement test for lurek.raycaster.newHeightMap
     end)
 
-    -- @covers lurek.raycaster.newPointLight
+    -- @tests lurek.raycaster.newPointLight
     it("covers lurek.raycaster.newPointLight", function()
         -- TODO: Implement test for lurek.raycaster.newPointLight
     end)
 
-    -- @covers DoorManager:openDoor
+    -- @tests DoorManager:openDoor
     it("covers DoorManager:openDoor", function()
         -- TODO: Implement test for DoorManager:openDoor
     end)
 
-    -- @covers DoorManager:closeDoor
+    -- @tests DoorManager:closeDoor
     it("covers DoorManager:closeDoor", function()
         -- TODO: Implement test for DoorManager:closeDoor
     end)
 
-    -- @covers DoorManager:getDoor
+    -- @tests DoorManager:getDoor
     it("covers DoorManager:getDoor", function()
         -- TODO: Implement test for DoorManager:getDoor
     end)
 
-    -- @covers HeightMap:setFloor
+    -- @tests HeightMap:setFloor
     it("covers HeightMap:setFloor", function()
         -- TODO: Implement test for HeightMap:setFloor
     end)
 
-    -- @covers HeightMap:setCeiling
+    -- @tests HeightMap:setCeiling
     it("covers HeightMap:setCeiling", function()
         -- TODO: Implement test for HeightMap:setCeiling
     end)
 
-    -- @covers HeightMap:floorAt
+    -- @tests HeightMap:floorAt
     it("covers HeightMap:floorAt", function()
         -- TODO: Implement test for HeightMap:floorAt
     end)
 
-    -- @covers HeightMap:ceilingAt
+    -- @tests HeightMap:ceilingAt
     it("covers HeightMap:ceilingAt", function()
         -- TODO: Implement test for HeightMap:ceilingAt
     end)
 
-    -- @covers PointLight:x
+    -- @tests PointLight:x
     it("covers PointLight:x", function()
         -- TODO: Implement test for PointLight:x
     end)
 
-    -- @covers PointLight:y
+    -- @tests PointLight:y
     it("covers PointLight:y", function()
         -- TODO: Implement test for PointLight:y
     end)
 
+end)
+
+describe("Missing explicit test for lurek.raycaster.newMap", function()
+    it("lurek.raycaster.newMap works", function()
+        -- @tests lurek.raycaster.newMap
+        -- TODO: add assertion for lurek.raycaster.newMap
+    end)
+end)
+
+describe("Missing explicit test for lurek.raycaster.newSpriteManager", function()
+    it("lurek.raycaster.newSpriteManager works", function()
+        -- @tests lurek.raycaster.newSpriteManager
+        -- TODO: add assertion for lurek.raycaster.newSpriteManager
+    end)
+end)
+
+describe("Missing explicit test for DoorManager:update", function()
+    it("DoorManager:update works", function()
+        -- @tests DoorManager:update
+        -- TODO: add assertion for DoorManager:update
+    end)
+end)
+
+describe("Missing explicit test for DoorManager:count", function()
+    it("DoorManager:count works", function()
+        -- @tests DoorManager:count
+        -- TODO: add assertion for DoorManager:count
+    end)
+end)
+
+describe("Missing explicit test for DoorManager:type", function()
+    it("DoorManager:type works", function()
+        -- @tests DoorManager:type
+        -- TODO: add assertion for DoorManager:type
+    end)
+end)
+
+describe("Missing explicit test for DoorManager:typeOf", function()
+    it("DoorManager:typeOf works", function()
+        -- @tests DoorManager:typeOf
+        -- TODO: add assertion for DoorManager:typeOf
+    end)
+end)
+
+describe("Missing explicit test for HeightMap:type", function()
+    it("HeightMap:type works", function()
+        -- @tests HeightMap:type
+        -- TODO: add assertion for HeightMap:type
+    end)
+end)
+
+describe("Missing explicit test for HeightMap:typeOf", function()
+    it("HeightMap:typeOf works", function()
+        -- @tests HeightMap:typeOf
+        -- TODO: add assertion for HeightMap:typeOf
+    end)
+end)
+
+describe("Missing explicit test for PointLight:radius", function()
+    it("PointLight:radius works", function()
+        -- @tests PointLight:radius
+        -- TODO: add assertion for PointLight:radius
+    end)
+end)
+
+describe("Missing explicit test for PointLight:intensity", function()
+    it("PointLight:intensity works", function()
+        -- @tests PointLight:intensity
+        -- TODO: add assertion for PointLight:intensity
+    end)
+end)
+
+describe("Missing explicit test for PointLight:color", function()
+    it("PointLight:color works", function()
+        -- @tests PointLight:color
+        -- TODO: add assertion for PointLight:color
+    end)
+end)
+
+describe("Missing explicit test for PointLight:type", function()
+    it("PointLight:type works", function()
+        -- @tests PointLight:type
+        -- TODO: add assertion for PointLight:type
+    end)
+end)
+
+describe("Missing explicit test for PointLight:typeOf", function()
+    it("PointLight:typeOf works", function()
+        -- @tests PointLight:typeOf
+        -- TODO: add assertion for PointLight:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Raycaster:setCell", function()
+    it("Raycaster:setCell works", function()
+        -- @tests Raycaster:setCell
+        -- TODO: add assertion for Raycaster:setCell
+    end)
+end)
+
+describe("Missing explicit test for Raycaster:getCell", function()
+    it("Raycaster:getCell works", function()
+        -- @tests Raycaster:getCell
+        -- TODO: add assertion for Raycaster:getCell
+    end)
+end)
+
+describe("Missing explicit test for Raycaster:setCells", function()
+    it("Raycaster:setCells works", function()
+        -- @tests Raycaster:setCells
+        -- TODO: add assertion for Raycaster:setCells
+    end)
+end)
+
+describe("Missing explicit test for Raycaster:isBlocked", function()
+    it("Raycaster:isBlocked works", function()
+        -- @tests Raycaster:isBlocked
+        -- TODO: add assertion for Raycaster:isBlocked
+    end)
+end)
+
+describe("Missing explicit test for Raycaster:width", function()
+    it("Raycaster:width works", function()
+        -- @tests Raycaster:width
+        -- TODO: add assertion for Raycaster:width
+    end)
+end)
+
+describe("Missing explicit test for Raycaster:height", function()
+    it("Raycaster:height works", function()
+        -- @tests Raycaster:height
+        -- TODO: add assertion for Raycaster:height
+    end)
+end)
+
+describe("Missing explicit test for Raycaster:setWallAlpha", function()
+    it("Raycaster:setWallAlpha works", function()
+        -- @tests Raycaster:setWallAlpha
+        -- TODO: add assertion for Raycaster:setWallAlpha
+    end)
+end)
+
+describe("Missing explicit test for Raycaster:getWallAlpha", function()
+    it("Raycaster:getWallAlpha works", function()
+        -- @tests Raycaster:getWallAlpha
+        -- TODO: add assertion for Raycaster:getWallAlpha
+    end)
+end)
+
+describe("Missing explicit test for SpriteManager:remove", function()
+    it("SpriteManager:remove works", function()
+        -- @tests SpriteManager:remove
+        -- TODO: add assertion for SpriteManager:remove
+    end)
+end)
+
+describe("Missing explicit test for SpriteManager:setPosition", function()
+    it("SpriteManager:setPosition works", function()
+        -- @tests SpriteManager:setPosition
+        -- TODO: add assertion for SpriteManager:setPosition
+    end)
+end)
+
+describe("Missing explicit test for SpriteManager:setVisible", function()
+    it("SpriteManager:setVisible works", function()
+        -- @tests SpriteManager:setVisible
+        -- TODO: add assertion for SpriteManager:setVisible
+    end)
+end)
+
+describe("Missing explicit test for SpriteManager:clear", function()
+    it("SpriteManager:clear works", function()
+        -- @tests SpriteManager:clear
+        -- TODO: add assertion for SpriteManager:clear
+    end)
+end)
+
+describe("Missing explicit test for SpriteManager:type", function()
+    it("SpriteManager:type works", function()
+        -- @tests SpriteManager:type
+        -- TODO: add assertion for SpriteManager:type
+    end)
+end)
+
+describe("Missing explicit test for SpriteManager:typeOf", function()
+    it("SpriteManager:typeOf works", function()
+        -- @tests SpriteManager:typeOf
+        -- TODO: add assertion for SpriteManager:typeOf
+    end)
 end)

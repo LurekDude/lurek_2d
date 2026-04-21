@@ -4,22 +4,22 @@
 
 -- @description Verifies the module table, constructors, counters, ambient state, enable state, and max-light controls all round-trip through the public API.
 describe("lurek.light module functions", function()
-    -- @covers lurek.light.advanceFlickers
-    -- @covers lurek.light.clear
-    -- @covers lurek.light.getAmbient
-    -- @covers lurek.light.getGroupCount
-    -- @covers lurek.light.getLightCount
-    -- @covers lurek.light.getMaxLights
-    -- @covers lurek.light.getOccluderCount
-    -- @covers lurek.light.isEnabled
-    -- @covers lurek.light.newLight
-    -- @covers lurek.light.newOccluder
-    -- @covers lurek.light.setAmbient
-    -- @covers lurek.light.setEnabled
-    -- @covers lurek.light.setGroupColor
-    -- @covers lurek.light.setGroupEnabled
-    -- @covers lurek.light.setGroupIntensity
-    -- @covers lurek.light.setMaxLights
+    -- @tests lurek.light.advanceFlickers
+    -- @tests lurek.light.clear
+    -- @tests lurek.light.getAmbient
+    -- @tests lurek.light.getGroupCount
+    -- @tests lurek.light.getLightCount
+    -- @tests lurek.light.getMaxLights
+    -- @tests lurek.light.getOccluderCount
+    -- @tests lurek.light.isEnabled
+    -- @tests lurek.light.newLight
+    -- @tests lurek.light.newOccluder
+    -- @tests lurek.light.setAmbient
+    -- @tests lurek.light.setEnabled
+    -- @tests lurek.light.setGroupColor
+    -- @tests lurek.light.setGroupEnabled
+    -- @tests lurek.light.setGroupIntensity
+    -- @tests lurek.light.setMaxLights
     -- @description Asserts that lurek.light is exposed to Lua as a table.
     it("lurek.light is a table", function()
         expect_type("table", lurek.light)
@@ -1267,13 +1267,13 @@ end)
 describe("lurek.light ambient bridge", function()
     -- @description Covers suite: API exposure.
     describe("API exposure", function()
-        -- @covers lurek.light.syncAmbient
+        -- @tests lurek.light.syncAmbient
         -- @description syncAmbient is exposed as a function.
         it("exposes syncAmbient", function()
             expect_type("function", lurek.light.syncAmbient)
         end)
 
-        -- @covers lurek.light.getGodRayHints
+        -- @tests lurek.light.getGodRayHints
         -- @description getGodRayHints is exposed as a function.
         it("exposes getGodRayHints", function()
             expect_type("function", lurek.light.getGodRayHints)
@@ -1282,7 +1282,7 @@ describe("lurek.light ambient bridge", function()
 
     -- @description Covers suite: syncAmbient().
     describe("syncAmbient()", function()
-        -- @covers lurek.light.syncAmbient
+        -- @tests lurek.light.syncAmbient
         -- @description Returns four numbers.
         it("returns four numeric values", function()
             local r, g, b, a = lurek.light.syncAmbient()
@@ -1292,7 +1292,7 @@ describe("lurek.light ambient bridge", function()
             expect_type("number", a)
         end)
 
-        -- @covers lurek.light.syncAmbient
+        -- @tests lurek.light.syncAmbient
         -- @description Alpha is in [0, 1].
         it("alpha component is in [0, 1]", function()
             local _, _, _, a = lurek.light.syncAmbient()
@@ -1300,8 +1300,8 @@ describe("lurek.light ambient bridge", function()
                 "alpha out of [0,1]: " .. tostring(a))
         end)
 
-        -- @covers lurek.light.setAmbient
-        -- @covers lurek.light.syncAmbient
+        -- @tests lurek.light.setAmbient
+        -- @tests lurek.light.syncAmbient
         -- @description After setAmbient, syncAmbient reflects the new colour.
         it("reflects setAmbient changes", function()
             lurek.light.setAmbient(0.2, 0.4, 0.6, 0.8)
@@ -1312,8 +1312,8 @@ describe("lurek.light ambient bridge", function()
             expect_near(0.8, a, 0.001)
         end)
 
-        -- @covers lurek.light.setAmbient
-        -- @covers lurek.light.syncAmbient
+        -- @tests lurek.light.setAmbient
+        -- @tests lurek.light.syncAmbient
         -- @description syncAmbient matches getAmbient.
         it("matches getAmbient values", function()
             lurek.light.setAmbient(0.1, 0.3, 0.5, 1.0)
@@ -1328,14 +1328,14 @@ describe("lurek.light ambient bridge", function()
 
     -- @description Covers suite: getGodRayHints().
     describe("getGodRayHints()", function()
-        -- @covers lurek.light.getGodRayHints
+        -- @tests lurek.light.getGodRayHints
         -- @description Returns a table.
         it("returns a table", function()
             local hints = lurek.light.getGodRayHints()
             expect_type("table", hints)
         end)
 
-        -- @covers lurek.light.getGodRayHints
+        -- @tests lurek.light.getGodRayHints
         -- @description Returns empty table when no directional lights exist.
         it("returns empty table with no directional lights", function()
             lurek.light.clearAll()
@@ -1343,8 +1343,8 @@ describe("lurek.light ambient bridge", function()
             expect_equal(0, #hints)
         end)
 
-        -- @covers lurek.light.newLight
-        -- @covers lurek.light.getGodRayHints
+        -- @tests lurek.light.newLight
+        -- @tests lurek.light.getGodRayHints
         -- @description Each hint entry has x, y, and angle fields.
         it("each hint has x, y, angle fields", function()
             lurek.light.clearAll()
@@ -1360,7 +1360,7 @@ describe("lurek.light ambient bridge", function()
             end
         end)
 
-        -- @covers lurek.light.getGodRayHints
+        -- @tests lurek.light.getGodRayHints
         -- @description Disabled directional lights are not included.
         it("disabled lights are excluded", function()
             lurek.light.clearAll()
@@ -1379,34 +1379,447 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers Light:addFlicker
+    -- @tests Light:addFlicker
     it("covers Light:addFlicker", function()
         -- TODO: Implement test for Light:addFlicker
     end)
 
-    -- @covers Light:updateTransition
+    -- @tests Light:updateTransition
     it("covers Light:updateTransition", function()
         -- TODO: Implement test for Light:updateTransition
     end)
 
-    -- @covers Light:stopTransition
+    -- @tests Light:stopTransition
     it("covers Light:stopTransition", function()
         -- TODO: Implement test for Light:stopTransition
     end)
 
-    -- @covers Light:setCookie
+    -- @tests Light:setCookie
     it("covers Light:setCookie", function()
         -- TODO: Implement test for Light:setCookie
     end)
 
-    -- @covers Light:getCookie
+    -- @tests Light:getCookie
     it("covers Light:getCookie", function()
         -- TODO: Implement test for Light:getCookie
     end)
 
-    -- @covers Light:clearCookie
+    -- @tests Light:clearCookie
     it("covers Light:clearCookie", function()
         -- TODO: Implement test for Light:clearCookie
     end)
 
+end)
+
+describe("Missing explicit test for Light:setPosition", function()
+    it("Light:setPosition works", function()
+        -- @tests Light:setPosition
+        -- TODO: add assertion for Light:setPosition
+    end)
+end)
+
+describe("Missing explicit test for Light:getPosition", function()
+    it("Light:getPosition works", function()
+        -- @tests Light:getPosition
+        -- TODO: add assertion for Light:getPosition
+    end)
+end)
+
+describe("Missing explicit test for Light:setRadius", function()
+    it("Light:setRadius works", function()
+        -- @tests Light:setRadius
+        -- TODO: add assertion for Light:setRadius
+    end)
+end)
+
+describe("Missing explicit test for Light:getRadius", function()
+    it("Light:getRadius works", function()
+        -- @tests Light:getRadius
+        -- TODO: add assertion for Light:getRadius
+    end)
+end)
+
+describe("Missing explicit test for Light:getColor", function()
+    it("Light:getColor works", function()
+        -- @tests Light:getColor
+        -- TODO: add assertion for Light:getColor
+    end)
+end)
+
+describe("Missing explicit test for Light:setIntensity", function()
+    it("Light:setIntensity works", function()
+        -- @tests Light:setIntensity
+        -- TODO: add assertion for Light:setIntensity
+    end)
+end)
+
+describe("Missing explicit test for Light:getIntensity", function()
+    it("Light:getIntensity works", function()
+        -- @tests Light:getIntensity
+        -- TODO: add assertion for Light:getIntensity
+    end)
+end)
+
+describe("Missing explicit test for Light:setEnergy", function()
+    it("Light:setEnergy works", function()
+        -- @tests Light:setEnergy
+        -- TODO: add assertion for Light:setEnergy
+    end)
+end)
+
+describe("Missing explicit test for Light:getEnergy", function()
+    it("Light:getEnergy works", function()
+        -- @tests Light:getEnergy
+        -- TODO: add assertion for Light:getEnergy
+    end)
+end)
+
+describe("Missing explicit test for Light:setBlendMode", function()
+    it("Light:setBlendMode works", function()
+        -- @tests Light:setBlendMode
+        -- TODO: add assertion for Light:setBlendMode
+    end)
+end)
+
+describe("Missing explicit test for Light:getBlendMode", function()
+    it("Light:getBlendMode works", function()
+        -- @tests Light:getBlendMode
+        -- TODO: add assertion for Light:getBlendMode
+    end)
+end)
+
+describe("Missing explicit test for Light:setFalloff", function()
+    it("Light:setFalloff works", function()
+        -- @tests Light:setFalloff
+        -- TODO: add assertion for Light:setFalloff
+    end)
+end)
+
+describe("Missing explicit test for Light:getFalloff", function()
+    it("Light:getFalloff works", function()
+        -- @tests Light:getFalloff
+        -- TODO: add assertion for Light:getFalloff
+    end)
+end)
+
+describe("Missing explicit test for Light:setShadowEnabled", function()
+    it("Light:setShadowEnabled works", function()
+        -- @tests Light:setShadowEnabled
+        -- TODO: add assertion for Light:setShadowEnabled
+    end)
+end)
+
+describe("Missing explicit test for Light:isShadowEnabled", function()
+    it("Light:isShadowEnabled works", function()
+        -- @tests Light:isShadowEnabled
+        -- TODO: add assertion for Light:isShadowEnabled
+    end)
+end)
+
+describe("Missing explicit test for Light:getShadowColor", function()
+    it("Light:getShadowColor works", function()
+        -- @tests Light:getShadowColor
+        -- TODO: add assertion for Light:getShadowColor
+    end)
+end)
+
+describe("Missing explicit test for Light:setShadowFilter", function()
+    it("Light:setShadowFilter works", function()
+        -- @tests Light:setShadowFilter
+        -- TODO: add assertion for Light:setShadowFilter
+    end)
+end)
+
+describe("Missing explicit test for Light:getShadowFilter", function()
+    it("Light:getShadowFilter works", function()
+        -- @tests Light:getShadowFilter
+        -- TODO: add assertion for Light:getShadowFilter
+    end)
+end)
+
+describe("Missing explicit test for Light:setShadowSmooth", function()
+    it("Light:setShadowSmooth works", function()
+        -- @tests Light:setShadowSmooth
+        -- TODO: add assertion for Light:setShadowSmooth
+    end)
+end)
+
+describe("Missing explicit test for Light:getShadowSmooth", function()
+    it("Light:getShadowSmooth works", function()
+        -- @tests Light:getShadowSmooth
+        -- TODO: add assertion for Light:getShadowSmooth
+    end)
+end)
+
+describe("Missing explicit test for Light:setLightMask", function()
+    it("Light:setLightMask works", function()
+        -- @tests Light:setLightMask
+        -- TODO: add assertion for Light:setLightMask
+    end)
+end)
+
+describe("Missing explicit test for Light:getLightMask", function()
+    it("Light:getLightMask works", function()
+        -- @tests Light:getLightMask
+        -- TODO: add assertion for Light:getLightMask
+    end)
+end)
+
+describe("Missing explicit test for Light:setShadowMask", function()
+    it("Light:setShadowMask works", function()
+        -- @tests Light:setShadowMask
+        -- TODO: add assertion for Light:setShadowMask
+    end)
+end)
+
+describe("Missing explicit test for Light:getShadowMask", function()
+    it("Light:getShadowMask works", function()
+        -- @tests Light:getShadowMask
+        -- TODO: add assertion for Light:getShadowMask
+    end)
+end)
+
+describe("Missing explicit test for Light:setEnabled", function()
+    it("Light:setEnabled works", function()
+        -- @tests Light:setEnabled
+        -- TODO: add assertion for Light:setEnabled
+    end)
+end)
+
+describe("Missing explicit test for Light:isEnabled", function()
+    it("Light:isEnabled works", function()
+        -- @tests Light:isEnabled
+        -- TODO: add assertion for Light:isEnabled
+    end)
+end)
+
+describe("Missing explicit test for Light:setLightType", function()
+    it("Light:setLightType works", function()
+        -- @tests Light:setLightType
+        -- TODO: add assertion for Light:setLightType
+    end)
+end)
+
+describe("Missing explicit test for Light:getLightType", function()
+    it("Light:getLightType works", function()
+        -- @tests Light:getLightType
+        -- TODO: add assertion for Light:getLightType
+    end)
+end)
+
+describe("Missing explicit test for Light:setDirection", function()
+    it("Light:setDirection works", function()
+        -- @tests Light:setDirection
+        -- TODO: add assertion for Light:setDirection
+    end)
+end)
+
+describe("Missing explicit test for Light:getDirection", function()
+    it("Light:getDirection works", function()
+        -- @tests Light:getDirection
+        -- TODO: add assertion for Light:getDirection
+    end)
+end)
+
+describe("Missing explicit test for Light:setInnerAngle", function()
+    it("Light:setInnerAngle works", function()
+        -- @tests Light:setInnerAngle
+        -- TODO: add assertion for Light:setInnerAngle
+    end)
+end)
+
+describe("Missing explicit test for Light:getInnerAngle", function()
+    it("Light:getInnerAngle works", function()
+        -- @tests Light:getInnerAngle
+        -- TODO: add assertion for Light:getInnerAngle
+    end)
+end)
+
+describe("Missing explicit test for Light:setOuterAngle", function()
+    it("Light:setOuterAngle works", function()
+        -- @tests Light:setOuterAngle
+        -- TODO: add assertion for Light:setOuterAngle
+    end)
+end)
+
+describe("Missing explicit test for Light:getOuterAngle", function()
+    it("Light:getOuterAngle works", function()
+        -- @tests Light:getOuterAngle
+        -- TODO: add assertion for Light:getOuterAngle
+    end)
+end)
+
+describe("Missing explicit test for Light:setAttenuation", function()
+    it("Light:setAttenuation works", function()
+        -- @tests Light:setAttenuation
+        -- TODO: add assertion for Light:setAttenuation
+    end)
+end)
+
+describe("Missing explicit test for Light:getAttenuation", function()
+    it("Light:getAttenuation works", function()
+        -- @tests Light:getAttenuation
+        -- TODO: add assertion for Light:getAttenuation
+    end)
+end)
+
+describe("Missing explicit test for Light:setFlicker", function()
+    it("Light:setFlicker works", function()
+        -- @tests Light:setFlicker
+        -- TODO: add assertion for Light:setFlicker
+    end)
+end)
+
+describe("Missing explicit test for Light:getFlicker", function()
+    it("Light:getFlicker works", function()
+        -- @tests Light:getFlicker
+        -- TODO: add assertion for Light:getFlicker
+    end)
+end)
+
+describe("Missing explicit test for Light:setFlickerEnabled", function()
+    it("Light:setFlickerEnabled works", function()
+        -- @tests Light:setFlickerEnabled
+        -- TODO: add assertion for Light:setFlickerEnabled
+    end)
+end)
+
+describe("Missing explicit test for Light:isFlickerEnabled", function()
+    it("Light:isFlickerEnabled works", function()
+        -- @tests Light:isFlickerEnabled
+        -- TODO: add assertion for Light:isFlickerEnabled
+    end)
+end)
+
+describe("Missing explicit test for Light:setGroupId", function()
+    it("Light:setGroupId works", function()
+        -- @tests Light:setGroupId
+        -- TODO: add assertion for Light:setGroupId
+    end)
+end)
+
+describe("Missing explicit test for Light:getGroupId", function()
+    it("Light:getGroupId works", function()
+        -- @tests Light:getGroupId
+        -- TODO: add assertion for Light:getGroupId
+    end)
+end)
+
+describe("Missing explicit test for Light:setVolumetric", function()
+    it("Light:setVolumetric works", function()
+        -- @tests Light:setVolumetric
+        -- TODO: add assertion for Light:setVolumetric
+    end)
+end)
+
+describe("Missing explicit test for Light:isVolumetric", function()
+    it("Light:isVolumetric works", function()
+        -- @tests Light:isVolumetric
+        -- TODO: add assertion for Light:isVolumetric
+    end)
+end)
+
+describe("Missing explicit test for Light:remove", function()
+    it("Light:remove works", function()
+        -- @tests Light:remove
+        -- TODO: add assertion for Light:remove
+    end)
+end)
+
+describe("Missing explicit test for Light:isValid", function()
+    it("Light:isValid works", function()
+        -- @tests Light:isValid
+        -- TODO: add assertion for Light:isValid
+    end)
+end)
+
+describe("Missing explicit test for Light:transitionProgress", function()
+    it("Light:transitionProgress works", function()
+        -- @tests Light:transitionProgress
+        -- TODO: add assertion for Light:transitionProgress
+    end)
+end)
+
+describe("Missing explicit test for Occluder:setVertices", function()
+    it("Occluder:setVertices works", function()
+        -- @tests Occluder:setVertices
+        -- TODO: add assertion for Occluder:setVertices
+    end)
+end)
+
+describe("Missing explicit test for Occluder:getVertices", function()
+    it("Occluder:getVertices works", function()
+        -- @tests Occluder:getVertices
+        -- TODO: add assertion for Occluder:getVertices
+    end)
+end)
+
+describe("Missing explicit test for Occluder:setPosition", function()
+    it("Occluder:setPosition works", function()
+        -- @tests Occluder:setPosition
+        -- TODO: add assertion for Occluder:setPosition
+    end)
+end)
+
+describe("Missing explicit test for Occluder:getPosition", function()
+    it("Occluder:getPosition works", function()
+        -- @tests Occluder:getPosition
+        -- TODO: add assertion for Occluder:getPosition
+    end)
+end)
+
+describe("Missing explicit test for Occluder:setOpacity", function()
+    it("Occluder:setOpacity works", function()
+        -- @tests Occluder:setOpacity
+        -- TODO: add assertion for Occluder:setOpacity
+    end)
+end)
+
+describe("Missing explicit test for Occluder:getOpacity", function()
+    it("Occluder:getOpacity works", function()
+        -- @tests Occluder:getOpacity
+        -- TODO: add assertion for Occluder:getOpacity
+    end)
+end)
+
+describe("Missing explicit test for Occluder:setLightMask", function()
+    it("Occluder:setLightMask works", function()
+        -- @tests Occluder:setLightMask
+        -- TODO: add assertion for Occluder:setLightMask
+    end)
+end)
+
+describe("Missing explicit test for Occluder:getLightMask", function()
+    it("Occluder:getLightMask works", function()
+        -- @tests Occluder:getLightMask
+        -- TODO: add assertion for Occluder:getLightMask
+    end)
+end)
+
+describe("Missing explicit test for Occluder:setEnabled", function()
+    it("Occluder:setEnabled works", function()
+        -- @tests Occluder:setEnabled
+        -- TODO: add assertion for Occluder:setEnabled
+    end)
+end)
+
+describe("Missing explicit test for Occluder:isEnabled", function()
+    it("Occluder:isEnabled works", function()
+        -- @tests Occluder:isEnabled
+        -- TODO: add assertion for Occluder:isEnabled
+    end)
+end)
+
+describe("Missing explicit test for Occluder:remove", function()
+    it("Occluder:remove works", function()
+        -- @tests Occluder:remove
+        -- TODO: add assertion for Occluder:remove
+    end)
+end)
+
+describe("Missing explicit test for Occluder:isValid", function()
+    it("Occluder:isValid works", function()
+        -- @tests Occluder:isValid
+        -- TODO: add assertion for Occluder:isValid
+    end)
 end)

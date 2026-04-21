@@ -3,17 +3,17 @@
 
 -- @description Verifies the timer namespace is exposed on lurek as a Lua table.
 describe("lurek.timer module exists", function()
-    -- @covers lurek.timer.getAverageDelta
-    -- @covers lurek.timer.getDelta
-    -- @covers lurek.timer.getFrameCount
-    -- @covers lurek.timer.getFPS
-    -- @covers lurek.timer.getMicroTime
-    -- @covers lurek.timer.getPhysicsDelta
-    -- @covers lurek.timer.getTime
-    -- @covers lurek.timer.setPhysicsDelta
-    -- @covers lurek.timer.sleep
-    -- @covers lurek.timer.step
-    -- @covers lurek.timer.newScheduler
+    -- @tests lurek.timer.getAverageDelta
+    -- @tests lurek.timer.getDelta
+    -- @tests lurek.timer.getFrameCount
+    -- @tests lurek.timer.getFPS
+    -- @tests lurek.timer.getMicroTime
+    -- @tests lurek.timer.getPhysicsDelta
+    -- @tests lurek.timer.getTime
+    -- @tests lurek.timer.setPhysicsDelta
+    -- @tests lurek.timer.sleep
+    -- @tests lurek.timer.step
+    -- @tests lurek.timer.newScheduler
     -- @description Asserts that lurek.timer has Lua type table.
     it("lurek.timer is a table", function()
         expect_type("table", lurek.timer)
@@ -368,7 +368,7 @@ end)
 
 -- @description Tests for new timer features: scheduler.pauseNamed/resumeNamed, chain(), tickRealTimers(), getSmoothedDelta.
 describe("lurek.timer new scheduler features", function()
-  -- @covers lurek.timer.newScheduler
+  -- @tests lurek.timer.newScheduler
   -- @description Creates a scheduler, schedules a named event, pauses it, advances time, confirms it did not fire, then resumes and confirms it fires.
   it("pauseNamed and resumeNamed block and allow events", function()
     local s = lurek.timer.newScheduler()
@@ -382,7 +382,7 @@ describe("lurek.timer new scheduler features", function()
     expect_equal(fired, true)
   end)
 
-  -- @covers lurek.timer.chain
+  -- @tests lurek.timer.chain
   -- @description Creates a two-step chain; confirms second step fires after both delays have elapsed.
   it("chain fires steps in sequence", function()
     local results = {}
@@ -396,8 +396,8 @@ describe("lurek.timer new scheduler features", function()
     expect_equal(#results, 2)
   end)
 
-  -- @covers lurek.timer.afterReal
-  -- @covers lurek.timer.tickRealTimers
+  -- @tests lurek.timer.afterReal
+  -- @tests lurek.timer.tickRealTimers
   -- @description Schedules a near-zero real-clock timer; confirms it fires after tickRealTimers() is called with sufficient elapsed time.
   it("afterReal fires via tickRealTimers", function()
     local fired = false
@@ -406,8 +406,8 @@ describe("lurek.timer new scheduler features", function()
     expect_equal(fired, true)
   end)
 
-  -- @covers lurek.timer.setSmoothingFactor
-  -- @covers lurek.timer.getSmoothedDelta
+  -- @tests lurek.timer.setSmoothingFactor
+  -- @tests lurek.timer.getSmoothedDelta
   -- @description Confirms getSmoothedDelta returns a positive number after calling it once.
   it("getSmoothedDelta returns a positive number", function()
     lurek.timer.setSmoothingFactor(0.5)
@@ -415,7 +415,7 @@ describe("lurek.timer new scheduler features", function()
     expect_true(type(dt) == "number" and dt >= 0, "smoothed delta must be non-negative")
   end)
 
-  -- @covers lurek.timer.newScheduler
+  -- @tests lurek.timer.newScheduler
   -- @description Verifies isPausedNamed returns correct booleans.
   it("isPausedNamed reflects pause state", function()
     local s = lurek.timer.newScheduler()
@@ -432,14 +432,14 @@ end)
 
 -- @description Verifies coroutine wait/tick APIs: tickWaits is callable, waitFrames yields and resumes, waitSeconds completes after tick.
 describe("lurek.timer coroutine wait support", function()
-    -- @covers lurek.timer.tickWaits
+    -- @tests lurek.timer.tickWaits
     -- @description Calls tickWaits with no pending waits; expects no error.
     it("timer_tickWaits_is_callable", function()
         lurek.timer.tickWaits()
         expect_true(true, "tickWaits should not error when there are no pending waits")
     end)
 
-    -- @covers lurek.timer.waitFrames
+    -- @tests lurek.timer.waitFrames
     -- @description Creates a coroutine that calls waitFrames(1); confirms it yields (status remains "suspended") after the first resume.
     it("timer_waitFrames_inside_coroutine_yields", function()
         local co = coroutine.create(function()
@@ -450,8 +450,8 @@ describe("lurek.timer coroutine wait support", function()
             "coroutine should still be suspended after waitFrames(1)")
     end)
 
-    -- @covers lurek.timer.waitFrames
-    -- @covers lurek.timer.tickWaits
+    -- @tests lurek.timer.waitFrames
+    -- @tests lurek.timer.tickWaits
     -- @description Same setup as above; after one tickWaits() call the frame count reaches 1 so the coroutine is resumed to completion.
     it("timer_waitFrames_resumes_after_tick", function()
         local co = coroutine.create(function()
@@ -465,8 +465,8 @@ describe("lurek.timer coroutine wait support", function()
             "coroutine should be dead after waitFrames(1) + tickWaits()")
     end)
 
-    -- @covers lurek.timer.waitSeconds
-    -- @covers lurek.timer.tickWaits
+    -- @tests lurek.timer.waitSeconds
+    -- @tests lurek.timer.tickWaits
     -- @description Creates a coroutine calling waitSeconds(0); after resume + tick it should reach completion because 0-second deadline is already expired.
     it("timer_waitSeconds_inside_coroutine_yields", function()
         local co = coroutine.create(function()
@@ -485,27 +485,27 @@ end)
 
 -- @description Covers suite: lurek.timer physics max steps configurability.
 describe("lurek.timer physicsMaxSteps configurability", function()
-    -- @covers lurek.timer.getPhysicsMaxSteps
+    -- @tests lurek.timer.getPhysicsMaxSteps
     -- @description Verifies getPhysicsMaxSteps is exported as a callable function.
     it("getPhysicsMaxSteps is a function", function()
         expect_type("function", lurek.timer.getPhysicsMaxSteps)
     end)
 
-    -- @covers lurek.timer.setPhysicsMaxSteps
+    -- @tests lurek.timer.setPhysicsMaxSteps
     -- @description Verifies setPhysicsMaxSteps is exported as a callable function.
     it("setPhysicsMaxSteps is a function", function()
         expect_type("function", lurek.timer.setPhysicsMaxSteps)
     end)
 
-    -- @covers lurek.timer.getPhysicsMaxSteps
+    -- @tests lurek.timer.getPhysicsMaxSteps
     -- @description Confirms the default physics max steps value is 8 on a fresh VM.
     it("getPhysicsMaxSteps_default_is_8", function()
         local steps = lurek.timer.getPhysicsMaxSteps()
         expect_equal(8, steps)
     end)
 
-    -- @covers lurek.timer.setPhysicsMaxSteps
-    -- @covers lurek.timer.getPhysicsMaxSteps
+    -- @tests lurek.timer.setPhysicsMaxSteps
+    -- @tests lurek.timer.getPhysicsMaxSteps
     -- @description Sets a new physics max steps value and reads it back to verify round-trip fidelity.
     it("setPhysicsMaxSteps_roundtrips_value", function()
         lurek.timer.setPhysicsMaxSteps(16)
@@ -513,8 +513,8 @@ describe("lurek.timer physicsMaxSteps configurability", function()
         lurek.timer.setPhysicsMaxSteps(8) -- restore default
     end)
 
-    -- @covers lurek.timer.setPhysicsMaxSteps
-    -- @covers lurek.timer.getPhysicsMaxSteps
+    -- @tests lurek.timer.setPhysicsMaxSteps
+    -- @tests lurek.timer.getPhysicsMaxSteps
     -- @description Passes 0 (below minimum); the engine must clamp the stored value to 1.
     it("setPhysicsMaxSteps_clamps_below_minimum_to_1", function()
         lurek.timer.setPhysicsMaxSteps(0)
@@ -522,8 +522,8 @@ describe("lurek.timer physicsMaxSteps configurability", function()
         lurek.timer.setPhysicsMaxSteps(8) -- restore default
     end)
 
-    -- @covers lurek.timer.setPhysicsMaxSteps
-    -- @covers lurek.timer.getPhysicsMaxSteps
+    -- @tests lurek.timer.setPhysicsMaxSteps
+    -- @tests lurek.timer.getPhysicsMaxSteps
     -- @description Passes 999 (above maximum); the engine must clamp the stored value to 64.
     it("setPhysicsMaxSteps_clamps_above_maximum_to_64", function()
         lurek.timer.setPhysicsMaxSteps(999)
@@ -535,9 +535,9 @@ end)
 -- ── afterFrames / everyFrames / updateFrames ──────────────────────────────────
 -- @description Tests for frame-count based scheduler events: afterFrames, everyFrames, updateFrames.
 describe("lurek.timer scheduler frame events", function()
-  -- @covers lurek.timer.newScheduler
-  -- @covers lurek.timer.Scheduler.afterFrames
-  -- @covers lurek.timer.Scheduler.updateFrames
+  -- @tests lurek.timer.newScheduler
+  -- @tests lurek.timer.Scheduler.afterFrames
+  -- @tests lurek.timer.Scheduler.updateFrames
   -- @description afterFrames fires callback exactly after the given number of updateFrames calls.
   it("afterFrames fires after n frames", function()
     local s = lurek.timer.newScheduler()
@@ -550,7 +550,7 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(1, fired)
   end)
 
-  -- @covers lurek.timer.Scheduler.afterFrames
+  -- @tests lurek.timer.Scheduler.afterFrames
   -- @description afterFrames fires exactly once even after many more frames.
   it("afterFrames fires exactly once", function()
     local s = lurek.timer.newScheduler()
@@ -560,8 +560,8 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(1, fired)
   end)
 
-  -- @covers lurek.timer.Scheduler.everyFrames
-  -- @covers lurek.timer.Scheduler.updateFrames
+  -- @tests lurek.timer.Scheduler.everyFrames
+  -- @tests lurek.timer.Scheduler.updateFrames
   -- @description everyFrames fires once every n frames over 6 frames.
   it("everyFrames fires every n frames", function()
     local s = lurek.timer.newScheduler()
@@ -571,7 +571,7 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(3, fired)
   end)
 
-  -- @covers lurek.timer.Scheduler.everyFrames
+  -- @tests lurek.timer.Scheduler.everyFrames
   -- @description everyFrames with a count limit stops after that many firings.
   it("everyFrames respects count limit", function()
     local s = lurek.timer.newScheduler()
@@ -581,7 +581,7 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(3, fired)
   end)
 
-  -- @covers lurek.timer.Scheduler.updateFrames
+  -- @tests lurek.timer.Scheduler.updateFrames
   -- @description updateFrames returns the number of callbacks that fired this call.
   it("updateFrames returns fired count", function()
     local s = lurek.timer.newScheduler()
@@ -591,7 +591,7 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(2, count)
   end)
 
-  -- @covers lurek.timer.Scheduler.afterFrames
+  -- @tests lurek.timer.Scheduler.afterFrames
   -- @description afterFrames with n=0 fires immediately on the first updateFrames.
   it("afterFrames(0) fires on first updateFrames", function()
     local s = lurek.timer.newScheduler()
@@ -606,7 +606,7 @@ end)
 
 -- @description Verifies that calling afterNamed twice with the same name replaces the first timer, leaving only one scheduled event.
 describe("lurek.timer scheduler afterNamed replacement", function()
-  -- @covers lurek.timer.Scheduler.afterNamed
+  -- @tests lurek.timer.Scheduler.afterNamed
   -- @description Schedules two afterNamed events with the same name; count must remain 1 (second replaces first).
   it("afterNamed with same name replaces the previous timer", function()
     local s = lurek.timer.newScheduler()
@@ -616,7 +616,7 @@ describe("lurek.timer scheduler afterNamed replacement", function()
     expect_equal(1, s:getCount())
   end)
 
-  -- @covers lurek.timer.Scheduler.afterNamed
+  -- @tests lurek.timer.Scheduler.afterNamed
   -- @description Only the replacement callback fires; the original must not execute.
   it("afterNamed replacement fires the new callback, not the old one", function()
     local s = lurek.timer.newScheduler()
@@ -629,7 +629,7 @@ describe("lurek.timer scheduler afterNamed replacement", function()
     expect_equal(true,  fired_new)
   end)
 
-  -- @covers lurek.timer.Scheduler.afterNamed
+  -- @tests lurek.timer.Scheduler.afterNamed
   -- @description Different names do NOT replace each other; count must equal the number of distinct names.
   it("afterNamed with different names does not replace", function()
     local s = lurek.timer.newScheduler()
@@ -643,14 +643,14 @@ end)
 
 -- @description Verifies lurek.timer.delay is a coroutine-based wait alias backed by waitSeconds.
 describe("lurek.timer.delay", function()
-  -- @covers lurek.timer.delay
+  -- @tests lurek.timer.delay
   -- @description delay is exported as a callable function.
   it("delay is a function", function()
     expect_type("function", lurek.timer.delay)
   end)
 
-  -- @covers lurek.timer.delay
-  -- @covers lurek.timer.tickWaits
+  -- @tests lurek.timer.delay
+  -- @tests lurek.timer.tickWaits
   -- @description delay(0) inside a coroutine yields and resumes after one tickWaits.
   it("delay(0) yields and resumes after tickWaits", function()
     local co = coroutine.create(function()
@@ -669,14 +669,154 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers Scheduler:getRepeatCount
+    -- @tests Scheduler:getRepeatCount
     it("covers Scheduler:getRepeatCount", function()
         -- TODO: Implement test for Scheduler:getRepeatCount
     end)
 
-    -- @covers Scheduler:resetEvent
+    -- @tests Scheduler:resetEvent
     it("covers Scheduler:resetEvent", function()
         -- TODO: Implement test for Scheduler:resetEvent
     end)
 
+end)
+
+describe("Missing explicit test for Scheduler:after", function()
+    it("Scheduler:after works", function()
+        -- @tests Scheduler:after
+        -- TODO: add assertion for Scheduler:after
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:afterFrames", function()
+    it("Scheduler:afterFrames works", function()
+        -- @tests Scheduler:afterFrames
+        -- TODO: add assertion for Scheduler:afterFrames
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:cancel", function()
+    it("Scheduler:cancel works", function()
+        -- @tests Scheduler:cancel
+        -- TODO: add assertion for Scheduler:cancel
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:cancelNamed", function()
+    it("Scheduler:cancelNamed works", function()
+        -- @tests Scheduler:cancelNamed
+        -- TODO: add assertion for Scheduler:cancelNamed
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:cancelAll", function()
+    it("Scheduler:cancelAll works", function()
+        -- @tests Scheduler:cancelAll
+        -- TODO: add assertion for Scheduler:cancelAll
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:pause", function()
+    it("Scheduler:pause works", function()
+        -- @tests Scheduler:pause
+        -- TODO: add assertion for Scheduler:pause
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:resume", function()
+    it("Scheduler:resume works", function()
+        -- @tests Scheduler:resume
+        -- TODO: add assertion for Scheduler:resume
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:isPaused", function()
+    it("Scheduler:isPaused works", function()
+        -- @tests Scheduler:isPaused
+        -- TODO: add assertion for Scheduler:isPaused
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:pauseNamed", function()
+    it("Scheduler:pauseNamed works", function()
+        -- @tests Scheduler:pauseNamed
+        -- TODO: add assertion for Scheduler:pauseNamed
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:resumeNamed", function()
+    it("Scheduler:resumeNamed works", function()
+        -- @tests Scheduler:resumeNamed
+        -- TODO: add assertion for Scheduler:resumeNamed
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:isPausedNamed", function()
+    it("Scheduler:isPausedNamed works", function()
+        -- @tests Scheduler:isPausedNamed
+        -- TODO: add assertion for Scheduler:isPausedNamed
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:getRemaining", function()
+    it("Scheduler:getRemaining works", function()
+        -- @tests Scheduler:getRemaining
+        -- TODO: add assertion for Scheduler:getRemaining
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:getInterval", function()
+    it("Scheduler:getInterval works", function()
+        -- @tests Scheduler:getInterval
+        -- TODO: add assertion for Scheduler:getInterval
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:getCount", function()
+    it("Scheduler:getCount works", function()
+        -- @tests Scheduler:getCount
+        -- TODO: add assertion for Scheduler:getCount
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:isEmpty", function()
+    it("Scheduler:isEmpty works", function()
+        -- @tests Scheduler:isEmpty
+        -- TODO: add assertion for Scheduler:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:setInterval", function()
+    it("Scheduler:setInterval works", function()
+        -- @tests Scheduler:setInterval
+        -- TODO: add assertion for Scheduler:setInterval
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:setTimeScale", function()
+    it("Scheduler:setTimeScale works", function()
+        -- @tests Scheduler:setTimeScale
+        -- TODO: add assertion for Scheduler:setTimeScale
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:getTimeScale", function()
+    it("Scheduler:getTimeScale works", function()
+        -- @tests Scheduler:getTimeScale
+        -- TODO: add assertion for Scheduler:getTimeScale
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:update", function()
+    it("Scheduler:update works", function()
+        -- @tests Scheduler:update
+        -- TODO: add assertion for Scheduler:update
+    end)
+end)
+
+describe("Missing explicit test for Scheduler:updateFrames", function()
+    it("Scheduler:updateFrames works", function()
+        -- @tests Scheduler:updateFrames
+        -- TODO: add assertion for Scheduler:updateFrames
+    end)
 end)

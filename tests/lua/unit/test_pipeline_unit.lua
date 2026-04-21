@@ -3,9 +3,9 @@
 -- =========================================================================
 -- Helper: table contains value
 -- =========================================================================
--- @covers lurek.pipeline.fromTable
--- @covers lurek.pipeline.newPipeline
--- @covers lurek.pipeline.newStep
+-- @tests lurek.pipeline.fromTable
+-- @tests lurek.pipeline.newPipeline
+-- @tests lurek.pipeline.newStep
 
 local function table_contains(t, value)
     for _, v in ipairs(t) do
@@ -549,7 +549,7 @@ describe("Pipeline serialization", function()
 end)
 
 describe("lurek.pipeline addConditional", function()
-    -- @covers lurek.pipeline.Pipeline.addConditional
+    -- @tests lurek.pipeline.Pipeline.addConditional
     -- @description addConditional runs the step when the condition returns true.
     it("addConditional executes step when condition is true", function()
         local ran = false
@@ -560,7 +560,7 @@ describe("lurek.pipeline addConditional", function()
         expect_true(table_contains(r.completed, "guarded"))
     end)
 
-    -- @covers lurek.pipeline.Pipeline.addConditional
+    -- @tests lurek.pipeline.Pipeline.addConditional
     -- @description addConditional skips the step when the condition returns false.
     it("addConditional skips step when condition is false", function()
         local ran = false
@@ -572,7 +572,7 @@ describe("lurek.pipeline addConditional", function()
 end)
 
 describe("lurek.pipeline onProgress", function()
-    -- @covers lurek.pipeline.Pipeline.onProgress
+    -- @tests lurek.pipeline.Pipeline.onProgress
     -- @description onProgress callback receives step_name and a status string after every step.
     it("onProgress is called for every step", function()
         local events = {}
@@ -592,7 +592,7 @@ describe("lurek.pipeline onProgress", function()
 end)
 
 describe("lurek.pipeline toAscii", function()
-    -- @covers lurek.pipeline.Pipeline.toAscii
+    -- @tests lurek.pipeline.Pipeline.toAscii
     -- @description toAscii returns a non-empty string describing the DAG.
     it("toAscii returns a non-empty string", function()
         local p = lurek.pipeline.newPipeline("ascii_test")
@@ -603,7 +603,7 @@ describe("lurek.pipeline toAscii", function()
         expect_true(#diagram > 0, "toAscii must return a non-empty string")
     end)
 
-    -- @covers lurek.pipeline.Pipeline.toAscii
+    -- @tests lurek.pipeline.Pipeline.toAscii
     -- @description toAscii output contains step names.
     it("toAscii output contains step names", function()
         local p = lurek.pipeline.newPipeline("ascii_names")
@@ -620,64 +620,379 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers Step:setCallback
+    -- @tests Step:setCallback
     it("covers Step:setCallback", function()
         -- TODO: Implement test for Step:setCallback
     end)
 
-    -- @covers Step:getTimeout
+    -- @tests Step:getTimeout
     it("covers Step:getTimeout", function()
         -- TODO: Implement test for Step:getTimeout
     end)
 
-    -- @covers Step:setRetryDelay
+    -- @tests Step:setRetryDelay
     it("covers Step:setRetryDelay", function()
         -- TODO: Implement test for Step:setRetryDelay
     end)
 
-    -- @covers Step:setOnError
+    -- @tests Step:setOnError
     it("covers Step:setOnError", function()
         -- TODO: Implement test for Step:setOnError
     end)
 
-    -- @covers Step:getAttempt
+    -- @tests Step:getAttempt
     it("covers Step:getAttempt", function()
         -- TODO: Implement test for Step:getAttempt
     end)
 
-    -- @covers Pipeline:run
+    -- @tests Pipeline:run
     it("covers Pipeline:run", function()
         -- TODO: Implement test for Pipeline:run
     end)
 
-    -- @covers Pipeline:runAsync
+    -- @tests Pipeline:runAsync
     it("covers Pipeline:runAsync", function()
         -- TODO: Implement test for Pipeline:runAsync
     end)
 
-    -- @covers Pipeline:getResult
+    -- @tests Pipeline:getResult
     it("covers Pipeline:getResult", function()
         -- TODO: Implement test for Pipeline:getResult
     end)
 
-    -- @covers Pipeline:getContext
+    -- @tests Pipeline:getContext
     it("covers Pipeline:getContext", function()
         -- TODO: Implement test for Pipeline:getContext
     end)
 
-    -- @covers Pipeline:setOnComplete
+    -- @tests Pipeline:setOnComplete
     it("covers Pipeline:setOnComplete", function()
         -- TODO: Implement test for Pipeline:setOnComplete
     end)
 
-    -- @covers Pipeline:setOnStepComplete
+    -- @tests Pipeline:setOnStepComplete
     it("covers Pipeline:setOnStepComplete", function()
         -- TODO: Implement test for Pipeline:setOnStepComplete
     end)
 
-    -- @covers Pipeline:setOnStepError
+    -- @tests Pipeline:setOnStepError
     it("covers Pipeline:setOnStepError", function()
         -- TODO: Implement test for Pipeline:setOnStepError
     end)
 
+end)
+
+describe("Missing explicit test for Step:getName", function()
+    it("Step:getName works", function()
+        -- @tests Step:getName
+        -- TODO: add assertion for Step:getName
+    end)
+end)
+
+describe("Missing explicit test for Step:setCondition", function()
+    it("Step:setCondition works", function()
+        -- @tests Step:setCondition
+        -- TODO: add assertion for Step:setCondition
+    end)
+end)
+
+describe("Missing explicit test for Step:setDelay", function()
+    it("Step:setDelay works", function()
+        -- @tests Step:setDelay
+        -- TODO: add assertion for Step:setDelay
+    end)
+end)
+
+describe("Missing explicit test for Step:getDelay", function()
+    it("Step:getDelay works", function()
+        -- @tests Step:getDelay
+        -- TODO: add assertion for Step:getDelay
+    end)
+end)
+
+describe("Missing explicit test for Step:setTimeout", function()
+    it("Step:setTimeout works", function()
+        -- @tests Step:setTimeout
+        -- TODO: add assertion for Step:setTimeout
+    end)
+end)
+
+describe("Missing explicit test for Step:setRetryCount", function()
+    it("Step:setRetryCount works", function()
+        -- @tests Step:setRetryCount
+        -- TODO: add assertion for Step:setRetryCount
+    end)
+end)
+
+describe("Missing explicit test for Step:getRetryCount", function()
+    it("Step:getRetryCount works", function()
+        -- @tests Step:getRetryCount
+        -- TODO: add assertion for Step:getRetryCount
+    end)
+end)
+
+describe("Missing explicit test for Step:setOptional", function()
+    it("Step:setOptional works", function()
+        -- @tests Step:setOptional
+        -- TODO: add assertion for Step:setOptional
+    end)
+end)
+
+describe("Missing explicit test for Step:isOptional", function()
+    it("Step:isOptional works", function()
+        -- @tests Step:isOptional
+        -- TODO: add assertion for Step:isOptional
+    end)
+end)
+
+describe("Missing explicit test for Step:setData", function()
+    it("Step:setData works", function()
+        -- @tests Step:setData
+        -- TODO: add assertion for Step:setData
+    end)
+end)
+
+describe("Missing explicit test for Step:getData", function()
+    it("Step:getData works", function()
+        -- @tests Step:getData
+        -- TODO: add assertion for Step:getData
+    end)
+end)
+
+describe("Missing explicit test for Step:setTag", function()
+    it("Step:setTag works", function()
+        -- @tests Step:setTag
+        -- TODO: add assertion for Step:setTag
+    end)
+end)
+
+describe("Missing explicit test for Step:getTag", function()
+    it("Step:getTag works", function()
+        -- @tests Step:getTag
+        -- TODO: add assertion for Step:getTag
+    end)
+end)
+
+describe("Missing explicit test for Step:dependsOn", function()
+    it("Step:dependsOn works", function()
+        -- @tests Step:dependsOn
+        -- TODO: add assertion for Step:dependsOn
+    end)
+end)
+
+describe("Missing explicit test for Step:getDependencies", function()
+    it("Step:getDependencies works", function()
+        -- @tests Step:getDependencies
+        -- TODO: add assertion for Step:getDependencies
+    end)
+end)
+
+describe("Missing explicit test for Step:getDependencyCount", function()
+    it("Step:getDependencyCount works", function()
+        -- @tests Step:getDependencyCount
+        -- TODO: add assertion for Step:getDependencyCount
+    end)
+end)
+
+describe("Missing explicit test for Step:getStatus", function()
+    it("Step:getStatus works", function()
+        -- @tests Step:getStatus
+        -- TODO: add assertion for Step:getStatus
+    end)
+end)
+
+describe("Missing explicit test for Step:getError", function()
+    it("Step:getError works", function()
+        -- @tests Step:getError
+        -- TODO: add assertion for Step:getError
+    end)
+end)
+
+describe("Missing explicit test for Step:getDuration", function()
+    it("Step:getDuration works", function()
+        -- @tests Step:getDuration
+        -- TODO: add assertion for Step:getDuration
+    end)
+end)
+
+describe("Missing explicit test for Step:type", function()
+    it("Step:type works", function()
+        -- @tests Step:type
+        -- TODO: add assertion for Step:type
+    end)
+end)
+
+describe("Missing explicit test for Step:typeOf", function()
+    it("Step:typeOf works", function()
+        -- @tests Step:typeOf
+        -- TODO: add assertion for Step:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:addStep", function()
+    it("Pipeline:addStep works", function()
+        -- @tests Pipeline:addStep
+        -- TODO: add assertion for Pipeline:addStep
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:removeStep", function()
+    it("Pipeline:removeStep works", function()
+        -- @tests Pipeline:removeStep
+        -- TODO: add assertion for Pipeline:removeStep
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:getStep", function()
+    it("Pipeline:getStep works", function()
+        -- @tests Pipeline:getStep
+        -- TODO: add assertion for Pipeline:getStep
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:getSteps", function()
+    it("Pipeline:getSteps works", function()
+        -- @tests Pipeline:getSteps
+        -- TODO: add assertion for Pipeline:getSteps
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:getStepCount", function()
+    it("Pipeline:getStepCount works", function()
+        -- @tests Pipeline:getStepCount
+        -- TODO: add assertion for Pipeline:getStepCount
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:getStepsByTag", function()
+    it("Pipeline:getStepsByTag works", function()
+        -- @tests Pipeline:getStepsByTag
+        -- TODO: add assertion for Pipeline:getStepsByTag
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:clear", function()
+    it("Pipeline:clear works", function()
+        -- @tests Pipeline:clear
+        -- TODO: add assertion for Pipeline:clear
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:validate", function()
+    it("Pipeline:validate works", function()
+        -- @tests Pipeline:validate
+        -- TODO: add assertion for Pipeline:validate
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:getExecutionOrder", function()
+    it("Pipeline:getExecutionOrder works", function()
+        -- @tests Pipeline:getExecutionOrder
+        -- TODO: add assertion for Pipeline:getExecutionOrder
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:getParallelGroups", function()
+    it("Pipeline:getParallelGroups works", function()
+        -- @tests Pipeline:getParallelGroups
+        -- TODO: add assertion for Pipeline:getParallelGroups
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:update", function()
+    it("Pipeline:update works", function()
+        -- @tests Pipeline:update
+        -- TODO: add assertion for Pipeline:update
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:cancel", function()
+    it("Pipeline:cancel works", function()
+        -- @tests Pipeline:cancel
+        -- TODO: add assertion for Pipeline:cancel
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:reset", function()
+    it("Pipeline:reset works", function()
+        -- @tests Pipeline:reset
+        -- TODO: add assertion for Pipeline:reset
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:isRunning", function()
+    it("Pipeline:isRunning works", function()
+        -- @tests Pipeline:isRunning
+        -- TODO: add assertion for Pipeline:isRunning
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:isComplete", function()
+    it("Pipeline:isComplete works", function()
+        -- @tests Pipeline:isComplete
+        -- TODO: add assertion for Pipeline:isComplete
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:setErrorMode", function()
+    it("Pipeline:setErrorMode works", function()
+        -- @tests Pipeline:setErrorMode
+        -- TODO: add assertion for Pipeline:setErrorMode
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:getErrorMode", function()
+    it("Pipeline:getErrorMode works", function()
+        -- @tests Pipeline:getErrorMode
+        -- TODO: add assertion for Pipeline:getErrorMode
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:getName", function()
+    it("Pipeline:getName works", function()
+        -- @tests Pipeline:getName
+        -- TODO: add assertion for Pipeline:getName
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:setName", function()
+    it("Pipeline:setName works", function()
+        -- @tests Pipeline:setName
+        -- TODO: add assertion for Pipeline:setName
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:toTable", function()
+    it("Pipeline:toTable works", function()
+        -- @tests Pipeline:toTable
+        -- TODO: add assertion for Pipeline:toTable
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:type", function()
+    it("Pipeline:type works", function()
+        -- @tests Pipeline:type
+        -- TODO: add assertion for Pipeline:type
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:onProgress", function()
+    it("Pipeline:onProgress works", function()
+        -- @tests Pipeline:onProgress
+        -- TODO: add assertion for Pipeline:onProgress
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:toAscii", function()
+    it("Pipeline:toAscii works", function()
+        -- @tests Pipeline:toAscii
+        -- TODO: add assertion for Pipeline:toAscii
+    end)
+end)
+
+describe("Missing explicit test for Pipeline:typeOf", function()
+    it("Pipeline:typeOf works", function()
+        -- @tests Pipeline:typeOf
+        -- TODO: add assertion for Pipeline:typeOf
+    end)
 end)

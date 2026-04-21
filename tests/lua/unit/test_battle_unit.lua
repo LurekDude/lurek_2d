@@ -2,10 +2,10 @@
 
 -- @description Covers suite: lurek.turnbattle module exists.
 describe("lurek.turnbattle module exists", function()
-    -- @covers lurek.turnbattle
-    -- @covers lurek.turnbattle.newAction
-    -- @covers lurek.turnbattle.newBattle
-    -- @covers lurek.turnbattle.newCombatant
+    -- @tests lurek.turnbattle
+    -- @tests lurek.turnbattle.newAction
+    -- @tests lurek.turnbattle.newBattle
+    -- @tests lurek.turnbattle.newCombatant
     -- @description Verifies the turnbattle namespace is registered as a Lua table.
     it("is a table", function()
         expect_type("table", lurek.turnbattle)
@@ -14,10 +14,10 @@ end)
 
 -- @description Covers suite: lurek.turnbattle.newCombatant.
 describe("lurek.turnbattle.newCombatant", function()
-    -- @covers lurek.turnbattle.newCombatant
-    -- @covers Combatant.getName
-    -- @covers Combatant.isAlive
-    -- @covers Combatant.type
+    -- @tests lurek.turnbattle.newCombatant
+    -- @tests Combatant.getName
+    -- @tests Combatant.isAlive
+    -- @tests Combatant.type
     -- @description Verifies a new combatant exposes its assigned name, starts alive, and reports the Combatant userdata type.
     it("creates a combatant with basic accessors", function()
         local c = lurek.turnbattle.newCombatant("hero")
@@ -29,16 +29,16 @@ end)
 
 -- @description Covers suite: lurek.turnbattle.newBattle.
 describe("lurek.turnbattle.newBattle", function()
-    -- @covers lurek.turnbattle.newBattle
-    -- @covers lurek.turnbattle.newAction
-    -- @covers Combatant.setTeam
-    -- @covers Combatant.setHp
-    -- @covers Combatant.setMaxHp
-    -- @covers Combatant.addAction
-    -- @covers Action.setBaseDamage
-    -- @covers Action.setAccuracy
-    -- @covers Battle.addCombatant
-    -- @covers Battle.attack
+    -- @tests lurek.turnbattle.newBattle
+    -- @tests lurek.turnbattle.newAction
+    -- @tests Combatant.setTeam
+    -- @tests Combatant.setHp
+    -- @tests Combatant.setMaxHp
+    -- @tests Combatant.addAction
+    -- @tests Action.setBaseDamage
+    -- @tests Action.setAccuracy
+    -- @tests Battle.addCombatant
+    -- @tests Battle.attack
     -- @description Verifies a configured action resolves through the battle system and returns an attack result table with attacker, target, and damage fields.
     it("creates a battle and resolves a simple attack", function()
         local battle = lurek.turnbattle.newBattle("arena")

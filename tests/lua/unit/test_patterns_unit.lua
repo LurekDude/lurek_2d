@@ -7,14 +7,14 @@
 
 -- @description Covers suite: lurek.patterns.newEventBus.
 describe("lurek.patterns.newEventBus", function()
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.type
-    -- @covers lurek.patterns.EventBus.typeOf
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.newEventBus
+    -- @tests lurek.patterns.EventBus.type
+    -- @tests lurek.patterns.EventBus.typeOf
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.newFactory
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.newServiceLocator
+    -- @tests lurek.patterns.newSimpleState
     -- @description Verifies newEventBus returns EventBus userdata with working type checks.
     it("creates an EventBus with type/typeOf", function()
         local bus = lurek.patterns.newEventBus()
@@ -23,9 +23,9 @@ describe("lurek.patterns.newEventBus", function()
         expect_true(bus:typeOf("Object"))
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.emit
+    -- @tests lurek.patterns.newEventBus
+    -- @tests lurek.patterns.EventBus.on
+    -- @tests lurek.patterns.EventBus.emit
     -- @description Verifies EventBus:on registers listeners that EventBus:emit invokes with payload data.
     it("on/emit fires callbacks", function()
         local bus = lurek.patterns.newEventBus()
@@ -35,8 +35,8 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(received, 42)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
+    -- @tests lurek.patterns.newEventBus
+    -- @tests lurek.patterns.EventBus.on
     -- @description Verifies EventBus:on returns distinct subscription IDs for separate listeners.
     it("on returns unique subscription IDs", function()
         local bus = lurek.patterns.newEventBus()
@@ -45,9 +45,9 @@ describe("lurek.patterns.newEventBus", function()
         expect_true(id1 ~= id2)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.emit
+    -- @tests lurek.patterns.newEventBus
+    -- @tests lurek.patterns.EventBus.on
+    -- @tests lurek.patterns.EventBus.emit
     -- @description Verifies EventBus executes listeners in priority order.
     it("listeners fire in priority order", function()
         local bus = lurek.patterns.newEventBus()
@@ -61,10 +61,10 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(order[3], "low")
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.off
-    -- @covers lurek.patterns.EventBus.emit
+    -- @tests lurek.patterns.newEventBus
+    -- @tests lurek.patterns.EventBus.on
+    -- @tests lurek.patterns.EventBus.off
+    -- @tests lurek.patterns.EventBus.emit
     -- @description Verifies EventBus:off removes a listener so later emits do not invoke it.
     it("off removes a listener by ID", function()
         local bus = lurek.patterns.newEventBus()
@@ -77,10 +77,10 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(count, 1)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.clear
-    -- @covers lurek.patterns.EventBus.getListenerCount
+    -- @tests lurek.patterns.newEventBus
+    -- @tests lurek.patterns.EventBus.on
+    -- @tests lurek.patterns.EventBus.clear
+    -- @tests lurek.patterns.EventBus.getListenerCount
     -- @description Verifies EventBus:clear removes all listeners for one event without affecting others.
     it("clear removes all listeners for an event", function()
         local bus = lurek.patterns.newEventBus()
@@ -93,10 +93,10 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(bus:getListenerCount("y"), 1)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.clearAll
-    -- @covers lurek.patterns.EventBus.getListenerCount
+    -- @tests lurek.patterns.newEventBus
+    -- @tests lurek.patterns.EventBus.on
+    -- @tests lurek.patterns.EventBus.clearAll
+    -- @tests lurek.patterns.EventBus.getListenerCount
     -- @description Verifies EventBus:clearAll removes listeners across every event.
     it("clearAll removes all listeners", function()
         local bus = lurek.patterns.newEventBus()
@@ -107,9 +107,9 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(bus:getListenerCount("b"), 0)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.getEvents
+    -- @tests lurek.patterns.newEventBus
+    -- @tests lurek.patterns.EventBus.on
+    -- @tests lurek.patterns.EventBus.getEvents
     -- @description Verifies EventBus:getEvents returns the names of events with registered listeners.
     it("getEvents lists event names with listeners", function()
         local bus = lurek.patterns.newEventBus()
@@ -125,9 +125,9 @@ end)
 -- ===================================================================
 -- @description Covers suite: lurek.patterns.newObjectPool.
 describe("lurek.patterns.newObjectPool", function()
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.type
-    -- @covers lurek.patterns.ObjectPool.typeOf
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.ObjectPool.type
+    -- @tests lurek.patterns.ObjectPool.typeOf
     -- @description Verifies newObjectPool returns ObjectPool userdata with working type helpers.
     it("creates an ObjectPool with correct type", function()
         local pool = lurek.patterns.newObjectPool()
@@ -135,11 +135,11 @@ describe("lurek.patterns.newObjectPool", function()
         expect_true(pool:typeOf("ObjectPool"))
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.add
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.getAvailableCount
-    -- @covers lurek.patterns.ObjectPool.getActiveCount
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.ObjectPool.add
+    -- @tests lurek.patterns.ObjectPool.acquire
+    -- @tests lurek.patterns.ObjectPool.getAvailableCount
+    -- @tests lurek.patterns.ObjectPool.getActiveCount
     -- @description Verifies ObjectPool add and acquire update available and active counts correctly.
     it("add/acquire round-trips objects", function()
         local pool = lurek.patterns.newObjectPool()
@@ -152,8 +152,8 @@ describe("lurek.patterns.newObjectPool", function()
         expect_equal(pool:getAvailableCount(), 1)
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.acquire
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.ObjectPool.acquire
     -- @description Verifies ObjectPool:acquire returns nil when no pooled objects exist.
     it("acquire returns nil on empty pool", function()
         local pool = lurek.patterns.newObjectPool()
@@ -161,12 +161,12 @@ describe("lurek.patterns.newObjectPool", function()
         expect_nil(obj)
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.add
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.release
-    -- @covers lurek.patterns.ObjectPool.getActiveCount
-    -- @covers lurek.patterns.ObjectPool.getAvailableCount
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.ObjectPool.add
+    -- @tests lurek.patterns.ObjectPool.acquire
+    -- @tests lurek.patterns.ObjectPool.release
+    -- @tests lurek.patterns.ObjectPool.getActiveCount
+    -- @tests lurek.patterns.ObjectPool.getAvailableCount
     -- @description Verifies ObjectPool:release returns an acquired object back to the available pool.
     it("release returns object to pool", function()
         local pool = lurek.patterns.newObjectPool()
@@ -178,10 +178,10 @@ describe("lurek.patterns.newObjectPool", function()
         expect_equal(pool:getAvailableCount(), 1)
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.add
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.getTotalCount
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.ObjectPool.add
+    -- @tests lurek.patterns.ObjectPool.acquire
+    -- @tests lurek.patterns.ObjectPool.getTotalCount
     -- @description Verifies ObjectPool:getTotalCount reports active plus available objects.
     it("getTotalCount sums active + available", function()
         local pool = lurek.patterns.newObjectPool()
@@ -191,11 +191,11 @@ describe("lurek.patterns.newObjectPool", function()
         expect_equal(pool:getTotalCount(), 2)
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.add
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.clearAll
-    -- @covers lurek.patterns.ObjectPool.getTotalCount
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.ObjectPool.add
+    -- @tests lurek.patterns.ObjectPool.acquire
+    -- @tests lurek.patterns.ObjectPool.clearAll
+    -- @tests lurek.patterns.ObjectPool.getTotalCount
     -- @description Verifies ObjectPool:clearAll resets all stored and active objects.
     it("clearAll resets everything", function()
         local pool = lurek.patterns.newObjectPool()
@@ -212,9 +212,9 @@ end)
 -- ===================================================================
 -- @description Covers suite: lurek.patterns.newCommandStack.
 describe("lurek.patterns.newCommandStack", function()
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.type
-    -- @covers lurek.patterns.CommandStack.typeOf
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.type
+    -- @tests lurek.patterns.CommandStack.typeOf
     -- @description Verifies newCommandStack returns CommandStack userdata with working type checks.
     it("creates a CommandStack with correct type", function()
         local cmds = lurek.patterns.newCommandStack()
@@ -222,8 +222,8 @@ describe("lurek.patterns.newCommandStack", function()
         expect_true(cmds:typeOf("CommandStack"))
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.execute
     -- @description Verifies CommandStack:execute runs the forward command immediately.
     it("execute runs the command immediately", function()
         local cmds = lurek.patterns.newCommandStack()
@@ -232,9 +232,9 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(x, 1)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.CommandStack.undo
     -- @description Verifies CommandStack:undo invokes the stored reverse operation for the latest command.
     it("undo reverses the last command", function()
         local cmds = lurek.patterns.newCommandStack()
@@ -246,10 +246,10 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(x, 0)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
-    -- @covers lurek.patterns.CommandStack.redo
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.CommandStack.undo
+    -- @tests lurek.patterns.CommandStack.redo
     -- @description Verifies CommandStack:redo replays an undone command.
     it("redo re-executes after undo", function()
         local cmds = lurek.patterns.newCommandStack()
@@ -262,11 +262,11 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(x, 5)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
-    -- @covers lurek.patterns.CommandStack.canUndo
-    -- @covers lurek.patterns.CommandStack.canRedo
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.CommandStack.undo
+    -- @tests lurek.patterns.CommandStack.canUndo
+    -- @tests lurek.patterns.CommandStack.canRedo
     -- @description Verifies canUndo and canRedo track command history state changes.
     it("canUndo/canRedo report correctly", function()
         local cmds = lurek.patterns.newCommandStack()
@@ -280,11 +280,11 @@ describe("lurek.patterns.newCommandStack", function()
         expect_true(cmds:canRedo())
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
-    -- @covers lurek.patterns.CommandStack.canRedo
-    -- @covers lurek.patterns.CommandStack.getHistorySize
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.CommandStack.undo
+    -- @tests lurek.patterns.CommandStack.canRedo
+    -- @tests lurek.patterns.CommandStack.getHistorySize
     -- @description Verifies executing a new command after undo truncates redo history.
     it("execute after undo truncates redo history", function()
         local cmds = lurek.patterns.newCommandStack()
@@ -297,9 +297,9 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(cmds:getHistorySize(), 2)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.getCurrentName
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.CommandStack.getCurrentName
     -- @description Verifies getCurrentName reflects the most recently executed command name.
     it("getCurrentName returns the last command name", function()
         local cmds = lurek.patterns.newCommandStack()
@@ -308,11 +308,11 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(cmds:getCurrentName(), "move")
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.clearAll
-    -- @covers lurek.patterns.CommandStack.getHistorySize
-    -- @covers lurek.patterns.CommandStack.canUndo
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.CommandStack.clearAll
+    -- @tests lurek.patterns.CommandStack.getHistorySize
+    -- @tests lurek.patterns.CommandStack.canUndo
     -- @description Verifies CommandStack:clearAll removes all history and undo state.
     it("clearAll resets the stack", function()
         local cmds = lurek.patterns.newCommandStack()
@@ -329,9 +329,9 @@ end)
 -- ===================================================================
 -- @description Covers suite: lurek.patterns.newServiceLocator.
 describe("lurek.patterns.newServiceLocator", function()
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.type
-    -- @covers lurek.patterns.ServiceLocator.typeOf
+    -- @tests lurek.patterns.newServiceLocator
+    -- @tests lurek.patterns.ServiceLocator.type
+    -- @tests lurek.patterns.ServiceLocator.typeOf
     -- @description Verifies newServiceLocator returns ServiceLocator userdata with working type helpers.
     it("creates a ServiceLocator with correct type", function()
         local sl = lurek.patterns.newServiceLocator()
@@ -339,10 +339,10 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_true(sl:typeOf("ServiceLocator"))
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.provide
-    -- @covers lurek.patterns.ServiceLocator.has
-    -- @covers lurek.patterns.ServiceLocator.locate
+    -- @tests lurek.patterns.newServiceLocator
+    -- @tests lurek.patterns.ServiceLocator.provide
+    -- @tests lurek.patterns.ServiceLocator.has
+    -- @tests lurek.patterns.ServiceLocator.locate
     -- @description Verifies provide stores a service and locate retrieves it by name.
     it("provide/locate stores and retrieves values", function()
         local sl = lurek.patterns.newServiceLocator()
@@ -352,8 +352,8 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_true(svc ~= nil)
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.locate
+    -- @tests lurek.patterns.newServiceLocator
+    -- @tests lurek.patterns.ServiceLocator.locate
     -- @description Verifies locate returns nil for an unregistered service name.
     it("locate returns nil for unknown service", function()
         local sl = lurek.patterns.newServiceLocator()
@@ -361,10 +361,10 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_nil(svc)
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.provide
-    -- @covers lurek.patterns.ServiceLocator.has
-    -- @covers lurek.patterns.ServiceLocator.remove
+    -- @tests lurek.patterns.newServiceLocator
+    -- @tests lurek.patterns.ServiceLocator.provide
+    -- @tests lurek.patterns.ServiceLocator.has
+    -- @tests lurek.patterns.ServiceLocator.remove
     -- @description Verifies remove unregisters a previously provided service.
     it("remove deletes a service", function()
         local sl = lurek.patterns.newServiceLocator()
@@ -374,9 +374,9 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_false(sl:has("db"))
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.provide
-    -- @covers lurek.patterns.ServiceLocator.getServices
+    -- @tests lurek.patterns.newServiceLocator
+    -- @tests lurek.patterns.ServiceLocator.provide
+    -- @tests lurek.patterns.ServiceLocator.getServices
     -- @description Verifies getServices returns the set of registered service names.
     it("getServices lists all names", function()
         local sl = lurek.patterns.newServiceLocator()
@@ -386,10 +386,10 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_equal(#names, 2)
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.provide
-    -- @covers lurek.patterns.ServiceLocator.clearAll
-    -- @covers lurek.patterns.ServiceLocator.has
+    -- @tests lurek.patterns.newServiceLocator
+    -- @tests lurek.patterns.ServiceLocator.provide
+    -- @tests lurek.patterns.ServiceLocator.clearAll
+    -- @tests lurek.patterns.ServiceLocator.has
     -- @description Verifies clearAll removes every registered service.
     it("clearAll removes everything", function()
         local sl = lurek.patterns.newServiceLocator()
@@ -406,9 +406,9 @@ end)
 -- ===================================================================
 -- @description Covers suite: lurek.patterns.newFactory.
 describe("lurek.patterns.newFactory", function()
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.type
-    -- @covers lurek.patterns.Factory.typeOf
+    -- @tests lurek.patterns.newFactory
+    -- @tests lurek.patterns.Factory.type
+    -- @tests lurek.patterns.Factory.typeOf
     -- @description Verifies newFactory returns Factory userdata with working type helpers.
     it("creates a Factory with correct type", function()
         local f = lurek.patterns.newFactory()
@@ -416,9 +416,9 @@ describe("lurek.patterns.newFactory", function()
         expect_true(f:typeOf("Factory"))
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.register
-    -- @covers lurek.patterns.Factory.create
+    -- @tests lurek.patterns.newFactory
+    -- @tests lurek.patterns.Factory.register
+    -- @tests lurek.patterns.Factory.create
     -- @description Verifies register and create build objects using the named factory callback.
     it("register/create builds objects", function()
         local f = lurek.patterns.newFactory()
@@ -431,9 +431,9 @@ describe("lurek.patterns.newFactory", function()
         expect_equal(b.kind, "bullet")
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.has
-    -- @covers lurek.patterns.Factory.register
+    -- @tests lurek.patterns.newFactory
+    -- @tests lurek.patterns.Factory.has
+    -- @tests lurek.patterns.Factory.register
     -- @description Verifies has reflects whether a named factory type has been registered.
     it("has checks type registration", function()
         local f = lurek.patterns.newFactory()
@@ -442,9 +442,9 @@ describe("lurek.patterns.newFactory", function()
         expect_true(f:has("enemy"))
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.register
-    -- @covers lurek.patterns.Factory.getTypes
+    -- @tests lurek.patterns.newFactory
+    -- @tests lurek.patterns.Factory.register
+    -- @tests lurek.patterns.Factory.getTypes
     -- @description Verifies getTypes returns the registered factory type names.
     it("getTypes lists registered types", function()
         local f = lurek.patterns.newFactory()
@@ -454,10 +454,10 @@ describe("lurek.patterns.newFactory", function()
         expect_equal(#types, 2)
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.register
-    -- @covers lurek.patterns.Factory.remove
-    -- @covers lurek.patterns.Factory.has
+    -- @tests lurek.patterns.newFactory
+    -- @tests lurek.patterns.Factory.register
+    -- @tests lurek.patterns.Factory.remove
+    -- @tests lurek.patterns.Factory.has
     -- @description Verifies remove unregisters a factory type.
     it("remove unregisters a type", function()
         local f = lurek.patterns.newFactory()
@@ -466,10 +466,10 @@ describe("lurek.patterns.newFactory", function()
         expect_false(f:has("temp"))
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.register
-    -- @covers lurek.patterns.Factory.clearAll
-    -- @covers lurek.patterns.Factory.getTypes
+    -- @tests lurek.patterns.newFactory
+    -- @tests lurek.patterns.Factory.register
+    -- @tests lurek.patterns.Factory.clearAll
+    -- @tests lurek.patterns.Factory.getTypes
     -- @description Verifies clearAll removes every registered factory type.
     it("clearAll removes all types", function()
         local f = lurek.patterns.newFactory()
@@ -485,9 +485,9 @@ end)
 -- ===================================================================
 -- @description Covers suite: lurek.patterns.newSimpleState.
 describe("lurek.patterns.newSimpleState", function()
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.type
-    -- @covers lurek.patterns.SimpleState.typeOf
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.type
+    -- @tests lurek.patterns.SimpleState.typeOf
     -- @description Verifies newSimpleState returns SimpleState userdata with working type helpers.
     it("creates a SimpleState with correct type", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -495,10 +495,10 @@ describe("lurek.patterns.newSimpleState", function()
         expect_true(fsm:typeOf("SimpleState"))
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.transitionTo
-    -- @covers lurek.patterns.SimpleState.getCurrent
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.addState
+    -- @tests lurek.patterns.SimpleState.transitionTo
+    -- @tests lurek.patterns.SimpleState.getCurrent
     -- @description Verifies transitionTo activates registered states and updates the current state name.
     it("addState/transitionTo changes state", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -511,8 +511,8 @@ describe("lurek.patterns.newSimpleState", function()
         expect_equal(fsm:getCurrent(), "walk")
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.transitionTo
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.transitionTo
     -- @description Verifies transitionTo returns false when the target state is unknown.
     it("transitionTo returns false for unknown state", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -520,9 +520,9 @@ describe("lurek.patterns.newSimpleState", function()
         expect_false(ok)
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.transitionTo
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.addState
+    -- @tests lurek.patterns.SimpleState.transitionTo
     -- @description Verifies state enter and exit callbacks run during transitions.
     it("enter and exit callbacks fire on transition", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -541,10 +541,10 @@ describe("lurek.patterns.newSimpleState", function()
         expect_equal(log[3], "enter_b")
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.transitionTo
-    -- @covers lurek.patterns.SimpleState.update
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.addState
+    -- @tests lurek.patterns.SimpleState.transitionTo
+    -- @tests lurek.patterns.SimpleState.update
     -- @description Verifies update forwards dt to the active state's update callback.
     it("update calls the current state update", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -557,9 +557,9 @@ describe("lurek.patterns.newSimpleState", function()
         expect_true(math.abs(dt_received - 0.016) < 0.001)
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.hasState
-    -- @covers lurek.patterns.SimpleState.addState
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.hasState
+    -- @tests lurek.patterns.SimpleState.addState
     -- @description Verifies hasState reflects whether a state name has been registered.
     it("hasState checks registration", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -568,9 +568,9 @@ describe("lurek.patterns.newSimpleState", function()
         expect_true(fsm:hasState("jump"))
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.getStates
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.addState
+    -- @tests lurek.patterns.SimpleState.getStates
     -- @description Verifies getStates returns all registered state names.
     it("getStates lists all state names", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -581,12 +581,12 @@ describe("lurek.patterns.newSimpleState", function()
         expect_equal(#states, 3)
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.transitionTo
-    -- @covers lurek.patterns.SimpleState.clearAll
-    -- @covers lurek.patterns.SimpleState.getCurrent
-    -- @covers lurek.patterns.SimpleState.getStates
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.addState
+    -- @tests lurek.patterns.SimpleState.transitionTo
+    -- @tests lurek.patterns.SimpleState.clearAll
+    -- @tests lurek.patterns.SimpleState.getCurrent
+    -- @tests lurek.patterns.SimpleState.getStates
     -- @description Verifies clearAll removes states and resets the current-state pointer.
     it("clearAll resets the FSM", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -601,25 +601,25 @@ end)
 
 -- @description Covers suite: SimpleState extended coverage (RS parity).
 describe("SimpleState extended coverage (RS parity)", function()
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.hasState
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.hasState
     -- @description Verifies hasState returns false for names that were never registered.
     it("hasState returns false for unregistered state", function()
         local fsm = lurek.patterns.newSimpleState()
         expect_false(fsm:hasState("unknown"))
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.update
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.update
     -- @description Verifies update is a no-op when no current state has been selected.
     it("update does not error with no current state", function()
         local fsm = lurek.patterns.newSimpleState()
         expect_no_error(function() fsm:update(0.016) end)
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.getCurrent
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.addState
+    -- @tests lurek.patterns.SimpleState.getCurrent
     -- @description Verifies getCurrent stays nil until transitionTo is called.
     it("getCurrent returns nil before any transition", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -627,10 +627,10 @@ describe("SimpleState extended coverage (RS parity)", function()
         expect_nil(fsm:getCurrent())
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.clearAll
-    -- @covers lurek.patterns.SimpleState.getStates
+    -- @tests lurek.patterns.newSimpleState
+    -- @tests lurek.patterns.SimpleState.addState
+    -- @tests lurek.patterns.SimpleState.clearAll
+    -- @tests lurek.patterns.SimpleState.getStates
     -- @description Verifies states can be added again cleanly after clearAll.
     it("clearAll followed by addState works cleanly", function()
         local fsm = lurek.patterns.newSimpleState()
@@ -643,10 +643,10 @@ end)
 
 -- @description Covers suite: CommandStack undo/redo (RS parity).
 describe("CommandStack undo/redo (RS parity)", function()
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
-    -- @covers lurek.patterns.CommandStack.redo
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.CommandStack.undo
+    -- @tests lurek.patterns.CommandStack.redo
     -- @description Verifies a full undo and redo cycle restores the command effect.
     it("undo and redo cycle correctly", function()
         local cs = lurek.patterns.newCommandStack()
@@ -659,9 +659,9 @@ describe("CommandStack undo/redo (RS parity)", function()
         expect_equal(1, val)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.getHistorySize
-    -- @covers lurek.patterns.CommandStack.execute
+    -- @tests lurek.patterns.newCommandStack
+    -- @tests lurek.patterns.CommandStack.getHistorySize
+    -- @tests lurek.patterns.CommandStack.execute
     -- @description Verifies getHistorySize increments after command execution.
     it("getHistorySize reflects executed commands", function()
         local cs = lurek.patterns.newCommandStack()
@@ -675,12 +675,12 @@ end)
 
 -- @description Covers suite: lurek.patterns collections (Stack, Queue, List, Set).
 describe("lurek.patterns.Stack", function()
-    -- @covers lurek.patterns.newStack
-    -- @covers lurek.patterns.Stack.push
-    -- @covers lurek.patterns.Stack.pop
-    -- @covers lurek.patterns.Stack.peek
-    -- @covers lurek.patterns.Stack.len
-    -- @covers lurek.patterns.Stack.isEmpty
+    -- @tests lurek.patterns.newStack
+    -- @tests lurek.patterns.Stack.push
+    -- @tests lurek.patterns.Stack.pop
+    -- @tests lurek.patterns.Stack.peek
+    -- @tests lurek.patterns.Stack.len
+    -- @tests lurek.patterns.Stack.isEmpty
     -- @description Verifies LIFO push/pop ordering.
     it("push and pop follow LIFO order", function()
         local s = lurek.patterns.newStack()
@@ -694,7 +694,7 @@ describe("lurek.patterns.Stack", function()
         expect_equal(true, s:isEmpty())
     end)
 
-    -- @covers lurek.patterns.Stack.peek
+    -- @tests lurek.patterns.Stack.peek
     -- @description Verifies that peek does not remove the top item.
     it("peek does not remove the top item", function()
         local s = lurek.patterns.newStack()
@@ -703,7 +703,7 @@ describe("lurek.patterns.Stack", function()
         expect_equal(1, s:len())
     end)
 
-    -- @covers lurek.patterns.Stack.isFull
+    -- @tests lurek.patterns.Stack.isFull
     -- @description Verifies that isFull returns true when capacity is reached.
     it("isFull returns true at capacity", function()
         local s = lurek.patterns.newStack(3)
@@ -711,7 +711,7 @@ describe("lurek.patterns.Stack", function()
         expect_equal(true, s:isFull())
     end)
 
-    -- @covers lurek.patterns.Stack.toArray
+    -- @tests lurek.patterns.Stack.toArray
     it("toArray returns all items in order", function()
         local s = lurek.patterns.newStack()
         s:push("x"); s:push("y")
@@ -719,7 +719,7 @@ describe("lurek.patterns.Stack", function()
         expect_equal(2, #arr)
     end)
 
-    -- @covers lurek.patterns.Stack.clear
+    -- @tests lurek.patterns.Stack.clear
     it("clear empties the stack", function()
         local s = lurek.patterns.newStack()
         s:push(1); s:push(2)
@@ -729,9 +729,9 @@ describe("lurek.patterns.Stack", function()
 end)
 
 describe("lurek.patterns.Queue", function()
-    -- @covers lurek.patterns.newQueue
-    -- @covers lurek.patterns.Queue.enqueue
-    -- @covers lurek.patterns.Queue.dequeue
+    -- @tests lurek.patterns.newQueue
+    -- @tests lurek.patterns.Queue.enqueue
+    -- @tests lurek.patterns.Queue.dequeue
     -- @description Verifies FIFO enqueue/dequeue ordering.
     it("enqueue and dequeue follow FIFO order", function()
         local q = lurek.patterns.newQueue()
@@ -742,7 +742,7 @@ describe("lurek.patterns.Queue", function()
         expect_equal("second", q:dequeue())
     end)
 
-    -- @covers lurek.patterns.Queue.front
+    -- @tests lurek.patterns.Queue.front
     it("front peeks without removing", function()
         local q = lurek.patterns.newQueue()
         q:enqueue("peek_me")
@@ -750,7 +750,7 @@ describe("lurek.patterns.Queue", function()
         expect_equal(1, q:len())
     end)
 
-    -- @covers lurek.patterns.Queue.isEmpty
+    -- @tests lurek.patterns.Queue.isEmpty
     it("isEmpty returns true on empty queue", function()
         local q = lurek.patterns.newQueue()
         expect_equal(true, q:isEmpty())
@@ -760,11 +760,11 @@ describe("lurek.patterns.Queue", function()
 end)
 
 describe("lurek.patterns.List", function()
-    -- @covers lurek.patterns.newList
-    -- @covers lurek.patterns.List.add
-    -- @covers lurek.patterns.List.get
-    -- @covers lurek.patterns.List.set
-    -- @covers lurek.patterns.List.remove
+    -- @tests lurek.patterns.newList
+    -- @tests lurek.patterns.List.add
+    -- @tests lurek.patterns.List.get
+    -- @tests lurek.patterns.List.set
+    -- @tests lurek.patterns.List.remove
     -- @description Verifies indexed add/get/set/remove operations.
     it("supports indexed access and removal", function()
         local l = lurek.patterns.newList()
@@ -779,7 +779,7 @@ describe("lurek.patterns.List", function()
         expect_equal(2, l:len())
     end)
 
-    -- @covers lurek.patterns.List.contains
+    -- @tests lurek.patterns.List.contains
     it("contains returns true for present and false for absent values", function()
         local l = lurek.patterns.newList()
         l:add("hello")
@@ -789,10 +789,10 @@ describe("lurek.patterns.List", function()
 end)
 
 describe("lurek.patterns.Set", function()
-    -- @covers lurek.patterns.newSet
-    -- @covers lurek.patterns.Set.add
-    -- @covers lurek.patterns.Set.has
-    -- @covers lurek.patterns.Set.remove
+    -- @tests lurek.patterns.newSet
+    -- @tests lurek.patterns.Set.add
+    -- @tests lurek.patterns.Set.has
+    -- @tests lurek.patterns.Set.remove
     -- @description Verifies that Set provides string membership.
     it("add, has, and remove work for string members", function()
         local s = lurek.patterns.newSet()
@@ -805,7 +805,7 @@ describe("lurek.patterns.Set", function()
         expect_equal(1, s:len())
     end)
 
-    -- @covers lurek.patterns.Set.union
+    -- @tests lurek.patterns.Set.union
     it("union returns a set containing all elements of both sets", function()
         local a = lurek.patterns.newSet()
         local b = lurek.patterns.newSet()
@@ -815,7 +815,7 @@ describe("lurek.patterns.Set", function()
         expect_equal(3, u:len())
     end)
 
-    -- @covers lurek.patterns.Set.intersection
+    -- @tests lurek.patterns.Set.intersection
     it("intersection returns only shared elements", function()
         local a = lurek.patterns.newSet()
         local b = lurek.patterns.newSet()
@@ -825,7 +825,7 @@ describe("lurek.patterns.Set", function()
         expect_equal(2, i:len())
     end)
 
-    -- @covers lurek.patterns.Set.toArray
+    -- @tests lurek.patterns.Set.toArray
     it("toArray returns all set members", function()
         local s = lurek.patterns.newSet()
         s:add("one"); s:add("two"); s:add("three")
@@ -838,9 +838,9 @@ end)
 
 -- @description Covers suite: lurek.patterns Mediator.
 describe("lurek.patterns.Mediator", function()
-    -- @covers lurek.patterns.newMediator
-    -- @covers lurek.patterns.Mediator.on
-    -- @covers lurek.patterns.Mediator.send
+    -- @tests lurek.patterns.newMediator
+    -- @tests lurek.patterns.Mediator.on
+    -- @tests lurek.patterns.Mediator.send
     -- @description Verifies that a registered handler receives sent messages.
     it("on registers a handler that receives send messages", function()
         local m = lurek.patterns.newMediator()
@@ -852,7 +852,7 @@ describe("lurek.patterns.Mediator", function()
         expect_equal("hello", received)
     end)
 
-    -- @covers lurek.patterns.Mediator.off
+    -- @tests lurek.patterns.Mediator.off
     -- @description Verifies that off by handler id stops the handler receiving messages.
     it("off removes handler by id", function()
         local m = lurek.patterns.newMediator()
@@ -864,7 +864,7 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(1, count)
     end)
 
-    -- @covers lurek.patterns.Mediator.broadcast
+    -- @tests lurek.patterns.Mediator.broadcast
     -- @description Verifies that broadcast delivers to all subscribed channels that match.
     it("send only fires handler on its own channel", function()
         local m = lurek.patterns.newMediator()
@@ -875,7 +875,7 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(1, hit)
     end)
 
-    -- @covers lurek.patterns.Mediator.handlerCount
+    -- @tests lurek.patterns.Mediator.handlerCount
     -- @description Verifies that handlerCount reflects registered/removed handlers.
     it("handlerCount tracks registration and removal", function()
         local m = lurek.patterns.newMediator()
@@ -886,7 +886,7 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(0, m:handlerCount("events"))
     end)
 
-    -- @covers lurek.patterns.Mediator.channels
+    -- @tests lurek.patterns.Mediator.channels
     -- @description Verifies that channels returns all channel names.
     it("channels returns registered channel names", function()
         local m = lurek.patterns.newMediator()
@@ -896,7 +896,7 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(2, #ch)
     end)
 
-    -- @covers lurek.patterns.Mediator.removeChannel
+    -- @tests lurek.patterns.Mediator.removeChannel
     -- @description Verifies that removeChannel clears all handlers on that channel.
     it("removeChannel removes all handlers on a channel", function()
         local m = lurek.patterns.newMediator()
@@ -907,7 +907,7 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(0, m:handlerCount("destroy"))
     end)
 
-    -- @covers lurek.patterns.Mediator.clear
+    -- @tests lurek.patterns.Mediator.clear
     -- @description Verifies that clear removes all channels and handlers.
     it("clear removes all channels", function()
         local m = lurek.patterns.newMediator()
@@ -923,10 +923,10 @@ end)
 
 -- @description Covers suite: lurek.patterns Strategy.
 describe("lurek.patterns.Strategy", function()
-    -- @covers lurek.patterns.newStrategy
-    -- @covers lurek.patterns.Strategy.register
-    -- @covers lurek.patterns.Strategy.set
-    -- @covers lurek.patterns.Strategy.execute
+    -- @tests lurek.patterns.newStrategy
+    -- @tests lurek.patterns.Strategy.register
+    -- @tests lurek.patterns.Strategy.set
+    -- @tests lurek.patterns.Strategy.execute
     -- @description Verifies that register+set+execute calls the registered function.
     it("register, set, and execute calls the strategy function", function()
         local s = lurek.patterns.newStrategy()
@@ -937,7 +937,7 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(true, called)
     end)
 
-    -- @covers lurek.patterns.Strategy.getCurrent
+    -- @tests lurek.patterns.Strategy.getCurrent
     -- @description Verifies that getCurrent returns the active strategy name.
     it("getCurrent returns the active strategy name", function()
         local s = lurek.patterns.newStrategy()
@@ -947,7 +947,7 @@ describe("lurek.patterns.Strategy", function()
         expect_equal("patrol", s:getCurrent())
     end)
 
-    -- @covers lurek.patterns.Strategy.has
+    -- @tests lurek.patterns.Strategy.has
     -- @description Verifies that has returns true for registered strategies and false otherwise.
     it("has returns true for registered names and false for unknown", function()
         local s = lurek.patterns.newStrategy()
@@ -956,7 +956,7 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(false, s:has("retreat"))
     end)
 
-    -- @covers lurek.patterns.Strategy.remove
+    -- @tests lurek.patterns.Strategy.remove
     -- @description Verifies that remove unregisters a strategy and clears current if it was active.
     it("remove unregisters a strategy", function()
         local s = lurek.patterns.newStrategy()
@@ -968,7 +968,7 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(nil, s:getCurrent())
     end)
 
-    -- @covers lurek.patterns.Strategy.names
+    -- @tests lurek.patterns.Strategy.names
     -- @description Verifies that names returns all registered strategy names.
     it("names returns all registered names", function()
         local s = lurek.patterns.newStrategy()
@@ -979,7 +979,7 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(3, #names)
     end)
 
-    -- @covers lurek.patterns.Strategy.execute
+    -- @tests lurek.patterns.Strategy.execute
     -- @description Verifies that execute passes arguments to the strategy function.
     it("execute passes arguments to the strategy function", function()
         local s = lurek.patterns.newStrategy()
@@ -990,7 +990,7 @@ describe("lurek.patterns.Strategy", function()
         expect_near(0.016, got_dt, 1e-6)
     end)
 
-    -- @covers lurek.patterns.Strategy.clear
+    -- @tests lurek.patterns.Strategy.clear
     -- @description Verifies that clear removes all strategies and resets current.
     it("clear removes all strategies", function()
         local s = lurek.patterns.newStrategy()
@@ -1002,7 +1002,8 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(nil, s:getCurrent())
     end)
 end)
-
+
+
 
 -- [merged from test_patterns_regress_acquire_borrow.lua]
 -- Regression: ObjectPool:acquire must not trigger a RefCell double-borrow.
@@ -1012,9 +1013,9 @@ end)
 
 -- @description Covers suite: ObjectPool regression — acquire must not double-borrow internal RefCell.
 describe("ObjectPool regression: acquire double-borrow", function()
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.release
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.ObjectPool.acquire
+    -- @tests lurek.patterns.ObjectPool.release
     it("acquire -> release -> acquire cycle does not panic", function()
         local pool = lurek.patterns.newObjectPool()
         pool:add({ id = "a" })
@@ -1026,7 +1027,8 @@ describe("ObjectPool regression: acquire double-borrow", function()
         end)
     end)
 end)
-
+
+
 
 
 
@@ -1041,9 +1043,9 @@ end)
 
 -- @description Covers suite: ObjectPool regression — acquire must not double-borrow internal RefCell.
 describe("ObjectPool regression: acquire double-borrow", function()
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.release
+    -- @tests lurek.patterns.newObjectPool
+    -- @tests lurek.patterns.ObjectPool.acquire
+    -- @tests lurek.patterns.ObjectPool.release
     it("acquire -> release -> acquire cycle does not panic", function()
         local pool = lurek.patterns.newObjectPool()
         pool:add({ id = "a" })
@@ -1063,209 +1065,1021 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.patterns.newThrottle
+    -- @tests lurek.patterns.newThrottle
     it("covers lurek.patterns.newThrottle", function()
         -- TODO: Implement test for lurek.patterns.newThrottle
     end)
 
-    -- @covers lurek.patterns.newDebounce
+    -- @tests lurek.patterns.newDebounce
     it("covers lurek.patterns.newDebounce", function()
         -- TODO: Implement test for lurek.patterns.newDebounce
     end)
 
-    -- @covers lurek.patterns.newPriorityQueue
+    -- @tests lurek.patterns.newPriorityQueue
     it("covers lurek.patterns.newPriorityQueue", function()
         -- TODO: Implement test for lurek.patterns.newPriorityQueue
     end)
 
-    -- @covers lurek.patterns.newFunnel
+    -- @tests lurek.patterns.newFunnel
     it("covers lurek.patterns.newFunnel", function()
         -- TODO: Implement test for lurek.patterns.newFunnel
     end)
 
-    -- @covers EventBus:on
+    -- @tests EventBus:on
     it("covers EventBus:on", function()
         -- TODO: Implement test for EventBus:on
     end)
 
-    -- @covers EventBus:off
+    -- @tests EventBus:off
     it("covers EventBus:off", function()
         -- TODO: Implement test for EventBus:off
     end)
 
-    -- @covers ObjectPool:add
+    -- @tests ObjectPool:add
     it("covers ObjectPool:add", function()
         -- TODO: Implement test for ObjectPool:add
     end)
 
-    -- @covers ServiceLocator:has
+    -- @tests ServiceLocator:has
     it("covers ServiceLocator:has", function()
         -- TODO: Implement test for ServiceLocator:has
     end)
 
-    -- @covers Factory:has
+    -- @tests Factory:has
     it("covers Factory:has", function()
         -- TODO: Implement test for Factory:has
     end)
 
-    -- @covers Blackboard:set
+    -- @tests Blackboard:set
     it("covers Blackboard:set", function()
         -- TODO: Implement test for Blackboard:set
     end)
 
-    -- @covers Blackboard:get
+    -- @tests Blackboard:get
     it("covers Blackboard:get", function()
         -- TODO: Implement test for Blackboard:get
     end)
 
-    -- @covers Blackboard:has
+    -- @tests Blackboard:has
     it("covers Blackboard:has", function()
         -- TODO: Implement test for Blackboard:has
     end)
 
-    -- @covers Blackboard:getRevision
+    -- @tests Blackboard:getRevision
     it("covers Blackboard:getRevision", function()
         -- TODO: Implement test for Blackboard:getRevision
     end)
 
-    -- @covers Observer:set
+    -- @tests Observer:set
     it("covers Observer:set", function()
         -- TODO: Implement test for Observer:set
     end)
 
-    -- @covers Observer:get
+    -- @tests Observer:get
     it("covers Observer:get", function()
         -- TODO: Implement test for Observer:get
     end)
 
-    -- @covers Throttle:onFire
+    -- @tests Throttle:onFire
     it("covers Throttle:onFire", function()
         -- TODO: Implement test for Throttle:onFire
     end)
 
-    -- @covers Throttle:getFireCount
+    -- @tests Throttle:getFireCount
     it("covers Throttle:getFireCount", function()
         -- TODO: Implement test for Throttle:getFireCount
     end)
 
-    -- @covers Debounce:onFire
+    -- @tests Debounce:onFire
     it("covers Debounce:onFire", function()
         -- TODO: Implement test for Debounce:onFire
     end)
 
-    -- @covers Debounce:isPending
+    -- @tests Debounce:isPending
     it("covers Debounce:isPending", function()
         -- TODO: Implement test for Debounce:isPending
     end)
 
-    -- @covers Debounce:getFireCount
+    -- @tests Debounce:getFireCount
     it("covers Debounce:getFireCount", function()
         -- TODO: Implement test for Debounce:getFireCount
     end)
 
-    -- @covers PriorityQueue:pop
+    -- @tests PriorityQueue:pop
     it("covers PriorityQueue:pop", function()
         -- TODO: Implement test for PriorityQueue:pop
     end)
 
-    -- @covers PriorityQueue:len
+    -- @tests PriorityQueue:len
     it("covers PriorityQueue:len", function()
         -- TODO: Implement test for PriorityQueue:len
     end)
 
-    -- @covers Ring:sum
+    -- @tests Ring:sum
     it("covers Ring:sum", function()
         -- TODO: Implement test for Ring:sum
     end)
 
-    -- @covers Ring:len
+    -- @tests Ring:len
     it("covers Ring:len", function()
         -- TODO: Implement test for Ring:len
     end)
 
-    -- @covers Funnel:onFlush
+    -- @tests Funnel:onFlush
     it("covers Funnel:onFlush", function()
         -- TODO: Implement test for Funnel:onFlush
     end)
 
-    -- @covers Funnel:getFlushCount
+    -- @tests Funnel:getFlushCount
     it("covers Funnel:getFlushCount", function()
         -- TODO: Implement test for Funnel:getFlushCount
     end)
 
-    -- @covers RelationshipManager:removeType
+    -- @tests RelationshipManager:removeType
     it("covers RelationshipManager:removeType", function()
         -- TODO: Implement test for RelationshipManager:removeType
     end)
 
-    -- @covers Mediator:on
+    -- @tests Mediator:on
     it("covers Mediator:on", function()
         -- TODO: Implement test for Mediator:on
     end)
 
-    -- @covers Mediator:off
+    -- @tests Mediator:off
     it("covers Mediator:off", function()
         -- TODO: Implement test for Mediator:off
     end)
 
-    -- @covers Strategy:set
+    -- @tests Strategy:set
     it("covers Strategy:set", function()
         -- TODO: Implement test for Strategy:set
     end)
 
-    -- @covers Strategy:has
+    -- @tests Strategy:has
     it("covers Strategy:has", function()
         -- TODO: Implement test for Strategy:has
     end)
 
-    -- @covers Stack:pop
+    -- @tests Stack:pop
     it("covers Stack:pop", function()
         -- TODO: Implement test for Stack:pop
     end)
 
-    -- @covers Stack:len
+    -- @tests Stack:len
     it("covers Stack:len", function()
         -- TODO: Implement test for Stack:len
     end)
 
-    -- @covers Queue:len
+    -- @tests Queue:len
     it("covers Queue:len", function()
         -- TODO: Implement test for Queue:len
     end)
 
-    -- @covers List:add
+    -- @tests List:add
     it("covers List:add", function()
         -- TODO: Implement test for List:add
     end)
 
-    -- @covers List:get
+    -- @tests List:get
     it("covers List:get", function()
         -- TODO: Implement test for List:get
     end)
 
-    -- @covers List:set
+    -- @tests List:set
     it("covers List:set", function()
         -- TODO: Implement test for List:set
     end)
 
-    -- @covers List:len
+    -- @tests List:len
     it("covers List:len", function()
         -- TODO: Implement test for List:len
     end)
 
-    -- @covers Set:add
+    -- @tests Set:add
     it("covers Set:add", function()
         -- TODO: Implement test for Set:add
     end)
 
-    -- @covers Set:has
+    -- @tests Set:has
     it("covers Set:has", function()
         -- TODO: Implement test for Set:has
     end)
 
-    -- @covers Set:len
+    -- @tests Set:len
     it("covers Set:len", function()
         -- TODO: Implement test for Set:len
     end)
 
+end)
+
+describe("Missing explicit test for lurek.patterns.newBlackboard", function()
+    it("lurek.patterns.newBlackboard works", function()
+        -- @tests lurek.patterns.newBlackboard
+        -- TODO: add assertion for lurek.patterns.newBlackboard
+    end)
+end)
+
+describe("Missing explicit test for lurek.patterns.newObserver", function()
+    it("lurek.patterns.newObserver works", function()
+        -- @tests lurek.patterns.newObserver
+        -- TODO: add assertion for lurek.patterns.newObserver
+    end)
+end)
+
+describe("Missing explicit test for lurek.patterns.newRing", function()
+    it("lurek.patterns.newRing works", function()
+        -- @tests lurek.patterns.newRing
+        -- TODO: add assertion for lurek.patterns.newRing
+    end)
+end)
+
+describe("Missing explicit test for EventBus:emit", function()
+    it("EventBus:emit works", function()
+        -- @tests EventBus:emit
+        -- TODO: add assertion for EventBus:emit
+    end)
+end)
+
+describe("Missing explicit test for EventBus:clear", function()
+    it("EventBus:clear works", function()
+        -- @tests EventBus:clear
+        -- TODO: add assertion for EventBus:clear
+    end)
+end)
+
+describe("Missing explicit test for EventBus:clearAll", function()
+    it("EventBus:clearAll works", function()
+        -- @tests EventBus:clearAll
+        -- TODO: add assertion for EventBus:clearAll
+    end)
+end)
+
+describe("Missing explicit test for EventBus:getListenerCount", function()
+    it("EventBus:getListenerCount works", function()
+        -- @tests EventBus:getListenerCount
+        -- TODO: add assertion for EventBus:getListenerCount
+    end)
+end)
+
+describe("Missing explicit test for EventBus:getEvents", function()
+    it("EventBus:getEvents works", function()
+        -- @tests EventBus:getEvents
+        -- TODO: add assertion for EventBus:getEvents
+    end)
+end)
+
+describe("Missing explicit test for ObjectPool:acquire", function()
+    it("ObjectPool:acquire works", function()
+        -- @tests ObjectPool:acquire
+        -- TODO: add assertion for ObjectPool:acquire
+    end)
+end)
+
+describe("Missing explicit test for ObjectPool:release", function()
+    it("ObjectPool:release works", function()
+        -- @tests ObjectPool:release
+        -- TODO: add assertion for ObjectPool:release
+    end)
+end)
+
+describe("Missing explicit test for ObjectPool:getActiveCount", function()
+    it("ObjectPool:getActiveCount works", function()
+        -- @tests ObjectPool:getActiveCount
+        -- TODO: add assertion for ObjectPool:getActiveCount
+    end)
+end)
+
+describe("Missing explicit test for ObjectPool:getAvailableCount", function()
+    it("ObjectPool:getAvailableCount works", function()
+        -- @tests ObjectPool:getAvailableCount
+        -- TODO: add assertion for ObjectPool:getAvailableCount
+    end)
+end)
+
+describe("Missing explicit test for ObjectPool:getTotalCount", function()
+    it("ObjectPool:getTotalCount works", function()
+        -- @tests ObjectPool:getTotalCount
+        -- TODO: add assertion for ObjectPool:getTotalCount
+    end)
+end)
+
+describe("Missing explicit test for ObjectPool:clearAll", function()
+    it("ObjectPool:clearAll works", function()
+        -- @tests ObjectPool:clearAll
+        -- TODO: add assertion for ObjectPool:clearAll
+    end)
+end)
+
+describe("Missing explicit test for CommandStack:execute", function()
+    it("CommandStack:execute works", function()
+        -- @tests CommandStack:execute
+        -- TODO: add assertion for CommandStack:execute
+    end)
+end)
+
+describe("Missing explicit test for CommandStack:undo", function()
+    it("CommandStack:undo works", function()
+        -- @tests CommandStack:undo
+        -- TODO: add assertion for CommandStack:undo
+    end)
+end)
+
+describe("Missing explicit test for CommandStack:redo", function()
+    it("CommandStack:redo works", function()
+        -- @tests CommandStack:redo
+        -- TODO: add assertion for CommandStack:redo
+    end)
+end)
+
+describe("Missing explicit test for CommandStack:canUndo", function()
+    it("CommandStack:canUndo works", function()
+        -- @tests CommandStack:canUndo
+        -- TODO: add assertion for CommandStack:canUndo
+    end)
+end)
+
+describe("Missing explicit test for CommandStack:canRedo", function()
+    it("CommandStack:canRedo works", function()
+        -- @tests CommandStack:canRedo
+        -- TODO: add assertion for CommandStack:canRedo
+    end)
+end)
+
+describe("Missing explicit test for CommandStack:getHistorySize", function()
+    it("CommandStack:getHistorySize works", function()
+        -- @tests CommandStack:getHistorySize
+        -- TODO: add assertion for CommandStack:getHistorySize
+    end)
+end)
+
+describe("Missing explicit test for CommandStack:getCurrentName", function()
+    it("CommandStack:getCurrentName works", function()
+        -- @tests CommandStack:getCurrentName
+        -- TODO: add assertion for CommandStack:getCurrentName
+    end)
+end)
+
+describe("Missing explicit test for CommandStack:clearAll", function()
+    it("CommandStack:clearAll works", function()
+        -- @tests CommandStack:clearAll
+        -- TODO: add assertion for CommandStack:clearAll
+    end)
+end)
+
+describe("Missing explicit test for ServiceLocator:provide", function()
+    it("ServiceLocator:provide works", function()
+        -- @tests ServiceLocator:provide
+        -- TODO: add assertion for ServiceLocator:provide
+    end)
+end)
+
+describe("Missing explicit test for ServiceLocator:locate", function()
+    it("ServiceLocator:locate works", function()
+        -- @tests ServiceLocator:locate
+        -- TODO: add assertion for ServiceLocator:locate
+    end)
+end)
+
+describe("Missing explicit test for ServiceLocator:remove", function()
+    it("ServiceLocator:remove works", function()
+        -- @tests ServiceLocator:remove
+        -- TODO: add assertion for ServiceLocator:remove
+    end)
+end)
+
+describe("Missing explicit test for ServiceLocator:getServices", function()
+    it("ServiceLocator:getServices works", function()
+        -- @tests ServiceLocator:getServices
+        -- TODO: add assertion for ServiceLocator:getServices
+    end)
+end)
+
+describe("Missing explicit test for ServiceLocator:clearAll", function()
+    it("ServiceLocator:clearAll works", function()
+        -- @tests ServiceLocator:clearAll
+        -- TODO: add assertion for ServiceLocator:clearAll
+    end)
+end)
+
+describe("Missing explicit test for Factory:register", function()
+    it("Factory:register works", function()
+        -- @tests Factory:register
+        -- TODO: add assertion for Factory:register
+    end)
+end)
+
+describe("Missing explicit test for Factory:create", function()
+    it("Factory:create works", function()
+        -- @tests Factory:create
+        -- TODO: add assertion for Factory:create
+    end)
+end)
+
+describe("Missing explicit test for Factory:alias", function()
+    it("Factory:alias works", function()
+        -- @tests Factory:alias
+        -- TODO: add assertion for Factory:alias
+    end)
+end)
+
+describe("Missing explicit test for Factory:getTypes", function()
+    it("Factory:getTypes works", function()
+        -- @tests Factory:getTypes
+        -- TODO: add assertion for Factory:getTypes
+    end)
+end)
+
+describe("Missing explicit test for Factory:remove", function()
+    it("Factory:remove works", function()
+        -- @tests Factory:remove
+        -- TODO: add assertion for Factory:remove
+    end)
+end)
+
+describe("Missing explicit test for Factory:clearAll", function()
+    it("Factory:clearAll works", function()
+        -- @tests Factory:clearAll
+        -- TODO: add assertion for Factory:clearAll
+    end)
+end)
+
+describe("Missing explicit test for SimpleState:addState", function()
+    it("SimpleState:addState works", function()
+        -- @tests SimpleState:addState
+        -- TODO: add assertion for SimpleState:addState
+    end)
+end)
+
+describe("Missing explicit test for SimpleState:transitionTo", function()
+    it("SimpleState:transitionTo works", function()
+        -- @tests SimpleState:transitionTo
+        -- TODO: add assertion for SimpleState:transitionTo
+    end)
+end)
+
+describe("Missing explicit test for SimpleState:update", function()
+    it("SimpleState:update works", function()
+        -- @tests SimpleState:update
+        -- TODO: add assertion for SimpleState:update
+    end)
+end)
+
+describe("Missing explicit test for SimpleState:getCurrent", function()
+    it("SimpleState:getCurrent works", function()
+        -- @tests SimpleState:getCurrent
+        -- TODO: add assertion for SimpleState:getCurrent
+    end)
+end)
+
+describe("Missing explicit test for SimpleState:hasState", function()
+    it("SimpleState:hasState works", function()
+        -- @tests SimpleState:hasState
+        -- TODO: add assertion for SimpleState:hasState
+    end)
+end)
+
+describe("Missing explicit test for SimpleState:getStates", function()
+    it("SimpleState:getStates works", function()
+        -- @tests SimpleState:getStates
+        -- TODO: add assertion for SimpleState:getStates
+    end)
+end)
+
+describe("Missing explicit test for SimpleState:clearAll", function()
+    it("SimpleState:clearAll works", function()
+        -- @tests SimpleState:clearAll
+        -- TODO: add assertion for SimpleState:clearAll
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:clear", function()
+    it("Blackboard:clear works", function()
+        -- @tests Blackboard:clear
+        -- TODO: add assertion for Blackboard:clear
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:keys", function()
+    it("Blackboard:keys works", function()
+        -- @tests Blackboard:keys
+        -- TODO: add assertion for Blackboard:keys
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:watch", function()
+    it("Blackboard:watch works", function()
+        -- @tests Blackboard:watch
+        -- TODO: add assertion for Blackboard:watch
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:unwatch", function()
+    it("Blackboard:unwatch works", function()
+        -- @tests Blackboard:unwatch
+        -- TODO: add assertion for Blackboard:unwatch
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:snapshot", function()
+    it("Blackboard:snapshot works", function()
+        -- @tests Blackboard:snapshot
+        -- TODO: add assertion for Blackboard:snapshot
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:clearAll", function()
+    it("Blackboard:clearAll works", function()
+        -- @tests Blackboard:clearAll
+        -- TODO: add assertion for Blackboard:clearAll
+    end)
+end)
+
+describe("Missing explicit test for Observer:subscribe", function()
+    it("Observer:subscribe works", function()
+        -- @tests Observer:subscribe
+        -- TODO: add assertion for Observer:subscribe
+    end)
+end)
+
+describe("Missing explicit test for Observer:unsubscribe", function()
+    it("Observer:unsubscribe works", function()
+        -- @tests Observer:unsubscribe
+        -- TODO: add assertion for Observer:unsubscribe
+    end)
+end)
+
+describe("Missing explicit test for Observer:getCount", function()
+    it("Observer:getCount works", function()
+        -- @tests Observer:getCount
+        -- TODO: add assertion for Observer:getCount
+    end)
+end)
+
+describe("Missing explicit test for Throttle:update", function()
+    it("Throttle:update works", function()
+        -- @tests Throttle:update
+        -- TODO: add assertion for Throttle:update
+    end)
+end)
+
+describe("Missing explicit test for Throttle:reset", function()
+    it("Throttle:reset works", function()
+        -- @tests Throttle:reset
+        -- TODO: add assertion for Throttle:reset
+    end)
+end)
+
+describe("Missing explicit test for Throttle:getProgress", function()
+    it("Throttle:getProgress works", function()
+        -- @tests Throttle:getProgress
+        -- TODO: add assertion for Throttle:getProgress
+    end)
+end)
+
+describe("Missing explicit test for Throttle:setEnabled", function()
+    it("Throttle:setEnabled works", function()
+        -- @tests Throttle:setEnabled
+        -- TODO: add assertion for Throttle:setEnabled
+    end)
+end)
+
+describe("Missing explicit test for Debounce:trigger", function()
+    it("Debounce:trigger works", function()
+        -- @tests Debounce:trigger
+        -- TODO: add assertion for Debounce:trigger
+    end)
+end)
+
+describe("Missing explicit test for Debounce:update", function()
+    it("Debounce:update works", function()
+        -- @tests Debounce:update
+        -- TODO: add assertion for Debounce:update
+    end)
+end)
+
+describe("Missing explicit test for Debounce:cancel", function()
+    it("Debounce:cancel works", function()
+        -- @tests Debounce:cancel
+        -- TODO: add assertion for Debounce:cancel
+    end)
+end)
+
+describe("Missing explicit test for PriorityQueue:push", function()
+    it("PriorityQueue:push works", function()
+        -- @tests PriorityQueue:push
+        -- TODO: add assertion for PriorityQueue:push
+    end)
+end)
+
+describe("Missing explicit test for PriorityQueue:peek", function()
+    it("PriorityQueue:peek works", function()
+        -- @tests PriorityQueue:peek
+        -- TODO: add assertion for PriorityQueue:peek
+    end)
+end)
+
+describe("Missing explicit test for PriorityQueue:isEmpty", function()
+    it("PriorityQueue:isEmpty works", function()
+        -- @tests PriorityQueue:isEmpty
+        -- TODO: add assertion for PriorityQueue:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for PriorityQueue:clearAll", function()
+    it("PriorityQueue:clearAll works", function()
+        -- @tests PriorityQueue:clearAll
+        -- TODO: add assertion for PriorityQueue:clearAll
+    end)
+end)
+
+describe("Missing explicit test for Ring:push", function()
+    it("Ring:push works", function()
+        -- @tests Ring:push
+        -- TODO: add assertion for Ring:push
+    end)
+end)
+
+describe("Missing explicit test for Ring:latest", function()
+    it("Ring:latest works", function()
+        -- @tests Ring:latest
+        -- TODO: add assertion for Ring:latest
+    end)
+end)
+
+describe("Missing explicit test for Ring:toArray", function()
+    it("Ring:toArray works", function()
+        -- @tests Ring:toArray
+        -- TODO: add assertion for Ring:toArray
+    end)
+end)
+
+describe("Missing explicit test for Ring:average", function()
+    it("Ring:average works", function()
+        -- @tests Ring:average
+        -- TODO: add assertion for Ring:average
+    end)
+end)
+
+describe("Missing explicit test for Ring:isFull", function()
+    it("Ring:isFull works", function()
+        -- @tests Ring:isFull
+        -- TODO: add assertion for Ring:isFull
+    end)
+end)
+
+describe("Missing explicit test for Ring:clear", function()
+    it("Ring:clear works", function()
+        -- @tests Ring:clear
+        -- TODO: add assertion for Ring:clear
+    end)
+end)
+
+describe("Missing explicit test for Funnel:push", function()
+    it("Funnel:push works", function()
+        -- @tests Funnel:push
+        -- TODO: add assertion for Funnel:push
+    end)
+end)
+
+describe("Missing explicit test for Funnel:update", function()
+    it("Funnel:update works", function()
+        -- @tests Funnel:update
+        -- TODO: add assertion for Funnel:update
+    end)
+end)
+
+describe("Missing explicit test for Funnel:flush", function()
+    it("Funnel:flush works", function()
+        -- @tests Funnel:flush
+        -- TODO: add assertion for Funnel:flush
+    end)
+end)
+
+describe("Missing explicit test for Funnel:discard", function()
+    it("Funnel:discard works", function()
+        -- @tests Funnel:discard
+        -- TODO: add assertion for Funnel:discard
+    end)
+end)
+
+describe("Missing explicit test for Funnel:pendingCount", function()
+    it("Funnel:pendingCount works", function()
+        -- @tests Funnel:pendingCount
+        -- TODO: add assertion for Funnel:pendingCount
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:defineType", function()
+    it("RelationshipManager:defineType works", function()
+        -- @tests RelationshipManager:defineType
+        -- TODO: add assertion for RelationshipManager:defineType
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:typeNames", function()
+    it("RelationshipManager:typeNames works", function()
+        -- @tests RelationshipManager:typeNames
+        -- TODO: add assertion for RelationshipManager:typeNames
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:setValue", function()
+    it("RelationshipManager:setValue works", function()
+        -- @tests RelationshipManager:setValue
+        -- TODO: add assertion for RelationshipManager:setValue
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:getValue", function()
+    it("RelationshipManager:getValue works", function()
+        -- @tests RelationshipManager:getValue
+        -- TODO: add assertion for RelationshipManager:getValue
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:adjustValue", function()
+    it("RelationshipManager:adjustValue works", function()
+        -- @tests RelationshipManager:adjustValue
+        -- TODO: add assertion for RelationshipManager:adjustValue
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:setLevel", function()
+    it("RelationshipManager:setLevel works", function()
+        -- @tests RelationshipManager:setLevel
+        -- TODO: add assertion for RelationshipManager:setLevel
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:getLevel", function()
+    it("RelationshipManager:getLevel works", function()
+        -- @tests RelationshipManager:getLevel
+        -- TODO: add assertion for RelationshipManager:getLevel
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:removePair", function()
+    it("RelationshipManager:removePair works", function()
+        -- @tests RelationshipManager:removePair
+        -- TODO: add assertion for RelationshipManager:removePair
+    end)
+end)
+
+describe("Missing explicit test for RelationshipManager:pairCount", function()
+    it("RelationshipManager:pairCount works", function()
+        -- @tests RelationshipManager:pairCount
+        -- TODO: add assertion for RelationshipManager:pairCount
+    end)
+end)
+
+describe("Missing explicit test for Mediator:send", function()
+    it("Mediator:send works", function()
+        -- @tests Mediator:send
+        -- TODO: add assertion for Mediator:send
+    end)
+end)
+
+describe("Missing explicit test for Mediator:broadcast", function()
+    it("Mediator:broadcast works", function()
+        -- @tests Mediator:broadcast
+        -- TODO: add assertion for Mediator:broadcast
+    end)
+end)
+
+describe("Missing explicit test for Mediator:handlerCount", function()
+    it("Mediator:handlerCount works", function()
+        -- @tests Mediator:handlerCount
+        -- TODO: add assertion for Mediator:handlerCount
+    end)
+end)
+
+describe("Missing explicit test for Mediator:channels", function()
+    it("Mediator:channels works", function()
+        -- @tests Mediator:channels
+        -- TODO: add assertion for Mediator:channels
+    end)
+end)
+
+describe("Missing explicit test for Mediator:removeChannel", function()
+    it("Mediator:removeChannel works", function()
+        -- @tests Mediator:removeChannel
+        -- TODO: add assertion for Mediator:removeChannel
+    end)
+end)
+
+describe("Missing explicit test for Mediator:clear", function()
+    it("Mediator:clear works", function()
+        -- @tests Mediator:clear
+        -- TODO: add assertion for Mediator:clear
+    end)
+end)
+
+describe("Missing explicit test for Strategy:register", function()
+    it("Strategy:register works", function()
+        -- @tests Strategy:register
+        -- TODO: add assertion for Strategy:register
+    end)
+end)
+
+describe("Missing explicit test for Strategy:execute", function()
+    it("Strategy:execute works", function()
+        -- @tests Strategy:execute
+        -- TODO: add assertion for Strategy:execute
+    end)
+end)
+
+describe("Missing explicit test for Strategy:getCurrent", function()
+    it("Strategy:getCurrent works", function()
+        -- @tests Strategy:getCurrent
+        -- TODO: add assertion for Strategy:getCurrent
+    end)
+end)
+
+describe("Missing explicit test for Strategy:remove", function()
+    it("Strategy:remove works", function()
+        -- @tests Strategy:remove
+        -- TODO: add assertion for Strategy:remove
+    end)
+end)
+
+describe("Missing explicit test for Strategy:names", function()
+    it("Strategy:names works", function()
+        -- @tests Strategy:names
+        -- TODO: add assertion for Strategy:names
+    end)
+end)
+
+describe("Missing explicit test for Strategy:clear", function()
+    it("Strategy:clear works", function()
+        -- @tests Strategy:clear
+        -- TODO: add assertion for Strategy:clear
+    end)
+end)
+
+describe("Missing explicit test for Stack:push", function()
+    it("Stack:push works", function()
+        -- @tests Stack:push
+        -- TODO: add assertion for Stack:push
+    end)
+end)
+
+describe("Missing explicit test for Stack:peek", function()
+    it("Stack:peek works", function()
+        -- @tests Stack:peek
+        -- TODO: add assertion for Stack:peek
+    end)
+end)
+
+describe("Missing explicit test for Stack:isEmpty", function()
+    it("Stack:isEmpty works", function()
+        -- @tests Stack:isEmpty
+        -- TODO: add assertion for Stack:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for Stack:isFull", function()
+    it("Stack:isFull works", function()
+        -- @tests Stack:isFull
+        -- TODO: add assertion for Stack:isFull
+    end)
+end)
+
+describe("Missing explicit test for Stack:clear", function()
+    it("Stack:clear works", function()
+        -- @tests Stack:clear
+        -- TODO: add assertion for Stack:clear
+    end)
+end)
+
+describe("Missing explicit test for Stack:toArray", function()
+    it("Stack:toArray works", function()
+        -- @tests Stack:toArray
+        -- TODO: add assertion for Stack:toArray
+    end)
+end)
+
+describe("Missing explicit test for Queue:enqueue", function()
+    it("Queue:enqueue works", function()
+        -- @tests Queue:enqueue
+        -- TODO: add assertion for Queue:enqueue
+    end)
+end)
+
+describe("Missing explicit test for Queue:dequeue", function()
+    it("Queue:dequeue works", function()
+        -- @tests Queue:dequeue
+        -- TODO: add assertion for Queue:dequeue
+    end)
+end)
+
+describe("Missing explicit test for Queue:front", function()
+    it("Queue:front works", function()
+        -- @tests Queue:front
+        -- TODO: add assertion for Queue:front
+    end)
+end)
+
+describe("Missing explicit test for Queue:isEmpty", function()
+    it("Queue:isEmpty works", function()
+        -- @tests Queue:isEmpty
+        -- TODO: add assertion for Queue:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for Queue:isFull", function()
+    it("Queue:isFull works", function()
+        -- @tests Queue:isFull
+        -- TODO: add assertion for Queue:isFull
+    end)
+end)
+
+describe("Missing explicit test for Queue:clear", function()
+    it("Queue:clear works", function()
+        -- @tests Queue:clear
+        -- TODO: add assertion for Queue:clear
+    end)
+end)
+
+describe("Missing explicit test for Queue:toArray", function()
+    it("Queue:toArray works", function()
+        -- @tests Queue:toArray
+        -- TODO: add assertion for Queue:toArray
+    end)
+end)
+
+describe("Missing explicit test for List:remove", function()
+    it("List:remove works", function()
+        -- @tests List:remove
+        -- TODO: add assertion for List:remove
+    end)
+end)
+
+describe("Missing explicit test for List:isEmpty", function()
+    it("List:isEmpty works", function()
+        -- @tests List:isEmpty
+        -- TODO: add assertion for List:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for List:contains", function()
+    it("List:contains works", function()
+        -- @tests List:contains
+        -- TODO: add assertion for List:contains
+    end)
+end)
+
+describe("Missing explicit test for List:clear", function()
+    it("List:clear works", function()
+        -- @tests List:clear
+        -- TODO: add assertion for List:clear
+    end)
+end)
+
+describe("Missing explicit test for List:toArray", function()
+    it("List:toArray works", function()
+        -- @tests List:toArray
+        -- TODO: add assertion for List:toArray
+    end)
+end)
+
+describe("Missing explicit test for Set:remove", function()
+    it("Set:remove works", function()
+        -- @tests Set:remove
+        -- TODO: add assertion for Set:remove
+    end)
+end)
+
+describe("Missing explicit test for Set:isEmpty", function()
+    it("Set:isEmpty works", function()
+        -- @tests Set:isEmpty
+        -- TODO: add assertion for Set:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for Set:toArray", function()
+    it("Set:toArray works", function()
+        -- @tests Set:toArray
+        -- TODO: add assertion for Set:toArray
+    end)
+end)
+
+describe("Missing explicit test for Set:clear", function()
+    it("Set:clear works", function()
+        -- @tests Set:clear
+        -- TODO: add assertion for Set:clear
+    end)
+end)
+
+describe("Missing explicit test for Set:union", function()
+    it("Set:union works", function()
+        -- @tests Set:union
+        -- TODO: add assertion for Set:union
+    end)
+end)
+
+describe("Missing explicit test for Set:intersection", function()
+    it("Set:intersection works", function()
+        -- @tests Set:intersection
+        -- TODO: add assertion for Set:intersection
+    end)
 end)

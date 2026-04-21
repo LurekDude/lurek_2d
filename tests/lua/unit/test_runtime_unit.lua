@@ -4,7 +4,7 @@
 
 -- @description Tests for all lurek.runtime.* functions.
 describe("lurek.runtime metadata", function()
-  -- @covers lurek.runtime.getVersion
+  -- @tests lurek.runtime.getVersion
   -- @description Returns a non-empty version string.
   it("getVersion returns a non-empty string", function()
     local v = lurek.runtime.getVersion()
@@ -12,7 +12,7 @@ describe("lurek.runtime metadata", function()
     expect_true(#v > 0, "version must be non-empty")
   end)
 
-  -- @covers lurek.runtime.getFrameBudget
+  -- @tests lurek.runtime.getFrameBudget
   -- @description Returns approximately 16.67 ms for a 60 FPS target budget.
   it("getFrameBudget returns ~16.67 ms", function()
     local b = lurek.runtime.getFrameBudget()
@@ -20,7 +20,7 @@ describe("lurek.runtime metadata", function()
     expect_true(b > 16.0 and b < 17.0, "frame budget must be near 16.67 ms")
   end)
 
-  -- @covers lurek.runtime.memoryUsage
+  -- @tests lurek.runtime.memoryUsage
   -- @description Returns a table with lua_bytes and lua_kb fields; both non-negative.
   it("memoryUsage returns lua_bytes and lua_kb", function()
     local m = lurek.runtime.memoryUsage()
@@ -29,7 +29,7 @@ describe("lurek.runtime metadata", function()
     expect_true(type(m.lua_kb) == "number" and m.lua_kb >= 0, "lua_kb must be >= 0")
   end)
 
-  -- @covers lurek.runtime.platform
+  -- @tests lurek.runtime.platform
   -- @description Returns one of the expected platform strings.
   it("platform returns a known platform string", function()
     local p = lurek.runtime.platform()
@@ -37,7 +37,7 @@ describe("lurek.runtime metadata", function()
     expect_true(valid[p] == true, "platform must be a known OS")
   end)
 
-  -- @covers lurek.runtime.uptime
+  -- @tests lurek.runtime.uptime
   -- @description Returns a non-negative number.
   it("uptime returns a non-negative number", function()
     local u = lurek.runtime.uptime()
@@ -45,7 +45,7 @@ describe("lurek.runtime metadata", function()
     expect_true(u >= 0, "uptime must be non-negative")
   end)
 
-  -- @covers lurek.runtime.fps
+  -- @tests lurek.runtime.fps
   -- @description Returns a non-negative number.
   it("fps returns a non-negative number", function()
     local f = lurek.runtime.fps()
@@ -53,7 +53,7 @@ describe("lurek.runtime metadata", function()
     expect_true(f >= 0, "fps must be non-negative")
   end)
 
-  -- @covers lurek.runtime.frameCount
+  -- @tests lurek.runtime.frameCount
   -- @description Returns a non-negative integer.
   it("frameCount returns a non-negative integer", function()
     local c = lurek.runtime.frameCount()
@@ -62,14 +62,15 @@ describe("lurek.runtime metadata", function()
     expect_equal(math.floor(c), c)
   end)
 
-  -- @covers lurek.runtime.isDebug
+  -- @tests lurek.runtime.isDebug
   -- @description Returns a boolean without error.
   it("isDebug returns a boolean", function()
     local d = lurek.runtime.isDebug()
     expect_equal(type(d), "boolean")
   end)
 end)
-
+
+
 
 -- [merged from test_runtime_window.lua]
 -- Lurek2D system / platform API tests
@@ -81,31 +82,31 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime module.
 describe("lurek.runtime module", function()
-    -- @covers lurek.runtime
-    -- @covers lurek.runtime.getOS
-    -- @covers lurek.runtime.getVersion
-    -- @covers lurek.runtime.getArch
-    -- @covers lurek.runtime.getProcessorCount
-    -- @covers lurek.runtime.getMemorySize
-    -- @covers lurek.runtime.getInfo
-    -- @covers lurek.runtime.getClipboardText
-    -- @covers lurek.runtime.setClipboardText
-    -- @covers lurek.runtime.setDebugOverlay
-    -- @covers lurek.runtime.getDebugOverlay
-    -- @covers lurek.runtime.setLogLevel
-    -- @covers lurek.runtime.getLogLevel
-    -- @covers lurek.runtime.log
-    -- @covers lurek.runtime.getLastError
-    -- @covers lurek.runtime.getEnv
-    -- @covers lurek.runtime.getArgs
-    -- @covers lurek.runtime.parseArgs
-    -- @covers lurek.runtime.getPowerInfo
-    -- @covers lurek.runtime.getPreferredLocales
-    -- @covers lurek.runtime.openURL
-    -- @covers lurek.runtime.getMessage
-    -- @covers lurek.runtime.hasMessage
-    -- @covers lurek.runtime.getMessageCount
-    -- @covers lurek.event.quit
+    -- @tests lurek.runtime
+    -- @tests lurek.runtime.getOS
+    -- @tests lurek.runtime.getVersion
+    -- @tests lurek.runtime.getArch
+    -- @tests lurek.runtime.getProcessorCount
+    -- @tests lurek.runtime.getMemorySize
+    -- @tests lurek.runtime.getInfo
+    -- @tests lurek.runtime.getClipboardText
+    -- @tests lurek.runtime.setClipboardText
+    -- @tests lurek.runtime.setDebugOverlay
+    -- @tests lurek.runtime.getDebugOverlay
+    -- @tests lurek.runtime.setLogLevel
+    -- @tests lurek.runtime.getLogLevel
+    -- @tests lurek.runtime.log
+    -- @tests lurek.runtime.getLastError
+    -- @tests lurek.runtime.getEnv
+    -- @tests lurek.runtime.getArgs
+    -- @tests lurek.runtime.parseArgs
+    -- @tests lurek.runtime.getPowerInfo
+    -- @tests lurek.runtime.getPreferredLocales
+    -- @tests lurek.runtime.openURL
+    -- @tests lurek.runtime.getMessage
+    -- @tests lurek.runtime.hasMessage
+    -- @tests lurek.runtime.getMessageCount
+    -- @tests lurek.event.quit
     -- @description Verifies the platform namespace is available as a Lua table.
     it("is a table", function()
         expect_type("table", lurek.runtime)
@@ -117,20 +118,20 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime.getOS.
 describe("lurek.runtime.getOS", function()
-    -- @covers lurek.runtime.getOS
+    -- @tests lurek.runtime.getOS
     -- @description Verifies getOS is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getOS)
     end)
 
-    -- @covers lurek.runtime.getOS
+    -- @tests lurek.runtime.getOS
     -- @description Verifies getOS returns a string payload.
     it("returns a string", function()
         local os = lurek.runtime.getOS()
         expect_type("string", os)
     end)
 
-    -- @covers lurek.runtime.getOS
+    -- @tests lurek.runtime.getOS
     -- @description Verifies getOS maps to one of the known platform labels.
     it("returns a known OS name", function()
         local os = lurek.runtime.getOS()
@@ -142,13 +143,13 @@ end)
 
 -- @description Covers suite: lurek.runtime.getVersion.
 describe("lurek.runtime.getVersion", function()
-    -- @covers lurek.runtime.getVersion
+    -- @tests lurek.runtime.getVersion
     -- @description Verifies getVersion is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getVersion)
     end)
 
-    -- @covers lurek.runtime.getVersion
+    -- @tests lurek.runtime.getVersion
     -- @description Verifies getVersion returns non-empty version text.
     it("returns a non-empty string", function()
         local ver = lurek.runtime.getVersion()
@@ -159,13 +160,13 @@ end)
 
 -- @description Covers suite: lurek.runtime.getArch.
 describe("lurek.runtime.getArch", function()
-    -- @covers lurek.runtime.getArch
+    -- @tests lurek.runtime.getArch
     -- @description Verifies getArch is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getArch)
     end)
 
-    -- @covers lurek.runtime.getArch
+    -- @tests lurek.runtime.getArch
     -- @description Verifies getArch returns non-empty architecture text.
     it("returns a string", function()
         local arch = lurek.runtime.getArch()
@@ -176,13 +177,13 @@ end)
 
 -- @description Covers suite: lurek.runtime.getProcessorCount.
 describe("lurek.runtime.getProcessorCount", function()
-    -- @covers lurek.runtime.getProcessorCount
+    -- @tests lurek.runtime.getProcessorCount
     -- @description Verifies getProcessorCount is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getProcessorCount)
     end)
 
-    -- @covers lurek.runtime.getProcessorCount
+    -- @tests lurek.runtime.getProcessorCount
     -- @description Verifies getProcessorCount returns a positive integer.
     it("returns a positive integer", function()
         local n = lurek.runtime.getProcessorCount()
@@ -194,13 +195,13 @@ end)
 
 -- @description Covers suite: lurek.runtime.getMemorySize.
 describe("lurek.runtime.getMemorySize", function()
-    -- @covers lurek.runtime.getMemorySize
+    -- @tests lurek.runtime.getMemorySize
     -- @description Verifies getMemorySize is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getMemorySize)
     end)
 
-    -- @covers lurek.runtime.getMemorySize
+    -- @tests lurek.runtime.getMemorySize
     -- @description Verifies getMemorySize reports a positive memory value in MiB.
     it("returns a positive number (MiB)", function()
         local mb = lurek.runtime.getMemorySize()
@@ -214,27 +215,27 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime.getInfo.
 describe("lurek.runtime.getInfo", function()
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getInfo)
     end)
 
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo returns a table payload.
     it("returns a table", function()
         local info = lurek.runtime.getInfo()
         expect_type("table", info)
     end)
 
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo identifies the engine as Lurek2D.
     it("has engine == 'Lurek2D'", function()
         local info = lurek.runtime.getInfo()
         expect_equal("Lurek2D", info.engine)
     end)
 
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo includes a non-empty engine version string.
     it("has a non-empty version string", function()
         local info = lurek.runtime.getInfo()
@@ -242,28 +243,28 @@ describe("lurek.runtime.getInfo", function()
         expect_true(#info.version > 0)
     end)
 
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo exposes the Lua runtime version string.
     it("has lua_version containing 'Lua'", function()
         local info = lurek.runtime.getInfo()
         expect_contains(info.lua_version, "Lua")
     end)
 
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo reports wgpu as the active renderer backend.
     it("reports the wgpu renderer", function()
         local info = lurek.runtime.getInfo()
         expect_equal("wgpu", info.renderer)
     end)
 
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo includes the host OS string.
     it("has os field", function()
         local info = lurek.runtime.getInfo()
         expect_type("string", info.os)
     end)
 
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo includes a processor count of at least one.
     it("has processors field >= 1", function()
         local info = lurek.runtime.getInfo()
@@ -271,7 +272,7 @@ describe("lurek.runtime.getInfo", function()
         expect_true(info.processors >= 1)
     end)
 
-    -- @covers lurek.runtime.getInfo
+    -- @tests lurek.runtime.getInfo
     -- @description Verifies getInfo includes a positive memory value.
     it("has memory field > 0", function()
         local info = lurek.runtime.getInfo()
@@ -285,25 +286,25 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime clipboard.
 describe("lurek.runtime clipboard", function()
-    -- @covers lurek.runtime.setClipboardText
+    -- @tests lurek.runtime.setClipboardText
     -- @description Verifies the clipboard setter is exposed.
     it("setClipboardText is a function", function()
         expect_type("function", lurek.runtime.setClipboardText)
     end)
 
-    -- @covers lurek.runtime.getClipboardText
+    -- @tests lurek.runtime.getClipboardText
     -- @description Verifies the clipboard getter is exposed.
     it("getClipboardText is a function", function()
         expect_type("function", lurek.runtime.getClipboardText)
     end)
 
-    -- @covers lurek.runtime.setClipboardText
+    -- @tests lurek.runtime.setClipboardText
     -- @description Verifies setClipboardText accepts a string without error.
     it("setClipboardText does not error", function()
         lurek.runtime.setClipboardText("lurek2d test")
     end)
 
-    -- @covers lurek.runtime.getClipboardText
+    -- @tests lurek.runtime.getClipboardText
     -- @description Verifies getClipboardText returns a string payload.
     it("getClipboardText returns a string", function()
         local text = lurek.runtime.getClipboardText()
@@ -316,20 +317,20 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime debug overlay.
 describe("lurek.runtime debug overlay", function()
-    -- @covers lurek.runtime.setDebugOverlay
+    -- @tests lurek.runtime.setDebugOverlay
     -- @description Verifies the debug-overlay setter is exposed.
     it("setDebugOverlay is a function", function()
         expect_type("function", lurek.runtime.setDebugOverlay)
     end)
 
-    -- @covers lurek.runtime.getDebugOverlay
+    -- @tests lurek.runtime.getDebugOverlay
     -- @description Verifies the debug-overlay getter is exposed.
     it("getDebugOverlay is a function", function()
         expect_type("function", lurek.runtime.getDebugOverlay)
     end)
 
-    -- @covers lurek.runtime.setDebugOverlay
-    -- @covers lurek.runtime.getDebugOverlay
+    -- @tests lurek.runtime.setDebugOverlay
+    -- @tests lurek.runtime.getDebugOverlay
     -- @description Verifies debug-overlay state round-trips through the setter and getter.
     it("setDebugOverlay/getDebugOverlay round-trip", function()
         lurek.runtime.setDebugOverlay(true)
@@ -344,20 +345,20 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime log level.
 describe("lurek.runtime log level", function()
-    -- @covers lurek.runtime.setLogLevel
+    -- @tests lurek.runtime.setLogLevel
     -- @description Verifies the log-level setter is exposed.
     it("setLogLevel is a function", function()
         expect_type("function", lurek.runtime.setLogLevel)
     end)
 
-    -- @covers lurek.runtime.getLogLevel
+    -- @tests lurek.runtime.getLogLevel
     -- @description Verifies the log-level getter is exposed.
     it("getLogLevel is a function", function()
         expect_type("function", lurek.runtime.getLogLevel)
     end)
 
-    -- @covers lurek.runtime.setLogLevel
-    -- @covers lurek.runtime.getLogLevel
+    -- @tests lurek.runtime.setLogLevel
+    -- @tests lurek.runtime.getLogLevel
     -- @description Verifies warn log level round-trips through the API.
     it("setLogLevel/getLogLevel round-trip for 'warn'", function()
         lurek.runtime.setLogLevel("warn")
@@ -365,8 +366,8 @@ describe("lurek.runtime log level", function()
         expect_equal("warn", level)
     end)
 
-    -- @covers lurek.runtime.setLogLevel
-    -- @covers lurek.runtime.getLogLevel
+    -- @tests lurek.runtime.setLogLevel
+    -- @tests lurek.runtime.getLogLevel
     -- @description Verifies debug log level round-trips through the API.
     it("setLogLevel/getLogLevel round-trip for 'debug'", function()
         lurek.runtime.setLogLevel("debug")
@@ -380,19 +381,19 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime.log.
 describe("lurek.runtime.log", function()
-    -- @covers lurek.runtime.log
+    -- @tests lurek.runtime.log
     -- @description Verifies the generic log bridge is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.log)
     end)
 
-    -- @covers lurek.runtime.log
+    -- @tests lurek.runtime.log
     -- @description Verifies log accepts the info level without error.
     it("does not error for info level", function()
         lurek.runtime.log("info", "test log message")
     end)
 
-    -- @covers lurek.runtime.log
+    -- @tests lurek.runtime.log
     -- @description Verifies log accepts the warn level without error.
     it("does not error for warn level", function()
         lurek.runtime.log("warn", "test warn message")
@@ -404,13 +405,13 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime.getLastError.
 describe("lurek.runtime.getLastError", function()
-    -- @covers lurek.runtime.getLastError
+    -- @tests lurek.runtime.getLastError
     -- @description Verifies getLastError is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getLastError)
     end)
 
-    -- @covers lurek.runtime.getLastError
+    -- @tests lurek.runtime.getLastError
     -- @description Verifies getLastError returns either nil or a structured table.
     it("returns nil or a table", function()
         local err = lurek.runtime.getLastError()
@@ -425,20 +426,20 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime.getEnv.
 describe("lurek.runtime.getEnv", function()
-    -- @covers lurek.runtime.getEnv
+    -- @tests lurek.runtime.getEnv
     -- @description Verifies getEnv is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getEnv)
     end)
 
-    -- @covers lurek.runtime.getEnv
+    -- @tests lurek.runtime.getEnv
     -- @description Verifies getEnv returns nil for missing environment variables.
     it("returns nil for an unset variable", function()
         local v = lurek.runtime.getEnv("LUREK2D_NONEXISTENT_VAR_12345")
         expect_equal(nil, v)
     end)
 
-    -- @covers lurek.runtime.getEnv
+    -- @tests lurek.runtime.getEnv
     -- @description Verifies getEnv returns string data for a present variable when available.
     it("returns a string for a set variable", function()
         local v = lurek.runtime.getEnv("PATH")
@@ -450,13 +451,13 @@ end)
 
 -- @description Covers suite: lurek.runtime.getArgs.
 describe("lurek.runtime.getArgs", function()
-    -- @covers lurek.runtime.getArgs
+    -- @tests lurek.runtime.getArgs
     -- @description Verifies getArgs is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getArgs)
     end)
 
-    -- @covers lurek.runtime.getArgs
+    -- @tests lurek.runtime.getArgs
     -- @description Verifies getArgs returns a table of process arguments.
     it("returns a table", function()
         local args = lurek.runtime.getArgs()
@@ -466,13 +467,13 @@ end)
 
 -- @description Covers suite: lurek.runtime.parseArgs.
 describe("lurek.runtime.parseArgs", function()
-    -- @covers lurek.runtime.parseArgs
+    -- @tests lurek.runtime.parseArgs
     -- @description Verifies parseArgs is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.parseArgs)
     end)
 
-    -- @covers lurek.runtime.parseArgs
+    -- @tests lurek.runtime.parseArgs
     -- @description Verifies parseArgs returns flags, options, and positional arrays.
     it("returns a table with flags, options, positional", function()
         local parsed = lurek.runtime.parseArgs({})
@@ -482,7 +483,7 @@ describe("lurek.runtime.parseArgs", function()
         expect_type("table", parsed.positional)
     end)
 
-    -- @covers lurek.runtime.parseArgs
+    -- @tests lurek.runtime.parseArgs
     -- @description Verifies parseArgs treats double-dash flags as boolean entries.
     it("parses flag arguments", function()
         local parsed = lurek.runtime.parseArgs({"--verbose", "--debug"})
@@ -490,14 +491,14 @@ describe("lurek.runtime.parseArgs", function()
         expect_equal(true, parsed.flags.debug)
     end)
 
-    -- @covers lurek.runtime.parseArgs
+    -- @tests lurek.runtime.parseArgs
     -- @description Verifies parseArgs splits key=value options into the options table.
     it("parses key=value options", function()
         local parsed = lurek.runtime.parseArgs({"--output=foo.txt"})
         expect_equal("foo.txt", parsed.options.output)
     end)
 
-    -- @covers lurek.runtime.parseArgs
+    -- @tests lurek.runtime.parseArgs
     -- @description Verifies parseArgs preserves bare arguments in positional order.
     it("parses positional arguments", function()
         local parsed = lurek.runtime.parseArgs({"file1.lua", "file2.lua"})
@@ -511,55 +512,55 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime runtime message catalog lookup.
 describe("lurek.runtime message catalog", function()
-    -- @covers lurek.runtime.getMessage
+    -- @tests lurek.runtime.getMessage
     -- @description Verifies the stable message lookup helper is exposed.
     it("getMessage is a function", function()
         expect_type("function", lurek.runtime.getMessage)
     end)
 
-    -- @covers lurek.runtime.hasMessage
+    -- @tests lurek.runtime.hasMessage
     -- @description Verifies the catalog membership helper is exposed.
     it("hasMessage is a function", function()
         expect_type("function", lurek.runtime.hasMessage)
     end)
 
-    -- @covers lurek.runtime.getMessageCount
+    -- @tests lurek.runtime.getMessageCount
     -- @description Verifies the catalog size helper is exposed.
     it("getMessageCount is a function", function()
         expect_type("function", lurek.runtime.getMessageCount)
     end)
 
-    -- @covers lurek.runtime.getMessageCount
+    -- @tests lurek.runtime.getMessageCount
     -- @description Verifies the embedded runtime message catalog loads at least the baseline message set.
     it("getMessageCount returns at least 30 entries", function()
         expect_true(lurek.runtime.getMessageCount() >= 30)
     end)
 
-    -- @covers lurek.runtime.getMessage
+    -- @tests lurek.runtime.getMessage
     -- @description Verifies L001 resolves to the expected startup text from the embedded message catalog.
     it("L001 resolves to startup text", function()
         expect_equal("Lurek2D Engine starting", lurek.runtime.getMessage("L001"))
     end)
 
-    -- @covers lurek.runtime.getMessage
+    -- @tests lurek.runtime.getMessage
     -- @description Verifies L003 resolves to the expected game-loaded text from the embedded message catalog.
     it("L003 resolves to game loaded", function()
         expect_equal("Game loaded", lurek.runtime.getMessage("L003"))
     end)
 
-    -- @covers lurek.runtime.getMessage
+    -- @tests lurek.runtime.getMessage
     -- @description Verifies L010 resolves to the expected render-error text from the embedded message catalog.
     it("L010 resolves to render error", function()
         expect_equal("Render error", lurek.runtime.getMessage("L010"))
     end)
 
-    -- @covers lurek.runtime.getMessage
+    -- @tests lurek.runtime.getMessage
     -- @description Verifies unknown message IDs fall back to the raw ID string instead of crashing or returning nil.
     it("unknown IDs fall back to the raw id", function()
         expect_equal("ZZUNKNOWN", lurek.runtime.getMessage("ZZUNKNOWN"))
     end)
 
-    -- @covers lurek.runtime.hasMessage
+    -- @tests lurek.runtime.hasMessage
     -- @description Verifies known and unknown message IDs are reported correctly by the catalog membership helper.
     it("hasMessage distinguishes known and unknown ids", function()
         expect_equal(true, lurek.runtime.hasMessage("L001"))
@@ -572,13 +573,13 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime.getPowerInfo.
 describe("lurek.runtime.getPowerInfo", function()
-    -- @covers lurek.runtime.getPowerInfo
+    -- @tests lurek.runtime.getPowerInfo
     -- @description Verifies getPowerInfo is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getPowerInfo)
     end)
 
-    -- @covers lurek.runtime.getPowerInfo
+    -- @tests lurek.runtime.getPowerInfo
     -- @description Verifies getPowerInfo returns a string state as its first value.
     it("returns state as first value (string)", function()
         local state, pct, secs = lurek.runtime.getPowerInfo()
@@ -591,13 +592,13 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime.getPreferredLocales.
 describe("lurek.runtime.getPreferredLocales", function()
-    -- @covers lurek.runtime.getPreferredLocales
+    -- @tests lurek.runtime.getPreferredLocales
     -- @description Verifies getPreferredLocales is exposed.
     it("is a function", function()
         expect_type("function", lurek.runtime.getPreferredLocales)
     end)
 
-    -- @covers lurek.runtime.getPreferredLocales
+    -- @tests lurek.runtime.getPreferredLocales
     -- @description Verifies getPreferredLocales returns a table payload.
     it("returns a table", function()
         local locales = lurek.runtime.getPreferredLocales()
@@ -610,7 +611,7 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.runtime.openURL.
 describe("lurek.runtime.openURL", function()
-    -- @covers lurek.runtime.openURL
+    -- @tests lurek.runtime.openURL
     -- @description Verifies the openURL hook is exposed without invoking side effects.
     it("is a function", function()
         expect_type("function", lurek.runtime.openURL)
@@ -622,13 +623,13 @@ end)
 -- ============================================================
 -- @description Covers suite: lurek.event.quit.
 describe("lurek.event.quit", function()
-    -- @covers lurek.event.quit
+    -- @tests lurek.event.quit
     -- @description Verifies the signal namespace exists for the quit helper.
     it("lurek.event is a table", function()
         expect_type("table", lurek.event)
     end)
 
-    -- @covers lurek.event.quit
+    -- @tests lurek.event.quit
     -- @description Verifies the quit signal helper is exposed.
     it("quit is a function", function()
         expect_type("function", lurek.event.quit)
@@ -636,31 +637,31 @@ describe("lurek.event.quit", function()
 end)
 
 describe("lurek.runtime.errorSnapshot serialisation", function()
-    -- @covers lurek.runtime.errorSnapshot
+    -- @tests lurek.runtime.errorSnapshot
     it("errorSnapshot is a function", function()
         expect_equal("function", type(lurek.runtime.errorSnapshot))
     end)
 
-    -- @covers lurek.runtime.errorSnapshot
+    -- @tests lurek.runtime.errorSnapshot
     it("returns a non-empty string", function()
         local json = lurek.runtime.errorSnapshot("test error")
         expect_equal("string", type(json))
         expect_true(#json > 0)
     end)
 
-    -- @covers lurek.runtime.errorSnapshot
+    -- @tests lurek.runtime.errorSnapshot
     it("output contains message field", function()
         local json = lurek.runtime.errorSnapshot("my error")
         expect_true(json:find('"message"') ~= nil)
     end)
 
-    -- @covers lurek.runtime.errorSnapshot
+    -- @tests lurek.runtime.errorSnapshot
     it("output contains code field", function()
         local json = lurek.runtime.errorSnapshot("err")
         expect_true(json:find('"code"') ~= nil)
     end)
 
-    -- @covers lurek.runtime.errorSnapshot
+    -- @tests lurek.runtime.errorSnapshot
     it("output contains category field", function()
         local json = lurek.runtime.errorSnapshot("err")
         expect_true(json:find('"category"') ~= nil)

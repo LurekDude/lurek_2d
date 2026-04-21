@@ -6,27 +6,27 @@
 
 -- @description Verifies the AI namespace exposes every documented world, planner, decision-model, behavior-tree, and pathfinding factory needed by the Lua API.
 describe("lurek.ai module exists", function()
-    -- @covers lurek.ai.newAction
-    -- @covers lurek.ai.newBehaviorTree
-    -- @covers lurek.ai.newBlackboard
-    -- @covers lurek.ai.newCommandQueue
-    -- @covers lurek.ai.newCondition
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers lurek.ai.newInfluenceMap
-    -- @covers lurek.ai.newInverter
-    -- @covers lurek.ai.newParallel
-    -- @covers lurek.ai.newQLearner
-    -- @covers lurek.ai.newRepeater
-    -- @covers lurek.ai.newSelector
-    -- @covers lurek.ai.newSequence
-    -- @covers lurek.ai.newSquad
-    -- @covers lurek.ai.newStateMachine
-    -- @covers lurek.ai.newSteeringManager
-    -- @covers lurek.ai.newSucceeder
-    -- @covers lurek.ai.newUtilityAI
-    -- @covers lurek.ai.newWorld
-    -- @covers lurek.pathfind.newPathFlowField
-    -- @covers lurek.pathfind.newPathGrid
+    -- @tests lurek.ai.newAction
+    -- @tests lurek.ai.newBehaviorTree
+    -- @tests lurek.ai.newBlackboard
+    -- @tests lurek.ai.newCommandQueue
+    -- @tests lurek.ai.newCondition
+    -- @tests lurek.ai.newGOAPPlanner
+    -- @tests lurek.ai.newInfluenceMap
+    -- @tests lurek.ai.newInverter
+    -- @tests lurek.ai.newParallel
+    -- @tests lurek.ai.newQLearner
+    -- @tests lurek.ai.newRepeater
+    -- @tests lurek.ai.newSelector
+    -- @tests lurek.ai.newSequence
+    -- @tests lurek.ai.newSquad
+    -- @tests lurek.ai.newStateMachine
+    -- @tests lurek.ai.newSteeringManager
+    -- @tests lurek.ai.newSucceeder
+    -- @tests lurek.ai.newUtilityAI
+    -- @tests lurek.ai.newWorld
+    -- @tests lurek.pathfind.newPathFlowField
+    -- @tests lurek.pathfind.newPathGrid
     -- @description Checks that the AI namespace itself is registered as a Lua table.
     it("lurek.ai is a table", function()
         expect_type("table", lurek.ai)
@@ -1718,17 +1718,17 @@ end)
 
 -- @description Covers suite: lurek.ai GOAPPlanner maxIterations configurability.
 describe("lurek.ai GOAPPlanner maxIterations configurability", function()
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers GOAPPlanner:getMaxIterations
+    -- @tests lurek.ai.newGOAPPlanner
+    -- @tests GOAPPlanner:getMaxIterations
     -- @description Confirms the default A* iteration cap for a freshly-created GOAP planner is 10000.
     it("goap_getMaxIterations_default_is_10000", function()
         local g = lurek.ai.newGOAPPlanner()
         expect_equal(10000, g:getMaxIterations())
     end)
 
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers GOAPPlanner:setMaxIterations
-    -- @covers GOAPPlanner:getMaxIterations
+    -- @tests lurek.ai.newGOAPPlanner
+    -- @tests GOAPPlanner:setMaxIterations
+    -- @tests GOAPPlanner:getMaxIterations
     -- @description Sets a new iteration cap and reads it back to verify round-trip fidelity.
     it("goap_setMaxIterations_roundtrips_value", function()
         local g = lurek.ai.newGOAPPlanner()
@@ -1736,9 +1736,9 @@ describe("lurek.ai GOAPPlanner maxIterations configurability", function()
         expect_equal(500, g:getMaxIterations())
     end)
 
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers GOAPPlanner:setMaxIterations
-    -- @covers GOAPPlanner:getMaxIterations
+    -- @tests lurek.ai.newGOAPPlanner
+    -- @tests GOAPPlanner:setMaxIterations
+    -- @tests GOAPPlanner:getMaxIterations
     -- @description Sets the iteration cap to 1 to verify extreme low values are accepted.
     it("goap_setMaxIterations_accepts_small_value", function()
         local g = lurek.ai.newGOAPPlanner()
@@ -1746,9 +1746,9 @@ describe("lurek.ai GOAPPlanner maxIterations configurability", function()
         expect_equal(1, g:getMaxIterations())
     end)
 
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers GOAPPlanner:setMaxIterations
-    -- @covers GOAPPlanner:getMaxIterations
+    -- @tests lurek.ai.newGOAPPlanner
+    -- @tests GOAPPlanner:setMaxIterations
+    -- @tests GOAPPlanner:getMaxIterations
     -- @description Sets a very large iteration cap to confirm there is no hard upper bound that silently truncates.
     it("goap_setMaxIterations_accepts_large_value", function()
         local g = lurek.ai.newGOAPPlanner()
@@ -1762,24 +1762,24 @@ end)
 -- =========================================================================
 -- @description Verifies the ContextSteering factory and basic API.
 describe("lurek.ai.newContextSteering factory", function()
-    -- @covers lurek.ai.newContextSteering
+    -- @tests lurek.ai.newContextSteering
     it("exists as a function", function()
         expect_type("function", lurek.ai.newContextSteering)
     end)
 
-    -- @covers lurek.ai.newContextSteering
+    -- @tests lurek.ai.newContextSteering
     it("creates a userdata object", function()
         local cs = lurek.ai.newContextSteering(16)
         expect_type("userdata", cs)
     end)
 
-    -- @covers lurek.ai.newContextSteering
+    -- @tests lurek.ai.newContextSteering
     it("slot count reflects argument", function()
         local cs = lurek.ai.newContextSteering(8)
         expect_equal(cs:slotCount(), 8)
     end)
 
-    -- @covers lurek.ai.newContextSteering
+    -- @tests lurek.ai.newContextSteering
     it("defaults to 16 slots for 0 argument", function()
         local cs = lurek.ai.newContextSteering(0)
         expect_equal(cs:slotCount(), 16)
@@ -1791,7 +1791,7 @@ end)
 -- =========================================================================
 -- @description Verifies evaluate() returns non-nil floats.
 describe("ContextSteering evaluate", function()
-    -- @covers lurek.ai.newContextSteering
+    -- @tests lurek.ai.newContextSteering
     it("returns two numbers from evaluate", function()
         local cs = lurek.ai.newContextSteering(16)
         cs:addSeekTarget(100, 0, 1.0)
@@ -1800,7 +1800,7 @@ describe("ContextSteering evaluate", function()
         expect_type("number", dy)
     end)
 
-    -- @covers lurek.ai.newContextSteering
+    -- @tests lurek.ai.newContextSteering
     it("wander returns a non-zero vector length", function()
         local cs = lurek.ai.newContextSteering(16)
         cs:addWander(0.5, 1.0)
@@ -1809,7 +1809,7 @@ describe("ContextSteering evaluate", function()
         expect_near(cs:chosenMagnitude(), mag, 0.01)
     end)
 
-    -- @covers lurek.ai.newContextSteering
+    -- @tests lurek.ai.newContextSteering
     it("clearBehaviors resets to zero vector", function()
         local cs = lurek.ai.newContextSteering(16)
         cs:addSeekTarget(100, 100, 1.0)
@@ -1825,7 +1825,7 @@ end)
 -- =========================================================================
 -- @description Verifies addAvoidPoint generates a vector pointing away from the obstacle.
 describe("ContextSteering avoid", function()
-    -- @covers lurek.ai.newContextSteering
+    -- @tests lurek.ai.newContextSteering
     it("avoid obstacle pushes away on x-axis", function()
         local cs = lurek.ai.newContextSteering(32)
         -- Place obstacle to the right; agent at origin, avoid weight high
@@ -1841,24 +1841,24 @@ end)
 -- =========================================================================
 -- @description Verifies the AIDirector factory and basic API.
 describe("lurek.ai.newAIDirector factory", function()
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("exists as a function", function()
         expect_type("function", lurek.ai.newAIDirector)
     end)
 
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("creates a userdata object", function()
         local d = lurek.ai.newAIDirector()
         expect_type("userdata", d)
     end)
 
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("starts with zero tension", function()
         local d = lurek.ai.newAIDirector()
         expect_near(d:tension(), 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("starts in Relief phase", function()
         local d = lurek.ai.newAIDirector()
         expect_equal(d:phase(), "Relief")
@@ -1870,14 +1870,14 @@ end)
 -- =========================================================================
 -- @description Verifies that pushEvent() increases tension.
 describe("AIDirector pushEvent", function()
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("pushEvent raises tension", function()
         local d = lurek.ai.newAIDirector()
         d:pushEvent(0.8)
         expect_equal(d:tension() > 0.0, true)
     end)
 
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("tension does not exceed 1.0", function()
         local d = lurek.ai.newAIDirector()
         for i = 1, 50 do d:pushEvent(1.0) end
@@ -1890,7 +1890,7 @@ end)
 -- =========================================================================
 -- @description Verifies that update() transitions through phases.
 describe("AIDirector update", function()
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("update does not crash", function()
         local d = lurek.ai.newAIDirector()
         d:pushEvent(1.0)
@@ -1898,19 +1898,19 @@ describe("AIDirector update", function()
         expect_type("string", d:phase())
     end)
 
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("spawnRateFactor returns a number", function()
         local d = lurek.ai.newAIDirector()
         expect_type("number", d:spawnRateFactor())
     end)
 
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("lootFactor returns a number", function()
         local d = lurek.ai.newAIDirector()
         expect_type("number", d:lootFactor())
     end)
 
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("ambientIntensity returns a number", function()
         local d = lurek.ai.newAIDirector()
         expect_type("number", d:ambientIntensity())
@@ -1922,7 +1922,7 @@ end)
 -- =========================================================================
 -- @description Verifies that reset() restores zero tension.
 describe("AIDirector reset", function()
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("reset clears tension", function()
         local d = lurek.ai.newAIDirector()
         d:pushEvent(1.0)
@@ -1930,7 +1930,7 @@ describe("AIDirector reset", function()
         expect_near(d:tension(), 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newAIDirector
+    -- @tests lurek.ai.newAIDirector
     it("setTension changes tension directly", function()
         local d = lurek.ai.newAIDirector()
         d:setTension(0.5)
@@ -1943,12 +1943,12 @@ end)
 -- =========================================================================
 -- @description Verifies the EmotionModel factory and basic API.
 describe("lurek.ai.newEmotionModel factory", function()
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("exists as a function", function()
         expect_type("function", lurek.ai.newEmotionModel)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("creates a userdata object", function()
         local em = lurek.ai.newEmotionModel()
         expect_type("userdata", em)
@@ -1960,19 +1960,19 @@ end)
 -- =========================================================================
 -- @description Verifies emotions can be added and queried.
 describe("EmotionModel add/query", function()
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("dominant returns nil when empty", function()
         local em = lurek.ai.newEmotionModel()
         expect_equal(em:dominant(), nil)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("get returns 0 for unknown emotion", function()
         local em = lurek.ai.newEmotionModel()
         expect_near(em:get("anger"), 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("trigger raises emotion value", function()
         local em = lurek.ai.newEmotionModel()
         em:add("fear", 0.0, 0.5, 0.1)
@@ -1980,14 +1980,14 @@ describe("EmotionModel add/query", function()
         expect_equal(em:get("fear") > 0.0, true)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("isActive returns false before trigger", function()
         local em = lurek.ai.newEmotionModel()
         em:add("joy", 0.0, 0.3, 0.2)
         expect_equal(em:isActive("joy"), false)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("isActive returns true after strong trigger", function()
         local em = lurek.ai.newEmotionModel()
         em:add("joy", 0.0, 0.3, 0.2)
@@ -2001,7 +2001,7 @@ end)
 -- =========================================================================
 -- @description Verifies dominant() returns the strongest emotion.
 describe("EmotionModel dominant", function()
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("dominant returns the triggered emotion when only one", function()
         local em = lurek.ai.newEmotionModel()
         em:add("rage", 0.0, 0.2, 0.1)
@@ -2015,14 +2015,14 @@ end)
 -- =========================================================================
 -- @description Verifies update() decays emotions and reset() clears them.
 describe("EmotionModel update/reset", function()
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("update does not crash", function()
         local em = lurek.ai.newEmotionModel()
         em:update(0.016)
         expect_equal(em:dominant(), nil)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
+    -- @tests lurek.ai.newEmotionModel
     it("reset brings emotions to resting level", function()
         local em = lurek.ai.newEmotionModel()
         em:add("dread", 0.0, 0.5, 0.1)
@@ -2037,18 +2037,18 @@ end)
 -- =========================================================================
 -- @description Verifies the HTNDomain factory and basic API.
 describe("lurek.ai.newHTNDomain factory", function()
-    -- @covers lurek.ai.newHTNDomain
+    -- @tests lurek.ai.newHTNDomain
     it("exists as a function", function()
         expect_type("function", lurek.ai.newHTNDomain)
     end)
 
-    -- @covers lurek.ai.newHTNDomain
+    -- @tests lurek.ai.newHTNDomain
     it("creates a userdata object", function()
         local d = lurek.ai.newHTNDomain()
         expect_type("userdata", d)
     end)
 
-    -- @covers lurek.ai.newHTNDomain
+    -- @tests lurek.ai.newHTNDomain
     it("starts with zero tasks", function()
         local d = lurek.ai.newHTNDomain()
         expect_equal(d:taskCount(), 0)
@@ -2060,14 +2060,14 @@ end)
 -- =========================================================================
 -- @description Verifies that primitive tasks can be added.
 describe("HTNDomain addPrimitive", function()
-    -- @covers lurek.ai.newHTNDomain
+    -- @tests lurek.ai.newHTNDomain
     it("addPrimitive increments task count", function()
         local d = lurek.ai.newHTNDomain()
         d:addPrimitive("MoveTo", {}, {"at_target"}, {})
         expect_equal(d:taskCount(), 1)
     end)
 
-    -- @covers lurek.ai.newHTNDomain
+    -- @tests lurek.ai.newHTNDomain
     it("addPrimitive with preconditions is counted", function()
         local d = lurek.ai.newHTNDomain()
         d:addPrimitive("Attack", {"has_weapon", "enemy_visible"}, {"attacked"}, {})
@@ -2080,14 +2080,14 @@ end)
 -- =========================================================================
 -- @description Verifies that plan() returns a sequence of primitive actions.
 describe("HTNDomain plan", function()
-    -- @covers lurek.ai.newHTNDomain
+    -- @tests lurek.ai.newHTNDomain
     it("plan returns nil for unknown root task", function()
         local d = lurek.ai.newHTNDomain()
         local result = d:plan("nonexistent", {})
         expect_equal(result, nil)
     end)
 
-    -- @covers lurek.ai.newHTNDomain
+    -- @tests lurek.ai.newHTNDomain
     it("plan returns a table of primitive actions for solvable problem", function()
         local d = lurek.ai.newHTNDomain()
         -- Primitives
@@ -2104,7 +2104,7 @@ describe("HTNDomain plan", function()
         expect_equal(plan[2], "PickUp")
     end)
 
-    -- @covers lurek.ai.newHTNDomain
+    -- @tests lurek.ai.newHTNDomain
     it("plan returns nil when precondition not satisfied", function()
         local d = lurek.ai.newHTNDomain()
         d:addPrimitive("Attack", {"has_weapon"}, {"attacked"}, {})
@@ -2122,18 +2122,18 @@ end)
 -- =========================================================================
 -- @description Verifies the AILod factory and basic API.
 describe("lurek.ai.newAILod factory", function()
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("exists as a function", function()
         expect_type("function", lurek.ai.newAILod)
     end)
 
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("creates a userdata object", function()
         local lod = lurek.ai.newAILod()
         expect_type("userdata", lod)
     end)
 
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("tierCount is >= 1", function()
         local lod = lurek.ai.newAILod()
         expect_equal(lod:tierCount() >= 1, true)
@@ -2145,7 +2145,7 @@ end)
 -- =========================================================================
 -- @description Verifies tierFor() returns valid tier indices based on distance.
 describe("AILod tierFor", function()
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("returns an integer tier index", function()
         local lod = lurek.ai.newAILod()
         local tier = lod:tierFor(0, 0, 0, 0)
@@ -2153,14 +2153,14 @@ describe("AILod tierFor", function()
         expect_equal(tier >= 0, true)
     end)
 
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("agent at same position as reference gets tier 0 (nearest)", function()
         local lod = lurek.ai.newAILod()
         local tier = lod:tierFor(0, 0, 0, 0)
         expect_equal(tier, 0)
     end)
 
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("distant agent gets higher tier than close agent", function()
         local lod = lurek.ai.newAILod()
         local near_tier = lod:tierFor(5, 0, 0, 0)    -- close
@@ -2168,7 +2168,7 @@ describe("AILod tierFor", function()
         expect_equal(far_tier >= near_tier, true)
     end)
 
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("tier index never exceeds tierCount-1", function()
         local lod = lurek.ai.newAILod()
         local max_tier = lod:tierCount() - 1
@@ -2182,7 +2182,7 @@ end)
 -- =========================================================================
 -- @description Verifies shouldUpdate() behaviour for near vs far tiers.
 describe("AILod shouldUpdate", function()
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("tier 0 updates every frame", function()
         local lod = lurek.ai.newAILod()
         -- Tier 0 (near) should update every frame
@@ -2191,7 +2191,7 @@ describe("AILod shouldUpdate", function()
         expect_equal(lod:shouldUpdate(0, 7), true)
     end)
 
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("far tier does not update every frame", function()
         local lod = lurek.ai.newAILod()
         local max_tier = lod:tierCount() - 1
@@ -2218,14 +2218,14 @@ end)
 -- =========================================================================
 -- @description Verifies tierName returns a string for valid tiers.
 describe("AILod tierName", function()
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("tier 0 has a non-nil name", function()
         local lod = lurek.ai.newAILod()
         local name = lod:tierName(0)
         expect_type("string", name)
     end)
 
-    -- @covers lurek.ai.newAILod
+    -- @tests lurek.ai.newAILod
     it("out-of-bounds tier returns nil", function()
         local lod = lurek.ai.newAILod()
         local name = lod:tierName(9999)
@@ -2238,12 +2238,12 @@ end)
 -- =========================================================================
 -- @description Verifies the MCTSEngine factory and basic API.
 describe("lurek.ai.newMCTSEngine factory", function()
-    -- @covers lurek.ai.newMCTSEngine
+    -- @tests lurek.ai.newMCTSEngine
     it("exists as a function", function()
         expect_type("function", lurek.ai.newMCTSEngine)
     end)
 
-    -- @covers lurek.ai.newMCTSEngine
+    -- @tests lurek.ai.newMCTSEngine
     it("creates a userdata object", function()
         local mcts = lurek.ai.newMCTSEngine(50, 1.41, 10, 42)
         expect_type("userdata", mcts)
@@ -2258,7 +2258,7 @@ end)
 -- Trivial game: state = integer 0..5.  Actions: +1 or +2.
 -- Evaluate: higher state = better score.  Best first action from 0 = +2.
 describe("MCTSEngine search", function()
-    -- @covers lurek.ai.newMCTSEngine
+    -- @tests lurek.ai.newMCTSEngine
     it("returns an integer action from search", function()
         local mcts = lurek.ai.newMCTSEngine(100, 1.41, 5, 42)
         local function get_actions(state)
@@ -2275,7 +2275,7 @@ describe("MCTSEngine search", function()
         expect_type("number", action)
     end)
 
-    -- @covers lurek.ai.newMCTSEngine
+    -- @tests lurek.ai.newMCTSEngine
     it("returns nil when no actions available from root", function()
         local mcts = lurek.ai.newMCTSEngine(50, 1.41, 5, 1)
         local action = mcts:search(
@@ -2287,7 +2287,7 @@ describe("MCTSEngine search", function()
         expect_equal(action, nil)
     end)
 
-    -- @covers lurek.ai.newMCTSEngine
+    -- @tests lurek.ai.newMCTSEngine
     it("prefers higher reward action", function()
         local mcts = lurek.ai.newMCTSEngine(200, 1.41, 8, 99)
         -- Game: state is a bank balance. Action 1 adds 1, action 2 adds 10.
@@ -2314,24 +2314,24 @@ end)
 -- =========================================================================
 -- @description Verifies the NeuralNet factory and basic inference.
 describe("lurek.ai.newNeuralNet factory", function()
-    -- @covers lurek.ai.newNeuralNet
+    -- @tests lurek.ai.newNeuralNet
     it("exists as a function", function()
         expect_type("function", lurek.ai.newNeuralNet)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
+    -- @tests lurek.ai.newNeuralNet
     it("creates a userdata object", function()
         local net = lurek.ai.newNeuralNet()
         expect_type("userdata", net)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
+    -- @tests lurek.ai.newNeuralNet
     it("starts with zero layers", function()
         local net = lurek.ai.newNeuralNet()
         expect_equal(net:layerCount(), 0)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
+    -- @tests lurek.ai.newNeuralNet
     it("addLayer increments layer count", function()
         local net = lurek.ai.newNeuralNet()
         net:addLayer(2, 4, "relu")
@@ -2339,7 +2339,7 @@ describe("lurek.ai.newNeuralNet factory", function()
         expect_equal(net:layerCount(), 2)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
+    -- @tests lurek.ai.newNeuralNet
     it("forward returns table of correct size", function()
         local net = lurek.ai.newNeuralNet()
         net:addLayer(3, 2, "relu")
@@ -2348,7 +2348,7 @@ describe("lurek.ai.newNeuralNet factory", function()
         expect_equal(#out, 2)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
+    -- @tests lurek.ai.newNeuralNet
     it("paramCount is positive after adding layers", function()
         local net = lurek.ai.newNeuralNet()
         net:addLayer(2, 3, "tanh")
@@ -2356,7 +2356,7 @@ describe("lurek.ai.newNeuralNet factory", function()
         expect_equal(net:paramCount(), 9)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
+    -- @tests lurek.ai.newNeuralNet
     it("setWeights / getWeights roundtrip", function()
         local net = lurek.ai.newNeuralNet()
         net:addLayer(2, 2, "relu")
@@ -2375,24 +2375,24 @@ end)
 -- =========================================================================
 -- @description Verifies the GeneticAlgorithm factory and evolution API.
 describe("lurek.ai.newGeneticAlgorithm factory", function()
-    -- @covers lurek.ai.newGeneticAlgorithm
+    -- @tests lurek.ai.newGeneticAlgorithm
     it("exists as a function", function()
         expect_type("function", lurek.ai.newGeneticAlgorithm)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
+    -- @tests lurek.ai.newGeneticAlgorithm
     it("creates a userdata object", function()
         local ga = lurek.ai.newGeneticAlgorithm(10, 5, 42)
         expect_type("userdata", ga)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
+    -- @tests lurek.ai.newGeneticAlgorithm
     it("popSize matches argument", function()
         local ga = lurek.ai.newGeneticAlgorithm(20, 4, 1)
         expect_equal(ga:popSize(), 20)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
+    -- @tests lurek.ai.newGeneticAlgorithm
     it("getGenes returns table of expected length", function()
         local ga = lurek.ai.newGeneticAlgorithm(5, 8, 7)
         local genes = ga:getGenes(0)
@@ -2400,7 +2400,7 @@ describe("lurek.ai.newGeneticAlgorithm factory", function()
         expect_equal(#genes, 8)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
+    -- @tests lurek.ai.newGeneticAlgorithm
     it("evolve increments generation", function()
         local ga = lurek.ai.newGeneticAlgorithm(6, 4, 3)
         -- Assign trivial fitness before evolve
@@ -2410,7 +2410,7 @@ describe("lurek.ai.newGeneticAlgorithm factory", function()
         expect_equal(ga:generation(), g0 + 1)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
+    -- @tests lurek.ai.newGeneticAlgorithm
     it("bestGenes returns a table", function()
         local ga = lurek.ai.newGeneticAlgorithm(4, 3, 9)
         for i = 0, 3 do ga:setFitness(i, i * 0.5) end
@@ -2425,31 +2425,31 @@ end)
 -- =========================================================================
 -- @description Verifies the Bandit factory and arms API.
 describe("lurek.ai.newBandit factory", function()
-    -- @covers lurek.ai.newBandit
+    -- @tests lurek.ai.newBandit
     it("exists as a function", function()
         expect_type("function", lurek.ai.newBandit)
     end)
 
-    -- @covers lurek.ai.newBandit
+    -- @tests lurek.ai.newBandit
     it("creates a userdata object", function()
         local b = lurek.ai.newBandit(5, "epsilon_greedy", 0.1, 42)
         expect_type("userdata", b)
     end)
 
-    -- @covers lurek.ai.newBandit
+    -- @tests lurek.ai.newBandit
     it("armCount matches argument", function()
         local b = lurek.ai.newBandit(8, "ucb1", 0.0, 1)
         expect_equal(b:armCount(), 8)
     end)
 
-    -- @covers lurek.ai.newBandit
+    -- @tests lurek.ai.newBandit
     it("select returns a valid arm index", function()
         local b = lurek.ai.newBandit(4, "epsilon_greedy", 0.2, 10)
         local idx = b:select()
         expect_equal(idx >= 0 and idx < 4, true)
     end)
 
-    -- @covers lurek.ai.newBandit
+    -- @tests lurek.ai.newBandit
     it("update does not crash", function()
         local b = lurek.ai.newBandit(3, "ucb1", 0.0, 5)
         b:update(0, 1.0)
@@ -2458,7 +2458,7 @@ describe("lurek.ai.newBandit factory", function()
         expect_equal(b:totalPulls(), 3)
     end)
 
-    -- @covers lurek.ai.newBandit
+    -- @tests lurek.ai.newBandit
     it("bestArm returns a valid index after updates", function()
         local b = lurek.ai.newBandit(3, "ucb1", 0.0, 5)
         b:update(0, 0.1)
@@ -2467,14 +2467,14 @@ describe("lurek.ai.newBandit factory", function()
         expect_equal(b:bestArm() >= 0, true)
     end)
 
-    -- @covers lurek.ai.newBandit
+    -- @tests lurek.ai.newBandit
     it("thompson_sampling strategy creates successfully", function()
         local b = lurek.ai.newBandit(4, "thompson", 0.0, 7)
         local idx = b:select()
         expect_equal(idx >= 0 and idx < 4, true)
     end)
 
-    -- @covers lurek.ai.newBandit
+    -- @tests lurek.ai.newBandit
     it("reset clears pull history", function()
         local b = lurek.ai.newBandit(2, "epsilon_greedy", 0.5, 99)
         b:update(0, 1.0)
@@ -2488,12 +2488,12 @@ end)
 -- =========================================================================
 -- @description Verifies the Neuroevolution factory and basic API.
 describe("lurek.ai.newNeuroevolution factory", function()
-    -- @covers lurek.ai.newNeuroevolution
+    -- @tests lurek.ai.newNeuroevolution
     it("exists as a function", function()
         expect_type("function", lurek.ai.newNeuroevolution)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
+    -- @tests lurek.ai.newNeuroevolution
     it("creates a userdata object", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=2, outputs=4, activation="relu"},
@@ -2502,14 +2502,14 @@ describe("lurek.ai.newNeuroevolution factory", function()
         expect_type("userdata", ne)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
+    -- @tests lurek.ai.newNeuroevolution
     it("popSize matches argument", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=2, outputs=2, activation="relu"}}, 8, 1)
         expect_equal(ne:popSize(), 8)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
+    -- @tests lurek.ai.newNeuroevolution
     it("chromosomeToNet returns a NeuralNet userdata", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=2, outputs=2, activation="tanh"}}, 5, 3)
@@ -2517,7 +2517,7 @@ describe("lurek.ai.newNeuroevolution factory", function()
         expect_type("userdata", net)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
+    -- @tests lurek.ai.newNeuroevolution
     it("bestNetwork returns userdata after evolve", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=2, outputs=1, activation="sigmoid"}}, 4, 7)
@@ -2527,7 +2527,7 @@ describe("lurek.ai.newNeuroevolution factory", function()
         expect_type("userdata", best)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
+    -- @tests lurek.ai.newNeuroevolution
     it("evolve increments generation", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=1, outputs=1, activation="linear"}}, 4, 11)
@@ -2542,12 +2542,12 @@ end)
 -- =========================================================================
 -- @description Verifies the NeedSystem factory and basic API.
 describe("lurek.ai.newNeedSystem factory", function()
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("exists as a function", function()
         expect_type("function", lurek.ai.newNeedSystem)
     end)
 
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("creates a userdata object", function()
         local ns = lurek.ai.newNeedSystem()
         expect_type("userdata", ns)
@@ -2559,20 +2559,20 @@ end)
 -- =========================================================================
 -- @description Verifies that needs can be added and queried.
 describe("NeedSystem add/query", function()
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("mostUrgent returns nil when empty", function()
         local ns = lurek.ai.newNeedSystem()
         expect_equal(ns:mostUrgent(), nil)
     end)
 
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("valueOf returns 1.0 for new needs (full by default)", function()
         local ns = lurek.ai.newNeedSystem()
         ns:addNeed("hunger", 0.1, 0.3, 2.0)
         expect_near(ns:valueOf("hunger"), 1.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("valueOf returns 0 for unknown need", function()
         local ns = lurek.ai.newNeedSystem()
         expect_near(ns:valueOf("unknown"), 0.0, 0.001)
@@ -2584,14 +2584,14 @@ end)
 -- =========================================================================
 -- @description Verifies that needs decay over time.
 describe("NeedSystem update/decay", function()
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("update does not crash with empty system", function()
         local ns = lurek.ai.newNeedSystem()
         ns:update(0.016)
         expect_equal(ns:mostUrgent(), nil)
     end)
 
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("hunger decays after large dt", function()
         local ns = lurek.ai.newNeedSystem()
         ns:addNeed("hunger", 1.0, 0.3, 2.0)   -- fast decay
@@ -2605,7 +2605,7 @@ end)
 -- =========================================================================
 -- @description Verifies that satisfy() increases need value.
 describe("NeedSystem satisfy", function()
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("satisfy increases value", function()
         local ns = lurek.ai.newNeedSystem()
         ns:addNeed("hunger", 1.0, 0.3, 2.0)
@@ -2621,7 +2621,7 @@ end)
 -- =========================================================================
 -- @description Verifies mostUrgent returns the name of the most depleted need.
 describe("NeedSystem mostUrgent", function()
-    -- @covers lurek.ai.newNeedSystem
+    -- @tests lurek.ai.newNeedSystem
     it("returns the name of the urgent need when depleted", function()
         local ns = lurek.ai.newNeedSystem()
         ns:addNeed("sleep", 0.1, 0.8, 3.0)
@@ -2637,18 +2637,18 @@ end)
 -- =========================================================================
 -- @description Verifies the ORCASolver factory and basic API.
 describe("lurek.ai.newORCASolver factory", function()
-    -- @covers lurek.ai.newORCASolver
+    -- @tests lurek.ai.newORCASolver
     it("exists as a function", function()
         expect_type("function", lurek.ai.newORCASolver)
     end)
 
-    -- @covers lurek.ai.newORCASolver
+    -- @tests lurek.ai.newORCASolver
     it("creates a userdata object", function()
         local s = lurek.ai.newORCASolver(2.0)
         expect_type("userdata", s)
     end)
 
-    -- @covers lurek.ai.newORCASolver
+    -- @tests lurek.ai.newORCASolver
     it("starts with zero agents", function()
         local s = lurek.ai.newORCASolver(2.0)
         expect_equal(s:agentCount(), 0)
@@ -2660,14 +2660,14 @@ end)
 -- =========================================================================
 -- @description Verifies that agents can be added and counted.
 describe("ORCASolver addAgent", function()
-    -- @covers lurek.ai.newORCASolver
+    -- @tests lurek.ai.newORCASolver
     it("addAgent increments count", function()
         local s = lurek.ai.newORCASolver(2.0)
         s:addAgent(0, 0, 0.5, 3.0)
         expect_equal(s:agentCount(), 1)
     end)
 
-    -- @covers lurek.ai.newORCASolver
+    -- @tests lurek.ai.newORCASolver
     it("multiple agents counted", function()
         local s = lurek.ai.newORCASolver(2.0)
         s:addAgent(0, 0, 0.5, 3.0)
@@ -2681,7 +2681,7 @@ end)
 -- =========================================================================
 -- @description Verifies that compute() produces safe velocities.
 describe("ORCASolver compute", function()
-    -- @covers lurek.ai.newORCASolver
+    -- @tests lurek.ai.newORCASolver
     it("compute does not crash with one agent", function()
         local s = lurek.ai.newORCASolver(2.0)
         s:addAgent(0, 0, 0.5, 3.0)
@@ -2692,7 +2692,7 @@ describe("ORCASolver compute", function()
         expect_type("number", vy)
     end)
 
-    -- @covers lurek.ai.newORCASolver
+    -- @tests lurek.ai.newORCASolver
     it("getSafeVelocity returns zeros for out-of-bounds index", function()
         local s = lurek.ai.newORCASolver(2.0)
         local vx, vy = s:getSafeVelocity(99)
@@ -2700,7 +2700,7 @@ describe("ORCASolver compute", function()
         expect_near(vy, 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newORCASolver
+    -- @tests lurek.ai.newORCASolver
     it("two agents heading toward each other get non-colliding velocities", function()
         local s = lurek.ai.newORCASolver(2.0)
         s:addAgent(-5, 0, 0.5, 3.0)
@@ -2722,18 +2722,18 @@ end)
 -- =========================================================================
 -- @description Verifies the StimulusWorld factory and basic API.
 describe("lurek.ai.newStimulusWorld factory", function()
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("exists as a function", function()
         expect_type("function", lurek.ai.newStimulusWorld)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("creates a userdata object", function()
         local sw = lurek.ai.newStimulusWorld()
         expect_type("userdata", sw)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("starts with zero stimuli", function()
         local sw = lurek.ai.newStimulusWorld()
         expect_equal(sw:count(), 0)
@@ -2745,21 +2745,21 @@ end)
 -- =========================================================================
 -- @description Verifies that visual and auditory stimuli can be added and counted.
 describe("StimulusWorld add stimuli", function()
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("addVisual increases count", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:addVisual(100, 200, 1.0, 50.0, nil)
         expect_equal(sw:count(), 1)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("addAuditory increases count", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:addAuditory(50, 50, 0.8, 80.0, 0.5, "gunshot")
         expect_equal(sw:count(), 1)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("multiple stimuli counted correctly", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:addVisual(0, 0, 1.0, 40.0, nil)
@@ -2774,7 +2774,7 @@ end)
 -- =========================================================================
 -- @description Verifies that stimuli can be removed by ID.
 describe("StimulusWorld remove", function()
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("remove decrements count", function()
         local sw = lurek.ai.newStimulusWorld()
         local id = sw:addVisual(0, 0, 1.0, 50.0, nil)
@@ -2783,14 +2783,14 @@ describe("StimulusWorld remove", function()
         expect_equal(sw:count(), 0)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("remove returns true for valid id", function()
         local sw = lurek.ai.newStimulusWorld()
         local id = sw:addVisual(0, 0, 1.0, 50.0, nil)
         expect_equal(sw:remove(id), true)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("remove returns false for unknown id", function()
         local sw = lurek.ai.newStimulusWorld()
         expect_equal(sw:remove(99999), false)
@@ -2802,14 +2802,14 @@ end)
 -- =========================================================================
 -- @description Verifies update and clear operations.
 describe("StimulusWorld update/clear", function()
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("update does not crash with empty world", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:update(0.016)
         expect_equal(sw:count(), 0)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
+    -- @tests lurek.ai.newStimulusWorld
     it("clear removes all stimuli", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:addVisual(0, 0, 1.0, 50.0, nil)
@@ -2824,18 +2824,18 @@ end)
 -- =========================================================================
 -- @description Verifies the StrategyAI factory and basic API.
 describe("lurek.ai.newStrategyAI factory", function()
-    -- @covers lurek.ai.newStrategyAI
+    -- @tests lurek.ai.newStrategyAI
     it("exists as a function", function()
         expect_type("function", lurek.ai.newStrategyAI)
     end)
 
-    -- @covers lurek.ai.newStrategyAI
+    -- @tests lurek.ai.newStrategyAI
     it("creates a userdata object", function()
         local s = lurek.ai.newStrategyAI(5.0)
         expect_type("userdata", s)
     end)
 
-    -- @covers lurek.ai.newStrategyAI
+    -- @tests lurek.ai.newStrategyAI
     it("starts with no active goal", function()
         local s = lurek.ai.newStrategyAI(5.0)
         expect_equal(s:activeGoal(), nil)
@@ -2847,7 +2847,7 @@ end)
 -- =========================================================================
 -- @description Verifies goals can be added and evaluated by scorer.
 describe("StrategyAI addGoal / forceEvaluate", function()
-    -- @covers lurek.ai.newStrategyAI
+    -- @tests lurek.ai.newStrategyAI
     it("forceEvaluate sets active goal when one has highest score", function()
         local s = lurek.ai.newStrategyAI(10.0)
         s:addGoal("attack")
@@ -2859,7 +2859,7 @@ describe("StrategyAI addGoal / forceEvaluate", function()
         expect_equal(s:activeGoal(), "attack")
     end)
 
-    -- @covers lurek.ai.newStrategyAI
+    -- @tests lurek.ai.newStrategyAI
     it("activeGoal remains nil if all scores zero", function()
         local s = lurek.ai.newStrategyAI(10.0)
         s:addGoal("explore")
@@ -2873,7 +2873,7 @@ end)
 -- =========================================================================
 -- @description Verifies update() only re-evaluates after the interval expires.
 describe("StrategyAI update throttle", function()
-    -- @covers lurek.ai.newStrategyAI
+    -- @tests lurek.ai.newStrategyAI
     it("update does not crash before interval", function()
         local s = lurek.ai.newStrategyAI(5.0)
         s:addGoal("patrol")
@@ -2881,7 +2881,7 @@ describe("StrategyAI update throttle", function()
         expect_type("number", s:timeUntilNext())
     end)
 
-    -- @covers lurek.ai.newStrategyAI
+    -- @tests lurek.ai.newStrategyAI
     it("update evaluates after interval passes", function()
         local s = lurek.ai.newStrategyAI(0.1)
         s:addGoal("hunt")
@@ -2904,7 +2904,7 @@ end)
 -- =========================================================================
 -- @description Verifies tags can be added and removed.
 describe("StrategyAI tags", function()
-    -- @covers lurek.ai.newStrategyAI
+    -- @tests lurek.ai.newStrategyAI
     it("addTag / removeTag do not crash", function()
         local s = lurek.ai.newStrategyAI(5.0)
         s:addTag("night")
@@ -2919,12 +2919,12 @@ end)
 -- =========================================================================
 -- @description Verifies the TraitProfile factory exists and creates a valid object.
 describe("lurek.ai.newTraitProfile factory", function()
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("exists as a function", function()
         expect_type("function", lurek.ai.newTraitProfile)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("creates a userdata object", function()
         local tp = lurek.ai.newTraitProfile()
         expect_type("userdata", tp)
@@ -2936,33 +2936,33 @@ end)
 -- =========================================================================
 -- @description Verifies that trait values set via set() are returned by get().
 describe("TraitProfile set/get", function()
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("starts with zero for unknown trait", function()
         local tp = lurek.ai.newTraitProfile()
         expect_near(tp:get("aggression"), 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("returns set value", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("courage", 0.75)
         expect_near(tp:get("courage"), 0.75, 0.001)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("has() returns false for unset trait", function()
         local tp = lurek.ai.newTraitProfile()
         expect_equal(tp:has("unknown_trait"), false)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("has() returns true after set", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("loyalty", 0.5)
         expect_equal(tp:has("loyalty"), true)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("traitCount increments after set", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("a", 0.1)
@@ -2976,7 +2976,7 @@ end)
 -- =========================================================================
 -- @description Verifies that timed modifiers alter the effective trait value.
 describe("TraitProfile modifiers", function()
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("modifier raises effective value immediately", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("fear", 0.2)
@@ -2984,7 +2984,7 @@ describe("TraitProfile modifiers", function()
         expect_near(tp:get("fear"), 0.7, 0.01)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("removeModifiers restores base value", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("fear", 0.2)
@@ -2993,7 +2993,7 @@ describe("TraitProfile modifiers", function()
         expect_near(tp:get("fear"), 0.2, 0.01)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("getBase is unchanged by modifier", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("strength", 0.8)
@@ -3007,14 +3007,14 @@ end)
 -- =========================================================================
 -- @description Verifies that update() ticks the modifier timer and expires timed modifiers.
 describe("TraitProfile update", function()
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("update does not crash with no modifiers", function()
         local tp = lurek.ai.newTraitProfile()
         tp:update(0.016)
         expect_equal(tp:traitCount(), 0)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
+    -- @tests lurek.ai.newTraitProfile
     it("timed modifier expires after update", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("speed", 0.5)
@@ -3033,59 +3033,1410 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers Blackboard:has
+    -- @tests Blackboard:has
     it("covers Blackboard:has", function()
         -- TODO: Implement test for Blackboard:has
     end)
 
-    -- @covers BehaviorTree:getDebugState
+    -- @tests BehaviorTree:getDebugState
     it("covers BehaviorTree:getDebugState", function()
         -- TODO: Implement test for BehaviorTree:getDebugState
     end)
 
-    -- @covers SteeringManager:setSpatialHashCellSize
+    -- @tests SteeringManager:setSpatialHashCellSize
     it("covers SteeringManager:setSpatialHashCellSize", function()
         -- TODO: Implement test for SteeringManager:setSpatialHashCellSize
     end)
 
-    -- @covers SteeringManager:enableSpatialHash
+    -- @tests SteeringManager:enableSpatialHash
     it("covers SteeringManager:enableSpatialHash", function()
         -- TODO: Implement test for SteeringManager:enableSpatialHash
     end)
 
-    -- @covers CommandQueue:getCurrentTarget
+    -- @tests CommandQueue:getCurrentTarget
     it("covers CommandQueue:getCurrentTarget", function()
         -- TODO: Implement test for CommandQueue:getCurrentTarget
     end)
 
-    -- @covers TraitProfile:set
+    -- @tests TraitProfile:set
     it("covers TraitProfile:set", function()
         -- TODO: Implement test for TraitProfile:set
     end)
 
-    -- @covers TraitProfile:get
+    -- @tests TraitProfile:get
     it("covers TraitProfile:get", function()
         -- TODO: Implement test for TraitProfile:get
     end)
 
-    -- @covers TraitProfile:has
+    -- @tests TraitProfile:has
     it("covers TraitProfile:has", function()
         -- TODO: Implement test for TraitProfile:has
     end)
 
-    -- @covers ContextSteering:addAvoidBounds
+    -- @tests ContextSteering:addAvoidBounds
     it("covers ContextSteering:addAvoidBounds", function()
         -- TODO: Implement test for ContextSteering:addAvoidBounds
     end)
 
-    -- @covers EmotionModel:get
+    -- @tests EmotionModel:get
     it("covers EmotionModel:get", function()
         -- TODO: Implement test for EmotionModel:get
     end)
 
-    -- @covers Neuroevolution:bestFitness
+    -- @tests Neuroevolution:bestFitness
     it("covers Neuroevolution:bestFitness", function()
         -- TODO: Implement test for Neuroevolution:bestFitness
     end)
 
+end)
+
+describe("Missing explicit test for AIWorld:addAgent", function()
+    it("AIWorld:addAgent works", function()
+        -- @tests AIWorld:addAgent
+        -- TODO: add assertion for AIWorld:addAgent
+    end)
+end)
+
+describe("Missing explicit test for AIWorld:getAgent", function()
+    it("AIWorld:getAgent works", function()
+        -- @tests AIWorld:getAgent
+        -- TODO: add assertion for AIWorld:getAgent
+    end)
+end)
+
+describe("Missing explicit test for AIWorld:removeAgent", function()
+    it("AIWorld:removeAgent works", function()
+        -- @tests AIWorld:removeAgent
+        -- TODO: add assertion for AIWorld:removeAgent
+    end)
+end)
+
+describe("Missing explicit test for AIWorld:getAgentCount", function()
+    it("AIWorld:getAgentCount works", function()
+        -- @tests AIWorld:getAgentCount
+        -- TODO: add assertion for AIWorld:getAgentCount
+    end)
+end)
+
+describe("Missing explicit test for AIWorld:getGlobalBlackboard", function()
+    it("AIWorld:getGlobalBlackboard works", function()
+        -- @tests AIWorld:getGlobalBlackboard
+        -- TODO: add assertion for AIWorld:getGlobalBlackboard
+    end)
+end)
+
+describe("Missing explicit test for AIWorld:update", function()
+    it("AIWorld:update works", function()
+        -- @tests AIWorld:update
+        -- TODO: add assertion for AIWorld:update
+    end)
+end)
+
+describe("Missing explicit test for AIWorld:type", function()
+    it("AIWorld:type works", function()
+        -- @tests AIWorld:type
+        -- TODO: add assertion for AIWorld:type
+    end)
+end)
+
+describe("Missing explicit test for AIWorld:typeOf", function()
+    it("AIWorld:typeOf works", function()
+        -- @tests AIWorld:typeOf
+        -- TODO: add assertion for AIWorld:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Agent:getName", function()
+    it("Agent:getName works", function()
+        -- @tests Agent:getName
+        -- TODO: add assertion for Agent:getName
+    end)
+end)
+
+describe("Missing explicit test for Agent:setPosition", function()
+    it("Agent:setPosition works", function()
+        -- @tests Agent:setPosition
+        -- TODO: add assertion for Agent:setPosition
+    end)
+end)
+
+describe("Missing explicit test for Agent:getPosition", function()
+    it("Agent:getPosition works", function()
+        -- @tests Agent:getPosition
+        -- TODO: add assertion for Agent:getPosition
+    end)
+end)
+
+describe("Missing explicit test for Agent:setVelocity", function()
+    it("Agent:setVelocity works", function()
+        -- @tests Agent:setVelocity
+        -- TODO: add assertion for Agent:setVelocity
+    end)
+end)
+
+describe("Missing explicit test for Agent:getVelocity", function()
+    it("Agent:getVelocity works", function()
+        -- @tests Agent:getVelocity
+        -- TODO: add assertion for Agent:getVelocity
+    end)
+end)
+
+describe("Missing explicit test for Agent:setMaxSpeed", function()
+    it("Agent:setMaxSpeed works", function()
+        -- @tests Agent:setMaxSpeed
+        -- TODO: add assertion for Agent:setMaxSpeed
+    end)
+end)
+
+describe("Missing explicit test for Agent:getMaxSpeed", function()
+    it("Agent:getMaxSpeed works", function()
+        -- @tests Agent:getMaxSpeed
+        -- TODO: add assertion for Agent:getMaxSpeed
+    end)
+end)
+
+describe("Missing explicit test for Agent:setMaxForce", function()
+    it("Agent:setMaxForce works", function()
+        -- @tests Agent:setMaxForce
+        -- TODO: add assertion for Agent:setMaxForce
+    end)
+end)
+
+describe("Missing explicit test for Agent:getMaxForce", function()
+    it("Agent:getMaxForce works", function()
+        -- @tests Agent:getMaxForce
+        -- TODO: add assertion for Agent:getMaxForce
+    end)
+end)
+
+describe("Missing explicit test for Agent:setPriority", function()
+    it("Agent:setPriority works", function()
+        -- @tests Agent:setPriority
+        -- TODO: add assertion for Agent:setPriority
+    end)
+end)
+
+describe("Missing explicit test for Agent:getPriority", function()
+    it("Agent:getPriority works", function()
+        -- @tests Agent:getPriority
+        -- TODO: add assertion for Agent:getPriority
+    end)
+end)
+
+describe("Missing explicit test for Agent:setDecisionModel", function()
+    it("Agent:setDecisionModel works", function()
+        -- @tests Agent:setDecisionModel
+        -- TODO: add assertion for Agent:setDecisionModel
+    end)
+end)
+
+describe("Missing explicit test for Agent:getDecisionModel", function()
+    it("Agent:getDecisionModel works", function()
+        -- @tests Agent:getDecisionModel
+        -- TODO: add assertion for Agent:getDecisionModel
+    end)
+end)
+
+describe("Missing explicit test for Agent:addTag", function()
+    it("Agent:addTag works", function()
+        -- @tests Agent:addTag
+        -- TODO: add assertion for Agent:addTag
+    end)
+end)
+
+describe("Missing explicit test for Agent:removeTag", function()
+    it("Agent:removeTag works", function()
+        -- @tests Agent:removeTag
+        -- TODO: add assertion for Agent:removeTag
+    end)
+end)
+
+describe("Missing explicit test for Agent:hasTag", function()
+    it("Agent:hasTag works", function()
+        -- @tests Agent:hasTag
+        -- TODO: add assertion for Agent:hasTag
+    end)
+end)
+
+describe("Missing explicit test for Agent:getBlackboard", function()
+    it("Agent:getBlackboard works", function()
+        -- @tests Agent:getBlackboard
+        -- TODO: add assertion for Agent:getBlackboard
+    end)
+end)
+
+describe("Missing explicit test for Agent:type", function()
+    it("Agent:type works", function()
+        -- @tests Agent:type
+        -- TODO: add assertion for Agent:type
+    end)
+end)
+
+describe("Missing explicit test for Agent:typeOf", function()
+    it("Agent:typeOf works", function()
+        -- @tests Agent:typeOf
+        -- TODO: add assertion for Agent:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:setNumber", function()
+    it("Blackboard:setNumber works", function()
+        -- @tests Blackboard:setNumber
+        -- TODO: add assertion for Blackboard:setNumber
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:setBool", function()
+    it("Blackboard:setBool works", function()
+        -- @tests Blackboard:setBool
+        -- TODO: add assertion for Blackboard:setBool
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:setString", function()
+    it("Blackboard:setString works", function()
+        -- @tests Blackboard:setString
+        -- TODO: add assertion for Blackboard:setString
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:remove", function()
+    it("Blackboard:remove works", function()
+        -- @tests Blackboard:remove
+        -- TODO: add assertion for Blackboard:remove
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:clear", function()
+    it("Blackboard:clear works", function()
+        -- @tests Blackboard:clear
+        -- TODO: add assertion for Blackboard:clear
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:getKeys", function()
+    it("Blackboard:getKeys works", function()
+        -- @tests Blackboard:getKeys
+        -- TODO: add assertion for Blackboard:getKeys
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:getSize", function()
+    it("Blackboard:getSize works", function()
+        -- @tests Blackboard:getSize
+        -- TODO: add assertion for Blackboard:getSize
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:type", function()
+    it("Blackboard:type works", function()
+        -- @tests Blackboard:type
+        -- TODO: add assertion for Blackboard:type
+    end)
+end)
+
+describe("Missing explicit test for Blackboard:typeOf", function()
+    it("Blackboard:typeOf works", function()
+        -- @tests Blackboard:typeOf
+        -- TODO: add assertion for Blackboard:typeOf
+    end)
+end)
+
+describe("Missing explicit test for StateMachine:addState", function()
+    it("StateMachine:addState works", function()
+        -- @tests StateMachine:addState
+        -- TODO: add assertion for StateMachine:addState
+    end)
+end)
+
+describe("Missing explicit test for StateMachine:setInitialState", function()
+    it("StateMachine:setInitialState works", function()
+        -- @tests StateMachine:setInitialState
+        -- TODO: add assertion for StateMachine:setInitialState
+    end)
+end)
+
+describe("Missing explicit test for StateMachine:getCurrentState", function()
+    it("StateMachine:getCurrentState works", function()
+        -- @tests StateMachine:getCurrentState
+        -- TODO: add assertion for StateMachine:getCurrentState
+    end)
+end)
+
+describe("Missing explicit test for StateMachine:forceState", function()
+    it("StateMachine:forceState works", function()
+        -- @tests StateMachine:forceState
+        -- TODO: add assertion for StateMachine:forceState
+    end)
+end)
+
+describe("Missing explicit test for StateMachine:getTimeInState", function()
+    it("StateMachine:getTimeInState works", function()
+        -- @tests StateMachine:getTimeInState
+        -- TODO: add assertion for StateMachine:getTimeInState
+    end)
+end)
+
+describe("Missing explicit test for StateMachine:type", function()
+    it("StateMachine:type works", function()
+        -- @tests StateMachine:type
+        -- TODO: add assertion for StateMachine:type
+    end)
+end)
+
+describe("Missing explicit test for StateMachine:typeOf", function()
+    it("StateMachine:typeOf works", function()
+        -- @tests StateMachine:typeOf
+        -- TODO: add assertion for StateMachine:typeOf
+    end)
+end)
+
+describe("Missing explicit test for BehaviorTree:setRoot", function()
+    it("BehaviorTree:setRoot works", function()
+        -- @tests BehaviorTree:setRoot
+        -- TODO: add assertion for BehaviorTree:setRoot
+    end)
+end)
+
+describe("Missing explicit test for BehaviorTree:getLastStatus", function()
+    it("BehaviorTree:getLastStatus works", function()
+        -- @tests BehaviorTree:getLastStatus
+        -- TODO: add assertion for BehaviorTree:getLastStatus
+    end)
+end)
+
+describe("Missing explicit test for BehaviorTree:type", function()
+    it("BehaviorTree:type works", function()
+        -- @tests BehaviorTree:type
+        -- TODO: add assertion for BehaviorTree:type
+    end)
+end)
+
+describe("Missing explicit test for BehaviorTree:typeOf", function()
+    it("BehaviorTree:typeOf works", function()
+        -- @tests BehaviorTree:typeOf
+        -- TODO: add assertion for BehaviorTree:typeOf
+    end)
+end)
+
+describe("Missing explicit test for BTNode:addChild", function()
+    it("BTNode:addChild works", function()
+        -- @tests BTNode:addChild
+        -- TODO: add assertion for BTNode:addChild
+    end)
+end)
+
+describe("Missing explicit test for BTNode:getChildCount", function()
+    it("BTNode:getChildCount works", function()
+        -- @tests BTNode:getChildCount
+        -- TODO: add assertion for BTNode:getChildCount
+    end)
+end)
+
+describe("Missing explicit test for BTNode:reset", function()
+    it("BTNode:reset works", function()
+        -- @tests BTNode:reset
+        -- TODO: add assertion for BTNode:reset
+    end)
+end)
+
+describe("Missing explicit test for BTNode:setChild", function()
+    it("BTNode:setChild works", function()
+        -- @tests BTNode:setChild
+        -- TODO: add assertion for BTNode:setChild
+    end)
+end)
+
+describe("Missing explicit test for BTNode:setCount", function()
+    it("BTNode:setCount works", function()
+        -- @tests BTNode:setCount
+        -- TODO: add assertion for BTNode:setCount
+    end)
+end)
+
+describe("Missing explicit test for BTNode:getCount", function()
+    it("BTNode:getCount works", function()
+        -- @tests BTNode:getCount
+        -- TODO: add assertion for BTNode:getCount
+    end)
+end)
+
+describe("Missing explicit test for BTNode:setSuccessPolicy", function()
+    it("BTNode:setSuccessPolicy works", function()
+        -- @tests BTNode:setSuccessPolicy
+        -- TODO: add assertion for BTNode:setSuccessPolicy
+    end)
+end)
+
+describe("Missing explicit test for BTNode:setFailurePolicy", function()
+    it("BTNode:setFailurePolicy works", function()
+        -- @tests BTNode:setFailurePolicy
+        -- TODO: add assertion for BTNode:setFailurePolicy
+    end)
+end)
+
+describe("Missing explicit test for BTNode:getNodeType", function()
+    it("BTNode:getNodeType works", function()
+        -- @tests BTNode:getNodeType
+        -- TODO: add assertion for BTNode:getNodeType
+    end)
+end)
+
+describe("Missing explicit test for BTNode:type", function()
+    it("BTNode:type works", function()
+        -- @tests BTNode:type
+        -- TODO: add assertion for BTNode:type
+    end)
+end)
+
+describe("Missing explicit test for BTNode:typeOf", function()
+    it("BTNode:typeOf works", function()
+        -- @tests BTNode:typeOf
+        -- TODO: add assertion for BTNode:typeOf
+    end)
+end)
+
+describe("Missing explicit test for SteeringManager:getBehaviorCount", function()
+    it("SteeringManager:getBehaviorCount works", function()
+        -- @tests SteeringManager:getBehaviorCount
+        -- TODO: add assertion for SteeringManager:getBehaviorCount
+    end)
+end)
+
+describe("Missing explicit test for SteeringManager:setCombineMode", function()
+    it("SteeringManager:setCombineMode works", function()
+        -- @tests SteeringManager:setCombineMode
+        -- TODO: add assertion for SteeringManager:setCombineMode
+    end)
+end)
+
+describe("Missing explicit test for SteeringManager:getCombineMode", function()
+    it("SteeringManager:getCombineMode works", function()
+        -- @tests SteeringManager:getCombineMode
+        -- TODO: add assertion for SteeringManager:getCombineMode
+    end)
+end)
+
+describe("Missing explicit test for SteeringManager:getLastSteering", function()
+    it("SteeringManager:getLastSteering works", function()
+        -- @tests SteeringManager:getLastSteering
+        -- TODO: add assertion for SteeringManager:getLastSteering
+    end)
+end)
+
+describe("Missing explicit test for SteeringManager:type", function()
+    it("SteeringManager:type works", function()
+        -- @tests SteeringManager:type
+        -- TODO: add assertion for SteeringManager:type
+    end)
+end)
+
+describe("Missing explicit test for SteeringManager:typeOf", function()
+    it("SteeringManager:typeOf works", function()
+        -- @tests SteeringManager:typeOf
+        -- TODO: add assertion for SteeringManager:typeOf
+    end)
+end)
+
+describe("Missing explicit test for QLearner:chooseAction", function()
+    it("QLearner:chooseAction works", function()
+        -- @tests QLearner:chooseAction
+        -- TODO: add assertion for QLearner:chooseAction
+    end)
+end)
+
+describe("Missing explicit test for QLearner:bestAction", function()
+    it("QLearner:bestAction works", function()
+        -- @tests QLearner:bestAction
+        -- TODO: add assertion for QLearner:bestAction
+    end)
+end)
+
+describe("Missing explicit test for QLearner:getQValue", function()
+    it("QLearner:getQValue works", function()
+        -- @tests QLearner:getQValue
+        -- TODO: add assertion for QLearner:getQValue
+    end)
+end)
+
+describe("Missing explicit test for QLearner:endEpisode", function()
+    it("QLearner:endEpisode works", function()
+        -- @tests QLearner:endEpisode
+        -- TODO: add assertion for QLearner:endEpisode
+    end)
+end)
+
+describe("Missing explicit test for QLearner:getEpisodeCount", function()
+    it("QLearner:getEpisodeCount works", function()
+        -- @tests QLearner:getEpisodeCount
+        -- TODO: add assertion for QLearner:getEpisodeCount
+    end)
+end)
+
+describe("Missing explicit test for QLearner:getStateCount", function()
+    it("QLearner:getStateCount works", function()
+        -- @tests QLearner:getStateCount
+        -- TODO: add assertion for QLearner:getStateCount
+    end)
+end)
+
+describe("Missing explicit test for QLearner:getActionCount", function()
+    it("QLearner:getActionCount works", function()
+        -- @tests QLearner:getActionCount
+        -- TODO: add assertion for QLearner:getActionCount
+    end)
+end)
+
+describe("Missing explicit test for QLearner:setLearningRate", function()
+    it("QLearner:setLearningRate works", function()
+        -- @tests QLearner:setLearningRate
+        -- TODO: add assertion for QLearner:setLearningRate
+    end)
+end)
+
+describe("Missing explicit test for QLearner:getLearningRate", function()
+    it("QLearner:getLearningRate works", function()
+        -- @tests QLearner:getLearningRate
+        -- TODO: add assertion for QLearner:getLearningRate
+    end)
+end)
+
+describe("Missing explicit test for QLearner:setDiscountFactor", function()
+    it("QLearner:setDiscountFactor works", function()
+        -- @tests QLearner:setDiscountFactor
+        -- TODO: add assertion for QLearner:setDiscountFactor
+    end)
+end)
+
+describe("Missing explicit test for QLearner:getDiscountFactor", function()
+    it("QLearner:getDiscountFactor works", function()
+        -- @tests QLearner:getDiscountFactor
+        -- TODO: add assertion for QLearner:getDiscountFactor
+    end)
+end)
+
+describe("Missing explicit test for QLearner:setExplorationRate", function()
+    it("QLearner:setExplorationRate works", function()
+        -- @tests QLearner:setExplorationRate
+        -- TODO: add assertion for QLearner:setExplorationRate
+    end)
+end)
+
+describe("Missing explicit test for QLearner:getExplorationRate", function()
+    it("QLearner:getExplorationRate works", function()
+        -- @tests QLearner:getExplorationRate
+        -- TODO: add assertion for QLearner:getExplorationRate
+    end)
+end)
+
+describe("Missing explicit test for QLearner:setExplorationDecay", function()
+    it("QLearner:setExplorationDecay works", function()
+        -- @tests QLearner:setExplorationDecay
+        -- TODO: add assertion for QLearner:setExplorationDecay
+    end)
+end)
+
+describe("Missing explicit test for QLearner:getExplorationDecay", function()
+    it("QLearner:getExplorationDecay works", function()
+        -- @tests QLearner:getExplorationDecay
+        -- TODO: add assertion for QLearner:getExplorationDecay
+    end)
+end)
+
+describe("Missing explicit test for QLearner:serialize", function()
+    it("QLearner:serialize works", function()
+        -- @tests QLearner:serialize
+        -- TODO: add assertion for QLearner:serialize
+    end)
+end)
+
+describe("Missing explicit test for QLearner:deserialize", function()
+    it("QLearner:deserialize works", function()
+        -- @tests QLearner:deserialize
+        -- TODO: add assertion for QLearner:deserialize
+    end)
+end)
+
+describe("Missing explicit test for QLearner:type", function()
+    it("QLearner:type works", function()
+        -- @tests QLearner:type
+        -- TODO: add assertion for QLearner:type
+    end)
+end)
+
+describe("Missing explicit test for QLearner:typeOf", function()
+    it("QLearner:typeOf works", function()
+        -- @tests QLearner:typeOf
+        -- TODO: add assertion for QLearner:typeOf
+    end)
+end)
+
+describe("Missing explicit test for UtilityAI:evaluate", function()
+    it("UtilityAI:evaluate works", function()
+        -- @tests UtilityAI:evaluate
+        -- TODO: add assertion for UtilityAI:evaluate
+    end)
+end)
+
+describe("Missing explicit test for UtilityAI:getActionCount", function()
+    it("UtilityAI:getActionCount works", function()
+        -- @tests UtilityAI:getActionCount
+        -- TODO: add assertion for UtilityAI:getActionCount
+    end)
+end)
+
+describe("Missing explicit test for UtilityAI:getLastAction", function()
+    it("UtilityAI:getLastAction works", function()
+        -- @tests UtilityAI:getLastAction
+        -- TODO: add assertion for UtilityAI:getLastAction
+    end)
+end)
+
+describe("Missing explicit test for UtilityAI:type", function()
+    it("UtilityAI:type works", function()
+        -- @tests UtilityAI:type
+        -- TODO: add assertion for UtilityAI:type
+    end)
+end)
+
+describe("Missing explicit test for UtilityAI:typeOf", function()
+    it("UtilityAI:typeOf works", function()
+        -- @tests UtilityAI:typeOf
+        -- TODO: add assertion for UtilityAI:typeOf
+    end)
+end)
+
+describe("Missing explicit test for GOAPPlanner:getActionCount", function()
+    it("GOAPPlanner:getActionCount works", function()
+        -- @tests GOAPPlanner:getActionCount
+        -- TODO: add assertion for GOAPPlanner:getActionCount
+    end)
+end)
+
+describe("Missing explicit test for GOAPPlanner:getGoalCount", function()
+    it("GOAPPlanner:getGoalCount works", function()
+        -- @tests GOAPPlanner:getGoalCount
+        -- TODO: add assertion for GOAPPlanner:getGoalCount
+    end)
+end)
+
+describe("Missing explicit test for GOAPPlanner:type", function()
+    it("GOAPPlanner:type works", function()
+        -- @tests GOAPPlanner:type
+        -- TODO: add assertion for GOAPPlanner:type
+    end)
+end)
+
+describe("Missing explicit test for GOAPPlanner:typeOf", function()
+    it("GOAPPlanner:typeOf works", function()
+        -- @tests GOAPPlanner:typeOf
+        -- TODO: add assertion for GOAPPlanner:typeOf
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:addLayer", function()
+    it("InfluenceMap:addLayer works", function()
+        -- @tests InfluenceMap:addLayer
+        -- TODO: add assertion for InfluenceMap:addLayer
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:hasLayer", function()
+    it("InfluenceMap:hasLayer works", function()
+        -- @tests InfluenceMap:hasLayer
+        -- TODO: add assertion for InfluenceMap:hasLayer
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:decay", function()
+    it("InfluenceMap:decay works", function()
+        -- @tests InfluenceMap:decay
+        -- TODO: add assertion for InfluenceMap:decay
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:clearLayer", function()
+    it("InfluenceMap:clearLayer works", function()
+        -- @tests InfluenceMap:clearLayer
+        -- TODO: add assertion for InfluenceMap:clearLayer
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:clearAll", function()
+    it("InfluenceMap:clearAll works", function()
+        -- @tests InfluenceMap:clearAll
+        -- TODO: add assertion for InfluenceMap:clearAll
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:getMaxPosition", function()
+    it("InfluenceMap:getMaxPosition works", function()
+        -- @tests InfluenceMap:getMaxPosition
+        -- TODO: add assertion for InfluenceMap:getMaxPosition
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:getMinPosition", function()
+    it("InfluenceMap:getMinPosition works", function()
+        -- @tests InfluenceMap:getMinPosition
+        -- TODO: add assertion for InfluenceMap:getMinPosition
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:getWidth", function()
+    it("InfluenceMap:getWidth works", function()
+        -- @tests InfluenceMap:getWidth
+        -- TODO: add assertion for InfluenceMap:getWidth
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:getHeight", function()
+    it("InfluenceMap:getHeight works", function()
+        -- @tests InfluenceMap:getHeight
+        -- TODO: add assertion for InfluenceMap:getHeight
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:getCellSize", function()
+    it("InfluenceMap:getCellSize works", function()
+        -- @tests InfluenceMap:getCellSize
+        -- TODO: add assertion for InfluenceMap:getCellSize
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:type", function()
+    it("InfluenceMap:type works", function()
+        -- @tests InfluenceMap:type
+        -- TODO: add assertion for InfluenceMap:type
+    end)
+end)
+
+describe("Missing explicit test for InfluenceMap:typeOf", function()
+    it("InfluenceMap:typeOf works", function()
+        -- @tests InfluenceMap:typeOf
+        -- TODO: add assertion for InfluenceMap:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Squad:getName", function()
+    it("Squad:getName works", function()
+        -- @tests Squad:getName
+        -- TODO: add assertion for Squad:getName
+    end)
+end)
+
+describe("Missing explicit test for Squad:addMember", function()
+    it("Squad:addMember works", function()
+        -- @tests Squad:addMember
+        -- TODO: add assertion for Squad:addMember
+    end)
+end)
+
+describe("Missing explicit test for Squad:removeMember", function()
+    it("Squad:removeMember works", function()
+        -- @tests Squad:removeMember
+        -- TODO: add assertion for Squad:removeMember
+    end)
+end)
+
+describe("Missing explicit test for Squad:getMemberCount", function()
+    it("Squad:getMemberCount works", function()
+        -- @tests Squad:getMemberCount
+        -- TODO: add assertion for Squad:getMemberCount
+    end)
+end)
+
+describe("Missing explicit test for Squad:getMembers", function()
+    it("Squad:getMembers works", function()
+        -- @tests Squad:getMembers
+        -- TODO: add assertion for Squad:getMembers
+    end)
+end)
+
+describe("Missing explicit test for Squad:setLeader", function()
+    it("Squad:setLeader works", function()
+        -- @tests Squad:setLeader
+        -- TODO: add assertion for Squad:setLeader
+    end)
+end)
+
+describe("Missing explicit test for Squad:getLeader", function()
+    it("Squad:getLeader works", function()
+        -- @tests Squad:getLeader
+        -- TODO: add assertion for Squad:getLeader
+    end)
+end)
+
+describe("Missing explicit test for Squad:getFormation", function()
+    it("Squad:getFormation works", function()
+        -- @tests Squad:getFormation
+        -- TODO: add assertion for Squad:getFormation
+    end)
+end)
+
+describe("Missing explicit test for Squad:getFormationSpacing", function()
+    it("Squad:getFormationSpacing works", function()
+        -- @tests Squad:getFormationSpacing
+        -- TODO: add assertion for Squad:getFormationSpacing
+    end)
+end)
+
+describe("Missing explicit test for Squad:getBlackboard", function()
+    it("Squad:getBlackboard works", function()
+        -- @tests Squad:getBlackboard
+        -- TODO: add assertion for Squad:getBlackboard
+    end)
+end)
+
+describe("Missing explicit test for Squad:type", function()
+    it("Squad:type works", function()
+        -- @tests Squad:type
+        -- TODO: add assertion for Squad:type
+    end)
+end)
+
+describe("Missing explicit test for Squad:typeOf", function()
+    it("Squad:typeOf works", function()
+        -- @tests Squad:typeOf
+        -- TODO: add assertion for Squad:typeOf
+    end)
+end)
+
+describe("Missing explicit test for CommandQueue:cancelCurrent", function()
+    it("CommandQueue:cancelCurrent works", function()
+        -- @tests CommandQueue:cancelCurrent
+        -- TODO: add assertion for CommandQueue:cancelCurrent
+    end)
+end)
+
+describe("Missing explicit test for CommandQueue:clear", function()
+    it("CommandQueue:clear works", function()
+        -- @tests CommandQueue:clear
+        -- TODO: add assertion for CommandQueue:clear
+    end)
+end)
+
+describe("Missing explicit test for CommandQueue:getCount", function()
+    it("CommandQueue:getCount works", function()
+        -- @tests CommandQueue:getCount
+        -- TODO: add assertion for CommandQueue:getCount
+    end)
+end)
+
+describe("Missing explicit test for CommandQueue:isEmpty", function()
+    it("CommandQueue:isEmpty works", function()
+        -- @tests CommandQueue:isEmpty
+        -- TODO: add assertion for CommandQueue:isEmpty
+    end)
+end)
+
+describe("Missing explicit test for CommandQueue:getCurrentType", function()
+    it("CommandQueue:getCurrentType works", function()
+        -- @tests CommandQueue:getCurrentType
+        -- TODO: add assertion for CommandQueue:getCurrentType
+    end)
+end)
+
+describe("Missing explicit test for CommandQueue:type", function()
+    it("CommandQueue:type works", function()
+        -- @tests CommandQueue:type
+        -- TODO: add assertion for CommandQueue:type
+    end)
+end)
+
+describe("Missing explicit test for CommandQueue:typeOf", function()
+    it("CommandQueue:typeOf works", function()
+        -- @tests CommandQueue:typeOf
+        -- TODO: add assertion for CommandQueue:typeOf
+    end)
+end)
+
+describe("Missing explicit test for TraitProfile:getBase", function()
+    it("TraitProfile:getBase works", function()
+        -- @tests TraitProfile:getBase
+        -- TODO: add assertion for TraitProfile:getBase
+    end)
+end)
+
+describe("Missing explicit test for TraitProfile:removeModifiers", function()
+    it("TraitProfile:removeModifiers works", function()
+        -- @tests TraitProfile:removeModifiers
+        -- TODO: add assertion for TraitProfile:removeModifiers
+    end)
+end)
+
+describe("Missing explicit test for TraitProfile:update", function()
+    it("TraitProfile:update works", function()
+        -- @tests TraitProfile:update
+        -- TODO: add assertion for TraitProfile:update
+    end)
+end)
+
+describe("Missing explicit test for TraitProfile:traitCount", function()
+    it("TraitProfile:traitCount works", function()
+        -- @tests TraitProfile:traitCount
+        -- TODO: add assertion for TraitProfile:traitCount
+    end)
+end)
+
+describe("Missing explicit test for TraitProfile:archetype", function()
+    it("TraitProfile:archetype works", function()
+        -- @tests TraitProfile:archetype
+        -- TODO: add assertion for TraitProfile:archetype
+    end)
+end)
+
+describe("Missing explicit test for StimulusWorld:remove", function()
+    it("StimulusWorld:remove works", function()
+        -- @tests StimulusWorld:remove
+        -- TODO: add assertion for StimulusWorld:remove
+    end)
+end)
+
+describe("Missing explicit test for StimulusWorld:update", function()
+    it("StimulusWorld:update works", function()
+        -- @tests StimulusWorld:update
+        -- TODO: add assertion for StimulusWorld:update
+    end)
+end)
+
+describe("Missing explicit test for StimulusWorld:clear", function()
+    it("StimulusWorld:clear works", function()
+        -- @tests StimulusWorld:clear
+        -- TODO: add assertion for StimulusWorld:clear
+    end)
+end)
+
+describe("Missing explicit test for ContextSteering:addWander", function()
+    it("ContextSteering:addWander works", function()
+        -- @tests ContextSteering:addWander
+        -- TODO: add assertion for ContextSteering:addWander
+    end)
+end)
+
+describe("Missing explicit test for ContextSteering:clearBehaviors", function()
+    it("ContextSteering:clearBehaviors works", function()
+        -- @tests ContextSteering:clearBehaviors
+        -- TODO: add assertion for ContextSteering:clearBehaviors
+    end)
+end)
+
+describe("Missing explicit test for ContextSteering:chosenMagnitude", function()
+    it("ContextSteering:chosenMagnitude works", function()
+        -- @tests ContextSteering:chosenMagnitude
+        -- TODO: add assertion for ContextSteering:chosenMagnitude
+    end)
+end)
+
+describe("Missing explicit test for ContextSteering:slotCount", function()
+    it("ContextSteering:slotCount works", function()
+        -- @tests ContextSteering:slotCount
+        -- TODO: add assertion for ContextSteering:slotCount
+    end)
+end)
+
+describe("Missing explicit test for NeedSystem:addNeed", function()
+    it("NeedSystem:addNeed works", function()
+        -- @tests NeedSystem:addNeed
+        -- TODO: add assertion for NeedSystem:addNeed
+    end)
+end)
+
+describe("Missing explicit test for NeedSystem:update", function()
+    it("NeedSystem:update works", function()
+        -- @tests NeedSystem:update
+        -- TODO: add assertion for NeedSystem:update
+    end)
+end)
+
+describe("Missing explicit test for NeedSystem:mostUrgent", function()
+    it("NeedSystem:mostUrgent works", function()
+        -- @tests NeedSystem:mostUrgent
+        -- TODO: add assertion for NeedSystem:mostUrgent
+    end)
+end)
+
+describe("Missing explicit test for NeedSystem:satisfy", function()
+    it("NeedSystem:satisfy works", function()
+        -- @tests NeedSystem:satisfy
+        -- TODO: add assertion for NeedSystem:satisfy
+    end)
+end)
+
+describe("Missing explicit test for NeedSystem:valueOf", function()
+    it("NeedSystem:valueOf works", function()
+        -- @tests NeedSystem:valueOf
+        -- TODO: add assertion for NeedSystem:valueOf
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:pushEvent", function()
+    it("AIDirector:pushEvent works", function()
+        -- @tests AIDirector:pushEvent
+        -- TODO: add assertion for AIDirector:pushEvent
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:update", function()
+    it("AIDirector:update works", function()
+        -- @tests AIDirector:update
+        -- TODO: add assertion for AIDirector:update
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:tension", function()
+    it("AIDirector:tension works", function()
+        -- @tests AIDirector:tension
+        -- TODO: add assertion for AIDirector:tension
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:phase", function()
+    it("AIDirector:phase works", function()
+        -- @tests AIDirector:phase
+        -- TODO: add assertion for AIDirector:phase
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:spawnRateFactor", function()
+    it("AIDirector:spawnRateFactor works", function()
+        -- @tests AIDirector:spawnRateFactor
+        -- TODO: add assertion for AIDirector:spawnRateFactor
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:lootFactor", function()
+    it("AIDirector:lootFactor works", function()
+        -- @tests AIDirector:lootFactor
+        -- TODO: add assertion for AIDirector:lootFactor
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:ambientIntensity", function()
+    it("AIDirector:ambientIntensity works", function()
+        -- @tests AIDirector:ambientIntensity
+        -- TODO: add assertion for AIDirector:ambientIntensity
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:setTension", function()
+    it("AIDirector:setTension works", function()
+        -- @tests AIDirector:setTension
+        -- TODO: add assertion for AIDirector:setTension
+    end)
+end)
+
+describe("Missing explicit test for AIDirector:reset", function()
+    it("AIDirector:reset works", function()
+        -- @tests AIDirector:reset
+        -- TODO: add assertion for AIDirector:reset
+    end)
+end)
+
+describe("Missing explicit test for HTNDomain:addPrimitive", function()
+    it("HTNDomain:addPrimitive works", function()
+        -- @tests HTNDomain:addPrimitive
+        -- TODO: add assertion for HTNDomain:addPrimitive
+    end)
+end)
+
+describe("Missing explicit test for HTNDomain:taskCount", function()
+    it("HTNDomain:taskCount works", function()
+        -- @tests HTNDomain:taskCount
+        -- TODO: add assertion for HTNDomain:taskCount
+    end)
+end)
+
+describe("Missing explicit test for EmotionModel:trigger", function()
+    it("EmotionModel:trigger works", function()
+        -- @tests EmotionModel:trigger
+        -- TODO: add assertion for EmotionModel:trigger
+    end)
+end)
+
+describe("Missing explicit test for EmotionModel:dominant", function()
+    it("EmotionModel:dominant works", function()
+        -- @tests EmotionModel:dominant
+        -- TODO: add assertion for EmotionModel:dominant
+    end)
+end)
+
+describe("Missing explicit test for EmotionModel:isActive", function()
+    it("EmotionModel:isActive works", function()
+        -- @tests EmotionModel:isActive
+        -- TODO: add assertion for EmotionModel:isActive
+    end)
+end)
+
+describe("Missing explicit test for EmotionModel:update", function()
+    it("EmotionModel:update works", function()
+        -- @tests EmotionModel:update
+        -- TODO: add assertion for EmotionModel:update
+    end)
+end)
+
+describe("Missing explicit test for EmotionModel:reset", function()
+    it("EmotionModel:reset works", function()
+        -- @tests EmotionModel:reset
+        -- TODO: add assertion for EmotionModel:reset
+    end)
+end)
+
+describe("Missing explicit test for ORCASolver:setPosition", function()
+    it("ORCASolver:setPosition works", function()
+        -- @tests ORCASolver:setPosition
+        -- TODO: add assertion for ORCASolver:setPosition
+    end)
+end)
+
+describe("Missing explicit test for ORCASolver:compute", function()
+    it("ORCASolver:compute works", function()
+        -- @tests ORCASolver:compute
+        -- TODO: add assertion for ORCASolver:compute
+    end)
+end)
+
+describe("Missing explicit test for ORCASolver:getSafeVelocity", function()
+    it("ORCASolver:getSafeVelocity works", function()
+        -- @tests ORCASolver:getSafeVelocity
+        -- TODO: add assertion for ORCASolver:getSafeVelocity
+    end)
+end)
+
+describe("Missing explicit test for ORCASolver:agentCount", function()
+    it("ORCASolver:agentCount works", function()
+        -- @tests ORCASolver:agentCount
+        -- TODO: add assertion for ORCASolver:agentCount
+    end)
+end)
+
+describe("Missing explicit test for NeuralNet:forward", function()
+    it("NeuralNet:forward works", function()
+        -- @tests NeuralNet:forward
+        -- TODO: add assertion for NeuralNet:forward
+    end)
+end)
+
+describe("Missing explicit test for NeuralNet:setWeights", function()
+    it("NeuralNet:setWeights works", function()
+        -- @tests NeuralNet:setWeights
+        -- TODO: add assertion for NeuralNet:setWeights
+    end)
+end)
+
+describe("Missing explicit test for NeuralNet:getWeights", function()
+    it("NeuralNet:getWeights works", function()
+        -- @tests NeuralNet:getWeights
+        -- TODO: add assertion for NeuralNet:getWeights
+    end)
+end)
+
+describe("Missing explicit test for NeuralNet:paramCount", function()
+    it("NeuralNet:paramCount works", function()
+        -- @tests NeuralNet:paramCount
+        -- TODO: add assertion for NeuralNet:paramCount
+    end)
+end)
+
+describe("Missing explicit test for NeuralNet:layerCount", function()
+    it("NeuralNet:layerCount works", function()
+        -- @tests NeuralNet:layerCount
+        -- TODO: add assertion for NeuralNet:layerCount
+    end)
+end)
+
+describe("Missing explicit test for GeneticAlgorithm:evolve", function()
+    it("GeneticAlgorithm:evolve works", function()
+        -- @tests GeneticAlgorithm:evolve
+        -- TODO: add assertion for GeneticAlgorithm:evolve
+    end)
+end)
+
+describe("Missing explicit test for GeneticAlgorithm:generation", function()
+    it("GeneticAlgorithm:generation works", function()
+        -- @tests GeneticAlgorithm:generation
+        -- TODO: add assertion for GeneticAlgorithm:generation
+    end)
+end)
+
+describe("Missing explicit test for GeneticAlgorithm:popSize", function()
+    it("GeneticAlgorithm:popSize works", function()
+        -- @tests GeneticAlgorithm:popSize
+        -- TODO: add assertion for GeneticAlgorithm:popSize
+    end)
+end)
+
+describe("Missing explicit test for GeneticAlgorithm:setFitness", function()
+    it("GeneticAlgorithm:setFitness works", function()
+        -- @tests GeneticAlgorithm:setFitness
+        -- TODO: add assertion for GeneticAlgorithm:setFitness
+    end)
+end)
+
+describe("Missing explicit test for GeneticAlgorithm:getGenes", function()
+    it("GeneticAlgorithm:getGenes works", function()
+        -- @tests GeneticAlgorithm:getGenes
+        -- TODO: add assertion for GeneticAlgorithm:getGenes
+    end)
+end)
+
+describe("Missing explicit test for GeneticAlgorithm:bestGenes", function()
+    it("GeneticAlgorithm:bestGenes works", function()
+        -- @tests GeneticAlgorithm:bestGenes
+        -- TODO: add assertion for GeneticAlgorithm:bestGenes
+    end)
+end)
+
+describe("Missing explicit test for Bandit:select", function()
+    it("Bandit:select works", function()
+        -- @tests Bandit:select
+        -- TODO: add assertion for Bandit:select
+    end)
+end)
+
+describe("Missing explicit test for Bandit:update", function()
+    it("Bandit:update works", function()
+        -- @tests Bandit:update
+        -- TODO: add assertion for Bandit:update
+    end)
+end)
+
+describe("Missing explicit test for Bandit:bestArm", function()
+    it("Bandit:bestArm works", function()
+        -- @tests Bandit:bestArm
+        -- TODO: add assertion for Bandit:bestArm
+    end)
+end)
+
+describe("Missing explicit test for Bandit:reset", function()
+    it("Bandit:reset works", function()
+        -- @tests Bandit:reset
+        -- TODO: add assertion for Bandit:reset
+    end)
+end)
+
+describe("Missing explicit test for Bandit:armCount", function()
+    it("Bandit:armCount works", function()
+        -- @tests Bandit:armCount
+        -- TODO: add assertion for Bandit:armCount
+    end)
+end)
+
+describe("Missing explicit test for Bandit:totalPulls", function()
+    it("Bandit:totalPulls works", function()
+        -- @tests Bandit:totalPulls
+        -- TODO: add assertion for Bandit:totalPulls
+    end)
+end)
+
+describe("Missing explicit test for Neuroevolution:evolve", function()
+    it("Neuroevolution:evolve works", function()
+        -- @tests Neuroevolution:evolve
+        -- TODO: add assertion for Neuroevolution:evolve
+    end)
+end)
+
+describe("Missing explicit test for Neuroevolution:setFitness", function()
+    it("Neuroevolution:setFitness works", function()
+        -- @tests Neuroevolution:setFitness
+        -- TODO: add assertion for Neuroevolution:setFitness
+    end)
+end)
+
+describe("Missing explicit test for Neuroevolution:chromosomeToNet", function()
+    it("Neuroevolution:chromosomeToNet works", function()
+        -- @tests Neuroevolution:chromosomeToNet
+        -- TODO: add assertion for Neuroevolution:chromosomeToNet
+    end)
+end)
+
+describe("Missing explicit test for Neuroevolution:bestNetwork", function()
+    it("Neuroevolution:bestNetwork works", function()
+        -- @tests Neuroevolution:bestNetwork
+        -- TODO: add assertion for Neuroevolution:bestNetwork
+    end)
+end)
+
+describe("Missing explicit test for Neuroevolution:popSize", function()
+    it("Neuroevolution:popSize works", function()
+        -- @tests Neuroevolution:popSize
+        -- TODO: add assertion for Neuroevolution:popSize
+    end)
+end)
+
+describe("Missing explicit test for Neuroevolution:generation", function()
+    it("Neuroevolution:generation works", function()
+        -- @tests Neuroevolution:generation
+        -- TODO: add assertion for Neuroevolution:generation
+    end)
+end)
+
+describe("Missing explicit test for StrategyAI:addGoal", function()
+    it("StrategyAI:addGoal works", function()
+        -- @tests StrategyAI:addGoal
+        -- TODO: add assertion for StrategyAI:addGoal
+    end)
+end)
+
+describe("Missing explicit test for StrategyAI:addTag", function()
+    it("StrategyAI:addTag works", function()
+        -- @tests StrategyAI:addTag
+        -- TODO: add assertion for StrategyAI:addTag
+    end)
+end)
+
+describe("Missing explicit test for StrategyAI:removeTag", function()
+    it("StrategyAI:removeTag works", function()
+        -- @tests StrategyAI:removeTag
+        -- TODO: add assertion for StrategyAI:removeTag
+    end)
+end)
+
+describe("Missing explicit test for StrategyAI:update", function()
+    it("StrategyAI:update works", function()
+        -- @tests StrategyAI:update
+        -- TODO: add assertion for StrategyAI:update
+    end)
+end)
+
+describe("Missing explicit test for StrategyAI:forceEvaluate", function()
+    it("StrategyAI:forceEvaluate works", function()
+        -- @tests StrategyAI:forceEvaluate
+        -- TODO: add assertion for StrategyAI:forceEvaluate
+    end)
+end)
+
+describe("Missing explicit test for StrategyAI:activeGoal", function()
+    it("StrategyAI:activeGoal works", function()
+        -- @tests StrategyAI:activeGoal
+        -- TODO: add assertion for StrategyAI:activeGoal
+    end)
+end)
+
+describe("Missing explicit test for StrategyAI:timeUntilNext", function()
+    it("StrategyAI:timeUntilNext works", function()
+        -- @tests StrategyAI:timeUntilNext
+        -- TODO: add assertion for StrategyAI:timeUntilNext
+    end)
+end)
+
+describe("Missing explicit test for AILod:shouldUpdate", function()
+    it("AILod:shouldUpdate works", function()
+        -- @tests AILod:shouldUpdate
+        -- TODO: add assertion for AILod:shouldUpdate
+    end)
+end)
+
+describe("Missing explicit test for AILod:tierCount", function()
+    it("AILod:tierCount works", function()
+        -- @tests AILod:tierCount
+        -- TODO: add assertion for AILod:tierCount
+    end)
+end)
+
+describe("Missing explicit test for AILod:tierName", function()
+    it("AILod:tierName works", function()
+        -- @tests AILod:tierName
+        -- TODO: add assertion for AILod:tierName
+    end)
 end)

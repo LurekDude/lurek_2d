@@ -6,31 +6,31 @@ describe("lurek.docs", function()
 
     -- ============= scan =============
 
-    -- @covers lurek.docs.coverage
-    -- @covers lurek.docs.coverageModule
-    -- @covers lurek.docs.describe
-    -- @covers lurek.docs.getCatalog
-    -- @covers lurek.docs.quality
-    -- @covers lurek.docs.resetCatalog
-    -- @covers lurek.docs.scan
-    -- @covers lurek.docs.scanModule
-    -- @covers lurek.docs.setParamInfo
-    -- @covers lurek.docs.setReturnInfo
-    -- @covers lurek.docs.validate
-    -- @covers lurek.docs.validateModule
-    -- @covers lurek.test.bar
-    -- @covers lurek.test.foo
-    -- @covers lurek.test.func
-    -- @covers lurek.test.func2
-    -- @covers lurek.test.g1
-    -- @covers lurek.test.json
-    -- @covers lurek.test.ms
-    -- @covers lurek.test.q1
-    -- @covers lurek.test.scored
-    -- @covers lurek.test.sum
-    -- @covers lurek.test.tt
-    -- @covers lurek.test.w1
-    -- @covers lurek.test.w2
+    -- @tests lurek.docs.coverage
+    -- @tests lurek.docs.coverageModule
+    -- @tests lurek.docs.describe
+    -- @tests lurek.docs.getCatalog
+    -- @tests lurek.docs.quality
+    -- @tests lurek.docs.resetCatalog
+    -- @tests lurek.docs.scan
+    -- @tests lurek.docs.scanModule
+    -- @tests lurek.docs.setParamInfo
+    -- @tests lurek.docs.setReturnInfo
+    -- @tests lurek.docs.validate
+    -- @tests lurek.docs.validateModule
+    -- @tests lurek.test.bar
+    -- @tests lurek.test.foo
+    -- @tests lurek.test.func
+    -- @tests lurek.test.func2
+    -- @tests lurek.test.g1
+    -- @tests lurek.test.json
+    -- @tests lurek.test.ms
+    -- @tests lurek.test.q1
+    -- @tests lurek.test.scored
+    -- @tests lurek.test.sum
+    -- @tests lurek.test.tt
+    -- @tests lurek.test.w1
+    -- @tests lurek.test.w2
     -- @description Confirms scan() returns a non-nil ApiCatalog object for the full lurek namespace.
     it("should scan the lurek namespace", function()
         local catalog = lurek.docs.scan()
@@ -341,124 +341,397 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.docs.loadToml
+    -- @tests lurek.docs.loadToml
     it("covers lurek.docs.loadToml", function()
         -- TODO: Implement test for lurek.docs.loadToml
     end)
 
-    -- @covers lurek.docs.loadAll
+    -- @tests lurek.docs.loadAll
     it("covers lurek.docs.loadAll", function()
         -- TODO: Implement test for lurek.docs.loadAll
     end)
 
-    -- @covers lurek.docs.checkStaleness
+    -- @tests lurek.docs.checkStaleness
     it("covers lurek.docs.checkStaleness", function()
         -- TODO: Implement test for lurek.docs.checkStaleness
     end)
 
-    -- @covers lurek.docs.qualityModule
+    -- @tests lurek.docs.qualityModule
     it("covers lurek.docs.qualityModule", function()
         -- TODO: Implement test for lurek.docs.qualityModule
     end)
 
-    -- @covers lurek.docs.exportCompletions
+    -- @tests lurek.docs.exportCompletions
     it("covers lurek.docs.exportCompletions", function()
         -- TODO: Implement test for lurek.docs.exportCompletions
     end)
 
-    -- @covers lurek.docs.exportHover
+    -- @tests lurek.docs.exportHover
     it("covers lurek.docs.exportHover", function()
         -- TODO: Implement test for lurek.docs.exportHover
     end)
 
-    -- @covers lurek.docs.exportSignatures
+    -- @tests lurek.docs.exportSignatures
     it("covers lurek.docs.exportSignatures", function()
         -- TODO: Implement test for lurek.docs.exportSignatures
     end)
 
-    -- @covers lurek.docs.exportAll
+    -- @tests lurek.docs.exportAll
     it("covers lurek.docs.exportAll", function()
         -- TODO: Implement test for lurek.docs.exportAll
     end)
 
-    -- @covers lurek.docs.exportMarkdown
+    -- @tests lurek.docs.exportMarkdown
     it("covers lurek.docs.exportMarkdown", function()
         -- TODO: Implement test for lurek.docs.exportMarkdown
     end)
 
-    -- @covers lurek.docs.exportCheatsheet
+    -- @tests lurek.docs.exportCheatsheet
     it("covers lurek.docs.exportCheatsheet", function()
         -- TODO: Implement test for lurek.docs.exportCheatsheet
     end)
 
-    -- @covers lurek.docs.reflectLive
+    -- @tests lurek.docs.reflectLive
     it("covers lurek.docs.reflectLive", function()
         -- TODO: Implement test for lurek.docs.reflectLive
     end)
 
-    -- @covers lurek.docs.reflectTable
+    -- @tests lurek.docs.reflectTable
     it("covers lurek.docs.reflectTable", function()
         -- TODO: Implement test for lurek.docs.reflectTable
     end)
 
-    -- @covers Schema:getFields
+    -- @tests Schema:getFields
     it("covers Schema:getFields", function()
         -- TODO: Implement test for Schema:getFields
     end)
 
-    -- @covers DocEntry:getQualifiedName
+    -- @tests DocEntry:getQualifiedName
     it("covers DocEntry:getQualifiedName", function()
         -- TODO: Implement test for DocEntry:getQualifiedName
     end)
 
-    -- @covers DocEntry:getKind
+    -- @tests DocEntry:getKind
     it("covers DocEntry:getKind", function()
         -- TODO: Implement test for DocEntry:getKind
     end)
 
-    -- @covers DocEntry:getExample
+    -- @tests DocEntry:getExample
     it("covers DocEntry:getExample", function()
         -- TODO: Implement test for DocEntry:getExample
     end)
 
-    -- @covers DocEntry:getSince
+    -- @tests DocEntry:getSince
     it("covers DocEntry:getSince", function()
         -- TODO: Implement test for DocEntry:getSince
     end)
 
-    -- @covers DocEntry:getDeprecated
+    -- @tests DocEntry:getDeprecated
     it("covers DocEntry:getDeprecated", function()
         -- TODO: Implement test for DocEntry:getDeprecated
     end)
 
-    -- @covers ApiCatalog:getTypeMethods
+    -- @tests ApiCatalog:getTypeMethods
     it("covers ApiCatalog:getTypeMethods", function()
         -- TODO: Implement test for ApiCatalog:getTypeMethods
     end)
 
-    -- @covers ValidationReport:getMissing
+    -- @tests ValidationReport:getMissing
     it("covers ValidationReport:getMissing", function()
         -- TODO: Implement test for ValidationReport:getMissing
     end)
 
-    -- @covers ValidationReport:getPhantom
+    -- @tests ValidationReport:getPhantom
     it("covers ValidationReport:getPhantom", function()
         -- TODO: Implement test for ValidationReport:getPhantom
     end)
 
-    -- @covers ValidationReport:getIncomplete
+    -- @tests ValidationReport:getIncomplete
     it("covers ValidationReport:getIncomplete", function()
         -- TODO: Implement test for ValidationReport:getIncomplete
     end)
 
-    -- @covers ValidationReport:phantomCount
+    -- @tests ValidationReport:phantomCount
     it("covers ValidationReport:phantomCount", function()
         -- TODO: Implement test for ValidationReport:phantomCount
     end)
 
-    -- @covers ValidationReport:incompleteCount
+    -- @tests ValidationReport:incompleteCount
     it("covers ValidationReport:incompleteCount", function()
         -- TODO: Implement test for ValidationReport:incompleteCount
     end)
 
+end)
+
+describe("Missing explicit test for lurek.docs.schema", function()
+    it("lurek.docs.schema works", function()
+        -- @tests lurek.docs.schema
+        -- TODO: add assertion for lurek.docs.schema
+    end)
+end)
+
+describe("Missing explicit test for Schema:validate", function()
+    it("Schema:validate works", function()
+        -- @tests Schema:validate
+        -- TODO: add assertion for Schema:validate
+    end)
+end)
+
+describe("Missing explicit test for Schema:check", function()
+    it("Schema:check works", function()
+        -- @tests Schema:check
+        -- TODO: add assertion for Schema:check
+    end)
+end)
+
+describe("Missing explicit test for Schema:assert", function()
+    it("Schema:assert works", function()
+        -- @tests Schema:assert
+        -- TODO: add assertion for Schema:assert
+    end)
+end)
+
+describe("Missing explicit test for Schema:getName", function()
+    it("Schema:getName works", function()
+        -- @tests Schema:getName
+        -- TODO: add assertion for Schema:getName
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:getName", function()
+    it("DocEntry:getName works", function()
+        -- @tests DocEntry:getName
+        -- TODO: add assertion for DocEntry:getName
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:getModule", function()
+    it("DocEntry:getModule works", function()
+        -- @tests DocEntry:getModule
+        -- TODO: add assertion for DocEntry:getModule
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:getDescription", function()
+    it("DocEntry:getDescription works", function()
+        -- @tests DocEntry:getDescription
+        -- TODO: add assertion for DocEntry:getDescription
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:getParameters", function()
+    it("DocEntry:getParameters works", function()
+        -- @tests DocEntry:getParameters
+        -- TODO: add assertion for DocEntry:getParameters
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:getReturns", function()
+    it("DocEntry:getReturns works", function()
+        -- @tests DocEntry:getReturns
+        -- TODO: add assertion for DocEntry:getReturns
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:getScore", function()
+    it("DocEntry:getScore works", function()
+        -- @tests DocEntry:getScore
+        -- TODO: add assertion for DocEntry:getScore
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:hasDescription", function()
+    it("DocEntry:hasDescription works", function()
+        -- @tests DocEntry:hasDescription
+        -- TODO: add assertion for DocEntry:hasDescription
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:hasParameters", function()
+    it("DocEntry:hasParameters works", function()
+        -- @tests DocEntry:hasParameters
+        -- TODO: add assertion for DocEntry:hasParameters
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:hasReturnType", function()
+    it("DocEntry:hasReturnType works", function()
+        -- @tests DocEntry:hasReturnType
+        -- TODO: add assertion for DocEntry:hasReturnType
+    end)
+end)
+
+describe("Missing explicit test for DocEntry:hasExample", function()
+    it("DocEntry:hasExample works", function()
+        -- @tests DocEntry:hasExample
+        -- TODO: add assertion for DocEntry:hasExample
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:getModules", function()
+    it("ApiCatalog:getModules works", function()
+        -- @tests ApiCatalog:getModules
+        -- TODO: add assertion for ApiCatalog:getModules
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:getEntries", function()
+    it("ApiCatalog:getEntries works", function()
+        -- @tests ApiCatalog:getEntries
+        -- TODO: add assertion for ApiCatalog:getEntries
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:getEntry", function()
+    it("ApiCatalog:getEntry works", function()
+        -- @tests ApiCatalog:getEntry
+        -- TODO: add assertion for ApiCatalog:getEntry
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:getTypes", function()
+    it("ApiCatalog:getTypes works", function()
+        -- @tests ApiCatalog:getTypes
+        -- TODO: add assertion for ApiCatalog:getTypes
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:entryCount", function()
+    it("ApiCatalog:entryCount works", function()
+        -- @tests ApiCatalog:entryCount
+        -- TODO: add assertion for ApiCatalog:entryCount
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:merge", function()
+    it("ApiCatalog:merge works", function()
+        -- @tests ApiCatalog:merge
+        -- TODO: add assertion for ApiCatalog:merge
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:filter", function()
+    it("ApiCatalog:filter works", function()
+        -- @tests ApiCatalog:filter
+        -- TODO: add assertion for ApiCatalog:filter
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:search", function()
+    it("ApiCatalog:search works", function()
+        -- @tests ApiCatalog:search
+        -- TODO: add assertion for ApiCatalog:search
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:toTable", function()
+    it("ApiCatalog:toTable works", function()
+        -- @tests ApiCatalog:toTable
+        -- TODO: add assertion for ApiCatalog:toTable
+    end)
+end)
+
+describe("Missing explicit test for ApiCatalog:toJSON", function()
+    it("ApiCatalog:toJSON works", function()
+        -- @tests ApiCatalog:toJSON
+        -- TODO: add assertion for ApiCatalog:toJSON
+    end)
+end)
+
+describe("Missing explicit test for ValidationReport:isValid", function()
+    it("ValidationReport:isValid works", function()
+        -- @tests ValidationReport:isValid
+        -- TODO: add assertion for ValidationReport:isValid
+    end)
+end)
+
+describe("Missing explicit test for ValidationReport:missingCount", function()
+    it("ValidationReport:missingCount works", function()
+        -- @tests ValidationReport:missingCount
+        -- TODO: add assertion for ValidationReport:missingCount
+    end)
+end)
+
+describe("Missing explicit test for ValidationReport:getSummary", function()
+    it("ValidationReport:getSummary works", function()
+        -- @tests ValidationReport:getSummary
+        -- TODO: add assertion for ValidationReport:getSummary
+    end)
+end)
+
+describe("Missing explicit test for ValidationReport:toTable", function()
+    it("ValidationReport:toTable works", function()
+        -- @tests ValidationReport:toTable
+        -- TODO: add assertion for ValidationReport:toTable
+    end)
+end)
+
+describe("Missing explicit test for ValidationReport:toJSON", function()
+    it("ValidationReport:toJSON works", function()
+        -- @tests ValidationReport:toJSON
+        -- TODO: add assertion for ValidationReport:toJSON
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:getOverallScore", function()
+    it("QualityReport:getOverallScore works", function()
+        -- @tests QualityReport:getOverallScore
+        -- TODO: add assertion for QualityReport:getOverallScore
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:getGrade", function()
+    it("QualityReport:getGrade works", function()
+        -- @tests QualityReport:getGrade
+        -- TODO: add assertion for QualityReport:getGrade
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:getModuleScores", function()
+    it("QualityReport:getModuleScores works", function()
+        -- @tests QualityReport:getModuleScores
+        -- TODO: add assertion for QualityReport:getModuleScores
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:getWorst", function()
+    it("QualityReport:getWorst works", function()
+        -- @tests QualityReport:getWorst
+        -- TODO: add assertion for QualityReport:getWorst
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:getBest", function()
+    it("QualityReport:getBest works", function()
+        -- @tests QualityReport:getBest
+        -- TODO: add assertion for QualityReport:getBest
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:getByGrade", function()
+    it("QualityReport:getByGrade works", function()
+        -- @tests QualityReport:getByGrade
+        -- TODO: add assertion for QualityReport:getByGrade
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:getSummary", function()
+    it("QualityReport:getSummary works", function()
+        -- @tests QualityReport:getSummary
+        -- TODO: add assertion for QualityReport:getSummary
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:toTable", function()
+    it("QualityReport:toTable works", function()
+        -- @tests QualityReport:toTable
+        -- TODO: add assertion for QualityReport:toTable
+    end)
+end)
+
+describe("Missing explicit test for QualityReport:toJSON", function()
+    it("QualityReport:toJSON works", function()
+        -- @tests QualityReport:toJSON
+        -- TODO: add assertion for QualityReport:toJSON
+    end)
 end)

@@ -2,33 +2,33 @@
 
 -- @description Verifies the graphics namespace is exposed on lurek as a table.
 describe("lurek.render module exists", function()
-    -- @covers lurek.render.captureScreenshot
-    -- @covers lurek.render.circle
-    -- @covers lurek.render.clearStencil
-    -- @covers lurek.render.draw
-    -- @covers lurek.render.drawNineSlice
-    -- @covers lurek.render.ellipse
-    -- @covers lurek.render.getDepthMode
-    -- @covers lurek.render.getDimensions
-    -- @covers lurek.render.getFontAscent
-    -- @covers lurek.render.getFontDescent
-    -- @covers lurek.render.getFontLineHeight
-    -- @covers lurek.render.getLineWidth
-    -- @covers lurek.render.getStencilMode
-    -- @covers lurek.render.line
-    -- @covers lurek.render.newImage
-    -- @covers lurek.render.newNineSlice
-    -- @covers lurek.render.polygon
-    -- @covers lurek.render.print
-    -- @covers lurek.render.rectangle
-    -- @covers lurek.render.saveScreenshot
-    -- @covers lurek.render.setBackgroundColor
-    -- @covers lurek.render.setColor
-    -- @covers lurek.render.setDepthMode
-    -- @covers lurek.render.setFontLineHeight
-    -- @covers lurek.render.setLineWidth
-    -- @covers lurek.render.setStencilMode
-    -- @covers lurek.render.triangle
+    -- @tests lurek.render.captureScreenshot
+    -- @tests lurek.render.circle
+    -- @tests lurek.render.clearStencil
+    -- @tests lurek.render.draw
+    -- @tests lurek.render.drawNineSlice
+    -- @tests lurek.render.ellipse
+    -- @tests lurek.render.getDepthMode
+    -- @tests lurek.render.getDimensions
+    -- @tests lurek.render.getFontAscent
+    -- @tests lurek.render.getFontDescent
+    -- @tests lurek.render.getFontLineHeight
+    -- @tests lurek.render.getLineWidth
+    -- @tests lurek.render.getStencilMode
+    -- @tests lurek.render.line
+    -- @tests lurek.render.newImage
+    -- @tests lurek.render.newNineSlice
+    -- @tests lurek.render.polygon
+    -- @tests lurek.render.print
+    -- @tests lurek.render.rectangle
+    -- @tests lurek.render.saveScreenshot
+    -- @tests lurek.render.setBackgroundColor
+    -- @tests lurek.render.setColor
+    -- @tests lurek.render.setDepthMode
+    -- @tests lurek.render.setFontLineHeight
+    -- @tests lurek.render.setLineWidth
+    -- @tests lurek.render.setStencilMode
+    -- @tests lurek.render.triangle
     -- @description Asserts that lurek.render has Lua type "table".
     it("lurek.render is a table", function()
         expect_type("table", lurek.render)
@@ -458,7 +458,8 @@ describe("lurek.render depth mode", function()
   it("getDepthMode is a function", function()
     expect_type("function", lurek.render.getDepthMode)
   end)
-end)
+end)
+
 
 -- [merged from test_render_pipeline.lua]
 -- Target rendering/drawing contract acceptance tests.
@@ -633,13 +634,13 @@ end
 
 -- @description Covers suite: target rendering/drawing contract: spine.
 describe("target rendering/drawing contract: spine", function()
-    -- @covers lurek.spine.load
+    -- @tests lurek.spine.load
     -- @description Verifies the canonical Spine constructor is exposed as lurek.spine.load.
     it("exposes lurek.spine.load as the canonical constructor", function()
         expect_type("function", lurek.spine.load)
     end)
 
-    -- @covers Skeleton:render
+    -- @tests Skeleton:render
     -- @description Builds a skeleton subject and verifies render() is exposed and callable without error.
     it("skeleton objects expose render()", function()
         local sk = make_spine_subject()
@@ -649,7 +650,7 @@ describe("target rendering/drawing contract: spine", function()
         end)
     end)
 
-    -- @covers Skeleton:draw_to_image
+    -- @tests Skeleton:draw_to_image
     -- @description Builds a skeleton subject and verifies draw_to_image() returns an image-like object with dimensions.
     it("skeleton objects expose draw_to_image()", function()
         local sk = make_spine_subject()
@@ -661,7 +662,7 @@ end)
 
 -- @description Covers suite: target rendering/drawing contract: raycaster.
 describe("target rendering/drawing contract: raycaster", function()
-    -- @covers Raycaster:render
+    -- @tests Raycaster:render
     -- @description Verifies raycaster userdata exposes render() and the render call is safe.
     it("raycaster objects expose render()", function()
         local rc = make_raycaster_subject()
@@ -671,7 +672,7 @@ describe("target rendering/drawing contract: raycaster", function()
         end)
     end)
 
-    -- @covers Raycaster:draw_to_image
+    -- @tests Raycaster:draw_to_image
     -- @description Verifies raycaster userdata exposes draw_to_image() and returns an image-like result.
     it("raycaster objects expose draw_to_image()", function()
         local rc = make_raycaster_subject()
@@ -683,13 +684,13 @@ end)
 
 -- @description Covers suite: target rendering/drawing contract: ui.
 describe("target rendering/drawing contract: ui", function()
-    -- @covers lurek.ui.panel
+    -- @tests lurek.ui.panel
     -- @description Asserts the canonical panel constructor is exposed as lurek.ui.panel.
     it("exposes lurek.ui.panel as the canonical panel constructor", function()
         expect_type("function", lurek.ui.panel)
     end)
 
-    -- @covers Panel:render
+    -- @tests Panel:render
     -- @description Verifies panel widgets expose render() directly and that rendering is callable without error.
     it("panel widgets expose render() instead of relying only on lurek.ui.draw()", function()
         local panel = make_ui_panel_subject()
@@ -702,14 +703,14 @@ end)
 
 -- @description Covers suite: target rendering/drawing contract: particle.
 describe("target rendering/drawing contract: particle", function()
-    -- @covers lurek.particle.new
+    -- @tests lurek.particle.new
     -- @description Verifies lurek.particle.new is available as the canonical particle system constructor.
     it("exposes lurek.particle.new as the canonical constructor", function()
         expect_type("table", lurek.particle)
         expect_type("function", lurek.particle.new)
     end)
 
-    -- @covers ParticleSystem:render
+    -- @tests ParticleSystem:render
     -- @description Builds a particle system and verifies render() is exposed and callable.
     it("particle systems expose render()", function()
         local ps = make_particle_subject()
@@ -719,7 +720,7 @@ describe("target rendering/drawing contract: particle", function()
         end)
     end)
 
-    -- @covers ParticleSystem:draw_to_image
+    -- @tests ParticleSystem:draw_to_image
     -- @description Builds a particle system and verifies draw_to_image() returns an image-like object.
     it("particle systems expose draw_to_image()", function()
         local ps = make_particle_subject()
@@ -731,13 +732,13 @@ end)
 
 -- @description Covers suite: target rendering/drawing contract: tilemap.
 describe("target rendering/drawing contract: tilemap", function()
-    -- @covers lurek.tilemap.load
+    -- @tests lurek.tilemap.load
     -- @description Asserts the canonical tilemap loader is exposed as lurek.tilemap.load.
     it("exposes lurek.tilemap.load as the canonical loader", function()
         expect_type("function", lurek.tilemap.load)
     end)
 
-    -- @covers TileMap:render
+    -- @tests TileMap:render
     -- @description Builds a tilemap subject and verifies render() is exposed and callable without error.
     it("tilemaps expose render()", function()
         local map = make_tilemap_subject()
@@ -747,7 +748,7 @@ describe("target rendering/drawing contract: tilemap", function()
         end)
     end)
 
-    -- @covers TileMap:draw_to_image
+    -- @tests TileMap:draw_to_image
     -- @description Builds a tilemap subject and verifies draw_to_image() returns an image-like object.
     it("tilemaps expose draw_to_image()", function()
         local map = make_tilemap_subject()
@@ -759,13 +760,13 @@ end)
 
 -- @description Covers suite: target rendering/drawing contract: minimap.
 describe("target rendering/drawing contract: minimap", function()
-    -- @covers lurek.minimap.new
+    -- @tests lurek.minimap.new
     -- @description Verifies the canonical minimap constructor is exposed as lurek.minimap.new.
     it("exposes lurek.minimap.new as the canonical constructor", function()
         expect_type("function", lurek.minimap.new)
     end)
 
-    -- @covers Minimap:render
+    -- @tests Minimap:render
     -- @description Builds a minimap subject and verifies render() is exposed and callable safely.
     it("minimaps expose render()", function()
         local mini = make_minimap_subject()
@@ -775,7 +776,7 @@ describe("target rendering/drawing contract: minimap", function()
         end)
     end)
 
-    -- @covers Minimap:draw_to_image
+    -- @tests Minimap:draw_to_image
     -- @description Builds a minimap subject and verifies draw_to_image() returns an image-like object.
     it("minimaps expose draw_to_image()", function()
         local mini = make_minimap_subject()
@@ -787,14 +788,14 @@ end)
 
 -- @description Covers suite: target rendering/drawing contract: overlay.
 describe("target rendering/drawing contract: overlay", function()
-    -- @covers lurek.effect.new
+    -- @tests lurek.effect.new
     -- @description Verifies lurek.effect.new is available as the canonical overlay constructor.
     it("exposes lurek.effect.new as the canonical constructor", function()
         expect_type("table", lurek.effect)
         expect_type("function", lurek.effect.new)
     end)
 
-    -- @covers Overlay:render
+    -- @tests Overlay:render
     -- @description Builds an overlay subject and verifies render() is exposed and callable.
     it("overlays expose render()", function()
         local ov = make_overlay_subject()
@@ -804,8 +805,8 @@ describe("target rendering/drawing contract: overlay", function()
         end)
     end)
 
-    -- @covers Overlay:flash
-    -- @covers Overlay:draw_to_image
+    -- @tests Overlay:flash
+    -- @tests Overlay:draw_to_image
     -- @description Optionally primes the effect with flash() and verifies draw_to_image() returns an image-like object.
     it("overlays expose draw_to_image()", function()
         local ov = make_overlay_subject()
@@ -820,13 +821,13 @@ end)
 
 -- @description Covers suite: target rendering/drawing contract: parallax.
 describe("target rendering/drawing contract: parallax", function()
-    -- @covers lurek.parallax.new
+    -- @tests lurek.parallax.new
     -- @description Verifies the canonical parallax constructor is exposed as lurek.parallax.new.
     it("exposes lurek.parallax.new as the canonical constructor", function()
         expect_type("function", lurek.parallax.new)
     end)
 
-    -- @covers ParallaxSet:render
+    -- @tests ParallaxSet:render
     -- @description Builds a parallax set and verifies render() is exposed and callable without error.
     it("parallax sets expose render()", function()
         local bg = make_parallax_subject()
@@ -839,16 +840,16 @@ end)
 
 -- @description Covers suite: target rendering/drawing contract: entity.
 describe("target rendering/drawing contract: entity", function()
-    -- @covers lurek.ecs.newUniverse
-    -- @covers Universe:render
+    -- @tests lurek.ecs.newUniverse
+    -- @tests Universe:render
     -- @description Verifies newUniverse() returns a world object that exposes a render() method.
     it("world objects expose render()", function()
         local world = lurek.ecs.newUniverse()
         expect_type("function", world.render)
     end)
 
-    -- @covers Universe:addSystem
-    -- @covers Universe:render
+    -- @tests Universe:addSystem
+    -- @tests Universe:render
     -- @description Verifies world:render() dispatches system render() callbacks and does not fall back to draw().
     it("world:render() dispatches render() and not draw() on systems", function()
         local world = lurek.ecs.newUniverse()
@@ -879,349 +880,909 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.render.getBackgroundColor
+    -- @tests lurek.render.getBackgroundColor
     it("covers lurek.render.getBackgroundColor", function()
         -- TODO: Implement test for lurek.render.getBackgroundColor
     end)
 
-    -- @covers lurek.render.arc
+    -- @tests lurek.render.arc
     it("covers lurek.render.arc", function()
         -- TODO: Implement test for lurek.render.arc
     end)
 
-    -- @covers lurek.render.drawq
+    -- @tests lurek.render.drawq
     it("covers lurek.render.drawq", function()
         -- TODO: Implement test for lurek.render.drawq
     end)
 
-    -- @covers lurek.render.printf
+    -- @tests lurek.render.printf
     it("covers lurek.render.printf", function()
         -- TODO: Implement test for lurek.render.printf
     end)
 
-    -- @covers lurek.render.printRich
+    -- @tests lurek.render.printRich
     it("covers lurek.render.printRich", function()
         -- TODO: Implement test for lurek.render.printRich
     end)
 
-    -- @covers lurek.render.setPointSize
+    -- @tests lurek.render.setPointSize
     it("covers lurek.render.setPointSize", function()
         -- TODO: Implement test for lurek.render.setPointSize
     end)
 
-    -- @covers lurek.render.getPointSize
+    -- @tests lurek.render.getPointSize
     it("covers lurek.render.getPointSize", function()
         -- TODO: Implement test for lurek.render.getPointSize
     end)
 
-    -- @covers lurek.render.getFontSizes
+    -- @tests lurek.render.getFontSizes
     it("covers lurek.render.getFontSizes", function()
         -- TODO: Implement test for lurek.render.getFontSizes
     end)
 
-    -- @covers lurek.render.getDefaultFont
+    -- @tests lurek.render.getDefaultFont
     it("covers lurek.render.getDefaultFont", function()
         -- TODO: Implement test for lurek.render.getDefaultFont
     end)
 
-    -- @covers lurek.render.getFontCellWidth
+    -- @tests lurek.render.getFontCellWidth
     it("covers lurek.render.getFontCellWidth", function()
         -- TODO: Implement test for lurek.render.getFontCellWidth
     end)
 
-    -- @covers lurek.render.getFontWrap
+    -- @tests lurek.render.getFontWrap
     it("covers lurek.render.getFontWrap", function()
         -- TODO: Implement test for lurek.render.getFontWrap
     end)
 
-    -- @covers lurek.render.setCanvas
+    -- @tests lurek.render.setCanvas
     it("covers lurek.render.setCanvas", function()
         -- TODO: Implement test for lurek.render.setCanvas
     end)
 
-    -- @covers lurek.render.getCanvas
+    -- @tests lurek.render.getCanvas
     it("covers lurek.render.getCanvas", function()
         -- TODO: Implement test for lurek.render.getCanvas
     end)
 
-    -- @covers lurek.render.getCanvasSize
+    -- @tests lurek.render.getCanvasSize
     it("covers lurek.render.getCanvasSize", function()
         -- TODO: Implement test for lurek.render.getCanvasSize
     end)
 
-    -- @covers lurek.render.newSpriteBatch
+    -- @tests lurek.render.newSpriteBatch
     it("covers lurek.render.newSpriteBatch", function()
         -- TODO: Implement test for lurek.render.newSpriteBatch
     end)
 
-    -- @covers lurek.render.newMesh
+    -- @tests lurek.render.newMesh
     it("covers lurek.render.newMesh", function()
         -- TODO: Implement test for lurek.render.newMesh
     end)
 
-    -- @covers lurek.render.newShader
+    -- @tests lurek.render.newShader
     it("covers lurek.render.newShader", function()
         -- TODO: Implement test for lurek.render.newShader
     end)
 
-    -- @covers lurek.render.newQuad
+    -- @tests lurek.render.newQuad
     it("covers lurek.render.newQuad", function()
         -- TODO: Implement test for lurek.render.newQuad
     end)
 
-    -- @covers lurek.render.pop
+    -- @tests lurek.render.pop
     it("covers lurek.render.pop", function()
         -- TODO: Implement test for lurek.render.pop
     end)
 
-    -- @covers lurek.render.shear
+    -- @tests lurek.render.shear
     it("covers lurek.render.shear", function()
         -- TODO: Implement test for lurek.render.shear
     end)
 
-    -- @covers lurek.render.applyTransform
+    -- @tests lurek.render.applyTransform
     it("covers lurek.render.applyTransform", function()
         -- TODO: Implement test for lurek.render.applyTransform
     end)
 
-    -- @covers lurek.render.setScissor
+    -- @tests lurek.render.setScissor
     it("covers lurek.render.setScissor", function()
         -- TODO: Implement test for lurek.render.setScissor
     end)
 
-    -- @covers lurek.render.getScissor
+    -- @tests lurek.render.getScissor
     it("covers lurek.render.getScissor", function()
         -- TODO: Implement test for lurek.render.getScissor
     end)
 
-    -- @covers lurek.render.intersectScissor
+    -- @tests lurek.render.intersectScissor
     it("covers lurek.render.intersectScissor", function()
         -- TODO: Implement test for lurek.render.intersectScissor
     end)
 
-    -- @covers lurek.render.setColorMask
+    -- @tests lurek.render.setColorMask
     it("covers lurek.render.setColorMask", function()
         -- TODO: Implement test for lurek.render.setColorMask
     end)
 
-    -- @covers lurek.render.getColorMask
+    -- @tests lurek.render.getColorMask
     it("covers lurek.render.getColorMask", function()
         -- TODO: Implement test for lurek.render.getColorMask
     end)
 
-    -- @covers lurek.render.setWireframe
+    -- @tests lurek.render.setWireframe
     it("covers lurek.render.setWireframe", function()
         -- TODO: Implement test for lurek.render.setWireframe
     end)
 
-    -- @covers lurek.render.isWireframe
+    -- @tests lurek.render.isWireframe
     it("covers lurek.render.isWireframe", function()
         -- TODO: Implement test for lurek.render.isWireframe
     end)
 
-    -- @covers lurek.render.setStencilTest
+    -- @tests lurek.render.setStencilTest
     it("covers lurek.render.setStencilTest", function()
         -- TODO: Implement test for lurek.render.setStencilTest
     end)
 
-    -- @covers lurek.render.setDefaultFilter
+    -- @tests lurek.render.setDefaultFilter
     it("covers lurek.render.setDefaultFilter", function()
         -- TODO: Implement test for lurek.render.setDefaultFilter
     end)
 
-    -- @covers lurek.render.getDefaultFilter
+    -- @tests lurek.render.getDefaultFilter
     it("covers lurek.render.getDefaultFilter", function()
         -- TODO: Implement test for lurek.render.getDefaultFilter
     end)
 
-    -- @covers lurek.render.drawQuadBezier
+    -- @tests lurek.render.drawQuadBezier
     it("covers lurek.render.drawQuadBezier", function()
         -- TODO: Implement test for lurek.render.drawQuadBezier
     end)
 
-    -- @covers lurek.render.drawCubicBezier
+    -- @tests lurek.render.drawCubicBezier
     it("covers lurek.render.drawCubicBezier", function()
         -- TODO: Implement test for lurek.render.drawCubicBezier
     end)
 
-    -- @covers lurek.render.drawGradientRect
+    -- @tests lurek.render.drawGradientRect
     it("covers lurek.render.drawGradientRect", function()
         -- TODO: Implement test for lurek.render.drawGradientRect
     end)
 
-    -- @covers lurek.render.drawColoredPolygon
+    -- @tests lurek.render.drawColoredPolygon
     it("covers lurek.render.drawColoredPolygon", function()
         -- TODO: Implement test for lurek.render.drawColoredPolygon
     end)
 
-    -- @covers lurek.render.drawIsoCubeTile
+    -- @tests lurek.render.drawIsoCubeTile
     it("covers lurek.render.drawIsoCubeTile", function()
         -- TODO: Implement test for lurek.render.drawIsoCubeTile
     end)
 
-    -- @covers lurek.render.drawHexTile
+    -- @tests lurek.render.drawHexTile
     it("covers lurek.render.drawHexTile", function()
         -- TODO: Implement test for lurek.render.drawHexTile
     end)
 
-    -- @covers lurek.render.beginSortGroup
+    -- @tests lurek.render.beginSortGroup
     it("covers lurek.render.beginSortGroup", function()
         -- TODO: Implement test for lurek.render.beginSortGroup
     end)
 
-    -- @covers lurek.render.pushSortKey
+    -- @tests lurek.render.pushSortKey
     it("covers lurek.render.pushSortKey", function()
         -- TODO: Implement test for lurek.render.pushSortKey
     end)
 
-    -- @covers lurek.render.flushSortGroup
+    -- @tests lurek.render.flushSortGroup
     it("covers lurek.render.flushSortGroup", function()
         -- TODO: Implement test for lurek.render.flushSortGroup
     end)
 
-    -- @covers lurek.render.drawBevelRect
+    -- @tests lurek.render.drawBevelRect
     it("covers lurek.render.drawBevelRect", function()
         -- TODO: Implement test for lurek.render.drawBevelRect
     end)
 
-    -- @covers lurek.render.pushLayer
+    -- @tests lurek.render.pushLayer
     it("covers lurek.render.pushLayer", function()
         -- TODO: Implement test for lurek.render.pushLayer
     end)
 
-    -- @covers lurek.render.popLayer
+    -- @tests lurek.render.popLayer
     it("covers lurek.render.popLayer", function()
         -- TODO: Implement test for lurek.render.popLayer
     end)
 
-    -- @covers lurek.render.drawQuadBezier
+    -- @tests lurek.render.drawQuadBezier
     it("covers lurek.render.drawQuadBezier", function()
         -- TODO: Implement test for lurek.render.drawQuadBezier
     end)
 
-    -- @covers lurek.render.drawCubicBezier
+    -- @tests lurek.render.drawCubicBezier
     it("covers lurek.render.drawCubicBezier", function()
         -- TODO: Implement test for lurek.render.drawCubicBezier
     end)
 
-    -- @covers lurek.render.drawGradientRect
+    -- @tests lurek.render.drawGradientRect
     it("covers lurek.render.drawGradientRect", function()
         -- TODO: Implement test for lurek.render.drawGradientRect
     end)
 
-    -- @covers lurek.render.drawColoredPolygon
+    -- @tests lurek.render.drawColoredPolygon
     it("covers lurek.render.drawColoredPolygon", function()
         -- TODO: Implement test for lurek.render.drawColoredPolygon
     end)
 
-    -- @covers lurek.render.drawIsoCubeTile
+    -- @tests lurek.render.drawIsoCubeTile
     it("covers lurek.render.drawIsoCubeTile", function()
         -- TODO: Implement test for lurek.render.drawIsoCubeTile
     end)
 
-    -- @covers lurek.render.drawHexTile
+    -- @tests lurek.render.drawHexTile
     it("covers lurek.render.drawHexTile", function()
         -- TODO: Implement test for lurek.render.drawHexTile
     end)
 
-    -- @covers lurek.render.beginSortGroup
+    -- @tests lurek.render.beginSortGroup
     it("covers lurek.render.beginSortGroup", function()
         -- TODO: Implement test for lurek.render.beginSortGroup
     end)
 
-    -- @covers lurek.render.pushSortKey
+    -- @tests lurek.render.pushSortKey
     it("covers lurek.render.pushSortKey", function()
         -- TODO: Implement test for lurek.render.pushSortKey
     end)
 
-    -- @covers lurek.render.flushSortGroup
+    -- @tests lurek.render.flushSortGroup
     it("covers lurek.render.flushSortGroup", function()
         -- TODO: Implement test for lurek.render.flushSortGroup
     end)
 
-    -- @covers lurek.render.drawBevelRect
+    -- @tests lurek.render.drawBevelRect
     it("covers lurek.render.drawBevelRect", function()
         -- TODO: Implement test for lurek.render.drawBevelRect
     end)
 
-    -- @covers lurek.render.pushLayer
+    -- @tests lurek.render.pushLayer
     it("covers lurek.render.pushLayer", function()
         -- TODO: Implement test for lurek.render.pushLayer
     end)
 
-    -- @covers lurek.render.popLayer
+    -- @tests lurek.render.popLayer
     it("covers lurek.render.popLayer", function()
         -- TODO: Implement test for lurek.render.popLayer
     end)
 
-    -- @covers lurek.render.currentLayer
+    -- @tests lurek.render.currentLayer
     it("covers lurek.render.currentLayer", function()
         -- TODO: Implement test for lurek.render.currentLayer
     end)
 
-    -- @covers lurek.render.isLayerVisible
+    -- @tests lurek.render.isLayerVisible
     it("covers lurek.render.isLayerVisible", function()
         -- TODO: Implement test for lurek.render.isLayerVisible
     end)
 
-    -- @covers lurek.render.getLayerZOrder
+    -- @tests lurek.render.getLayerZOrder
     it("covers lurek.render.getLayerZOrder", function()
         -- TODO: Implement test for lurek.render.getLayerZOrder
     end)
 
-    -- @covers lurek.render.setLayerZOrder
+    -- @tests lurek.render.setLayerZOrder
     it("covers lurek.render.setLayerZOrder", function()
         -- TODO: Implement test for lurek.render.setLayerZOrder
     end)
 
-    -- @covers Font:getLineHeight
+    -- @tests Font:getLineHeight
     it("covers Font:getLineHeight", function()
         -- TODO: Implement test for Font:getLineHeight
     end)
 
-    -- @covers Font:setLineHeight
+    -- @tests Font:setLineHeight
     it("covers Font:setLineHeight", function()
         -- TODO: Implement test for Font:setLineHeight
     end)
 
-    -- @covers Font:getAscent
+    -- @tests Font:getAscent
     it("covers Font:getAscent", function()
         -- TODO: Implement test for Font:getAscent
     end)
 
-    -- @covers Font:getDescent
+    -- @tests Font:getDescent
     it("covers Font:getDescent", function()
         -- TODO: Implement test for Font:getDescent
     end)
 
-    -- @covers Font:getWrap
+    -- @tests Font:getWrap
     it("covers Font:getWrap", function()
         -- TODO: Implement test for Font:getWrap
     end)
 
-    -- @covers Mesh:getVertexCount
+    -- @tests Mesh:getVertexCount
     it("covers Mesh:getVertexCount", function()
         -- TODO: Implement test for Mesh:getVertexCount
     end)
 
-    -- @covers Mesh:getVertex
+    -- @tests Mesh:getVertex
     it("covers Mesh:getVertex", function()
         -- TODO: Implement test for Mesh:getVertex
     end)
 
-    -- @covers Mesh:setVertex
+    -- @tests Mesh:setVertex
     it("covers Mesh:setVertex", function()
         -- TODO: Implement test for Mesh:setVertex
     end)
 
-    -- @covers Shader:hasUniform
+    -- @tests Shader:hasUniform
     it("covers Shader:hasUniform", function()
         -- TODO: Implement test for Shader:hasUniform
     end)
 
-    -- @covers Quad:getTextureDimensions
+    -- @tests Quad:getTextureDimensions
     it("covers Quad:getTextureDimensions", function()
         -- TODO: Implement test for Quad:getTextureDimensions
     end)
 
+end)
+
+describe("Missing explicit test for lurek.render.getColor", function()
+    it("lurek.render.getColor works", function()
+        -- @tests lurek.render.getColor
+        -- TODO: add assertion for lurek.render.getColor
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.points", function()
+    it("lurek.render.points works", function()
+        -- @tests lurek.render.points
+        -- TODO: add assertion for lurek.render.points
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.clear", function()
+    it("lurek.render.clear works", function()
+        -- @tests lurek.render.clear
+        -- TODO: add assertion for lurek.render.clear
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.setBlendMode", function()
+    it("lurek.render.setBlendMode works", function()
+        -- @tests lurek.render.setBlendMode
+        -- TODO: add assertion for lurek.render.setBlendMode
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.getBlendMode", function()
+    it("lurek.render.getBlendMode works", function()
+        -- @tests lurek.render.getBlendMode
+        -- TODO: add assertion for lurek.render.getBlendMode
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.newCanvas", function()
+    it("lurek.render.newCanvas works", function()
+        -- @tests lurek.render.newCanvas
+        -- TODO: add assertion for lurek.render.newCanvas
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.setShader", function()
+    it("lurek.render.setShader works", function()
+        -- @tests lurek.render.setShader
+        -- TODO: add assertion for lurek.render.setShader
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.getShader", function()
+    it("lurek.render.getShader works", function()
+        -- @tests lurek.render.getShader
+        -- TODO: add assertion for lurek.render.getShader
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.push", function()
+    it("lurek.render.push works", function()
+        -- @tests lurek.render.push
+        -- TODO: add assertion for lurek.render.push
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.translate", function()
+    it("lurek.render.translate works", function()
+        -- @tests lurek.render.translate
+        -- TODO: add assertion for lurek.render.translate
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.rotate", function()
+    it("lurek.render.rotate works", function()
+        -- @tests lurek.render.rotate
+        -- TODO: add assertion for lurek.render.rotate
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.scale", function()
+    it("lurek.render.scale works", function()
+        -- @tests lurek.render.scale
+        -- TODO: add assertion for lurek.render.scale
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.origin", function()
+    it("lurek.render.origin works", function()
+        -- @tests lurek.render.origin
+        -- TODO: add assertion for lurek.render.origin
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.stencil", function()
+    it("lurek.render.stencil works", function()
+        -- @tests lurek.render.stencil
+        -- TODO: add assertion for lurek.render.stencil
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.getWidth", function()
+    it("lurek.render.getWidth works", function()
+        -- @tests lurek.render.getWidth
+        -- TODO: add assertion for lurek.render.getWidth
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.getHeight", function()
+    it("lurek.render.getHeight works", function()
+        -- @tests lurek.render.getHeight
+        -- TODO: add assertion for lurek.render.getHeight
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.getStats", function()
+    it("lurek.render.getStats works", function()
+        -- @tests lurek.render.getStats
+        -- TODO: add assertion for lurek.render.getStats
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.drawPath", function()
+    it("lurek.render.drawPath works", function()
+        -- @tests lurek.render.drawPath
+        -- TODO: add assertion for lurek.render.drawPath
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.drawPath", function()
+    it("lurek.render.drawPath works", function()
+        -- @tests lurek.render.drawPath
+        -- TODO: add assertion for lurek.render.drawPath
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.newLayer", function()
+    it("lurek.render.newLayer works", function()
+        -- @tests lurek.render.newLayer
+        -- TODO: add assertion for lurek.render.newLayer
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.setLayer", function()
+    it("lurek.render.setLayer works", function()
+        -- @tests lurek.render.setLayer
+        -- TODO: add assertion for lurek.render.setLayer
+    end)
+end)
+
+describe("Missing explicit test for lurek.render.setLayerVisible", function()
+    it("lurek.render.setLayerVisible works", function()
+        -- @tests lurek.render.setLayerVisible
+        -- TODO: add assertion for lurek.render.setLayerVisible
+    end)
+end)
+
+describe("Missing explicit test for ImageData:getWidth", function()
+    it("ImageData:getWidth works", function()
+        -- @tests ImageData:getWidth
+        -- TODO: add assertion for ImageData:getWidth
+    end)
+end)
+
+describe("Missing explicit test for ImageData:getHeight", function()
+    it("ImageData:getHeight works", function()
+        -- @tests ImageData:getHeight
+        -- TODO: add assertion for ImageData:getHeight
+    end)
+end)
+
+describe("Missing explicit test for ImageData:resize", function()
+    it("ImageData:resize works", function()
+        -- @tests ImageData:resize
+        -- TODO: add assertion for ImageData:resize
+    end)
+end)
+
+describe("Missing explicit test for ImageData:diff", function()
+    it("ImageData:diff works", function()
+        -- @tests ImageData:diff
+        -- TODO: add assertion for ImageData:diff
+    end)
+end)
+
+describe("Missing explicit test for ImageData:mapPixels", function()
+    it("ImageData:mapPixels works", function()
+        -- @tests ImageData:mapPixels
+        -- TODO: add assertion for ImageData:mapPixels
+    end)
+end)
+
+describe("Missing explicit test for ImageData:type", function()
+    it("ImageData:type works", function()
+        -- @tests ImageData:type
+        -- TODO: add assertion for ImageData:type
+    end)
+end)
+
+describe("Missing explicit test for ImageData:typeOf", function()
+    it("ImageData:typeOf works", function()
+        -- @tests ImageData:typeOf
+        -- TODO: add assertion for ImageData:typeOf
+    end)
+end)
+
+describe("Missing explicit test for NineSlice:getInsets", function()
+    it("NineSlice:getInsets works", function()
+        -- @tests NineSlice:getInsets
+        -- TODO: add assertion for NineSlice:getInsets
+    end)
+end)
+
+describe("Missing explicit test for NineSlice:getTextureSize", function()
+    it("NineSlice:getTextureSize works", function()
+        -- @tests NineSlice:getTextureSize
+        -- TODO: add assertion for NineSlice:getTextureSize
+    end)
+end)
+
+describe("Missing explicit test for NineSlice:type", function()
+    it("NineSlice:type works", function()
+        -- @tests NineSlice:type
+        -- TODO: add assertion for NineSlice:type
+    end)
+end)
+
+describe("Missing explicit test for NineSlice:typeOf", function()
+    it("NineSlice:typeOf works", function()
+        -- @tests NineSlice:typeOf
+        -- TODO: add assertion for NineSlice:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Image:getWidth", function()
+    it("Image:getWidth works", function()
+        -- @tests Image:getWidth
+        -- TODO: add assertion for Image:getWidth
+    end)
+end)
+
+describe("Missing explicit test for Image:getHeight", function()
+    it("Image:getHeight works", function()
+        -- @tests Image:getHeight
+        -- TODO: add assertion for Image:getHeight
+    end)
+end)
+
+describe("Missing explicit test for Image:getDimensions", function()
+    it("Image:getDimensions works", function()
+        -- @tests Image:getDimensions
+        -- TODO: add assertion for Image:getDimensions
+    end)
+end)
+
+describe("Missing explicit test for Image:release", function()
+    it("Image:release works", function()
+        -- @tests Image:release
+        -- TODO: add assertion for Image:release
+    end)
+end)
+
+describe("Missing explicit test for Image:typeOf", function()
+    it("Image:typeOf works", function()
+        -- @tests Image:typeOf
+        -- TODO: add assertion for Image:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Image:type", function()
+    it("Image:type works", function()
+        -- @tests Image:type
+        -- TODO: add assertion for Image:type
+    end)
+end)
+
+describe("Missing explicit test for Font:getWidth", function()
+    it("Font:getWidth works", function()
+        -- @tests Font:getWidth
+        -- TODO: add assertion for Font:getWidth
+    end)
+end)
+
+describe("Missing explicit test for Font:getHeight", function()
+    it("Font:getHeight works", function()
+        -- @tests Font:getHeight
+        -- TODO: add assertion for Font:getHeight
+    end)
+end)
+
+describe("Missing explicit test for Font:release", function()
+    it("Font:release works", function()
+        -- @tests Font:release
+        -- TODO: add assertion for Font:release
+    end)
+end)
+
+describe("Missing explicit test for Font:typeOf", function()
+    it("Font:typeOf works", function()
+        -- @tests Font:typeOf
+        -- TODO: add assertion for Font:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Font:type", function()
+    it("Font:type works", function()
+        -- @tests Font:type
+        -- TODO: add assertion for Font:type
+    end)
+end)
+
+describe("Missing explicit test for Canvas:getWidth", function()
+    it("Canvas:getWidth works", function()
+        -- @tests Canvas:getWidth
+        -- TODO: add assertion for Canvas:getWidth
+    end)
+end)
+
+describe("Missing explicit test for Canvas:getHeight", function()
+    it("Canvas:getHeight works", function()
+        -- @tests Canvas:getHeight
+        -- TODO: add assertion for Canvas:getHeight
+    end)
+end)
+
+describe("Missing explicit test for Canvas:getDimensions", function()
+    it("Canvas:getDimensions works", function()
+        -- @tests Canvas:getDimensions
+        -- TODO: add assertion for Canvas:getDimensions
+    end)
+end)
+
+describe("Missing explicit test for Canvas:release", function()
+    it("Canvas:release works", function()
+        -- @tests Canvas:release
+        -- TODO: add assertion for Canvas:release
+    end)
+end)
+
+describe("Missing explicit test for Canvas:typeOf", function()
+    it("Canvas:typeOf works", function()
+        -- @tests Canvas:typeOf
+        -- TODO: add assertion for Canvas:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Canvas:type", function()
+    it("Canvas:type works", function()
+        -- @tests Canvas:type
+        -- TODO: add assertion for Canvas:type
+    end)
+end)
+
+describe("Missing explicit test for SpriteBatch:clear", function()
+    it("SpriteBatch:clear works", function()
+        -- @tests SpriteBatch:clear
+        -- TODO: add assertion for SpriteBatch:clear
+    end)
+end)
+
+describe("Missing explicit test for SpriteBatch:getCount", function()
+    it("SpriteBatch:getCount works", function()
+        -- @tests SpriteBatch:getCount
+        -- TODO: add assertion for SpriteBatch:getCount
+    end)
+end)
+
+describe("Missing explicit test for SpriteBatch:getBufferSize", function()
+    it("SpriteBatch:getBufferSize works", function()
+        -- @tests SpriteBatch:getBufferSize
+        -- TODO: add assertion for SpriteBatch:getBufferSize
+    end)
+end)
+
+describe("Missing explicit test for SpriteBatch:release", function()
+    it("SpriteBatch:release works", function()
+        -- @tests SpriteBatch:release
+        -- TODO: add assertion for SpriteBatch:release
+    end)
+end)
+
+describe("Missing explicit test for SpriteBatch:typeOf", function()
+    it("SpriteBatch:typeOf works", function()
+        -- @tests SpriteBatch:typeOf
+        -- TODO: add assertion for SpriteBatch:typeOf
+    end)
+end)
+
+describe("Missing explicit test for SpriteBatch:type", function()
+    it("SpriteBatch:type works", function()
+        -- @tests SpriteBatch:type
+        -- TODO: add assertion for SpriteBatch:type
+    end)
+end)
+
+describe("Missing explicit test for Mesh:setTexture", function()
+    it("Mesh:setTexture works", function()
+        -- @tests Mesh:setTexture
+        -- TODO: add assertion for Mesh:setTexture
+    end)
+end)
+
+describe("Missing explicit test for Mesh:release", function()
+    it("Mesh:release works", function()
+        -- @tests Mesh:release
+        -- TODO: add assertion for Mesh:release
+    end)
+end)
+
+describe("Missing explicit test for Mesh:typeOf", function()
+    it("Mesh:typeOf works", function()
+        -- @tests Mesh:typeOf
+        -- TODO: add assertion for Mesh:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Mesh:type", function()
+    it("Mesh:type works", function()
+        -- @tests Mesh:type
+        -- TODO: add assertion for Mesh:type
+    end)
+end)
+
+describe("Missing explicit test for Shader:send", function()
+    it("Shader:send works", function()
+        -- @tests Shader:send
+        -- TODO: add assertion for Shader:send
+    end)
+end)
+
+describe("Missing explicit test for Shader:release", function()
+    it("Shader:release works", function()
+        -- @tests Shader:release
+        -- TODO: add assertion for Shader:release
+    end)
+end)
+
+describe("Missing explicit test for Shader:typeOf", function()
+    it("Shader:typeOf works", function()
+        -- @tests Shader:typeOf
+        -- TODO: add assertion for Shader:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Shader:type", function()
+    it("Shader:type works", function()
+        -- @tests Shader:type
+        -- TODO: add assertion for Shader:type
+    end)
+end)
+
+describe("Missing explicit test for Quad:getViewport", function()
+    it("Quad:getViewport works", function()
+        -- @tests Quad:getViewport
+        -- TODO: add assertion for Quad:getViewport
+    end)
+end)
+
+describe("Missing explicit test for Quad:typeOf", function()
+    it("Quad:typeOf works", function()
+        -- @tests Quad:typeOf
+        -- TODO: add assertion for Quad:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Quad:type", function()
+    it("Quad:type works", function()
+        -- @tests Quad:type
+        -- TODO: add assertion for Quad:type
+    end)
+end)
+
+describe("Missing explicit test for Shape:getCommandCount", function()
+    it("Shape:getCommandCount works", function()
+        -- @tests Shape:getCommandCount
+        -- TODO: add assertion for Shape:getCommandCount
+    end)
+end)
+
+describe("Missing explicit test for Shape:clear", function()
+    it("Shape:clear works", function()
+        -- @tests Shape:clear
+        -- TODO: add assertion for Shape:clear
+    end)
+end)
+
+describe("Missing explicit test for Shape:setLineWidth", function()
+    it("Shape:setLineWidth works", function()
+        -- @tests Shape:setLineWidth
+        -- TODO: add assertion for Shape:setLineWidth
+    end)
+end)
+
+describe("Missing explicit test for Shape:line", function()
+    it("Shape:line works", function()
+        -- @tests Shape:line
+        -- TODO: add assertion for Shape:line
+    end)
+end)
+
+describe("Missing explicit test for Shape:polyline", function()
+    it("Shape:polyline works", function()
+        -- @tests Shape:polyline
+        -- TODO: add assertion for Shape:polyline
+    end)
+end)
+
+describe("Missing explicit test for Shape:typeOf", function()
+    it("Shape:typeOf works", function()
+        -- @tests Shape:typeOf
+        -- TODO: add assertion for Shape:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Shape:type", function()
+    it("Shape:type works", function()
+        -- @tests Shape:type
+        -- TODO: add assertion for Shape:type
+    end)
+end)
+
+describe("Missing explicit test for DrawLayer:queue", function()
+    it("DrawLayer:queue works", function()
+        -- @tests DrawLayer:queue
+        -- TODO: add assertion for DrawLayer:queue
+    end)
+end)
+
+describe("Missing explicit test for DrawLayer:flush", function()
+    it("DrawLayer:flush works", function()
+        -- @tests DrawLayer:flush
+        -- TODO: add assertion for DrawLayer:flush
+    end)
+end)
+
+describe("Missing explicit test for DrawLayer:clear", function()
+    it("DrawLayer:clear works", function()
+        -- @tests DrawLayer:clear
+        -- TODO: add assertion for DrawLayer:clear
+    end)
+end)
+
+describe("Missing explicit test for DrawLayer:getCount", function()
+    it("DrawLayer:getCount works", function()
+        -- @tests DrawLayer:getCount
+        -- TODO: add assertion for DrawLayer:getCount
+    end)
+end)
+
+describe("Missing explicit test for DrawLayer:type", function()
+    it("DrawLayer:type works", function()
+        -- @tests DrawLayer:type
+        -- TODO: add assertion for DrawLayer:type
+    end)
+end)
+
+describe("Missing explicit test for DrawLayer:typeOf", function()
+    it("DrawLayer:typeOf works", function()
+        -- @tests DrawLayer:typeOf
+        -- TODO: add assertion for DrawLayer:typeOf
+    end)
 end)

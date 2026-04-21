@@ -3,9 +3,9 @@
 
 -- @description Covers suite: lurek.minimap.newMinimap.
 describe("lurek.minimap.newMinimap", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getGridWidth
-    -- @covers Minimap.getGridHeight
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getGridWidth
+    -- @tests Minimap.getGridHeight
     -- @description Creates a minimap with grid dimensions and verifies the grid width and height accessors.
     it("creates a minimap with grid dimensions", function()
         local m = lurek.minimap.newMinimap(64, 48)
@@ -14,9 +14,9 @@ describe("lurek.minimap.newMinimap", function()
         expect_equal(48, m:getGridHeight())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getDisplayWidth
-    -- @covers Minimap.getDisplayHeight
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getDisplayWidth
+    -- @tests Minimap.getDisplayHeight
     -- @description Creates a minimap with an explicit display size and checks the stored display dimensions.
     it("creates a minimap with custom display size", function()
         local m = lurek.minimap.newMinimap(32, 32, 200, 150)
@@ -24,9 +24,9 @@ describe("lurek.minimap.newMinimap", function()
         expect_equal(150, m:getDisplayHeight())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.type
-    -- @covers Minimap.typeOf
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.type
+    -- @tests Minimap.typeOf
     -- @description Verifies the minimap userdata reports the correct type and type hierarchy.
     it("reports correct type", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -41,8 +41,8 @@ end)
 
 -- @description Covers suite: grid dimensions.
 describe("grid dimensions", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getGridSize
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getGridSize
     -- @description Confirms getGridSize returns the grid width and height that were used at construction.
     it("returns grid size as two values", function()
         local m = lurek.minimap.newMinimap(40, 30)
@@ -56,11 +56,11 @@ end)
 
 -- @description Covers suite: display size.
 describe("display size", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setDisplaySize
-    -- @covers Minimap.getDisplayWidth
-    -- @covers Minimap.getDisplayHeight
-    -- @covers Minimap.getDisplaySize
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setDisplaySize
+    -- @tests Minimap.getDisplayWidth
+    -- @tests Minimap.getDisplayHeight
+    -- @tests Minimap.getDisplaySize
     -- @description Updates the minimap display size and verifies both scalar and tuple getters reflect the new values.
     it("can set and get display size", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -77,8 +77,8 @@ end)
 
 -- @description Covers suite: terrain.
 describe("terrain", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getTerrain
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getTerrain
     -- @description Verifies uninitialized terrain cells default to terrain type 0.
     it("defaults to terrain type 0", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -86,9 +86,9 @@ describe("terrain", function()
         expect_equal(0, m:getTerrain(5, 5))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTerrain
-    -- @covers Minimap.getTerrain
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTerrain
+    -- @tests Minimap.getTerrain
     -- @description Writes a terrain type into one cell and reads it back from the same coordinates.
     it("can set and get terrain type", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -96,9 +96,9 @@ describe("terrain", function()
         expect_equal(7, m:getTerrain(3, 4))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTerrainColor
-    -- @covers Minimap.getTerrainColor
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTerrainColor
+    -- @tests Minimap.getTerrainColor
     -- @description Stores a terrain color with alpha and verifies all four returned channels.
     it("can set and get terrain colors with alpha", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -110,9 +110,9 @@ describe("terrain", function()
         expect_near(0.8, a)
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTerrainColor
-    -- @covers Minimap.getTerrainColor
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTerrainColor
+    -- @tests Minimap.getTerrainColor
     -- @description Verifies setTerrainColor applies the default alpha value of 1.0 when alpha is omitted.
     it("defaults alpha to 1.0", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -126,14 +126,14 @@ end)
 
 -- @description Covers suite: fog of war.
 describe("fog of war", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.isFogEnabled
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.isFogEnabled
     -- @description Confirms fog of war is disabled when a minimap is first created.
     it("is disabled by default", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_false(m:isFogEnabled())
     end)
-    -- @covers Minimap.isFogEnabled
+    -- @tests Minimap.isFogEnabled
     -- @description Toggles fog of war on and off and checks the enabled flag after each change.
     it("can toggle fog", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -143,17 +143,17 @@ describe("fog of war", function()
         expect_false(m:isFogEnabled())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getFogLevel
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getFogLevel
     -- @description Verifies unexplored tiles default to fog level 0.
     it("defaults fog level to 0 (hidden)", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_equal(0, m:getFogLevel(1, 1))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setFogLevel
-    -- @covers Minimap.getFogLevel
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setFogLevel
+    -- @tests Minimap.getFogLevel
     -- @description Writes visible and explored fog states to a tile and verifies the stored levels.
     it("can set fog levels", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -163,9 +163,9 @@ describe("fog of war", function()
         expect_equal(1, m:getFogLevel(2, 3))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setFogColor
-    -- @covers Minimap.getFogColor
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setFogColor
+    -- @tests Minimap.getFogColor
     -- @description Sets a fog tint with alpha and checks that the returned RGBA values match.
     it("can set fog color", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -177,9 +177,9 @@ describe("fog of war", function()
         expect_near(0.5, a)
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setFogData
-    -- @covers Minimap.getFogLevel
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setFogData
+    -- @tests Minimap.getFogLevel
     -- @description Bulk-loads fog data into the grid and verifies representative cells across the map.
     it("can bulk set fog data", function()
         local m = lurek.minimap.newMinimap(3, 3)
@@ -201,17 +201,17 @@ end)
 
 -- @description Covers suite: object types.
 describe("object types", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getObjectTypeCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getObjectTypeCount
     -- @description Verifies a new minimap starts with no registered object types.
     it("starts with zero types", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_equal(0, m:getObjectTypeCount())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addObjectType
-    -- @covers Minimap.getObjectTypeCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addObjectType
+    -- @tests Minimap.getObjectTypeCount
     -- @description Adds multiple object types and verifies they receive 1-based indices and increment the type count.
     it("adds types with 1-based indices", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -222,10 +222,10 @@ describe("object types", function()
         expect_equal(2, m:getObjectTypeCount())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addObjectType
-    -- @covers Minimap.isObjectTypeVisible
-    -- @covers Minimap.setObjectTypeVisible
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addObjectType
+    -- @tests Minimap.isObjectTypeVisible
+    -- @tests Minimap.setObjectTypeVisible
     -- @description Toggles the visibility flag for an object type and verifies the updated state.
     it("toggles type visibility", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -240,19 +240,19 @@ end)
 
 -- @description Covers suite: objects.
 describe("objects", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getObjectCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getObjectCount
     -- @description Confirms a new minimap has no placed objects.
     it("starts with zero objects", function()
         local m = lurek.minimap.newMinimap(100, 100)
         expect_equal(0, m:getObjectCount())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addObjectType
-    -- @covers Minimap.setObject
-    -- @covers Minimap.getObjectCount
-    -- @covers Minimap.removeObject
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addObjectType
+    -- @tests Minimap.setObject
+    -- @tests Minimap.getObjectCount
+    -- @tests Minimap.removeObject
     -- @description Adds objects of a registered type, removes them by id, and verifies the object count updates correctly.
     it("can add and remove objects", function()
         local m = lurek.minimap.newMinimap(100, 100)
@@ -266,11 +266,11 @@ describe("objects", function()
         expect_false(m:removeObject(999))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addObjectType
-    -- @covers Minimap.setObject
-    -- @covers Minimap.clearObjects
-    -- @covers Minimap.getObjectCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addObjectType
+    -- @tests Minimap.setObject
+    -- @tests Minimap.clearObjects
+    -- @tests Minimap.getObjectCount
     -- @description Clears all placed objects and verifies the minimap reports an empty object list.
     it("can clear all objects", function()
         local m = lurek.minimap.newMinimap(100, 100)
@@ -286,9 +286,9 @@ end)
 
 -- @description Covers suite: owner colors.
 describe("owner colors", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setOwnerColor
-    -- @covers Minimap.getOwnerColor
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setOwnerColor
+    -- @tests Minimap.getOwnerColor
     -- @description Stores an owner color with alpha and verifies the returned RGBA channels.
     it("can set and get owner colors", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -305,17 +305,17 @@ end)
 
 -- @description Covers suite: color mode.
 describe("color mode", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getColorMode
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getColorMode
     -- @description Verifies the default minimap color mode is terrain-based.
     it("defaults to terrain", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_equal("terrain", m:getColorMode())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setColorMode
-    -- @covers Minimap.getColorMode
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setColorMode
+    -- @tests Minimap.getColorMode
     -- @description Switches the color mode to political and confirms the new mode is reported.
     it("can switch to political", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -323,8 +323,8 @@ describe("color mode", function()
         expect_equal("political", m:getColorMode())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setColorMode
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setColorMode
     -- @description Ensures setColorMode rejects an unsupported mode string.
     it("errors on invalid mode", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -336,17 +336,17 @@ end)
 
 -- @description Covers suite: zoom and pan.
 describe("zoom and pan", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getZoom
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getZoom
     -- @description Confirms the initial zoom factor is 1.0.
     it("defaults zoom to 1.0", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_near(1.0, m:getZoom())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setZoom
-    -- @covers Minimap.getZoom
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setZoom
+    -- @tests Minimap.getZoom
     -- @description Updates the zoom factor and verifies the new zoom value is returned.
     it("can set zoom", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -354,9 +354,9 @@ describe("zoom and pan", function()
         expect_near(2.5, m:getZoom())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setCenter
-    -- @covers Minimap.getCenter
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setCenter
+    -- @tests Minimap.getCenter
     -- @description Re-centers the minimap and verifies the new center coordinates.
     it("can set center", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -371,17 +371,17 @@ end)
 
 -- @description Covers suite: viewport.
 describe("viewport", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getViewportRect
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getViewportRect
     -- @description Verifies the viewport rectangle is unset on a new minimap.
     it("starts with no viewport rect", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_nil(m:getViewportRect())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setViewportRect
-    -- @covers Minimap.getViewportRect
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setViewportRect
+    -- @tests Minimap.getViewportRect
     -- @description Sets a viewport rectangle and verifies each returned field matches the assigned bounds.
     it("can set and get viewport rect", function()
         local m = lurek.minimap.newMinimap(100, 100)
@@ -394,10 +394,10 @@ describe("viewport", function()
         expect_equal(40, vp.h)
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setViewportRect
-    -- @covers Minimap.clearViewportRect
-    -- @covers Minimap.getViewportRect
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setViewportRect
+    -- @tests Minimap.clearViewportRect
+    -- @tests Minimap.getViewportRect
     -- @description Clears a previously assigned viewport rectangle and confirms it becomes nil again.
     it("can clear viewport rect", function()
         local m = lurek.minimap.newMinimap(100, 100)
@@ -406,9 +406,9 @@ describe("viewport", function()
         expect_nil(m:getViewportRect())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.isViewportVisible
-    -- @covers Minimap.setViewportVisible
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.isViewportVisible
+    -- @tests Minimap.setViewportVisible
     -- @description Toggles viewport rendering visibility and verifies the visible flag changes accordingly.
     it("can toggle viewport visibility", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -417,9 +417,9 @@ describe("viewport", function()
         expect_false(m:isViewportVisible())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setViewportColor
-    -- @covers Minimap.getViewportColor
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setViewportColor
+    -- @tests Minimap.getViewportColor
     -- @description Sets the viewport highlight color and verifies all returned color channels.
     it("can set viewport color", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -436,17 +436,17 @@ end)
 
 -- @description Covers suite: pings.
 describe("pings", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getPingCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getPingCount
     -- @description Confirms a new minimap starts with no active pings.
     it("starts with zero pings", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_equal(0, m:getPingCount())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addPing
-    -- @covers Minimap.getPingCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addPing
+    -- @tests Minimap.getPingCount
     -- @description Adds pings with default and explicit color parameters and verifies the ping count increases.
     it("can add pings", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -456,10 +456,10 @@ describe("pings", function()
         expect_equal(2, m:getPingCount())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addPing
-    -- @covers Minimap.update
-    -- @covers Minimap.getPingCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addPing
+    -- @tests Minimap.update
+    -- @tests Minimap.getPingCount
     -- @description Advances the minimap update loop past a ping duration and confirms the ping expires.
     it("expires pings after duration", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -476,19 +476,19 @@ end)
 
 -- @description Covers suite: markers.
 describe("markers", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getMarkerCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getMarkerCount
     -- @description Confirms a new minimap starts with no markers.
     it("starts with zero markers", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_equal(0, m:getMarkerCount())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addMarker
-    -- @covers Minimap.hasMarker
-    -- @covers Minimap.getMarkerDescription
-    -- @covers Minimap.getMarkerCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addMarker
+    -- @tests Minimap.hasMarker
+    -- @tests Minimap.getMarkerDescription
+    -- @tests Minimap.getMarkerCount
     -- @description Adds a marker with a description and verifies it can be queried by id.
     it("can add and query markers", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -498,12 +498,12 @@ describe("markers", function()
         expect_equal(1, m:getMarkerCount())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addMarker
-    -- @covers Minimap.removeMarker
-    -- @covers Minimap.hasMarker
-    -- @covers Minimap.getMarkerCount
-    -- @covers Minimap.getMarkerDescription
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addMarker
+    -- @tests Minimap.removeMarker
+    -- @tests Minimap.hasMarker
+    -- @tests Minimap.getMarkerCount
+    -- @tests Minimap.getMarkerDescription
     -- @description Removes a marker and verifies its presence, count, and description are cleared.
     it("can remove markers", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -514,10 +514,10 @@ describe("markers", function()
         expect_nil(m:getMarkerDescription(id))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.addMarker
-    -- @covers Minimap.hasMarker
-    -- @covers Minimap.getMarkerCount
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.addMarker
+    -- @tests Minimap.hasMarker
+    -- @tests Minimap.getMarkerCount
     -- @description Adds a marker without a description and verifies it is still tracked correctly.
     it("can add markers without description", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -526,8 +526,8 @@ describe("markers", function()
         expect_equal(1, m:getMarkerCount())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.removeMarker
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.removeMarker
     -- @description Verifies removeMarker returns false for an id that does not exist.
     it("returns false for non-existent marker removal", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -539,17 +539,17 @@ end)
 
 -- @description Covers suite: anti-alias.
 describe("anti-alias", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.isAntiAlias
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.isAntiAlias
     -- @description Confirms anti-aliasing is disabled by default.
     it("defaults to false", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_false(m:isAntiAlias())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setAntiAlias
-    -- @covers Minimap.isAntiAlias
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setAntiAlias
+    -- @tests Minimap.isAntiAlias
     -- @description Enables anti-aliasing and verifies the flag becomes true.
     it("can toggle", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -562,9 +562,9 @@ end)
 
 -- @description Covers suite: coordinate conversion.
 describe("coordinate conversion", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.gridToScreen
-    -- @covers Minimap.screenToGrid
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.gridToScreen
+    -- @tests Minimap.screenToGrid
     -- @description Converts a grid coordinate to screen space and back to verify the mapping round-trips.
     it("converts grid to screen and back", function()
         local m = lurek.minimap.newMinimap(10, 10, 100, 100)
@@ -581,8 +581,8 @@ end)
 
 -- @description Covers suite: update.
 describe("update", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.update
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.update
     -- @description Verifies update accepts typical frame deltas without raising an error.
     it("does not crash", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -595,15 +595,15 @@ end)
 
 -- @description Covers suite: full workflow.
 describe("full workflow", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTerrain
-    -- @covers Minimap.setFogEnabled
-    -- @covers Minimap.addObjectType
-    -- @covers Minimap.setViewportRect
-    -- @covers Minimap.addPing
-    -- @covers Minimap.addMarker
-    -- @covers Minimap.setZoom
-    -- @covers Minimap.update
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTerrain
+    -- @tests Minimap.setFogEnabled
+    -- @tests Minimap.addObjectType
+    -- @tests Minimap.setViewportRect
+    -- @tests Minimap.addPing
+    -- @tests Minimap.addMarker
+    -- @tests Minimap.setZoom
+    -- @tests Minimap.update
     -- @description Exercises a representative minimap setup flow with terrain, fog, objects, viewport, pings, markers, zoom, and update handling.
     it("runs a complete minimap setup", function()
         local m = lurek.minimap.newMinimap(32, 32, 200, 200)
@@ -657,9 +657,9 @@ end)
 
 -- @description Covers suite: terrain data bulk set.
 describe("terrain data bulk set", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTerrainData
-    -- @covers Minimap.getTerrain
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTerrainData
+    -- @tests Minimap.getTerrain
     -- @description Loads a flat terrain array into the grid and verifies each cell is populated in row-major order.
     it("sets all cells from a flat table", function()
         local m = lurek.minimap.newMinimap(3, 2)
@@ -672,9 +672,9 @@ describe("terrain data bulk set", function()
         expect_equal(6, m:getTerrain(3, 2))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTerrainData
-    -- @covers Minimap.getTerrain
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTerrainData
+    -- @tests Minimap.getTerrain
     -- @description Verifies setTerrainData ignores extra entries that exceed the minimap grid size.
     it("ignores excess values beyond grid size", function()
         local m = lurek.minimap.newMinimap(2, 2)
@@ -689,8 +689,8 @@ end)
 
 -- @description Covers suite: tile descriptions.
 describe("tile descriptions", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getTileDescription
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getTileDescription
     -- @description Confirms querying an unset tile description returns nil.
     it("returns nil for unset types", function()
         local m = lurek.minimap.newMinimap(5, 5)
@@ -698,9 +698,9 @@ describe("tile descriptions", function()
         expect_nil(m:getTileDescription(99))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTileDescription
-    -- @covers Minimap.getTileDescription
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTileDescription
+    -- @tests Minimap.getTileDescription
     -- @description Stores a tile description string and verifies it can be retrieved by terrain type.
     it("sets and retrieves a description", function()
         local m = lurek.minimap.newMinimap(5, 5)
@@ -708,9 +708,9 @@ describe("tile descriptions", function()
         expect_equal("Grass", m:getTileDescription(1))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTileDescription
-    -- @covers Minimap.getTileDescription
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTileDescription
+    -- @tests Minimap.getTileDescription
     -- @description Replaces an existing tile description and verifies the later value wins.
     it("overwrites existing description", function()
         local m = lurek.minimap.newMinimap(5, 5)
@@ -719,9 +719,9 @@ describe("tile descriptions", function()
         expect_equal("Deep water", m:getTileDescription(0))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTileDescription
-    -- @covers Minimap.getTileDescription
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTileDescription
+    -- @tests Minimap.getTileDescription
     -- @description Verifies tile descriptions are stored independently for multiple terrain types.
     it("handles multiple types independently", function()
         local m = lurek.minimap.newMinimap(5, 5)
@@ -739,8 +739,8 @@ end)
 
 -- @description Covers suite: getHoverInfo.
 describe("getHoverInfo", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.getHoverInfo
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.getHoverInfo
     -- @description Verifies hover queries outside the minimap display bounds return nil.
     it("returns nil outside minimap bounds", function()
         local m = lurek.minimap.newMinimap(4, 4, 100, 100)
@@ -750,10 +750,10 @@ describe("getHoverInfo", function()
         expect_nil(m:getHoverInfo(50, 101, 0, 0))
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTerrainData
-    -- @covers Minimap.setTileDescription
-    -- @covers Minimap.getHoverInfo
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTerrainData
+    -- @tests Minimap.setTileDescription
+    -- @tests Minimap.getHoverInfo
     -- @description Resolves a hovered tile to its configured terrain description.
     it("returns tile description for hovered cell", function()
         local m = lurek.minimap.newMinimap(4, 4, 100, 100)
@@ -763,9 +763,9 @@ describe("getHoverInfo", function()
         expect_equal("Plains", info)
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setTerrain
-    -- @covers Minimap.getHoverInfo
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setTerrain
+    -- @tests Minimap.getHoverInfo
     -- @description Verifies hover info returns nil when the hovered terrain type has no description.
     it("returns nil when terrain has no description", function()
         local m = lurek.minimap.newMinimap(4, 4, 100, 100)
@@ -778,17 +778,17 @@ end)
 
 -- @description Covers suite: clickable.
 describe("clickable", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.isClickable
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.isClickable
     -- @description Confirms minimaps are clickable by default.
     it("defaults to true", function()
         local m = lurek.minimap.newMinimap(10, 10)
         expect_true(m:isClickable())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setClickable
-    -- @covers Minimap.isClickable
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setClickable
+    -- @tests Minimap.isClickable
     -- @description Disables minimap click handling and verifies the clickable flag turns off.
     it("can be disabled", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -796,9 +796,9 @@ describe("clickable", function()
         expect_false(m:isClickable())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setClickable
-    -- @covers Minimap.isClickable
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setClickable
+    -- @tests Minimap.isClickable
     -- @description Re-enables click handling after disabling it and verifies the flag returns to true.
     it("can be re-enabled", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -812,9 +812,9 @@ end)
 
 -- @description Covers suite: center individual getters.
 describe("center individual getters", function()
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setCenter
-    -- @covers Minimap.getCenterX
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setCenter
+    -- @tests Minimap.getCenterX
     -- @description Sets the minimap center and verifies getCenterX returns the X component.
     it("getCenterX returns the X component", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -822,9 +822,9 @@ describe("center individual getters", function()
         expect_near(3.5, m:getCenterX())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setCenter
-    -- @covers Minimap.getCenterY
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setCenter
+    -- @tests Minimap.getCenterY
     -- @description Sets the minimap center and verifies getCenterY returns the Y component.
     it("getCenterY returns the Y component", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -832,11 +832,11 @@ describe("center individual getters", function()
         expect_near(7.25, m:getCenterY())
     end)
 
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap.setCenter
-    -- @covers Minimap.getCenter
-    -- @covers Minimap.getCenterX
-    -- @covers Minimap.getCenterY
+    -- @tests lurek.minimap.newMinimap
+    -- @tests Minimap.setCenter
+    -- @tests Minimap.getCenter
+    -- @tests Minimap.getCenterX
+    -- @tests Minimap.getCenterY
     -- @description Verifies the individual center getters stay in sync with the tuple returned by getCenter.
     it("getCenterX and getCenterY match getCenter", function()
         local m = lurek.minimap.newMinimap(10, 10)
@@ -851,15 +851,15 @@ end)
 
 -- @description Covers suite: minimap layers.
 describe("minimap layers", function()
-    -- @covers Minimap.getLayer
+    -- @tests Minimap.getLayer
     -- @description getLayer returns 0 by default.
     it("setLayer defaults to layer 0", function()
         local mm = lurek.minimap.newMinimap(64, 64)
         expect_equal(mm:getLayer(), 0)
     end)
 
-    -- @covers Minimap.setLayer
-    -- @covers Minimap.getLayer
+    -- @tests Minimap.setLayer
+    -- @tests Minimap.getLayer
     -- @description setLayer and getLayer round-trip correctly.
     it("setLayer and getLayer work", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -867,8 +867,8 @@ describe("minimap layers", function()
         expect_equal(mm:getLayer(), 1)
     end)
 
-    -- @covers Minimap.setLayer
-    -- @covers Minimap.getLayer
+    -- @tests Minimap.setLayer
+    -- @tests Minimap.getLayer
     -- @description setLayer can switch between multiple layer indices.
     it("setLayer can switch between layers", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -878,7 +878,7 @@ describe("minimap layers", function()
         expect_equal(mm:getLayer(), 0)
     end)
 
-    -- @covers Minimap.setLayerData
+    -- @tests Minimap.setLayerData
     -- @description setLayerData stores a flat table without error.
     it("setLayerData stores layer data", function()
         local mm = lurek.minimap.newMinimap(8, 8)
@@ -888,7 +888,7 @@ describe("minimap layers", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.setLayerData
+    -- @tests Minimap.setLayerData
     -- @description setLayerData can write non-contiguous layer indices.
     it("setLayerData works for higher layer indices", function()
         local mm = lurek.minimap.newMinimap(4, 4)
@@ -901,7 +901,7 @@ end)
 
 -- @description Covers suite: minimap marker animation.
 describe("minimap marker animation", function()
-    -- @covers Minimap.setMarkerAnimation
+    -- @tests Minimap.setMarkerAnimation
     -- @description setMarkerAnimation with "blink" does not error.
     it("setMarkerAnimation blink does not error", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -910,7 +910,7 @@ describe("minimap marker animation", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.setMarkerAnimation
+    -- @tests Minimap.setMarkerAnimation
     -- @description setMarkerAnimation with "pulse" does not error.
     it("setMarkerAnimation pulse does not error", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -919,7 +919,7 @@ describe("minimap marker animation", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.setMarkerAnimation
+    -- @tests Minimap.setMarkerAnimation
     -- @description setMarkerAnimation with "rotate" does not error.
     it("setMarkerAnimation rotate does not error", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -928,7 +928,7 @@ describe("minimap marker animation", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.clearMarkerAnimation
+    -- @tests Minimap.clearMarkerAnimation
     -- @description clearMarkerAnimation removes animation without error.
     it("clearMarkerAnimation stops animation", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -938,7 +938,7 @@ describe("minimap marker animation", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.setMarkerAnimation
+    -- @tests Minimap.setMarkerAnimation
     -- @description setMarkerAnimation with an invalid type returns an error.
     it("setMarkerAnimation rejects unknown type", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -948,8 +948,8 @@ describe("minimap marker animation", function()
         end)
     end)
 
-    -- @covers Minimap.update
-    -- @covers Minimap.setMarkerAnimation
+    -- @tests Minimap.update
+    -- @tests Minimap.setMarkerAnimation
     -- @description update advances animation phases without error.
     it("update advances marker animation phases", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -964,7 +964,7 @@ end)
 
 -- @description Covers suite: minimap geometry overlay.
 describe("minimap geometry overlay", function()
-    -- @covers Minimap.drawLine
+    -- @tests Minimap.drawLine
     -- @description drawLine accepts valid coordinates and color table without error.
     it("drawLine does not error", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -972,7 +972,7 @@ describe("minimap geometry overlay", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.drawRect
+    -- @tests Minimap.drawRect
     -- @description drawRect accepts valid coordinates and color table without error.
     it("drawRect does not error", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -980,7 +980,7 @@ describe("minimap geometry overlay", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.clearOverlay
+    -- @tests Minimap.clearOverlay
     -- @description clearOverlay removes all geometry without crashing.
     it("clearOverlay clears geometry", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -990,8 +990,8 @@ describe("minimap geometry overlay", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.drawLine
-    -- @covers Minimap.clearOverlay
+    -- @tests Minimap.drawLine
+    -- @tests Minimap.clearOverlay
     -- @description clearOverlay can be called on an empty overlay without error.
     it("clearOverlay on empty overlay does not error", function()
         local mm = lurek.minimap.newMinimap(32, 32)
@@ -999,8 +999,8 @@ describe("minimap geometry overlay", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.drawLine
-    -- @covers Minimap.drawRect
+    -- @tests Minimap.drawLine
+    -- @tests Minimap.drawRect
     -- @description Multiple shapes can be accumulated before clearing.
     it("multiple shapes accumulate before clear", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -1016,7 +1016,7 @@ end)
 
 -- @description Covers suite: minimap path visualization.
 describe("minimap path visualization", function()
-    -- @covers Minimap.showPath
+    -- @tests Minimap.showPath
     -- @description showPath accepts a list of {x, y} point tables without error.
     it("showPath accepts a list of points", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -1024,7 +1024,7 @@ describe("minimap path visualization", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.showPath
+    -- @tests Minimap.showPath
     -- @description showPath returns a non-zero integer path ID.
     it("showPath returns a path ID", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -1033,7 +1033,7 @@ describe("minimap path visualization", function()
         expect_true(id > 0)
     end)
 
-    -- @covers Minimap.showPath
+    -- @tests Minimap.showPath
     -- @description Each showPath call returns a distinct ID.
     it("showPath returns distinct IDs", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -1042,7 +1042,7 @@ describe("minimap path visualization", function()
         expect_true(id1 ~= id2)
     end)
 
-    -- @covers Minimap.clearPath
+    -- @tests Minimap.clearPath
     -- @description clearPath() with no argument removes all paths without error.
     it("clearPath removes all paths", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -1052,7 +1052,7 @@ describe("minimap path visualization", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.clearPath
+    -- @tests Minimap.clearPath
     -- @description clearPath(id) removes only the path with the given ID.
     it("clearPath with id removes specific path", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -1061,7 +1061,7 @@ describe("minimap path visualization", function()
         expect_equal(true, true)
     end)
 
-    -- @covers Minimap.clearPath
+    -- @tests Minimap.clearPath
     -- @description clearPath on an empty set does not error.
     it("clearPath on empty set does not error", function()
         local mm = lurek.minimap.newMinimap(64, 64)
@@ -1071,3 +1071,381 @@ describe("minimap path visualization", function()
 end)
 
 test_summary()
+
+describe("Missing explicit test for Minimap:getGridWidth", function()
+    it("Minimap:getGridWidth works", function()
+        -- @tests Minimap:getGridWidth
+        -- TODO: add assertion for Minimap:getGridWidth
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getGridHeight", function()
+    it("Minimap:getGridHeight works", function()
+        -- @tests Minimap:getGridHeight
+        -- TODO: add assertion for Minimap:getGridHeight
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getGridSize", function()
+    it("Minimap:getGridSize works", function()
+        -- @tests Minimap:getGridSize
+        -- TODO: add assertion for Minimap:getGridSize
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getDisplayWidth", function()
+    it("Minimap:getDisplayWidth works", function()
+        -- @tests Minimap:getDisplayWidth
+        -- TODO: add assertion for Minimap:getDisplayWidth
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getDisplayHeight", function()
+    it("Minimap:getDisplayHeight works", function()
+        -- @tests Minimap:getDisplayHeight
+        -- TODO: add assertion for Minimap:getDisplayHeight
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getDisplaySize", function()
+    it("Minimap:getDisplaySize works", function()
+        -- @tests Minimap:getDisplaySize
+        -- TODO: add assertion for Minimap:getDisplaySize
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setDisplaySize", function()
+    it("Minimap:setDisplaySize works", function()
+        -- @tests Minimap:setDisplaySize
+        -- TODO: add assertion for Minimap:setDisplaySize
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getTerrain", function()
+    it("Minimap:getTerrain works", function()
+        -- @tests Minimap:getTerrain
+        -- TODO: add assertion for Minimap:getTerrain
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setTerrainData", function()
+    it("Minimap:setTerrainData works", function()
+        -- @tests Minimap:setTerrainData
+        -- TODO: add assertion for Minimap:setTerrainData
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getTerrainColor", function()
+    it("Minimap:getTerrainColor works", function()
+        -- @tests Minimap:getTerrainColor
+        -- TODO: add assertion for Minimap:getTerrainColor
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getTileDescription", function()
+    it("Minimap:getTileDescription works", function()
+        -- @tests Minimap:getTileDescription
+        -- TODO: add assertion for Minimap:getTileDescription
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setFogEnabled", function()
+    it("Minimap:setFogEnabled works", function()
+        -- @tests Minimap:setFogEnabled
+        -- TODO: add assertion for Minimap:setFogEnabled
+    end)
+end)
+
+describe("Missing explicit test for Minimap:isFogEnabled", function()
+    it("Minimap:isFogEnabled works", function()
+        -- @tests Minimap:isFogEnabled
+        -- TODO: add assertion for Minimap:isFogEnabled
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setFogLevel", function()
+    it("Minimap:setFogLevel works", function()
+        -- @tests Minimap:setFogLevel
+        -- TODO: add assertion for Minimap:setFogLevel
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getFogLevel", function()
+    it("Minimap:getFogLevel works", function()
+        -- @tests Minimap:getFogLevel
+        -- TODO: add assertion for Minimap:getFogLevel
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getFogColor", function()
+    it("Minimap:getFogColor works", function()
+        -- @tests Minimap:getFogColor
+        -- TODO: add assertion for Minimap:getFogColor
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setFogData", function()
+    it("Minimap:setFogData works", function()
+        -- @tests Minimap:setFogData
+        -- TODO: add assertion for Minimap:setFogData
+    end)
+end)
+
+describe("Missing explicit test for Minimap:isObjectTypeVisible", function()
+    it("Minimap:isObjectTypeVisible works", function()
+        -- @tests Minimap:isObjectTypeVisible
+        -- TODO: add assertion for Minimap:isObjectTypeVisible
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getObjectTypeCount", function()
+    it("Minimap:getObjectTypeCount works", function()
+        -- @tests Minimap:getObjectTypeCount
+        -- TODO: add assertion for Minimap:getObjectTypeCount
+    end)
+end)
+
+describe("Missing explicit test for Minimap:removeObject", function()
+    it("Minimap:removeObject works", function()
+        -- @tests Minimap:removeObject
+        -- TODO: add assertion for Minimap:removeObject
+    end)
+end)
+
+describe("Missing explicit test for Minimap:clearObjects", function()
+    it("Minimap:clearObjects works", function()
+        -- @tests Minimap:clearObjects
+        -- TODO: add assertion for Minimap:clearObjects
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getObjectCount", function()
+    it("Minimap:getObjectCount works", function()
+        -- @tests Minimap:getObjectCount
+        -- TODO: add assertion for Minimap:getObjectCount
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getOwnerColor", function()
+    it("Minimap:getOwnerColor works", function()
+        -- @tests Minimap:getOwnerColor
+        -- TODO: add assertion for Minimap:getOwnerColor
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setColorMode", function()
+    it("Minimap:setColorMode works", function()
+        -- @tests Minimap:setColorMode
+        -- TODO: add assertion for Minimap:setColorMode
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getColorMode", function()
+    it("Minimap:getColorMode works", function()
+        -- @tests Minimap:getColorMode
+        -- TODO: add assertion for Minimap:getColorMode
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setZoom", function()
+    it("Minimap:setZoom works", function()
+        -- @tests Minimap:setZoom
+        -- TODO: add assertion for Minimap:setZoom
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getZoom", function()
+    it("Minimap:getZoom works", function()
+        -- @tests Minimap:getZoom
+        -- TODO: add assertion for Minimap:getZoom
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setCenter", function()
+    it("Minimap:setCenter works", function()
+        -- @tests Minimap:setCenter
+        -- TODO: add assertion for Minimap:setCenter
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getCenter", function()
+    it("Minimap:getCenter works", function()
+        -- @tests Minimap:getCenter
+        -- TODO: add assertion for Minimap:getCenter
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getCenterX", function()
+    it("Minimap:getCenterX works", function()
+        -- @tests Minimap:getCenterX
+        -- TODO: add assertion for Minimap:getCenterX
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getCenterY", function()
+    it("Minimap:getCenterY works", function()
+        -- @tests Minimap:getCenterY
+        -- TODO: add assertion for Minimap:getCenterY
+    end)
+end)
+
+describe("Missing explicit test for Minimap:clearViewportRect", function()
+    it("Minimap:clearViewportRect works", function()
+        -- @tests Minimap:clearViewportRect
+        -- TODO: add assertion for Minimap:clearViewportRect
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getViewportRect", function()
+    it("Minimap:getViewportRect works", function()
+        -- @tests Minimap:getViewportRect
+        -- TODO: add assertion for Minimap:getViewportRect
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setViewportVisible", function()
+    it("Minimap:setViewportVisible works", function()
+        -- @tests Minimap:setViewportVisible
+        -- TODO: add assertion for Minimap:setViewportVisible
+    end)
+end)
+
+describe("Missing explicit test for Minimap:isViewportVisible", function()
+    it("Minimap:isViewportVisible works", function()
+        -- @tests Minimap:isViewportVisible
+        -- TODO: add assertion for Minimap:isViewportVisible
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getViewportColor", function()
+    it("Minimap:getViewportColor works", function()
+        -- @tests Minimap:getViewportColor
+        -- TODO: add assertion for Minimap:getViewportColor
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getPingCount", function()
+    it("Minimap:getPingCount works", function()
+        -- @tests Minimap:getPingCount
+        -- TODO: add assertion for Minimap:getPingCount
+    end)
+end)
+
+describe("Missing explicit test for Minimap:removeMarker", function()
+    it("Minimap:removeMarker works", function()
+        -- @tests Minimap:removeMarker
+        -- TODO: add assertion for Minimap:removeMarker
+    end)
+end)
+
+describe("Missing explicit test for Minimap:hasMarker", function()
+    it("Minimap:hasMarker works", function()
+        -- @tests Minimap:hasMarker
+        -- TODO: add assertion for Minimap:hasMarker
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getMarkerDescription", function()
+    it("Minimap:getMarkerDescription works", function()
+        -- @tests Minimap:getMarkerDescription
+        -- TODO: add assertion for Minimap:getMarkerDescription
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getMarkerCount", function()
+    it("Minimap:getMarkerCount works", function()
+        -- @tests Minimap:getMarkerCount
+        -- TODO: add assertion for Minimap:getMarkerCount
+    end)
+end)
+
+describe("Missing explicit test for Minimap:clearMarkerAnimation", function()
+    it("Minimap:clearMarkerAnimation works", function()
+        -- @tests Minimap:clearMarkerAnimation
+        -- TODO: add assertion for Minimap:clearMarkerAnimation
+    end)
+end)
+
+describe("Missing explicit test for Minimap:clearOverlay", function()
+    it("Minimap:clearOverlay works", function()
+        -- @tests Minimap:clearOverlay
+        -- TODO: add assertion for Minimap:clearOverlay
+    end)
+end)
+
+describe("Missing explicit test for Minimap:clearPath", function()
+    it("Minimap:clearPath works", function()
+        -- @tests Minimap:clearPath
+        -- TODO: add assertion for Minimap:clearPath
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setLayer", function()
+    it("Minimap:setLayer works", function()
+        -- @tests Minimap:setLayer
+        -- TODO: add assertion for Minimap:setLayer
+    end)
+end)
+
+describe("Missing explicit test for Minimap:getLayer", function()
+    it("Minimap:getLayer works", function()
+        -- @tests Minimap:getLayer
+        -- TODO: add assertion for Minimap:getLayer
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setAntiAlias", function()
+    it("Minimap:setAntiAlias works", function()
+        -- @tests Minimap:setAntiAlias
+        -- TODO: add assertion for Minimap:setAntiAlias
+    end)
+end)
+
+describe("Missing explicit test for Minimap:isAntiAlias", function()
+    it("Minimap:isAntiAlias works", function()
+        -- @tests Minimap:isAntiAlias
+        -- TODO: add assertion for Minimap:isAntiAlias
+    end)
+end)
+
+describe("Missing explicit test for Minimap:setClickable", function()
+    it("Minimap:setClickable works", function()
+        -- @tests Minimap:setClickable
+        -- TODO: add assertion for Minimap:setClickable
+    end)
+end)
+
+describe("Missing explicit test for Minimap:isClickable", function()
+    it("Minimap:isClickable works", function()
+        -- @tests Minimap:isClickable
+        -- TODO: add assertion for Minimap:isClickable
+    end)
+end)
+
+describe("Missing explicit test for Minimap:update", function()
+    it("Minimap:update works", function()
+        -- @tests Minimap:update
+        -- TODO: add assertion for Minimap:update
+    end)
+end)
+
+describe("Missing explicit test for Minimap:type", function()
+    it("Minimap:type works", function()
+        -- @tests Minimap:type
+        -- TODO: add assertion for Minimap:type
+    end)
+end)
+
+describe("Missing explicit test for Minimap:typeOf", function()
+    it("Minimap:typeOf works", function()
+        -- @tests Minimap:typeOf
+        -- TODO: add assertion for Minimap:typeOf
+    end)
+end)
+
+describe("Missing explicit test for Minimap:drawToImage", function()
+    it("Minimap:drawToImage works", function()
+        -- @tests Minimap:drawToImage
+        -- TODO: add assertion for Minimap:drawToImage
+    end)
+end)

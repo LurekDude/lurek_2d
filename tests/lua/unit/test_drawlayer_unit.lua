@@ -4,14 +4,14 @@
 
 -- @description Covers suite: DrawLayer creation.
 describe("DrawLayer creation", function()
-    -- @covers lurek.render.newDrawLayer
+    -- @tests lurek.render.newDrawLayer
     -- @description Verifies the draw-layer constructor returns userdata.
     it("creates a DrawLayer via lurek.render.newDrawLayer()", function()
         local layer = lurek.render.newDrawLayer()
         expect_type("userdata", layer)
     end)
 
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.getCount
     -- @description Verifies new draw layers start with an empty queue.
     it("starts with count 0", function()
         local layer = lurek.render.newDrawLayer()
@@ -22,8 +22,8 @@ end)
 -- -------------------------------------------------------------------
 -- @description Covers suite: DrawLayer queue.
 describe("DrawLayer queue", function()
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.getCount
     -- @description Verifies queueing callbacks increments the pending draw-call count.
     it("queuing increases count", function()
         local layer = lurek.render.newDrawLayer()
@@ -33,8 +33,8 @@ describe("DrawLayer queue", function()
         expect_equal(2, layer:getCount())
     end)
 
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.getCount
     -- @description Verifies negative depth values are accepted for back-to-front ordering.
     it("queue accepts negative z-order", function()
         local layer = lurek.render.newDrawLayer()
@@ -42,8 +42,8 @@ describe("DrawLayer queue", function()
         expect_equal(1, layer:getCount())
     end)
 
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.getCount
     -- @description Verifies zero depth is treated as a valid queue key.
     it("queue accepts zero z-order", function()
         local layer = lurek.render.newDrawLayer()
@@ -55,8 +55,8 @@ end)
 -- -------------------------------------------------------------------
 -- @description Covers suite: DrawLayer flush.
 describe("DrawLayer flush", function()
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.flush
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.flush
     -- @description Verifies flush executes queued callbacks in ascending z-order.
     it("flush calls callbacks in z-order (ascending)", function()
         local layer = lurek.render.newDrawLayer()
@@ -71,8 +71,8 @@ describe("DrawLayer flush", function()
         expect_equal("C", order[3])
     end)
 
-    -- @covers DrawLayer.flush
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.flush
+    -- @tests DrawLayer.getCount
     -- @description Verifies flush drains the queue after running callbacks.
     it("flush empties the queue", function()
         local layer = lurek.render.newDrawLayer()
@@ -83,8 +83,8 @@ describe("DrawLayer flush", function()
         expect_equal(0, layer:getCount())
     end)
 
-    -- @covers DrawLayer.flush
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.flush
+    -- @tests DrawLayer.getCount
     -- @description Verifies flushing an empty layer is a safe no-op.
     it("flush on empty layer is a no-op", function()
         local layer = lurek.render.newDrawLayer()
@@ -92,8 +92,8 @@ describe("DrawLayer flush", function()
         expect_equal(0, layer:getCount())
     end)
 
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.flush
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.flush
     -- @description Verifies sort order handles negative, zero, and positive z-values consistently.
     it("flush handles negative z-orders correctly", function()
         local layer = lurek.render.newDrawLayer()
@@ -107,8 +107,8 @@ describe("DrawLayer flush", function()
         expect_equal("pos", order[3])
     end)
 
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.flush
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.flush
     -- @description Verifies equal z-values still execute every callback exactly once.
     it("flush handles equal z-orders (stable-ish)", function()
         local layer = lurek.render.newDrawLayer()
@@ -124,8 +124,8 @@ end)
 -- -------------------------------------------------------------------
 -- @description Covers suite: DrawLayer clear.
 describe("DrawLayer clear", function()
-    -- @covers DrawLayer.clear
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.clear
+    -- @tests DrawLayer.getCount
     -- @description Verifies clear drops all queued callbacks immediately.
     it("clear removes all queued entries", function()
         local layer = lurek.render.newDrawLayer()
@@ -137,8 +137,8 @@ describe("DrawLayer clear", function()
         expect_equal(0, layer:getCount())
     end)
 
-    -- @covers DrawLayer.clear
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.clear
+    -- @tests DrawLayer.getCount
     -- @description Verifies clear is safe on an already empty layer.
     it("clear on empty layer is safe", function()
         local layer = lurek.render.newDrawLayer()
@@ -146,8 +146,8 @@ describe("DrawLayer clear", function()
         expect_equal(0, layer:getCount())
     end)
 
-    -- @covers DrawLayer.clear
-    -- @covers DrawLayer.flush
+    -- @tests DrawLayer.clear
+    -- @tests DrawLayer.flush
     -- @description Verifies callbacks removed by clear are not later executed by flush.
     it("cleared callbacks are not called on flush", function()
         local layer = lurek.render.newDrawLayer()
@@ -162,9 +162,9 @@ end)
 -- -------------------------------------------------------------------
 -- @description Covers suite: DrawLayer reuse.
 describe("DrawLayer reuse", function()
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.flush
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.flush
+    -- @tests DrawLayer.getCount
     -- @description Verifies a layer can accept new work after a flush cycle completes.
     it("layer can be reused after flush", function()
         local layer = lurek.render.newDrawLayer()
@@ -175,9 +175,9 @@ describe("DrawLayer reuse", function()
         expect_equal(1, layer:getCount())
     end)
 
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.clear
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.clear
+    -- @tests DrawLayer.getCount
     -- @description Verifies a layer can be reused after being cleared.
     it("layer can be reused after clear", function()
         local layer = lurek.render.newDrawLayer()
@@ -187,8 +187,8 @@ describe("DrawLayer reuse", function()
         expect_equal(1, layer:getCount())
     end)
 
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.flush
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.flush
     -- @description Verifies multiple flush cycles preserve correct ordering across reused queue state.
     it("multiple flush cycles work correctly", function()
         local layer = lurek.render.newDrawLayer()
@@ -211,28 +211,28 @@ end)
 -- -------------------------------------------------------------------
 -- @description Covers suite: DrawLayer type system.
 describe("DrawLayer type system", function()
-    -- @covers DrawLayer.type
+    -- @tests DrawLayer.type
     -- @description Verifies DrawLayer userdata reports its concrete type string.
     it("has type() method returning DrawLayer", function()
         local layer = lurek.render.newDrawLayer()
         expect_equal("DrawLayer", layer:type())
     end)
 
-    -- @covers DrawLayer.typeOf
+    -- @tests DrawLayer.typeOf
     -- @description Verifies DrawLayer advertises Object ancestry through typeOf.
     it("typeOf Object returns true", function()
         local layer = lurek.render.newDrawLayer()
         expect_equal(true, layer:typeOf("Object"))
     end)
 
-    -- @covers DrawLayer.typeOf
+    -- @tests DrawLayer.typeOf
     -- @description Verifies DrawLayer recognizes its own runtime type name.
     it("typeOf DrawLayer returns true", function()
         local layer = lurek.render.newDrawLayer()
         expect_equal(true, layer:typeOf("DrawLayer"))
     end)
 
-    -- @covers DrawLayer.typeOf
+    -- @tests DrawLayer.typeOf
     -- @description Verifies typeOf rejects unrelated type names.
     it("typeOf wrong type returns false", function()
         local layer = lurek.render.newDrawLayer()
@@ -243,9 +243,9 @@ end)
 -- -------------------------------------------------------------------
 -- @description Covers suite: DrawLayer large queue.
 describe("DrawLayer large queue", function()
-    -- @covers DrawLayer.queue
-    -- @covers DrawLayer.flush
-    -- @covers DrawLayer.getCount
+    -- @tests DrawLayer.queue
+    -- @tests DrawLayer.flush
+    -- @tests DrawLayer.getCount
     -- @description Verifies the queue handles a large batch and executes every callback exactly once.
     it("handles many entries", function()
         local layer = lurek.render.newDrawLayer()

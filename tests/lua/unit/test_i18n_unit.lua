@@ -4,32 +4,32 @@
 -- setLanguage, getLanguages, fallbacks, t(), hasKey, getKeys, setKey,
 -- interpolate, pluralFor, onChange/offChange, keyCount, categories,
 -- keysInCategory, search, buildIndex/searchIndexed, mergeLocale.
--- @covers lurek.i18n.loadTable
--- @covers lurek.i18n.unloadTable
--- @covers lurek.i18n.setLanguage
--- @covers lurek.i18n.getLanguage
--- @covers lurek.i18n.getLanguages
--- @covers lurek.i18n.getAvailableLanguages
--- @covers lurek.i18n.hasLanguage
--- @covers lurek.i18n.setFallbacks
--- @covers lurek.i18n.getFallbacks
--- @covers lurek.i18n.setBase
--- @covers lurek.i18n.getBase
--- @covers lurek.i18n.t
--- @covers lurek.i18n.hasKey
--- @covers lurek.i18n.getKeys
--- @covers lurek.i18n.setKey
--- @covers lurek.i18n.interpolate
--- @covers lurek.i18n.pluralFor
--- @covers lurek.i18n.onChange
--- @covers lurek.i18n.offChange
--- @covers lurek.i18n.keyCount
--- @covers lurek.i18n.categories
--- @covers lurek.i18n.keysInCategory
--- @covers lurek.i18n.search
--- @covers lurek.i18n.buildIndex
--- @covers lurek.i18n.searchIndexed
--- @covers lurek.i18n.mergeLocale
+-- @tests lurek.i18n.loadTable
+-- @tests lurek.i18n.unloadTable
+-- @tests lurek.i18n.setLanguage
+-- @tests lurek.i18n.getLanguage
+-- @tests lurek.i18n.getLanguages
+-- @tests lurek.i18n.getAvailableLanguages
+-- @tests lurek.i18n.hasLanguage
+-- @tests lurek.i18n.setFallbacks
+-- @tests lurek.i18n.getFallbacks
+-- @tests lurek.i18n.setBase
+-- @tests lurek.i18n.getBase
+-- @tests lurek.i18n.t
+-- @tests lurek.i18n.hasKey
+-- @tests lurek.i18n.getKeys
+-- @tests lurek.i18n.setKey
+-- @tests lurek.i18n.interpolate
+-- @tests lurek.i18n.pluralFor
+-- @tests lurek.i18n.onChange
+-- @tests lurek.i18n.offChange
+-- @tests lurek.i18n.keyCount
+-- @tests lurek.i18n.categories
+-- @tests lurek.i18n.keysInCategory
+-- @tests lurek.i18n.search
+-- @tests lurek.i18n.buildIndex
+-- @tests lurek.i18n.searchIndexed
+-- @tests lurek.i18n.mergeLocale
 
 local en = {
     greeting = "Hello",
@@ -433,27 +433,27 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.i18n.onLanguageChange
+    -- @tests lurek.i18n.onLanguageChange
     it("covers lurek.i18n.onLanguageChange", function()
         -- TODO: Implement test for lurek.i18n.onLanguageChange
     end)
 
-    -- @covers lurek.i18n.formatNumber
+    -- @tests lurek.i18n.formatNumber
     it("covers lurek.i18n.formatNumber", function()
         -- TODO: Implement test for lurek.i18n.formatNumber
     end)
 
-    -- @covers lurek.i18n.formatDate
+    -- @tests lurek.i18n.formatDate
     it("covers lurek.i18n.formatDate", function()
         -- TODO: Implement test for lurek.i18n.formatDate
     end)
 
-    -- @covers lurek.i18n.tGender
+    -- @tests lurek.i18n.tGender
     it("covers lurek.i18n.tGender", function()
         -- TODO: Implement test for lurek.i18n.tGender
     end)
 
-    -- @covers lurek.i18n.getLoadedLocales
+    -- @tests lurek.i18n.getLoadedLocales
     it("covers lurek.i18n.getLoadedLocales", function()
         -- TODO: Implement test for lurek.i18n.getLoadedLocales
     end)
