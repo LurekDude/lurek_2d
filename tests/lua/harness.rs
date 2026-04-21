@@ -136,11 +136,6 @@ fn lua_test_window() {
 }
 
 #[test]
-fn lua_test_runtime_platform() {
-    run_lua_test("unit/test_runtime_platform.lua");
-}
-
-#[test]
 fn lua_test_render() {
     run_lua_test("unit/test_render.lua");
 }
@@ -299,11 +294,6 @@ fn lua_test_audio_stereo() {}
 fn lua_test_audio_offline() {}
 
 #[test]
-fn lua_test_physics_collision() {
-    run_lua_test("unit/test_physics_collision.lua");
-}
-
-#[test]
 fn lua_test_compute() {
     run_lua_test("unit/test_compute.lua");
 }
@@ -348,34 +338,11 @@ fn lua_test_pathfind() {
 fn lua_test_unit_pathfind_bidirectional() {}
 
 #[test]
-fn lua_test_event_signal() {
-    run_lua_test("unit/test_event_signal.lua");
-}
-
-#[test]
 fn lua_test_patterns() {
     run_lua_test("unit/test_patterns.lua");
 }
 
-#[test]
-fn lua_test_pathfind_regress_zero_index() {
-    run_lua_test("unit/test_pathfind_regress_zero_index.lua");
-}
 
-#[test]
-fn lua_test_tilemap_regress_zero_index() {
-    run_lua_test("unit/test_tilemap_regress_zero_index.lua");
-}
-
-#[test]
-fn lua_test_patterns_regress_acquire_borrow() {
-    run_lua_test("unit/test_patterns_regress_acquire_borrow.lua");
-}
-
-#[test]
-fn lua_test_ecs_regress_relationship_default() {
-    run_lua_test("unit/test_ecs_regress_relationship_default.lua");
-}
 
 #[test]
 fn lua_test_light() {
@@ -501,11 +468,6 @@ fn lua_test_thread() {
 
 #[test]
 fn lua_test_thread_new_features() {}
-
-#[test]
-fn lua_test_render_pipeline() {
-    run_lua_test("unit/test_render_pipeline.lua");
-}
 
 #[test]
 fn lua_test_save() {
@@ -650,17 +612,7 @@ fn lua_test_parallax_depth() {}
 fn lua_test_parallax_blend() {}
 
 #[test]
-fn lua_test_effect_postfx() {
-    run_lua_test("unit/test_effect_postfx.lua");
-}
-
-#[test]
 fn lua_test_image_effect() {}
-
-#[test]
-fn lua_test_effect_overlay() {
-    run_lua_test("unit/test_effect_overlay.lua");
-}
 
 #[test]
 fn lua_test_scene() {
@@ -931,11 +883,6 @@ fn lua_test_terminal() {
 
 #[test]
 fn lua_test_terminal_ansi_completion() {}
-
-#[test]
-fn lua_test_effect_api() {
-    run_lua_test("unit/test_effect_api.lua");
-}
 
 #[test]
 fn lua_test_effect_dedup() {}
@@ -1780,3 +1727,114 @@ fn lua_test_integration_image_dataframe() {
 fn lua_test_integration_animation_tween() {
     run_lua_test("integration/test_animation_tween.lua");
 }
+
+// ─── Demo content tests ───────────────────────────────────────────────────────
+// Static-analysis + headless-load tests for content/games/ demos.
+// These run in the headless Lua VM (no GPU) and catch:
+//   - Wrong callback names (lurek.load instead of lurek.init etc.)
+//   - Banned API calls (lurek.input.isDown, old namespaces, etc.)
+//   - Syntax / load errors (dofile fails)
+//
+// For binary screenshot tests that require a real display, see:
+//   cargo test --test demo_smoke_tests -- --include-ignored
+
+#[test]
+fn lua_demo_globe_demo() {
+    run_lua_test("content/demos/test_globe_demo.lua");
+}
+
+#[test]
+fn lua_demo_hello_world() {
+    run_lua_test("content/demos/test_hello_world.lua");
+}
+
+#[test]
+fn lua_demo_sprites() {
+    run_lua_test("content/demos/test_sprites.lua");
+}
+
+#[test]
+fn lua_demo_particles_demo() {
+    run_lua_test("content/demos/test_particles_demo.lua");
+}
+
+#[test]
+fn lua_demo_tween_demo() {
+    run_lua_test("content/demos/test_tween_demo.lua");
+}
+
+#[test]
+fn lua_demo_scene_demo() {
+    run_lua_test("content/demos/test_scene_demo.lua");
+}
+
+#[test]
+fn lua_demo_postfx_demo() {
+    run_lua_test("content/demos/test_postfx_demo.lua");
+}
+
+#[test]
+fn lua_demo_minimap_demo() {
+    run_lua_test("content/demos/test_minimap_demo.lua");
+}
+
+#[test]
+fn lua_demo_light_demo() {
+    run_lua_test("content/demos/test_light_demo.lua");
+}
+
+#[test]
+fn lua_demo_demo_game() {
+    run_lua_test("content/demos/test_demo_game.lua");
+}
+
+#[test]
+fn lua_demo_pong() {
+    run_lua_test("content/demos/test_pong.lua");
+}
+
+#[test]
+fn lua_demo_snake() {
+    run_lua_test("content/demos/test_snake.lua");
+}
+
+#[test]
+fn lua_demo_tetris() {
+    run_lua_test("content/demos/test_tetris.lua");
+}
+
+#[test]
+fn lua_demo_pac_man() {
+    run_lua_test("content/demos/test_pac_man.lua");
+}
+
+#[test]
+fn lua_demo_asteroids() {
+    run_lua_test("content/demos/test_asteroids.lua");
+}
+
+#[test]
+fn lua_demo_physics_demo() {
+    run_lua_test("content/demos/test_physics_demo.lua");
+}
+
+#[test]
+fn lua_demo_physics_sandbox() {
+    run_lua_test("content/demos/test_physics_sandbox.lua");
+}
+
+#[test]
+fn lua_demo_platformer() {
+    run_lua_test("content/demos/test_platformer.lua");
+}
+
+#[test]
+fn lua_demo_brick_breaker() {
+    run_lua_test("content/demos/test_brick_breaker.lua");
+}
+
+#[test]
+fn lua_demo_tower_defense() {
+    run_lua_test("content/demos/test_tower_defense.lua");
+}
+

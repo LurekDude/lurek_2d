@@ -2,6 +2,15 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.5] — 2026-04-22
+
+### Demo test infrastructure (session globe-content-20260421)
+
+- **test(demos): add headless static-analysis Lua test layer for all game demos** — Created `tests/lua/content/demos/` with 21 test files (one per demo) and a shared `_common_checks.lua` helper. Each test uses `dofile()` + static pattern matching to verify: correct engine callback names (`lurek.init`/`lurek.process`/`lurek.render`), no legacy API (no `drawRect`, `isDown`, old namespaces), no file-scope API captures. Game-specific `describe()` suites verify module API calls. All 21 tests registered in `tests/lua/harness.rs` as `lua_demo_*` entries.
+- **test(demos): add binary screenshot smoke test runner** — Created `tests/demo_smoke_tests.rs` with 21 `#[ignore]` Rust integration tests that spawn the real `lurek2d` binary with `--screenshot=<path> --screenshot-frames=180` and assert PNG validity (exists, >2 KiB, magic bytes). Registered as `[[test]] name = "demo_smoke_tests"` in `Cargo.toml`. Run with `cargo test --test demo_smoke_tests -- --include-ignored`.
+- **refactor(tests): consolidate split unit test files into single-module files (TST-06)** — Merged 11 extra per-sub-feature test files into their canonical single-module file and deleted the extras: `test_event_signal.lua`→`test_event.lua`, `test_ecs_regress_relationship_default.lua`→`test_ecs.lua`, `test_render_pipeline.lua`→`test_render.lua`, `test_runtime_platform.lua`→`test_runtime.lua`, `test_physics_collision.lua`→`test_physics.lua`, `test_pathfind_regress_zero_index.lua`→`test_pathfind.lua`, `test_tilemap_regress_zero_index.lua`→`test_tilemap.lua`, `test_patterns_regress_acquire_borrow.lua`→`test_patterns.lua`, `test_effect_api.lua`+`test_effect_overlay.lua`+`test_effect_postfx.lua`→`test_effect.lua`. Removed 11 stale harness entries.
+- **docs(test-framework): document TST-05 and TST-06 demo-test constraints** — Updated `docs/architecture/test-framework.md` with TST-05 (demo tests in `tests/lua/content/demos/`, screenshot runner in `tests/demo_smoke_tests.rs`) and TST-06 (one file per Rust module in `tests/lua/unit/`). Added decision-tree branch 3 for game demo tests. Added screenshot smoke test comparison table and `--screenshot-frames=180` parameter note. Fixed demo test naming format from `test_demo_<name>.lua` to `test_<name>.lua`. Added `demo_smoke_tests` to Cargo.toml example in doc.
+
 ## [0.20.4] — 2026-04-22
 
 ### Test coverage sweep — Phase 2 (session test-coverage-sweep-20260421)

@@ -58,7 +58,16 @@ Examples are not tested. They exist to document API usage and are not expected t
 
 ## Test placement
 
-Test placement is governed by binding constraints **TST-01** (Lua-first testing), **TST-02** (centralised Rust unit tests), **TST-03** (thin Lua API wrappers), and **TST-04** (thin `mod.rs`). See [philosophy.md § Testing Constraints](philosophy.md#testing-constraints) for the canonical text.
+Test placement is governed by binding constraints **TST-01** through **TST-06**. See [philosophy.md § Testing Constraints](philosophy.md#testing-constraints) for the canonical text.
+
+| Constraint | Rule |
+|---|---|
+| **TST-01** | Lua-first: behaviour reachable via `lurek.*` must be tested in Lua. |
+| **TST-02** | Rust unit tests are centralised in `tests/rust/unit/` — no inline `#[cfg(test)]` in `src/`. |
+| **TST-03** | `src/lua_api/*_api.rs` holds only `impl LuaUserData`, registration, and conversions. |
+| **TST-04** | `mod.rs` holds only `pub mod`, `pub use`, attributes, and doc comments. |
+| **TST-05** | Demo/game tests: headless Lua tests live in `tests/lua/content/demos/` (one file per demo, name `test_<name>.lua`); binary screenshot tests live in `tests/demo_smoke_tests.rs` (`#[ignore]`). Never put demo tests in `tests/lua/unit/`. |
+| **TST-06** | `tests/lua/unit/` has exactly **one file per Rust module**. No split files per sub-feature (`test_event_signal.lua`, `test_effect_overlay.lua`, etc. are all banned). |
 
 > **Migration note (2026-04-20).** This project previously tolerated inline `#[cfg(test)] mod tests` blocks inside `src/**/*.rs` for private-helper coverage. That recommendation is **superseded by TST-02**, effective 2026-04-20. Existing inline blocks are tracked for relocation under session [`testing-cleanup-20260420`](../../work/testing-cleanup-20260420/reports/plan.md); no new inline blocks are accepted.
 
@@ -70,7 +79,10 @@ Test placement is governed by binding constraints **TST-01** (Lua-first testing)
 2. **Otherwise, is it a pure internal helper** — private module, `pub(crate)` surface, free function, or algorithm with no Lua exposure?
    → Write a **Rust unit test** under [`tests/rust/unit/<module>_tests.rs`](../../tests/rust/unit/). Register the binary in `Cargo.toml` if the file is new. This is **TST-02**; inline `#[cfg(test)]` blocks inside `src/` are banned.
 
-3. **Anything else** — integration across Rust + Lua, golden snapshot comparisons, stress / throughput runs, evidence artefact production, config loading, sandbox probes — goes in the existing `tests/rust/` or `tests/lua/` subfolder for that concern (see [Directory Layout](#directory-layout)). The subfolder choice is unchanged by TST-01..TST-04.
+3. **Is it a test of a game demo in `content/games/`?**
+   → Write a **headless Lua test** under [`tests/lua/content/demos/test_<name>.lua`](../../tests/lua/content/demos/) using static analysis + `dofile()`. This is **TST-05**. Additionally, add a `#[ignore]` binary screenshot test to [`tests/demo_smoke_tests.rs`](../../tests/demo_smoke_tests.rs) for GPU-rendered validation. Do NOT put demo tests in `tests/lua/unit/`.
+
+4. **Anything else** — integration across Rust + Lua, golden snapshot comparisons, stress / throughput runs, evidence artefact production, config loading, sandbox probes — goes in the existing `tests/rust/` or `tests/lua/` subfolder for that concern (see [Directory Layout](#directory-layout)). The subfolder choice is unchanged by TST-01..TST-06.
 
 If both branch 1 and branch 2 appear to apply, choose branch 1 (Lua-first). Promote private helpers to `pub(crate)` and cover them through the Lua surface unless there is a specific reason they are Rust-only.
 
@@ -82,6 +94,8 @@ The following are rejected at code review and by the audit scripts below:
 - **Business logic in `src/lua_api/*_api.rs`** — loops beyond argument unpacking, arithmetic beyond type conversion, branching on game state, state machines. Violates **TST-03**. Move the logic to `src/<module>/*.rs` as a pure-Rust function exposed crate-publicly, then call it from the thin wrapper.
 - **`fn`, `struct`, `enum`, `trait`, or `impl` definitions in any `mod.rs`** — violates **TST-04**. Move to a sibling file (`facade.rs`, `register.rs`, `types.rs`, or similar). `mod.rs` keeps only `pub mod X;`, `pub use X::*;`, module-level `#![...]` attributes, and doc comments.
 - **Duplicating a `lurek.*`-reachable test in Rust** — violates **TST-01**. Delete the Rust duplicate; keep the Lua test as the source of truth.
+- **Demo tests in `tests/lua/unit/`** — violates **TST-05**. Demo tests belong in `tests/lua/content/demos/`.
+- **Split per-sub-feature test files** (e.g. `test_effect_overlay.lua` alongside `test_effect.lua`) — violates **TST-06**. Merge into the single canonical `test_<module>.lua` file.
 
 ### Enforcement — audit scripts
 
@@ -269,12 +283,15 @@ tests/
     ├── config/                      Configuration loading tests
     │   └── test_config.lua
     │
-    └── content/demos/                       One test file per demo in content/demos/
-        │   Rule: every demo in content/demos/ must have a corresponding file here.
-        │   Name format: test_demo_<name>.lua
-        ├── test_demo_hello_world.lua
-        ├── test_demo_physics_demo.lua
-        ├── test_demo_sprites.lua
+    └── content/demos/                       One test file per demo in content/games/
+        │   Rule: every game demo must have exactly one test here (TST-05)
+        │   Name format: test_<name>.lua
+        │   Shared helper: _common_checks.lua  (static analysis + dofile load)
+        ├── _common_checks.lua
+        ├── test_globe_demo.lua
+        ├── test_hello_world.lua
+        ├── test_physics_demo.lua
+        ├── test_sprites.lua
         └── ...
 ```
 
@@ -294,7 +311,44 @@ path = "tests/rust/golden/harness.rs"
 [[test]]
 name = "lua_tests"
 path = "tests/lua/harness.rs"
+
+[[test]]
+name = "demo_smoke_tests"
+path = "tests/demo_smoke_tests.rs"
 ```
+
+### Demo Screenshot Smoke Tests
+
+`tests/demo_smoke_tests.rs` is a Rust integration test that **spawns the real `lurek2d` binary** with `--screenshot=<abs_path> --screenshot-frames=180` and asserts the output PNG is valid.
+
+All functions in this file are `#[ignore]` by default so they do not run in normal `cargo test`. They require a pre-built binary and a real display (GPU + window).
+
+Run with:
+```bash
+# All demo screenshot tests:
+cargo test --test demo_smoke_tests -- --include-ignored
+
+# Single demo:
+cargo test --test demo_smoke_tests demo_smoke_globe_demo -- --include-ignored
+```
+
+The screenshot is written to `<demo_dir>/screenshot_smoke.png` (relative to repo root). Each test:
+1. Deletes any stale `screenshot_smoke.png` from a previous run.
+2. Spawns `lurek2d <demo_abs_path> --screenshot=<abs_path> --screenshot-frames=180`.
+3. Waits up to 45 seconds for the binary to exit (the engine exits automatically after capturing).
+4. Asserts the PNG exists, is > 2 KiB, and starts with the PNG magic bytes `\x89PNG`.
+
+**Key parameters:** `--screenshot-frames=180` = 3 seconds at 60 FPS. The engine saves the screenshot and requests shutdown after the Nth rendered frame.
+
+### Demo Lua Tests vs Screenshot Tests
+
+| Concern | Lua test (`tests/lua/content/demos/`) | Screenshot test (`tests/demo_smoke_tests.rs`) |
+|---|---|---|
+| Runs in headless VM? | ✅ Yes | ❌ No — needs real GPU |
+| Runs in CI by default? | ✅ Yes | ❌ No (`#[ignore]`) |
+| Catches wrong callback names? | ✅ Via static analysis | ❌ Not specifically |
+| Catches crash at frame 180? | ❌ No — headless only | ✅ Yes |
+| Verifies rendered output? | ❌ No | ✅ PNG magic bytes + size check |
 
 ### tests/rust/game/ — Retired
 
@@ -380,7 +434,7 @@ All Lua tests use a custom BDD framework defined in `tests/lua/init.lua`. This f
 | **Security** | `tests/lua/security/` | Sandboxing + input validation | Nil spam, path traversal, bad types |
 | **Golden** | `tests/lua/golden/` | Deterministic output comparison | Compare against saved reference data |
 | **Config** | `tests/lua/config/` | Configuration loading | TOML keys, defaults, missing fields |
-| **Demos** | `tests/lua/content/demos/` | One file per demo in `content/demos/` | Name: `test_demo_<name>.lua` |
+| **Demos** | `tests/lua/content/demos/` | One file per demo in `content/games/` | Name: `test_<name>.lua`; shared: `_common_checks.lua` |
 
 ### Framework API
 
