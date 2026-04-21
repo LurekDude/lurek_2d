@@ -1238,6 +1238,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|_, ()| Ok(LuaDataFrame::new(DataFrame::new())))?,
     )?;
 
+    // -- new --
+    /// Alias for `newDataFrame`. Creates a new empty DataFrame.
+    /// @return DataFrame
+    tbl.set(
+        "new",
+        lua.create_function(|_, ()| Ok(LuaDataFrame::new(DataFrame::new())))?,
+    )?;
+
     // -- newDatabase --
     /// Creates a new empty Database.
     /// @return Database

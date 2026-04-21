@@ -1659,29 +1659,29 @@ describe("lurek.math Vec2 fromAngle and reflect", function()
   -- @covers lurek.math.Vec2.fromAngle
   -- @description fromAngle(0) points in the +X direction.
   it("fromAngle(0) returns unit +X", function()
-    local v = lurek.math.Vec2.fromAngle(0)
+    local v = lurek.math.vec2(0, 0).fromAngle(0)
     expect_near(1.0, v.x, 1e-5)
     expect_near(0.0, v.y, 1e-5)
   end)
   -- @covers lurek.math.Vec2.fromAngle
   -- @description fromAngle(pi/2) points in the +Y direction.
   it("fromAngle(pi/2) returns unit +Y", function()
-    local v = lurek.math.Vec2.fromAngle(math.pi / 2)
+    local v = lurek.math.vec2(0, 0).fromAngle(math.pi / 2)
     expect_near(0.0, v.x, 1e-5)
     expect_near(1.0, v.y, 1e-5)
   end)
   -- @covers lurek.math.Vec2.fromAngle
   -- @description result has unit length.
   it("fromAngle result is unit length", function()
-    local v = lurek.math.Vec2.fromAngle(1.23)
+    local v = lurek.math.vec2(0, 0).fromAngle(1.23)
     local len = math.sqrt(v.x * v.x + v.y * v.y)
     expect_near(1.0, len, 1e-5)
   end)
   -- @covers lurek.math.Vec2.reflect
   -- @description reflecting (1,-1) off a horizontal normal (0,1) gives (1,1).
   it("reflect off horizontal normal", function()
-    local v = lurek.math.Vec2.new(1, -1)
-    local n = lurek.math.Vec2.new(0, 1)
+    local v = lurek.math.Vec2(1, -1)
+    local n = lurek.math.Vec2(0, 1)
     local r = v:reflect(n)
     expect_near(1.0, r.x, 1e-5)
     expect_near(1.0, r.y, 1e-5)
@@ -1689,8 +1689,8 @@ describe("lurek.math Vec2 fromAngle and reflect", function()
   -- @covers lurek.math.Vec2.reflect
   -- @description reflecting a vector along its normal returns the negative vector.
   it("reflect parallel to normal flips sign", function()
-    local v = lurek.math.Vec2.new(0, -1)
-    local n = lurek.math.Vec2.new(0, 1)
+    local v = lurek.math.Vec2(0, -1)
+    local n = lurek.math.Vec2(0, 1)
     local r = v:reflect(n)
     expect_near(0.0, r.x, 1e-5)
     expect_near(1.0, r.y, 1e-5)

@@ -448,6 +448,30 @@ impl ImageData {
         self.pixels.clone()
     }
 
+    /// Replace all pixel data from a raw RGBA byte slice.
+    ///
+    /// The slice length must equal `width * height * 4`.  Returns `Err` with a
+    /// descriptive message if the length does not match; on success the pixel
+    /// buffer is replaced in-place.
+    ///
+    /// # Parameters
+    /// - `bytes` — raw RGBA8 bytes.
+    ///
+    /// # Returns
+    /// `Result<(), String>`.
+    pub fn set_raw_data(&mut self, bytes: &[u8]) -> Result<(), String> {
+        let expected = (self.width * self.height * 4) as usize;
+        if bytes.len() != expected {
+            return Err(format!(
+                "setRawData: expected {} bytes for {}x{} RGBA image, got {}",
+                expected, self.width, self.height, bytes.len()
+            ));
+        }
+        self.pixels.clear();
+        self.pixels.extend_from_slice(bytes);
+        Ok(())
+    }
+
     /// Apply a per-pixel transform in parallel for large images.
     ///
     /// # Returns

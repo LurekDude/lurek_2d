@@ -971,6 +971,34 @@ impl mlua::UserData for ImageData {
             lut.inner.apply(this);
             Ok(())
         });
+
+        // -- setRawData --
+        /// Replaces all pixel data from a raw RGBA byte string.
+        /// The string length must equal `width * height * 4`.
+        ///
+        /// @param bytes : string
+        /// @return nil
+        methods.add_method_mut("setRawData", |_, this, bytes: LuaString| {
+            this.set_raw_data(bytes.as_bytes())
+                .map_err(LuaError::RuntimeError)
+        });
+
+        // -- paste --
+        /// Copies pixels from `source` onto this image starting at (dx, dy).
+        /// Pixels that fall outside the destination bounds are clipped.
+        ///
+        /// @param source : ImageData
+        /// @param dx : integer
+        /// @param dy : integer
+        /// @return nil
+        methods.add_method_mut(
+            "paste",
+            |_, this, (src_ud, dx, dy): (LuaAnyUserData, u32, u32)| {
+                let src = src_ud.borrow::<ImageData>()?;
+                this.paste(&src, dx, dy);
+                Ok(())
+            },
+        );
     }
 }
 

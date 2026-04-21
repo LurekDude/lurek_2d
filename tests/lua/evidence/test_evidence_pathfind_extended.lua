@@ -97,7 +97,7 @@ end)
 -- @description Covers suite: Evidence: lurek.pathfind FlowField.
 describe("Evidence: lurek.pathfind FlowField", function()
     -- @evidence file
-    -- @covers FlowField:compute
+    -- @covers FlowField:calculate
     -- @covers FlowField:getDirection
     -- @covers lurek.pathfind.newFlowField
     -- @description Visually outputs a grid map encoding obstacles, free tiles, and the generated path finding vectors via getDirection calls to show a robust global flow navigation visual.
@@ -110,7 +110,7 @@ describe("Evidence: lurek.pathfind FlowField", function()
         for x = 8, 16 do grid:setBlocked(x, 8, true) end
 
         local ff = lurek.pathfind.newFlowField(grid, W, H)
-        ff:compute(16, 16)
+        ff:calculate(16, 16)
 
         local scale = 12
         local img = lurek.image.newImageData(W * scale, H * scale)

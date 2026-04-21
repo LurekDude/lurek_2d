@@ -452,13 +452,12 @@ impl LuaUserData for LuaBlendLayerSet {
         );
 
         // -- removeLayer --
-        /// Removes a blend layer by name.
+        /// Removes a blend layer by name. No-op if the layer does not exist.
         /// @param name : string
         /// @return boolean
         methods.add_method_mut("removeLayer", |_, this, name: String| {
-            this.inner
-                .remove_layer(&name)
-                .map_err(LuaError::RuntimeError)?;
+            // Silently ignore "not found" — resilient scripting.
+            let _ = this.inner.remove_layer(&name);
             Ok(true)
         });
 

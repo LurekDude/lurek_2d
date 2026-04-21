@@ -736,6 +736,37 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // -- mkdir --
+    /// Creates a directory (and any missing parents) relative to the game root.
+    /// Unlike `createDirectory`, this is not restricted to `save/`.
+    /// Mainly useful for evidence test output folders.
+    /// @param path : string
+    /// @return nil
+    let s = state.clone();
+    tbl.set(
+        "mkdir",
+        lua.create_function(move |_, path: String| {
+            let abs = s.borrow().fs.base_dir().join(&path);
+            std::fs::create_dir_all(&abs).map_err(|e| {
+                LuaError::RuntimeError(format!("mkdir '{}': {}", path, e))
+            })
+        })?,
+    )?;
+
+    // -- toAbsolutePath --
+    /// Resolves a path relative to the game root to an absolute OS path string.
+    /// Useful when passing paths to Lua's `io.open`.
+    /// @param path : string
+    /// @return string
+    let s = state.clone();
+    tbl.set(
+        "toAbsolutePath",
+        lua.create_function(move |_, path: String| {
+            let abs = s.borrow().fs.base_dir().join(&path);
+            Ok(abs.to_string_lossy().to_string())
+        })?,
+    )?;
+
     luna.set("filesystem", tbl)?;
     Ok(())
 }

@@ -1751,6 +1751,45 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- simplex --
+    /// Alias for `simplex2d`. Returns 2D Simplex noise at (x, y).
+    /// @param x : number
+    /// @param y : number
+    /// @param seed : integer?
+    /// @return number
+    tbl.set(
+        "simplex",
+        lua.create_function(|_, (x, y, seed): (f32, f32, Option<u32>)| {
+            Ok(noise_functions::simplex2d(x, y, seed.unwrap_or(0)))
+        })?,
+    )?;
+
+    // -- perlin --
+    /// Returns 2D Perlin noise in [-1, 1].
+    /// @param x : number
+    /// @param y : number
+    /// @param seed : integer?
+    /// @return number
+    tbl.set(
+        "perlin",
+        lua.create_function(|_, (x, y, seed): (f32, f32, Option<u32>)| {
+            Ok(noise_functions::perlin2d(x, y, seed.unwrap_or(0)))
+        })?,
+    )?;
+
+    // -- perlinFast --
+    /// Alias for `perlin`. Returns 2D Perlin noise in [-1, 1].
+    /// @param x : number
+    /// @param y : number
+    /// @param seed : integer?
+    /// @return number
+    tbl.set(
+        "perlinFast",
+        lua.create_function(|_, (x, y, seed): (f32, f32, Option<u32>)| {
+            Ok(noise_functions::perlin2d(x, y, seed.unwrap_or(0)))
+        })?,
+    )?;
+
     // -- fbm --
     /// Returns fractal Brownian motion noise at (x, y).
     /// @param x : number

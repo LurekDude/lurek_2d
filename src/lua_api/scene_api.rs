@@ -775,6 +775,24 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // `lurek.scene.newScene(def)` — alias for `new`.
+    /// Alias for `lurek.scene.new`. Creates a scene instance from a methods table.
+    /// @param def : table?
+    /// @return table
+    tbl.set(
+        "newScene",
+        lua.create_function(|lua, def: Option<LuaTable>| {
+            let def = match def {
+                Some(t) => t,
+                None => lua.create_table()?,
+            };
+            def.set("__index", def.clone())?;
+            let instance: LuaTable = lua.create_table()?;
+            instance.set_metatable(Some(def));
+            Ok(instance)
+        })?,
+    )?;
+
     // `lurek.scene.define(def)` — creates a reusable scene class (callable constructor).
     // The definition table is stored in the Lua registry so the returned constructor
     // closure can access it across multiple calls without holding a borrow.
