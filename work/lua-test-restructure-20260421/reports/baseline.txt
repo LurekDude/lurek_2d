@@ -1,0 +1,124 @@
+# Phase 0 Baseline — Lua Test Restructure
+
+Generated: 2026-04-21 (branch `refactor/src-migration-v2`)
+
+## Lua test file counts per layer
+
+(from `work/lua-test-restructure-20260421/data/inventory.json`)
+
+| Layer       | Files | Test cases |
+|-------------|------:|-----------:|
+| config      |     2 |         31 |
+| evidence    |    53 |        264 |
+| golden      |    22 |         60 |
+| integration |    64 |        441 |
+| library     |    21 |       1289 |
+| security    |     8 |         94 |
+| stress      |    33 |        141 |
+| unit        |    55 |       4843 |
+| **total**   | **258** |  **7163** |
+
+## `cargo test --test lua_tests`
+
+Command: `cargo test --test lua_tests`
+Full log: `work/lua-test-restructure-20260421/data/cargo_test_baseline.txt`
+
+- Test binary result: **FAILED** (exit 101)
+- libtest summary (line 5010): `test result: FAILED. 251 passed; 115 failed; 7 ignored; 0 measured; 0 filtered out; finished in 43.01s`
+
+**RISK:** branch is red. 115 `#[test]` fns in `tests/lua/harness.rs` currently fail. Failures are pre-existing on `refactor/src-migration-v2`; Phase 0 does not touch code. Phases 1–15 must not regress the *passing* subset (251 green); they are not required to turn the reds green.
+
+## `cargo clippy --all-targets -- -D warnings`
+
+Command: `cargo clippy --all-targets -- -D warnings`
+Full log: `work/lua-test-restructure-20260421/data/cargo_clippy_baseline.txt`
+
+- Result: **FAILED** — `could not compile lurek2d (lib) due to 75 previous errors`
+- Non-test build warnings promoted to errors by `-D warnings`.
+- Pre-existing on branch. Phase 0 records but does NOT fix.
+
+**RISK:** no clippy-clean baseline available. The Reviewer at Phase 15 must decide whether the restructure PR requires a green clippy run or merely "no new clippy violations introduced by the restructured files." Recommend the latter — track against this baseline.
+
+## Harness function counts
+
+(from `tests/lua/harness.rs`, via `work/lua-test-restructure-20260421/data/harness_counts.txt`)
+
+- `#[test]` attribute occurrences: **374**
+- Empty-body `#[test]` stubs (body is `{}` or only `//` comments): **94**
+
+The empty stubs are the placeholder entries slated for deletion in Phase 11 per `DECISIONS.md` §6.
+
+## `conf.lua` references
+
+Command: `rg conf\.lua src/ docs/` (equivalent Select-String on `.rs`, `.md`, `.toml`).
+Raw list: `work/lua-test-restructure-20260421/data/conf_lua_refs.txt` (103 matches)
+
+Top files:
+
+```
+ 22  src/runtime/config.rs
+  8  src/app/app.rs
+  7  docs/architecture/engine-architecture.md
+  6  docs/wiki/Architecture.md
+  6  docs/API/rust-api.md
+  5  docs/architecture/plugins.md
+  4  docs/wiki/Project-Structure.md
+  4  docs/specs/runtime.md
+  3  docs/architecture/vscode-architecture.md
+  3  src/runtime/cfg/messages.toml
+  3  src/runtime/IDEA.md
+  3  docs/handbook.md
+  3  docs/wiki/Configuration.md
+  3  src/runtime/log_messages.rs
+  2  src/runtime/error.rs
+  2  docs/wiki/Callbacks.md
+  2  docs/CHANGELOG.md
+  2  docs/wiki/Home.md
+  2  src/lua_api/register.rs
+  1  docs/wiki/Network-API.md
+```
+
+Plus further scattered single-hit references (total 103). Configurator (Phase 1) owns removal of the Lua `conf.lua` fallback and the associated Rust paths in `src/runtime/config.rs` + `src/app/app.rs` + `src/lua_api/register.rs`; doc sweep of the remaining refs in `docs/**` is Phase 13 (Doc-Writer).
+
+## Duplicate-module files (Phase 3–8 merge inputs)
+
+(from `work/lua-test-restructure-20260421/data/duplicate_groups.txt`)
+
+Groups whose filenames share a module prefix within a layer **and** need collapsing to a single `test_<module>_<layer>.lua`:
+
+**Evidence (Phases 3–5) — 9 mergeable module groups, 25 files folding to 9:**
+- `audio` ×6 (audio + bus + dsp + offline + visualizer + waves)
+- `effect` ×3 (overlay + postfx + types)
+- `image` ×3 (image + drawing + effects)
+- `imagedata` ×2 (imagedata + effects)
+- `pathfind` ×2 (pathfind + extended)
+- `physics` ×4 (physics + debug_gpu + ext + zone_debug)
+- `raycaster` ×2 (raycaster + ext)
+- `render` ×3 (drawing + draw_cmds + graphics) — **plus** `test_terrain_render_evidence.lua` merges here (per DECISIONS §2)
+- residual re-home: `combined`, `misc`, `migrated_15`, `migrated_20`, `golden_text_outputs` (5 files, split per-module)
+
+**Golden (Phase 6) — 2 mergeable groups + residual:**
+- `pathfind` ×2 (pathfind + pathfind_grid)
+- residual: `migrated_15`, `migrated_20`, `migrated_rust`, `misc` (4 files, split per module → data, serial, math, etc.)
+
+**Stress (Phase 8) — 4 mergeable module groups, 11 files folding to 4:**
+- `data` ×2 (data + compression)
+- `ecs` ×2 (ecs + bulk_spawn)
+- `physics` ×5 (physics + cellular + collision + terrain + zones)
+- `scene` ×2 (scene + depth_sort)
+
+**Security (Phase 7) — 8 files, rename-by-module + split fuzz:**
+- Rename: `sandbox`+`mount_traversal` → `filesystem`; `network_security` → `network`; `save_validation` → `save`; `toml_validation` → `runtime`.
+- Split: `api_fuzz`, `fuzz_boundary`, `invalid_args` → per-module files (no `fuzz` bucket — DECISIONS §4).
+
+**Integration (Phase 10) — pairwise files are legitimate** (each file = one module-pair). No merging; Phase 10 adds the 10 new pairs per DECISIONS §5.
+
+**Unit (Phase 9) — no module-prefix duplicates detected.** 55 files already at ~1-per-module. Phase 9 audit only checks for sub-feature splits inside a single module.
+
+**Library (no restructure) — 21 files, one per Lunasome library, already conformant.**
+
+**Totals:** 31 layer-module groups with >1 file (incl. legit integration pairs); **excluding integration pairs and library, 15 groups / ~44 files need merging**, plus 11 residual-bucket files need re-homing (see `duplicate_groups.txt`).
+
+## Files touched in Phase 0
+
+None under `tests/lua/`, `src/`, or `docs/`. Phase 0 is read-only.

@@ -1,0 +1,53 @@
+Per-layer module-prefix groups with >1 file:
+[evidence]
+  audio: 6  -> ['test_audio_bus_evidence.lua', 'test_audio_dsp_evidence.lua', 'test_audio_evidence.lua', 'test_audio_offline_evidence.lua', 'test_audio_visualizer_evidence.lua', 'test_audio_waves_evidence.lua']
+  effect: 3  -> ['test_effect_overlay_evidence.lua', 'test_effect_postfx_evidence.lua', 'test_effect_types_evidence.lua']
+  image: 3  -> ['test_image_drawing_evidence.lua', 'test_image_effects_evidence.lua', 'test_image_evidence.lua']
+  imagedata: 2  -> ['test_imagedata_effects_evidence.lua', 'test_imagedata_evidence.lua']
+  migrated: 2  -> ['test_migrated_15_evidence.lua', 'test_migrated_20_evidence.lua']
+  pathfind: 2  -> ['test_pathfind_evidence.lua', 'test_pathfind_extended_evidence.lua']
+  physics: 4  -> ['test_physics_debug_gpu_evidence.lua', 'test_physics_evidence.lua', 'test_physics_ext_evidence.lua', 'test_physics_zone_debug_evidence.lua']
+  raycaster: 2  -> ['test_raycaster_evidence.lua', 'test_raycaster_ext_evidence.lua']
+  render: 3  -> ['test_render_draw_cmds_evidence.lua', 'test_render_drawing_evidence.lua', 'test_render_graphics_evidence.lua']
+[golden]
+  migrated: 3  -> ['test_migrated_15_golden.lua', 'test_migrated_20_golden.lua', 'test_migrated_rust_golden.lua']
+  pathfind: 2  -> ['test_pathfind_golden.lua', 'test_pathfind_golden_grid.lua']
+[integration]
+  ai: 3  -> ['test_ai_ecs_scene.lua', 'test_ai_pathfind.lua', 'test_ai_physics.lua']
+  animation: 2  -> ['test_animation_timer.lua', 'test_animation_tween.lua']
+  audio: 2  -> ['test_audio_event.lua', 'test_audio_timer.lua']
+  data: 3  -> ['test_data_compute.lua', 'test_data_filesystem.lua', 'test_data_system.lua']
+  ecs: 3  -> ['test_ecs_ai.lua', 'test_ecs_physics.lua', 'test_ecs_render.lua']
+  math: 3  -> ['test_math_pathfind.lua', 'test_math_physics.lua', 'test_math_render.lua']
+  pathfind: 4  -> ['test_pathfind_ai.lua', 'test_pathfind_ecs.lua', 'test_pathfind_graph.lua', 'test_pathfind_hexmap.lua']
+  physics: 6  -> ['test_physics_platformer.lua', 'test_physics_space.lua', 'test_physics_tanks.lua', 'test_physics_timer.lua', 'test_physics_world_sim.lua', 'test_physics_worms.lua']
+  procgen: 2  -> ['test_procgen_ai.lua', 'test_procgen_tilemap.lua']
+  render: 2  -> ['test_render_animation.lua', 'test_render_camera.lua']
+  save: 3  -> ['test_save_ecs.lua', 'test_save_ecs_scene.lua', 'test_save_tilemap.lua']
+  scene: 2  -> ['test_scene_camera.lua', 'test_scene_ecs.lua']
+  tilemap: 3  -> ['test_tilemap_camera.lua', 'test_tilemap_pathfind.lua', 'test_tilemap_physics.lua']
+  timer: 2  -> ['test_timer_event.lua', 'test_timer_math.lua']
+  tween: 3  -> ['test_tween_animation.lua', 'test_tween_camera.lua', 'test_tween_ecs.lua']
+[library]
+  library: 21  -> ['test_library_battle.lua', 'test_library_cardgame.lua', 'test_library_cinematic.lua', 'test_library_combat.lua', 'test_library_crafting.lua', 'test_library_dialog.lua', 'test_library_doll.lua', 'test_library_economy.lua', 'test_library_inventory.lua', 'test_library_item.lua', 'test_library_lobby.lua', 'test_library_loot.lua', 'test_library_narrative.lua', 'test_library_netstate.lua', 'test_library_patterns.lua', 'test_library_province_map.lua', 'test_library_quest.lua', 'test_library_rhythm.lua', 'test_library_roguelike.lua', 'test_library_rpc.lua', 'test_library_stats.lua']
+[stress]
+  data: 2  -> ['test_data_compression_stress.lua', 'test_data_stress.lua']
+  ecs: 2  -> ['test_ecs_bulk_spawn.lua', 'test_ecs_stress.lua']
+  physics: 5  -> ['test_physics_cellular_stress.lua', 'test_physics_collision_stress.lua', 'test_physics_stress.lua', 'test_physics_terrain_stress.lua', 'test_physics_zones_stress.lua']
+  scene: 2  -> ['test_scene_depth_sort.lua', 'test_scene_stress.lua']
+
+TOTAL dup groups: 31
+TOTAL files in dup groups: 107
+
+Residual-bucket files: 11
+  tests/lua/evidence/test_combined_evidence.lua
+  tests/lua/evidence/test_golden_text_outputs_evidence.lua
+  tests/lua/evidence/test_migrated_15_evidence.lua
+  tests/lua/evidence/test_migrated_20_evidence.lua
+  tests/lua/evidence/test_misc_evidence.lua
+  tests/lua/golden/test_migrated_15_golden.lua
+  tests/lua/golden/test_migrated_20_golden.lua
+  tests/lua/golden/test_migrated_rust_golden.lua
+  tests/lua/golden/test_misc_golden.lua
+  tests/lua/security/test_api_fuzz.lua
+  tests/lua/security/test_fuzz_boundary.lua

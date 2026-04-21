@@ -1,0 +1,15 @@
+# Phase 0 Summary — Lua Test Inventory Freeze
+
+- **Inventory captured:** 258 Lua test files across 8 layers holding **7 163** `it(...)` / `test(...)` cases (config 2 / evidence 53 / golden 22 / integration 64 / library 21 / security 8 / stress 33 / unit 55). Full data in `work/lua-test-restructure-20260421/data/inventory.json`; regenerate anytime with `python work/lua-test-restructure-20260421/scripts/build_inventory.py`.
+- **Baseline test state is RED** — `cargo test --test lua_tests` exits 101: **251 passed / 115 failed / 7 ignored** (log: `data/cargo_test_baseline.txt`). `cargo clippy --all-targets -- -D warnings` also fails with 75 errors (log: `data/cargo_clippy_baseline.txt`). Both are pre-existing on `refactor/src-migration-v2`; Phase 0 did not fix them.
+- **Harness scale:** `tests/lua/harness.rs` holds **374** `#[test]` functions, **94** of which have empty bodies — matches the Phase-11 deletion backlog from DECISIONS §6.
+- **Merge workload quantified:** 15 non-integration layer-module groups need collapsing (~44 files folding to 15) plus 11 residual-bucket files (`combined`/`misc`/`migrated_15`/`migrated_20`/`migrated_rust`/`golden_text_outputs`/`api_fuzz`/`fuzz_boundary`) needing per-module re-homing. Library layer (21) and integration layer (64 pairs) are already conformant. Breakdown in `reports/baseline.txt` "Duplicate-module files" section.
+- **`conf.lua` removal surface:** 103 references across `src/` + `docs/` (top: `src/runtime/config.rs`×22, `src/app/app.rs`×8, `src/lua_api/register.rs`×2). Configurator owns Phase 1 Rust removal; Doc-Writer mops up `docs/**` refs in Phase 13. Full list: `data/conf_lua_refs.txt`.
+
+## Risks for Manager before routing Phase 1
+
+1. **Red baseline.** The success criterion for Phases 1–14 must be "no regression of the **251 currently passing** `#[test]` functions" — not "all green", because the branch inherited 115 reds and 75 clippy errors unrelated to the restructure. Reviewer at Phase 15 should re-confirm this gate.
+2. **`conf.lua` surface is larger than expected** (103 refs, 3 `src/lua_api/register.rs` hits). Phase 1 Configurator scope should explicitly include `src/lua_api/register.rs` and `src/runtime/log_messages.rs`, not just `runtime/config.rs`.
+3. **Empty `#[test]` stubs (94) are ~25 % of harness entries.** Deleting them in Phase 11 removes ~94 spurious "passing" entries from the libtest count; the Phase 15 gate should read the delta against the 251-pass baseline *after* subtracting any reds they were masking (verify none of the 94 empties currently pass-with-no-assertions and get counted in the 251).
+4. **Integration layer is NOT a duplicate-merge target.** Naïve module-prefix grouping shows 14 "dup groups" in integration (e.g. `physics_*`×6) but those are legitimate module-pairs per DECISIONS §5 — Phase 10 adds 10 more pairs, does not merge.
+5. **`tests/lua/golden/test_migrated_rust_golden.lua` references samples under `tests/lua/golden/samples/migrated_rust/`** per repo memory. Phase 2's `tests/lua/golden/samples/` → `tests/samples/` relocation must carry this subtree and the existing memory-documented contract (compare-only, no prechecks).
