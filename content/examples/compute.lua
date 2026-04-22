@@ -1,480 +1,563 @@
 -- content/examples/compute.lua
--- love2d-style usage snippets for the lurek.compute API (67 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.compute API (67 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/compute_api.rs   (Lua binding, arg types, return shape)
+--   * src/compute/                 (semantics, side effects)
+--   * docs/specs/compute.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/compute.lua
 
 -- ── lurek.compute.* functions ──
 
 --@api-stub: lurek.compute.newArray
 -- Creates a zero-initialized array with the given shape and optional dtype.
--- Build once at startup; reuse across frames.
-local array = lurek.compute.newArray(shape, dtype)
-print("created", array)
-return array
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.newArray
+  local _todo = "TODO: write a real lurek.compute.newArray usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.zeros
 -- Creates a zero-filled array with the given shape and optional dtype.
--- See the module spec for detailed semantics.
-local result = lurek.compute.zeros(shape, dtype)
-print("zeros:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.zeros
+  local _todo = "TODO: write a real lurek.compute.zeros usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.ones
 -- Creates a one-filled array with the given shape and optional dtype.
--- See the module spec for detailed semantics.
-local result = lurek.compute.ones(shape, dtype)
-print("ones:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.ones
+  local _todo = "TODO: write a real lurek.compute.ones usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.range
 -- Creates a 1D array from start to stop with optional step and dtype.
--- See the module spec for detailed semantics.
-local result = lurek.compute.range(start, stop, step, dtype)
-print("range:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.range
+  local _todo = "TODO: write a real lurek.compute.range usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.fromTable
 -- Creates an array from a Lua table of numbers with optional shape and dtype.
--- Build once at startup; reuse across frames.
-local fromtable = lurek.compute.fromTable({ x = 0, y = 0 }, shape, dtype)
-print("created", fromtable)
-return fromtable
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.fromTable
+  local _todo = "TODO: write a real lurek.compute.fromTable usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.gaussianKernel
 -- Creates a sizeĂ—size Gaussian kernel array.
--- See the module spec for detailed semantics.
-local result = lurek.compute.gaussianKernel(10, sigma)
-print("gaussianKernel:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.gaussianKernel
+  local _todo = "TODO: write a real lurek.compute.gaussianKernel usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.rotate2dMatrix
 -- Creates a 2Ă—2 rotation matrix for the given angle in radians.
--- See the module spec for detailed semantics.
-local result = lurek.compute.rotate2dMatrix(angle_rad)
-print("rotate2dMatrix:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.rotate2dMatrix
+  local _todo = "TODO: write a real lurek.compute.rotate2dMatrix usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.affine2d
 -- Creates a 3Ă—3 homogeneous affine matrix.
--- See the module spec for detailed semantics.
-local result = lurek.compute.affine2d(tx, ty, angle_rad, sx, sy)
-print("affine2d:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.affine2d
+  local _todo = "TODO: write a real lurek.compute.affine2d usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.fft
 -- Computes the discrete Fourier transform of a 1D real-valued sample array.
--- See the module spec for detailed semantics.
-local result = lurek.compute.fft(samples)
-print("fft:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.fft
+  local _todo = "TODO: write a real lurek.compute.fft usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.ifft
 -- Computes the inverse discrete Fourier transform.
--- See the module spec for detailed semantics.
-local result = lurek.compute.ifft(freqs)
-print("ifft:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.ifft
+  local _todo = "TODO: write a real lurek.compute.ifft usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.compute.fftMagnitude
 -- Returns the magnitude spectrum `|X[k]|` of a real-valued sample array.
--- See the module spec for detailed semantics.
-local result = lurek.compute.fftMagnitude(samples)
-print("fftMagnitude:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: lurek.compute.fftMagnitude
+  local _todo = "TODO: write a real lurek.compute.fftMagnitude usage example"
+  print(_todo)
+end
 
 -- ── Array methods ──
 
 --@api-stub: Array:getShape
 -- Returns the shape as a table of dimension sizes.
--- Cheap to call; safe inside callbacks.
-local array = lurek.compute.newArray()  -- or your existing handle
-local value = array:getShape()
-print("Array:getShape ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:getShape
+  local _todo = "TODO: write a real Array:getShape usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:getDimensions
 -- Returns the number of dimensions.
--- Cheap to call; safe inside callbacks.
-local array = lurek.compute.newArray()  -- or your existing handle
-local value = array:getDimensions()
-print("Array:getDimensions ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:getDimensions
+  local _todo = "TODO: write a real Array:getDimensions usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:getSize
 -- Returns the total number of elements.
--- Cheap to call; safe inside callbacks.
-local array = lurek.compute.newArray()  -- or your existing handle
-local value = array:getSize()
-print("Array:getSize ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:getSize
+  local _todo = "TODO: write a real Array:getSize usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:getDataType
 -- Returns the element data type name.
--- Cheap to call; safe inside callbacks.
-local array = lurek.compute.newArray()  -- or your existing handle
-local value = array:getDataType()
-print("Array:getDataType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:getDataType
+  local _todo = "TODO: write a real Array:getDataType usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:isOnGPU
 -- Returns false (CPU arrays only).
--- Use as a guard inside lurek.update or event handlers.
-local array = lurek.compute.newArray()
-if array:isOnGPU() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:isOnGPU
+  local _todo = "TODO: write a real Array:isOnGPU usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:get
 -- Returns the element at the given 1-based indices.
--- Cheap to call; safe inside callbacks.
-local array = lurek.compute.newArray()  -- or your existing handle
-local value = array:get({ x = 0, y = 0 })
-print("Array:get ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:get
+  local _todo = "TODO: write a real Array:get usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:set
 -- Sets the element at the given 1-based indices to a value.
--- Apply at startup or in response to user input.
-local array = lurek.compute.newArray()
-array:set({ x = 0, y = 0 })
-print("Array:set applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:set
+  local _todo = "TODO: write a real Array:set usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:toTable
 -- Returns all elements as a flat table of numbers.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:toTable()
-print("Array:toTable done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:toTable
+  local _todo = "TODO: write a real Array:toTable usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:reshape
 -- Returns a new array with the given shape and the same data.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:reshape(shape)
-print("Array:reshape done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:reshape
+  local _todo = "TODO: write a real Array:reshape usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:clone
 -- Returns a deep copy of this array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:clone()
-print("Array:clone done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:clone
+  local _todo = "TODO: write a real Array:clone usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:transpose
 -- Returns the transposed 2D array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:transpose()
-print("Array:transpose done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:transpose
+  local _todo = "TODO: write a real Array:transpose usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:fill
 -- Fills all elements with the given value in-place.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:fill(val)
-print("Array:fill done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:fill
+  local _todo = "TODO: write a real Array:fill usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:pow
 -- Raises each element to a scalar exponent.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:pow(exp)
-print("Array:pow done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:pow
+  local _todo = "TODO: write a real Array:pow usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:sqrt
 -- Element-wise square root.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:sqrt()
-print("Array:sqrt done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:sqrt
+  local _todo = "TODO: write a real Array:sqrt usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:abs
 -- Element-wise absolute value.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:abs()
-print("Array:abs done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:abs
+  local _todo = "TODO: write a real Array:abs usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:neg
 -- Returns a new Array with every element negated (multiplied by â’1).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:neg()
-print("Array:neg done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:neg
+  local _todo = "TODO: write a real Array:neg usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:clamp
 -- Clamps each element to the given range.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:clamp(0, 100)
-print("Array:clamp done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:clamp
+  local _todo = "TODO: write a real Array:clamp usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:threshold
 -- Returns a mask array with 1.0 where elements >= val, else 0.0.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:threshold(val)
-print("Array:threshold done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:threshold
+  local _todo = "TODO: write a real Array:threshold usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:countNonZero
 -- Returns the count of nonzero elements.
--- Cheap to call; safe inside callbacks.
-local array = lurek.compute.newArray()  -- or your existing handle
-local value = array:countNonZero()
-print("Array:countNonZero ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:countNonZero
+  local _todo = "TODO: write a real Array:countNonZero usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:argmin
 -- Returns the 1-based flat index of the minimum element.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:argmin()
-print("Array:argmin done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:argmin
+  local _todo = "TODO: write a real Array:argmin usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:argmax
 -- Returns the 1-based flat index of the maximum element.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:argmax()
-print("Array:argmax done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:argmax
+  local _todo = "TODO: write a real Array:argmax usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:any
 -- Returns true if any element is nonzero.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:any()
-print("Array:any done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:any
+  local _todo = "TODO: write a real Array:any usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:all
 -- Returns true if all elements are nonzero.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:all()
-print("Array:all done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:all
+  local _todo = "TODO: write a real Array:all usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:sum
 -- Sum of all elements, or along an axis (1-based).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:sum(axis)
-print("Array:sum done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:sum
+  local _todo = "TODO: write a real Array:sum usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:mean
 -- Mean of all elements, or along an axis (1-based).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:mean(axis)
-print("Array:mean done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:mean
+  local _todo = "TODO: write a real Array:mean usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:min
 -- Minimum of all elements, or along an axis (1-based).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:min(axis)
-print("Array:min done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:min
+  local _todo = "TODO: write a real Array:min usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:max
 -- Maximum of all elements, or along an axis (1-based).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:max(axis)
-print("Array:max done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:max
+  local _todo = "TODO: write a real Array:max usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:matmul
 -- Matrix multiplication of two 2D arrays.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:matmul(other)
-print("Array:matmul done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:matmul
+  local _todo = "TODO: write a real Array:matmul usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:dot
 -- Dot product of two 1D arrays.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:dot(other)
-print("Array:dot done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:dot
+  local _todo = "TODO: write a real Array:dot usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:bitwiseAnd
 -- Bitwise AND of two Int32 arrays.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:bitwiseAnd(other)
-print("Array:bitwiseAnd done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:bitwiseAnd
+  local _todo = "TODO: write a real Array:bitwiseAnd usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:bitwiseOr
 -- Bitwise OR of two Int32 arrays.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:bitwiseOr(other)
-print("Array:bitwiseOr done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:bitwiseOr
+  local _todo = "TODO: write a real Array:bitwiseOr usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:bitwiseXor
 -- Bitwise XOR of two Int32 arrays.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:bitwiseXor(other)
-print("Array:bitwiseXor done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:bitwiseXor
+  local _todo = "TODO: write a real Array:bitwiseXor usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:bitwiseNot
 -- Bitwise NOT of an Int32 array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:bitwiseNot()
-print("Array:bitwiseNot done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:bitwiseNot
+  local _todo = "TODO: write a real Array:bitwiseNot usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:bitwiseLShift
 -- Bitwise left shift of an Int32 array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:bitwiseLShift(amount)
-print("Array:bitwiseLShift done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:bitwiseLShift
+  local _todo = "TODO: write a real Array:bitwiseLShift usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:bitwiseRShift
 -- Bitwise right shift of an Int32 array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:bitwiseRShift(amount)
-print("Array:bitwiseRShift done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:bitwiseRShift
+  local _todo = "TODO: write a real Array:bitwiseRShift usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:convolve2D
 -- 2D convolution with zero-padding.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:convolve2D(kernel)
-print("Array:convolve2D done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:convolve2D
+  local _todo = "TODO: write a real Array:convolve2D usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:dilate
 -- Morphological dilation with a diamond structuring element.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:dilate(radius)
-print("Array:dilate done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:dilate
+  local _todo = "TODO: write a real Array:dilate usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:erode
 -- Morphological erosion with a diamond structuring element.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:erode(radius)
-print("Array:erode done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:erode
+  local _todo = "TODO: write a real Array:erode usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:cumsum
 -- Cumulative sum of all elements (flattened).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:cumsum()
-print("Array:cumsum done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:cumsum
+  local _todo = "TODO: write a real Array:cumsum usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:diff
 -- Discrete difference applied `order` times.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:diff(order)
-print("Array:diff done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:diff
+  local _todo = "TODO: write a real Array:diff usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:percentile
 -- Compute the p-th percentile (0â€“100).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:percentile(p)
-print("Array:percentile done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:percentile
+  local _todo = "TODO: write a real Array:percentile usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:covariance
 -- Population covariance with another 1D array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:covariance(other)
-print("Array:covariance done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:covariance
+  local _todo = "TODO: write a real Array:covariance usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:pearsonCorr
 -- Pearson correlation coefficient with another 1D array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:pearsonCorr(other)
-print("Array:pearsonCorr done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:pearsonCorr
+  local _todo = "TODO: write a real Array:pearsonCorr usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:normalizeRange
 -- Linearly rescale values to [out_min, out_max].
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:normalizeRange(lo, hi)
-print("Array:normalizeRange done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:normalizeRange
+  local _todo = "TODO: write a real Array:normalizeRange usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:zscore
 -- Standardise values to zero mean and unit variance.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:zscore()
-print("Array:zscore done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:zscore
+  local _todo = "TODO: write a real Array:zscore usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:convolve1d
 -- 1D convolution with a kernel array (full output).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:convolve1d(kernel)
-print("Array:convolve1d done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:convolve1d
+  local _todo = "TODO: write a real Array:convolve1d usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:correlate1d
 -- 1D cross-correlation with a template array (valid output).
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:correlate1d(template)
-print("Array:correlate1d done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:correlate1d
+  local _todo = "TODO: write a real Array:correlate1d usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:normalizeVec
 -- L2-normalise a 1D vector.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:normalizeVec()
-print("Array:normalizeVec done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:normalizeVec
+  local _todo = "TODO: write a real Array:normalizeVec usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:outer
 -- Outer product of two 1D vectors â†’ 2D array [m, n].
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:outer(other)
-print("Array:outer done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:outer
+  local _todo = "TODO: write a real Array:outer usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:cross2d
 -- Signed 2D cross product with another length-2 array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:cross2d(other)
-print("Array:cross2d done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:cross2d
+  local _todo = "TODO: write a real Array:cross2d usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:transformPoints
 -- Apply this 2Ă—2 or 3Ă—3 matrix to an [N,2] points array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:transformPoints(pts)
-print("Array:transformPoints done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:transformPoints
+  local _todo = "TODO: write a real Array:transformPoints usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:sobel
 -- Apply Sobel edge detection to a 2D array.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:sobel()
-print("Array:sobel done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:sobel
+  local _todo = "TODO: write a real Array:sobel usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:linsolve
 -- Solve AÂ·x = b where this array is A (square [n,n]) and b is a 1D vector.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:linsolve(0)
-print("Array:linsolve done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:linsolve
+  local _todo = "TODO: write a real Array:linsolve usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:luDecompose
 -- Decomposes this square matrix into L and U factors with partial pivoting.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:luDecompose()
-print("Array:luDecompose done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:luDecompose
+  local _todo = "TODO: write a real Array:luDecompose usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:type
 -- Returns the type name "Array".
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:type()
-print("Array:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:type
+  local _todo = "TODO: write a real Array:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Array:typeOf
 -- Returns true when the given name matches "Array" or a parent type.
--- See the module spec for detailed semantics.
-local array = lurek.compute.newArray()
-array:typeOf("main")
-print("Array:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/compute_api.rs and docs/specs/compute.md).
+do  -- TODO: Array:typeOf
+  local _todo = "TODO: write a real Array:typeOf usage example"
+  print(_todo)
+end
 

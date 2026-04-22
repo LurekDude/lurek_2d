@@ -1,822 +1,921 @@
 -- content/examples/graph.lua
--- love2d-style usage snippets for the lurek.graph API (111 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.graph API (111 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/graph_api.rs   (Lua binding, arg types, return shape)
+--   * src/graph/                 (semantics, side effects)
+--   * docs/specs/graph.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/graph.lua
 
 -- ── lurek.graph.* functions ──
 
 --@api-stub: lurek.graph.newGraph
 -- Creates a new empty directed graph for item flow simulation.
--- Build once at startup; reuse across frames.
-local graph = lurek.graph.newGraph()
-print("created", graph)
-return graph
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: lurek.graph.newGraph
+  local _todo = "TODO: write a real lurek.graph.newGraph usage example"
+  print(_todo)
+end
 
 -- ── GraphItem methods ──
 
 --@api-stub: GraphItem:getType
 -- Returns the item type string.
--- Cheap to call; safe inside callbacks.
-local graphItem = lurek.graph.newGraphItem()  -- or your existing handle
-local value = graphItem:getType()
-print("GraphItem:getType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:getType
+  local _todo = "TODO: write a real GraphItem:getType usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:setType
 -- Sets the item type string.
--- Apply at startup or in response to user input.
-local graphItem = lurek.graph.newGraphItem()
-graphItem:setType(t)
-print("GraphItem:setType applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:setType
+  local _todo = "TODO: write a real GraphItem:setType usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:getDecayTime
 -- Returns the decay time in seconds (-1 = immortal).
--- Cheap to call; safe inside callbacks.
-local graphItem = lurek.graph.newGraphItem()  -- or your existing handle
-local value = graphItem:getDecayTime()
-print("GraphItem:getDecayTime ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:getDecayTime
+  local _todo = "TODO: write a real GraphItem:getDecayTime usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:setDecayTime
 -- Sets the decay time in seconds (-1 = immortal).
--- Apply at startup or in response to user input.
-local graphItem = lurek.graph.newGraphItem()
-graphItem:setDecayTime(t)
-print("GraphItem:setDecayTime applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:setDecayTime
+  local _todo = "TODO: write a real GraphItem:setDecayTime usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:getRemainingLife
 -- Returns the remaining life in seconds.
--- Cheap to call; safe inside callbacks.
-local graphItem = lurek.graph.newGraphItem()  -- or your existing handle
-local value = graphItem:getRemainingLife()
-print("GraphItem:getRemainingLife ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:getRemainingLife
+  local _todo = "TODO: write a real GraphItem:getRemainingLife usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:isAlive
 -- Returns true if the item is alive.
--- Use as a guard inside lurek.update or event handlers.
-local graphItem = lurek.graph.newGraphItem()
-if graphItem:isAlive() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:isAlive
+  local _todo = "TODO: write a real GraphItem:isAlive usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:kill
 -- Marks this graph item as dead so it is removed on the next cleanup pass.
--- See the module spec for detailed semantics.
-local graphItem = lurek.graph.newGraphItem()
-graphItem:kill()
-print("GraphItem:kill done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:kill
+  local _todo = "TODO: write a real GraphItem:kill usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:getPriority
 -- Returns the item priority.
--- Cheap to call; safe inside callbacks.
-local graphItem = lurek.graph.newGraphItem()  -- or your existing handle
-local value = graphItem:getPriority()
-print("GraphItem:getPriority ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:getPriority
+  local _todo = "TODO: write a real GraphItem:getPriority usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:setPriority
 -- Sets the scheduling priority; higher values are processed before lower ones.
--- Apply at startup or in response to user input.
-local graphItem = lurek.graph.newGraphItem()
-graphItem:setPriority(p)
-print("GraphItem:setPriority applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:setPriority
+  local _todo = "TODO: write a real GraphItem:setPriority usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:getPosition
 -- Returns the item position: node userdata if at a node, (edge, progress).
--- Cheap to call; safe inside callbacks.
-local graphItem = lurek.graph.newGraphItem()  -- or your existing handle
-local value = graphItem:getPosition()
-print("GraphItem:getPosition ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:getPosition
+  local _todo = "TODO: write a real GraphItem:getPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local graphItem = lurek.graph.newGraphItem()
-graphItem:type()
-print("GraphItem:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:type
+  local _todo = "TODO: write a real GraphItem:type usage example"
+  print(_todo)
+end
 
 --@api-stub: GraphItem:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local graphItem = lurek.graph.newGraphItem()
-graphItem:typeOf("main")
-print("GraphItem:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: GraphItem:typeOf
+  local _todo = "TODO: write a real GraphItem:typeOf usage example"
+  print(_todo)
+end
 
 -- ── Edge methods ──
 
 --@api-stub: Edge:getType
 -- Returns the edge type string.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getType()
-print("Edge:getType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getType
+  local _todo = "TODO: write a real Edge:getType usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setType
 -- Sets the edge type string.
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setType(t)
-print("Edge:setType applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setType
+  local _todo = "TODO: write a real Edge:setType usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getFrom
 -- Returns the source node handle.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getFrom()
-print("Edge:getFrom ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getFrom
+  local _todo = "TODO: write a real Edge:getFrom usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getTo
 -- Returns the destination node handle.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getTo()
-print("Edge:getTo ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getTo
+  local _todo = "TODO: write a real Edge:getTo usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getCapacity
 -- Returns the edge capacity (-1 = unlimited).
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getCapacity()
-print("Edge:getCapacity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getCapacity
+  local _todo = "TODO: write a real Edge:getCapacity usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setCapacity
 -- Sets the edge capacity (-1 = unlimited).
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setCapacity(c)
-print("Edge:setCapacity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setCapacity
+  local _todo = "TODO: write a real Edge:setCapacity usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getThroughput
 -- Returns items per second this edge can transfer.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getThroughput()
-print("Edge:getThroughput ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getThroughput
+  local _todo = "TODO: write a real Edge:getThroughput usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setThroughput
 -- Sets items per second this edge can transfer.
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setThroughput(t)
-print("Edge:setThroughput applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setThroughput
+  local _todo = "TODO: write a real Edge:setThroughput usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getTravelTime
 -- Returns the travel time in seconds for items on this edge.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getTravelTime()
-print("Edge:getTravelTime ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getTravelTime
+  local _todo = "TODO: write a real Edge:getTravelTime usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setTravelTime
 -- Sets the travel time in seconds for items on this edge.
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setTravelTime(t)
-print("Edge:setTravelTime applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setTravelTime
+  local _todo = "TODO: write a real Edge:setTravelTime usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getWeight
 -- Returns the pathfinding weight of this edge.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getWeight()
-print("Edge:getWeight ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getWeight
+  local _todo = "TODO: write a real Edge:getWeight usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setWeight
 -- Sets the pathfinding weight of this edge.
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setWeight(64)
-print("Edge:setWeight applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setWeight
+  local _todo = "TODO: write a real Edge:setWeight usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getSpeedModifier
 -- Returns the speed modifier applied to items in transit.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getSpeedModifier()
-print("Edge:getSpeedModifier ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getSpeedModifier
+  local _todo = "TODO: write a real Edge:getSpeedModifier usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setSpeedModifier
 -- Sets the speed modifier applied to items in transit.
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setSpeedModifier(m)
-print("Edge:setSpeedModifier applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setSpeedModifier
+  local _todo = "TODO: write a real Edge:setSpeedModifier usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getCooldown
 -- Returns the cooldown duration in seconds.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getCooldown()
-print("Edge:getCooldown ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getCooldown
+  local _todo = "TODO: write a real Edge:getCooldown usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setCooldown
 -- Sets the cooldown duration in seconds.
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setCooldown(c)
-print("Edge:setCooldown applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setCooldown
+  local _todo = "TODO: write a real Edge:setCooldown usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:isOnCooldown
 -- Returns true if the edge is currently on cooldown.
--- Use as a guard inside lurek.update or event handlers.
-local edge = lurek.graph.newEdge()
-if edge:isOnCooldown() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:isOnCooldown
+  local _todo = "TODO: write a real Edge:isOnCooldown usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:isBidirectional
 -- Returns true if items can travel the edge in either direction.
--- Use as a guard inside lurek.update or event handlers.
-local edge = lurek.graph.newEdge()
-if edge:isBidirectional() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:isBidirectional
+  local _todo = "TODO: write a real Edge:isBidirectional usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setBidirectional
 -- Sets whether items can travel the edge in either direction.
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setBidirectional(0)
-print("Edge:setBidirectional applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setBidirectional
+  local _todo = "TODO: write a real Edge:setBidirectional usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:isActive
 -- Returns true if the edge is active.
--- Use as a guard inside lurek.update or event handlers.
-local edge = lurek.graph.newEdge()
-if edge:isActive() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:isActive
+  local _todo = "TODO: write a real Edge:isActive usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:setActive
 -- Sets the active state of this edge.
--- Apply at startup or in response to user input.
-local edge = lurek.graph.newEdge()
-edge:setActive(1)
-print("Edge:setActive applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:setActive
+  local _todo = "TODO: write a real Edge:setActive usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:getItemsInTransit
 -- Returns a table of GraphItem handles currently in transit on this edge.
--- Cheap to call; safe inside callbacks.
-local edge = lurek.graph.newEdge()  -- or your existing handle
-local value = edge:getItemsInTransit()
-print("Edge:getItemsInTransit ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:getItemsInTransit
+  local _todo = "TODO: write a real Edge:getItemsInTransit usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:addAllowedType
 -- Adds an item type to the edge allow-list.
--- Side-effecting; safe to call any time after init.
-local edge = lurek.graph.newEdge()
-edge:addAllowedType(t)
-print("Edge:addAllowedType done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:addAllowedType
+  local _todo = "TODO: write a real Edge:addAllowedType usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:removeAllowedType
 -- Removes an item type from the edge allow-list.
--- Pair with the matching constructor to free resources.
-local edge = lurek.graph.newEdge()
-edge:removeAllowedType(t)
--- edge is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:removeAllowedType
+  local _todo = "TODO: write a real Edge:removeAllowedType usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:clearAllowedTypes
 -- Clears the edge allow-list so all item types are permitted.
--- Pair with the matching constructor to free resources.
-local edge = lurek.graph.newEdge()
-edge:clearAllowedTypes()
--- edge is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:clearAllowedTypes
+  local _todo = "TODO: write a real Edge:clearAllowedTypes usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:isItemTypeAllowed
 -- Returns true if the given item type is allowed on this edge.
--- Use as a guard inside lurek.update or event handlers.
-local edge = lurek.graph.newEdge()
-if edge:isItemTypeAllowed(t) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:isItemTypeAllowed
+  local _todo = "TODO: write a real Edge:isItemTypeAllowed usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:type
 -- Returns the type name "GraphEdge".
--- See the module spec for detailed semantics.
-local edge = lurek.graph.newEdge()
-edge:type()
-print("Edge:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:type
+  local _todo = "TODO: write a real Edge:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Edge:typeOf
 -- Returns true when the given name matches "GraphEdge" or a parent type.
--- See the module spec for detailed semantics.
-local edge = lurek.graph.newEdge()
-edge:typeOf("main")
-print("Edge:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Edge:typeOf
+  local _todo = "TODO: write a real Edge:typeOf usage example"
+  print(_todo)
+end
 
 -- ── Node methods ──
 
 --@api-stub: Node:getType
 -- Returns the node type string.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getType()
-print("Node:getType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getType
+  local _todo = "TODO: write a real Node:getType usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setType
 -- Sets the node type string.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setType(t)
-print("Node:setType applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setType
+  local _todo = "TODO: write a real Node:setType usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getCapacity
 -- Returns the node capacity (-1 = unlimited).
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getCapacity()
-print("Node:getCapacity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getCapacity
+  local _todo = "TODO: write a real Node:getCapacity usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setCapacity
 -- Sets the node capacity (-1 = unlimited).
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setCapacity(c)
-print("Node:setCapacity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setCapacity
+  local _todo = "TODO: write a real Node:setCapacity usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getItemCount
 -- Returns the number of items currently at this node.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getItemCount()
-print("Node:getItemCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getItemCount
+  local _todo = "TODO: write a real Node:getItemCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:isFull
 -- Returns true if the node has reached its capacity.
--- Use as a guard inside lurek.update or event handlers.
-local node = lurek.graph.newNode()
-if node:isFull() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:isFull
+  local _todo = "TODO: write a real Node:isFull usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:isActive
 -- Returns true if the node is active.
--- Use as a guard inside lurek.update or event handlers.
-local node = lurek.graph.newNode()
-if node:isActive() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:isActive
+  local _todo = "TODO: write a real Node:isActive usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setActive
 -- Sets the active state of this node.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setActive(1)
-print("Node:setActive applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setActive
+  local _todo = "TODO: write a real Node:setActive usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getOverflowPolicy
 -- Returns the overflow policy as a string.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getOverflowPolicy()
-print("Node:getOverflowPolicy ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getOverflowPolicy
+  local _todo = "TODO: write a real Node:getOverflowPolicy usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setOverflowPolicy
 -- Sets the overflow policy from a string.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setOverflowPolicy(p)
-print("Node:setOverflowPolicy applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setOverflowPolicy
+  local _todo = "TODO: write a real Node:setOverflowPolicy usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getFlowMode
 -- Returns the flow mode as a string.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getFlowMode()
-print("Node:getFlowMode ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getFlowMode
+  local _todo = "TODO: write a real Node:getFlowMode usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setFlowMode
 -- Sets the flow mode from a string.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setFlowMode(m)
-print("Node:setFlowMode applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setFlowMode
+  local _todo = "TODO: write a real Node:setFlowMode usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getPushRate
 -- Returns items per second this node pushes.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getPushRate()
-print("Node:getPushRate ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getPushRate
+  local _todo = "TODO: write a real Node:getPushRate usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setPushRate
 -- Sets items per second this node pushes.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setPushRate(1)
-print("Node:setPushRate applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setPushRate
+  local _todo = "TODO: write a real Node:setPushRate usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getPullRate
 -- Returns items per second this node pulls.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getPullRate()
-print("Node:getPullRate ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getPullRate
+  local _todo = "TODO: write a real Node:getPullRate usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setPullRate
 -- Sets items per second this node pulls.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setPullRate(1)
-print("Node:setPullRate applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setPullRate
+  local _todo = "TODO: write a real Node:setPullRate usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getPushFilter
 -- Returns the push filter string, or nil if unset.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getPushFilter()
-print("Node:getPushFilter ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getPushFilter
+  local _todo = "TODO: write a real Node:getPushFilter usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setPushFilter
 -- Sets the push filter string, or nil to clear.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setPushFilter(f)
-print("Node:setPushFilter applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setPushFilter
+  local _todo = "TODO: write a real Node:setPushFilter usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getPullFilter
 -- Returns the pull filter string, or nil if unset.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getPullFilter()
-print("Node:getPullFilter ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getPullFilter
+  local _todo = "TODO: write a real Node:getPullFilter usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setPullFilter
 -- Sets the pull filter string, or nil to clear.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setPullFilter(f)
-print("Node:setPullFilter applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setPullFilter
+  local _todo = "TODO: write a real Node:setPullFilter usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getProcessTime
 -- Returns the processing time in seconds.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getProcessTime()
-print("Node:getProcessTime ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getProcessTime
+  local _todo = "TODO: write a real Node:getProcessTime usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setProcessTime
 -- Sets the processing time in seconds.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setProcessTime(t)
-print("Node:setProcessTime applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setProcessTime
+  local _todo = "TODO: write a real Node:setProcessTime usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:isQueueEnabled
 -- Returns true if the node queue is enabled.
--- Use as a guard inside lurek.update or event handlers.
-local node = lurek.graph.newNode()
-if node:isQueueEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:isQueueEnabled
+  local _todo = "TODO: write a real Node:isQueueEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setQueueEnabled
 -- Enables or disables the node queue.
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setQueueEnabled(e)
-print("Node:setQueueEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setQueueEnabled
+  local _todo = "TODO: write a real Node:setQueueEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getQueueCapacity
 -- Returns the queue capacity (-1 = unlimited).
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getQueueCapacity()
-print("Node:getQueueCapacity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getQueueCapacity
+  local _todo = "TODO: write a real Node:getQueueCapacity usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:setQueueCapacity
 -- Sets the queue capacity (-1 = unlimited).
--- Apply at startup or in response to user input.
-local node = lurek.graph.newNode()
-node:setQueueCapacity(c)
-print("Node:setQueueCapacity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:setQueueCapacity
+  local _todo = "TODO: write a real Node:setQueueCapacity usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getQueueSize
 -- Returns the number of items currently in the queue.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getQueueSize()
-print("Node:getQueueSize ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getQueueSize
+  local _todo = "TODO: write a real Node:getQueueSize usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getItems
 -- Returns a table of GraphItem handles at this node.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getItems()
-print("Node:getItems ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getItems
+  local _todo = "TODO: write a real Node:getItems usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getEdges
 -- Returns a table of Edge handles connected to this node.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getEdges("data/file.txt")
-print("Node:getEdges ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getEdges
+  local _todo = "TODO: write a real Node:getEdges usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:clearConversion
 -- Removes the conversion rule for the given input type.
--- Pair with the matching constructor to free resources.
-local node = lurek.graph.newNode()
-node:clearConversion(in_type)
--- node is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:clearConversion
+  local _todo = "TODO: write a real Node:clearConversion usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:clearAllConversions
 -- Removes all conversion rules from this node.
--- Pair with the matching constructor to free resources.
-local node = lurek.graph.newNode()
-node:clearAllConversions()
--- node is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:clearAllConversions
+  local _todo = "TODO: write a real Node:clearAllConversions usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:addTag
 -- Attaches a string tag to this node for fast group queries.
--- Side-effecting; safe to call any time after init.
-local node = lurek.graph.newNode()
-node:addTag("main")
-print("Node:addTag done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:addTag
+  local _todo = "TODO: write a real Node:addTag usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:removeTag
 -- Removes a tag from this node.
--- Pair with the matching constructor to free resources.
-local node = lurek.graph.newNode()
-node:removeTag("main")
--- node is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:removeTag
+  local _todo = "TODO: write a real Node:removeTag usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:hasTag
 -- Returns true if this node has the given tag.
--- Use as a guard inside lurek.update or event handlers.
-local node = lurek.graph.newNode()
-if node:hasTag("main") then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:hasTag
+  local _todo = "TODO: write a real Node:hasTag usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:clearTags
 -- Removes all tags from this node.
--- Pair with the matching constructor to free resources.
-local node = lurek.graph.newNode()
-node:clearTags()
--- node is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:clearTags
+  local _todo = "TODO: write a real Node:clearTags usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:getTags
 -- Returns a table of tag strings on this node.
--- Cheap to call; safe inside callbacks.
-local node = lurek.graph.newNode()  -- or your existing handle
-local value = node:getTags()
-print("Node:getTags ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:getTags
+  local _todo = "TODO: write a real Node:getTags usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:removeSupply
 -- Removes the supply declaration for the given item type.
--- Pair with the matching constructor to free resources.
-local node = lurek.graph.newNode()
-node:removeSupply(item_type)
--- node is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:removeSupply
+  local _todo = "TODO: write a real Node:removeSupply usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:clearSupplies
 -- Removes all supply declarations from this node.
--- Pair with the matching constructor to free resources.
-local node = lurek.graph.newNode()
-node:clearSupplies()
--- node is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:clearSupplies
+  local _todo = "TODO: write a real Node:clearSupplies usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:removeDemand
 -- Removes the demand declaration for the given item type.
--- Pair with the matching constructor to free resources.
-local node = lurek.graph.newNode()
-node:removeDemand(item_type)
--- node is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:removeDemand
+  local _todo = "TODO: write a real Node:removeDemand usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:clearDemands
 -- Removes all demand declarations from this node.
--- Pair with the matching constructor to free resources.
-local node = lurek.graph.newNode()
-node:clearDemands()
--- node is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:clearDemands
+  local _todo = "TODO: write a real Node:clearDemands usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:enqueue
 -- Pushes an item into the node queue.
--- See the module spec for detailed semantics.
-local node = lurek.graph.newNode()
-node:enqueue(item_ud)
-print("Node:enqueue done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:enqueue
+  local _todo = "TODO: write a real Node:enqueue usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:dequeue
 -- Pops the next item from the node queue, or nil if empty.
--- See the module spec for detailed semantics.
-local node = lurek.graph.newNode()
-node:dequeue()
-print("Node:dequeue done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:dequeue
+  local _todo = "TODO: write a real Node:dequeue usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:type
 -- Returns the type name "GraphNode".
--- See the module spec for detailed semantics.
-local node = lurek.graph.newNode()
-node:type()
-print("Node:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:type
+  local _todo = "TODO: write a real Node:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Node:typeOf
 -- Returns true when the given name matches "GraphNode" or a parent type.
--- See the module spec for detailed semantics.
-local node = lurek.graph.newNode()
-node:typeOf("main")
-print("Node:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Node:typeOf
+  local _todo = "TODO: write a real Node:typeOf usage example"
+  print(_todo)
+end
 
 -- ── Graph methods ──
 
 --@api-stub: Graph:removeNode
 -- Removes a node from the graph.
--- Pair with the matching constructor to free resources.
-local graph = lurek.graph.newGraph()
-graph:removeNode(node_ud)
--- graph is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:removeNode
+  local _todo = "TODO: write a real Graph:removeNode usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:hasNode
 -- Returns true if the node exists in the graph.
--- Use as a guard inside lurek.update or event handlers.
-local graph = lurek.graph.newGraph()
-if graph:hasNode(node_ud) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:hasNode
+  local _todo = "TODO: write a real Graph:hasNode usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getNodes
 -- Returns a table of all Node handles.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getNodes()
-print("Graph:getNodes ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getNodes
+  local _todo = "TODO: write a real Graph:getNodes usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getNodeCount
 -- Returns the number of nodes in the graph.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getNodeCount()
-print("Graph:getNodeCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getNodeCount
+  local _todo = "TODO: write a real Graph:getNodeCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:removeEdge
 -- Removes an edge from the graph.
--- Pair with the matching constructor to free resources.
-local graph = lurek.graph.newGraph()
-graph:removeEdge(edge_ud)
--- graph is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:removeEdge
+  local _todo = "TODO: write a real Graph:removeEdge usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:hasEdge
 -- Returns true if the edge exists in the graph.
--- Use as a guard inside lurek.update or event handlers.
-local graph = lurek.graph.newGraph()
-if graph:hasEdge(edge_ud) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:hasEdge
+  local _todo = "TODO: write a real Graph:hasEdge usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getEdges
 -- Returns a table of all Edge handles.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getEdges()
-print("Graph:getEdges ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getEdges
+  local _todo = "TODO: write a real Graph:getEdges usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getEdgeCount
 -- Returns the number of edges in the graph.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getEdgeCount()
-print("Graph:getEdgeCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getEdgeCount
+  local _todo = "TODO: write a real Graph:getEdgeCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:removeItem
 -- Removes an item from the graph entirely.
--- Pair with the matching constructor to free resources.
-local graph = lurek.graph.newGraph()
-graph:removeItem(item_ud)
--- graph is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:removeItem
+  local _todo = "TODO: write a real Graph:removeItem usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:hasItem
 -- Returns true if the item exists in the graph.
--- Use as a guard inside lurek.update or event handlers.
-local graph = lurek.graph.newGraph()
-if graph:hasItem(item_ud) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:hasItem
+  local _todo = "TODO: write a real Graph:hasItem usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getItems
 -- Returns a table of all GraphItem handles.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getItems()
-print("Graph:getItems ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getItems
+  local _todo = "TODO: write a real Graph:getItems usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getItemCount
 -- Returns the number of items in the graph.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getItemCount()
-print("Graph:getItemCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getItemCount
+  local _todo = "TODO: write a real Graph:getItemCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:update
 -- Advances simulation by dt seconds and fires event callbacks.
--- Apply at startup or in response to user input.
-local graph = lurek.graph.newGraph()
-graph:update(dt)
-print("Graph:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:update
+  local _todo = "TODO: write a real Graph:update usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:step
 -- Runs one discrete simulation step and fires event callbacks.
--- Trigger from input, timers, or game events.
-local graph = lurek.graph.newGraph()
-graph:step()
--- trigger from input, timer, or event
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:step
+  local _todo = "TODO: write a real Graph:step usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:tickParallel
 -- Advances simulation by dt seconds using a parallelised decay phase.
--- Trigger from input, timers, or game events.
-local graph = lurek.graph.newGraph()
-graph:tickParallel(dt)
--- trigger from input, timer, or event
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:tickParallel
+  local _todo = "TODO: write a real Graph:tickParallel usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getNeighbors
 -- Returns a table of direct neighbor Node handles.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getNeighbors(node_ud)
-print("Graph:getNeighbors ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getNeighbors
+  local _todo = "TODO: write a real Graph:getNeighbors usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getComponents
 -- Returns weakly connected components as a table of tables of Node handles.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getComponents()
-print("Graph:getComponents ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getComponents
+  local _todo = "TODO: write a real Graph:getComponents usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:hasCycle
 -- Returns true if the graph contains a directed cycle.
--- Use as a guard inside lurek.update or event handlers.
-local graph = lurek.graph.newGraph()
-if graph:hasCycle() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:hasCycle
+  local _todo = "TODO: write a real Graph:hasCycle usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:topologicalSort
 -- Returns a topologically sorted table of Node handles, or nil if a cycle exists.
--- See the module spec for detailed semantics.
-local graph = lurek.graph.newGraph()
-graph:topologicalSort()
-print("Graph:topologicalSort done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:topologicalSort
+  local _todo = "TODO: write a real Graph:topologicalSort usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:mst
 -- Returns edge IDs forming a minimum spanning tree (Kruskal, undirected view).
--- See the module spec for detailed semantics.
-local graph = lurek.graph.newGraph()
-graph:mst()
-print("Graph:mst done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:mst
+  local _todo = "TODO: write a real Graph:mst usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:colorGraph
 -- Assigns each node the smallest non-negative integer colour not shared with any.
--- See the module spec for detailed semantics.
-local graph = lurek.graph.newGraph()
-graph:colorGraph()
-print("Graph:colorGraph done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:colorGraph
+  local _todo = "TODO: write a real Graph:colorGraph usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:isBipartite
 -- Returns `true` when the graph can be 2-coloured (bipartite check via BFS).
--- Use as a guard inside lurek.update or event handlers.
-local graph = lurek.graph.newGraph()
-if graph:isBipartite() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:isBipartite
+  local _todo = "TODO: write a real Graph:isBipartite usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:processDemand
 -- Processes all supply/demand declarations and fires event callbacks.
--- See the module spec for detailed semantics.
-local graph = lurek.graph.newGraph()
-graph:processDemand()
-print("Graph:processDemand done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:processDemand
+  local _todo = "TODO: write a real Graph:processDemand usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:getStats
 -- Returns a statistics snapshot table.
--- Cheap to call; safe inside callbacks.
-local graph = lurek.graph.newGraph()  -- or your existing handle
-local value = graph:getStats()
-print("Graph:getStats ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:getStats
+  local _todo = "TODO: write a real Graph:getStats usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local graph = lurek.graph.newGraph()
-graph:type()
-print("Graph:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:type
+  local _todo = "TODO: write a real Graph:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Graph:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local graph = lurek.graph.newGraph()
-graph:typeOf("main")
-print("Graph:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/graph_api.rs and docs/specs/graph.md).
+do  -- TODO: Graph:typeOf
+  local _todo = "TODO: write a real Graph:typeOf usage example"
+  print(_todo)
+end
 

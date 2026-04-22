@@ -1,79 +1,105 @@
 -- content/examples/engine.lua
--- love2d-style usage snippets for the lurek.engine API (10 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.engine API (10 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/engine_api.rs   (Lua binding, arg types, return shape)
+--   * src/engine/                 (semantics, side effects)
+--   * docs/specs/engine.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/engine.lua
 
 -- ── lurek.engine.* functions ──
 
 --@api-stub: lurek.engine.getVersion
 -- Returns the engine version string (from `Cargo.toml`).
--- Cheap to call; safe inside callbacks.
-local value = lurek.engine.getVersion()
-print("getVersion:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.getVersion
+  local _todo = "TODO: write a real lurek.engine.getVersion usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.engine.getFrameBudget
 -- Returns the target frame budget in milliseconds (default: 1000 / 60 â‰ 16.667 ms).
--- Cheap to call; safe inside callbacks.
-local value = lurek.engine.getFrameBudget()
-print("getFrameBudget:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.getFrameBudget
+  local _todo = "TODO: write a real lurek.engine.getFrameBudget usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.engine.memoryUsage
 -- Returns a table with `lua_bytes` (Lua GC heap usage in bytes) and.
--- See the module spec for detailed semantics.
-local result = lurek.engine.memoryUsage()
-print("memoryUsage:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.memoryUsage
+  local _todo = "TODO: write a real lurek.engine.memoryUsage usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.engine.platform
 -- Returns a string identifying the host operating system:.
--- See the module spec for detailed semantics.
-local result = lurek.engine.platform()
-print("platform:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.platform
+  local _todo = "TODO: write a real lurek.engine.platform usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.engine.uptime
 -- Returns the total engine uptime in seconds (sum of all processed deltas).
--- See the module spec for detailed semantics.
-local result = lurek.engine.uptime()
-print("uptime:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.uptime
+  local _todo = "TODO: write a real lurek.engine.uptime usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.engine.fps
 -- Returns the current measured frames-per-second.
--- See the module spec for detailed semantics.
-local result = lurek.engine.fps()
-print("fps:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.fps
+  local _todo = "TODO: write a real lurek.engine.fps usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.engine.frameCount
 -- Returns the total number of frames processed since engine start.
--- See the module spec for detailed semantics.
-local result = lurek.engine.frameCount()
-print("frameCount:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.frameCount
+  local _todo = "TODO: write a real lurek.engine.frameCount usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.engine.isDebug
 -- Returns `true` if the engine was compiled in debug mode.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.engine.isDebug() then
-  print("isDebug -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.isDebug
+  local _todo = "TODO: write a real lurek.engine.isDebug usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.engine.setResourceBudget
 -- Sets the maximum resident texture memory budget in bytes.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.engine.setResourceBudget(budget_bytes)
-print("setResourceBudget applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.setResourceBudget
+  local _todo = "TODO: write a real lurek.engine.setResourceBudget usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.engine.getResourceStats
 -- Returns a table with resident resource memory statistics.
--- Cheap to call; safe inside callbacks.
-local value = lurek.engine.getResourceStats()
-print("getResourceStats:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/engine_api.rs and docs/specs/engine.md).
+do  -- TODO: lurek.engine.getResourceStats
+  local _todo = "TODO: write a real lurek.engine.getResourceStats usage example"
+  print(_todo)
+end
 

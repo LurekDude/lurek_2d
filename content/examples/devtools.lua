@@ -1,360 +1,413 @@
 -- content/examples/devtools.lua
--- love2d-style usage snippets for the lurek.devtools API (48 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.devtools API (48 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/devtools_api.rs   (Lua binding, arg types, return shape)
+--   * src/devtools/                 (semantics, side effects)
+--   * docs/specs/devtools.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/devtools.lua
 
 -- ── lurek.devtools.* functions ──
 
 --@api-stub: lurek.devtools.log
 -- Logs a message at the given level.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.log(level, message)
-print("log:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.log
+  local _todo = "TODO: write a real lurek.devtools.log usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.setLogLevel
 -- Sets the minimum log level.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.devtools.setLogLevel(level)
-print("setLogLevel applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.setLogLevel
+  local _todo = "TODO: write a real lurek.devtools.setLogLevel usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getLogLevel
 -- Returns the current minimum log level.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getLogLevel()
-print("getLogLevel:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getLogLevel
+  local _todo = "TODO: write a real lurek.devtools.getLogLevel usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.setLogConsole
 -- Enables or disables console log output.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.devtools.setLogConsole(enabled)
-print("setLogConsole applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.setLogConsole
+  local _todo = "TODO: write a real lurek.devtools.setLogConsole usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getLogConsole
 -- Returns whether console log output is enabled.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getLogConsole()
-print("getLogConsole:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getLogConsole
+  local _todo = "TODO: write a real lurek.devtools.getLogConsole usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.setLogFile
 -- Sets the log file path (empty string disables file output).
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.devtools.setLogFile("data/file.txt")
-print("setLogFile applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.setLogFile
+  local _todo = "TODO: write a real lurek.devtools.setLogFile usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getLogFile
 -- Returns the current log file path.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getLogFile()
-print("getLogFile:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getLogFile
+  local _todo = "TODO: write a real lurek.devtools.getLogFile usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getLogHistory
 -- Returns recent log entries as an array of tables.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getLogHistory(10)
-print("getLogHistory:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getLogHistory
+  local _todo = "TODO: write a real lurek.devtools.getLogHistory usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.clearLog
 -- Discards all accumulated log entries from the in-memory devtools log buffer.
--- Pair with the matching constructor to free resources.
--- release the resource and forget the handle
-lurek.devtools.clearLog()
-print("clearLog done")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.clearLog
+  local _todo = "TODO: write a real lurek.devtools.clearLog usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.setProfilingEnabled
 -- Enables or disables the profiler.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.devtools.setProfilingEnabled(enabled)
-print("setProfilingEnabled applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.setProfilingEnabled
+  local _todo = "TODO: write a real lurek.devtools.setProfilingEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.isProfilingEnabled
 -- Returns whether the profiler is enabled.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.devtools.isProfilingEnabled() then
-  print("isProfilingEnabled -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.isProfilingEnabled
+  local _todo = "TODO: write a real lurek.devtools.isProfilingEnabled usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.devtools.profilePush
 -- Opens a named profiling zone on the stack.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.profilePush("main")
-print("profilePush:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.profilePush
+  local _todo = "TODO: write a real lurek.devtools.profilePush usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.profilePop
 -- Closes the most recent profiling zone.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.profilePop()
-print("profilePop:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.profilePop
+  local _todo = "TODO: write a real lurek.devtools.profilePop usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.profileFrame
 -- Seals the current frame of profiling data.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.profileFrame()
-print("profileFrame:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.profileFrame
+  local _todo = "TODO: write a real lurek.devtools.profileFrame usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getProfileFrameCount
 -- Returns the number of retained profile frames.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getProfileFrameCount()
-print("getProfileFrameCount:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getProfileFrameCount
+  local _todo = "TODO: write a real lurek.devtools.getProfileFrameCount usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getProfileData
 -- Returns zone data table for a specific frame (0 or nil = most recent).
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getProfileData(frame)
-print("getProfileData:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getProfileData
+  local _todo = "TODO: write a real lurek.devtools.getProfileData usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.resetProfile
 -- Clears all profiling data and resets the zone stack.
--- Pair with the matching constructor to free resources.
--- release the resource and forget the handle
-lurek.devtools.resetProfile()
-print("resetProfile done")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.resetProfile
+  local _todo = "TODO: write a real lurek.devtools.resetProfile usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.recordFrameTime
 -- Records a frame-time sample (call each frame with delta time in seconds).
--- See the module spec for detailed semantics.
-local result = lurek.devtools.recordFrameTime(dt_val)
-print("recordFrameTime:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.recordFrameTime
+  local _todo = "TODO: write a real lurek.devtools.recordFrameTime usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getFrameStats
 -- Returns a table of computed frame statistics.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getFrameStats()
-print("getFrameStats:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getFrameStats
+  local _todo = "TODO: write a real lurek.devtools.getFrameStats usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getFrameHistory
 -- Returns the raw frame-time sample array.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getFrameHistory()
-print("getFrameHistory:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getFrameHistory
+  local _todo = "TODO: write a real lurek.devtools.getFrameHistory usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.setFrameHistorySize
 -- Sets the frame-history buffer capacity (clamped 10-10000).
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.devtools.setFrameHistorySize(10)
-print("setFrameHistorySize applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.setFrameHistorySize
+  local _todo = "TODO: write a real lurek.devtools.setFrameHistorySize usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getFrameHistorySize
 -- Returns the current frame-history buffer capacity.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getFrameHistorySize()
-print("getFrameHistorySize:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getFrameHistorySize
+  local _todo = "TODO: write a real lurek.devtools.getFrameHistorySize usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.watch
 -- Adds a file path to the watch list.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.watch("data/file.txt")
-print("watch:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.watch
+  local _todo = "TODO: write a real lurek.devtools.watch usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.unwatch
 -- Removes a file path from the watch list.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.unwatch("data/file.txt")
-print("unwatch:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.unwatch
+  local _todo = "TODO: write a real lurek.devtools.unwatch usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getWatchedPaths
 -- Returns an array of all watched paths.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getWatchedPaths()
-print("getWatchedPaths:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getWatchedPaths
+  local _todo = "TODO: write a real lurek.devtools.getWatchedPaths usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.scan
 -- Polls all watched paths and returns paths whose mtime changed.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.scan()
-print("scan:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.scan
+  local _todo = "TODO: write a real lurek.devtools.scan usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.clearWatches
 -- Clears all watched paths.
--- Pair with the matching constructor to free resources.
--- release the resource and forget the handle
-lurek.devtools.clearWatches()
-print("clearWatches done")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.clearWatches
+  local _todo = "TODO: write a real lurek.devtools.clearWatches usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getWatchInterval
 -- Returns the file watch poll interval in seconds.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getWatchInterval()
-print("getWatchInterval:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getWatchInterval
+  local _todo = "TODO: write a real lurek.devtools.getWatchInterval usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.setWatchInterval
 -- Sets the file watch poll interval in seconds.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.devtools.setWatchInterval(interval)
-print("setWatchInterval applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.setWatchInterval
+  local _todo = "TODO: write a real lurek.devtools.setWatchInterval usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getCallStack
 -- Returns the Lua call stack as a table of frames.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getCallStack(max_depth)
-print("getCallStack:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getCallStack
+  local _todo = "TODO: write a real lurek.devtools.getCallStack usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.eval
 -- Evaluates a Lua string and returns (success, results...).
--- See the module spec for detailed semantics.
-local result = lurek.devtools.eval(code)
-print("eval:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.eval
+  local _todo = "TODO: write a real lurek.devtools.eval usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.openConsole
 -- Opens the console window (updates the console flag; returns true).
--- Build once at startup; reuse across frames.
-local openconsole = lurek.devtools.openConsole()
-print("created", openconsole)
-return openconsole
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.openConsole
+  local _todo = "TODO: write a real lurek.devtools.openConsole usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.isConsoleOpen
 -- Returns whether the console is considered open.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.devtools.isConsoleOpen() then
-  print("isConsoleOpen -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.isConsoleOpen
+  local _todo = "TODO: write a real lurek.devtools.isConsoleOpen usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.devtools.exposeWatch
 -- Registers a named live watch.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.exposeWatch("main", getter, category)
-print("exposeWatch:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.exposeWatch
+  local _todo = "TODO: write a real lurek.devtools.exposeWatch usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.removeWatch
 -- Removes a watch by the id returned from exposeWatch.
--- Pair with the matching constructor to free resources.
--- release the resource and forget the handle
-lurek.devtools.removeWatch(1)
-print("removeWatch done")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.removeWatch
+  local _todo = "TODO: write a real lurek.devtools.removeWatch usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.getWatches
 -- Calls all registered watch getters and returns a table of {name, category, value} records.
--- Cheap to call; safe inside callbacks.
-local value = lurek.devtools.getWatches()
-print("getWatches:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.getWatches
+  local _todo = "TODO: write a real lurek.devtools.getWatches usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.snapshot
 -- Takes a structured snapshot of all watches + frame stats + last profile frame.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.snapshot()
-print("snapshot:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.snapshot
+  local _todo = "TODO: write a real lurek.devtools.snapshot usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.profilerReport
 -- Returns a flat summary table of all recorded profiler zones across all stored.
--- See the module spec for detailed semantics.
-local result = lurek.devtools.profilerReport()
-print("profilerReport:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.profilerReport
+  local _todo = "TODO: write a real lurek.devtools.profilerReport usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.newFileWatcher
 -- Creates a standalone per-path file watcher.
--- Build once at startup; reuse across frames.
-local filewatcher = lurek.devtools.newFileWatcher("data/file.txt")
-print("created", filewatcher)
-return filewatcher
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.newFileWatcher
+  local _todo = "TODO: write a real lurek.devtools.newFileWatcher usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.devtools.newRepl
 -- Creates an interactive Lua REPL console with a bounded history buffer.
--- Build once at startup; reuse across frames.
-local repl = lurek.devtools.newRepl(max_history)
-print("created", repl)
-return repl
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: lurek.devtools.newRepl
+  local _todo = "TODO: write a real lurek.devtools.newRepl usage example"
+  print(_todo)
+end
 
 -- ── FileWatcher methods ──
 
 --@api-stub: FileWatcher:onChanged
 -- Registers a callback invoked (with no arguments) when the watched path changes.
--- See the module spec for detailed semantics.
-local fileWatcher = lurek.devtools.newFileWatcher()
-fileWatcher:onChanged(function() print("onChanged fired") end)
-print("FileWatcher:onChanged done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: FileWatcher:onChanged
+  local _todo = "TODO: write a real FileWatcher:onChanged usage example"
+  print(_todo)
+end
 
 --@api-stub: FileWatcher:check
 -- Polls the watcher.
--- See the module spec for detailed semantics.
-local fileWatcher = lurek.devtools.newFileWatcher()
-fileWatcher:check()
-print("FileWatcher:check done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: FileWatcher:check
+  local _todo = "TODO: write a real FileWatcher:check usage example"
+  print(_todo)
+end
 
 --@api-stub: FileWatcher:getPath
 -- Returns the watched path string.
--- Cheap to call; safe inside callbacks.
-local fileWatcher = lurek.devtools.newFileWatcher()  -- or your existing handle
-local value = fileWatcher:getPath()
-print("FileWatcher:getPath ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: FileWatcher:getPath
+  local _todo = "TODO: write a real FileWatcher:getPath usage example"
+  print(_todo)
+end
 
 --@api-stub: FileWatcher:cancel
 -- Removes the stored `onChanged` callback and stops future notifications.
--- Pair with the matching constructor to free resources.
-local fileWatcher = lurek.devtools.newFileWatcher()
-fileWatcher:cancel()
--- fileWatcher is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: FileWatcher:cancel
+  local _todo = "TODO: write a real FileWatcher:cancel usage example"
+  print(_todo)
+end
 
 -- ── ReplConsole methods ──
 
 --@api-stub: ReplConsole:eval
 -- Evaluates a Lua snippet and records the input in history.
--- See the module spec for detailed semantics.
-local replConsole = lurek.devtools.newReplConsole()
-replConsole:eval(code)
-print("ReplConsole:eval done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: ReplConsole:eval
+  local _todo = "TODO: write a real ReplConsole:eval usage example"
+  print(_todo)
+end
 
 --@api-stub: ReplConsole:history
 -- Returns an ordered array of past inputs (oldest first).
--- See the module spec for detailed semantics.
-local replConsole = lurek.devtools.newReplConsole()
-replConsole:history()
-print("ReplConsole:history done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: ReplConsole:history
+  local _todo = "TODO: write a real ReplConsole:history usage example"
+  print(_todo)
+end
 
 --@api-stub: ReplConsole:clear
 -- Clears the REPL history buffer.
--- Pair with the matching constructor to free resources.
-local replConsole = lurek.devtools.newReplConsole()
-replConsole:clear()
--- replConsole is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: ReplConsole:clear
+  local _todo = "TODO: write a real ReplConsole:clear usage example"
+  print(_todo)
+end
 
 --@api-stub: ReplConsole:len
 -- Returns the number of history entries.
--- See the module spec for detailed semantics.
-local replConsole = lurek.devtools.newReplConsole()
-replConsole:len()
-print("ReplConsole:len done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/devtools_api.rs and docs/specs/devtools.md).
+do  -- TODO: ReplConsole:len
+  local _todo = "TODO: write a real ReplConsole:len usage example"
+  print(_todo)
+end
 

@@ -1,1042 +1,1171 @@
 -- content/examples/effect.lua
--- love2d-style usage snippets for the lurek.effect API (142 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.effect API (142 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/effect_api.rs   (Lua binding, arg types, return shape)
+--   * src/effect/                 (semantics, side effects)
+--   * docs/specs/effect.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/effect.lua
 
 -- ── lurek.effect.* functions ──
 
 --@api-stub: lurek.effect.newEffect
 -- Creates a new built-in post-processing effect by type name.
--- Build once at startup; reuse across frames.
-local effect = lurek.effect.newEffect("main")
-print("created", effect)
-return effect
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.newEffect
+  local _todo = "TODO: write a real lurek.effect.newEffect usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.newCustomEffect
 -- Creates a custom shader post-processing effect.
--- Build once at startup; reuse across frames.
-local customeffect = lurek.effect.newCustomEffect(1)
-print("created", customeffect)
-return customeffect
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.newCustomEffect
+  local _todo = "TODO: write a real lurek.effect.newCustomEffect usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.newStack
 -- Creates a new post-processing pipeline stack.
--- Build once at startup; reuse across frames.
-local stack = lurek.effect.newStack(64, 64)
-print("created", stack)
-return stack
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.newStack
+  local _todo = "TODO: write a real lurek.effect.newStack usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.newPresetStack
 -- Creates a pre-configured effect stack from a named preset.
--- Build once at startup; reuse across frames.
-local presetstack = lurek.effect.newPresetStack("main", 64, 64)
-print("created", presetstack)
-return presetstack
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.newPresetStack
+  local _todo = "TODO: write a real lurek.effect.newPresetStack usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.newPass
 -- Creates a custom-shader post-processing effect (alias for newCustomEffect).
--- Build once at startup; reuse across frames.
-local pass = lurek.effect.newPass(1)
-print("created", pass)
-return pass
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.newPass
+  local _todo = "TODO: write a real lurek.effect.newPass usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.getEffectTypes
 -- Returns the list of all built-in effect type names.
--- Cheap to call; safe inside callbacks.
-local value = lurek.effect.getEffectTypes()
-print("getEffectTypes:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.getEffectTypes
+  local _todo = "TODO: write a real lurek.effect.getEffectTypes usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.newImageEffect
 -- Creates a new per-image effect chain.
--- Build once at startup; reuse across frames.
-local imageeffect = lurek.effect.newImageEffect({ x = 0, y = 0 })
-print("created", imageeffect)
-return imageeffect
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.newImageEffect
+  local _todo = "TODO: write a real lurek.effect.newImageEffect usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.newOverlay
 -- Creates a new screen overlay controller for weather, flash, shake, and fade effects.
--- Build once at startup; reuse across frames.
-local overlay = lurek.effect.newOverlay(64, 64)
-print("created", overlay)
-return overlay
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.newOverlay
+  local _todo = "TODO: write a real lurek.effect.newOverlay usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.newTransition
 -- Creates a new screen-transition controller.
--- Build once at startup; reuse across frames.
-local transition = lurek.effect.newTransition(kind, 1.0, {1, 0.5, 0, 1})
-print("created", transition)
-return transition
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.newTransition
+  local _todo = "TODO: write a real lurek.effect.newTransition usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.setShaderErrorDisplay
 -- Enables or disables the effect that renders shader compile errors as red text.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.effect.setShaderErrorDisplay(enabled)
-print("setShaderErrorDisplay applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.setShaderErrorDisplay
+  local _todo = "TODO: write a real lurek.effect.setShaderErrorDisplay usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.effect.getShaderErrorDisplay
 -- Returns whether shader error display is currently enabled.
--- Cheap to call; safe inside callbacks.
-local value = lurek.effect.getShaderErrorDisplay()
-print("getShaderErrorDisplay:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: lurek.effect.getShaderErrorDisplay
+  local _todo = "TODO: write a real lurek.effect.getShaderErrorDisplay usage example"
+  print(_todo)
+end
 
 -- ── PostFxEffect methods ──
 
 --@api-stub: PostFxEffect:getTypeName
 -- Returns the display name of this effect type.
--- Cheap to call; safe inside callbacks.
-local postFxEffect = lurek.effect.newPostFxEffect()  -- or your existing handle
-local value = postFxEffect:getTypeName()
-print("PostFxEffect:getTypeName ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:getTypeName
+  local _todo = "TODO: write a real PostFxEffect:getTypeName usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:isBuiltIn
 -- Returns true if this is a built-in effect, false if custom.
--- Use as a guard inside lurek.update or event handlers.
-local postFxEffect = lurek.effect.newPostFxEffect()
-if postFxEffect:isBuiltIn() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:isBuiltIn
+  local _todo = "TODO: write a real PostFxEffect:isBuiltIn usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:isEnabled
 -- Returns whether this effect is currently active.
--- Use as a guard inside lurek.update or event handlers.
-local postFxEffect = lurek.effect.newPostFxEffect()
-if postFxEffect:isEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:isEnabled
+  local _todo = "TODO: write a real PostFxEffect:isEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setEnabled
 -- Enables or disables this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setEnabled(enabled)
-print("PostFxEffect:setEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setEnabled
+  local _todo = "TODO: write a real PostFxEffect:setEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setParameter
 -- Sets a named float parameter on this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setParameter("main", value)
-print("PostFxEffect:setParameter applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setParameter
+  local _todo = "TODO: write a real PostFxEffect:setParameter usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:hasParameter
 -- Returns true if the named parameter exists on this effect.
--- Use as a guard inside lurek.update or event handlers.
-local postFxEffect = lurek.effect.newPostFxEffect()
-if postFxEffect:hasParameter("main") then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:hasParameter
+  local _todo = "TODO: write a real PostFxEffect:hasParameter usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:getParameterNames
 -- Returns a list of all parameter names on this effect.
--- Cheap to call; safe inside callbacks.
-local postFxEffect = lurek.effect.newPostFxEffect()  -- or your existing handle
-local value = postFxEffect:getParameterNames()
-print("PostFxEffect:getParameterNames ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:getParameterNames
+  local _todo = "TODO: write a real PostFxEffect:getParameterNames usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:getEffectType
 -- Returns the type name of this effect (alias for getTypeName).
--- Cheap to call; safe inside callbacks.
-local postFxEffect = lurek.effect.newPostFxEffect()  -- or your existing handle
-local value = postFxEffect:getEffectType()
-print("PostFxEffect:getEffectType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:getEffectType
+  local _todo = "TODO: write a real PostFxEffect:getEffectType usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:getType
 -- Returns the type name of this effect (alias for getTypeName).
--- Cheap to call; safe inside callbacks.
-local postFxEffect = lurek.effect.newPostFxEffect()  -- or your existing handle
-local value = postFxEffect:getType()
-print("PostFxEffect:getType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:getType
+  local _todo = "TODO: write a real PostFxEffect:getType usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:type
 -- Returns the type name "PostFxEffect".
--- See the module spec for detailed semantics.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:type()
-print("PostFxEffect:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:type
+  local _todo = "TODO: write a real PostFxEffect:type usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:typeOf
 -- Returns true when the given name matches "PostFxEffect" or a parent type.
--- See the module spec for detailed semantics.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:typeOf("main")
-print("PostFxEffect:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:typeOf
+  local _todo = "TODO: write a real PostFxEffect:typeOf usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setThreshold
 -- Sets the threshold parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setThreshold(v)
-print("PostFxEffect:setThreshold applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setThreshold
+  local _todo = "TODO: write a real PostFxEffect:setThreshold usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setIntensity
 -- Sets the intensity parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setIntensity(v)
-print("PostFxEffect:setIntensity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setIntensity
+  local _todo = "TODO: write a real PostFxEffect:setIntensity usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setRadius
 -- Sets the radius parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setRadius(v)
-print("PostFxEffect:setRadius applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setRadius
+  local _todo = "TODO: write a real PostFxEffect:setRadius usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setStrength
 -- Sets the strength parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setStrength(v)
-print("PostFxEffect:setStrength applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setStrength
+  local _todo = "TODO: write a real PostFxEffect:setStrength usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setScanlineStrength
 -- Sets the scanline strength parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setScanlineStrength(v)
-print("PostFxEffect:setScanlineStrength applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setScanlineStrength
+  local _todo = "TODO: write a real PostFxEffect:setScanlineStrength usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setOffset
 -- Sets the offset parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setOffset(v)
-print("PostFxEffect:setOffset applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setOffset
+  local _todo = "TODO: write a real PostFxEffect:setOffset usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setBrightness
 -- Sets the brightness parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setBrightness(v)
-print("PostFxEffect:setBrightness applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setBrightness
+  local _todo = "TODO: write a real PostFxEffect:setBrightness usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setContrast
 -- Sets the contrast parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setContrast(v)
-print("PostFxEffect:setContrast applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setContrast
+  local _todo = "TODO: write a real PostFxEffect:setContrast usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxEffect:setSaturation
 -- Sets the saturation parameter of this effect.
--- Apply at startup or in response to user input.
-local postFxEffect = lurek.effect.newPostFxEffect()
-postFxEffect:setSaturation(v)
-print("PostFxEffect:setSaturation applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxEffect:setSaturation
+  local _todo = "TODO: write a real PostFxEffect:setSaturation usage example"
+  print(_todo)
+end
 
 -- ── PostFxStack methods ──
 
 --@api-stub: PostFxStack:add
 -- Appends a PostFxEffect to the end of the pipeline.
--- Side-effecting; safe to call any time after init.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:add(effect_ud)
-print("PostFxStack:add done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:add
+  local _todo = "TODO: write a real PostFxStack:add usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:remove
 -- Removes the given PostFxEffect from the pipeline.
--- Pair with the matching constructor to free resources.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:remove(effect_ud)
--- postFxStack is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:remove
+  local _todo = "TODO: write a real PostFxStack:remove usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:isEnabled
 -- Returns whether the effect at the given 1-based position is enabled.
--- Use as a guard inside lurek.update or event handlers.
-local postFxStack = lurek.effect.newPostFxStack()
-if postFxStack:isEnabled(position) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:isEnabled
+  local _todo = "TODO: write a real PostFxStack:isEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:getEffectCount
 -- Returns the number of effects in the pipeline.
--- Cheap to call; safe inside callbacks.
-local postFxStack = lurek.effect.newPostFxStack()  -- or your existing handle
-local value = postFxStack:getEffectCount()
-print("PostFxStack:getEffectCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:getEffectCount
+  local _todo = "TODO: write a real PostFxStack:getEffectCount usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:getEffect
 -- Returns the effect at the given 1-based position, or nil.
--- Cheap to call; safe inside callbacks.
-local postFxStack = lurek.effect.newPostFxStack()  -- or your existing handle
-local value = postFxStack:getEffect(1)
-print("PostFxStack:getEffect ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:getEffect
+  local _todo = "TODO: write a real PostFxStack:getEffect usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:getEnabledEffects
 -- Returns a list of currently enabled effect objects.
--- Cheap to call; safe inside callbacks.
-local postFxStack = lurek.effect.newPostFxStack()  -- or your existing handle
-local value = postFxStack:getEnabledEffects()
-print("PostFxStack:getEnabledEffects ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:getEnabledEffects
+  local _todo = "TODO: write a real PostFxStack:getEnabledEffects usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:getWidth
 -- Returns the width of the render target.
--- Cheap to call; safe inside callbacks.
-local postFxStack = lurek.effect.newPostFxStack()  -- or your existing handle
-local value = postFxStack:getWidth()
-print("PostFxStack:getWidth ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:getWidth
+  local _todo = "TODO: write a real PostFxStack:getWidth usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:getHeight
 -- Returns the height of the render target.
--- Cheap to call; safe inside callbacks.
-local postFxStack = lurek.effect.newPostFxStack()  -- or your existing handle
-local value = postFxStack:getHeight()
-print("PostFxStack:getHeight ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:getHeight
+  local _todo = "TODO: write a real PostFxStack:getHeight usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:getDimensions
 -- Returns width and height of the render target.
--- Cheap to call; safe inside callbacks.
-local postFxStack = lurek.effect.newPostFxStack()  -- or your existing handle
-local value = postFxStack:getDimensions()
-print("PostFxStack:getDimensions ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:getDimensions
+  local _todo = "TODO: write a real PostFxStack:getDimensions usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:resize
 -- Resizes the render target to the given dimensions.
--- See the module spec for detailed semantics.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:resize(64, 64)
-print("PostFxStack:resize done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:resize
+  local _todo = "TODO: write a real PostFxStack:resize usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:len
 -- Returns the total number of effect slots in the pipeline.
--- See the module spec for detailed semantics.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:len()
-print("PostFxStack:len done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:len
+  local _todo = "TODO: write a real PostFxStack:len usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:isEmpty
 -- Returns true if the pipeline has no effect slots.
--- Use as a guard inside lurek.update or event handlers.
-local postFxStack = lurek.effect.newPostFxStack()
-if postFxStack:isEmpty() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:isEmpty
+  local _todo = "TODO: write a real PostFxStack:isEmpty usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:clear
 -- Removes all effects from the pipeline.
--- Pair with the matching constructor to free resources.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:clear()
--- postFxStack is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:clear
+  local _todo = "TODO: write a real PostFxStack:clear usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:dedup
 -- Removes duplicate effects from the pipeline, keeping the first occurrence.
--- See the module spec for detailed semantics.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:dedup()
-print("PostFxStack:dedup done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:dedup
+  local _todo = "TODO: write a real PostFxStack:dedup usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:isCapturing
 -- Returns whether the stack is currently capturing the scene.
--- Use as a guard inside lurek.update or event handlers.
-local postFxStack = lurek.effect.newPostFxStack()
-if postFxStack:isCapturing() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:isCapturing
+  local _todo = "TODO: write a real PostFxStack:isCapturing usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:beginCapture
 -- Begins capturing the scene for post-processing.
--- See the module spec for detailed semantics.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:beginCapture()
-print("PostFxStack:beginCapture done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:beginCapture
+  local _todo = "TODO: write a real PostFxStack:beginCapture usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:endCapture
 -- Ends scene capture for post-processing.
--- See the module spec for detailed semantics.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:endCapture()
-print("PostFxStack:endCapture done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:endCapture
+  local _todo = "TODO: write a real PostFxStack:endCapture usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:apply
 -- Applies all enabled effects in the stack and composites the result to screen.
--- Apply at startup or in response to user input.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:apply()
-print("PostFxStack:apply applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:apply
+  local _todo = "TODO: write a real PostFxStack:apply usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:type
 -- Returns the type name "PostFxStack".
--- See the module spec for detailed semantics.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:type()
-print("PostFxStack:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:type
+  local _todo = "TODO: write a real PostFxStack:type usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:typeOf
 -- Returns true when the given name matches "PostFxStack" or a parent type.
--- See the module spec for detailed semantics.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:typeOf("main")
-print("PostFxStack:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:typeOf
+  local _todo = "TODO: write a real PostFxStack:typeOf usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:setFeedback
 -- Sets the feedback loop intensity.
--- Apply at startup or in response to user input.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:setFeedback(1.0)
-print("PostFxStack:setFeedback applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:setFeedback
+  local _todo = "TODO: write a real PostFxStack:setFeedback usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:getFeedback
 -- Returns the current feedback loop intensity `[0.0, 1.0]`.
--- Cheap to call; safe inside callbacks.
-local postFxStack = lurek.effect.newPostFxStack()  -- or your existing handle
-local value = postFxStack:getFeedback()
-print("PostFxStack:getFeedback ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:getFeedback
+  local _todo = "TODO: write a real PostFxStack:getFeedback usage example"
+  print(_todo)
+end
 
 --@api-stub: PostFxStack:clearFeedback
 -- Resets the feedback intensity to `0.0` (disables feedback).
--- Pair with the matching constructor to free resources.
-local postFxStack = lurek.effect.newPostFxStack()
-postFxStack:clearFeedback()
--- postFxStack is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: PostFxStack:clearFeedback
+  local _todo = "TODO: write a real PostFxStack:clearFeedback usage example"
+  print(_todo)
+end
 
 -- ── ImageEffect methods ──
 
 --@api-stub: ImageEffect:addEffect
 -- Creates a new effect by type name, appends it, and returns the shared PostFxEffect.
--- Side-effecting; safe to call any time after init.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:addEffect("main")
-print("ImageEffect:addEffect done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:addEffect
+  local _todo = "TODO: write a real ImageEffect:addEffect usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:getEffect
 -- Returns the effect at the given 1-based index or with the given type name.
--- Cheap to call; safe inside callbacks.
-local imageEffect = lurek.effect.newImageEffect()  -- or your existing handle
-local value = imageEffect:getEffect("space")
-print("ImageEffect:getEffect ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:getEffect
+  local _todo = "TODO: write a real ImageEffect:getEffect usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:removeEffect
 -- Removes the effect at the given 1-based index or with the given type name.
--- Pair with the matching constructor to free resources.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:removeEffect("space")
--- imageEffect is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:removeEffect
+  local _todo = "TODO: write a real ImageEffect:removeEffect usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:clearEffects
 -- Removes all effects from the chain.
--- Pair with the matching constructor to free resources.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:clearEffects()
--- imageEffect is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:clearEffects
+  local _todo = "TODO: write a real ImageEffect:clearEffects usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:clear
 -- Removes all effects from the chain (alias for clearEffects).
--- Pair with the matching constructor to free resources.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:clear()
--- imageEffect is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:clear
+  local _todo = "TODO: write a real ImageEffect:clear usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:effectCount
 -- Returns the number of effects in the chain.
--- See the module spec for detailed semantics.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:effectCount()
-print("ImageEffect:effectCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:effectCount
+  local _todo = "TODO: write a real ImageEffect:effectCount usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:getEffectCount
 -- Returns the number of effects in the chain (alias for effectCount).
--- Cheap to call; safe inside callbacks.
-local imageEffect = lurek.effect.newImageEffect()  -- or your existing handle
-local value = imageEffect:getEffectCount()
-print("ImageEffect:getEffectCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:getEffectCount
+  local _todo = "TODO: write a real ImageEffect:getEffectCount usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:clone
 -- Returns a deep copy of this ImageEffect chain.
--- See the module spec for detailed semantics.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:clone()
-print("ImageEffect:clone done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:clone
+  local _todo = "TODO: write a real ImageEffect:clone usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:save
 -- Stub: no-op serialisation placeholder.
--- May block — call from a worker thread for large payloads.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:save()
-print("ImageEffect:save done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:save
+  local _todo = "TODO: write a real ImageEffect:save usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:type
 -- Returns the type name "ImageEffect".
--- See the module spec for detailed semantics.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:type()
-print("ImageEffect:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:type
+  local _todo = "TODO: write a real ImageEffect:type usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:typeOf
 -- Returns true when the given name matches "ImageEffect" or a parent type.
--- See the module spec for detailed semantics.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:typeOf("main")
-print("ImageEffect:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:typeOf
+  local _todo = "TODO: write a real ImageEffect:typeOf usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:removeByIndex
 -- Removes the effect at the given 0-based index from the chain.
--- Pair with the matching constructor to free resources.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:removeByIndex(1)
--- imageEffect is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:removeByIndex
+  local _todo = "TODO: write a real ImageEffect:removeByIndex usage example"
+  print(_todo)
+end
 
 --@api-stub: ImageEffect:removeByName
 -- Removes the first effect matching the given type name.
--- Pair with the matching constructor to free resources.
-local imageEffect = lurek.effect.newImageEffect()
-imageEffect:removeByName("main")
--- imageEffect is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: ImageEffect:removeByName
+  local _todo = "TODO: write a real ImageEffect:removeByName usage example"
+  print(_todo)
+end
 
 -- ── Overlay methods ──
 
 --@api-stub: Overlay:update
 -- Advances all effect subsystems by the given delta time.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:update(dt)
-print("Overlay:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:update
+  local _todo = "TODO: write a real Overlay:update usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:triggerLightning
 -- Triggers a lightning flash effect.
--- See the module spec for detailed semantics.
-local overlay = lurek.effect.newOverlay()
-overlay:triggerLightning()
-print("Overlay:triggerLightning done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:triggerLightning
+  local _todo = "TODO: write a real Overlay:triggerLightning usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getShakeOffset
 -- Returns the current shake displacement as x, y.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getShakeOffset()
-print("Overlay:getShakeOffset ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getShakeOffset
+  local _todo = "TODO: write a real Overlay:getShakeOffset usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isActive
 -- Returns true if any effect subsystem is currently active.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isActive() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isActive
+  local _todo = "TODO: write a real Overlay:isActive usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:clear
 -- Resets all effect subsystems to their default inactive state.
--- Pair with the matching constructor to free resources.
-local overlay = lurek.effect.newOverlay()
-overlay:clear()
--- overlay is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:clear
+  local _todo = "TODO: write a real Overlay:clear usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:resize
 -- Resizes the effect to match new window dimensions.
--- See the module spec for detailed semantics.
-local overlay = lurek.effect.newOverlay()
-overlay:resize(64, 64)
-print("Overlay:resize done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:resize
+  local _todo = "TODO: write a real Overlay:resize usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getWidth
 -- Returns the effect width.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getWidth()
-print("Overlay:getWidth ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getWidth
+  local _todo = "TODO: write a real Overlay:getWidth usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getHeight
 -- Returns the effect height.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getHeight()
-print("Overlay:getHeight ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getHeight
+  local _todo = "TODO: write a real Overlay:getHeight usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getDimensions
 -- Returns the effect width and height.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getDimensions()
-print("Overlay:getDimensions ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getDimensions
+  local _todo = "TODO: write a real Overlay:getDimensions usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getFlashAlpha
 -- Returns the current flash overlay alpha value.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getFlashAlpha()
-print("Overlay:getFlashAlpha ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getFlashAlpha
+  local _todo = "TODO: write a real Overlay:getFlashAlpha usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getLightningAlpha
 -- Returns the current lightning overlay alpha value.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getLightningAlpha()
-print("Overlay:getLightningAlpha ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getLightningAlpha
+  local _todo = "TODO: write a real Overlay:getLightningAlpha usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setAmbientEnabled
 -- Enables or disables the ambient light layer.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setAmbientEnabled(v)
-print("Overlay:setAmbientEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setAmbientEnabled
+  local _todo = "TODO: write a real Overlay:setAmbientEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isAmbientEnabled
 -- Returns whether the ambient light layer is active.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isAmbientEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isAmbientEnabled
+  local _todo = "TODO: write a real Overlay:isAmbientEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getAmbientColor
 -- Returns the current ambient tint as r, g, b, a components.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getAmbientColor()
-print("Overlay:getAmbientColor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getAmbientColor
+  local _todo = "TODO: write a real Overlay:getAmbientColor usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setTimeOfDay
 -- Sets the simulated time-of-day (0â€“24) which drives ambient colour.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setTimeOfDay(v)
-print("Overlay:setTimeOfDay applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setTimeOfDay
+  local _todo = "TODO: write a real Overlay:setTimeOfDay usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getTimeOfDay
 -- Returns the current simulated time-of-day (0â€“24).
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getTimeOfDay()
-print("Overlay:getTimeOfDay ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getTimeOfDay
+  local _todo = "TODO: write a real Overlay:getTimeOfDay usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setFogEnabled
 -- Enables or disables the fog layer.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setFogEnabled(v)
-print("Overlay:setFogEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setFogEnabled
+  local _todo = "TODO: write a real Overlay:setFogEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isFogEnabled
 -- Returns whether the fog layer is active.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isFogEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isFogEnabled
+  local _todo = "TODO: write a real Overlay:isFogEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setFogDensity
 -- Sets the fog density (0.0 = clear, 1.0 = fully opaque).
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setFogDensity(v)
-print("Overlay:setFogDensity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setFogDensity
+  local _todo = "TODO: write a real Overlay:setFogDensity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getFogDensity
 -- Returns the current fog density.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getFogDensity()
-print("Overlay:getFogDensity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getFogDensity
+  local _todo = "TODO: write a real Overlay:getFogDensity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getFogColor
 -- Returns the current fog tint as r, g, b, a components.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getFogColor()
-print("Overlay:getFogColor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getFogColor
+  local _todo = "TODO: write a real Overlay:getFogColor usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setHeatHazeEnabled
 -- Enables or disables the heat-haze distortion layer.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setHeatHazeEnabled(v)
-print("Overlay:setHeatHazeEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setHeatHazeEnabled
+  local _todo = "TODO: write a real Overlay:setHeatHazeEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isHeatHazeEnabled
 -- Returns whether the heat-haze layer is active.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isHeatHazeEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isHeatHazeEnabled
+  local _todo = "TODO: write a real Overlay:isHeatHazeEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setHeatHazeIntensity
 -- Sets the heat-haze distortion intensity (0.0â€“1.0).
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setHeatHazeIntensity(v)
-print("Overlay:setHeatHazeIntensity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setHeatHazeIntensity
+  local _todo = "TODO: write a real Overlay:setHeatHazeIntensity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getHeatHazeIntensity
 -- Returns the current heat-haze distortion intensity.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getHeatHazeIntensity()
-print("Overlay:getHeatHazeIntensity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getHeatHazeIntensity
+  local _todo = "TODO: write a real Overlay:getHeatHazeIntensity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setVignetteEnabled
 -- Enables or disables the screen-edge vignette layer.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setVignetteEnabled(v)
-print("Overlay:setVignetteEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setVignetteEnabled
+  local _todo = "TODO: write a real Overlay:setVignetteEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isVignetteEnabled
 -- Returns whether the vignette layer is active.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isVignetteEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isVignetteEnabled
+  local _todo = "TODO: write a real Overlay:isVignetteEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setVignetteStrength
 -- Sets the vignette darkening strength (0.0â€“1.0).
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setVignetteStrength(v)
-print("Overlay:setVignetteStrength applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setVignetteStrength
+  local _todo = "TODO: write a real Overlay:setVignetteStrength usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getVignetteStrength
 -- Returns the current vignette strength.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getVignetteStrength()
-print("Overlay:getVignetteStrength ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getVignetteStrength
+  local _todo = "TODO: write a real Overlay:getVignetteStrength usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setFilmGrainEnabled
 -- Enables or disables the film-grain noise layer.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setFilmGrainEnabled(v)
-print("Overlay:setFilmGrainEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setFilmGrainEnabled
+  local _todo = "TODO: write a real Overlay:setFilmGrainEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isFilmGrainEnabled
 -- Returns whether the film-grain layer is active.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isFilmGrainEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isFilmGrainEnabled
+  local _todo = "TODO: write a real Overlay:isFilmGrainEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setFilmGrainIntensity
 -- Sets the film-grain noise intensity (0.0â€“1.0).
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setFilmGrainIntensity(v)
-print("Overlay:setFilmGrainIntensity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setFilmGrainIntensity
+  local _todo = "TODO: write a real Overlay:setFilmGrainIntensity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getFilmGrainIntensity
 -- Returns the current film-grain intensity.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getFilmGrainIntensity()
-print("Overlay:getFilmGrainIntensity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getFilmGrainIntensity
+  local _todo = "TODO: write a real Overlay:getFilmGrainIntensity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setCloudShadows
 -- Enables or disables scrolling cloud-shadow projection.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setCloudShadows(v)
-print("Overlay:setCloudShadows applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setCloudShadows
+  local _todo = "TODO: write a real Overlay:setCloudShadows usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isCloudShadowsEnabled
 -- Returns whether cloud shadows are active.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isCloudShadowsEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isCloudShadowsEnabled
+  local _todo = "TODO: write a real Overlay:isCloudShadowsEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setCloudCount
 -- Sets the number of cloud shadow instances to render.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setCloudCount(v)
-print("Overlay:setCloudCount applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setCloudCount
+  local _todo = "TODO: write a real Overlay:setCloudCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getCloudCount
 -- Returns the current cloud shadow instance count.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getCloudCount()
-print("Overlay:getCloudCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getCloudCount
+  local _todo = "TODO: write a real Overlay:getCloudCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setCloudSpeed
 -- Sets the horizontal scroll speed of cloud shadows in pixels per second.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setCloudSpeed(v)
-print("Overlay:setCloudSpeed applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setCloudSpeed
+  local _todo = "TODO: write a real Overlay:setCloudSpeed usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getCloudSpeed
 -- Returns the current cloud shadow scroll speed.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getCloudSpeed()
-print("Overlay:getCloudSpeed ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getCloudSpeed
+  local _todo = "TODO: write a real Overlay:getCloudSpeed usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setCloudScale
 -- Sets the scale multiplier applied to each cloud shadow.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setCloudScale(v)
-print("Overlay:setCloudScale applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setCloudScale
+  local _todo = "TODO: write a real Overlay:setCloudScale usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getCloudScale
 -- Returns the current cloud shadow scale.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getCloudScale()
-print("Overlay:getCloudScale ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getCloudScale
+  local _todo = "TODO: write a real Overlay:getCloudScale usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setCloudOpacity
 -- Sets the opacity of cloud shadows (0.0 = invisible, 1.0 = fully dark).
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setCloudOpacity(v)
-print("Overlay:setCloudOpacity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setCloudOpacity
+  local _todo = "TODO: write a real Overlay:setCloudOpacity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getCloudOpacity
 -- Returns the current cloud shadow opacity.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getCloudOpacity()
-print("Overlay:getCloudOpacity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getCloudOpacity
+  local _todo = "TODO: write a real Overlay:getCloudOpacity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setWeatherEnabled
 -- Enables or disables the weather particle system.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setWeatherEnabled(v)
-print("Overlay:setWeatherEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setWeatherEnabled
+  local _todo = "TODO: write a real Overlay:setWeatherEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isWeatherEnabled
 -- Returns whether the weather particle system is active.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isWeatherEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isWeatherEnabled
+  local _todo = "TODO: write a real Overlay:isWeatherEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setWeather
 -- Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen").
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setWeather("main")
-print("Overlay:setWeather applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setWeather
+  local _todo = "TODO: write a real Overlay:setWeather usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getWeather
 -- Returns the name of the current weather type.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getWeather()
-print("Overlay:getWeather ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getWeather
+  local _todo = "TODO: write a real Overlay:getWeather usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setWeatherIntensity
 -- Sets the particle spawn rate multiplier (0.0â€“1.0).
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setWeatherIntensity(v)
-print("Overlay:setWeatherIntensity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setWeatherIntensity
+  local _todo = "TODO: write a real Overlay:setWeatherIntensity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getWeatherIntensity
 -- Returns the current weather intensity.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getWeatherIntensity()
-print("Overlay:getWeatherIntensity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getWeatherIntensity
+  local _todo = "TODO: write a real Overlay:getWeatherIntensity usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setWindDirection
 -- Sets the wind direction in radians (0 = right, Ď€/2 = down).
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setWindDirection(v)
-print("Overlay:setWindDirection applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setWindDirection
+  local _todo = "TODO: write a real Overlay:setWindDirection usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getWindDirection
 -- Returns the current wind direction in radians.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getWindDirection()
-print("Overlay:getWindDirection ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getWindDirection
+  local _todo = "TODO: write a real Overlay:getWindDirection usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setWindSpeed
 -- Sets the wind speed applied to weather particles in units per second.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setWindSpeed(v)
-print("Overlay:setWindSpeed applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setWindSpeed
+  local _todo = "TODO: write a real Overlay:setWindSpeed usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getWindSpeed
 -- Returns the current wind speed.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getWindSpeed()
-print("Overlay:getWindSpeed ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getWindSpeed
+  local _todo = "TODO: write a real Overlay:getWindSpeed usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getLightningColor
 -- Returns the lightning flash tint as r, g, b, a components.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getLightningColor()
-print("Overlay:getLightningColor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getLightningColor
+  local _todo = "TODO: write a real Overlay:getLightningColor usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isFlashing
 -- Returns true while a flash effect is in progress.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isFlashing() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isFlashing
+  local _todo = "TODO: write a real Overlay:isFlashing usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:shake
 -- Triggers a camera shake; duration defaults to 0.5 s.
--- See the module spec for detailed semantics.
-local overlay = lurek.effect.newOverlay()
-overlay:shake(intensity, dur)
-print("Overlay:shake done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:shake
+  local _todo = "TODO: write a real Overlay:shake usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isShaking
 -- Returns true while a shake effect is in progress.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isShaking() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isShaking
+  local _todo = "TODO: write a real Overlay:isShaking usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:isFading
 -- Returns true while a fade effect is in progress.
--- Use as a guard inside lurek.update or event handlers.
-local overlay = lurek.effect.newOverlay()
-if overlay:isFading() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:isFading
+  local _todo = "TODO: write a real Overlay:isFading usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:render
 -- Emits GPU render commands for all active overlay effects (flash, fade, lightning, vignette).
--- See the module spec for detailed semantics.
-local overlay = lurek.effect.newOverlay()
-overlay:render()
-print("Overlay:render done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:render
+  local _todo = "TODO: write a real Overlay:render usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:drawToImage
 -- Renders the effect state (flash, fade, effects) to a CPU ImageData.
--- Place inside `function lurek.render() ... end`.
-local overlay = lurek.effect.newOverlay()
-overlay:drawToImage(64, 64)
-print("Overlay:drawToImage done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:drawToImage
+  local _todo = "TODO: write a real Overlay:drawToImage usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:setCustomShader
 -- Assigns a custom shader name to the effect, or clears it when `nil` is passed.
--- Apply at startup or in response to user input.
-local overlay = lurek.effect.newOverlay()
-overlay:setCustomShader("main")
-print("Overlay:setCustomShader applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:setCustomShader
+  local _todo = "TODO: write a real Overlay:setCustomShader usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:getWater
 -- Returns a table describing the current water overlay state.
--- Cheap to call; safe inside callbacks.
-local overlay = lurek.effect.newOverlay()  -- or your existing handle
-local value = overlay:getWater()
-print("Overlay:getWater ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:getWater
+  local _todo = "TODO: write a real Overlay:getWater usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:type
 -- Returns the type name of this object ("Overlay").
--- See the module spec for detailed semantics.
-local overlay = lurek.effect.newOverlay()
-overlay:type()
-print("Overlay:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:type
+  local _todo = "TODO: write a real Overlay:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Overlay:typeOf
 -- Returns true if this object is of the given type ("Object" or "Overlay").
--- See the module spec for detailed semantics.
-local overlay = lurek.effect.newOverlay()
-overlay:typeOf("main")
-print("Overlay:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: Overlay:typeOf
+  local _todo = "TODO: write a real Overlay:typeOf usage example"
+  print(_todo)
+end
 
 -- ── mlua methods ──
 
 --@api-stub: mlua:play
 -- Starts the transition playing forward (scene fades/wipes out).
--- Trigger from input, timers, or game events.
-local mlua = lurek.effect.newmlua()
-mlua:play()
--- trigger from input, timer, or event
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:play
+  local _todo = "TODO: write a real mlua:play usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:reverse
 -- Starts the transition in reverse (scene fades/wipes in).
--- See the module spec for detailed semantics.
-local mlua = lurek.effect.newmlua()
-mlua:reverse()
-print("mlua:reverse done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:reverse
+  local _todo = "TODO: write a real mlua:reverse usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:update
 -- Advances the transition by `dt` seconds.
--- Apply at startup or in response to user input.
-local mlua = lurek.effect.newmlua()
-mlua:update(dt)
-print("mlua:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:update
+  local _todo = "TODO: write a real mlua:update usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:progress
 -- Returns the fractional progress `[0, 1]` of the transition, taking.
--- See the module spec for detailed semantics.
-local mlua = lurek.effect.newmlua()
-mlua:progress()
-print("mlua:progress done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:progress
+  local _todo = "TODO: write a real mlua:progress usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:isActive
 -- Returns `true` while the transition is running.
--- Use as a guard inside lurek.update or event handlers.
-local mlua = lurek.effect.newmlua()
-if mlua:isActive() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:isActive
+  local _todo = "TODO: write a real mlua:isActive usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:isDone
 -- Returns `true` after the transition has completed.
--- Use as a guard inside lurek.update or event handlers.
-local mlua = lurek.effect.newmlua()
-if mlua:isDone() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:isDone
+  local _todo = "TODO: write a real mlua:isDone usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:kind
 -- Returns the transition kind name (`"fade"`, `"wipe"`, `"iris_wipe"`,.
--- See the module spec for detailed semantics.
-local mlua = lurek.effect.newmlua()
-mlua:kind()
-print("mlua:kind done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:kind
+  local _todo = "TODO: write a real mlua:kind usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:color
 -- Returns the fill color as four numbers: `r, g, b, a`.
--- See the module spec for detailed semantics.
-local mlua = lurek.effect.newmlua()
-mlua:color()
-print("mlua:color done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:color
+  local _todo = "TODO: write a real mlua:color usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:setColor
 -- Updates the fill color from `{r, g, b, a?}`.
--- Apply at startup or in response to user input.
-local mlua = lurek.effect.newmlua()
-mlua:setColor()
-print("mlua:setColor applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:setColor
+  local _todo = "TODO: write a real mlua:setColor usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:type
 -- Type.
--- See the module spec for detailed semantics.
-local mlua = lurek.effect.newmlua()
-mlua:type()
-print("mlua:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:type
+  local _todo = "TODO: write a real mlua:type usage example"
+  print(_todo)
+end
 
 --@api-stub: mlua:typeOf
 -- Type of.
--- See the module spec for detailed semantics.
-local mlua = lurek.effect.newmlua()
-mlua:typeOf("main")
-print("mlua:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/effect_api.rs and docs/specs/effect.md).
+do  -- TODO: mlua:typeOf
+  local _todo = "TODO: write a real mlua:typeOf usage example"
+  print(_todo)
+end
 

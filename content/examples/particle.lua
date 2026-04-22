@@ -1,614 +1,701 @@
 -- content/examples/particle.lua
--- love2d-style usage snippets for the lurek.particle API (84 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.particle API (84 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/particle_api.rs   (Lua binding, arg types, return shape)
+--   * src/particle/                 (semantics, side effects)
+--   * docs/specs/particle.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/particle.lua
 
 -- ── lurek.particle.* functions ──
 
 --@api-stub: lurek.particle.newSystem
 -- Creates a new particle system and stores it in the engine pool.
--- Build once at startup; reuse across frames.
-local system = lurek.particle.newSystem({ x = 0, y = 0 })
-print("created", system)
-return system
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: lurek.particle.newSystem
+  local _todo = "TODO: write a real lurek.particle.newSystem usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.particle.newTrail
 -- Creates a new trail ribbon effect.
--- Build once at startup; reuse across frames.
-local trail = lurek.particle.newTrail(lifetime, start_width)
-print("created", trail)
-return trail
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: lurek.particle.newTrail
+  local _todo = "TODO: write a real lurek.particle.newTrail usage example"
+  print(_todo)
+end
 
 -- ── ParticleSystem methods ──
 
 --@api-stub: ParticleSystem:update
 -- Advances the particle simulation by dt seconds.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:update(dt)
-print("ParticleSystem:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:update
+  local _todo = "TODO: write a real ParticleSystem:update usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:emit
 -- Emits a burst of the given number of particles.
--- Side-effecting; safe to call any time after init.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:emit(10)
-print("ParticleSystem:emit done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:emit
+  local _todo = "TODO: write a real ParticleSystem:emit usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:start
 -- Starts or restarts particle emission.
--- Trigger from input, timers, or game events.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:start()
--- trigger from input, timer, or event
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:start
+  local _todo = "TODO: write a real ParticleSystem:start usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:stop
 -- Stops particle emission immediately.
--- Trigger from input, timers, or game events.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:stop()
--- trigger from input, timer, or event
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:stop
+  local _todo = "TODO: write a real ParticleSystem:stop usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:pause
 -- Pauses particle emission; existing particles continue to simulate.
--- Trigger from input, timers, or game events.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:pause()
--- trigger from input, timer, or event
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:pause
+  local _todo = "TODO: write a real ParticleSystem:pause usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:resume
 -- Resumes a paused emitter.
--- Trigger from input, timers, or game events.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:resume()
--- trigger from input, timer, or event
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:resume
+  local _todo = "TODO: write a real ParticleSystem:resume usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:reset
 -- Removes all particles and resets the emitter.
--- Pair with the matching constructor to free resources.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:reset()
--- particleSystem is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:reset
+  local _todo = "TODO: write a real ParticleSystem:reset usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:moveTo
 -- Moves the emitter to the given world position.
--- See the module spec for detailed semantics.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:moveTo(100, 100)
-print("ParticleSystem:moveTo done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:moveTo
+  local _todo = "TODO: write a real ParticleSystem:moveTo usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:count
 -- Returns the number of living particles.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:count()
-print("ParticleSystem:count ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:count
+  local _todo = "TODO: write a real ParticleSystem:count usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:isActive
 -- Returns true if the emitter is currently emitting or has live particles.
--- Use as a guard inside lurek.update or event handlers.
-local particleSystem = lurek.particle.newParticleSystem()
-if particleSystem:isActive() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:isActive
+  local _todo = "TODO: write a real ParticleSystem:isActive usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:isPaused
 -- Returns true if the emitter is paused.
--- Use as a guard inside lurek.update or event handlers.
-local particleSystem = lurek.particle.newParticleSystem()
-if particleSystem:isPaused() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:isPaused
+  local _todo = "TODO: write a real ParticleSystem:isPaused usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:isStopped
 -- Returns true if the emitter is stopped.
--- Use as a guard inside lurek.update or event handlers.
-local particleSystem = lurek.particle.newParticleSystem()
-if particleSystem:isStopped() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:isStopped
+  local _todo = "TODO: write a real ParticleSystem:isStopped usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:isEmpty
 -- Returns true if there are no live particles.
--- Use as a guard inside lurek.update or event handlers.
-local particleSystem = lurek.particle.newParticleSystem()
-if particleSystem:isEmpty() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:isEmpty
+  local _todo = "TODO: write a real ParticleSystem:isEmpty usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:isFull
 -- Returns true if the system has reached max_particles.
--- Use as a guard inside lurek.update or event handlers.
-local particleSystem = lurek.particle.newParticleSystem()
-if particleSystem:isFull() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:isFull
+  local _todo = "TODO: write a real ParticleSystem:isFull usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:release
 -- Removes the particle system from the engine, freeing its slot.
--- See the module spec for detailed semantics.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:release()
-print("ParticleSystem:release done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:release
+  local _todo = "TODO: write a real ParticleSystem:release usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getCount
 -- Returns the number of living particles (alias for count).
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getCount()
-print("ParticleSystem:getCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getCount
+  local _todo = "TODO: write a real ParticleSystem:getCount usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:type
 -- Returns the type name "ParticleSystem".
--- See the module spec for detailed semantics.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:type()
-print("ParticleSystem:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:type
+  local _todo = "TODO: write a real ParticleSystem:type usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:typeOf
 -- Returns true if this matches the given type name.
--- See the module spec for detailed semantics.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:typeOf("main")
-print("ParticleSystem:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:typeOf
+  local _todo = "TODO: write a real ParticleSystem:typeOf usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setPosition
 -- Sets the emitter world position.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setPosition(100, 100)
-print("ParticleSystem:setPosition applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setPosition
+  local _todo = "TODO: write a real ParticleSystem:setPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getPosition
 -- Returns the emitter world position.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getPosition()
-print("ParticleSystem:getPosition ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getPosition
+  local _todo = "TODO: write a real ParticleSystem:getPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setEmissionRate
 -- Sets particles emitted per second.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setEmissionRate(rate)
-print("ParticleSystem:setEmissionRate applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setEmissionRate
+  local _todo = "TODO: write a real ParticleSystem:setEmissionRate usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getEmissionRate
 -- Returns particles emitted per second.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getEmissionRate()
-print("ParticleSystem:getEmissionRate ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getEmissionRate
+  local _todo = "TODO: write a real ParticleSystem:getEmissionRate usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setParticleLifetime
 -- Sets min and max particle lifetime in seconds.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setParticleLifetime(0, 100)
-print("ParticleSystem:setParticleLifetime applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setParticleLifetime
+  local _todo = "TODO: write a real ParticleSystem:setParticleLifetime usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getParticleLifetime
 -- Returns min and max particle lifetime.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getParticleLifetime()
-print("ParticleSystem:getParticleLifetime ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getParticleLifetime
+  local _todo = "TODO: write a real ParticleSystem:getParticleLifetime usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setEmitterLifetime
 -- Sets how long the emitter runs before auto-stopping.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setEmitterLifetime(t)
-print("ParticleSystem:setEmitterLifetime applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setEmitterLifetime
+  local _todo = "TODO: write a real ParticleSystem:setEmitterLifetime usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getEmitterLifetime
 -- Returns the emitter lifetime.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getEmitterLifetime()
-print("ParticleSystem:getEmitterLifetime ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getEmitterLifetime
+  local _todo = "TODO: write a real ParticleSystem:getEmitterLifetime usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setSpeed
 -- Sets min/max initial speed.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setSpeed(0, 100)
-print("ParticleSystem:setSpeed applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setSpeed
+  local _todo = "TODO: write a real ParticleSystem:setSpeed usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getSpeed
 -- Returns min/max initial speed.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getSpeed()
-print("ParticleSystem:getSpeed ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getSpeed
+  local _todo = "TODO: write a real ParticleSystem:getSpeed usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setDirection
 -- Sets emission direction in radians.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setDirection("data/file.txt")
-print("ParticleSystem:setDirection applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setDirection
+  local _todo = "TODO: write a real ParticleSystem:setDirection usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getDirection
 -- Returns emission direction in radians.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getDirection()
-print("ParticleSystem:getDirection ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getDirection
+  local _todo = "TODO: write a real ParticleSystem:getDirection usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setSpread
 -- Sets emission spread (half-angle cone) in radians.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setSpread(spread)
-print("ParticleSystem:setSpread applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setSpread
+  local _todo = "TODO: write a real ParticleSystem:setSpread usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getSpread
 -- Returns the half-angle spread in radians for the emission cone.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getSpread()
-print("ParticleSystem:getSpread ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getSpread
+  local _todo = "TODO: write a real ParticleSystem:getSpread usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getLinearAcceleration
 -- Returns linear acceleration range.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getLinearAcceleration()
-print("ParticleSystem:getLinearAcceleration ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getLinearAcceleration
+  local _todo = "TODO: write a real ParticleSystem:getLinearAcceleration usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getRadialAcceleration
 -- Returns radial acceleration range.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getRadialAcceleration()
-print("ParticleSystem:getRadialAcceleration ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getRadialAcceleration
+  local _todo = "TODO: write a real ParticleSystem:getRadialAcceleration usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getTangentialAcceleration
 -- Returns tangential acceleration range.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getTangentialAcceleration()
-print("ParticleSystem:getTangentialAcceleration ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getTangentialAcceleration
+  local _todo = "TODO: write a real ParticleSystem:getTangentialAcceleration usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setLinearDamping
 -- Sets linear damping range.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setLinearDamping(0, 100)
-print("ParticleSystem:setLinearDamping applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setLinearDamping
+  local _todo = "TODO: write a real ParticleSystem:setLinearDamping usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getLinearDamping
 -- Returns linear damping range.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getLinearDamping()
-print("ParticleSystem:getLinearDamping ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getLinearDamping
+  local _todo = "TODO: write a real ParticleSystem:getLinearDamping usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setSizes
 -- Sets size keyframes (varargs: each number is one keyframe).
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setSizes(sizes)
-print("ParticleSystem:setSizes applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setSizes
+  local _todo = "TODO: write a real ParticleSystem:setSizes usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getSizes
 -- Returns size keyframes as a Lua table.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getSizes()
-print("ParticleSystem:getSizes ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getSizes
+  local _todo = "TODO: write a real ParticleSystem:getSizes usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setSizeVariation
 -- Sets size variation (0â€“1).
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setSizeVariation(v)
-print("ParticleSystem:setSizeVariation applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setSizeVariation
+  local _todo = "TODO: write a real ParticleSystem:setSizeVariation usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getSizeVariation
 -- Returns the maximum random size variation applied to newly emitted particles.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getSizeVariation()
-print("ParticleSystem:getSizeVariation ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getSizeVariation
+  local _todo = "TODO: write a real ParticleSystem:getSizeVariation usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setRotation
 -- Sets initial rotation range in radians.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setRotation(0, 100)
-print("ParticleSystem:setRotation applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setRotation
+  local _todo = "TODO: write a real ParticleSystem:setRotation usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getRotation
 -- Returns initial rotation range.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getRotation()
-print("ParticleSystem:getRotation ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getRotation
+  local _todo = "TODO: write a real ParticleSystem:getRotation usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setSpin
 -- Sets angular velocity range.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setSpin(0, 100)
-print("ParticleSystem:setSpin applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setSpin
+  local _todo = "TODO: write a real ParticleSystem:setSpin usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getSpin
 -- Returns angular velocity range.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getSpin()
-print("ParticleSystem:getSpin ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getSpin
+  local _todo = "TODO: write a real ParticleSystem:getSpin usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setSpinVariation
 -- Sets spin variation (0â€“1).
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setSpinVariation(v)
-print("ParticleSystem:setSpinVariation applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setSpinVariation
+  local _todo = "TODO: write a real ParticleSystem:setSpinVariation usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getSpinVariation
 -- Returns the maximum random angular velocity variation for new particles.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getSpinVariation()
-print("ParticleSystem:getSpinVariation ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getSpinVariation
+  local _todo = "TODO: write a real ParticleSystem:getSpinVariation usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setRelativeRotation
 -- Sets whether particle rotation follows velocity direction.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setRelativeRotation(v)
-print("ParticleSystem:setRelativeRotation applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setRelativeRotation
+  local _todo = "TODO: write a real ParticleSystem:setRelativeRotation usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:hasRelativeRotation
 -- Returns whether relative rotation is enabled.
--- Use as a guard inside lurek.update or event handlers.
-local particleSystem = lurek.particle.newParticleSystem()
-if particleSystem:hasRelativeRotation() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:hasRelativeRotation
+  local _todo = "TODO: write a real ParticleSystem:hasRelativeRotation usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setColors
 -- Sets color keyframes.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setColors({1, 0.5, 0, 1})
-print("ParticleSystem:setColors applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setColors
+  local _todo = "TODO: write a real ParticleSystem:setColors usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getColors
 -- Returns color keyframes as a table of {r,g,b,a} tables.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getColors()
-print("ParticleSystem:getColors ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getColors
+  local _todo = "TODO: write a real ParticleSystem:getColors usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setOffset
 -- Sets the render origin offset.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setOffset(ox, oy)
-print("ParticleSystem:setOffset applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setOffset
+  local _todo = "TODO: write a real ParticleSystem:setOffset usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getOffset
 -- Returns the render origin offset.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getOffset()
-print("ParticleSystem:getOffset ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getOffset
+  local _todo = "TODO: write a real ParticleSystem:getOffset usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setInsertMode
 -- Sets the insert mode: "top", "bottom", or "random".
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setInsertMode(mode)
-print("ParticleSystem:setInsertMode applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setInsertMode
+  local _todo = "TODO: write a real ParticleSystem:setInsertMode usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getInsertMode
 -- Returns the insert mode as a string.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getInsertMode()
-print("ParticleSystem:getInsertMode ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getInsertMode
+  local _todo = "TODO: write a real ParticleSystem:getInsertMode usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setBufferSize
 -- Sets the maximum number of particles (resizes the pool).
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setBufferSize(10)
-print("ParticleSystem:setBufferSize applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setBufferSize
+  local _todo = "TODO: write a real ParticleSystem:setBufferSize usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getBufferSize
 -- Returns the maximum particle count.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getBufferSize()
-print("ParticleSystem:getBufferSize ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getBufferSize
+  local _todo = "TODO: write a real ParticleSystem:getBufferSize usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setEmissionArea
 -- Sets emission area distribution and size.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setEmissionArea(dist, 64, 64, 0, "data/file.txt")
-print("ParticleSystem:setEmissionArea applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setEmissionArea
+  local _todo = "TODO: write a real ParticleSystem:setEmissionArea usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getEmissionArea
 -- Returns emission area: dist-string, w, h.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getEmissionArea()
-print("ParticleSystem:getEmissionArea ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getEmissionArea
+  local _todo = "TODO: write a real ParticleSystem:getEmissionArea usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setShape
 -- Sets the particle draw shape.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setShape(shape)
-print("ParticleSystem:setShape applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setShape
+  local _todo = "TODO: write a real ParticleSystem:setShape usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getShape
 -- Returns the particle draw shape as a string.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getShape()
-print("ParticleSystem:getShape ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getShape
+  local _todo = "TODO: write a real ParticleSystem:getShape usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getGravity
 -- Returns the gravity acceleration applied to particles as two numbers `gx, gy`.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getGravity()
-print("ParticleSystem:getGravity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getGravity
+  local _todo = "TODO: write a real ParticleSystem:getGravity usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:setGravity
 -- Sets the gravity acceleration applied to all active particles each frame.
--- Apply at startup or in response to user input.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:setGravity(gx, gy)
-print("ParticleSystem:setGravity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:setGravity
+  local _todo = "TODO: write a real ParticleSystem:setGravity usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:render
 -- Renders all live particles to the GPU command queue.
--- See the module spec for detailed semantics.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:render(ox, oy)
-print("ParticleSystem:render done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:render
+  local _todo = "TODO: write a real ParticleSystem:render usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:clone
 -- Creates a copy of this particle system (config only, no live particles).
--- See the module spec for detailed semantics.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:clone()
-print("ParticleSystem:clone done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:clone
+  local _todo = "TODO: write a real ParticleSystem:clone usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:drawToImage
 -- Renders all live particles to a CPU ImageData.
--- Place inside `function lurek.render() ... end`.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:drawToImage(64, 64)
-print("ParticleSystem:drawToImage done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:drawToImage
+  local _todo = "TODO: write a real ParticleSystem:drawToImage usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:toImage
 -- Alias for `drawToImage`.
--- See the module spec for detailed semantics.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:toImage(64, 64)
-print("ParticleSystem:toImage done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:toImage
+  local _todo = "TODO: write a real ParticleSystem:toImage usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:warmUp
 -- Pre-simulates the particle system for `seconds` so it appears fully.
--- See the module spec for detailed semantics.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:warmUp(1.0)
-print("ParticleSystem:warmUp done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:warmUp
+  local _todo = "TODO: write a real ParticleSystem:warmUp usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:clearAttractors
 -- Removes all attractors from this particle system.
--- Pair with the matching constructor to free resources.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:clearAttractors()
--- particleSystem is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:clearAttractors
+  local _todo = "TODO: write a real ParticleSystem:clearAttractors usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getAttractorCount
 -- Returns the number of attractors currently registered on this system.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getAttractorCount()
-print("ParticleSystem:getAttractorCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getAttractorCount
+  local _todo = "TODO: write a real ParticleSystem:getAttractorCount usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:clearBounds
 -- Removes the bounding rectangle so particles can move freely.
--- Pair with the matching constructor to free resources.
-local particleSystem = lurek.particle.newParticleSystem()
-particleSystem:clearBounds()
--- particleSystem is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:clearBounds
+  local _todo = "TODO: write a real ParticleSystem:clearBounds usage example"
+  print(_todo)
+end
 
 --@api-stub: ParticleSystem:getFlipbook
 -- Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
--- Cheap to call; safe inside callbacks.
-local particleSystem = lurek.particle.newParticleSystem()  -- or your existing handle
-local value = particleSystem:getFlipbook()
-print("ParticleSystem:getFlipbook ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: ParticleSystem:getFlipbook
+  local _todo = "TODO: write a real ParticleSystem:getFlipbook usage example"
+  print(_todo)
+end
 
 -- ── Trail methods ──
 
 --@api-stub: Trail:pushPoint
 -- Appends a new point to the trail head.
--- Side-effecting; safe to call any time after init.
-local trail = lurek.particle.newTrail()
-trail:pushPoint(100, 100)
-print("Trail:pushPoint done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:pushPoint
+  local _todo = "TODO: write a real Trail:pushPoint usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:update
 -- Ages trail points and removes expired ones.
--- Apply at startup or in response to user input.
-local trail = lurek.particle.newTrail()
-trail:update(dt)
-print("Trail:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:update
+  local _todo = "TODO: write a real Trail:update usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:setWidth
 -- Sets the start and end width of the trail ribbon.
--- Apply at startup or in response to user input.
-local trail = lurek.particle.newTrail()
-trail:setWidth(start, end)
-print("Trail:setWidth applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:setWidth
+  local _todo = "TODO: write a real Trail:setWidth usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:getWidth
 -- Returns the start and end width.
--- Cheap to call; safe inside callbacks.
-local trail = lurek.particle.newTrail()  -- or your existing handle
-local value = trail:getWidth()
-print("Trail:getWidth ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:getWidth
+  local _todo = "TODO: write a real Trail:getWidth usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:setLifetime
 -- Sets how long each trail point persists in seconds.
--- Apply at startup or in response to user input.
-local trail = lurek.particle.newTrail()
-trail:setLifetime(lifetime)
-print("Trail:setLifetime applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:setLifetime
+  local _todo = "TODO: write a real Trail:setLifetime usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:getLifetime
 -- Returns the trail point lifetime in seconds.
--- Cheap to call; safe inside callbacks.
-local trail = lurek.particle.newTrail()  -- or your existing handle
-local value = trail:getLifetime()
-print("Trail:getLifetime ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:getLifetime
+  local _todo = "TODO: write a real Trail:getLifetime usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:setMinDistance
 -- Sets the minimum distance between trail points.
--- Apply at startup or in response to user input.
-local trail = lurek.particle.newTrail()
-trail:setMinDistance(distance)
-print("Trail:setMinDistance applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:setMinDistance
+  local _todo = "TODO: write a real Trail:setMinDistance usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:getPointCount
 -- Returns the number of active trail points.
--- Cheap to call; safe inside callbacks.
-local trail = lurek.particle.newTrail()  -- or your existing handle
-local value = trail:getPointCount()
-print("Trail:getPointCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:getPointCount
+  local _todo = "TODO: write a real Trail:getPointCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:clear
 -- Removes all trail points.
--- Pair with the matching constructor to free resources.
-local trail = lurek.particle.newTrail()
-trail:clear()
--- trail is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:clear
+  local _todo = "TODO: write a real Trail:clear usage example"
+  print(_todo)
+end
 
 --@api-stub: Trail:drawToImage
 -- Renders the trail ribbon to a CPU ImageData.
--- Place inside `function lurek.render() ... end`.
-local trail = lurek.particle.newTrail()
-trail:drawToImage(64, 64)
-print("Trail:drawToImage done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/particle_api.rs and docs/specs/particle.md).
+do  -- TODO: Trail:drawToImage
+  local _todo = "TODO: write a real Trail:drawToImage usage example"
+  print(_todo)
+end
 

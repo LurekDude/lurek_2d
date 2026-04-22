@@ -1,598 +1,671 @@
 -- content/examples/input.lua
--- love2d-style usage snippets for the lurek.input API (80 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.input API (80 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/input_api.rs   (Lua binding, arg types, return shape)
+--   * src/input/                 (semantics, side effects)
+--   * docs/specs/input.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/input.lua
 
 -- ── lurek.input.* functions ──
 
 --@api-stub: lurek.input.isDown
 -- Returns true if any of the given keys is currently held down.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isDown({ x = 0, y = 0 }) then
-  print("isDown -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isDown
+  local _todo = "TODO: write a real lurek.input.isDown usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.isScancodeDown
 -- Returns whether the key with the given scancode is held.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isScancodeDown(scancode) then
-  print("isScancodeDown -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isScancodeDown
+  local _todo = "TODO: write a real lurek.input.isScancodeDown usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.setKeyRepeat
 -- Enables or disables key-repeat events.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setKeyRepeat(enabled)
-print("setKeyRepeat applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setKeyRepeat
+  local _todo = "TODO: write a real lurek.input.setKeyRepeat usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.hasKeyRepeat
 -- Returns whether key-repeat is currently enabled.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.hasKeyRepeat() then
-  print("hasKeyRepeat -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.hasKeyRepeat
+  local _todo = "TODO: write a real lurek.input.hasKeyRepeat usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.setTextInput
 -- Enables or disables Unicode text input mode.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setTextInput(enabled)
-print("setTextInput applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setTextInput
+  local _todo = "TODO: write a real lurek.input.setTextInput usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.hasTextInput
 -- Returns whether text input mode is currently active.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.hasTextInput() then
-  print("hasTextInput -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.hasTextInput
+  local _todo = "TODO: write a real lurek.input.hasTextInput usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.getScancodeFromKey
 -- Returns the hardware scancode for the given key name.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getScancodeFromKey("space")
-print("getScancodeFromKey:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getScancodeFromKey
+  local _todo = "TODO: write a real lurek.input.getScancodeFromKey usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getKeyFromScancode
 -- Returns the key name for the given hardware scancode.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getKeyFromScancode(scancode)
-print("getKeyFromScancode:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getKeyFromScancode
+  local _todo = "TODO: write a real lurek.input.getKeyFromScancode usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isModifierActive
 -- Returns whether the named modifier key is currently held.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isModifierActive(modifier) then
-  print("isModifierActive -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isModifierActive
+  local _todo = "TODO: write a real lurek.input.isModifierActive usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.getPosition
 -- Returns the current cursor position as (x, y).
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getPosition()
-print("getPosition:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getPosition
+  local _todo = "TODO: write a real lurek.input.getPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getX
 -- Returns the current mouse X position in window coordinates.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getX()
-print("getX:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getX
+  local _todo = "TODO: write a real lurek.input.getX usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getY
 -- Returns the current mouse Y position in window coordinates.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getY()
-print("getY:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getY
+  local _todo = "TODO: write a real lurek.input.getY usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isDown
 -- Returns whether the given mouse button is currently held down.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isDown("left") then
-  print("isDown -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isDown
+  local _todo = "TODO: write a real lurek.input.isDown usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.setVisible
 -- Shows or hides the operating-system mouse cursor.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setVisible(visible)
-print("setVisible applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setVisible
+  local _todo = "TODO: write a real lurek.input.setVisible usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isVisible
 -- Returns whether the mouse cursor is currently visible.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isVisible() then
-  print("isVisible -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isVisible
+  local _todo = "TODO: write a real lurek.input.isVisible usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.setGrabbed
 -- Locks or unlocks the mouse cursor to the window.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setGrabbed(grabbed)
-print("setGrabbed applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setGrabbed
+  local _todo = "TODO: write a real lurek.input.setGrabbed usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isGrabbed
 -- Returns whether the mouse cursor is locked to the window.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isGrabbed() then
-  print("isGrabbed -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isGrabbed
+  local _todo = "TODO: write a real lurek.input.isGrabbed usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.setRelativeMode
 -- Enables or disables raw relative mouse motion mode.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setRelativeMode(relative)
-print("setRelativeMode applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setRelativeMode
+  local _todo = "TODO: write a real lurek.input.setRelativeMode usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getRelativeMode
 -- Returns whether relative mouse mode is active.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getRelativeMode()
-print("getRelativeMode:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getRelativeMode
+  local _todo = "TODO: write a real lurek.input.getRelativeMode usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.setPosition
 -- Moves the mouse cursor to the given window-space position.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setPosition(100, 100)
-print("setPosition applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setPosition
+  local _todo = "TODO: write a real lurek.input.setPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.setCursor
 -- Sets the active mouse cursor from a Cursor handle, name string, or nil to reset.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setCursor(cursor_val)
-print("setCursor applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setCursor
+  local _todo = "TODO: write a real lurek.input.setCursor usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.newCursor
 -- Creates a custom mouse cursor from RGBA pixel data.
--- Build once at startup; reuse across frames.
-local cursor = lurek.input.newCursor()
-print("created", cursor)
-return cursor
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.newCursor
+  local _todo = "TODO: write a real lurek.input.newCursor usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getSystemCursor
 -- Returns a system cursor object for the named cursor shape.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getSystemCursor("main")
-print("getSystemCursor:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getSystemCursor
+  local _todo = "TODO: write a real lurek.input.getSystemCursor usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isCursorSupported
 -- Returns whether cursor customisation is supported on this platform.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isCursorSupported() then
-  print("isCursorSupported -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isCursorSupported
+  local _todo = "TODO: write a real lurek.input.isCursorSupported usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.getCursor
 -- Returns the name of the currently active system cursor.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getCursor()
-print("getCursor:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getCursor
+  local _todo = "TODO: write a real lurek.input.getCursor usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getWheelDelta
 -- Returns the mouse scroll wheel delta (dx, dy) since last frame.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getWheelDelta()
-print("getWheelDelta:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getWheelDelta
+  local _todo = "TODO: write a real lurek.input.getWheelDelta usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getCount
 -- Returns the number of connected gamepads.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getCount()
-print("getCount:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getCount
+  local _todo = "TODO: write a real lurek.input.getCount usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getJoystickCount
 -- Returns the number of tracked gamepad slots.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getJoystickCount()
-print("getJoystickCount:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getJoystickCount
+  local _todo = "TODO: write a real lurek.input.getJoystickCount usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getJoysticks
 -- Returns a list of connected gamepad IDs.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getJoysticks()
-print("getJoysticks:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getJoysticks
+  local _todo = "TODO: write a real lurek.input.getJoysticks usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isConnected
 -- Returns whether the gamepad with the given ID is connected.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isConnected(1) then
-  print("isConnected -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isConnected
+  local _todo = "TODO: write a real lurek.input.isConnected usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.getName
 -- Returns the human-readable name of a gamepad.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getName(1)
-print("getName:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getName
+  local _todo = "TODO: write a real lurek.input.getName usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isGamepad
 -- Returns whether the joystick at the given slot is a recognized gamepad.
--- Place inside `function lurek.update(dt) ... end`.
-function lurek.update(dt)
-  lurek.input.isGamepad(1)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isGamepad
+  local _todo = "TODO: write a real lurek.input.isGamepad usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.getButtonCount
 -- Returns the total number of buttons on the gamepad.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getButtonCount(1)
-print("getButtonCount:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getButtonCount
+  local _todo = "TODO: write a real lurek.input.getButtonCount usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getAxisCount
 -- Returns the total number of analog axes on the gamepad.
--- Place inside `function lurek.update(dt) ... end`.
-function lurek.update(dt)
-  lurek.input.getAxisCount(1)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getAxisCount
+  local _todo = "TODO: write a real lurek.input.getAxisCount usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.isDown
 -- Returns whether the given button on the gamepad is currently held.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isDown(1, "left") then
-  print("isDown -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isDown
+  local _todo = "TODO: write a real lurek.input.isDown usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.getAxis
 -- Returns the current value (-1 to 1) of a gamepad analog axis.
--- Place inside `function lurek.update(dt) ... end`.
-function lurek.update(dt)
-  local ax = lurek.input.getAxis("leftx")
-  player.vx = ax * 200
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getAxis
+  local _todo = "TODO: write a real lurek.input.getAxis usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.isVibrationSupported
 -- Returns whether the gamepad supports haptic vibration.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isVibrationSupported(1) then
-  print("isVibrationSupported -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isVibrationSupported
+  local _todo = "TODO: write a real lurek.input.isVibrationSupported usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.vibrate
 -- Requests haptic vibration on a gamepad.
--- See the module spec for detailed semantics.
-local result = lurek.input.vibrate(1, low_freq, high_freq, duration_ms)
-print("vibrate:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.vibrate
+  local _todo = "TODO: write a real lurek.input.vibrate usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getGUID
 -- Returns the hardware GUID string of the gamepad.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getGUID(1)
-print("getGUID:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getGUID
+  local _todo = "TODO: write a real lurek.input.getGUID usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getHat
 -- Returns the direction string of a hat switch on the gamepad.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getHat(1, hat)
-print("getHat:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getHat
+  local _todo = "TODO: write a real lurek.input.getHat usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.setVibration
 -- Triggers haptic rumble (currently a no-op stub).
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setVibration({ x = 0, y = 0 })
-print("setVibration applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setVibration
+  local _todo = "TODO: write a real lurek.input.setVibration usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.setBackgroundEvents
 -- Enable or disable receiving gamepad events when the window is not focused.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setBackgroundEvents(enable)
-print("setBackgroundEvents applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setBackgroundEvents
+  local _todo = "TODO: write a real lurek.input.setBackgroundEvents usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getBackgroundEvents
 -- Returns whether background gamepad events are enabled.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getBackgroundEvents()
-print("getBackgroundEvents:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getBackgroundEvents
+  local _todo = "TODO: write a real lurek.input.getBackgroundEvents usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.setGamepadMapping
 -- Stores or replaces the SDL2 GameControllerDB mapping string for the given GUID.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.input.setGamepadMapping(1, mapping)
-print("setGamepadMapping applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.setGamepadMapping
+  local _todo = "TODO: write a real lurek.input.setGamepadMapping usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getGamepadMappingString
 -- Returns the stored mapping string for the given GUID, or nil.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getGamepadMappingString(1)
-print("getGamepadMappingString:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getGamepadMappingString
+  local _todo = "TODO: write a real lurek.input.getGamepadMappingString usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.loadGamepadMappings
 -- Loads SDL2 GameControllerDB-format mappings from a file.
--- May block — call from a worker thread for large payloads.
-local result = lurek.input.loadGamepadMappings("data/file.txt")
--- may block; consider lurek.thread for large payloads
-print("loadGamepadMappings:", result)
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.loadGamepadMappings
+  local _todo = "TODO: write a real lurek.input.loadGamepadMappings usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.saveGamepadMappings
 -- Saves all stored gamepad mappings to a plain-text file.
--- May block — call from a worker thread for large payloads.
-local result = lurek.input.saveGamepadMappings("data/file.txt")
--- may block; consider lurek.thread for large payloads
-print("saveGamepadMappings:", result)
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.saveGamepadMappings
+  local _todo = "TODO: write a real lurek.input.saveGamepadMappings usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getTouches
 -- Returns a table of active touch points with id, x, y, and pressure fields.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getTouches()
-print("getTouches:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getTouches
+  local _todo = "TODO: write a real lurek.input.getTouches usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getPosition
 -- Returns the position (x, y) of the touch with the given ID.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getPosition(1)
-print("getPosition:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getPosition
+  local _todo = "TODO: write a real lurek.input.getPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getPressure
 -- Returns the pressure (0-1) of the touch with the given ID.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getPressure(1)
-print("getPressure:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getPressure
+  local _todo = "TODO: write a real lurek.input.getPressure usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getTouchCount
 -- Returns the number of currently active touch points.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getTouchCount()
-print("getTouchCount:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getTouchCount
+  local _todo = "TODO: write a real lurek.input.getTouchCount usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.bind
 -- Maps an action name to one or more key/button names.
--- Side-effecting; safe to call any time after init.
-lurek.input.bind(action, keys)
--- mutator; side effect applied
-print("bind done")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.bind
+  local _todo = "TODO: write a real lurek.input.bind usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.unbind
 -- Removes all key bindings for the given action name.
--- Pair with the matching constructor to free resources.
--- release the resource and forget the handle
-lurek.input.unbind(action)
-print("unbind done")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.unbind
+  local _todo = "TODO: write a real lurek.input.unbind usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.clearBindings
 -- Removes all action bindings.
--- Pair with the matching constructor to free resources.
--- release the resource and forget the handle
-lurek.input.clearBindings()
-print("clearBindings done")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.clearBindings
+  local _todo = "TODO: write a real lurek.input.clearBindings usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.getBindings
 -- Returns a table mapping each action name to its bound keys.
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getBindings()
-print("getBindings:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getBindings
+  local _todo = "TODO: write a real lurek.input.getBindings usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isActionDown
 -- Returns true if any key bound to the action is currently held down.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isActionDown(action) then
-  print("isActionDown -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isActionDown
+  local _todo = "TODO: write a real lurek.input.isActionDown usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.wasActionPressed
 -- Returns true if any key bound to the action was pressed this frame.
--- See the module spec for detailed semantics.
-local result = lurek.input.wasActionPressed(action)
-print("wasActionPressed:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.wasActionPressed
+  local _todo = "TODO: write a real lurek.input.wasActionPressed usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.wasActionReleased
 -- Returns true if any key bound to the action was released this frame.
--- See the module spec for detailed semantics.
-local result = lurek.input.wasActionReleased(action)
-print("wasActionReleased:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.wasActionReleased
+  local _todo = "TODO: write a real lurek.input.wasActionReleased usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.wasActionPressedWithin
 -- Was action pressed within.
--- See the module spec for detailed semantics.
-local result = lurek.input.wasActionPressedWithin(action, frames)
-print("wasActionPressedWithin:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.wasActionPressedWithin
+  local _todo = "TODO: write a real lurek.input.wasActionPressedWithin usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.newCombo
 -- Creates a new combo detector from an ordered list of steps.
--- Build once at startup; reuse across frames.
-local combo = lurek.input.newCombo(steps_val, { x = 0, y = 0 })
-print("created", combo)
-return combo
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.newCombo
+  local _todo = "TODO: write a real lurek.input.newCombo usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.startRecording
 -- Starts capturing input events frame-by-frame.
--- Trigger from input, timers, or game events.
--- trigger from input or timer
-lurek.input.startRecording()
-print("startRecording fired")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.startRecording
+  local _todo = "TODO: write a real lurek.input.startRecording usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.stopRecording
 -- Stops recording and returns an `InputRecording` userdata, or nil if not recording.
--- Trigger from input, timers, or game events.
--- trigger from input or timer
-lurek.input.stopRecording()
-print("stopRecording fired")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.stopRecording
+  local _todo = "TODO: write a real lurek.input.stopRecording usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.loadRecording
 -- Loads a JSON-encoded recording string for playback.
--- May block — call from a worker thread for large payloads.
-local result = lurek.input.loadRecording(json)
--- may block; consider lurek.thread for large payloads
-print("loadRecording:", result)
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.loadRecording
+  local _todo = "TODO: write a real lurek.input.loadRecording usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.startPlayback
 -- Starts playback from the beginning of the loaded recording.
--- Trigger from input, timers, or game events.
--- trigger from input or timer
-lurek.input.startPlayback()
-print("startPlayback fired")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.startPlayback
+  local _todo = "TODO: write a real lurek.input.startPlayback usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.stopPlayback
 -- Stops playback immediately.
--- Trigger from input, timers, or game events.
--- trigger from input or timer
-lurek.input.stopPlayback()
-print("stopPlayback fired")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.stopPlayback
+  local _todo = "TODO: write a real lurek.input.stopPlayback usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.isRecording
 -- Returns true if input recording is currently active.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isRecording() then
-  print("isRecording -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isRecording
+  local _todo = "TODO: write a real lurek.input.isRecording usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.isPlayingBack
 -- Returns true if input playback is currently active.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.input.isPlayingBack() then
-  print("isPlayingBack -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.isPlayingBack
+  local _todo = "TODO: write a real lurek.input.isPlayingBack usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.input.getPlaybackFrame
 -- Returns the current playback frame index (0-based).
--- Cheap to call; safe inside callbacks.
-local value = lurek.input.getPlaybackFrame()
-print("getPlaybackFrame:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.getPlaybackFrame
+  local _todo = "TODO: write a real lurek.input.getPlaybackFrame usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.input.advancePlayback
 -- Advances playback by one frame and returns an array of key/button events for that.
--- See the module spec for detailed semantics.
-local result = lurek.input.advancePlayback()
-print("advancePlayback:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: lurek.input.advancePlayback
+  local _todo = "TODO: write a real lurek.input.advancePlayback usage example"
+  print(_todo)
+end
 
 -- ── Cursor methods ──
 
 --@api-stub: Cursor:release
 -- Releases the cursor resource (no-op on desktop).
--- See the module spec for detailed semantics.
-local cursor = lurek.input.newCursor()
-cursor:release()
-print("Cursor:release done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: Cursor:release
+  local _todo = "TODO: write a real Cursor:release usage example"
+  print(_todo)
+end
 
 --@api-stub: Cursor:getType
 -- Returns the cursor type as "system" or "custom".
--- Cheap to call; safe inside callbacks.
-local cursor = lurek.input.newCursor()  -- or your existing handle
-local value = cursor:getType()
-print("Cursor:getType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: Cursor:getType
+  local _todo = "TODO: write a real Cursor:getType usage example"
+  print(_todo)
+end
 
 -- ── Combo methods ──
 
 --@api-stub: Combo:feed
 -- Feed a key-press event into the combo detector.
--- See the module spec for detailed semantics.
-local combo = lurek.input.newCombo()
-combo:feed("space")
-print("Combo:feed done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: Combo:feed
+  local _todo = "TODO: write a real Combo:feed usage example"
+  print(_todo)
+end
 
 --@api-stub: Combo:tick
 -- Advance the internal clock by `dt` seconds and check for timeouts.
--- Trigger from input, timers, or game events.
-local combo = lurek.input.newCombo()
-combo:tick(dt)
--- trigger from input, timer, or event
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: Combo:tick
+  local _todo = "TODO: write a real Combo:tick usage example"
+  print(_todo)
+end
 
 --@api-stub: Combo:reset
 -- Reset the detector to its initial idle state, cancelling any in-progress sequence.
--- Pair with the matching constructor to free resources.
-local combo = lurek.input.newCombo()
-combo:reset()
--- combo is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: Combo:reset
+  local _todo = "TODO: write a real Combo:reset usage example"
+  print(_todo)
+end
 
 --@api-stub: Combo:totalSteps
 -- Returns the total number of steps in the combo sequence.
--- See the module spec for detailed semantics.
-local combo = lurek.input.newCombo()
-combo:totalSteps()
-print("Combo:totalSteps done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: Combo:totalSteps
+  local _todo = "TODO: write a real Combo:totalSteps usage example"
+  print(_todo)
+end
 
 --@api-stub: Combo:isInProgress
 -- Returns true if the detector is currently mid-sequence.
--- Use as a guard inside lurek.update or event handlers.
-local combo = lurek.input.newCombo()
-if combo:isInProgress() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: Combo:isInProgress
+  local _todo = "TODO: write a real Combo:isInProgress usage example"
+  print(_todo)
+end
 
 --@api-stub: Combo:getStep
 -- Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
--- Cheap to call; safe inside callbacks.
-local combo = lurek.input.newCombo()  -- or your existing handle
-local value = combo:getStep(1)
-print("Combo:getStep ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: Combo:getStep
+  local _todo = "TODO: write a real Combo:getStep usage example"
+  print(_todo)
+end
 
 -- ── InputRecording methods ──
 
 --@api-stub: InputRecording:toJson
 -- Serializes this recording to a JSON string for saving to disk.
--- See the module spec for detailed semantics.
-local inputRecording = lurek.input.newInputRecording()
-inputRecording:toJson()
-print("InputRecording:toJson done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: InputRecording:toJson
+  local _todo = "TODO: write a real InputRecording:toJson usage example"
+  print(_todo)
+end
 
 --@api-stub: InputRecording:totalFrames
 -- Returns the total frame count when recording was stopped.
--- See the module spec for detailed semantics.
-local inputRecording = lurek.input.newInputRecording()
-inputRecording:totalFrames()
-print("InputRecording:totalFrames done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: InputRecording:totalFrames
+  local _todo = "TODO: write a real InputRecording:totalFrames usage example"
+  print(_todo)
+end
 
 --@api-stub: InputRecording:frameCount
 -- Returns the number of sparse event frames stored in this recording.
--- See the module spec for detailed semantics.
-local inputRecording = lurek.input.newInputRecording()
-inputRecording:frameCount()
-print("InputRecording:frameCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/input_api.rs and docs/specs/input.md).
+do  -- TODO: InputRecording:frameCount
+  local _todo = "TODO: write a real InputRecording:frameCount usage example"
+  print(_todo)
+end
 

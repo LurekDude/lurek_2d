@@ -1,1767 +1,1999 @@
 -- content/examples/ai.lua
--- love2d-style usage snippets for the lurek.ai API (240 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.ai API (240 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/ai_api.rs   (Lua binding, arg types, return shape)
+--   * src/ai/                 (semantics, side effects)
+--   * docs/specs/ai.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/ai.lua
 
 -- ── lurek.ai.* functions ──
 
 --@api-stub: lurek.ai.newWorld
 -- Creates a new AI world container.
--- Build once at startup; reuse across frames.
-local world = lurek.ai.newWorld()
-print("created", world)
-return world
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newWorld
+  local _todo = "TODO: write a real lurek.ai.newWorld usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newBlackboard
 -- Creates a new standalone blackboard.
--- Build once at startup; reuse across frames.
-local blackboard = lurek.ai.newBlackboard()
-print("created", blackboard)
-return blackboard
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newBlackboard
+  local _todo = "TODO: write a real lurek.ai.newBlackboard usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newStateMachine
 -- Creates a new finite state machine.
--- Build once at startup; reuse across frames.
-local statemachine = lurek.ai.newStateMachine()
-print("created", statemachine)
-return statemachine
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newStateMachine
+  local _todo = "TODO: write a real lurek.ai.newStateMachine usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newBehaviorTree
 -- Creates a new behavior tree.
--- Build once at startup; reuse across frames.
-local behaviortree = lurek.ai.newBehaviorTree()
-print("created", behaviortree)
-return behaviortree
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newBehaviorTree
+  local _todo = "TODO: write a real lurek.ai.newBehaviorTree usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newSelector
 -- Creates a BT selector node.
--- Build once at startup; reuse across frames.
-local selector = lurek.ai.newSelector()
-print("created", selector)
-return selector
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newSelector
+  local _todo = "TODO: write a real lurek.ai.newSelector usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newSequence
 -- Creates a BT sequence node.
--- Build once at startup; reuse across frames.
-local sequence = lurek.ai.newSequence()
-print("created", sequence)
-return sequence
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newSequence
+  local _todo = "TODO: write a real lurek.ai.newSequence usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newParallel
 -- Creates a BT parallel node with optional policies.
--- Build once at startup; reuse across frames.
-local parallel = lurek.ai.newParallel(sp, fp)
-print("created", parallel)
-return parallel
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newParallel
+  local _todo = "TODO: write a real lurek.ai.newParallel usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newInverter
 -- Creates a BT inverter decorator.
--- Build once at startup; reuse across frames.
-local inverter = lurek.ai.newInverter()
-print("created", inverter)
-return inverter
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newInverter
+  local _todo = "TODO: write a real lurek.ai.newInverter usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newRepeater
 -- Creates a BT repeater decorator.
--- Build once at startup; reuse across frames.
-local repeater = lurek.ai.newRepeater(10)
-print("created", repeater)
-return repeater
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newRepeater
+  local _todo = "TODO: write a real lurek.ai.newRepeater usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newSucceeder
 -- Creates a BT succeeder decorator.
--- Build once at startup; reuse across frames.
-local succeeder = lurek.ai.newSucceeder()
-print("created", succeeder)
-return succeeder
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newSucceeder
+  local _todo = "TODO: write a real lurek.ai.newSucceeder usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newAction
 -- Creates a BT action leaf with a Lua callback.
--- Build once at startup; reuse across frames.
-local action = lurek.ai.newAction(function() print("newAction fired") end)
-print("created", action)
-return action
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newAction
+  local _todo = "TODO: write a real lurek.ai.newAction usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newCondition
 -- Creates a BT condition leaf with a Lua predicate.
--- Build once at startup; reuse across frames.
-local condition = lurek.ai.newCondition(function() print("newCondition fired") end)
-print("created", condition)
-return condition
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newCondition
+  local _todo = "TODO: write a real lurek.ai.newCondition usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newSteeringManager
 -- Creates a new steering behavior manager.
--- Build once at startup; reuse across frames.
-local steeringmanager = lurek.ai.newSteeringManager()
-print("created", steeringmanager)
-return steeringmanager
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newSteeringManager
+  local _todo = "TODO: write a real lurek.ai.newSteeringManager usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newQLearner
 -- Creates a tabular Q-learner.
--- Build once at startup; reuse across frames.
-local qlearner = lurek.ai.newQLearner(sc, ac)
-print("created", qlearner)
-return qlearner
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newQLearner
+  local _todo = "TODO: write a real lurek.ai.newQLearner usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newUtilityAI
 -- Creates a new utility AI evaluator.
--- Build once at startup; reuse across frames.
-local utilityai = lurek.ai.newUtilityAI()
-print("created", utilityai)
-return utilityai
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newUtilityAI
+  local _todo = "TODO: write a real lurek.ai.newUtilityAI usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newGOAPPlanner
 -- Creates a new GOAP planning solver.
--- Build once at startup; reuse across frames.
-local goapplanner = lurek.ai.newGOAPPlanner()
-print("created", goapplanner)
-return goapplanner
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newGOAPPlanner
+  local _todo = "TODO: write a real lurek.ai.newGOAPPlanner usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newInfluenceMap
 -- Creates a multi-layer influence map grid.
--- Build once at startup; reuse across frames.
-local influencemap = lurek.ai.newInfluenceMap(64, 64, cs)
-print("created", influencemap)
-return influencemap
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newInfluenceMap
+  local _todo = "TODO: write a real lurek.ai.newInfluenceMap usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newSquad
 -- Creates a named squad for formation positioning.
--- Build once at startup; reuse across frames.
-local squad = lurek.ai.newSquad("main")
-print("created", squad)
-return squad
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newSquad
+  local _todo = "TODO: write a real lurek.ai.newSquad usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newCommandQueue
 -- Creates an RTS-style command queue.
--- Build once at startup; reuse across frames.
-local commandqueue = lurek.ai.newCommandQueue()
-print("created", commandqueue)
-return commandqueue
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newCommandQueue
+  local _todo = "TODO: write a real lurek.ai.newCommandQueue usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newTraitProfile
 -- Creates a new personality trait profile.
--- Build once at startup; reuse across frames.
-local traitprofile = lurek.ai.newTraitProfile()
-print("created", traitprofile)
-return traitprofile
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newTraitProfile
+  local _todo = "TODO: write a real lurek.ai.newTraitProfile usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newStimulusWorld
 -- Creates a new stimulus perception world.
--- Build once at startup; reuse across frames.
-local stimulusworld = lurek.ai.newStimulusWorld()
-print("created", stimulusworld)
-return stimulusworld
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newStimulusWorld
+  local _todo = "TODO: write a real lurek.ai.newStimulusWorld usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newContextSteering
 -- Creates a new context steering controller.
--- Build once at startup; reuse across frames.
-local contextsteering = lurek.ai.newContextSteering(slots)
-print("created", contextsteering)
-return contextsteering
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newContextSteering
+  local _todo = "TODO: write a real lurek.ai.newContextSteering usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newNeedSystem
 -- Creates a new motivational need system.
--- Build once at startup; reuse across frames.
-local needsystem = lurek.ai.newNeedSystem()
-print("created", needsystem)
-return needsystem
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newNeedSystem
+  local _todo = "TODO: write a real lurek.ai.newNeedSystem usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newAIDirector
 -- Creates a new AI pacing director with default config.
--- Build once at startup; reuse across frames.
-local aidirector = lurek.ai.newAIDirector()
-print("created", aidirector)
-return aidirector
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newAIDirector
+  local _todo = "TODO: write a real lurek.ai.newAIDirector usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newHTNDomain
 -- Creates a new Hierarchical Task Network domain.
--- Build once at startup; reuse across frames.
-local htndomain = lurek.ai.newHTNDomain()
-print("created", htndomain)
-return htndomain
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newHTNDomain
+  local _todo = "TODO: write a real lurek.ai.newHTNDomain usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newMCTSEngine
 -- Creates a new Monte Carlo Tree Search engine.
--- Build once at startup; reuse across frames.
-local mctsengine = lurek.ai.newMCTSEngine(iters, uct_c, depth, seed)
-print("created", mctsengine)
-return mctsengine
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newMCTSEngine
+  local _todo = "TODO: write a real lurek.ai.newMCTSEngine usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newEmotionModel
 -- Creates a new affective emotion model.
--- Build once at startup; reuse across frames.
-local emotionmodel = lurek.ai.newEmotionModel()
-print("created", emotionmodel)
-return emotionmodel
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newEmotionModel
+  local _todo = "TODO: write a real lurek.ai.newEmotionModel usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newORCASolver
 -- Creates a new ORCA crowd avoidance solver.
--- Build once at startup; reuse across frames.
-local orcasolver = lurek.ai.newORCASolver(time_horizon)
-print("created", orcasolver)
-return orcasolver
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newORCASolver
+  local _todo = "TODO: write a real lurek.ai.newORCASolver usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newNeuralNet
 -- Creates a new feedforward neural network (inference only).
--- Build once at startup; reuse across frames.
-local neuralnet = lurek.ai.newNeuralNet()
-print("created", neuralnet)
-return neuralnet
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newNeuralNet
+  local _todo = "TODO: write a real lurek.ai.newNeuralNet usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newGeneticAlgorithm
 -- Creates a new genetic algorithm.
--- Build once at startup; reuse across frames.
-local geneticalgorithm = lurek.ai.newGeneticAlgorithm(pop_size, 10, seed)
-print("created", geneticalgorithm)
-return geneticalgorithm
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newGeneticAlgorithm
+  local _todo = "TODO: write a real lurek.ai.newGeneticAlgorithm usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newBandit
 -- Creates a new multi-armed bandit.
--- Build once at startup; reuse across frames.
-local bandit = lurek.ai.newBandit(10, "hello", epsilon, seed)
-print("created", bandit)
-return bandit
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newBandit
+  local _todo = "TODO: write a real lurek.ai.newBandit usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newNeuroevolution
 -- Creates a neuroevolution trainer (GA for neural network weights).
--- Build once at startup; reuse across frames.
-local neuroevolution = lurek.ai.newNeuroevolution(layer_spec, pop_size, seed)
-print("created", neuroevolution)
-return neuroevolution
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newNeuroevolution
+  local _todo = "TODO: write a real lurek.ai.newNeuroevolution usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newStrategyAI
 -- Creates a new throttled strategy AI.
--- Build once at startup; reuse across frames.
-local strategyai = lurek.ai.newStrategyAI(update_interval)
-print("created", strategyai)
-return strategyai
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newStrategyAI
+  local _todo = "TODO: write a real lurek.ai.newStrategyAI usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.ai.newAILod
 -- Creates a new AI LOD controller with default 3-tier config.
--- Build once at startup; reuse across frames.
-local ailod = lurek.ai.newAILod()
-print("created", ailod)
-return ailod
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: lurek.ai.newAILod
+  local _todo = "TODO: write a real lurek.ai.newAILod usage example"
+  print(_todo)
+end
 
 -- ── AIWorld methods ──
 
 --@api-stub: AIWorld:addAgent
 -- Registers a new named agent and returns its handle.
--- Side-effecting; safe to call any time after init.
-local aIWorld = lurek.ai.newAIWorld()
-aIWorld:addAgent("main")
-print("AIWorld:addAgent done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIWorld:addAgent
+  local _todo = "TODO: write a real AIWorld:addAgent usage example"
+  print(_todo)
+end
 
 --@api-stub: AIWorld:getAgent
 -- Returns the agent handle for the given name, or nil.
--- Cheap to call; safe inside callbacks.
-local aIWorld = lurek.ai.newAIWorld()  -- or your existing handle
-local value = aIWorld:getAgent("main")
-print("AIWorld:getAgent ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIWorld:getAgent
+  local _todo = "TODO: write a real AIWorld:getAgent usage example"
+  print(_todo)
+end
 
 --@api-stub: AIWorld:removeAgent
 -- Removes an agent by its userdata handle.
--- Pair with the matching constructor to free resources.
-local aIWorld = lurek.ai.newAIWorld()
-aIWorld:removeAgent(agent)
--- aIWorld is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIWorld:removeAgent
+  local _todo = "TODO: write a real AIWorld:removeAgent usage example"
+  print(_todo)
+end
 
 --@api-stub: AIWorld:getAgentCount
 -- Returns the number of registered agents.
--- Cheap to call; safe inside callbacks.
-local aIWorld = lurek.ai.newAIWorld()  -- or your existing handle
-local value = aIWorld:getAgentCount()
-print("AIWorld:getAgentCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIWorld:getAgentCount
+  local _todo = "TODO: write a real AIWorld:getAgentCount usage example"
+  print(_todo)
+end
 
 --@api-stub: AIWorld:getGlobalBlackboard
 -- Returns a snapshot of the world-level blackboard.
--- Cheap to call; safe inside callbacks.
-local aIWorld = lurek.ai.newAIWorld()  -- or your existing handle
-local value = aIWorld:getGlobalBlackboard()
-print("AIWorld:getGlobalBlackboard ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIWorld:getGlobalBlackboard
+  local _todo = "TODO: write a real AIWorld:getGlobalBlackboard usage example"
+  print(_todo)
+end
 
 --@api-stub: AIWorld:update
 -- Advances all agents by dt seconds.
--- Apply at startup or in response to user input.
-local aIWorld = lurek.ai.newAIWorld()
-aIWorld:update(dt)
-print("AIWorld:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIWorld:update
+  local _todo = "TODO: write a real AIWorld:update usage example"
+  print(_todo)
+end
 
 --@api-stub: AIWorld:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local aIWorld = lurek.ai.newAIWorld()
-aIWorld:type()
-print("AIWorld:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIWorld:type
+  local _todo = "TODO: write a real AIWorld:type usage example"
+  print(_todo)
+end
 
 --@api-stub: AIWorld:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local aIWorld = lurek.ai.newAIWorld()
-aIWorld:typeOf("main")
-print("AIWorld:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIWorld:typeOf
+  local _todo = "TODO: write a real AIWorld:typeOf usage example"
+  print(_todo)
+end
 
 -- ── Agent methods ──
 
 --@api-stub: Agent:getName
 -- Returns the agent's registered name.
--- Cheap to call; safe inside callbacks.
-local agent = lurek.ai.newAgent()  -- or your existing handle
-local value = agent:getName()
-print("Agent:getName ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:getName
+  local _todo = "TODO: write a real Agent:getName usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:setPosition
 -- Sets the agent's world-space position.
--- Apply at startup or in response to user input.
-local agent = lurek.ai.newAgent()
-agent:setPosition(100, 100)
-print("Agent:setPosition applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:setPosition
+  local _todo = "TODO: write a real Agent:setPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:getPosition
 -- Returns the agent's current position.
--- Cheap to call; safe inside callbacks.
-local agent = lurek.ai.newAgent()  -- or your existing handle
-local value = agent:getPosition()
-print("Agent:getPosition ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:getPosition
+  local _todo = "TODO: write a real Agent:getPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:setVelocity
 -- Sets the agent's velocity vector.
--- Apply at startup or in response to user input.
-local agent = lurek.ai.newAgent()
-agent:setVelocity(100, 100)
-print("Agent:setVelocity applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:setVelocity
+  local _todo = "TODO: write a real Agent:setVelocity usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:getVelocity
 -- Returns the agent's current velocity.
--- Cheap to call; safe inside callbacks.
-local agent = lurek.ai.newAgent()  -- or your existing handle
-local value = agent:getVelocity()
-print("Agent:getVelocity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:getVelocity
+  local _todo = "TODO: write a real Agent:getVelocity usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:setMaxSpeed
 -- Sets the maximum speed cap.
--- Apply at startup or in response to user input.
-local agent = lurek.ai.newAgent()
-agent:setMaxSpeed(v)
-print("Agent:setMaxSpeed applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:setMaxSpeed
+  local _todo = "TODO: write a real Agent:setMaxSpeed usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:getMaxSpeed
 -- Returns the maximum speed cap.
--- Cheap to call; safe inside callbacks.
-local agent = lurek.ai.newAgent()  -- or your existing handle
-local value = agent:getMaxSpeed()
-print("Agent:getMaxSpeed ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:getMaxSpeed
+  local _todo = "TODO: write a real Agent:getMaxSpeed usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:setMaxForce
 -- Sets the maximum steering force cap.
--- Apply at startup or in response to user input.
-local agent = lurek.ai.newAgent()
-agent:setMaxForce(v)
-print("Agent:setMaxForce applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:setMaxForce
+  local _todo = "TODO: write a real Agent:setMaxForce usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:getMaxForce
 -- Returns the maximum steering force cap.
--- Cheap to call; safe inside callbacks.
-local agent = lurek.ai.newAgent()  -- or your existing handle
-local value = agent:getMaxForce()
-print("Agent:getMaxForce ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:getMaxForce
+  local _todo = "TODO: write a real Agent:getMaxForce usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:setPriority
 -- Sets the scheduling priority (higher = earlier).
--- Apply at startup or in response to user input.
-local agent = lurek.ai.newAgent()
-agent:setPriority(p)
-print("Agent:setPriority applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:setPriority
+  local _todo = "TODO: write a real Agent:setPriority usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:getPriority
 -- Returns the agent's scheduling priority.
--- Cheap to call; safe inside callbacks.
-local agent = lurek.ai.newAgent()  -- or your existing handle
-local value = agent:getPriority()
-print("Agent:getPriority ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:getPriority
+  local _todo = "TODO: write a real Agent:getPriority usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:setDecisionModel
 -- Sets the active decision model.
--- Apply at startup or in response to user input.
-local agent = lurek.ai.newAgent()
-agent:setDecisionModel(model)
-print("Agent:setDecisionModel applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:setDecisionModel
+  local _todo = "TODO: write a real Agent:setDecisionModel usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:getDecisionModel
 -- Returns the name of the current decision model.
--- Cheap to call; safe inside callbacks.
-local agent = lurek.ai.newAgent()  -- or your existing handle
-local value = agent:getDecisionModel()
-print("Agent:getDecisionModel ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:getDecisionModel
+  local _todo = "TODO: write a real Agent:getDecisionModel usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:addTag
 -- Adds a tag to this agent.
--- Side-effecting; safe to call any time after init.
-local agent = lurek.ai.newAgent()
-agent:addTag("main")
-print("Agent:addTag done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:addTag
+  local _todo = "TODO: write a real Agent:addTag usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:removeTag
 -- Removes a tag from this agent.
--- Pair with the matching constructor to free resources.
-local agent = lurek.ai.newAgent()
-agent:removeTag("main")
--- agent is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:removeTag
+  local _todo = "TODO: write a real Agent:removeTag usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:hasTag
 -- Returns true if the agent has the given tag.
--- Use as a guard inside lurek.update or event handlers.
-local agent = lurek.ai.newAgent()
-if agent:hasTag("main") then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:hasTag
+  local _todo = "TODO: write a real Agent:hasTag usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:getBlackboard
 -- Returns the agent's local blackboard.
--- Cheap to call; safe inside callbacks.
-local agent = lurek.ai.newAgent()  -- or your existing handle
-local value = agent:getBlackboard()
-print("Agent:getBlackboard ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:getBlackboard
+  local _todo = "TODO: write a real Agent:getBlackboard usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local agent = lurek.ai.newAgent()
-agent:type()
-print("Agent:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:type
+  local _todo = "TODO: write a real Agent:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Agent:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local agent = lurek.ai.newAgent()
-agent:typeOf("main")
-print("Agent:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Agent:typeOf
+  local _todo = "TODO: write a real Agent:typeOf usage example"
+  print(_todo)
+end
 
 -- ── Blackboard methods ──
 
 --@api-stub: Blackboard:setNumber
 -- Stores a number under the given key.
--- Apply at startup or in response to user input.
-local blackboard = lurek.ai.newBlackboard()
-blackboard:setNumber("space", value)
-print("Blackboard:setNumber applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:setNumber
+  local _todo = "TODO: write a real Blackboard:setNumber usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:setBool
 -- Stores a boolean under the given key.
--- Apply at startup or in response to user input.
-local blackboard = lurek.ai.newBlackboard()
-blackboard:setBool("space", value)
-print("Blackboard:setBool applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:setBool
+  local _todo = "TODO: write a real Blackboard:setBool usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:setString
 -- Stores a string under the given key.
--- Apply at startup or in response to user input.
-local blackboard = lurek.ai.newBlackboard()
-blackboard:setString("space", value)
-print("Blackboard:setString applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:setString
+  local _todo = "TODO: write a real Blackboard:setString usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:has
 -- Returns true if a value exists under the key.
--- See the module spec for detailed semantics.
-local blackboard = lurek.ai.newBlackboard()
-blackboard:has("space")
-print("Blackboard:has done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:has
+  local _todo = "TODO: write a real Blackboard:has usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:remove
 -- Removes the entry at key.
--- Pair with the matching constructor to free resources.
-local blackboard = lurek.ai.newBlackboard()
-blackboard:remove("space")
--- blackboard is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:remove
+  local _todo = "TODO: write a real Blackboard:remove usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:clear
 -- Removes all local entries.
--- Pair with the matching constructor to free resources.
-local blackboard = lurek.ai.newBlackboard()
-blackboard:clear()
--- blackboard is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:clear
+  local _todo = "TODO: write a real Blackboard:clear usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:getKeys
 -- Returns all local keys as a table.
--- Cheap to call; safe inside callbacks.
-local blackboard = lurek.ai.newBlackboard()  -- or your existing handle
-local value = blackboard:getKeys()
-print("Blackboard:getKeys ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:getKeys
+  local _todo = "TODO: write a real Blackboard:getKeys usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:getSize
 -- Returns the number of local entries.
--- Cheap to call; safe inside callbacks.
-local blackboard = lurek.ai.newBlackboard()  -- or your existing handle
-local value = blackboard:getSize()
-print("Blackboard:getSize ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:getSize
+  local _todo = "TODO: write a real Blackboard:getSize usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local blackboard = lurek.ai.newBlackboard()
-blackboard:type()
-print("Blackboard:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:type
+  local _todo = "TODO: write a real Blackboard:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Blackboard:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local blackboard = lurek.ai.newBlackboard()
-blackboard:typeOf("main")
-print("Blackboard:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Blackboard:typeOf
+  local _todo = "TODO: write a real Blackboard:typeOf usage example"
+  print(_todo)
+end
 
 -- ── StateMachine methods ──
 
 --@api-stub: StateMachine:addState
 -- Registers a named state with optional lifecycle callbacks.
--- Side-effecting; safe to call any time after init.
-local stateMachine = lurek.ai.newStateMachine()
-stateMachine:addState("main", { x = 0, y = 0 })
-print("StateMachine:addState done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StateMachine:addState
+  local _todo = "TODO: write a real StateMachine:addState usage example"
+  print(_todo)
+end
 
 --@api-stub: StateMachine:setInitialState
 -- Sets the FSM's initial state; must be called before the first update.
--- Apply at startup or in response to user input.
-local stateMachine = lurek.ai.newStateMachine()
-stateMachine:setInitialState("main")
-print("StateMachine:setInitialState applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StateMachine:setInitialState
+  local _todo = "TODO: write a real StateMachine:setInitialState usage example"
+  print(_todo)
+end
 
 --@api-stub: StateMachine:getCurrentState
 -- Returns the current state name, or nil.
--- Cheap to call; safe inside callbacks.
-local stateMachine = lurek.ai.newStateMachine()  -- or your existing handle
-local value = stateMachine:getCurrentState()
-print("StateMachine:getCurrentState ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StateMachine:getCurrentState
+  local _todo = "TODO: write a real StateMachine:getCurrentState usage example"
+  print(_todo)
+end
 
 --@api-stub: StateMachine:forceState
 -- Forces a transition to the named state.
--- See the module spec for detailed semantics.
-local stateMachine = lurek.ai.newStateMachine()
-stateMachine:forceState("main")
-print("StateMachine:forceState done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StateMachine:forceState
+  local _todo = "TODO: write a real StateMachine:forceState usage example"
+  print(_todo)
+end
 
 --@api-stub: StateMachine:getTimeInState
 -- Returns seconds spent in the current state.
--- Cheap to call; safe inside callbacks.
-local stateMachine = lurek.ai.newStateMachine()  -- or your existing handle
-local value = stateMachine:getTimeInState()
-print("StateMachine:getTimeInState ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StateMachine:getTimeInState
+  local _todo = "TODO: write a real StateMachine:getTimeInState usage example"
+  print(_todo)
+end
 
 --@api-stub: StateMachine:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local stateMachine = lurek.ai.newStateMachine()
-stateMachine:type()
-print("StateMachine:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StateMachine:type
+  local _todo = "TODO: write a real StateMachine:type usage example"
+  print(_todo)
+end
 
 --@api-stub: StateMachine:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local stateMachine = lurek.ai.newStateMachine()
-stateMachine:typeOf("main")
-print("StateMachine:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StateMachine:typeOf
+  local _todo = "TODO: write a real StateMachine:typeOf usage example"
+  print(_todo)
+end
 
 -- ── BehaviorTree methods ──
 
 --@api-stub: BehaviorTree:setRoot
 -- Sets the root node of this behavior tree.
--- Apply at startup or in response to user input.
-local behaviorTree = lurek.ai.newBehaviorTree()
-behaviorTree:setRoot(node_ud)
-print("BehaviorTree:setRoot applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BehaviorTree:setRoot
+  local _todo = "TODO: write a real BehaviorTree:setRoot usage example"
+  print(_todo)
+end
 
 --@api-stub: BehaviorTree:getLastStatus
 -- Returns the status from the last tick.
--- Cheap to call; safe inside callbacks.
-local behaviorTree = lurek.ai.newBehaviorTree()  -- or your existing handle
-local value = behaviorTree:getLastStatus()
-print("BehaviorTree:getLastStatus ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BehaviorTree:getLastStatus
+  local _todo = "TODO: write a real BehaviorTree:getLastStatus usage example"
+  print(_todo)
+end
 
 --@api-stub: BehaviorTree:getDebugState
 -- Returns a diagnostic snapshot of this behavior tree.
--- Cheap to call; safe inside callbacks.
-local behaviorTree = lurek.ai.newBehaviorTree()  -- or your existing handle
-local value = behaviorTree:getDebugState()
-print("BehaviorTree:getDebugState ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BehaviorTree:getDebugState
+  local _todo = "TODO: write a real BehaviorTree:getDebugState usage example"
+  print(_todo)
+end
 
 --@api-stub: BehaviorTree:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local behaviorTree = lurek.ai.newBehaviorTree()
-behaviorTree:type()
-print("BehaviorTree:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BehaviorTree:type
+  local _todo = "TODO: write a real BehaviorTree:type usage example"
+  print(_todo)
+end
 
 --@api-stub: BehaviorTree:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local behaviorTree = lurek.ai.newBehaviorTree()
-behaviorTree:typeOf("main")
-print("BehaviorTree:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BehaviorTree:typeOf
+  local _todo = "TODO: write a real BehaviorTree:typeOf usage example"
+  print(_todo)
+end
 
 -- ── BTNode methods ──
 
 --@api-stub: BTNode:addChild
 -- Adds a child node (Selector, Sequence, or Parallel only).
--- Side-effecting; safe to call any time after init.
-local bTNode = lurek.ai.newBTNode()
-bTNode:addChild(child_ud)
-print("BTNode:addChild done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:addChild
+  local _todo = "TODO: write a real BTNode:addChild usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:getChildCount
 -- Returns the number of direct children.
--- Cheap to call; safe inside callbacks.
-local bTNode = lurek.ai.newBTNode()  -- or your existing handle
-local value = bTNode:getChildCount()
-print("BTNode:getChildCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:getChildCount
+  local _todo = "TODO: write a real BTNode:getChildCount usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:reset
 -- Resets all running-child memos and repeater counters.
--- Pair with the matching constructor to free resources.
-local bTNode = lurek.ai.newBTNode()
-bTNode:reset()
--- bTNode is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:reset
+  local _todo = "TODO: write a real BTNode:reset usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:setChild
 -- Sets the single child of a decorator node.
--- Apply at startup or in response to user input.
-local bTNode = lurek.ai.newBTNode()
-bTNode:setChild(child_ud)
-print("BTNode:setChild applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:setChild
+  local _todo = "TODO: write a real BTNode:setChild usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:setCount
 -- Sets the repeat count for a Repeater node.
--- Apply at startup or in response to user input.
-local bTNode = lurek.ai.newBTNode()
-bTNode:setCount(10)
-print("BTNode:setCount applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:setCount
+  local _todo = "TODO: write a real BTNode:setCount usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:getCount
 -- Returns the repeat count, or 0 if not a Repeater.
--- Cheap to call; safe inside callbacks.
-local bTNode = lurek.ai.newBTNode()  -- or your existing handle
-local value = bTNode:getCount()
-print("BTNode:getCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:getCount
+  local _todo = "TODO: write a real BTNode:getCount usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:setSuccessPolicy
 -- Sets the success policy for a Parallel node.
--- Apply at startup or in response to user input.
-local bTNode = lurek.ai.newBTNode()
-bTNode:setSuccessPolicy(policy)
-print("BTNode:setSuccessPolicy applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:setSuccessPolicy
+  local _todo = "TODO: write a real BTNode:setSuccessPolicy usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:setFailurePolicy
 -- Sets the failure policy for a Parallel node.
--- Apply at startup or in response to user input.
-local bTNode = lurek.ai.newBTNode()
-bTNode:setFailurePolicy(policy)
-print("BTNode:setFailurePolicy applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:setFailurePolicy
+  local _todo = "TODO: write a real BTNode:setFailurePolicy usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:getNodeType
 -- Returns the node type as a string.
--- Cheap to call; safe inside callbacks.
-local bTNode = lurek.ai.newBTNode()  -- or your existing handle
-local value = bTNode:getNodeType()
-print("BTNode:getNodeType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:getNodeType
+  local _todo = "TODO: write a real BTNode:getNodeType usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local bTNode = lurek.ai.newBTNode()
-bTNode:type()
-print("BTNode:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:type
+  local _todo = "TODO: write a real BTNode:type usage example"
+  print(_todo)
+end
 
 --@api-stub: BTNode:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local bTNode = lurek.ai.newBTNode()
-bTNode:typeOf("main")
-print("BTNode:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: BTNode:typeOf
+  local _todo = "TODO: write a real BTNode:typeOf usage example"
+  print(_todo)
+end
 
 -- ── SteeringManager methods ──
 
 --@api-stub: SteeringManager:getBehaviorCount
 -- Returns the number of active behaviors.
--- Cheap to call; safe inside callbacks.
-local steeringManager = lurek.ai.newSteeringManager()  -- or your existing handle
-local value = steeringManager:getBehaviorCount()
-print("SteeringManager:getBehaviorCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: SteeringManager:getBehaviorCount
+  local _todo = "TODO: write a real SteeringManager:getBehaviorCount usage example"
+  print(_todo)
+end
 
 --@api-stub: SteeringManager:setCombineMode
 -- Sets the force combination mode.
--- Apply at startup or in response to user input.
-local steeringManager = lurek.ai.newSteeringManager()
-steeringManager:setCombineMode(mode)
-print("SteeringManager:setCombineMode applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: SteeringManager:setCombineMode
+  local _todo = "TODO: write a real SteeringManager:setCombineMode usage example"
+  print(_todo)
+end
 
 --@api-stub: SteeringManager:getCombineMode
 -- Returns the current combination mode.
--- Cheap to call; safe inside callbacks.
-local steeringManager = lurek.ai.newSteeringManager()  -- or your existing handle
-local value = steeringManager:getCombineMode()
-print("SteeringManager:getCombineMode ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: SteeringManager:getCombineMode
+  local _todo = "TODO: write a real SteeringManager:getCombineMode usage example"
+  print(_todo)
+end
 
 --@api-stub: SteeringManager:getLastSteering
 -- Returns the last computed steering force.
--- Cheap to call; safe inside callbacks.
-local steeringManager = lurek.ai.newSteeringManager()  -- or your existing handle
-local value = steeringManager:getLastSteering()
-print("SteeringManager:getLastSteering ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: SteeringManager:getLastSteering
+  local _todo = "TODO: write a real SteeringManager:getLastSteering usage example"
+  print(_todo)
+end
 
 --@api-stub: SteeringManager:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local steeringManager = lurek.ai.newSteeringManager()
-steeringManager:type()
-print("SteeringManager:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: SteeringManager:type
+  local _todo = "TODO: write a real SteeringManager:type usage example"
+  print(_todo)
+end
 
 --@api-stub: SteeringManager:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local steeringManager = lurek.ai.newSteeringManager()
-steeringManager:typeOf("main")
-print("SteeringManager:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: SteeringManager:typeOf
+  local _todo = "TODO: write a real SteeringManager:typeOf usage example"
+  print(_todo)
+end
 
 --@api-stub: SteeringManager:setSpatialHashCellSize
 -- Sets the cell size used by the spatial-hash neighbourhood search.
--- Apply at startup or in response to user input.
-local steeringManager = lurek.ai.newSteeringManager()
-steeringManager:setSpatialHashCellSize(10)
-print("SteeringManager:setSpatialHashCellSize applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: SteeringManager:setSpatialHashCellSize
+  local _todo = "TODO: write a real SteeringManager:setSpatialHashCellSize usage example"
+  print(_todo)
+end
 
 --@api-stub: SteeringManager:enableSpatialHash
 -- Enables or disables spatial-hash bucketing for neighbourhood queries.
--- See the module spec for detailed semantics.
-local steeringManager = lurek.ai.newSteeringManager()
-steeringManager:enableSpatialHash(enabled)
-print("SteeringManager:enableSpatialHash done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: SteeringManager:enableSpatialHash
+  local _todo = "TODO: write a real SteeringManager:enableSpatialHash usage example"
+  print(_todo)
+end
 
 -- ── QLearner methods ──
 
 --@api-stub: QLearner:chooseAction
 -- Selects an action using epsilon-greedy policy (1-based).
--- See the module spec for detailed semantics.
-local qLearner = lurek.ai.newQLearner()
-qLearner:chooseAction(state)
-print("QLearner:chooseAction done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:chooseAction
+  local _todo = "TODO: write a real QLearner:chooseAction usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:bestAction
 -- Returns the greedy-best action for the state (1-based).
--- See the module spec for detailed semantics.
-local qLearner = lurek.ai.newQLearner()
-qLearner:bestAction(state)
-print("QLearner:bestAction done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:bestAction
+  local _todo = "TODO: write a real QLearner:bestAction usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:getQValue
 -- Returns the Q-value for a state-action pair (1-based).
--- Cheap to call; safe inside callbacks.
-local qLearner = lurek.ai.newQLearner()  -- or your existing handle
-local value = qLearner:getQValue(state, action)
-print("QLearner:getQValue ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:getQValue
+  local _todo = "TODO: write a real QLearner:getQValue usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:endEpisode
 -- Ends the current episode, applying epsilon decay.
--- See the module spec for detailed semantics.
-local qLearner = lurek.ai.newQLearner()
-qLearner:endEpisode()
-print("QLearner:endEpisode done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:endEpisode
+  local _todo = "TODO: write a real QLearner:endEpisode usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:getEpisodeCount
 -- Returns the number of completed episodes.
--- Cheap to call; safe inside callbacks.
-local qLearner = lurek.ai.newQLearner()  -- or your existing handle
-local value = qLearner:getEpisodeCount()
-print("QLearner:getEpisodeCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:getEpisodeCount
+  local _todo = "TODO: write a real QLearner:getEpisodeCount usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:getStateCount
 -- Returns the number of discrete states.
--- Cheap to call; safe inside callbacks.
-local qLearner = lurek.ai.newQLearner()  -- or your existing handle
-local value = qLearner:getStateCount()
-print("QLearner:getStateCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:getStateCount
+  local _todo = "TODO: write a real QLearner:getStateCount usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:getActionCount
 -- Returns the number of discrete actions.
--- Cheap to call; safe inside callbacks.
-local qLearner = lurek.ai.newQLearner()  -- or your existing handle
-local value = qLearner:getActionCount()
-print("QLearner:getActionCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:getActionCount
+  local _todo = "TODO: write a real QLearner:getActionCount usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:setLearningRate
 -- Sets the learning rate alpha.
--- Apply at startup or in response to user input.
-local qLearner = lurek.ai.newQLearner()
-qLearner:setLearningRate(v)
-print("QLearner:setLearningRate applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:setLearningRate
+  local _todo = "TODO: write a real QLearner:setLearningRate usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:getLearningRate
 -- Returns the current learning rate.
--- Cheap to call; safe inside callbacks.
-local qLearner = lurek.ai.newQLearner()  -- or your existing handle
-local value = qLearner:getLearningRate()
-print("QLearner:getLearningRate ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:getLearningRate
+  local _todo = "TODO: write a real QLearner:getLearningRate usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:setDiscountFactor
 -- Sets the discount factor gamma.
--- Apply at startup or in response to user input.
-local qLearner = lurek.ai.newQLearner()
-qLearner:setDiscountFactor(v)
-print("QLearner:setDiscountFactor applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:setDiscountFactor
+  local _todo = "TODO: write a real QLearner:setDiscountFactor usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:getDiscountFactor
 -- Returns the current discount factor.
--- Cheap to call; safe inside callbacks.
-local qLearner = lurek.ai.newQLearner()  -- or your existing handle
-local value = qLearner:getDiscountFactor()
-print("QLearner:getDiscountFactor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:getDiscountFactor
+  local _todo = "TODO: write a real QLearner:getDiscountFactor usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:setExplorationRate
 -- Sets the exploration rate epsilon.
--- Apply at startup or in response to user input.
-local qLearner = lurek.ai.newQLearner()
-qLearner:setExplorationRate(v)
-print("QLearner:setExplorationRate applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:setExplorationRate
+  local _todo = "TODO: write a real QLearner:setExplorationRate usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:getExplorationRate
 -- Returns the current exploration rate.
--- Cheap to call; safe inside callbacks.
-local qLearner = lurek.ai.newQLearner()  -- or your existing handle
-local value = qLearner:getExplorationRate()
-print("QLearner:getExplorationRate ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:getExplorationRate
+  local _todo = "TODO: write a real QLearner:getExplorationRate usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:setExplorationDecay
 -- Sets the epsilon decay multiplier.
--- Apply at startup or in response to user input.
-local qLearner = lurek.ai.newQLearner()
-qLearner:setExplorationDecay(v)
-print("QLearner:setExplorationDecay applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:setExplorationDecay
+  local _todo = "TODO: write a real QLearner:setExplorationDecay usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:getExplorationDecay
 -- Returns the epsilon decay multiplier.
--- Cheap to call; safe inside callbacks.
-local qLearner = lurek.ai.newQLearner()  -- or your existing handle
-local value = qLearner:getExplorationDecay()
-print("QLearner:getExplorationDecay ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:getExplorationDecay
+  local _todo = "TODO: write a real QLearner:getExplorationDecay usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:serialize
 -- Serializes the Q-table to a JSON string.
--- May block — call from a worker thread for large payloads.
-local qLearner = lurek.ai.newQLearner()
-qLearner:serialize()
-print("QLearner:serialize done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:serialize
+  local _todo = "TODO: write a real QLearner:serialize usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:deserialize
 -- Restores the Q-table from a JSON string.
--- May block — call from a worker thread for large payloads.
-local qLearner = lurek.ai.newQLearner()
-qLearner:deserialize(json)
-print("QLearner:deserialize done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:deserialize
+  local _todo = "TODO: write a real QLearner:deserialize usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local qLearner = lurek.ai.newQLearner()
-qLearner:type()
-print("QLearner:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:type
+  local _todo = "TODO: write a real QLearner:type usage example"
+  print(_todo)
+end
 
 --@api-stub: QLearner:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local qLearner = lurek.ai.newQLearner()
-qLearner:typeOf("main")
-print("QLearner:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: QLearner:typeOf
+  local _todo = "TODO: write a real QLearner:typeOf usage example"
+  print(_todo)
+end
 
 -- ── UtilityAI methods ──
 
 --@api-stub: UtilityAI:evaluate
 -- Evaluates all actions and returns the best action name, or nil.
--- See the module spec for detailed semantics.
-local utilityAI = lurek.ai.newUtilityAI()
-utilityAI:evaluate()
-print("UtilityAI:evaluate done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: UtilityAI:evaluate
+  local _todo = "TODO: write a real UtilityAI:evaluate usage example"
+  print(_todo)
+end
 
 --@api-stub: UtilityAI:getActionCount
 -- Returns the number of registered actions.
--- Cheap to call; safe inside callbacks.
-local utilityAI = lurek.ai.newUtilityAI()  -- or your existing handle
-local value = utilityAI:getActionCount()
-print("UtilityAI:getActionCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: UtilityAI:getActionCount
+  local _todo = "TODO: write a real UtilityAI:getActionCount usage example"
+  print(_todo)
+end
 
 --@api-stub: UtilityAI:getLastAction
 -- Returns the name of the last chosen action, or nil.
--- Cheap to call; safe inside callbacks.
-local utilityAI = lurek.ai.newUtilityAI()  -- or your existing handle
-local value = utilityAI:getLastAction()
-print("UtilityAI:getLastAction ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: UtilityAI:getLastAction
+  local _todo = "TODO: write a real UtilityAI:getLastAction usage example"
+  print(_todo)
+end
 
 --@api-stub: UtilityAI:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local utilityAI = lurek.ai.newUtilityAI()
-utilityAI:type()
-print("UtilityAI:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: UtilityAI:type
+  local _todo = "TODO: write a real UtilityAI:type usage example"
+  print(_todo)
+end
 
 --@api-stub: UtilityAI:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local utilityAI = lurek.ai.newUtilityAI()
-utilityAI:typeOf("main")
-print("UtilityAI:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: UtilityAI:typeOf
+  local _todo = "TODO: write a real UtilityAI:typeOf usage example"
+  print(_todo)
+end
 
 -- ── GOAPPlanner methods ──
 
 --@api-stub: GOAPPlanner:getActionCount
 -- Returns the number of registered actions.
--- Cheap to call; safe inside callbacks.
-local gOAPPlanner = lurek.ai.newGOAPPlanner()  -- or your existing handle
-local value = gOAPPlanner:getActionCount()
-print("GOAPPlanner:getActionCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GOAPPlanner:getActionCount
+  local _todo = "TODO: write a real GOAPPlanner:getActionCount usage example"
+  print(_todo)
+end
 
 --@api-stub: GOAPPlanner:getGoalCount
 -- Returns the number of registered goals.
--- Cheap to call; safe inside callbacks.
-local gOAPPlanner = lurek.ai.newGOAPPlanner()  -- or your existing handle
-local value = gOAPPlanner:getGoalCount()
-print("GOAPPlanner:getGoalCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GOAPPlanner:getGoalCount
+  local _todo = "TODO: write a real GOAPPlanner:getGoalCount usage example"
+  print(_todo)
+end
 
 --@api-stub: GOAPPlanner:getMaxIterations
 -- Returns the maximum A* planning iterations.
--- Cheap to call; safe inside callbacks.
-local gOAPPlanner = lurek.ai.newGOAPPlanner()  -- or your existing handle
-local value = gOAPPlanner:getMaxIterations()
-print("GOAPPlanner:getMaxIterations ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GOAPPlanner:getMaxIterations
+  local _todo = "TODO: write a real GOAPPlanner:getMaxIterations usage example"
+  print(_todo)
+end
 
 --@api-stub: GOAPPlanner:setMaxIterations
 -- Sets the maximum A* planning iterations (0 = unlimited).
--- Apply at startup or in response to user input.
-local gOAPPlanner = lurek.ai.newGOAPPlanner()
-gOAPPlanner:setMaxIterations(10)
-print("GOAPPlanner:setMaxIterations applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GOAPPlanner:setMaxIterations
+  local _todo = "TODO: write a real GOAPPlanner:setMaxIterations usage example"
+  print(_todo)
+end
 
 --@api-stub: GOAPPlanner:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local gOAPPlanner = lurek.ai.newGOAPPlanner()
-gOAPPlanner:type()
-print("GOAPPlanner:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GOAPPlanner:type
+  local _todo = "TODO: write a real GOAPPlanner:type usage example"
+  print(_todo)
+end
 
 --@api-stub: GOAPPlanner:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local gOAPPlanner = lurek.ai.newGOAPPlanner()
-gOAPPlanner:typeOf("main")
-print("GOAPPlanner:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GOAPPlanner:typeOf
+  local _todo = "TODO: write a real GOAPPlanner:typeOf usage example"
+  print(_todo)
+end
 
 -- ── InfluenceMap methods ──
 
 --@api-stub: InfluenceMap:addLayer
 -- Adds a named influence layer.
--- Side-effecting; safe to call any time after init.
-local influenceMap = lurek.ai.newInfluenceMap()
-influenceMap:addLayer("main")
-print("InfluenceMap:addLayer done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:addLayer
+  local _todo = "TODO: write a real InfluenceMap:addLayer usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:hasLayer
 -- Returns true if the named layer exists.
--- Use as a guard inside lurek.update or event handlers.
-local influenceMap = lurek.ai.newInfluenceMap()
-if influenceMap:hasLayer("main") then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:hasLayer
+  local _todo = "TODO: write a real InfluenceMap:hasLayer usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:decay
 -- Multiplies all influences by a decay factor.
--- See the module spec for detailed semantics.
-local influenceMap = lurek.ai.newInfluenceMap()
-influenceMap:decay(layer, 1.0)
-print("InfluenceMap:decay done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:decay
+  local _todo = "TODO: write a real InfluenceMap:decay usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:clearLayer
 -- Clears all influence in a layer.
--- Pair with the matching constructor to free resources.
-local influenceMap = lurek.ai.newInfluenceMap()
-influenceMap:clearLayer(layer)
--- influenceMap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:clearLayer
+  local _todo = "TODO: write a real InfluenceMap:clearLayer usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:clearAll
 -- Removes all influence values from every layer in the map.
--- Pair with the matching constructor to free resources.
-local influenceMap = lurek.ai.newInfluenceMap()
-influenceMap:clearAll()
--- influenceMap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:clearAll
+  local _todo = "TODO: write a real InfluenceMap:clearAll usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:getMaxPosition
 -- Returns the world-space position of the maximum value.
--- Cheap to call; safe inside callbacks.
-local influenceMap = lurek.ai.newInfluenceMap()  -- or your existing handle
-local value = influenceMap:getMaxPosition(layer)
-print("InfluenceMap:getMaxPosition ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:getMaxPosition
+  local _todo = "TODO: write a real InfluenceMap:getMaxPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:getMinPosition
 -- Returns the world-space position of the minimum value.
--- Cheap to call; safe inside callbacks.
-local influenceMap = lurek.ai.newInfluenceMap()  -- or your existing handle
-local value = influenceMap:getMinPosition(layer)
-print("InfluenceMap:getMinPosition ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:getMinPosition
+  local _todo = "TODO: write a real InfluenceMap:getMinPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:getWidth
 -- Returns the influence map width in grid cells.
--- Cheap to call; safe inside callbacks.
-local influenceMap = lurek.ai.newInfluenceMap()  -- or your existing handle
-local value = influenceMap:getWidth()
-print("InfluenceMap:getWidth ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:getWidth
+  local _todo = "TODO: write a real InfluenceMap:getWidth usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:getHeight
 -- Returns the influence map height in grid cells.
--- Cheap to call; safe inside callbacks.
-local influenceMap = lurek.ai.newInfluenceMap()  -- or your existing handle
-local value = influenceMap:getHeight()
-print("InfluenceMap:getHeight ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:getHeight
+  local _todo = "TODO: write a real InfluenceMap:getHeight usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:getCellSize
 -- Returns the cell size in world units.
--- Cheap to call; safe inside callbacks.
-local influenceMap = lurek.ai.newInfluenceMap()  -- or your existing handle
-local value = influenceMap:getCellSize()
-print("InfluenceMap:getCellSize ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:getCellSize
+  local _todo = "TODO: write a real InfluenceMap:getCellSize usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local influenceMap = lurek.ai.newInfluenceMap()
-influenceMap:type()
-print("InfluenceMap:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:type
+  local _todo = "TODO: write a real InfluenceMap:type usage example"
+  print(_todo)
+end
 
 --@api-stub: InfluenceMap:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local influenceMap = lurek.ai.newInfluenceMap()
-influenceMap:typeOf("main")
-print("InfluenceMap:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: InfluenceMap:typeOf
+  local _todo = "TODO: write a real InfluenceMap:typeOf usage example"
+  print(_todo)
+end
 
 -- ── Squad methods ──
 
 --@api-stub: Squad:getName
 -- Returns the unique name string assigned to this squad.
--- Cheap to call; safe inside callbacks.
-local squad = lurek.ai.newSquad()  -- or your existing handle
-local value = squad:getName()
-print("Squad:getName ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:getName
+  local _todo = "TODO: write a real Squad:getName usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:addMember
 -- Adds an agent by name to this squad.
--- Side-effecting; safe to call any time after init.
-local squad = lurek.ai.newSquad()
-squad:addMember("main")
-print("Squad:addMember done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:addMember
+  local _todo = "TODO: write a real Squad:addMember usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:removeMember
 -- Removes an agent by name from this squad.
--- Pair with the matching constructor to free resources.
-local squad = lurek.ai.newSquad()
-squad:removeMember("main")
--- squad is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:removeMember
+  local _todo = "TODO: write a real Squad:removeMember usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:getMemberCount
 -- Returns the number of squad members.
--- Cheap to call; safe inside callbacks.
-local squad = lurek.ai.newSquad()  -- or your existing handle
-local value = squad:getMemberCount()
-print("Squad:getMemberCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:getMemberCount
+  local _todo = "TODO: write a real Squad:getMemberCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:getMembers
 -- Returns the member names as a table.
--- Cheap to call; safe inside callbacks.
-local squad = lurek.ai.newSquad()  -- or your existing handle
-local value = squad:getMembers()
-print("Squad:getMembers ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:getMembers
+  local _todo = "TODO: write a real Squad:getMembers usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:setLeader
 -- Sets the squad leader by name.
--- Apply at startup or in response to user input.
-local squad = lurek.ai.newSquad()
-squad:setLeader("main")
-print("Squad:setLeader applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:setLeader
+  local _todo = "TODO: write a real Squad:setLeader usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:getLeader
 -- Returns the leader name, or nil.
--- Cheap to call; safe inside callbacks.
-local squad = lurek.ai.newSquad()  -- or your existing handle
-local value = squad:getLeader()
-print("Squad:getLeader ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:getLeader
+  local _todo = "TODO: write a real Squad:getLeader usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:getFormation
 -- Returns the current formation type name.
--- Cheap to call; safe inside callbacks.
-local squad = lurek.ai.newSquad()  -- or your existing handle
-local value = squad:getFormation()
-print("Squad:getFormation ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:getFormation
+  local _todo = "TODO: write a real Squad:getFormation usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:getFormationSpacing
 -- Returns the formation spacing in world units.
--- Cheap to call; safe inside callbacks.
-local squad = lurek.ai.newSquad()  -- or your existing handle
-local value = squad:getFormationSpacing()
-print("Squad:getFormationSpacing ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:getFormationSpacing
+  local _todo = "TODO: write a real Squad:getFormationSpacing usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:getBlackboard
 -- Returns the squad's shared blackboard.
--- Cheap to call; safe inside callbacks.
-local squad = lurek.ai.newSquad()  -- or your existing handle
-local value = squad:getBlackboard()
-print("Squad:getBlackboard ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:getBlackboard
+  local _todo = "TODO: write a real Squad:getBlackboard usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local squad = lurek.ai.newSquad()
-squad:type()
-print("Squad:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:type
+  local _todo = "TODO: write a real Squad:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Squad:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local squad = lurek.ai.newSquad()
-squad:typeOf("main")
-print("Squad:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Squad:typeOf
+  local _todo = "TODO: write a real Squad:typeOf usage example"
+  print(_todo)
+end
 
 -- ── CommandQueue methods ──
 
 --@api-stub: CommandQueue:cancelCurrent
 -- Cancels the front command if it is interruptible.
--- Pair with the matching constructor to free resources.
-local commandQueue = lurek.ai.newCommandQueue()
-commandQueue:cancelCurrent()
--- commandQueue is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: CommandQueue:cancelCurrent
+  local _todo = "TODO: write a real CommandQueue:cancelCurrent usage example"
+  print(_todo)
+end
 
 --@api-stub: CommandQueue:clear
 -- Discards all queued commands.
--- Pair with the matching constructor to free resources.
-local commandQueue = lurek.ai.newCommandQueue()
-commandQueue:clear()
--- commandQueue is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: CommandQueue:clear
+  local _todo = "TODO: write a real CommandQueue:clear usage example"
+  print(_todo)
+end
 
 --@api-stub: CommandQueue:getCount
 -- Returns the number of queued commands.
--- Cheap to call; safe inside callbacks.
-local commandQueue = lurek.ai.newCommandQueue()  -- or your existing handle
-local value = commandQueue:getCount()
-print("CommandQueue:getCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: CommandQueue:getCount
+  local _todo = "TODO: write a real CommandQueue:getCount usage example"
+  print(_todo)
+end
 
 --@api-stub: CommandQueue:isEmpty
 -- Returns true if there are no queued commands.
--- Use as a guard inside lurek.update or event handlers.
-local commandQueue = lurek.ai.newCommandQueue()
-if commandQueue:isEmpty() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: CommandQueue:isEmpty
+  local _todo = "TODO: write a real CommandQueue:isEmpty usage example"
+  print(_todo)
+end
 
 --@api-stub: CommandQueue:getCurrentType
 -- Returns the kind of the front command, or nil.
--- Cheap to call; safe inside callbacks.
-local commandQueue = lurek.ai.newCommandQueue()  -- or your existing handle
-local value = commandQueue:getCurrentType()
-print("CommandQueue:getCurrentType ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: CommandQueue:getCurrentType
+  local _todo = "TODO: write a real CommandQueue:getCurrentType usage example"
+  print(_todo)
+end
 
 --@api-stub: CommandQueue:getCurrentTarget
 -- Returns the target coordinates of the front command.
--- Cheap to call; safe inside callbacks.
-local commandQueue = lurek.ai.newCommandQueue()  -- or your existing handle
-local value = commandQueue:getCurrentTarget()
-print("CommandQueue:getCurrentTarget ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: CommandQueue:getCurrentTarget
+  local _todo = "TODO: write a real CommandQueue:getCurrentTarget usage example"
+  print(_todo)
+end
 
 --@api-stub: CommandQueue:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local commandQueue = lurek.ai.newCommandQueue()
-commandQueue:type()
-print("CommandQueue:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: CommandQueue:type
+  local _todo = "TODO: write a real CommandQueue:type usage example"
+  print(_todo)
+end
 
 --@api-stub: CommandQueue:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local commandQueue = lurek.ai.newCommandQueue()
-commandQueue:typeOf("main")
-print("CommandQueue:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: CommandQueue:typeOf
+  local _todo = "TODO: write a real CommandQueue:typeOf usage example"
+  print(_todo)
+end
 
 -- ── TraitProfile methods ──
 
 --@api-stub: TraitProfile:set
 -- Sets the base value of this trait, replacing any previous base.
--- Apply at startup or in response to user input.
-local traitProfile = lurek.ai.newTraitProfile()
-traitProfile:set("main", value)
-print("TraitProfile:set applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: TraitProfile:set
+  local _todo = "TODO: write a real TraitProfile:set usage example"
+  print(_todo)
+end
 
 --@api-stub: TraitProfile:get
 -- Returns the current float value of this emotion dimension.
--- Cheap to call; safe inside callbacks.
-local traitProfile = lurek.ai.newTraitProfile()  -- or your existing handle
-local value = traitProfile:get("main")
-print("TraitProfile:get ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: TraitProfile:get
+  local _todo = "TODO: write a real TraitProfile:get usage example"
+  print(_todo)
+end
 
 --@api-stub: TraitProfile:getBase
 -- Returns the unmodified base value of this trait before modifiers.
--- Cheap to call; safe inside callbacks.
-local traitProfile = lurek.ai.newTraitProfile()  -- or your existing handle
-local value = traitProfile:getBase("main")
-print("TraitProfile:getBase ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: TraitProfile:getBase
+  local _todo = "TODO: write a real TraitProfile:getBase usage example"
+  print(_todo)
+end
 
 --@api-stub: TraitProfile:removeModifiers
 -- Removes the specified modifiers.
--- Pair with the matching constructor to free resources.
-local traitProfile = lurek.ai.newTraitProfile()
-traitProfile:removeModifiers(source)
--- traitProfile is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: TraitProfile:removeModifiers
+  local _todo = "TODO: write a real TraitProfile:removeModifiers usage example"
+  print(_todo)
+end
 
 --@api-stub: TraitProfile:update
 -- Advances the simulation by one time step.
--- Apply at startup or in response to user input.
-local traitProfile = lurek.ai.newTraitProfile()
-traitProfile:update(dt)
-print("TraitProfile:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: TraitProfile:update
+  local _todo = "TODO: write a real TraitProfile:update usage example"
+  print(_todo)
+end
 
 --@api-stub: TraitProfile:has
 -- Returns true if a item is present.
--- See the module spec for detailed semantics.
-local traitProfile = lurek.ai.newTraitProfile()
-traitProfile:has("main")
-print("TraitProfile:has done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: TraitProfile:has
+  local _todo = "TODO: write a real TraitProfile:has usage example"
+  print(_todo)
+end
 
 --@api-stub: TraitProfile:traitCount
 -- Returns or performs trait count.
--- See the module spec for detailed semantics.
-local traitProfile = lurek.ai.newTraitProfile()
-traitProfile:traitCount()
-print("TraitProfile:traitCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: TraitProfile:traitCount
+  local _todo = "TODO: write a real TraitProfile:traitCount usage example"
+  print(_todo)
+end
 
 --@api-stub: TraitProfile:archetype
 -- Returns or performs archetype.
--- See the module spec for detailed semantics.
-local traitProfile = lurek.ai.newTraitProfile()
-traitProfile:archetype()
-print("TraitProfile:archetype done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: TraitProfile:archetype
+  local _todo = "TODO: write a real TraitProfile:archetype usage example"
+  print(_todo)
+end
 
 -- ── StimulusWorld methods ──
 
 --@api-stub: StimulusWorld:remove
 -- Removes the specified item.
--- Pair with the matching constructor to free resources.
-local stimulusWorld = lurek.ai.newStimulusWorld()
-stimulusWorld:remove(1)
--- stimulusWorld is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StimulusWorld:remove
+  local _todo = "TODO: write a real StimulusWorld:remove usage example"
+  print(_todo)
+end
 
 --@api-stub: StimulusWorld:update
 -- Advances the simulation by one time step.
--- Apply at startup or in response to user input.
-local stimulusWorld = lurek.ai.newStimulusWorld()
-stimulusWorld:update(dt)
-print("StimulusWorld:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StimulusWorld:update
+  local _todo = "TODO: write a real StimulusWorld:update usage example"
+  print(_todo)
+end
 
 --@api-stub: StimulusWorld:clear
 -- Resets or clears the state.
--- Pair with the matching constructor to free resources.
-local stimulusWorld = lurek.ai.newStimulusWorld()
-stimulusWorld:clear()
--- stimulusWorld is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StimulusWorld:clear
+  local _todo = "TODO: write a real StimulusWorld:clear usage example"
+  print(_todo)
+end
 
 -- ── ContextSteering methods ──
 
 --@api-stub: ContextSteering:addWander
 -- Adds a wander behavior with jitter and weight to the context steering evaluator.
--- Side-effecting; safe to call any time after init.
-local contextSteering = lurek.ai.newContextSteering()
-contextSteering:addWander(jitter, weight)
-print("ContextSteering:addWander done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ContextSteering:addWander
+  local _todo = "TODO: write a real ContextSteering:addWander usage example"
+  print(_todo)
+end
 
 --@api-stub: ContextSteering:addAvoidBounds
 -- Registers a rectangular region this agent must avoid.
--- Side-effecting; safe to call any time after init.
-local contextSteering = lurek.ai.newContextSteering()
-contextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weight)
-print("ContextSteering:addAvoidBounds done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ContextSteering:addAvoidBounds
+  local _todo = "TODO: write a real ContextSteering:addAvoidBounds usage example"
+  print(_todo)
+end
 
 --@api-stub: ContextSteering:clearBehaviors
 -- Resets or clears the behaviors.
--- Pair with the matching constructor to free resources.
-local contextSteering = lurek.ai.newContextSteering()
-contextSteering:clearBehaviors()
--- contextSteering is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ContextSteering:clearBehaviors
+  local _todo = "TODO: write a real ContextSteering:clearBehaviors usage example"
+  print(_todo)
+end
 
 --@api-stub: ContextSteering:chosenMagnitude
 -- Returns or performs chosen magnitude.
--- See the module spec for detailed semantics.
-local contextSteering = lurek.ai.newContextSteering()
-contextSteering:chosenMagnitude()
-print("ContextSteering:chosenMagnitude done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ContextSteering:chosenMagnitude
+  local _todo = "TODO: write a real ContextSteering:chosenMagnitude usage example"
+  print(_todo)
+end
 
 --@api-stub: ContextSteering:slotCount
 -- Returns or performs slot count.
--- See the module spec for detailed semantics.
-local contextSteering = lurek.ai.newContextSteering()
-contextSteering:slotCount()
-print("ContextSteering:slotCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ContextSteering:slotCount
+  local _todo = "TODO: write a real ContextSteering:slotCount usage example"
+  print(_todo)
+end
 
 -- ── NeedSystem methods ──
 
 --@api-stub: NeedSystem:addNeed
 -- Registers a new need with the specified name, urgency, and decay rate in the system.
--- Side-effecting; safe to call any time after init.
-local needSystem = lurek.ai.newNeedSystem()
-needSystem:addNeed("main", decay_rate, urgency_threshold, urgency_factor)
-print("NeedSystem:addNeed done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeedSystem:addNeed
+  local _todo = "TODO: write a real NeedSystem:addNeed usage example"
+  print(_todo)
+end
 
 --@api-stub: NeedSystem:update
 -- Advances the simulation by one time step.
--- Apply at startup or in response to user input.
-local needSystem = lurek.ai.newNeedSystem()
-needSystem:update(dt)
-print("NeedSystem:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeedSystem:update
+  local _todo = "TODO: write a real NeedSystem:update usage example"
+  print(_todo)
+end
 
 --@api-stub: NeedSystem:mostUrgent
 -- Returns or performs most urgent.
--- See the module spec for detailed semantics.
-local needSystem = lurek.ai.newNeedSystem()
-needSystem:mostUrgent()
-print("NeedSystem:mostUrgent done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeedSystem:mostUrgent
+  local _todo = "TODO: write a real NeedSystem:mostUrgent usage example"
+  print(_todo)
+end
 
 --@api-stub: NeedSystem:satisfy
 -- Returns or performs satisfy.
--- See the module spec for detailed semantics.
-local needSystem = lurek.ai.newNeedSystem()
-needSystem:satisfy("main", amount)
-print("NeedSystem:satisfy done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeedSystem:satisfy
+  local _todo = "TODO: write a real NeedSystem:satisfy usage example"
+  print(_todo)
+end
 
 --@api-stub: NeedSystem:valueOf
 -- Returns or performs value of.
--- See the module spec for detailed semantics.
-local needSystem = lurek.ai.newNeedSystem()
-needSystem:valueOf("main")
-print("NeedSystem:valueOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeedSystem:valueOf
+  local _todo = "TODO: write a real NeedSystem:valueOf usage example"
+  print(_todo)
+end
 
 -- ── AIDirector methods ──
 
 --@api-stub: AIDirector:pushEvent
 -- Pushes a gameplay event with the given intensity to the director for awareness analysis.
--- Side-effecting; safe to call any time after init.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:pushEvent(intensity)
-print("AIDirector:pushEvent done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:pushEvent
+  local _todo = "TODO: write a real AIDirector:pushEvent usage example"
+  print(_todo)
+end
 
 --@api-stub: AIDirector:update
 -- Advances the simulation by one time step.
--- Apply at startup or in response to user input.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:update(dt)
-print("AIDirector:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:update
+  local _todo = "TODO: write a real AIDirector:update usage example"
+  print(_todo)
+end
 
 --@api-stub: AIDirector:tension
 -- Returns or performs tension.
--- See the module spec for detailed semantics.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:tension()
-print("AIDirector:tension done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:tension
+  local _todo = "TODO: write a real AIDirector:tension usage example"
+  print(_todo)
+end
 
 --@api-stub: AIDirector:phase
 -- Returns or performs phase.
--- See the module spec for detailed semantics.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:phase()
-print("AIDirector:phase done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:phase
+  local _todo = "TODO: write a real AIDirector:phase usage example"
+  print(_todo)
+end
 
 --@api-stub: AIDirector:spawnRateFactor
 -- Returns or performs spawn rate factor.
--- Build once at startup; reuse across frames.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:spawnRateFactor()
-print("AIDirector:spawnRateFactor done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:spawnRateFactor
+  local _todo = "TODO: write a real AIDirector:spawnRateFactor usage example"
+  print(_todo)
+end
 
 --@api-stub: AIDirector:lootFactor
 -- Returns or performs loot factor.
--- See the module spec for detailed semantics.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:lootFactor()
-print("AIDirector:lootFactor done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:lootFactor
+  local _todo = "TODO: write a real AIDirector:lootFactor usage example"
+  print(_todo)
+end
 
 --@api-stub: AIDirector:ambientIntensity
 -- Returns or performs ambient intensity.
--- See the module spec for detailed semantics.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:ambientIntensity()
-print("AIDirector:ambientIntensity done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:ambientIntensity
+  local _todo = "TODO: write a real AIDirector:ambientIntensity usage example"
+  print(_todo)
+end
 
 --@api-stub: AIDirector:setTension
 -- Sets the global narrative tension level (0â€“1 scale).
--- Apply at startup or in response to user input.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:setTension(value)
-print("AIDirector:setTension applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:setTension
+  local _todo = "TODO: write a real AIDirector:setTension usage example"
+  print(_todo)
+end
 
 --@api-stub: AIDirector:reset
 -- Resets or clears the state.
--- Pair with the matching constructor to free resources.
-local aIDirector = lurek.ai.newAIDirector()
-aIDirector:reset()
--- aIDirector is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AIDirector:reset
+  local _todo = "TODO: write a real AIDirector:reset usage example"
+  print(_todo)
+end
 
 -- ── HTNDomain methods ──
 
 --@api-stub: HTNDomain:addPrimitive
 -- Registers a primitive HTN task with a direct operator function.
--- Side-effecting; safe to call any time after init.
-local hTNDomain = lurek.ai.newHTNDomain()
-hTNDomain:addPrimitive("main", preconds, effects, clears)
-print("HTNDomain:addPrimitive done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: HTNDomain:addPrimitive
+  local _todo = "TODO: write a real HTNDomain:addPrimitive usage example"
+  print(_todo)
+end
 
 --@api-stub: HTNDomain:taskCount
 -- Returns or performs task count.
--- See the module spec for detailed semantics.
-local hTNDomain = lurek.ai.newHTNDomain()
-hTNDomain:taskCount()
-print("HTNDomain:taskCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: HTNDomain:taskCount
+  local _todo = "TODO: write a real HTNDomain:taskCount usage example"
+  print(_todo)
+end
 
 -- ── EmotionModel methods ──
 
 --@api-stub: EmotionModel:trigger
 -- Returns or performs trigger.
--- See the module spec for detailed semantics.
-local emotionModel = lurek.ai.newEmotionModel()
-emotionModel:trigger("main", amount)
-print("EmotionModel:trigger done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: EmotionModel:trigger
+  local _todo = "TODO: write a real EmotionModel:trigger usage example"
+  print(_todo)
+end
 
 --@api-stub: EmotionModel:get
 -- Returns the current float value of this emotion dimension.
--- Cheap to call; safe inside callbacks.
-local emotionModel = lurek.ai.newEmotionModel()  -- or your existing handle
-local value = emotionModel:get("main")
-print("EmotionModel:get ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: EmotionModel:get
+  local _todo = "TODO: write a real EmotionModel:get usage example"
+  print(_todo)
+end
 
 --@api-stub: EmotionModel:dominant
 -- Returns or performs dominant.
--- See the module spec for detailed semantics.
-local emotionModel = lurek.ai.newEmotionModel()
-emotionModel:dominant()
-print("EmotionModel:dominant done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: EmotionModel:dominant
+  local _todo = "TODO: write a real EmotionModel:dominant usage example"
+  print(_todo)
+end
 
 --@api-stub: EmotionModel:isActive
 -- Returns `true` if the emotion dimension is currently active and above threshold.
--- Use as a guard inside lurek.update or event handlers.
-local emotionModel = lurek.ai.newEmotionModel()
-if emotionModel:isActive("main") then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: EmotionModel:isActive
+  local _todo = "TODO: write a real EmotionModel:isActive usage example"
+  print(_todo)
+end
 
 --@api-stub: EmotionModel:update
 -- Advances the simulation by one time step.
--- Apply at startup or in response to user input.
-local emotionModel = lurek.ai.newEmotionModel()
-emotionModel:update(dt)
-print("EmotionModel:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: EmotionModel:update
+  local _todo = "TODO: write a real EmotionModel:update usage example"
+  print(_todo)
+end
 
 --@api-stub: EmotionModel:reset
 -- Resets or clears the state.
--- Pair with the matching constructor to free resources.
-local emotionModel = lurek.ai.newEmotionModel()
-emotionModel:reset()
--- emotionModel is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: EmotionModel:reset
+  local _todo = "TODO: write a real EmotionModel:reset usage example"
+  print(_todo)
+end
 
 -- ── ORCASolver methods ──
 
 --@api-stub: ORCASolver:setPosition
 -- Sets the agent's current world-space position for ORCA velocity computation.
--- Apply at startup or in response to user input.
-local oRCASolver = lurek.ai.newORCASolver()
-oRCASolver:setPosition(1, 100, 100)
-print("ORCASolver:setPosition applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ORCASolver:setPosition
+  local _todo = "TODO: write a real ORCASolver:setPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: ORCASolver:compute
 -- Computes and returns the result.
--- See the module spec for detailed semantics.
-local oRCASolver = lurek.ai.newORCASolver()
-oRCASolver:compute(dt)
-print("ORCASolver:compute done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ORCASolver:compute
+  local _todo = "TODO: write a real ORCASolver:compute usage example"
+  print(_todo)
+end
 
 --@api-stub: ORCASolver:getSafeVelocity
 -- Returns the safe velocity.
--- Cheap to call; safe inside callbacks.
-local oRCASolver = lurek.ai.newORCASolver()  -- or your existing handle
-local value = oRCASolver:getSafeVelocity(1)
-print("ORCASolver:getSafeVelocity ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ORCASolver:getSafeVelocity
+  local _todo = "TODO: write a real ORCASolver:getSafeVelocity usage example"
+  print(_todo)
+end
 
 --@api-stub: ORCASolver:agentCount
 -- Returns or performs agent count.
--- See the module spec for detailed semantics.
-local oRCASolver = lurek.ai.newORCASolver()
-oRCASolver:agentCount()
-print("ORCASolver:agentCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: ORCASolver:agentCount
+  local _todo = "TODO: write a real ORCASolver:agentCount usage example"
+  print(_todo)
+end
 
 -- ── NeuralNet methods ──
 
 --@api-stub: NeuralNet:forward
 -- Returns or performs forward.
--- See the module spec for detailed semantics.
-local neuralNet = lurek.ai.newNeuralNet()
-neuralNet:forward(input)
-print("NeuralNet:forward done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeuralNet:forward
+  local _todo = "TODO: write a real NeuralNet:forward usage example"
+  print(_todo)
+end
 
 --@api-stub: NeuralNet:setWeights
 -- Overwrites all connection weights with values from a flat table.
--- Apply at startup or in response to user input.
-local neuralNet = lurek.ai.newNeuralNet()
-neuralNet:setWeights(weights)
-print("NeuralNet:setWeights applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeuralNet:setWeights
+  local _todo = "TODO: write a real NeuralNet:setWeights usage example"
+  print(_todo)
+end
 
 --@api-stub: NeuralNet:getWeights
 -- Returns a flat table of all connection weight values in the network.
--- Cheap to call; safe inside callbacks.
-local neuralNet = lurek.ai.newNeuralNet()  -- or your existing handle
-local value = neuralNet:getWeights()
-print("NeuralNet:getWeights ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeuralNet:getWeights
+  local _todo = "TODO: write a real NeuralNet:getWeights usage example"
+  print(_todo)
+end
 
 --@api-stub: NeuralNet:paramCount
 -- Returns or performs param count.
--- See the module spec for detailed semantics.
-local neuralNet = lurek.ai.newNeuralNet()
-neuralNet:paramCount()
-print("NeuralNet:paramCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeuralNet:paramCount
+  local _todo = "TODO: write a real NeuralNet:paramCount usage example"
+  print(_todo)
+end
 
 --@api-stub: NeuralNet:layerCount
 -- Returns or performs layer count.
--- See the module spec for detailed semantics.
-local neuralNet = lurek.ai.newNeuralNet()
-neuralNet:layerCount()
-print("NeuralNet:layerCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: NeuralNet:layerCount
+  local _todo = "TODO: write a real NeuralNet:layerCount usage example"
+  print(_todo)
+end
 
 -- ── GeneticAlgorithm methods ──
 
 --@api-stub: GeneticAlgorithm:evolve
 -- Runs one generation of the evolutionary algorithm.
--- See the module spec for detailed semantics.
-local geneticAlgorithm = lurek.ai.newGeneticAlgorithm()
-geneticAlgorithm:evolve()
-print("GeneticAlgorithm:evolve done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GeneticAlgorithm:evolve
+  local _todo = "TODO: write a real GeneticAlgorithm:evolve usage example"
+  print(_todo)
+end
 
 --@api-stub: GeneticAlgorithm:generation
 -- Returns or performs generation.
--- See the module spec for detailed semantics.
-local geneticAlgorithm = lurek.ai.newGeneticAlgorithm()
-geneticAlgorithm:generation()
-print("GeneticAlgorithm:generation done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GeneticAlgorithm:generation
+  local _todo = "TODO: write a real GeneticAlgorithm:generation usage example"
+  print(_todo)
+end
 
 --@api-stub: GeneticAlgorithm:popSize
 -- Returns or performs pop size.
--- Pair with the matching constructor to free resources.
-local geneticAlgorithm = lurek.ai.newGeneticAlgorithm()
-geneticAlgorithm:popSize()
--- geneticAlgorithm is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GeneticAlgorithm:popSize
+  local _todo = "TODO: write a real GeneticAlgorithm:popSize usage example"
+  print(_todo)
+end
 
 --@api-stub: GeneticAlgorithm:setFitness
 -- Sets the fitness score used by the genetic algorithm selection step.
--- Apply at startup or in response to user input.
-local geneticAlgorithm = lurek.ai.newGeneticAlgorithm()
-geneticAlgorithm:setFitness(1, fitness)
-print("GeneticAlgorithm:setFitness applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GeneticAlgorithm:setFitness
+  local _todo = "TODO: write a real GeneticAlgorithm:setFitness usage example"
+  print(_todo)
+end
 
 --@api-stub: GeneticAlgorithm:getGenes
 -- Returns the chromosome as an ordered table of gene values.
--- Cheap to call; safe inside callbacks.
-local geneticAlgorithm = lurek.ai.newGeneticAlgorithm()  -- or your existing handle
-local value = geneticAlgorithm:getGenes(1)
-print("GeneticAlgorithm:getGenes ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GeneticAlgorithm:getGenes
+  local _todo = "TODO: write a real GeneticAlgorithm:getGenes usage example"
+  print(_todo)
+end
 
 --@api-stub: GeneticAlgorithm:bestGenes
 -- Returns or performs best genes.
--- See the module spec for detailed semantics.
-local geneticAlgorithm = lurek.ai.newGeneticAlgorithm()
-geneticAlgorithm:bestGenes()
-print("GeneticAlgorithm:bestGenes done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: GeneticAlgorithm:bestGenes
+  local _todo = "TODO: write a real GeneticAlgorithm:bestGenes usage example"
+  print(_todo)
+end
 
 -- ── Bandit methods ──
 
 --@api-stub: Bandit:select
 -- Returns or performs select.
--- See the module spec for detailed semantics.
-local bandit = lurek.ai.newBandit()
-bandit:select()
-print("Bandit:select done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Bandit:select
+  local _todo = "TODO: write a real Bandit:select usage example"
+  print(_todo)
+end
 
 --@api-stub: Bandit:update
 -- Advances the simulation by one time step.
--- Apply at startup or in response to user input.
-local bandit = lurek.ai.newBandit()
-bandit:update(1, reward)
-print("Bandit:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Bandit:update
+  local _todo = "TODO: write a real Bandit:update usage example"
+  print(_todo)
+end
 
 --@api-stub: Bandit:bestArm
 -- Returns or performs best arm.
--- See the module spec for detailed semantics.
-local bandit = lurek.ai.newBandit()
-bandit:bestArm()
-print("Bandit:bestArm done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Bandit:bestArm
+  local _todo = "TODO: write a real Bandit:bestArm usage example"
+  print(_todo)
+end
 
 --@api-stub: Bandit:reset
 -- Resets or clears the state.
--- Pair with the matching constructor to free resources.
-local bandit = lurek.ai.newBandit()
-bandit:reset()
--- bandit is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Bandit:reset
+  local _todo = "TODO: write a real Bandit:reset usage example"
+  print(_todo)
+end
 
 --@api-stub: Bandit:armCount
 -- Returns or performs arm count.
--- See the module spec for detailed semantics.
-local bandit = lurek.ai.newBandit()
-bandit:armCount()
-print("Bandit:armCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Bandit:armCount
+  local _todo = "TODO: write a real Bandit:armCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Bandit:totalPulls
 -- Returns or performs total pulls.
--- See the module spec for detailed semantics.
-local bandit = lurek.ai.newBandit()
-bandit:totalPulls()
-print("Bandit:totalPulls done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Bandit:totalPulls
+  local _todo = "TODO: write a real Bandit:totalPulls usage example"
+  print(_todo)
+end
 
 -- ── Neuroevolution methods ──
 
 --@api-stub: Neuroevolution:evolve
 -- Runs one generation of the evolutionary algorithm.
--- See the module spec for detailed semantics.
-local neuroevolution = lurek.ai.newNeuroevolution()
-neuroevolution:evolve()
-print("Neuroevolution:evolve done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Neuroevolution:evolve
+  local _todo = "TODO: write a real Neuroevolution:evolve usage example"
+  print(_todo)
+end
 
 --@api-stub: Neuroevolution:setFitness
 -- Sets the fitness score used by the genetic algorithm selection step.
--- Apply at startup or in response to user input.
-local neuroevolution = lurek.ai.newNeuroevolution()
-neuroevolution:setFitness(1, fitness)
-print("Neuroevolution:setFitness applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Neuroevolution:setFitness
+  local _todo = "TODO: write a real Neuroevolution:setFitness usage example"
+  print(_todo)
+end
 
 --@api-stub: Neuroevolution:chromosomeToNet
 -- Returns or performs chromosome to net.
--- See the module spec for detailed semantics.
-local neuroevolution = lurek.ai.newNeuroevolution()
-neuroevolution:chromosomeToNet(1)
-print("Neuroevolution:chromosomeToNet done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Neuroevolution:chromosomeToNet
+  local _todo = "TODO: write a real Neuroevolution:chromosomeToNet usage example"
+  print(_todo)
+end
 
 --@api-stub: Neuroevolution:bestNetwork
 -- Returns or performs best network.
--- See the module spec for detailed semantics.
-local neuroevolution = lurek.ai.newNeuroevolution()
-neuroevolution:bestNetwork()
-print("Neuroevolution:bestNetwork done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Neuroevolution:bestNetwork
+  local _todo = "TODO: write a real Neuroevolution:bestNetwork usage example"
+  print(_todo)
+end
 
 --@api-stub: Neuroevolution:bestFitness
 -- Returns or performs best fitness.
--- See the module spec for detailed semantics.
-local neuroevolution = lurek.ai.newNeuroevolution()
-neuroevolution:bestFitness()
-print("Neuroevolution:bestFitness done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Neuroevolution:bestFitness
+  local _todo = "TODO: write a real Neuroevolution:bestFitness usage example"
+  print(_todo)
+end
 
 --@api-stub: Neuroevolution:popSize
 -- Returns or performs pop size.
--- Pair with the matching constructor to free resources.
-local neuroevolution = lurek.ai.newNeuroevolution()
-neuroevolution:popSize()
--- neuroevolution is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Neuroevolution:popSize
+  local _todo = "TODO: write a real Neuroevolution:popSize usage example"
+  print(_todo)
+end
 
 --@api-stub: Neuroevolution:generation
 -- Returns or performs generation.
--- See the module spec for detailed semantics.
-local neuroevolution = lurek.ai.newNeuroevolution()
-neuroevolution:generation()
-print("Neuroevolution:generation done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: Neuroevolution:generation
+  local _todo = "TODO: write a real Neuroevolution:generation usage example"
+  print(_todo)
+end
 
 -- ── StrategyAI methods ──
 
 --@api-stub: StrategyAI:addGoal
 -- Adds a strategic goal with priority score to the planner for future evaluation.
--- Side-effecting; safe to call any time after init.
-local strategyAI = lurek.ai.newStrategyAI()
-strategyAI:addGoal("main")
-print("StrategyAI:addGoal done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StrategyAI:addGoal
+  local _todo = "TODO: write a real StrategyAI:addGoal usage example"
+  print(_todo)
+end
 
 --@api-stub: StrategyAI:addTag
 -- Adds a string tag to the strategy AI instance for goal filtering and categorization.
--- Side-effecting; safe to call any time after init.
-local strategyAI = lurek.ai.newStrategyAI()
-strategyAI:addTag("main")
-print("StrategyAI:addTag done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StrategyAI:addTag
+  local _todo = "TODO: write a real StrategyAI:addTag usage example"
+  print(_todo)
+end
 
 --@api-stub: StrategyAI:removeTag
 -- Removes the specified tag.
--- Pair with the matching constructor to free resources.
-local strategyAI = lurek.ai.newStrategyAI()
-strategyAI:removeTag("main")
--- strategyAI is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StrategyAI:removeTag
+  local _todo = "TODO: write a real StrategyAI:removeTag usage example"
+  print(_todo)
+end
 
 --@api-stub: StrategyAI:update
 -- Advances the simulation by one time step.
--- Apply at startup or in response to user input.
-local strategyAI = lurek.ai.newStrategyAI()
-strategyAI:update(dt, function() print("update fired") end)
-print("StrategyAI:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StrategyAI:update
+  local _todo = "TODO: write a real StrategyAI:update usage example"
+  print(_todo)
+end
 
 --@api-stub: StrategyAI:forceEvaluate
 -- Returns or performs force evaluate.
--- See the module spec for detailed semantics.
-local strategyAI = lurek.ai.newStrategyAI()
-strategyAI:forceEvaluate(function() print("forceEvaluate fired") end)
-print("StrategyAI:forceEvaluate done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StrategyAI:forceEvaluate
+  local _todo = "TODO: write a real StrategyAI:forceEvaluate usage example"
+  print(_todo)
+end
 
 --@api-stub: StrategyAI:activeGoal
 -- Returns or performs active goal.
--- See the module spec for detailed semantics.
-local strategyAI = lurek.ai.newStrategyAI()
-strategyAI:activeGoal()
-print("StrategyAI:activeGoal done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StrategyAI:activeGoal
+  local _todo = "TODO: write a real StrategyAI:activeGoal usage example"
+  print(_todo)
+end
 
 --@api-stub: StrategyAI:timeUntilNext
 -- Returns or performs time until next.
--- See the module spec for detailed semantics.
-local strategyAI = lurek.ai.newStrategyAI()
-strategyAI:timeUntilNext()
-print("StrategyAI:timeUntilNext done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: StrategyAI:timeUntilNext
+  local _todo = "TODO: write a real StrategyAI:timeUntilNext usage example"
+  print(_todo)
+end
 
 -- ── AILod methods ──
 
 --@api-stub: AILod:shouldUpdate
 -- Returns or performs should update.
--- Use as a guard inside lurek.update or event handlers.
-local aILod = lurek.ai.newAILod()
-if aILod:shouldUpdate(tier, frame) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AILod:shouldUpdate
+  local _todo = "TODO: write a real AILod:shouldUpdate usage example"
+  print(_todo)
+end
 
 --@api-stub: AILod:tierCount
 -- Returns or performs tier count.
--- See the module spec for detailed semantics.
-local aILod = lurek.ai.newAILod()
-aILod:tierCount()
-print("AILod:tierCount done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AILod:tierCount
+  local _todo = "TODO: write a real AILod:tierCount usage example"
+  print(_todo)
+end
 
 --@api-stub: AILod:tierName
 -- Returns or performs tier name.
--- See the module spec for detailed semantics.
-local aILod = lurek.ai.newAILod()
-aILod:tierName(tier)
-print("AILod:tierName done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ai_api.rs and docs/specs/ai.md).
+do  -- TODO: AILod:tierName
+  local _todo = "TODO: write a real AILod:tierName usage example"
+  print(_todo)
+end
 

@@ -1,110 +1,137 @@
 -- content/examples/debugbridge.lua
--- love2d-style usage snippets for the lurek.debugbridge API (14 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.debugbridge API (14 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/debugbridge_api.rs   (Lua binding, arg types, return shape)
+--   * src/debugbridge/                 (semantics, side effects)
+--   * docs/specs/debugbridge.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/debugbridge.lua
 
 -- ── lurek.debugbridge.* functions ──
 
 --@api-stub: lurek.debugbridge.start
 -- Start the TCP debug server on 127.0.0.1:port.
--- Trigger from input, timers, or game events.
--- trigger from input or timer
-lurek.debugbridge.start(port)
-print("start fired")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.start
+  local _todo = "TODO: write a real lurek.debugbridge.start usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.stop
 -- Stop the TCP debug server and close all connections.
--- Trigger from input, timers, or game events.
--- trigger from input or timer
-lurek.debugbridge.stop()
-print("stop fired")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.stop
+  local _todo = "TODO: write a real lurek.debugbridge.stop usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.isRunning
 -- Returns whether the server is currently running.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.debugbridge.isRunning() then
-  print("isRunning -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.isRunning
+  local _todo = "TODO: write a real lurek.debugbridge.isRunning usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.debugbridge.getPort
 -- Returns the server port (0 if not running).
--- Cheap to call; safe inside callbacks.
-local value = lurek.debugbridge.getPort()
-print("getPort:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.getPort
+  local _todo = "TODO: write a real lurek.debugbridge.getPort usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.getClientCount
 -- Returns the number of connected TCP clients.
--- Cheap to call; safe inside callbacks.
-local value = lurek.debugbridge.getClientCount()
-print("getClientCount:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.getClientCount
+  local _todo = "TODO: write a real lurek.debugbridge.getClientCount usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.poll
 -- Poll for pending Lua-dependent requests from TCP clients.
--- See the module spec for detailed semantics.
-local result = lurek.debugbridge.poll()
-print("poll:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.poll
+  local _todo = "TODO: write a real lurek.debugbridge.poll usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.capturePrint
 -- Captures a print message and broadcasts it to connected clients.
--- See the module spec for detailed semantics.
-local result = lurek.debugbridge.capturePrint("hello", source, line)
-print("capturePrint:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.capturePrint
+  local _todo = "TODO: write a real lurek.debugbridge.capturePrint usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.getPrintHistory
 -- Returns the print history.
--- Cheap to call; safe inside callbacks.
-local value = lurek.debugbridge.getPrintHistory(10)
-print("getPrintHistory:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.getPrintHistory
+  local _todo = "TODO: write a real lurek.debugbridge.getPrintHistory usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.clearPrintHistory
 -- Clears the print history.
--- Pair with the matching constructor to free resources.
--- release the resource and forget the handle
-lurek.debugbridge.clearPrintHistory()
-print("clearPrintHistory done")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.clearPrintHistory
+  local _todo = "TODO: write a real lurek.debugbridge.clearPrintHistory usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.setMaxPrintHistory
 -- Sets the maximum print history size.
--- Apply at startup or in response to user input.
--- apply at startup or on config change
-lurek.debugbridge.setMaxPrintHistory(100)
-print("setMaxPrintHistory applied")
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.setMaxPrintHistory
+  local _todo = "TODO: write a real lurek.debugbridge.setMaxPrintHistory usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.getPerformance
 -- Returns performance statistics.
--- Cheap to call; safe inside callbacks.
-local value = lurek.debugbridge.getPerformance()
-print("getPerformance:", value)
-return value
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.getPerformance
+  local _todo = "TODO: write a real lurek.debugbridge.getPerformance usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.requestScreenshot
 -- Flags a screenshot request for the next frame.
--- See the module spec for detailed semantics.
-local result = lurek.debugbridge.requestScreenshot(1.0)
-print("requestScreenshot:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.requestScreenshot
+  local _todo = "TODO: write a real lurek.debugbridge.requestScreenshot usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.debugbridge.isScreenshotRequested
 -- Returns whether a screenshot is currently requested.
--- Use as a guard inside lurek.update or event handlers.
-if lurek.debugbridge.isScreenshotRequested() then
-  print("isScreenshotRequested -> true")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.isScreenshotRequested
+  local _todo = "TODO: write a real lurek.debugbridge.isScreenshotRequested usage example"
+  print(_todo)
 end
 
 --@api-stub: lurek.debugbridge.broadcast
 -- Broadcasts a JSON event to all connected clients.
--- See the module spec for detailed semantics.
-local result = lurek.debugbridge.broadcast(event, { x = 0, y = 0 })
-print("broadcast:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/debugbridge_api.rs and docs/specs/debugbridge.md).
+do  -- TODO: lurek.debugbridge.broadcast
+  local _todo = "TODO: write a real lurek.debugbridge.broadcast usage example"
+  print(_todo)
+end
 

@@ -1,169 +1,203 @@
 -- content/examples/save.lua
--- love2d-style usage snippets for the lurek.save API (22 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.save API (22 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/save_api.rs   (Lua binding, arg types, return shape)
+--   * src/save/                 (semantics, side effects)
+--   * docs/specs/save.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/save.lua
 
 -- ── lurek.save.* functions ──
 
 --@api-stub: lurek.save.newSaveManager
 -- Creates a new SaveManager for slot-based save/load operations.
--- Build once at startup; reuse across frames.
-local savemanager = lurek.save.newSaveManager()
-print("created", savemanager)
-return savemanager
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: lurek.save.newSaveManager
+  local _todo = "TODO: write a real lurek.save.newSaveManager usage example"
+  print(_todo)
+end
 
 -- ── SaveManager methods ──
 
 --@api-stub: SaveManager:unregister
 -- Removes a named module and its callbacks.
--- Pair with the matching constructor to free resources.
-local saveManager = lurek.save.newSaveManager()
-saveManager:unregister("main")
--- saveManager is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:unregister
+  local _todo = "TODO: write a real SaveManager:unregister usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:setSchemaVersion
 -- Sets the current schema version for new saves.
--- Apply at startup or in response to user input.
-local saveManager = lurek.save.newSaveManager()
-saveManager:setSchemaVersion(version)
-print("SaveManager:setSchemaVersion applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:setSchemaVersion
+  local _todo = "TODO: write a real SaveManager:setSchemaVersion usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:getSchemaVersion
 -- Returns the current schema version.
--- Cheap to call; safe inside callbacks.
-local saveManager = lurek.save.newSaveManager()  -- or your existing handle
-local value = saveManager:getSchemaVersion()
-print("SaveManager:getSchemaVersion ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:getSchemaVersion
+  local _todo = "TODO: write a real SaveManager:getSchemaVersion usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:collect
 -- Collects data from all registered collectors into a table with metadata.
--- See the module spec for detailed semantics.
-local saveManager = lurek.save.newSaveManager()
-saveManager:collect()
-print("SaveManager:collect done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:collect
+  local _todo = "TODO: write a real SaveManager:collect usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:restore
 -- Restores data from a table, applying migrations and calling restorers.
--- See the module spec for detailed semantics.
-local saveManager = lurek.save.newSaveManager()
-saveManager:restore({ x = 0, y = 0 })
-print("SaveManager:restore done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:restore
+  local _todo = "TODO: write a real SaveManager:restore usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:markDirty
 -- Marks data as modified since the last save or load.
--- See the module spec for detailed semantics.
-local saveManager = lurek.save.newSaveManager()
-saveManager:markDirty()
-print("SaveManager:markDirty done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:markDirty
+  local _todo = "TODO: write a real SaveManager:markDirty usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:isDirty
 -- Returns whether data has been modified since the last save or load.
--- Use as a guard inside lurek.update or event handlers.
-local saveManager = lurek.save.newSaveManager()
-if saveManager:isDirty() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:isDirty
+  local _todo = "TODO: write a real SaveManager:isDirty usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:disableAutoSave
 -- Disables automatic periodic saving; manual `write()` calls still work.
--- See the module spec for detailed semantics.
-local saveManager = lurek.save.newSaveManager()
-saveManager:disableAutoSave()
-print("SaveManager:disableAutoSave done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:disableAutoSave
+  local _todo = "TODO: write a real SaveManager:disableAutoSave usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:update
 -- Advances the auto-save timer, returning the slot name if a save should trigger.
--- Apply at startup or in response to user input.
-local saveManager = lurek.save.newSaveManager()
-saveManager:update(dt)
-print("SaveManager:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:update
+  local _todo = "TODO: write a real SaveManager:update usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:setSummary
 -- Sets the summary string included in save metadata.
--- Apply at startup or in response to user input.
-local saveManager = lurek.save.newSaveManager()
-saveManager:setSummary(summary)
-print("SaveManager:setSummary applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:setSummary
+  local _todo = "TODO: write a real SaveManager:setSummary usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:getSummary
 -- Returns the current summary string.
--- Cheap to call; safe inside callbacks.
-local saveManager = lurek.save.newSaveManager()  -- or your existing handle
-local value = saveManager:getSummary()
-print("SaveManager:getSummary ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:getSummary
+  local _todo = "TODO: write a real SaveManager:getSummary usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:reset
 -- Resets all state, removing callbacks and clearing the manager.
--- Pair with the matching constructor to free resources.
-local saveManager = lurek.save.newSaveManager()
-saveManager:reset()
--- saveManager is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:reset
+  local _todo = "TODO: write a real SaveManager:reset usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:setCompress
 -- Enables or disables LZ4 compression for saved data.
--- Apply at startup or in response to user input.
-local saveManager = lurek.save.newSaveManager()
-saveManager:setCompress(enabled)
-print("SaveManager:setCompress applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:setCompress
+  local _todo = "TODO: write a real SaveManager:setCompress usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:isCompressed
 -- Returns whether compression is currently enabled.
--- Use as a guard inside lurek.update or event handlers.
-local saveManager = lurek.save.newSaveManager()
-if saveManager:isCompressed() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:isCompressed
+  local _todo = "TODO: write a real SaveManager:isCompressed usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:onBeforeSave
 -- Registers a callback that fires before every save operation.
--- See the module spec for detailed semantics.
-local saveManager = lurek.save.newSaveManager()
-saveManager:onBeforeSave(function() print("onBeforeSave fired") end)
-print("SaveManager:onBeforeSave done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:onBeforeSave
+  local _todo = "TODO: write a real SaveManager:onBeforeSave usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:onAfterLoad
 -- Registers a callback that fires after every successful load operation.
--- See the module spec for detailed semantics.
-local saveManager = lurek.save.newSaveManager()
-saveManager:onAfterLoad(function() print("onAfterLoad fired") end)
-print("SaveManager:onAfterLoad done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:onAfterLoad
+  local _todo = "TODO: write a real SaveManager:onAfterLoad usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:save
 -- Collects data and writes it to a slot file.
--- May block — call from a worker thread for large payloads.
-local saveManager = lurek.save.newSaveManager()
-saveManager:save(slot)
-print("SaveManager:save done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:save
+  local _todo = "TODO: write a real SaveManager:save usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:load
 -- Loads data from a slot file, applies migrations, and restores.
--- May block — call from a worker thread for large payloads.
-local saveManager = lurek.save.newSaveManager()
-saveManager:load(slot)
-print("SaveManager:load done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:load
+  local _todo = "TODO: write a real SaveManager:load usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:delete
 -- Deletes a save file for the given slot.
--- Pair with the matching constructor to free resources.
-local saveManager = lurek.save.newSaveManager()
-saveManager:delete(slot)
--- saveManager is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:delete
+  local _todo = "TODO: write a real SaveManager:delete usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:getSlots
 -- Returns a list of all save slots with metadata.
--- Cheap to call; safe inside callbacks.
-local saveManager = lurek.save.newSaveManager()  -- or your existing handle
-local value = saveManager:getSlots()
-print("SaveManager:getSlots ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:getSlots
+  local _todo = "TODO: write a real SaveManager:getSlots usage example"
+  print(_todo)
+end
 
 --@api-stub: SaveManager:getSlotInfo
 -- Returns metadata for a single slot, or nil if not found.
--- Cheap to call; safe inside callbacks.
-local saveManager = lurek.save.newSaveManager()  -- or your existing handle
-local value = saveManager:getSlotInfo(slot)
-print("SaveManager:getSlotInfo ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/save_api.rs and docs/specs/save.md).
+do  -- TODO: SaveManager:getSlotInfo
+  local _todo = "TODO: write a real SaveManager:getSlotInfo usage example"
+  print(_todo)
+end
 

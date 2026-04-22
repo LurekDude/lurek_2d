@@ -1,315 +1,371 @@
 -- content/examples/raycaster.lua
--- love2d-style usage snippets for the lurek.raycaster API (42 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.raycaster API (42 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/raycaster_api.rs   (Lua binding, arg types, return shape)
+--   * src/raycaster/                 (semantics, side effects)
+--   * docs/specs/raycaster.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/raycaster.lua
 
 -- ── lurek.raycaster.* functions ──
 
 --@api-stub: lurek.raycaster.new
 -- Creates a new raycaster grid of the given dimensions.
--- Build once at startup; reuse across frames.
-local obj = lurek.raycaster.new(64, 64)
-print("created", obj)
-return obj
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: lurek.raycaster.new
+  local _todo = "TODO: write a real lurek.raycaster.new usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.raycaster.newMap
 -- Alias for `new`.
--- Build once at startup; reuse across frames.
-local map = lurek.raycaster.newMap(64, 64)
-print("created", map)
-return map
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: lurek.raycaster.newMap
+  local _todo = "TODO: write a real lurek.raycaster.newMap usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.raycaster.projectColumn
 -- Projects a wall distance to screen-space drawing parameters.
--- See the module spec for detailed semantics.
-local result = lurek.raycaster.projectColumn(distance, fov, screen_height)
-print("projectColumn:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: lurek.raycaster.projectColumn
+  local _todo = "TODO: write a real lurek.raycaster.projectColumn usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.raycaster.distanceShade
 -- Returns distance-based brightness in [0, 1].
--- See the module spec for detailed semantics.
-local result = lurek.raycaster.distanceShade(distance, max_distance)
-print("distanceShade:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: lurek.raycaster.distanceShade
+  local _todo = "TODO: write a real lurek.raycaster.distanceShade usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.raycaster.newDoorManager
 -- Creates a new empty door manager.
--- Build once at startup; reuse across frames.
-local doormanager = lurek.raycaster.newDoorManager()
-print("created", doormanager)
-return doormanager
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: lurek.raycaster.newDoorManager
+  local _todo = "TODO: write a real lurek.raycaster.newDoorManager usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.raycaster.newHeightMap
 -- Creates a new height map with default floor (0.0) and ceiling (1.0) values.
--- Build once at startup; reuse across frames.
-local heightmap = lurek.raycaster.newHeightMap(64, 64)
-print("created", heightmap)
-return heightmap
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: lurek.raycaster.newHeightMap
+  local _todo = "TODO: write a real lurek.raycaster.newHeightMap usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.raycaster.newPointLight
 -- Creates a point light for use in raycaster scene lighting.
--- Build once at startup; reuse across frames.
-local pointlight = lurek.raycaster.newPointLight(100, 100, 1, 0.5, 0, radius, intensity)
-print("created", pointlight)
-return pointlight
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: lurek.raycaster.newPointLight
+  local _todo = "TODO: write a real lurek.raycaster.newPointLight usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.raycaster.newSpriteManager
 -- Creates a new empty batch sprite manager for depth-sorted projection.
--- Build once at startup; reuse across frames.
-local spritemanager = lurek.raycaster.newSpriteManager()
-print("created", spritemanager)
-return spritemanager
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: lurek.raycaster.newSpriteManager
+  local _todo = "TODO: write a real lurek.raycaster.newSpriteManager usage example"
+  print(_todo)
+end
 
 -- ── DoorManager methods ──
 
 --@api-stub: DoorManager:openDoor
 -- Begins opening the door at the given index.
--- Build once at startup; reuse across frames.
-local doorManager = lurek.raycaster.newDoorManager()
-doorManager:openDoor(1)
-print("DoorManager:openDoor done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: DoorManager:openDoor
+  local _todo = "TODO: write a real DoorManager:openDoor usage example"
+  print(_todo)
+end
 
 --@api-stub: DoorManager:closeDoor
 -- Begins closing the door at the given index.
--- See the module spec for detailed semantics.
-local doorManager = lurek.raycaster.newDoorManager()
-doorManager:closeDoor(1)
-print("DoorManager:closeDoor done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: DoorManager:closeDoor
+  local _todo = "TODO: write a real DoorManager:closeDoor usage example"
+  print(_todo)
+end
 
 --@api-stub: DoorManager:update
 -- Advances all door animations by dt seconds.
--- Apply at startup or in response to user input.
-local doorManager = lurek.raycaster.newDoorManager()
-doorManager:update(dt)
-print("DoorManager:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: DoorManager:update
+  local _todo = "TODO: write a real DoorManager:update usage example"
+  print(_todo)
+end
 
 --@api-stub: DoorManager:getDoor
 -- Returns the state table for door at index, or nil if out of range.
--- Cheap to call; safe inside callbacks.
-local doorManager = lurek.raycaster.newDoorManager()  -- or your existing handle
-local value = doorManager:getDoor(1)
-print("DoorManager:getDoor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: DoorManager:getDoor
+  local _todo = "TODO: write a real DoorManager:getDoor usage example"
+  print(_todo)
+end
 
 --@api-stub: DoorManager:count
 -- Returns the number of registered doors.
--- Cheap to call; safe inside callbacks.
-local doorManager = lurek.raycaster.newDoorManager()  -- or your existing handle
-local value = doorManager:count()
-print("DoorManager:count ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: DoorManager:count
+  local _todo = "TODO: write a real DoorManager:count usage example"
+  print(_todo)
+end
 
 --@api-stub: DoorManager:type
 -- Returns the type string "DoorManager".
--- See the module spec for detailed semantics.
-local doorManager = lurek.raycaster.newDoorManager()
-doorManager:type()
-print("DoorManager:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: DoorManager:type
+  local _todo = "TODO: write a real DoorManager:type usage example"
+  print(_todo)
+end
 
 --@api-stub: DoorManager:typeOf
 -- Returns the type string "DoorManager".
--- See the module spec for detailed semantics.
-local doorManager = lurek.raycaster.newDoorManager()
-doorManager:typeOf()
-print("DoorManager:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: DoorManager:typeOf
+  local _todo = "TODO: write a real DoorManager:typeOf usage example"
+  print(_todo)
+end
 
 -- ── HeightMap methods ──
 
 --@api-stub: HeightMap:setFloor
 -- Sets the floor height at (x, y).
--- Apply at startup or in response to user input.
-local heightMap = lurek.raycaster.newHeightMap()
-heightMap:setFloor(100, 100, 64)
-print("HeightMap:setFloor applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: HeightMap:setFloor
+  local _todo = "TODO: write a real HeightMap:setFloor usage example"
+  print(_todo)
+end
 
 --@api-stub: HeightMap:setCeiling
 -- Sets the ceiling height at (x, y).
--- Apply at startup or in response to user input.
-local heightMap = lurek.raycaster.newHeightMap()
-heightMap:setCeiling(100, 100, 64)
-print("HeightMap:setCeiling applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: HeightMap:setCeiling
+  local _todo = "TODO: write a real HeightMap:setCeiling usage example"
+  print(_todo)
+end
 
 --@api-stub: HeightMap:floorAt
 -- Returns the floor height at (x, y).
--- See the module spec for detailed semantics.
-local heightMap = lurek.raycaster.newHeightMap()
-heightMap:floorAt(100, 100)
-print("HeightMap:floorAt done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: HeightMap:floorAt
+  local _todo = "TODO: write a real HeightMap:floorAt usage example"
+  print(_todo)
+end
 
 --@api-stub: HeightMap:ceilingAt
 -- Returns the ceiling height at (x, y).
--- See the module spec for detailed semantics.
-local heightMap = lurek.raycaster.newHeightMap()
-heightMap:ceilingAt(100, 100)
-print("HeightMap:ceilingAt done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: HeightMap:ceilingAt
+  local _todo = "TODO: write a real HeightMap:ceilingAt usage example"
+  print(_todo)
+end
 
 --@api-stub: HeightMap:type
 -- Returns the type string "HeightMap".
--- See the module spec for detailed semantics.
-local heightMap = lurek.raycaster.newHeightMap()
-heightMap:type()
-print("HeightMap:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: HeightMap:type
+  local _todo = "TODO: write a real HeightMap:type usage example"
+  print(_todo)
+end
 
 --@api-stub: HeightMap:typeOf
 -- Returns the type string "HeightMap".
--- See the module spec for detailed semantics.
-local heightMap = lurek.raycaster.newHeightMap()
-heightMap:typeOf()
-print("HeightMap:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: HeightMap:typeOf
+  local _todo = "TODO: write a real HeightMap:typeOf usage example"
+  print(_todo)
+end
 
 -- ── PointLight methods ──
 
 --@api-stub: PointLight:x
 -- Returns the world-space X position.
--- See the module spec for detailed semantics.
-local pointLight = lurek.raycaster.newPointLight()
-pointLight:x()
-print("PointLight:x done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: PointLight:x
+  local _todo = "TODO: write a real PointLight:x usage example"
+  print(_todo)
+end
 
 --@api-stub: PointLight:y
 -- Returns the world-space Y position.
--- See the module spec for detailed semantics.
-local pointLight = lurek.raycaster.newPointLight()
-pointLight:y()
-print("PointLight:y done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: PointLight:y
+  local _todo = "TODO: write a real PointLight:y usage example"
+  print(_todo)
+end
 
 --@api-stub: PointLight:radius
 -- Returns the illumination radius.
--- See the module spec for detailed semantics.
-local pointLight = lurek.raycaster.newPointLight()
-pointLight:radius()
-print("PointLight:radius done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: PointLight:radius
+  local _todo = "TODO: write a real PointLight:radius usage example"
+  print(_todo)
+end
 
 --@api-stub: PointLight:intensity
 -- Returns the intensity multiplier.
--- See the module spec for detailed semantics.
-local pointLight = lurek.raycaster.newPointLight()
-pointLight:intensity()
-print("PointLight:intensity done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: PointLight:intensity
+  local _todo = "TODO: write a real PointLight:intensity usage example"
+  print(_todo)
+end
 
 --@api-stub: PointLight:color
 -- Returns the RGB color as three separate values.
--- See the module spec for detailed semantics.
-local pointLight = lurek.raycaster.newPointLight()
-pointLight:color()
-print("PointLight:color done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: PointLight:color
+  local _todo = "TODO: write a real PointLight:color usage example"
+  print(_todo)
+end
 
 --@api-stub: PointLight:type
 -- Returns the type string "PointLight".
--- See the module spec for detailed semantics.
-local pointLight = lurek.raycaster.newPointLight()
-pointLight:type()
-print("PointLight:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: PointLight:type
+  local _todo = "TODO: write a real PointLight:type usage example"
+  print(_todo)
+end
 
 --@api-stub: PointLight:typeOf
 -- Returns the type string "PointLight".
--- See the module spec for detailed semantics.
-local pointLight = lurek.raycaster.newPointLight()
-pointLight:typeOf()
-print("PointLight:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: PointLight:typeOf
+  local _todo = "TODO: write a real PointLight:typeOf usage example"
+  print(_todo)
+end
 
 -- ── Raycaster methods ──
 
 --@api-stub: Raycaster:setCell
 -- Sets the cell value at grid position (x, y).
--- Apply at startup or in response to user input.
-local raycaster = lurek.raycaster.newRaycaster()
-raycaster:setCell(100, 100, val)
-print("Raycaster:setCell applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: Raycaster:setCell
+  local _todo = "TODO: write a real Raycaster:setCell usage example"
+  print(_todo)
+end
 
 --@api-stub: Raycaster:getCell
 -- Returns the cell value at (x, y).
--- Cheap to call; safe inside callbacks.
-local raycaster = lurek.raycaster.newRaycaster()  -- or your existing handle
-local value = raycaster:getCell(100, 100)
-print("Raycaster:getCell ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: Raycaster:getCell
+  local _todo = "TODO: write a real Raycaster:getCell usage example"
+  print(_todo)
+end
 
 --@api-stub: Raycaster:setCells
 -- Replaces all grid cells from a flat array of values in row-major order.
--- Apply at startup or in response to user input.
-local raycaster = lurek.raycaster.newRaycaster()
-raycaster:setCells(cells_tbl)
-print("Raycaster:setCells applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: Raycaster:setCells
+  local _todo = "TODO: write a real Raycaster:setCells usage example"
+  print(_todo)
+end
 
 --@api-stub: Raycaster:isBlocked
 -- Returns true when the cell at (x, y) is a wall (value > 0).
--- Use as a guard inside lurek.update or event handlers.
-local raycaster = lurek.raycaster.newRaycaster()
-if raycaster:isBlocked(100, 100) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: Raycaster:isBlocked
+  local _todo = "TODO: write a real Raycaster:isBlocked usage example"
+  print(_todo)
+end
 
 --@api-stub: Raycaster:width
 -- Returns the grid width in cells.
--- See the module spec for detailed semantics.
-local raycaster = lurek.raycaster.newRaycaster()
-raycaster:width()
-print("Raycaster:width done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: Raycaster:width
+  local _todo = "TODO: write a real Raycaster:width usage example"
+  print(_todo)
+end
 
 --@api-stub: Raycaster:height
 -- Returns the grid height in cells.
--- See the module spec for detailed semantics.
-local raycaster = lurek.raycaster.newRaycaster()
-raycaster:height()
-print("Raycaster:height done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: Raycaster:height
+  local _todo = "TODO: write a real Raycaster:height usage example"
+  print(_todo)
+end
 
 --@api-stub: Raycaster:setWallAlpha
 -- Sets the opacity for a wall tile type.
--- Apply at startup or in response to user input.
-local raycaster = lurek.raycaster.newRaycaster()
-raycaster:setWallAlpha(tile_type, 1)
-print("Raycaster:setWallAlpha applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: Raycaster:setWallAlpha
+  local _todo = "TODO: write a real Raycaster:setWallAlpha usage example"
+  print(_todo)
+end
 
 --@api-stub: Raycaster:getWallAlpha
 -- Returns the opacity for a wall tile type.
--- Cheap to call; safe inside callbacks.
-local raycaster = lurek.raycaster.newRaycaster()  -- or your existing handle
-local value = raycaster:getWallAlpha(tile_type)
-print("Raycaster:getWallAlpha ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: Raycaster:getWallAlpha
+  local _todo = "TODO: write a real Raycaster:getWallAlpha usage example"
+  print(_todo)
+end
 
 -- ── SpriteManager methods ──
 
 --@api-stub: SpriteManager:remove
 -- Removes the sprite with the given id.
--- Pair with the matching constructor to free resources.
-local spriteManager = lurek.raycaster.newSpriteManager()
-spriteManager:remove(1)
--- spriteManager is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: SpriteManager:remove
+  local _todo = "TODO: write a real SpriteManager:remove usage example"
+  print(_todo)
+end
 
 --@api-stub: SpriteManager:setPosition
 -- Moves the sprite with the given id to world (x, y).
--- Apply at startup or in response to user input.
-local spriteManager = lurek.raycaster.newSpriteManager()
-spriteManager:setPosition(1, 100, 100)
-print("SpriteManager:setPosition applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: SpriteManager:setPosition
+  local _todo = "TODO: write a real SpriteManager:setPosition usage example"
+  print(_todo)
+end
 
 --@api-stub: SpriteManager:setVisible
 -- Shows or hides the sprite with the given id.
--- Apply at startup or in response to user input.
-local spriteManager = lurek.raycaster.newSpriteManager()
-spriteManager:setVisible(1, visible)
-print("SpriteManager:setVisible applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: SpriteManager:setVisible
+  local _todo = "TODO: write a real SpriteManager:setVisible usage example"
+  print(_todo)
+end
 
 --@api-stub: SpriteManager:clear
 -- Removes all sprites from the manager.
--- Pair with the matching constructor to free resources.
-local spriteManager = lurek.raycaster.newSpriteManager()
-spriteManager:clear()
--- spriteManager is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: SpriteManager:clear
+  local _todo = "TODO: write a real SpriteManager:clear usage example"
+  print(_todo)
+end
 
 --@api-stub: SpriteManager:type
 -- Returns the type string "SpriteManager".
--- See the module spec for detailed semantics.
-local spriteManager = lurek.raycaster.newSpriteManager()
-spriteManager:type()
-print("SpriteManager:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: SpriteManager:type
+  local _todo = "TODO: write a real SpriteManager:type usage example"
+  print(_todo)
+end
 
 --@api-stub: SpriteManager:typeOf
 -- Returns the type string "SpriteManager".
--- See the module spec for detailed semantics.
-local spriteManager = lurek.raycaster.newSpriteManager()
-spriteManager:typeOf()
-print("SpriteManager:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/raycaster_api.rs and docs/specs/raycaster.md).
+do  -- TODO: SpriteManager:typeOf
+  local _todo = "TODO: write a real SpriteManager:typeOf usage example"
+  print(_todo)
+end
 

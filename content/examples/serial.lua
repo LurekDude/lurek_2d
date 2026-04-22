@@ -1,81 +1,105 @@
 -- content/examples/serial.lua
--- love2d-style usage snippets for the lurek.serial API (10 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.serial API (10 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/serial_api.rs   (Lua binding, arg types, return shape)
+--   * src/serial/                 (semantics, side effects)
+--   * docs/specs/serial.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/serial.lua
 
 -- ── lurek.serial.* functions ──
 
 --@api-stub: lurek.serial.fromJson
 -- Parses a JSON string and returns a Lua table.
--- Build once at startup; reuse across frames.
-local fromjson = lurek.serial.fromJson(s)
-print("created", fromjson)
-return fromjson
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.fromJson
+  local _todo = "TODO: write a real lurek.serial.fromJson usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.toJson
 -- Serializes a Lua value to a JSON string.
--- See the module spec for detailed semantics.
-local result = lurek.serial.toJson(value, pretty)
-print("toJson:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.toJson
+  local _todo = "TODO: write a real lurek.serial.toJson usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.fromToml
 -- Parses a TOML string and returns a Lua table.
--- Build once at startup; reuse across frames.
-local fromtoml = lurek.serial.fromToml(s)
-print("created", fromtoml)
-return fromtoml
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.fromToml
+  local _todo = "TODO: write a real lurek.serial.fromToml usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.toToml
 -- Serializes a Lua table to a TOML string.
--- See the module spec for detailed semantics.
-local result = lurek.serial.toToml(value)
-print("toToml:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.toToml
+  local _todo = "TODO: write a real lurek.serial.toToml usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.fromCsv
 -- Parses a CSV string and returns a sequence of row tables.
--- Build once at startup; reuse across frames.
-local fromcsv = lurek.serial.fromCsv(s, delim, headers)
-print("created", fromcsv)
-return fromcsv
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.fromCsv
+  local _todo = "TODO: write a real lurek.serial.fromCsv usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.toCsv
 -- Serializes a sequence of row tables to a CSV string.
--- See the module spec for detailed semantics.
-local result = lurek.serial.toCsv(value, delim, headers)
-print("toCsv:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.toCsv
+  local _todo = "TODO: write a real lurek.serial.toCsv usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.encodeMsgPack
 -- Encodes a Lua table to a binary MessagePack string.
--- May block — call from a worker thread for large payloads.
-local result = lurek.serial.encodeMsgPack(value)
--- may block; consider lurek.thread for large payloads
-print("encodeMsgPack:", result)
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.encodeMsgPack
+  local _todo = "TODO: write a real lurek.serial.encodeMsgPack usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.decodeMsgPack
 -- Decodes a binary MessagePack string into a Lua table.
--- May block — call from a worker thread for large payloads.
-local result = lurek.serial.decodeMsgPack()
--- may block; consider lurek.thread for large payloads
-print("decodeMsgPack:", result)
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.decodeMsgPack
+  local _todo = "TODO: write a real lurek.serial.decodeMsgPack usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.decodeXml
 -- Parses an XML string and returns a nested Lua table.
--- May block — call from a worker thread for large payloads.
-local result = lurek.serial.decodeXml(s)
--- may block; consider lurek.thread for large payloads
-print("decodeXml:", result)
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.decodeXml
+  local _todo = "TODO: write a real lurek.serial.decodeXml usage example"
+  print(_todo)
+end
 
 --@api-stub: lurek.serial.validate
 -- Validates a Lua table against a schema table.
--- See the module spec for detailed semantics.
-local result = lurek.serial.validate(value, schema)
-print("validate:", result)
-return result
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/serial_api.rs and docs/specs/serial.md).
+do  -- TODO: lurek.serial.validate
+  local _todo = "TODO: write a real lurek.serial.validate usage example"
+  print(_todo)
+end
 

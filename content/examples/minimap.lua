@@ -1,415 +1,475 @@
 -- content/examples/minimap.lua
--- love2d-style usage snippets for the lurek.minimap API (56 items).
--- Each --@api-stub: block is a copy-pastable snippet showing the API
--- in real context (callbacks, conditionals, real arg values).
+-- Scaffolded coverage of the lurek.minimap API (56 items).
+--
+-- Every --@api-stub: block below is a SCAFFOLD. The body must be
+-- replaced by hand with a 3-6 line real usage snippet showing how to
+-- call the API in real game context, written by reading:
+--   * src/lua_api/minimap_api.rs   (Lua binding, arg types, return shape)
+--   * src/minimap/                 (semantics, side effects)
+--   * docs/specs/minimap.md        (canonical reference)
+--
+-- Snippet rules (love2d-wiki style):
+--   * NO `return` at top-level (breaks the file).
+--   * NO `pcall` defensive wrappers, NO `if false then`.
+--   * Wrap GPU / audio / physics calls inside
+--     `function lurek.render() ... end` or
+--     `function lurek.update(dt) ... end` callbacks so the file loads.
+--   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
+--     colours like {1, 0.5, 0, 1}.
+--   * Keep the two `--` comment lines: 1) what the API does (use the
+--     existing description), 2) one line of practical advice.
+--
 -- Run: cargo run -- content/examples/minimap.lua
 
 -- ── lurek.minimap.* functions ──
 
 --@api-stub: lurek.minimap.newMinimap
 -- Creates a new grid-based minimap.
--- Build once at startup; reuse across frames.
-local minimap = lurek.minimap.newMinimap(grid_w, grid_h, display_w, display_h)
-print("created", minimap)
-return minimap
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: lurek.minimap.newMinimap
+  local _todo = "TODO: write a real lurek.minimap.newMinimap usage example"
+  print(_todo)
+end
 
 -- ── Minimap methods ──
 
 --@api-stub: Minimap:getGridWidth
 -- Returns the grid width in cells.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getGridWidth()
-print("Minimap:getGridWidth ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getGridWidth
+  local _todo = "TODO: write a real Minimap:getGridWidth usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getGridHeight
 -- Returns the grid height in cells.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getGridHeight()
-print("Minimap:getGridHeight ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getGridHeight
+  local _todo = "TODO: write a real Minimap:getGridHeight usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getGridSize
 -- Returns the grid width and height as two values.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getGridSize()
-print("Minimap:getGridSize ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getGridSize
+  local _todo = "TODO: write a real Minimap:getGridSize usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getDisplayWidth
 -- Returns the display width in pixels.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getDisplayWidth()
-print("Minimap:getDisplayWidth ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getDisplayWidth
+  local _todo = "TODO: write a real Minimap:getDisplayWidth usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getDisplayHeight
 -- Returns the display height in pixels.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getDisplayHeight()
-print("Minimap:getDisplayHeight ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getDisplayHeight
+  local _todo = "TODO: write a real Minimap:getDisplayHeight usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getDisplaySize
 -- Returns the display width and height as two values.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getDisplaySize()
-print("Minimap:getDisplaySize ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getDisplaySize
+  local _todo = "TODO: write a real Minimap:getDisplaySize usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setDisplaySize
 -- Sets the display size in pixels.
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setDisplaySize(64, 64)
-print("Minimap:setDisplaySize applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setDisplaySize
+  local _todo = "TODO: write a real Minimap:setDisplaySize usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getTerrain
 -- Returns the terrain type at a 1-based grid position.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getTerrain(100, 100)
-print("Minimap:getTerrain ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getTerrain
+  local _todo = "TODO: write a real Minimap:getTerrain usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setTerrainData
 -- Sets terrain types from a flat 1-based Lua table of integers (row-major).
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setTerrainData({ x = 0, y = 0 })
-print("Minimap:setTerrainData applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setTerrainData
+  local _todo = "TODO: write a real Minimap:setTerrainData usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getTerrainColor
 -- Returns the display color for a terrain type as r, g, b, a.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getTerrainColor(terrain_type)
-print("Minimap:getTerrainColor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getTerrainColor
+  local _todo = "TODO: write a real Minimap:getTerrainColor usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getTileDescription
 -- Returns the hover tooltip string for a terrain type ID, or nil.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getTileDescription(1)
-print("Minimap:getTileDescription ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getTileDescription
+  local _todo = "TODO: write a real Minimap:getTileDescription usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setFogEnabled
 -- Enables or disables fog of war.
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setFogEnabled(enabled)
-print("Minimap:setFogEnabled applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setFogEnabled
+  local _todo = "TODO: write a real Minimap:setFogEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:isFogEnabled
 -- Returns whether fog of war is enabled.
--- Use as a guard inside lurek.update or event handlers.
-local minimap = lurek.minimap.newMinimap()
-if minimap:isFogEnabled() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:isFogEnabled
+  local _todo = "TODO: write a real Minimap:isFogEnabled usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setFogLevel
 -- Sets the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setFogLevel(100, 100, level)
-print("Minimap:setFogLevel applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setFogLevel
+  local _todo = "TODO: write a real Minimap:setFogLevel usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getFogLevel
 -- Returns the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getFogLevel(100, 100)
-print("Minimap:getFogLevel ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getFogLevel
+  local _todo = "TODO: write a real Minimap:getFogLevel usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getFogColor
 -- Returns the fog overlay color as r, g, b, a.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getFogColor()
-print("Minimap:getFogColor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getFogColor
+  local _todo = "TODO: write a real Minimap:getFogColor usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setFogData
 -- Sets the entire fog grid from a flat 1-based table (0=hidden, 1=explored, 2=visible).
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setFogData({ x = 0, y = 0 })
-print("Minimap:setFogData applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setFogData
+  local _todo = "TODO: write a real Minimap:setFogData usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:isObjectTypeVisible
 -- Returns whether an object type (1-based index) is visible.
--- Use as a guard inside lurek.update or event handlers.
-local minimap = lurek.minimap.newMinimap()
-if minimap:isObjectTypeVisible(1) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:isObjectTypeVisible
+  local _todo = "TODO: write a real Minimap:isObjectTypeVisible usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getObjectTypeCount
 -- Returns the number of registered object types.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getObjectTypeCount()
-print("Minimap:getObjectTypeCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getObjectTypeCount
+  local _todo = "TODO: write a real Minimap:getObjectTypeCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:removeObject
 -- Removes a tracked object by ID.
--- Pair with the matching constructor to free resources.
-local minimap = lurek.minimap.newMinimap()
-minimap:removeObject(1)
--- minimap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:removeObject
+  local _todo = "TODO: write a real Minimap:removeObject usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:clearObjects
 -- Removes all tracked objects.
--- Pair with the matching constructor to free resources.
-local minimap = lurek.minimap.newMinimap()
-minimap:clearObjects()
--- minimap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:clearObjects
+  local _todo = "TODO: write a real Minimap:clearObjects usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getObjectCount
 -- Returns the number of tracked objects.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getObjectCount()
-print("Minimap:getObjectCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getObjectCount
+  local _todo = "TODO: write a real Minimap:getObjectCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getOwnerColor
 -- Returns the display color for an owner/faction as r, g, b, a.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getOwnerColor(owner)
-print("Minimap:getOwnerColor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getOwnerColor
+  local _todo = "TODO: write a real Minimap:getOwnerColor usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setColorMode
 -- Sets the color mode ("terrain" or "political").
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setColorMode(mode)
-print("Minimap:setColorMode applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setColorMode
+  local _todo = "TODO: write a real Minimap:setColorMode usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getColorMode
 -- Returns the current color mode as a string.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getColorMode()
-print("Minimap:getColorMode ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getColorMode
+  local _todo = "TODO: write a real Minimap:getColorMode usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setZoom
 -- Sets the zoom level (minimum 0.1).
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setZoom(zoom)
-print("Minimap:setZoom applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setZoom
+  local _todo = "TODO: write a real Minimap:setZoom usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getZoom
 -- Returns the current zoom level.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getZoom()
-print("Minimap:getZoom ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getZoom
+  local _todo = "TODO: write a real Minimap:getZoom usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setCenter
 -- Sets the center of the minimap view in grid coordinates.
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setCenter(100, 100)
-print("Minimap:setCenter applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setCenter
+  local _todo = "TODO: write a real Minimap:setCenter usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getCenter
 -- Returns the center coordinates as x, y.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getCenter()
-print("Minimap:getCenter ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getCenter
+  local _todo = "TODO: write a real Minimap:getCenter usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getCenterX
 -- Returns the center X coordinate.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getCenterX()
-print("Minimap:getCenterX ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getCenterX
+  local _todo = "TODO: write a real Minimap:getCenterX usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getCenterY
 -- Returns the center Y coordinate.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getCenterY()
-print("Minimap:getCenterY ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getCenterY
+  local _todo = "TODO: write a real Minimap:getCenterY usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:clearViewportRect
 -- Clears the viewport rectangle overlay.
--- Pair with the matching constructor to free resources.
-local minimap = lurek.minimap.newMinimap()
-minimap:clearViewportRect()
--- minimap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:clearViewportRect
+  local _todo = "TODO: write a real Minimap:clearViewportRect usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getViewportRect
 -- Returns the viewport rectangle as x, y, w, h or nil if not set.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getViewportRect()
-print("Minimap:getViewportRect ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getViewportRect
+  local _todo = "TODO: write a real Minimap:getViewportRect usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setViewportVisible
 -- Sets whether the viewport rectangle is visible.
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setViewportVisible(visible)
-print("Minimap:setViewportVisible applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setViewportVisible
+  local _todo = "TODO: write a real Minimap:setViewportVisible usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:isViewportVisible
 -- Returns whether the viewport rectangle is visible.
--- Use as a guard inside lurek.update or event handlers.
-local minimap = lurek.minimap.newMinimap()
-if minimap:isViewportVisible() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:isViewportVisible
+  local _todo = "TODO: write a real Minimap:isViewportVisible usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getViewportColor
 -- Returns the viewport rectangle color as r, g, b, a.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getViewportColor()
-print("Minimap:getViewportColor ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getViewportColor
+  local _todo = "TODO: write a real Minimap:getViewportColor usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getPingCount
 -- Returns the number of active pings.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getPingCount()
-print("Minimap:getPingCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getPingCount
+  local _todo = "TODO: write a real Minimap:getPingCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:removeMarker
 -- Removes the minimap marker with the given integer ID, if present.
--- Pair with the matching constructor to free resources.
-local minimap = lurek.minimap.newMinimap()
-minimap:removeMarker(1)
--- minimap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:removeMarker
+  local _todo = "TODO: write a real Minimap:removeMarker usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:hasMarker
 -- Returns whether a marker with the given ID exists.
--- Use as a guard inside lurek.update or event handlers.
-local minimap = lurek.minimap.newMinimap()
-if minimap:hasMarker(1) then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:hasMarker
+  local _todo = "TODO: write a real Minimap:hasMarker usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getMarkerDescription
 -- Returns the description of a marker, or nil.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getMarkerDescription(1)
-print("Minimap:getMarkerDescription ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getMarkerDescription
+  local _todo = "TODO: write a real Minimap:getMarkerDescription usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getMarkerCount
 -- Returns the number of markers.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getMarkerCount()
-print("Minimap:getMarkerCount ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getMarkerCount
+  local _todo = "TODO: write a real Minimap:getMarkerCount usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:clearMarkerAnimation
 -- Removes the animation from a marker, reverting it to static.
--- Pair with the matching constructor to free resources.
-local minimap = lurek.minimap.newMinimap()
-minimap:clearMarkerAnimation(1)
--- minimap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:clearMarkerAnimation
+  local _todo = "TODO: write a real Minimap:clearMarkerAnimation usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:clearOverlay
 -- Removes all custom geometry from the minimap overlay.
--- Pair with the matching constructor to free resources.
-local minimap = lurek.minimap.newMinimap()
-minimap:clearOverlay()
--- minimap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:clearOverlay
+  local _todo = "TODO: write a real Minimap:clearOverlay usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:clearPath
 -- Removes a displayed path.
--- Pair with the matching constructor to free resources.
-local minimap = lurek.minimap.newMinimap()
-minimap:clearPath(1)
--- minimap is now released
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:clearPath
+  local _todo = "TODO: write a real Minimap:clearPath usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setLayer
 -- Switches the minimap's active render layer (0-based index).
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setLayer(layer)
-print("Minimap:setLayer applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setLayer
+  local _todo = "TODO: write a real Minimap:setLayer usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:getLayer
 -- Returns the index of the currently active render layer.
--- Cheap to call; safe inside callbacks.
-local minimap = lurek.minimap.newMinimap()  -- or your existing handle
-local value = minimap:getLayer()
-print("Minimap:getLayer ->", value)
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:getLayer
+  local _todo = "TODO: write a real Minimap:getLayer usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setAntiAlias
 -- Sets whether anti-aliasing is enabled.
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setAntiAlias(enabled)
-print("Minimap:setAntiAlias applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setAntiAlias
+  local _todo = "TODO: write a real Minimap:setAntiAlias usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:isAntiAlias
 -- Returns whether anti-aliasing is enabled.
--- Use as a guard inside lurek.update or event handlers.
-local minimap = lurek.minimap.newMinimap()
-if minimap:isAntiAlias() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:isAntiAlias
+  local _todo = "TODO: write a real Minimap:isAntiAlias usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:setClickable
 -- Sets whether this minimap responds to click hit-testing.
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:setClickable(enabled)
-print("Minimap:setClickable applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:setClickable
+  local _todo = "TODO: write a real Minimap:setClickable usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:isClickable
 -- Returns whether this minimap responds to click hit-testing.
--- Use as a guard inside lurek.update or event handlers.
-local minimap = lurek.minimap.newMinimap()
-if minimap:isClickable() then print("yes") end
--- swap the constructor for your real handle
-print("ok")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:isClickable
+  local _todo = "TODO: write a real Minimap:isClickable usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:update
 -- Advances time-based effects by dt seconds (expires pings).
--- Apply at startup or in response to user input.
-local minimap = lurek.minimap.newMinimap()
-minimap:update(dt)
-print("Minimap:update applied")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:update
+  local _todo = "TODO: write a real Minimap:update usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:type
 -- Returns the type name of this object.
--- See the module spec for detailed semantics.
-local minimap = lurek.minimap.newMinimap()
-minimap:type()
-print("Minimap:type done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:type
+  local _todo = "TODO: write a real Minimap:type usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:typeOf
 -- Returns true if this object is of the given type.
--- See the module spec for detailed semantics.
-local minimap = lurek.minimap.newMinimap()
-minimap:typeOf("main")
-print("Minimap:typeOf done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:typeOf
+  local _todo = "TODO: write a real Minimap:typeOf usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:render
 -- Renders the minimap to the screen at the given position.
--- See the module spec for detailed semantics.
-local minimap = lurek.minimap.newMinimap()
-minimap:render(100, 100)
-print("Minimap:render done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:render
+  local _todo = "TODO: write a real Minimap:render usage example"
+  print(_todo)
+end
 
 --@api-stub: Minimap:drawToImage
 -- Renders the minimap grid to a CPU ImageData.
--- Place inside `function lurek.render() ... end`.
-local minimap = lurek.minimap.newMinimap()
-minimap:drawToImage(pixel_size)
-print("Minimap:drawToImage done")
+-- TODO: replace this scaffold with a real usage snippet (see src/lua_api/minimap_api.rs and docs/specs/minimap.md).
+do  -- TODO: Minimap:drawToImage
+  local _todo = "TODO: write a real Minimap:drawToImage usage example"
+  print(_todo)
+end
 
