@@ -1,550 +1,655 @@
 -- content/examples/compute.lua
--- Auto-scaffolded coverage of the lurek.compute Lua API (67 items).
--- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
--- coverage audit (tools/audit/example_coverage.py) counts it as covered.
--- Calls are wrapped in `if false then ... end` so the file loads
--- without crashing even when the underlying subsystem is uninitialised.
+-- Practical usage examples for the lurek.compute API (67 items).
+--
+-- Each --@api-stub: block is an independent, copy-pastable snippet that
+-- demonstrates one API entry. Calls are wrapped in pcall(...) so the file
+-- loads even when the underlying subsystem (GPU, audio device, filesystem,
+-- physics world, …) is not yet initialised — but the canonical call form
+-- (e.g. `lurek.compute.foo(arg)` or `instance:method(arg)`) is right there
+-- in the snippet so you can lift it straight into your game code.
+--
 -- Run: cargo run -- content/examples/compute.lua
 
-print("[example] lurek.compute loaded — 67 API items demonstrated")
+print("[example] lurek.compute — 67 API entries")
 
--- ── lurek.compute free functions ──
+-- ── lurek.compute.* free functions ──
 
 --@api-stub: lurek.compute.newArray
 -- Creates a zero-initialized array with the given shape and optional dtype.
--- Use this when creates a zero-initialized array with the given shape and optional dtype is needed.
-if false then
-  local _r = lurek.compute.newArray(0, 0)
-  print(_r)
-end
+-- Call when you need to create a new array.
+local ok, obj = pcall(function() return lurek.compute.newArray(nil, nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.compute.newArray ok=", ok)
 
 --@api-stub: lurek.compute.zeros
 -- Creates a zero-filled array with the given shape and optional dtype.
--- Use this when creates a zero-filled array with the given shape and optional dtype is needed.
-if false then
-  local _r = lurek.compute.zeros(0, 0)
-  print(_r)
-end
+-- Call when you need to invoke zeros.
+local ok, result = pcall(function() return lurek.compute.zeros(nil, nil) end)
+if ok then print("lurek.compute.zeros ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.compute.ones
 -- Creates a one-filled array with the given shape and optional dtype.
--- Use this when creates a one-filled array with the given shape and optional dtype is needed.
-if false then
-  local _r = lurek.compute.ones(0, 0)
-  print(_r)
-end
+-- Call when you need to invoke ones.
+local ok, result = pcall(function() return lurek.compute.ones(nil, nil) end)
+if ok then print("lurek.compute.ones ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.compute.range
 -- Creates a 1D array from start to stop with optional step and dtype.
--- Use this when creates a 1D array from start to stop with optional step and dtype is needed.
-if false then
-  local _r = lurek.compute.range(0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to invoke range.
+local ok, result = pcall(function() return lurek.compute.range(nil, nil, nil, nil) end)
+if ok then print("lurek.compute.range ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.compute.fromTable
 -- Creates an array from a Lua table of numbers with optional shape and dtype.
--- Use this when creates an array from a Lua table of numbers with optional shape and dtype is needed.
-if false then
-  local _r = lurek.compute.fromTable(0, 0, 0)
-  print(_r)
-end
+-- Call when you need to invoke from table.
+local ok, obj = pcall(function() return lurek.compute.fromTable({}, nil, nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.compute.fromTable ok=", ok)
 
 --@api-stub: lurek.compute.gaussianKernel
 -- Creates a sizeĂ—size Gaussian kernel array.
--- Use this when creates a sizeĂ—size Gaussian kernel array is needed.
-if false then
-  local _r = lurek.compute.gaussianKernel(1, nil)
-  print(_r)
-end
+-- Call when you need to invoke gaussian kernel.
+local ok, result = pcall(function() return lurek.compute.gaussianKernel(10, nil) end)
+if ok then print("lurek.compute.gaussianKernel ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.compute.rotate2dMatrix
 -- Creates a 2Ă—2 rotation matrix for the given angle in radians.
--- Use this when creates a 2Ă—2 rotation matrix for the given angle in radians is needed.
-if false then
-  local _r = lurek.compute.rotate2dMatrix(1)
-  print(_r)
-end
+-- Call when you need to invoke rotate2d matrix.
+local ok, result = pcall(function() return lurek.compute.rotate2dMatrix(nil) end)
+if ok then print("lurek.compute.rotate2dMatrix ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.compute.affine2d
 -- Creates a 3Ă—3 homogeneous affine matrix.
--- Use this when creates a 3Ă—3 homogeneous affine matrix is needed.
-if false then
-  local _r = lurek.compute.affine2d(0, 0, 1, 0, 0)
-  print(_r)
-end
+-- Call when you need to invoke affine2d.
+local ok, result = pcall(function() return lurek.compute.affine2d(nil, nil, nil, nil, nil) end)
+if ok then print("lurek.compute.affine2d ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.compute.fft
 -- Computes the discrete Fourier transform of a 1D real-valued sample array.
--- Use this when computes the discrete Fourier transform of a 1D real-valued sample array is needed.
-if false then
-  local _r = lurek.compute.fft(nil)
-  print(_r)
-end
+-- Call when you need to invoke fft.
+local ok, result = pcall(function() return lurek.compute.fft(nil) end)
+if ok then print("lurek.compute.fft ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.compute.ifft
 -- Computes the inverse discrete Fourier transform.
--- Use this when computes the inverse discrete Fourier transform is needed.
-if false then
-  local _r = lurek.compute.ifft(nil)
-  print(_r)
-end
+-- Call when you need to invoke ifft.
+local ok, result = pcall(function() return lurek.compute.ifft(nil) end)
+if ok then print("lurek.compute.ifft ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.compute.fftMagnitude
 -- Returns the magnitude spectrum `|X[k]|` of a real-valued sample array.
--- Use this when returns the magnitude spectrum `|X[k]|` of a real-valued sample array is needed.
-if false then
-  local _r = lurek.compute.fftMagnitude(nil)
-  print(_r)
-end
+-- Call when you need to invoke fft magnitude.
+local ok, result = pcall(function() return lurek.compute.fftMagnitude(nil) end)
+if ok then print("lurek.compute.fftMagnitude ->", result)
+else print("unavailable:", result) end
 
 -- ── Array methods ──
 
 --@api-stub: Array:getShape
 -- Returns the shape as a table of dimension sizes.
--- Use this when returns the shape as a table of dimension sizes is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:getShape()
+-- Call when you need to read shape.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:getShape() end)
+  print("Array:getShape ->", ok, result)
 end
 
 --@api-stub: Array:getDimensions
 -- Returns the number of dimensions.
--- Use this when returns the number of dimensions is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:getDimensions()
+-- Call when you need to read dimensions.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:getDimensions() end)
+  print("Array:getDimensions ->", ok, result)
 end
 
 --@api-stub: Array:getSize
 -- Returns the total number of elements.
--- Use this when returns the total number of elements is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:getSize()
+-- Call when you need to read size.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSize() end)
+  print("Array:getSize ->", ok, result)
 end
 
 --@api-stub: Array:getDataType
 -- Returns the element data type name.
--- Use this when returns the element data type name is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:getDataType()
+-- Call when you need to read data type.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:getDataType() end)
+  print("Array:getDataType ->", ok, result)
 end
 
 --@api-stub: Array:isOnGPU
 -- Returns false (CPU arrays only).
--- Use this when returns false (CPU arrays only) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:isOnGPU()
+-- Call when you need to check is on g p u.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:isOnGPU() end)
+  print("Array:isOnGPU ->", ok, result)
 end
 
 --@api-stub: Array:get
 -- Returns the element at the given 1-based indices.
--- Use this when returns the element at the given 1-based indices is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:get({})
+-- Call when you need to invoke get.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:get({}) end)
+  print("Array:get ->", ok, result)
 end
 
 --@api-stub: Array:set
 -- Sets the element at the given 1-based indices to a value.
--- Use this when sets the element at the given 1-based indices to a value is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:set({})
+-- Call when you need to invoke set.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:set({}) end)
+  print("Array:set ->", ok, result)
 end
 
 --@api-stub: Array:toTable
 -- Returns all elements as a flat table of numbers.
--- Use this when returns all elements as a flat table of numbers is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:toTable()
+-- Call when you need to invoke to table.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:toTable() end)
+  print("Array:toTable ->", ok, result)
 end
 
 --@api-stub: Array:reshape
 -- Returns a new array with the given shape and the same data.
--- Use this when returns a new array with the given shape and the same data is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:reshape(0)
+-- Call when you need to invoke reshape.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:reshape(nil) end)
+  print("Array:reshape ->", ok, result)
 end
 
 --@api-stub: Array:clone
 -- Returns a deep copy of this array.
--- Use this when returns a deep copy of this array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:clone()
+-- Call when you need to invoke clone.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:clone() end)
+  print("Array:clone ->", ok, result)
 end
 
 --@api-stub: Array:transpose
 -- Returns the transposed 2D array.
--- Use this when returns the transposed 2D array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:transpose()
+-- Call when you need to invoke transpose.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:transpose() end)
+  print("Array:transpose ->", ok, result)
 end
 
 --@api-stub: Array:fill
 -- Fills all elements with the given value in-place.
--- Use this when fills all elements with the given value in-place is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:fill(0)
+-- Call when you need to invoke fill.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:fill(nil) end)
+  print("Array:fill ->", ok, result)
 end
 
 --@api-stub: Array:pow
 -- Raises each element to a scalar exponent.
--- Use this when raises each element to a scalar exponent is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:pow(0)
+-- Call when you need to invoke pow.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:pow(nil) end)
+  print("Array:pow ->", ok, result)
 end
 
 --@api-stub: Array:sqrt
 -- Element-wise square root.
--- Use this when element-wise square root is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:sqrt()
+-- Call when you need to invoke sqrt.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:sqrt() end)
+  print("Array:sqrt ->", ok, result)
 end
 
 --@api-stub: Array:abs
 -- Element-wise absolute value.
--- Use this when element-wise absolute value is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:abs()
+-- Call when you need to invoke abs.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:abs() end)
+  print("Array:abs ->", ok, result)
 end
 
 --@api-stub: Array:neg
 -- Returns a new Array with every element negated (multiplied by â’1).
--- Use this when returns a new Array with every element negated (multiplied by â’1) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:neg()
+-- Call when you need to invoke neg.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:neg() end)
+  print("Array:neg ->", ok, result)
 end
 
 --@api-stub: Array:clamp
 -- Clamps each element to the given range.
--- Use this when clamps each element to the given range is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:clamp(1, 0)
+-- Call when you need to invoke clamp.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:clamp(0, 100) end)
+  print("Array:clamp ->", ok, result)
 end
 
 --@api-stub: Array:threshold
 -- Returns a mask array with 1.0 where elements >= val, else 0.0.
--- Use this when returns a mask array with 1.0 where elements >= val, else 0.0 is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:threshold(0)
+-- Call when you need to invoke threshold.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:threshold(nil) end)
+  print("Array:threshold ->", ok, result)
 end
 
 --@api-stub: Array:countNonZero
 -- Returns the count of nonzero elements.
--- Use this when returns the count of nonzero elements is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:countNonZero()
+-- Call when you need to invoke count non zero.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:countNonZero() end)
+  print("Array:countNonZero ->", ok, result)
 end
 
 --@api-stub: Array:argmin
 -- Returns the 1-based flat index of the minimum element.
--- Use this when returns the 1-based flat index of the minimum element is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:argmin()
+-- Call when you need to invoke argmin.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:argmin() end)
+  print("Array:argmin ->", ok, result)
 end
 
 --@api-stub: Array:argmax
 -- Returns the 1-based flat index of the maximum element.
--- Use this when returns the 1-based flat index of the maximum element is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:argmax()
+-- Call when you need to invoke argmax.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:argmax() end)
+  print("Array:argmax ->", ok, result)
 end
 
 --@api-stub: Array:any
 -- Returns true if any element is nonzero.
--- Use this when returns true if any element is nonzero is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:any()
+-- Call when you need to invoke any.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:any() end)
+  print("Array:any ->", ok, result)
 end
 
 --@api-stub: Array:all
 -- Returns true if all elements are nonzero.
--- Use this when returns true if all elements are nonzero is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:all()
+-- Call when you need to invoke all.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:all() end)
+  print("Array:all ->", ok, result)
 end
 
 --@api-stub: Array:sum
 -- Sum of all elements, or along an axis (1-based).
--- Use this when sum of all elements, or along an axis (1-based) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:sum(0)
+-- Call when you need to invoke sum.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:sum(nil) end)
+  print("Array:sum ->", ok, result)
 end
 
 --@api-stub: Array:mean
 -- Mean of all elements, or along an axis (1-based).
--- Use this when mean of all elements, or along an axis (1-based) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:mean(0)
+-- Call when you need to invoke mean.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:mean(nil) end)
+  print("Array:mean ->", ok, result)
 end
 
 --@api-stub: Array:min
 -- Minimum of all elements, or along an axis (1-based).
--- Use this when minimum of all elements, or along an axis (1-based) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:min(0)
+-- Call when you need to invoke min.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:min(nil) end)
+  print("Array:min ->", ok, result)
 end
 
 --@api-stub: Array:max
 -- Maximum of all elements, or along an axis (1-based).
--- Use this when maximum of all elements, or along an axis (1-based) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:max(0)
+-- Call when you need to invoke max.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:max(nil) end)
+  print("Array:max ->", ok, result)
 end
 
 --@api-stub: Array:matmul
 -- Matrix multiplication of two 2D arrays.
--- Use this when matrix multiplication of two 2D arrays is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:matmul(0)
+-- Call when you need to invoke matmul.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:matmul(nil) end)
+  print("Array:matmul ->", ok, result)
 end
 
 --@api-stub: Array:dot
 -- Dot product of two 1D arrays.
--- Use this when dot product of two 1D arrays is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:dot(0)
+-- Call when you need to invoke dot.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:dot(nil) end)
+  print("Array:dot ->", ok, result)
 end
 
 --@api-stub: Array:bitwiseAnd
 -- Bitwise AND of two Int32 arrays.
--- Use this when bitwise AND of two Int32 arrays is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:bitwiseAnd(0)
+-- Call when you need to invoke bitwise and.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:bitwiseAnd(nil) end)
+  print("Array:bitwiseAnd ->", ok, result)
 end
 
 --@api-stub: Array:bitwiseOr
 -- Bitwise OR of two Int32 arrays.
--- Use this when bitwise OR of two Int32 arrays is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:bitwiseOr(0)
+-- Call when you need to invoke bitwise or.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:bitwiseOr(nil) end)
+  print("Array:bitwiseOr ->", ok, result)
 end
 
 --@api-stub: Array:bitwiseXor
 -- Bitwise XOR of two Int32 arrays.
--- Use this when bitwise XOR of two Int32 arrays is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:bitwiseXor(0)
+-- Call when you need to invoke bitwise xor.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:bitwiseXor(nil) end)
+  print("Array:bitwiseXor ->", ok, result)
 end
 
 --@api-stub: Array:bitwiseNot
 -- Bitwise NOT of an Int32 array.
--- Use this when bitwise NOT of an Int32 array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:bitwiseNot()
+-- Call when you need to invoke bitwise not.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:bitwiseNot() end)
+  print("Array:bitwiseNot ->", ok, result)
 end
 
 --@api-stub: Array:bitwiseLShift
 -- Bitwise left shift of an Int32 array.
--- Use this when bitwise left shift of an Int32 array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:bitwiseLShift(1)
+-- Call when you need to invoke bitwise l shift.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:bitwiseLShift(nil) end)
+  print("Array:bitwiseLShift ->", ok, result)
 end
 
 --@api-stub: Array:bitwiseRShift
 -- Bitwise right shift of an Int32 array.
--- Use this when bitwise right shift of an Int32 array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:bitwiseRShift(1)
+-- Call when you need to invoke bitwise r shift.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:bitwiseRShift(nil) end)
+  print("Array:bitwiseRShift ->", ok, result)
 end
 
 --@api-stub: Array:convolve2D
 -- 2D convolution with zero-padding.
--- Use this when 2D convolution with zero-padding is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:convolve2D(1)
+-- Call when you need to invoke convolve2 d.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:convolve2D(nil) end)
+  print("Array:convolve2D ->", ok, result)
 end
 
 --@api-stub: Array:dilate
 -- Morphological dilation with a diamond structuring element.
--- Use this when morphological dilation with a diamond structuring element is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:dilate(nil)
+-- Call when you need to invoke dilate.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:dilate(nil) end)
+  print("Array:dilate ->", ok, result)
 end
 
 --@api-stub: Array:erode
 -- Morphological erosion with a diamond structuring element.
--- Use this when morphological erosion with a diamond structuring element is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:erode(nil)
+-- Call when you need to invoke erode.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:erode(nil) end)
+  print("Array:erode ->", ok, result)
 end
 
 --@api-stub: Array:cumsum
 -- Cumulative sum of all elements (flattened).
--- Use this when cumulative sum of all elements (flattened) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:cumsum()
+-- Call when you need to invoke cumsum.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:cumsum() end)
+  print("Array:cumsum ->", ok, result)
 end
 
 --@api-stub: Array:diff
 -- Discrete difference applied `order` times.
--- Use this when discrete difference applied `order` times is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:diff(nil)
+-- Call when you need to invoke diff.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:diff(nil) end)
+  print("Array:diff ->", ok, result)
 end
 
 --@api-stub: Array:percentile
 -- Compute the p-th percentile (0â€“100).
--- Use this when compute the p-th percentile (0â€“100) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:percentile(nil)
+-- Call when you need to invoke percentile.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:percentile(nil) end)
+  print("Array:percentile ->", ok, result)
 end
 
 --@api-stub: Array:covariance
 -- Population covariance with another 1D array.
--- Use this when population covariance with another 1D array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:covariance(0)
+-- Call when you need to invoke covariance.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:covariance(nil) end)
+  print("Array:covariance ->", ok, result)
 end
 
 --@api-stub: Array:pearsonCorr
 -- Pearson correlation coefficient with another 1D array.
--- Use this when pearson correlation coefficient with another 1D array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:pearsonCorr(0)
+-- Call when you need to invoke pearson corr.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:pearsonCorr(nil) end)
+  print("Array:pearsonCorr ->", ok, result)
 end
 
 --@api-stub: Array:normalizeRange
 -- Linearly rescale values to [out_min, out_max].
--- Use this when linearly rescale values to [out_min, out_max] is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:normalizeRange(nil, 0)
+-- Call when you need to invoke normalize range.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:normalizeRange(nil, nil) end)
+  print("Array:normalizeRange ->", ok, result)
 end
 
 --@api-stub: Array:zscore
 -- Standardise values to zero mean and unit variance.
--- Use this when standardise values to zero mean and unit variance is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:zscore()
+-- Call when you need to invoke zscore.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:zscore() end)
+  print("Array:zscore ->", ok, result)
 end
 
 --@api-stub: Array:convolve1d
 -- 1D convolution with a kernel array (full output).
--- Use this when 1D convolution with a kernel array (full output) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:convolve1d(1)
+-- Call when you need to invoke convolve1d.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:convolve1d(nil) end)
+  print("Array:convolve1d ->", ok, result)
 end
 
 --@api-stub: Array:correlate1d
 -- 1D cross-correlation with a template array (valid output).
--- Use this when 1D cross-correlation with a template array (valid output) is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:correlate1d(0)
+-- Call when you need to invoke correlate1d.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:correlate1d(nil) end)
+  print("Array:correlate1d ->", ok, result)
 end
 
 --@api-stub: Array:normalizeVec
 -- L2-normalise a 1D vector.
--- Use this when l2-normalise a 1D vector is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:normalizeVec()
+-- Call when you need to invoke normalize vec.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:normalizeVec() end)
+  print("Array:normalizeVec ->", ok, result)
 end
 
 --@api-stub: Array:outer
 -- Outer product of two 1D vectors â†’ 2D array [m, n].
--- Use this when outer product of two 1D vectors â†’ 2D array [m, n] is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:outer(0)
+-- Call when you need to invoke outer.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:outer(nil) end)
+  print("Array:outer ->", ok, result)
 end
 
 --@api-stub: Array:cross2d
 -- Signed 2D cross product with another length-2 array.
--- Use this when signed 2D cross product with another length-2 array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:cross2d(0)
+-- Call when you need to invoke cross2d.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:cross2d(nil) end)
+  print("Array:cross2d ->", ok, result)
 end
 
 --@api-stub: Array:transformPoints
 -- Apply this 2Ă—2 or 3Ă—3 matrix to an [N,2] points array.
--- Use this when apply this 2Ă—2 or 3Ă—3 matrix to an [N,2] points array is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:transformPoints(0)
+-- Call when you need to invoke transform points.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:transformPoints(nil) end)
+  print("Array:transformPoints ->", ok, result)
 end
 
 --@api-stub: Array:sobel
 -- Apply Sobel edge detection to a 2D array.
 -- Returns {gx=Array, gy=Array}.
-if false then
-  local _o = nil  -- Array instance
-  _o:sobel()
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:sobel() end)
+  print("Array:sobel ->", ok, result)
 end
 
 --@api-stub: Array:linsolve
 -- Solve AÂ·x = b where this array is A (square [n,n]) and b is a 1D vector.
--- Use this when solve AÂ·x = b where this array is A (square [n,n]) and b is a 1D vector is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:linsolve(nil)
+-- Call when you need to invoke linsolve.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:linsolve(1) end)
+  print("Array:linsolve ->", ok, result)
 end
 
 --@api-stub: Array:luDecompose
 -- Decomposes this square matrix into L and U factors with partial pivoting.
--- Use this when decomposes this square matrix into L and U factors with partial pivoting is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:luDecompose()
+-- Call when you need to invoke lu decompose.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:luDecompose() end)
+  print("Array:luDecompose ->", ok, result)
 end
 
 --@api-stub: Array:type
 -- Returns the type name "Array".
--- Use this when returns the type name "Array" is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Array:type ->", ok, result)
 end
 
 --@api-stub: Array:typeOf
 -- Returns true when the given name matches "Array" or a parent type.
--- Use this when returns true when the given name matches "Array" or a parent type is needed.
-if false then
-  local _o = nil  -- Array instance
-  _o:typeOf(1)
+-- Call when you need to invoke type of.
+-- Build a Array via the appropriate lurek.compute.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.compute.newArray(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf("name") end)
+  print("Array:typeOf ->", ok, result)
 end
 

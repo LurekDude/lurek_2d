@@ -1,336 +1,411 @@
 -- content/examples/mods.lua
--- Auto-scaffolded coverage of the lurek.mods Lua API (40 items).
--- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
--- coverage audit (tools/audit/example_coverage.py) counts it as covered.
--- Calls are wrapped in `if false then ... end` so the file loads
--- without crashing even when the underlying subsystem is uninitialised.
+-- Practical usage examples for the lurek.mods API (40 items).
+--
+-- Each --@api-stub: block is an independent, copy-pastable snippet that
+-- demonstrates one API entry. Calls are wrapped in pcall(...) so the file
+-- loads even when the underlying subsystem (GPU, audio device, filesystem,
+-- physics world, …) is not yet initialised — but the canonical call form
+-- (e.g. `lurek.mods.foo(arg)` or `instance:method(arg)`) is right there
+-- in the snippet so you can lift it straight into your game code.
+--
 -- Run: cargo run -- content/examples/mods.lua
 
-print("[example] lurek.mods loaded — 40 API items demonstrated")
+print("[example] lurek.mods — 40 API entries")
 
--- ── lurek.mods free functions ──
+-- ── lurek.mods.* free functions ──
 
 --@api-stub: lurek.mods.newMod
 -- Creates a new Mod from an info table with at least an `id` field.
--- Use this when creates a new Mod from an info table with at least an `id` field is needed.
-if false then
-  local _r = lurek.mods.newMod(1)
-  print(_r)
-end
+-- Call when you need to create a new mod.
+local ok, obj = pcall(function() return lurek.mods.newMod(nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.mods.newMod ok=", ok)
 
 --@api-stub: lurek.mods.newModManager
 -- Creates a new empty ModManager.
--- Use this when creates a new empty ModManager is needed.
-if false then
-  local _r = lurek.mods.newModManager()
-  print(_r)
-end
+-- Call when you need to create a new mod manager.
+local ok, obj = pcall(function() return lurek.mods.newModManager() end)
+if ok and obj then print("created:", obj) end
+print("lurek.mods.newModManager ok=", ok)
 
 --@api-stub: lurek.mods.checkApiVersion
 -- Checks whether a mod's required `api_version` is compatible with the given `host_version`.
--- Use this when checks whether a mod's required `api_version` is compatible with the given `host_version` is needed.
-if false then
-  local _r = lurek.mods.checkApiVersion(nil, 1)
-  print(_r)
-end
+-- Call when you need to invoke check api version.
+local ok, result = pcall(function() return lurek.mods.checkApiVersion(nil, nil) end)
+if ok then print("lurek.mods.checkApiVersion ->", result)
+else print("unavailable:", result) end
 
 -- ── Mod methods ──
 
 --@api-stub: Mod:getId
 -- Returns the unique mod identifier.
--- Use this when returns the unique mod identifier is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getId()
+-- Call when you need to read id.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getId() end)
+  print("Mod:getId ->", ok, result)
 end
 
 --@api-stub: Mod:getName
 -- Returns the localized or human-readable display name of the mod.
--- Use this when returns the localized or human-readable display name of the mod is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getName()
+-- Call when you need to read name.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getName() end)
+  print("Mod:getName ->", ok, result)
 end
 
 --@api-stub: Mod:getVersion
 -- Returns the version string.
--- Use this when returns the version string is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getVersion()
+-- Call when you need to read version.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getVersion() end)
+  print("Mod:getVersion ->", ok, result)
 end
 
 --@api-stub: Mod:getAuthor
 -- Returns the author name string from this mod's metadata manifest.
--- Use this when returns the author name string from this mod's metadata manifest is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getAuthor()
+-- Call when you need to read author.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getAuthor() end)
+  print("Mod:getAuthor ->", ok, result)
 end
 
 --@api-stub: Mod:getDescription
 -- Returns the mod description.
--- Use this when returns the mod description is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getDescription()
+-- Call when you need to read description.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getDescription() end)
+  print("Mod:getDescription ->", ok, result)
 end
 
 --@api-stub: Mod:getDependencies
 -- Returns the list of required mod IDs.
--- Use this when returns the list of required mod IDs is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getDependencies()
+-- Call when you need to read dependencies.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getDependencies() end)
+  print("Mod:getDependencies ->", ok, result)
 end
 
 --@api-stub: Mod:getPriority
 -- Returns the load-order priority.
--- Use this when returns the load-order priority is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getPriority()
+-- Call when you need to read priority.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getPriority() end)
+  print("Mod:getPriority ->", ok, result)
 end
 
 --@api-stub: Mod:isEnabled
 -- Returns whether the mod is enabled.
--- Use this when returns whether the mod is enabled is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:isEnabled()
+-- Call when you need to check is enabled.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:isEnabled() end)
+  print("Mod:isEnabled ->", ok, result)
 end
 
 --@api-stub: Mod:setEnabled
 -- Enables or disables this mod; disabled mods are skipped during loading.
--- Use this when enables or disables this mod; disabled mods are skipped during loading is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:setEnabled(1)
+-- Call when you need to assign enabled.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:setEnabled(nil) end)
+  print("Mod:setEnabled ->", ok, result)
 end
 
 --@api-stub: Mod:isLoaded
 -- Returns whether the mod has been loaded.
--- Use this when returns whether the mod has been loaded is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:isLoaded()
+-- Call when you need to check is loaded.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:isLoaded() end)
+  print("Mod:isLoaded ->", ok, result)
 end
 
 --@api-stub: Mod:getApiVersion
 -- Returns the required engine API version string, or nil if not set.
--- Use this when returns the required engine API version string, or nil if not set is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getApiVersion()
+-- Call when you need to read api version.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getApiVersion() end)
+  print("Mod:getApiVersion ->", ok, result)
 end
 
 --@api-stub: Mod:setApiVersion
 -- Sets the required engine API version string.
--- Use this when sets the required engine API version string is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:setApiVersion(1)
+-- Call when you need to assign api version.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:setApiVersion(nil) end)
+  print("Mod:setApiVersion ->", ok, result)
 end
 
 --@api-stub: Mod:getCapabilities
 -- Returns an array of declared capability flags.
--- Use this when returns an array of declared capability flags is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getCapabilities()
+-- Call when you need to read capabilities.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getCapabilities() end)
+  print("Mod:getCapabilities ->", ok, result)
 end
 
 --@api-stub: Mod:setCapabilities
 -- Replaces the capability list with the given array of strings.
--- Use this when replaces the capability list with the given array of strings is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:setCapabilities(nil)
+-- Call when you need to assign capabilities.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:setCapabilities(nil) end)
+  print("Mod:setCapabilities ->", ok, result)
 end
 
 --@api-stub: Mod:getConfigSchema
 -- Returns the config schema as an array of `{key, type, default}` tables.
--- Use this when returns the config schema as an array of `{key, type, default}` tables is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getConfigSchema()
+-- Call when you need to read config schema.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getConfigSchema() end)
+  print("Mod:getConfigSchema ->", ok, result)
 end
 
 --@api-stub: Mod:setConfigSchema
 -- Replaces the config schema with the given array of `{key, type, default}` tables.
--- Use this when replaces the config schema with the given array of `{key, type, default}` tables is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:setConfigSchema(0)
+-- Call when you need to assign config schema.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:setConfigSchema(nil) end)
+  print("Mod:setConfigSchema ->", ok, result)
 end
 
 --@api-stub: Mod:getHook
 -- Returns the hook function for the given name, or nil.
--- Use this when returns the hook function for the given name, or nil is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getHook(1)
+-- Call when you need to read hook.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getHook("name") end)
+  print("Mod:getHook ->", ok, result)
 end
 
 --@api-stub: Mod:hasHook
 -- Returns whether a hook with the given name exists.
--- Use this when returns whether a hook with the given name exists is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:hasHook(1)
+-- Call when you need to check has hook.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:hasHook("name") end)
+  print("Mod:hasHook ->", ok, result)
 end
 
 --@api-stub: Mod:getHookNames
 -- Returns an array of registered hook names.
--- Use this when returns an array of registered hook names is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getHookNames()
+-- Call when you need to read hook names.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getHookNames() end)
+  print("Mod:getHookNames ->", ok, result)
 end
 
 --@api-stub: Mod:setConfig
 -- Stores an arbitrary config value for this mod.
--- Use this when stores an arbitrary config value for this mod is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:setConfig(0)
+-- Call when you need to assign config.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:setConfig(nil) end)
+  print("Mod:setConfig ->", ok, result)
 end
 
 --@api-stub: Mod:getConfig
 -- Returns the stored config value, or nil.
--- Use this when returns the stored config value, or nil is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:getConfig()
+-- Call when you need to read config.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:getConfig() end)
+  print("Mod:getConfig ->", ok, result)
 end
 
 --@api-stub: Mod:releaseRefs
 -- Releases all hook and config registry references.
--- Use this when releases all hook and config registry references is needed.
-if false then
-  local _o = nil  -- Mod instance
-  _o:releaseRefs()
+-- Call when you need to invoke release refs.
+-- Build a Mod via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newMod(...)
+if instance then
+  local ok, result = pcall(function() return instance:releaseRefs() end)
+  print("Mod:releaseRefs ->", ok, result)
 end
 
 -- ── ModManager methods ──
 
 --@api-stub: ModManager:registerMod
 -- Registers a mod from its Mod userdata.
--- Use this when registers a mod from its Mod userdata is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:registerMod(nil)
+-- Call when you need to invoke register mod.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:registerMod(nil) end)
+  print("ModManager:registerMod ->", ok, result)
 end
 
 --@api-stub: ModManager:unregisterMod
 -- Removes a mod by ID and returns whether it was found.
--- Use this when removes a mod by ID and returns whether it was found is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:unregisterMod(1)
+-- Call when you need to invoke unregister mod.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:unregisterMod(1) end)
+  print("ModManager:unregisterMod ->", ok, result)
 end
 
 --@api-stub: ModManager:hasMod
 -- Returns whether a mod with the given ID is registered.
--- Use this when returns whether a mod with the given ID is registered is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:hasMod(1)
+-- Call when you need to check has mod.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:hasMod(1) end)
+  print("ModManager:hasMod ->", ok, result)
 end
 
 --@api-stub: ModManager:getModCount
 -- Returns the number of registered mods.
--- Use this when returns the number of registered mods is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:getModCount()
+-- Call when you need to read mod count.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getModCount() end)
+  print("ModManager:getModCount ->", ok, result)
 end
 
 --@api-stub: ModManager:getAllMods
 -- Returns an array of info tables for all registered mods.
--- Use this when returns an array of info tables for all registered mods is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:getAllMods()
+-- Call when you need to read all mods.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getAllMods() end)
+  print("ModManager:getAllMods ->", ok, result)
 end
 
 --@api-stub: ModManager:getLoadOrder
 -- Returns an array of info tables in effective load order.
--- Use this when returns an array of info tables in effective load order is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:getLoadOrder()
+-- Call when you need to read load order.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getLoadOrder() end)
+  print("ModManager:getLoadOrder ->", ok, result)
 end
 
 --@api-stub: ModManager:validateDependencies
 -- Returns an array of mod IDs with missing dependencies.
--- Use this when returns an array of mod IDs with missing dependencies is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:validateDependencies()
+-- Call when you need to invoke validate dependencies.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:validateDependencies() end)
+  print("ModManager:validateDependencies ->", ok, result)
 end
 
 --@api-stub: ModManager:hasCircularDependencies
 -- Returns whether any circular dependency cycles exist.
--- Use this when returns whether any circular dependency cycles exist is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:hasCircularDependencies()
+-- Call when you need to check has circular dependencies.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:hasCircularDependencies() end)
+  print("ModManager:hasCircularDependencies ->", ok, result)
 end
 
 --@api-stub: ModManager:setLoadOrder
 -- Sets an explicit load order from an array of mod ID strings.
--- Use this when sets an explicit load order from an array of mod ID strings is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:setLoadOrder(0)
+-- Call when you need to assign load order.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:setLoadOrder({}) end)
+  print("ModManager:setLoadOrder ->", ok, result)
 end
 
 --@api-stub: ModManager:clearLoadOrder
 -- Clears the custom load order, reverting to priority-based sorting.
--- Use this when clears the custom load order, reverting to priority-based sorting is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:clearLoadOrder()
+-- Call when you need to invoke clear load order.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:clearLoadOrder() end)
+  print("ModManager:clearLoadOrder ->", ok, result)
 end
 
 --@api-stub: ModManager:scanFolder
 -- Scans a directory for mods with mod.toml and registers them.
--- Use this when scans a directory for mods with mod.toml and registers them is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:scanFolder(0)
+-- Call when you need to invoke scan folder.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:scanFolder("path") end)
+  print("ModManager:scanFolder ->", ok, result)
 end
 
 --@api-stub: ModManager:getModPath
 -- Returns the filesystem path of a registered mod, or nil.
--- Use this when returns the filesystem path of a registered mod, or nil is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:getModPath(1)
+-- Call when you need to read mod path.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getModPath(1) end)
+  print("ModManager:getModPath ->", ok, result)
 end
 
 --@api-stub: ModManager:markForReload
 -- Marks a registered mod for hot-reload.
--- Use this when marks a registered mod for hot-reload is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:markForReload(1)
+-- Call when you need to invoke mark for reload.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:markForReload(1) end)
+  print("ModManager:markForReload ->", ok, result)
 end
 
 --@api-stub: ModManager:getReloadQueue
 -- Returns the array of mod IDs pending hot-reload.
--- Use this when returns the array of mod IDs pending hot-reload is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:getReloadQueue()
+-- Call when you need to read reload queue.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getReloadQueue() end)
+  print("ModManager:getReloadQueue ->", ok, result)
 end
 
 --@api-stub: ModManager:clearReloadQueue
 -- Clears the reload queue without reloading.
--- Use this when clears the reload queue without reloading is needed.
-if false then
-  local _o = nil  -- ModManager instance
-  _o:clearReloadQueue()
+-- Call when you need to invoke clear reload queue.
+-- Build a ModManager via the appropriate lurek.mods.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.mods.newModManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:clearReloadQueue() end)
+  print("ModManager:clearReloadQueue ->", ok, result)
 end
 

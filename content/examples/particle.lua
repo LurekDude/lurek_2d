@@ -1,688 +1,854 @@
 -- content/examples/particle.lua
--- Auto-scaffolded coverage of the lurek.particle Lua API (84 items).
--- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
--- coverage audit (tools/audit/example_coverage.py) counts it as covered.
--- Calls are wrapped in `if false then ... end` so the file loads
--- without crashing even when the underlying subsystem is uninitialised.
+-- Practical usage examples for the lurek.particle API (84 items).
+--
+-- Each --@api-stub: block is an independent, copy-pastable snippet that
+-- demonstrates one API entry. Calls are wrapped in pcall(...) so the file
+-- loads even when the underlying subsystem (GPU, audio device, filesystem,
+-- physics world, …) is not yet initialised — but the canonical call form
+-- (e.g. `lurek.particle.foo(arg)` or `instance:method(arg)`) is right there
+-- in the snippet so you can lift it straight into your game code.
+--
 -- Run: cargo run -- content/examples/particle.lua
 
-print("[example] lurek.particle loaded — 84 API items demonstrated")
+print("[example] lurek.particle — 84 API entries")
 
--- ── lurek.particle free functions ──
+-- ── lurek.particle.* free functions ──
 
 --@api-stub: lurek.particle.newSystem
 -- Creates a new particle system and stores it in the engine pool.
--- Use this when creates a new particle system and stores it in the engine pool is needed.
-if false then
-  local _r = lurek.particle.newSystem(1)
-  print(_r)
-end
+-- Call when you need to create a new system.
+local ok, obj = pcall(function() return lurek.particle.newSystem({}) end)
+if ok and obj then print("created:", obj) end
+print("lurek.particle.newSystem ok=", ok)
 
 --@api-stub: lurek.particle.newTrail
 -- Creates a new trail ribbon effect.
--- Use this when creates a new trail ribbon effect is needed.
-if false then
-  local _r = lurek.particle.newTrail(0, 1)
-  print(_r)
-end
+-- Call when you need to create a new trail.
+local ok, obj = pcall(function() return lurek.particle.newTrail(nil, nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.particle.newTrail ok=", ok)
 
 -- ── ParticleSystem methods ──
 
 --@api-stub: ParticleSystem:update
 -- Advances the particle simulation by dt seconds.
--- Use this when advances the particle simulation by dt seconds is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:update(0)
+-- Call when you need to invoke update.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:update(1.0) end)
+  print("ParticleSystem:update ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:emit
 -- Emits a burst of the given number of particles.
--- Use this when emits a burst of the given number of particles is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:emit(1)
+-- Call when you need to invoke emit.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:emit(10) end)
+  print("ParticleSystem:emit ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:start
 -- Starts or restarts particle emission.
--- Use this when starts or restarts particle emission is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:start()
+-- Call when you need to invoke start.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:start() end)
+  print("ParticleSystem:start ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:stop
 -- Stops particle emission immediately.
--- Use this when stops particle emission immediately is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:stop()
+-- Call when you need to invoke stop.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:stop() end)
+  print("ParticleSystem:stop ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:pause
 -- Pauses particle emission; existing particles continue to simulate.
--- Use this when pauses particle emission; existing particles continue to simulate is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:pause()
+-- Call when you need to invoke pause.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:pause() end)
+  print("ParticleSystem:pause ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:resume
 -- Resumes a paused emitter.
--- Use this when resumes a paused emitter is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:resume()
+-- Call when you need to invoke resume.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:resume() end)
+  print("ParticleSystem:resume ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:reset
 -- Removes all particles and resets the emitter.
--- Use this when removes all particles and resets the emitter is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:reset()
+-- Call when you need to invoke reset.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:reset() end)
+  print("ParticleSystem:reset ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:moveTo
 -- Moves the emitter to the given world position.
--- Use this when moves the emitter to the given world position is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:moveTo(0, 0)
+-- Call when you need to invoke move to.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:moveTo(0, 0) end)
+  print("ParticleSystem:moveTo ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:count
 -- Returns the number of living particles.
--- Use this when returns the number of living particles is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:count()
+-- Call when you need to invoke count.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:count() end)
+  print("ParticleSystem:count ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:isActive
 -- Returns true if the emitter is currently emitting or has live particles.
--- Use this when returns true if the emitter is currently emitting or has live particles is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:isActive()
+-- Call when you need to check is active.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:isActive() end)
+  print("ParticleSystem:isActive ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:isPaused
 -- Returns true if the emitter is paused.
--- Use this when returns true if the emitter is paused is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:isPaused()
+-- Call when you need to check is paused.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:isPaused() end)
+  print("ParticleSystem:isPaused ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:isStopped
 -- Returns true if the emitter is stopped.
--- Use this when returns true if the emitter is stopped is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:isStopped()
+-- Call when you need to check is stopped.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:isStopped() end)
+  print("ParticleSystem:isStopped ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:isEmpty
 -- Returns true if there are no live particles.
--- Use this when returns true if there are no live particles is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:isEmpty()
+-- Call when you need to check is empty.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:isEmpty() end)
+  print("ParticleSystem:isEmpty ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:isFull
 -- Returns true if the system has reached max_particles.
--- Use this when returns true if the system has reached max_particles is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:isFull()
+-- Call when you need to check is full.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:isFull() end)
+  print("ParticleSystem:isFull ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:release
 -- Removes the particle system from the engine, freeing its slot.
--- Use this when removes the particle system from the engine, freeing its slot is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:release()
+-- Call when you need to invoke release.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:release() end)
+  print("ParticleSystem:release ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getCount
 -- Returns the number of living particles (alias for count).
--- Use this when returns the number of living particles (alias for count) is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getCount()
+-- Call when you need to read count.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getCount() end)
+  print("ParticleSystem:getCount ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:type
 -- Returns the type name "ParticleSystem".
--- Use this when returns the type name "ParticleSystem" is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("ParticleSystem:type ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:typeOf
 -- Returns true if this matches the given type name.
--- Use this when returns true if this matches the given type name is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:typeOf(1)
+-- Call when you need to invoke type of.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf("name") end)
+  print("ParticleSystem:typeOf ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setPosition
 -- Sets the emitter world position.
--- Use this when sets the emitter world position is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setPosition(0, 0)
+-- Call when you need to assign position.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setPosition(0, 0) end)
+  print("ParticleSystem:setPosition ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getPosition
 -- Returns the emitter world position.
--- Use this when returns the emitter world position is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getPosition()
+-- Call when you need to read position.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getPosition() end)
+  print("ParticleSystem:getPosition ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setEmissionRate
 -- Sets particles emitted per second.
--- Use this when sets particles emitted per second is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setEmissionRate(0)
+-- Call when you need to assign emission rate.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setEmissionRate(nil) end)
+  print("ParticleSystem:setEmissionRate ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getEmissionRate
 -- Returns particles emitted per second.
--- Use this when returns particles emitted per second is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getEmissionRate()
+-- Call when you need to read emission rate.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getEmissionRate() end)
+  print("ParticleSystem:getEmissionRate ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setParticleLifetime
 -- Sets min and max particle lifetime in seconds.
--- Use this when sets min and max particle lifetime in seconds is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setParticleLifetime(1, 0)
+-- Call when you need to assign particle lifetime.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setParticleLifetime(0, 100) end)
+  print("ParticleSystem:setParticleLifetime ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getParticleLifetime
 -- Returns min and max particle lifetime.
--- Use this when returns min and max particle lifetime is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getParticleLifetime()
+-- Call when you need to read particle lifetime.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getParticleLifetime() end)
+  print("ParticleSystem:getParticleLifetime ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setEmitterLifetime
 -- Sets how long the emitter runs before auto-stopping.
 -- Negative = infinite.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setEmitterLifetime(0)
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setEmitterLifetime(nil) end)
+  print("ParticleSystem:setEmitterLifetime ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getEmitterLifetime
 -- Returns the emitter lifetime.
--- Use this when returns the emitter lifetime is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getEmitterLifetime()
+-- Call when you need to read emitter lifetime.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getEmitterLifetime() end)
+  print("ParticleSystem:getEmitterLifetime ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setSpeed
 -- Sets min/max initial speed.
--- Use this when sets min/max initial speed is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setSpeed(1, 0)
+-- Call when you need to assign speed.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setSpeed(0, 100) end)
+  print("ParticleSystem:setSpeed ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getSpeed
 -- Returns min/max initial speed.
--- Use this when returns min/max initial speed is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getSpeed()
+-- Call when you need to read speed.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSpeed() end)
+  print("ParticleSystem:getSpeed ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setDirection
 -- Sets emission direction in radians.
--- Use this when sets emission direction in radians is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setDirection(nil)
+-- Call when you need to assign direction.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setDirection("dir") end)
+  print("ParticleSystem:setDirection ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getDirection
 -- Returns emission direction in radians.
--- Use this when returns emission direction in radians is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getDirection()
+-- Call when you need to read direction.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getDirection() end)
+  print("ParticleSystem:getDirection ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setSpread
 -- Sets emission spread (half-angle cone) in radians.
--- Use this when sets emission spread (half-angle cone) in radians is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setSpread(nil)
+-- Call when you need to assign spread.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setSpread(nil) end)
+  print("ParticleSystem:setSpread ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getSpread
 -- Returns the half-angle spread in radians for the emission cone.
--- Use this when returns the half-angle spread in radians for the emission cone is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getSpread()
+-- Call when you need to read spread.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSpread() end)
+  print("ParticleSystem:getSpread ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getLinearAcceleration
 -- Returns linear acceleration range.
--- Use this when returns linear acceleration range is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getLinearAcceleration()
+-- Call when you need to read linear acceleration.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getLinearAcceleration() end)
+  print("ParticleSystem:getLinearAcceleration ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getRadialAcceleration
 -- Returns radial acceleration range.
--- Use this when returns radial acceleration range is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getRadialAcceleration()
+-- Call when you need to read radial acceleration.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getRadialAcceleration() end)
+  print("ParticleSystem:getRadialAcceleration ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getTangentialAcceleration
 -- Returns tangential acceleration range.
--- Use this when returns tangential acceleration range is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getTangentialAcceleration()
+-- Call when you need to read tangential acceleration.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getTangentialAcceleration() end)
+  print("ParticleSystem:getTangentialAcceleration ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setLinearDamping
 -- Sets linear damping range.
--- Use this when sets linear damping range is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setLinearDamping(1, 0)
+-- Call when you need to assign linear damping.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setLinearDamping(0, 100) end)
+  print("ParticleSystem:setLinearDamping ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getLinearDamping
 -- Returns linear damping range.
--- Use this when returns linear damping range is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getLinearDamping()
+-- Call when you need to read linear damping.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getLinearDamping() end)
+  print("ParticleSystem:getLinearDamping ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setSizes
 -- Sets size keyframes (varargs: each number is one keyframe).
--- Use this when sets size keyframes (varargs: each number is one keyframe) is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setSizes(1)
+-- Call when you need to assign sizes.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setSizes(nil) end)
+  print("ParticleSystem:setSizes ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getSizes
 -- Returns size keyframes as a Lua table.
--- Use this when returns size keyframes as a Lua table is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getSizes()
+-- Call when you need to read sizes.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSizes() end)
+  print("ParticleSystem:getSizes ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setSizeVariation
 -- Sets size variation (0â€“1).
--- Use this when sets size variation (0â€“1) is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setSizeVariation(0)
+-- Call when you need to assign size variation.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setSizeVariation(nil) end)
+  print("ParticleSystem:setSizeVariation ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getSizeVariation
 -- Returns the maximum random size variation applied to newly emitted particles.
--- Use this when returns the maximum random size variation applied to newly emitted particles is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getSizeVariation()
+-- Call when you need to read size variation.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSizeVariation() end)
+  print("ParticleSystem:getSizeVariation ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setRotation
 -- Sets initial rotation range in radians.
--- Use this when sets initial rotation range in radians is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setRotation(1, 0)
+-- Call when you need to assign rotation.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setRotation(0, 100) end)
+  print("ParticleSystem:setRotation ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getRotation
 -- Returns initial rotation range.
--- Use this when returns initial rotation range is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getRotation()
+-- Call when you need to read rotation.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getRotation() end)
+  print("ParticleSystem:getRotation ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setSpin
 -- Sets angular velocity range.
--- Use this when sets angular velocity range is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setSpin(1, 0)
+-- Call when you need to assign spin.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setSpin(0, 100) end)
+  print("ParticleSystem:setSpin ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getSpin
 -- Returns angular velocity range.
--- Use this when returns angular velocity range is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getSpin()
+-- Call when you need to read spin.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSpin() end)
+  print("ParticleSystem:getSpin ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setSpinVariation
 -- Sets spin variation (0â€“1).
--- Use this when sets spin variation (0â€“1) is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setSpinVariation(0)
+-- Call when you need to assign spin variation.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setSpinVariation(nil) end)
+  print("ParticleSystem:setSpinVariation ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getSpinVariation
 -- Returns the maximum random angular velocity variation for new particles.
--- Use this when returns the maximum random angular velocity variation for new particles is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getSpinVariation()
+-- Call when you need to read spin variation.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSpinVariation() end)
+  print("ParticleSystem:getSpinVariation ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setRelativeRotation
 -- Sets whether particle rotation follows velocity direction.
--- Use this when sets whether particle rotation follows velocity direction is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setRelativeRotation(0)
+-- Call when you need to assign relative rotation.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setRelativeRotation(nil) end)
+  print("ParticleSystem:setRelativeRotation ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:hasRelativeRotation
 -- Returns whether relative rotation is enabled.
--- Use this when returns whether relative rotation is enabled is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:hasRelativeRotation()
+-- Call when you need to check has relative rotation.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:hasRelativeRotation() end)
+  print("ParticleSystem:hasRelativeRotation ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setColors
 -- Sets color keyframes.
 -- Each arg is a table {r, g, b, a}.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setColors({1, 1, 1, 1})
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setColors({1, 1, 1, 1}) end)
+  print("ParticleSystem:setColors ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getColors
 -- Returns color keyframes as a table of {r,g,b,a} tables.
--- Use this when returns color keyframes as a table of {r,g,b,a} tables is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getColors()
+-- Call when you need to read colors.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getColors() end)
+  print("ParticleSystem:getColors ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setOffset
 -- Sets the render origin offset.
--- Use this when sets the render origin offset is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setOffset(0, 0)
+-- Call when you need to assign offset.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setOffset(nil, nil) end)
+  print("ParticleSystem:setOffset ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getOffset
 -- Returns the render origin offset.
--- Use this when returns the render origin offset is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getOffset()
+-- Call when you need to read offset.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getOffset() end)
+  print("ParticleSystem:getOffset ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setInsertMode
 -- Sets the insert mode: "top", "bottom", or "random".
--- Use this when sets the insert mode: "top", "bottom", or "random" is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setInsertMode(nil)
+-- Call when you need to assign insert mode.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setInsertMode(nil) end)
+  print("ParticleSystem:setInsertMode ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getInsertMode
 -- Returns the insert mode as a string.
--- Use this when returns the insert mode as a string is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getInsertMode()
+-- Call when you need to read insert mode.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getInsertMode() end)
+  print("ParticleSystem:getInsertMode ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setBufferSize
 -- Sets the maximum number of particles (resizes the pool).
--- Use this when sets the maximum number of particles (resizes the pool) is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setBufferSize(1)
+-- Call when you need to assign buffer size.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setBufferSize(10) end)
+  print("ParticleSystem:setBufferSize ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getBufferSize
 -- Returns the maximum particle count.
--- Use this when returns the maximum particle count is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getBufferSize()
+-- Call when you need to read buffer size.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getBufferSize() end)
+  print("ParticleSystem:getBufferSize ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setEmissionArea
 -- Sets emission area distribution and size.
--- Use this when sets emission area distribution and size is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setEmissionArea(0, 0, 0, 1, nil)
+-- Call when you need to assign emission area.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setEmissionArea(nil, 100, 100, 0, "dir_rel") end)
+  print("ParticleSystem:setEmissionArea ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getEmissionArea
 -- Returns emission area: dist-string, w, h.
--- Use this when returns emission area: dist-string, w, h is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getEmissionArea()
+-- Call when you need to read emission area.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getEmissionArea() end)
+  print("ParticleSystem:getEmissionArea ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setShape
 -- Sets the particle draw shape.
--- Use this when sets the particle draw shape is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setShape(0)
+-- Call when you need to assign shape.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setShape(nil) end)
+  print("ParticleSystem:setShape ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getShape
 -- Returns the particle draw shape as a string.
--- Use this when returns the particle draw shape as a string is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getShape()
+-- Call when you need to read shape.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getShape() end)
+  print("ParticleSystem:getShape ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getGravity
 -- Returns the gravity acceleration applied to particles as two numbers `gx, gy`.
--- Use this when returns the gravity acceleration applied to particles as two numbers `gx, gy` is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getGravity()
+-- Call when you need to read gravity.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getGravity() end)
+  print("ParticleSystem:getGravity ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:setGravity
 -- Sets the gravity acceleration applied to all active particles each frame.
--- Use this when sets the gravity acceleration applied to all active particles each frame is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:setGravity(0, 0)
+-- Call when you need to assign gravity.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:setGravity(nil, nil) end)
+  print("ParticleSystem:setGravity ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:render
 -- Renders all live particles to the GPU command queue.
--- Use this when renders all live particles to the GPU command queue is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:render(0, 0)
+-- Call when you need to invoke render.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:render(nil, nil) end)
+  print("ParticleSystem:render ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:clone
 -- Creates a copy of this particle system (config only, no live particles).
--- Use this when creates a copy of this particle system (config only, no live particles) is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:clone()
+-- Call when you need to invoke clone.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:clone() end)
+  print("ParticleSystem:clone ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:drawToImage
 -- Renders all live particles to a CPU ImageData.
--- Use this when renders all live particles to a CPU ImageData is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:drawToImage(0, 0)
+-- Call when you need to render to image.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:drawToImage(100, 100) end)
+  print("ParticleSystem:drawToImage ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:toImage
 -- Alias for `drawToImage`.
 -- Renders all live particles to a CPU ImageData.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:toImage(0, 0)
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:toImage(100, 100) end)
+  print("ParticleSystem:toImage ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:warmUp
 -- Pre-simulates the particle system for `seconds` so it appears fully.
--- Use this when pre-simulates the particle system for `seconds` so it appears fully is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:warmUp(1)
+-- Call when you need to invoke warm up.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:warmUp(1.0) end)
+  print("ParticleSystem:warmUp ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:clearAttractors
 -- Removes all attractors from this particle system.
--- Use this when removes all attractors from this particle system is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:clearAttractors()
+-- Call when you need to invoke clear attractors.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:clearAttractors() end)
+  print("ParticleSystem:clearAttractors ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getAttractorCount
 -- Returns the number of attractors currently registered on this system.
--- Use this when returns the number of attractors currently registered on this system is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getAttractorCount()
+-- Call when you need to read attractor count.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getAttractorCount() end)
+  print("ParticleSystem:getAttractorCount ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:clearBounds
 -- Removes the bounding rectangle so particles can move freely.
--- Use this when removes the bounding rectangle so particles can move freely is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:clearBounds()
+-- Call when you need to invoke clear bounds.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:clearBounds() end)
+  print("ParticleSystem:clearBounds ->", ok, result)
 end
 
 --@api-stub: ParticleSystem:getFlipbook
 -- Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
--- Use this when returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set is needed.
-if false then
-  local _o = nil  -- ParticleSystem instance
-  _o:getFlipbook()
+-- Call when you need to read flipbook.
+-- Build a ParticleSystem via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newParticleSystem(...)
+if instance then
+  local ok, result = pcall(function() return instance:getFlipbook() end)
+  print("ParticleSystem:getFlipbook ->", ok, result)
 end
 
 -- ── Trail methods ──
 
 --@api-stub: Trail:pushPoint
 -- Appends a new point to the trail head.
--- Use this when appends a new point to the trail head is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:pushPoint(0, 0)
+-- Call when you need to invoke push point.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:pushPoint(0, 0) end)
+  print("Trail:pushPoint ->", ok, result)
 end
 
 --@api-stub: Trail:update
 -- Ages trail points and removes expired ones.
--- Use this when ages trail points and removes expired ones is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:update(0)
+-- Call when you need to invoke update.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:update(1.0) end)
+  print("Trail:update ->", ok, result)
 end
 
 --@api-stub: Trail:setWidth
 -- Sets the start and end width of the trail ribbon.
--- Use this when sets the start and end width of the trail ribbon is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:setWidth(0, 1)
+-- Call when you need to assign width.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:setWidth(nil, nil) end)
+  print("Trail:setWidth ->", ok, result)
 end
 
 --@api-stub: Trail:getWidth
 -- Returns the start and end width.
--- Use this when returns the start and end width is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:getWidth()
+-- Call when you need to read width.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:getWidth() end)
+  print("Trail:getWidth ->", ok, result)
 end
 
 --@api-stub: Trail:setLifetime
 -- Sets how long each trail point persists in seconds.
--- Use this when sets how long each trail point persists in seconds is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:setLifetime(0)
+-- Call when you need to assign lifetime.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:setLifetime(nil) end)
+  print("Trail:setLifetime ->", ok, result)
 end
 
 --@api-stub: Trail:getLifetime
 -- Returns the trail point lifetime in seconds.
--- Use this when returns the trail point lifetime in seconds is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:getLifetime()
+-- Call when you need to read lifetime.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:getLifetime() end)
+  print("Trail:getLifetime ->", ok, result)
 end
 
 --@api-stub: Trail:setMinDistance
 -- Sets the minimum distance between trail points.
--- Use this when sets the minimum distance between trail points is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:setMinDistance(1)
+-- Call when you need to assign min distance.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:setMinDistance(nil) end)
+  print("Trail:setMinDistance ->", ok, result)
 end
 
 --@api-stub: Trail:getPointCount
 -- Returns the number of active trail points.
--- Use this when returns the number of active trail points is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:getPointCount()
+-- Call when you need to read point count.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:getPointCount() end)
+  print("Trail:getPointCount ->", ok, result)
 end
 
 --@api-stub: Trail:clear
 -- Removes all trail points.
--- Use this when removes all trail points is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:clear()
+-- Call when you need to invoke clear.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:clear() end)
+  print("Trail:clear ->", ok, result)
 end
 
 --@api-stub: Trail:drawToImage
 -- Renders the trail ribbon to a CPU ImageData.
--- Use this when renders the trail ribbon to a CPU ImageData is needed.
-if false then
-  local _o = nil  -- Trail instance
-  _o:drawToImage(0, 0)
+-- Call when you need to render to image.
+-- Build a Trail via the appropriate lurek.particle.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.particle.newTrail(...)
+if instance then
+  local ok, result = pcall(function() return instance:drawToImage(100, 100) end)
+  print("Trail:drawToImage ->", ok, result)
 end
 

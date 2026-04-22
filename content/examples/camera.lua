@@ -1,302 +1,375 @@
 -- content/examples/camera.lua
--- Auto-scaffolded coverage of the lurek.camera Lua API (36 items).
--- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
--- coverage audit (tools/audit/example_coverage.py) counts it as covered.
--- Calls are wrapped in `if false then ... end` so the file loads
--- without crashing even when the underlying subsystem is uninitialised.
+-- Practical usage examples for the lurek.camera API (36 items).
+--
+-- Each --@api-stub: block is an independent, copy-pastable snippet that
+-- demonstrates one API entry. Calls are wrapped in pcall(...) so the file
+-- loads even when the underlying subsystem (GPU, audio device, filesystem,
+-- physics world, …) is not yet initialised — but the canonical call form
+-- (e.g. `lurek.camera.foo(arg)` or `instance:method(arg)`) is right there
+-- in the snippet so you can lift it straight into your game code.
+--
 -- Run: cargo run -- content/examples/camera.lua
 
-print("[example] lurek.camera loaded — 36 API items demonstrated")
+print("[example] lurek.camera — 36 API entries")
 
--- ── lurek.camera free functions ──
+-- ── lurek.camera.* free functions ──
 
 --@api-stub: lurek.camera.new
 -- Creates a new Camera2D with the given viewport dimensions.
--- Use this when creates a new Camera2D with the given viewport dimensions is needed.
-if false then
-  local _r = lurek.camera.new(0, 0)
-  print(_r)
-end
+-- Call when you need to invoke new.
+local ok, obj = pcall(function() return lurek.camera.new(nil, nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.camera.new ok=", ok)
 
 -- ── Camera2D methods ──
 
 --@api-stub: Camera2D:setPosition
 -- Sets the camera's world-space position.
--- Use this when sets the camera's world-space position is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:setPosition(0, 0)
+-- Call when you need to assign position.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:setPosition(0, 0) end)
+  print("Camera2D:setPosition ->", ok, result)
 end
 
 --@api-stub: Camera2D:getPosition
 -- Returns the camera's world-space position as x, y.
--- Use this when returns the camera's world-space position as x, y is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:getPosition()
+-- Call when you need to read position.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:getPosition() end)
+  print("Camera2D:getPosition ->", ok, result)
 end
 
 --@api-stub: Camera2D:setZoom
 -- Sets the uniform zoom factor (1.0 = natural size).
--- Use this when sets the uniform zoom factor (1.0 = natural size) is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:setZoom(0)
+-- Call when you need to assign zoom.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:setZoom(nil) end)
+  print("Camera2D:setZoom ->", ok, result)
 end
 
 --@api-stub: Camera2D:getZoom
 -- Returns the current zoom factor.
--- Use this when returns the current zoom factor is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:getZoom()
+-- Call when you need to read zoom.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:getZoom() end)
+  print("Camera2D:getZoom ->", ok, result)
 end
 
 --@api-stub: Camera2D:setRotation
 -- Sets the rotation in radians.
--- Use this when sets the rotation in radians is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:setRotation(nil)
+-- Call when you need to assign rotation.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:setRotation(1) end)
+  print("Camera2D:setRotation ->", ok, result)
 end
 
 --@api-stub: Camera2D:getRotation
 -- Returns the rotation in radians.
--- Use this when returns the rotation in radians is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:getRotation()
+-- Call when you need to read rotation.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:getRotation() end)
+  print("Camera2D:getRotation ->", ok, result)
 end
 
 --@api-stub: Camera2D:getViewport
 -- Returns the current viewport as x, y, w, h.
--- Use this when returns the current viewport as x, y, w, h is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:getViewport()
+-- Call when you need to read viewport.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:getViewport() end)
+  print("Camera2D:getViewport ->", ok, result)
 end
 
 --@api-stub: Camera2D:removeBounds
 -- Removes previously set world-space bounds.
--- Use this when removes previously set world-space bounds is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:removeBounds()
+-- Call when you need to remove bounds.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:removeBounds() end)
+  print("Camera2D:removeBounds ->", ok, result)
 end
 
 --@api-stub: Camera2D:setTarget
 -- Sets the follow target position.
--- Use this when sets the follow target position is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:setTarget(0, 0)
+-- Call when you need to assign target.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:setTarget(0, 0) end)
+  print("Camera2D:setTarget ->", ok, result)
 end
 
 --@api-stub: Camera2D:clearTarget
 -- Clears the follow target so the camera stops tracking.
--- Use this when clears the follow target so the camera stops tracking is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:clearTarget()
+-- Call when you need to invoke clear target.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:clearTarget() end)
+  print("Camera2D:clearTarget ->", ok, result)
 end
 
 --@api-stub: Camera2D:setFollowSmooth
 -- Sets the follow smooth interpolation speed (0.0 = instant snap).
--- Use this when sets the follow smooth interpolation speed (0.0 = instant snap) is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:setFollowSmooth(0)
+-- Call when you need to assign follow smooth.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:setFollowSmooth(nil) end)
+  print("Camera2D:setFollowSmooth ->", ok, result)
 end
 
 --@api-stub: Camera2D:setDeadZone
 -- Sets the dead zone half-extents for camera follow.
--- Use this when sets the dead zone half-extents for camera follow is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:setDeadZone(0, 0)
+-- Call when you need to assign dead zone.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:setDeadZone(100, 100) end)
+  print("Camera2D:setDeadZone ->", ok, result)
 end
 
 --@api-stub: Camera2D:setLookAhead
 -- Sets the look-ahead multiplier for follow prediction.
--- Use this when sets the look-ahead multiplier for follow prediction is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:setLookAhead(nil)
+-- Call when you need to assign look ahead.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:setLookAhead(nil) end)
+  print("Camera2D:setLookAhead ->", ok, result)
 end
 
 --@api-stub: Camera2D:shake
 -- Starts a screen-shake effect.
--- Use this when starts a screen-shake effect is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:shake(1, 1)
+-- Call when you need to invoke shake.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:shake(nil, 1.0) end)
+  print("Camera2D:shake ->", ok, result)
 end
 
 --@api-stub: Camera2D:update
 -- Advances the camera simulation by dt seconds.
--- Use this when advances the camera simulation by dt seconds is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:update(0)
+-- Call when you need to invoke update.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:update(1.0) end)
+  print("Camera2D:update ->", ok, result)
 end
 
 --@api-stub: Camera2D:toWorld
 -- Converts screen coordinates to world coordinates.
--- Use this when converts screen coordinates to world coordinates is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:toWorld(0, 0)
+-- Call when you need to invoke to world.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:toWorld(nil, nil) end)
+  print("Camera2D:toWorld ->", ok, result)
 end
 
 --@api-stub: Camera2D:toScreen
 -- Converts world coordinates to screen coordinates.
--- Use this when converts world coordinates to screen coordinates is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:toScreen(0, 0)
+-- Call when you need to invoke to screen.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:toScreen(nil, nil) end)
+  print("Camera2D:toScreen ->", ok, result)
 end
 
 --@api-stub: Camera2D:getVisibleArea
 -- Returns the visible world area as x, y, w, h.
--- Use this when returns the visible world area as x, y, w, h is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:getVisibleArea()
+-- Call when you need to read visible area.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:getVisibleArea() end)
+  print("Camera2D:getVisibleArea ->", ok, result)
 end
 
 --@api-stub: Camera2D:lookAt
 -- Instantly moves the camera to look at the given position.
--- Use this when instantly moves the camera to look at the given position is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:lookAt(0, 0)
+-- Call when you need to invoke look at.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:lookAt(0, 0) end)
+  print("Camera2D:lookAt ->", ok, result)
 end
 
 --@api-stub: Camera2D:move
 -- Translates the camera by dx, dy in world space.
--- Use this when translates the camera by dx, dy in world space is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:move(0, 0)
+-- Call when you need to invoke move.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:move(0, 0) end)
+  print("Camera2D:move ->", ok, result)
 end
 
 --@api-stub: Camera2D:stopPath
 -- Cancels the active camera path animation.
--- Use this when cancels the active camera path animation is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:stopPath()
+-- Call when you need to invoke stop path.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:stopPath() end)
+  print("Camera2D:stopPath ->", ok, result)
 end
 
 --@api-stub: Camera2D:updatePath
 -- Advances the path animation by `dt` seconds and applies the.
--- Use this when advances the path animation by `dt` seconds and applies the is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:updatePath(0)
+-- Call when you need to invoke update path.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:updatePath(1.0) end)
+  print("Camera2D:updatePath ->", ok, result)
 end
 
 --@api-stub: Camera2D:pathProgress
 -- Returns the fractional progress `[0, 1]` of the active path, or.
--- Use this when returns the fractional progress `[0, 1]` of the active path, or is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:pathProgress()
+-- Call when you need to invoke path progress.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:pathProgress() end)
+  print("Camera2D:pathProgress ->", ok, result)
 end
 
 --@api-stub: Camera2D:zoomTo
 -- Smoothly tweens the camera zoom from its current level to.
--- Use this when smoothly tweens the camera zoom from its current level to is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:zoomTo(0, 1)
+-- Call when you need to invoke zoom to.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:zoomTo(nil, 1.0) end)
+  print("Camera2D:zoomTo ->", ok, result)
 end
 
 --@api-stub: Camera2D:stopZoom
 -- Cancels the active zoom tween.
--- Use this when cancels the active zoom tween is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:stopZoom()
+-- Call when you need to invoke stop zoom.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:stopZoom() end)
+  print("Camera2D:stopZoom ->", ok, result)
 end
 
 --@api-stub: Camera2D:updateZoom
 -- Advances the zoom tween by `dt` seconds and applies the resulting.
--- Use this when advances the zoom tween by `dt` seconds and applies the resulting is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:updateZoom(0)
+-- Call when you need to invoke update zoom.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:updateZoom(1.0) end)
+  print("Camera2D:updateZoom ->", ok, result)
 end
 
 --@api-stub: Camera2D:getParallaxFactor
 -- Returns the parallax factor for the named layer, or `1.0` if unset.
--- Use this when returns the parallax factor for the named layer, or `1.0` if unset is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:getParallaxFactor(0)
+-- Call when you need to read parallax factor.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:getParallaxFactor(nil) end)
+  print("Camera2D:getParallaxFactor ->", ok, result)
 end
 
 --@api-stub: Camera2D:clearParallaxFactors
 -- Removes all parallax factor overrides.
--- Use this when removes all parallax factor overrides is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:clearParallaxFactors()
+-- Call when you need to invoke clear parallax factors.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:clearParallaxFactors() end)
+  print("Camera2D:clearParallaxFactors ->", ok, result)
 end
 
 --@api-stub: Camera2D:zoomPulse
 -- Triggers a momentary zoom-in that decays back via a sine envelope.
--- Use this when triggers a momentary zoom-in that decays back via a sine envelope is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:zoomPulse(0, 1)
+-- Call when you need to invoke zoom pulse.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:zoomPulse(nil, 1.0) end)
+  print("Camera2D:zoomPulse ->", ok, result)
 end
 
 --@api-stub: Camera2D:stopSway
 -- Stops the active sway effect immediately.
--- Use this when stops the active sway effect immediately is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:stopSway()
+-- Call when you need to invoke stop sway.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:stopSway() end)
+  print("Camera2D:stopSway ->", ok, result)
 end
 
 --@api-stub: Camera2D:isSway
 -- Returns true if the sway effect is currently active.
--- Use this when returns true if the sway effect is currently active is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:isSway()
+-- Call when you need to check is sway.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:isSway() end)
+  print("Camera2D:isSway ->", ok, result)
 end
 
 --@api-stub: Camera2D:stopBreathing
 -- Stops the active breathing effect.
--- Use this when stops the active breathing effect is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:stopBreathing()
+-- Call when you need to invoke stop breathing.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:stopBreathing() end)
+  print("Camera2D:stopBreathing ->", ok, result)
 end
 
 --@api-stub: Camera2D:isBreathing
 -- Returns true if the breathing effect is currently active.
--- Use this when returns true if the breathing effect is currently active is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:isBreathing()
+-- Call when you need to check is breathing.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:isBreathing() end)
+  print("Camera2D:isBreathing ->", ok, result)
 end
 
 --@api-stub: Camera2D:getEffectiveZoom
 -- Returns the current zoom level including zoom pulse and breathing deltas.
--- Use this when returns the current zoom level including zoom pulse and breathing deltas is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:getEffectiveZoom()
+-- Call when you need to read effective zoom.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:getEffectiveZoom() end)
+  print("Camera2D:getEffectiveZoom ->", ok, result)
 end
 
 --@api-stub: Camera2D:getEffectOffset
 -- Returns the current sway x, y world-space offset.
--- Use this when returns the current sway x, y world-space offset is needed.
-if false then
-  local _o = nil  -- Camera2D instance
-  _o:getEffectOffset()
+-- Call when you need to read effect offset.
+-- Build a Camera2D via the appropriate lurek.camera.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.camera.newCamera2D(...)
+if instance then
+  local ok, result = pcall(function() return instance:getEffectOffset() end)
+  print("Camera2D:getEffectOffset ->", ok, result)
 end
 

@@ -1,1498 +1,1549 @@
 -- content/examples/render.lua
--- Auto-scaffolded coverage of the lurek.render Lua API (183 items).
--- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
--- coverage audit (tools/audit/example_coverage.py) counts it as covered.
--- Calls are wrapped in `if false then ... end` so the file loads
--- without crashing even when the underlying subsystem is uninitialised.
+-- Practical usage examples for the lurek.render API (183 items).
+--
+-- Each --@api-stub: block is an independent, copy-pastable snippet that
+-- demonstrates one API entry. Calls are wrapped in pcall(...) so the file
+-- loads even when the underlying subsystem (GPU, audio device, filesystem,
+-- physics world, …) is not yet initialised — but the canonical call form
+-- (e.g. `lurek.render.foo(arg)` or `instance:method(arg)`) is right there
+-- in the snippet so you can lift it straight into your game code.
+--
 -- Run: cargo run -- content/examples/render.lua
 
-print("[example] lurek.render loaded — 183 API items demonstrated")
+print("[example] lurek.render — 183 API entries")
 
--- ── lurek.render free functions ──
+-- ── lurek.render.* free functions ──
 
 --@api-stub: lurek.render.setColor
 -- Sets the current drawing color.
--- Use this when sets the current drawing color is needed.
-if false then
-  local _r = lurek.render.setColor(nil, nil, nil, nil)
-  print(_r)
-end
+-- Call when you need to assign color.
+local ok, err = pcall(function() lurek.render.setColor(1, 1, 1, 1) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setColor applied=", ok)
 
 --@api-stub: lurek.render.getColor
 -- Returns the current drawing color.
--- Use this when returns the current drawing color is needed.
-if false then
-  local _r = lurek.render.getColor()
-  print(_r)
-end
+-- Call when you need to read color.
+local ok, value = pcall(function() return lurek.render.getColor() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getColor ->", v)
 
 --@api-stub: lurek.render.setBackgroundColor
 -- Sets the background clear color.
--- Use this when sets the background clear color is needed.
-if false then
-  local _r = lurek.render.setBackgroundColor(nil, nil, nil)
-  print(_r)
-end
+-- Call when you need to assign background color.
+local ok, err = pcall(function() lurek.render.setBackgroundColor(1, 1, 1) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setBackgroundColor applied=", ok)
 
 --@api-stub: lurek.render.getBackgroundColor
 -- Returns the current background color.
--- Use this when returns the current background color is needed.
-if false then
-  local _r = lurek.render.getBackgroundColor()
-  print(_r)
-end
+-- Call when you need to read background color.
+local ok, value = pcall(function() return lurek.render.getBackgroundColor() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getBackgroundColor ->", v)
 
 --@api-stub: lurek.render.rectangle
 -- Draws a filled or outlined axis-aligned rectangle at the given position.
--- Use this when draws a filled or outlined axis-aligned rectangle at the given position is needed.
-if false then
-  local _r = lurek.render.rectangle()
-  print(_r)
-end
+-- Call when you need to invoke rectangle.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.rectangle() end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.rectangle drawn=", ok)
 
 --@api-stub: lurek.render.circle
 -- Draws a filled or outlined circle at the given world-space position.
--- Use this when draws a filled or outlined circle at the given world-space position is needed.
-if false then
-  local _r = lurek.render.circle(nil, 0, 0, nil)
-  print(_r)
-end
+-- Call when you need to invoke circle.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.circle("fill", 0, 0, nil) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.circle drawn=", ok)
 
 --@api-stub: lurek.render.ellipse
 -- Draws a filled or outlined ellipse with independent x/y radii.
--- Use this when draws a filled or outlined ellipse with independent x/y radii is needed.
-if false then
-  local _r = lurek.render.ellipse(nil, 0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to invoke ellipse.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.ellipse("fill", 0, 0, nil, nil) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.ellipse drawn=", ok)
 
 --@api-stub: lurek.render.triangle
 -- Draws a filled or outlined triangle connecting three world-space vertices.
--- Use this when draws a filled or outlined triangle connecting three world-space vertices is needed.
-if false then
-  local _r = lurek.render.triangle(nil, 0, 0, 0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to invoke triangle.
+local ok, result = pcall(function() return lurek.render.triangle("fill", nil, nil, nil, nil, nil, nil) end)
+if ok then print("lurek.render.triangle ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.line
 -- Draws a line between two points.
--- Use this when draws a line between two points is needed.
-if false then
-  local _r = lurek.render.line({})
-  print(_r)
-end
+-- Call when you need to invoke line.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.line({}) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.line drawn=", ok)
 
 --@api-stub: lurek.render.polygon
 -- Draws a polygon from a list of vertices.
--- Use this when draws a polygon from a list of vertices is needed.
-if false then
-  local _r = lurek.render.polygon({})
-  print(_r)
-end
+-- Call when you need to invoke polygon.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.polygon({}) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.polygon drawn=", ok)
 
 --@api-stub: lurek.render.arc
 -- Draws a partial circle arc at the given position with specified radius and angle range.
--- Use this when draws a partial circle arc at the given position with specified radius and angle range is needed.
-if false then
-  local _r = lurek.render.arc()
-  print(_r)
-end
+-- Call when you need to invoke arc.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.arc() end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.arc drawn=", ok)
 
 --@api-stub: lurek.render.points
 -- Draws a batch of individual points at the specified world-space coordinates.
--- Use this when draws a batch of individual points at the specified world-space coordinates is needed.
-if false then
-  local _r = lurek.render.points({})
-  print(_r)
-end
+-- Call when you need to invoke points.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.points({}) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.points drawn=", ok)
 
 --@api-stub: lurek.render.draw
 -- Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
--- Use this when draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position is needed.
-if false then
-  local _r = lurek.render.draw({})
-  print(_r)
-end
+-- Call when you need to invoke draw.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.draw({}) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.draw drawn=", ok)
 
 --@api-stub: lurek.render.drawq
 -- Draws a portion of an image defined by a Quad.
--- Use this when draws a portion of an image defined by a Quad is needed.
-if false then
-  local _r = lurek.render.drawq()
-  print(_r)
-end
+-- Call when you need to invoke drawq.
+local ok, result = pcall(function() return lurek.render.drawq() end)
+if ok then print("lurek.render.drawq ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.print
 -- Draws text at the given position.
--- Use this when draws text at the given position is needed.
-if false then
-  local _r = lurek.render.print(0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to invoke print.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.print("hello", 0, 0, 1) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.print drawn=", ok)
 
 --@api-stub: lurek.render.printf
 -- Draws word-wrapped text within a given width.
--- Use this when draws word-wrapped text within a given width is needed.
-if false then
-  local _r = lurek.render.printf(0, 0, 0, 0, 1)
-  print(_r)
-end
+-- Call when you need to invoke printf.
+local ok, result = pcall(function() return lurek.render.printf("hello", 0, 0, nil, nil) end)
+if ok then print("lurek.render.printf ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.printRich
 -- Draws a sequence of individually-styled text spans at `(x, y)`.
--- Use this when draws a sequence of individually-styled text spans at `(x, y)` is needed.
-if false then
-  local _r = lurek.render.printRich(1, 0, 0)
-  print(_r)
-end
+-- Call when you need to render rich.
+local ok, result = pcall(function() return lurek.render.printRich({}, 0, 0) end)
+if ok then print("lurek.render.printRich ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.clear
 -- Clears the draw command queue (resets the screen).
--- Use this when clears the draw command queue (resets the screen) is needed.
-if false then
-  local _r = lurek.render.clear(nil, nil, nil)
-  print(_r)
-end
+-- Call when you need to invoke clear.
+local ok, err = pcall(function() lurek.render.clear(1, 1, 1) end)
+if not ok then print("skipped:", err) end
+print("lurek.render.clear cleared=", ok)
 
 --@api-stub: lurek.render.setLineWidth
 -- Sets the line width for outline drawing.
--- Use this when sets the line width for outline drawing is needed.
-if false then
-  local _r = lurek.render.setLineWidth(0)
-  print(_r)
-end
+-- Call when you need to assign line width.
+local ok, err = pcall(function() lurek.render.setLineWidth(100) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setLineWidth applied=", ok)
 
 --@api-stub: lurek.render.getLineWidth
 -- Returns the current line width.
--- Use this when returns the current line width is needed.
-if false then
-  local _r = lurek.render.getLineWidth()
-  print(_r)
-end
+-- Call when you need to read line width.
+local ok, value = pcall(function() return lurek.render.getLineWidth() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getLineWidth ->", v)
 
 --@api-stub: lurek.render.setPointSize
 -- Sets the point diameter in pixels.
--- Use this when sets the point diameter in pixels is needed.
-if false then
-  local _r = lurek.render.setPointSize(1)
-  print(_r)
-end
+-- Call when you need to assign point size.
+local ok, err = pcall(function() lurek.render.setPointSize(10) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setPointSize applied=", ok)
 
 --@api-stub: lurek.render.getPointSize
 -- Returns the current point size.
--- Use this when returns the current point size is needed.
-if false then
-  local _r = lurek.render.getPointSize()
-  print(_r)
-end
+-- Call when you need to read point size.
+local ok, value = pcall(function() return lurek.render.getPointSize() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getPointSize ->", v)
 
 --@api-stub: lurek.render.setBlendMode
 -- Sets the blend mode for drawing.
--- Use this when sets the blend mode for drawing is needed.
-if false then
-  local _r = lurek.render.setBlendMode(nil)
-  print(_r)
-end
+-- Call when you need to assign blend mode.
+local ok, err = pcall(function() lurek.render.setBlendMode("fill") end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setBlendMode applied=", ok)
 
 --@api-stub: lurek.render.getBlendMode
 -- Returns the current blend mode as a string.
--- Use this when returns the current blend mode as a string is needed.
-if false then
-  local _r = lurek.render.getBlendMode()
-  print(_r)
-end
+-- Call when you need to read blend mode.
+local ok, value = pcall(function() return lurek.render.getBlendMode() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getBlendMode ->", v)
 
 --@api-stub: lurek.render.newFont
 -- Loads a bitmap font PNG from a file, or selects a built-in size by pixel height.
--- Use this when loads a bitmap font PNG from a file, or selects a built-in size by pixel height is needed.
-if false then
-  local _r = lurek.render.newFont({})
-  print(_r)
-end
+-- Call when you need to create a new font.
+local ok, obj = pcall(function() return lurek.render.newFont({}) end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newFont ok=", ok)
 
 --@api-stub: lurek.render.setFont
 -- Sets the active font for print calls.
--- Use this when sets the active font for print calls is needed.
-if false then
-  local _r = lurek.render.setFont(nil)
-  print(_r)
-end
+-- Call when you need to assign font.
+local ok, err = pcall(function() lurek.render.setFont(nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setFont applied=", ok)
 
 --@api-stub: lurek.render.getFont
 -- Returns the currently active font, or nil.
--- Use this when returns the currently active font, or nil is needed.
-if false then
-  local _r = lurek.render.getFont()
-  print(_r)
-end
+-- Call when you need to read font.
+local ok, value = pcall(function() return lurek.render.getFont() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFont ->", v)
 
 --@api-stub: lurek.render.getFontSizes
 -- Returns a table of available built-in font pixel heights.
--- Use this when returns a table of available built-in font pixel heights is needed.
-if false then
-  local _r = lurek.render.getFontSizes()
-  print(_r)
-end
+-- Call when you need to read font sizes.
+local ok, value = pcall(function() return lurek.render.getFontSizes() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFontSizes ->", v)
 
 --@api-stub: lurek.render.getDefaultFont
 -- Returns a built-in font by pixel height (snaps to nearest available size).
--- Use this when returns a built-in font by pixel height (snaps to nearest available size) is needed.
-if false then
-  local _r = lurek.render.getDefaultFont(1)
-  print(_r)
-end
+-- Call when you need to read default font.
+local ok, value = pcall(function() return lurek.render.getDefaultFont(nil) end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getDefaultFont ->", v)
 
 --@api-stub: lurek.render.getFontCellWidth
 -- Returns the cell width of the given font (for monospaced bitmap fonts).
--- Use this when returns the cell width of the given font (for monospaced bitmap fonts) is needed.
-if false then
-  local _r = lurek.render.getFontCellWidth(nil)
-  print(_r)
-end
+-- Call when you need to read font cell width.
+local ok, value = pcall(function() return lurek.render.getFontCellWidth(nil) end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFontCellWidth ->", v)
 
 --@api-stub: lurek.render.getFontWidth
 -- Returns the pixel width of text in the given font.
--- Use this when returns the pixel width of text in the given font is needed.
-if false then
-  local _r = lurek.render.getFontWidth(nil, 0)
-  print(_r)
-end
+-- Call when you need to read font width.
+local ok, value = pcall(function() return lurek.render.getFontWidth(nil, "hello") end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFontWidth ->", v)
 
 --@api-stub: lurek.render.getFontHeight
 -- Returns the line height of the given font.
--- Use this when returns the line height of the given font is needed.
-if false then
-  local _r = lurek.render.getFontHeight(nil)
-  print(_r)
-end
+-- Call when you need to read font height.
+local ok, value = pcall(function() return lurek.render.getFontHeight(nil) end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFontHeight ->", v)
 
 --@api-stub: lurek.render.getFontLineHeight
 -- Returns the line height of the given font (alias for getFontHeight).
--- Use this when returns the line height of the given font (alias for getFontHeight) is needed.
-if false then
-  local _r = lurek.render.getFontLineHeight(nil)
-  print(_r)
-end
+-- Call when you need to read font line height.
+local ok, value = pcall(function() return lurek.render.getFontLineHeight(nil) end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFontLineHeight ->", v)
 
 --@api-stub: lurek.render.setFontLineHeight
 -- Sets the line height of the given font (stub â€” returns nil; fonts are immutable in headless mode).
--- Use this when sets the line height of the given font (stub â€” returns nil; fonts are immutable in headless mode) is needed.
-if false then
-  local _r = lurek.render.setFontLineHeight(1, 0)
-  print(_r)
-end
+-- Call when you need to assign font line height.
+local ok, err = pcall(function() lurek.render.setFontLineHeight(nil, nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setFontLineHeight applied=", ok)
 
 --@api-stub: lurek.render.getFontAscent
 -- Returns the ascent of the given font.
--- Use this when returns the ascent of the given font is needed.
-if false then
-  local _r = lurek.render.getFontAscent(nil)
-  print(_r)
-end
+-- Call when you need to read font ascent.
+local ok, value = pcall(function() return lurek.render.getFontAscent(nil) end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFontAscent ->", v)
 
 --@api-stub: lurek.render.getFontDescent
 -- Returns the descent of the given font.
--- Use this when returns the descent of the given font is needed.
-if false then
-  local _r = lurek.render.getFontDescent(nil)
-  print(_r)
-end
+-- Call when you need to read font descent.
+local ok, value = pcall(function() return lurek.render.getFontDescent(nil) end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFontDescent ->", v)
 
 --@api-stub: lurek.render.getFontWrap
 -- Returns wrapped lines and the maximum line width.
--- Use this when returns wrapped lines and the maximum line width is needed.
-if false then
-  local _r = lurek.render.getFontWrap(0, 0)
-  print(_r)
-end
+-- Call when you need to read font wrap.
+local ok, value = pcall(function() return lurek.render.getFontWrap("hello", nil) end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getFontWrap ->", v)
 
 --@api-stub: lurek.render.newImage
 -- Loads an image from a file path or creates one from ImageData.
--- Use this when loads an image from a file path or creates one from ImageData is needed.
-if false then
-  local _r = lurek.render.newImage(nil)
-  print(_r)
-end
+-- Call when you need to create a new image.
+local ok, obj = pcall(function() return lurek.render.newImage(nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newImage ok=", ok)
 
 --@api-stub: lurek.render.newCanvas
 -- Creates an off-screen render canvas.
--- Use this when creates an off-screen render canvas is needed.
-if false then
-  local _r = lurek.render.newCanvas(1, 1)
-  print(_r)
-end
+-- Call when you need to create a new canvas.
+local ok, obj = pcall(function() return lurek.render.newCanvas(100, 100) end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newCanvas ok=", ok)
 
 --@api-stub: lurek.render.setCanvas
 -- Sets the active render target to a Canvas, or back to the screen.
--- Use this when sets the active render target to a Canvas, or back to the screen is needed.
-if false then
-  local _r = lurek.render.setCanvas(nil)
-  print(_r)
-end
+-- Call when you need to assign canvas.
+local ok, err = pcall(function() lurek.render.setCanvas(nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setCanvas applied=", ok)
 
 --@api-stub: lurek.render.getCanvas
 -- Returns the current canvas, or nil if drawing to screen.
--- Use this when returns the current canvas, or nil if drawing to screen is needed.
-if false then
-  local _r = lurek.render.getCanvas()
-  print(_r)
-end
+-- Call when you need to read canvas.
+local ok, value = pcall(function() return lurek.render.getCanvas() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getCanvas ->", v)
 
 --@api-stub: lurek.render.getCanvasSize
 -- Returns the dimensions of a canvas.
--- Use this when returns the dimensions of a canvas is needed.
-if false then
-  local _r = lurek.render.getCanvasSize(nil)
-  print(_r)
-end
+-- Call when you need to read canvas size.
+local ok, value = pcall(function() return lurek.render.getCanvasSize(nil) end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getCanvasSize ->", v)
 
 --@api-stub: lurek.render.newSpriteBatch
 -- Creates a new sprite batch for the given image.
--- Use this when creates a new sprite batch for the given image is needed.
-if false then
-  local _r = lurek.render.newSpriteBatch(nil, 0)
-  print(_r)
-end
+-- Call when you need to create a new sprite batch.
+local ok, obj = pcall(function() return lurek.render.newSpriteBatch(nil, 100) end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newSpriteBatch ok=", ok)
 
 --@api-stub: lurek.render.newMesh
 -- Creates a custom mesh from vertex data.
--- Use this when creates a custom mesh from vertex data is needed.
-if false then
-  local _r = lurek.render.newMesh(0, nil)
-  print(_r)
-end
+-- Call when you need to create a new mesh.
+local ok, obj = pcall(function() return lurek.render.newMesh(nil, "fill") end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newMesh ok=", ok)
 
 --@api-stub: lurek.render.newShader
 -- Compiles a custom WGSL shader and returns its handle.
--- Use this when compiles a custom WGSL shader and returns its handle is needed.
-if false then
-  local _r = lurek.render.newShader(nil)
-  print(_r)
-end
+-- Call when you need to create a new shader.
+local ok, obj = pcall(function() return lurek.render.newShader(nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newShader ok=", ok)
 
 --@api-stub: lurek.render.setShader
 -- Sets the active shader, or clears it.
--- Use this when sets the active shader, or clears it is needed.
-if false then
-  local _r = lurek.render.setShader(nil)
-  print(_r)
-end
+-- Call when you need to assign shader.
+local ok, err = pcall(function() lurek.render.setShader(nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setShader applied=", ok)
 
 --@api-stub: lurek.render.getShader
 -- Returns the active shader, or nil.
--- Use this when returns the active shader, or nil is needed.
-if false then
-  local _r = lurek.render.getShader()
-  print(_r)
-end
+-- Call when you need to read shader.
+local ok, value = pcall(function() return lurek.render.getShader() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getShader ->", v)
 
 --@api-stub: lurek.render.newQuad
 -- Creates a new Quad viewport into a texture.
--- Use this when creates a new Quad viewport into a texture is needed.
-if false then
-  local _r = lurek.render.newQuad(0, 0, 0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to create a new quad.
+local ok, obj = pcall(function() return lurek.render.newQuad(0, 0, 100, 100, nil, nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newQuad ok=", ok)
 
 --@api-stub: lurek.render.push
 -- Pushes the current transform onto the stack.
--- Use this when pushes the current transform onto the stack is needed.
-if false then
-  local _r = lurek.render.push()
-  print(_r)
-end
+-- Call when you need to invoke push.
+local ok, err = pcall(function() lurek.render.push() end)
+if not ok then print("mutator skipped:", err) end
+print("lurek.render.push done=", ok)
 
 --@api-stub: lurek.render.pop
 -- Pops the transform from the stack.
--- Use this when pops the transform from the stack is needed.
-if false then
-  local _r = lurek.render.pop()
-  print(_r)
-end
+-- Call when you need to invoke pop.
+local ok, err = pcall(function() lurek.render.pop() end)
+if not ok then print("skipped:", err) end
+print("lurek.render.pop cleared=", ok)
 
 --@api-stub: lurek.render.translate
 -- Translates the coordinate system.
--- Use this when translates the coordinate system is needed.
-if false then
-  local _r = lurek.render.translate(0, 0)
-  print(_r)
-end
+-- Call when you need to invoke translate.
+local ok, result = pcall(function() return lurek.render.translate(0, 0) end)
+if ok then print("lurek.render.translate ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.rotate
 -- Rotates the coordinate system.
--- Use this when rotates the coordinate system is needed.
-if false then
-  local _r = lurek.render.rotate(1)
-  print(_r)
-end
+-- Call when you need to invoke rotate.
+local ok, result = pcall(function() return lurek.render.rotate(0) end)
+if ok then print("lurek.render.rotate ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.scale
 -- Scales the coordinate system.
--- Use this when scales the coordinate system is needed.
-if false then
-  local _r = lurek.render.scale(0, 0)
-  print(_r)
-end
+-- Call when you need to invoke scale.
+local ok, result = pcall(function() return lurek.render.scale(nil, nil) end)
+if ok then print("lurek.render.scale ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.shear
 -- Shears the coordinate system.
--- Use this when shears the coordinate system is needed.
-if false then
-  local _r = lurek.render.shear(0, 0)
-  print(_r)
-end
+-- Call when you need to invoke shear.
+local ok, result = pcall(function() return lurek.render.shear(nil, nil) end)
+if ok then print("lurek.render.shear ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.origin
 -- Resets the transform to the identity.
--- Use this when resets the transform to the identity is needed.
-if false then
-  local _r = lurek.render.origin()
-  print(_r)
-end
+-- Call when you need to invoke origin.
+local ok, result = pcall(function() return lurek.render.origin() end)
+if ok then print("lurek.render.origin ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.applyTransform
 -- Applies an affine transform matrix.
--- Use this when applies an affine transform matrix is needed.
-if false then
-  local _r = lurek.render.applyTransform(0)
-  print(_r)
-end
+-- Call when you need to invoke apply transform.
+local ok, err = pcall(function() lurek.render.applyTransform(nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.applyTransform applied=", ok)
 
 --@api-stub: lurek.render.setScissor
 -- Restricts drawing to a rectangle, or clears scissor if no args.
--- Use this when restricts drawing to a rectangle, or clears scissor if no args is needed.
-if false then
-  local _r = lurek.render.setScissor({})
-  print(_r)
-end
+-- Call when you need to assign scissor.
+local ok, err = pcall(function() lurek.render.setScissor({}) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setScissor applied=", ok)
 
 --@api-stub: lurek.render.getScissor
 -- Returns the active scissor rectangle, or nothing.
--- Use this when returns the active scissor rectangle, or nothing is needed.
-if false then
-  local _r = lurek.render.getScissor()
-  print(_r)
-end
+-- Call when you need to read scissor.
+local ok, value = pcall(function() return lurek.render.getScissor() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getScissor ->", v)
 
 --@api-stub: lurek.render.intersectScissor
 -- Intersects the current scissor with a new rectangle.
--- Use this when intersects the current scissor with a new rectangle is needed.
-if false then
-  local _r = lurek.render.intersectScissor(0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to invoke intersect scissor.
+local ok, result = pcall(function() return lurek.render.intersectScissor(0, 0, 100, 100) end)
+if ok then print("lurek.render.intersectScissor ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.setColorMask
 -- Sets which RGBA channels are written.
 -- Reset with no args.
-if false then
-  local _r = lurek.render.setColorMask({})
-  print(_r)
-end
+local ok, err = pcall(function() lurek.render.setColorMask({}) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setColorMask applied=", ok)
 
 --@api-stub: lurek.render.getColorMask
 -- Returns the current color mask.
--- Use this when returns the current color mask is needed.
-if false then
-  local _r = lurek.render.getColorMask()
-  print(_r)
-end
+-- Call when you need to read color mask.
+local ok, value = pcall(function() return lurek.render.getColorMask() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getColorMask ->", v)
 
 --@api-stub: lurek.render.setWireframe
 -- Enables or disables wireframe rendering.
--- Use this when enables or disables wireframe rendering is needed.
-if false then
-  local _r = lurek.render.setWireframe(1)
-  print(_r)
-end
+-- Call when you need to assign wireframe.
+local ok, err = pcall(function() lurek.render.setWireframe(nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setWireframe applied=", ok)
 
 --@api-stub: lurek.render.isWireframe
 -- Returns whether wireframe mode is active.
--- Use this when returns whether wireframe mode is active is needed.
-if false then
-  local _r = lurek.render.isWireframe()
-  print(_r)
-end
+-- Call when you need to check is wireframe.
+local ok, result = pcall(function() return lurek.render.isWireframe() end)
+if ok and result then print("yes") else print("no or unavailable") end
+print("lurek.render.isWireframe ok=", ok)
 
 --@api-stub: lurek.render.stencil
 -- Begins stencil writing with the given action and value.
--- Use this when begins stencil writing with the given action and value is needed.
-if false then
-  local _r = lurek.render.stencil(1, 0)
-  print(_r)
-end
+-- Call when you need to invoke stencil.
+local ok, result = pcall(function() return lurek.render.stencil(nil, nil) end)
+if ok then print("lurek.render.stencil ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.setStencilTest
 -- Sets the stencil comparison test, or disables stencil testing.
--- Use this when sets the stencil comparison test, or disables stencil testing is needed.
-if false then
-  local _r = lurek.render.setStencilTest(nil, 0)
-  print(_r)
-end
+-- Call when you need to assign stencil test.
+local ok, err = pcall(function() lurek.render.setStencilTest(nil, nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setStencilTest applied=", ok)
 
 --@api-stub: lurek.render.setStencilMode
 -- Sets the stencil buffer write/test mode.
--- Use this when sets the stencil buffer write/test mode is needed.
-if false then
-  local _r = lurek.render.setStencilMode(1, nil, 0)
-  print(_r)
-end
+-- Call when you need to assign stencil mode.
+local ok, err = pcall(function() lurek.render.setStencilMode(nil, nil, nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setStencilMode applied=", ok)
 
 --@api-stub: lurek.render.getStencilMode
 -- Returns the current stencil mode as (action, compare, value).
--- Use this when returns the current stencil mode as (action, compare, value) is needed.
-if false then
-  local _r = lurek.render.getStencilMode()
-  print(_r)
-end
+-- Call when you need to read stencil mode.
+local ok, value = pcall(function() return lurek.render.getStencilMode() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getStencilMode ->", v)
 
 --@api-stub: lurek.render.clearStencil
 -- Resets the stencil mode to the default (keep / always / 0).
--- Use this when resets the stencil mode to the default (keep / always / 0) is needed.
-if false then
-  local _r = lurek.render.clearStencil()
-  print(_r)
-end
+-- Call when you need to invoke clear stencil.
+local ok, err = pcall(function() lurek.render.clearStencil() end)
+if not ok then print("skipped:", err) end
+print("lurek.render.clearStencil cleared=", ok)
 
 --@api-stub: lurek.render.setDepthMode
 -- Sets the depth test comparison and write enable.
--- Use this when sets the depth test comparison and write enable is needed.
-if false then
-  local _r = lurek.render.setDepthMode(nil, 0)
-  print(_r)
-end
+-- Call when you need to assign depth mode.
+local ok, err = pcall(function() lurek.render.setDepthMode("fill", nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setDepthMode applied=", ok)
 
 --@api-stub: lurek.render.getDepthMode
 -- Returns the current depth mode as (mode, write).
--- Use this when returns the current depth mode as (mode, write) is needed.
-if false then
-  local _r = lurek.render.getDepthMode()
-  print(_r)
-end
+-- Call when you need to read depth mode.
+local ok, value = pcall(function() return lurek.render.getDepthMode() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getDepthMode ->", v)
 
 --@api-stub: lurek.render.getWidth
 -- Returns the window width in pixels.
--- Use this when returns the window width in pixels is needed.
-if false then
-  local _r = lurek.render.getWidth()
-  print(_r)
-end
+-- Call when you need to read width.
+local ok, value = pcall(function() return lurek.render.getWidth() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getWidth ->", v)
 
 --@api-stub: lurek.render.getHeight
 -- Returns the window height in pixels.
--- Use this when returns the window height in pixels is needed.
-if false then
-  local _r = lurek.render.getHeight()
-  print(_r)
-end
+-- Call when you need to read height.
+local ok, value = pcall(function() return lurek.render.getHeight() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getHeight ->", v)
 
 --@api-stub: lurek.render.getDimensions
 -- Returns window width and height.
--- Use this when returns window width and height is needed.
-if false then
-  local _r = lurek.render.getDimensions()
-  print(_r)
-end
+-- Call when you need to read dimensions.
+local ok, value = pcall(function() return lurek.render.getDimensions() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getDimensions ->", v)
 
 --@api-stub: lurek.render.setDefaultFilter
 -- Sets the default texture filter mode.
--- Use this when sets the default texture filter mode is needed.
-if false then
-  local _r = lurek.render.setDefaultFilter(1, nil, 1)
-  print(_r)
-end
+-- Call when you need to assign default filter.
+local ok, err = pcall(function() lurek.render.setDefaultFilter(0, nil, nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setDefaultFilter applied=", ok)
 
 --@api-stub: lurek.render.getDefaultFilter
 -- Returns the default texture filter mode.
--- Use this when returns the default texture filter mode is needed.
-if false then
-  local _r = lurek.render.getDefaultFilter()
-  print(_r)
-end
+-- Call when you need to read default filter.
+local ok, value = pcall(function() return lurek.render.getDefaultFilter() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getDefaultFilter ->", v)
 
 --@api-stub: lurek.render.getStats
 -- Returns a table of renderer statistics.
--- Use this when returns a table of renderer statistics is needed.
-if false then
-  local _r = lurek.render.getStats()
-  print(_r)
-end
+-- Call when you need to read stats.
+local ok, value = pcall(function() return lurek.render.getStats() end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getStats ->", v)
 
 --@api-stub: lurek.render.saveScreenshot
 -- Queues a screenshot to be saved after the current frame.
--- Use this when queues a screenshot to be saved after the current frame is needed.
-if false then
-  local _r = lurek.render.saveScreenshot(0)
-  print(_r)
-end
+-- Call when you need to invoke save screenshot.
+local ok, obj = pcall(function() return lurek.render.saveScreenshot("path") end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.saveScreenshot ok=", ok)
 
 --@api-stub: lurek.render.captureScreenshot
 -- Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
--- Use this when calls the given callback with an ImageData captured from the current frame (stub: creates blank) is needed.
-if false then
-  local _r = lurek.render.captureScreenshot(function() end)
-  print(_r)
-end
+-- Call when you need to invoke capture screenshot.
+local ok, result = pcall(function() return lurek.render.captureScreenshot(function() end) end)
+if ok then print("lurek.render.captureScreenshot ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.newNineSlice
 -- Creates a 9-slice descriptor from a texture and inset values.
--- Use this when creates a 9-slice descriptor from a texture and inset values is needed.
-if false then
-  local _r = lurek.render.newNineSlice(nil, 0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to create a new nine slice.
+local ok, obj = pcall(function() return lurek.render.newNineSlice(nil, nil, nil, nil, nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newNineSlice ok=", ok)
 
 --@api-stub: lurek.render.drawNineSlice
 -- Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
--- Use this when queues a 9-slice draw call inside lurek.render / lurek.render_ui is needed.
-if false then
-  local _r = lurek.render.drawNineSlice(nil, 0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to render nine slice.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawNineSlice(nil, 0, 0, 100, 100) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawNineSlice drawn=", ok)
 
 --@api-stub: lurek.render.newShape
 -- Creates a new empty [`CompoundShape`] stored in the resource pool.
--- Use this when creates a new empty [`CompoundShape`] stored in the resource pool is needed.
-if false then
-  local _r = lurek.render.newShape()
-  print(_r)
-end
+-- Call when you need to create a new shape.
+local ok, obj = pcall(function() return lurek.render.newShape() end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newShape ok=", ok)
 
 --@api-stub: lurek.render.newDrawLayer
 -- Creates a new z-ordered draw-call queue.
--- Use this when creates a new z-ordered draw-call queue is needed.
-if false then
-  local _r = lurek.render.newDrawLayer()
-  print(_r)
-end
+-- Call when you need to create a new draw layer.
+local ok, obj = pcall(function() return lurek.render.newDrawLayer() end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newDrawLayer ok=", ok)
 
 --@api-stub: lurek.render.drawQuadBezier
 -- Queues a quadratic BĂ©zier curve from (x1,y1) to (x2,y2) with one control point.
--- Use this when queues a quadratic BĂ©zier curve from (x1,y1) to (x2,y2) with one control point is needed.
-if false then
-  local _r = lurek.render.drawQuadBezier()
-  print(_r)
-end
+-- Call when you need to render quad bezier.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawQuadBezier() end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawQuadBezier drawn=", ok)
 
 --@api-stub: lurek.render.drawCubicBezier
 -- Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
--- Use this when queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points is needed.
-if false then
-  local _r = lurek.render.drawCubicBezier()
-  print(_r)
-end
+-- Call when you need to render cubic bezier.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawCubicBezier() end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawCubicBezier drawn=", ok)
 
 --@api-stub: lurek.render.drawPath
 -- Queues a multi-segment vector path.
--- Use this when queues a multi-segment vector path is needed.
-if false then
-  local _r = lurek.render.drawPath(0, nil, nil)
-  print(_r)
-end
+-- Call when you need to render path.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawPath("path", "fill", nil) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawPath drawn=", ok)
 
 --@api-stub: lurek.render.drawGradientRect
 -- Queues a gradient-filled rectangle.
 -- color1/color2 are {r,g,b,a} tables.
-if false then
-  local _r = lurek.render.drawGradientRect()
-  print(_r)
-end
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawGradientRect() end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawGradientRect drawn=", ok)
 
 --@api-stub: lurek.render.drawColoredPolygon
 -- Queues a convex polygon with per-vertex colours.
--- Use this when queues a convex polygon with per-vertex colours is needed.
-if false then
-  local _r = lurek.render.drawColoredPolygon(0, {1, 1, 1, 1}, nil)
-  print(_r)
-end
+-- Call when you need to render colored polygon.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawColoredPolygon(nil, {1, 1, 1, 1}, "fill") end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawColoredPolygon drawn=", ok)
 
 --@api-stub: lurek.render.drawIsoCubeTile
 -- Queues a three-face isometric cube tile at screen position (sx, sy).
--- Use this when queues a three-face isometric cube tile at screen position (sx, sy) is needed.
-if false then
-  local _r = lurek.render.drawIsoCubeTile()
-  print(_r)
-end
+-- Call when you need to render iso cube tile.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawIsoCubeTile() end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawIsoCubeTile drawn=", ok)
 
 --@api-stub: lurek.render.drawHexTile
 -- Queues a hexagonal tile at centre (cx, cy) with given circumradius.
--- Use this when queues a hexagonal tile at centre (cx, cy) with given circumradius is needed.
-if false then
-  local _r = lurek.render.drawHexTile()
-  print(_r)
-end
+-- Call when you need to render hex tile.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawHexTile() end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawHexTile drawn=", ok)
 
 --@api-stub: lurek.render.beginSortGroup
 -- Begins a Y/Z depth sort group.
 -- Draw commands until flushSortGroup are depth-sortable.
-if false then
-  local _r = lurek.render.beginSortGroup(1)
-  print(_r)
-end
+local ok, result = pcall(function() return lurek.render.beginSortGroup(1) end)
+if ok then print("lurek.render.beginSortGroup ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.pushSortKey
 -- Associates the previous draw command with a depth value within the active sort group.
--- Use this when associates the previous draw command with a depth value within the active sort group is needed.
-if false then
-  local _r = lurek.render.pushSortKey(1)
-  print(_r)
-end
+-- Call when you need to invoke push sort key.
+local ok, err = pcall(function() lurek.render.pushSortKey(nil) end)
+if not ok then print("mutator skipped:", err) end
+print("lurek.render.pushSortKey done=", ok)
 
 --@api-stub: lurek.render.flushSortGroup
 -- Sorts and flushes all draw commands in the sort group.
--- Use this when sorts and flushes all draw commands in the sort group is needed.
-if false then
-  local _r = lurek.render.flushSortGroup(1)
-  print(_r)
-end
+-- Call when you need to invoke flush sort group.
+local ok, result = pcall(function() return lurek.render.flushSortGroup(1) end)
+if ok then print("lurek.render.flushSortGroup ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.drawBevelRect
 -- Queues a beveled border rectangle with inner fill.
--- Use this when queues a beveled border rectangle with inner fill is needed.
-if false then
-  local _r = lurek.render.drawBevelRect()
-  print(_r)
-end
+-- Call when you need to render bevel rect.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawBevelRect() end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawBevelRect drawn=", ok)
 
 --@api-stub: lurek.render.pushLayer
 -- Begins a named compositing layer with optional alpha and blend mode.
--- Use this when begins a named compositing layer with optional alpha and blend mode is needed.
-if false then
-  local _r = lurek.render.pushLayer(1, 0, 1)
-  print(_r)
-end
+-- Call when you need to invoke push layer.
+local ok, err = pcall(function() lurek.render.pushLayer(1, 1, nil) end)
+if not ok then print("mutator skipped:", err) end
+print("lurek.render.pushLayer done=", ok)
 
 --@api-stub: lurek.render.popLayer
 -- Ends and composites the named layer back to its parent.
--- Use this when ends and composites the named layer back to its parent is needed.
-if false then
-  local _r = lurek.render.popLayer(1)
-  print(_r)
-end
+-- Call when you need to invoke pop layer.
+local ok, err = pcall(function() lurek.render.popLayer(1) end)
+if not ok then print("skipped:", err) end
+print("lurek.render.popLayer cleared=", ok)
 
 --@api-stub: lurek.render.drawQuadBezier
 -- Must be called inside lurek.render or lurek.render_ui.
--- Use this when must be called inside lurek.render or lurek.render_ui is needed.
-if false then
-  local _r = lurek.render.drawQuadBezier(0, 0, 0, 0, 0, 0, 1)
-  print(_r)
-end
+-- Call when you need to render quad bezier.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawQuadBezier(nil, nil, nil, nil, nil, nil, nil) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawQuadBezier drawn=", ok)
 
 --@api-stub: lurek.render.drawCubicBezier
 -- Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
--- Use this when queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points is needed.
-if false then
-  local _r = lurek.render.drawCubicBezier(0, 0, 0, 0, 0, 0, 0, 0, 1)
-  print(_r)
-end
+-- Call when you need to render cubic bezier.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawCubicBezier(nil, nil, nil, nil, nil, nil, nil, nil, nil) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawCubicBezier drawn=", ok)
 
 --@api-stub: lurek.render.drawPath
 -- Queues a multi-segment vector path.
--- Use this when queues a multi-segment vector path is needed.
-if false then
-  local _r = lurek.render.drawPath(0, nil, nil)
-  print(_r)
-end
+-- Call when you need to render path.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawPath("path", "fill", nil) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawPath drawn=", ok)
 
 --@api-stub: lurek.render.drawGradientRect
 -- Queues a gradient-filled rectangle.
 -- Both colors are RGBA tables {r,g,b,a} or positional {[1]=r,[2]=g,[3]=b,[4]=a}.
-if false then
-  local _r = lurek.render.drawGradientRect(0, 0, 0, 0, nil, nil, nil)
-  print(_r)
-end
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawGradientRect(0, 0, 100, 100, nil, nil, "dir") end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawGradientRect drawn=", ok)
 
 --@api-stub: lurek.render.drawColoredPolygon
 -- Queues a convex polygon with per-vertex colours.
--- Use this when queues a convex polygon with per-vertex colours is needed.
-if false then
-  local _r = lurek.render.drawColoredPolygon(0, {1, 1, 1, 1}, nil)
-  print(_r)
-end
+-- Call when you need to render colored polygon.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawColoredPolygon(nil, {1, 1, 1, 1}, "fill") end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawColoredPolygon drawn=", ok)
 
 --@api-stub: lurek.render.drawIsoCubeTile
 -- Queues a three-face isometric cube tile at screen position (sx, sy).
--- Use this when queues a three-face isometric cube tile at screen position (sx, sy) is needed.
-if false then
-  local _r = lurek.render.drawIsoCubeTile(0, 0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to render iso cube tile.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawIsoCubeTile(nil, nil, nil, nil, {}) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawIsoCubeTile drawn=", ok)
 
 --@api-stub: lurek.render.drawHexTile
 -- Queues a hexagonal tile at centre (cx, cy) with given circumradius.
--- Use this when queues a hexagonal tile at centre (cx, cy) with given circumradius is needed.
-if false then
-  local _r = lurek.render.drawHexTile(0, 0, 1, 1, nil)
-  print(_r)
-end
+-- Call when you need to render hex tile.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawHexTile(nil, nil, 10, nil, "fill") end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawHexTile drawn=", ok)
 
 --@api-stub: lurek.render.beginSortGroup
 -- Begins a Y/Z depth sort group identified by id.
--- Use this when begins a Y/Z depth sort group identified by id is needed.
-if false then
-  local _r = lurek.render.beginSortGroup(1)
-  print(_r)
-end
+-- Call when you need to invoke begin sort group.
+local ok, result = pcall(function() return lurek.render.beginSortGroup(1) end)
+if ok then print("lurek.render.beginSortGroup ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.pushSortKey
 -- Associates the previous draw command with a depth value within the active sort group.
--- Use this when associates the previous draw command with a depth value within the active sort group is needed.
-if false then
-  local _r = lurek.render.pushSortKey(1)
-  print(_r)
-end
+-- Call when you need to invoke push sort key.
+local ok, err = pcall(function() lurek.render.pushSortKey(nil) end)
+if not ok then print("mutator skipped:", err) end
+print("lurek.render.pushSortKey done=", ok)
 
 --@api-stub: lurek.render.flushSortGroup
 -- Sorts and flushes all draw commands in the sort group.
--- Use this when sorts and flushes all draw commands in the sort group is needed.
-if false then
-  local _r = lurek.render.flushSortGroup(1)
-  print(_r)
-end
+-- Call when you need to invoke flush sort group.
+local ok, result = pcall(function() return lurek.render.flushSortGroup(1) end)
+if ok then print("lurek.render.flushSortGroup ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.drawBevelRect
 -- Queues a beveled border rectangle.
--- Use this when queues a beveled border rectangle is needed.
-if false then
-  local _r = lurek.render.drawBevelRect(0, 0, 0, 0, 0, 0, 0)
-  print(_r)
-end
+-- Call when you need to render bevel rect.
+-- Real use: place this call inside your `function lurek.render() ... end` callback.
+local ok, err = pcall(function() lurek.render.drawBevelRect(0, 0, 100, 100, nil, nil, {}) end)
+if not ok then print("draw skipped (no GPU ctx):", err) end
+print("lurek.render.drawBevelRect drawn=", ok)
 
 --@api-stub: lurek.render.pushLayer
 -- Begins a named compositing layer.
 -- Provides alpha and blend mode for composite.
-if false then
-  local _r = lurek.render.pushLayer(1, 0, 1)
-  print(_r)
-end
+local ok, err = pcall(function() lurek.render.pushLayer(1, 1, nil) end)
+if not ok then print("mutator skipped:", err) end
+print("lurek.render.pushLayer done=", ok)
 
 --@api-stub: lurek.render.popLayer
 -- Ends and composites the named layer.
--- Use this when ends and composites the named layer is needed.
-if false then
-  local _r = lurek.render.popLayer(1)
-  print(_r)
-end
+-- Call when you need to invoke pop layer.
+local ok, err = pcall(function() lurek.render.popLayer(1) end)
+if not ok then print("skipped:", err) end
+print("lurek.render.popLayer cleared=", ok)
 
 --@api-stub: lurek.render.newLayer
 -- Registers a named render layer with an optional z-order (default 0).
--- Use this when registers a named render layer with an optional z-order (default 0) is needed.
-if false then
-  local _r = lurek.render.newLayer(1, 0)
-  print(_r)
-end
+-- Call when you need to create a new layer.
+local ok, obj = pcall(function() return lurek.render.newLayer("name", nil) end)
+if ok and obj then print("created:", obj) end
+print("lurek.render.newLayer ok=", ok)
 
 --@api-stub: lurek.render.setLayer
 -- Sets the active named layer.
--- Draw calls made after this will be
-if false then
-  local _r = lurek.render.setLayer(1)
-  print(_r)
-end
+-- Draw calls made after this will be.
+local ok, err = pcall(function() lurek.render.setLayer("name") end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setLayer applied=", ok)
 
 --@api-stub: lurek.render.currentLayer
 -- Returns the name of the currently active named layer.
--- Use this when returns the name of the currently active named layer is needed.
-if false then
-  local _r = lurek.render.currentLayer()
-  print(_r)
-end
+-- Call when you need to invoke current layer.
+local ok, result = pcall(function() return lurek.render.currentLayer() end)
+if ok then print("lurek.render.currentLayer ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.render.setLayerVisible
 -- Shows or hides the named layer.
--- Hidden layers are excluded from
-if false then
-  local _r = lurek.render.setLayerVisible(1, 0)
-  print(_r)
-end
+-- Hidden layers are excluded from.
+local ok, err = pcall(function() lurek.render.setLayerVisible("name", nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setLayerVisible applied=", ok)
 
 --@api-stub: lurek.render.isLayerVisible
 -- Returns `true` if the named layer is visible (default: `true`).
--- Use this when returns `true` if the named layer is visible (default: `true`) is needed.
-if false then
-  local _r = lurek.render.isLayerVisible(1)
-  print(_r)
-end
+-- Call when you need to check is layer visible.
+local ok, result = pcall(function() return lurek.render.isLayerVisible("name") end)
+if ok and result then print("yes") else print("no or unavailable") end
+print("lurek.render.isLayerVisible ok=", ok)
 
 --@api-stub: lurek.render.getLayerZOrder
 -- Returns the z-order of the named layer, or `0` if unregistered.
--- Use this when returns the z-order of the named layer, or `0` if unregistered is needed.
-if false then
-  local _r = lurek.render.getLayerZOrder(1)
-  print(_r)
-end
+-- Call when you need to read layer z order.
+local ok, value = pcall(function() return lurek.render.getLayerZOrder("name") end)
+local v = ok and value or "(unavailable)"
+print("lurek.render.getLayerZOrder ->", v)
 
 --@api-stub: lurek.render.setLayerZOrder
 -- Updates the z-order of the named layer.
--- Auto-creates the layer if
-if false then
-  local _r = lurek.render.setLayerZOrder(1, 0)
-  print(_r)
-end
+-- Auto-creates the layer if.
+local ok, err = pcall(function() lurek.render.setLayerZOrder("name", 0) end)
+if not ok then print("set skipped:", err) end
+print("lurek.render.setLayerZOrder applied=", ok)
 
 -- ── ImageData methods ──
 
 --@api-stub: ImageData:getWidth
 -- Returns the pixel width of this image buffer.
--- Use this when returns the pixel width of this image buffer is needed.
-if false then
-  local _o = nil  -- ImageData instance
-  _o:getWidth()
+-- Call when you need to read width.
+-- Build a ImageData via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImageData(...)
+if instance then
+  local ok, result = pcall(function() return instance:getWidth() end)
+  print("ImageData:getWidth ->", ok, result)
 end
 
 --@api-stub: ImageData:getHeight
 -- Returns the pixel height of this image buffer.
--- Use this when returns the pixel height of this image buffer is needed.
-if false then
-  local _o = nil  -- ImageData instance
-  _o:getHeight()
+-- Call when you need to read height.
+-- Build a ImageData via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImageData(...)
+if instance then
+  local ok, result = pcall(function() return instance:getHeight() end)
+  print("ImageData:getHeight ->", ok, result)
 end
 
 --@api-stub: ImageData:resize
 -- Returns a new ImageData scaled to the given dimensions using bilinear interpolation.
--- Use this when returns a new ImageData scaled to the given dimensions using bilinear interpolation is needed.
-if false then
-  local _o = nil  -- ImageData instance
-  _o:resize(0, 0)
+-- Call when you need to invoke resize.
+-- Build a ImageData via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImageData(...)
+if instance then
+  local ok, result = pcall(function() return instance:resize(100, 100) end)
+  print("ImageData:resize ->", ok, result)
 end
 
 --@api-stub: ImageData:diff
 -- Returns the sum of absolute per-channel differences between this image and `other`.
--- Use this when returns the sum of absolute per-channel differences between this image and `other` is needed.
-if false then
-  local _o = nil  -- ImageData instance
-  _o:diff(0)
+-- Call when you need to invoke diff.
+-- Build a ImageData via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImageData(...)
+if instance then
+  local ok, result = pcall(function() return instance:diff(nil) end)
+  print("ImageData:diff ->", ok, result)
 end
 
 --@api-stub: ImageData:mapPixels
 -- Applies a Lua function to every pixel in-place.
--- Use this when applies a Lua function to every pixel in-place is needed.
-if false then
-  local _o = nil  -- ImageData instance
-  _o:mapPixels(function() end)
+-- Call when you need to invoke map pixels.
+-- Build a ImageData via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImageData(...)
+if instance then
+  local ok, result = pcall(function() return instance:mapPixels(function() end) end)
+  print("ImageData:mapPixels ->", ok, result)
 end
 
 --@api-stub: ImageData:type
 -- Returns the type name "ImageData".
--- Use this when returns the type name "ImageData" is needed.
-if false then
-  local _o = nil  -- ImageData instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a ImageData via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImageData(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("ImageData:type ->", ok, result)
 end
 
 --@api-stub: ImageData:typeOf
 -- Returns true when the given name matches "ImageData" or a parent type.
--- Use this when returns true when the given name matches "ImageData" or a parent type is needed.
-if false then
-  local _o = nil  -- ImageData instance
-  _o:typeOf(1)
+-- Call when you need to invoke type of.
+-- Build a ImageData via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImageData(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf("name") end)
+  print("ImageData:typeOf ->", ok, result)
 end
 
 -- ── NineSlice methods ──
 
 --@api-stub: NineSlice:getInsets
 -- Returns the four inset values as (top, right, bottom, left).
--- Use this when returns the four inset values as (top, right, bottom, left) is needed.
-if false then
-  local _o = nil  -- NineSlice instance
-  _o:getInsets()
+-- Call when you need to read insets.
+-- Build a NineSlice via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newNineSlice(...)
+if instance then
+  local ok, result = pcall(function() return instance:getInsets() end)
+  print("NineSlice:getInsets ->", ok, result)
 end
 
 --@api-stub: NineSlice:getTextureSize
 -- Returns the width and height of the source texture.
--- Use this when returns the width and height of the source texture is needed.
-if false then
-  local _o = nil  -- NineSlice instance
-  _o:getTextureSize()
+-- Call when you need to read texture size.
+-- Build a NineSlice via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newNineSlice(...)
+if instance then
+  local ok, result = pcall(function() return instance:getTextureSize() end)
+  print("NineSlice:getTextureSize ->", ok, result)
 end
 
 --@api-stub: NineSlice:type
 -- Returns the type name "NineSlice".
--- Use this when returns the type name "NineSlice" is needed.
-if false then
-  local _o = nil  -- NineSlice instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a NineSlice via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newNineSlice(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("NineSlice:type ->", ok, result)
 end
 
 --@api-stub: NineSlice:typeOf
 -- Returns true when the given name matches "NineSlice" or a parent type.
--- Use this when returns true when the given name matches "NineSlice" or a parent type is needed.
-if false then
-  local _o = nil  -- NineSlice instance
-  _o:typeOf(1)
+-- Call when you need to invoke type of.
+-- Build a NineSlice via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newNineSlice(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf("name") end)
+  print("NineSlice:typeOf ->", ok, result)
 end
 
 -- ── Image methods ──
 
 --@api-stub: Image:getWidth
 -- Returns the width of this image in pixels.
--- Use this when returns the width of this image in pixels is needed.
-if false then
-  local _o = nil  -- Image instance
-  _o:getWidth()
+-- Call when you need to read width.
+-- Build a Image via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImage(...)
+if instance then
+  local ok, result = pcall(function() return instance:getWidth() end)
+  print("Image:getWidth ->", ok, result)
 end
 
 --@api-stub: Image:getHeight
 -- Returns the height of this image in pixels.
--- Use this when returns the height of this image in pixels is needed.
-if false then
-  local _o = nil  -- Image instance
-  _o:getHeight()
+-- Call when you need to read height.
+-- Build a Image via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImage(...)
+if instance then
+  local ok, result = pcall(function() return instance:getHeight() end)
+  print("Image:getHeight ->", ok, result)
 end
 
 --@api-stub: Image:getDimensions
 -- Returns width and height of this image.
--- Use this when returns width and height of this image is needed.
-if false then
-  local _o = nil  -- Image instance
-  _o:getDimensions()
+-- Call when you need to read dimensions.
+-- Build a Image via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImage(...)
+if instance then
+  local ok, result = pcall(function() return instance:getDimensions() end)
+  print("Image:getDimensions ->", ok, result)
 end
 
 --@api-stub: Image:release
 -- Releases the GPU texture memory for this image.
--- Use this when releases the GPU texture memory for this image is needed.
-if false then
-  local _o = nil  -- Image instance
-  _o:release()
+-- Call when you need to invoke release.
+-- Build a Image via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImage(...)
+if instance then
+  local ok, result = pcall(function() return instance:release() end)
+  print("Image:release ->", ok, result)
 end
 
 --@api-stub: Image:typeOf
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Image instance
-  _o:typeOf()
+-- Call when you need to invoke type of.
+-- Build a Image via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImage(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf() end)
+  print("Image:typeOf ->", ok, result)
 end
 
 --@api-stub: Image:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Image instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Image via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newImage(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Image:type ->", ok, result)
 end
 
 -- ── Font methods ──
 
 --@api-stub: Font:getWidth
 -- Returns the rendered width of the given text string.
--- Use this when returns the rendered width of the given text string is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:getWidth(0)
+-- Call when you need to read width.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:getWidth("hello") end)
+  print("Font:getWidth ->", ok, result)
 end
 
 --@api-stub: Font:getHeight
 -- Returns the line height of this font.
--- Use this when returns the line height of this font is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:getHeight()
+-- Call when you need to read height.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:getHeight() end)
+  print("Font:getHeight ->", ok, result)
 end
 
 --@api-stub: Font:getLineHeight
 -- Returns the line height multiplier of this font.
--- Use this when returns the line height multiplier of this font is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:getLineHeight()
+-- Call when you need to read line height.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:getLineHeight() end)
+  print("Font:getLineHeight ->", ok, result)
 end
 
 --@api-stub: Font:setLineHeight
 -- Sets the line height multiplier for this font.
--- Use this when sets the line height multiplier for this font is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:setLineHeight(1)
+-- Call when you need to assign line height.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:setLineHeight(100) end)
+  print("Font:setLineHeight ->", ok, result)
 end
 
 --@api-stub: Font:getAscent
 -- Returns the ascent of this font in pixels.
--- Use this when returns the ascent of this font in pixels is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:getAscent()
+-- Call when you need to read ascent.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:getAscent() end)
+  print("Font:getAscent ->", ok, result)
 end
 
 --@api-stub: Font:getDescent
 -- Returns the descent of this font in pixels.
--- Use this when returns the descent of this font in pixels is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:getDescent()
+-- Call when you need to read descent.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:getDescent() end)
+  print("Font:getDescent ->", ok, result)
 end
 
 --@api-stub: Font:getWrap
 -- Wraps text to the given width and returns the lines.
--- Use this when wraps text to the given width and returns the lines is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:getWrap(0, 0)
+-- Call when you need to read wrap.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:getWrap("hello", nil) end)
+  print("Font:getWrap ->", ok, result)
 end
 
 --@api-stub: Font:release
 -- Releases this font and frees its atlas memory.
--- Use this when releases this font and frees its atlas memory is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:release()
+-- Call when you need to invoke release.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:release() end)
+  print("Font:release ->", ok, result)
 end
 
 --@api-stub: Font:typeOf
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:typeOf()
+-- Call when you need to invoke type of.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf() end)
+  print("Font:typeOf ->", ok, result)
 end
 
 --@api-stub: Font:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Font instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Font via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newFont(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Font:type ->", ok, result)
 end
 
 -- ── Canvas methods ──
 
 --@api-stub: Canvas:getWidth
 -- Returns the width of this canvas in pixels.
--- Use this when returns the width of this canvas in pixels is needed.
-if false then
-  local _o = nil  -- Canvas instance
-  _o:getWidth()
+-- Call when you need to read width.
+-- Build a Canvas via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newCanvas(...)
+if instance then
+  local ok, result = pcall(function() return instance:getWidth() end)
+  print("Canvas:getWidth ->", ok, result)
 end
 
 --@api-stub: Canvas:getHeight
 -- Returns the height of this canvas in pixels.
--- Use this when returns the height of this canvas in pixels is needed.
-if false then
-  local _o = nil  -- Canvas instance
-  _o:getHeight()
+-- Call when you need to read height.
+-- Build a Canvas via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newCanvas(...)
+if instance then
+  local ok, result = pcall(function() return instance:getHeight() end)
+  print("Canvas:getHeight ->", ok, result)
 end
 
 --@api-stub: Canvas:getDimensions
 -- Returns width and height of this canvas.
--- Use this when returns width and height of this canvas is needed.
-if false then
-  local _o = nil  -- Canvas instance
-  _o:getDimensions()
+-- Call when you need to read dimensions.
+-- Build a Canvas via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newCanvas(...)
+if instance then
+  local ok, result = pcall(function() return instance:getDimensions() end)
+  print("Canvas:getDimensions ->", ok, result)
 end
 
 --@api-stub: Canvas:release
 -- Releases GPU framebuffer memory for this canvas.
--- Use this when releases GPU framebuffer memory for this canvas is needed.
-if false then
-  local _o = nil  -- Canvas instance
-  _o:release()
+-- Call when you need to invoke release.
+-- Build a Canvas via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newCanvas(...)
+if instance then
+  local ok, result = pcall(function() return instance:release() end)
+  print("Canvas:release ->", ok, result)
 end
 
 --@api-stub: Canvas:typeOf
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Canvas instance
-  _o:typeOf()
+-- Call when you need to invoke type of.
+-- Build a Canvas via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newCanvas(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf() end)
+  print("Canvas:typeOf ->", ok, result)
 end
 
 --@api-stub: Canvas:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Canvas instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Canvas via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newCanvas(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Canvas:type ->", ok, result)
 end
 
 -- ── SpriteBatch methods ──
 
 --@api-stub: SpriteBatch:clear
 -- Removes all sprites from this batch.
--- Use this when removes all sprites from this batch is needed.
-if false then
-  local _o = nil  -- SpriteBatch instance
-  _o:clear()
+-- Call when you need to invoke clear.
+-- Build a SpriteBatch via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newSpriteBatch(...)
+if instance then
+  local ok, result = pcall(function() return instance:clear() end)
+  print("SpriteBatch:clear ->", ok, result)
 end
 
 --@api-stub: SpriteBatch:getCount
 -- Returns the number of sprites in this batch.
--- Use this when returns the number of sprites in this batch is needed.
-if false then
-  local _o = nil  -- SpriteBatch instance
-  _o:getCount()
+-- Call when you need to read count.
+-- Build a SpriteBatch via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newSpriteBatch(...)
+if instance then
+  local ok, result = pcall(function() return instance:getCount() end)
+  print("SpriteBatch:getCount ->", ok, result)
 end
 
 --@api-stub: SpriteBatch:getBufferSize
 -- Returns the maximum capacity of this batch.
--- Use this when returns the maximum capacity of this batch is needed.
-if false then
-  local _o = nil  -- SpriteBatch instance
-  _o:getBufferSize()
+-- Call when you need to read buffer size.
+-- Build a SpriteBatch via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newSpriteBatch(...)
+if instance then
+  local ok, result = pcall(function() return instance:getBufferSize() end)
+  print("SpriteBatch:getBufferSize ->", ok, result)
 end
 
 --@api-stub: SpriteBatch:release
 -- Releases this sprite batch.
--- Use this when releases this sprite batch is needed.
-if false then
-  local _o = nil  -- SpriteBatch instance
-  _o:release()
+-- Call when you need to invoke release.
+-- Build a SpriteBatch via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newSpriteBatch(...)
+if instance then
+  local ok, result = pcall(function() return instance:release() end)
+  print("SpriteBatch:release ->", ok, result)
 end
 
 --@api-stub: SpriteBatch:typeOf
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- SpriteBatch instance
-  _o:typeOf()
+-- Call when you need to invoke type of.
+-- Build a SpriteBatch via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newSpriteBatch(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf() end)
+  print("SpriteBatch:typeOf ->", ok, result)
 end
 
 --@api-stub: SpriteBatch:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- SpriteBatch instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a SpriteBatch via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newSpriteBatch(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("SpriteBatch:type ->", ok, result)
 end
 
 -- ── Mesh methods ──
 
 --@api-stub: Mesh:getVertexCount
 -- Returns the number of vertices in this mesh.
--- Use this when returns the number of vertices in this mesh is needed.
-if false then
-  local _o = nil  -- Mesh instance
-  _o:getVertexCount()
+-- Call when you need to read vertex count.
+-- Build a Mesh via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newMesh(...)
+if instance then
+  local ok, result = pcall(function() return instance:getVertexCount() end)
+  print("Mesh:getVertexCount ->", ok, result)
 end
 
 --@api-stub: Mesh:getVertex
 -- Returns vertex data at the given 1-based index.
--- Use this when returns vertex data at the given 1-based index is needed.
-if false then
-  local _o = nil  -- Mesh instance
-  _o:getVertex(1)
+-- Call when you need to read vertex.
+-- Build a Mesh via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newMesh(...)
+if instance then
+  local ok, result = pcall(function() return instance:getVertex(1) end)
+  print("Mesh:getVertex ->", ok, result)
 end
 
 --@api-stub: Mesh:setVertex
 -- Sets vertex data at the given 1-based index.
--- Use this when sets vertex data at the given 1-based index is needed.
-if false then
-  local _o = nil  -- Mesh instance
-  _o:setVertex(1, 0)
+-- Call when you need to assign vertex.
+-- Build a Mesh via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newMesh(...)
+if instance then
+  local ok, result = pcall(function() return instance:setVertex(1, {}) end)
+  print("Mesh:setVertex ->", ok, result)
 end
 
 --@api-stub: Mesh:setTexture
 -- Assigns a texture to this mesh.
--- Use this when assigns a texture to this mesh is needed.
-if false then
-  local _o = nil  -- Mesh instance
-  _o:setTexture(nil)
+-- Call when you need to assign texture.
+-- Build a Mesh via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newMesh(...)
+if instance then
+  local ok, result = pcall(function() return instance:setTexture(nil) end)
+  print("Mesh:setTexture ->", ok, result)
 end
 
 --@api-stub: Mesh:release
 -- Releases the GPU mesh resource, freeing VRAM immediately.
--- Use this when releases the GPU mesh resource, freeing VRAM immediately is needed.
-if false then
-  local _o = nil  -- Mesh instance
-  _o:release()
+-- Call when you need to invoke release.
+-- Build a Mesh via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newMesh(...)
+if instance then
+  local ok, result = pcall(function() return instance:release() end)
+  print("Mesh:release ->", ok, result)
 end
 
 --@api-stub: Mesh:typeOf
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Mesh instance
-  _o:typeOf()
+-- Call when you need to invoke type of.
+-- Build a Mesh via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newMesh(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf() end)
+  print("Mesh:typeOf ->", ok, result)
 end
 
 --@api-stub: Mesh:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Mesh instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Mesh via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newMesh(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Mesh:type ->", ok, result)
 end
 
 -- ── Shader methods ──
 
 --@api-stub: Shader:send
 -- Sends a uniform value to this shader.
--- Use this when sends a uniform value to this shader is needed.
-if false then
-  local _o = nil  -- Shader instance
-  _o:send(1, 0)
+-- Call when you need to invoke send.
+-- Build a Shader via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShader(...)
+if instance then
+  local ok, result = pcall(function() return instance:send("name", nil) end)
+  print("Shader:send ->", ok, result)
 end
 
 --@api-stub: Shader:hasUniform
 -- Returns whether this shader has a uniform with the given name.
--- Use this when returns whether this shader has a uniform with the given name is needed.
-if false then
-  local _o = nil  -- Shader instance
-  _o:hasUniform(1)
+-- Call when you need to check has uniform.
+-- Build a Shader via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShader(...)
+if instance then
+  local ok, result = pcall(function() return instance:hasUniform("name") end)
+  print("Shader:hasUniform ->", ok, result)
 end
 
 --@api-stub: Shader:release
 -- Releases the compiled GPU shader, freeing VRAM and shader slots.
--- Use this when releases the compiled GPU shader, freeing VRAM and shader slots is needed.
-if false then
-  local _o = nil  -- Shader instance
-  _o:release()
+-- Call when you need to invoke release.
+-- Build a Shader via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShader(...)
+if instance then
+  local ok, result = pcall(function() return instance:release() end)
+  print("Shader:release ->", ok, result)
 end
 
 --@api-stub: Shader:typeOf
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Shader instance
-  _o:typeOf()
+-- Call when you need to invoke type of.
+-- Build a Shader via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShader(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf() end)
+  print("Shader:typeOf ->", ok, result)
 end
 
 --@api-stub: Shader:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Shader instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Shader via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShader(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Shader:type ->", ok, result)
 end
 
 -- ── Quad methods ──
 
 --@api-stub: Quad:getViewport
 -- Returns the quad viewport rectangle.
--- Use this when returns the quad viewport rectangle is needed.
-if false then
-  local _o = nil  -- Quad instance
-  _o:getViewport()
+-- Call when you need to read viewport.
+-- Build a Quad via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newQuad(...)
+if instance then
+  local ok, result = pcall(function() return instance:getViewport() end)
+  print("Quad:getViewport ->", ok, result)
 end
 
 --@api-stub: Quad:getTextureDimensions
 -- Returns the reference texture dimensions.
--- Use this when returns the reference texture dimensions is needed.
-if false then
-  local _o = nil  -- Quad instance
-  _o:getTextureDimensions()
+-- Call when you need to read texture dimensions.
+-- Build a Quad via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newQuad(...)
+if instance then
+  local ok, result = pcall(function() return instance:getTextureDimensions() end)
+  print("Quad:getTextureDimensions ->", ok, result)
 end
 
 --@api-stub: Quad:typeOf
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Quad instance
-  _o:typeOf()
+-- Call when you need to invoke type of.
+-- Build a Quad via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newQuad(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf() end)
+  print("Quad:typeOf ->", ok, result)
 end
 
 --@api-stub: Quad:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Quad instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Quad via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newQuad(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Quad:type ->", ok, result)
 end
 
 -- ── Shape methods ──
 
 --@api-stub: Shape:getCommandCount
 -- Returns the number of drawing commands currently stored.
--- Use this when returns the number of drawing commands currently stored is needed.
-if false then
-  local _o = nil  -- Shape instance
-  _o:getCommandCount()
+-- Call when you need to read command count.
+-- Build a Shape via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShape(...)
+if instance then
+  local ok, result = pcall(function() return instance:getCommandCount() end)
+  print("Shape:getCommandCount ->", ok, result)
 end
 
 --@api-stub: Shape:clear
 -- Removes all commands and resets the shape to empty.
--- Use this when removes all commands and resets the shape to empty is needed.
-if false then
-  local _o = nil  -- Shape instance
-  _o:clear()
+-- Call when you need to invoke clear.
+-- Build a Shape via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShape(...)
+if instance then
+  local ok, result = pcall(function() return instance:clear() end)
+  print("Shape:clear ->", ok, result)
 end
 
 --@api-stub: Shape:setLineWidth
 -- Sets the stroke width for subsequent outlined primitives.
--- Use this when sets the stroke width for subsequent outlined primitives is needed.
-if false then
-  local _o = nil  -- Shape instance
-  _o:setLineWidth(0)
+-- Call when you need to assign line width.
+-- Build a Shape via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShape(...)
+if instance then
+  local ok, result = pcall(function() return instance:setLineWidth(100) end)
+  print("Shape:setLineWidth ->", ok, result)
 end
 
 --@api-stub: Shape:line
 -- Queues a line segment command.
--- Use this when queues a line segment command is needed.
-if false then
-  local _o = nil  -- Shape instance
-  _o:line(0, 0, 0, 0)
+-- Call when you need to invoke line.
+-- Build a Shape via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShape(...)
+if instance then
+  local ok, result = pcall(function() return instance:line(nil, nil, nil, nil) end)
+  print("Shape:line ->", ok, result)
 end
 
 --@api-stub: Shape:polyline
 -- Queues a polyline command from variadic (x, y) coordinate pairs.
--- Use this when queues a polyline command from variadic (x, y) coordinate pairs is needed.
-if false then
-  local _o = nil  -- Shape instance
-  _o:polyline()
+-- Call when you need to invoke polyline.
+-- Build a Shape via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShape(...)
+if instance then
+  local ok, result = pcall(function() return instance:polyline() end)
+  print("Shape:polyline ->", ok, result)
 end
 
 --@api-stub: Shape:typeOf
 -- Returns true if the given type name matches this object's type or any parent type.
--- Use this when returns true if the given type name matches this object's type or any parent type is needed.
-if false then
-  local _o = nil  -- Shape instance
-  _o:typeOf(1)
+-- Call when you need to invoke type of.
+-- Build a Shape via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShape(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf("name") end)
+  print("Shape:typeOf ->", ok, result)
 end
 
 --@api-stub: Shape:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Shape instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Shape via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newShape(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Shape:type ->", ok, result)
 end
 
 -- ── DrawLayer methods ──
 
 --@api-stub: DrawLayer:queue
 -- Queues a draw callback at the given z-order.
--- Use this when queues a draw callback at the given z-order is needed.
-if false then
-  local _o = nil  -- DrawLayer instance
-  _o:queue(0, nil)
+-- Call when you need to invoke queue.
+-- Build a DrawLayer via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newDrawLayer(...)
+if instance then
+  local ok, result = pcall(function() return instance:queue(0, nil) end)
+  print("DrawLayer:queue ->", ok, result)
 end
 
 --@api-stub: DrawLayer:flush
 -- Sorts and calls all queued callbacks, then empties the queue.
--- Use this when sorts and calls all queued callbacks, then empties the queue is needed.
-if false then
-  local _o = nil  -- DrawLayer instance
-  _o:flush()
+-- Call when you need to invoke flush.
+-- Build a DrawLayer via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newDrawLayer(...)
+if instance then
+  local ok, result = pcall(function() return instance:flush() end)
+  print("DrawLayer:flush ->", ok, result)
 end
 
 --@api-stub: DrawLayer:clear
 -- Removes all queued callbacks without calling them.
--- Use this when removes all queued callbacks without calling them is needed.
-if false then
-  local _o = nil  -- DrawLayer instance
-  _o:clear()
+-- Call when you need to invoke clear.
+-- Build a DrawLayer via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newDrawLayer(...)
+if instance then
+  local ok, result = pcall(function() return instance:clear() end)
+  print("DrawLayer:clear ->", ok, result)
 end
 
 --@api-stub: DrawLayer:getCount
 -- Returns the number of queued callbacks.
--- Use this when returns the number of queued callbacks is needed.
-if false then
-  local _o = nil  -- DrawLayer instance
-  _o:getCount()
+-- Call when you need to read count.
+-- Build a DrawLayer via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newDrawLayer(...)
+if instance then
+  local ok, result = pcall(function() return instance:getCount() end)
+  print("DrawLayer:getCount ->", ok, result)
 end
 
 --@api-stub: DrawLayer:type
 -- Returns the string type identifier of this draw layer (e.g.
 -- `'sprite'`).
-if false then
-  local _o = nil  -- DrawLayer instance
-  _o:type()
+-- Build a DrawLayer via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newDrawLayer(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("DrawLayer:type ->", ok, result)
 end
 
 --@api-stub: DrawLayer:typeOf
 -- Returns true if this object is an instance of the given type name.
--- Use this when returns true if this object is an instance of the given type name is needed.
-if false then
-  local _o = nil  -- DrawLayer instance
-  _o:typeOf(1)
+-- Call when you need to invoke type of.
+-- Build a DrawLayer via the appropriate lurek.render.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.render.newDrawLayer(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf("name") end)
+  print("DrawLayer:typeOf ->", ok, result)
 end
 

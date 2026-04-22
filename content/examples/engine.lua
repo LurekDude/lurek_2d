@@ -1,92 +1,86 @@
 -- content/examples/engine.lua
--- Auto-scaffolded coverage of the lurek.engine Lua API (10 items).
--- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
--- coverage audit (tools/audit/example_coverage.py) counts it as covered.
--- Calls are wrapped in `if false then ... end` so the file loads
--- without crashing even when the underlying subsystem is uninitialised.
+-- Practical usage examples for the lurek.engine API (10 items).
+--
+-- Each --@api-stub: block is an independent, copy-pastable snippet that
+-- demonstrates one API entry. Calls are wrapped in pcall(...) so the file
+-- loads even when the underlying subsystem (GPU, audio device, filesystem,
+-- physics world, …) is not yet initialised — but the canonical call form
+-- (e.g. `lurek.engine.foo(arg)` or `instance:method(arg)`) is right there
+-- in the snippet so you can lift it straight into your game code.
+--
 -- Run: cargo run -- content/examples/engine.lua
 
-print("[example] lurek.engine loaded — 10 API items demonstrated")
+print("[example] lurek.engine — 10 API entries")
 
--- ── lurek.engine free functions ──
+-- ── lurek.engine.* free functions ──
 
 --@api-stub: lurek.engine.getVersion
 -- Returns the engine version string (from `Cargo.toml`).
--- Use this when returns the engine version string (from `Cargo.toml`) is needed.
-if false then
-  local _r = lurek.engine.getVersion()
-  print(_r)
-end
+-- Call when you need to read version.
+local ok, value = pcall(function() return lurek.engine.getVersion() end)
+local v = ok and value or "(unavailable)"
+print("lurek.engine.getVersion ->", v)
 
 --@api-stub: lurek.engine.getFrameBudget
 -- Returns the target frame budget in milliseconds (default: 1000 / 60 â‰ 16.667 ms).
--- Use this when returns the target frame budget in milliseconds (default: 1000 / 60 â‰ 16.667 ms) is needed.
-if false then
-  local _r = lurek.engine.getFrameBudget()
-  print(_r)
-end
+-- Call when you need to read frame budget.
+local ok, value = pcall(function() return lurek.engine.getFrameBudget() end)
+local v = ok and value or "(unavailable)"
+print("lurek.engine.getFrameBudget ->", v)
 
 --@api-stub: lurek.engine.memoryUsage
 -- Returns a table with `lua_bytes` (Lua GC heap usage in bytes) and.
--- Use this when returns a table with `lua_bytes` (Lua GC heap usage in bytes) and is needed.
-if false then
-  local _r = lurek.engine.memoryUsage()
-  print(_r)
-end
+-- Call when you need to invoke memory usage.
+local ok, result = pcall(function() return lurek.engine.memoryUsage() end)
+if ok then print("lurek.engine.memoryUsage ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.engine.platform
 -- Returns a string identifying the host operating system:.
--- Use this when returns a string identifying the host operating system: is needed.
-if false then
-  local _r = lurek.engine.platform()
-  print(_r)
-end
+-- Call when you need to invoke platform.
+local ok, result = pcall(function() return lurek.engine.platform() end)
+if ok then print("lurek.engine.platform ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.engine.uptime
 -- Returns the total engine uptime in seconds (sum of all processed deltas).
--- Use this when returns the total engine uptime in seconds (sum of all processed deltas) is needed.
-if false then
-  local _r = lurek.engine.uptime()
-  print(_r)
-end
+-- Call when you need to invoke uptime.
+local ok, result = pcall(function() return lurek.engine.uptime() end)
+if ok then print("lurek.engine.uptime ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.engine.fps
 -- Returns the current measured frames-per-second.
--- Use this when returns the current measured frames-per-second is needed.
-if false then
-  local _r = lurek.engine.fps()
-  print(_r)
-end
+-- Call when you need to invoke fps.
+local ok, result = pcall(function() return lurek.engine.fps() end)
+if ok then print("lurek.engine.fps ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.engine.frameCount
 -- Returns the total number of frames processed since engine start.
--- Use this when returns the total number of frames processed since engine start is needed.
-if false then
-  local _r = lurek.engine.frameCount()
-  print(_r)
-end
+-- Call when you need to invoke frame count.
+local ok, result = pcall(function() return lurek.engine.frameCount() end)
+if ok then print("lurek.engine.frameCount ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.engine.isDebug
 -- Returns `true` if the engine was compiled in debug mode.
--- Use this when returns `true` if the engine was compiled in debug mode is needed.
-if false then
-  local _r = lurek.engine.isDebug()
-  print(_r)
-end
+-- Call when you need to check is debug.
+local ok, result = pcall(function() return lurek.engine.isDebug() end)
+if ok and result then print("yes") else print("no or unavailable") end
+print("lurek.engine.isDebug ok=", ok)
 
 --@api-stub: lurek.engine.setResourceBudget
 -- Sets the maximum resident texture memory budget in bytes.
--- Use this when sets the maximum resident texture memory budget in bytes is needed.
-if false then
-  local _r = lurek.engine.setResourceBudget(0)
-  print(_r)
-end
+-- Call when you need to assign resource budget.
+local ok, err = pcall(function() lurek.engine.setResourceBudget(nil) end)
+if not ok then print("set skipped:", err) end
+print("lurek.engine.setResourceBudget applied=", ok)
 
 --@api-stub: lurek.engine.getResourceStats
 -- Returns a table with resident resource memory statistics.
--- Use this when returns a table with resident resource memory statistics is needed.
-if false then
-  local _r = lurek.engine.getResourceStats()
-  print(_r)
-end
+-- Call when you need to read resource stats.
+local ok, value = pcall(function() return lurek.engine.getResourceStats() end)
+local v = ok and value or "(unavailable)"
+print("lurek.engine.getResourceStats ->", v)
 

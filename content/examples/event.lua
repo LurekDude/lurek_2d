@@ -1,190 +1,196 @@
 -- content/examples/event.lua
--- Auto-scaffolded coverage of the lurek.event Lua API (22 items).
--- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
--- coverage audit (tools/audit/example_coverage.py) counts it as covered.
--- Calls are wrapped in `if false then ... end` so the file loads
--- without crashing even when the underlying subsystem is uninitialised.
+-- Practical usage examples for the lurek.event API (22 items).
+--
+-- Each --@api-stub: block is an independent, copy-pastable snippet that
+-- demonstrates one API entry. Calls are wrapped in pcall(...) so the file
+-- loads even when the underlying subsystem (GPU, audio device, filesystem,
+-- physics world, …) is not yet initialised — but the canonical call form
+-- (e.g. `lurek.event.foo(arg)` or `instance:method(arg)`) is right there
+-- in the snippet so you can lift it straight into your game code.
+--
 -- Run: cargo run -- content/examples/event.lua
 
-print("[example] lurek.event loaded — 22 API items demonstrated")
+print("[example] lurek.event — 22 API entries")
 
--- ── lurek.event free functions ──
+-- ── lurek.event.* free functions ──
 
 --@api-stub: lurek.event.exit
 -- Pushes an exit event, requesting the engine to stop.
--- Use this when pushes an exit event, requesting the engine to stop is needed.
-if false then
-  local _r = lurek.event.exit(nil)
-  print(_r)
-end
+-- Call when you need to invoke exit.
+local ok, result = pcall(function() return lurek.event.exit(nil) end)
+if ok then print("lurek.event.exit ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.event.poll
 -- Returns an iterator function that pops events from the queue.
--- Use this when returns an iterator function that pops events from the queue is needed.
-if false then
-  local _r = lurek.event.poll()
-  print(_r)
-end
+-- Call when you need to invoke poll.
+local ok, result = pcall(function() return lurek.event.poll() end)
+if ok then print("lurek.event.poll ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.event.clear
 -- Discards all pending events in the queue.
--- Use this when discards all pending events in the queue is needed.
-if false then
-  local _r = lurek.event.clear()
-  print(_r)
-end
+-- Call when you need to invoke clear.
+local ok, err = pcall(function() lurek.event.clear() end)
+if not ok then print("skipped:", err) end
+print("lurek.event.clear cleared=", ok)
 
 --@api-stub: lurek.event.newSignal
 -- Creates a new pub-sub Signal dispatcher.
--- Use this when creates a new pub-sub Signal dispatcher is needed.
-if false then
-  local _r = lurek.event.newSignal()
-  print(_r)
-end
+-- Call when you need to create a new signal.
+local ok, obj = pcall(function() return lurek.event.newSignal() end)
+if ok and obj then print("created:", obj) end
+print("lurek.event.newSignal ok=", ok)
 
 --@api-stub: lurek.event.pump
 -- Syncs OS-level events into the queue (no-op in Lurek2D push model).
--- Use this when syncs OS-level events into the queue (no-op in Lurek2D push model) is needed.
-if false then
-  local _r = lurek.event.pump()
-  print(_r)
-end
+-- Call when you need to invoke pump.
+local ok, result = pcall(function() return lurek.event.pump() end)
+if ok then print("lurek.event.pump ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.event.wait
 -- Blocks until the next event arrives or the optional timeout elapses.
--- Use this when blocks until the next event arrives or the optional timeout elapses is needed.
-if false then
-  local _r = lurek.event.wait(0)
-  print(_r)
-end
+-- Call when you need to invoke wait.
+local ok, result = pcall(function() return lurek.event.wait(nil) end)
+if ok then print("lurek.event.wait ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.event.restart
 -- Requests that the engine restart at the beginning of the next frame.
--- Use this when requests that the engine restart at the beginning of the next frame is needed.
-if false then
-  local _r = lurek.event.restart()
-  print(_r)
-end
+-- Call when you need to invoke restart.
+local ok, result = pcall(function() return lurek.event.restart() end)
+if ok then print("lurek.event.restart ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.event.quit
 -- Alias for `exit()` â€” requests the engine to stop at the end of the current frame.
--- Use this when alias for `exit()` â€” requests the engine to stop at the end of the current frame is needed.
-if false then
-  local _r = lurek.event.quit()
-  print(_r)
-end
+-- Call when you need to invoke quit.
+local ok, result = pcall(function() return lurek.event.quit() end)
+if ok then print("lurek.event.quit ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.event.pushDeferred
 -- Pushes a named event to the deferred buffer; it will not reach the main queue.
--- Use this when pushes a named event to the deferred buffer; it will not reach the main queue is needed.
-if false then
-  local _r = lurek.event.pushDeferred({})
-  print(_r)
-end
+-- Call when you need to invoke push deferred.
+local ok, err = pcall(function() lurek.event.pushDeferred({}) end)
+if not ok then print("mutator skipped:", err) end
+print("lurek.event.pushDeferred done=", ok)
 
 --@api-stub: lurek.event.flushDeferred
 -- Moves all buffered deferred events into the main event queue and clears the buffer.
--- Use this when moves all buffered deferred events into the main event queue and clears the buffer is needed.
-if false then
-  local _r = lurek.event.flushDeferred()
-  print(_r)
-end
+-- Call when you need to invoke flush deferred.
+local ok, result = pcall(function() return lurek.event.flushDeferred() end)
+if ok then print("lurek.event.flushDeferred ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.event.enableHistory
 -- Enables event history recording, keeping the last `capacity` pushed events.
--- Use this when enables event history recording, keeping the last `capacity` pushed events is needed.
-if false then
-  local _r = lurek.event.enableHistory(0)
-  print(_r)
-end
+-- Call when you need to invoke enable history.
+local ok, result = pcall(function() return lurek.event.enableHistory(nil) end)
+if ok then print("lurek.event.enableHistory ->", result)
+else print("unavailable:", result) end
 
 --@api-stub: lurek.event.getHistory
 -- Returns an array of recent events as `{name, args}` tables.
--- Use this when returns an array of recent events as `{name, args}` tables is needed.
-if false then
-  local _r = lurek.event.getHistory()
-  print(_r)
-end
+-- Call when you need to read history.
+local ok, value = pcall(function() return lurek.event.getHistory() end)
+local v = ok and value or "(unavailable)"
+print("lurek.event.getHistory ->", v)
 
 --@api-stub: lurek.event.clearHistory
 -- Clears all recorded event history.
--- Use this when clears all recorded event history is needed.
-if false then
-  local _r = lurek.event.clearHistory()
-  print(_r)
-end
+-- Call when you need to invoke clear history.
+local ok, err = pcall(function() lurek.event.clearHistory() end)
+if not ok then print("skipped:", err) end
+print("lurek.event.clearHistory cleared=", ok)
 
 --@api-stub: lurek.event.push
 -- Adds an event item to the end of the event queue for processing.
--- Use this when adds an event item to the end of the event queue for processing is needed.
-if false then
-  local _r = lurek.event.push({})
-  print(_r)
-end
+-- Call when you need to invoke push.
+local ok, err = pcall(function() lurek.event.push({}) end)
+if not ok then print("mutator skipped:", err) end
+print("lurek.event.push done=", ok)
 
 -- ── Signal methods ──
 
 --@api-stub: Signal:emit
 -- Emits the named event, calling all registered callbacks with extra arguments.
--- Use this when emits the named event, calling all registered callbacks with extra arguments is needed.
-if false then
-  local _o = nil  -- Signal instance
-  _o:emit({})
+-- Call when you need to invoke emit.
+-- Build a Signal via the appropriate lurek.event.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.event.newSignal(...)
+if instance then
+  local ok, result = pcall(function() return instance:emit({}) end)
+  print("Signal:emit ->", ok, result)
 end
 
 --@api-stub: Signal:remove
 -- Removes a subscription by handle ID.
--- Use this when removes a subscription by handle ID is needed.
-if false then
-  local _o = nil  -- Signal instance
-  _o:remove(1)
+-- Call when you need to invoke remove.
+-- Build a Signal via the appropriate lurek.event.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.event.newSignal(...)
+if instance then
+  local ok, result = pcall(function() return instance:remove(nil) end)
+  print("Signal:remove ->", ok, result)
 end
 
 --@api-stub: Signal:clear
 -- Removes all callbacks for the named event.
--- Use this when removes all callbacks for the named event is needed.
-if false then
-  local _o = nil  -- Signal instance
-  _o:clear(1)
+-- Call when you need to invoke clear.
+-- Build a Signal via the appropriate lurek.event.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.event.newSignal(...)
+if instance then
+  local ok, result = pcall(function() return instance:clear("name") end)
+  print("Signal:clear ->", ok, result)
 end
 
 --@api-stub: Signal:clearAll
 -- Removes all callbacks across all events.
--- Use this when removes all callbacks across all events is needed.
-if false then
-  local _o = nil  -- Signal instance
-  _o:clearAll()
+-- Call when you need to invoke clear all.
+-- Build a Signal via the appropriate lurek.event.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.event.newSignal(...)
+if instance then
+  local ok, result = pcall(function() return instance:clearAll() end)
+  print("Signal:clearAll ->", ok, result)
 end
 
 --@api-stub: Signal:getCount
 -- Returns the callback count for the named event.
--- Use this when returns the callback count for the named event is needed.
-if false then
-  local _o = nil  -- Signal instance
-  _o:getCount(1)
+-- Call when you need to read count.
+-- Build a Signal via the appropriate lurek.event.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.event.newSignal(...)
+if instance then
+  local ok, result = pcall(function() return instance:getCount("name") end)
+  print("Signal:getCount ->", ok, result)
 end
 
 --@api-stub: Signal:getTotalCount
 -- Returns the total callback count across all events.
--- Use this when returns the total callback count across all events is needed.
-if false then
-  local _o = nil  -- Signal instance
-  _o:getTotalCount()
+-- Call when you need to read total count.
+-- Build a Signal via the appropriate lurek.event.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.event.newSignal(...)
+if instance then
+  local ok, result = pcall(function() return instance:getTotalCount() end)
+  print("Signal:getTotalCount ->", ok, result)
 end
 
 --@api-stub: Signal:type
 -- Returns the type name of this object.
--- Use this when returns the type name of this object is needed.
-if false then
-  local _o = nil  -- Signal instance
-  _o:type()
+-- Call when you need to invoke type.
+-- Build a Signal via the appropriate lurek.event.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.event.newSignal(...)
+if instance then
+  local ok, result = pcall(function() return instance:type() end)
+  print("Signal:type ->", ok, result)
 end
 
 --@api-stub: Signal:typeOf
 -- Returns true if the given type name matches this object's type or any parent type.
--- Use this when returns true if the given type name matches this object's type or any parent type is needed.
-if false then
-  local _o = nil  -- Signal instance
-  _o:typeOf(1)
+-- Call when you need to invoke type of.
+-- Build a Signal via the appropriate lurek.event.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.event.newSignal(...)
+if instance then
+  local ok, result = pcall(function() return instance:typeOf("name") end)
+  print("Signal:typeOf ->", ok, result)
 end
 

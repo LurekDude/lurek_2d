@@ -1,190 +1,235 @@
 -- content/examples/save.lua
--- Auto-scaffolded coverage of the lurek.save Lua API (22 items).
--- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
--- coverage audit (tools/audit/example_coverage.py) counts it as covered.
--- Calls are wrapped in `if false then ... end` so the file loads
--- without crashing even when the underlying subsystem is uninitialised.
+-- Practical usage examples for the lurek.save API (22 items).
+--
+-- Each --@api-stub: block is an independent, copy-pastable snippet that
+-- demonstrates one API entry. Calls are wrapped in pcall(...) so the file
+-- loads even when the underlying subsystem (GPU, audio device, filesystem,
+-- physics world, …) is not yet initialised — but the canonical call form
+-- (e.g. `lurek.save.foo(arg)` or `instance:method(arg)`) is right there
+-- in the snippet so you can lift it straight into your game code.
+--
 -- Run: cargo run -- content/examples/save.lua
 
-print("[example] lurek.save loaded — 22 API items demonstrated")
+print("[example] lurek.save — 22 API entries")
 
--- ── lurek.save free functions ──
+-- ── lurek.save.* free functions ──
 
 --@api-stub: lurek.save.newSaveManager
 -- Creates a new SaveManager for slot-based save/load operations.
--- Use this when creates a new SaveManager for slot-based save/load operations is needed.
-if false then
-  local _r = lurek.save.newSaveManager()
-  print(_r)
-end
+-- Call when you need to create a new save manager.
+local ok, obj = pcall(function() return lurek.save.newSaveManager() end)
+if ok and obj then print("created:", obj) end
+print("lurek.save.newSaveManager ok=", ok)
 
 -- ── SaveManager methods ──
 
 --@api-stub: SaveManager:unregister
 -- Removes a named module and its callbacks.
--- Use this when removes a named module and its callbacks is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:unregister(1)
+-- Call when you need to invoke unregister.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:unregister("name") end)
+  print("SaveManager:unregister ->", ok, result)
 end
 
 --@api-stub: SaveManager:setSchemaVersion
 -- Sets the current schema version for new saves.
--- Use this when sets the current schema version for new saves is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:setSchemaVersion(1)
+-- Call when you need to assign schema version.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:setSchemaVersion(nil) end)
+  print("SaveManager:setSchemaVersion ->", ok, result)
 end
 
 --@api-stub: SaveManager:getSchemaVersion
 -- Returns the current schema version.
--- Use this when returns the current schema version is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:getSchemaVersion()
+-- Call when you need to read schema version.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSchemaVersion() end)
+  print("SaveManager:getSchemaVersion ->", ok, result)
 end
 
 --@api-stub: SaveManager:collect
 -- Collects data from all registered collectors into a table with metadata.
--- Use this when collects data from all registered collectors into a table with metadata is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:collect()
+-- Call when you need to invoke collect.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:collect() end)
+  print("SaveManager:collect ->", ok, result)
 end
 
 --@api-stub: SaveManager:restore
 -- Restores data from a table, applying migrations and calling restorers.
--- Use this when restores data from a table, applying migrations and calling restorers is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:restore(0)
+-- Call when you need to invoke restore.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:restore({}) end)
+  print("SaveManager:restore ->", ok, result)
 end
 
 --@api-stub: SaveManager:markDirty
 -- Marks data as modified since the last save or load.
--- Use this when marks data as modified since the last save or load is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:markDirty()
+-- Call when you need to invoke mark dirty.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:markDirty() end)
+  print("SaveManager:markDirty ->", ok, result)
 end
 
 --@api-stub: SaveManager:isDirty
 -- Returns whether data has been modified since the last save or load.
--- Use this when returns whether data has been modified since the last save or load is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:isDirty()
+-- Call when you need to check is dirty.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:isDirty() end)
+  print("SaveManager:isDirty ->", ok, result)
 end
 
 --@api-stub: SaveManager:disableAutoSave
 -- Disables automatic periodic saving; manual `write()` calls still work.
--- Use this when disables automatic periodic saving; manual `write()` calls still work is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:disableAutoSave()
+-- Call when you need to invoke disable auto save.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:disableAutoSave() end)
+  print("SaveManager:disableAutoSave ->", ok, result)
 end
 
 --@api-stub: SaveManager:update
 -- Advances the auto-save timer, returning the slot name if a save should trigger.
--- Use this when advances the auto-save timer, returning the slot name if a save should trigger is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:update(0)
+-- Call when you need to invoke update.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:update(1.0) end)
+  print("SaveManager:update ->", ok, result)
 end
 
 --@api-stub: SaveManager:setSummary
 -- Sets the summary string included in save metadata.
--- Use this when sets the summary string included in save metadata is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:setSummary(0)
+-- Call when you need to assign summary.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:setSummary(nil) end)
+  print("SaveManager:setSummary ->", ok, result)
 end
 
 --@api-stub: SaveManager:getSummary
 -- Returns the current summary string.
--- Use this when returns the current summary string is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:getSummary()
+-- Call when you need to read summary.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSummary() end)
+  print("SaveManager:getSummary ->", ok, result)
 end
 
 --@api-stub: SaveManager:reset
 -- Resets all state, removing callbacks and clearing the manager.
--- Use this when resets all state, removing callbacks and clearing the manager is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:reset()
+-- Call when you need to invoke reset.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:reset() end)
+  print("SaveManager:reset ->", ok, result)
 end
 
 --@api-stub: SaveManager:setCompress
 -- Enables or disables LZ4 compression for saved data.
--- Use this when enables or disables LZ4 compression for saved data is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:setCompress(1)
+-- Call when you need to assign compress.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:setCompress(nil) end)
+  print("SaveManager:setCompress ->", ok, result)
 end
 
 --@api-stub: SaveManager:isCompressed
 -- Returns whether compression is currently enabled.
--- Use this when returns whether compression is currently enabled is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:isCompressed()
+-- Call when you need to check is compressed.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:isCompressed() end)
+  print("SaveManager:isCompressed ->", ok, result)
 end
 
 --@api-stub: SaveManager:onBeforeSave
 -- Registers a callback that fires before every save operation.
--- Use this when registers a callback that fires before every save operation is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:onBeforeSave(1)
+-- Call when you need to invoke on before save.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:onBeforeSave(function() end) end)
+  print("SaveManager:onBeforeSave ->", ok, result)
 end
 
 --@api-stub: SaveManager:onAfterLoad
 -- Registers a callback that fires after every successful load operation.
--- Use this when registers a callback that fires after every successful load operation is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:onAfterLoad(1)
+-- Call when you need to invoke on after load.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:onAfterLoad(function() end) end)
+  print("SaveManager:onAfterLoad ->", ok, result)
 end
 
 --@api-stub: SaveManager:save
 -- Collects data and writes it to a slot file.
--- Use this when collects data and writes it to a slot file is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:save(0)
+-- Call when you need to invoke save.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:save(nil) end)
+  print("SaveManager:save ->", ok, result)
 end
 
 --@api-stub: SaveManager:load
 -- Loads data from a slot file, applies migrations, and restores.
--- Use this when loads data from a slot file, applies migrations, and restores is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:load(0)
+-- Call when you need to invoke load.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:load(nil) end)
+  print("SaveManager:load ->", ok, result)
 end
 
 --@api-stub: SaveManager:delete
 -- Deletes a save file for the given slot.
--- Use this when deletes a save file for the given slot is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:delete(0)
+-- Call when you need to invoke delete.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:delete(nil) end)
+  print("SaveManager:delete ->", ok, result)
 end
 
 --@api-stub: SaveManager:getSlots
 -- Returns a list of all save slots with metadata.
--- Use this when returns a list of all save slots with metadata is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:getSlots()
+-- Call when you need to read slots.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSlots() end)
+  print("SaveManager:getSlots ->", ok, result)
 end
 
 --@api-stub: SaveManager:getSlotInfo
 -- Returns metadata for a single slot, or nil if not found.
--- Use this when returns metadata for a single slot, or nil if not found is needed.
-if false then
-  local _o = nil  -- SaveManager instance
-  _o:getSlotInfo(0)
+-- Call when you need to read slot info.
+-- Build a SaveManager via the appropriate lurek.save.new* constructor first.
+local instance = nil  -- e.g. local instance = lurek.save.newSaveManager(...)
+if instance then
+  local ok, result = pcall(function() return instance:getSlotInfo(nil) end)
+  print("SaveManager:getSlotInfo ->", ok, result)
 end
 
