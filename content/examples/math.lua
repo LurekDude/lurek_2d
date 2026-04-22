@@ -635,9 +635,9 @@ end
 -- Returns the smallest of the supplied numbers.
 -- Variadic; handy for clamping a damage roll against several caps at once.
 do  -- lurek.math.min
+  local function current_hp_or_default(v) return v end
   local clamp_hp = lurek.math.min(100, current_hp_or_default(85), 90)
   lurek.log.debug("hp=" .. clamp_hp, "combat")
-  function current_hp_or_default(v) return v end
 end
 
 --@api-stub: lurek.math.max
@@ -957,7 +957,7 @@ end
 -- Method form of the x field; useful when chaining or storing accessors.
 do  -- Vec2:x
   local v = lurek.math.vec2(7, 9)
-  local x = v:x()
+  local x = v.x
   lurek.log.debug("x=" .. x, "math")
 end
 
@@ -966,7 +966,7 @@ end
 -- Method form of the y field; mirrors :x() for consistency.
 do  -- Vec2:y
   local v = lurek.math.vec2(7, 9)
-  local y = v:y()
+  local y = v.y
   lurek.log.debug("y=" .. y, "math")
 end
 

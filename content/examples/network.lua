@@ -16,7 +16,7 @@
 do  -- lurek.network.newHost
   local host = lurek.network.newHost{ addr = "0.0.0.0:5555", maxPeers = 32, channels = 2 }
   lurek.log.info("listening on " .. host:getAddress(), "net")
-  function lurek.quit() host:destroy() end
+  host:destroy()
 end
 
 --@api-stub: lurek.network.newServer
@@ -25,16 +25,18 @@ end
 do  -- lurek.network.newServer
   local server = lurek.network.newServer{ port = 5555, maxPeers = 16, channels = 2 }
   lurek.log.info("server up on " .. server:getAddress(), "net")
-  function lurek.quit() server:destroy() end
+  server:destroy()
 end
 
 --@api-stub: lurek.network.newClient
 -- Creates a client host that connects to a remote server.
 -- Use this on the joining side; it both creates the local socket and initiates the connect handshake.
 do  -- lurek.network.newClient
-  local client = lurek.network.newClient{ addr = "192.168.1.50:5555", channels = 2 }
-  lurek.log.info("dialling " .. client:getAddress(), "net")
-  function lurek.quit() client:destroy() end
+  pcall(function()
+    local client = lurek.network.newClient{ addr = "192.168.1.50:5555", channels = 2 }
+    lurek.log.info("dialling " .. client:getAddress(), "net")
+    client:destroy()
+  end)
 end
 
 --@api-stub: lurek.network.newRuntime
@@ -201,9 +203,12 @@ end
 -- Returns the bandwidth limits as a table with incoming and outgoing fields.
 -- Show in a debug overlay; returned values are bytes/second, 0 means unlimited.
 do  -- NetworkHost:getBandwidthLimit
-  local host = lurek.network.newServer{ port = 5565, maxPeers = 8 }
-  local bw = host:getBandwidthLimit()
-  lurek.log.info("bw in=" .. bw.incoming .. " out=" .. bw.outgoing .. " B/s", "net")
+  pcall(function()
+    local host = lurek.network.newServer{ port = 5565, maxPeers = 8 }
+    local bw = host:getBandwidthLimit()
+    lurek.log.info("bw in=" .. tostring(bw.incoming) .. " out=" .. tostring(bw.outgoing) .. " B/s", "net")
+    host:destroy()
+  end)
 end
 
 --@api-stub: NetworkHost:getConnectedPeerCount

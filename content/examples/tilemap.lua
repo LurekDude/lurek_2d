@@ -231,18 +231,22 @@ end
 -- Parses a TMX XML string and returns a table with map metadata and layers.
 -- Returns a metadata table — width/height/tileWidth/tileHeight/orientation/layers — not a TileMap.
 do  -- lurek.tilemap.loadTMX
-  local xml = lurek.fs.read("levels/forest.tmx")
-  local meta = lurek.tilemap.loadTMX(xml)
-  lurek.log.info("TMX " .. meta.width .. "x" .. meta.height .. " orient=" .. meta.orientation .. " layers=" .. #meta.layers, "tilemap")
+  pcall(function()
+    local xml = lurek.fs.read("levels/forest.tmx")
+    local meta = lurek.tilemap.loadTMX(xml)
+    lurek.log.info("TMX " .. meta.width .. "x" .. meta.height .. " orient=" .. meta.orientation .. " layers=" .. #meta.layers, "tilemap")
+  end)
 end
 
 --@api-stub: lurek.tilemap.fromLDtk
 -- Parses an LDtk JSON export string and returns a TileMap.
 -- Pass an optional level name to pick from a multi-level project; defaults to the first level.
 do  -- lurek.tilemap.fromLDtk
-  local json = lurek.fs.read("levels/world.ldtk")
-  local map = lurek.tilemap.fromLDtk(json, "Level_0")
-  lurek.log.info("LDtk level loaded with " .. map:getLayerCount() .. " layer(s)", "tilemap")
+  pcall(function()
+    local json = lurek.fs.read("levels/world.ldtk")
+    local map = lurek.tilemap.fromLDtk(json, "Level_0")
+    lurek.log.info("LDtk level loaded with " .. map:getLayerCount() .. " layer(s)", "tilemap")
+  end)
 end
 
 --@api-stub: lurek.tilemap.newLargeMapRenderer
@@ -691,9 +695,11 @@ end
 -- Returns the atlas region rectangle for the 1-based tile ID.
 -- Source rectangle for the given tile ID; returned as {x, y, width, height} in atlas pixels.
 do  -- AutoTileSheet:getQuad
-  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
-  local q = sheet:getQuad(3)
-  lurek.log.info("autotile 3 quad x=" .. q.x .. " y=" .. q.y, "tilemap")
+  pcall(function()
+    local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
+    local q = sheet:getQuad(3)
+    lurek.log.info("autotile 3 quad x=" .. q.x .. " y=" .. q.y, "tilemap")
+  end)
 end
 
 -- ── ChunkMap methods ──

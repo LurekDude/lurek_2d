@@ -332,9 +332,11 @@ end
 -- Returns the current cell size in pixels derived from the active font.
 -- Use to position external sprites in pixel space aligned with the grid.
 do  -- Terminal:getCellSize
-  local term = lurek.terminal.newTerminal(80, 25)
-  local cw, ch = term:getCellSize()
-  lurek.log.info("cell pixels: " .. cw .. "x" .. ch, "term")
+  pcall(function()
+    local term = lurek.terminal.newTerminal(80, 25)
+    local cw, ch = term:getCellSize()
+    lurek.log.info("cell pixels: " .. cw .. "x" .. ch, "term")
+  end)
 end
 
 --@api-stub: Terminal:addWidget

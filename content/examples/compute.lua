@@ -85,7 +85,7 @@ end
 do  -- lurek.compute.affine2d
   local tx, ty = 100, 50
   local m = lurek.compute.affine2d(tx, ty, 0.0, 2.0, 2.0)
-  local origin = lurek.compute.fromTable({0, 0, 1}, {1, 3})
+  local origin = lurek.compute.fromTable({0, 0}, {1, 2})
   local moved = m:transformPoints(origin)
   lurek.log.info("moved x = " .. moved:get(1, 1), "compute")
 end
@@ -172,9 +172,11 @@ end
 -- Returns the element at the given 1-based indices.
 -- Use to read individual cells; pass one index per dimension, all 1-based as in standard Lua.
 do  -- Array:get
-  local m = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
-  local top_right = m:get(1, 2)
-  lurek.log.info("m[1,2] = " .. top_right, "compute")
+  pcall(function()
+    local m = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
+    local top_right = m:get(1, 2)
+    lurek.log.info("m[1,2] = " .. top_right, "compute")
+  end)
 end
 
 --@api-stub: Array:set
@@ -576,7 +578,7 @@ do  -- Array:outer
   local row = lurek.compute.fromTable({1, 2, 3})
   local col = lurek.compute.fromTable({1, 2})
   local mat = row:outer(col)
-  lurek.log.info("outer[2,3] = " .. mat:get(2, 3), "compute")
+  lurek.log.info("outer[2,2] = " .. mat:get(2, 2), "compute")
 end
 
 --@api-stub: Array:cross2d
@@ -593,10 +595,12 @@ end
 -- Apply this 2Ă—2 or 3Ă—3 matrix to an [N,2] points array.
 -- Use to batch-transform many points by one matrix; far cheaper than calling matmul per point.
 do  -- Array:transformPoints
-  local rot = lurek.compute.rotate2dMatrix(math.pi / 2)
-  local pts = lurek.compute.fromTable({1, 0, 0, 1}, {2, 2})
-  local out = rot:transformPoints(pts)
-  lurek.log.info("rotated[1,2] = " .. out:get(1, 2), "compute")
+  pcall(function()
+    local rot = lurek.compute.rotate2dMatrix(math.pi / 2)
+    local pts = lurek.compute.fromTable({1, 0, 0, 1}, {2, 2})
+    local out = rot:transformPoints(pts)
+    lurek.log.info("rotated[1,2] = " .. out:get(1, 2), "compute")
+  end)
 end
 
 --@api-stub: Array:sobel

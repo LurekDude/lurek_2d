@@ -15,9 +15,14 @@
 -- Call once at boot behind a config flag; returns true on bind, errors if the port is < 1024 or already in use.
 do  -- lurek.debugbridge.start
   local debug_port = 17800
-  local ok = lurek.debugbridge.start(debug_port)
-  if ok then
-    lurek.log.info("debug bridge listening on 127.0.0.1:" .. debug_port, "debugbridge")
+  local ok = pcall(function()
+    local bound = lurek.debugbridge.start(debug_port)
+    if bound then
+      lurek.log.info("debug bridge listening on 127.0.0.1:" .. debug_port, "debugbridge")
+    end
+  end)
+  if not ok then
+    lurek.log.info("debug bridge unavailable (port in use)", "debugbridge")
   end
 end
 

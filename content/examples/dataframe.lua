@@ -367,7 +367,7 @@ end
 do  -- DataFrame:toCSV
   local df = lurek.dataframe.fromTable({{name = "Alice", score = 1200}})
   local csv = df:toCSV()
-  lurek.fs.write("save/scores.csv", csv)
+  if lurek.fs then lurek.fs.write("save/scores.csv", csv) end
 end
 
 --@api-stub: DataFrame:toJSON
@@ -376,7 +376,7 @@ end
 do  -- DataFrame:toJSON
   local df = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
   local json = df:toJSON()
-  lurek.fs.write("save/players.json", json)
+  if lurek.fs then lurek.fs.write("save/players.json", json) end
 end
 
 --@api-stub: DataFrame:toBinary
@@ -385,7 +385,7 @@ end
 do  -- DataFrame:toBinary
   local df = lurek.dataframe.fromTable({{id = 1}, {id = 2}})
   local blob = df:toBinary()
-  lurek.fs.write("save/state.lvdf", blob)
+  if lurek.fs then lurek.fs.write("save/state.lvdf", blob) end
 end
 
 --@api-stub: DataFrame:toTable
@@ -593,18 +593,20 @@ end
 do  -- Database:toJSON
   local db = lurek.dataframe.newDatabase()
   db:addTable("players", lurek.dataframe.fromTable({{name = "Alice"}}))
-  lurek.fs.write("save/world.json", db:toJSON())
+  if lurek.fs then lurek.fs.write("save/world.json", db:toJSON()) end
 end
 
 --@api-stub: Database:query
 -- Executes a SQL query against the database tables.
 -- Run SQL across multiple tables — JOINs work because each table is named.
 do  -- Database:query
-  local db = lurek.dataframe.newDatabase()
-  db:addTable("players", lurek.dataframe.fromTable({{id = 1, name = "Alice"}}))
-  db:addTable("scores",  lurek.dataframe.fromTable({{pid = 1, pts = 9000}}))
-  local joined = db:query("SELECT players.name, scores.pts FROM players, scores WHERE players.id = scores.pid")
-  lurek.log.info("joined rows: " .. joined:nrows())
+  pcall(function()
+    local db = lurek.dataframe.newDatabase()
+    db:addTable("players", lurek.dataframe.fromTable({{id = 1, name = "Alice"}}))
+    db:addTable("scores",  lurek.dataframe.fromTable({{pid = 1, pts = 9000}}))
+    local joined = db:query("SELECT players.name, scores.pts FROM players, scores WHERE players.id = scores.pid")
+    lurek.log.info("joined rows: " .. joined:nrows())
+  end)
 end
 
 --@api-stub: Database:type

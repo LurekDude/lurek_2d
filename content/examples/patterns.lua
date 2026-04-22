@@ -103,7 +103,7 @@ end
 do  -- lurek.patterns.newThrottle
   local fire = lurek.patterns.newThrottle(0.25)
   fire:onFire(function() print("BANG") end)
-  function lurek.process(dt) if lurek.input.isKeyDown("space") then fire:update(dt) end end
+  function lurek.process(dt) if lurek.input.keyboard.isDown("space") then fire:update(dt) end end
 end
 
 --@api-stub: lurek.patterns.newDebounce

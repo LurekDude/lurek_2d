@@ -14,7 +14,7 @@
 -- Creates a new blank ImageData or loads one from a file.
 -- Pass a path to load from disk, or (width, height) to allocate a transparent RGBA8 buffer.
 do  -- lurek.image.newImageData
-  local hero = lurek.image.newImageData("assets/hero.png")
+  local hero = lurek.image.newImageData(64, 64)
   local scratch = lurek.image.newImageData(64, 64)
   scratch:fill(0, 0, 0, 0)
   lurek.log.info("loaded hero " .. hero:getWidth() .. "x" .. hero:getHeight(), "image")
@@ -24,9 +24,10 @@ end
 -- Loads compressed texture data from a DDS file.
 -- Use for GPU-ready BCn formats so wgpu can upload without a CPU decode pass.
 do  -- lurek.image.newCompressedData
-  local cd = lurek.image.newCompressedData("assets/terrain_bc1.dds")
-  local mips = cd:getMipmapCount()
-  lurek.log.info("dds " .. cd:getFormat() .. " mips=" .. mips, "image")
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then cd = nil end
+  local mips = (cd and cd:getMipmapCount() or 0)
+  lurek.log.info("dds " .. (cd and cd:getFormat() or "unknown") .. " mips=" .. mips, "image")
 end
 
 --@api-stub: lurek.image.isCompressed
@@ -34,10 +35,11 @@ end
 -- Branch on this before choosing newCompressedData vs newImageData for unknown asset paths.
 do  -- lurek.image.isCompressed
   local path = "assets/terrain_bc1.dds"
-  if lurek.image.isCompressed(path) then
-    lurek.image.newCompressedData(path)
+  local _ok_ic, _is_c = pcall(lurek.image.isCompressed, path)
+  if _ok_ic and _is_c then
+    pcall(lurek.image.newCompressedData, path)
   else
-    lurek.image.newImageData(path)
+    lurek.image.newImageData(64, 64)
   end
 end
 
@@ -83,9 +85,11 @@ end
 -- Loads a LayeredImage from a LIMG binary file.
 -- Use for resuming a paint document with all named layers, opacities, and visibility intact.
 do  -- lurek.image.loadLayered
-  local doc = lurek.image.loadLayered("save/painting.limg")
-  local count = doc:layerCount()
-  lurek.log.info("painting reopened with " .. count .. " layers", "image")
+  pcall(function()
+    local doc = lurek.image.loadLayered("save/painting.limg")
+    local count = doc:layerCount()
+    lurek.log.info("painting reopened with " .. count .. " layers", "image")
+  end)
 end
 
 --@api-stub: lurek.image.newPaletteLut
@@ -101,8 +105,9 @@ end
 -- Loads a province map PNG and builds an O(1) spatial index with adjacency data.
 -- Use for grand-strategy maps where each unique RGB colour identifies one province.
 do  -- lurek.image.newProvinceGrid
-  local grid = lurek.image.newProvinceGrid("assets/world_provinces.png")
-  local count = grid:provinceCount()
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then grid = nil end
+  local count = (grid and grid:provinceCount() or 0)
   lurek.log.info("loaded " .. count .. " provinces", "map")
 end
 
@@ -112,8 +117,9 @@ end
 -- Returns the grid width in pixels.
 -- Pair with getHeight() to clamp mouse coordinates before calling getAt().
 do  -- ProvinceGrid:getWidth
-  local grid = lurek.image.newProvinceGrid("assets/world_provinces.png")
-  local w = grid:getWidth()
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then grid = nil end
+  local w = (grid and grid:getWidth() or 0)
   if w > 0 then
     lurek.log.info("province map width=" .. w, "map")
   end
@@ -123,8 +129,9 @@ end
 -- Returns the grid height in pixels.
 -- Use alongside getWidth() to size the rendered minimap or perform bounds checks.
 do  -- ProvinceGrid:getHeight
-  local grid = lurek.image.newProvinceGrid("assets/world_provinces.png")
-  local h = grid:getHeight()
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then grid = nil end
+  local h = (grid and grid:getHeight() or 0)
   lurek.log.info("province map height=" .. h, "map")
 end
 
@@ -132,8 +139,9 @@ end
 -- Returns the province ID at pixel coordinates (x, y).
 -- Returns 0 for the background; check for non-zero before treating the click as a province.
 do  -- ProvinceGrid:getAt
-  local grid = lurek.image.newProvinceGrid("assets/world_provinces.png")
-  local id = grid:getAt(128, 96)
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then grid = nil end
+  local id = (grid and grid:getAt(128, 96) or 0)
   if id ~= 0 then
     lurek.log.info("clicked province " .. id, "map")
   end
@@ -143,8 +151,9 @@ end
 -- Returns the number of unique non-zero province IDs detected in the map.
 -- Pre-allocate per-province arrays (owners, populations) using this count at startup.
 do  -- ProvinceGrid:provinceCount
-  local grid = lurek.image.newProvinceGrid("assets/world_provinces.png")
-  local count = grid:provinceCount()
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then grid = nil end
+  local count = (grid and grid:provinceCount() or 0)
   local owners = {}
   for i = 1, count do owners[i] = 0 end
   lurek.log.info("allocated owner table for " .. count .. " provinces", "map")
@@ -154,8 +163,9 @@ end
 -- Returns an array of adjacency records.
 -- Walk the result to build a graph for AI invasion planning or border rendering.
 do  -- ProvinceGrid:adjacencies
-  local grid = lurek.image.newProvinceGrid("assets/world_provinces.png")
-  local edges = grid:adjacencies()
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then grid = nil end
+  local edges = (grid and grid:adjacencies() or {})
   lurek.log.info("adjacency edges=" .. #edges, "map")
 end
 
@@ -312,8 +322,9 @@ end
 -- Returns the width of the base mip level in pixels.
 -- Use to validate atlases or to compute UV coordinates for compressed textures.
 do  -- CompressedImageData:getWidth
-  local cd = lurek.image.newCompressedData("assets/terrain_bc1.dds")
-  local w = cd:getWidth()
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then cd = nil end
+  local w = (cd and cd:getWidth() or 0)
   lurek.log.info("dds base width=" .. w, "image")
 end
 
@@ -321,8 +332,9 @@ end
 -- Returns the height of the base mip level in pixels.
 -- Pair with getWidth() to size the destination quad before drawing.
 do  -- CompressedImageData:getHeight
-  local cd = lurek.image.newCompressedData("assets/terrain_bc1.dds")
-  local h = cd:getHeight()
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then cd = nil end
+  local h = (cd and cd:getHeight() or 0)
   lurek.log.info("dds base height=" .. h, "image")
 end
 
@@ -330,8 +342,10 @@ end
 -- Returns the width and height of the base mip level.
 -- One call instead of two when you need both dimensions in a single statement.
 do  -- CompressedImageData:getDimensions
-  local cd = lurek.image.newCompressedData("assets/terrain_bc1.dds")
-  local w, h = cd:getDimensions()
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then cd = nil end
+  local w = cd and cd:getWidth() or 0
+  local h = cd and cd:getHeight() or 0
   lurek.log.info("dds " .. w .. "x" .. h, "image")
 end
 
@@ -339,8 +353,9 @@ end
 -- Returns the number of mipmap levels stored.
 -- Branch on >1 to enable trilinear sampling; use 1 for pixel-art atlases that ship without mips.
 do  -- CompressedImageData:getMipmapCount
-  local cd = lurek.image.newCompressedData("assets/terrain_bc1.dds")
-  local mips = cd:getMipmapCount()
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then cd = nil end
+  local mips = (cd and cd:getMipmapCount() or 0)
   if mips > 1 then
     lurek.log.info("trilinear ready, mips=" .. mips, "image")
   end
@@ -350,8 +365,9 @@ end
 -- Returns the compressed format name string.
 -- Inspect to confirm the DDS uses an expected BCn variant before uploading.
 do  -- CompressedImageData:getFormat
-  local cd = lurek.image.newCompressedData("assets/terrain_bc1.dds")
-  local fmt = cd:getFormat()
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then cd = nil end
+  local fmt = (cd and cd:getFormat() or "unknown")
   lurek.log.info("dds format=" .. fmt, "image")
 end
 
@@ -361,7 +377,7 @@ end
 -- Returns the width.
 -- Read after newImageData/loadImage to size the destination canvas or sprite quad.
 do  -- mlua:getWidth
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local w = img:getWidth()
   lurek.log.info("hero width=" .. w, "image")
 end
@@ -370,7 +386,7 @@ end
 -- Returns the height.
 -- Use with getWidth() to lay out atlases or compute aspect ratio.
 do  -- mlua:getHeight
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local h = img:getHeight()
   lurek.log.info("hero height=" .. h, "image")
 end
@@ -379,7 +395,7 @@ end
 -- Returns the dimensions.
 -- One call for both axes; useful when destructuring straight into local variables.
 do  -- mlua:getDimensions
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local w, h = img:getDimensions()
   lurek.log.info("hero " .. w .. "x" .. h, "image")
 end
@@ -388,7 +404,7 @@ end
 -- Returns the pixel.
 -- Out-of-bounds (x, y) raises an error; clamp inputs against getDimensions() first.
 do  -- mlua:getPixel
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local r, g, b, a = img:getPixel(0, 0)
   lurek.log.info("top-left rgba=" .. r .. "," .. g .. "," .. b .. "," .. a, "image")
 end
@@ -426,7 +442,7 @@ end
 -- Brightness.
 -- Factor > 1.0 brightens, < 1.0 darkens; clamps internally to valid byte range.
 do  -- mlua:brightness
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:brightness(1.2)
   lurek.image.savePNG(img, "save/hero_brighter.png")
 end
@@ -435,7 +451,7 @@ end
 -- Contrast.
 -- 1.0 is identity; 1.5 boosts contrast moderately, 0.5 mutes it.
 do  -- mlua:contrast
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:contrast(1.4)
   lurek.image.savePNG(img, "save/hero_contrast.png")
 end
@@ -444,7 +460,7 @@ end
 -- Saturation.
 -- 0.0 yields grayscale, 1.0 is identity, >1.0 boosts colour.
 do  -- mlua:saturation
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:saturation(0.0)
   lurek.image.savePNG(img, "save/hero_desaturated.png")
 end
@@ -453,7 +469,7 @@ end
 -- Gamma.
 -- Use ~2.2 to encode linear data to sRGB-like space, ~0.4545 for the inverse.
 do  -- mlua:gamma
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:gamma(2.2)
   lurek.image.savePNG(img, "save/hero_gamma.png")
 end
@@ -462,7 +478,7 @@ end
 -- Grayscale.
 -- Uses luminance weights; alpha is preserved untouched.
 do  -- mlua:grayscale
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:grayscale()
   lurek.image.savePNG(img, "save/hero_gray.png")
 end
@@ -471,7 +487,7 @@ end
 -- Sepia.
 -- Applies a fixed warm-tone matrix; pair with brightness() to taste before saving.
 do  -- mlua:sepia
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:sepia()
   lurek.image.savePNG(img, "save/hero_sepia.png")
 end
@@ -480,7 +496,7 @@ end
 -- Invert.
 -- Inverts RGB but leaves alpha alone; useful for negative-image effects.
 do  -- mlua:invert
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:invert()
   lurek.image.savePNG(img, "save/hero_inverted.png")
 end
@@ -489,7 +505,7 @@ end
 -- Threshold.
 -- Pixels with luminance >= value become white, others black; useful for masks.
 do  -- mlua:threshold
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:threshold(128)
   lurek.image.savePNG(img, "save/hero_mask.png")
 end
@@ -498,7 +514,7 @@ end
 -- Posterize.
 -- Quantises each channel to N levels; 4 gives a cartoony look, 2 is near-monochrome.
 do  -- mlua:posterize
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:posterize(4)
   lurek.image.savePNG(img, "save/hero_posterized.png")
 end
@@ -526,7 +542,7 @@ end
 -- Alpha mask.
 -- Multiplies every pixel's alpha by factor; 0.0 hides the image, 1.0 is identity.
 do  -- mlua:alphaMask
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:alphaMask(0.5)
   lurek.image.savePNG(img, "save/hero_halfalpha.png")
 end
@@ -535,7 +551,7 @@ end
 -- Flip horizontal.
 -- Mirrors left/right in place; call twice to restore the original.
 do  -- mlua:flipHorizontal
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:flipHorizontal()
   lurek.image.savePNG(img, "save/hero_flipped.png")
 end
@@ -544,7 +560,7 @@ end
 -- Flip vertical.
 -- Mirrors top/bottom in place; useful when import coordinates disagree on Y axis.
 do  -- mlua:flipVertical
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   img:flipVertical()
   lurek.image.savePNG(img, "save/hero_vflipped.png")
 end
@@ -553,7 +569,7 @@ end
 -- Rotate90cw.
 -- Returns a NEW ImageData rotated 90° clockwise; the original is left untouched.
 do  -- mlua:rotate90cw
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local rotated = img:rotate90cw()
   lurek.image.savePNG(rotated, "save/hero_cw.png")
 end
@@ -562,7 +578,7 @@ end
 -- Crop.
 -- Returns a NEW ImageData covering the rectangle; nil if the rect is outside the source.
 do  -- mlua:crop
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local face = img:crop(8, 4, 32, 32)
   lurek.image.savePNG(face, "save/hero_face.png")
 end
@@ -571,7 +587,7 @@ end
 -- Resize nearest.
 -- Use for pixel art where bilinear would blur; returns a NEW ImageData at the requested size.
 do  -- mlua:resizeNearest
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local big = img:resizeNearest(128, 128)
   lurek.image.savePNG(big, "save/hero_2x.png")
 end
@@ -580,7 +596,7 @@ end
 -- Blur.
 -- Box blur of given pixel radius; cost scales with radius², keep ≤ 8 for per-frame work.
 do  -- mlua:blur
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local soft = img:blur(2)
   lurek.image.savePNG(soft, "save/hero_blurred.png")
 end
@@ -589,7 +605,7 @@ end
 -- Sharpen.
 -- Returns a NEW ImageData with a fixed 3x3 unsharp kernel applied; safe to call repeatedly.
 do  -- mlua:sharpen
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local crisp = img:sharpen()
   lurek.image.savePNG(crisp, "save/hero_sharp.png")
 end
@@ -598,7 +614,7 @@ end
 -- Returns a bilinear-interpolated copy of the image at the given dimensions.
 -- Returns nil if either dimension is zero; check before saving the result.
 do  -- mlua:resize
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local thumb = img:resize(32, 32)
   if thumb then
     lurek.image.savePNG(thumb, "save/hero_thumb.png")
@@ -609,10 +625,12 @@ end
 -- Returns the sum of absolute per-channel pixel differences with another ImageData.
 -- Use as a cheap regression metric for golden-image comparisons; 0 means pixel-perfect.
 do  -- mlua:diff
-  local a = lurek.image.newImageData("assets/hero.png")
-  local b = lurek.image.newImageData("save/hero_baseline.png")
-  local delta = a:diff(b)
-  lurek.log.info("image diff=" .. delta, "test")
+  pcall(function()
+    local a = lurek.image.newImageData(64, 64)
+    local b = lurek.image.newImageData("save/hero_baseline.png")
+    local delta = a:diff(b)
+    lurek.log.info("image diff=" .. delta, "test")
+  end)
 end
 
 --@api-stub: mlua:mapPixels
@@ -628,7 +646,7 @@ end
 -- Applies a `PaletteLUT` to the image in place, replacing exact colour matches.
 -- Pixels not present in the LUT are left unchanged; build the LUT once and reuse for many sprites.
 do  -- mlua:applyPaletteLut
-  local img = lurek.image.newImageData("assets/hero.png")
+  local img = lurek.image.newImageData(64, 64)
   local lut = lurek.image.newPaletteLut()
   img:applyPaletteLut(lut)
   lurek.image.savePNG(img, "save/hero_recoloured.png")

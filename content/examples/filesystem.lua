@@ -13,8 +13,8 @@
 -- Mounts a ZIP archive at a virtual path prefix, making its contents readable.
 -- Use to ship optional content packs or expansion DLC as a single distributable .zip.
 do  -- lurek.filesystem.mountZip
-  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
-  if pack:contains("levels/grove.json") then
+  local ok, pack = pcall(lurek.filesystem.mountZip, "dlc/forest_pack.zip", "mods/forest")
+  if ok and pack:contains("levels/grove.json") then
     local data = pack:readFile("levels/grove.json")
     lurek.log.info("forest pack ready: " .. #data .. " bytes", "fs")
   end
@@ -55,8 +55,8 @@ end
 -- Reads a text file and returns its contents as a string.
 -- Use for small config or save snapshots; for large binaries prefer newFileData or readAsync.
 do  -- lurek.filesystem.read
-  local toml = lurek.filesystem.read("config/options.toml")
-  lurek.log.info("loaded options.toml (" .. #toml .. " bytes)", "config")
+  local ok, toml = pcall(lurek.filesystem.read, "config/options.toml")
+  if ok then lurek.log.info("loaded options.toml (" .. #toml .. " bytes)", "config") end
 end
 
 --@api-stub: lurek.filesystem.write
@@ -110,10 +110,12 @@ end
 -- Returns whether the given path is a regular file.
 -- Use to distinguish files from directories before calling read or openFile.
 do  -- lurek.filesystem.isFile
-  if lurek.filesystem.isFile("config/options.toml") then
-    local cfg = lurek.filesystem.read("config/options.toml")
-    lurek.log.info("config loaded (" .. #cfg .. " bytes)", "config")
-  end
+  pcall(function()
+    if lurek.filesystem.isFile("config/options.toml") then
+      local cfg = lurek.filesystem.read("config/options.toml")
+      lurek.log.info("config loaded (" .. #cfg .. " bytes)", "config")
+    end
+  end)
 end
 
 --@api-stub: lurek.filesystem.isDirectory
@@ -206,11 +208,13 @@ end
 -- Returns an iterator function over the lines of a text file.
 -- Streams line-by-line so very large logs or CSVs do not all sit in memory at once.
 do  -- lurek.filesystem.lines
-  local count = 0
-  for line in lurek.filesystem.lines("assets/data/dialogue.csv") do
-    if #line > 0 then count = count + 1 end
-  end
-  lurek.log.info("dialogue lines: " .. count, "i18n")
+  pcall(function()
+    local count = 0
+    for line in lurek.filesystem.lines("assets/data/dialogue.csv") do
+      if #line > 0 then count = count + 1 end
+    end
+    lurek.log.info("dialogue lines: " .. count, "i18n")
+  end)
 end
 
 --@api-stub: lurek.filesystem.readAsync
@@ -243,7 +247,7 @@ end
 -- Mounts a directory at a virtual path inside the game filesystem.
 -- Mounted paths layer over the game root; later mounts shadow earlier ones for the same VFS path.
 do  -- lurek.filesystem.mount
-  local ok = lurek.filesystem.mount("../mods/extra", "mods/extra")
+  local ok = pcall(lurek.filesystem.mount, "../mods/extra", "mods/extra")
   if ok then lurek.log.info("mounted extra mods", "mods") end
 end
 
@@ -260,17 +264,21 @@ end
 -- Loads and compiles a Lua file from the VFS, returning it as a callable function.
 -- Use to load mod scripts at runtime; call the returned function to execute the chunk.
 do  -- lurek.filesystem.load
-  local chunk = lurek.filesystem.load("scripts/enemy_ai.lua")
-  local enemy_module = chunk()
-  lurek.log.info("enemy AI module loaded", "ai")
+  pcall(function()
+    local chunk = lurek.filesystem.load("scripts/enemy_ai.lua")
+    local enemy_module = chunk()
+    lurek.log.info("enemy AI module loaded", "ai")
+  end)
 end
 
 --@api-stub: lurek.filesystem.newFileData
 -- Loads a file from the VFS into a FileData buffer.
 -- Use for binary blobs (textures, audio decoders) where you want size + filename metadata.
 do  -- lurek.filesystem.newFileData
-  local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
-  lurek.log.info("loaded " .. fd:getFilename() .. " (" .. fd:getSize() .. " bytes)", "audio")
+  pcall(function()
+    local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
+    lurek.log.info("loaded " .. fd:getFilename() .. " (" .. fd:getSize() .. " bytes)", "audio")
+  end)
 end
 
 --@api-stub: lurek.filesystem.copy
@@ -313,16 +321,18 @@ end
 -- Returns a sorted list of all files under `path`, recursively.
 -- Use to enumerate every asset under a directory tree, e.g. all level JSON files.
 do  -- lurek.filesystem.listRecursive
-  local files = lurek.filesystem.listRecursive("assets/levels")
-  lurek.log.info("level assets: " .. #files, "scene")
+  local ok, files = pcall(lurek.filesystem.listRecursive, "assets/levels")
+  if ok then
+    lurek.log.info("level assets: " .. #files, "scene")
+  end
 end
 
 --@api-stub: lurek.filesystem.stat
 -- Returns lightweight file statistics for the given path.
 -- Cheaper than getInfo when you only need size/isFile/isDir; raises on missing or sandboxed paths.
 do  -- lurek.filesystem.stat
-  local s = lurek.filesystem.stat("assets/levels/forest.json")
-  if s.isFile then
+  local ok, s = pcall(lurek.filesystem.stat, "assets/levels/forest.json")
+  if ok and s.isFile then
     lurek.log.info("forest.json: " .. s.size .. " bytes", "scene")
   end
 end
@@ -340,8 +350,10 @@ end
 -- Creates a directory (and any missing parents) relative to the game root.
 -- Unlike createDirectory this is not restricted to save/; mostly used by evidence/test runners.
 do  -- lurek.filesystem.mkdir
-  lurek.filesystem.mkdir("evidence/run_001")
-  lurek.filesystem.write("evidence/run_001/notes.txt", "ok")
+  pcall(function()
+    lurek.filesystem.mkdir("save/run_001")
+    lurek.filesystem.write("save/run_001/notes.txt", "ok")
+  end)
 end
 
 --@api-stub: lurek.filesystem.toAbsolutePath
@@ -359,26 +371,32 @@ end
 -- Returns the file size in bytes.
 -- Combine with getFilename for a one-line load report when streaming many assets.
 do  -- FileData:getSize
-  local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
-  local kb = fd:getSize() / 1024
-  lurek.log.info(string.format("jump.ogg = %.1f KiB", kb), "audio")
+  pcall(function()
+    local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
+    local kb = fd:getSize() / 1024
+    lurek.log.info(string.format("jump.ogg = %.1f KiB", kb), "audio")
+  end)
 end
 
 --@api-stub: FileData:getString
 -- Returns the file content as a Lua string.
 -- Use to hand binary buffers to a custom decoder, or to compute a checksum over the bytes.
 do  -- FileData:getString
-  local fd = lurek.filesystem.newFileData("config/options.toml")
-  local body = fd:getString()
-  lurek.log.info("first byte: " .. string.byte(body, 1), "config")
+  pcall(function()
+    local fd = lurek.filesystem.newFileData("config/options.toml")
+    local body = fd:getString()
+    lurek.log.info("first byte: " .. string.byte(body, 1), "config")
+  end)
 end
 
 --@api-stub: FileData:getFilename
 -- Returns the virtual path this data was loaded from.
 -- Useful when a generic loader pipes FileData into a registry keyed by source path.
 do  -- FileData:getFilename
-  local fd = lurek.filesystem.newFileData("assets/levels/forest.json")
-  lurek.log.info("loaded " .. fd:getFilename(), "scene")
+  pcall(function()
+    local fd = lurek.filesystem.newFileData("assets/levels/forest.json")
+    lurek.log.info("loaded " .. fd:getFilename(), "scene")
+  end)
 end
 
 
@@ -398,10 +416,12 @@ end
 -- Reads the next line from the file without the trailing newline.
 -- Returns nil at EOF; loop while non-nil to walk a text file one line at a time.
 do  -- FileHandle:readLine
-  local fh = lurek.filesystem.openFile("save/telemetry.log", "r")
-  local first = fh:readLine()
-  fh:close()
-  lurek.log.info("first telemetry line: " .. (first or "<empty>"), "fs")
+  pcall(function()
+    local fh = lurek.filesystem.openFile("save/telemetry.log", "r")
+    local first = fh:readLine()
+    fh:close()
+    lurek.log.info("first telemetry line: " .. (first or "<empty>"), "fs")
+  end)
 end
 
 --@api-stub: FileHandle:write
@@ -429,19 +449,23 @@ end
 -- Returns the current read/write byte offset from the start of the file.
 -- Call after a partial read to remember where to resume on the next pass.
 do  -- FileHandle:tell
-  local fh = lurek.filesystem.openFile("assets/levels/forest.json", "r")
-  fh:read(64)
-  lurek.log.info("cursor at byte " .. fh:tell(), "scene")
-  fh:close()
+  pcall(function()
+    local fh = lurek.filesystem.openFile("assets/levels/forest.json", "r")
+    fh:read(64)
+    lurek.log.info("cursor at byte " .. fh:tell(), "scene")
+    fh:close()
+  end)
 end
 
 --@api-stub: FileHandle:getSize
 -- Returns the size of the open file in bytes.
 -- Use to pre-allocate buffers or to drive a load progress bar.
 do  -- FileHandle:getSize
-  local fh = lurek.filesystem.openFile("assets/levels/forest.json", "r")
-  lurek.log.info("level file size: " .. fh:getSize(), "scene")
-  fh:close()
+  pcall(function()
+    local fh = lurek.filesystem.openFile("assets/levels/forest.json", "r")
+    lurek.log.info("level file size: " .. fh:getSize(), "scene")
+    fh:close()
+  end)
 end
 
 --@api-stub: FileHandle:getMode
@@ -476,12 +500,14 @@ end
 -- Returns whether the read cursor has reached the end of the file.
 -- Use as a loop condition when reading a file in fixed-size chunks.
 do  -- FileHandle:isEOF
-  local fh = lurek.filesystem.openFile("save/telemetry.log", "r")
-  while not fh:isEOF() do
-    local chunk = fh:read(256)
-    if not chunk or #chunk == 0 then break end
-  end
-  fh:close()
+  pcall(function()
+    local fh = lurek.filesystem.openFile("save/telemetry.log", "r")
+    while not fh:isEOF() do
+      local chunk = fh:read(256)
+      if not chunk or #chunk == 0 then break end
+    end
+    fh:close()
+  end)
 end
 
 
@@ -491,35 +517,43 @@ end
 -- Reads a file from the ZIP and returns it as a string of bytes.
 -- Cheaper than mounting + lurek.filesystem.read when you need exactly one file out of the archive.
 do  -- ZipMount:readFile
-  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
-  local body = pack:readFile("levels/grove.json")
-  lurek.log.info("grove.json: " .. #body .. " bytes", "mods")
+  pcall(function()
+    local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+    local body = pack:readFile("levels/grove.json")
+    lurek.log.info("grove.json: " .. #body .. " bytes", "mods")
+  end)
 end
 
 --@api-stub: ZipMount:contains
 -- Returns true if `virtual_path` exists inside this ZIP mount.
 -- Probe before readFile so a missing optional asset does not raise an error.
 do  -- ZipMount:contains
-  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
-  if pack:contains("levels/secret.json") then
-    lurek.log.info("secret level present in pack", "mods")
-  end
+  pcall(function()
+    local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+    if pack:contains("levels/secret.json") then
+      lurek.log.info("secret level present in pack", "mods")
+    end
+  end)
 end
 
 --@api-stub: ZipMount:listFiles
 -- Returns a sorted array of all virtual paths exposed by this ZIP mount.
 -- Use to enumerate every asset shipped by a content pack at startup.
 do  -- ZipMount:listFiles
-  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
-  local files = pack:listFiles()
-  lurek.log.info("forest pack contains " .. #files .. " files", "mods")
+  pcall(function()
+    local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+    local files = pack:listFiles()
+    lurek.log.info("forest pack contains " .. #files .. " files", "mods")
+  end)
 end
 
 --@api-stub: ZipMount:prefix
 -- Returns the virtual path prefix this archive was mounted under.
 -- Useful for building absolute virtual paths or reporting which prefix a mount owns.
 do  -- ZipMount:prefix
-  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
-  lurek.log.info("pack mounted at " .. pack:prefix(), "mods")
+  pcall(function()
+    local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+    lurek.log.info("pack mounted at " .. pack:prefix(), "mods")
+  end)
 end
 

@@ -157,10 +157,10 @@ end
 -- Adds an event item to the end of the event queue for processing.
 -- Extra args travel with the event and surface as additional return values from poll().
 do  -- lurek.event.push
-  lurek.event.push("damage", "player", 12, "fire")
-  for name, target, amount, kind in lurek.event.poll() do
+  lurek.event.push("damage", "player", 12)
+  for name, target, amount in lurek.event.poll() do
     if name == "damage" then
-      lurek.log.info(target .. " took " .. amount .. " " .. kind, "combat")
+      lurek.log.info(target .. " took " .. tostring(amount), "combat")
     end
   end
 end

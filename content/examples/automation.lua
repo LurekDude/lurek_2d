@@ -185,7 +185,7 @@ end
 -- Parses a TOML string and registers it as a named script.
 -- Prefer TOML for designer-authored scripts that live alongside game data; falls back to `load` for code-built tables.
 do  -- lurek.automation.loadFromToml
-  local toml = [[
+  local toml = [=[
 [meta]
 description = "left-right wiggle"
 [[steps]]
@@ -196,7 +196,7 @@ key = "left"
 time = 0.3
 action = "keyrelease"
 key = "left"
-]]
+]=]
   lurek.automation.loadFromToml("wiggle", toml)
 end
 

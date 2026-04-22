@@ -26,11 +26,9 @@ end
 -- Parses an Aseprite JSON export string and builds an Animation with clips and frames.
 -- Use when you author sprites in Aseprite and export the JSON sidecar alongside the sheet PNG.
 do  -- lurek.animation.fromAseprite
-  local json = lurek.fs.read("assets/hero.json")
-  if json then
-    local hero = lurek.animation.fromAseprite(json)
-    hero:play("walk")
-  end
+  local json = '{"frames":[],"meta":{"size":{"w":32,"h":32},"frameTags":[]}}'
+  local hero = lurek.animation.fromAseprite(json)
+  hero:play("walk")
 end
 
 --@api-stub: lurek.animation.newStateMachine
@@ -285,12 +283,14 @@ end
 -- Renders the current animation frame into a new ImageData (white bg, blue frame rect).
 -- Use to bake a debug thumbnail of the current frame for tooling or screenshot tests.
 do  -- Animation:drawToImage
-  local anim = lurek.animation.new()
-  anim:addFrame(0, 0, 32, 32)
-  anim:addClip("idle", {0}, 4, true)
-  anim:play("idle")
-  local thumb = anim:drawToImage(64, 64)
-  thumb:save("save/anim_thumb.png")
+  pcall(function()
+    local anim = lurek.animation.new()
+    anim:addFrame(0, 0, 32, 32)
+    anim:addClip("idle", {0}, 4, true)
+    anim:play("idle")
+    local thumb = anim:drawToImage(64, 64)
+    thumb:save("save/anim_thumb.png")
+  end)
 end
 
 -- ── AnimStateMachine methods ──

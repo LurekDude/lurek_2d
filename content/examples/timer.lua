@@ -386,7 +386,7 @@ end
 -- -1 means infinite; use to display "3 charges left" style HUD elements.
 do  -- Scheduler:getRepeatCount
   local sched = lurek.timer.newScheduler()
-  local id = sched:every(1.0, 5, function() end)
+  local id = sched:every(1.0, function() end)
   local left = sched:getRepeatCount(id) or 0
   lurek.log.debug("charges left = " .. left, "ability")
 end

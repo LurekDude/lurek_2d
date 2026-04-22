@@ -338,7 +338,9 @@ end
 -- Use to find which bodies a joint connects when reacting to a break event.
 do  -- World:getJointBodies
   local world = lurek.physics.newWorld(0, 9.81)
-  local jid = 1
+  local b1 = world:newBody(0, 0, "static")
+  local b2 = world:newBody(0, 100, "dynamic")
+  local jid = world:addRevoluteJoint(b1:getId(), b2:getId(), 0, 50)
   local a, b = world:getJointBodies(jid)
   lurek.log.debug("joint " .. jid .. " links " .. a .. " <-> " .. b, "phys")
 end
@@ -348,7 +350,10 @@ end
 -- Call when an entity disassembles (vehicle wreck, broken chain) to free constraint solver work.
 do  -- World:destroyJoint
   local world = lurek.physics.newWorld(0, 9.81)
-  world:destroyJoint(1)
+  local b1 = world:newBody(0, 0, "static")
+  local b2 = world:newBody(0, 100, "dynamic")
+  local jid = world:addRevoluteJoint(b1:getId(), b2:getId(), 0, 50)
+  world:destroyJoint(jid)
 end
 
 --@api-stub: World:getJointType
@@ -356,7 +361,10 @@ end
 -- Branch on the type string when you have a heterogeneous joint registry.
 do  -- World:getJointType
   local world = lurek.physics.newWorld(0, 9.81)
-  local kind = world:getJointType(1)
+  local b1 = world:newBody(0, 0, "static")
+  local b2 = world:newBody(0, 100, "dynamic")
+  local jid = world:addRevoluteJoint(b1:getId(), b2:getId(), 0, 50)
+  local kind = world:getJointType(jid)
   if kind == "revolute" then lurek.log.debug("hinge joint", "phys") end
 end
 
@@ -365,7 +373,10 @@ end
 -- Read motor speed for HUD telemetry or to drive sound pitch on a powered joint.
 do  -- World:getJointMotorSpeed
   local world = lurek.physics.newWorld(0, 9.81)
-  local rpm = world:getJointMotorSpeed(1)
+  local b1 = world:newBody(0, 0, "static")
+  local b2 = world:newBody(0, 100, "dynamic")
+  local jid = world:addRevoluteJoint(b1:getId(), b2:getId(), 0, 50)
+  local rpm = world:getJointMotorSpeed(jid)
   lurek.log.debug("motor speed=" .. rpm, "phys")
 end
 
@@ -374,7 +385,10 @@ end
 -- Use when serialising joint state or rendering a limit indicator in editor mode.
 do  -- World:getJointLimits
   local world = lurek.physics.newWorld(0, 9.81)
-  local lo, hi = world:getJointLimits(1)
+  local b1 = world:newBody(0, 0, "static")
+  local b2 = world:newBody(0, 100, "dynamic")
+  local jid = world:addRevoluteJoint(b1:getId(), b2:getId(), 0, 50)
+  local lo, hi = world:getJointLimits(jid)
   lurek.log.debug("limits=[" .. lo .. ", " .. hi .. "]", "phys")
 end
 
@@ -567,7 +581,10 @@ end
 -- Use to model destructible vehicle joints — the engine destroys the joint when exceeded.
 do  -- World:setJointBreakForce
   local world = lurek.physics.newWorld(0, 9.81)
-  world:setJointBreakForce(1, 5000.0)
+  local b1 = world:newBody(0, 0, "static")
+  local b2 = world:newBody(0, 100, "dynamic")
+  local jid = world:addRevoluteJoint(b1:getId(), b2:getId(), 0, 50)
+  world:setJointBreakForce(jid, 5000.0)
 end
 
 --@api-stub: World:getJointBreakForce
@@ -575,7 +592,10 @@ end
 -- Read for HUD / damage display; returns nil when no break threshold has been set.
 do  -- World:getJointBreakForce
   local world = lurek.physics.newWorld(0, 9.81)
-  local f = world:getJointBreakForce(1)
+  local b1 = world:newBody(0, 0, "static")
+  local b2 = world:newBody(0, 100, "dynamic")
+  local jid = world:addRevoluteJoint(b1:getId(), b2:getId(), 0, 50)
+  local f = world:getJointBreakForce(jid)
   if f then lurek.log.debug("breaks at " .. f .. " N", "phys") end
 end
 

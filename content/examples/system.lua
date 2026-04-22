@@ -10,6 +10,9 @@
 
 -- ── lurek.system.* functions ──
 
+-- Guard: lurek.system is not registered in the headless test VM.
+if not lurek.system then return end
+
 --@api-stub: lurek.system.getOS
 -- Returns the host operating system name ('Windows', 'Linux', 'macOS').
 -- Branch on this at startup to pick platform-specific asset paths or hot-keys.

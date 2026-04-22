@@ -32,12 +32,12 @@ end
 -- Load provinces from a TOML string and create a globe.
 -- Useful at level-load time when provinces are authored in a data file rather than built procedurally in script.
 do  -- lurek.globe.loadFromTOML
-  local toml_src = [[
+  local toml_src = [=[
   [[provinces]]
   id = 1
   centroid = [10.0, 20.0]
   vertices = [[5.0,15.0],[15.0,15.0],[15.0,25.0],[5.0,25.0]]
-  ]]
+  ]=]
   local g = lurek.globe.loadFromTOML("loaded", toml_src, {})
   lurek.log.info("loaded provinces=" .. g:provinceCount(), "globe")
 end
@@ -164,7 +164,9 @@ do  -- Globe:getCamera
   local g = lurek.globe.new("getcam_demo", {})
   g:setCamera(0.0, 0.0, 1.5)
   local lat, lon, z = g:getCamera()
-  lurek.save.write("globe_camera", { lat = lat, lon = lon, zoom = z })
+  if lurek.save and lurek.save.write then
+    lurek.save.write("globe_camera", { lat = lat, lon = lon, zoom = z })
+  end
 end
 
 --@api-stub: Globe:getLod
@@ -435,7 +437,9 @@ end
 do  -- Globe:getName
   local g = lurek.globe.new("primary_world", {})
   local name = g:getName()
-  lurek.save.write("active_globe", name)
+  if lurek.save and lurek.save.write then
+    lurek.save.write("active_globe", name)
+  end
   lurek.log.info("active globe = " .. name, "globe")
 end
 

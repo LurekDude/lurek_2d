@@ -73,7 +73,7 @@ do  -- ParticleSystem:stop
   local jet = lurek.particle.newSystem({ emissionRate = 100 })
   jet:start()
   function lurek.process(dt)
-    if lurek.input.isKeyDown("space") then jet:stop() end
+    if lurek.input.keyboard.isDown("space") then jet:stop() end
   end
 end
 
@@ -83,7 +83,7 @@ end
 do  -- ParticleSystem:pause
   local steam = lurek.particle.newSystem({ emissionRate = 40 })
   steam:start()
-  if lurek.input.isKeyDown("escape") then steam:pause() end
+  if lurek.input.keyboard.isDown("escape") then steam:pause() end
 end
 
 --@api-stub: ParticleSystem:resume

@@ -87,6 +87,7 @@ end
 -- Pass the GIDs of solid tiles so the resulting NavGrid mirrors collision exactly without manual setCost loops.
 do  -- lurek.pathfind.newNavGridFromTileMap
   local tm = lurek.tilemap.newTileMap(40, 25, 32, 32)
+  tm:addLayer("walls", 40, 25)
   tm:setTile(1, 10, 5, 7)  -- place wall tile (gid=7) on layer 1
   local grid = lurek.pathfind.newNavGridFromTileMap(tm, 1, {7, 8, 9})
   lurek.log.info("nav grid from tilemap: " .. grid:getWidth() .. "x" .. grid:getHeight(), "pathfind")
@@ -268,7 +269,7 @@ end
 -- Modes: "never", "always", "no_corner_cutting" (recommended for tile-based games to prevent clipping).
 do  -- NavGrid:setDiagonalMode
   local grid = lurek.pathfind.newNavGrid(40, 40)
-  grid:setDiagonalMode("no_corner_cutting")
+  grid:setDiagonalMode("nocornercut")
   lurek.log.info("diagonal mode set to " .. grid:getDiagonalMode(), "pathfind")
 end
 

@@ -611,21 +611,21 @@ end
 
 --@api-stub: Node:getOverflowPolicy
 -- Returns the overflow policy as a string.
--- Returns one of "drop", "block", "redirect". Display it in the building inspector UI.
+-- Returns one of "reject", "destroy", "queue". Display it in the building inspector UI.
 do  -- Node:getOverflowPolicy
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
-  depot:setOverflowPolicy("drop")
+  depot:setOverflowPolicy("reject")
   lurek.log.debug("overflow policy=" .. depot:getOverflowPolicy(), "factory")
 end
 
 --@api-stub: Node:setOverflowPolicy
 -- Sets the overflow policy from a string.
--- Common choices: "block" upstream (default), "drop" to discard, "redirect" to spill onto another edge.
+-- Common choices: "queue" to buffer, "reject" to refuse, "destroy" to silently discard excess.
 do  -- Node:setOverflowPolicy
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
-  depot:setOverflowPolicy("block")  -- back-pressure upstream when full
+  depot:setOverflowPolicy("queue")  -- buffer excess items rather than rejecting them
 end
 
 --@api-stub: Node:getFlowMode

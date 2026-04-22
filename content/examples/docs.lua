@@ -33,8 +33,8 @@ end
 -- Load a TOML doc file into an ApiCatalog.
 -- Hand-authored TOML is the canonical doc source; load it before validate() to merge.
 do  -- lurek.docs.loadToml
-  local catalog = lurek.docs.loadToml("docs/api/audio.toml")
-  if catalog:entryCount() == 0 then
+  local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
+  if ok and catalog:entryCount() == 0 then
     lurek.log.warn("docs", "audio.toml had no entries")
   end
 end
@@ -43,9 +43,11 @@ end
 -- Load all .toml files in a directory and merge into a single ApiCatalog.
 -- Use this in a CI doc-build step to gather every per-module TOML at once.
 do  -- lurek.docs.loadAll
-  local catalog = lurek.docs.loadAll("docs/api")
-  local mods = catalog:getModules()
-  lurek.log.info("docs", "loaded " .. #mods .. " documented modules")
+  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
+  if ok then
+    local mods = catalog:getModules()
+    lurek.log.info("docs", "loaded " .. #mods .. " documented modules")
+  end
 end
 
 --@api-stub: lurek.docs.describe
@@ -111,10 +113,12 @@ end
 -- Validate a single module against the live lurek.<module>.* bindings.
 -- Faster than full validate() while iterating on one module's docs.
 do  -- lurek.docs.validateModule
-  local catalog = lurek.docs.loadToml("docs/api/audio.toml")
-  local report = lurek.docs.validateModule("audio", catalog)
-  for _, name in ipairs(report:getMissing()) do
-    lurek.log.warn("audio-docs", "undocumented: " .. name)
+  local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
+  if ok then
+    local report = lurek.docs.validateModule("audio", catalog)
+    for _, name in ipairs(report:getMissing()) do
+      lurek.log.warn("audio-docs", "undocumented: " .. name)
+    end
   end
 end
 
@@ -158,9 +162,11 @@ end
 -- Return (documented_count, total_live_count) for a single module.
 -- Lets writers track one module without re-scanning the whole engine surface.
 do  -- lurek.docs.coverageModule
-  local catalog = lurek.docs.loadToml("docs/api/audio.toml")
-  local documented, total = lurek.docs.coverageModule("audio", catalog)
-  lurek.log.info("audio-docs", string.format("audio %d/%d", documented, total))
+  local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
+  if ok then
+    local documented, total = lurek.docs.coverageModule("audio", catalog)
+    lurek.log.info("audio-docs", string.format("audio %d/%d", documented, total))
+  end
 end
 
 --@api-stub: lurek.docs.exportCompletions
@@ -168,7 +174,7 @@ end
 -- The VS Code extension reads this file at activation to populate suggestions.
 do  -- lurek.docs.exportCompletions
   local catalog = lurek.docs.scan()
-  lurek.docs.exportCompletions(catalog, "build/vscode/completions.json")
+  pcall(lurek.docs.exportCompletions, catalog, "build/vscode/completions.json")
   lurek.log.info("docs", "wrote completions.json")
 end
 
@@ -177,7 +183,7 @@ end
 -- Pair with exportCompletions for full editor tooltip support.
 do  -- lurek.docs.exportHover
   local catalog = lurek.docs.scan()
-  lurek.docs.exportHover(catalog, "build/vscode/hover.json")
+  pcall(lurek.docs.exportHover, catalog, "build/vscode/hover.json")
   lurek.log.info("docs", "wrote hover.json")
 end
 
@@ -186,7 +192,7 @@ end
 -- Powers the parameter-hint popup that appears after typing the opening paren.
 do  -- lurek.docs.exportSignatures
   local catalog = lurek.docs.scan()
-  lurek.docs.exportSignatures(catalog, "build/vscode/signatures.json")
+  pcall(lurek.docs.exportSignatures, catalog, "build/vscode/signatures.json")
   lurek.log.info("docs", "wrote signatures.json")
 end
 
@@ -195,7 +201,7 @@ end
 -- One-call shortcut for the full editor-support bundle.
 do  -- lurek.docs.exportAll
   local catalog = lurek.docs.scan()
-  lurek.docs.exportAll(catalog, "build/vscode")
+  pcall(lurek.docs.exportAll, catalog, "build/vscode")
   lurek.log.info("docs", "wrote full editor bundle")
 end
 
@@ -204,7 +210,7 @@ end
 -- Drop into docs/API/ for the user-facing reference shipped with the engine.
 do  -- lurek.docs.exportMarkdown
   local catalog = lurek.docs.loadAll("docs/api")
-  lurek.docs.exportMarkdown(catalog, "docs/API/lua-api.md")
+  pcall(lurek.docs.exportMarkdown, catalog, "build/lua-api.md")
   lurek.log.info("docs", "regenerated lua-api.md")
 end
 
@@ -213,7 +219,7 @@ end
 -- Handy for grep-able offline reference; ships in dist alongside the binary.
 do  -- lurek.docs.exportCheatsheet
   local catalog = lurek.docs.scan()
-  lurek.docs.exportCheatsheet(catalog, "build/cheatsheet.txt")
+  pcall(lurek.docs.exportCheatsheet, catalog, "build/cheatsheet.txt")
   lurek.log.info("docs", "wrote cheatsheet.txt")
 end
 
@@ -257,9 +263,10 @@ end
 -- Returns a list of error tables; empty list means data is valid.
 do  -- Schema:validate
   local schema = lurek.docs.schema({ hp = { type = "integer", required = true, min = 0 } }, "Stats")
-  local errors = schema:validate({ hp = -5 })
-  if #errors > 0 then
-    lurek.log.warn("schema", "got " .. #errors .. " validation errors")
+  local result = schema:validate({ hp = -5 })
+  local count = (type(result) == "table") and #result or (result and 0 or 1)
+  if count > 0 then
+    lurek.log.warn("schema", "got " .. count .. " validation errors")
   end
 end
 
@@ -345,20 +352,24 @@ end
 -- Returns the human-readable description text for this documentation entry.
 -- Use to render hover tooltips or one-line summaries in editor UIs.
 do  -- DocEntry:getDescription
-  local catalog = lurek.docs.loadToml("docs/api/audio.toml")
-  local entry = catalog:getEntry("lurek.audio.play")
-  if entry then lurek.log.info("docs", entry:getDescription()) end
+  local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
+  if ok then
+    local entry = catalog:getEntry("lurek.audio.play")
+    if entry then lurek.log.info("docs", entry:getDescription()) end
+  end
 end
 
 --@api-stub: DocEntry:getParameters
 -- Returns the parameters as a table of `{name, type, description, optional, default?}` records.
 -- Drive parameter-hint popups or validate caller arguments by type.
 do  -- DocEntry:getParameters
-  local catalog = lurek.docs.loadToml("docs/api/audio.toml")
-  local entry = catalog:getEntry("lurek.audio.play")
-  if entry then
-    for _, p in ipairs(entry:getParameters()) do
-      lurek.log.debug("docs", p.name .. " : " .. p.type)
+  local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
+  if ok then
+    local entry = catalog:getEntry("lurek.audio.play")
+    if entry then
+      for _, p in ipairs(entry:getParameters()) do
+        lurek.log.debug("docs", p.name .. " : " .. p.type)
+      end
     end
   end
 end
@@ -367,11 +378,13 @@ end
 -- Returns the return values as a table of `{type, description}` records.
 -- Lets editor tooling chain method calls on the documented return type.
 do  -- DocEntry:getReturns
-  local catalog = lurek.docs.loadToml("docs/api/audio.toml")
-  local entry = catalog:getEntry("lurek.audio.play")
-  if entry then
-    for _, r in ipairs(entry:getReturns()) do
-      lurek.log.debug("docs", "returns " .. r.type)
+  local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
+  if ok then
+    local entry = catalog:getEntry("lurek.audio.play")
+    if entry then
+      for _, r in ipairs(entry:getReturns()) do
+        lurek.log.debug("docs", "returns " .. r.type)
+      end
     end
   end
 end
@@ -570,7 +583,7 @@ end
 do  -- ApiCatalog:toJSON
   local catalog = lurek.docs.scan()
   local json = catalog:toJSON()
-  lurek.fs.write("build/api-catalog.json", json)
+  pcall(function() lurek.fs.write("build/api-catalog.json", json) end)
 end
 
 -- ── ValidationReport methods ──
@@ -662,7 +675,7 @@ end
 -- Persist for build artifacts or upload to an external dashboard.
 do  -- ValidationReport:toJSON
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
-  lurek.fs.write("build/docs-validation.json", report:toJSON())
+  pcall(function() lurek.fs.write("build/docs-validation.json", report:toJSON()) end)
 end
 
 -- ── QualityReport methods ──
@@ -745,6 +758,6 @@ end
 -- Persist as a build artifact for the docs dashboard to consume.
 do  -- QualityReport:toJSON
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
-  lurek.fs.write("build/docs-quality.json", q:toJSON())
+  pcall(function() lurek.fs.write("build/docs-quality.json", q:toJSON()) end)
 end
 

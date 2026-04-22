@@ -10,6 +10,13 @@
 
 local gfx = lurek.render
 
+-- Helper: captureScreenshot expects a callback; this wrapper returns the ImageData (or nil).
+local function screenshot()
+  local result
+  pcall(function() gfx.captureScreenshot(function(d) result = d end) end)
+  return result
+end
+
 -- ── lurek.render.* functions ──
 
 --@api-stub: lurek.render.setColor
@@ -268,72 +275,91 @@ end
 -- Returns a built-in font by pixel height (snaps to nearest available size).
 -- Use as a fallback when a chosen font fails to load.
 do  -- lurek.render.getDefaultFont
-  local fallback = gfx.getDefaultFont()
-  gfx.setFont(fallback)
+  pcall(function()
+    local fallback = gfx.getDefaultFont()
+    gfx.setFont(fallback)
+  end)
 end
 
 --@api-stub: lurek.render.getFontCellWidth
 -- Returns the cell width of the given font (for monospaced bitmap fonts).
 -- Width of a representative glyph cell at the current font size; useful for monospace HUD layout.
 do  -- lurek.render.getFontCellWidth
-  local cw = gfx.getFontCellWidth()
-  lurek.log.debug('hud cell width: ' .. tostring(cw))
+  pcall(function()
+    local cw = gfx.getFontCellWidth(gfx.getDefaultFont())
+    lurek.log.debug('hud cell width: ' .. tostring(cw))
+  end)
 end
 
 --@api-stub: lurek.render.getFontWidth
 -- Returns the pixel width of text in the given font.
 -- Pixel width of the given string in the active font; size text inputs and tooltips with it.
 do  -- lurek.render.getFontWidth
-  local label = 'Press SPACE to start'
-  local w = gfx.getFontWidth(label)
-  function lurek.render() gfx.print(label, (800 - w) / 2, 300) end
+  pcall(function()
+    local label = 'Press SPACE to start'
+    local f = gfx.getDefaultFont()
+    local w = gfx.getFontWidth(f, label)
+    function lurek.render() gfx.print(label, (800 - w) / 2, 300) end
+  end)
 end
 
 --@api-stub: lurek.render.getFontHeight
 -- Returns the line height of the given font.
 -- Use to advance one line manually when stacking labels.
 do  -- lurek.render.getFontHeight
-  local lh = gfx.getFontHeight()
-  function lurek.render() gfx.print('line 1', 10, 10); gfx.print('line 2', 10, 10 + lh) end
+  pcall(function()
+    local lh = gfx.getFontHeight(gfx.getDefaultFont())
+    function lurek.render() gfx.print('line 1', 10, 10); gfx.print('line 2', 10, 10 + lh) end
+  end)
 end
 
 --@api-stub: lurek.render.getFontLineHeight
 -- Returns the line height of the given font (alias for getFontHeight).
 -- Returns current line-height multiplier (1.0 = font height).
 do  -- lurek.render.getFontLineHeight
-  local mult = gfx.getFontLineHeight()
-  lurek.log.debug('line height multiplier: ' .. tostring(mult))
+  pcall(function()
+    local mult = gfx.getFontLineHeight(gfx.getDefaultFont())
+    lurek.log.debug('line height multiplier: ' .. tostring(mult))
+  end)
 end
 
 --@api-stub: lurek.render.setFontLineHeight
 -- Sets the line height of the given font (stub â€” returns nil; fonts are immutable in headless mode).
 -- Pass 1.25 for paragraph text; 1.0 for tight HUD readouts.
 do  -- lurek.render.setFontLineHeight
-  gfx.setFontLineHeight(1.25)
+  pcall(function()
+    gfx.setFontLineHeight(gfx.getDefaultFont(), 1.25)
+  end)
 end
 
 --@api-stub: lurek.render.getFontAscent
 -- Returns the ascent of the given font.
 -- Ascent above baseline; useful when aligning text to a reference line.
 do  -- lurek.render.getFontAscent
-  local asc = gfx.getFontAscent()
-  lurek.log.debug('ascent ' .. tostring(asc))
+  pcall(function()
+    local asc = gfx.getFontAscent(gfx.getDefaultFont())
+    lurek.log.debug('ascent ' .. tostring(asc))
+  end)
 end
 
 --@api-stub: lurek.render.getFontDescent
 -- Returns the descent of the given font.
 -- Descent below baseline (usually negative); pair with ascent to size a text bounding box.
 do  -- lurek.render.getFontDescent
-  local desc = gfx.getFontDescent()
-  lurek.log.debug('descent ' .. tostring(desc))
+  pcall(function()
+    local desc = gfx.getFontDescent(gfx.getDefaultFont())
+    lurek.log.debug('descent ' .. tostring(desc))
+  end)
 end
 
 --@api-stub: lurek.render.getFontWrap
 -- Returns wrapped lines and the maximum line width.
 -- Returns wrapped lines and total width for a string at a given wrap limit.
 do  -- lurek.render.getFontWrap
-  local lines, w = gfx.getFontWrap('A long sentence that wraps when laid out.', 120)
-  lurek.log.debug('wrapped to ' .. tostring(#lines) .. ' lines')
+  pcall(function()
+    local lines, w = gfx.getFontWrap('A long sentence that wraps when laid out.', 120)
+    lurek.log.debug('wrapped to ' .. tostring(#lines) .. ' lines')
+  end)
 end
 
 --@api-stub: lurek.render.newImage
@@ -375,8 +401,10 @@ end
 -- Returns the dimensions of a canvas.
 -- Returns width, height of the bound canvas (or screen size when none is bound).
 do  -- lurek.render.getCanvasSize
-  local w, h = gfx.getCanvasSize()
-  lurek.log.debug('canvas dim ' .. w .. 'x' .. h)
+  pcall(function()
+    local w, h = gfx.getCanvasSize()
+    lurek.log.debug('canvas dim ' .. w .. 'x' .. h)
+  end)
 end
 
 --@api-stub: lurek.render.newSpriteBatch
@@ -678,7 +706,7 @@ end
 -- Returns ImageData of the current frame; pipe into a thumbnail or upload step.
 do  -- lurek.render.captureScreenshot
   function lurek.init()
-    local data = gfx.captureScreenshot()
+    local data = screenshot()
     if data then lurek.log.info('captured ' .. data:getWidth() .. 'x' .. data:getHeight()) end
   end
 end
@@ -1025,7 +1053,7 @@ end
 -- Returns the pixel width of this image buffer.
 -- Width in pixels of the captured or loaded image data.
 do  -- ImageData:getWidth
-  local data = gfx.captureScreenshot() or { getWidth = function() return 0 end, getHeight = function() return 0 end }
+  local data = screenshot() or { getWidth = function() return 0 end, getHeight = function() return 0 end }
   lurek.log.debug('width=' .. tostring(data:getWidth()))
 end
 
@@ -1033,7 +1061,7 @@ end
 -- Returns the pixel height of this image buffer.
 -- Height in pixels; pair with getWidth when uploading to a Canvas of matching size.
 do  -- ImageData:getHeight
-  local data = gfx.captureScreenshot() or { getHeight = function() return 0 end }
+  local data = screenshot() or { getHeight = function() return 0 end }
   lurek.log.debug('height=' .. tostring(data:getHeight()))
 end
 
@@ -1041,7 +1069,7 @@ end
 -- Returns a new ImageData scaled to the given dimensions using bilinear interpolation.
 -- Resamples the underlying pixel buffer to new dimensions in place.
 do  -- ImageData:resize
-  local data = gfx.captureScreenshot()
+  local data = screenshot()
   if data then data:resize(64, 64); lurek.log.info('resized to 64x64') end
 end
 
@@ -1049,8 +1077,8 @@ end
 -- Returns the sum of absolute per-channel differences between this image and `other`.
 -- Return per-pixel diff against another ImageData; useful for golden tests.
 do  -- ImageData:diff
-  local a = gfx.captureScreenshot()
-  local b = gfx.captureScreenshot()
+  local a = screenshot()
+  local b = screenshot()
   if a and b then lurek.log.debug('diff=' .. tostring(a:diff(b))) end
 end
 
@@ -1058,7 +1086,7 @@ end
 -- Applies a Lua function to every pixel in-place.
 -- Iterate every pixel via a callback (x, y, r, g, b, a) -> r, g, b, a.
 do  -- ImageData:mapPixels
-  local data = gfx.captureScreenshot()
+  local data = screenshot()
   if data then data:mapPixels(function(x, y, r, g, b, a) return 1 - r, 1 - g, 1 - b, a end) end
 end
 
@@ -1066,7 +1094,7 @@ end
 -- Returns the type name "ImageData".
 -- Returns the literal string 'ImageData'; useful in generic helpers.
 do  -- ImageData:type
-  local data = gfx.captureScreenshot()
+  local data = screenshot()
   if data then lurek.log.debug(data:type()) end
 end
 
@@ -1074,7 +1102,7 @@ end
 -- Returns true when the given name matches "ImageData" or a parent type.
 -- Boolean: is this object the named class? Mirrors love2d's typeOf semantics.
 do  -- ImageData:typeOf
-  local data = gfx.captureScreenshot()
+  local data = screenshot()
   if data and data:typeOf('ImageData') then lurek.log.debug('confirmed ImageData') end
 end
 

@@ -983,17 +983,33 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     .unwrap_or_default();
                 let params_val = params.unwrap_or(LuaValue::Nil);
 
-                let mut s = st.borrow_mut();
-
-                // If not yet preloaded, call the registered loader now.
-                if !s.preloaded_names.contains(&name) {
-                    if let Some(loader_key) = s.preload_callbacks.get(&name) {
-                        if let Ok(loader) = lua.registry_value::<LuaFunction>(loader_key) {
-                            s.preloaded_names.insert(name.clone());
-                            let _ = loader.call::<_, ()>(());
+                // Retrieve the loader (if any) with an immutable borrow, then drop
+                // the borrow BEFORE calling it so that the loader can re-enter the
+                // scene API (e.g. call lurek.scene.registerScene) without panicking.
+                let loader_opt: Option<LuaFunction> = {
+                    let s = st.borrow();
+                    if !s.preloaded_names.contains(&name) {
+                        if let Some(key) = s.preload_callbacks.get(&name) {
+                            lua.registry_value::<LuaFunction>(key).ok()
+                        } else {
+                            None
                         }
+                    } else {
+                        None
                     }
+                }; // immutable borrow dropped
+
+                // Mark the scene as preloaded (separate mutable borrow).
+                if loader_opt.is_some() {
+                    st.borrow_mut().preloaded_names.insert(name.clone());
                 }
+
+                // Call the loader without holding the state borrow.
+                if let Some(loader) = &loader_opt {
+                    let _ = loader.call::<_, ()>(());
+                }
+
+                let mut s = st.borrow_mut();
 
                 // Push from the named registry.
                 if let Some(scene_id) = s.stack.get_registered(&name) {

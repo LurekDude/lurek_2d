@@ -10,6 +10,12 @@
 --
 -- Run: cargo run -- content/examples/sprite.lua
 
+-- Helper: return file contents or nil (lurek.filesystem.read throws on missing files).
+local function tryRead(path)
+  local ok, data = pcall(lurek.filesystem.read, path)
+  return ok and data or nil
+end
+
 -- ── lurek.sprite.* functions ──
 
 --@api-stub: lurek.sprite.newSheet
@@ -37,37 +43,43 @@ end
 -- Parses a TexturePacker JSON string (hash or array format) and returns a SpriteAtlas.
 -- Read the .json off disk with lurek.filesystem.read first; raises a Lua error on malformed JSON.
 do  -- lurek.sprite.parseAtlas
-  local json = lurek.filesystem.read("img/ui_atlas.json")
-  if json then
-    local atlas = lurek.sprite.parseAtlas(json)
-    lurek.log.info("ui atlas loaded with " .. atlas:entryCount() .. " regions", "sprite")
-  end
+  pcall(function()
+    local json = tryRead("img/ui_atlas.json")
+    if json then
+      local atlas = lurek.sprite.parseAtlas(json)
+      lurek.log.info("ui atlas loaded with " .. atlas:entryCount() .. " regions", "sprite")
+    end
+  end)
 end
 
 --@api-stub: lurek.sprite.newAtlasSheet
 -- Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
 -- Use when the artist exported a packed atlas instead of a uniform grid; each region also becomes a single-frame named group.
 do  -- lurek.sprite.newAtlasSheet
-  local json = lurek.filesystem.read("img/items.json")
-  if json then
-    local atlas = lurek.sprite.parseAtlas(json)
-    local sheet = lurek.sprite.newAtlasSheet(atlas, 512, 512)
-    local sword = sheet:getGroupFrames("sword_iron")
-    if sword then lurek.log.info("sword frame at " .. sword[1].x .. "," .. sword[1].y, "sprite") end
-  end
+  pcall(function()
+    local json = tryRead("img/items.json")
+    if json then
+      local atlas = lurek.sprite.parseAtlas(json)
+      local sheet = lurek.sprite.newAtlasSheet(atlas, 512, 512)
+      local sword = sheet:getGroupFrames("sword_iron")
+      if sword then lurek.log.info("sword frame at " .. sword[1].x .. "," .. sword[1].y, "sprite") end
+    end
+  end)
 end
 
 --@api-stub: lurek.sprite.parseAsepriteAtlas
 -- Parses an Aseprite JSON export string and returns a `SpriteAtlas`.
 -- Use the "Export Sprite Sheet" command in Aseprite; both array and hash JSON layouts are accepted.
 do  -- lurek.sprite.parseAsepriteAtlas
-  local json = lurek.filesystem.read("img/hero.json")
-  if json then
-    local atlas = lurek.sprite.parseAsepriteAtlas(json)
-    for _, name in ipairs(atlas:entryNames()) do
-      lurek.log.debug("aseprite tag: " .. name, "sprite")
+  pcall(function()
+    local json = tryRead("img/hero.json")
+    if json then
+      local atlas = lurek.sprite.parseAsepriteAtlas(json)
+      for _, name in ipairs(atlas:entryNames()) do
+        lurek.log.debug("aseprite tag: " .. name, "sprite")
+      end
     end
-  end
+  end)
 end
 
 -- ── SpriteSheet methods ──
@@ -171,7 +183,7 @@ end
 -- Returns the named region as a table `{name, x, y, w, h, rotated}`, or nil.
 -- The `rotated` flag tells the renderer to draw the source quad 90° CCW (TexturePacker rotation packing).
 do  -- SpriteAtlas:getEntry
-  local json = lurek.filesystem.read("img/ui.json")
+  local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
     local btn = atlas:getEntry("button_play")
@@ -185,7 +197,7 @@ end
 -- Returns the region at the given 1-based insertion index, or nil.
 -- Use to iterate atlas regions in export order (handy for cycling through tiles in a tileset preview).
 do  -- SpriteAtlas:getByIndex
-  local json = lurek.filesystem.read("img/tiles.json")
+  local json = tryRead("img/tiles.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
     for i = 1, math.min(atlas:entryCount(), 5) do
@@ -199,7 +211,7 @@ end
 -- Returns the total number of named regions in the atlas.
 -- Use to size preallocated tables, paginate a debug atlas viewer, or sanity-check that an export was complete.
 do  -- SpriteAtlas:entryCount
-  local json = lurek.filesystem.read("img/ui.json")
+  local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
     local n = atlas:entryCount()
@@ -212,7 +224,7 @@ end
 -- Returns a sequential table of all region names.
 -- Build an in-game asset browser by sorting these names and filtering by prefix (e.g. "icon_*").
 do  -- SpriteAtlas:entryNames
-  local json = lurek.filesystem.read("img/ui.json")
+  local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
     local icons = {}

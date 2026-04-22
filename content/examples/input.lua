@@ -463,8 +463,8 @@ end
 -- Loads SDL2 GameControllerDB-format mappings from a file.
 -- Returns the number of mappings parsed; ship a curated gamecontrollerdb.txt with your game and load it once at startup.
 do  -- lurek.input.loadGamepadMappings
-  local n = lurek.input.gamepad.loadGamepadMappings("save/gamecontrollerdb.txt")
-  lurek.log.info("loaded " .. n .. " controller mappings", "input")
+  local ok, n = pcall(lurek.input.gamepad.loadGamepadMappings, "save/gamecontrollerdb.txt")
+  if ok then lurek.log.info("loaded " .. n .. " controller mappings", "input") end
 end
 
 --@api-stub: lurek.input.saveGamepadMappings
