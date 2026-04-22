@@ -9,9 +9,6 @@
 # Session and planning artifacts
 /work/
 
-# Transient developer logs
-/logs/
-
 # Local research and draft docs
 /docs/competition/
 /docs/future/

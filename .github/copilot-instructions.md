@@ -32,9 +32,9 @@ When you change one of these, you MUST update the others in the same commit.
 |----------------------------------------------|--------------------------------------------------------------------------|
 | `src/<module>/*.rs`                          | `docs/specs/<module>.md`                                                 |
 | `src/lua_api/<module>_api.rs`                | `docs/specs/<module>.md` · `docs/lua-api.md`                             |
-| `lurek.*` API added / renamed / removed      | `content/examples/<module>.lua` · affected `content/games/` · dependent `content/library/` modules |
+| `lurek.*` API added / renamed / removed      | `content/examples/<module>.lua` · affected `content/games/` · dependent `library/` modules |
 | New module created                           | New `docs/specs/<module>.md` · `docs/specs/README.md`                    |
-| `content/library/<name>/init.lua` changed    | `content/library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/reports/library-docs.md` via `tools/docs/gen_lib_docs.py` |
+| `library/<name>/init.lua` changed            | `library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/reports/library-docs.md` via `tools/docs/gen_lib_docs.py` |
 | Contributor onboarding flow changes (build steps, first-game tutorial, quality gates) | `docs/handbook.md` (relevant section) · `CONTRIBUTING.md` if needed |
 | New game demo added to `content/games/`      | `tests/lua/content/demos/test_<name>.lua` (new static-analysis test) · `tests/demo_smoke_tests.rs` (new `#[ignore]` screenshot test) · `tests/lua/harness.rs` (add `lua_demo_<name>` entry) |
 | Any change                                   | `docs/CHANGELOG.md`                                                      |
@@ -73,9 +73,12 @@ Minimum before any commit:
 ```
 src/         Rust engine source (Foundations · Core Runtime · Platform Services · Feature Systems · Edge/Integration)
 tests/       Rust + Lua test suites — tests/rust/{unit,golden,ext,fixtures} and tests/lua/
-docs/        Architecture, module specs, generated API references, CHANGELOG
+docs/        Architecture, module specs, CHANGELOG — docs/architecture/, docs/specs/, docs/api/, docs/handbook.md
+logs/        Auto-generated data — logs/data/ (JSON), logs/reports/ (markdown), logs/quality/ (per-module)
+wiki/        Game-developer wiki pages (GitHub Wiki mirror)
+library/     Lunasome pure-Lua game libraries (library/<name>/init.lua)
 tools/       Permanent CLI scripts — validate/, audit/, fix/, docs/, dev/, demos/, dist/, github/, assets/
-content/     Lua content — games/, examples/, library/, layouts/, plugins/
+content/     Lua content — games/, examples/, layouts/, plugins/
 .github/     CAG layer — copilot-instructions.md, agents/, skills/, prompts/
 extensions/  First-party VS Code extension (extensions/vscode/)
 work/        Active session folders and work/archive/

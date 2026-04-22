@@ -9,7 +9,7 @@ the preceding /// docstring contains:
   3. @return type        for methods that return a non-unit value
 
 Writes:
-  logs/docstring_audit.json  -- machine-readable report for docstring_fix.py
+  logs/data/docstring_audit.json  -- machine-readable report for docstring_fix.py
   stdout                         -- human-readable summary with counts per file
 
 Usage:

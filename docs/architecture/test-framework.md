@@ -931,12 +931,12 @@ Every commit must pass all of these:
 
 | Tool | Purpose | Output |
 |---|---|---|
-| `python tools/audit/test_coverage.py` | Test coverage analytics | `logs/test_coverage.json` |
+| `python tools/audit/test_coverage.py` | Test coverage analytics | `logs/data/test_coverage.json` |
 | `python tools/audit/test_coverage.py --suggest` | Generate stubs for uncovered items | stdout |
 | `python tools/audit/module_audit.py` | Full module audit (includes test status) | stdout |
 | `python tools/audit/audit_module.py <name>` | Single module quality audit | PASS/WARN/ERROR |
 | `python tools/audit/lua_api_test_coverage.py` | Per-function API coverage (marker + heuristic) | stdout / JSON |
-| `python tools/audit/lua_api_test_coverage.py --json` | JSON export for CI/tooling | `logs/lua_api_test_coverage.json` |
+| `python tools/audit/lua_api_test_coverage.py --json` | JSON export for CI/tooling | `logs/data/lua_api_test_coverage.json` |
 | `python tools/audit/lua_api_test_coverage.py --markdown` | Markdown report | stdout |
 | `python tools/audit/lua_api_test_coverage.py --suggest` | Suggest missing `@covers` markers | stdout |
 | `python tools/audit/lua_api_test_coverage.py --strict --threshold 40` | Exit 1 if coverage below 40% | — |
@@ -1029,7 +1029,7 @@ python tools/audit/lua_api_test_coverage.py --strict --threshold 40
 
 The scanner uses a **hybrid approach**: explicit `-- @covers` markers when present, heuristic substring matching as fallback for unmarked files. As markers are added, heuristic coverage is gradually replaced by verified marker coverage.
 
-Output: `logs/lua_api_test_coverage.json`
+Output: `logs/data/lua_api_test_coverage.json`
 
 ---
 
@@ -1335,7 +1335,7 @@ The planned `tools/audit/test_analytics.py` script aggregates all coverage data 
 
 ```powershell
 python tools/audit/test_analytics.py                   # full stdout report
-python tools/audit/test_analytics.py --html            # HTML dashboard → docs/quality/test_analytics.html
+python tools/audit/test_analytics.py --html            # HTML dashboard → logs/quality/test_analytics.html
 python tools/audit/test_analytics.py --json            # JSON → logs/test_analytics.json
 python tools/audit/test_analytics.py --module physics  # single module deep-dive
 python tools/audit/test_analytics.py --worst 10        # 10 lowest-scoring modules
@@ -1350,5 +1350,5 @@ Grades: A (9–10), B (7–8), C (5–6), D (3–4) ⚠, F (0–2) 🚨
 
 ### Output Files
 
-- `docs/quality/test_analytics.html` — browsable dashboard with sortable module table, category charts, uncovered function explorer
+- `logs/quality/test_analytics.html` — browsable dashboard with sortable module table, category charts, uncovered function explorer
 - `logs/test_analytics.json` — git-tracked for trend comparison across runs

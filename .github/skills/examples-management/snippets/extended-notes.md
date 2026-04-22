@@ -1,6 +1,6 @@
 2. Test: `cargo run -- content/examples/<module>.lua`
 3. Link in `content/examples/README.md`
-4. If the example demonstrates a newly added API function, update `logs/lua_api_data.json`
+4. If the example demonstrates a newly added API function, update `logs/data/lua_api_data.json`
 
 **Full demo** (game directory):
 1. Create `content/demos/<name>/` with `main.lua` (+ optional `conf.toml`, assets, README)

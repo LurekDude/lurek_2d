@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gen_docs_rust.py — Generate compact inline Rust API reference from logs/rust_api_data.json.
+gen_docs_rust.py — Generate compact inline Rust API reference from logs/data/rust_api_data.json.
 
 Each public item is rendered in a Rust code block:
     pub fn name(param: Type) -> ReturnType  // description

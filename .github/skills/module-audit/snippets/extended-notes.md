@@ -31,7 +31,7 @@ Run manually by reviewing file names, checking if pure-Lua alternative exists, a
 ### Python Validation Tool
 The audit runner automates checks across 12 phases using a single-pass file analyzer
 (each `.rs` file is read exactly once per run). **Every invocation always writes a
-per-module Markdown report to `docs/quality/<module>.md`** — nothing large ever
+per-module Markdown report to `logs/quality/<module>.md`** — nothing large ever
 goes to stdout, so the VS Code pipe never blocks.
 
 > See [snippets/python-validation-tool.ps1](snippets/python-validation-tool.ps1) for the example.
@@ -39,7 +39,7 @@ goes to stdout, so the VS Code pipe never blocks.
 Exit code: 0 = all PASS, 1 = any FAIL, 2 = argument error.
 Run time: ~0.12 s per module, under 5 s for all 46 modules.
 
-### What every report contains (`docs/quality/<module>.md`)
+### What every report contains (`logs/quality/<module>.md`)
 
 > See [snippets/what-every-report-contains-docs-quality.txt](snippets/what-every-report-contains-docs-quality.txt) for the example.
 
@@ -56,7 +56,7 @@ When an agent needs to fix module quality issues, follow this loop:
 
 ### Step 2 — Read the report
 
-Open `docs/quality/<module>.md`. The **Action Items** section at the top lists
+Open `logs/quality/<module>.md`. The **Action Items** section at the top lists
 every ❌ Error and ⚠️ Warning checkbox with **a precise fix instruction** — file
 path, method name, and what to do. Read all errors before writing any code.
 
@@ -125,7 +125,7 @@ most common error type across all modules before re-running batch mode:
 > See [snippets/batch-fix-strategy.ps1](snippets/batch-fix-strategy.ps1) for the example.
 
 ### Report Template
-The `--docs-quality` flag writes a Markdown report to `docs/quality/<module>.md`.
+The `--docs-quality` flag writes a Markdown report to `logs/quality/<module>.md`.
 The `stdout` report format (without `--docs-quality`) shows:
 
 > See [snippets/report-template.txt](snippets/report-template.txt) for the example.
@@ -133,21 +133,21 @@ The `stdout` report format (without `--docs-quality`) shows:
 ### Batch Mode
 When auditing multiple modules with `--all`, the tool:
 1. Runs all 64 checks per module
-2. Writes `docs/quality/<module>.md` for each module (if `--docs-quality` flag set)
+2. Writes `logs/quality/<module>.md` for each module (if `--docs-quality` flag set)
 3. Prints a batch summary to stdout:
 
 > See [snippets/batch-mode.txt](snippets/batch-mode.txt) for the example.
 
-Use `Get-ChildItem docs/quality/` to verify all reports were written.
+Use `Get-ChildItem logs/quality/` to verify all reports were written.
 
 ### Post-Audit Fix Workflow
 See **CAG Audit → Fix → Verify Loop** above for the full agent workflow.
 Summary of fix priority:
 
-1. **Read** `docs/quality/<module>.md` — the Action Items section is the work queue
+1. **Read** `logs/quality/<module>.md` — the Action Items section is the work queue
 2. **Fix ERRORs** — blocking; must fix all before merge
 3. **Fix WARNINGs** — reduce until fewer than 3 remain
 4. **Re-run** `python tools/audit/audit_module.py <module> --docs-quality` after each fix batch
 5. **Never run full build** during fixes — use `cargo check`
 6. **Scoped tests only** — `cargo test --test <module>_tests` — never bare `cargo test`
-7. **Commit when clean** — only after Status shows 🟢 PASS in `docs/quality/<module>.md`
+7. **Commit when clean** — only after Status shows 🟢 PASS in `logs/quality/<module>.md`

@@ -11,18 +11,50 @@
 
 ## Summary
 
-The `pipeline` module provides Lurek2D's DAG-based workflow orchestration system for composing multi-step data processing sequences. It is a Feature Systems tier module designed for analytics pipelines, automated test sequences, boot initialization with dependency ordering, and complex mod-loading or asset-processing workflows.
+The `pipeline` module provides Lurek2D's DAG-based workflow orchestration
+system for composing multi-step data-processing sequences with explicit
+dependency ordering, parallel execution, error policies, and time-based
+scheduling. It is a Feature Systems tier module designed for analytics
+pipelines, boot initialization sequences, automated test orchestration, and
+complex mod-loading or asset-processing workflows where steps must run in a
+controlled, partially-ordered manner.
 
-`Pipeline` stores `PipelineStep` nodes and directed edges in a DAG. Each step has: a unique name, a `StepStatus` tracking its run state, an `ErrorPolicy` (FailFast — abort on first error; Continue — run all steps and collect errors; Retry(n) — retry up to n times before failing), and an optional timeout duration. Steps reference other steps by name to express dependencies; the DAG must be acyclic.
+**DAG model**: `Pipeline` stores `PipelineStep` nodes and directed edges in a
+name-keyed adjacency structure. Each `PipelineStep` carries: a unique name
+string, a `StepStatus` tracking its run state (Pending → Running → Done |
+Failed | Skipped | Cancelled), an `ErrorPolicy` (`FailFast` — abort the run on
+first error; `Continue` — collect errors and run all steps;
+`Retry(n)` — retry up to n times before marking failed), an optional timeout
+duration, arbitrary string tag set, and a list of dependency step names. The
+DAG must be acyclic — `validate()` returns a list of error strings including
+cycle detection and missing-dependency reports before any execution begins.
 
-`Pipeline::run()` performs a topological sort, executes independent step groups in dependency order, and returns a `PipelineResult` carrying the final `PipelineStatus` (Success, PartialFailure, or Failed) plus per-step `StepStatus` records. `run_async()` dispatches step groups to a thread pool for parallel execution where dependencies allow.
+**Execution**: `Pipeline::run()` performs Kahn's algorithm topological sort,
+groups independent steps into parallel levels via `get_parallel_groups()`,
+executes group by group, and collects a `PipelineResult` carrying
+`PipelineStatus` (Success, PartialFailure, Failed, Cancelled) plus per-step
+outcome records. `run_async()` dispatches each step group to a thread pool,
+allowing independent steps to run concurrently where the dependency graph
+permits. Lua callbacks registered per step supply the actual execution logic;
+the pipeline module handles only ordering, error policy, and timing.
 
-`PipelineScheduler` wraps one or more pipelines with time-based triggering: an interval-based scheduler fires a pipeline repeatedly on a configurable period, and a delay-based scheduler fires once after a specified delay. `tick(dt)` is called each frame by the engine to advance the scheduler.
+**PipelineScheduler**: Wraps one or more pipelines with time-based triggering.
+It tracks elapsed time per step delay and per-pipeline interval. `tick(dt)` is
+called each frame; `update(dt)` returns names of steps whose delay has elapsed
+and that are ready to fire. This makes the scheduler the timing primitive for
+async multi-frame pipeline execution without requiring hand-managed timers in
+game scripts.
 
-Step execution logic is provided by Lua callbacks; the pipeline module manages ordering and error handling only.
+**Diagnostics and composition**: `to_ascii_diagram()` returns a multi-line
+ASCII string visualising DAG edges and step names for debugging.
+`add_sub_pipeline(sub, prefix)` merges all steps from another pipeline with a
+name prefix, enabling composable workflow libraries. `collect_result()`
+aggregates per-step runtime data into a `PipelineResult` including total counts
+of completed, failed, skipped, and cancelled steps alongside step-level error
+messages for post-run inspection.
 
-**Scope boundary**: Feature Systems tier. Depends on `math`, `runtime`. Lua bridge in `src/lua_api/pipeline_api.rs`.
-
+**Scope boundary**: Feature Systems tier. Depends on `math`, `runtime`. Lua
+bridge in `src/lua_api/pipeline_api.rs` as `lurek.pipeline.*`.
 ## Files
 
 - `dag.rs`: Defines Pipeline and the graph-level algorithms such as dependency validation, topological ordering, and parallel-group calculation. This is the core file for execution-order semantics.

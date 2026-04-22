@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gen_docs_lua.py -- Generate Lua API reference from logs/lua_api_data.json.
+gen_docs_lua.py -- Generate Lua API reference from logs/data/lua_api_data.json.
 
 Each function/method is rendered in a Lua code block:
     name( param : type, optional : type? ) -> ReturnType  -- description

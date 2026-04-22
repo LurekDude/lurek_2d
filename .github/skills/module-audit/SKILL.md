@@ -97,7 +97,7 @@ When checking A-02 (template structure), the canonical short AGENT.md format is:
 - [snippets/r-01-r-05-architecture-compliance.txt](snippets/r-01-r-05-architecture-compliance.txt) — R-01–R-05: Architecture Compliance
 - [snippets/q-01-q-06-code-quality.txt](snippets/q-01-q-06-code-quality.txt) — Q-01–Q-06: Code Quality
 - [snippets/python-validation-tool.ps1](snippets/python-validation-tool.ps1) — Python Validation Tool
-- [snippets/what-every-report-contains-docs-quality.txt](snippets/what-every-report-contains-docs-quality.txt) — What every report contains (`docs/quality/<module>.md`)
+- [snippets/what-every-report-contains-docs-quality.txt](snippets/what-every-report-contains-docs-quality.txt) — What every report contains (`logs/quality/<module>.md`)
 - [snippets/step-1-generate-reports.ps1](snippets/step-1-generate-reports.ps1) — Step 1 — Generate reports
 - [snippets/step-4-re-run-and-verify.ps1](snippets/step-4-re-run-and-verify.ps1) — Step 4 — Re-run and verify
 - [snippets/batch-fix-strategy.ps1](snippets/batch-fix-strategy.ps1) — Batch fix strategy

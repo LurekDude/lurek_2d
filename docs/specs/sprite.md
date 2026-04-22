@@ -11,20 +11,54 @@
 
 ## Summary
 
-The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types. It is a Feature Systems tier module sitting above the `render` command queue, providing higher-level game-graphics abstractions rather than raw draw calls.
+The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types.
+It is a Feature Systems tier module sitting above the `render` command queue,
+offering higher-level game-graphics abstractions rather than raw draw calls.
 
-`Sprite` is an individually positioned, scaled, rotated, and tinted image quad. It wraps a `TextureKey`, `Rect` source region, position, rotation, scale, tint color, blend mode, and Z-order. Calling `draw()` pushes a `RenderCommand::DrawImage` into `SharedState`'s pending draw list.
+**Sprite**: `Sprite` is the smallest individually controlled image quad,
+wrapping a `TextureKey`, `Rect` source region, world-space position, rotation
+(radians), per-axis scale, multiplicative tint `[f32; 4]` color, blend mode,
+and Z-order integer. Calling `draw()` pushes a `RenderCommand::DrawImage` into
+`SharedState`'s pending draw list, making each sprite a lightweight, directly
+scriptable entity rather than a managed pooled object.
 
-`SpriteBatch` groups sprites sharing one texture into a single GPU draw call, essential for rendering large numbers of similar game objects (bullets, particles, crowd NPCs) efficiently. Instances are added via `batch:add(x, y, src, opts)`, accumulating in a pre-allocated `Vec<SpriteInstance>`. The batch emits one `RenderCommand::DrawSpriteBatch` per flush, which `GpuRenderer` handles as a single instanced draw call. The instance list is cleared at the start of each frame.
+**SpriteBatch**: Groups many sprites sharing one texture into a single GPU draw
+call, critical for efficiently rendering large numbers of similar objects
+(bullets, particles, crowd NPCs, map decorations). Instances are added via
+`add(x, y, src_rect, opts)`, accumulating `BatchEntry` records in a
+pre-allocated `Vec<SpriteInstance>`. The batch emits one
+`RenderCommand::DrawSpriteBatch` per flush, which `GpuRenderer` handles as a
+single instanced draw call. The instance list is cleared at the start of each
+frame. `buffer_size()` exposes the pre-allocated capacity for sizing decisions.
 
-`SpriteSheet` maps named string frames to UV rectangles within a single texture, loaded from a JSON manifest. `SpriteAtlas` imports TexturePacker-format JSON exports with `AtlasEntry` records (trimmed bounds, source size, pivot point, nine-patch flags) for packed atlas sheets with per-sprite metadata.
+**SpriteSheet**: Maps 0-based frame indices to UV rectangles within a uniform
+grid on a single texture. Named `FrameGroup` ranges allow game code to reference
+animation sequences by name (`"walk_right"`, `"idle"`) rather than raw index
+ranges. `DirectionLayout` describes whether directional frames are arranged
+row-by-row or column-by-column. Factory helpers `from_rpgmaker()` build
+RPGMaker VX/Ace-compatible 3×4 character sheets with standard directional
+groups; `from_atlas()` builds a sheet from named entries in a `SpriteAtlas`
+rather than a uniform grid.
 
-`NineSlice` renders scalable nine-patch textures — partitioning a source texture into a 3×3 grid of corner, edge, and center regions — for resizable UI panels and dialog boxes without visible stretch artifacts.
+**SpriteAtlas**: Imports TexturePacker-format JSON exports
+(`parse_texturepacker_json`) and Aseprite JSON exports (`parse_aseprite_json`)
+with `AtlasEntry` records per named region: trimmed source `Rect`, original
+source size, rotation flag, pivot point, and optional nine-patch flags.
+`get_flipped()` returns a copy with horizontal/vertical flip applied to the
+source bounds without modifying the atlas.
 
-Minor additions to sprite and sprite-batch types have refined the Lua API surface for common workflows, including updated tint and blend mode accessors and improved batch-state introspection through `lurek.sprite.*`.
+**NineSlice**: Renders scalable nine-patch textures for resizable UI panels,
+dialog boxes, and HUD frames without visible stretch artifacts. `patches()`
+partitions the source texture and destination rectangle into a 3×3 grid of
+`Patch` (src_rect, dst_rect) tuples that the caller passes to the render queue
+as nine individual image draws.
 
-**Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/sprite_api.rs`.
+**SpriteSheet debugging**: `draw_to_image()` renders the sheet grid as a
+color-coded `ImageData` debug view with frame-boundary overlays, useful for
+verifying grid layout and named group assignments during authoring.
 
+**Scope boundary**: Feature Systems tier. Depends on `render`, `math`,
+`runtime`. Lua bridge in `src/lua_api/sprite_api.rs` as `lurek.sprite.*`.
 ## Files
 
 - `atlas.rs`: TexturePacker JSON atlas importer and named region lookup.

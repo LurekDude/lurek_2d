@@ -47,7 +47,7 @@ The MCP server exposes Lurek2D engine capabilities to AI agents:
 - Defined in `extensions/vscode/src/mcp/server.ts`
 - Methods follow JSON-RPC 2.0 over stdio
 - Add new MCP tools by registering handler functions in `extensions/vscode/src/mcp/server.ts`
-- Reference `docs/` and `logs/lua_api_data.json` for available API surface
+- Reference `docs/` and `logs/data/lua_api_data.json` for available API surface
 
 ### Adding a New Command
 1. Register in `package.json` under `contributes.commands`
@@ -67,7 +67,7 @@ The MCP server exposes Lurek2D engine capabilities to AI agents:
 - Use `@vscode/test-electron` for integration tests against real VS Code API
 
 ### Anti-Patterns
-- **Hard-coding lurek.* lists**: Always derive completions from `logs/lua_api_data.json` — never maintain a hand-written list alongside the generated source
+- **Hard-coding lurek.* lists**: Always derive completions from `logs/data/lua_api_data.json` — never maintain a hand-written list alongside the generated source
 - **Blocking the main thread**: Use `async/await` for file I/O in providers — VS Code providers are called synchronously but can return `Promise`
 - **Skipping activation guards**: Check `context.subscriptions` and dispose providers on deactivation to prevent memory leaks
 

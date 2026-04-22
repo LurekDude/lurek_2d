@@ -2,7 +2,7 @@
 """
 gen_luadoc.py — Generate LuaCATS type-annotation stubs for the Lurek2D VS Code extension.
 
-Reads logs/lua_api_data.json and emits docs/api/lurek.lua — a LuaCATS
+Reads logs/data/lua_api_data.json and emits docs/api/lurek.lua — a LuaCATS
 stub file that gives the VS Code Lua language server full type information
 for the lurek.* API. Consumed by the vscode-extension IntelliSense provider.
 

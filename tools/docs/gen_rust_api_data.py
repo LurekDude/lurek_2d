@@ -7,7 +7,7 @@ producing a single machine-readable JSON used as the source for all other
 doc generators. Not intended for direct human reading.
 
 Usage:
-    python tools/gen_rust_api_data.py                  # -> logs/rust_api_data.json
+    python tools/gen_rust_api_data.py                  # -> logs/data/rust_api_data.json
     python tools/gen_rust_api_data.py --output FILE    # custom output path
     python tools/gen_rust_api_data.py --verbose        # print per-module stats
 
@@ -342,7 +342,7 @@ def main() -> int:
         epilog=__doc__,
     )
     parser.add_argument(
-        "--output", default=str(OUTPUT_FILE), help="Output JSON path (default: logs/rust_api_data.json)"
+        "--output", default=str(OUTPUT_FILE), help="Output JSON path (default: logs/data/rust_api_data.json)"
     )
     parser.add_argument("--verbose", "-v", action="store_true", help="Print per-module stats")
     args = parser.parse_args()

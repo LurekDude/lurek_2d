@@ -2,14 +2,14 @@
 """Convenience runner: regenerate the full Lurek2D documentation pipeline in one command.
 
 Steps:
-    1.  gen_rust_api_data.py         -> logs/rust_api_data.json           (Rust master JSON)
-    2.  gen_lua_api_data.py          -> logs/lua_api_data.json            (Lua master JSON)
+    1.  gen_rust_api_data.py         -> logs/data/rust_api_data.json           (Rust master JSON)
+    2.  gen_lua_api_data.py          -> logs/data/lua_api_data.json            (Lua master JSON)
     3.  gen_luadoc.py                -> docs/api/lurek.lua                (LuaCATS stubs)
     4.  gen_docs_lua.py              -> docs/api/lurek.md                 (Lua API reference)
     5.  gen_docs_rust.py             -> docs/api/rust.md                  (Rust API reference)
-    6.  gen_wiki_api.py              -> docs/wiki/API-Reference.md        (game-dev cheatsheet)
-    7.  doc_coverage.py              -> logs/doc_coverage.json            (docstring coverage JSON)
-    8.  test_coverage.py             -> logs/test_coverage.json           (test coverage JSON)
+    6.  gen_wiki_api.py              -> wiki/API-Reference.md        (game-dev cheatsheet)
+    7.  doc_coverage.py              -> logs/data/doc_coverage.json            (docstring coverage JSON)
+    8.  test_coverage.py             -> logs/data/test_coverage.json           (test coverage JSON)
     9.  gen_test_docs.py --mode rust -> logs/reports/test_docs_rust.md
    10.  gen_test_docs.py --mode lua  -> logs/reports/test_docs_lua.md
    11.  gen_coverage_gaps.py         -> logs/reports/coverage_gaps.md     (API gap report)
@@ -32,14 +32,14 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SCRIPTS = [
-    ("docs/gen_rust_api_data.py", "Rust JSON (logs/rust_api_data.json)"),
-    ("docs/gen_lua_api_data.py",  "Lua JSON (logs/lua_api_data.json)"),
+    ("docs/gen_rust_api_data.py", "Rust JSON (logs/data/rust_api_data.json)"),
+    ("docs/gen_lua_api_data.py",  "Lua JSON (logs/data/lua_api_data.json)"),
     ("docs/gen_luadoc.py",        "LuaCATS Stubs (docs/api/lurek.lua)"),
     ("docs/gen_docs_lua.py",      "Lua API reference (docs/api/lurek.md)"),
     ("docs/gen_docs_rust.py",     "Rust API reference (docs/api/rust.md)"),
-    ("docs/gen_wiki_api.py",      "Wiki cheatsheet (docs/wiki/API-Reference.md)"),
-    ("audit/doc_coverage.py",      "Doc coverage analytics (logs/doc_coverage.json)"),
-    ("audit/test_coverage.py",     "Test coverage analytics (logs/test_coverage.json)"),
+    ("docs/gen_wiki_api.py",      "Wiki cheatsheet (wiki/API-Reference.md)"),
+    ("audit/doc_coverage.py",      "Doc coverage analytics (logs/data/doc_coverage.json)"),
+    ("audit/test_coverage.py",     "Test coverage analytics (logs/data/test_coverage.json)"),
 ]
 
 # Scripts that need extra arguments (script_name, args_list, label)

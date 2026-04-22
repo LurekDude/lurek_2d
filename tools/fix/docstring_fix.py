@@ -2,7 +2,7 @@
 """
 docstring_fix.py -- Auto-inject missing @param/@return tags into Lua API docstrings.
 
-Reads logs/docstring_audit.json (produced by docstring_audit.py) and patches
+Reads logs/data/docstring_audit.json (produced by docstring_audit.py) and patches
 the corresponding src/lua_api/*.rs files by inserting the missing /// lines directly
 above each registered function.
 
@@ -15,7 +15,7 @@ The patching is done per-file, bottom-up (highest line first) so that line
 numbers from the audit report remain valid as we insert text.
 
 Usage:
-    python tools/docstring_fix.py                  # use logs/docstring_audit.json
+    python tools/docstring_fix.py                  # use logs/data/docstring_audit.json
     python tools/docstring_fix.py --dry-run        # print patches, do not write
     python tools/docstring_fix.py --file RS_FILE   # patch one file only
     python tools/docstring_fix.py --no-description # skip description injection

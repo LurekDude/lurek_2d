@@ -6,7 +6,7 @@ Lurek2D — Quality-improve all content/examples/*.lua stubs.
 Pass A — Remove trivial :type() / :typeOf() stubs from class sections; add a
           single consolidated "Type introspection" note instead.
 Pass B — Fill realistic argument values into empty method stubs by consulting
-          the API JSON (logs/lua_api_data.json).
+          the API JSON (logs/data/lua_api_data.json).
 Pass C — Improve class-section variable names (e.g. rename low-quality
           inferrred names from expand_examples.py).
 Pass D — Consolidate blank lines after class sections and before next section.
@@ -359,7 +359,7 @@ def main() -> None:
 
     if not API_JSON.exists():
         print(f"[ERROR] API JSON not found: {API_JSON}")
-        print("  Run: python tools/docs/gen_lua_api_data.py --output logs/lua_api_data.json")
+        print("  Run: python tools/docs/gen_lua_api_data.py --output logs/data/lua_api_data.json")
         raise SystemExit(1)
 
     api_data = json.loads(API_JSON.read_text(encoding="utf-8"))

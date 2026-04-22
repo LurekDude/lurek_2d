@@ -7,7 +7,7 @@ counts those with doc comments (/// or ---), and reports coverage metrics.
 
 Outputs:
   - Summary to stdout (total, covered, missing count, coverage %)
-  - JSON metadata to logs/doc_coverage.json (use --output to change)
+  - JSON metadata to logs/data/doc_coverage.json (use --output to change)
 
 Usage:
     python tools/doc_coverage.py                 # summary + write JSON

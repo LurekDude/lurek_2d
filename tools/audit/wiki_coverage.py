@@ -1,6 +1,6 @@
 """Audit wiki page coverage against engine modules and Lua API.
 
-Cross-references docs/wiki/ pages against:
+Cross-references wiki/ pages against:
   - src/ module directories (each module should have a wiki page).
   - lurek.* API surface (key namespaces should be documented).
   - content/library/ entries (each library should appear in wiki).
@@ -62,7 +62,7 @@ def discover_libraries() -> set[str]:
 
 
 def discover_wiki_pages() -> dict[str, Path]:
-    """Return dict of {page_stem: path} from docs/wiki/."""
+    """Return dict of {page_stem: path} from wiki/."""
     pages: dict[str, Path] = {}
     if not WIKI_DIR.exists():
         return pages
@@ -94,7 +94,7 @@ def main() -> int:
                 "level": "ERROR" if args.strict else "WARN",
                 "category": "module",
                 "name": mod,
-                "message": f"Module '{mod}' has no wiki page in docs/wiki/",
+                "message": f"Module '{mod}' has no wiki page in wiki/",
             })
 
     # Check libraries are mentioned

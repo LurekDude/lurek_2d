@@ -11,16 +11,53 @@
 
 ## Summary
 
-The `lua_api` module is the Lua scripting bridge for Lurek2D. Its only responsibility is binding: collecting all `lurek.*` API sub-modules, creating the `lurek` global table, sandboxing the Lua environment, and registering every sub-API when the VM boots. It sits at the Edge/Integration tier — nothing in the engine may import from `lua_api`.
+The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integration
+tier that connects every `lurek.*` Lua namespace to its Rust domain module. Its
+single responsibility is binding: collecting all sub-module registration
+functions, creating the `lurek` global table, sandboxing the VM environment,
+and gating optional modules through `ModulesConfig`. Nothing in the engine may
+import from `lua_api`; all traffic flows outward from this module to domain
+modules, never inward.
 
-The primary entry point is `create_lua_vm(state, modules)`, which constructs a fresh LuaJIT VM, creates the `lurek` global table, removes dangerous standard library functions (`load`, `loadfile`, `dofile`, `debug`, `os.execute`, `os.getenv`, `io.open`, `io.popen`) from the sandbox, and then calls each sub-API module's `register(lua, lurek, state)` function in sequence. Sub-APIs are gated by `ModulesConfig` flags from `conf.toml`, except for the mandatory group (`event`, `timer`, `math`, `log`) which is always registered.
+**VM bootstrap**: `create_lua_vm(state, modules)` constructs a fresh LuaJIT VM
+(or Lua 5.4 with the `lua54` Cargo feature), opens only the safe standard
+libraries (`math`, `string`, `table`, restricted `io`), creates the `lurek`
+global table, and strips dangerous stdlib functions from the sandbox: `load`,
+`loadfile`, `dofile`, `debug`, `os.execute`, `os.getenv`, `io.open`, `io.popen`.
+This prevents game scripts from executing arbitrary system commands or escaping
+the GameFS sandbox.
 
-Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn register()` + Lua wrapper structs + `impl LuaUserData` with `add_method` / `add_method_mut` calls. Domain modules in `src/<module>/` contain only pure-Rust types. From the engine's perspective, `SharedState` and `WindowState` are re-exported here from `crate::runtime` for sub-module convenience, meaning all binding code imports from `lua_api` rather than from `runtime` directly.
+**Module registration**: Each of the ~45 sub-API files under `src/lua_api/`
+exports a `pub fn register(lua, lurek, state)` function. `create_lua_vm` calls
+these in sequence, each adding a sub-table to the `lurek` global. The mandatory
+group — `event`, `timer`, `math`, `log` — is always registered. Optional modules
+(render, physics, audio, input, and others) are skipped when the corresponding
+`ModulesConfig` flag is false, enabling headless server builds and
+memory-constrained configurations.
 
-`lua_types.rs` provides the `LunaType` trait and `add_type_methods` helper used by sub-APIs for consistent UserData method registration patterns.
+**Thin Wrapper Rule (TST-03)**: Every file in `src/lua_api/` follows the Thin
+Wrapper Rule: `pub fn register()` + Lua wrapper structs + `impl LuaUserData`
+with `add_method` / `add_method_mut` calls. All domain logic lives in
+`src/<module>/` pure-Rust code; `lua_types.rs` provides the `LunaType` trait
+and `add_type_methods` helper for consistent `UserData` type metadata and method
+registration patterns across the bridge layer.
 
-**Scope boundary**: Edge/Integration tier. Imports from all other module groups. Nothing imports from `lua_api`.
+**State sharing**: `SharedState` and `WindowState` from `crate::runtime` are
+re-exported through this module so sub-API registration code imports from
+`lua_api` rather than directly from `runtime`. Resource keys (SlotMap IDs for
+textures, sounds, fonts, etc.) are passed to Lua as opaque UserData objects
+holding only the key — never raw pointers or references — preventing lifetime
+issues across the Rust/Lua boundary.
 
+**Test surface**: `tests/rust/ext/` holds Rust-side integration tests that
+construct a headless VM via `create_lua_vm`. Lua-level behaviour tests live
+under `tests/lua/unit/`, `tests/lua/integration/`, `tests/lua/security/`,
+`tests/lua/stress/`, and `tests/lua/golden/`, driven by the harness in
+`tests/lua/harness.rs` per TST-01.
+
+**Scope boundary**: Edge/Integration tier. Imports from all other module
+groups. Nothing imports from `lua_api`. No `lurek.*` Lua-facing namespace —
+this module creates the namespace table but exposes nothing directly.
 ## Files
 
 - `ai_api.rs`: Registers the lurek.ai namespace and translates Lua calls into the AI module's Rust types and operations.

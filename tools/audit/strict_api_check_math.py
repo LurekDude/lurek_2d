@@ -4,7 +4,7 @@ Narrower variant of strict_api_check.py that restricts analysis to the
 'math' module only. Useful for rapid iteration when improving math.lua
 without re-scanning all example files.
 
-Reads logs/lua_api_data.json, filters to math module entries, and
+Reads logs/data/lua_api_data.json, filters to math module entries, and
 applies the same quality checks: minimum code/comment lines, forbidden
 placeholder words, and actual API reference presence.
 

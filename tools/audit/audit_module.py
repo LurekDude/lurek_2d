@@ -1091,7 +1091,7 @@ def check_wiki_page(module: str) -> Check:
             return Check("W-05", "Wiki page", PASS, str(c.relative_to(WORKSPACE)))
 
     return Check("W-05", "Wiki page", WARN,
-                  f"No wiki page found (expected docs/wiki/{module.title()}-API.md)")
+                  f"No wiki page found (expected wiki/{module.title()}-API.md)")
 
 
 def check_example_exists(module: str) -> Check:
@@ -1466,14 +1466,14 @@ def main() -> int:
 
         if not args.json:
             import datetime
-            quality_dir = WORKSPACE / "docs" / "quality"
+            quality_dir = WORKSPACE / "logs" / "quality"
             quality_dir.mkdir(parents=True, exist_ok=True)
             date_str = datetime.date.today().isoformat()
             qr = format_quality_report(module_name, checks, result, date_str)
             qpath = quality_dir / f"{module_name}.md"
             qpath.write_text(qr, encoding="utf-8")
             # One short line — never fills the pipe.
-            print(f"docs/quality/{module_name}.md [{result}]", flush=True)
+            print(f"logs/quality/{module_name}.md [{result}]", flush=True)
 
         # Release cached file content between modules so memory stays bounded.
         clear_file_cache()

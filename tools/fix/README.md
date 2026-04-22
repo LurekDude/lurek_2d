@@ -15,7 +15,7 @@ stale path references.
 |---|---|---|
 | `add_lua_docstrings.py` | Add missing `///` Lua docstring stubs interactively | `--dry-run`, file path |
 | `add_lua_docstrings_auto.py` | Auto-generate `///` Lua docstring stubs non-interactively | `--dry-run` |
-| `docstring_fix.py` | Apply docstring fixes from `logs/docstring_audit.json` | `--dry-run` |
+| `docstring_fix.py` | Apply docstring fixes from `logs/data/docstring_audit.json` | `--dry-run` |
 | `fix_docstrings.py` | Auto-fill missing `# Parameters`/`# Returns`/`# Fields`/`# Variants` | — |
 | `improve_lua_docstrings.py` | Upgrade low-quality stub `///` comments with richer descriptions | `--dry-run` |
 

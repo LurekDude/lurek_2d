@@ -14,22 +14,53 @@
 
 ## Summary
 
-`globe` is an XCOM UFO Defense 1994 Geoscape–style strategy globe — a projection-correct 2D rendering of a unit sphere divided into named, navigable provinces. It provides:
+The `globe` module provides an XCOM Geoscape-style 2D strategic globe view —
+a projection-correct rendering of a unit sphere divided into navigable named
+provinces. It is a Feature Systems tier module that works entirely through the
+engine's existing 2D `RenderCommand` variants (`DrawConvexFan`, `Polyline`,
+`Circle`, `Print`), adding no new wgpu pipeline or 3D draw calls (consistent
+with binding constraint A-03).
 
-- Province topology (adjacency graph with A* path-finding and reachability analysis)
-- Orbit camera (lat/lon pan, zoom, LOD tier)
-- Day/night lighting with a soft terminator band
-- Per-faction fog-of-war (bit-vector, zero-copy serialization)
-- Named markers (cities, units, events) and text labels
-- Thematic layers (political, terrain, heat-map color overlays)
-- Arc rendering (great-circle routes, range rings)
-- TOML province-map loader + PNG stub
-- A thin `lurek.globe.*` Lua API
+**Province topology**: `ProvinceGraph` stores adjacency lists keyed by
+`ProvinceId` (u32). Each `Province` carries a vertex polygon in lat/lon
+degrees, centroid coordinates, neighbor list, free-form attribute `HashMap`,
+per-edge tag sets, optional texture name, and base RGBA color. Up to
+`MAX_PROVINCES` (8192) provinces are supported per globe instance.
+`ProvinceGraph` supports A\* pathfinding between provinces, reachability
+analysis with configurable edge-tag filtering, and nearest-province queries
+for click-to-select interactions.
 
-All rendering uses existing 2D `RenderCommand` variants (`DrawConvexFan`, `Polyline`, `Circle`, `Print`) — no new wgpu pipeline.
+**Orbit camera**: `OrbitCamera` tracks lat/lon look-at position, zoom
+multiplier, and screen centre offset. `build_view_matrix` converts orbital
+parameters to a 2D projection matrix used by the draw pass. `project_province`
+and `project_point` map lat/lon to screen coordinates under the current
+projection. `LodTier` (Far / Mid / Near) derives from zoom and gates border
+detail, province labels, and marker rendering at three LOD levels.
 
----
+**Day/night lighting**: The sun direction derives from `GlobeSpec.time_of_day`
+(0–24 h) and an `axial_tilt_deg` field. Each province receives a scalar
+intensity value with a soft terminator band. The `ambient` floor prevents
+night-side provinces from becoming invisible.
 
+**Fog of war**: `FogMask` is a compact 128 × u64 bit-vector giving O(1)
+reveal/hide per province. `FogStore` manages one `FogMask` per viewer entity,
+enabling multi-faction fog-of-war without per-frame heap allocation.
+
+**Markers, labels, and overlay layers**: `MarkerStore` and `LabelStore` manage
+point-of-interest and text overlays with lifecycle tracking. `LayerStore` holds
+thematic overlay layers (political, terrain, heat-map) and computes a blended
+`effective_color` for each province at draw time from base color, overlay
+contributions, and fog intensity.
+
+**Arc rendering**: `Arc` records great-circle routes or range-ring annotations;
+the draw module converts arcs to polyline sequences in screen space.
+
+**Loaders**: `loader.rs` parses TOML province-map files (province polygon
+lists, adjacency tables, attribute maps) and stub PNG province rasters. Both
+populate native `Globe` structures through `GlobeRegistry`.
+
+**Scope boundary**: Feature Systems tier. Depends on `render`, `math`,
+`runtime`, `image`. Lua bridge in `src/lua_api/globe_api.rs`.
 ## Files
 
 | File | Role |

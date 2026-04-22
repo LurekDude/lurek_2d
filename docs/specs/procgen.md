@@ -11,16 +11,50 @@
 
 ## Summary
 
-The `procgen` module is Lurek2D's procedural content generation library. It is a Foundations tier module that depends only on `math`, enabling all generators to run headlessly in tests and pre-generation passes without a window or GPU.
+The `procgen` module is Lurek2D's procedural content generation library, a
+Foundations tier module that depends only on `math`, enabling all generators
+to run headlessly in tests and pre-generation passes without a window or GPU
+context.
 
-Noise: `perlin2d`, `perlin3d`, `perlin4d`, `simplex2d`, `simplex_noise_3d` are direct noise functions. `NoiseGenerator` is a configurable wrapper with `NoiseKind` (Perlin, Simplex), `FractalType` (Fbm, Ridged, Turbulence), octaves, lacunarity, persistence, and frequency. Worley 2D/3D cellular noise supports Euclidean, Manhattan, and Chebyshev distance metrics. `generate_noise_map_parallel` fills a 2D grid using Rayon for fast multi-threaded generation. `perlin_noise_periodic` generates tileable Perlin noise for seamless textures.
+**Noise generators**: Direct functions `perlin2d`, `perlin3d`, `perlin4d`,
+`simplex2d`, and `simplex_noise_3d` provide single-sample noise values.
+`NoiseGenerator` is a configurable multi-octave wrapper with `NoiseKind`
+(Perlin, Simplex), `FractalType` (Fbm, Ridged, Turbulence), octave count,
+lacunarity, persistence, and frequency settings. Worley (cellular) noise
+supports Euclidean, Manhattan, and Chebyshev distance metrics. Periodic Perlin
+noise (`perlin_noise_periodic`) generates tileable maps that wrap without seams.
+`generate_noise_map_parallel` fills a 2D grid using Rayon parallel iterators
+for fast CPU-parallel generation at world-map scale.
 
-Dungeon generation: `bsp_dungeon(opts)` uses Binary Space Partitioning; `rooms_dungeon(opts)` uses random room placement with connected corridors; `cellular_automata(opts)` applies Game-of-Life cave smoothing. `Heightmap` generates terrain using fractal noise, hydraulic erosion passes, and normalization to [0, 1].
+**Dungeon and cave generation**: `bsp_dungeon(opts)` partitions a rectangle
+recursively using Binary Space Partitioning to place non-overlapping rooms with
+L-shaped corridors. `rooms_dungeon(opts)` scatters rectangular rooms randomly
+with configurable room size and margin constraints. `cellular_automata(opts)`
+applies configurable birth and survival rules (Game of Life style) to smooth a
+random fill into organic cave or island networks. `flood_fill` performs BFS
+over a flat byte grid from a seed position for region tagging and connectivity
+analysis.
 
-Strategic generation: `voronoi_diagram(points, warp)` generates Voronoi cells with optional domain-warp for organic shapes. `WorldGraph` stores `WorldRegion` nodes and `WorldEdge` connections with MST and pathfinding. `WfcGrid` implements Wave Function Collapse for tile-based constraint-driven map generation. `LSystem` performs string rewriting via production rules for plants, dungeons, and fractal structures. `NameGen` is a Markov-chain name generator trained on a provided word list. `poisson_disk(area, min_dist, tries)` samples points with guaranteed minimum spacing for natural scatter patterns.
+**Heightmap terrain**: `Heightmap` generates 2D float elevation grids using
+fractal noise with `HeightmapOpts`. Post-processing passes include simplified
+hydraulic erosion (sediment flows from high-to-low neighbours) and
+`normalize()` to rescale values to [0, 1]. `to_rgba_bytes()` exports the
+heightmap as a grayscale RGBA image buffer for CPU-side texture generation.
 
-**Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in `src/lua_api/procgen_api.rs`.
+**Strategic and structural generators**: `voronoi_diagram(points, warp)`
+generates Voronoi region cells with optional domain-warp distortion for organic
+shapes. `WorldGraph` stores `WorldRegion` nodes and `WorldEdge` connections
+with MST generation and pathfinding support for regional strategy maps.
+`WfcGrid` implements Wave Function Collapse with adjacency `WfcRules` and
+per-tile weights. `LSystem` performs parametric string rewriting via production
+rules for plants, dungeons, and fractal structures; `to_segments()` converts
+the generated string to turtle-graphics line segments. `NameGen` trains a
+Markov chain model on a word list and generates names with configurable length
+bounds. `poisson_disk(area, min_dist, tries)` uses Bridson's algorithm to
+sample points with guaranteed minimum spacing for natural object scatter.
 
+**Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in
+`src/lua_api/procgen_api.rs` as `lurek.procgen.*`.
 ## Files
 
 - `bsp.rs`: Binary Space Partitioning dungeon generator.

@@ -7,7 +7,7 @@ userdata methods by scanning for .set() and add_method() patterns, associating
 each entry with its preceding /// docstrings.
 
 This module is a library used by other tools:
-    gen_lua_api_data.py  -- builds logs/lua_api_data.json
+    gen_lua_api_data.py  -- builds logs/data/lua_api_data.json
     gen_rust_api_data.py -- cross-references Rust <-> Lua symbols
     gen_coverage_gaps.py -- detects missing Lua API coverage
     test_coverage.py     -- measures test coverage against the Lua API

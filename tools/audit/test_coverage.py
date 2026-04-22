@@ -425,7 +425,7 @@ def main() -> int:
             args.module,
         )
 
-    # Always write JSON metadata to logs/test_coverage.json (unless --json stdout mode)
+    # Always write JSON metadata to logs/data/test_coverage.json (unless --json stdout mode)
     if not args.json:
         json_payload = {
             "rust": {
@@ -463,7 +463,7 @@ def main() -> int:
         }
         DEFAULT_JSON_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
         DEFAULT_JSON_OUTPUT.write_text(json.dumps(json_payload, indent=2), encoding="utf-8")
-        print(f"[OK] Coverage JSON written to logs/test_coverage.json", file=sys.stderr)
+        print(f"[OK] Coverage JSON written to logs/data/test_coverage.json", file=sys.stderr)
 
     if args.output:
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)

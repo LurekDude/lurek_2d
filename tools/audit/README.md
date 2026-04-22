@@ -17,7 +17,7 @@ coverage â€” producing reports that tell you what still needs work.
 | Script               | Purpose                                      | Output                           |
 | -------------------- | -------------------------------------------- | -------------------------------- |
 | `doc_coverage.py`    | Rust + Lua `///` docstring coverage metrics  | `logs/reports/doc_coverage.json`    |
-| `docstring_audit.py` | Per-file Lua API docstring quality audit     | `logs/docstring_audit.json` |
+| `docstring_audit.py` | Per-file Lua API docstring quality audit     | `logs/data/docstring_audit.json` |
 | `count_gaps.py`      | Count missing-doc items per `lurek.*` module | stdout                           |
 
 ### Test coverage â€” measure test completeness
@@ -37,7 +37,7 @@ coverage â€” producing reports that tell you what still needs work.
 
 | Script                 | Purpose                                                           | Output                            |
 | ---------------------- | ----------------------------------------------------------------- | --------------------------------- |
-| `audit_module.py`      | 12-phase module quality audit (PASS/WARN/ERROR)                   | `docs/quality/<module>.md` / JSON |
+| `audit_module.py`      | 12-phase module quality audit (PASS/WARN/ERROR)                   | `logs/quality/<module>.md` / JSON |
 
 ### Specialised audits
 
@@ -71,7 +71,7 @@ coverage â€” producing reports that tell you what still needs work.
 | Script                    | Purpose                                                                                     | Output        |
 | ------------------------- | ------------------------------------------------------------------------------------------- | ------------- |
 | `tool_registry_audit.py`  | Self-audit: verify every tools/ script is registered, has a docstring, and uses valid paths  | stdout / JSON |
-| `wiki_coverage.py`        | Cross-reference docs/wiki/ pages against src/ modules and library/ entries            | stdout / JSON |
+| `wiki_coverage.py`        | Cross-reference wiki/ pages against src/ modules and library/ entries            | stdout / JSON |
 
 Companion validator: `tools/validate/cag_validate.py` (rule engine for the
 same files; the audit tools above are read-only analytics).

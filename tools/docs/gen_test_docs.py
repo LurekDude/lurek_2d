@@ -2,7 +2,7 @@
 """
 gen_test_docs.py — Generate human-readable test documentation for Lurek2D.
 
-Reads logs/test_coverage.json (produced by test_coverage.py) and generates
+Reads logs/data/test_coverage.json (produced by test_coverage.py) and generates
 Markdown documents describing what each module tests, coverage statistics, and
 a prioritised list of uncovered items.
 
@@ -290,7 +290,7 @@ def main() -> None:
     input_path = Path(args.input)
     if not input_path.is_file():
         print(f"ERROR: Input file not found: {input_path}", file=sys.stderr)
-        print("Run: python tools/test_coverage.py  (to generate logs/test_coverage.json first)",
+        print("Run: python tools/test_coverage.py  (to generate logs/data/test_coverage.json first)",
               file=sys.stderr)
         sys.exit(1)
 

@@ -9,7 +9,7 @@ Two page types:
 Reads:  docs/specs/*.md, content/examples/*.lua, content/library/, content/demos/, tools/, docs/architecture/,
         .github/agents/, .github/skills/, extensions/vscode/README.md,
         CONTRIBUTING.md
-Writes: docs/wiki/*.md  (61 pages total)
+Writes: wiki/*.md  (61 pages total)
 
 Usage:
     python tools/docs/gen_wiki.py                # regenerate all pages
@@ -145,11 +145,11 @@ def write_page(filename: str, content: str, dry_run: bool = False,
         print("  [... truncated ...]")
         return "dry-run"
     if is_manual and path.exists() and not force:
-        print(f"  skip   docs/wiki/{filename} (manual page exists)")
+        print(f"  skip   wiki/{filename} (manual page exists)")
         return "skipped"
     path.write_text(content, encoding="utf-8")
     tag = "wrote " if not is_manual else "scaffolded"
-    print(f"  {tag} docs/wiki/{filename}")
+    print(f"  {tag} wiki/{filename}")
     return "wrote"
 
 
@@ -3167,7 +3167,7 @@ def main() -> int:
         manual = 0
         for slug, (filename, _, is_manual) in sorted(PAGES.items()):
             tag = "MANUAL" if is_manual else "SCRIPTED"
-            print(f"  {slug:30s}  →  docs/wiki/{filename:35s}  [{tag}]")
+            print(f"  {slug:30s}  →  wiki/{filename:35s}  [{tag}]")
             if is_manual:
                 manual += 1
             else:

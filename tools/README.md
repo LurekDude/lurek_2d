@@ -19,7 +19,7 @@ go under `work/{session}/scripts/` and are archived at session end.
 
 | Folder                                  | Purpose                                                                    | Script Count |
 | --------------------------------------- | -------------------------------------------------------------------------- | ------------ |
-| [`tools/docs/`](docs/README.md)         | Documentation generators â€” produce `docs/reports/`, `logs/`, `docs/wiki/` | 15           |
+| [`tools/docs/`](docs/README.md)         | Documentation generators â€” produce `docs/reports/`, `logs/`, `wiki/` | 15           |
 | [`tools/audit/`](audit/README.md)       | Quality auditing, coverage analytics, gap reports                          | 29           |
 | [`tools/fix/`](fix/README.md)           | Code fixers and docstring improvers                                        | 9            |
 | [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure)                        | 7            |
@@ -42,12 +42,12 @@ python tools/gen_all_docs.py
 
 `gen_all_docs.py` lives at the tools root and calls scripts from `tools/docs/`
 and `tools/audit/` in the correct dependency order. Produces:
-- `logs/rust_api_data.json` â€” raw Rust API metadata
-- `logs/lua_api_data.json` â€” raw Lua API metadata
+- `logs/data/rust_api_data.json` â€” raw Rust API metadata
+- `logs/data/lua_api_data.json` â€” raw Lua API metadata
 - `docs/lurek.lua` â€” LuaCATS type stubs for IDE
 - `docs/api/lurek.md` â€” human-readable Lua API reference
 - `docs/api/rust.md` â€” human-readable Rust API reference
-- `docs/wiki/API-Reference.md` â€” game-developer cheatsheet
+- `wiki/API-Reference.md` â€” game-developer cheatsheet
 - `logs/reports/doc_coverage.json` â€” docstring coverage metrics
 - `logs/reports/test_coverage.json` â€” test coverage metrics
 - `docs/reports/test_docs_rust.md` â€” Rust test catalog
@@ -64,8 +64,8 @@ and `tools/audit/` in the correct dependency order. Produces:
 
 | Script                 | Reads              | Produces                       | Args                    |
 | ---------------------- | ------------------ | ------------------------------ | ----------------------- |
-| `gen_rust_api_data.py` | `src/**/*.rs`      | `logs/rust_api_data.json` | `--output`              |
-| `gen_lua_api_data.py`  | `src/lua_api/*.rs` | `logs/lua_api_data.json`  | `--output`, `--verbose` |
+| `gen_rust_api_data.py` | `src/**/*.rs`      | `logs/data/rust_api_data.json` | `--output`              |
+| `gen_lua_api_data.py`  | `src/lua_api/*.rs` | `logs/data/lua_api_data.json`  | `--output`, `--verbose` |
 
 **Reference generators** â€” produce human-readable docs from JSON:
 
@@ -74,7 +74,7 @@ and `tools/audit/` in the correct dependency order. Produces:
 | `gen_docs_lua.py`        | `lua_api_data.json`  | `docs/api/lurek.md`                | â€”                              |
 | `gen_docs_rust.py`       | `rust_api_data.json` | `docs/api/rust.md`               | â€”                              |
 | `gen_luadoc.py`          | `lua_api_data.json`  | `docs/lurek.lua` (IDE stubs)     | â€”                              |
-| `gen_wiki_api.py`        | `lua_api_data.json`  | `docs/wiki/API-Reference.md`         | â€”                              |
+| `gen_wiki_api.py`        | `lua_api_data.json`  | `wiki/API-Reference.md`         | â€”                              |
 | `gen_lib_docs.py`        | `library/`   | `docs/reports/lib-api.md`                | â€”                              |
 | `gen_engine_docs.py`     | `src/` structure     | `docs/reports/` engine docs              | â€”                              |
 | `gen_lua_dev_docs.py`    | `lua_api_data.json`  | `docs/reports/` dev docs                 | â€”                              |
@@ -102,7 +102,7 @@ and `tools/audit/` in the correct dependency order. Produces:
 | Script               | Purpose                                      | Output                           | Args                                                                  |
 | -------------------- | -------------------------------------------- | -------------------------------- | --------------------------------------------------------------------- |
 | `doc_coverage.py`    | Rust + Lua `///` docstring coverage metrics  | `logs/reports/doc_coverage.json`    | `--report-missing`, `--json`, `--module`, `--lua-only`, `--rust-only` |
-| `docstring_audit.py` | Per-file Lua API docstring quality audit     | `logs/docstring_audit.json` | `--json`, `--output`                                                  |
+| `docstring_audit.py` | Per-file Lua API docstring quality audit     | `logs/data/docstring_audit.json` | `--json`, `--output`                                                  |
 | `count_gaps.py`      | Count missing-doc items per `lurek.*` module | stdout                           | â€”                                                                     |
 
 **Test coverage** â€” measure test completeness:
@@ -120,7 +120,7 @@ and `tools/audit/` in the correct dependency order. Produces:
 
 | Script                 | Purpose                                                           | Output                     | Args                                                               |
 | ---------------------- | ----------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------ |
-| `audit_module.py`      | 12-phase module quality audit (PASS/WARN/ERROR)                   | `docs/quality/<module>.md` | `NAME`, `--all`, `--tier N`, `--json`, `--docs-quality`            |
+| `audit_module.py`      | 12-phase module quality audit (PASS/WARN/ERROR)                   | `logs/quality/<module>.md` | `NAME`, `--all`, `--tier N`, `--json`, `--docs-quality`            |
 
 **Specialised audits**:
 
@@ -133,7 +133,7 @@ and `tools/audit/` in the correct dependency order. Produces:
 | `parse_test_log.py`        | Parse Rust test execution logs (internal helper)     | parsed data                 |
 | `strict_api_check.py`      | Validate all `lurek.*` API stubs in examples         | stdout                      |
 | `strict_api_check_math.py` | Validate math-module API stubs in examples           | stdout                      |
-| `wiki_coverage.py`         | Cross-reference docs/wiki/ vs src/ modules & libs    | stdout / JSON               |
+| `wiki_coverage.py`         | Cross-reference wiki/ vs src/ modules & libs    | stdout / JSON               |
 | `tool_registry_audit.py`   | Self-audit: verify tools registry internal consistency | stdout / JSON               |
 
 ### Validators (`tools/validate/`)
@@ -225,8 +225,8 @@ All validators exit 0 on pass, 1 on failure.
 
 ```
 gen_all_docs.py
-â”śâ”€â”€ gen_rust_api_data.py  â†’ logs/rust_api_data.json
-â”śâ”€â”€ gen_lua_api_data.py   â†’ logs/lua_api_data.json
+â”śâ”€â”€ gen_rust_api_data.py  â†’ logs/data/rust_api_data.json
+â”śâ”€â”€ gen_lua_api_data.py   â†’ logs/data/lua_api_data.json
 â”śâ”€â”€ gen_luadoc.py         â† reads lua_api_data.json
 â”śâ”€â”€ gen_docs_lua.py       â† reads lua_api_data.json
 â”śâ”€â”€ gen_docs_rust.py      â† reads rust_api_data.json
@@ -246,7 +246,7 @@ quality_report.py
 audit_module.py           (standalone, reads source directly)
 docstring_audit.py        (standalone, reads lua_api source)
 tool_registry_audit.py    (standalone, self-audit of tools/ registry)
-wiki_coverage.py          (standalone, cross-refs docs/wiki/ vs src/ modules)
+wiki_coverage.py          (standalone, cross-refs wiki/ vs src/ modules)
 ```
 
 ### Overlap-Free Ownership
