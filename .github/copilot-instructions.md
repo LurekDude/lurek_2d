@@ -50,7 +50,7 @@ This system prompt is a discovery index, not a manual. Find specialised context 
 - **Prompts** live in `.github/prompts/<verb>-<noun>.prompt.md`. Each is a parameterised user-selected entrypoint; the `expected_agent` frontmatter names the runner.
 - **Tools** are catalogued in [`tools/README.md`](../tools/README.md) — the authoritative registry with complete script reference, dependency map, and usage guide. Each subfolder has its own `README.md` with per-script tables.
 - **Module specs** live in `docs/specs/<module>.md` — load directly when you need the canonical reference for a Rust module, its Lua bindings, types, and functions.
-- **Sessions** must create `work/<session-name>/` with subfolders `scripts/`, `handovers/`, `reports/`, `data/`, `examples/`, `other/`, `temp/`, `logs/`. Append one JSONL entry per completed phase to `logs/agent_log.jsonl`; never overwrite. Move completed sessions to `work/archive/`.
+- **Sessions** must create `work/<session-name>/` with subfolders `scripts/`, `handovers/`, `reports/`, `data/`, `examples/`, `other/`, `temp/`, `logs/`. Append one JSONL entry per phase to `logs/agent_log.jsonl`; never overwrite. Move to `work/archive/` when done.
 - **API namespace** is `lurek.*` exclusively — never bare globals or external prefixes. The Thin Wrapper Rule binds: `src/lua_api/<module>_api.rs` owns ALL `impl LuaUserData` and `mlua` imports; domain modules under `src/<module>/` stay pure-Rust.
 - **Lua-first testing rule (TST-01)**: behaviour observable through `lurek.*` MUST be tested in Lua under `tests/lua/`. Rust unit tests under `tests/rust/unit/` are reserved for non-Lua-reachable internals. Full text: [philosophy.md § Testing Constraints](../docs/architecture/philosophy.md#testing-constraints).
 
