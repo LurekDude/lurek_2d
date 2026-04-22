@@ -18,6 +18,11 @@
 /docs/references/
 /ideas/competition/
 
+# One-shot scripts removed from tools/ — gitignored to prevent VS Code re-creating
+tools/fix/fix_math.py
+tools/fix/rename_example_files.py
+tools/fix/rename_test_files.py
+
 # Root diagnostics and runtime logs
 /cargo_check_err.txt
 /clippy_out.txt
