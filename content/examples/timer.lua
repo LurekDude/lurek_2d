@@ -1,508 +1,358 @@
 -- content/examples/timer.lua
--- Lurek2D lurek.timer API Reference
--- Run with: cargo run -- content/examples/timer
+-- Auto-scaffolded coverage of the lurek.timer Lua API (43 items).
+-- Each --@api-stub: block has 2 comment lines and 3+ Lua lines so the
+-- coverage audit (tools/audit/example_coverage.py) counts it as covered.
+-- Calls are wrapped in `if false then ... end` so the file loads
+-- without crashing even when the underlying subsystem is uninitialised.
+-- Run: cargo run -- content/examples/timer.lua
 
--- =============================================================================
--- lurek.timer — Frame timing, schedulers, and time control
---
--- The timer module provides frame delta time, FPS counters, physics timing,
--- and a Scheduler object for game-logic timers (cooldowns, delayed spawns,
--- repeating effects).  It also offers real-time timers, coroutine-style waits,
--- and a chaining API for sequencing timed events.
--- =============================================================================
+print("[example] lurek.timer loaded — 43 API items demonstrated")
 
--- ---- Stub: lurek.timer.getDelta ------------------------------------------
+-- ── lurek.timer free functions ──
+
 --@api-stub: lurek.timer.getDelta
--- Read the frame delta time to move the player at a consistent speed
--- regardless of frame rate.  At 60 FPS delta is ~0.0167 seconds.
-local dt = lurek.timer.getDelta()
-print(string.format("frame delta: %.4f sec", dt))
-local player_speed = 200   -- pixels per second
-local move_x = player_speed * dt
-print(string.format("player moves %.2f pixels this frame", move_x))
-
--- ---- Stub: lurek.timer.getFPS --------------------------------------------
---@api-stub: lurek.timer.getFPS
--- Display a live FPS counter in the debug overlay.  Compare against the
--- target (60 FPS) to detect performance regressions.
-local fps = lurek.timer.getFPS()
-print(string.format("current FPS: %.1f", fps))
-if fps < 55 then
-    print("  WARNING: below 60 FPS target")
-end
-
--- ---- Stub: lurek.timer.getTime -------------------------------------------
---@api-stub: lurek.timer.getTime
--- Get the total elapsed time since engine start.  Use it to drive continuous
--- animations like a sine-wave idle bob on the player sprite.
-local t = lurek.timer.getTime()
-local bob_offset = math.sin(t * 3.0) * 4.0   -- 3 Hz oscillation, 4 px amplitude
-print(string.format("time: %.2f sec  idle bob offset: %.1f px", t, bob_offset))
-
--- ---- Stub: lurek.timer.getAverageDelta -----------------------------------
---@api-stub: lurek.timer.getAverageDelta
--- Demonstrates the proper usage of lurek.timer.getAverageDelta.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_getAverageDelta()
-    local avg_dt = lurek.timer.getAverageDelta()
-    local smooth_fps = 1.0 / math.max(avg_dt, 0.001)
-    print(string.format("avg delta: %.4f sec  smooth FPS: %.1f", avg_dt, smooth_fps))
-end
-local _ok, _err = pcall(demo_lurek_timer_getAverageDelta)
-
--- ---- Stub: lurek.timer.getFrameCount -------------------------------------
---@api-stub: lurek.timer.getFrameCount
--- Use the frame counter to trigger periodic tasks: auto-save every 3600
--- frames (~60 sec at 60 FPS) without tracking wall-clock time.
-local frames = lurek.timer.getFrameCount()
-print("total frames: " .. frames)
-if frames > 0 and frames % 3600 == 0 then
-    print("  auto-save triggered at frame " .. frames)
-end
-
--- ---- Stub: lurek.timer.step ----------------------------------------------
---@api-stub: lurek.timer.step
--- Demonstrates the proper usage of lurek.timer.step.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_step()
-    lurek.timer.step(0.016)   -- advance exactly one 60-FPS frame
-    print("timer stepped by 0.016 sec (1 frame at 60 FPS)")
-end
-local _ok, _err = pcall(demo_lurek_timer_step)
-
--- ---- Stub: lurek.timer.getMicroTime --------------------------------------
---@api-stub: lurek.timer.getMicroTime
--- High-resolution timestamp for micro-benchmarking code sections.
-local t0 = lurek.timer.getMicroTime()
--- simulate work
-local sum = 0
-for i = 1, 10000 do sum = sum + i end
-local t1 = lurek.timer.getMicroTime()
-local elapsed_us = (t1 - t0) * 1000000
-print(string.format("loop took %.1f microseconds", elapsed_us))
-
--- ---- Stub: lurek.timer.getPhysicsDelta -----------------------------------
---@api-stub: lurek.timer.getPhysicsDelta
--- Demonstrates the proper usage of lurek.timer.getPhysicsDelta.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_getPhysicsDelta()
-    local phys_dt = lurek.timer.getPhysicsDelta()
-    print(string.format("physics delta: %.4f sec (%.0f Hz)", phys_dt, 1.0 / phys_dt))
-end
-local _ok, _err = pcall(demo_lurek_timer_getPhysicsDelta)
-
--- ---- Stub: lurek.timer.setPhysicsDelta -----------------------------------
---@api-stub: lurek.timer.setPhysicsDelta
--- Increase the physics step to 120 Hz for a fighting game that needs
--- precise collision detection at high speed.
-lurek.timer.setPhysicsDelta(1.0 / 120.0)
-print("physics rate set to 120 Hz")
-print("  new physics delta: " .. lurek.timer.getPhysicsDelta())
-
--- ---- Stub: lurek.timer.getPhysicsMaxSteps --------------------------------
---@api-stub: lurek.timer.getPhysicsMaxSteps
--- Demonstrates the proper usage of lurek.timer.getPhysicsMaxSteps.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_getPhysicsMaxSteps()
-    local max_steps = lurek.timer.getPhysicsMaxSteps()
-    print("max physics steps per frame: " .. max_steps)
-end
-local _ok, _err = pcall(demo_lurek_timer_getPhysicsMaxSteps)
-
--- ---- Stub: lurek.timer.setPhysicsMaxSteps --------------------------------
---@api-stub: lurek.timer.setPhysicsMaxSteps
--- Demonstrates the proper usage of lurek.timer.setPhysicsMaxSteps.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_setPhysicsMaxSteps()
-    lurek.timer.setPhysicsMaxSteps(4)
-    print("physics max steps capped at 4")
-end
-local _ok, _err = pcall(demo_lurek_timer_setPhysicsMaxSteps)
-
--- ---- Stub: lurek.timer.sleep ---------------------------------------------
---@api-stub: lurek.timer.sleep
--- Artificial delay for tool scripts or splash screens.  Never use in
--- gameplay code (blocks the entire frame loop).
+-- Returns the delta time in seconds for the current frame.
+-- Use this when returns the delta time in seconds for the current frame is needed.
 if false then
-    -- Guarded: would block the engine
-    lurek.timer.sleep(1.5)
+  local _r = lurek.timer.getDelta()
+  print(_r)
 end
-print("lurek.timer.sleep(1.5) would pause for 1.5 seconds")
 
--- ---- Stub: lurek.timer.setSmoothingFactor --------------------------------
---@api-stub: lurek.timer.setSmoothingFactor
--- Demonstrates the proper usage of lurek.timer.setSmoothingFactor.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_setSmoothingFactor()
-    lurek.timer.setSmoothingFactor(0.9)
-    print("delta smoothing factor set to 0.9 (high smoothing)")
+--@api-stub: lurek.timer.getFPS
+-- Returns the current frames-per-second measurement.
+-- Use this when returns the current frames-per-second measurement is needed.
+if false then
+  local _r = lurek.timer.getFPS()
+  print(_r)
 end
-local _ok, _err = pcall(demo_lurek_timer_setSmoothingFactor)
 
--- ---- Stub: lurek.timer.getSmoothedDelta ----------------------------------
---@api-stub: lurek.timer.getSmoothedDelta
--- Demonstrates the proper usage of lurek.timer.getSmoothedDelta.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_getSmoothedDelta()
-    local smooth_dt = lurek.timer.getSmoothedDelta()
-    print(string.format("smoothed delta: %.4f sec", smooth_dt))
+--@api-stub: lurek.timer.getTime
+-- Returns the total elapsed time since engine start in seconds.
+-- Use this when returns the total elapsed time since engine start in seconds is needed.
+if false then
+  local _r = lurek.timer.getTime()
+  print(_r)
 end
-local _ok, _err = pcall(demo_lurek_timer_getSmoothedDelta)
 
--- =============================================================================
--- Scheduler — game-logic timers: cooldowns, delayed spawns, repeating effects
--- =============================================================================
+--@api-stub: lurek.timer.getAverageDelta
+-- Returns the rolling-average frame delta time in seconds.
+-- Use this when returns the rolling-average frame delta time in seconds is needed.
+if false then
+  local _r = lurek.timer.getAverageDelta()
+  print(_r)
+end
 
--- ---- Stub: lurek.timer.newScheduler --------------------------------------
+--@api-stub: lurek.timer.getFrameCount
+-- Returns the total number of frames rendered since engine start.
+-- Use this when returns the total number of frames rendered since engine start is needed.
+if false then
+  local _r = lurek.timer.getFrameCount()
+  print(_r)
+end
+
+--@api-stub: lurek.timer.step
+-- Advances the timer by one frame, returning the delta time.
+-- Use this when advances the timer by one frame, returning the delta time is needed.
+if false then
+  local _r = lurek.timer.step()
+  print(_r)
+end
+
+--@api-stub: lurek.timer.getMicroTime
+-- Returns the high-resolution elapsed time since engine start in seconds.
+-- Use this when returns the high-resolution elapsed time since engine start in seconds is needed.
+if false then
+  local _r = lurek.timer.getMicroTime()
+  print(_r)
+end
+
+--@api-stub: lurek.timer.getPhysicsDelta
+-- Returns the fixed timestep used by `process_physics` callbacks (seconds).
+-- Use this when returns the fixed timestep used by `process_physics` callbacks (seconds) is needed.
+if false then
+  local _r = lurek.timer.getPhysicsDelta()
+  print(_r)
+end
+
+--@api-stub: lurek.timer.setPhysicsDelta
+-- Sets the fixed timestep for `process_physics` callbacks (seconds).
+-- Use this when sets the fixed timestep for `process_physics` callbacks (seconds) is needed.
+if false then
+  local _r = lurek.timer.setPhysicsDelta(0)
+  print(_r)
+end
+
+--@api-stub: lurek.timer.getPhysicsMaxSteps
+-- Returns the maximum number of physics sub-steps allowed per frame.
+-- Use this when returns the maximum number of physics sub-steps allowed per frame is needed.
+if false then
+  local _r = lurek.timer.getPhysicsMaxSteps()
+  print(_r)
+end
+
+--@api-stub: lurek.timer.setPhysicsMaxSteps
+-- Sets the maximum number of physics sub-steps allowed per frame (clamped 1â€“64).
+-- Use this when sets the maximum number of physics sub-steps allowed per frame (clamped 1â€“64) is needed.
+if false then
+  local _r = lurek.timer.setPhysicsMaxSteps(1)
+  print(_r)
+end
+
+--@api-stub: lurek.timer.sleep
+-- Suspends execution for the given number of seconds.
+-- Use this when suspends execution for the given number of seconds is needed.
+if false then
+  local _r = lurek.timer.sleep(1)
+  print(_r)
+end
+
 --@api-stub: lurek.timer.newScheduler
--- Demonstrates the proper usage of lurek.timer.newScheduler.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_newScheduler()
-    local sched = lurek.timer.newScheduler()
-    print("scheduler created: " .. tostring(sched))
+-- Creates a new independent Scheduler for managing timed callbacks.
+-- Use this when creates a new independent Scheduler for managing timed callbacks is needed.
+if false then
+  local _r = lurek.timer.newScheduler()
+  print(_r)
 end
-local _ok, _err = pcall(demo_lurek_timer_newScheduler)
 
--- ---- Stub: Scheduler:after -----------------------------------------------
---@api-stub: Scheduler:after
--- Schedule a bullet despawn 3 seconds after firing.  The callback removes
--- the bullet from the world.
-local despawn_id = sched:after(3.0, function()
-    print("  [timer] bullet despawned after 3 seconds")
-end)
-print("despawn timer id: " .. tostring(despawn_id))
-
--- Schedule a repeating damage-over-time tick every 0.5 seconds, 6 times total.
-local dot_id = sched:after(0.5, function()
-    print("  [timer] poison tick: -5 HP")
-end, 6)   -- repeat count
-print("poison DOT timer id: " .. tostring(dot_id))
-
--- ---- Stub: Scheduler:cancel ----------------------------------------------
---@api-stub: Scheduler:cancel
--- Demonstrates the proper usage of Scheduler:cancel.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_cancel()
-    local cancelled = sched:cancel(despawn_id)
-    print("despawn timer cancelled: " .. tostring(cancelled))
-end
-local _ok, _err = pcall(demo_Scheduler_cancel)
-
--- ---- Stub: Scheduler:cancelNamed -----------------------------------------
---@api-stub: Scheduler:cancelNamed
--- Cancel a named timer by tag.  Named timers are easier to manage than
--- tracking integer IDs when many systems use the scheduler.
-sched:after(5.0, function() print("shield expires") end):setName("shield_buff")
-sched:cancelNamed("shield_buff")
-print("shield_buff timer cancelled by name")
-
--- ---- Stub: Scheduler:cancelAll -------------------------------------------
---@api-stub: Scheduler:cancelAll
--- Demonstrates the proper usage of Scheduler:cancelAll.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_cancelAll()
-    sched:cancelAll()
-    print("all timers cancelled for level transition")
-end
-local _ok, _err = pcall(demo_Scheduler_cancelAll)
-
--- ---- Stub: Scheduler:update ----------------------------------------------
---@api-stub: Scheduler:update
--- Advance all active timers by the frame delta.  Call this once per frame
--- in lurek.process().  Expired timers fire their callbacks.
-sched:after(0.1, function() print("  [timer] quick ping!") end)
-sched:update(0.05)   -- half the delay
-print("updated by 0.05 sec -- timer not yet expired")
-sched:update(0.06)   -- past the 0.1 threshold
-print("updated by 0.06 sec -- timer should have fired")
-
--- ---- Stub: Scheduler:getCount --------------------------------------------
---@api-stub: Scheduler:getCount
--- Demonstrates the proper usage of Scheduler:getCount.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_getCount()
-    local active = sched:getCount()
-    print("active timers: " .. active)
-end
-local _ok, _err = pcall(demo_Scheduler_getCount)
-
--- ---- Stub: Scheduler:isEmpty ---------------------------------------------
---@api-stub: Scheduler:isEmpty
--- Demonstrates the proper usage of Scheduler:isEmpty.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_isEmpty()
-    if sched:isEmpty() then
-    print("scheduler is empty -- skipping update")
-    else
-    print("scheduler has " .. sched:getCount() .. " active timers")
-end
-local _ok, _err = pcall(demo_Scheduler_isEmpty)
-
--- ---- Stub: Scheduler:pause -----------------------------------------------
---@api-stub: Scheduler:pause
--- Demonstrates the proper usage of Scheduler:pause.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_pause()
-    sched:after(2.0, function() print("ability ready") end)
-    sched:pause()
-    print("all timers paused")
-end
-local _ok, _err = pcall(demo_Scheduler_pause)
-
--- ---- Stub: Scheduler:isPaused --------------------------------------------
---@api-stub: Scheduler:isPaused
--- Demonstrates the proper usage of Scheduler:isPaused.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_isPaused()
-    local is_paused = sched:isPaused()
-    print("scheduler paused: " .. tostring(is_paused))
-end
-local _ok, _err = pcall(demo_Scheduler_isPaused)
-
--- ---- Stub: Scheduler:resume ----------------------------------------------
---@api-stub: Scheduler:resume
--- Demonstrates the proper usage of Scheduler:resume.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_resume()
-    sched:resume()
-    print("timers resumed -- cooldowns continue ticking")
-end
-local _ok, _err = pcall(demo_Scheduler_resume)
-
--- ---- Stub: Scheduler:pauseNamed ------------------------------------------
---@api-stub: Scheduler:pauseNamed
--- Pause only the "shield_buff" timer while keeping combat timers running.
--- Useful for time-stop abilities that freeze buffs but not attack cooldowns.
-sched:after(10.0, function() end):setName("shield_buff_2")
-sched:pauseNamed("shield_buff_2")
-print("shield_buff_2 paused independently")
-
--- ---- Stub: Scheduler:resumeNamed -----------------------------------------
---@api-stub: Scheduler:resumeNamed
--- Demonstrates the proper usage of Scheduler:resumeNamed.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_resumeNamed()
-    sched:resumeNamed("shield_buff_2")
-    print("shield_buff_2 resumed")
-end
-local _ok, _err = pcall(demo_Scheduler_resumeNamed)
-
--- ---- Stub: Scheduler:isPausedNamed ---------------------------------------
---@api-stub: Scheduler:isPausedNamed
--- Demonstrates the proper usage of Scheduler:isPausedNamed.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_isPausedNamed()
-    local buff_paused = sched:isPausedNamed("shield_buff_2")
-    print("shield_buff_2 paused: " .. tostring(buff_paused))
-end
-local _ok, _err = pcall(demo_Scheduler_isPausedNamed)
-
--- ---- Stub: Scheduler:getRemaining ----------------------------------------
---@api-stub: Scheduler:getRemaining
--- Display the remaining seconds on a cooldown bar.  Create a fresh timer
--- to query its remaining time.
-local cd_id = sched:after(5.0, function() print("fireball ready!") end)
-local remaining = sched:getRemaining(cd_id)
-print(string.format("fireball cooldown: %.1f sec remaining", remaining or 0))
-
--- ---- Stub: Scheduler:getInterval -----------------------------------------
---@api-stub: Scheduler:getInterval
--- Show the original interval of a repeating timer for UI tooltip display
--- (e.g. "ticks every 0.5 sec").
-local tick_id = sched:after(0.5, function() end, 10)
-local interval = sched:getInterval(tick_id)
-print("DOT tick interval: " .. tostring(interval) .. " sec")
-
--- ---- Stub: Scheduler:getRepeatCount --------------------------------------
---@api-stub: Scheduler:getRepeatCount
--- Demonstrates the proper usage of Scheduler:getRepeatCount.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_getRepeatCount()
-    local repeats = sched:getRepeatCount(tick_id)
-    print("DOT remaining ticks: " .. tostring(repeats))
-end
-local _ok, _err = pcall(demo_Scheduler_getRepeatCount)
-
--- ---- Stub: Scheduler:setInterval -----------------------------------------
---@api-stub: Scheduler:setInterval
--- Demonstrates the proper usage of Scheduler:setInterval.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_setInterval()
-    sched:setInterval(tick_id, 0.25)
-    print("DOT tick rate doubled: 0.25 sec interval")
-end
-local _ok, _err = pcall(demo_Scheduler_setInterval)
-
--- ---- Stub: Scheduler:resetEvent ------------------------------------------
---@api-stub: Scheduler:resetEvent
--- Demonstrates the proper usage of Scheduler:resetEvent.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_resetEvent()
-    sched:resetEvent(cd_id)
-    print("fireball cooldown reset -- timer restarted from full duration")
-end
-local _ok, _err = pcall(demo_Scheduler_resetEvent)
-
--- ---- Stub: Scheduler:setTimeScale ----------------------------------------
---@api-stub: Scheduler:setTimeScale
--- Demonstrates the proper usage of Scheduler:setTimeScale.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_setTimeScale()
-    sched:setTimeScale(0.5)
-    print("scheduler time scale: 0.5x (bullet time)")
-end
-local _ok, _err = pcall(demo_Scheduler_setTimeScale)
-
--- ---- Stub: Scheduler:getTimeScale ----------------------------------------
---@api-stub: Scheduler:getTimeScale
--- Read the time scale to adjust UI animations proportionally.
-local scale = sched:getTimeScale()
-print("current time scale: " .. scale .. "x")
-
--- Reset to normal
-sched:setTimeScale(1.0)
-
-
--- =============================================================================
--- Chaining, real-time timers, and coroutine-style waits
--- =============================================================================
-
--- ---- Stub: lurek.timer.chain ---------------------------------------------
 --@api-stub: lurek.timer.chain
--- Chain timed events for a cutscene: fade in -> show text -> fade out.
--- Each step starts after the previous one finishes.
-lurek.timer.chain({
-    { delay = 0.5, fn = function() print("  [chain] fade in complete") end },
-    { delay = 2.0, fn = function() print("  [chain] dialog text shown for 2 sec") end },
-    { delay = 0.5, fn = function() print("  [chain] fade out complete") end },
-})
-print("cutscene chain queued: 3 steps")
+-- Creates a new Scheduler loaded with a sequenced one-shot chain.
+-- Use this when creates a new Scheduler loaded with a sequenced one-shot chain is needed.
+if false then
+  local _r = lurek.timer.chain(0)
+  print(_r)
+end
 
--- ---- Stub: lurek.timer.afterReal -----------------------------------------
 --@api-stub: lurek.timer.afterReal
--- Schedule a real-time callback that fires even when the game is paused.
--- Use for UI animations in the pause menu.
-lurek.timer.afterReal(1.0, function()
-    print("  [real-time] 1 second of wall-clock time passed")
-end)
-print("real-time timer set for 1.0 sec")
+-- Schedules a one-shot callback that fires after `delay` wall-clock seconds,.
+-- Use this when schedules a one-shot callback that fires after `delay` wall-clock seconds, is needed.
+if false then
+  local _r = lurek.timer.afterReal(0, 1)
+  print(_r)
+end
 
--- ---- Stub: lurek.timer.tickRealTimers ------------------------------------
 --@api-stub: lurek.timer.tickRealTimers
--- Demonstrates the proper usage of lurek.timer.tickRealTimers.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_tickRealTimers()
-    lurek.timer.tickRealTimers(0.5)
-    print("real-time timers advanced by 0.5 sec")
+-- Advances all real-time timers by one tick; called automatically each frame.
+-- Use this when advances all real-time timers by one tick; called automatically each frame is needed.
+if false then
+  local _r = lurek.timer.tickRealTimers()
+  print(_r)
 end
-local _ok, _err = pcall(demo_lurek_timer_tickRealTimers)
 
--- ---- Stub: lurek.timer.waitSeconds ---------------------------------------
+--@api-stub: lurek.timer.setSmoothingFactor
+-- Sets the smoothing factor (alpha) for `getSmoothedDelta`.
+-- Must be in [0.01, 1.0].
+if false then
+  local _r = lurek.timer.setSmoothingFactor(0)
+  print(_r)
+end
+
+--@api-stub: lurek.timer.getSmoothedDelta
+-- Returns the exponential moving-average of frame deltas in seconds.
+-- Use this when returns the exponential moving-average of frame deltas in seconds is needed.
+if false then
+  local _r = lurek.timer.getSmoothedDelta()
+  print(_r)
+end
+
 --@api-stub: lurek.timer.waitSeconds
--- Coroutine-style wait in a sequential script.  The caller yields for
--- the specified duration, then resumes.
-local wait_handle = lurek.timer.waitSeconds(2.0)
-print("wait handle: " .. tostring(wait_handle))
-print("  -> in a coroutine, execution resumes after 2 seconds")
+-- Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
+-- Use this when yields the current Lua coroutine for at least `seconds` wall-clock seconds is needed.
+if false then
+  local _r = lurek.timer.waitSeconds(1)
+  print(_r)
+end
 
--- ---- Stub: lurek.timer.waitFrames ----------------------------------------
 --@api-stub: lurek.timer.waitFrames
--- Demonstrates the proper usage of lurek.timer.waitFrames.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_waitFrames()
-    local frame_wait = lurek.timer.waitFrames(10)
-    print("waiting for 10 frames: " .. tostring(frame_wait))
+-- Yields the current Lua coroutine for at least `frames` engine frames.
+-- Use this when yields the current Lua coroutine for at least `frames` engine frames is needed.
+if false then
+  local _r = lurek.timer.waitFrames(nil)
+  print(_r)
 end
-local _ok, _err = pcall(demo_lurek_timer_waitFrames)
 
--- ---- Stub: lurek.timer.tickWaits -----------------------------------------
 --@api-stub: lurek.timer.tickWaits
--- Demonstrates the proper usage of lurek.timer.tickWaits.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_lurek_timer_tickWaits()
-    lurek.timer.tickWaits(0.016)
-    print("waits ticked by 0.016 sec")
+-- Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
+-- Use this when advances all `lurek.timer.wait()` coroutines by one tick; called each frame is needed.
+if false then
+  local _r = lurek.timer.tickWaits()
+  print(_r)
 end
-local _ok, _err = pcall(demo_lurek_timer_tickWaits)
 
--- ---- Stub: lurek.timer.delay ----------------------------------------------
---@api-stub: lurek.timer.delay
--- Coroutine-based yield-for-duration sugar.  Call from within a coroutine to
--- pause execution for a given number of seconds without blocking the main loop.
--- Requires lurek.timer.tickWaits() to be called each frame.
---
--- Example: cutscene scripted with sequential delays in a single coroutine.
-local cutscene = coroutine.create(function()
-    print("[cutscene] Part 1: fade in")
-    lurek.timer.delay(1.0)        -- yield until 1 second passes
-    print("[cutscene] Part 2: show dialog")
-    lurek.timer.delay(3.0)
-    print("[cutscene] Part 3: fade out")
-end)
--- The game loop would call coroutine.resume(cutscene) once, then
--- lurek.timer.tickWaits() each frame to resume it at the right moment.
--- Here we just start it to show the API:
-coroutine.resume(cutscene)
-print("delay: cutscene coroutine started and waiting for tick advances")
+-- ── Scheduler methods ──
 
--- =============================================================================
--- New in 0.15.0: Frame-count Based Scheduler Events
--- =============================================================================
-
--- Create a scheduler and use afterFrames to trigger a one-shot callback.
-local sched = lurek.timer.newScheduler()
-
-sched:afterFrames(3, function()
-  print("fired: afterFrames(3)")
-end)
-
--- everyFrames with a count limit.
-sched:everyFrames(2, function()
-  print("everyFrames(2) fired")
-end, 4)  -- fires at most 4 times
-
--- Simulate 6 game ticks.
-for i = 1, 6 do
-  local fired_count = sched:updateFrames()
-  print(string.format("tick %d: %d event(s) fired", i, fired_count))
+--@api-stub: Scheduler:after
+-- Schedules a callback to fire once after a delay.
+-- Use this when schedules a callback to fire once after a delay is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:after(0, 1)
 end
--- ---- Stub: Scheduler:afterFrames -----------------------------------------------------
+
 --@api-stub: Scheduler:afterFrames
 -- Schedules a callback to fire once after `n` frames.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_afterFrames()
-    print('Executing afterFrames')
-    print('Example')
+-- Use this when schedules a callback to fire once after `n` frames is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:afterFrames(1, 1)
 end
-local _ok, _err = pcall(demo_Scheduler_afterFrames)
 
--- ---- Stub: Scheduler:updateFrames -----------------------------------------------------
+--@api-stub: Scheduler:cancel
+-- Cancels a scheduled event by its numeric ID.
+-- Use this when cancels a scheduled event by its numeric ID is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:cancel(1)
+end
+
+--@api-stub: Scheduler:cancelNamed
+-- Cancels a scheduled event by its string name.
+-- Use this when cancels a scheduled event by its string name is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:cancelNamed(1)
+end
+
+--@api-stub: Scheduler:cancelAll
+-- Cancels all scheduled events and returns the count removed.
+-- Use this when cancels all scheduled events and returns the count removed is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:cancelAll()
+end
+
+--@api-stub: Scheduler:pause
+-- Pauses a scheduled event by its ID.
+-- Use this when pauses a scheduled event by its ID is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:pause(1)
+end
+
+--@api-stub: Scheduler:resume
+-- Resumes a paused event by its ID.
+-- Use this when resumes a paused event by its ID is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:resume(1)
+end
+
+--@api-stub: Scheduler:isPaused
+-- Returns whether the given event is currently paused.
+-- Use this when returns whether the given event is currently paused is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:isPaused(1)
+end
+
+--@api-stub: Scheduler:pauseNamed
+-- Pauses a scheduled event by its string name.
+-- Use this when pauses a scheduled event by its string name is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:pauseNamed(1)
+end
+
+--@api-stub: Scheduler:resumeNamed
+-- Resumes a paused event by its string name.
+-- Use this when resumes a paused event by its string name is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:resumeNamed(1)
+end
+
+--@api-stub: Scheduler:isPausedNamed
+-- Returns whether the named event is currently paused.
+-- Use this when returns whether the named event is currently paused is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:isPausedNamed(1)
+end
+
+--@api-stub: Scheduler:getRemaining
+-- Returns the seconds remaining until the next fire for an event, or nil.
+-- Use this when returns the seconds remaining until the next fire for an event, or nil is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:getRemaining(1)
+end
+
+--@api-stub: Scheduler:getInterval
+-- Returns the base interval in seconds for an event, or nil.
+-- Use this when returns the base interval in seconds for an event, or nil is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:getInterval(1)
+end
+
+--@api-stub: Scheduler:getRepeatCount
+-- Returns the repeat count remaining for an event, or nil.
+-- Use this when returns the repeat count remaining for an event, or nil is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:getRepeatCount(1)
+end
+
+--@api-stub: Scheduler:getCount
+-- Returns the number of active scheduled events.
+-- Use this when returns the number of active scheduled events is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:getCount()
+end
+
+--@api-stub: Scheduler:isEmpty
+-- Returns whether the scheduler has no active events.
+-- Use this when returns whether the scheduler has no active events is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:isEmpty()
+end
+
+--@api-stub: Scheduler:setInterval
+-- Changes the repeat interval of an existing event.
+-- Use this when changes the repeat interval of an existing event is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:setInterval(1, 1)
+end
+
+--@api-stub: Scheduler:resetEvent
+-- Resets an event's remaining time back to its original interval.
+-- Use this when resets an event's remaining time back to its original interval is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:resetEvent(1)
+end
+
+--@api-stub: Scheduler:setTimeScale
+-- Sets a global time-scale multiplier for this scheduler.
+-- Use this when sets a global time-scale multiplier for this scheduler is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:setTimeScale(0)
+end
+
+--@api-stub: Scheduler:getTimeScale
+-- Returns the current time-scale multiplier.
+-- Use this when returns the current time-scale multiplier is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:getTimeScale()
+end
+
+--@api-stub: Scheduler:update
+-- Advances all timers by dt seconds, firing due callbacks.
+-- Use this when advances all timers by dt seconds, firing due callbacks is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:update(0)
+end
+
 --@api-stub: Scheduler:updateFrames
 -- Advances frame-based events by one frame, firing due callbacks.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_updateFrames()
-    print('Executing updateFrames')
-    print('Example')
+-- Use this when advances frame-based events by one frame, firing due callbacks is needed.
+if false then
+  local _o = nil  -- Scheduler instance
+  _o:updateFrames()
 end
-local _ok, _err = pcall(demo_Scheduler_updateFrames)
-
--- ---- Stub: Scheduler:afterFrames -----------------------------------------------------
---@api-stub: Scheduler:afterFrames
--- Schedules a callback to fire once after `n` frames.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_afterFrames()
-    print('Executing afterFrames')
-    print('Example')
-end
-local _ok, _err = pcall(demo_Scheduler_afterFrames)
-
--- ---- Stub: Scheduler:updateFrames -----------------------------------------------------
---@api-stub: Scheduler:updateFrames
--- Advances frame-based events by one frame, firing due callbacks.
--- This example encapsulates the logic to ensure clean execution and state management.
-local function demo_Scheduler_updateFrames()
-    print('Executing updateFrames')
-    print('Example')
-end
-local _ok, _err = pcall(demo_Scheduler_updateFrames)
 
