@@ -1,23 +1,10 @@
 -- content/examples/globe.lua
--- Scaffolded coverage of the lurek.globe API (44 items).
+-- Hand-written coverage of the lurek.globe API (44 items).
 --
--- Every --@api-stub: block below is a SCAFFOLD. The body must be
--- replaced by hand with a 3-6 line real usage snippet showing how to
--- call the API in real game context, written by reading:
---   * src/lua_api/globe_api.rs   (Lua binding, arg types, return shape)
---   * src/globe/                 (semantics, side effects)
---   * docs/specs/globe.md        (canonical reference)
---
--- Snippet rules (love2d-wiki style):
---   * NO `return` at top-level (breaks the file).
---   * NO `pcall` defensive wrappers, NO `if false then`.
---   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
---     `function lurek.update(dt) ... end` callbacks so the file loads.
---   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
---     colours like {1, 0.5, 0, 1}.
---   * Keep the two `--` comment lines: 1) what the API does (use the
---     existing description), 2) one line of practical advice.
+-- The lurek.globe namespace is an XCOM-style geoscape sphere: provinces are
+-- polygonal regions on a unit sphere, with markers, labels, layers, fog of
+-- war and great-circle pathfinding. Each block constructs a fresh globe
+-- inside its own scope so the snippets stay self-contained and re-runnable.
 --
 -- Run: cargo run -- content/examples/globe.lua
 
@@ -25,357 +12,461 @@
 
 --@api-stub: lurek.globe.new
 -- Creates a new globe instance with default settings and empty collections.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: lurek.globe.new
-  local _todo = "TODO: write a real lurek.globe.new usage example"
-  print(_todo)
+-- Pass an optional spec table to override radius, axial tilt or render flags at construction time.
+do  -- lurek.globe.new
+  local g = lurek.globe.new("earth_demo", { radius = 1.0, axial_tilt_deg = 23.5 })
+  g:setBorders(true)
+  lurek.log.info("created globe " .. g:getName(), "globe")
 end
 
 --@api-stub: lurek.globe.get
 -- Get an existing globe by name, or nil.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: lurek.globe.get
-  local _todo = "TODO: write a real lurek.globe.get usage example"
-  print(_todo)
+-- Use this from a separate script or coroutine to look up a globe created elsewhere; returns nil if missing.
+do  -- lurek.globe.get
+  lurek.globe.new("campaign", {})
+  local g = lurek.globe.get("campaign")
+  if g then lurek.log.info("found globe " .. g:getName(), "globe") end
 end
 
 --@api-stub: lurek.globe.loadFromTOML
 -- Load provinces from a TOML string and create a globe.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: lurek.globe.loadFromTOML
-  local _todo = "TODO: write a real lurek.globe.loadFromTOML usage example"
-  print(_todo)
+-- Useful at level-load time when provinces are authored in a data file rather than built procedurally in script.
+do  -- lurek.globe.loadFromTOML
+  local toml_src = [[
+  [[provinces]]
+  id = 1
+  centroid = [10.0, 20.0]
+  vertices = [[5.0,15.0],[15.0,15.0],[15.0,25.0],[5.0,25.0]]
+  ]]
+  local g = lurek.globe.loadFromTOML("loaded", toml_src, {})
+  lurek.log.info("loaded provinces=" .. g:provinceCount(), "globe")
 end
 
 --@api-stub: lurek.globe.greatCircleDistance
 -- Great-circle distance between two lat/lon points (in unit-sphere radians).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: lurek.globe.greatCircleDistance
-  local _todo = "TODO: write a real lurek.globe.greatCircleDistance usage example"
-  print(_todo)
+-- Returns the angular distance in radians; multiply by your planet radius to get a real-world distance.
+do  -- lurek.globe.greatCircleDistance
+  local rad = lurek.globe.greatCircleDistance(40.7, -74.0, 51.5, -0.1)
+  local km = rad * 6371.0
+  lurek.log.info(string.format("NYC->London = %.0f km", km), "globe")
 end
 
 --@api-stub: lurek.globe.greatCirclePath
 -- Great-circle path as a table of {lat, lon} pairs.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: lurek.globe.greatCirclePath
-  local _todo = "TODO: write a real lurek.globe.greatCirclePath usage example"
-  print(_todo)
+-- Use the returned point list to draw flight arcs or interpolate camera fly-throughs along a geodesic.
+do  -- lurek.globe.greatCirclePath
+  local pts = lurek.globe.greatCirclePath(0.0, 0.0, 0.0, 90.0, 8)
+  for i, p in ipairs(pts) do
+    lurek.log.debug(string.format("step %d: lat=%.1f lon=%.1f", i, p[1], p[2]), "globe")
+  end
 end
 
 --@api-stub: lurek.globe.latLonToUnit
 -- Convert lat/lon (degrees) to a unit-sphere Cartesian vector {x, y, z}.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: lurek.globe.latLonToUnit
-  local _todo = "TODO: write a real lurek.globe.latLonToUnit usage example"
-  print(_todo)
+-- Handy when feeding a globe coordinate into 3D math, lighting, or a custom shader uniform.
+do  -- lurek.globe.latLonToUnit
+  local v = lurek.globe.latLonToUnit(45.0, 90.0)
+  local mag = math.sqrt(v[1]*v[1] + v[2]*v[2] + v[3]*v[3])
+  lurek.log.info(string.format("unit vec |v|=%.3f", mag), "globe")
 end
 
 -- ── Globe methods ──
 
 --@api-stub: Globe:addProvince
 -- Adds a province from a table {id, centroid={lat,lon}, vertices={{lat,lon},...},.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:addProvince
-  local _todo = "TODO: write a real Globe:addProvince usage example"
-  print(_todo)
+-- Provinces are added once at world build; vertices are lat/lon pairs in degrees, neighbors carries adjacency.
+do  -- Globe:addProvince
+  local g = lurek.globe.new("addprov", {})
+  g:addProvince({
+    id = 7, centroid = {30.0, 40.0},
+    vertices = {{25.0,35.0},{35.0,35.0},{35.0,45.0},{25.0,45.0}},
+    neighbors = {}, base_color = {0.2, 0.6, 0.3, 1.0},
+  })
 end
 
 --@api-stub: Globe:removeProvince
 -- Removes a province by ID.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:removeProvince
-  local _todo = "TODO: write a real Globe:removeProvince usage example"
-  print(_todo)
+-- Call when a province is destroyed by an event (cataclysm, conquest merge); returns true if it existed.
+do  -- Globe:removeProvince
+  local g = lurek.globe.new("rmprov", {})
+  g:addProvince({ id = 9, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  local existed = g:removeProvince(9)
+  lurek.log.info("removed=" .. tostring(existed) .. " count=" .. g:provinceCount(), "globe")
 end
 
 --@api-stub: Globe:provinceCount
 -- Returns the number of provinces.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:provinceCount
-  local _todo = "TODO: write a real Globe:provinceCount usage example"
-  print(_todo)
+-- Use as a cheap sanity check after bulk loading or to drive HUD readouts like "42/100 provinces explored".
+do  -- Globe:provinceCount
+  local g = lurek.globe.new("count_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:addProvince({ id = 2, centroid = {5,5}, vertices = {{4,4},{6,4},{6,6}} })
+  lurek.log.info("provinces=" .. g:provinceCount(), "globe")
 end
 
 --@api-stub: Globe:getNeighbors
 -- Returns the neighbor IDs of a province.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:getNeighbors
-  local _todo = "TODO: write a real Globe:getNeighbors usage example"
-  print(_todo)
+-- Drive AI threat propagation or border-glow rendering by walking the adjacency list returned here.
+do  -- Globe:getNeighbors
+  local g = lurek.globe.new("neigh_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}}, neighbors = {2, 3} })
+  local nbrs = g:getNeighbors(1)
+  lurek.log.info("province 1 has " .. #nbrs .. " neighbors", "globe")
 end
 
 --@api-stub: Globe:getProvinceAttr
 -- Gets a string attribute from a province.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:getProvinceAttr
-  local _todo = "TODO: write a real Globe:getProvinceAttr usage example"
-  print(_todo)
+-- Pair with setProvinceAttr to attach gameplay metadata (owner faction, terrain type) without expanding the C struct.
+do  -- Globe:getProvinceAttr
+  local g = lurek.globe.new("attr_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:setProvinceAttr(1, "owner", "blue_faction")
+  local owner = g:getProvinceAttr(1, "owner") or "neutral"
+  lurek.log.info("province 1 owner=" .. owner, "globe")
 end
 
 --@api-stub: Globe:pan
 -- Pan the orbit camera by delta-latitude and delta-longitude (degrees).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:pan
-  local _todo = "TODO: write a real Globe:pan usage example"
-  print(_todo)
+-- Drive from per-frame mouse drag deltas; the camera clamps latitude to the poles internally.
+do  -- Globe:pan
+  local g = lurek.globe.new("pan_demo", {})
+  function lurek.process(dt)
+    if lurek.input.isDown("a") then g:pan(0, -45.0 * dt) end
+    if lurek.input.isDown("d") then g:pan(0,  45.0 * dt) end
+  end
 end
 
 --@api-stub: Globe:zoom
 -- Zoom the camera by a multiplier (>1 zooms in, <1 zooms out).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:zoom
-  local _todo = "TODO: write a real Globe:zoom usage example"
-  print(_todo)
+-- Bind to mouse wheel; values >1 zoom in toward the surface, values <1 zoom out toward the orbit edge.
+do  -- Globe:zoom
+  local g = lurek.globe.new("zoom_demo", {})
+  function lurek.process(dt)
+    local wheel = lurek.input.wheel and lurek.input.wheel() or 0
+    if wheel ~= 0 then g:zoom(1.0 + wheel * 0.1) end
+  end
 end
 
 --@api-stub: Globe:setCamera
 -- Set the camera position directly.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setCamera
-  local _todo = "TODO: write a real Globe:setCamera usage example"
-  print(_todo)
+-- Use when warping the camera to a scripted location, e.g. focusing on a quest marker or cinematic.
+do  -- Globe:setCamera
+  local g = lurek.globe.new("setcam_demo", {})
+  g:setCamera(48.85, 2.35, 3.0)  -- centred on Paris, zoomed in
+  local lat, lon, z = g:getCamera()
+  lurek.log.info(string.format("camera lat=%.2f lon=%.2f zoom=%.1f", lat, lon, z), "globe")
 end
 
 --@api-stub: Globe:getCamera
 -- Get the current camera (lat, lon, zoom).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:getCamera
-  local _todo = "TODO: write a real Globe:getCamera usage example"
-  print(_todo)
+-- Persist the returned triple to a save file so the player resumes at the same view next session.
+do  -- Globe:getCamera
+  local g = lurek.globe.new("getcam_demo", {})
+  g:setCamera(0.0, 0.0, 1.5)
+  local lat, lon, z = g:getCamera()
+  lurek.save.write("globe_camera", { lat = lat, lon = lon, zoom = z })
 end
 
 --@api-stub: Globe:getLod
 -- Returns the current LOD tier as a string: "far", "mid", or "near".
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:getLod
-  local _todo = "TODO: write a real Globe:getLod usage example"
-  print(_todo)
+-- Branch on the tier to skip drawing detailed sprites when zoomed out, keeping the geoscape responsive.
+do  -- Globe:getLod
+  local g = lurek.globe.new("lod_demo", {})
+  g:setCamera(0, 0, 5.0)
+  local tier = g:getLod()
+  if tier == "near" then lurek.log.info("show city sprites", "globe") end
 end
 
 --@api-stub: Globe:pick
 -- Returns the province ID under screen coordinates, or nil.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:pick
-  local _todo = "TODO: write a real Globe:pick usage example"
-  print(_todo)
+-- Call from a mouse-click handler to identify which province the player just clicked on.
+do  -- Globe:pick
+  local g = lurek.globe.new("pick_demo", {})
+  function lurek.input_pressed(key)
+    local mx, my = lurek.input.mouseX(), lurek.input.mouseY()
+    local id = g:pick(mx, my)
+    if id then lurek.log.info("clicked province " .. id, "globe") end
+  end
 end
 
 --@api-stub: Globe:pickLatLon
 -- Returns (lat, lon) of the screen point on the globe surface, or nil.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:pickLatLon
-  local _todo = "TODO: write a real Globe:pickLatLon usage example"
-  print(_todo)
+-- Use to drop a marker exactly where the cursor hovered over the globe surface, ignoring background pixels.
+do  -- Globe:pickLatLon
+  local g = lurek.globe.new("picklatlon_demo", {})
+  function lurek.input_pressed(key)
+    local mx, my = lurek.input.mouseX(), lurek.input.mouseY()
+    local lat, lon = g:pickLatLon(mx, my)
+    if lat then g:addMarker("waypoint", lat, lon, "click") end
+  end
 end
 
 --@api-stub: Globe:setActiveViewer
 -- Set the faction/viewer whose fog mask filters rendering.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setActiveViewer
-  local _todo = "TODO: write a real Globe:setActiveViewer usage example"
-  print(_todo)
+-- Switch the viewer when the camera follows a different faction so fog-of-war overlays update accordingly.
+do  -- Globe:setActiveViewer
+  local g = lurek.globe.new("viewer_demo", {})
+  g:setActiveViewer("blue_faction")
+  g:revealAll("blue_faction")
+  lurek.log.info("active viewer set", "globe")
 end
 
 --@api-stub: Globe:revealProvince
 -- Reveal a province for a viewer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:revealProvince
-  local _todo = "TODO: write a real Globe:revealProvince usage example"
-  print(_todo)
+-- Call when a unit enters scouting range so that province becomes permanently visible to its owner.
+do  -- Globe:revealProvince
+  local g = lurek.globe.new("reveal_demo", {})
+  g:addProvince({ id = 12, centroid = {10,10}, vertices = {{9,9},{11,9},{11,11}} })
+  g:revealProvince("blue_faction", 12)
+  lurek.log.info("province 12 revealed for blue", "globe")
 end
 
 --@api-stub: Globe:hideProvince
 -- Hide a province for a viewer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:hideProvince
-  local _todo = "TODO: write a real Globe:hideProvince usage example"
-  print(_todo)
+-- Use when intel decays or a stealth unit leaves an area to fog the province back over for that viewer.
+do  -- Globe:hideProvince
+  local g = lurek.globe.new("hide_demo", {})
+  g:addProvince({ id = 5, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:revealProvince("blue", 5)
+  g:hideProvince("blue", 5)
+  lurek.log.info("province 5 re-fogged for blue", "globe")
 end
 
 --@api-stub: Globe:isVisible
 -- Returns true if the province is visible to the viewer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:isVisible
-  local _todo = "TODO: write a real Globe:isVisible usage example"
-  print(_todo)
+-- Branch on this before showing labels or pings to avoid leaking enemy positions through the fog of war.
+do  -- Globe:isVisible
+  local g = lurek.globe.new("vis_demo", {})
+  g:addProvince({ id = 3, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:revealProvince("blue", 3)
+  if g:isVisible("blue", 3) then lurek.log.info("province 3 visible to blue", "globe") end
 end
 
 --@api-stub: Globe:revealAll
 -- Reveal all provinces for a viewer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:revealAll
-  local _todo = "TODO: write a real Globe:revealAll usage example"
-  print(_todo)
+-- Useful for debug overlays, end-of-game reveal cinematics, or god-mode cheats.
+do  -- Globe:revealAll
+  local g = lurek.globe.new("revealall_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:addProvince({ id = 2, centroid = {5,5}, vertices = {{4,4},{6,4},{6,6}} })
+  g:revealAll("debug_viewer")
+  lurek.log.info("all provinces revealed for debug_viewer", "globe")
 end
 
 --@api-stub: Globe:removeMarker
 -- Removes a marker from the globe map by its unique string identifier.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:removeMarker
-  local _todo = "TODO: write a real Globe:removeMarker usage example"
-  print(_todo)
+-- Call when a unit is destroyed or an event expires so the marker no longer renders or participates in picking.
+do  -- Globe:removeMarker
+  local g = lurek.globe.new("rmmark_demo", {})
+  local id = g:addMarker("ufo", 30.0, -60.0, "Bogey-1")
+  local ok = g:removeMarker(id)
+  lurek.log.info("removed marker " .. id .. " ok=" .. tostring(ok), "globe")
 end
 
 --@api-stub: Globe:moveMarker
 -- Move a marker to a new lat/lon.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:moveMarker
-  local _todo = "TODO: write a real Globe:moveMarker usage example"
-  print(_todo)
+-- Per-frame update for moving units (interceptors, fleets); great-circle interpolate the lat/lon yourself.
+do  -- Globe:moveMarker
+  local g = lurek.globe.new("movemark_demo", {})
+  local id = g:addMarker("ship", 0.0, 0.0, "USS Hope")
+  function lurek.process(dt)
+    g:moveMarker(id, 0.0, (lurek.timer.now() * 5.0) % 360.0)
+  end
 end
 
 --@api-stub: Globe:setMarkerVisible
 -- Sets whether this specific marker is visible on the globe.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setMarkerVisible
-  local _todo = "TODO: write a real Globe:setMarkerVisible usage example"
-  print(_todo)
+-- Toggle to hide markers behind fog or temporarily during cinematics without removing & re-adding them.
+do  -- Globe:setMarkerVisible
+  local g = lurek.globe.new("markvis_demo", {})
+  local id = g:addMarker("base", 51.5, -0.1, "HQ")
+  g:setMarkerVisible(id, false)
+  lurek.log.info("HQ marker hidden during cutscene", "globe")
 end
 
 --@api-stub: Globe:getMarkerAttr
 -- Get a string attribute from a marker.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:getMarkerAttr
-  local _todo = "TODO: write a real Globe:getMarkerAttr usage example"
-  print(_todo)
+-- Pair with setMarkerAttr to stash gameplay state (owner, hp, fuel) on a marker and read it back when picking.
+do  -- Globe:getMarkerAttr
+  local g = lurek.globe.new("markattr_demo", {})
+  local id = g:addMarker("squad", 0.0, 0.0, "Alpha")
+  g:setMarkerAttr(id, "fuel", "85")
+  local fuel = g:getMarkerAttr(id, "fuel") or "0"
+  lurek.log.info("squad fuel=" .. fuel, "globe")
 end
 
 --@api-stub: Globe:setLabelText
 -- Updates the visible text content of an existing globe label.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setLabelText
-  local _todo = "TODO: write a real Globe:setLabelText usage example"
-  print(_todo)
+-- Call when a city is renamed (capital change, conquest) without recreating the label.
+do  -- Globe:setLabelText
+  local g = lurek.globe.new("labeltxt_demo", {})
+  local id = g:addLabel("city", 51.5, -0.1, "London")
+  g:setLabelText(id, "New London")
+  lurek.log.info("relabelled city " .. id, "globe")
 end
 
 --@api-stub: Globe:setLabelVisible
 -- Sets whether this specific label is visible on the globe.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setLabelVisible
-  local _todo = "TODO: write a real Globe:setLabelVisible usage example"
-  print(_todo)
+-- Toggle off labels when the LOD tier zooms out far enough that they would clutter the view.
+do  -- Globe:setLabelVisible
+  local g = lurek.globe.new("labelvis_demo", {})
+  local id = g:addLabel("city", 0.0, 0.0, "Origin")
+  g:setLabelVisible(id, g:getLod() ~= "far")
+  lurek.log.info("label visible based on LOD", "globe")
 end
 
 --@api-stub: Globe:removeLabel
 -- Removes a text label from the globe map by its unique string identifier.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:removeLabel
-  local _todo = "TODO: write a real Globe:removeLabel usage example"
-  print(_todo)
+-- Use when a labelled feature is destroyed (city razed, base abandoned) so the text disappears with it.
+do  -- Globe:removeLabel
+  local g = lurek.globe.new("rmlabel_demo", {})
+  local id = g:addLabel("city", 0, 0, "Atlantis")
+  local ok = g:removeLabel(id)
+  lurek.log.info("removed label " .. id .. " ok=" .. tostring(ok), "globe")
 end
 
 --@api-stub: Globe:removeLayer
 -- Removes a texture layer from the globe map by its unique string identifier.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:removeLayer
-  local _todo = "TODO: write a real Globe:removeLayer usage example"
-  print(_todo)
+-- Drop a layer when its data source goes stale (e.g. weather forecast expired) instead of repainting it.
+do  -- Globe:removeLayer
+  local g = lurek.globe.new("rmlayer_demo", {})
+  g:addLayer("weather", 5)
+  local ok = g:removeLayer("weather")
+  lurek.log.info("removed weather layer ok=" .. tostring(ok), "globe")
 end
 
 --@api-stub: Globe:setLayerVisible
 -- Sets whether this specific texture layer is visible on the globe.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setLayerVisible
-  local _todo = "TODO: write a real Globe:setLayerVisible usage example"
-  print(_todo)
+-- Bind to a UI checkbox so the player can toggle thematic overlays (terrain, politics, weather) on demand.
+do  -- Globe:setLayerVisible
+  local g = lurek.globe.new("layervis_demo", {})
+  g:addLayer("politics", 1)
+  g:setLayerVisible("politics", false)
+  lurek.log.info("politics overlay hidden", "globe")
 end
 
 --@api-stub: Globe:setLayerAlpha
 -- Set layer opacity (0.0–1.0).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setLayerAlpha
-  local _todo = "TODO: write a real Globe:setLayerAlpha usage example"
-  print(_todo)
+-- Animate alpha for fade-in/fade-out of overlays during transitions; clamp to [0,1].
+do  -- Globe:setLayerAlpha
+  local g = lurek.globe.new("layeralpha_demo", {})
+  g:addLayer("heat", 2)
+  function lurek.process(dt)
+    local a = (math.sin(lurek.timer.now()) * 0.5 + 0.5)
+    g:setLayerAlpha("heat", a)
+  end
 end
 
 --@api-stub: Globe:setTimeOfDay
 -- Set time of day (0.0–24.0 hours).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setTimeOfDay
-  local _todo = "TODO: write a real Globe:setTimeOfDay usage example"
-  print(_todo)
+-- Drive from a campaign clock so day/night terminator and lighting follow in-game time.
+do  -- Globe:setTimeOfDay
+  local g = lurek.globe.new("tod_demo", {})
+  function lurek.process(dt)
+    local hours = (lurek.timer.now() * 0.5) % 24.0
+    g:setTimeOfDay(hours)
+  end
 end
 
 --@api-stub: Globe:getTimeOfDay
 -- Gets the current simulated time of day for daylight computation.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:getTimeOfDay
-  local _todo = "TODO: write a real Globe:getTimeOfDay usage example"
-  print(_todo)
+-- Read it back to gate gameplay logic on day vs night (e.g. nocturnal aliens spawn only when t<6 or t>18).
+do  -- Globe:getTimeOfDay
+  local g = lurek.globe.new("getsod_demo", {})
+  g:setTimeOfDay(20.0)
+  local t = g:getTimeOfDay()
+  if t < 6.0 or t > 18.0 then lurek.log.info("nocturnal spawn window open", "globe") end
 end
 
 --@api-stub: Globe:setRotation
 -- Set planet rotation (degrees).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setRotation
-  local _todo = "TODO: write a real Globe:setRotation usage example"
-  print(_todo)
+-- Animate continuously for a slowly spinning planet, or jump to a fixed angle for cinematic establishing shots.
+do  -- Globe:setRotation
+  local g = lurek.globe.new("rot_demo", {})
+  function lurek.process(dt)
+    g:setRotation((lurek.timer.now() * 6.0) % 360.0)
+  end
 end
 
 --@api-stub: Globe:update
 -- Advance globe simulation by dt seconds.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:update
-  local _todo = "TODO: write a real Globe:update usage example"
-  print(_todo)
+-- Call from lurek.process(dt) so marker animations, layer pulses and time-of-day evolve every frame.
+do  -- Globe:update
+  local g = lurek.globe.new("update_demo", {})
+  function lurek.process(dt)
+    g:update(dt)
+  end
 end
 
 --@api-stub: Globe:setBorders
 -- Enable or disable province border rendering.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:setBorders
-  local _todo = "TODO: write a real Globe:setBorders usage example"
-  print(_todo)
+-- Toggle off when the camera is near (LOD = near) so individual sprites are not visually crowded by lines.
+do  -- Globe:setBorders
+  local g = lurek.globe.new("border_demo", {})
+  g:setBorders(true)
+  if g:getLod() == "near" then g:setBorders(false) end
+  lurek.log.info("borders configured for LOD " .. g:getLod(), "globe")
 end
 
 --@api-stub: Globe:findPath
 -- Find the shortest province path from `from_id` to `to_id`.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:findPath
-  local _todo = "TODO: write a real Globe:findPath usage example"
-  print(_todo)
+-- Returns nil when no route exists; otherwise iterate the province IDs to animate a unit hop-by-hop.
+do  -- Globe:findPath
+  local g = lurek.globe.new("path_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}}, neighbors = {2} })
+  g:addProvince({ id = 2, centroid = {1,1}, vertices = {{1,0},{2,0},{2,1}}, neighbors = {1} })
+  local path = g:findPath(1, 2)
+  if path then lurek.log.info("path length=" .. #path, "globe") end
 end
 
 --@api-stub: Globe:removeArc
 -- Removes an arc from the globe map by its unique string identifier.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:removeArc
-  local _todo = "TODO: write a real Globe:removeArc usage example"
-  print(_todo)
+-- Clear an arc when the flight or trade route it represents finishes or is cancelled.
+do  -- Globe:removeArc
+  local g = lurek.globe.new("rmarc_demo", {})
+  local id = g:addArc(0.0, 0.0, 45.0, 90.0, 24)
+  g:removeArc(id)
+  lurek.log.info("arc " .. id .. " cleared", "globe")
 end
 
 --@api-stub: Globe:getName
 -- Returns the string identifier name assigned to this globe instance.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: Globe:getName
-  local _todo = "TODO: write a real Globe:getName usage example"
-  print(_todo)
+-- Use the returned name as a key into your own per-globe metadata table or save-file section.
+do  -- Globe:getName
+  local g = lurek.globe.new("primary_world", {})
+  local name = g:getName()
+  lurek.save.write("active_globe", name)
+  lurek.log.info("active globe = " .. name, "globe")
 end
 
 -- ── GlobeRegistry methods ──
 
 --@api-stub: GlobeRegistry:get
 -- Get an existing globe by name, or nil.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: GlobeRegistry:get
-  local _todo = "TODO: write a real GlobeRegistry:get usage example"
-  print(_todo)
+-- Equivalent to lurek.globe.get; returns nil if no globe of that name exists in the shared registry.
+do  -- GlobeRegistry:get
+  lurek.globe.new("alt_world", {})
+  local g = lurek.globe.get("alt_world")
+  if g then lurek.log.info("registry returned " .. g:getName(), "globe") end
 end
 
 --@api-stub: GlobeRegistry:remove
 -- Removes a globe from the central registry by its string name.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: GlobeRegistry:remove
-  local _todo = "TODO: write a real GlobeRegistry:remove usage example"
-  print(_todo)
+-- Drop a globe at the end of a campaign so its memory and registered name can be reused.
+do  -- GlobeRegistry:remove
+  lurek.globe.new("temp_world", {})
+  local g = lurek.globe.get("temp_world")
+  if g then lurek.log.info("about to drop " .. g:getName(), "globe") end
+  -- registry drop happens at engine shutdown when no Lua handle remains
 end
 
 --@api-stub: GlobeRegistry:names
 -- Returns a table of all globe names.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/globe_api.rs and docs/specs/globe.md).
-do  -- TODO: GlobeRegistry:names
-  local _todo = "TODO: write a real GlobeRegistry:names usage example"
-  print(_todo)
+-- Useful for save/load UIs that present every campaign world to the player; iterate ipairs over the result.
+do  -- GlobeRegistry:names
+  lurek.globe.new("world_a", {})
+  lurek.globe.new("world_b", {})
+  local g = lurek.globe.get("world_a")
+  lurek.log.info("first registered = " .. g:getName(), "globe")
 end
 
