@@ -1,23 +1,9 @@
 -- content/examples/filesystem.lua
--- Scaffolded coverage of the lurek.filesystem API (54 items).
+-- Hand-written coverage of the lurek.filesystem API (54 items).
 --
--- Every --@api-stub: block below is a SCAFFOLD. The body must be
--- replaced by hand with a 3-6 line real usage snippet showing how to
--- call the API in real game context, written by reading:
---   * src/lua_api/filesystem_api.rs   (Lua binding, arg types, return shape)
---   * src/filesystem/                 (semantics, side effects)
---   * docs/specs/filesystem.md        (canonical reference)
---
--- Snippet rules (love2d-wiki style):
---   * NO `return` at top-level (breaks the file).
---   * NO `pcall` defensive wrappers, NO `if false then`.
---   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
---     `function lurek.update(dt) ... end` callbacks so the file loads.
---   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
---     colours like {1, 0.5, 0, 1}.
---   * Keep the two `--` comment lines: 1) what the API does (use the
---     existing description), 2) one line of practical advice.
+-- The lurek.filesystem namespace is the sandboxed VFS: reads resolve through
+-- the game root and any mounts, writes are confined to the save/ directory,
+-- and ZIP archives can be mounted at virtual prefixes for content packs.
 --
 -- Run: cargo run -- content/examples/filesystem.lua
 
@@ -25,439 +11,515 @@
 
 --@api-stub: lurek.filesystem.mountZip
 -- Mounts a ZIP archive at a virtual path prefix, making its contents readable.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.mountZip
-  local _todo = "TODO: write a real lurek.filesystem.mountZip usage example"
-  print(_todo)
+-- Use to ship optional content packs or expansion DLC as a single distributable .zip.
+do  -- lurek.filesystem.mountZip
+  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+  if pack:contains("levels/grove.json") then
+    local data = pack:readFile("levels/grove.json")
+    lurek.log.info("forest pack ready: " .. #data .. " bytes", "fs")
+  end
 end
 
 --@api-stub: lurek.filesystem.watchPath
 -- Adds `path` to the polled file-watch list.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.watchPath
-  local _todo = "TODO: write a real lurek.filesystem.watchPath usage example"
-  print(_todo)
+-- Pair with pollWatchers() once per second to drive hot-reload of scripts or assets.
+do  -- lurek.filesystem.watchPath
+  lurek.filesystem.watchPath("assets/levels/forest.json")
+  lurek.filesystem.watchPath("scripts/enemy.lua")
 end
 
 --@api-stub: lurek.filesystem.unwatchPath
 -- Removes `path` from the polled file-watch list.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.unwatchPath
-  local _todo = "TODO: write a real lurek.filesystem.unwatchPath usage example"
-  print(_todo)
+-- Call when leaving a level so reloads of unloaded assets do not trigger spurious work.
+do  -- lurek.filesystem.unwatchPath
+  lurek.filesystem.watchPath("assets/levels/forest.json")
+  lurek.filesystem.unwatchPath("assets/levels/forest.json")
 end
 
 --@api-stub: lurek.filesystem.pollWatchers
--- Polls all watched paths and returns an array of paths that changed since the.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.pollWatchers
-  local _todo = "TODO: write a real lurek.filesystem.pollWatchers usage example"
-  print(_todo)
+-- Polls all watched paths and returns an array of paths that changed since the last poll.
+-- Drive from a slow timer (1 Hz) rather than every frame; reload only the listed paths.
+do  -- lurek.filesystem.pollWatchers
+  local timer = 0
+  function lurek.process(dt)
+    timer = timer + dt
+    if timer < 1 then return end
+    timer = 0
+    for _, path in ipairs(lurek.filesystem.pollWatchers()) do
+      lurek.log.info("changed: " .. path, "hotreload")
+    end
+  end
 end
 
 --@api-stub: lurek.filesystem.read
 -- Reads a text file and returns its contents as a string.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.read
-  local _todo = "TODO: write a real lurek.filesystem.read usage example"
-  print(_todo)
+-- Use for small config or save snapshots; for large binaries prefer newFileData or readAsync.
+do  -- lurek.filesystem.read
+  local toml = lurek.filesystem.read("config/options.toml")
+  lurek.log.info("loaded options.toml (" .. #toml .. " bytes)", "config")
 end
 
 --@api-stub: lurek.filesystem.write
 -- Writes a string to a file in the save directory.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.write
-  local _todo = "TODO: write a real lurek.filesystem.write usage example"
-  print(_todo)
+-- Writes are sandboxed under save/; create parent dirs first with createDirectory.
+do  -- lurek.filesystem.write
+  local score = 12450
+  lurek.filesystem.write("save/highscore.txt", tostring(score))
 end
 
 --@api-stub: lurek.filesystem.exists
 -- Returns whether the given file or directory exists.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.exists
-  local _todo = "TODO: write a real lurek.filesystem.exists usage example"
-  print(_todo)
+-- Use to decide between loading a saved game and starting a fresh one.
+do  -- lurek.filesystem.exists
+  if lurek.filesystem.exists("save/slot1.dat") then
+    lurek.log.info("resuming from slot 1", "save")
+  else
+    lurek.log.info("no save, starting new game", "save")
+  end
 end
 
 --@api-stub: lurek.filesystem.append
 -- Opens the file in append mode and writes the given string at the end.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.append
-  local _todo = "TODO: write a real lurek.filesystem.append usage example"
-  print(_todo)
+-- Use for rolling logs or telemetry; keep one line per record so tailing tools work.
+do  -- lurek.filesystem.append
+  local line = os.date("%Y-%m-%dT%H:%M:%S") .. "\tlevel_complete\tforest_01\n"
+  lurek.filesystem.append("save/telemetry.log", line)
 end
 
 --@api-stub: lurek.filesystem.openFile
 -- Opens a file and returns a readable/writable file handle.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.openFile
-  local _todo = "TODO: write a real lurek.filesystem.openFile usage example"
-  print(_todo)
+-- Modes: "r" read, "w" truncate-write, "a" append. Always close() when done.
+do  -- lurek.filesystem.openFile
+  local fh = lurek.filesystem.openFile("save/slot1.dat", "w")
+  fh:write("level=forest_01;hp=80;mana=42")
+  fh:close()
 end
 
 --@api-stub: lurek.filesystem.getDirectoryItems
 -- Returns a table containing the names of every file and subdirectory in the given path.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.getDirectoryItems
-  local _todo = "TODO: write a real lurek.filesystem.getDirectoryItems usage example"
-  print(_todo)
+-- Use to enumerate save slots or installed mods; result is unsorted, sort if you need order.
+do  -- lurek.filesystem.getDirectoryItems
+  local saves = lurek.filesystem.getDirectoryItems("save")
+  lurek.log.info("found " .. #saves .. " save files", "save")
+  for _, name in ipairs(saves) do
+    lurek.log.debug("  save: " .. name, "save")
+  end
 end
 
 --@api-stub: lurek.filesystem.isFile
 -- Returns whether the given path is a regular file.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.isFile
-  local _todo = "TODO: write a real lurek.filesystem.isFile usage example"
-  print(_todo)
+-- Use to distinguish files from directories before calling read or openFile.
+do  -- lurek.filesystem.isFile
+  if lurek.filesystem.isFile("config/options.toml") then
+    local cfg = lurek.filesystem.read("config/options.toml")
+    lurek.log.info("config loaded (" .. #cfg .. " bytes)", "config")
+  end
 end
 
 --@api-stub: lurek.filesystem.isDirectory
 -- Returns whether the given path is a directory.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.isDirectory
-  local _todo = "TODO: write a real lurek.filesystem.isDirectory usage example"
-  print(_todo)
+-- Useful before iterating with getDirectoryItems or recursive listings.
+do  -- lurek.filesystem.isDirectory
+  if lurek.filesystem.isDirectory("assets/levels") then
+    local levels = lurek.filesystem.getDirectoryItems("assets/levels")
+    lurek.log.info("levels available: " .. #levels, "scene")
+  end
 end
 
 --@api-stub: lurek.filesystem.createDirectory
 -- Creates a directory and any missing parent directories in the save area.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.createDirectory
-  local _todo = "TODO: write a real lurek.filesystem.createDirectory usage example"
-  print(_todo)
+-- Call once at startup before writing nested save files; safe to call when dir already exists.
+do  -- lurek.filesystem.createDirectory
+  lurek.filesystem.createDirectory("save/screenshots")
+  lurek.filesystem.write("save/screenshots/last_run.txt", "ok")
 end
 
 --@api-stub: lurek.filesystem.remove
 -- Permanently deletes a file or empty directory from the save directory.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.remove
-  local _todo = "TODO: write a real lurek.filesystem.remove usage example"
-  print(_todo)
+-- Restricted to save/; use removeDir to recursively delete a non-empty folder.
+do  -- lurek.filesystem.remove
+  if lurek.filesystem.exists("save/temp_export.json") then
+    lurek.filesystem.remove("save/temp_export.json")
+    lurek.log.info("cleared stale export", "save")
+  end
 end
 
 --@api-stub: lurek.filesystem.getInfo
 -- Returns a table of metadata for a path, or nil if the path does not exist.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.getInfo
-  local _todo = "TODO: write a real lurek.filesystem.getInfo usage example"
-  print(_todo)
+-- Inspect the type/size/modtime/readonly fields to drive UI listings of save files.
+do  -- lurek.filesystem.getInfo
+  local info = lurek.filesystem.getInfo("save/slot1.dat")
+  if info then
+    lurek.log.info("slot1 " .. info.type .. " " .. info.size .. " bytes", "save")
+  end
 end
 
 --@api-stub: lurek.filesystem.getSource
 -- Returns the absolute path of the directory the game was loaded from.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.getSource
-  local _todo = "TODO: write a real lurek.filesystem.getSource usage example"
-  print(_todo)
+-- Useful for diagnostic logs and for spawning child processes that need the game folder.
+do  -- lurek.filesystem.getSource
+  local src = lurek.filesystem.getSource()
+  lurek.log.info("game source dir: " .. src, "fs")
 end
 
 --@api-stub: lurek.filesystem.getSaveDirectory
 -- Returns the sandboxed save data directory path.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.getSaveDirectory
-  local _todo = "TODO: write a real lurek.filesystem.getSaveDirectory usage example"
-  print(_todo)
+-- Show this in the options menu so players can find their saves on disk.
+do  -- lurek.filesystem.getSaveDirectory
+  local save_dir = lurek.filesystem.getSaveDirectory()
+  lurek.log.info("saves stored at: " .. save_dir, "save")
 end
 
 --@api-stub: lurek.filesystem.getWorkingDirectory
 -- Returns the current working directory path.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.getWorkingDirectory
-  local _todo = "TODO: write a real lurek.filesystem.getWorkingDirectory usage example"
-  print(_todo)
+-- Mostly useful for diagnostics; never assume it equals the game source directory.
+do  -- lurek.filesystem.getWorkingDirectory
+  local cwd = lurek.filesystem.getWorkingDirectory()
+  lurek.log.debug("cwd at launch: " .. cwd, "fs")
 end
 
 --@api-stub: lurek.filesystem.getUserDirectory
 -- Returns the current user's home directory path.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.getUserDirectory
-  local _todo = "TODO: write a real lurek.filesystem.getUserDirectory usage example"
-  print(_todo)
+-- Use as a fallback default location for export/import file pickers.
+do  -- lurek.filesystem.getUserDirectory
+  local home = lurek.filesystem.getUserDirectory()
+  lurek.log.info("user home: " .. home, "fs")
 end
 
 --@api-stub: lurek.filesystem.getIdentity
 -- Returns the identity string used to locate the game's save directory.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.getIdentity
-  local _todo = "TODO: write a real lurek.filesystem.getIdentity usage example"
-  print(_todo)
+-- Identity selects the per-game folder name under the OS save root.
+do  -- lurek.filesystem.getIdentity
+  local id = lurek.filesystem.getIdentity()
+  lurek.log.info("save identity: " .. id, "save")
 end
 
 --@api-stub: lurek.filesystem.setIdentity
 -- Sets the identity string that names the game's sandboxed save-data directory.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.setIdentity
-  local _todo = "TODO: write a real lurek.filesystem.setIdentity usage example"
-  print(_todo)
+-- Call once at startup, before any read/write, to pin saves to your game name.
+do  -- lurek.filesystem.setIdentity
+  lurek.filesystem.setIdentity("forest_quest")
+  lurek.log.info("save identity set to forest_quest", "save")
 end
 
 --@api-stub: lurek.filesystem.lines
 -- Returns an iterator function over the lines of a text file.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.lines
-  local _todo = "TODO: write a real lurek.filesystem.lines usage example"
-  print(_todo)
+-- Streams line-by-line so very large logs or CSVs do not all sit in memory at once.
+do  -- lurek.filesystem.lines
+  local count = 0
+  for line in lurek.filesystem.lines("assets/data/dialogue.csv") do
+    if #line > 0 then count = count + 1 end
+  end
+  lurek.log.info("dialogue lines: " .. count, "i18n")
 end
 
 --@api-stub: lurek.filesystem.readAsync
 -- Starts loading a file in the background and returns an opaque handle.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.readAsync
-  local _todo = "TODO: write a real lurek.filesystem.readAsync usage example"
-  print(_todo)
+-- Pair with pollAsync() each frame; use for big level data so the main thread stays smooth.
+do  -- lurek.filesystem.readAsync
+  local pending
+  function lurek.init()
+    pending = lurek.filesystem.readAsync("assets/levels/forest.json")
+  end
 end
 
 --@api-stub: lurek.filesystem.pollAsync
 -- Polls an async load handle, returning status and optional data.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.pollAsync
-  local _todo = "TODO: write a real lurek.filesystem.pollAsync usage example"
-  print(_todo)
+-- Status is "pending", "done", or "error"; data is non-nil only when status is "done".
+do  -- lurek.filesystem.pollAsync
+  local pending
+  function lurek.init() pending = lurek.filesystem.readAsync("assets/levels/forest.json") end
+  function lurek.process(dt)
+    if not pending then return end
+    local status, data = lurek.filesystem.pollAsync(pending)
+    if status == "done" then
+      lurek.log.info("level loaded: " .. #data .. " bytes", "scene")
+      pending = nil
+    end
+  end
 end
 
 --@api-stub: lurek.filesystem.mount
 -- Mounts a directory at a virtual path inside the game filesystem.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.mount
-  local _todo = "TODO: write a real lurek.filesystem.mount usage example"
-  print(_todo)
+-- Mounted paths layer over the game root; later mounts shadow earlier ones for the same VFS path.
+do  -- lurek.filesystem.mount
+  local ok = lurek.filesystem.mount("../mods/extra", "mods/extra")
+  if ok then lurek.log.info("mounted extra mods", "mods") end
 end
 
 --@api-stub: lurek.filesystem.unmount
 -- Removes a virtual mount layer by mountpoint.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.unmount
-  local _todo = "TODO: write a real lurek.filesystem.unmount usage example"
-  print(_todo)
+-- Call when disabling a mod from the options screen so its assets stop being visible.
+do  -- lurek.filesystem.unmount
+  if lurek.filesystem.unmount("mods/extra") then
+    lurek.log.info("extra mods unmounted", "mods")
+  end
 end
 
 --@api-stub: lurek.filesystem.load
 -- Loads and compiles a Lua file from the VFS, returning it as a callable function.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.load
-  local _todo = "TODO: write a real lurek.filesystem.load usage example"
-  print(_todo)
+-- Use to load mod scripts at runtime; call the returned function to execute the chunk.
+do  -- lurek.filesystem.load
+  local chunk = lurek.filesystem.load("scripts/enemy_ai.lua")
+  local enemy_module = chunk()
+  lurek.log.info("enemy AI module loaded", "ai")
 end
 
 --@api-stub: lurek.filesystem.newFileData
 -- Loads a file from the VFS into a FileData buffer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.newFileData
-  local _todo = "TODO: write a real lurek.filesystem.newFileData usage example"
-  print(_todo)
+-- Use for binary blobs (textures, audio decoders) where you want size + filename metadata.
+do  -- lurek.filesystem.newFileData
+  local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
+  lurek.log.info("loaded " .. fd:getFilename() .. " (" .. fd:getSize() .. " bytes)", "audio")
 end
 
 --@api-stub: lurek.filesystem.copy
 -- Copies a file within the sandbox.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.copy
-  local _todo = "TODO: write a real lurek.filesystem.copy usage example"
-  print(_todo)
+-- Source can be anywhere readable; destination MUST live under save/.
+do  -- lurek.filesystem.copy
+  lurek.filesystem.copy("save/slot1.dat", "save/slot1.bak")
+  lurek.log.info("backed up slot 1", "save")
 end
 
 --@api-stub: lurek.filesystem.move
 -- Moves (renames) a file within the `save/` directory.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.move
-  local _todo = "TODO: write a real lurek.filesystem.move usage example"
-  print(_todo)
+-- Use for atomic save rotation: write to slot1.tmp then move to slot1.dat.
+do  -- lurek.filesystem.move
+  lurek.filesystem.write("save/slot1.tmp", "level=forest_02;hp=92")
+  lurek.filesystem.move("save/slot1.tmp", "save/slot1.dat")
 end
 
 --@api-stub: lurek.filesystem.removeDir
 -- Recursively deletes a directory and all its contents within `save/`.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.removeDir
-  local _todo = "TODO: write a real lurek.filesystem.removeDir usage example"
-  print(_todo)
+-- Destructive: use only on directories your game owns (e.g. clearing a temp screenshot folder).
+do  -- lurek.filesystem.removeDir
+  if lurek.filesystem.isDirectory("save/screenshots") then
+    lurek.filesystem.removeDir("save/screenshots")
+    lurek.log.info("cleared screenshots cache", "save")
+  end
 end
 
 --@api-stub: lurek.filesystem.glob
 -- Returns a sorted list of paths matching a simple wildcard pattern.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.glob
-  local _todo = "TODO: write a real lurek.filesystem.glob usage example"
-  print(_todo)
+-- `*` matches one path component; `?` matches one character. Patterns are game-root-relative.
+do  -- lurek.filesystem.glob
+  local saves = lurek.filesystem.glob("save/slot*.dat")
+  for _, path in ipairs(saves) do
+    lurek.log.info("save: " .. path, "save")
+  end
 end
 
 --@api-stub: lurek.filesystem.listRecursive
 -- Returns a sorted list of all files under `path`, recursively.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.listRecursive
-  local _todo = "TODO: write a real lurek.filesystem.listRecursive usage example"
-  print(_todo)
+-- Use to enumerate every asset under a directory tree, e.g. all level JSON files.
+do  -- lurek.filesystem.listRecursive
+  local files = lurek.filesystem.listRecursive("assets/levels")
+  lurek.log.info("level assets: " .. #files, "scene")
 end
 
 --@api-stub: lurek.filesystem.stat
 -- Returns lightweight file statistics for the given path.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.stat
-  local _todo = "TODO: write a real lurek.filesystem.stat usage example"
-  print(_todo)
+-- Cheaper than getInfo when you only need size/isFile/isDir; raises on missing or sandboxed paths.
+do  -- lurek.filesystem.stat
+  local s = lurek.filesystem.stat("assets/levels/forest.json")
+  if s.isFile then
+    lurek.log.info("forest.json: " .. s.size .. " bytes", "scene")
+  end
 end
 
 --@api-stub: lurek.filesystem.createTempFile
--- Creates an empty temporary file in the `save/` sandbox and returns its.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.createTempFile
-  local _todo = "TODO: write a real lurek.filesystem.createTempFile usage example"
-  print(_todo)
+-- Creates an empty temporary file in the `save/` sandbox and returns its relative path.
+-- You own the file: delete it with remove() once the export or scratch buffer is no longer needed.
+do  -- lurek.filesystem.createTempFile
+  local tmp = lurek.filesystem.createTempFile("export")
+  lurek.filesystem.write(tmp, "snapshot=" .. os.time())
+  lurek.log.info("export staged at " .. tmp, "save")
 end
 
 --@api-stub: lurek.filesystem.mkdir
 -- Creates a directory (and any missing parents) relative to the game root.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.mkdir
-  local _todo = "TODO: write a real lurek.filesystem.mkdir usage example"
-  print(_todo)
+-- Unlike createDirectory this is not restricted to save/; mostly used by evidence/test runners.
+do  -- lurek.filesystem.mkdir
+  lurek.filesystem.mkdir("evidence/run_001")
+  lurek.filesystem.write("evidence/run_001/notes.txt", "ok")
 end
 
 --@api-stub: lurek.filesystem.toAbsolutePath
 -- Resolves a path relative to the game root to an absolute OS path string.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: lurek.filesystem.toAbsolutePath
-  local _todo = "TODO: write a real lurek.filesystem.toAbsolutePath usage example"
-  print(_todo)
+-- Use when handing a path to a non-VFS API such as Lua's stock io.open or an OS launcher.
+do  -- lurek.filesystem.toAbsolutePath
+  local abs = lurek.filesystem.toAbsolutePath("save/slot1.dat")
+  lurek.log.info("absolute path: " .. abs, "fs")
 end
+
 
 -- ── FileData methods ──
 
 --@api-stub: FileData:getSize
 -- Returns the file size in bytes.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileData:getSize
-  local _todo = "TODO: write a real FileData:getSize usage example"
-  print(_todo)
+-- Combine with getFilename for a one-line load report when streaming many assets.
+do  -- FileData:getSize
+  local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
+  local kb = fd:getSize() / 1024
+  lurek.log.info(string.format("jump.ogg = %.1f KiB", kb), "audio")
 end
 
 --@api-stub: FileData:getString
 -- Returns the file content as a Lua string.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileData:getString
-  local _todo = "TODO: write a real FileData:getString usage example"
-  print(_todo)
+-- Use to hand binary buffers to a custom decoder, or to compute a checksum over the bytes.
+do  -- FileData:getString
+  local fd = lurek.filesystem.newFileData("config/options.toml")
+  local body = fd:getString()
+  lurek.log.info("first byte: " .. string.byte(body, 1), "config")
 end
 
 --@api-stub: FileData:getFilename
 -- Returns the virtual path this data was loaded from.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileData:getFilename
-  local _todo = "TODO: write a real FileData:getFilename usage example"
-  print(_todo)
+-- Useful when a generic loader pipes FileData into a registry keyed by source path.
+do  -- FileData:getFilename
+  local fd = lurek.filesystem.newFileData("assets/levels/forest.json")
+  lurek.log.info("loaded " .. fd:getFilename(), "scene")
 end
+
 
 -- ── FileHandle methods ──
 
 --@api-stub: FileHandle:read
 -- Reads bytes from the file, returning them as a string.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:read
-  local _todo = "TODO: write a real FileHandle:read usage example"
-  print(_todo)
+-- Pass a count to read at most N bytes; omit to read until EOF in one call.
+do  -- FileHandle:read
+  local fh = lurek.filesystem.openFile("save/slot1.dat", "r")
+  local body = fh:read()
+  fh:close()
+  lurek.log.info("slot1 size: " .. #body .. " bytes", "save")
 end
 
 --@api-stub: FileHandle:readLine
 -- Reads the next line from the file without the trailing newline.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:readLine
-  local _todo = "TODO: write a real FileHandle:readLine usage example"
-  print(_todo)
+-- Returns nil at EOF; loop while non-nil to walk a text file one line at a time.
+do  -- FileHandle:readLine
+  local fh = lurek.filesystem.openFile("save/telemetry.log", "r")
+  local first = fh:readLine()
+  fh:close()
+  lurek.log.info("first telemetry line: " .. (first or "<empty>"), "fs")
 end
 
 --@api-stub: FileHandle:write
 -- Writes a string to the file and returns the number of bytes written.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:write
-  local _todo = "TODO: write a real FileHandle:write usage example"
-  print(_todo)
+-- Open with mode "w" to truncate, "a" to append; remember to close() to flush.
+do  -- FileHandle:write
+  local fh = lurek.filesystem.openFile("save/score.txt", "w")
+  local n = fh:write("12450")
+  fh:close()
+  lurek.log.info("wrote " .. n .. " bytes to score.txt", "save")
 end
 
 --@api-stub: FileHandle:seek
 -- Seeks the file position to the given byte offset from the start.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:seek
-  local _todo = "TODO: write a real FileHandle:seek usage example"
-  print(_todo)
+-- Use for fixed-record save files where you want to update one slot without rewriting the rest.
+do  -- FileHandle:seek
+  local fh = lurek.filesystem.openFile("save/slot1.dat", "r")
+  fh:seek(16)
+  local chunk = fh:read(8)
+  fh:close()
+  lurek.log.debug("bytes 16..23 = " .. chunk, "save")
 end
 
 --@api-stub: FileHandle:tell
 -- Returns the current read/write byte offset from the start of the file.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:tell
-  local _todo = "TODO: write a real FileHandle:tell usage example"
-  print(_todo)
+-- Call after a partial read to remember where to resume on the next pass.
+do  -- FileHandle:tell
+  local fh = lurek.filesystem.openFile("assets/levels/forest.json", "r")
+  fh:read(64)
+  lurek.log.info("cursor at byte " .. fh:tell(), "scene")
+  fh:close()
 end
 
 --@api-stub: FileHandle:getSize
 -- Returns the size of the open file in bytes.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:getSize
-  local _todo = "TODO: write a real FileHandle:getSize usage example"
-  print(_todo)
+-- Use to pre-allocate buffers or to drive a load progress bar.
+do  -- FileHandle:getSize
+  local fh = lurek.filesystem.openFile("assets/levels/forest.json", "r")
+  lurek.log.info("level file size: " .. fh:getSize(), "scene")
+  fh:close()
 end
 
 --@api-stub: FileHandle:getMode
 -- Returns the access mode the file was opened with.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:getMode
-  local _todo = "TODO: write a real FileHandle:getMode usage example"
-  print(_todo)
+-- Useful in helper functions that branch on whether the handle is readable or writable.
+do  -- FileHandle:getMode
+  local fh = lurek.filesystem.openFile("save/slot1.dat", "r")
+  lurek.log.debug("opened slot1 in mode " .. fh:getMode(), "save")
+  fh:close()
 end
 
 --@api-stub: FileHandle:flush
 -- Flushes all buffered writes to disk without closing the handle.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:flush
-  local _todo = "TODO: write a real FileHandle:flush usage example"
-  print(_todo)
+-- Call after each completed game-state checkpoint so a crash loses at most one round.
+do  -- FileHandle:flush
+  local fh = lurek.filesystem.openFile("save/journal.log", "a")
+  fh:write("checkpoint=forest_02\n")
+  fh:flush()
+  fh:close()
 end
 
 --@api-stub: FileHandle:close
 -- Flushes any pending writes and closes the file handle.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:close
-  local _todo = "TODO: write a real FileHandle:close usage example"
-  print(_todo)
+-- Always close handles when done; leaking them holds OS file descriptors and locks.
+do  -- FileHandle:close
+  local fh = lurek.filesystem.openFile("save/slot1.dat", "w")
+  fh:write("hp=100;mana=50")
+  fh:close()
 end
 
 --@api-stub: FileHandle:isEOF
 -- Returns whether the read cursor has reached the end of the file.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: FileHandle:isEOF
-  local _todo = "TODO: write a real FileHandle:isEOF usage example"
-  print(_todo)
+-- Use as a loop condition when reading a file in fixed-size chunks.
+do  -- FileHandle:isEOF
+  local fh = lurek.filesystem.openFile("save/telemetry.log", "r")
+  while not fh:isEOF() do
+    local chunk = fh:read(256)
+    if not chunk or #chunk == 0 then break end
+  end
+  fh:close()
 end
+
 
 -- ── ZipMount methods ──
 
 --@api-stub: ZipMount:readFile
 -- Reads a file from the ZIP and returns it as a string of bytes.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: ZipMount:readFile
-  local _todo = "TODO: write a real ZipMount:readFile usage example"
-  print(_todo)
+-- Cheaper than mounting + lurek.filesystem.read when you need exactly one file out of the archive.
+do  -- ZipMount:readFile
+  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+  local body = pack:readFile("levels/grove.json")
+  lurek.log.info("grove.json: " .. #body .. " bytes", "mods")
 end
 
 --@api-stub: ZipMount:contains
 -- Returns true if `virtual_path` exists inside this ZIP mount.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: ZipMount:contains
-  local _todo = "TODO: write a real ZipMount:contains usage example"
-  print(_todo)
+-- Probe before readFile so a missing optional asset does not raise an error.
+do  -- ZipMount:contains
+  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+  if pack:contains("levels/secret.json") then
+    lurek.log.info("secret level present in pack", "mods")
+  end
 end
 
 --@api-stub: ZipMount:listFiles
 -- Returns a sorted array of all virtual paths exposed by this ZIP mount.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: ZipMount:listFiles
-  local _todo = "TODO: write a real ZipMount:listFiles usage example"
-  print(_todo)
+-- Use to enumerate every asset shipped by a content pack at startup.
+do  -- ZipMount:listFiles
+  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+  local files = pack:listFiles()
+  lurek.log.info("forest pack contains " .. #files .. " files", "mods")
 end
 
 --@api-stub: ZipMount:prefix
 -- Returns the virtual path prefix this archive was mounted under.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/filesystem_api.rs and docs/specs/filesystem.md).
-do  -- TODO: ZipMount:prefix
-  local _todo = "TODO: write a real ZipMount:prefix usage example"
-  print(_todo)
+-- Useful for building absolute virtual paths or reporting which prefix a mount owns.
+do  -- ZipMount:prefix
+  local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
+  lurek.log.info("pack mounted at " .. pack:prefix(), "mods")
 end
 
