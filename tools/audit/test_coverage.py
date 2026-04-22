@@ -29,7 +29,7 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 SRC_DIR = WORKSPACE_ROOT / "src"
 TESTS_DIR = WORKSPACE_ROOT / "tests" / "rust"
 LUA_TESTS_DIR = WORKSPACE_ROOT / "tests" / "lua"
-DEFAULT_JSON_OUTPUT = WORKSPACE_ROOT / "docs" / "logs" / "test_coverage.json"
+DEFAULT_JSON_OUTPUT = WORKSPACE_ROOT / "logs" / "test_coverage.json"
 
 
 def _snake_to_parts(name: str) -> Set[str]:
@@ -425,7 +425,7 @@ def main() -> int:
             args.module,
         )
 
-    # Always write JSON metadata to docs/logs/test_coverage.json (unless --json stdout mode)
+    # Always write JSON metadata to logs/test_coverage.json (unless --json stdout mode)
     if not args.json:
         json_payload = {
             "rust": {
@@ -463,7 +463,7 @@ def main() -> int:
         }
         DEFAULT_JSON_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
         DEFAULT_JSON_OUTPUT.write_text(json.dumps(json_payload, indent=2), encoding="utf-8")
-        print(f"[OK] Coverage JSON written to docs/logs/test_coverage.json", file=sys.stderr)
+        print(f"[OK] Coverage JSON written to logs/test_coverage.json", file=sys.stderr)
 
     if args.output:
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)

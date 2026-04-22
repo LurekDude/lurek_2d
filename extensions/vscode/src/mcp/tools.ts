@@ -155,7 +155,7 @@ export function handleGetApiDoc(
     const apiDocPath = resolveWorkspaceApiDocPath(workspaceRoot);
 
     if (!apiDocPath || !fs.existsSync(apiDocPath)) {
-      return "API reference not found. Expected docs/API/lurek.lua or docs/API/lua-api.md.";
+      return "API reference not found. Expected docs/lurek.lua or docs/lua-api.md.";
     }
 
     const content = fs.readFileSync(apiDocPath, "utf-8");

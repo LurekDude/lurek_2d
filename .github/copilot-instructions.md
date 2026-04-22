@@ -31,10 +31,10 @@ When you change one of these, you MUST update the others in the same commit.
 | Changed                                      | Also update                                                              |
 |----------------------------------------------|--------------------------------------------------------------------------|
 | `src/<module>/*.rs`                          | `docs/specs/<module>.md`                                                 |
-| `src/lua_api/<module>_api.rs`                | `docs/specs/<module>.md` · `docs/API/lua-api.md`                         |
+| `src/lua_api/<module>_api.rs`                | `docs/specs/<module>.md` · `docs/lua-api.md`                             |
 | `lurek.*` API added / renamed / removed      | `content/examples/<module>.lua` · affected `content/games/` · dependent `content/library/` modules |
 | New module created                           | New `docs/specs/<module>.md` · `docs/specs/README.md`                    |
-| `content/library/<name>/init.lua` changed    | `content/library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/API/library-docs.md` via `tools/docs/gen_lib_docs.py` |
+| `content/library/<name>/init.lua` changed    | `content/library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/reports/library-docs.md` via `tools/docs/gen_lib_docs.py` |
 | Contributor onboarding flow changes (build steps, first-game tutorial, quality gates) | `docs/handbook.md` (relevant section) · `CONTRIBUTING.md` if needed |
 | New game demo added to `content/games/`      | `tests/lua/content/demos/test_<name>.lua` (new static-analysis test) · `tests/demo_smoke_tests.rs` (new `#[ignore]` screenshot test) · `tests/lua/harness.rs` (add `lua_demo_<name>` entry) |
 | Any change                                   | `docs/CHANGELOG.md`                                                      |
@@ -48,7 +48,7 @@ This system prompt is a discovery index, not a manual. Find specialised context 
 - **Skills** live in `.github/skills/<name>/SKILL.md`. Match the user's task domain to a skill's `description` frontmatter — every description is shaped "Load this skill when X. Skip it for Y." Load all that apply (a single task may need several).
 - **Agents** live in `.github/agents/<name>.agent.md`. Match the task type to the `mission` frontmatter; chain via the `routes_to` field. For multi-agent work spanning ≥3 agents or ≥5 files, route to `Manager` first — Manager will engage `Planner` before any implementation begins.
 - **Prompts** live in `.github/prompts/<verb>-<noun>.prompt.md`. Each is a parameterised user-selected entrypoint; the `expected_agent` frontmatter names the runner.
-- **Tools** are catalogued in `tools/README.md` with one `README.md` per subfolder under `tools/`.
+- **Tools** are catalogued in [`tools/README.md`](../tools/README.md) — the authoritative registry with complete script reference, dependency map, and usage guide. Each subfolder has its own `README.md` with per-script tables.
 - **Module specs** live in `docs/specs/<module>.md` — load directly when you need the canonical reference for a Rust module, its Lua bindings, types, and functions.
 - **Sessions** must create `work/<session-name>/` with subfolders `scripts/`, `handovers/`, `reports/`, `data/`, `examples/`, `other/`, `temp/`, `logs/`. Append one JSONL entry per completed phase to `logs/agent_log.jsonl`; never overwrite. Move completed sessions to `work/archive/`.
 - **API namespace** is `lurek.*` exclusively — never bare globals or external prefixes. The Thin Wrapper Rule binds: `src/lua_api/<module>_api.rs` owns ALL `impl LuaUserData` and `mlua` imports; domain modules under `src/<module>/` stay pure-Rust.

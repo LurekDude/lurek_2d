@@ -169,8 +169,8 @@ Baseline           ← math (leaf, no deps) · engine (lifecycle, SharedState)
 | Component | Location | Description |
 |---|---|---|
 | **Engine binary** | `src/` | The `lurek2d` executable — the entire runtime |
-| **Lua API reference** | `docs/API/lua-api.md` | Full `lurek.*` function signatures and descriptions |
-| **Rust API reference** | `docs/API/rust-api.md` | Engine internals for contributors |
+| **Lua API reference** | `docs/lua-api.md` | Full `lurek.*` function signatures and descriptions |
+| **Rust API reference** | `docs/reports/rust-api.md` | Engine internals for contributors |
 | **VS Code extension** | `extensions/vscode/` | IntelliSense, MCP server, CAG tooling, debug workflows |
 | **Demos** | `content/demos/` | Playable examples across 8 genres (action, arcade, RPG, strategy, …) |
 | **API examples** | `content/examples/` | Single-file scripts demonstrating one `lurek.*` module each |

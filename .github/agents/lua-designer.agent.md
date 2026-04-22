@@ -38,14 +38,14 @@ Lua-Designer owns the public `lurek.*` Lua API surface for GameDev and Modder us
 - Updated `docs/specs/<module>.md` Lua API section.
 
 ## Workflow
-1. Read the existing `lurek.*` surface in `src/lua_api/` and `docs/API/lua-api.md`; load [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md) and [skill: lua-scripting](.github/skills/lua-scripting/SKILL.md).
+1. Read the existing `lurek.*` surface in `src/lua_api/` and `docs/lua-api.md`; load [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md) and [skill: lua-scripting](.github/skills/lua-scripting/SKILL.md).
 2. Draft the usage example **first** to expose awkward names or parameter order before locking the signature.
 3. Write the signature with sensible defaults; check consistency against `lurek.render`, `lurek.audio`, `lurek.physics` aliases (`dt`, `x, y`, `w, h`, `r, g, b, a`, `key`, `btn`).
 4. Run [tool: validate_lua_api](tools/validate/validate_lua_api.py) on the example.
 5. Self-review: could a Copilot agent call this without a clarifying question? If no, redesign.
 6. Update `docs/specs/<module>.md` Lua API section and add a migration note when applicable; regenerate the reference via [tool: gen_lua_api](tools/docs/gen_lua_api.py).
 7. Add a `docs/CHANGELOG.md` entry if a public API was added or changed.
-8. Commit: `git add docs/specs/ content/examples/ docs/API/ docs/CHANGELOG.md` then `git commit -m "feat|change(api): description"`. Hand off to `Developer` for implementation. If `.github/` was touched, route final review to `CAG-Architect`.
+8. Commit: `git add docs/specs/ content/examples/ docs/lua-api.md docs/CHANGELOG.md` then `git commit -m "feat|change(api): description"`. Hand off to `Developer` for implementation. If `.github/` was touched, route final review to `CAG-Architect`.
 9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
 10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
 11. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
@@ -67,7 +67,7 @@ Lua-Designer owns the public `lurek.*` Lua API surface for GameDev and Modder us
 - String Enums Explosion: stringy magic values where a small flags table or named function is clearer.
 - Missing Examples: proposing API without a working Lua snippet.
 - Breaking Silently: changing an existing API without a migration note.
-- Hand-editing generated `docs/API/lua-api.md`; always regenerate from `///` comments.
+- Hand-editing generated `docs/lua-api.md`; always regenerate from `///` comments.
 
 ## CAG Metadata
 

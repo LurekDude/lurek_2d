@@ -1,4 +1,20 @@
-﻿import json, re, sys
+﻿"""Validate math-module API stubs in content/examples/math.lua.
+
+Narrower variant of strict_api_check.py that restricts analysis to the
+'math' module only. Useful for rapid iteration when improving math.lua
+without re-scanning all example files.
+
+Reads docs/logs/lua_api_data.json, filters to math module entries, and
+applies the same quality checks: minimum code/comment lines, forbidden
+placeholder words, and actual API reference presence.
+
+Usage:
+    python tools/audit/strict_api_check_math.py
+
+Exit code:
+    Always 0 (prints report to stdout). Use the failure count for gating.
+"""
+import json, re, sys
 from pathlib import Path
 
 ROOT = Path('.').resolve()

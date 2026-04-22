@@ -19,17 +19,16 @@ go under `work/{session}/scripts/` and are archived at session end.
 
 | Folder                                  | Purpose                                                                    | Script Count |
 | --------------------------------------- | -------------------------------------------------------------------------- | ------------ |
-| [`tools/docs/`](docs/README.md)         | Documentation generators — produce `docs/API/`, `docs/logs/`, `docs/wiki/` | 15           |
-| [`tools/audit/`](audit/README.md)       | Quality auditing, coverage analytics, gap reports                          | 19           |
-| [`tools/fix/`](fix/README.md)           | Code fixers and docstring improvers                                        | 14           |
-| [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure)                        | 5            |
+| [`tools/docs/`](docs/README.md)         | Documentation generators — produce `docs/reports/`, `logs/`, `docs/wiki/` | 16           |
+| [`tools/audit/`](audit/README.md)       | Quality auditing, coverage analytics, gap reports                          | 31           |
+| [`tools/fix/`](fix/README.md)           | Code fixers and docstring improvers                                        | 19           |
+| [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure)                        | 7            |
 | [`tools/dist/`](dist/README.md)         | Build, package, and install scripts                                        | 7            |
 | [`tools/github/`](github/README.md)     | GitHub project management automation                                       | 1            |
-| [`tools/demos/`](demos/README.md)                | Demo folder management and screenshot generation                           | 2            |
-| [`tools/ui/`](ui/README.md)           | UI layout tooling — render TOML layout files to PNG wireframe previews     | 3            |
+| [`tools/demos/`](demos/README.md)       | Demo folder management, screenshot generation, smoke testing               | 3            |
+| [`tools/ui/`](ui/README.md)             | UI layout tooling — render TOML layout files to PNG wireframe previews     | 3            |
 | [`tools/dev/`](dev/README.md)           | Dev helper scripts                                                         | 2            |
 | [`tools/mods/`](mods/README.md)         | Mod scaffolding helpers (`lurek-mod` workflow)                              | 1            |
-| [`tools/screenshots/`](screenshots/README.md) | Legacy alias for `tools/demos/` screenshot capture                          | 1            |
 | [`tools/assets/`](assets/README.md)     | Notes on engine asset placement (no scripts)                               | 0            |
 
 ---
@@ -43,17 +42,17 @@ python tools/gen_all_docs.py
 
 `gen_all_docs.py` lives at the tools root and calls scripts from `tools/docs/`
 and `tools/audit/` in the correct dependency order. Produces:
-- `docs/logs/rust_api_data.json` — raw Rust API metadata
-- `docs/logs/lua_api_data.json` — raw Lua API metadata
-- `docs/API/lurek.lua` — LuaCATS type stubs for IDE
-- `docs/API/lua-api.md` — human-readable Lua API reference
-- `docs/API/rust-api.md` — human-readable Rust API reference
+- `logs/rust_api_data.json` — raw Rust API metadata
+- `logs/lua_api_data.json` — raw Lua API metadata
+- `docs/lurek.lua` — LuaCATS type stubs for IDE
+- `docs/lua-api.md` — human-readable Lua API reference
+- `docs/reports/rust-api.md` — human-readable Rust API reference
 - `docs/wiki/API-Reference.md` — game-developer cheatsheet
-- `docs/logs/doc_coverage.json` — docstring coverage metrics
-- `docs/logs/test_coverage.json` — test coverage metrics
-- `docs/tests/test_docs_rust.md` — Rust test catalog
-- `docs/tests/test_docs_lua.md` — Lua test catalog
-- `docs/API/coverage_gaps.md` — Rust→Lua coverage gap report
+- `logs/doc_coverage.json` — docstring coverage metrics
+- `logs/test_coverage.json` — test coverage metrics
+- `docs/reports/test_docs_rust.md` — Rust test catalog
+- `docs/reports/test_docs_lua.md` — Lua test catalog
+- `docs/reports/coverage_gaps.md` — Rust→Lua coverage gap report
 
 ---
 
@@ -65,22 +64,22 @@ and `tools/audit/` in the correct dependency order. Produces:
 
 | Script                 | Reads              | Produces                       | Args                    |
 | ---------------------- | ------------------ | ------------------------------ | ----------------------- |
-| `gen_rust_api_data.py` | `src/**/*.rs`      | `docs/logs/rust_api_data.json` | `--output`              |
-| `gen_lua_api_data.py`  | `src/lua_api/*.rs` | `docs/logs/lua_api_data.json`  | `--output`, `--verbose` |
+| `gen_rust_api_data.py` | `src/**/*.rs`      | `logs/rust_api_data.json` | `--output`              |
+| `gen_lua_api_data.py`  | `src/lua_api/*.rs` | `logs/lua_api_data.json`  | `--output`, `--verbose` |
 
 **Reference generators** — produce human-readable docs from JSON:
 
 | Script                   | Reads                | Produces                             | Args                           |
 | ------------------------ | -------------------- | ------------------------------------ | ------------------------------ |
-| `gen_docs_lua.py`        | `lua_api_data.json`  | `docs/API/lua-api.md`                | —                              |
-| `gen_docs_rust.py`       | `rust_api_data.json` | `docs/API/rust-api.md`               | —                              |
-| `gen_luadoc.py`          | `lua_api_data.json`  | `docs/API/lurek.lua` (IDE stubs)     | —                              |
+| `gen_docs_lua.py`        | `lua_api_data.json`  | `docs/lua-api.md`                | —                              |
+| `gen_docs_rust.py`       | `rust_api_data.json` | `docs/reports/rust-api.md`               | —                              |
+| `gen_luadoc.py`          | `lua_api_data.json`  | `docs/lurek.lua` (IDE stubs)     | —                              |
 | `gen_wiki_api.py`        | `lua_api_data.json`  | `docs/wiki/API-Reference.md`         | —                              |
-| `gen_lib_docs.py`        | `content/library/`   | `docs/API/lib-api.md`                | —                              |
-| `gen_engine_docs.py`     | `src/` structure     | `docs/API/` engine docs              | —                              |
-| `gen_lua_dev_docs.py`    | `lua_api_data.json`  | `docs/API/` dev docs                 | —                              |
+| `gen_lib_docs.py`        | `content/library/`   | `docs/reports/lib-api.md`                | —                              |
+| `gen_engine_docs.py`     | `src/` structure     | `docs/reports/` engine docs              | —                              |
+| `gen_lua_dev_docs.py`    | `lua_api_data.json`  | `docs/reports/` dev docs                 | —                              |
 | `gen_lua_library_api.py` | `content/library/`   | LuaCATS stubs for libs               | —                              |
-| `gen_test_docs.py`       | `tests/`             | `docs/tests/test_docs_{rust,lua}.md` | `--mode rust\|lua`, `--output` |
+| `gen_test_docs.py`       | `tests/`             | `docs/reports/test_docs_{rust,lua}.md` | `--mode rust\|lua`, `--output` |
 
 **Legacy/analysis** — standalone reference tools:
 
@@ -103,38 +102,41 @@ and `tools/audit/` in the correct dependency order. Produces:
 
 | Script               | Purpose                                      | Output                           | Args                                                                  |
 | -------------------- | -------------------------------------------- | -------------------------------- | --------------------------------------------------------------------- |
-| `doc_coverage.py`    | Rust + Lua `///` docstring coverage metrics  | `docs/logs/doc_coverage.json`    | `--report-missing`, `--json`, `--module`, `--lua-only`, `--rust-only` |
-| `docstring_audit.py` | Per-file Lua API docstring quality audit     | `docs/logs/docstring_audit.json` | `--json`, `--output`                                                  |
+| `doc_coverage.py`    | Rust + Lua `///` docstring coverage metrics  | `logs/doc_coverage.json`    | `--report-missing`, `--json`, `--module`, `--lua-only`, `--rust-only` |
+| `docstring_audit.py` | Per-file Lua API docstring quality audit     | `logs/docstring_audit.json` | `--json`, `--output`                                                  |
 | `count_gaps.py`      | Count missing-doc items per `lurek.*` module | stdout                           | —                                                                     |
 
 **Test coverage** — measure test completeness:
 
 | Script                      | Purpose                                                          | Output                                         | Args                                                                   |
 | --------------------------- | ---------------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------- |
-| `test_coverage.py`          | Cross-reference `pub` items vs test files                        | `docs/logs/test_coverage.json`                 | `--json`, `--suggest`, `--module`, `--threshold`                       |
-| `lua_api_test_coverage.py`  | Lua API test coverage (via `@covers` markers)                    | `docs/logs/lua_api_test_coverage.json`         | `--strict`, `--json`, `--module`, `--suggest`, `--report`, `--orphans` |
+| `test_coverage.py`          | Cross-reference `pub` items vs test files                        | `logs/test_coverage.json`                 | `--json`, `--suggest`, `--module`, `--threshold`                       |
+| `lua_api_test_coverage.py`  | Lua API test coverage (via `@covers` markers)                    | `logs/lua_api_test_coverage.json`         | `--strict`, `--json`, `--module`, `--suggest`, `--report`, `--orphans` |
 | `unit_test_api_coverage.py` | Unit test API coverage metrics                                   | stdout                                         | —                                                                      |
 | `example_coverage.py`       | Cross-reference `content/examples/` vs Lua API; exits 1 on gaps  | stdout / JSON                                  | `--module`, `--missing`, `--json`, `--report`                          |
 | `example_add_missing.py`    | Append stub blocks for every uncovered API item to example files | patches `.lua`                                 | `--module`, `--dry-run`, `--report`, `--verbose`                       |
-| `integration_coverage.py`   | Integration test module-pair heat map                            | stdout / `docs/logs/integration_coverage.json` | `--json`, `--output`                                                   |
+| `integration_coverage.py`   | Integration test module-pair heat map                            | stdout / `logs/integration_coverage.json` | `--json`, `--output`                                                   |
 
 **Module quality** — end-to-end module audits:
 
 | Script                 | Purpose                                                           | Output                     | Args                                                               |
 | ---------------------- | ----------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------ |
 | `audit_module.py`      | 12-phase module quality audit (PASS/WARN/ERROR)                   | `docs/quality/<module>.md` | `NAME`, `--all`, `--tier N`, `--json`, `--docs-quality`            |
-| `validate_agent_md.py` | Validate merged docs/specs module references (legacy script name) | stdout / JSON              | `--module`, `--all`, `--scaffold`, `--write`, `--strict`, `--json` |
 | `module_audit.py`      | Module restructuring & reference audit                            | stdout / JSON              | `--json`, `--output`                                               |
 
 **Specialised audits**:
 
 | Script                 | Purpose                                          | Output                      |
 | ---------------------- | ------------------------------------------------ | --------------------------- |
-| `gen_coverage_gaps.py` | Rust→Lua API coverage gap report                 | `docs/API/coverage_gaps.md` |
-| `golden_test.py`       | Deterministic output diff tests                  | stdout / JSON               |
-| `stress_report.py`     | Stress test timing report                        | stdout / JSON               |
-| `test_analytics.py`    | Test execution trend analysis                    | stdout                      |
-| `parse_test_log.py`    | Parse Rust test execution logs (internal helper) | parsed data                 |
+| `gen_coverage_gaps.py`     | Rust→Lua API coverage gap report                     | `docs/reports/coverage_gaps.md` |
+| `golden_test.py`           | Deterministic output diff tests                      | stdout / JSON               |
+| `stress_report.py`         | Stress test timing report                            | stdout / JSON               |
+| `test_analytics.py`        | Test execution trend analysis                        | stdout                      |
+| `parse_test_log.py`        | Parse Rust test execution logs (internal helper)     | parsed data                 |
+| `strict_api_check.py`      | Validate all `lurek.*` API stubs in examples         | stdout                      |
+| `strict_api_check_math.py` | Validate math-module API stubs in examples           | stdout                      |
+| `wiki_coverage.py`         | Cross-reference docs/wiki/ vs src/ modules & libs    | stdout / JSON               |
+| `tool_registry_audit.py`   | Self-audit: verify tools registry internal consistency | stdout / JSON               |
 
 ### Validators (`tools/validate/`)
 
@@ -146,6 +148,8 @@ All validators exit 0 on pass, 1 on failure.
 | `validate_lua_api.py`         | Validate `src/lua_api/*_api.rs` against SKILL.md contract    | `FILE_OR_DIR`, `--errors-only`                            |
 | `validate_module_coverage.py` | Ensure every `src/` module has a spec and no legacy AGENT.md | `--fix-readme`                                            |
 | `validate_game.py`            | Validate game/demo directory structure                       | `PATH`, `--all-examples`, `--json`, `--output`            |
+| `validate_changelog.py`       | Validate CHANGELOG structure: versions, ordering, dates      | `--strict`, `--format text\|json`                         |
+| `validate_library.py`         | Validate content/library/ entries: required files, LDoc tags | `--library NAME`, `--strict`, `--format text\|json`       |
 | `check_callbacks.py`          | Verify gen_docs_lua callback output (internal)               | —                                                         |
 
 ### Code Fixers (`tools/fix/`)
@@ -180,6 +184,11 @@ All validators exit 0 on pass, 1 on failure.
 | `fix_type_stub_vars.py`             | Fix type stub variable declarations                | —    |
 | `fix_typeof_args.py`                | Fix typeof() argument calls                        | —    |
 | `strip_instance_method_comments.py` | Remove instance method doc comments                | —    |
+| `fix_math.py`                       | Auto-rewrite math.lua placeholder stubs            | —    |
+| `fix_thread_api.py`                 | Fix thread API function signatures                 | —    |
+| `rename_example_files.py`           | Rename examples and update cross-repo references   | —    |
+| `rename_test_files.py`              | Rename Lua tests and update harness.rs             | —    |
+| `rename_namespaces.py`              | Rename `lurek.*` namespaces to match src/ folders  | `--dry-run` |
 
 ### Build & Distribution (`tools/dist/`)
 
@@ -203,8 +212,9 @@ All validators exit 0 on pass, 1 on failure.
 
 | Script                          | Purpose                            |
 | ------------------------------- | ---------------------------------- |
-| `demos/organize_demos.py`       | Demo folder organisation/cleanup   |
-| `demos/gen_demo_screenshots.py` | Generate demo screenshots for docs |
+| `demos/organize_demos.py`       | Demo folder organisation/cleanup              |
+| `demos/gen_demo_screenshots.py` | Generate demo screenshots for docs            |
+| `demos/smoke_sweep.py`          | Smoke-test all demos/examples for crash-free launch |
 
 ### Dev Helpers (`tools/dev/`)
 
@@ -227,16 +237,16 @@ All validators exit 0 on pass, 1 on failure.
 
 ```
 gen_all_docs.py
-├── gen_rust_api_data.py  → docs/logs/rust_api_data.json
-├── gen_lua_api_data.py   → docs/logs/lua_api_data.json
+├── gen_rust_api_data.py  → logs/rust_api_data.json
+├── gen_lua_api_data.py   → logs/lua_api_data.json
 ├── gen_luadoc.py         ← reads lua_api_data.json
 ├── gen_docs_lua.py       ← reads lua_api_data.json
 ├── gen_docs_rust.py      ← reads rust_api_data.json
 ├── gen_wiki_api.py       ← reads lua_api_data.json
-├── doc_coverage.py       → docs/logs/doc_coverage.json
-├── test_coverage.py      → docs/logs/test_coverage.json
-├── gen_test_docs.py      → docs/tests/
-└── gen_coverage_gaps.py  → docs/API/coverage_gaps.md
+├── doc_coverage.py       → logs/doc_coverage.json
+├── test_coverage.py      → logs/test_coverage.json
+├── gen_test_docs.py      → docs/reports/
+└── gen_coverage_gaps.py  → docs/reports/coverage_gaps.md
 
 quality_report.py
 ├── doc_audit.py
@@ -247,8 +257,9 @@ quality_report.py
 └── validate_game.py
 
 audit_module.py           (standalone, reads source directly)
-validate_agent_md.py      (standalone, reads docs/specs/*.md module references)
 docstring_audit.py        (standalone, reads lua_api source)
+tool_registry_audit.py    (standalone, self-audit of tools/ registry)
+wiki_coverage.py          (standalone, cross-refs docs/wiki/ vs src/ modules)
 ```
 
 ### Overlap-Free Ownership
@@ -259,8 +270,11 @@ docstring_audit.py        (standalone, reads lua_api source)
 | Lua API docstrings       | `docstring_audit.py`          | `doc_coverage.py --lua-only` | `docstring_audit` = per-function quality; `doc_coverage` = aggregate %                  |
 | Test coverage (Rust)     | `test_coverage.py`            | `unit_test_api_coverage.py`  | `test_coverage` = heuristic cross-ref; `unit_test_api_coverage` = unit-level            |
 | Test coverage (Lua)      | `lua_api_test_coverage.py`    | `test_coverage.py`           | `lua_api_test_coverage` = precise `@covers`; `test_coverage` = broad heuristic          |
-| Module reference quality | `validate_agent_md.py`        | `audit_module.py`            | `validate_agent_md` = merged spec structure only; `audit_module` = broader module audit |
 | Module structure         | `validate_module_coverage.py` | `module_audit.py`            | `validate_module_coverage` = file existence; `module_audit` = restructuring ideas       |
+| CHANGELOG                | `validate_changelog.py`       | —                            | Structure, version ordering, dates                                                      |
+| Library quality          | `validate_library.py`         | —                            | Required files, LDoc tags, return tables                                                |
+| Wiki completeness        | `wiki_coverage.py`            | —                            | Cross-reference wiki pages vs src/ modules                                              |
+| Tools registry           | `tool_registry_audit.py`      | —                            | Self-audit: READMEs, docstrings, paths                                                  |
 
 ---
 
@@ -284,7 +298,6 @@ python tools/audit/docstring_audit.py                  # check docstring quality
 
 ```powershell
 python tools/validate/validate_module_coverage.py     # merged specs exist and AGENT.md is gone?
-python tools/audit/validate_agent_md.py --module NAME # merged spec structure ok?
 python tools/audit/audit_module.py NAME               # full 12-phase audit
 ```
 
@@ -300,6 +313,27 @@ python tools/audit/lua_api_test_coverage.py --report  # Lua test coverage
 
 ```powershell
 python tools/validate/cag_validate.py                 # validate CAG layer
+```
+
+### After editing `content/library/`
+
+```powershell
+python tools/validate/validate_library.py             # validate all libraries
+python tools/validate/validate_library.py --library NAME --strict  # single library
+python tools/docs/gen_lib_docs.py                     # regenerate library docs
+```
+
+### After editing `docs/CHANGELOG.md`
+
+```powershell
+python tools/validate/validate_changelog.py           # validate structure
+python tools/validate/validate_changelog.py --strict   # treat warnings as errors
+```
+
+### After editing `tools/`
+
+```powershell
+python tools/audit/tool_registry_audit.py             # self-audit tools registry
 ```
 
 ---

@@ -14,7 +14,7 @@ Load this skill when authoring or modifying a Lunasome library under content/lib
 - Refactoring an existing library: helper deduplication, runtime-namespace fixes, docstring cleanup
 - Adding or renaming a public function in a library `init.lua`
 - Wiring a new library's test file into `tests/lua/harness.rs`
-- Regenerating `docs/API/library-docs.md` or `docs/API/libs/<name>.md`
+- Regenerating `docs/reports/library-docs.md` or `docs/reports/libs/<name>.md`
 - Renaming/deprecating a library (e.g. `library.patterns` → `library.scheduler`)
 
 ## When To Skip
@@ -45,14 +45,14 @@ Load this skill when authoring or modifying a Lunasome library under content/lib
 | `content/library/<name>/example.lua` | Self-contained runnable showcase |
 | `tests/lua/library/test_library_<name>.lua` | BDD test, ends with `test_summary()` |
 | `tests/lua/harness.rs` | `#[test] fn lua_test_library_<name>()` entry — manual, not auto-discovered |
-| `docs/API/libs/<name>.md` | Per-library API page (regen) |
-| `docs/API/library-docs.md` | Aggregate library reference (regen) |
+| `docs/reports/libs/<name>.md` | Per-library API page (regen) |
+| `docs/reports/library-docs.md` | Aggregate library reference (regen) |
 
 Renames or deletions must update **all** of the above in the same commit. Deprecated libraries keep the old `init.lua` as a thin stub that `require`s the new name and logs a one-time deprecation warning.
 
 ### Runtime Namespace Names (CRITICAL)
 
-`docs/API/lua-api.md` and several spec files use historical names. The **runtime registers different names** — libraries must call the runtime names or they crash with `attempt to index nil`.
+`docs/lua-api.md` and several spec files use historical names. The **runtime registers different names** — libraries must call the runtime names or they crash with `attempt to index nil`.
 
 | Stale doc name | Runtime name | Notes |
 |---|---|---|

@@ -20,7 +20,7 @@ Audit the `lurek.*` API surface for naming and convention consistency.
 4. Check parameter conventions: `dt`, `x, y`, `key`, `btn`
 5. Check return types: all return `LuaResult<T>`
 6. Check key name conventions: lowercase strings
-7. Compare against `docs/API/lua-api.md` for accuracy
+7. Compare against `docs/lua-api.md` for accuracy
 8. Report inconsistencies
 
 ## Success Criteria

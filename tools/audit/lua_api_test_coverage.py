@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-LUA_API_DATA = WORKSPACE_ROOT / "docs" / "logs" / "lua_api_data.json"
+LUA_API_DATA = WORKSPACE_ROOT / "logs" / "lua_api_data.json"
 LUA_TESTS_DIR = WORKSPACE_ROOT / "tests" / "lua"
 OUTPUT_JSON = WORKSPACE_ROOT / "docs" / "logs" / "lua_api_test_coverage.json"
 
@@ -536,7 +536,7 @@ def main() -> int:
     else:
         print(output)
 
-    # Always save JSON to docs/logs/
+    # Always save JSON to logs/
     OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)

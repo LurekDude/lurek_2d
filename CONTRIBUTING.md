@@ -117,7 +117,7 @@ Libraries are pure-Lua game-mechanics modules with no Rust internals.
 See [`extensions/vscode/README.md`](extensions/vscode/README.md) and [docs/architecture/vscode-architecture.md](docs/architecture/vscode-architecture.md).
 
 - TypeScript source is in `extensions/vscode/src/`.
-- The extension reads API data from `docs/API/` — regenerate with `python tools/gen_all_docs.py` after engine API changes.
+- The extension reads API data from `docs/` — regenerate with `python tools/gen_all_docs.py` after engine API changes.
 - Test the extension with `F5` launch in VS Code (Extension Development Host).
 - Keep MCP server endpoints in sync with engine API additions.
 

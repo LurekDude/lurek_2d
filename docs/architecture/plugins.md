@@ -87,7 +87,7 @@ Plugins are **NOT**:
 - Pure asset bundles — those mount via `GameFS` or archive mounting.
 - Mods loaded through the `mods` module — those are sandboxed Lua at runtime.
 
-Each plugin owns one or more `lurek.<namespace>` tables and has its own slice of [docs/specs/](../specs/) and [docs/API/](../API/). When the candidate list (§5) becomes plugins, their existing specs and API references move with them.
+Each plugin owns one or more `lurek.<namespace>` tables and has its own slice of [docs/specs/](../specs/) and [docs/reports/](../reports/). When the candidate list (§5) becomes plugins, their existing specs and API references move with them.
 
 A plugin exposes the same registration shape required by **C-02**:
 

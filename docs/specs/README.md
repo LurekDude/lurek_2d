@@ -1,6 +1,6 @@
 # `docs/specs/` — Lurek2D Module Reference Index
 
-Per-module reference: each module under `src/<module>/` has a matching `docs/specs/<module>.md` produced by [tools/docs/gen_module_specs.py](../../tools/docs/gen_module_specs.py) (auto sections) plus hand-curated `Summary` / `General Info` / `Notes` (manual sections). Specs are the canonical reference; [docs/architecture/](../architecture/) holds the narrative, [docs/API/](../API/) holds the generated public surface.
+Per-module reference: each module under `src/<module>/` has a matching `docs/specs/<module>.md` produced by [tools/docs/gen_module_specs.py](../../tools/docs/gen_module_specs.py) (auto sections) plus hand-curated `Summary` / `General Info` / `Notes` (manual sections). Specs are the canonical reference; [docs/architecture/](../architecture/) holds the narrative, [docs/reports/](../reports/) holds the generated public surface.
 
 ## Table of Contents
 
@@ -28,7 +28,7 @@ Each spec follows [SPEC_TEMPLATE.md](SPEC_TEMPLATE.md). Sections split into two 
 
 Regen workflow:
 
-- `python tools/gen_all_docs.py` — full sweep: regenerates every spec's auto sections plus `docs/API/lua-api.md`, `docs/API/rust-api.md`, `docs/API/lurek.lua`, `docs/API/library-docs.md`, and `docs/API/coverage_gaps.md`.
+- `python tools/gen_all_docs.py` — full sweep: regenerates every spec's auto sections plus `docs/lua-api.md`, `docs/reports/rust-api.md`, `docs/lurek.lua`, `docs/reports/library-docs.md`, and `docs/reports/coverage_gaps.md`.
 - `python tools/docs/gen_module_specs.py` — specs only.
 - `python tools/audit/validate_agent_md.py` — validates the merged spec format. The script name is kept for backwards compatibility; the per-module `src/<module>/AGENT.md` files have been retired.
 - `python tools/audit/doc_coverage.py` — flags missing / undersized manual prose.

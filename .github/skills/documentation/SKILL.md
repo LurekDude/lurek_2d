@@ -32,7 +32,7 @@ description: "Load this skill when writing or updating Lurek2D documentation: AP
 - Code comment conventions
 
 ### Live Repository Contracts
-- `docs/API/lua_api_reference_generated.md` — generated Lua API reference (do not hand-edit)
+- `docs/lua-api.md` — generated Lua API reference (do not hand-edit)
 - `docs/architecture/engine-architecture.md` — module structure, tier system, rendering pipeline
 - `docs/architecture/philosophy.md` — design assumptions, binding constraints, Zen of Luna
 - `docs/architecture/test-framework.md` — test suite architecture and quality gates
@@ -93,5 +93,5 @@ Never conflate these. A failing integration test and a failing cargo run are dif
 
 - See related skills in `.github/skills/`.
 - [tools/docs/gen_wiki.py](../../../tools/docs/gen_wiki.py) — full wiki regenerator.
-- [tools/docs/gen_test_docs.py](../../../tools/docs/gen_test_docs.py) — generates `docs/tests/` from the test tree.
+- [tools/docs/gen_test_docs.py](../../../tools/docs/gen_test_docs.py) — generates `docs/reports/` test documentation from the test tree.
 - [tools/fix/add_lua_docstrings.py](../../../tools/fix/add_lua_docstrings.py) — interactive `///` docstring backfill for Lua API bindings.

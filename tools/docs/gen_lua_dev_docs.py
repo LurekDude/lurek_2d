@@ -16,7 +16,7 @@ Parses the lurek2d lua_api docstring format (defined in .github/skills/lua-api-d
     methods.add_meta_method(LuaMetaMethod::X)  metamethod (__tostring, __index, etc.)
     tbl.set("name", ...)                       module-level function
 
-Outputs one Markdown file per lurek.* module to docs/API/lua/.
+Outputs one Markdown file per lurek.* module to docs/reports/lua/.
 Target audience: Lua game developers (not Rust engine contributors).
 
 Usage:
@@ -48,7 +48,7 @@ from typing import Dict, List, Optional, Tuple
 
 _ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_SRC = _ROOT / "src" / "lua_api"
-DEFAULT_OUT = _ROOT / "docs" / "API" / "lua"
+DEFAULT_OUT = _ROOT / "docs" / "reports" / "lua"
 
 # ---------------------------------------------------------------------------
 # Regex patterns
@@ -496,7 +496,7 @@ def main(argv=None) -> int:
     )
     ap.add_argument(
         "--output", "-o", type=Path, default=DEFAULT_OUT,
-        help="Output directory (default: docs/API/lua/)",
+        help="Output directory (default: docs/reports/lua/)",
     )
     ap.add_argument("--module", "-m", help="Process only this module name (e.g. timer)")
     ap.add_argument("--dry-run", action="store_true", help="Print to stdout, write no files")

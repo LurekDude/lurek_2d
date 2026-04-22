@@ -185,7 +185,7 @@ Services are singletons or classes instantiated once and shared via dependency i
 
 | Service               | File                      | Responsibility                                                                                                                                                                                                                                              |
 | --------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ApiDataService`      | `services/apiData.ts`     | Parses `docs/API/lua_api_reference_generated.md` and `api_data.json`; provides `getFunction()`, `getModule()`, `getAllFunctions()`, `searchFunctions()`. Exposes built-in enum definitions for `DrawMode`, `BodyType`, `BlendMode`, `FilterMode`, and more. |
+| `ApiDataService`      | `services/apiData.ts`     | Parses `docs/lua-api.md` and `api_data.json`; provides `getFunction()`, `getModule()`, `getAllFunctions()`, `searchFunctions()`. Exposes built-in enum definitions for `DrawMode`, `BodyType`, `BlendMode`, `FilterMode`, and more. |
 | `LuaDocumentAnalyzer` | `services/luaParser.ts`   | Full Lua tokeniser producing `Token` streams. Extracts `LuaDocumentInfo`: symbols, require paths, callbacks, scopes, and comments. Cached per document version in each provider.                                                                            |
 | `LunaProcessService`  | `services/lunaProcess.ts` | Resolves the lurek binary (user setting → PATH → `cargo run`). Runs the game in an integrated terminal. Emits `onStatusChange` events. Reads `lurek.lunaPath` and `lurek.srcDir` from workspace settings.                                                    |
 | `DebugBridge`         | `services/debugBridge.ts` | TCP socket client connecting to the running engine on port 19740 (configurable via `lurek.debugBridge.port`). JSON request/response protocol with per-request timeouts. Shows a live stats status bar item when connected.                                  |
@@ -269,7 +269,7 @@ The 29 editor panels are webview-only (HTML canvas + vanilla JS inside the webvi
 
 | Editor                   | Opens when                                               |
 | ------------------------ | -------------------------------------------------------- |
-| `ApiReferenceEditor`     | Command; reads `docs/API/lua_api_reference_generated.md` |
+| `ApiReferenceEditor`     | Command; reads `docs/lua-api.md` |
 | `TileMapEditor`          | Command; exports to `tilemap.lua` or `tilemap.toml`      |
 | `SceneFlowEditor`        | Command; scene state machine editor                      |
 | `ParticleEditor`         | Command; particle system tuner                           |
@@ -362,7 +362,7 @@ typeInference.ts (scanDocument → VarType[] + ClassInfo[] + ModuleAlias[])
         ├──▶ colon-access completions (methods for typed variables + OOP instances)
         └──▶ hover provider  (type + factory origin for typed variables)
 
-docs/API/lua_api_reference_generated.md
+docs/lua-api.md
         │
         ▼
 ApiDataService (apiData.ts)

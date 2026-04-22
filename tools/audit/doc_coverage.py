@@ -7,7 +7,7 @@ counts those with doc comments (/// or ---), and reports coverage metrics.
 
 Outputs:
   - Summary to stdout (total, covered, missing count, coverage %)
-  - JSON metadata to docs/logs/doc_coverage.json (use --output to change)
+  - JSON metadata to logs/doc_coverage.json (use --output to change)
 
 Usage:
     python tools/doc_coverage.py                 # summary + write JSON
@@ -36,7 +36,7 @@ from datetime import datetime, timezone
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 SRC_DIR = WORKSPACE_ROOT / "src"
-DEFAULT_OUTPUT = WORKSPACE_ROOT / "docs" / "logs" / "doc_coverage.json"
+DEFAULT_OUTPUT = WORKSPACE_ROOT / "logs" / "doc_coverage.json"
 
 # Matches pub item declarations in Rust source
 _PUB_ITEM_RE = re.compile(

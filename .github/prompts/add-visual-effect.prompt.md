@@ -16,7 +16,7 @@ Implement a named full-screen post-processing effect using the canvas render-to-
 1. Load [skill: visual-effects](.github/skills/visual-effects/SKILL.md) before changing any files.
 2. Confirm every input listed in this prompt's frontmatter is present in the user invocation.
 3. Carry out the work as the `Renderer` agent, following the workflow in the loaded skill.
-4. Consult the actual `lurek.*` API surface via [docs/API/lua-api.md](docs/API/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
+4. Consult the actual `lurek.*` API surface via [docs/lua-api.md](docs/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 5. Run `python tools/validate/cag_validate.py` and the quality gates listed in [skill: quality-pipeline](.github/skills/quality-pipeline/SKILL.md) before declaring the prompt done.
 6. Add a `docs/CHANGELOG.md` entry under the current version.
 

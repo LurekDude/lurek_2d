@@ -8,7 +8,7 @@
 | **Source** | `src/<module>/` |
 | **Rust Tests** | `tests/rust/unit/<module>_tests.rs` |
 | **Lua Tests** | `tests/lua/unit/test_<module>.lua` (or `—` if none) |
-| **Architecture** | `docs/API/<module>-design.md` (if exists, else `—`) |
+| **Architecture** | `docs/reports/<module>-design.md` (if exists, else `—`) |
 
 ## Purpose
 

@@ -84,7 +84,7 @@ where the library wraps or composes a `lurek.*` surface.
 ## Generating Docs
 
 ```powershell
-python tools/docs/gen_lib_docs.py          # generate docs/API/libs/*.md per module
+python tools/docs/gen_lib_docs.py          # generate docs/reports/libs/*.md per module
 python tools/docs/gen_lib_docs.py --check  # report modules missing doc coverage
 ```
 # Lunasome ��� Lurek2D Standard Library
@@ -153,6 +153,6 @@ function M.newThing(name, opts) end
 ## Generating Docs
 
 ```powershell
-python tools/gen_lib_docs.py          # generate docs/API/libs/*.md per module
+python tools/gen_lib_docs.py          # generate docs/reports/libs/*.md per module
 python tools/gen_lib_docs.py --check  # report modules missing doc coverage
 ```

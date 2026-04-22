@@ -15,7 +15,7 @@ stale path references.
 |---|---|---|
 | `add_lua_docstrings.py` | Add missing `///` Lua docstring stubs interactively | `--dry-run`, file path |
 | `add_lua_docstrings_auto.py` | Auto-generate `///` Lua docstring stubs non-interactively | `--dry-run` |
-| `docstring_fix.py` | Apply docstring fixes from `docs/logs/docstring_audit.json` | `--dry-run` |
+| `docstring_fix.py` | Apply docstring fixes from `logs/docstring_audit.json` | `--dry-run` |
 | `fix_docstrings.py` | Auto-fill missing `# Parameters`/`# Returns`/`# Fields`/`# Variants` | — |
 | `improve_lua_docstrings.py` | Upgrade low-quality stub `///` comments with richer descriptions | `--dry-run` |
 | `fix_thread_api.py` | One-shot repair for `src/lua_api/thread_api.rs` malformed doc blocks (idempotent) | — |
@@ -44,6 +44,15 @@ stale path references.
 | `add_test_markers.py` | Add `@covers` annotation markers to Lua test files | — |
 | `find_typed_params.py` | Find API params that already have explicit Lua types | — |
 
+### Rename/migration helpers — one-shot transformations
+
+| Script | Purpose | Key args |
+|---|---|---|
+| `rename_example_files.py` | Rename and update references to renamed example files across the repo | — |
+| `rename_test_files.py` | Rename Lua test files and update `harness.rs` paths/function names | — |
+| `rename_namespaces.py` | Rename `lurek.*` Lua namespaces to match `src/` folder names | `--dry-run` |
+| `fix_math.py` | Auto-rewrite math.lua example stubs with valid API calls | — |
+
 ## Common usage
 
 ```powershell
@@ -55,10 +64,6 @@ python tools/fix/docstring_fix.py --dry-run              # preview audit fixes
 python tools/fix/docstring_fix.py                        # apply
 
 python tools/fix/fix_docstrings.py                       # auto-fill sections
-
-# --- Source fixers ---
-python tools/fix/update_paths.py --dry-run               # preview path updates
-python tools/fix/update_paths.py                         # apply
 
 # --- Examples ---
 python tools/fix/format_examples.py                      # format all examples

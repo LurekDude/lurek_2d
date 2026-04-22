@@ -241,7 +241,7 @@
         },
         {
             "label": "Docs: Generate Library API",
-            "detail": "📚 Run tools/docs/gen_lib_docs.py to regenerate docs/API/library-docs.md (aggregate) and docs/API/libs/lib_<name>.md (per-library) from content/library/*/init.lua LDoc tags.",
+            "detail": "📚 Run tools/docs/gen_lib_docs.py to regenerate docs/reports/library-docs.md (aggregate) and docs/reports/libs/lib_<name>.md (per-library) from content/library/*/init.lua LDoc tags.",
             "type": "shell",
             "command": "python tools/docs/gen_lib_docs.py",
             "problemMatcher": []
@@ -262,7 +262,7 @@
         },
         {
             "label": "Docs: Coverage Report",
-            "detail": "📊 Run tools/audit/doc_coverage.py to show docstring coverage for all Rust public items and Lua API bindings. Writes docs/logs/doc_coverage.json.",
+            "detail": "📊 Run tools/audit/doc_coverage.py to show docstring coverage for all Rust public items and Lua API bindings. Writes logs/doc_coverage.json.",
             "type": "shell",
             "command": "python tools/audit/doc_coverage.py",
             "problemMatcher": []
@@ -276,14 +276,14 @@
         },
         {
             "label": "Docs: Generate Test Docs",
-            "detail": "🧪 Run tools/docs/gen_test_docs.py to generate docs/test_docs.md — a human-readable description of all tests and coverage gaps. Requires docs/logs/test_coverage.json (run 'Docs: Test Coverage' first).",
+            "detail": "🧪 Run tools/docs/gen_test_docs.py to generate docs/reports/test_docs.md — a human-readable description of all tests and coverage gaps. Requires logs/test_coverage.json (run 'Docs: Test Coverage' first).",
             "type": "shell",
             "command": "python tools/docs/gen_test_docs.py",
             "problemMatcher": []
         },
         {
             "label": "Docs: Test Coverage",
-            "detail": "📊 Run tools/audit/test_coverage.py to analyse Rust and Lua API test coverage. Writes docs/logs/test_coverage.json.",
+            "detail": "📊 Run tools/audit/test_coverage.py to analyse Rust and Lua API test coverage. Writes logs/test_coverage.json.",
             "type": "shell",
             "command": "python tools/audit/test_coverage.py",
             "problemMatcher": []

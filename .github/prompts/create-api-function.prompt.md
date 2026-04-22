@@ -22,15 +22,15 @@ Step-by-step workflow for adding a new function to the `lurek.*` Lua API.
 3. Verify the function doesn't duplicate existing functionality
 4. Design the signature following Lua API conventions (see `lua-api-design` skill)
 5. Implement the binding in the appropriate `*_api.rs` file using the `register()` pattern
-6. Add the function to `docs/API/lua-api.md`
+6. Add the function to `docs/lua-api.md`
 7. Write at least one test exercising the new function
 8. Run `cargo test` and `cargo clippy`
-9. Consult the actual `lurek.*` API surface via [docs/API/lua-api.md](docs/API/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
+9. Consult the actual `lurek.*` API surface via [docs/lua-api.md](docs/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 
 ## Success Criteria
 
 - [ ] Modified `src/lua_api/<module>_api.rs` with new binding
-- [ ] Updated `docs/API/lua-api.md`
+- [ ] Updated `docs/lua-api.md`
 - [ ] New or updated test in `tests/`
 - [ ] Verified: `cargo test` passes, `cargo clippy` clean
 

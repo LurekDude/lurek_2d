@@ -25,7 +25,7 @@ Generate a complete Lurek2D roadmap phase file from a natural language descripti
 4. **Scope signal** — is this a small addition (1–3 new functions), a medium module extension (new sub-system), or a large new module (brand-new `src/<name>/` + `lua_api/<name>_api.rs`)?
 5. **Lua API surface sketch** — list the `lurek.*` function names implied by the description. If none are named, invent canonical names following the `lurek.<module>.<verb><Noun>` pattern.
 6. **Rust implementation surface sketch** — list the struct/trait/module names the implementation will likely need.
-7. `docs/API/lua-api.md` — what the current generated reference says
+7. `docs/lua-api.md` — what the current generated reference says
 8. Assign the next number (zero-padded, e.g. `19`, `20`).
 9. Choose a slug: lowercase-hyphenated, max 4 words, describes the feature not the status.
 10. Determine dependencies:

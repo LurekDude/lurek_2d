@@ -36,7 +36,7 @@ For contributor onboarding (clone → build → first game → first engine chan
 
 ## Cross-Artifact Sync
 
-The system prompt at [.github/copilot-instructions.md](../../.github/copilot-instructions.md) carries the authoritative **Cross-Artifact Sync** table — use it whenever you change Rust code, Lua bindings, library init, or CAG files. Per-module contracts (types, functions, `lurek.*` reference, test paths) live in [docs/specs/<module>.md](../specs/); generated API references live in [docs/API/](../API/). Architecture docs above describe *how the pieces fit*; specs describe *what each module is*.
+The system prompt at [.github/copilot-instructions.md](../../.github/copilot-instructions.md) carries the authoritative **Cross-Artifact Sync** table — use it whenever you change Rust code, Lua bindings, library init, or CAG files. Per-module contracts (types, functions, `lurek.*` reference, test paths) live in [docs/specs/<module>.md](../specs/); generated API references live in [docs/reports/](../reports/) and [docs/lua-api.md](../lua-api.md). Architecture docs above describe *how the pieces fit*; specs describe *what each module is*.
 
 ---
 

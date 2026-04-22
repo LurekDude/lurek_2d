@@ -24,7 +24,7 @@ Create a new self-contained Lua example game in content/examples/. Use when demo
 7. `function lurek.process(dt)` — frame logic
 8. `function lurek.render()` — rendering only
 9. Optionally: `lurek.keypressed`, `lurek.input.mousepressed` callbacks
-10. Check all API calls against `docs/API/lua-api.md`:
+10. Check all API calls against `docs/lua-api.md`:
 11. Colors: `[0.0, 1.0]` float range
 12. Shapes: `("fill"/"line", x, y, ...)`
 

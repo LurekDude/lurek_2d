@@ -12,6 +12,8 @@ structural rules. Each script exits 1 on failure and prints a report.
 | `validate_game.py` | Validate a game/demo directory structure | `--all-examples`, `--all-demos` |
 | `validate_lua_api.py` | Validate `src/lua_api/*_api.rs` against SKILL.md contract | file path or dir |
 | `validate_module_coverage.py` | Verify every `src/` module has a matching `docs/specs/*.md` | — |
+| `validate_changelog.py` | Validate `docs/CHANGELOG.md` structure: version ordering, duplicates, dates | `--strict`, `--format text\|json` |
+| `validate_library.py` | Validate `content/library/` entries: required files, LDoc tags, return tables | `--library NAME`, `--strict`, `--format text\|json` |
 
 The shared module `_cag_common.py` (frontmatter parser, link extractor, file
 discovery) is re-used by the audit-side tools `tools/audit/cag_link_check.py`,
@@ -55,4 +57,12 @@ python tools/validate/validate_lua_api.py src/lua_api/
 
 # --- Spec coverage ---
 python tools/validate/validate_module_coverage.py
+
+# --- CHANGELOG validation ---
+python tools/validate/validate_changelog.py
+python tools/validate/validate_changelog.py --strict
+
+# --- Library validation ---
+python tools/validate/validate_library.py
+python tools/validate/validate_library.py --library camera_utils --strict
 ```

@@ -59,10 +59,10 @@ This orchestrates all doc generators under `tools/docs/`. Always run this before
 |---|---|---|
 | `tools/audit/quality_report.py` | **Master dashboard** — aggregates doc + test + module audits | PASS/FAIL verdict |
 | `tools/audit/doc_audit.py` | Rust + Lua documentation completeness | % coverage |
-| `tools/audit/doc_coverage.py` | `///` docstring coverage | `docs/logs/doc_coverage.json` |
-| `tools/audit/docstring_audit.py` | Per-file Lua API docstring quality | `docs/logs/docstring_audit.json` |
-| `tools/audit/test_coverage.py` | API-to-test cross-reference | `docs/logs/test_coverage.json` |
-| `tools/audit/lua_api_test_coverage.py` | Lua test `@covers` marker coverage | `docs/logs/lua_api_test_coverage.json` |
+| `tools/audit/doc_coverage.py` | `///` docstring coverage | `logs/doc_coverage.json` |
+| `tools/audit/docstring_audit.py` | Per-file Lua API docstring quality | `logs/docstring_audit.json` |
+| `tools/audit/test_coverage.py` | API-to-test cross-reference | `logs/test_coverage.json` |
+| `tools/audit/lua_api_test_coverage.py` | Lua test `@covers` marker coverage | `logs/lua_api_test_coverage.json` |
 | `tools/audit/lua_test_structure_audit.py` | Lua test structure rules (`@description`, legacy markers, `test_summary()`) | stdout / JSON |
 | `tools/audit/lua_evidence_golden_contract_audit.py` | Lua evidence/golden contract rules (`@evidence`, mixed prechecks, compare-only goldens) | stdout / JSON |
 | `tools/audit/example_coverage.py` | Content/examples vs Lua API coverage | stdout |

@@ -207,13 +207,13 @@ def load_texts(d: Path) -> dict[str, dict]:
         file_lines = raw.splitlines()
         comments = 0
         blocks = {}
-        
+
         current_stub = None
         for ln in file_lines:
             stripped = ln.strip()
             if stripped.startswith('--'):
                 comments += 1
-            
+
             if stripped.startswith('--@api-stub:'):
                 marker = stripped[len('--@api-stub:'):].strip()
                 current_stub = marker
@@ -224,7 +224,7 @@ def load_texts(d: Path) -> dict[str, dict]:
                     blocks[current_stub]['comment'] += 1
                 elif bool(stripped) and not stripped.startswith('--'):
                     blocks[current_stub]['lua'] += 1
-                    
+
         out[p.name] = {
             'blocks': blocks,
             'lines': len(file_lines),
@@ -286,7 +286,7 @@ def build_cov(entries: list[ApiEntry], texts: dict[str, dict]) -> dict[str, Modu
                 mc.stub_items.append(f"{e.name} " + " ".join(reasons))
         else:
             mc.missing.append(f"{e.name} <No Marker>")
-            
+
     return bk
 
 
@@ -347,29 +347,29 @@ def print_missing(bk: dict[str, ModuleCov], filt: str | None = None) -> None:
 def export_markdown(bk: dict[str, ModuleCov], out_path: str):
     p = Path(out_path)
     p.parent.mkdir(parents=True, exist_ok=True)
-    
+
     with p.open('w', encoding='utf-8') as f:
         f.write("# Example Coverage & Quality Report\n\n")
         f.write("| Module | Namespace | Example File | Coverage | Stubs | Total | Length (lines) | Comments | Docstrings |\n")
         f.write("|---|---|---|---|---|---|---|---|---|\n")
-        
+
         total_cov = total_stub = total_all = total_lines = total_comms = total_docs = 0
         for k, mc in sorted(bk.items()):
             ex_exists = (EXAMPLES_DIR / mc.example_file).exists()
             flag = '' if ex_exists else ' (MISSING)'
-            
+
             f.write(f"| `{k}` | `lurek.{mc.namespace}` | `{mc.example_file}`{flag} | ")
             f.write(f"{mc.covered} | {mc.stub_covered} | {mc.total} | {mc.line_count} | {mc.comment_count} | {mc.docstring_count} |\n")
-            
+
             total_cov += mc.covered
             total_stub += mc.stub_covered
             total_all += mc.total
             total_lines += mc.line_count
             total_comms += mc.comment_count
             total_docs += mc.docstring_count
-            
+
         f.write(f"| **TOTAL** | | | **{total_cov}** | **{total_stub}** | **{total_all}** | **{total_lines}** | **{total_comms}** | **{total_docs}** |\n\n")
-        
+
         pct = ((total_cov + total_stub) / total_all * 100) if total_all else 100
         f.write(f"**Overall Coverage (including stubs):** {pct:.1f}%\n")
 

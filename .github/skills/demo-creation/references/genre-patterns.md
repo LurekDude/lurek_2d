@@ -96,7 +96,7 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 
 For the full API surface run:
 ```powershell
-cat docs/API/lua_api_reference_generated.md
+cat docs/lua-api.md
 ```
 
-Or check `docs/API/lua-api.md` (regenerate with `python tools/gen_all_docs.py` if stale).
+Or check `docs/lua-api.md` (regenerate with `python tools/gen_all_docs.py` if stale).

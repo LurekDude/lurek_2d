@@ -302,10 +302,10 @@ export class ApiDataService {
   async load(extensionPath: string): Promise<void> {
     if (this.loaded) return;
 
-    // Priority 1: docs/API/lurek.lua (full LuaCATS reference)
+    // Priority 1: docs/lurek.lua (full LuaCATS reference)
     const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (wsRoot) {
-      const luaCatsPath = path.join(wsRoot, "docs", "API", "lurek.lua");
+      const luaCatsPath = path.join(wsRoot, "docs", "lurek.lua");
       if (fs.existsSync(luaCatsPath)) {
         try {
           const raw = fs.readFileSync(luaCatsPath, "utf-8");
@@ -319,8 +319,8 @@ export class ApiDataService {
         }
       }
 
-      // Priority 2: docs/API/api_data.json (precompiled)
-      const jsonPath = path.join(wsRoot, "docs", "API", "api_data.json");
+      // Priority 2: docs/reports/api_data.json (precompiled)
+      const jsonPath = path.join(wsRoot, "docs", "reports", "api_data.json");
       if (fs.existsSync(jsonPath)) {
         try {
           const raw = fs.readFileSync(jsonPath, "utf-8");
@@ -350,9 +350,9 @@ export class ApiDataService {
       }
     }
 
-    // Priority 4: docs/API/lua-api.md (compact generated reference)
+    // Priority 4: docs/lua-api.md (compact generated reference)
     if (wsRoot) {
-      const mdPath = path.join(wsRoot, "docs", "API", "lua-api.md");
+      const mdPath = path.join(wsRoot, "docs", "lua-api.md");
       if (fs.existsSync(mdPath)) {
         try {
           const md = fs.readFileSync(mdPath, "utf-8");
@@ -909,7 +909,7 @@ export class ApiDataService {
     };
   }
 
-  // ── docs/API/lurek.lua loader ─────────────────────────────────────────────
+  // ── docs/lurek.lua loader ─────────────────────────────────────────────
   // Parses the LuaCATS-style full API reference used as the workspace source of
   // truth. This format includes richer @param and @return annotations than the
   // compact lua-api.md reference.
@@ -1066,7 +1066,7 @@ export class ApiDataService {
 
 
   // ── lua-api.md loader ─────────────────────────────────────────────────────
-  // Parses the compact one-liner format used in docs/API/lua-api.md:
+  // Parses the compact one-liner format used in docs/lua-api.md:
   //   lurek.MODULE.FUNCNAME( params )[ -> returnType]  -- description
   //   ObjType:methodName( params )[ -> returnType]  -- description
   private loadFromLuaApiMd(md: string): void {

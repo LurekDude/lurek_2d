@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gen_docs_rust.py — Generate compact inline Rust API reference from docs/logs/rust_api_data.json.
+gen_docs_rust.py — Generate compact inline Rust API reference from logs/rust_api_data.json.
 
 Each public item is rendered in a Rust code block:
     pub fn name(param: Type) -> ReturnType  // description
@@ -10,7 +10,7 @@ Each public item is rendered in a Rust code block:
 Includes per-module and overall docstring coverage statistics.
 
 Usage:
-    python tools/gen_docs_rust.py                   # -> docs/API/rust-api.md
+    python tools/gen_docs_rust.py                   # -> docs/reports/rust-api.md
     python tools/gen_docs_rust.py --output FILE     # custom output path
     python tools/gen_docs_rust.py --input FILE      # custom input path
 
@@ -25,8 +25,8 @@ import sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-INPUT_FILE = WORKSPACE_ROOT / "docs" / "logs" / "rust_api_data.json"
-OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "API" / "rust-api.md"
+INPUT_FILE = WORKSPACE_ROOT / "logs" / "rust_api_data.json"
+OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "reports" / "rust-api.md"
 
 # Modules to skip (test utilities, build scripts, etc.)
 _SKIP_MODS = {"main", "root", "lib"}

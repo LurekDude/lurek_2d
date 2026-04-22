@@ -36,8 +36,8 @@ End-to-end delivery of a single roadmap phase: read the phase file, understand w
 - [ ] `cargo clippy -- -D warnings` produces zero warnings
 - [ ] `cargo fmt --check` produces zero diffs
 - [ ] `python tools/docs/collect_docs.py --report-missing` exits 0 (zero missing public docs)
-- [ ] `python tools/docs/collect_docs.py` completes and `docs/API/lua-api.md` is updated
-- [ ] Every new `lurek.*` function appears in `docs/API/lua-api.md`
+- [ ] `python tools/docs/collect_docs.py` completes and `docs/lua-api.md` is updated
+- [ ] Every new `lurek.*` function appears in `docs/lua-api.md`
 - [ ] Every new `lurek.*` function has a corresponding Lua test in `tests/lua/`
 - [ ] Every new Rust public function has a corresponding Rust test in `tests/<module>_tests.rs`
 - [ ] API parity check passed: new functions use same parameter order and semantics as a similar game engine equivalents

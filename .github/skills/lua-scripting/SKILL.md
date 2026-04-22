@@ -33,7 +33,7 @@ description: "Load this skill when writing or reviewing Lua game scripts for Lur
 - `content/demos/hello_world/main.lua` — minimal game example
 - `content/demos/physics_demo/main.lua` — physics usage example
 - `content/demos/sprites/main.lua` — sprite and texture example
-- `docs/API/lua_api_reference_generated.md` — API reference for script authors
+- `docs/lua-api.md` — API reference for script authors
 
 ### Decision Rules
 - **Entry point**: Every game has a `main.lua` in its directory

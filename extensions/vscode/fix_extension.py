@@ -62,13 +62,13 @@ print(f'  Fixed Priority-3 md path + method call: {n3} replacement(s)')
 # Also update the comment for Priority 3
 content = content.replace(
     '    // Priority 3: generated markdown in workspace',
-    '    // Priority 3: docs/API/lua-api.md (generated reference)'
+    '    // Priority 3: docs/lua-api.md (generated reference)'
 )
 
 # Insert loadFromLuaApiMd() and parseParamStr() before loadFallback()
 NEW_METHODS = '''
   // ── lua-api.md loader ─────────────────────────────────────────────────────
-  // Parses the compact one-liner format used in docs/API/lua-api.md:
+  // Parses the compact one-liner format used in docs/lua-api.md:
   //   lurek.MODULE.FUNCNAME( params )[ -> returnType]  -- description
   //   ObjType:methodName( params )[ -> returnType]  -- description
   private loadFromLuaApiMd(md: string): void {

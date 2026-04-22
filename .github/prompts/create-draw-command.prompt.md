@@ -19,10 +19,10 @@ Add a new RenderCommand variant to the rendering pipeline.
 2. Add variant to `RenderCommand` enum in `src/render/mod.rs`
 3. Implement rendering in `src/render/renderer.rs` match arm
 4. Add Lua binding in `src/lua_api/render_api.rs`
-5. Update `docs/API/lua-api.md`
+5. Update `docs/lua-api.md`
 6. Write test for the new command
 7. Run `cargo test` and `cargo clippy`
-8. Consult the actual `lurek.*` API surface via [docs/API/lua-api.md](docs/API/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
+8. Consult the actual `lurek.*` API surface via [docs/lua-api.md](docs/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 
 ## Success Criteria
 

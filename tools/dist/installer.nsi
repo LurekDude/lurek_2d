@@ -123,9 +123,11 @@ Section "Engine (required)" SecEngine
     SetOutPath "$INSTDIR\library\stats"
     File "..\..\library\stats\*.lua"
 
-    ; API docs (full docs/API/ folder: Markdown reference + LuaCATS stubs)
+    ; API docs (reports + top-level lua-api.md + lurek.lua)
     SetOutPath "$INSTDIR\docs"
-    File /r "..\..\docs\API"
+    File "..\..\docs\lua-api.md"
+    File "..\..\docs\lurek.lua"
+    File /r "..\..\docs\reports"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName"          "${APP_NAME} ${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion"       "${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher"            "${APP_PUBLISHER}"

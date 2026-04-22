@@ -2,7 +2,7 @@
 """
 find_typed_params.py — Find API parameters that already have explicit Lua types.
 
-Scans docs/logs/lua_api_data.json and prints function parameter entries whose
+Scans logs/lua_api_data.json and prints function parameter entries whose
 documentation contains explicit backtick-typed mentions (e.g. `string`,
 `number`, `boolean`, `Vec2`). Used when auditing which bindings already
 carry type information.
@@ -11,7 +11,7 @@ Usage:
     python tools/fix/find_typed_params.py           # prints typed-param list to stdout
 """
 import json, re
-data = json.loads(open('docs/logs/lua_api_data.json', encoding='utf-8').read())
+data = json.loads(open('logs/lua_api_data.json', encoding='utf-8').read())
 mods = data['lua_api']['modules']
 # Find params_doc that has explicit type (backtick-typed like `string`, `number`, `boolean`, `Vec2`)
 TYPES = re.compile(r'`(string|number|boolean|integer|table|Vec2|Vec3|Rect|[A-Z][A-Za-z0-9]+)`')

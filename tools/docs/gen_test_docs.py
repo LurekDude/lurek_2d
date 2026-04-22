@@ -2,14 +2,14 @@
 """
 gen_test_docs.py — Generate human-readable test documentation for Lurek2D.
 
-Reads docs/logs/test_coverage.json (produced by test_coverage.py) and generates
+Reads logs/test_coverage.json (produced by test_coverage.py) and generates
 Markdown documents describing what each module tests, coverage statistics, and
 a prioritised list of uncovered items.
 
 Usage:
-    python tools/gen_test_docs.py                          # docs/tests/test_docs.md (all)
-    python tools/gen_test_docs.py --mode rust              # docs/tests/test_docs_rust.md
-    python tools/gen_test_docs.py --mode lua               # docs/tests/test_docs_lua.md
+    python tools/gen_test_docs.py                          # docs/reports/test_docs.md (all)
+    python tools/gen_test_docs.py --mode rust              # docs/reports/test_docs_rust.md
+    python tools/gen_test_docs.py --mode lua               # docs/reports/test_docs_lua.md
     python tools/gen_test_docs.py --output FILE            # custom output path
     python tools/gen_test_docs.py --input FILE             # custom input JSON path
     python tools/gen_test_docs.py --help
@@ -28,10 +28,10 @@ import sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-DEFAULT_INPUT = WORKSPACE_ROOT / "docs" / "logs" / "test_coverage.json"
-DEFAULT_OUTPUT = WORKSPACE_ROOT / "docs" / "tests" / "test_docs.md"
-DEFAULT_OUTPUT_RUST = WORKSPACE_ROOT / "docs" / "tests" / "test_docs_rust.md"
-DEFAULT_OUTPUT_LUA = WORKSPACE_ROOT / "docs" / "tests" / "test_docs_lua.md"
+DEFAULT_INPUT = WORKSPACE_ROOT / "logs" / "test_coverage.json"
+DEFAULT_OUTPUT = WORKSPACE_ROOT / "docs" / "reports" / "test_docs.md"
+DEFAULT_OUTPUT_RUST = WORKSPACE_ROOT / "docs" / "reports" / "test_docs_rust.md"
+DEFAULT_OUTPUT_LUA = WORKSPACE_ROOT / "docs" / "reports" / "test_docs_lua.md"
 TESTS_DIR = WORKSPACE_ROOT / "tests" / "rust"
 
 # Matches a Rust test function
@@ -290,7 +290,7 @@ def main() -> None:
     input_path = Path(args.input)
     if not input_path.is_file():
         print(f"ERROR: Input file not found: {input_path}", file=sys.stderr)
-        print("Run: python tools/test_coverage.py  (to generate docs/logs/test_coverage.json first)",
+        print("Run: python tools/test_coverage.py  (to generate logs/test_coverage.json first)",
               file=sys.stderr)
         sys.exit(1)
 

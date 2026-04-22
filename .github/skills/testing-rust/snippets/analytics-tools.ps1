@@ -1,4 +1,4 @@
-python tools/audit/test_coverage.py                  # coverage metrics → docs/logs/test_coverage.json
+python tools/audit/test_coverage.py                  # coverage metrics → logs/test_coverage.json
 python tools/audit/integration_coverage.py           # Lua integration coverage map
 python tools/docs/collect_docs.py --report-missing  # undocumented public items (exit 1 if any)
 python tools/audit/quality_report.py                 # combined quality snapshot

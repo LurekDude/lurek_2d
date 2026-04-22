@@ -3,9 +3,9 @@
 
 Scans ``content/library/**/init.lua`` for LDoc-style docstrings and emits:
 
-* one Markdown page per library at ``docs/API/libs/lib_<name>.md``
-* a single aggregate index at ``docs/API/library-docs.md`` (mirrors the
-  layout of ``docs/API/lua-api.md``)
+* one Markdown page per library at ``docs/reports/libs/lib_<name>.md``
+* a single aggregate index at ``docs/reports/library-docs.md`` (mirrors the
+  layout of ``docs/lua-api.md``)
 * (optional) a wiki mirror under ``docs/wiki/`` if that folder exists
 
 LDoc tags recognised (see work/library-overhaul-20260418/reports/P6_doc_generator_spec.md):
@@ -43,8 +43,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 LIB_DIR = REPO_ROOT / "content" / "library"
-OUT_DIR = REPO_ROOT / "docs" / "API" / "libs"
-AGGREGATE_PATH = REPO_ROOT / "docs" / "API" / "library-docs.md"
+OUT_DIR = REPO_ROOT / "docs" / "reports" / "libs"
+AGGREGATE_PATH = REPO_ROOT / "docs" / "reports" / "library-docs.md"
 WIKI_DIR = REPO_ROOT / "docs" / "wiki"
 
 VALID_STATUS = {"full", "partial", "stub", "proxy"}
@@ -740,7 +740,7 @@ def main() -> int:
     parser.add_argument("--module", metavar="NAME",
                         help="Process only the named library (e.g. dialog)")
     parser.add_argument("--no-aggregate", action="store_true",
-                        help="Skip writing docs/API/library-docs.md")
+                        help="Skip writing docs/reports/library-docs.md")
     args = parser.parse_args()
 
     modules = scan_library()
