@@ -1,1115 +1,1276 @@
 -- content/examples/tilemap.lua
--- Scaffolded coverage of the lurek.tilemap API (134 items).
+-- Hand-written coverage of the lurek.tilemap API (134 items).
 --
--- Every --@api-stub: block below is a SCAFFOLD. The body must be
--- replaced by hand with a 3-6 line real usage snippet showing how to
--- call the API in real game context, written by reading:
---   * src/lua_api/tilemap_api.rs   (Lua binding, arg types, return shape)
---   * src/tilemap/                 (semantics, side effects)
---   * docs/specs/tilemap.md        (canonical reference)
---
--- Snippet rules (love2d-wiki style):
---   * NO `return` at top-level (breaks the file).
---   * NO `pcall` defensive wrappers, NO `if false then`.
---   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
---     `function lurek.update(dt) ... end` callbacks so the file loads.
---   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
---     colours like {1, 0.5, 0, 1}.
---   * Keep the two `--` comment lines: 1) what the API does (use the
---     existing description), 2) one line of practical advice.
+-- The lurek.tilemap namespace covers ortho/iso/hex grids, autotiling,
+-- chunked sparse maps, large-map culling, TMX/LDtk import, and a
+-- block + script driven procedural generator.
 --
 -- Run: cargo run -- content/examples/tilemap.lua
 
--- ── lurek.tilemap.* functions ──
-
 --@api-stub: lurek.tilemap.newTileSet
 -- Creates a new TileSet with the given atlas layout parameters.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newTileSet
-  local _todo = "TODO: write a real lurek.tilemap.newTileSet usage example"
-  print(_todo)
+-- Pass the firstGid you want this set to occupy in the global ID space; spacing/margin default to 0.
+do  -- lurek.tilemap.newTileSet
+  local grass = lurek.tilemap.newTileSet(1, 256, 16, 16, 16, 0, 0)
+  lurek.log.info("grass tileset gid range " .. grass:getFirstGid() .. ".." .. (grass:getFirstGid() + grass:getTileCount() - 1), "tilemap")
 end
 
 --@api-stub: lurek.tilemap.newTileMap
 -- Creates a new TileMap with the given tile size and chunk size.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newTileMap
-  local _todo = "TODO: write a real lurek.tilemap.newTileMap usage example"
-  print(_todo)
+-- Tile size is in pixels; chunk size groups tiles for spatial culling and defaults to 16 if omitted.
+do  -- lurek.tilemap.newTileMap
+  local map = lurek.tilemap.newTileMap(16, 16, 32)
+  lurek.log.info("map tile " .. map:getTileWidth() .. "x" .. map:getTileHeight() .. " chunk=" .. map:getChunkSize(), "tilemap")
 end
 
 --@api-stub: lurek.tilemap.newAutoTileSheet
 -- Creates a new AutoTileSheet with the given tile dimensions and layout.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newAutoTileSheet
-  local _todo = "TODO: write a real lurek.tilemap.newAutoTileSheet usage example"
-  print(_todo)
+-- Layout must be 'blob47', 'composite48', or 'minimal16' — pick to match how your atlas was authored.
+do  -- lurek.tilemap.newAutoTileSheet
+  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
+  lurek.log.info("autotile sheet '" .. sheet:getLayout() .. "' has " .. sheet:getTileCount() .. " tiles", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.newChunkMap
 -- Creates a new ChunkMap with the given chunk size.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newChunkMap
-  local _todo = "TODO: write a real lurek.tilemap.newChunkMap usage example"
-  print(_todo)
+-- Use ChunkMap for sparse infinite worlds where most coordinates are empty; chunkSize defaults to 16.
+do  -- lurek.tilemap.newChunkMap
+  local world = lurek.tilemap.newChunkMap(32)
+  world:setTile(0, 0, 1)
+  world:setTile(1000, -500, 7)
+  lurek.log.info("loaded " .. #world:getLoadedChunks() .. " chunks", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.newIsoMap
 -- Creates a new IsoMap with no levels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newIsoMap
-  local _todo = "TODO: write a real lurek.tilemap.newIsoMap usage example"
-  print(_todo)
+-- levelHeight is the vertical pixel offset between Z-levels; partCount defaults to 4 (floor/N-wall/W-wall/object).
+do  -- lurek.tilemap.newIsoMap
+  local iso = lurek.tilemap.newIsoMap(32, 32, 64, 32, 24, 4)
+  iso:addLevel()
+  lurek.log.info("iso map " .. iso:getWidth() .. "x" .. iso:getHeight() .. " parts=" .. iso:getPartCount(), "tilemap")
 end
 
 --@api-stub: lurek.tilemap.newMapBlock
 -- Creates a new MapBlock with the given dimensions.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newMapBlock
-  local _todo = "TODO: write a real lurek.tilemap.newMapBlock usage example"
-  print(_todo)
+-- MapBlocks are reusable map fragments stitched together by MapGen; layers/segmentSize default to 1.
+do  -- lurek.tilemap.newMapBlock
+  local room = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  room:setName("starter_room")
+  room:setWeight(2.0)
+  lurek.log.info("block '" .. room:getName() .. "' " .. room:getWidth() .. "x" .. room:getHeight(), "tilemap")
 end
 
 --@api-stub: lurek.tilemap.newMapGroup
 -- Creates a new empty MapGroup with the given name.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newMapGroup
-  local _todo = "TODO: write a real lurek.tilemap.newMapGroup usage example"
-  print(_todo)
+-- A MapGroup is a named bag of MapBlocks and MapScripts that MapGen samples from.
+do  -- lurek.tilemap.newMapGroup
+  local dungeon = lurek.tilemap.newMapGroup("dungeon")
+  lurek.log.info("group '" .. dungeon:getName() .. "' starts with " .. dungeon:getBlockCount() .. " blocks", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.toScreenIso
 -- Converts tile coordinates to screen position using diamond isometric projection.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.toScreenIso
-  local _todo = "TODO: write a real lurek.tilemap.toScreenIso usage example"
-  print(_todo)
+-- Use this to position sprites on a diamond-isometric grid; tileW/tileH are the tile footprint in pixels.
+do  -- lurek.tilemap.toScreenIso
+  local sx, sy = lurek.tilemap.toScreenIso(3, 5, 64, 32)
+  lurek.log.info("iso tile (3,5) -> screen (" .. sx .. ", " .. sy .. ")", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.fromScreenIso
 -- Converts screen position back to tile coordinates for diamond isometric projection.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.fromScreenIso
-  local _todo = "TODO: write a real lurek.tilemap.fromScreenIso usage example"
-  print(_todo)
+-- Inverse of toScreenIso; useful for hit-testing the mouse against an isometric grid.
+do  -- lurek.tilemap.fromScreenIso
+  local mx, my = 320, 200
+  local tx, ty = lurek.tilemap.fromScreenIso(mx, my, 64, 32)
+  lurek.log.info("mouse (" .. mx .. "," .. my .. ") over iso tile (" .. tx .. ", " .. ty .. ")", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.toScreenHex
 -- Converts axial hex coordinates to screen position (pointy-top layout).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.toScreenHex
-  local _todo = "TODO: write a real lurek.tilemap.toScreenHex usage example"
-  print(_todo)
+-- Pointy-top axial layout; size is the hex radius in pixels (corner-to-centre distance).
+do  -- lurek.tilemap.toScreenHex
+  local sx, sy = lurek.tilemap.toScreenHex(2, -1, 24)
+  lurek.log.info("hex (q=2,r=-1) at screen (" .. sx .. ", " .. sy .. ")", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.fromScreenHex
 -- Converts screen position back to axial hex coordinates (pointy-top layout).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.fromScreenHex
-  local _todo = "TODO: write a real lurek.tilemap.fromScreenHex usage example"
-  print(_todo)
+-- Returns the integer axial (q, r) under the cursor; pair with hexRound for fractional sources.
+do  -- lurek.tilemap.fromScreenHex
+  local q, r = lurek.tilemap.fromScreenHex(150, 90, 24)
+  lurek.log.info("screen (150,90) -> hex (q=" .. q .. ", r=" .. r .. ")", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.hexNeighbors
 -- Returns the six axial neighbor coordinates as a table of {q, r} pairs.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexNeighbors
-  local _todo = "TODO: write a real lurek.tilemap.hexNeighbors usage example"
-  print(_todo)
+-- Each entry is a {q, r} table; iterate with ipairs to walk all six adjacent cells.
+do  -- lurek.tilemap.hexNeighbors
+  local n = lurek.tilemap.hexNeighbors(0, 0)
+  for _, c in ipairs(n) do
+    lurek.log.debug("neighbor q=" .. c.q .. " r=" .. c.r, "tilemap")
+  end
 end
 
 --@api-stub: lurek.tilemap.hexDistance
 -- Returns the hex distance between two axial coordinates.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexDistance
-  local _todo = "TODO: write a real lurek.tilemap.hexDistance usage example"
-  print(_todo)
+-- Use to gate abilities by hex range or to sort enemies by proximity in a strategy game.
+do  -- lurek.tilemap.hexDistance
+  local d = lurek.tilemap.hexDistance(0, 0, 3, -2)
+  if d <= 2 then
+    lurek.log.info("target in melee range (d=" .. d .. ")", "combat")
+  end
 end
 
 --@api-stub: lurek.tilemap.hexRound
 -- Rounds fractional axial coordinates to the nearest hex cell.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexRound
-  local _todo = "TODO: write a real lurek.tilemap.hexRound usage example"
-  print(_todo)
+-- Snap a fractional hex (e.g. from fromScreenHex with floats) back to the nearest integer cell.
+do  -- lurek.tilemap.hexRound
+  local q, r = lurek.tilemap.hexRound(2.4, -1.7)
+  lurek.log.info("rounded fractional hex to (q=" .. q .. ", r=" .. r .. ")", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.hexLine
 -- Returns all hex cells along a line between two axial coordinates as a table.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexLine
-  local _todo = "TODO: write a real lurek.tilemap.hexLine usage example"
-  print(_todo)
+-- Walk every cell along a straight hex line — useful for line-of-sight and ranged-attack paths.
+do  -- lurek.tilemap.hexLine
+  local cells = lurek.tilemap.hexLine(0, 0, 4, -2)
+  for _, c in ipairs(cells) do
+    lurek.log.debug("line cell (" .. c[1] .. ", " .. c[2] .. ")", "tilemap")
+  end
 end
 
 --@api-stub: lurek.tilemap.hexRing
 -- Returns all cells at exactly radius distance from (q, r) as a table.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexRing
-  local _todo = "TODO: write a real lurek.tilemap.hexRing usage example"
-  print(_todo)
+-- All cells exactly `radius` away — perfect for ring-shaped explosion or aura visuals.
+do  -- lurek.tilemap.hexRing
+  local ring = lurek.tilemap.hexRing(0, 0, 3)
+  lurek.log.info("ring at radius 3 has " .. #ring .. " cells", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.hexSpiral
 -- Returns all hex cells from center outward to radius, ring by ring, as a table.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexSpiral
-  local _todo = "TODO: write a real lurek.tilemap.hexSpiral usage example"
-  print(_todo)
+-- Returns center then each ring outward — handy for ordered placement or expanding-search BFS.
+do  -- lurek.tilemap.hexSpiral
+  local spiral = lurek.tilemap.hexSpiral(0, 0, 2)
+  lurek.log.info("spiral 0..2 covers " .. #spiral .. " cells", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.hexArea
 -- Returns all hex cells within radius distance (filled hex circle) as a table.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexArea
-  local _todo = "TODO: write a real lurek.tilemap.hexArea usage example"
-  print(_todo)
+-- Filled hex disc — use for area-of-effect spells, fog-of-war reveal, or city-radius queries.
+do  -- lurek.tilemap.hexArea
+  local aoe = lurek.tilemap.hexArea(5, 5, 2)
+  for _, c in ipairs(aoe) do
+    lurek.log.debug("aoe cell (" .. c[1] .. ", " .. c[2] .. ")", "tilemap")
+  end
 end
 
 --@api-stub: lurek.tilemap.hexRotate
 -- Rotates hex coordinates around a center by steps x 60 degrees clockwise.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexRotate
-  local _todo = "TODO: write a real lurek.tilemap.hexRotate usage example"
-  print(_todo)
+-- Each step is 60° clockwise; use a negative `steps` value to rotate counter-clockwise.
+do  -- lurek.tilemap.hexRotate
+  local q, r = lurek.tilemap.hexRotate(2, 0, 0, 0, 1)
+  lurek.log.info("rotated (2,0) by 60° -> (q=" .. q .. ", r=" .. r .. ")", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.hexReflect
 -- Reflects hex coordinates across an axis through the center.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.hexReflect
-  local _todo = "TODO: write a real lurek.tilemap.hexReflect usage example"
-  print(_todo)
+-- Axis is one of '"q"', '"r"', or '"s"' — the three hex symmetry axes.
+do  -- lurek.tilemap.hexReflect
+  local q, r = lurek.tilemap.hexReflect(2, 1, 0, 0, "q")
+  lurek.log.info("reflected hex (2,1) over q -> (" .. q .. ", " .. r .. ")", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.isoRotate
 -- Rotates an isometric direction (1-4) clockwise by steps.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.isoRotate
-  local _todo = "TODO: write a real lurek.tilemap.isoRotate usage example"
-  print(_todo)
+-- Direction is 1=N, 2=E, 3=S, 4=W; steps wraps around modulo 4.
+do  -- lurek.tilemap.isoRotate
+  local d = lurek.tilemap.isoRotate(1, 2)
+  lurek.log.info("rotated dir 1 by 2 steps -> " .. d .. " (" .. lurek.tilemap.isoDirectionName(d) .. ")", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.isoDirectionName
 -- Returns the name of an isometric direction (1-4).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.isoDirectionName
-  local _todo = "TODO: write a real lurek.tilemap.isoDirectionName usage example"
-  print(_todo)
+-- Returns 'north'/'east'/'south'/'west'; useful for animation lookup keys.
+do  -- lurek.tilemap.isoDirectionName
+  local facing = lurek.tilemap.isoDirectionName(2)
+  local sprite_key = "walk_" .. facing
+  lurek.log.info("playing animation '" .. sprite_key .. "'", "anim")
 end
 
 --@api-stub: lurek.tilemap.isoDirectionFromAngle
 -- Snaps an angle (in radians) to the nearest isometric direction (1-4).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.isoDirectionFromAngle
-  local _todo = "TODO: write a real lurek.tilemap.isoDirectionFromAngle usage example"
-  print(_todo)
+-- Maps a movement vector angle (math.atan2(dy, dx)) to the nearest cardinal iso direction.
+do  -- lurek.tilemap.isoDirectionFromAngle
+  local dx, dy = 1, 0.2
+  local dir = lurek.tilemap.isoDirectionFromAngle(math.atan2(dy, dx))
+  lurek.log.info("velocity faces " .. lurek.tilemap.isoDirectionName(dir), "anim")
 end
 
 --@api-stub: lurek.tilemap.newMapScript
 -- Creates a new empty MapScript procedural generation script.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newMapScript
-  local _todo = "TODO: write a real lurek.tilemap.newMapScript usage example"
-  print(_todo)
+-- A MapScript is a sequence of generation steps replayed by MapGen; build it once at load time.
+do  -- lurek.tilemap.newMapScript
+  local script = lurek.tilemap.newMapScript()
+  script:addStep({ type = "fillRandom", gid = 1, chance = 0.3 })
+  lurek.log.info("script has " .. script:getStepCount() .. " step(s)", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.newMapGen
 -- Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newMapGen
-  local _todo = "TODO: write a real lurek.tilemap.newMapGen usage example"
-  print(_todo)
+-- Pass either a preset string ('small'/'medium'/'large') or explicit width/height; segmentSize controls block grid.
+do  -- lurek.tilemap.newMapGen
+  local group = lurek.tilemap.newMapGroup("rooms")
+  group:addBlock(lurek.tilemap.newMapBlock(8, 8, 1, 4))
+  local gen = lurek.tilemap.newMapGen(group, "small", 8)
+  local map = gen:generate(nil, 1234)
+  lurek.log.info("generated map with " .. map:getLayerCount() .. " layer(s)", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.loadTMX
 -- Parses a TMX XML string and returns a table with map metadata and layers.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.loadTMX
-  local _todo = "TODO: write a real lurek.tilemap.loadTMX usage example"
-  print(_todo)
+-- Returns a metadata table — width/height/tileWidth/tileHeight/orientation/layers — not a TileMap.
+do  -- lurek.tilemap.loadTMX
+  local xml = lurek.fs.read("levels/forest.tmx")
+  local meta = lurek.tilemap.loadTMX(xml)
+  lurek.log.info("TMX " .. meta.width .. "x" .. meta.height .. " orient=" .. meta.orientation .. " layers=" .. #meta.layers, "tilemap")
 end
 
 --@api-stub: lurek.tilemap.fromLDtk
 -- Parses an LDtk JSON export string and returns a TileMap.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.fromLDtk
-  local _todo = "TODO: write a real lurek.tilemap.fromLDtk usage example"
-  print(_todo)
+-- Pass an optional level name to pick from a multi-level project; defaults to the first level.
+do  -- lurek.tilemap.fromLDtk
+  local json = lurek.fs.read("levels/world.ldtk")
+  local map = lurek.tilemap.fromLDtk(json, "Level_0")
+  lurek.log.info("LDtk level loaded with " .. map:getLayerCount() .. " layer(s)", "tilemap")
 end
 
 --@api-stub: lurek.tilemap.newLargeMapRenderer
 -- Creates a LargeMapRenderer for chunk-level occlusion culling on maps > 200Ă—200 tiles.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: lurek.tilemap.newLargeMapRenderer
-  local _todo = "TODO: write a real lurek.tilemap.newLargeMapRenderer usage example"
-  print(_todo)
+-- Use for maps over 200×200 tiles; the renderer culls invisible chunks before issuing draw calls.
+do  -- lurek.tilemap.newLargeMapRenderer
+  local renderer = lurek.tilemap.newLargeMapRenderer(16, 16)
+  renderer:setChunkSize(32)
+  lurek.log.info("large map renderer ready, chunk=" .. renderer:getChunkSize(), "render")
 end
 
 -- ── TileSet methods ──
 
 --@api-stub: TileSet:getFirstGid
 -- Returns the first global ID assigned to this tileset.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getFirstGid
-  local _todo = "TODO: write a real TileSet:getFirstGid usage example"
-  print(_todo)
+-- Use the first GID to translate between local tile IDs and the map-wide global ID space.
+do  -- TileSet:getFirstGid
+  local ts = lurek.tilemap.newTileSet(257, 64, 8, 16, 16)
+  lurek.log.info("tileset firstGid=" .. ts:getFirstGid(), "tilemap")
 end
 
 --@api-stub: TileSet:getTileCount
 -- Returns the total number of tiles in this tileset.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getTileCount
-  local _todo = "TODO: write a real TileSet:getTileCount usage example"
-  print(_todo)
+-- Iterate 1..getTileCount() to enumerate every local tile ID in the set.
+do  -- TileSet:getTileCount
+  local ts = lurek.tilemap.newTileSet(1, 96, 12, 16, 16)
+  for id = 1, ts:getTileCount() do
+    ts:setSolid(id, id <= 32)
+  end
 end
 
 --@api-stub: TileSet:getColumns
 -- Returns the number of tile columns in the atlas texture.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getColumns
-  local _todo = "TODO: write a real TileSet:getColumns usage example"
-  print(_todo)
+-- Columns × rows = tileCount; use this to compute atlas row index for a given tile ID.
+do  -- TileSet:getColumns
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
+  local rows = ts:getTileCount() / ts:getColumns()
+  lurek.log.info("atlas " .. ts:getColumns() .. " cols x " .. rows .. " rows", "tilemap")
 end
 
 --@api-stub: TileSet:getTileWidth
 -- Returns the width of a single tile in pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getTileWidth
-  local _todo = "TODO: write a real TileSet:getTileWidth usage example"
-  print(_todo)
+-- Use when configuring matching collision shapes or placing markers in tile units.
+do  -- TileSet:getTileWidth
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 32, 16)
+  local box_w = ts:getTileWidth()
+  lurek.log.info("collision width matches tile = " .. box_w, "physics")
 end
 
 --@api-stub: TileSet:getTileHeight
 -- Returns the height of a single tile in pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getTileHeight
-  local _todo = "TODO: write a real TileSet:getTileHeight usage example"
-  print(_todo)
+-- Pair with getTileWidth when building axis-aligned colliders that match a tile sprite.
+do  -- TileSet:getTileHeight
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 24)
+  local box_h = ts:getTileHeight()
+  lurek.log.info("collision height = " .. box_h, "physics")
 end
 
 --@api-stub: TileSet:getTileDimensions
 -- Returns the tile dimensions as (width, height).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getTileDimensions
-  local _todo = "TODO: write a real TileSet:getTileDimensions usage example"
-  print(_todo)
+-- Returns (width, height) — handy for one-line capture without two getter calls.
+do  -- TileSet:getTileDimensions
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
+  local tw, th = ts:getTileDimensions()
+  lurek.log.info("tile is " .. tw .. "x" .. th .. " px", "tilemap")
 end
 
 --@api-stub: TileSet:getSpacing
 -- Returns the spacing in pixels between tiles in the atlas.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getSpacing
-  local _todo = "TODO: write a real TileSet:getSpacing usage example"
-  print(_todo)
+-- Spacing is the gap in pixels between adjacent tiles in the atlas; 0 means tiles touch.
+do  -- TileSet:getSpacing
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16, 2, 1)
+  lurek.log.info("atlas spacing=" .. ts:getSpacing() .. " margin=" .. ts:getMargin(), "tilemap")
 end
 
 --@api-stub: TileSet:getMargin
 -- Returns the margin in pixels around the edges of the atlas.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getMargin
-  local _todo = "TODO: write a real TileSet:getMargin usage example"
-  print(_todo)
+-- Margin is the border in pixels around the entire atlas; account for it when slicing source rects.
+do  -- TileSet:getMargin
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16, 0, 4)
+  local m = ts:getMargin()
+  lurek.log.info("first tile starts " .. m .. " px in from atlas edge", "tilemap")
 end
 
 --@api-stub: TileSet:getQuad
 -- Computes the atlas source rectangle for a 1-based local tile ID.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getQuad
-  local _todo = "TODO: write a real TileSet:getQuad usage example"
-  print(_todo)
+-- Returns a {x, y, width, height} table of the source rectangle in atlas pixels.
+do  -- TileSet:getQuad
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
+  local q = ts:getQuad(5)
+  lurek.log.info("tile 5 quad x=" .. q.x .. " y=" .. q.y .. " w=" .. q.width .. " h=" .. q.height, "tilemap")
 end
 
 --@api-stub: TileSet:getAnimation
 -- Returns the animation frames for a 1-based local tile ID as a table of {tileid, duration}, or nil.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:getAnimation
-  local _todo = "TODO: write a real TileSet:getAnimation usage example"
-  print(_todo)
+-- Returns nil when a tile has no animation; otherwise an array of {tileid, duration} frames.
+do  -- TileSet:getAnimation
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
+  local frames = ts:getAnimation(1)
+  if frames == nil then
+    lurek.log.info("tile 1 is static", "tilemap")
+  end
 end
 
 --@api-stub: TileSet:setSolid
 -- Sets whether a 1-based local tile ID is solid for collision purposes.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:setSolid
-  local _todo = "TODO: write a real TileSet:setSolid usage example"
-  print(_todo)
+-- Mark walls, water, or pit tiles solid up-front so isSolid/sweepRect later use it for collision.
+do  -- TileSet:setSolid
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
+  for _, gid in ipairs({ 5, 6, 7, 8 }) do
+    ts:setSolid(gid, true)
+  end
 end
 
 --@api-stub: TileSet:isSolid
 -- Returns whether a 1-based local tile ID is solid.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileSet:isSolid
-  local _todo = "TODO: write a real TileSet:isSolid usage example"
-  print(_todo)
+-- Defaults to false; query at startup to validate tilesets imported from external editors.
+do  -- TileSet:isSolid
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
+  ts:setSolid(7, true)
+  if ts:isSolid(7) then
+    lurek.log.info("tile 7 will block movement", "tilemap")
+  end
 end
 
 -- ── TileMap methods ──
 
 --@api-stub: TileMap:addTileSet
 -- Adds a tileset to this map.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:addTileSet
-  local _todo = "TODO: write a real TileMap:addTileSet usage example"
-  print(_todo)
+-- Add tilesets in firstGid order so global IDs resolve correctly when you set or query tiles.
+do  -- TileMap:addTileSet
+  local map = lurek.tilemap.newTileMap(16, 16)
+  local terrain = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
+  map:addTileSet(terrain)
+  lurek.log.info("map now has " .. map:getTileSetCount() .. " tileset(s)", "tilemap")
 end
 
 --@api-stub: TileMap:getTileSetCount
 -- Returns the number of tilesets attached to this map.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getTileSetCount
-  local _todo = "TODO: write a real TileMap:getTileSetCount usage example"
-  print(_todo)
+-- Loop 1..getTileSetCount() to walk every tileset attached to the map.
+do  -- TileMap:getTileSetCount
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addTileSet(lurek.tilemap.newTileSet(1, 32, 8, 16, 16))
+  map:addTileSet(lurek.tilemap.newTileSet(33, 32, 8, 16, 16))
+  lurek.log.info("tilesets attached: " .. map:getTileSetCount(), "tilemap")
 end
 
 --@api-stub: TileMap:getTileSet
 -- Returns a tileset by 1-based index, or nil if out of range.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getTileSet
-  local _todo = "TODO: write a real TileMap:getTileSet usage example"
-  print(_todo)
+-- Returns nil for out-of-range indices, so always nil-check before calling tileset methods.
+do  -- TileMap:getTileSet
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addTileSet(lurek.tilemap.newTileSet(1, 64, 8, 16, 16))
+  local ts = map:getTileSet(1)
+  if ts then
+    lurek.log.info("first tileset has " .. ts:getTileCount() .. " tiles", "tilemap")
+  end
 end
 
 --@api-stub: TileMap:addLayer
 -- Adds a new empty layer and returns its 1-based index.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:addLayer
-  local _todo = "TODO: write a real TileMap:addLayer usage example"
-  print(_todo)
+-- Pass the desired layer name plus width/height in tiles; returns the 1-based layer index.
+do  -- TileMap:addLayer
+  local map = lurek.tilemap.newTileMap(16, 16)
+  local bg = map:addLayer("background", 64, 64)
+  local fg = map:addLayer("collision", 64, 64)
+  lurek.log.info("background=" .. bg .. " collision=" .. fg, "tilemap")
 end
 
 --@api-stub: TileMap:getLayerCount
 -- Returns the number of layers.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getLayerCount
-  local _todo = "TODO: write a real TileMap:getLayerCount usage example"
-  print(_todo)
+-- Use to drive a render loop that walks every layer in declaration order.
+do  -- TileMap:getLayerCount
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("background", 32, 32)
+  map:addLayer("collision", 32, 32)
+  lurek.log.info("layers in map: " .. map:getLayerCount(), "tilemap")
 end
 
 --@api-stub: TileMap:getLayerName
 -- Returns the name of a layer by 1-based index.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getLayerName
-  local _todo = "TODO: write a real TileMap:getLayerName usage example"
-  print(_todo)
+-- Names are the contract between scripts and level data — branch on them to drive collision rules.
+do  -- TileMap:getLayerName
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("collision", 32, 32)
+  local name = map:getLayerName(1)
+  if name == "collision" then
+    lurek.log.info("layer 1 is the collision layer", "tilemap")
+  end
 end
 
 --@api-stub: TileMap:getLayerVisible
 -- Returns layer visibility.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getLayerVisible
-  local _todo = "TODO: write a real TileMap:getLayerVisible usage example"
-  print(_todo)
+-- Use in a debug-overlay toggle that hides layers without modifying their tile data.
+do  -- TileMap:getLayerVisible
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("collision", 32, 32)
+  if not map:getLayerVisible(1) then
+    lurek.log.warn("collision layer is hidden", "tilemap")
+  end
 end
 
 --@api-stub: TileMap:getLayerColor
 -- Returns the RGBA tint color of a layer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getLayerColor
-  local _todo = "TODO: write a real TileMap:getLayerColor usage example"
-  print(_todo)
+-- Returns r, g, b, a in 0..1 range; use to fade layers in/out for transitions.
+do  -- TileMap:getLayerColor
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("background", 32, 32)
+  local r, g, b, a = map:getLayerColor(1)
+  lurek.log.info("background tint rgba=" .. r .. "," .. g .. "," .. b .. "," .. a, "tilemap")
 end
 
 --@api-stub: TileMap:getLayerOffset
 -- Returns the pixel offset of a layer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getLayerOffset
-  local _todo = "TODO: write a real TileMap:getLayerOffset usage example"
-  print(_todo)
+-- Returns (ox, oy) in pixels — useful when implementing camera-relative parallax UI.
+do  -- TileMap:getLayerOffset
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("background", 32, 32)
+  local ox, oy = map:getLayerOffset(1)
+  lurek.log.info("layer offset px=(" .. ox .. ", " .. oy .. ")", "tilemap")
 end
 
 --@api-stub: TileMap:getLayerParallax
 -- Returns the parallax factor of a layer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getLayerParallax
-  local _todo = "TODO: write a real TileMap:getLayerParallax usage example"
-  print(_todo)
+-- Parallax of 1.0 scrolls 1:1 with the camera; 0.5 means half-speed (distant background).
+do  -- TileMap:getLayerParallax
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("clouds", 64, 32)
+  local px, py = map:getLayerParallax(1)
+  lurek.log.info("clouds parallax=(" .. px .. ", " .. py .. ")", "tilemap")
 end
 
 --@api-stub: TileMap:getTile
 -- Returns the GID at (x, y) on the given layer (1-based).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getTile
-  local _todo = "TODO: write a real TileMap:getTile usage example"
-  print(_todo)
+-- Returns the GID at (x, y) on the layer; 0 means empty. Use for interaction probes.
+do  -- TileMap:getTile
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("collision", 32, 32)
+  local gid = map:getTile(1, 4, 4)
+  if gid == 0 then
+    lurek.log.info("(4,4) is walkable", "tilemap")
+  end
 end
 
 --@api-stub: TileMap:clearTile
 -- Clears a tile (sets GID to 0) at (x, y) on the given layer (1-based).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:clearTile
-  local _todo = "TODO: write a real TileMap:clearTile usage example"
-  print(_todo)
+-- Equivalent to setTile(layer, x, y, 0); use when destroying a destructible block.
+do  -- TileMap:clearTile
+  local map = lurek.tilemap.newTileMap(16, 16)
+  local layer = map:addLayer("walls", 32, 32)
+  map:fill(layer, 5)
+  map:clearTile(layer, 10, 10)  -- player blew up the wall
 end
 
 --@api-stub: TileMap:fill
 -- Fills an entire layer with the given GID (1-based layer).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:fill
-  local _todo = "TODO: write a real TileMap:fill usage example"
-  print(_todo)
+-- Floods every cell of a layer with a single GID — handy for paint-by-number background fills.
+do  -- TileMap:fill
+  local map = lurek.tilemap.newTileMap(16, 16)
+  local bg = map:addLayer("background", 32, 32)
+  map:fill(bg, 1)  -- gid 1 = grass tile
+  lurek.log.info("background filled with grass", "tilemap")
 end
 
 --@api-stub: TileMap:getViewport
 -- Returns the viewport as (x, y, w, h) or nil if not set.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getViewport
-  local _todo = "TODO: write a real TileMap:getViewport usage example"
-  print(_todo)
+-- Returns nil values when no viewport is set; check before reading the rectangle.
+do  -- TileMap:getViewport
+  local map = lurek.tilemap.newTileMap(16, 16)
+  local x, y, w, h = map:getViewport()
+  if x == nil then
+    lurek.log.info("no viewport set, will render full map", "tilemap")
+  end
 end
 
 --@api-stub: TileMap:update
 -- Advances tile animation timers by dt seconds.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:update
-  local _todo = "TODO: write a real TileMap:update usage example"
-  print(_todo)
+-- Call once per frame from lurek.process(dt) to advance any animated tile timers.
+do  -- TileMap:update
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("water", 32, 32)
+  function lurek.process(dt) map:update(dt) end
 end
 
 --@api-stub: TileMap:worldToTile
 -- Converts world pixel coordinates to tile coordinates.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:worldToTile
-  local _todo = "TODO: write a real TileMap:worldToTile usage example"
-  print(_todo)
+-- Returns 1-based tile coordinates; use for mouse-over highlighting or click placement.
+do  -- TileMap:worldToTile
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("background", 64, 64)
+  local tx, ty = map:worldToTile(128, 96)
+  lurek.log.info("world (128,96) -> tile (" .. tx .. ", " .. ty .. ")", "tilemap")
 end
 
 --@api-stub: TileMap:tileToWorld
 -- Converts tile coordinates to world pixel coordinates (1-based input).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:tileToWorld
-  local _todo = "TODO: write a real TileMap:tileToWorld usage example"
-  print(_todo)
+-- Inverse of worldToTile (1-based input); use to anchor sprites to tile centres or corners.
+do  -- TileMap:tileToWorld
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("background", 32, 32)
+  local wx, wy = map:tileToWorld(5, 8)
+  lurek.log.info("spawn pos px=(" .. wx .. ", " .. wy .. ")", "tilemap")
 end
 
 --@api-stub: TileMap:getTileWidth
 -- Returns the tile width in pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getTileWidth
-  local _todo = "TODO: write a real TileMap:getTileWidth usage example"
-  print(_todo)
+-- Use when computing camera bounds or snapping movement to multiples of one tile.
+do  -- TileMap:getTileWidth
+  local map = lurek.tilemap.newTileMap(32, 32)
+  local step = map:getTileWidth()
+  lurek.log.info("snap step = " .. step .. " px", "tilemap")
 end
 
 --@api-stub: TileMap:getTileHeight
 -- Returns the tile height in pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getTileHeight
-  local _todo = "TODO: write a real TileMap:getTileHeight usage example"
-  print(_todo)
+-- Pair with getTileWidth when scaling UI overlays to a tile grid.
+do  -- TileMap:getTileHeight
+  local map = lurek.tilemap.newTileMap(16, 32)
+  local row_h = map:getTileHeight()
+  lurek.log.info("HUD row height = " .. row_h, "ui")
 end
 
 --@api-stub: TileMap:getTileDimensions
 -- Returns tile dimensions as (width, height).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getTileDimensions
-  local _todo = "TODO: write a real TileMap:getTileDimensions usage example"
-  print(_todo)
+-- Single-call alternative to getTileWidth / getTileHeight; returns (w, h).
+do  -- TileMap:getTileDimensions
+  local map = lurek.tilemap.newTileMap(16, 16)
+  local tw, th = map:getTileDimensions()
+  lurek.log.info("tile size " .. tw .. "x" .. th, "tilemap")
 end
 
 --@api-stub: TileMap:getChunkSize
 -- Returns the chunk size used for spatial partitioning.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getChunkSize
-  local _todo = "TODO: write a real TileMap:getChunkSize usage example"
-  print(_todo)
+-- Chunk size determines spatial-query granularity for culling; 16 is a good default.
+do  -- TileMap:getChunkSize
+  local map = lurek.tilemap.newTileMap(16, 16, 32)
+  lurek.log.info("map chunk size = " .. map:getChunkSize(), "tilemap")
 end
 
 --@api-stub: TileMap:isSolid
 -- Returns true if the tile at (x, y) on layer is solid (1-based).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:isSolid
-  local _todo = "TODO: write a real TileMap:isSolid usage example"
-  print(_todo)
+-- Reads the solidity from the tileset for the GID at (layer, x, y); use as a cheap blocker check.
+do  -- TileMap:isSolid
+  local map = lurek.tilemap.newTileMap(16, 16)
+  local layer = map:addLayer("collision", 32, 32)
+  if map:isSolid(layer, 4, 4) then
+    lurek.log.info("(4,4) blocks movement", "physics")
+  end
 end
 
 --@api-stub: TileMap:getOrientation
 -- Returns the map orientation as a string ("topdown", "sideview", "isometric", or "hexagonal").
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:getOrientation
-  local _todo = "TODO: write a real TileMap:getOrientation usage example"
-  print(_todo)
+-- One of 'topdown', 'sideview', 'isometric', or 'hexagonal' — branch on it to pick movement code.
+do  -- TileMap:getOrientation
+  local map = lurek.tilemap.newTileMap(16, 16)
+  local o = map:getOrientation()
+  if o == "topdown" then
+    lurek.log.info("using top-down 4-way movement", "input")
+  end
 end
 
 --@api-stub: TileMap:setOrientation
 -- Sets the map orientation from a string ("topdown", "sideview", "isometric", or "hexagonal").
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:setOrientation
-  local _todo = "TODO: write a real TileMap:setOrientation usage example"
-  print(_todo)
+-- Set once at level load; passing an unknown string raises an error so validate first.
+do  -- TileMap:setOrientation
+  local map = lurek.tilemap.newTileMap(64, 32)
+  map:setOrientation("isometric")
+  lurek.log.info("orientation now " .. map:getOrientation(), "tilemap")
 end
 
 --@api-stub: TileMap:render
 -- Renders the tile map to the screen at the given offset.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:render
-  local _todo = "TODO: write a real TileMap:render usage example"
-  print(_todo)
+-- Call from lurek.render with the camera offset to draw the map at the correct screen position.
+do  -- TileMap:render
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("background", 32, 32)
+  local cam_x, cam_y = 0, 0
+  function lurek.render() map:render(-cam_x, -cam_y) end
 end
 
 --@api-stub: TileMap:drawToImage
 -- Renders the tile map to a CPU ImageData using the given tile pixel size.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: TileMap:drawToImage
-  local _todo = "TODO: write a real TileMap:drawToImage usage example"
-  print(_todo)
+-- Returns an ImageData you can save for a minimap thumbnail or in-engine debug snapshot.
+do  -- TileMap:drawToImage
+  local map = lurek.tilemap.newTileMap(16, 16)
+  map:addLayer("background", 32, 32)
+  local thumb = map:drawToImage(2)
+  lurek.log.info("rendered map preview to ImageData", "tilemap")
 end
 
 -- ── AutoTileSheet methods ──
 
 --@api-stub: AutoTileSheet:getLayout
 -- Returns the layout variant as a string.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: AutoTileSheet:getLayout
-  local _todo = "TODO: write a real AutoTileSheet:getLayout usage example"
-  print(_todo)
+-- Returns 'blob47'/'composite48'/'minimal16' — branch on it when emitting tiles per ruleset.
+do  -- AutoTileSheet:getLayout
+  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "minimal16")
+  if sheet:getLayout() == "minimal16" then
+    lurek.log.info("using 16-tile autotile ruleset", "tilemap")
+  end
 end
 
 --@api-stub: AutoTileSheet:getTileCount
 -- Returns the number of tiles in this sheet.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: AutoTileSheet:getTileCount
-  local _todo = "TODO: write a real AutoTileSheet:getTileCount usage example"
-  print(_todo)
+-- Total tiles in the sheet; matches the layout (16, 47, or 48).
+do  -- AutoTileSheet:getTileCount
+  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
+  lurek.log.info("blob47 sheet exposes " .. sheet:getTileCount() .. " tiles", "tilemap")
 end
 
 --@api-stub: AutoTileSheet:getTileWidth
 -- Returns the tile width in pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: AutoTileSheet:getTileWidth
-  local _todo = "TODO: write a real AutoTileSheet:getTileWidth usage example"
-  print(_todo)
+-- Use when sizing a debug overlay or palette preview for the autotile set.
+do  -- AutoTileSheet:getTileWidth
+  local sheet = lurek.tilemap.newAutoTileSheet(32, 32, "composite48")
+  lurek.log.info("autotile tile width = " .. sheet:getTileWidth() .. " px", "tilemap")
 end
 
 --@api-stub: AutoTileSheet:getTileHeight
 -- Returns the tile height in pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: AutoTileSheet:getTileHeight
-  local _todo = "TODO: write a real AutoTileSheet:getTileHeight usage example"
-  print(_todo)
+-- Pair with getTileWidth when laying out a palette for tile selection in a level editor.
+do  -- AutoTileSheet:getTileHeight
+  local sheet = lurek.tilemap.newAutoTileSheet(16, 24, "blob47")
+  lurek.log.info("autotile tile height = " .. sheet:getTileHeight() .. " px", "tilemap")
 end
 
 --@api-stub: AutoTileSheet:getBitmaskForTile
 -- Returns the bitmask value associated with a 1-based local tile ID.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: AutoTileSheet:getBitmaskForTile
-  local _todo = "TODO: write a real AutoTileSheet:getBitmaskForTile usage example"
-  print(_todo)
+-- Returns the connectivity bitmask the given tile ID was authored to represent.
+do  -- AutoTileSheet:getBitmaskForTile
+  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
+  local mask = sheet:getBitmaskForTile(5)
+  lurek.log.info("tile 5 represents bitmask " .. mask, "tilemap")
 end
 
 --@api-stub: AutoTileSheet:getTileForBitmask
 -- Returns the 1-based tile ID for a given bitmask, or nil.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: AutoTileSheet:getTileForBitmask
-  local _todo = "TODO: write a real AutoTileSheet:getTileForBitmask usage example"
-  print(_todo)
+-- Returns nil when no tile is assigned to that bitmask; fall back to a default in that case.
+do  -- AutoTileSheet:getTileForBitmask
+  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
+  local id = sheet:getTileForBitmask(15) or 1
+  lurek.log.info("bitmask 15 -> tile " .. id, "tilemap")
 end
 
 --@api-stub: AutoTileSheet:getQuad
 -- Returns the atlas region rectangle for the 1-based tile ID.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: AutoTileSheet:getQuad
-  local _todo = "TODO: write a real AutoTileSheet:getQuad usage example"
-  print(_todo)
+-- Source rectangle for the given tile ID; returned as {x, y, width, height} in atlas pixels.
+do  -- AutoTileSheet:getQuad
+  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
+  local q = sheet:getQuad(3)
+  lurek.log.info("autotile 3 quad x=" .. q.x .. " y=" .. q.y, "tilemap")
 end
 
 -- ── ChunkMap methods ──
 
 --@api-stub: ChunkMap:getTile
 -- Returns the GID at tile coordinate (x, y).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: ChunkMap:getTile
-  local _todo = "TODO: write a real ChunkMap:getTile usage example"
-  print(_todo)
+-- Coordinates can be any integer (positive or negative); returns 0 for never-touched cells.
+do  -- ChunkMap:getTile
+  local world = lurek.tilemap.newChunkMap(32)
+  world:setTile(-5, 12, 9)
+  local gid = world:getTile(-5, 12)
+  lurek.log.info("tile at (-5, 12) gid=" .. gid, "tilemap")
 end
 
 --@api-stub: ChunkMap:setTile
 -- Sets the GID at tile coordinate (x, y).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: ChunkMap:setTile
-  local _todo = "TODO: write a real ChunkMap:setTile usage example"
-  print(_todo)
+-- Allocates the underlying chunk lazily; safe to call on any (x, y) including negatives.
+do  -- ChunkMap:setTile
+  local world = lurek.tilemap.newChunkMap(16)
+  for x = 0, 9 do
+    world:setTile(x, 0, 1)
+  end
 end
 
 --@api-stub: ChunkMap:clearTile
 -- Clears the tile at (x, y) by setting its GID to 0.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: ChunkMap:clearTile
-  local _todo = "TODO: write a real ChunkMap:clearTile usage example"
-  print(_todo)
+-- Sets the GID back to 0 but does NOT free the chunk — use unloadChunk for memory.
+do  -- ChunkMap:clearTile
+  local world = lurek.tilemap.newChunkMap(16)
+  world:setTile(3, 3, 5)
+  world:clearTile(3, 3)
+  lurek.log.info("tile (3,3) now gid=" .. world:getTile(3, 3), "tilemap")
 end
 
 --@api-stub: ChunkMap:loadChunk
 -- Pre-allocates the chunk at chunk coordinates (cx, cy).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: ChunkMap:loadChunk
-  local _todo = "TODO: write a real ChunkMap:loadChunk usage example"
-  print(_todo)
+-- Pre-warm chunks ahead of the camera to avoid first-touch allocation hitches at the edge.
+do  -- ChunkMap:loadChunk
+  local world = lurek.tilemap.newChunkMap(16)
+  for cx = 0, 3 do
+    world:loadChunk(cx, 0)
+  end
 end
 
 --@api-stub: ChunkMap:unloadChunk
 -- Removes the chunk at chunk coordinates (cx, cy) from memory.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: ChunkMap:unloadChunk
-  local _todo = "TODO: write a real ChunkMap:unloadChunk usage example"
-  print(_todo)
+-- Drop chunks the camera has left behind to keep memory bounded for infinite worlds.
+do  -- ChunkMap:unloadChunk
+  local world = lurek.tilemap.newChunkMap(16)
+  world:loadChunk(0, 0)
+  world:unloadChunk(0, 0)
+  lurek.log.info("chunks resident: " .. #world:getLoadedChunks(), "tilemap")
 end
 
 --@api-stub: ChunkMap:getChunkSize
 -- Returns the chunk size (tiles per side).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: ChunkMap:getChunkSize
-  local _todo = "TODO: write a real ChunkMap:getChunkSize usage example"
-  print(_todo)
+-- Use when converting world tile coords to chunk coords: cx = floor(x / chunkSize).
+do  -- ChunkMap:getChunkSize
+  local world = lurek.tilemap.newChunkMap(64)
+  local size = world:getChunkSize()
+  lurek.log.info("chunk side = " .. size .. " tiles", "tilemap")
 end
 
 --@api-stub: ChunkMap:getLoadedChunks
 -- Returns a table of all currently loaded chunk coordinates as {{cx, cy}, ...}.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: ChunkMap:getLoadedChunks
-  local _todo = "TODO: write a real ChunkMap:getLoadedChunks usage example"
-  print(_todo)
+-- Each entry is {cx, cy}; iterate to draw a debug overlay of resident chunks.
+do  -- ChunkMap:getLoadedChunks
+  local world = lurek.tilemap.newChunkMap(16)
+  world:setTile(0, 0, 1)
+  world:setTile(40, -10, 2)
+  for _, c in ipairs(world:getLoadedChunks()) do
+    lurek.log.debug("chunk loaded cx=" .. c[1] .. " cy=" .. c[2], "tilemap")
+  end
 end
 
 --@api-stub: ChunkMap:chunkTileRange
 -- Returns the tile coordinate range for chunk (cx, cy) as (x0, y0, x1, y1).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: ChunkMap:chunkTileRange
-  local _todo = "TODO: write a real ChunkMap:chunkTileRange usage example"
-  print(_todo)
+-- Returns inclusive (x0, y0, x1, y1) tile bounds — use to iterate every cell of a chunk.
+do  -- ChunkMap:chunkTileRange
+  local world = lurek.tilemap.newChunkMap(16)
+  local x0, y0, x1, y1 = world:chunkTileRange(2, -1)
+  lurek.log.info("chunk (2,-1) covers x[" .. x0 .. ".." .. x1 .. "] y[" .. y0 .. ".." .. y1 .. "]", "tilemap")
 end
 
 -- ── LargeMapRenderer methods ──
 
 --@api-stub: LargeMapRenderer:setTile
 -- Sets a single tile ID at (x, y).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:setTile
-  local _todo = "TODO: write a real LargeMapRenderer:setTile usage example"
-  print(_todo)
+-- Coordinates are 0-based and must be within the map size set via setMapData.
+do  -- LargeMapRenderer:setTile
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 0, 0, 0, 0 }, 2, 2)
+  r:setTile(1, 0, 5)
+  r:invalidateChunk(0, 0)
 end
 
 --@api-stub: LargeMapRenderer:getTile
 -- Returns the tile ID at (x, y), or nil if out of bounds.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:getTile
-  local _todo = "TODO: write a real LargeMapRenderer:getTile usage example"
-  print(_todo)
+-- Returns nil when (x, y) is outside the map; pair with getMapSize for bounds.
+do  -- LargeMapRenderer:getTile
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 1, 2, 3, 4 }, 2, 2)
+  local id = r:getTile(0, 0)
+  if id then lurek.log.info("origin tile = " .. id, "render") end
 end
 
 --@api-stub: LargeMapRenderer:getMapSize
 -- Returns the map dimensions as (width, height) in tiles.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:getMapSize
-  local _todo = "TODO: write a real LargeMapRenderer:getMapSize usage example"
-  print(_todo)
+-- Use to drive iteration loops or to size a minimap proportional to the world.
+do  -- LargeMapRenderer:getMapSize
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 0, 0, 0, 0 }, 2, 2)
+  local w, h = r:getMapSize()
+  lurek.log.info("large map " .. w .. "x" .. h .. " tiles", "render")
 end
 
 --@api-stub: LargeMapRenderer:setChunkSize
 -- Sets the chunk size used for culling (default 16).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:setChunkSize
-  local _todo = "TODO: write a real LargeMapRenderer:setChunkSize usage example"
-  print(_todo)
+-- Larger chunks reduce overhead but coarsen culling; 16-32 is typical for HD tilesets.
+do  -- LargeMapRenderer:setChunkSize
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setChunkSize(32)
+  lurek.log.info("renderer chunk size = " .. r:getChunkSize(), "render")
 end
 
 --@api-stub: LargeMapRenderer:getChunkSize
 -- Returns the current chunk size.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:getChunkSize
-  local _todo = "TODO: write a real LargeMapRenderer:getChunkSize usage example"
-  print(_todo)
+-- Read after setChunkSize to confirm the value the renderer is actually using.
+do  -- LargeMapRenderer:getChunkSize
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  lurek.log.info("default chunk size = " .. r:getChunkSize(), "render")
 end
 
 --@api-stub: LargeMapRenderer:invalidateChunk
 -- Marks a chunk at chunk-grid coordinates (cx, cy) as dirty,.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:invalidateChunk
-  local _todo = "TODO: write a real LargeMapRenderer:invalidateChunk usage example"
-  print(_todo)
+-- Call after editing tiles in a chunk so the renderer rebuilds its cached geometry.
+do  -- LargeMapRenderer:invalidateChunk
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 0, 0, 0, 0 }, 2, 2)
+  r:setTile(0, 0, 7)
+  r:invalidateChunk(0, 0)
 end
 
 --@api-stub: LargeMapRenderer:invalidateAll
 -- Marks every chunk as dirty.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:invalidateAll
-  local _todo = "TODO: write a real LargeMapRenderer:invalidateAll usage example"
-  print(_todo)
+-- Use after a global change like swapping tilesets or applying a colour grading tint.
+do  -- LargeMapRenderer:invalidateAll
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 1, 2, 3, 4 }, 2, 2)
+  r:invalidateAll()
+  lurek.log.info("all chunks marked dirty", "render")
 end
 
 --@api-stub: LargeMapRenderer:getVisibleChunks
 -- Returns the number of chunks currently within the camera viewport.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:getVisibleChunks
-  local _todo = "TODO: write a real LargeMapRenderer:getVisibleChunks usage example"
-  print(_todo)
+-- Use as a debug HUD value to confirm culling is actually trimming work.
+do  -- LargeMapRenderer:getVisibleChunks
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 0, 0, 0, 0 }, 2, 2)
+  r:setCamera(0, 0, 1.0)
+  r:setViewport(800, 600)
+  lurek.log.info("visible chunks: " .. r:getVisibleChunks(), "render")
 end
 
 --@api-stub: LargeMapRenderer:getTotalChunks
 -- Returns the total number of chunks that cover the loaded map.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:getTotalChunks
-  local _todo = "TODO: write a real LargeMapRenderer:getTotalChunks usage example"
-  print(_todo)
+-- Compare against getVisibleChunks to compute culling efficiency in a perf overlay.
+do  -- LargeMapRenderer:getTotalChunks
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 0, 0, 0, 0, 0, 0, 0, 0 }, 4, 2)
+  lurek.log.info("total chunks = " .. r:getTotalChunks(), "render")
 end
 
 --@api-stub: LargeMapRenderer:setCamera
 -- Updates the camera position and zoom used for visibility culling.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:setCamera
-  local _todo = "TODO: write a real LargeMapRenderer:setCamera usage example"
-  print(_todo)
+-- Update from your main loop with the camera position and current zoom each frame.
+do  -- LargeMapRenderer:setCamera
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 0, 0, 0, 0 }, 2, 2)
+  function lurek.process(dt) r:setCamera(player_x or 0, player_y or 0, 1.0) end
 end
 
 --@api-stub: LargeMapRenderer:setViewport
 -- Sets the viewport dimensions in pixels used for visibility culling.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:setViewport
-  local _todo = "TODO: write a real LargeMapRenderer:setViewport usage example"
-  print(_todo)
+-- Pass your render target size in pixels so the renderer can compute culling bounds.
+do  -- LargeMapRenderer:setViewport
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setMapData({ 0, 0, 0, 0 }, 2, 2)
+  r:setViewport(1920, 1080)
 end
 
 --@api-stub: LargeMapRenderer:setLodEnabled
 -- Enables or disables level-of-detail rendering for distant chunks.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:setLodEnabled
-  local _todo = "TODO: write a real LargeMapRenderer:setLodEnabled usage example"
-  print(_todo)
+-- Enable LOD when the camera can zoom out far enough to make per-tile rendering wasteful.
+do  -- LargeMapRenderer:setLodEnabled
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setLodEnabled(true)
+  if r:isLodEnabled() then
+    lurek.log.info("LOD active", "render")
+  end
 end
 
 --@api-stub: LargeMapRenderer:isLodEnabled
 -- Returns whether LOD rendering is currently enabled.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:isLodEnabled
-  local _todo = "TODO: write a real LargeMapRenderer:isLodEnabled usage example"
-  print(_todo)
+-- Read in a debug HUD to confirm the LOD toggle is matching the menu setting.
+do  -- LargeMapRenderer:isLodEnabled
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  if not r:isLodEnabled() then
+    r:setLodEnabled(true)
+  end
 end
 
 --@api-stub: LargeMapRenderer:setLodThresholds
 -- Sets the distance thresholds (in tile units) at which each LOD level activates.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:setLodThresholds
-  local _todo = "TODO: write a real LargeMapRenderer:setLodThresholds usage example"
-  print(_todo)
+-- Each entry is the camera-distance in tile units at which the next LOD tier kicks in.
+do  -- LargeMapRenderer:setLodThresholds
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setLodEnabled(true)
+  r:setLodThresholds({ 64.0, 256.0, 1024.0 })
 end
 
 --@api-stub: LargeMapRenderer:setTilesetColumns
 -- Sets the number of tile columns in the atlas texture used for UV calculation.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:setTilesetColumns
-  local _todo = "TODO: write a real LargeMapRenderer:setTilesetColumns usage example"
-  print(_todo)
+-- Set this to match your atlas column count so UV mapping is correct.
+do  -- LargeMapRenderer:setTilesetColumns
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setTilesetColumns(16)
+  lurek.log.info("renderer atlas cols = " .. r:getTilesetColumns(), "render")
 end
 
 --@api-stub: LargeMapRenderer:getTilesetColumns
 -- Returns the number of tileset atlas columns.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: LargeMapRenderer:getTilesetColumns
-  local _todo = "TODO: write a real LargeMapRenderer:getTilesetColumns usage example"
-  print(_todo)
+-- Read after setTilesetColumns to confirm the value used in the next render pass.
+do  -- LargeMapRenderer:getTilesetColumns
+  local r = lurek.tilemap.newLargeMapRenderer(16, 16)
+  r:setTilesetColumns(8)
+  lurek.log.info("UVs are sliced into " .. r:getTilesetColumns() .. " columns", "render")
 end
 
 -- ── IsoMap methods ──
 
 --@api-stub: IsoMap:addLevel
 -- Appends a new empty Z-level and returns its 1-based index.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:addLevel
-  local _todo = "TODO: write a real IsoMap:addLevel usage example"
-  print(_todo)
+-- Adds an empty Z-level on top of the stack and returns its 1-based index.
+do  -- IsoMap:addLevel
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  local z = iso:addLevel()
+  lurek.log.info("added level " .. z .. ", count now " .. iso:getLevelCount(), "tilemap")
 end
 
 --@api-stub: IsoMap:getLevelCount
 -- Returns the number of Z-levels currently in the map.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:getLevelCount
-  local _todo = "TODO: write a real IsoMap:getLevelCount usage example"
-  print(_todo)
+-- Drive a render loop from 1..getLevelCount() to draw every Z-level back to front.
+do  -- IsoMap:getLevelCount
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  iso:addLevel(); iso:addLevel(); iso:addLevel()
+  lurek.log.info("iso has " .. iso:getLevelCount() .. " level(s)", "tilemap")
 end
 
 --@api-stub: IsoMap:setLevelVisible
 -- Sets the visibility of a level (1-based z).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:setLevelVisible
-  local _todo = "TODO: write a real IsoMap:setLevelVisible usage example"
-  print(_todo)
+-- Toggle to implement a 'cutaway' view that hides upper floors above the camera target.
+do  -- IsoMap:setLevelVisible
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  iso:addLevel(); iso:addLevel()
+  iso:setLevelVisible(2, false)  -- hide upper floor
 end
 
 --@api-stub: IsoMap:isLevelVisible
 -- Returns the visibility of a level (1-based z).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:isLevelVisible
-  local _todo = "TODO: write a real IsoMap:isLevelVisible usage example"
-  print(_todo)
+-- Combine with a UI toggle so the player can opt in to seeing higher Z-levels.
+do  -- IsoMap:isLevelVisible
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  iso:addLevel()
+  if iso:isLevelVisible(1) then
+    lurek.log.info("ground floor is visible", "tilemap")
+  end
 end
 
 --@api-stub: IsoMap:fillLevel
 -- Fills every cell in level z with gid for the given part (1-based z; 0-based part).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:fillLevel
-  local _todo = "TODO: write a real IsoMap:fillLevel usage example"
-  print(_todo)
+-- Floods every cell of (z, part) with the same GID — handy for laying solid floors fast.
+do  -- IsoMap:fillLevel
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  iso:addLevel()
+  iso:fillLevel(1, lurek.tilemap.FLOOR - 1, 1)  -- floor part 0, gid 1
 end
 
 --@api-stub: IsoMap:setOrigin
 -- Sets the screen pixel origin.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:setOrigin
-  local _todo = "TODO: write a real IsoMap:setOrigin usage example"
-  print(_todo)
+-- Set the screen-space pixel origin (top-left of the diamond grid) when scrolling the iso world.
+do  -- IsoMap:setOrigin
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  iso:addLevel()
+  iso:setOrigin(400, 100)
 end
 
 --@api-stub: IsoMap:getWidth
 -- Returns the map width in tiles.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:getWidth
-  local _todo = "TODO: write a real IsoMap:getWidth usage example"
-  print(_todo)
+-- Use when sizing a minimap proportional to the iso footprint.
+do  -- IsoMap:getWidth
+  local iso = lurek.tilemap.newIsoMap(20, 30, 64, 32, 24)
+  lurek.log.info("iso map is " .. iso:getWidth() .. " tiles wide", "tilemap")
 end
 
 --@api-stub: IsoMap:getHeight
 -- Returns the map height in tiles.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:getHeight
-  local _todo = "TODO: write a real IsoMap:getHeight usage example"
-  print(_todo)
+-- Pair with getWidth when iterating over every (x, y) on a level.
+do  -- IsoMap:getHeight
+  local iso = lurek.tilemap.newIsoMap(20, 30, 64, 32, 24)
+  lurek.log.info("iso map is " .. iso:getHeight() .. " tiles tall", "tilemap")
 end
 
 --@api-stub: IsoMap:getTileWidth
 -- Returns the tile footprint width in pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:getTileWidth
-  local _todo = "TODO: write a real IsoMap:getTileWidth usage example"
-  print(_todo)
+-- Tile footprint width in pixels — typical iso ratio is 2:1 width:height.
+do  -- IsoMap:getTileWidth
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  lurek.log.info("iso tile footprint width = " .. iso:getTileWidth() .. " px", "tilemap")
 end
 
 --@api-stub: IsoMap:getTileHeight
 -- Returns the tile footprint height in pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:getTileHeight
-  local _todo = "TODO: write a real IsoMap:getTileHeight usage example"
-  print(_todo)
+-- Tile footprint height in pixels — half the width gives the classic 2:1 isometric look.
+do  -- IsoMap:getTileHeight
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  lurek.log.info("iso tile footprint height = " .. iso:getTileHeight() .. " px", "tilemap")
 end
 
 --@api-stub: IsoMap:getLevelHeight
 -- Returns the vertical pixel offset between consecutive Z-levels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:getLevelHeight
-  local _todo = "TODO: write a real IsoMap:getLevelHeight usage example"
-  print(_todo)
+-- Vertical pixel offset between Z-levels; tune to match the height of your wall sprites.
+do  -- IsoMap:getLevelHeight
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 32)
+  lurek.log.info("Z step = " .. iso:getLevelHeight() .. " px between levels", "tilemap")
 end
 
 --@api-stub: IsoMap:tileToScreen
 -- Projects isometric tile coordinates (tx, ty, tz) to screen pixels.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:tileToScreen
-  local _todo = "TODO: write a real IsoMap:tileToScreen usage example"
-  print(_todo)
+-- Use to position sprite overlays (HP bars, names) above a particular iso tile.
+do  -- IsoMap:tileToScreen
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  iso:setOrigin(400, 100)
+  local sx, sy = iso:tileToScreen(3, 4, 0)
+  lurek.log.info("tile (3,4,0) at screen (" .. sx .. ", " .. sy .. ")", "tilemap")
 end
 
 --@api-stub: IsoMap:screenToTile
 -- Converts screen pixel coordinates to isometric tile coordinates at Z-level 0.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:screenToTile
-  local _todo = "TODO: write a real IsoMap:screenToTile usage example"
-  print(_todo)
+-- Use for mouse picking; result is at Z=0 — apply your own offset for higher levels.
+do  -- IsoMap:screenToTile
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24)
+  iso:setOrigin(400, 100)
+  local tx, ty = iso:screenToTile(500, 200)
+  lurek.log.info("cursor over iso tile (" .. tx .. ", " .. ty .. ")", "tilemap")
 end
 
 --@api-stub: IsoMap:getPartCount
 -- Returns the number of GID slots per tile.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:getPartCount
-  local _todo = "TODO: write a real IsoMap:getPartCount usage example"
-  print(_todo)
+-- Default 4 (floor/N-wall/W-wall/object); use the lurek.tilemap constants to index parts symbolically.
+do  -- IsoMap:getPartCount
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24, 4)
+  lurek.log.info("iso parts per tile = " .. iso:getPartCount(), "tilemap")
 end
 
 --@api-stub: IsoMap:getPartOrder
 -- Returns the current draw-order array (0-based part slot indices).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:getPartOrder
-  local _todo = "TODO: write a real IsoMap:getPartOrder usage example"
-  print(_todo)
+-- Returns 0-based slot indices in draw order; useful for debugging Z-fighting on stacked parts.
+do  -- IsoMap:getPartOrder
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24, 4)
+  local order = iso:getPartOrder()
+  lurek.log.info("iso draw order has " .. #order .. " slots", "tilemap")
 end
 
 --@api-stub: IsoMap:setPartOrder
 -- Overrides the draw order for this IsoMap.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: IsoMap:setPartOrder
-  local _todo = "TODO: write a real IsoMap:setPartOrder usage example"
-  print(_todo)
+-- Pass a permutation of 0..partCount-1; raises an error if the length or values are wrong.
+do  -- IsoMap:setPartOrder
+  local iso = lurek.tilemap.newIsoMap(16, 16, 64, 32, 24, 4)
+  iso:setPartOrder({ 0, 2, 1, 3 })  -- swap N-wall and W-wall draw order
 end
 
 -- ── MapBlock methods ──
 
 --@api-stub: MapBlock:getTile
 -- Returns the GID of the tile at (x, y) on the given layer (1-based).
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getTile
-  local _todo = "TODO: write a real MapBlock:getTile usage example"
-  print(_todo)
+-- Layer/x/y are 1-based; returns 0 for empty cells.
+do  -- MapBlock:getTile
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  block:setTile(1, 3, 3, 5)
+  local gid = block:getTile(1, 3, 3)
+  lurek.log.info("block tile (3,3) gid=" .. gid, "tilemap")
 end
 
 --@api-stub: MapBlock:getSide
 -- Returns the side connection ID for a segment on a given edge.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getSide
-  local _todo = "TODO: write a real MapBlock:getSide usage example"
-  print(_todo)
+-- Edge is 'north', 'east', 'south', or 'west'; segments are 1-based along each edge.
+do  -- MapBlock:getSide
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  block:setSide("north", 1, 7)
+  local id = block:getSide("north", 1)
+  lurek.log.info("north edge segment 1 connection id=" .. id, "tilemap")
 end
 
 --@api-stub: MapBlock:getWidth
 -- Returns the block width in tiles.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getWidth
-  local _todo = "TODO: write a real MapBlock:getWidth usage example"
-  print(_todo)
+-- Read the authored block width to validate against an expected room size.
+do  -- MapBlock:getWidth
+  local block = lurek.tilemap.newMapBlock(12, 8, 1, 4)
+  lurek.log.info("block width " .. block:getWidth() .. " tiles", "tilemap")
 end
 
 --@api-stub: MapBlock:getHeight
 -- Returns the block height in tiles.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getHeight
-  local _todo = "TODO: write a real MapBlock:getHeight usage example"
-  print(_todo)
+-- Pair with getWidth to compute the block bounding box for placement queries.
+do  -- MapBlock:getHeight
+  local block = lurek.tilemap.newMapBlock(8, 12, 1, 4)
+  lurek.log.info("block height " .. block:getHeight() .. " tiles", "tilemap")
 end
 
 --@api-stub: MapBlock:getDimensions
 -- Returns the block dimensions as (width, height) in tiles.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getDimensions
-  local _todo = "TODO: write a real MapBlock:getDimensions usage example"
-  print(_todo)
+-- Single-call alternative to getWidth/getHeight; returns (w, h).
+do  -- MapBlock:getDimensions
+  local block = lurek.tilemap.newMapBlock(10, 6, 1, 2)
+  local w, h = block:getDimensions()
+  lurek.log.info("block " .. w .. "x" .. h, "tilemap")
 end
 
 --@api-stub: MapBlock:getLayerCount
 -- Returns the number of layers in this block.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getLayerCount
-  local _todo = "TODO: write a real MapBlock:getLayerCount usage example"
-  print(_todo)
+-- Use to drive a per-layer iteration when copying a block into a TileMap.
+do  -- MapBlock:getLayerCount
+  local block = lurek.tilemap.newMapBlock(8, 8, 3, 4)
+  lurek.log.info("block has " .. block:getLayerCount() .. " layer(s)", "tilemap")
 end
 
 --@api-stub: MapBlock:getSegmentSize
 -- Returns the segment size in tiles.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getSegmentSize
-  local _todo = "TODO: write a real MapBlock:getSegmentSize usage example"
-  print(_todo)
+-- Edges are split into segments of this many tiles; segment-level matching drives MapGen connections.
+do  -- MapBlock:getSegmentSize
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  lurek.log.info("segment size = " .. block:getSegmentSize() .. " tiles", "tilemap")
 end
 
 --@api-stub: MapBlock:getWidthInSegments
 -- Returns the number of segments along the width.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getWidthInSegments
-  local _todo = "TODO: write a real MapBlock:getWidthInSegments usage example"
-  print(_todo)
+-- Equals getWidth() / getSegmentSize(); use when laying out edge-connection rules.
+do  -- MapBlock:getWidthInSegments
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  lurek.log.info("block is " .. block:getWidthInSegments() .. " segments wide", "tilemap")
 end
 
 --@api-stub: MapBlock:getHeightInSegments
 -- Returns the number of segments along the height.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getHeightInSegments
-  local _todo = "TODO: write a real MapBlock:getHeightInSegments usage example"
-  print(_todo)
+-- Pair with getWidthInSegments when iterating over every edge segment of the block.
+do  -- MapBlock:getHeightInSegments
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  lurek.log.info("block is " .. block:getHeightInSegments() .. " segments tall", "tilemap")
 end
 
 --@api-stub: MapBlock:setName
 -- Sets the human-readable name of this block.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:setName
-  local _todo = "TODO: write a real MapBlock:setName usage example"
-  print(_todo)
+-- Names appear in MapGen logging and tooling; pick something searchable like '"start_room"'.
+do  -- MapBlock:setName
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  block:setName("treasure_room")
+  lurek.log.info("named block: " .. block:getName(), "tilemap")
 end
 
 --@api-stub: MapBlock:getName
 -- Returns the name of this block.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getName
-  local _todo = "TODO: write a real MapBlock:getName usage example"
-  print(_todo)
+-- Read the authored name to filter blocks before adding them to a MapGroup.
+do  -- MapBlock:getName
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  block:setName("corridor_h")
+  if block:getName():match("^corridor") then
+    lurek.log.info("block is a corridor variant", "tilemap")
+  end
 end
 
 --@api-stub: MapBlock:setWeight
 -- Sets the placement weight.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:setWeight
-  local _todo = "TODO: write a real MapBlock:setWeight usage example"
-  print(_todo)
+-- Higher weights make MapGen pick this block more often; default is 1.0.
+do  -- MapBlock:setWeight
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  block:setWeight(3.5)  -- show up 3.5x more often than weight=1 blocks
+  lurek.log.info("weight = " .. block:getWeight(), "tilemap")
 end
 
 --@api-stub: MapBlock:getWeight
 -- Returns the placement weight.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapBlock:getWeight
-  local _todo = "TODO: write a real MapBlock:getWeight usage example"
-  print(_todo)
+-- Read after setWeight to confirm the value MapGen will sample with.
+do  -- MapBlock:getWeight
+  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
+  if block:getWeight() < 1.0 then
+    lurek.log.warn("block '" .. block:getName() .. "' is rare", "tilemap")
+  end
 end
 
 -- ── MapGroup methods ──
 
 --@api-stub: MapGroup:addBlock
 -- Adds a block to this group.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapGroup:addBlock
-  local _todo = "TODO: write a real MapGroup:addBlock usage example"
-  print(_todo)
+-- Add every block variant once; MapGen will sample using each block's weight.
+do  -- MapGroup:addBlock
+  local group = lurek.tilemap.newMapGroup("rooms")
+  group:addBlock(lurek.tilemap.newMapBlock(8, 8, 1, 4))
+  group:addBlock(lurek.tilemap.newMapBlock(12, 8, 1, 4))
+  lurek.log.info("group has " .. group:getBlockCount() .. " blocks", "tilemap")
 end
 
 --@api-stub: MapGroup:getBlockCount
 -- Returns the number of blocks in this group.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapGroup:getBlockCount
-  local _todo = "TODO: write a real MapGroup:getBlockCount usage example"
-  print(_todo)
+-- Use to validate level data loaded from disk before passing the group to MapGen.
+do  -- MapGroup:getBlockCount
+  local group = lurek.tilemap.newMapGroup("rooms")
+  group:addBlock(lurek.tilemap.newMapBlock(8, 8, 1, 4))
+  if group:getBlockCount() == 0 then
+    lurek.log.error("group '" .. group:getName() .. "' is empty", "tilemap")
+  end
 end
 
 --@api-stub: MapGroup:removeBlock
 -- Removes a block by 1-based index.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapGroup:removeBlock
-  local _todo = "TODO: write a real MapGroup:removeBlock usage example"
-  print(_todo)
+-- 1-based index; remove a misauthored block before generation without rebuilding the group.
+do  -- MapGroup:removeBlock
+  local group = lurek.tilemap.newMapGroup("rooms")
+  group:addBlock(lurek.tilemap.newMapBlock(8, 8, 1, 4))
+  group:addBlock(lurek.tilemap.newMapBlock(12, 8, 1, 4))
+  group:removeBlock(1)  -- drop first block
 end
 
 --@api-stub: MapGroup:getName
 -- Returns the name of this group.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapGroup:getName
-  local _todo = "TODO: write a real MapGroup:getName usage example"
-  print(_todo)
+-- Use when logging or when a generator picks a group from a registry by name.
+do  -- MapGroup:getName
+  local group = lurek.tilemap.newMapGroup("dungeon_floor_1")
+  lurek.log.info("active group: " .. group:getName(), "tilemap")
 end
 
 --@api-stub: MapGroup:addScript
 -- Adds a MapScript to this group.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapGroup:addScript
-  local _todo = "TODO: write a real MapGroup:addScript usage example"
-  print(_todo)
+-- Attach generation scripts (random fill, place, flood) that MapGen runs in order.
+do  -- MapGroup:addScript
+  local group = lurek.tilemap.newMapGroup("rooms")
+  local script = lurek.tilemap.newMapScript()
+  script:addStep({ type = "fillRandom", gid = 1, chance = 0.2 })
+  group:addScript(script)
 end
 
 --@api-stub: MapGroup:getScriptCount
 -- Returns the number of scripts in this group.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapGroup:getScriptCount
-  local _todo = "TODO: write a real MapGroup:getScriptCount usage example"
-  print(_todo)
+-- Use to validate that all expected scripts loaded before generation begins.
+do  -- MapGroup:getScriptCount
+  local group = lurek.tilemap.newMapGroup("rooms")
+  group:addScript(lurek.tilemap.newMapScript())
+  lurek.log.info("group has " .. group:getScriptCount() .. " script(s)", "tilemap")
 end
 
 -- ── MapScript methods ──
 
 --@api-stub: MapScript:getStepCount
 -- Returns the number of steps in this script.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapScript:getStepCount
-  local _todo = "TODO: write a real MapScript:getStepCount usage example"
-  print(_todo)
+-- Inspect the step count after addStep calls to confirm a script loaded as expected.
+do  -- MapScript:getStepCount
+  local script = lurek.tilemap.newMapScript()
+  script:addStep({ type = "fillArea", x = 1, y = 1, w = 8, h = 8, gid = 1 })
+  lurek.log.info("script step count: " .. script:getStepCount(), "tilemap")
 end
 
 --@api-stub: MapScript:addStep
 -- Appends a generation step from a step-definition table.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/tilemap_api.rs and docs/specs/tilemap.md).
-do  -- TODO: MapScript:addStep
-  local _todo = "TODO: write a real MapScript:addStep usage example"
-  print(_todo)
+-- Step `type` must be one of fillRandom/placeBlock/placeRandom/placeLine/floodFill/fillArea/drawPath/fillRect.
+do  -- MapScript:addStep
+  local script = lurek.tilemap.newMapScript()
+  script:addStep({ type = "fillRect", x = 0, y = 0, w = 16, h = 16, gid = 1 })
+  script:addStep({ type = "drawPath", x = 1, y = 1, w = 14, h = 14, gid = 2, pathWidth = 2 })
+  lurek.log.info("authored " .. script:getStepCount() .. " step(s)", "tilemap")
 end
-
