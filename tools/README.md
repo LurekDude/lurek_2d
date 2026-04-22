@@ -19,9 +19,9 @@ go under `work/{session}/scripts/` and are archived at session end.
 
 | Folder                                  | Purpose                                                                    | Script Count |
 | --------------------------------------- | -------------------------------------------------------------------------- | ------------ |
-| [`tools/docs/`](docs/README.md)         | Documentation generators — produce `docs/reports/`, `logs/`, `docs/wiki/` | 16           |
-| [`tools/audit/`](audit/README.md)       | Quality auditing, coverage analytics, gap reports                          | 31           |
-| [`tools/fix/`](fix/README.md)           | Code fixers and docstring improvers                                        | 19           |
+| [`tools/docs/`](docs/README.md)         | Documentation generators — produce `docs/reports/`, `logs/`, `docs/wiki/` | 15           |
+| [`tools/audit/`](audit/README.md)       | Quality auditing, coverage analytics, gap reports                          | 29           |
+| [`tools/fix/`](fix/README.md)           | Code fixers and docstring improvers                                        | 9            |
 | [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure)                        | 7            |
 | [`tools/dist/`](dist/README.md)         | Build, package, and install scripts                                        | 7            |
 | [`tools/github/`](github/README.md)     | GitHub project management automation                                       | 1            |
@@ -87,7 +87,6 @@ and `tools/audit/` in the correct dependency order. Produces:
 | ------------------------- | --------------------------------------------------- | ----------------------------------------------------- |
 | `gen_lua_api.py`          | Original Lua API scanner (reads `@param`/`@return`) | `--check` (coverage check)                            |
 | `collect_docs.py`         | Rich API doc collector with missing-doc report      | `--report-missing`, `--suggest`, `--json`, `--output` |
-| `gen_lua_api_skeleton.py` | Generate `src/lua_api/*_api.rs` skeleton stubs      | `--module NAME`, `--all`, `--dry-run`                 |
 
 ### Quality Auditing (`tools/audit/`)
 
@@ -122,7 +121,6 @@ and `tools/audit/` in the correct dependency order. Produces:
 | Script                 | Purpose                                                           | Output                     | Args                                                               |
 | ---------------------- | ----------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------ |
 | `audit_module.py`      | 12-phase module quality audit (PASS/WARN/ERROR)                   | `docs/quality/<module>.md` | `NAME`, `--all`, `--tier N`, `--json`, `--docs-quality`            |
-| `module_audit.py`      | Module restructuring & reference audit                            | stdout / JSON              | `--json`, `--output`                                               |
 
 **Specialised audits**:
 
@@ -173,22 +171,12 @@ All validators exit 0 on pass, 1 on failure.
 | `expand_examples.py`    | Expand code example blocks    | —    |
 | `format_examples.py`    | Format code examples          | —    |
 | `improve_examples.py`   | Improve example quality       | —    |
-| `uncomment_examples.py` | Uncomment code example blocks | —    |
 
 **Other fixers**:
 
 | Script                              | Purpose                                            | Args |
 | ----------------------------------- | -------------------------------------------------- | ---- |
 | `add_test_markers.py`               | Add `@covers` test markers                         | —    |
-| `find_typed_params.py`              | Discover params with explicit Lua type annotations | —    |
-| `fix_type_stub_vars.py`             | Fix type stub variable declarations                | —    |
-| `fix_typeof_args.py`                | Fix typeof() argument calls                        | —    |
-| `strip_instance_method_comments.py` | Remove instance method doc comments                | —    |
-| `fix_math.py`                       | Auto-rewrite math.lua placeholder stubs            | —    |
-| `fix_thread_api.py`                 | Fix thread API function signatures                 | —    |
-| `rename_example_files.py`           | Rename examples and update cross-repo references   | —    |
-| `rename_test_files.py`              | Rename Lua tests and update harness.rs             | —    |
-| `rename_namespaces.py`              | Rename `lurek.*` namespaces to match src/ folders  | `--dry-run` |
 
 ### Build & Distribution (`tools/dist/`)
 
@@ -253,7 +241,6 @@ quality_report.py
 │   ├── collect_docs.py   (Rust docs)
 │   └── gen_lua_api_data.py (Lua API docs)
 ├── test_coverage.py
-├── module_audit.py
 └── validate_game.py
 
 audit_module.py           (standalone, reads source directly)
@@ -270,7 +257,7 @@ wiki_coverage.py          (standalone, cross-refs docs/wiki/ vs src/ modules)
 | Lua API docstrings       | `docstring_audit.py`          | `doc_coverage.py --lua-only` | `docstring_audit` = per-function quality; `doc_coverage` = aggregate %                  |
 | Test coverage (Rust)     | `test_coverage.py`            | `unit_test_api_coverage.py`  | `test_coverage` = heuristic cross-ref; `unit_test_api_coverage` = unit-level            |
 | Test coverage (Lua)      | `lua_api_test_coverage.py`    | `test_coverage.py`           | `lua_api_test_coverage` = precise `@covers`; `test_coverage` = broad heuristic          |
-| Module structure         | `validate_module_coverage.py` | `module_audit.py`            | `validate_module_coverage` = file existence; `module_audit` = restructuring ideas       |
+| Module structure         | `validate_module_coverage.py` | —                            | Single tool: validates that every src/ module has a docs/specs/ file                    |
 | CHANGELOG                | `validate_changelog.py`       | —                            | Structure, version ordering, dates                                                      |
 | Library quality          | `validate_library.py`         | —                            | Required files, LDoc tags, return tables                                                |
 | Wiki completeness        | `wiki_coverage.py`            | —                            | Cross-reference wiki pages vs src/ modules                                              |
@@ -385,10 +372,8 @@ Scripts kept in `tools/` that are not currently referenced by any `.github/` age
 
 | Script                                          | Kept because                                                              |
 | ----------------------------------------------- | ------------------------------------------------------------------------- |
-| `tools/audit/annotate_tests.py`                 | One-shot — auto-inserts `@tests` markers when migrating a test folder.    |
 | `tools/audit/gen_coverage_gaps.py`              | Invoked via `gen_all_docs.py` orchestrator, not directly by agents.       |
 | `tools/audit/golden_test.py`                    | Manual diff-debug helper for golden-file regressions.                     |
-| `tools/audit/module_audit.py`                   | Superseded by `audit_module.py`; kept for legacy comparisons.             |
 | `tools/audit/test_analytics.py`                 | Trend-only reporter; consumed by humans, not gates.                       |
 | `tools/audit/unit_test_api_coverage.py`         | Niche metric; superset covered by `lua_api_test_coverage.py`.             |
 | `tools/audit/parse_test_log.py`                 | Internal helper for `quality_report.py`.                                  |
@@ -396,7 +381,6 @@ Scripts kept in `tools/` that are not currently referenced by any `.github/` age
 | `tools/dev/test_fix_loop.py`                    | Local dev convenience; not part of CI or any agent workflow.              |
 | `tools/dist/pack.ps1`, `tools/dist/pack.py`     | Player-facing pack helpers, invoked from VS Code tasks not CAG.           |
 | `tools/docs/gen_docs_rust.py`                   | Run via `gen_all_docs.py`; not directly invoked by agents.                |
-| `tools/docs/gen_lua_api_skeleton.py`            | One-shot scaffolding tool for new `lua_api/*_api.rs` modules.             |
 | `tools/docs/gen_lua_dev_docs.py`                | Subset of `gen_all_docs.py` pipeline.                                     |
 | `tools/docs/gen_lua_library_api.py`             | Run via `gen_lib_docs.py`; chained internally.                            |
 | `tools/docs/gen_luadoc.py`                      | Chained from `gen_all_docs.py`; produces LuaCATS stubs.                   |
@@ -404,13 +388,7 @@ Scripts kept in `tools/` that are not currently referenced by any `.github/` age
 | `tools/docs/gen_test_docs.py`                   | Chained from `gen_all_docs.py`.                                           |
 | `tools/docs/gen_wiki.py`                        | Manual wiki-rebuild helper; superseded by `gen_wiki_api.py` for API page. |
 | `tools/fix/add_lua_docstrings.py`               | Interactive — used by humans, not agents (auto variant is preferred).     |
-| `tools/fix/find_typed_params.py`                | One-shot discovery script.                                                |
-| `tools/fix/fix_thread_api.py`                   | One-shot repair for `src/lua_api/thread_api.rs`; idempotent, kept.        |
-| `tools/fix/fix_type_stub_vars.py`               | One-shot migration helper.                                                |
-| `tools/fix/fix_typeof_args.py`                  | One-shot migration helper.                                                |
 | `tools/fix/improve_examples.py`                 | Manual content-quality helper.                                            |
-| `tools/fix/strip_instance_method_comments.py`   | One-shot cleanup script; kept for repeatability.                          |
-| `tools/fix/uncomment_examples.py`               | One-shot — re-enables disabled example sections after big rewrites.       |
 | `tools/github/ideas_to_github_issues.py`        | One-shot — bulk-imports `ideas/` into Issues; rarely needed.              |
 | `tools/mods/mod_init.py`                        | Modder-facing scaffolder; invoked by humans via VS Code task.             |
 | `tools/validate/_cag_common.py`                 | Private helper module for CAG validators (not directly callable).         |

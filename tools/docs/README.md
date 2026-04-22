@@ -39,7 +39,6 @@ python tools/gen_all_docs.py
 |---|---|---|
 | `gen_lua_api.py` | Original Lua API scanner (reads `@param`/`@return`) | `--check` (coverage check, exit 1 if stale) |
 | `collect_docs.py` | Rich Rust API doc collector with missing-doc report | `--report-missing`, `--suggest`, `--json`, `--output` |
-| `gen_lua_api_skeleton.py` | Generate `src/lua_api/*_api.rs` skeleton stubs | `--module NAME`, `--all`, `--dry-run`, `--list` |
 
 ## Common usage
 
@@ -56,10 +55,6 @@ python tools/docs/gen_lua_api.py --check
 # Regenerate JSON intermediates
 python tools/docs/gen_lua_api_data.py
 python tools/docs/gen_rust_api_data.py
-
-# Generate lua_api skeleton for a module
-python tools/docs/gen_lua_api_skeleton.py --module physics
-python tools/docs/gen_lua_api_skeleton.py --all --dry-run
 
 # List items missing /// docs
 python tools/docs/collect_docs.py --report-missing

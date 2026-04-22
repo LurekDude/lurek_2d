@@ -428,7 +428,7 @@ def main() -> int:
     lua_api = extract_lua_api(gen_lua_api, verbose=args.verbose)
 
     # Apply docs overlay (fills descriptions that cannot live in Rust source)
-    overlay_path = WORKSPACE_ROOT / "docs" / "logs" / "docs_overlay.json"
+    overlay_path = WORKSPACE_ROOT / "logs" / "docs_overlay.json"
     if overlay_path.exists():
         overlay = json.loads(overlay_path.read_text(encoding="utf-8"))
         _apply_overlay(lua_api, overlay)

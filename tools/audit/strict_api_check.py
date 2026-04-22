@@ -1,6 +1,6 @@
 ﻿"""Validate all lurek.* API stubs in content/examples/ against the master API data.
 
-Reads docs/logs/lua_api_data.json and cross-references every registered function,
+Reads logs/lua_api_data.json and cross-references every registered function,
 method, and property against its --@api: marker block in the corresponding example
 file. Fails any stub that has fewer than 3 code lines, fewer than 2 comment lines,
 contains forbidden placeholder words (todo, stub, executing, example), or does not
@@ -16,7 +16,7 @@ import json, re, sys
 from pathlib import Path
 
 ROOT = Path('.').resolve()
-API_JSON = ROOT / 'docs' / 'logs' / 'lua_api_data.json'
+API_JSON = ROOT / 'logs' / 'lua_api_data.json'
 EXAMPLES_DIR = ROOT / 'content' / 'examples'
 
 try:

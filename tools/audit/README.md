@@ -38,7 +38,6 @@ coverage — producing reports that tell you what still needs work.
 | Script                 | Purpose                                                           | Output                            |
 | ---------------------- | ----------------------------------------------------------------- | --------------------------------- |
 | `audit_module.py`      | 12-phase module quality audit (PASS/WARN/ERROR)                   | `docs/quality/<module>.md` / JSON |
-| `module_audit.py`      | Module restructuring & reference audit                            | stdout / JSON                     |
 
 ### Specialised audits
 
@@ -81,7 +80,6 @@ same files; the audit tools above are read-only analytics).
 
 | Script                                  | Purpose                                                  |
 | --------------------------------------- | -------------------------------------------------------- |
-| `annotate_tests.py`                     | Add annotation metadata to test files                    |
 | `lua_test_structure_audit.py`           | Audit/fix Lua BDD comment and `test_summary()` structure |
 | `lua_evidence_golden_contract_audit.py` | Audit/fix Lua evidence and golden contract markers       |
 | `parse_test_log.py`                     | Parse Rust test execution logs                           |

@@ -4,6 +4,11 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.5] - 2026-04-22
 
+### Tools cleanup — path fixes and one-shot purge
+
+- **chore(tools): fix stale `docs/logs/` paths in 8 scripts** — After the docs/ folder restructure that moved `docs/logs/*.json` to root `logs/`, updated hardcoded path constants in `tools/audit/example_coverage.py`, `tools/audit/example_add_missing.py`, `tools/audit/lua_api_test_coverage.py`, `tools/audit/strict_api_check.py`, `tools/audit/strict_api_check_math.py`, `tools/audit/test_analytics.py`, `tools/audit/unit_test_api_coverage.py`, and `tools/docs/gen_lua_api_data.py`. All path constants now correctly point to root-level `logs/`.
+- **chore(tools): remove 13 one-shot scripts from tools/** — Deleted one-off migration/repair scripts that belong in `work/` rather than the permanent `tools/` registry. Removed from `tools/fix/`: `find_typed_params.py`, `fix_math.py`, `fix_thread_api.py`, `fix_type_stub_vars.py`, `fix_typeof_args.py`, `rename_example_files.py`, `rename_test_files.py`, `rename_namespaces.py`, `strip_instance_method_comments.py`, `uncomment_examples.py`. Removed from `tools/audit/`: `annotate_tests.py`, `module_audit.py`. Removed from `tools/docs/`: `gen_lua_api_skeleton.py`. Updated all subfolder READMEs and master `tools/README.md` (counts: fix/ 19→9, audit/ 31→29, docs/ 16→15).
+
 ### Docs folder reorganization
 
 - **refactor(docs): reorganize docs/ folder structure** — Merged `docs/API/` and `docs/tests/` into a single `docs/reports/` folder for all generated reports (coverage gaps, rust-api, test docs, library docs, example coverage, unit test coverage). Promoted `docs/API/lua-api.md` and `docs/API/lurek.lua` to `docs/` top level for discoverability. Moved `docs/logs/` (8 JSON intermediate data files) to root `logs/` since they are tool data, not documentation. Updated ~40 files across Python tools, TypeScript extension, NSIS installer, READMEs, system prompt, handbook, prompts, and VS Code tasks. Deleted empty `docs/API/`, `docs/tests/`, `docs/logs/` directories. Architecture, wiki, specs, and quality folders are unchanged.
