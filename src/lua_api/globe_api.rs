@@ -98,16 +98,7 @@ impl LuaUserData for LuaGlobe {
             } else {
                 [0.5, 0.5, 0.5, 1.0]
             };
-            let province = Province {
-                id,
-                vertices,
-                centroid,
-                neighbors,
-                attrs: HashMap::new(),
-                edge_tags: HashMap::new(),
-                texture: None,
-                base_color,
-            };
+            let province = Province::with_data(id, centroid, vertices, neighbors, base_color);
             this.with_mut(|g| g.add_province(province).map(|_| true).unwrap_or(false))
         });
 

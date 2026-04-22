@@ -18,7 +18,7 @@ cargo run -- content/demos/hello_world  # verify it works
 Release build:
 
 ```bash
-cargo build --release                   # → build/release/lurek2d (~20 MB)
+cargo build --release                   # → build/release/lurek2d (~10 MB)
 ```
 
 The build output directory is `build/` (not `target/`) — configured via `.cargo/config.toml`.

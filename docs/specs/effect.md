@@ -303,6 +303,56 @@ Three new source files add dedicated post-processing presets as first-class type
 - `PostFxStack:endCapture`: Ends scene capture for post-processing.
 - `PostFxStack:apply`: Applies all enabled effects in the stack and composites the result to screen.
 - `PostFxStack:type`: Returns the type name "PostFxStack".
+
+## Custom WGSL Shaders
+
+### Creating Custom Effects
+
+Use `lurek.render.newShader(wgsl_source)` to compile a WGSL fragment shader, then
+wrap it in a post-processing effect with `lurek.effect.newCustomEffect(shader_id)`.
+
+Fragment shaders receive:
+- `@group(0) @binding(0)` — source texture (`texture_2d<f32>`)
+- `@group(0) @binding(1)` — sampler
+- `@group(0) @binding(2)` — parameter buffer (`PostFxParams`)
+
+Entry point must accept `@location(0) color: vec4<f32>` and `@location(1) uv: vec2<f32>`,
+and return `@location(0) vec4<f32>`.
+
+### Auto-Uniforms
+
+Call `effect:enableAutoUniforms()` to have the engine inject common values into
+parameter slot `p[3]` each frame:
+
+| Slot | Field | Description |
+|------|-------|-------------|
+| `p[3].x` | time | Total elapsed seconds (f32) |
+| `p[3].y` | frame | Frame count cast to f32 |
+| `p[3].z` | width | Render target width in pixels |
+| `p[3].w` | height | Render target height in pixels |
+
+Access in WGSL:
+
+```wgsl
+struct PostFxParams { p: array<vec4<f32>, 4>, }
+@group(0) @binding(2) var<uniform> params: PostFxParams;
+
+// In fragment main:
+let time       = params.p[3].x;
+let frame      = params.p[3].y;
+let resolution = params.p[3].zw;
+```
+
+**Convention:** Slots `p[0]..p[2]` are free for user parameters (set via `effect:setParameter(name, value)`).
+Slot `p[3]` is reserved for auto-uniforms when enabled. Do not overlap.
+
+### Auto-Uniform API
+
+| Method | Description |
+|--------|-------------|
+| `effect:enableAutoUniforms()` | Enable p[3] auto-injection |
+| `effect:disableAutoUniforms()` | Disable p[3] auto-injection |
+| `effect:isAutoUniforms()` | Returns current flag (boolean) |
 - `PostFxStack:typeOf`: Returns true when the given name matches "PostFxStack" or a parent type.
 - `PostFxStack:setFeedback`: Sets the feedback loop intensity. At `0.0` (default) there is no
 - `PostFxStack:getFeedback`: Returns the current feedback loop intensity `[0.0, 1.0]`.

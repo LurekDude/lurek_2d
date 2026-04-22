@@ -104,7 +104,7 @@ function AIWorld:type() end
 ---@return boolean
 function AIWorld:typeOf(name) end
 
---- Advances all agents by dt seconds.
+--- Advances all agents by dt seconds, then invokes any custom-model callbacks.
 ---@param dt any
 ---@return nil
 function AIWorld:update(dt) end
@@ -159,6 +159,11 @@ function Agent:hasTag(tag) end
 ---@param tag any
 ---@return nil
 function Agent:removeTag(tag) end
+
+--- Installs a Lua-driven decision model on this agent.
+---@param callback any
+---@return nil
+function Agent:setCustomModel(callback) end
 
 --- Sets the active decision model.
 ---@param model any
@@ -1126,6 +1131,12 @@ function lurek.ai.newGOAPPlanner() end
 ---@return GeneticAlgorithm
 function lurek.ai.newGeneticAlgorithm(pop_size, gene_count, seed) end
 
+--- Creates a BT Guard decorator. The predicate is evaluated before each tick;
+---@param predicate any
+---@param child_ud any
+---@return BTNode
+function lurek.ai.newGuard(predicate, child_ud) end
+
 --- Creates a new Hierarchical Task Network domain.
 ---@return HTNDomain
 function lurek.ai.newHTNDomain() end
@@ -1257,6 +1268,11 @@ function AnimCurve:eval(t) end
 --- Returns the number of keyframes currently stored.
 ---@return integer
 function AnimCurve:keyframeCount() end
+
+--- Set a custom Lua easing function for this curve.
+---@param func any
+---@return nil
+function AnimCurve:setCustomEasing(func) end
 
 --- Sets the easing kind applied between all keyframe segments.
 ---@param mode any
@@ -2856,52 +2872,6 @@ function Camera2D:zoomTo(target_zoom, duration) end
 ---@param vh any
 function lurek.camera.new(vw, vh) end
 
----@class lurek.collision
-lurek.collision = {}
-
---- Returns true when two axis-aligned bounding boxes overlap.
----@param ax any
----@param ay any
----@param aw any
----@param ah any
----@param bx any
----@param by any
----@param bw any
----@param bh any
----@return boolean
-function lurek.collision.testAABB(ax, ay, aw, ah, bx, by, bw, bh) end
-
---- Returns true when a circle overlaps an AABB.
----@param cx any
----@param cy any
----@param cr any
----@param ax any
----@param ay any
----@param aw any
----@param ah any
----@return boolean
-function lurek.collision.testCircleAABB(cx, cy, cr, ax, ay, aw, ah) end
-
---- Returns true when two circles overlap.
----@param ax any
----@param ay any
----@param ar any
----@param bx any
----@param by any
----@param br any
----@return boolean
-function lurek.collision.testCircles(ax, ay, ar, bx, by, br) end
-
---- Returns true when point (px, py) lies inside the AABB.
----@param px any
----@param py any
----@param ax any
----@param ay any
----@param aw any
----@param ah any
----@return boolean
-function lurek.collision.testPoint(px, py, ax, ay, aw, ah) end
-
 ---@class lurek.compute
 lurek.compute = {}
 
@@ -3021,6 +2991,11 @@ function Array:dot(other) end
 ---@return Array
 function Array:erode(radius) end
 
+--- Evaluate a Lua expression string element-wise, returning a new Array.
+---@param expr any
+---@return Array
+function Array:eval(expr) end
+
 --- Fills all elements with the given value in-place.
 ---@param val any
 ---@return nil
@@ -3059,6 +3034,11 @@ function Array:linsolve(b) end
 --- Decomposes this square matrix into L and U factors with partial pivoting.
 ---@return table
 function Array:luDecompose() end
+
+--- Apply a Lua callback element-wise, returning a new Array of the same shape.
+---@param func any
+---@return Array
+function Array:map(func) end
 
 --- Matrix multiplication of two 2D arrays.
 ---@param other any
@@ -3114,10 +3094,22 @@ function Array:percentile(p) end
 ---@return Array
 function Array:pow(exp) end
 
+--- Fold the array left-to-right with an accumulator.
+---@param func any
+---@param init any
+---@return number
+function Array:reduce(func, init) end
+
 --- Returns a new array with the given shape and the same data.
 ---@param shape any
 ---@return Array
 function Array:reshape(shape) end
+
+--- Running accumulation — like reduce but returns every intermediate result.
+---@param func any
+---@param init any
+---@return Array
+function Array:scan(func, init) end
 
 --- Sets the element at the given 1-based indices to a value.
 ---@param args any
@@ -3611,6 +3603,11 @@ function DataFrame:getValue(row, col) end
 ---@return table
 function DataFrame:groupBy(col) end
 
+--- Groups rows by column value, returns a GroupedFrame object supporting aggregate().
+---@param col any
+---@return GroupedFrame
+function DataFrame:groupByObj(col) end
+
 --- Returns the first n rows (default 5).
 ---@param n? any (optional)
 ---@return DataFrame
@@ -3812,6 +3809,16 @@ function Database:type() end
 ---@param name any
 ---@return boolean
 function Database:typeOf(name) end
+
+--- Lua-side wrapper around a grouped result from [`DataFrame::group_by`].
+---@class GroupedFrame
+local GroupedFrame = {}
+
+--- Apply a Lua function to aggregate a column's values per group.
+---@param col_name any
+---@param func any
+---@return DataFrame
+function GroupedFrame:aggregate(col_name, func) end
 
 --- Deserializes a binary LVDF string into a DataFrame.
 ---@param s any
@@ -5101,6 +5108,14 @@ function Overlay:update(dt) end
 ---@class PostFxEffect
 local PostFxEffect = {}
 
+--- Disables auto-injection of common uniforms into shader slot p[3].
+---@return nil
+function PostFxEffect:disableAutoUniforms() end
+
+--- Enables auto-injection of common uniforms into shader slot p[3] each frame.
+---@return nil
+function PostFxEffect:enableAutoUniforms() end
+
 --- Returns the type name of this effect (alias for getTypeName).
 ---@return string
 function PostFxEffect:getEffectType() end
@@ -5121,6 +5136,10 @@ function PostFxEffect:getTypeName() end
 ---@param name any
 ---@return boolean
 function PostFxEffect:hasParameter(name) end
+
+--- Returns whether auto-uniform injection is enabled for this effect.
+---@return boolean
+function PostFxEffect:isAutoUniforms() end
 
 --- Returns true if this is a built-in effect, false if custom.
 ---@return boolean
@@ -9443,6 +9462,37 @@ function lurek.minimap.newMinimap(grid_w, grid_h, display_w, display_h) end
 ---@class lurek.mods
 lurek.mods = {}
 
+--- A typed content registry for mod-contributed assets and objects.
+---@class ContentRegistry
+local ContentRegistry = {}
+
+--- Retrieve a content entry.
+---@param type_name any
+---@param id any
+---@return any
+function ContentRegistry:get(type_name, id) end
+
+--- Get all entries for a type.
+---@param type_name any
+---@return table
+function ContentRegistry:getAll(type_name) end
+
+--- Get all registered type names.
+---@return table
+function ContentRegistry:getTypes() end
+
+--- Register a content entry.
+---@param type_name any
+---@param id any
+---@param obj any
+---@return nil
+function ContentRegistry:register(type_name, id, obj) end
+
+--- Register a new content type.
+---@param type_name any
+---@return nil
+function ContentRegistry:registerType(type_name) end
+
 --- Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
 ---@class Mod
 local Mod = {}
@@ -9627,6 +9677,10 @@ function lurek.mods.newMod(info) end
 --- Creates a new empty ModManager.
 ---@return ModManager
 function lurek.mods.newModManager() end
+
+--- Creates a new empty ContentRegistry for mod-contributed assets.
+---@return ContentRegistry
+function lurek.mods.newRegistry() end
 
 ---@class lurek.network
 lurek.network = {}
@@ -10046,6 +10100,11 @@ lurek.particle = {}
 ---@class ParticleSystem
 local ParticleSystem = {}
 
+--- Adds a child emitter that updates and renders with this system.
+---@param config_tbl any
+---@return index
+function ParticleSystem:addSubSystem(config_tbl) end
+
 --- Removes all attractors from this particle system.
 ---@return nil
 function ParticleSystem:clearAttractors() end
@@ -10239,6 +10298,11 @@ function ParticleSystem:setBufferSize(n) end
 ---@return nil
 function ParticleSystem:setColors(colors) end
 
+--- Sets a Lua function that returns (offset_x, offset_y) for each newly spawned
+---@param cb any
+---@return nil
+function ParticleSystem:setCustomEmissionShape(cb) end
+
 --- Sets emission direction in radians.
 ---@param dir any
 ---@return nil
@@ -10285,6 +10349,11 @@ function ParticleSystem:setLinearDamping(min, max) end
 ---@param oy any
 ---@return nil
 function ParticleSystem:setOffset(ox, oy) end
+
+--- Sets a Lua function called after each update() with all particles that died
+---@param cb any
+---@return nil
+function ParticleSystem:setOnDeathBatch(cb) end
 
 --- Sets min and max particle lifetime in seconds.
 ---@param min any
@@ -10353,6 +10422,10 @@ function ParticleSystem:start() end
 --- Stops particle emission immediately.
 ---@return nil
 function ParticleSystem:stop() end
+
+--- Returns the number of direct child sub-systems attached to this emitter.
+---@return count
+function ParticleSystem:subSystemCount() end
 
 --- Alias for `drawToImage`. Renders all live particles to a CPU ImageData.
 ---@param w any
@@ -10431,6 +10504,11 @@ function Trail:setWidth(start, end) end
 ---@param dt any
 ---@return nil
 function Trail:update(dt) end
+
+--- Creates a new particle system from a TOML config file.
+---@param path any
+---@return ParticleSystem
+function lurek.particle.fromTOML(path) end
 
 --- Creates a new particle system and stores it in the engine pool.
 ---@param config? any (optional)
@@ -12439,6 +12517,49 @@ function lurek.physics.setSleepingAllowed(world_ud, body_ud, allowed) end
 ---@param dt any
 ---@return nil
 function lurek.physics.step(world_ud, dt) end
+
+--- Returns true when two axis-aligned bounding boxes overlap.
+---@param ax any
+---@param ay any
+---@param aw any
+---@param ah any
+---@param bx any
+---@param by any
+---@param bw any
+---@param bh any
+---@return boolean
+function lurek.physics.testAABB(ax, ay, aw, ah, bx, by, bw, bh) end
+
+--- Returns true when a circle overlaps an AABB.
+---@param cx any
+---@param cy any
+---@param cr any
+---@param ax any
+---@param ay any
+---@param aw any
+---@param ah any
+---@return boolean
+function lurek.physics.testCircleAABB(cx, cy, cr, ax, ay, aw, ah) end
+
+--- Returns true when two circles overlap.
+---@param ax any
+---@param ay any
+---@param ar any
+---@param bx any
+---@param by any
+---@param br any
+---@return boolean
+function lurek.physics.testCircles(ax, ay, ar, bx, by, br) end
+
+--- Returns true when point (px, py) lies inside the AABB.
+---@param px any
+---@param py any
+---@param ax any
+---@param ay any
+---@param aw any
+---@param ah any
+---@return boolean
+function lurek.physics.testPoint(px, py, ax, ay, aw, ah) end
 
 ---@class lurek.pipeline
 lurek.pipeline = {}
@@ -15924,6 +16045,22 @@ function TileMap:drawToImage(tile_size) end
 ---@return nil
 function TileMap:fill(layer, gid) end
 
+--- Fire the tile exit callback for the given GID (call when entity leaves tile).
+---@param gid any
+---@param entity any
+---@param tx any
+---@param ty any
+---@return nil
+function TileMap:fireTileExit(gid, entity, tx, ty) end
+
+--- Fire the tile step callback for the given GID (call each frame while entity is on tile).
+---@param gid any
+---@param entity any
+---@param tx any
+---@param ty any
+---@return nil
+function TileMap:fireTileStep(gid, entity, tx, ty) end
+
 --- Returns the chunk size used for spatial partitioning.
 ---@return integer
 function TileMap:getChunkSize() end
@@ -15999,6 +16136,18 @@ function TileMap:getViewport() end
 ---@param y any
 ---@return boolean
 function TileMap:isSolid(layer, x, y) end
+
+--- Register a callback for when an entity exits a tile with the given GID.
+---@param gid any
+---@param func any
+---@return nil
+function TileMap:onTileExit(gid, func) end
+
+--- Register a callback for when an entity steps on a tile with the given GID.
+---@param gid any
+---@param func any
+---@return nil
+function TileMap:onTileStep(gid, func) end
 
 --- Renders the tile map to the screen at the given offset.
 ---@param ox? any (optional)
@@ -17073,7 +17222,7 @@ function Image_Widget:addToast(toast_table) end
 ---@return nil
 function Image_Widget:clearFocus() end
 
---- Headless compatibility stub for GUI draw.
+--- Invokes all registered on_draw callbacks, each receiving the widget's
 ---@return nil
 function Image_Widget:draw() end
 
@@ -17204,6 +17353,11 @@ function Image_Widget:newColorPicker() end
 --- Creates a dropdown combo box widget.
 ---@return table
 function Image_Widget:newComboBox() end
+
+--- Creates a new widget with custom Lua-driven rendering.
+---@param config? any (optional)
+---@return table
+function Image_Widget:newCustomWidget(config) end
 
 --- Creates a modal dialog widget.
 ---@param title? any (optional)

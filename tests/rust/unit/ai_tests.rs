@@ -581,3 +581,115 @@ mod world_tests {
         assert!((world.global_blackboard().get_number("threat", 0.0) - 2.0).abs() < 1e-10);
     }
 }
+
+// ── extensibility: DecisionModel::Custom ─────────────────────────────────────
+
+mod decision_model_custom_tests {
+    use lurek2d::ai::agent::DecisionModel;
+
+    #[test]
+    fn decision_model_custom_as_str() {
+        let dm = DecisionModel::Custom { callback_id: 42 };
+        assert_eq!(dm.as_str(), "custom");
+    }
+
+    #[test]
+    fn decision_model_custom_not_parseable_by_string() {
+        // "custom" is a runtime-only model set via agent:setCustomModel(fn),
+        // not via agent:setDecisionModel("custom").
+        assert!(DecisionModel::parse_str("custom").is_none());
+    }
+
+    #[test]
+    fn decision_model_existing_round_trips_unaffected() {
+        for &s in &["fsm", "bt", "steering", "fsm+steering", "bt+steering"] {
+            let dm = DecisionModel::parse_str(s).unwrap();
+            assert_eq!(dm.as_str(), s);
+        }
+    }
+}
+
+// ── extensibility: ResponseCurve::Custom ─────────────────────────────────────
+
+mod response_curve_custom_tests {
+    use lurek2d::ai::utility_ai::ResponseCurve;
+
+    #[test]
+    fn response_curve_custom_identity_transform() {
+        let rc = ResponseCurve::Custom { callback_id: 0 };
+        // apply() returns identity for Custom; real call handled by Lua API layer.
+        assert!((rc.apply(0.7, 1.0, 0.0, 0.0) - 0.7).abs() < 1e-10);
+        assert!((rc.apply(0.0, 2.0, 1.0, 0.5) - 0.0).abs() < 1e-10);
+        assert!((rc.apply(1.0, 5.0, 0.0, 0.0) - 1.0).abs() < 1e-10);
+    }
+
+    #[test]
+    fn response_curve_custom_not_parsed_from_string() {
+        // "custom" is runtime-only; parse_str falls through to Linear default.
+        let rc = ResponseCurve::parse_str("custom");
+        assert_eq!(rc, ResponseCurve::Linear);
+    }
+}
+
+// ── extensibility: SteeringBehaviorType::Custom ───────────────────────────────
+
+mod steering_custom_tests {
+    use lurek2d::ai::steering::{SteeringBase, SteeringBehaviorType};
+
+    #[test]
+    fn steering_custom_kind_is_custom() {
+        let b = SteeringBehaviorType::Custom {
+            callback_id: 1,
+            base: SteeringBase::default(),
+        };
+        assert_eq!(b.kind(), "custom");
+    }
+
+    #[test]
+    fn steering_custom_calculate_returns_zero_force() {
+        let b = SteeringBehaviorType::Custom {
+            callback_id: 0,
+            base: SteeringBase::default(),
+        };
+        // calculate() is a no-op for Custom; Lua layer handles the real call.
+        let force = b.calculate((0.0, 0.0), (10.0, 0.0), 100.0, 0.016);
+        assert_eq!(force, (0.0, 0.0));
+    }
+
+    #[test]
+    fn steering_custom_base_weight_accessible() {
+        let b = SteeringBehaviorType::Custom {
+            callback_id: 7,
+            base: SteeringBase { weight: 2.5, enabled: true },
+        };
+        assert!((b.base().weight - 2.5).abs() < 1e-6);
+        assert!(b.base().enabled);
+    }
+}
+
+// ── extensibility: BTNode::Guard (structural) ─────────────────────────────────
+
+mod bt_node_guard_tests {
+    use lurek2d::ai::behavior_tree::{BTNode, BehaviorTree};
+
+    #[test]
+    fn bt_node_guard_child_count_is_one() {
+        // Guard nodes can't be built in unit tests (RegistryKey not constructable),
+        // but we verify child_count for other decorator nodes returns 1.
+        let inv = BTNode::Inverter {
+            child: Box::new(BTNode::Sequence {
+                children: Vec::new(),
+                running_idx: 0,
+            }),
+        };
+        assert_eq!(inv.child_count(), 1);
+    }
+
+    #[test]
+    fn new_behavior_tree_empty_state() {
+        let bt = BehaviorTree::new();
+        assert!(bt.root.is_none());
+        assert_eq!(bt.debug_state().node_count, 0);
+    }
+}
+

@@ -153,5 +153,8 @@ pub fn emission_shape_offset(shape: &EmissionShape) -> (f32, f32) {
             let r = t * radius;
             (angle.cos() * r, angle.sin() * r)
         }
+        // Custom shape: the Lua API layer applies the actual offset via callback.
+        // Return (0, 0) here as a placeholder; the API layer overwrites these after emission.
+        EmissionShape::Custom { .. } => (0.0, 0.0),
     }
 }

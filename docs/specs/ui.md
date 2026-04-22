@@ -782,6 +782,55 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 
+## Custom Widget Extensibility
+
+The `lurek.ui` API exposes two mechanisms for Lua-driven custom rendering:
+
+### `lurek.ui.newCustomWidget(config?)`
+
+Creates a new `WidgetType::Custom` widget backed by a `CustomWidget` struct that
+carries only a `WidgetBase`. No Rust-side rendering is applied; the entire visual
+output is driven from Lua via the `on_draw` callback.
+
+**Parameters:**
+- `config` (optional table): `{ id?, x?, y?, width?, height?, visible?, enabled? }`
+
+**Returns:** widget handle table (same as all other `new*` factories)
+
+```lua
+local w = lurek.ui.newCustomWidget({
+    x = 50, y = 50, width = 300, height = 200, id = "health_bar"
+})
+```
+
+### `widget:setOnDraw(fn)`
+
+Registers a per-widget draw callback. The callback receives one argument: a rect
+table `{ x, y, w, h }` containing the widget's computed screen-space bounds.
+
+```lua
+w:setOnDraw(function(rect)
+    lurek.graphic.setColor(0, 1, 0, 1)
+    lurek.graphic.fillRect(rect.x, rect.y, rect.w, rect.h)
+end)
+```
+
+### `lurek.ui.draw()`
+
+Iterates all registered `on_draw` callbacks and invokes each one with the
+widget's computed `{ x, y, w, h }` rect. Call this from your `lurek.render`
+callback after `lurek.ui.update(dt)`.
+
+```lua
+function lurek.render()
+    lurek.ui.draw()
+end
+```
+
+**Design note:** `on_draw` callbacks are stored as `LuaRegistryKey` values in the
+`GuiCallbacks` struct in `src/lua_api/ui_api.rs`. Domain code in `src/ui/` has no
+Lua dependency; the callback invocation lives entirely in the API layer.
+
 ## Notes
 
 - Keep this module reference synchronized with `src/ui/` and any matching Lua bindings.

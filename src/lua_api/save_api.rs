@@ -5,10 +5,10 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::data::compress::{compress, decompress, CompressFormat};
 use crate::filesystem::vfs::GameFS;
-use crate::save::{serialize_table, SaveManager, SaveValue};
-use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
+use crate::save::{
+    compress_save_content, decompress_save_content, serialize_table, SaveManager, SaveValue,
+};
 use std::collections::HashMap;
 
 // -------------------------------------------------------------------------------
@@ -158,11 +158,7 @@ impl LuaSaveManager {
         }
         let plain = self.serialize_collected(lua)?;
         let content = if self.compress {
-            let bytes = plain.as_bytes();
-            let compressed =
-                compress(bytes, CompressFormat::Lz4, 1).map_err(LuaError::RuntimeError)?;
-            let encoded = BASE64.encode(&compressed);
-            format!("--[[COMPRESSED]]\nreturn \"{}\"\n", encoded)
+            compress_save_content(&plain).map_err(LuaError::RuntimeError)?
         } else {
             plain
         };
@@ -186,38 +182,9 @@ impl LuaSaveManager {
             }
         };
         // Handle compressed saves.
-        let content: String = if raw.starts_with("--[[COMPRESSED]]") {
-            let encoded = raw
-                .lines()
-                .nth(1)
-                .and_then(|line| line.strip_prefix("return \""))
-                .and_then(|s| s.strip_suffix('"'))
-                .unwrap_or_default();
-            let compressed = match BASE64.decode(encoded) {
-                Ok(b) => b,
-                Err(e) => {
-                    return Ok((
-                        false,
-                        Some(format!("lurek.save:load: base64 decode: {}", e)),
-                    ))
-                }
-            };
-            match decompress(&compressed, CompressFormat::Lz4) {
-                Ok(bytes) => match String::from_utf8(bytes) {
-                    Ok(s) => s,
-                    Err(e) => {
-                        return Ok((false, Some(format!("lurek.save:load: utf8: {}", e))))
-                    }
-                },
-                Err(e) => {
-                    return Ok((
-                        false,
-                        Some(format!("lurek.save:load: decompress: {}", e)),
-                    ))
-                }
-            }
-        } else {
-            raw
+        let content: String = match decompress_save_content(&raw) {
+            Ok(s) => s,
+            Err(e) => return Ok((false, Some(format!("lurek.save:load: {}", e)))),
         };
         let data: LuaTable = match eval_save_content(lua, &content) {
             Ok(t) => t,

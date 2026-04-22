@@ -30,7 +30,7 @@
 
 ### Goals
 
-- **Hold core ≤ 15 MB stripped** on desktop targets (Windows / Linux / macOS, x86_64 + ARM). Constraint **A-05 (Proposed)** in [philosophy.md](philosophy.md#platform-and-runtime-constraints).
+- **Hold core ≤ 10 MB stripped** on desktop targets (Windows / Linux / macOS, x86_64 + ARM). Constraint **A-05 (Proposed)** in [philosophy.md](philosophy.md#platform-and-runtime-constraints).
 - **Optional features ship as plugins**, not as compile-time `cfg` thickets. A user who needs only sprites + audio + input must not pay binary size for AI, raycasting, dataframes, or the in-game terminal.
 - **Documented third-party extension surface**. A community author building a Steam SDK wrapper, a custom physics adapter, or a domain-specific renderer should plug in via a stable Rust crate API rather than forking the engine.
 - **Future Steam / Epic / itch.io SDK integration as a first-party plugin**, satisfying constraint **A-04** (no platform SDKs in the core binary) without requiring out-of-tree forks.
@@ -315,7 +315,7 @@ Introduce Cargo features `plugin-ai`, `plugin-ui`, `plugin-raycaster`, `plugin-p
 
 ### M3 — Size enforcement and A-05 promotion
 
-Flip default features off for `minimal`. Measure the stripped release binary on Windows / Linux / macOS. If the stripped size meets ≤ 15 MB, promote **A-05** in [philosophy.md](philosophy.md#platform-and-runtime-constraints) from *Proposed* to *Active*, add a CI gate that rejects PRs pushing the stripped binary over budget, and update [README.md](../../README.md) to advertise the size guarantee. **Gate**: A-05 active; CI size budget green on all three platforms.
+Flip default features off for `minimal`. Measure the stripped release binary on Windows / Linux / macOS. If the stripped size meets ≤ 10 MB, promote **A-05** in [philosophy.md](philosophy.md#platform-and-runtime-constraints) from *Proposed* to *Active*, add a CI gate that rejects PRs pushing the stripped binary over budget, and update [README.md](../../README.md) to advertise the size guarantee. **Gate**: A-05 active; CI size budget green on all three platforms.
 
 ### M4 — Dynamic plugins (Option B), optional
 
@@ -333,7 +333,7 @@ Add the `libloading` path behind a `dynamic-plugins` Cargo feature. Port one TIE
 | **GameMaker**          | Extensions as DLLs / JS, marketplace-distributed. Tied to GMS.                 | Yes          | No (GML)           | ~100+ MB                    |
 | **RPG Maker**          | Pure JS plugin model on top of NW.js / Electron.                               | No           | n/a (JS)           | ~80–150 MB                  |
 | **Godot**              | GDExtension: stable C ABI since 4.1, first-class.                              | Yes (stable) | GDScript only      | ~60–100 MB                  |
-| **Lurek2D (proposed)** | Hybrid: Cargo features (M2/M3), Lunasome Lua libs, optional `libloading` (M4). | Planned (M4) | Yes (Lunasome)     | **≤ 15 MB stripped (A-05)** |
+| **Lurek2D (proposed)** | Hybrid: Cargo features (M2/M3), Lunasome Lua libs, optional `libloading` (M4). | Planned (M4) | Yes (Lunasome)     | **≤ 10 MB stripped (A-05)** |
 
 Position: **simpler than Godot's GDExtension** (no full ABI surface to maintain in v1), **more native than RPG Maker's JS** (Rust + LuaJIT vs Electron), **smaller core than LÖVE-with-everything-bundled** (LÖVE ships every module always).
 
@@ -358,7 +358,7 @@ Position: **simpler than Godot's GDExtension** (no full ABI surface to maintain 
 
 ## 12. References
 
-- [philosophy.md § Platform and Runtime Constraints](philosophy.md#platform-and-runtime-constraints) — A-04 (no platform SDKs in core), A-05 (Proposed: ≤ 15 MB).
+- [philosophy.md § Platform and Runtime Constraints](philosophy.md#platform-and-runtime-constraints) — A-04 (no platform SDKs in core), A-05 (Proposed: ≤ 10 MB).
 - [philosophy.md § Active Module Group Constraints](philosophy.md#active-module-group-constraints) — T-08 (Steam SDK wrappers live outside the five-group stack).
 - [engine-architecture.md § Module Group Model](engine-architecture.md#module-group-model) — five-tier responsibility model the plugin tiers map onto.
 - [engine-architecture.md § State Architecture](engine-architecture.md#state-architecture) — `SharedState` design, the surface M1 refactors.

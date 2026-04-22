@@ -184,6 +184,8 @@ pub enum WidgetType {
     Switch,
     /// Notification badge with a count or label.
     Badge,
+    /// A fully Lua-driven widget with custom rendering.
+    Custom,
 }
 
 impl WidgetType {
@@ -228,6 +230,7 @@ impl WidgetType {
             Self::SpinBox => "spinbox",
             Self::Switch => "switch",
             Self::Badge => "badge",
+            Self::Custom => "custom",
         }
     }
 
@@ -275,6 +278,7 @@ impl WidgetType {
             "spinbox" => Some(Self::SpinBox),
             "switch" => Some(Self::Switch),
             "badge" => Some(Self::Badge),
+            "custom" => Some(Self::Custom),
             _ => None,
         }
     }
@@ -323,6 +327,7 @@ impl WidgetType {
             Self::SpinBox => (128.0, 32.0),
             Self::Switch => (64.0, 32.0),
             Self::Badge => (32.0, 16.0),
+            Self::Custom => (128.0, 128.0),
         }
     }
 }

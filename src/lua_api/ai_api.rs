@@ -1,6 +1,7 @@
 //! `lurek.ai` â€” Game AI toolkit: worlds, agents, FSM, behavior trees, steering, Q-learning, utility AI, GOAP, squads, and command queues.
 
 use super::SharedState;
+use crate::lua_api::callback_registry::CallbackRegistry;
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -17,6 +18,7 @@ use crate::ai::{
     BehaviorTree,
     Blackboard,
     CommandQueue,
+    Consideration,
     ContextSteering,
     DecisionModel,
     Emotion,
@@ -39,6 +41,7 @@ use crate::ai::{
     ORCASolver,
     ParallelPolicy,
     QLearner,
+    ResponseCurve,
     Squad,
     SteeringManager,
     StimulusWorld,
@@ -59,6 +62,9 @@ use crate::pathfind::InfluenceMap;
 #[derive(Clone)]
 struct LuaAIWorld {
     inner: Rc<RefCell<AIWorld>>,
+    /// Registry for custom-model Lua callbacks; shared with all agents that
+    /// have been given a `setCustomModel` callback.
+    custom_callbacks: Rc<RefCell<CallbackRegistry>>,
 }
 
 impl LuaUserData for LuaAIWorld {
@@ -73,6 +79,7 @@ impl LuaUserData for LuaAIWorld {
             Ok(LuaAgent {
                 world: this.inner.clone(),
                 name,
+                callbacks: this.custom_callbacks.clone(),
             })
         });
 
@@ -87,6 +94,7 @@ impl LuaUserData for LuaAIWorld {
                 Ok(Some(LuaAgent {
                     world: this.inner.clone(),
                     name,
+                    callbacks: this.custom_callbacks.clone(),
                 }))
             } else {
                 Ok(None)
@@ -121,11 +129,51 @@ impl LuaUserData for LuaAIWorld {
         });
 
         // -- update --
-        /// Advances all agents by dt seconds.
+        /// Advances all agents by dt seconds, then invokes any custom-model callbacks.
         /// @param dt : number
         /// @return nil
-        methods.add_method("update", |_, this, dt: f32| {
+        methods.add_method("update", |lua, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
+            // Collect names + callback IDs for all Custom-model agents.
+            let custom_agents: Vec<(String, u32)> = {
+                let w = this.inner.borrow();
+                w.agents
+                    .iter()
+                    .filter_map(|a| {
+                        if let crate::ai::DecisionModel::Custom { callback_id } = a.decision_model {
+                            Some((a.name.clone(), callback_id))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect()
+            };
+            for (name, callback_id) in custom_agents {
+                let lua_agent = LuaAgent {
+                    world: this.inner.clone(),
+                    name: name.clone(),
+                    callbacks: this.custom_callbacks.clone(),
+                };
+                let lua_bb = {
+                    let w = this.inner.borrow();
+                    match w.get_agent_index(&name) {
+                        Some(idx) => LuaBlackboard {
+                            inner: Rc::new(RefCell::new(w.agents[idx].blackboard.clone())),
+                        },
+                        None => continue,
+                    }
+                };
+                // Look up the Lua function (drops the borrow before calling).
+                let func_opt: Option<LuaFunction> = {
+                    let cb = this.custom_callbacks.borrow();
+                    cb.get(callback_id).and_then(|key| lua.registry_value(key).ok())
+                };
+                if let Some(func) = func_opt {
+                    if let Err(e) = func.call::<_, ()>((lua_agent, lua_bb, dt)) {
+                        eprintln!("[lurek.ai] custom model callback error for '{name}': {e}");
+                    }
+                }
+            }
             Ok(())
         });
 
@@ -153,6 +201,8 @@ impl LuaUserData for LuaAIWorld {
 struct LuaAgent {
     world: Rc<RefCell<AIWorld>>,
     name: String,
+    /// Shared reference to the owning `LuaAIWorld`'s callback registry.
+    callbacks: Rc<RefCell<CallbackRegistry>>,
 }
 
 impl LuaUserData for LuaAgent {
@@ -308,6 +358,22 @@ impl LuaUserData for LuaAgent {
             } else {
                 Ok("fsm".to_string())
             }
+        });
+
+        // -- setCustomModel --
+        /// Installs a Lua-driven decision model on this agent.
+        /// The callback is invoked by `world:update(dt)` each frame.
+        /// @param callback : function(agent, blackboard, dt)
+        /// @return nil
+        methods.add_method("setCustomModel", |lua, this, callback: LuaFunction| {
+            let key = lua.create_registry_value(callback)?;
+            let callback_id = this.callbacks.borrow_mut().register(key);
+            let mut w = this.world.borrow_mut();
+            if let Some(idx) = w.get_agent_index(&this.name) {
+                w.agents[idx].decision_model =
+                    crate::ai::DecisionModel::Custom { callback_id };
+            }
+            Ok(())
         });
 
         // -- addTag --
@@ -829,6 +895,7 @@ impl LuaUserData for LuaBTNode {
                 BTNode::Inverter { .. } => "inverter",
                 BTNode::Repeater { .. } => "repeater",
                 BTNode::Succeeder { .. } => "succeeder",
+                BTNode::Guard { .. } => "guard",
                 BTNode::Action { .. } => "action",
                 BTNode::Condition { .. } => "condition",
             };
@@ -858,6 +925,8 @@ impl LuaUserData for LuaBTNode {
 #[derive(Clone)]
 struct LuaSteeringManager {
     inner: Rc<RefCell<SteeringManager>>,
+    /// Registry for custom steering behavior Lua callbacks.
+    custom_callbacks: Rc<RefCell<CallbackRegistry>>,
 }
 
 impl LuaUserData for LuaSteeringManager {
@@ -1091,6 +1160,83 @@ impl LuaUserData for LuaSteeringManager {
             this.inner.borrow_mut().set_use_spatial_hash(enabled);
             Ok(())
         });
+
+        // -- addCustomBehavior --
+        /// Registers a Lua callback as a custom steering behavior.
+        /// The callback is invoked by `applyCustomSteering(agent, dt)` each frame.
+        /// @param callback : function(agent, dt) -> dx, dy
+        /// @param weight : number?
+        /// @return nil
+        methods.add_method(
+            "addCustomBehavior",
+            |lua, this, (func, weight): (LuaFunction, Option<f32>)| {
+                let key = lua.create_registry_value(func)?;
+                let callback_id = this.custom_callbacks.borrow_mut().register(key);
+                this.inner
+                    .borrow_mut()
+                    .behaviors
+                    .push(crate::ai::SteeringBehaviorType::Custom {
+                        callback_id,
+                        base: crate::ai::SteeringBase {
+                            weight: weight.unwrap_or(1.0),
+                            enabled: true,
+                        },
+                    });
+                Ok(())
+            },
+        );
+
+        // -- applyCustomSteering --
+        /// Invokes all registered custom steering callbacks and returns the combined force.
+        /// Call this each frame after `world:update(dt)` and apply the result to agent velocity.
+        /// @param agent : Agent
+        /// @param dt : number
+        /// @return number, number  (fx, fy)
+        methods.add_method(
+            "applyCustomSteering",
+            |lua, this, (agent_ud, dt): (LuaAnyUserData, f32)| {
+                let behaviors: Vec<(u32, f32)> = {
+                    let sm = this.inner.borrow();
+                    sm.behaviors
+                        .iter()
+                        .filter_map(|b| {
+                            if let crate::ai::SteeringBehaviorType::Custom {
+                                callback_id,
+                                base,
+                            } = b
+                            {
+                                if base.enabled {
+                                    Some((*callback_id, base.weight))
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            }
+                        })
+                        .collect()
+                };
+                let mut force = (0.0f32, 0.0f32);
+                for (callback_id, weight) in behaviors {
+                    let func_opt: Option<LuaFunction> = {
+                        let cb = this.custom_callbacks.borrow();
+                        cb.get(callback_id).and_then(|key| lua.registry_value(key).ok())
+                    };
+                    if let Some(func) = func_opt {
+                        match func.call::<_, (f32, f32)>((agent_ud.clone(), dt)) {
+                            Ok((fx, fy)) => {
+                                force.0 += fx * weight;
+                                force.1 += fy * weight;
+                            }
+                            Err(e) => {
+                                eprintln!("[lurek.ai] custom steering callback error: {e}");
+                            }
+                        }
+                    }
+                }
+                Ok(force)
+            },
+        );
     }
 }
 
@@ -1307,6 +1453,8 @@ impl LuaUserData for LuaQLearner {
 #[derive(Clone)]
 struct LuaUtilityAI {
     inner: Rc<RefCell<UtilityAI>>,
+    /// Registry for custom response-curve Lua callbacks.
+    custom_callbacks: Rc<RefCell<CallbackRegistry>>,
 }
 
 impl LuaUserData for LuaUtilityAI {
@@ -1355,6 +1503,86 @@ impl LuaUserData for LuaUtilityAI {
             let ai = this.inner.borrow();
             Ok(ai.last_action.map(|i| ai.actions[i].name.clone()))
         });
+
+        // -- addConsideration --
+        /// Adds a multi-axis consideration to a named action.
+        /// The curve argument may be a string ("linear", "quadratic", etc.) or a
+        /// Lua function `fn(x) -> y` for a fully custom curve.
+        /// @param actionName : string
+        /// @param name : string
+        /// @param scorerFn : function()  -- returns the raw consideration value
+        /// @param curve : string | function(x) -> y
+        /// @param p1 : number?
+        /// @param p2 : number?
+        /// @param p3 : number?
+        /// @param weight : number?
+        /// @return nil
+        methods.add_method(
+            "addConsideration",
+            |lua,
+             this,
+             (action_name, name, scorer_fn, curve_arg, p1, p2, p3, weight): (
+                String,
+                String,
+                LuaFunction,
+                LuaValue,
+                Option<f64>,
+                Option<f64>,
+                Option<f64>,
+                Option<f64>,
+            )| {
+                let scorer_key = lua.create_registry_value(scorer_fn)?;
+                match curve_arg {
+                    LuaValue::Function(f) => {
+                        // Custom Lua curve: register and push a Consideration directly
+                        // to avoid losing the Custom variant through parse_str round-trip.
+                        let curve_key = lua.create_registry_value(f)?;
+                        let callback_id = this.custom_callbacks.borrow_mut().register(curve_key);
+                        let curve = ResponseCurve::Custom { callback_id };
+                        let mut ua = this.inner.borrow_mut();
+                        if let Some(action) =
+                            ua.actions.iter_mut().find(|a| a.name == action_name)
+                        {
+                            action.considerations.push(Consideration {
+                                name,
+                                callback: scorer_key,
+                                curve,
+                                p1: p1.unwrap_or(1.0),
+                                p2: p2.unwrap_or(0.0),
+                                p3: p3.unwrap_or(0.0),
+                                weight: weight.unwrap_or(1.0),
+                            });
+                        }
+                    }
+                    LuaValue::String(s) => {
+                        let curve_str = s.to_str().unwrap_or("linear").to_string();
+                        this.inner.borrow_mut().add_consideration(
+                            &action_name,
+                            name,
+                            scorer_key,
+                            &curve_str,
+                            p1.unwrap_or(1.0),
+                            p2.unwrap_or(0.0),
+                            p3.unwrap_or(0.0),
+                            weight.unwrap_or(1.0),
+                        );
+                    }
+                    _ => {
+                        this.inner.borrow_mut().add_consideration(
+                            &action_name,
+                            name,
+                            scorer_key,
+                            "linear",
+                            p1.unwrap_or(1.0),
+                            p2.unwrap_or(0.0),
+                            p3.unwrap_or(0.0),
+                            weight.unwrap_or(1.0),
+                        );
+                    }
+                }
+                Ok(())
+            },
+        );
 
         // -- type --
         /// Returns the type name of this object.
@@ -3101,6 +3329,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         lua.create_function(|_, ()| {
             Ok(LuaAIWorld {
                 inner: Rc::new(RefCell::new(AIWorld::new())),
+                custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
             })
         })?,
     )?;
@@ -3275,6 +3504,35 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    // ── newGuard ──────────────────────────────────────────────────────────────────
+    /// Creates a BT Guard decorator. The predicate is evaluated before each tick;
+    /// if it returns false the child is skipped and Failure is returned.
+    /// @param predicate : function(agent, blackboard) -> boolean
+    /// @param child : BTNode
+    /// @return BTNode
+    tbl.set(
+        "newGuard",
+        lua.create_function(|lua, (predicate, child_ud): (LuaFunction, LuaAnyUserData)| {
+            let key = lua.create_registry_value(predicate)?;
+            let child = child_ud.borrow::<LuaBTNode>()?;
+            // Take ownership of the child node (leaves a placeholder Sequence behind),
+            // matching the same move-out pattern used by setChild/addChild.
+            let taken = std::mem::replace(
+                &mut *child.inner.borrow_mut(),
+                BTNode::Sequence {
+                    children: Vec::new(),
+                    running_idx: 0,
+                },
+            );
+            Ok(LuaBTNode {
+                inner: Rc::new(RefCell::new(BTNode::Guard {
+                    predicate: key,
+                    child: Box::new(taken),
+                })),
+            })
+        })?,
+    )?;
+
     // â”€â”€ newSteeringManager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new steering behavior manager.
     /// @return SteeringManager
@@ -3283,6 +3541,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         lua.create_function(|_, ()| {
             Ok(LuaSteeringManager {
                 inner: Rc::new(RefCell::new(SteeringManager::new())),
+                custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
             })
         })?,
     )?;
@@ -3309,6 +3568,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         lua.create_function(|_, ()| {
             Ok(LuaUtilityAI {
                 inner: Rc::new(RefCell::new(UtilityAI::new())),
+                custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
             })
         })?,
     )?;

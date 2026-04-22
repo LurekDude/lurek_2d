@@ -4,6 +4,7 @@ use super::render_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::math::Rect;
@@ -303,6 +304,8 @@ pub struct LuaTileMap {
     pub(super) inner: Rc<RefCell<TileMap>>,
     state: Rc<RefCell<SharedState>>,
     tile_callbacks: Rc<RefCell<Vec<(u32, LuaRegistryKey)>>>,
+    tile_exit_callbacks: Rc<RefCell<HashMap<u32, LuaRegistryKey>>>,
+    tile_step_callbacks: Rc<RefCell<HashMap<u32, LuaRegistryKey>>>,
 }
 
 impl LuaUserData for LuaTileMap {
@@ -874,6 +877,59 @@ impl LuaUserData for LuaTileMap {
                 Ok(())
             },
         );
+        // ── Tile Event Callbacks ─────────────────────────────────────────────
+
+        // -- onTileStep --
+        /// Register a callback for when an entity steps on a tile with the given GID.
+        /// @param gid : integer — tile global ID
+        /// @param fn : function(entity: table, tile_x: integer, tile_y: integer)
+        /// @return nil
+        methods.add_method_mut("onTileStep", |lua, this, (gid, func): (u32, LuaFunction)| {
+            let key = lua.create_registry_value(func)?;
+            this.tile_step_callbacks.borrow_mut().insert(gid, key);
+            Ok(())
+        });
+
+        // -- onTileExit --
+        /// Register a callback for when an entity exits a tile with the given GID.
+        /// @param gid : integer — tile global ID
+        /// @param fn : function(entity: table, tile_x: integer, tile_y: integer)
+        /// @return nil
+        methods.add_method_mut("onTileExit", |lua, this, (gid, func): (u32, LuaFunction)| {
+            let key = lua.create_registry_value(func)?;
+            this.tile_exit_callbacks.borrow_mut().insert(gid, key);
+            Ok(())
+        });
+
+        // -- fireTileStep --
+        /// Fire the tile step callback for the given GID (call each frame while entity is on tile).
+        /// @param gid : integer — tile GID
+        /// @param entity : table — entity data passed to callback
+        /// @param tile_x : integer — tile column
+        /// @param tile_y : integer — tile row
+        /// @return nil
+        methods.add_method("fireTileStep", |lua, this, (gid, entity, tx, ty): (u32, LuaTable, i32, i32)| {
+            if let Some(key) = this.tile_step_callbacks.borrow().get(&gid) {
+                let func: mlua::Function = lua.registry_value(key)?;
+                let _: () = func.call((entity, tx, ty))?;
+            }
+            Ok(())
+        });
+
+        // -- fireTileExit --
+        /// Fire the tile exit callback for the given GID (call when entity leaves tile).
+        /// @param gid : integer — tile GID
+        /// @param entity : table — entity data
+        /// @param tile_x : integer — tile column
+        /// @param tile_y : integer — tile row
+        /// @return nil
+        methods.add_method("fireTileExit", |lua, this, (gid, entity, tx, ty): (u32, LuaTable, i32, i32)| {
+            if let Some(key) = this.tile_exit_callbacks.borrow().get(&gid) {
+                let func: mlua::Function = lua.registry_value(key)?;
+                let _: () = func.call((entity, tx, ty))?;
+            }
+            Ok(())
+        });
     }
 }
 
@@ -1838,6 +1894,8 @@ impl LuaUserData for LuaMapGen {
                     inner: inner_rc,
                     state: this.state.clone(),
                     tile_callbacks: Rc::new(RefCell::new(Vec::new())),
+                    tile_step_callbacks: Rc::new(RefCell::new(HashMap::new())),
+                    tile_exit_callbacks: Rc::new(RefCell::new(HashMap::new())),
                 })
             },
         );
@@ -1919,6 +1977,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     inner: inner_rc,
                     state: s.clone(),
                     tile_callbacks: Rc::new(RefCell::new(Vec::new())),
+                    tile_step_callbacks: Rc::new(RefCell::new(HashMap::new())),
+                    tile_exit_callbacks: Rc::new(RefCell::new(HashMap::new())),
                 })
             },
         )?,
@@ -2512,6 +2572,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                         inner: Rc::new(RefCell::new(map)),
                         state: state.clone(),
                         tile_callbacks: Rc::new(RefCell::new(Vec::new())),
+                    tile_step_callbacks: Rc::new(RefCell::new(HashMap::new())),
+                    tile_exit_callbacks: Rc::new(RefCell::new(HashMap::new())),
                     })?;
                     Ok(LuaValue::UserData(ud))
                 }

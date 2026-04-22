@@ -17,7 +17,7 @@
 /// - `Puff` â€” Soft filled circle with more tessellation segments than `Circle` for a smoother look.
 /// - `Ring` â€” Hollow ring (annulus). `thickness` controls the ring band width as a fraction of particle size.
 /// - `Capsule` â€” Rectangle with hemispherical caps oriented along the particle's rotation.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum ParticleShape {
     /// Axis-aligned filled square. Backward-compatible default. Size is the side length.
     #[default]

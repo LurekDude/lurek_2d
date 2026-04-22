@@ -175,6 +175,77 @@ describe("lurek.ui.loadLayout — widget type coverage", function()
     end
 end)
 
+-- =========================================================================
+-- 5. Custom widget extensibility
+-- =========================================================================
+-- @description lurek.ui.newCustomWidget and setOnDraw API
+describe("UI custom widget", function()
+    -- @tests lurek.ui.newCustomWidget
+    -- @description newCustomWidget is a function
+    it("newCustomWidget is a function", function()
+        expect_type("function", lurek.ui.newCustomWidget)
+    end)
+
+    -- @tests lurek.ui.newCustomWidget
+    -- @description newCustomWidget creates a widget handle
+    it("newCustomWidget creates a widget handle", function()
+        local before = lurek.ui.getWidgetCount()
+        local w = lurek.ui.newCustomWidget({
+            x = 10, y = 20, width = 200, height = 150,
+            id = "test_custom",
+        })
+        expect_not_nil(w)
+        local after = lurek.ui.getWidgetCount()
+        assert(after > before, "widget count must increase after newCustomWidget")
+    end)
+
+    -- @tests lurek.ui.newCustomWidget
+    -- @tests widget:setOnDraw
+    -- @description setOnDraw method exists on the returned widget handle
+    it("setOnDraw method exists on widget", function()
+        local w = lurek.ui.newCustomWidget({ width = 100, height = 100 })
+        expect_not_nil(w)
+        expect_type("function", w.setOnDraw)
+    end)
+
+    -- @tests lurek.ui.newCustomWidget
+    -- @tests widget:setOnDraw
+    -- @description setOnDraw does not throw when called with a function
+    it("setOnDraw accepts a callback without error", function()
+        local w = lurek.ui.newCustomWidget({ x = 0, y = 0, width = 100, height = 50 })
+        local ok = pcall(function()
+            w:setOnDraw(function(rect)
+                -- rect table is passed by draw(); no draw call here
+            end)
+        end)
+        expect_true(ok, "setOnDraw must not throw")
+    end)
+
+    -- @tests lurek.ui.newCustomWidget
+    -- @description loadLayout supports type='custom' without error
+    it("loadLayout type='custom' does not crash", function()
+        local ok = pcall(function()
+            lurek.ui.loadLayout({
+                type = "custom",
+                x = 0, y = 0, w = 64, h = 64, id = "layout_custom",
+            })
+        end)
+        expect_true(ok, "loadLayout({type='custom'}) must not throw")
+    end)
+
+    -- @tests lurek.ui.draw
+    -- @description draw invokes registered on_draw callbacks
+    it("draw invokes on_draw callback", function()
+        local called = false
+        local w = lurek.ui.newCustomWidget({ x = 5, y = 5, width = 40, height = 30 })
+        w:setOnDraw(function(rect)
+            called = true
+        end)
+        lurek.ui.draw()
+        expect_true(called, "on_draw callback must be called by lurek.ui.draw()")
+    end)
+end)
+
 test_summary()
 
 -- =========================================================================

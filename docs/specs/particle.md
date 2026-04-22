@@ -32,7 +32,7 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `math.rs`: Defines interpolation and random-sampling helpers used during particle updates.
 - `mod.rs`: Declares the particle submodules and re-exports the public emitter, config, particle, trail, and helper types.
 - `particle.rs`: Defines Particle, the live per-particle state record used during simulation.
-- `render.rs`: Provides standard generate_render_commands wrappers for particle systems and trails.
+- `render.rs`: Provides standard `generate_render_commands` wrappers for particle systems and trails, plus `expand_particle_commands` which splits textured particles into individual `DrawQuad`/`DrawImageEx` commands.
 - `shapes.rs`: Defines ParticleShape, the geometric primitive enum for untextured particle rendering.
 - `trail.rs`: Defines Trail and TrailPoint for fading ribbon effects built from timestamped points.
 
@@ -41,7 +41,7 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `AreaDistribution` (`enum`, `config.rs`): Enum controlling secondary spread across rectangular or elliptical areas.
 - `InsertMode` (`enum`, `config.rs`): Insert mode controlling where new particles are placed in the particle list.
 - `EmitterState` (`enum`, `config.rs`): Enum tracking whether an emitter is active, paused, or stopped.
-- `EmissionShape` (`enum`, `config.rs`): Enum controlling where particles spawn relative to the emitter.
+- `EmissionShape` (`enum`, `config.rs`): Enum controlling where particles spawn relative to the emitter. Variants: `Point`, `Circle`, `Rectangle`, `Ring`, `Line`, `Cone`, `Star`, `Spiral`, `Custom { callback_id: u32 }`. Derives `serde::Serialize + Deserialize`.
 - `RelativeMode` (`enum`, `config.rs`): Enum controlling whether particles remain in world space or move with the emitter.
 - `Attractor` (`struct`, `config.rs`): Gravity well applied to live particles. Fields: `x: f32`, `y: f32`, `strength: f32`, `radius: f32`. Positive strength pulls; negative repels.
 - `BounceBounds` (`struct`, `config.rs`): Axis-aligned bounding rectangle. Particles that cross a wall have their velocity component reversed and scaled by `restitution`. Fields: `x_min`, `x_max`, `y_min`, `y_max`, `restitution: f32`.
@@ -193,6 +193,74 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `ParticleSystem:addSubEmitter`: Attaches a sub-emitter that bursts when a particle dies.
 - `ParticleSystem:setFlipbook`: Configures sprite-sheet flipbook animation by dividing the texture into a grid.
 - `ParticleSystem:getFlipbook`: Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
+- `ParticleSystem:addSubSystem`: Adds a persistent child emitter that updates and renders alongside this system. Returns a 1-based index.
+- `ParticleSystem:subSystemCount`: Returns the number of direct child sub-systems.
+- `ParticleSystem:setCustomEmissionShape`: Registers a Lua `function() -> (offset_x, offset_y)` callback invoked for each newly spawned particle when using the `Custom` emission shape.
+- `ParticleSystem:setOnDeathBatch`: Registers a Lua `function(batch)` callback invoked after each `update()` with a table array of `{x, y, vx, vy}` entries for all particles that died that frame.
+- `lurek.particle.fromTOML`: Loads a TOML-serialized `ParticleConfig` from a file path and returns a new `ParticleSystem`.
+
+## Lua Extensibility Hooks
+
+Phase 03 adds four hooks that let Lua scripts extend particle system behaviour without modifying the Rust engine.
+
+### `ps:addSubSystem(config) → index`
+
+Attaches a persistent child emitter to `ps`.  Unlike the `death_emitter` sub-burst, this child is always updated and rendered alongside the parent — useful for multi-layered effects (e.g. a fire core + smoke outer layer).
+
+```lua
+local fire  = lurek.particle.newSystem({ maxParticles = 256 })
+local smoke_idx = fire:addSubSystem({
+    maxParticles = 64,
+    lifetimeMin  = 2.0,
+    lifetimeMax  = 3.0,
+    speed_min    = 10,
+    speed_max    = 30,
+})
+```
+
+### `ps:setCustomEmissionShape(fn)`
+
+Delegates spawn-position calculation to a Lua callback.  Must be called before `emit()`; the callback is invoked once per particle each `update()` step.
+
+```lua
+ps:setCustomEmissionShape(function()
+    local angle = math.random() * math.pi * 2
+    return math.cos(angle) * 40, math.sin(angle) * 40
+end)
+```
+
+The `EmissionShape` for `ps` is automatically set to `Custom` when this method is called.  The initial `(0, 0)` placeholder emitted by the domain layer is replaced with the callback's return value.
+
+### `ps:setOnDeathBatch(fn)`
+
+Registers a callback invoked at the end of each `update()` call whenever one or more particles died that frame.  The argument is a sequence table where each entry has `x`, `y`, `vx`, `vy` (world-space position and velocity at death).
+
+```lua
+ps:setOnDeathBatch(function(batch)
+    for _, p in ipairs(batch) do
+        spawn_spark(p.x, p.y)
+    end
+end)
+```
+
+### `lurek.particle.fromTOML(path) → ParticleSystem`
+
+Loads a TOML file and parses it into a `ParticleConfig`, then creates and returns a new `ParticleSystem`.  Uses the same field names as the Rust `ParticleConfig` struct (snake_case TOML keys).
+
+```lua
+local ps = lurek.particle.fromTOML("assets/effects/explosion.toml")
+```
+
+`texture_id` is not supported in TOML configs (it is a runtime-only resource handle); all other scalar and table fields are round-trippable.
+
+### Domain changes (src/particle/)
+
+| File | Change |
+|------|--------|
+| `config.rs` | `EmissionShape::Custom { callback_id: u32 }` variant added; all config enums and `ParticleConfig` derive `serde::Serialize + Deserialize`; `ParticleConfig::from_toml_str()` added |
+| `shapes.rs` | `ParticleShape` derives `serde::Serialize + Deserialize` |
+| `emission.rs` | `EmissionShape::Custom { .. }` arm returns `(0.0, 0.0)` placeholder |
+| `emitter.rs` | `pending_custom_offsets: Vec<usize>` and `pending_deaths: Vec<(f32,f32,f32,f32)>` fields added to `ParticleSystem`; `drain_custom_offsets()`, `drain_pending_deaths()`, `add_sub_system()`, `sub_system_count()` methods added; Phase 2 of `update()` collects deaths into `pending_deaths` |
 
 ### `Trail` Methods
 - `Trail:pushPoint`: Appends a new point to the trail head.

@@ -45,6 +45,7 @@ use crate::ai::traits::TraitProfile;
 /// (potentially setting steering targets), then steering computes forces.
 ///
 /// Lua scripts set this via `agent:setDecisionModel("fsm+steering")` etc.
+/// Custom models are set via `agent:setCustomModel(fn)` in Lua.
 ///
 /// # Variants
 /// - `Fsm` — Fsm variant.
@@ -52,6 +53,7 @@ use crate::ai::traits::TraitProfile;
 /// - `Steering` — Steering variant.
 /// - `FsmSteering` — FsmSteering variant.
 /// - `BtSteering` — BtSteering variant.
+/// - `Custom` — Custom variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum DecisionModel {
     /// Ticks only the attached StateMachine. Transitions are evaluated each frame
@@ -69,6 +71,13 @@ pub enum DecisionModel {
     /// Ticks the BehaviorTree first (which may update steering targets via
     /// blackboard), then applies the SteeringManager forces.
     BtSteering,
+    /// A user-defined Lua callback drives this agent's decisions.
+    /// The callback is stored by the Lua API layer; this field holds only the
+    /// opaque ID into that layer's [`CallbackRegistry`].
+    Custom {
+        /// Opaque ID referencing the Lua callback in the API-layer registry.
+        callback_id: u32,
+    },
 }
 
 impl DecisionModel {
@@ -97,7 +106,8 @@ impl DecisionModel {
     /// Returns the canonical Lua string identifier for this decision model.
     ///
     /// Used when serializing agent state back to Lua or for debugging output.
-    /// Round-trips with [`parse_str`](Self::parse_str).
+    /// Round-trips with [`parse_str`](Self::parse_str) for all variants except
+    /// `Custom`, which is set programmatically via `agent:setCustomModel(fn)`.
     ///
     /// # Returns
     /// `&'static str`.
@@ -108,6 +118,7 @@ impl DecisionModel {
             Self::Steering => "steering",
             Self::FsmSteering => "fsm+steering",
             Self::BtSteering => "bt+steering",
+            Self::Custom { .. } => "custom",
         }
     }
 }

@@ -734,3 +734,36 @@ mod weather_tests {
         assert!((p.alpha - 0.8).abs() < 1e-6);
     }
 }
+
+// ── auto_uniforms tests ─────────────────────────────────────────────────────
+
+mod auto_uniforms_tests {
+    use super::*;
+
+    #[test]
+    fn post_fx_effect_auto_uniforms_default_false() {
+        let fx = PostFxEffect::new(PostFxEffectType::Bloom);
+        assert!(!fx.auto_uniforms);
+    }
+
+    #[test]
+    fn post_fx_effect_new_custom_auto_uniforms_default_false() {
+        let fx = PostFxEffect::new_custom(0);
+        assert!(!fx.auto_uniforms);
+    }
+
+    #[test]
+    fn post_fx_effect_auto_uniforms_set_true() {
+        let mut fx = PostFxEffect::new_custom(0);
+        fx.auto_uniforms = true;
+        assert!(fx.auto_uniforms);
+    }
+
+    #[test]
+    fn post_fx_effect_auto_uniforms_round_trip() {
+        let mut fx = PostFxEffect::new_custom(42);
+        fx.auto_uniforms = true;
+        fx.auto_uniforms = false;
+        assert!(!fx.auto_uniforms);
+    }
+}

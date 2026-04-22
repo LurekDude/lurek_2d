@@ -2729,3 +2729,50 @@ describe("Missing explicit test for mlua:typeOf", function()
         -- TODO: add assertion for mlua:typeOf
     end)
 end)
+
+-- ── enableAutoUniforms ──────────────────────────────────────────────────────
+
+describe("effect:enableAutoUniforms", function()
+    it("enableAutoUniforms exists on PostFxEffect", function()
+        local fx = lurek.effect.newCustomEffect(0)
+        expect_equal(type(fx.enableAutoUniforms), "function")
+    end)
+
+    it("isAutoUniforms exists on PostFxEffect", function()
+        local fx = lurek.effect.newCustomEffect(0)
+        expect_equal(type(fx.isAutoUniforms), "function")
+    end)
+
+    it("disableAutoUniforms exists on PostFxEffect", function()
+        local fx = lurek.effect.newCustomEffect(0)
+        expect_equal(type(fx.disableAutoUniforms), "function")
+    end)
+
+    it("isAutoUniforms defaults to false", function()
+        local fx = lurek.effect.newCustomEffect(0)
+        expect_equal(fx:isAutoUniforms(), false)
+    end)
+
+    it("enableAutoUniforms sets flag to true", function()
+        local fx = lurek.effect.newCustomEffect(0)
+        fx:enableAutoUniforms()
+        expect_equal(fx:isAutoUniforms(), true)
+    end)
+
+    it("disableAutoUniforms sets flag back to false", function()
+        local fx = lurek.effect.newCustomEffect(0)
+        fx:enableAutoUniforms()
+        fx:disableAutoUniforms()
+        expect_equal(fx:isAutoUniforms(), false)
+    end)
+
+    it("built-in effect also has enableAutoUniforms", function()
+        local fx = lurek.effect.newEffect("bloom")
+        expect_equal(type(fx.enableAutoUniforms), "function")
+    end)
+
+    it("built-in effect isAutoUniforms defaults to false", function()
+        local fx = lurek.effect.newEffect("vignette")
+        expect_equal(fx:isAutoUniforms(), false)
+    end)
+end)

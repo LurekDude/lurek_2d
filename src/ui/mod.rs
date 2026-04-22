@@ -54,8 +54,8 @@ pub use controls::{
     SpinBox, Switch, TabBar, TextInput,
 };
 pub use extras::{
-    Accordion, AccordionSection, Badge, ColorPicker, Dialog, GUITable, ImageWidget, MenuBar,
-    MenuItem, Separator, Spacer, StatusBar, TableColumn, Toast, Toolbar, ToolbarButton,
+    Accordion, AccordionSection, Badge, ColorPicker, CustomWidget, Dialog, GUITable, ImageWidget,
+    MenuBar, MenuItem, Separator, Spacer, StatusBar, TableColumn, Toast, Toolbar, ToolbarButton,
     TooltipPanel, TreeNode, TreeView,
 };
 pub use theme::{Theme, WidgetStyle};

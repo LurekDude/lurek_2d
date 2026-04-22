@@ -2,7 +2,10 @@
 
 use std::collections::HashMap;
 
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use mlua::prelude::{LuaError, LuaResult, LuaValue};
+
+use crate::data::compress::{compress, decompress, CompressFormat};
 
 use crate::log_msg;
 use crate::runtime::log_messages::{SV01, SV02, SV03, SV04};
@@ -372,4 +375,58 @@ fn escape_lua_str(s: &str) -> String {
         .replace('\n', "\\n")
         .replace('\r', "\\r")
         .replace('\0', "\\0")
+}
+
+// ── Save-file compression helpers ──────────────────────────────────────────────
+
+/// Prefix marker written at the top of compressed save files.
+const COMPRESSED_MARKER: &str = "--[[COMPRESSED]]";
+
+/// Compress a serialised save string with LZ4, then base64-encode it.
+///
+/// The returned string has the form:
+/// ```text
+/// --[[COMPRESSED]]
+/// return "<base64>"
+/// ```
+///
+/// # Parameters
+/// - `plain` — `&str`. The raw `return { ... }` save content.
+///
+/// # Returns
+/// `Result<String, String>` — the wrapped, encoded payload, or an error message.
+pub fn compress_save_content(plain: &str) -> Result<String, String> {
+    let compressed = compress(plain.as_bytes(), CompressFormat::Lz4, 1)?;
+    let encoded = BASE64.encode(&compressed);
+    Ok(format!("{}\nreturn \"{}\"\n", COMPRESSED_MARKER, encoded))
+}
+
+/// Detect and decode a compressed save file, or pass through an uncompressed one.
+///
+/// If `raw` starts with the `--[[COMPRESSED]]` marker, the second line is
+/// expected to contain `return "<base64>"`. The base64 payload is decoded and
+/// LZ4-decompressed back to the original `return { ... }` string.
+///
+/// Uncompressed content is returned unchanged.
+///
+/// # Parameters
+/// - `raw` — `&str`. The raw file content read from disk.
+///
+/// # Returns
+/// `Result<String, String>` — the decompressed content, or an error message.
+pub fn decompress_save_content(raw: &str) -> Result<String, String> {
+    if !raw.starts_with(COMPRESSED_MARKER) {
+        return Ok(raw.to_string());
+    }
+    let encoded = raw
+        .lines()
+        .nth(1)
+        .and_then(|line| line.strip_prefix("return \""))
+        .and_then(|s| s.strip_suffix('"'))
+        .unwrap_or_default();
+    let compressed = BASE64
+        .decode(encoded)
+        .map_err(|e| format!("base64 decode: {}", e))?;
+    let bytes = decompress(&compressed, CompressFormat::Lz4)?;
+    String::from_utf8(bytes).map_err(|e| format!("utf8: {}", e))
 }

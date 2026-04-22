@@ -101,7 +101,7 @@ For canonical group-by-group module placement, see [architecture/engine-architec
 Cargo profiles:
 
 - `cargo build` → `build/debug/lurek2d` — fast incremental, slow runtime, full debug symbols.
-- `cargo build --release` → `build/release/lurek2d` — slow build, optimised binary (~20 MB stripped today; target is ≤ 15 MB once the [plugin architecture](architecture/plugins.md) lands).
+- `cargo build --release` → `build/release/lurek2d` — slow build, optimised binary (target is ≤ 10 MB once the [plugin architecture](architecture/plugins.md) lands).
 - `cargo check` — type-check only; the fastest "did I break the build?" loop.
 
 The `build/` directory is the configured Cargo `target-dir` ([.cargo/config.toml](../.cargo/config.toml)). Don't use `target/`.

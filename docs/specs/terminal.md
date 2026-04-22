@@ -30,6 +30,7 @@ Three source files extend the terminal's text-mode surface. The existing `ansi.r
 - `ansi.rs`: ANSI escape code parsing for the terminal module.
 - `cell.rs`: Defines the `TCell` character-cell record with foreground and background color data.
 - `completion.rs`: Tab-completion engine for the terminal module.
+- `highlighter.rs`: Text-highlighting algorithm (`HighlightRule`, `ColoredSpan`, `highlight_spans`) — splits text by earliest-match-wins rules.
 - `mod.rs`: Declares the terminal submodules and re-exports the grid, widget, and border types.
 - `render.rs`: Converts terminal contents and terminal widgets into render commands or CPU-side image output.
 - `terminal_state.rs`: Implements the main `Terminal` state, including the cell grid, cursor, focus, input routing, and terminal events.

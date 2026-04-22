@@ -23,9 +23,9 @@ Save operations work through the collector pattern: Lua registers named modules 
 
 ## Files
 
-- `mod.rs`: Declares the save submodules and re-exports the public save manager, value, metadata, and serialization-facing types.
+- `mod.rs`: Declares the save submodules and re-exports the public save manager, value, metadata, serialization-facing types, and compression helpers.
 - `save_data.rs`: Holds an alternate save-data type definition set that currently lives in the module tree but is not the primary surface re-exported from `mod.rs`.
-- `save_manager.rs`: Implements `SaveManager`, slot metadata, schema versioning, dirty tracking, collector registration, restore hooks, and auto-save timing.
+- `save_manager.rs`: Implements `SaveManager`, slot metadata, schema versioning, dirty tracking, collector registration, restore hooks, auto-save timing, and save-file compression helpers (`compress_save_content`, `decompress_save_content`).
 
 ## Types
 

@@ -62,6 +62,11 @@
 -- @tests lurek.particle.start
 -- @tests lurek.particle.stop
 -- @tests lurek.particle.update
+-- @tests lurek.particle.addSubSystem
+-- @tests lurek.particle.subSystemCount
+-- @tests lurek.particle.setCustomEmissionShape
+-- @tests lurek.particle.setOnDeathBatch
+-- @tests lurek.particle.fromTOML
 
     -- Lurek2D Particle API Tests
 
@@ -1228,6 +1233,117 @@ describe("Missing explicit test for ParticleSystem:getColors", function()
     it("ParticleSystem:getColors works", function()
         -- @tests ParticleSystem:getColors
         -- TODO: add assertion for ParticleSystem:getColors
+    end)
+end)
+
+-- ── Phase 03: Extensibility Hooks ────────────────────────────────────────────
+
+describe("particle sub-systems", function()
+    it("addSubSystem method exists on handle", function()
+        local ps = lurek.particle.newSystem({ maxParticles = 64 })
+        expect_equal(type(ps.addSubSystem), "function")
+    end)
+
+    it("subSystemCount starts at 0", function()
+        local ps = lurek.particle.newSystem({ maxParticles = 64 })
+        expect_equal(ps:subSystemCount(), 0)
+    end)
+
+    it("addSubSystem increases count by 1", function()
+        local ps = lurek.particle.newSystem({ maxParticles = 64 })
+        ps:addSubSystem({ maxParticles = 16 })
+        expect_equal(ps:subSystemCount(), 1)
+    end)
+
+    it("addSubSystem returns 1-based index", function()
+        local ps = lurek.particle.newSystem({ maxParticles = 64 })
+        local idx = ps:addSubSystem({ maxParticles = 16 })
+        expect_equal(idx, 1)
+        local idx2 = ps:addSubSystem({ maxParticles = 16 })
+        expect_equal(idx2, 2)
+    end)
+end)
+
+describe("particle custom emission shape", function()
+    it("setCustomEmissionShape method exists on handle", function()
+        local ps = lurek.particle.newSystem({ maxParticles = 64 })
+        expect_equal(type(ps.setCustomEmissionShape), "function")
+    end)
+
+    it("setCustomEmissionShape accepts a callback without error", function()
+        local ps = lurek.particle.newSystem({ maxParticles = 64 })
+        local ok = pcall(function()
+            ps:setCustomEmissionShape(function() return 0, 0 end)
+        end)
+        expect_true(ok, "setCustomEmissionShape should accept a callback function")
+    end)
+
+    it("callback is invoked when particles are emitted and updated", function()
+        local ps = lurek.particle.newSystem({
+            maxParticles = 8,
+            emissionRate = 0,
+        })
+        local calls = 0
+        ps:setCustomEmissionShape(function()
+            calls = calls + 1
+            return 10, 20
+        end)
+        ps:emit(3)
+        ps:update(0.016)
+        expect_true(calls >= 3, "custom shape callback should be called for each emitted particle")
+    end)
+end)
+
+describe("particle death batch callback", function()
+    it("setOnDeathBatch method exists on handle", function()
+        local ps = lurek.particle.newSystem({ maxParticles = 64 })
+        expect_equal(type(ps.setOnDeathBatch), "function")
+    end)
+
+    it("setOnDeathBatch accepts a callback without error", function()
+        local ps = lurek.particle.newSystem({ maxParticles = 64 })
+        local ok = pcall(function()
+            ps:setOnDeathBatch(function(_batch) end)
+        end)
+        expect_true(ok, "setOnDeathBatch should accept a callback function")
+    end)
+
+    it("death batch callback is invoked when particles die", function()
+        local ps = lurek.particle.newSystem({
+            maxParticles = 8,
+            emissionRate = 0,
+            lifetimeMin = 0.001,
+            lifetimeMax = 0.001,
+        })
+        local death_count = 0
+        ps:setOnDeathBatch(function(batch)
+            death_count = death_count + #batch
+        end)
+        ps:emit(3)
+        ps:update(1.0)  -- enough to kill all 3
+        expect_true(death_count >= 3, "death batch callback should receive all 3 dead particles")
+    end)
+
+    it("death batch entries have x, y, vx, vy fields", function()
+        local ps = lurek.particle.newSystem({
+            maxParticles = 4,
+            emissionRate = 0,
+            lifetimeMin = 0.001,
+            lifetimeMax = 0.001,
+        })
+        local entry = nil
+        ps:setOnDeathBatch(function(batch)
+            if #batch > 0 then entry = batch[1] end
+        end)
+        ps:emit(1)
+        ps:update(1.0)
+        expect_true(entry ~= nil, "should have received a death entry")
+        if entry then
+            expect_equal(type(entry.x), "number")
+            expect_equal(type(entry.y), "number")
+            expect_equal(type(entry.vx), "number")
+            expect_equal(type(entry.vy), "number")
+        end
     end)
 end)
 

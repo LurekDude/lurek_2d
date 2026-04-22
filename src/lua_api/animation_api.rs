@@ -593,6 +593,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|lua, ()| {
             lua.create_userdata(LuaAnimCurve {
                 inner: crate::animation::curve::AnimCurve::new(),
+                custom_easing: None,
             })
         })?,
     )?;
@@ -648,6 +649,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 /// Lua-side wrapper around an [`AnimCurve`].
 pub struct LuaAnimCurve {
     inner: crate::animation::curve::AnimCurve,
+    /// Optional Lua registry key for a custom easing callback.
+    custom_easing: Option<LuaRegistryKey>,
 }
 
 impl LuaUserData for LuaAnimCurve {
@@ -667,12 +670,21 @@ impl LuaUserData for LuaAnimCurve {
         // -- eval --
         /// Returns the interpolated value at the given time using the curve's easing.
         ///
+        /// If a custom easing callback was set via `setCustomEasing`, it is called with
+        /// the raw time `t` and its return value is used directly.
         /// Returns `0.0` if the curve has no keyframes.
         /// Clamps to the first/last keyframe value when `t` is out of range.
         ///
         /// @param t : number
         /// @return number
-        methods.add_method("eval", |_, this, t: f32| Ok(this.inner.eval(t)));
+        methods.add_method("eval", |lua, this, t: f32| {
+            if let Some(key) = &this.custom_easing {
+                let func: mlua::Function = lua.registry_value(key)?;
+                let v: f64 = func.call(t as f64)?;
+                return Ok(v as f32);
+            }
+            Ok(this.inner.eval(t))
+        });
 
         // -- setEasing --
         /// Sets the easing kind applied between all keyframe segments.
@@ -704,6 +716,34 @@ impl LuaUserData for LuaAnimCurve {
         /// @return integer
         methods.add_method("keyframeCount", |_, this, ()| {
             Ok(this.inner.keyframe_count())
+        });
+
+        // -- setCustomEasing --
+        /// Set a custom Lua easing function for this curve.
+        ///
+        /// When set, `eval(t)` will call this function with the raw time value and
+        /// return its result directly, bypassing the built-in easing modes.
+        /// Pass `nil` to clear any previously set custom easing.
+        ///
+        /// @param fn : function(t: number) → number — receives time t, returns output value
+        /// @return nil
+        methods.add_method_mut("setCustomEasing", |lua, this, func: LuaValue| {
+            use crate::animation::curve::EasingKind;
+            if let Some(old_key) = this.custom_easing.take() {
+                lua.remove_registry_value(old_key)?;
+            }
+            match func {
+                LuaValue::Function(f) => {
+                    let key = lua.create_registry_value(f)?;
+                    this.custom_easing = Some(key);
+                    this.inner.easing = EasingKind::Custom { callback_id: 0 };
+                }
+                LuaValue::Nil => {
+                    this.inner.easing = EasingKind::Linear;
+                }
+                _ => return Err(LuaError::RuntimeError("setCustomEasing: expected function or nil".into())),
+            }
+            Ok(())
         });
 
         // -- clear --

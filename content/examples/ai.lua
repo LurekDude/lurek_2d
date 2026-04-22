@@ -2220,3 +2220,79 @@ do  -- AILod:tierName
   local n = lod:tierName(0)
   if n then lurek.log.debug("tier 0=" .. n, "ai") end
 end
+
+
+-- =============================================================================
+-- Lua Extensibility Hooks (Phase 01)
+-- =============================================================================
+
+--@api-stub: Agent:setCustomModel
+-- Sets a Lua-driven decision model on an agent.
+-- The callback fn(agent, blackboard, dt) is called each frame by world:update(dt).
+do  -- Agent:setCustomModel
+  local world = lurek.ai.newWorld()
+  local agent = world:addAgent("custom_agent")
+  agent:setCustomModel(function(ag, bb, dt)
+    -- Read from blackboard and steer accordingly
+    local dist = bb:getNumber("target_dist", 999)
+    if dist < 50 then
+      ag:setVelocity(0, 0)
+    end
+  end)
+  world:update(0.016)
+  lurek.log.debug("custom model: " .. agent:getDecisionModel(), "ai")
+end
+
+--@api-stub: lurek.ai.newGuard
+-- Creates a BT Guard decorator that checks a predicate before ticking the child.
+-- Returns "guard" from getNodeType(); getChildCount() returns 1.
+do  -- lurek.ai.newGuard
+  local action = lurek.ai.newAction(function(ag, bb, dt) return "success" end)
+  local guard = lurek.ai.newGuard(
+    function(ag, bb) return bb:getNumber("health", 1.0) > 0.0 end,
+    action
+  )
+  lurek.log.debug("guard type=" .. guard:getNodeType(), "ai")
+  lurek.log.debug("guard children=" .. guard:getChildCount(), "ai")
+end
+
+--@api-stub: UtilityAI:addConsideration
+-- Adds a multi-axis consideration with optional custom Lua curve function.
+-- Accepts either a string curve name or a fn(x)->y for a custom response curve.
+do  -- UtilityAI:addConsideration (custom curve)
+  local ua = lurek.ai.newUtilityAI()
+  ua:addAction("patrol", function() return 0.4 end)
+  ua:addConsideration(
+    "patrol",
+    "health_curve",
+    function() return 0.8 end,
+    function(x) return x * x end   -- quadratic custom curve
+  )
+  lurek.log.debug("considerations registered without error", "ai")
+end
+
+--@api-stub: SteeringManager:addCustomBehavior
+-- Registers a Lua callback fn(agent, dt)->dx,dy as a custom steering force.
+-- Weight multiplies the returned force before combination.
+do  -- SteeringManager:addCustomBehavior
+  local sm = lurek.ai.newSteeringManager()
+  sm:addCustomBehavior(function(ag, dt)
+    return 100, 0   -- constant rightward force
+  end, 1.0)
+  lurek.log.debug("custom behaviors=" .. sm:getBehaviorCount(), "ai")
+end
+
+--@api-stub: SteeringManager:applyCustomSteering
+-- Invokes all custom steering callbacks and returns the combined (fx, fy) force.
+-- Call each frame and add the result to the agent's velocity manually.
+do  -- SteeringManager:applyCustomSteering
+  local world = lurek.ai.newWorld()
+  local agent = world:addAgent("steered")
+  local sm = lurek.ai.newSteeringManager()
+  sm:addCustomBehavior(function(ag, dt)
+    return 50, 25
+  end, 1.0)
+  -- applyCustomSteering passes the agent userdata to each callback
+  local fx, fy = sm:applyCustomSteering(agent, 0.016)
+  lurek.log.debug("custom force=" .. fx .. "," .. fy, "ai")
+end

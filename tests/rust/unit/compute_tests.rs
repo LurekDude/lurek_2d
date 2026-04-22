@@ -726,3 +726,24 @@ mod ops_tests {
         assert!(add(&a, &b).is_err());
     }
 }
+
+// ── Lua-driven compute extensions ────────────────────────────────────────────
+
+mod lua_ops_tests {
+    use lurek2d::compute::array::{DataType, NdArray};
+
+    #[test]
+    fn ndarray_to_f64_vec_roundtrip() {
+        let arr = NdArray::from_slice(&[1.0, 2.0, 3.0], &[3], DataType::Float64)
+            .expect("from_slice");
+        let v = arr.to_f64_vec();
+        assert_eq!(v, vec![1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn ndarray_get_set_f64() {
+        let mut arr = NdArray::zeros(&[4], DataType::Float64).expect("zeros");
+        arr.set_f64(2, 99.0);
+        assert_eq!(arr.get_f64(2), 99.0);
+    }
+}

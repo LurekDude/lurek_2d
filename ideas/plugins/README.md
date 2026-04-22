@@ -6,7 +6,7 @@
 
 ## Summary
 
-Split Lurek2D from a monolithic ~20 MB binary into a thin runtime executable (~3–5 MB)
+Split Lurek2D from a monolithic ~10 MB binary into a thin runtime executable (~3–5 MB)
 plus dynamically-loaded plugin libraries (`.dll` / `.so` / `.dylib`). Each plugin
 registers additional `lurek.*` Lua API functions. Users select plugins via `conf.toml`
 and the runtime discovers and loads them at startup.

@@ -1116,6 +1116,7 @@ impl LurekApp {
             bg,
             cam_matrix,
             frame_time,
+            frame_count,
             vp_scale_x,
             vp_scale_y,
             vp_offset_x,
@@ -1134,6 +1135,7 @@ impl LurekApp {
                 st.background_color,
                 st.camera.view_matrix(),
                 st.total_time as f32,
+                st.frame_counter,
                 st.window_state.viewport_scale_x,
                 st.window_state.viewport_scale_y,
                 st.window_state.viewport_offset_x,
@@ -1210,6 +1212,7 @@ impl LurekApp {
                 bg,
                 &cam_matrix,
                 frame_time,
+                frame_count,
                 capture_screenshot || should_auto_capture,
             )
         };
@@ -1399,6 +1402,7 @@ impl LurekApp {
             bg,
             &crate::math::Mat3::identity(),
             total_time as f32,
+            0u64,
             false,
         ) {
             if e == wgpu::SurfaceError::Lost || e == wgpu::SurfaceError::Outdated {
@@ -1466,6 +1470,7 @@ impl LurekApp {
             bg,
             &crate::math::Mat3::identity(),
             0.0,
+            0u64,
             false,
         ) {
             if e == wgpu::SurfaceError::Lost || e == wgpu::SurfaceError::Outdated {

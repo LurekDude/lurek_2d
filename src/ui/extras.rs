@@ -1170,3 +1170,36 @@ impl Badge {
         self.count = count;
     }
 }
+
+// ── CustomWidget ───────────────────────────────────────────────────────────────
+
+/// A fully Lua-driven widget with custom rendering.
+///
+/// Carries only the shared [`WidgetBase`] — all visual output is produced by
+/// the Lua `on_draw` callback registered via `widget:setOnDraw(fn)`.
+///
+/// # Fields
+/// - `base` — `WidgetBase`. Shared widget properties.
+#[derive(Debug, Clone)]
+pub struct CustomWidget {
+    /// Shared widget properties.
+    pub base: WidgetBase,
+}
+
+impl CustomWidget {
+    /// Create a new custom widget.
+    ///
+    /// # Returns
+    /// `CustomWidget`.
+    pub fn new() -> Self {
+        Self {
+            base: WidgetBase::new(WidgetType::Custom),
+        }
+    }
+}
+
+impl Default for CustomWidget {
+    fn default() -> Self {
+        Self::new()
+    }
+}

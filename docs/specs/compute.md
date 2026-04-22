@@ -226,6 +226,54 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Array:luDecompose`: Decomposes this square matrix into L and U factors with partial pivoting.
 - `Array:type`: Returns the type name "Array".
 - `Array:typeOf`: Returns true when the given name matches "Array" or a parent type.
+- `Array:map`: Apply a Lua callback element-wise, returning a new Array of the same shape.
+- `Array:eval`: Evaluate a Lua expression string element-wise, returning a new Array.
+- `Array:reduce`: Fold the array left-to-right with an accumulator, returning a scalar.
+- `Array:scan`: Running accumulation — like reduce but returns every intermediate result as an Array.
+
+## Lua Extensibility Hooks
+
+Four methods allow game developers to apply arbitrary Lua logic over array elements without writing Rust:
+
+### `Array:map(fn) → Array`
+
+Applies a `function(x) → number` callback to every element, returning a new array of the same shape and dtype.
+
+```lua
+local a = lurek.compute.fromTable({1, 4, 9})
+local b = a:map(function(x) return math.sqrt(x) end)
+-- b:toTable() → {1, 2, 3}
+```
+
+### `Array:eval(expr) → Array`
+
+Compiles and applies a Lua expression string element-wise. The variable `x` holds the current element value.
+
+```lua
+local a = lurek.compute.fromTable({1, 2, 3})
+local b = a:eval("x * x + 1")
+-- b:toTable() → {2, 5, 10}
+```
+
+### `Array:reduce(fn, init) → number`
+
+Folds the array left-to-right with a `function(acc, x) → number` accumulator. Returns the final scalar.
+
+```lua
+local a = lurek.compute.fromTable({1, 2, 3, 4})
+local total = a:reduce(function(acc, x) return acc + x end, 0)
+-- total → 10
+```
+
+### `Array:scan(fn, init) → Array`
+
+Like `reduce` but emits every intermediate accumulator value as an array (same shape as input).
+
+```lua
+local a = lurek.compute.fromTable({1, 2, 3, 4})
+local prefix = a:scan(function(acc, x) return acc + x end, 0)
+-- prefix:toTable() → {1, 3, 6, 10}
+```
 
 ## References
 

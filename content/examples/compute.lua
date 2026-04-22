@@ -650,3 +650,39 @@ do  -- Array:typeOf
   end
 end
 
+--@api-stub: Array:map
+-- Apply a Lua callback element-wise, returning a new Array of the same shape.
+-- Use to transform every element without a manual loop.
+do  -- Array:map
+  local a = lurek.compute.fromTable({1, 4, 9})
+  local b = a:map(function(x) return math.sqrt(x) end)
+  lurek.log.debug("map sqrt: " .. tostring(b:toTable()[1]), "compute")
+end
+
+--@api-stub: Array:eval
+-- Evaluate a Lua expression string element-wise, returning a new Array.
+-- The variable x holds the current element; useful for quick one-off transforms.
+do  -- Array:eval
+  local a = lurek.compute.fromTable({1, 2, 3})
+  local b = a:eval("x * x + 1")
+  lurek.log.debug("eval x^2+1: " .. tostring(b:toTable()[2]), "compute")
+end
+
+--@api-stub: Array:reduce
+-- Fold the array left-to-right with an accumulator function, returning a scalar.
+-- Use for sum, product, max, or any custom fold.
+do  -- Array:reduce
+  local a = lurek.compute.fromTable({1, 2, 3, 4})
+  local total = a:reduce(function(acc, x) return acc + x end, 0)
+  lurek.log.debug("reduce sum: " .. tostring(total), "compute")
+end
+
+--@api-stub: Array:scan
+-- Running accumulation — like reduce but returns every intermediate result as an Array.
+-- Use for prefix sums, running averages, or cumulative scoring.
+do  -- Array:scan
+  local a = lurek.compute.fromTable({1, 2, 3, 4})
+  local prefix = a:scan(function(acc, x) return acc + x end, 0)
+  lurek.log.debug("scan prefix[4]: " .. tostring(prefix:toTable()[4]), "compute")
+end
+

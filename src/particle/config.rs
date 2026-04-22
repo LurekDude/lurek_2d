@@ -12,7 +12,7 @@ use crate::runtime::resource_keys::TextureKey;
 /// - `Ellipse` â€” Uniform random distribution inside an ellipse.
 /// - `BorderEllipse` â€” Random distribution on the border of an ellipse.
 /// - `BorderRectangle` â€” Random distribution on the border of a rectangle.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum AreaDistribution {
     /// No area â€” all particles spawn at the emitter center.
     #[default]
@@ -35,7 +35,7 @@ pub enum AreaDistribution {
 /// - `Top` â€” New particles added to the end of the list (drawn on top, default).
 /// - `Bottom` â€” New particles added to the front of the list (drawn behind existing particles).
 /// - `Random` â€” New particles inserted at a random position in the list.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum InsertMode {
     /// New particles are added to the end (drawn on top).
     #[default]
@@ -52,7 +52,7 @@ pub enum InsertMode {
 /// - `Active` â€” Emitting and updating particles each frame.
 /// - `Paused` â€” Particles freeze in place; no new emissions and no physics updates.
 /// - `Stopped` â€” No new emissions; existing particles continue ageing until dead.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum EmitterState {
     /// Emitting particles and updating existing ones.
     Active,
@@ -73,7 +73,8 @@ pub enum EmitterState {
 /// - `Cone` â€” Particles spawn within a cone sector.
 /// - `Star` â€” Particles spawn on the points or edges of a star polygon.
 /// - `Spiral` â€” Particles spawn along an Archimedean spiral.
-#[derive(Clone, Debug, Default, PartialEq)]
+/// - `Custom` — Spawn offset delegated to a Lua callback in the API layer.
+#[derive(Clone, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum EmissionShape {
     /// All particles spawn at the emitter center.
     #[default]
@@ -131,6 +132,12 @@ pub enum EmissionShape {
         /// Maximum radius of the spiral in pixels.
         radius: f32,
     },
+    /// Spawn offset is computed by a Lua callback registered in the API layer.
+    /// `callback_id` is an opaque key into the `CallbackRegistry`; 0 means unregistered.
+    Custom {
+        /// Opaque callback ID into the Lua API layer's `CallbackRegistry`.
+        callback_id: u32,
+    },
 }
 
 /// Relative mode controlling whether particles move with the emitter.
@@ -138,7 +145,7 @@ pub enum EmissionShape {
 /// # Variants
 /// - `Detached` â€” Particles remain in world space after emission (default).
 /// - `Attached` â€” Particles move with the emitter position each frame.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum RelativeMode {
     /// Particles remain in world space after emission (default).
     #[default]
@@ -210,7 +217,7 @@ pub struct BounceBounds {
 /// - `relative_mode` â€” `RelativeMode`. Whether particles follow the emitter.
 /// - `shape` â€” `ParticleShape`. Rendered primitive type (point, rect, sprite).
 /// - (additional fields: gravity, accel, damping, turbulence, drag, orbit, animation, etc.)
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ParticleConfig {
     /// Maximum number of live particles (pool size).
     pub max_particles: u32,
@@ -289,6 +296,8 @@ pub struct ParticleConfig {
     /// Whether particle rotation follows velocity direction.
     pub relative_rotation: bool,
     /// Optional texture key for textured particle rendering.
+    /// Not serialized — texture references are runtime-only handles.
+    #[serde(skip)]
     pub texture_id: Option<TextureKey>,
     /// Quad sub-regions for sprite-sheet particle rendering `[x, y, w, h]`.
     pub quads: Vec<[f32; 4]>,
@@ -404,5 +413,15 @@ impl Default for ParticleConfig {
             ray_aspect: 4.0,
             ring_thickness: 0.2,
         }
+    }
+}
+
+impl ParticleConfig {
+    /// Parses a TOML string into a `ParticleConfig`.
+    ///
+    /// @param toml_str : &str  TOML-formatted particle configuration.
+    /// @return Result<Self, String>
+    pub fn from_toml_str(toml_str: &str) -> Result<Self, String> {
+        toml::from_str(toml_str).map_err(|e| e.to_string())
     }
 }

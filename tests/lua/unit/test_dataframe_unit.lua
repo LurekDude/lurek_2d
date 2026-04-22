@@ -2270,3 +2270,39 @@ describe("Missing explicit test for Database:typeOf", function()
         -- TODO: add assertion for Database:typeOf
     end)
 end)
+
+-- =========================================================================
+-- Phase 06: grouped:aggregate with Lua callback
+-- =========================================================================
+describe("grouped:aggregate with Lua callback", function()
+    it("groupByObj method exists on DataFrame", function()
+        local df = lurek.dataframe.newDataFrame()
+        expect_equal(type(df.groupByObj), "function")
+    end)
+
+    it("groupByObj returns a GroupedFrame object", function()
+        local df = lurek.dataframe.newDataFrame()
+        df:addColumn("category", nil)
+        df:addColumn("value", nil)
+        df:addRow({category = "a", value = 1})
+        df:addRow({category = "b", value = 10})
+        local g = df:groupByObj("category")
+        expect_not_nil(g)
+        expect_equal(type(g.aggregate), "function")
+    end)
+
+    it("aggregate with sum callback produces correct result", function()
+        local csv = "category,value\na,1\na,2\nb,10"
+        local df = lurek.dataframe.fromCSV(csv)
+        local g = df:groupByObj("category")
+        if g then
+            local result = g:aggregate("value", function(vals)
+                local s = 0
+                for _, v in ipairs(vals) do s = s + v end
+                return s
+            end)
+            expect_not_nil(result)
+            expect_equal(result:nrows(), 2)
+        end
+    end)
+end)

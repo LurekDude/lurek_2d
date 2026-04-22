@@ -142,7 +142,7 @@ These are **active, binding decisions**. All code must comply. Do not propose ch
 | **A-02** | Active   | **Desktop only** — Windows / Linux / macOS, x86_64 + ARM. Mobile (iOS / Android) and WASM are out of scope.                                                                                  |
 | **A-03** | Active   | **2D graphics only** — no 3D scene graph, no perspective projection pipeline. Raycasting columns and isometric rendering are acceptable because they use 2D draw calls.                      |
 | **A-04** | Active   | No distribution platform SDK integration (Steam, Epic, itch.io store APIs) in the core engine binary. Platform wrappers live outside the five-group module stack entirely — constraint T-08. |
-| **A-05** | Proposed | **A-05 (Proposed)** — Core binary stays ≤ 15 MB stripped on desktop targets. Optional subsystems ship as plugins; plugin size is additional and unbudgeted.                                  |
+| **A-05** | Proposed | **A-05 (Proposed)** — Core binary stays ≤ 10 MB stripped on desktop targets. Optional subsystems ship as plugins; plugin size is additional and unbudgeted.                                  |
 
 > **A-05 status note**: Currently *Proposed* (not yet binding). It becomes Active when the plugin system described in [plugins.md](plugins.md) is accepted and a baseline stripped-binary measurement is recorded.
 

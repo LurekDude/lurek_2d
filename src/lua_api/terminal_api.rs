@@ -8,6 +8,7 @@ use std::rc::{Rc, Weak};
 
 use crate::terminal::ansi::{parse_ansi_spans, strip_ansi_codes};
 use crate::terminal::completion::CompletionEngine;
+use crate::terminal::highlighter::{HighlightRule, highlight_spans};
 use crate::terminal::{BorderStyle, Terminal, TerminalEvent, Widget, WidgetKind};
 
 // -------------------------------------------------------------------------------
@@ -1665,12 +1666,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 String,
                 LuaTable,
             )| {
-                struct Rule {
-                    pattern: String,
-                    fg: [f32; 4],
-                    bg: Option<[f32; 4]>,
-                }
-                let mut rules: Vec<Rule> = Vec::new();
+                let mut rules: Vec<HighlightRule> = Vec::new();
                 for pair in rules_t.sequence_values::<LuaTable>() {
                     let rt = pair?;
                     let pattern: String = rt.get("pattern")?;
@@ -1690,7 +1686,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                             1.0,
                         ])
                     });
-                    rules.push(Rule {
+                    rules.push(HighlightRule {
                         pattern,
                         fg: [
                             fr as f32 / 255.0,
@@ -1701,45 +1697,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         bg,
                     });
                 }
-                let mut term_ref = term_ud.borrow_mut::<LuaTerminal>()?;
                 let default_fg = [1.0f32, 1.0, 1.0, 1.0];
-                let mut remaining = text.as_str();
+                let spans = highlight_spans(&text, &rules, default_fg);
+                let mut term_ref = term_ud.borrow_mut::<LuaTerminal>()?;
                 let mut cur_col = col;
-                while !remaining.is_empty() {
-                    let best = rules
-                        .iter()
-                        .filter_map(|r| remaining.find(r.pattern.as_str()).map(|pos| (pos, r)))
-                        .min_by_key(|(pos, _)| *pos);
-                    match best {
-                        None => {
-                            term_ref
-                                .binding
-                                .terminal
-                                .borrow_mut()
-                                .print_colored(cur_col, row, remaining, default_fg, None);
-                            break;
-                        }
-                        Some((pos, rule)) => {
-                            if pos > 0 {
-                                let prefix = &remaining[..pos];
-                                term_ref
-                                    .binding
-                                    .terminal
-                                    .borrow_mut()
-                                    .print_colored(cur_col, row, prefix, default_fg, None);
-                                cur_col += prefix.chars().count();
-                            }
-                            let end = pos + rule.pattern.len();
-                            let token = &remaining[pos..end];
-                            term_ref
-                                .binding
-                                .terminal
-                                .borrow_mut()
-                                .print_colored(cur_col, row, token, rule.fg, rule.bg);
-                            cur_col += token.chars().count();
-                            remaining = &remaining[end..];
-                        }
-                    }
+                for span in &spans {
+                    term_ref
+                        .binding
+                        .terminal
+                        .borrow_mut()
+                        .print_colored(cur_col, row, &span.text, span.fg, span.bg);
+                    cur_col += span.text.chars().count();
                 }
                 Ok(())
             },

@@ -1,5 +1,6 @@
-//! `lurek.particle` â€” Emitter-based 2D particle systems and trail ribbons.
+﻿//! `lurek.particle` â€” Emitter-based 2D particle systems and trail ribbons.
 
+use super::callback_registry::CallbackRegistry;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -30,6 +31,9 @@ use crate::runtime::resource_keys::ParticleKey;
 pub struct LuaParticleSystem {
     pub(crate) state: Rc<RefCell<SharedState>>,
     pub(crate) key: ParticleKey,
+    pub(crate) custom_callbacks: Rc<RefCell<CallbackRegistry>>,
+    pub(crate) custom_shape_id: Option<u32>,
+    pub(crate) death_batch_id: Option<u32>,
 }
 
 impl LuaUserData for LuaParticleSystem {
@@ -38,10 +42,66 @@ impl LuaUserData for LuaParticleSystem {
         /// Advances the particle simulation by dt seconds.
         /// @param dt : number
         /// @return nil
-        methods.add_method("update", |_, this, dt: f32| {
-            let mut st = this.state.borrow_mut();
-            if let Some(ps) = st.particle_systems.get_mut(this.key) {
-                ps.update(dt);
+        methods.add_method("update", |lua, this, dt: f32| {
+            // Phase 1: domain update
+            {
+                let mut st = this.state.borrow_mut();
+                if let Some(ps) = st.particle_systems.get_mut(this.key) {
+                    ps.update(dt);
+                }
+            }
+            // Phase 2: apply custom emission offsets
+            {
+                let indices: Vec<usize> = {
+                    let mut st = this.state.borrow_mut();
+                    st.particle_systems
+                        .get_mut(this.key)
+                        .map(|ps| ps.drain_custom_offsets())
+                        .unwrap_or_default()
+                };
+                if let Some(cb_id) = this.custom_shape_id {
+                    if !indices.is_empty() {
+                        let reg = this.custom_callbacks.borrow();
+                        for idx in indices {
+                            if let Ok((ox, oy)) = reg.invoke::<_, (f32, f32)>(cb_id, lua, ()) {
+                                let mut st = this.state.borrow_mut();
+                                if let Some(ps) = st.particle_systems.get_mut(this.key) {
+                                    if let Some(p) = ps.particles.get_mut(idx) {
+                                        p.x = ox;
+                                        p.y = oy;
+                                        p.origin_x = ox;
+                                        p.origin_y = oy;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // Phase 3: invoke death-batch callback
+            {
+                let deaths: Vec<(f32, f32, f32, f32)> = {
+                    let mut st = this.state.borrow_mut();
+                    st.particle_systems
+                        .get_mut(this.key)
+                        .map(|ps| ps.drain_pending_deaths())
+                        .unwrap_or_default()
+                };
+                if let Some(cb_id) = this.death_batch_id {
+                    if !deaths.is_empty() {
+                        let batch = lua.create_table()?;
+                        for (i, (x, y, vx, vy)) in deaths.iter().enumerate() {
+                            let entry = lua.create_table()?;
+                            entry.set("x", *x)?;
+                            entry.set("y", *y)?;
+                            entry.set("vx", *vx)?;
+                            entry.set("vy", *vy)?;
+                            batch.set(i + 1, entry)?;
+                        }
+                        let reg = this.custom_callbacks.borrow();
+                        let _ = reg.invoke::<_, LuaMultiValue>(cb_id, lua, batch);
+                    }
+                }
             }
             Ok(())
         });
@@ -976,7 +1036,6 @@ impl LuaUserData for LuaParticleSystem {
         /// @param oy : number?  World Y offset added to every particle (default 0).
         /// @return nil
         methods.add_method("render", |_, this, (ox, oy): (Option<f32>, Option<f32>)| {
-            use crate::render::renderer::RenderCommand;
             let ox = ox.unwrap_or(0.0);
             let oy = oy.unwrap_or(0.0);
             // Snapshot particles while borrowing immutably; drop borrow before borrow_mut.
@@ -990,58 +1049,9 @@ impl LuaUserData for LuaParticleSystem {
             // Textured particles expand to DrawQuad / DrawImageEx.
             // Untextured particles are forwarded as a single DrawParticleSystem batch
             // so the GPU renderer can tessellate all shapes in one colour draw call.
+            let expanded = crate::particle::render::expand_particle_commands(cmds);
             let mut st = this.state.borrow_mut();
-            for cmd in cmds {
-                if let RenderCommand::DrawParticleSystem { particles } = cmd {
-                    let mut untextured = Vec::new();
-                    for p in &particles {
-                        if let Some(tex_key) = p.texture_key {
-                            if let Some([qx, qy, qw, qh]) = p.quad {
-                                let (tex_w, tex_h) = p.quad_tex_dims.unwrap_or((qw, qh));
-                                let scale = if qw > 0.0 { p.size / qw } else { 1.0 };
-                                st.render_commands.push(RenderCommand::DrawQuad {
-                                    texture_key: tex_key,
-                                    quad_x: qx,
-                                    quad_y: qy,
-                                    quad_w: qw,
-                                    quad_h: qh,
-                                    tex_w,
-                                    tex_h,
-                                    x: p.x,
-                                    y: p.y,
-                                    rotation: p.rotation,
-                                    sx: scale,
-                                    sy: scale,
-                                    ox: p.size * 0.5,
-                                    oy: p.size * 0.5,
-                                    effect: None,
-                                });
-                            } else {
-                                st.render_commands.push(RenderCommand::DrawImageEx {
-                                    texture_key: tex_key,
-                                    x: p.x,
-                                    y: p.y,
-                                    rotation: p.rotation,
-                                    sx: 1.0,
-                                    sy: 1.0,
-                                    ox: p.size * 0.5,
-                                    oy: p.size * 0.5,
-                                    effect: None,
-                                });
-                            }
-                        } else {
-                            untextured.push(p.clone());
-                        }
-                    }
-                    if !untextured.is_empty() {
-                        st.render_commands.push(RenderCommand::DrawParticleSystem {
-                            particles: untextured,
-                        });
-                    }
-                } else {
-                    st.render_commands.push(cmd);
-                }
-            }
+            st.render_commands.extend(expanded);
             Ok(())
         });
 
@@ -1057,7 +1067,13 @@ impl LuaUserData for LuaParticleSystem {
                 (this.state.clone(), ps.clone_config())
             };
             let key = state.borrow_mut().particle_systems.insert(new_ps);
-            lua.create_userdata(LuaParticleSystem { state, key })
+            lua.create_userdata(LuaParticleSystem {
+                state,
+                key,
+                custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
+                custom_shape_id: None,
+                death_batch_id: None,
+            })
         });
 
         // -- drawToImage --
@@ -1266,6 +1282,63 @@ impl LuaUserData for LuaParticleSystem {
             let fps = ps.config.frame_rate;
             Ok((Some(cols as i64), Some(rows as i64), Some(fps as f64)))
         });
+
+        // ── Extensibility ──────────────────────────────────────────────────────
+
+        // -- addSubSystem --
+        /// Adds a child emitter that updates and renders with this system.
+        /// @param config : table  same format as lurek.particle.newSystem config
+        /// @return index : integer  1-based index of the new sub-system
+        methods.add_method_mut("addSubSystem", |_, this, config_tbl: LuaTable| {
+            let config = ParticleConfig::from_lua_opts(&config_tbl)?;
+            let mut st = this.state.borrow_mut();
+            let ps = st.particle_systems.get_mut(this.key).ok_or_else(|| {
+                LuaError::runtime("ParticleSystem handle is invalid (released)")
+            })?;
+            let idx = ps.add_sub_system(config);
+            Ok((idx + 1) as i64)
+        });
+
+        // -- subSystemCount --
+        /// Returns the number of direct child sub-systems attached to this emitter.
+        /// @return count : integer
+        methods.add_method("subSystemCount", |_, this, ()| {
+            let st = this.state.borrow();
+            Ok(st
+                .particle_systems
+                .get(this.key)
+                .map_or(0_i64, |ps| ps.sub_system_count() as i64))
+        });
+
+        // -- setCustomEmissionShape --
+        /// Sets a Lua function that returns (offset_x, offset_y) for each newly spawned
+        /// particle when the emission shape is delegated to Lua.  The callback takes no
+        /// arguments and is called once per particle per emit step.
+        /// @param fn : function  () -> number, number
+        /// @return nil
+        methods.add_method_mut("setCustomEmissionShape", |lua, this, cb: LuaFunction| {
+            let key = lua.create_registry_value(cb)?;
+            let id = this.custom_callbacks.borrow_mut().register(key);
+            this.custom_shape_id = Some(id);
+            let mut st = this.state.borrow_mut();
+            if let Some(ps) = st.particle_systems.get_mut(this.key) {
+                ps.config.emission_shape = EmissionShape::Custom { callback_id: id };
+            }
+            Ok(())
+        });
+
+        // -- setOnDeathBatch --
+        /// Sets a Lua function called after each update() with all particles that died
+        /// during that frame.  The callback receives a table array where each entry is
+        /// { x, y, vx, vy } in world space.
+        /// @param fn : function  (batch: table) -> nil
+        /// @return nil
+        methods.add_method_mut("setOnDeathBatch", |lua, this, cb: LuaFunction| {
+            let key = lua.create_registry_value(cb)?;
+            let id = this.custom_callbacks.borrow_mut().register(key);
+            this.death_batch_id = Some(id);
+            Ok(())
+        });
     }
 }
 
@@ -1430,6 +1503,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             lua.create_userdata(LuaParticleSystem {
                 state: s.clone(),
                 key,
+                custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
+                custom_shape_id: None,
+                death_batch_id: None,
             })
         })?,
     )?;
@@ -1444,6 +1520,30 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|lua, (lifetime, start_width): (f32, f32)| {
             lua.create_userdata(LuaTrail {
                 inner: Trail::new(lifetime, start_width),
+            })
+        })?,
+    )?;
+
+    // -- fromTOML --
+    /// Creates a new particle system from a TOML config file.
+    /// @param path : string  Path to the TOML config file.
+    /// @return ParticleSystem
+    let s_toml = state.clone();
+    tbl.set(
+        "fromTOML",
+        lua.create_function(move |lua, path: String| {
+            let toml_str = std::fs::read_to_string(&path)
+                .map_err(|e| LuaError::runtime(format!("fromTOML: cannot read '{path}': {e}")))?;
+            let cfg = ParticleConfig::from_toml_str(&toml_str)
+                .map_err(|e| LuaError::runtime(format!("fromTOML: parse error in '{path}': {e}")))?;
+            let ps = ParticleSystem::new(cfg);
+            let key = s_toml.borrow_mut().particle_systems.insert(ps);
+            lua.create_userdata(LuaParticleSystem {
+                state: s_toml.clone(),
+                key,
+                custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
+                custom_shape_id: None,
+                death_batch_id: None,
             })
         })?,
     )?;
@@ -1518,6 +1618,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         "type",
         "typeOf",
         "clone",
+        "addSubSystem",
+        "subSystemCount",
+        "setCustomEmissionShape",
+        "setOnDeathBatch",
     ];
     for &method_name in flat_methods {
         let mn = method_name.to_string();

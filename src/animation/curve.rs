@@ -20,8 +20,9 @@ pub enum EasingKind {
     /// Smooth ease-out.
     EaseOut,
     /// Smooth ease-in-out.
-    EaseInOut,
-}
+    EaseInOut,    /// A Lua callback computes the interpolation factor.
+    /// `callback_id` is an opaque key resolved by the Lua API layer.
+    Custom { callback_id: u32 },}
 
 // â”€â”€ AnimCurve â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -135,6 +136,9 @@ impl AnimCurve {
                     EasingKind::EaseIn => easing::ease_in_quad(alpha),
                     EasingKind::EaseOut => easing::ease_out_quad(alpha),
                     EasingKind::EaseInOut => easing::ease_in_out_quad(alpha),
+                    // Domain code cannot call Lua; return linear interpolation as fallback.
+                    // The Lua API layer overrides this by calling the callback directly.
+                    EasingKind::Custom { .. } => alpha,
                 };
                 v0 + (v1 - v0) * alpha_eased
             }

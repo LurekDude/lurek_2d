@@ -142,7 +142,8 @@ fn bt_node_count(node: &BTNode) -> usize {
         }
         BTNode::Inverter { child }
         | BTNode::Repeater { child, .. }
-        | BTNode::Succeeder { child } => 1 + bt_node_count(child),
+        | BTNode::Succeeder { child }
+        | BTNode::Guard { child, .. } => 1 + bt_node_count(child),
         BTNode::Action { .. } | BTNode::Condition { .. } => 1,
     }
 }
@@ -156,6 +157,7 @@ fn bt_node_label(node: &BTNode) -> &'static str {
         BTNode::Inverter { .. } => "INV",
         BTNode::Repeater { .. } => "REP",
         BTNode::Succeeder { .. } => "SUC",
+        BTNode::Guard { .. } => "GRD",
         BTNode::Action { .. } => "ACT",
         BTNode::Condition { .. } => "CND",
     }
@@ -169,7 +171,8 @@ fn bt_depth(node: &BTNode) -> usize {
         | BTNode::Parallel { children, .. } => 1 + children.iter().map(bt_depth).max().unwrap_or(0),
         BTNode::Inverter { child }
         | BTNode::Repeater { child, .. }
-        | BTNode::Succeeder { child } => 1 + bt_depth(child),
+        | BTNode::Succeeder { child }
+        | BTNode::Guard { child, .. } => 1 + bt_depth(child),
         BTNode::Action { .. } | BTNode::Condition { .. } => 1,
     }
 }
@@ -204,7 +207,8 @@ fn emit_bt_commands(
         | BTNode::Parallel { children, .. } => children.iter().collect(),
         BTNode::Inverter { child }
         | BTNode::Repeater { child, .. }
-        | BTNode::Succeeder { child } => vec![child.as_ref()],
+        | BTNode::Succeeder { child }
+        | BTNode::Guard { child, .. } => vec![child.as_ref()],
         _ => vec![],
     };
 
@@ -314,7 +318,7 @@ fn draw_bt_image(
         BTNode::Selector { .. } | BTNode::Sequence { .. } | BTNode::Parallel { .. } => {
             (80u8, 120, 200)
         }
-        BTNode::Inverter { .. } | BTNode::Repeater { .. } | BTNode::Succeeder { .. } => {
+        BTNode::Inverter { .. } | BTNode::Repeater { .. } | BTNode::Succeeder { .. } | BTNode::Guard { .. } => {
             (200, 140, 60)
         }
         BTNode::Action { .. } | BTNode::Condition { .. } => (80, 200, 80),
@@ -336,7 +340,8 @@ fn draw_bt_image(
         | BTNode::Parallel { children, .. } => children.iter().collect(),
         BTNode::Inverter { child }
         | BTNode::Repeater { child, .. }
-        | BTNode::Succeeder { child } => vec![child.as_ref()],
+        | BTNode::Succeeder { child }
+        | BTNode::Guard { child, .. } => vec![child.as_ref()],
         _ => vec![],
     };
 

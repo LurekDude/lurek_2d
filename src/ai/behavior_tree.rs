@@ -142,6 +142,8 @@ impl ParallelPolicy {
 /// - `Inverter` — flips Success ↔ Failure, passes Running through unchanged.
 /// - `Repeater` — repeats the child N times (0 = infinite loop).
 /// - `Succeeder` — always returns Success regardless of child result.
+/// - `Guard` — evaluates a Lua predicate; ticks the child only when it returns
+///   `true`, otherwise returns `Failure` immediately.
 ///
 /// **Leaves** (no children, call Lua callbacks):
 /// - `Action` — calls `fn(agent, bb, dt) → "success"|"failure"|"running"`.
@@ -203,6 +205,17 @@ pub enum BTNode {
         /// The single child node.
         child: Box<BTNode>,
     },
+    /// Guard decorator: evaluates a Lua predicate before ticking the child.
+    /// Returns `Failure` immediately when the predicate returns `false`,
+    /// otherwise delegates to the child and returns its status.
+    /// Consistent with `Action` and `Condition`, the predicate is stored as a
+    /// `RegistryKey` so the Lua API layer can invoke it directly.
+    Guard {
+        /// Lua predicate: `fn(agent, bb) → bool`.
+        predicate: RegistryKey,
+        /// The guarded child node.
+        child: Box<BTNode>,
+    },
     /// Leaf that calls a Lua function: `fn(agent, bb, dt) → "success"|"failure"|"running"`.
     Action {
         /// Registry key to the Lua callback.
@@ -253,6 +266,7 @@ impl BTNode {
                 child.reset();
             }
             BTNode::Succeeder { child } => child.reset(),
+            BTNode::Guard { child, .. } => child.reset(),
             BTNode::Action { .. } | BTNode::Condition { .. } => {}
         }
     }
@@ -270,7 +284,7 @@ impl BTNode {
             BTNode::Selector { children, .. }
             | BTNode::Sequence { children, .. }
             | BTNode::Parallel { children, .. } => children.len(),
-            BTNode::Inverter { .. } | BTNode::Repeater { .. } | BTNode::Succeeder { .. } => 1,
+            BTNode::Inverter { .. } | BTNode::Repeater { .. } | BTNode::Succeeder { .. } | BTNode::Guard { .. } => 1,
             BTNode::Action { .. } | BTNode::Condition { .. } => 0,
         }
     }
@@ -325,7 +339,8 @@ fn count_bt_nodes(node: &BTNode) -> usize {
         | BTNode::Sequence { children, .. }
         | BTNode::Parallel { children, .. } => children.iter().map(count_bt_nodes).sum(),
         BTNode::Inverter { child }
-        | BTNode::Succeeder { child } => count_bt_nodes(child),
+        | BTNode::Succeeder { child }
+        | BTNode::Guard { child, .. } => count_bt_nodes(child),
         BTNode::Repeater { child, .. } => count_bt_nodes(child),
         BTNode::Action { .. } | BTNode::Condition { .. } => 0,
     }

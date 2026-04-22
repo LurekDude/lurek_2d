@@ -56,7 +56,7 @@ Lurek2D ships in three tiers. Each tier adds binary size and capabilities:
 | Tier | Name | Description | Binary Target |
 |---|---|---|---|
 | **1** | **Lurek2D Light** | Core Engine A equivalent. Graphics, audio, input, physics, timer, filesystem, math, window, events, system, particles. | ? 10 MB |
-| **2** | **Lurek2D Standard** | Extended game systems. Tilemap, scene, pathfinding, entity/ECS, AI, graph, data processing, compute, noise, tweening. Pure Rust or tiny crate additions only. | ? 15 MB |
+| **2** | **Lurek2D Standard** | Extended game systems. Tilemap, scene, pathfinding, entity/ECS, AI, graph, data processing, compute, noise, tweening. Pure Rust or tiny crate additions only. | ? 10 MB |
 | **3** | **Lurek2D Full** | Optional heavy features controlled by Cargo feature flags. Advanced physics (rapier2d), networking, advanced audio effects, Tiled import, Zstd compression. | ? 25 MB |
 
 **The golden rule**: a game with 5 MB of assets should not ship with a 200 MB engine. Lurek2D Light must be smaller than the game it runs.
@@ -83,7 +83,7 @@ Estimated release binary breakdown by dependency weight:
 
 **Projected Light tier** (removing rapier2d): **~7-10 MB release**.
 **Projected Standard tier** (Light + tiny pure-Rust additions): **~10-12 MB release**.
-**Projected Full tier** (Standard + rapier2d + optional heavy deps): **~15-20 MB release**.
+**Projected Full tier** (Standard + rapier2d + optional heavy deps): **~10-15 MB release**.
 
 ---
 
@@ -932,7 +932,7 @@ Best-in-class for the use case. No changes needed.
 - **1 removed recommendation**: kira (replaced by native audio effects)
 - **1 removed recommendation**: rmp-serde (replaced by native binary dump)
 
-Lurek2D's strategy is clear: **use crates for infrastructure** (GPU, windowing, audio playback, scripting) and **build game systems natively** (tilemap, scene, AI, physics, graph, compute, noise, animation, serialization). This gives full control over the Lua API surface while keeping binary size under 15 MB for Standard tier.
+Lurek2D's strategy is clear: **use crates for infrastructure** (GPU, windowing, audio playback, scripting) and **build game systems natively** (tilemap, scene, AI, physics, graph, compute, noise, animation, serialization). This gives full control over the Lua API surface while keeping binary size under 10 MB for Standard tier.
 
 ---
 

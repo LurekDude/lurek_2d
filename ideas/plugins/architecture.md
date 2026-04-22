@@ -29,7 +29,7 @@ src/
 Dependencies: mlua 0.9 (LuaJIT vendored), wgpu 22, winit 0.30, rapier2d 0.32,
 rodio 0.17, fontdue 0.9, gilrs 0.11, plus ~30 utility crates.
 
-Binary size: ~20 MB (release, stripped).
+Binary size: target ≤ 10 MB (release, stripped).
 
 ---
 
@@ -96,10 +96,10 @@ lurek2d/                       ← Cargo workspace root
 
 | Crate | Modules | Output | Size Est. |
 |-------|---------|--------|-----------|
-| `lurek2d-core` | engine, math, graphics, audio, physics, input, timer, filesystem, window, camera, animation, event, image, thread, data, serial, entity, compute, sound, light, savegame, modding, localization, log, devtools, debugbridge, automation, system, docs, network, procgen, raycaster, spine | `libluna2d_core.rlib` (static, linked into bin) | ~15 MB |
+| `lurek2d-core` | engine, math, graphics, audio, physics, input, timer, filesystem, window, camera, animation, event, image, thread, data, serial, entity, compute, sound, light, savegame, modding, localization, log, devtools, debugbridge, automation, system, docs, network, procgen, raycaster, spine | `libluna2d_core.rlib` (static, linked into bin) | ~10 MB |
 | `lurek2d-gamedev` | particle, tilemap, scene, gui, overlay/fx, minimap, pathfinding, ai, graph, pipeline, patterns, terminal | `luna_gamedev.dll` | ~3 MB |
 | `lurek2d-business` | dataframe (extended), pipeline (extended), graph (extended), reporting, analytics | `luna_business.dll` | ~2 MB |
-| `lurek2d-bin` | main.rs only | `lurek2d.exe` | ~15 MB (links core statically) |
+| `lurek2d-bin` | main.rs only | `lurek2d.exe` | ~10 MB (links core statically) |
 | `lurek2d-plugin-api` | C-ABI interface types | header-only-equivalent | ~10 KB |
 
 ---

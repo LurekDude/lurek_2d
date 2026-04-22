@@ -4,6 +4,12 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.5] - 2026-04-22
 
+### CAG Sweep — session `lua-extensibility-review-20260422`
+
+- **chore(cag): fix E003 system prompt byte overflow** — Trimmed 19 bytes from the Sessions discovery directive in `.github/copilot-instructions.md` (8207 → 8188 bytes; cap 8192). `python tools/validate/cag_validate.py` now exits 0 with 0 errors / 0 warnings.
+
+
+
 ### Phase 10 — Example coverage stubs and UI bug fixes
 
 - **fix(ui): correct setOnDraw colon-call signature** — Changed the `setOnDraw` closure argument from `f: LuaFunction` to `(_self, f): (LuaValue, LuaFunction)` in `src/lua_api/ui_api.rs`. Lua's `:` method-call syntax prepends the receiver table as the first argument; the previous signature captured the widget table instead of the callback function, causing "error converting Lua table to function". UI custom widget tests now pass 49/49 (`test_ui_unit.lua` section 5).

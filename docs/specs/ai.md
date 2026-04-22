@@ -737,6 +737,94 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `UtilityAI:getLastAction`: Returns the name of the last chosen action, or nil.
 - `UtilityAI:type`: Returns the type name of this object.
 - `UtilityAI:typeOf`: Returns true if this object is of the given type.
+- `UtilityAI:addConsideration`: Adds a multi-axis consideration to a named action; accepts a string curve name or a `fn(x) → y` Lua function for a custom curve.
+
+### `SteeringManager` Methods (new)
+- `SteeringManager:addCustomBehavior`: Registers a `fn(agent, dt) → dx, dy` Lua callback as a custom steering behavior.
+- `SteeringManager:applyCustomSteering`: Invokes all custom steering callbacks and returns the combined `(fx, fy)` force.
+
+### `Agent` Methods (new)
+- `Agent:setCustomModel`: Installs a `fn(agent, blackboard, dt)` Lua callback as the agent's decision model. Called each frame by `world:update(dt)`.
+
+## Lua Extensibility Hooks
+
+Phase 01 adds four Lua extensibility patterns to the AI module, each backed by an opaque `u32` callback ID stored in the domain layer and resolved to an actual `LuaFunction` by `src/lua_api/ai_api.rs`.
+
+### Custom Decision Model
+
+Any agent can use a fully Lua-driven decision model:
+
+```lua
+local world = lurek.ai.newWorld()
+local agent = world:addAgent("boss")
+agent:setCustomModel(function(agent, blackboard, dt)
+    local dist = blackboard:getNumber("player_distance", 999)
+    if dist < 100 then
+        agent:setVelocity(0, 0)  -- stop and wait
+    else
+        -- chase the player
+        local px = blackboard:getNumber("player_x", 0)
+        local py = blackboard:getNumber("player_y", 0)
+        local dx, dy = px - agent:getX(), py - agent:getY()
+        agent:setVelocity(dx, dy)
+    end
+end)
+world:update(0.016)
+```
+
+The callback receives the agent handle, its blackboard, and the frame delta time. `agent:getDecisionModel()` returns `"custom"` after this call.
+
+### BT Guard Decorator
+
+`lurek.ai.newGuard(predicate, child)` creates a decorator that evaluates a Lua predicate before ticking the child node. If the predicate returns `false`, the Guard returns `Failure` without executing the child:
+
+```lua
+local patrol = lurek.ai.newAction(function(agent, bb, dt) return "running" end)
+local alive_guard = lurek.ai.newGuard(
+    function(agent, bb) return bb:getNumber("health") > 0.0 end,
+    patrol
+)
+-- alive_guard:getNodeType() == "guard"
+-- alive_guard:getChildCount() == 1
+```
+
+### Custom Utility Response Curve
+
+`UtilityAI:addConsideration` now accepts a `fn(x) → y` Lua function as the curve argument in place of a string curve name:
+
+```lua
+local ua = lurek.ai.newUtilityAI()
+ua:addAction("attack", function() return 0.8 end)
+ua:addConsideration(
+    "attack",
+    "proximity_curve",
+    function() return dist / 500 end,         -- scorer: returns raw value
+    function(x) return 1 / (1 + math.exp(-10 * (x - 0.5))) end  -- custom S-curve
+)
+```
+
+The custom curve function is called with the raw scorer output and should return a `[0, 1]` normalized score.
+
+### Custom Steering Force
+
+`SteeringManager:addCustomBehavior(fn, weight?)` registers a Lua callback that produces a steering force each frame. Call `applyCustomSteering(agent, dt)` to collect the combined force and apply it manually:
+
+```lua
+local sm = lurek.ai.newSteeringManager()
+local magnet_x, magnet_y = 400, 300
+
+sm:addCustomBehavior(function(agent, dt)
+    local ax, ay = agent:getPosition()
+    local dx, dy = magnet_x - ax, magnet_y - ay
+    local d = math.max(1, math.sqrt(dx*dx + dy*dy))
+    return dx/d * 200, dy/d * 200  -- attractive force toward magnet
+end, 1.5)
+
+-- Each frame:
+local fx, fy = sm:applyCustomSteering(agent, dt)
+local vx, vy = agent:getVelocity()
+agent:setVelocity(vx + fx * dt, vy + fy * dt)
+```
 
 ## References
 

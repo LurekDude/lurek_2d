@@ -59,6 +59,61 @@ fn validate_row(row: usize) -> LuaResult<usize> {
     Ok(row - 1)
 }
 
+// ── LuaGroupedFrame ────────────────────────────────────────────────────────────
+
+/// Lua-side wrapper around a grouped result from [`DataFrame::group_by`].
+///
+/// Supports `aggregate(col, fn)` to apply a Lua callback to each group's values.
+pub struct LuaGroupedFrame {
+    groups: Vec<(CellValue, DataFrame)>,
+}
+
+impl LuaGroupedFrame {
+    fn new(groups: Vec<(CellValue, DataFrame)>) -> Self {
+        Self { groups }
+    }
+}
+
+impl LuaUserData for LuaGroupedFrame {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- aggregate --
+        /// Apply a Lua function to aggregate a column's values per group.
+        /// @param col_name : string — column to aggregate
+        /// @param fn : function(values: table) → number — receives array of column values, returns aggregate
+        /// @return DataFrame — new dataframe with group keys and aggregated values
+        methods.add_method("aggregate", |lua, this, (col_name, func): (String, LuaFunction)| {
+            let mut result = DataFrame::new();
+            result.add_column("group_key", CellValue::Nil).map_err(LuaError::RuntimeError)?;
+            result.add_column(&col_name, CellValue::Nil).map_err(LuaError::RuntimeError)?;
+            for (key, sub_df) in &this.groups {
+                let col_ref = ColRef::Name(col_name.clone());
+                let cell_vals = sub_df.get_column(col_ref).map_err(LuaError::RuntimeError)?;
+                let vals_tbl = lua.create_table()?;
+                let mut idx = 0usize;
+                for cv in cell_vals {
+                    if let Some(n) = cv.as_number() {
+                        idx += 1;
+                        vals_tbl.set(idx, n)?;
+                    }
+                }
+                let agg: f64 = func.call(vals_tbl)?;
+                result.add_row(&[
+                    ("group_key".to_string(), key.clone()),
+                    (col_name.clone(), CellValue::Number(agg)),
+                ]);
+            }
+            Ok(LuaDataFrame::new(result))
+        });
+
+        // -- __tostring --
+        /// Returns a human-readable string for debugging.
+        /// @return string
+        methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
+            Ok(format!("GroupedFrame({} groups)", this.groups.len()))
+        });
+    }
+}
+
 // -------------------------------------------------------------------------------
 // LuaDataFrame UserData
 // -------------------------------------------------------------------------------
@@ -360,6 +415,17 @@ impl LuaUserData for LuaDataFrame {
                 tbl.set(lua_key, LuaDataFrame::new(sub_df))?;
             }
             Ok(tbl)
+        });
+
+        // -- groupByObj --
+        /// Groups rows by column value, returns a GroupedFrame object supporting aggregate().
+        /// @param col : string|integer
+        /// @return GroupedFrame
+        methods.add_method("groupByObj", |_, this, col: LuaValue| {
+            let cr = lua_to_col_ref(col)?;
+            let df = this.inner.borrow();
+            let groups = df.group_by(cr).map_err(LuaError::RuntimeError)?;
+            Ok(LuaGroupedFrame::new(groups))
         });
 
         // -- join --

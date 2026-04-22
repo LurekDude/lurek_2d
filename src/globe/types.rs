@@ -65,6 +65,28 @@ impl Province {
             base_color: [0.5, 0.5, 0.5, 1.0],
         }
     }
+
+    /// Create a province with explicit centroid, neighbors, and base color.
+    ///
+    /// Attribute, edge-tag, and texture fields are initialised to empty/`None`.
+    pub fn with_data(
+        id: ProvinceId,
+        centroid: (f32, f32),
+        vertices: Vec<(f32, f32)>,
+        neighbors: Vec<ProvinceId>,
+        base_color: [f32; 4],
+    ) -> Self {
+        Self {
+            id,
+            centroid,
+            vertices,
+            neighbors,
+            attrs: HashMap::new(),
+            edge_tags: HashMap::new(),
+            texture: None,
+            base_color,
+        }
+    }
 }
 
 // ── Globe specification ────────────────────────────────────────────────────────

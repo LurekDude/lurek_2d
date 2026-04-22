@@ -80,3 +80,61 @@ mod visualization_tests {
         assert_eq!(img.height(), 40);
     }
 }
+
+mod extensibility_tests {
+    use lurek2d::particle::{EmissionShape, ParticleConfig, ParticleSystem};
+
+    #[test]
+    fn custom_emission_shape_variant_exists() {
+        let shape = EmissionShape::Custom { callback_id: 99 };
+        match shape {
+            EmissionShape::Custom { callback_id } => assert_eq!(callback_id, 99),
+            _ => panic!("unexpected variant"),
+        }
+    }
+
+    #[test]
+    fn pending_deaths_drained_after_update() {
+        let mut config = ParticleConfig::default();
+        config.lifetime_min = 0.001;
+        config.lifetime_max = 0.001;
+        config.emission_rate = 0.0;
+        let mut ps = ParticleSystem::new(config);
+        ps.emit(3);
+        ps.update(1.0); // enough time to kill all 3
+        let deaths = ps.drain_pending_deaths();
+        assert!(!deaths.is_empty(), "should have deaths recorded after all particles expire");
+    }
+
+    #[test]
+    fn add_sub_system_increments_count() {
+        let mut ps = ParticleSystem::new(ParticleConfig::default());
+        assert_eq!(ps.sub_system_count(), 0);
+        ps.add_sub_system(ParticleConfig::default());
+        assert_eq!(ps.sub_system_count(), 1);
+        ps.add_sub_system(ParticleConfig::default());
+        assert_eq!(ps.sub_system_count(), 2);
+    }
+
+    #[test]
+    fn drain_custom_offsets_clears_vec() {
+        let mut config = ParticleConfig::default();
+        config.emission_shape = EmissionShape::Custom { callback_id: 1 };
+        config.emission_rate = 0.0;
+        let mut ps = ParticleSystem::new(config);
+        ps.emit(2);
+        let offsets = ps.drain_custom_offsets();
+        assert_eq!(offsets.len(), 2);
+        assert!(ps.drain_custom_offsets().is_empty(), "second drain should be empty");
+    }
+
+    #[test]
+    fn from_toml_str_roundtrip() {
+        // Serialize a default config to TOML, then deserialize it back.
+        let original = ParticleConfig::default();
+        let toml_str = toml::to_string(&original).expect("serialize to TOML should succeed");
+        let cfg = ParticleConfig::from_toml_str(&toml_str);
+        assert!(cfg.is_ok(), "from_toml_str should round-trip a default config: {:?}", cfg.err());
+        assert_eq!(cfg.unwrap().max_particles, original.max_particles);
+    }
+}

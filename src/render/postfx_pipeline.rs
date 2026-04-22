@@ -909,6 +909,8 @@ impl PostFxPipeline {
     /// - `target_view` — Output surface or canvas texture view.
     /// - `passes` — [`PostFxPass`] list built by the Lua PostFxStack.
     /// - `width` / `height` — Frame dimensions in pixels.
+    /// - `total_time` — Elapsed seconds since engine start (for auto-uniform p[3].x).
+    /// - `frame_count` — Monotonic frame counter (for auto-uniform p[3].y).
     pub fn apply(
         &self,
         device: &wgpu::Device,
@@ -919,6 +921,8 @@ impl PostFxPipeline {
         passes: &[crate::render::renderer::PostFxPass],
         width: u32,
         height: u32,
+        total_time: f32,
+        frame_count: u64,
     ) {
         if passes.is_empty() {
             // Nothing to do — just copy capture to target.
@@ -947,7 +951,13 @@ impl PostFxPipeline {
             };
 
             // Update params UBO.
-            let raw = params_to_uniform(&pass.params);
+            let mut raw = params_to_uniform(&pass.params);
+            if pass.auto_uniforms {
+                raw[12] = total_time;           // p[3].x — elapsed time (s)
+                raw[13] = frame_count as f32;   // p[3].y — frame counter
+                raw[14] = width as f32;         // p[3].z — render target width
+                raw[15] = height as f32;        // p[3].w — render target height
+            }
             queue.write_buffer(&self.params_buf, 0, bytemuck::cast_slice(&raw));
 
             // Look up pipeline.

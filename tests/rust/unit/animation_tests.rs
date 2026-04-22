@@ -640,3 +640,35 @@ mod aseprite_tests {
         assert!(load_aseprite_json(json).is_err());
     }
 }
+
+mod curve_custom_easing_tests {
+    use lurek2d::animation::curve::{AnimCurve, EasingKind};
+
+    #[test]
+    fn easing_kind_custom_variant_matches() {
+        let k = EasingKind::Custom { callback_id: 42 };
+        match k {
+            EasingKind::Custom { callback_id } => assert_eq!(callback_id, 42),
+            _ => panic!("unexpected variant"),
+        }
+    }
+
+    #[test]
+    fn curve_eval_custom_returns_linear_fallback() {
+        let mut c = AnimCurve::new();
+        c.easing = EasingKind::Custom { callback_id: 0 };
+        c.add_keyframe(0.0, 0.0);
+        c.add_keyframe(1.0, 1.0);
+        let v = c.eval(0.5);
+        assert!(v.is_finite(), "Custom eval should return finite value");
+        // Domain fallback is linear: v should be approximately 0.5
+        assert!((v - 0.5).abs() < 1e-5, "expected ~0.5 linear fallback, got {v}");
+    }
+
+    #[test]
+    fn curve_eval_custom_empty_returns_zero() {
+        let mut c = AnimCurve::new();
+        c.easing = EasingKind::Custom { callback_id: 1 };
+        assert_eq!(c.eval(0.5), 0.0);
+    }
+}

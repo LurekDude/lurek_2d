@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>A ~15 MB 2D game engine.</strong> Rust core · Lua scripting · wgpu GPU rendering · AI-first design.
+  <strong>A ~10 MB 2D game engine.</strong> Rust core · Lua scripting · wgpu GPU rendering · AI-first design.
 </p>
 
 ---

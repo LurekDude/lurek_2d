@@ -233,6 +233,7 @@ pub enum BlendMode {
 /// - `effect_name` — Name that maps to a WGSL shader file (e.g. `"bloom"`, `"vignette"`).
 /// - `params` — Shader uniform values keyed by name.
 /// - `shader_id` — For `Custom` passes only; index into the GPU shader registry.
+/// - `auto_uniforms` — When `true`, the engine injects time/frame/resolution into `p[3]`.
 #[derive(Debug, Clone)]
 pub struct PostFxPass {
     /// Effect name mapping to a built-in WGSL shader (e.g. `"bloom"`, `"crt"`, `"vignette"`).
@@ -241,6 +242,8 @@ pub struct PostFxPass {
     pub params: HashMap<String, f32>,
     /// For custom shader passes: index into the GPU shader registry. `None` for built-ins.
     pub shader_id: Option<usize>,
+    /// When `true`, the engine injects `(total_time, frame_count, width, height)` into `p[3]`.
+    pub auto_uniforms: bool,
 }
 
 /// RenderCommand.

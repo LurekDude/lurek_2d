@@ -1391,6 +1391,7 @@ impl GpuRenderer {
         background_color: [f32; 4],
         camera_matrix: &Mat3,
         frame_time: f32,
+        frame_count: u64,
         capture_screenshot: bool,
     ) -> Result<Option<(u32, u32, Vec<u8>)>, wgpu::SurfaceError> {
         self.prune_released_resources(textures, fonts, canvases, shaders);
@@ -4287,6 +4288,8 @@ impl GpuRenderer {
                     passes,
                     *w,
                     *h,
+                    frame_time,
+                    frame_count,
                 );
             }
         }

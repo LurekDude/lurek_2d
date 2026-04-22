@@ -16,8 +16,8 @@ them. With plugins, developers load only what they need:
 | Roguelike | tilemap, pathfinding, ai, terminal | spine, minimap |
 | Puzzle | core only | tilemap, ai, pathfinding, spine |
 
-**Binary size reduction**: a puzzle game ships `lurek2d.exe` (~15 MB) + no plugin DLLs,
-vs. today's ~20 MB monolith. An RPG ships `lurek2d.exe` + `luna_gamedev.dll` (~3 MB).
+**Binary size reduction**: a puzzle game ships `lurek2d.exe` (~10 MB) + no plugin DLLs,
+vs. today's monolith. An RPG ships `lurek2d.exe` + `luna_gamedev.dll` (~3 MB).
 
 ### Third-Party Game Extensions
 

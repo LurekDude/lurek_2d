@@ -23,7 +23,7 @@ Build a release binary for Lurek2D for a target platform. Use when creating a di
 7. Cross: `target/<TARGET_TRIPLE>/release/lurek2d[.exe]`
 8. Smoke test the binary:
 9. Check binary size:
-10. Typical release binary: 5–15 MB (software rendering stack)
+10. Typical release binary: 5–10 MB (software rendering stack)
 11. Warning if > 50 MB — likely debug symbols leaked into release build
 
 ## Success Criteria

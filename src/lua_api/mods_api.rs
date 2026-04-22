@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::mods::{ModInfo, ModManager};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 // -------------------------------------------------------------------------------
 // Helpers
@@ -597,6 +597,105 @@ impl LuaUserData for LuaModManager {
 }
 
 // -------------------------------------------------------------------------------
+// LuaContentRegistry UserData
+// -------------------------------------------------------------------------------
+
+/// A typed content registry for mod-contributed assets and objects.
+pub struct LuaContentRegistry {
+    /// Map: type_name → (id → LuaRegistryKey)
+    entries: HashMap<String, HashMap<String, LuaRegistryKey>>,
+    /// Registered type names.
+    types: HashSet<String>,
+}
+
+impl LuaContentRegistry {
+    /// Creates a new empty [`LuaContentRegistry`].
+    pub fn new() -> Self {
+        Self {
+            entries: HashMap::new(),
+            types: HashSet::new(),
+        }
+    }
+}
+
+impl LuaUserData for LuaContentRegistry {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- registerType --
+        /// Register a new content type.
+        /// @param type_name : string — type identifier (e.g. "weapon", "spell")
+        /// @return nil
+        methods.add_method_mut("registerType", |_, this, type_name: String| {
+            this.types.insert(type_name.clone());
+            this.entries.entry(type_name).or_default();
+            Ok(())
+        });
+
+        // -- register --
+        /// Register a content entry.
+        /// @param type_name : string — registered type name
+        /// @param id : string — unique identifier for this entry
+        /// @param obj : any — the content object to store
+        /// @return nil
+        methods.add_method_mut("register", |lua, this, (type_name, id, obj): (String, String, LuaValue)| {
+            if !this.types.contains(&type_name) {
+                return Err(LuaError::RuntimeError(format!("content type '{}' not registered", type_name)));
+            }
+            let key = lua.create_registry_value(obj)?;
+            this.entries.entry(type_name).or_default().insert(id, key);
+            Ok(())
+        });
+
+        // -- get --
+        /// Retrieve a content entry.
+        /// @param type_name : string — registered type name
+        /// @param id : string — content identifier
+        /// @return any — the registered content, or nil if not found
+        methods.add_method("get", |lua, this, (type_name, id): (String, String)| {
+            let val = this.entries
+                .get(&type_name)
+                .and_then(|m| m.get(&id))
+                .map(|key| lua.registry_value::<LuaValue>(key))
+                .transpose()?
+                .unwrap_or(LuaValue::Nil);
+            Ok(val)
+        });
+
+        // -- getAll --
+        /// Get all entries for a type.
+        /// @param type_name : string — registered type name
+        /// @return table — map of {id: any}
+        methods.add_method("getAll", |lua, this, type_name: String| {
+            let tbl = lua.create_table()?;
+            if let Some(map) = this.entries.get(&type_name) {
+                for (id, key) in map {
+                    let val: LuaValue = lua.registry_value(key)?;
+                    tbl.set(id.as_str(), val)?;
+                }
+            }
+            Ok(tbl)
+        });
+
+        // -- getTypes --
+        /// Get all registered type names.
+        /// @return table — array of type name strings
+        methods.add_method("getTypes", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (i, t) in this.types.iter().enumerate() {
+                tbl.set(i + 1, t.as_str())?;
+            }
+            Ok(tbl)
+        });
+
+        // -- __tostring --
+        /// Returns a human-readable string for debugging.
+        /// @return string
+        methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
+            Ok(format!("ContentRegistry({} types)", this.types.len()))
+        });
+    }
+}
+
+// -------------------------------------------------------------------------------
 // Register
 // -------------------------------------------------------------------------------
 
@@ -626,6 +725,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     tbl.set(
         "newModManager",
         lua.create_function(|lua, ()| lua.create_userdata(LuaModManager::new()))?,
+    )?;
+
+    // -- newRegistry --
+    /// Creates a new empty ContentRegistry for mod-contributed assets.
+    /// @return ContentRegistry
+    tbl.set(
+        "newRegistry",
+        lua.create_function(|lua, ()| lua.create_userdata(LuaContentRegistry::new()))?,
     )?;
 
     // -- checkApiVersion --

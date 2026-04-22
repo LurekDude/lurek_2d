@@ -1,20 +1,20 @@
 {
   "meta": {
-    "generated": "2026-04-21T22:19:50.318072+00:00",
+    "generated": "2026-04-22T21:25:34.852782+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "0.20.0",
     "stats": {
-      "rust_items": 1859,
-      "rust_modules": 449,
-      "rust_tests": 0,
+      "rust_items": 1873,
+      "rust_modules": 451,
+      "rust_tests": 1,
       "lua_tests": 245
     }
   },
   "rust_api": {
     "summary": {
-      "total_items": 1859,
-      "documented": 1848,
-      "modules": 449
+      "total_items": 1873,
+      "documented": 1862,
+      "modules": 451
     },
     "modules": {
       "ai::agent": {
@@ -24,16 +24,16 @@
           {
             "name": "DecisionModel",
             "kind": "enum",
-            "description": "Controls which AI subsystems are ticked for an agent during `AIWorld::update`.  Each variant maps to a specific combination of decision-making subsystems. The world checks this field to decide whether to tick the agent's FSM, BehaviorTree, SteeringManager, or a combination thereof. The order matters: when both FSM/BT and steering are active, the decision layer runs first (potentially setting steering targets), then steering computes forces.  Lua scripts set this via `agent:setDecisionModel(\"fsm+steering\")` etc.  # Variants - `Fsm` — Fsm variant. - `Bt` — Bt variant. - `Steering` — Steering variant. - `FsmSteering` — FsmSteering variant. - `BtSteering` — BtSteering variant.",
+            "description": "Controls which AI subsystems are ticked for an agent during `AIWorld::update`.  Each variant maps to a specific combination of decision-making subsystems. The world checks this field to decide whether to tick the agent's FSM, BehaviorTree, SteeringManager, or a combination thereof. The order matters: when both FSM/BT and steering are active, the decision layer runs first (potentially setting steering targets), then steering computes forces.  Lua scripts set this via `agent:setDecisionModel(\"fsm+steering\")` etc. Custom models are set via `agent:setCustomModel(fn)` in Lua.  # Variants - `Fsm` — Fsm variant. - `Bt` — Bt variant. - `Steering` — Steering variant. - `FsmSteering` — FsmSteering variant. - `BtSteering` — BtSteering variant. - `Custom` — Custom variant.",
             "file": "src/ai/agent.rs",
-            "line": 56
+            "line": 58
           },
           {
             "name": "Agent",
             "kind": "struct",
             "description": "An autonomous AI agent with kinematic state and pluggable decision subsystems.  Each agent lives inside an [`AIWorld`](crate::ai::world::AIWorld) and carries:  - **Kinematic state**: position, velocity, max_speed, max_force — used by   steering behaviors to compute and clamp movement forces. - **Decision model**: selects which subsystems (FSM, BT, steering) are ticked. - **Subsystem indices**: optional indices into the world's FSM/BT/steering   storage arrays, linking this agent to its attached decision-makers. - **Blackboard**: local key-value store with a parent chain to the world's   global blackboard for hierarchical data lookup. - **Tags**: string-based labels for group queries and filtering (e.g.,   `\"enemy\"`, `\"flying\"`, `\"boss\"`).  Agents are ticked in descending `priority` order by the world's update loop. Higher priority agents run first, allowing leaders to update blackboard state before followers read it.  # Fields - `name` — `String`. - `priority` — `i32`. - `position` — `(f32, f32)`. - `velocity` — `(f32, f32)`. - `max_speed` — `f32`. - `max_force` — `f32`. - `decision_model` — `DecisionModel`. - `blackboard` — `Blackboard`. - `tags` — `HashSet<String>`. - `fsm_index` — `Option<usize>`. - `bt_index` — `Option<usize>`. - `steering_index` — `Option<usize>`. - `trait_profile` — `Option<TraitProfile>`. - `sensor` — `Option<Sensor>`. - `emotion_model` — `Option<EmotionModel>`. - `need_system` — `Option<NeedSystem>`. - `lod_tier` — `usize`.",
             "file": "src/ai/agent.rs",
-            "line": 151
+            "line": 162
           }
         ]
       },
@@ -85,23 +85,23 @@
           {
             "name": "BTNode",
             "kind": "enum",
-            "description": "A node in the behavior tree. Nodes are organized into three categories:  **Composites** (have multiple children): - `Selector` — tries children left-to-right; returns `Success` on the first   child success, `Failure` if all children fail. - `Sequence` — runs children left-to-right; returns `Failure` on the first   child failure, `Success` if all children succeed. - `Parallel` — ticks all children every frame; result depends on the   `success_policy` and `failure_policy`.  **Decorators** (have exactly one child): - `Inverter` — flips Success ↔ Failure, passes Running through unchanged. - `Repeater` — repeats the child N times (0 = infinite loop). - `Succeeder` — always returns Success regardless of child result.  **Leaves** (no children, call Lua callbacks): - `Action` — calls `fn(agent, bb, dt) → \"success\"|\"failure\"|\"running\"`. - `Condition` — calls `fn(agent, bb) → bool` (true → Success, false → Failure).  Composite nodes store a `running_idx` that memos which child was Running last frame, allowing the tree to resume mid-sequence without restarting from the first child.  # Variants - `Selector` — Selector variant. - `Sequence` — Sequence variant. - `Parallel` — Parallel variant. - `Inverter` — Inverter variant. - `Repeater` — Repeater variant. - `Succeeder` — Succeeder variant. - `Action` — Action variant. - `Condition` — Condition variant.",
+            "description": "A node in the behavior tree. Nodes are organized into three categories:  **Composites** (have multiple children): - `Selector` — tries children left-to-right; returns `Success` on the first   child success, `Failure` if all children fail. - `Sequence` — runs children left-to-right; returns `Failure` on the first   child failure, `Success` if all children succeed. - `Parallel` — ticks all children every frame; result depends on the   `success_policy` and `failure_policy`.  **Decorators** (have exactly one child): - `Inverter` — flips Success ↔ Failure, passes Running through unchanged. - `Repeater` — repeats the child N times (0 = infinite loop). - `Succeeder` — always returns Success regardless of child result. - `Guard` — evaluates a Lua predicate; ticks the child only when it returns   `true`, otherwise returns `Failure` immediately.  **Leaves** (no children, call Lua callbacks): - `Action` — calls `fn(agent, bb, dt) → \"success\"|\"failure\"|\"running\"`. - `Condition` — calls `fn(agent, bb) → bool` (true → Success, false → Failure).  Composite nodes store a `running_idx` that memos which child was Running last frame, allowing the tree to resume mid-sequence without restarting from the first child.  # Variants - `Selector` — Selector variant. - `Sequence` — Sequence variant. - `Parallel` — Parallel variant. - `Inverter` — Inverter variant. - `Repeater` — Repeater variant. - `Succeeder` — Succeeder variant. - `Action` — Action variant. - `Condition` — Condition variant.",
             "file": "src/ai/behavior_tree.rs",
-            "line": 163
+            "line": 165
           },
           {
             "name": "BehaviorTree",
             "kind": "struct",
             "description": "Root container for a behavior tree instance.  Wraps an optional root [`BTNode`] and caches the [`BTStatus`] from the last tick. The `last_status` is useful for external code (e.g., the Lua API) to query what the tree decided without re-ticking it.  An empty tree (root = None) is valid — it returns `Success` without doing anything.  # Fields - `root` — `Option<BTNode>`. - `last_status` — `BTStatus`.",
             "file": "src/ai/behavior_tree.rs",
-            "line": 290
+            "line": 304
           },
           {
             "name": "BtDebugState",
             "kind": "struct",
             "description": "A snapshot of a [`BehaviorTree`]'s current diagnostic state.  Returned by [`BehaviorTree::debug_state`] and exposed to Lua via `bt:getDebugState()`.  # Fields - `node_count` — Total number of nodes in the tree (0 for an empty tree). - `last_status` — The status string returned by the most recent tick.",
             "file": "src/ai/behavior_tree.rs",
-            "line": 342
+            "line": 357
           }
         ]
       },
@@ -772,7 +772,7 @@
             "kind": "struct",
             "description": "Manages a list of steering behaviors and combines their forces each frame.  # Fields - `behaviors` — `Vec<SteeringBehaviorType>`. - `combine_mode` — `CombineMode`. - `last_force` — `Force`. - `cell_size` — Cell size used by the optional spatial-hash neighbourhood search (default `64.0`). - `use_spatial_hash` — When `true`, neighbourhood queries bucket agents by cell instead of iterating all (default `false`).",
             "file": "src/ai/steering.rs",
-            "line": 370
+            "line": 386
           }
         ]
       },
@@ -830,30 +830,30 @@
           {
             "name": "ResponseCurve",
             "kind": "enum",
-            "description": "Mathematical function shapes for transforming raw consideration inputs into normalized scores.  Response curves allow designers to control how sensitive an action is to changes in a game variable. For example, a logistic curve for health makes the agent barely react to damage until health drops below a threshold, then react sharply.  # Variants - `Linear` — Linear variant. - `Quadratic` — Quadratic variant. - `Logistic` — Logistic variant. - `Logit` — Logit variant. - `Step` — Step variant.",
+            "description": "Mathematical function shapes for transforming raw consideration inputs into normalized scores.  Response curves allow designers to control how sensitive an action is to changes in a game variable. For example, a logistic curve for health makes the agent barely react to damage until health drops below a threshold, then react sharply.  # Variants - `Linear` — Linear variant. - `Quadratic` — Quadratic variant. - `Logistic` — Logistic variant. - `Logit` — Logit variant. - `Step` — Step variant. - `Custom` — Custom variant.",
             "file": "src/ai/utility_ai.rs",
-            "line": 49
+            "line": 50
           },
           {
             "name": "Consideration",
             "kind": "struct",
             "description": "A single evaluation axis within a utility action's scoring function.  Each consideration queries a game-state value via its Lua `callback`, transforms the result through a [`ResponseCurve`], multiplies by `weight`, and contributes to the action's composite score. Multiple considerations are multiplied together (not summed), so a zero on any axis zeros the entire action — useful for hard prerequisites.  # Fields - `name` — `String`. - `callback` — `RegistryKey`. - `curve` — `ResponseCurve`. - `p1` — `f64`. - `p2` — `f64`. - `p3` — `f64`. - `weight` — `f64`.",
             "file": "src/ai/utility_ai.rs",
-            "line": 131
+            "line": 142
           },
           {
             "name": "UAAction",
             "kind": "struct",
             "description": "A candidate action in the utility AI decision space.  Each action has a name (returned to the game when chosen), an optional simple scorer callback, and zero or more multi-axis [`Consideration`]s. The `momentum_bonus` is added to the composite score when this action was chosen in the previous evaluation, providing action inertia.  # Fields - `name` — `String`. - `scorer` — `RegistryKey`. - `considerations` — `Vec<Consideration>`. - `momentum_bonus` — `f64`.",
             "file": "src/ai/utility_ai.rs",
-            "line": 160
+            "line": 171
           },
           {
             "name": "UtilityAI",
             "kind": "struct",
             "description": "Multi-axis utility scorer that evaluates candidate actions and chooses the one with the highest composite score.  The scorer holds a list of [`UAAction`]s, evaluates each one's considerations, applies momentum bonuses, and records the winning action index and all scores for later inspection. The AIWorld calls `evaluate()` during the agent update loop for agents whose decision model includes utility AI.  # Fields - `actions` — `Vec<UAAction>`. - `last_action` — `Option<usize>`. - `last_scores` — `Vec<f64>`.",
             "file": "src/ai/utility_ai.rs",
-            "line": 183
+            "line": 194
           }
         ]
       },
@@ -980,7 +980,7 @@
             "kind": "struct",
             "description": "A keyframe-based animation curve.  Each `keyframe` entry is a `(time: f32, value: f32)` pair.  Keyframes must be kept in ascending time order â€” [`AnimCurve::add_keyframe`] inserts them in sorted position automatically.  [`AnimCurve::eval`] evaluates the curve at any time by locating the surrounding pair and applying the chosen [`EasingKind`].",
             "file": "src/animation/curve.rs",
-            "line": 36
+            "line": 37
           }
         ]
       },
@@ -1225,7 +1225,7 @@
             "kind": "struct",
             "description": "Entry point for the Lurek2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.  # Fields - `config` â€” `Config`. - `conf_error` â€” `Option<String>`.",
             "file": "src/app/app.rs",
-            "line": 2565
+            "line": 2570
           }
         ]
       },
@@ -3587,9 +3587,9 @@
           {
             "name": "PostFxEffect",
             "kind": "struct",
-            "description": "A single post-processing effect with named float parameters.  Acts as a parameter bag describing one shader pass — it does NOT hold any GPU resource. Parameters are stored in a `HashMap<String, f32>` so that new shader uniforms can be added without changing the struct layout. Use `PostFxEffectType::default_params` to pre-populate sensible defaults, then call `set_parameter` to override individual values. The `enabled` flag lets you temporarily skip the pass within the stack without removing it.  # Fields - `effect_type` — `PostFxEffectType` — Which shader pass to run. - `params` — Named float parameters controlling the shader (e.g., `\"threshold\"`, `\"intensity\"`). - `enabled` — Whether this effect is active within its parent stack. - `shader_id` — Optional custom shader handle; only used for `Custom` effects.",
+            "description": "A single post-processing effect with named float parameters.  Acts as a parameter bag describing one shader pass — it does NOT hold any GPU resource. Parameters are stored in a `HashMap<String, f32>` so that new shader uniforms can be added without changing the struct layout. Use `PostFxEffectType::default_params` to pre-populate sensible defaults, then call `set_parameter` to override individual values. The `enabled` flag lets you temporarily skip the pass within the stack without removing it.  # Fields - `effect_type` — `PostFxEffectType` — Which shader pass to run. - `params` — Named float parameters controlling the shader (e.g., `\"threshold\"`, `\"intensity\"`). - `enabled` — Whether this effect is active within its parent stack. - `shader_id` — Optional custom shader handle; only used for `Custom` effects. - `auto_uniforms` — When `true`, the engine injects time/frame/resolution into `p[3]` each frame.",
             "file": "src/effect/effect.rs",
-            "line": 28
+            "line": 29
           }
         ]
       },
@@ -4484,77 +4484,77 @@
             "kind": "struct",
             "description": "Top-level configuration for one globe instance.  # Fields - `radius` — Visual radius in world units (default 300.0). - `axial_tilt_deg` — Planet axial tilt in degrees (default 23.5). - `rotation_deg` — Current longitude-rotation of the planet (0–360). - `time_of_day` — Fraction of a day elapsed `[0, 1)`. 0 = midnight on prime meridian. - `render_borders` — Whether to draw province borders. - `border_color` — Border line color `[r,g,b,a]`. - `border_width` — Border stroke width in pixels. - `ambient` — Minimum per-province light intensity `[0, 1]`. - `show_atmosphere` — Draw a subtle atmospheric rim glow. - `background_color` — Color of the space background behind the globe.",
             "file": "src/globe/types.rs",
-            "line": 86
+            "line": 108
           },
           {
             "name": "Marker",
             "kind": "struct",
             "description": "A point of interest placed on the globe at a specific latitude/longitude.  # Fields - `id` — Unique identifier for this marker within the globe. - `marker_type` — User-defined type tag (e.g. `\"city\"`, `\"base\"`, `\"ufo\"`). Nothing is hardcoded. - `lat_deg` / `lon_deg` — Position on the unit sphere. - `label` — Optional display text. - `visible` — Whether the marker is currently rendered. - `style` — Visual style configuration. - `attrs` — User-defined attribute store.",
             "file": "src/globe/types.rs",
-            "line": 139
+            "line": 161
           },
           {
             "name": "MarkerStyle",
             "kind": "struct",
             "description": "Visual style for a [`Marker`].  # Fields - `color` — RGBA tint. - `size` — Screen-space size in pixels. - `icon_texture` — Optional texture key string for a sprite icon. - `shape` — Fallback shape if no icon texture is set.",
             "file": "src/globe/types.rs",
-            "line": 166
+            "line": 188
           },
           {
             "name": "MarkerShape",
             "kind": "enum",
             "description": "Primitive fallback shape for an icon-less marker.",
             "file": "src/globe/types.rs",
-            "line": 179
+            "line": 201
           },
           {
             "name": "Label",
             "kind": "struct",
             "description": "A text annotation placed on the globe.  # Fields - `id` — Unique label ID within the globe. - `label_type` — User-defined type tag (`\"country\"`, `\"region\"`, `\"capital\"`, …). - `lat_deg` / `lon_deg` — Anchor position on the sphere. - `text` — Display text. - `visible` — Whether the label renders this frame. - `style` — Visual style. - `min_lod` — Minimum LOD tier at which this label appears.",
             "file": "src/globe/types.rs",
-            "line": 211
+            "line": 233
           },
           {
             "name": "LabelStyle",
             "kind": "struct",
             "description": "Visual style for a [`Label`].",
             "file": "src/globe/types.rs",
-            "line": 232
+            "line": 254
           },
           {
             "name": "Layer",
             "kind": "struct",
             "description": "A named rendering layer that sits above the base province map.  Layers are rendered in z-order. Each layer has a visibility flag and an optional opacity so callers can blend overlays (political, climate, resources, fog-of-war fill, etc.) without touching province base colors.  # Fields - `name` — Unique layer name. - `visible` — Render this layer. - `alpha` — Layer opacity `[0, 1]`. - `z_order` — Render priority (lower = rendered first / beneath). - `kind` — Semantic type; user-defined. - `province_colors` — Per-province color override for this layer.",
             "file": "src/globe/types.rs",
-            "line": 267
+            "line": 289
           },
           {
             "name": "LodTier",
             "kind": "enum",
             "description": "Level-of-detail tier, selected based on camera zoom.  Higher = more detail (closer zoom).",
             "file": "src/globe/types.rs",
-            "line": 302
+            "line": 324
           },
           {
             "name": "ProjectedProvince",
             "kind": "struct",
             "description": "A province projected to screen space, ready for draw calls.  # Fields - `id` — Source province ID. - `screen_verts` — Projected screen-space vertices. - `centroid_screen` — Screen-space centroid for label anchor. - `light_intensity` — Per-province cosine lighting `[0, 1]`. - `visible` — False if entirely behind the globe or in the fog.",
             "file": "src/globe/types.rs",
-            "line": 322
+            "line": 344
           },
           {
             "name": "Arc",
             "kind": "struct",
             "description": "A great-circle travel arc, projected to screen space.  Used for trade routes, flight paths, ballistic trajectories, etc.",
             "file": "src/globe/types.rs",
-            "line": 341
+            "line": 363
           },
           {
             "name": "GlobeError",
             "kind": "enum",
             "description": "Errors returned by globe operations.",
             "file": "src/globe/types.rs",
-            "line": 366
+            "line": 388
           }
         ]
       },
@@ -4822,6 +4822,47 @@
           }
         ]
       },
+      "i18n::format": {
+        "module_doc": "Number and date formatting utilities for the i18n subsystem.  Pure-Rust formatting helpers used by `lurek.i18n.formatNumber` and `lurek.i18n.formatDate`. These live in the domain module so they can be reused by future language bindings (Python, TypeScript) without depending on `mlua`.",
+        "source_file": "src/i18n/format.rs",
+        "items": [
+          {
+            "name": "locale_separators",
+            "kind": "fn",
+            "description": "Returns `(decimal_separator, thousands_separator)` for the given locale code.",
+            "file": "src/i18n/format.rs",
+            "line": 9
+          },
+          {
+            "name": "format_number",
+            "kind": "fn",
+            "description": "Formats `n` with `decimals` decimal places and locale-specific separators.",
+            "file": "src/i18n/format.rs",
+            "line": 24
+          },
+          {
+            "name": "format_date",
+            "kind": "fn",
+            "description": "Formats a Unix timestamp (seconds UTC) as a locale-aware date string.",
+            "file": "src/i18n/format.rs",
+            "line": 51
+          },
+          {
+            "name": "days_to_ymd",
+            "kind": "fn",
+            "description": "Converts days since Unix epoch to `(year, month, day)`.",
+            "file": "src/i18n/format.rs",
+            "line": 86
+          },
+          {
+            "name": "month_name_tables",
+            "kind": "fn",
+            "description": "Returns (long_month_names, short_month_names) for English.",
+            "file": "src/i18n/format.rs",
+            "line": 102
+          }
+        ]
+      },
       "i18n::interpolation": {
         "module_doc": "Variable interpolation for translation strings.  Replaces `{key}` placeholders in a template string with values from a lookup map.  Unrecognised keys are kept as-is so templates remain readable even with partial variable sets.",
         "source_file": "src/i18n/interpolation.rs",
@@ -4854,18 +4895,25 @@
             "line": 25
           },
           {
+            "name": "format",
+            "kind": "mod",
+            "description": "Number and date formatting utilities.",
+            "file": "src/i18n/mod.rs",
+            "line": 27
+          },
+          {
             "name": "interpolation",
             "kind": "mod",
             "description": "Variable substitution in translation strings.",
             "file": "src/i18n/mod.rs",
-            "line": 27
+            "line": 29
           },
           {
             "name": "plural",
             "kind": "mod",
             "description": "CLDR-style count-based plural form selection.",
             "file": "src/i18n/mod.rs",
-            "line": 29
+            "line": 31
           }
         ]
       },
@@ -7821,37 +7869,37 @@
           {
             "name": "EmissionShape",
             "kind": "enum",
-            "description": "Emission shape controlling where new particles spawn relative to the emitter.  # Variants - `Point` â€” All particles spawn at the emitter center. - `Circle` â€” Particles spawn within or on the edge of a circle. - `Rectangle` â€” Particles spawn within a rectangle centered on the emitter. - `Ring` â€” Particles spawn within an annulus (ring between two radii). - `Line` â€” Particles spawn along a line segment. - `Cone` â€” Particles spawn within a cone sector. - `Star` â€” Particles spawn on the points or edges of a star polygon. - `Spiral` â€” Particles spawn along an Archimedean spiral.",
+            "description": "Emission shape controlling where new particles spawn relative to the emitter.  # Variants - `Point` â€” All particles spawn at the emitter center. - `Circle` â€” Particles spawn within or on the edge of a circle. - `Rectangle` â€” Particles spawn within a rectangle centered on the emitter. - `Ring` â€” Particles spawn within an annulus (ring between two radii). - `Line` â€” Particles spawn along a line segment. - `Cone` â€” Particles spawn within a cone sector. - `Star` â€” Particles spawn on the points or edges of a star polygon. - `Spiral` â€” Particles spawn along an Archimedean spiral. - `Custom` — Spawn offset delegated to a Lua callback in the API layer.",
             "file": "src/particle/config.rs",
-            "line": 77
+            "line": 78
           },
           {
             "name": "RelativeMode",
             "kind": "enum",
             "description": "Relative mode controlling whether particles move with the emitter.  # Variants - `Detached` â€” Particles remain in world space after emission (default). - `Attached` â€” Particles move with the emitter position each frame.",
             "file": "src/particle/config.rs",
-            "line": 142
+            "line": 149
           },
           {
             "name": "Attractor",
             "kind": "struct",
             "description": "A point attractor that pulls (or repels) nearby particles toward a world-space location.  Added to a `ParticleSystem` instance via `ParticleSystem::add_attractor`. Multiple attractors are independently accumulated each physics step.  # Fields - `x` â€” World-space X coordinate of the attractor. - `y` â€” World-space Y coordinate of the attractor. - `strength` â€” Force magnitude in pixels/sÂ˛. Positive attracts; negative repels. - `radius` â€” Influence radius in pixels. Particles outside this range are unaffected.",
             "file": "src/particle/config.rs",
-            "line": 161
+            "line": 168
           },
           {
             "name": "BounceBounds",
             "kind": "struct",
             "description": "Axis-aligned rectangular boundaries for particle bounce / containment.  When set on a `ParticleSystem`, particles that leave the bounds have their velocity component on the crossing axis negated and scaled by `restitution`.  # Fields - `x_min` / `x_max` â€” Horizontal bounds in world space (pixels). - `y_min` / `y_max` â€” Vertical bounds in world space (pixels). - `restitution` â€” Velocity retention factor on bounce (0 = inelastic, 1 = perfectly elastic).",
             "file": "src/particle/config.rs",
-            "line": 182
+            "line": 189
           },
           {
             "name": "ParticleConfig",
             "kind": "struct",
             "description": "Configuration for a particle emitter. Controls emission rate, lifetime, physics, rendering, and the full set of per-particle randomisation ranges.  All range fields (e.g. `speed_min` / `speed_max`) are sampled uniformly per particle at spawn.  # Fields - `max_particles` â€” `u32`. Pool size cap. - `emission_rate` â€” `f32`. Particles per second. - `lifetime_min` / `lifetime_max` â€” `f32`. Particle lifetime range in seconds. - `speed_min` / `speed_max` â€” `f32`. Initial speed range. - `direction` â€” `f32`. Base emission angle in radians. - `spread` â€” `f32`. Angular spread around `direction`. - `sizes` â€” `Vec<f32>`. Keyframe sizes over particle lifetime. - `colors` â€” `Vec<[f32; 4]>`. RGBA colour gradient keyframes. - `emission_shape` â€” `EmissionShape`. Spawn-point distribution shape. - `relative_mode` â€” `RelativeMode`. Whether particles follow the emitter. - `shape` â€” `ParticleShape`. Rendered primitive type (point, rect, sprite). - (additional fields: gravity, accel, damping, turbulence, drag, orbit, animation, etc.)",
             "file": "src/particle/config.rs",
-            "line": 214
+            "line": 221
           }
         ]
       },
@@ -8014,7 +8062,15 @@
       "particle::render": {
         "module_doc": "Consolidated render-command interface for the particle module.  Pure CPU â€” no wgpu, winit, or mlua imports.  Provides the standard `generate_render_commands()` wrapper on [`ParticleSystem`] and [`Trail`] that delegates to the existing `build_render_commands()` methods with a zero world offset.",
         "source_file": "src/particle/render.rs",
-        "items": []
+        "items": [
+          {
+            "name": "expand_particle_commands",
+            "kind": "fn",
+            "description": "Expand particle render commands for textured particles.  Walks a list of [`RenderCommand`]s produced by [`ParticleSystem::build_render_commands`].  Each [`DrawParticleSystem`](RenderCommand::DrawParticleSystem) batch is split:  * **Textured particles** are expanded into individual   [`DrawQuad`](RenderCommand::DrawQuad) or   [`DrawImageEx`](RenderCommand::DrawImageEx) commands so that per-sprite   texture regions are respected. * **Untextured particles** remain batched in a single   `DrawParticleSystem` for efficient GPU tessellation.  Non-particle commands are forwarded unchanged.  # Parameters - `cmds` — `Vec<RenderCommand>`. The raw commands from the particle system.  # Returns `Vec<RenderCommand>` — the expanded command list ready for the GPU queue.",
+            "file": "src/particle/render.rs",
+            "line": 63
+          }
+        ]
       },
       "particle::shapes": {
         "module_doc": "Particle shape enum defining the geometric primitive used to render untextured particles.",
@@ -10711,100 +10767,100 @@
           {
             "name": "PostFxPass",
             "kind": "struct",
-            "description": "A single deferred draw operation queued during `lurek.draw()` and executed by `GpuRenderer`.  # Variants - `SetColor(r, g, b, a)` — Sets the active draw color; affects all subsequent draw calls. - `Rectangle` — Draws an axis-aligned rectangle. - `RoundedRectangle` — Draws a rectangle with rounded corners. - `Circle` — Draws a circle at center `(x, y)` with radius `r`. - `Ellipse` — Draws an ellipse with semi-axes `rx`, `ry`. - `Triangle` — Draws a triangle with three explicit vertices. - `Polygon` — Draws an arbitrary polygon from a flat `[x0, y0, x1, y1, ...]` vertex list. - `Line` — Draws a line segment from `(x1, y1)` to `(x2, y2)`. - `Polyline` — Draws a connected sequence of line segments through a flat `[x0,y0,x1,y1,…]` list. - `DrawImage` — Blits a texture (by index) at position `(x, y)`. - `DrawImageEx` — Draws a texture with full transform (rotation, scale, origin offset). - `DrawQuad` — Draws a sub-region (quad) of a texture with full transform. - `Print` — Renders text using a loaded bitmap font. - `SetLineWidth` — Sets the stroke width for subsequent outline draws. - `PushTransform` — Saves the current transform onto the stack. - `PopTransform` — Restores the previous transform from the stack. - `Translate` — Applies a translation to the current transform. - `Rotate` — Applies a rotation (in radians) to the current transform. - `Scale` — Applies a scale to the current transform. - `Arc` — Draws an arc (sector or outline) of a circle. - `DrawShape` — Draw all primitives in a compound shape with a unified affine transform. - `DrawParticleSystem` — Renders all particles in a single batched command, dispatching per-shape geometry helpers internally. - `BeginPostFx` — Start capturing the framebuffer for post-processing; subsequent draw calls render into the capture target. - `EndPostFx` — Stop capturing; resume rendering to the previous target. - `ApplyPostFx` — Apply the registered post-processing effects from the named stack and composite the result onto the current target. - `DrawTexturedQuad` — Draws an arbitrary textured quad specified by four explicit screen-space corners and four UV coordinates. A single shader pass in a post-FX pipeline.  Produced by the Lua PostFx stack at `apply()` time and stored inside [`RenderCommand::ApplyPostFx`]. The GPU renderer iterates the list and dispatches the appropriate WGSL shader for each pass in order.  # Fields - `effect_name` — Name that maps to a WGSL shader file (e.g. `\"bloom\"`, `\"vignette\"`). - `params` — Shader uniform values keyed by name. - `shader_id` — For `Custom` passes only; index into the GPU shader registry.",
+            "description": "A single deferred draw operation queued during `lurek.draw()` and executed by `GpuRenderer`.  # Variants - `SetColor(r, g, b, a)` — Sets the active draw color; affects all subsequent draw calls. - `Rectangle` — Draws an axis-aligned rectangle. - `RoundedRectangle` — Draws a rectangle with rounded corners. - `Circle` — Draws a circle at center `(x, y)` with radius `r`. - `Ellipse` — Draws an ellipse with semi-axes `rx`, `ry`. - `Triangle` — Draws a triangle with three explicit vertices. - `Polygon` — Draws an arbitrary polygon from a flat `[x0, y0, x1, y1, ...]` vertex list. - `Line` — Draws a line segment from `(x1, y1)` to `(x2, y2)`. - `Polyline` — Draws a connected sequence of line segments through a flat `[x0,y0,x1,y1,…]` list. - `DrawImage` — Blits a texture (by index) at position `(x, y)`. - `DrawImageEx` — Draws a texture with full transform (rotation, scale, origin offset). - `DrawQuad` — Draws a sub-region (quad) of a texture with full transform. - `Print` — Renders text using a loaded bitmap font. - `SetLineWidth` — Sets the stroke width for subsequent outline draws. - `PushTransform` — Saves the current transform onto the stack. - `PopTransform` — Restores the previous transform from the stack. - `Translate` — Applies a translation to the current transform. - `Rotate` — Applies a rotation (in radians) to the current transform. - `Scale` — Applies a scale to the current transform. - `Arc` — Draws an arc (sector or outline) of a circle. - `DrawShape` — Draw all primitives in a compound shape with a unified affine transform. - `DrawParticleSystem` — Renders all particles in a single batched command, dispatching per-shape geometry helpers internally. - `BeginPostFx` — Start capturing the framebuffer for post-processing; subsequent draw calls render into the capture target. - `EndPostFx` — Stop capturing; resume rendering to the previous target. - `ApplyPostFx` — Apply the registered post-processing effects from the named stack and composite the result onto the current target. - `DrawTexturedQuad` — Draws an arbitrary textured quad specified by four explicit screen-space corners and four UV coordinates. A single shader pass in a post-FX pipeline.  Produced by the Lua PostFx stack at `apply()` time and stored inside [`RenderCommand::ApplyPostFx`]. The GPU renderer iterates the list and dispatches the appropriate WGSL shader for each pass in order.  # Fields - `effect_name` — Name that maps to a WGSL shader file (e.g. `\"bloom\"`, `\"vignette\"`). - `params` — Shader uniform values keyed by name. - `shader_id` — For `Custom` passes only; index into the GPU shader registry. - `auto_uniforms` — When `true`, the engine injects time/frame/resolution into `p[3]`.",
             "file": "src/render/renderer.rs",
-            "line": 237
+            "line": 238
           },
           {
             "name": "TextSpan",
             "kind": "struct",
             "description": "RenderCommand.  # Variants - `SetColor` — SetColor variant. - `Rectangle` — Rectangle variant. - `RoundedRectangle` — RoundedRectangle variant. - `Circle` — Circle variant. - `Ellipse` — Ellipse variant. - `Triangle` — Triangle variant. - `Polygon` — Polygon variant. - `Line` — Line variant. - `Polyline` — Polyline variant. - `DrawImage` — DrawImage variant. - `DrawImageEx` — DrawImageEx variant. - `DrawQuad` — DrawQuad variant. - `Print` — Print variant. - `SetLineWidth` — SetLineWidth variant. - `PushTransform` — PushTransform variant. - `PopTransform` — PopTransform variant. - `Translate` — Translate variant. - `Rotate` — Rotate variant. - `Scale` — Scale variant. - `Shear` — Shear variant. - `Origin` — Origin variant. - `ApplyTransform` — ApplyTransform variant. - `Arc` — Arc variant. - `DrawBatch` — DrawBatch variant. - `SetBlendMode` — SetBlendMode variant. - `SetCanvas` — SetCanvas variant. - `DrawCanvas` — DrawCanvas variant. - `RegisterCanvas` — RegisterCanvas variant. - `Points` — Points variant. - `SetPointSize` — SetPointSize variant. - `SetScissor` — SetScissor variant. - `SetColorMask` — SetColorMask variant. - `SetWireframe` — SetWireframe variant. - `PrintFormatted` — PrintFormatted variant. - `StencilBegin` — StencilBegin variant. - `StencilEnd` — StencilEnd variant. - `SetStencilTest` — SetStencilTest variant. - `SetShader` — SetShader variant. - `DrawMesh` — DrawMesh variant. - `SyncMesh` — SyncMesh variant. - `DrawNineSlice` — DrawNineSlice variant. - `DrawShape` — DrawShape variant. - `DrawParticleSystem` — DrawParticleSystem variant. - `BeginPostFx` — BeginPostFx variant. - `EndPostFx` — EndPostFx variant. - `ApplyPostFx` — ApplyPostFx variant. - `DrawTexturedQuad` — DrawTexturedQuad variant. - `DrawQuadBezier` — DrawQuadBezier variant. - `DrawCubicBezier` — DrawCubicBezier variant. - `DrawPath` — DrawPath variant. - `DrawGradientRect` — DrawGradientRect variant. - `DrawColoredPolygon` — DrawColoredPolygon variant. - `DrawIsoCubeTile` — DrawIsoCubeTile variant. - `DrawHexTile` — DrawHexTile variant. - `BeginSortGroup` — BeginSortGroup variant. - `PushSortKey` — PushSortKey variant. - `FlushSortGroup` — FlushSortGroup variant. - `DrawPhysicsDebug` — DrawPhysicsDebug variant. - `DrawSpineSkeleton` — DrawSpineSkeleton variant. - `DrawBevelRect` — DrawBevelRect variant. - `PushLayer` — PushLayer variant. - `PopLayer` — PopLayer variant. - `DrawRichText` — DrawRichText variant. One styled segment inside a [`RenderCommand::DrawRichText`] command.  Each span can carry its own colour and scale, while the command as a whole provides the default font and the baseline origin.  # Fields - `text` — `String`. UTF-8 text content of this span. - `r`, `g`, `b`, `a` — `u8`. RGBA colour override (0–255). - `scale` — `f32`. Font scale multiplier (1.0 = default size).",
             "file": "src/render/renderer.rs",
-            "line": 323
+            "line": 326
           },
           {
             "name": "RenderCommand",
             "kind": "enum",
             "description": "Enqueues a typed draw or state command into the per-frame GPU render queue.",
             "file": "src/render/renderer.rs",
-            "line": 355
+            "line": 358
           },
           {
             "name": "TextureData",
             "kind": "struct",
             "description": "Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.  # Fields - `pixels` — Raw RGBA byte data in RGBA format. - `width` — Texture width in pixels. - `height` — Texture height in pixels.",
             "file": "src/render/renderer.rs",
-            "line": 1037
+            "line": 1040
           },
           {
             "name": "ParticleRenderShape",
             "kind": "enum",
             "description": "Geometric shape used when rendering a single untextured particle via `DrawParticleSystem`.  This mirrors `particle::ParticleShape` one-for-one. The particle module converts `ParticleShape` -> `ParticleRenderShape` when building the `DrawParticleSystem` command, keeping the Tier-1 `graphics` module free of an upward Tier-2 import.  # Variants - `Square` — Axis-aligned filled square. - `Circle` — Filled circle. - `Triangle` — Filled equilateral triangle. - `Spark` — Thin line segment along velocity. - `Diamond` — Filled diamond (square rotated 45°). - `Shrapnel` — Random jagged polygon (deterministic per particle). `edges` = vertex count; `seed` = per-particle RNG seed. - `Ray` — Elongated filled rectangle. `aspect` = length-to-width ratio. - `Puff` — Soft filled circle (more tessellation segments than `Circle`). - `Ring` — Hollow ring (annulus). `thickness` = band width as fraction of size. - `Capsule` — Filled capsule (rectangle + hemispherical caps).",
             "file": "src/render/renderer.rs",
-            "line": 1061
+            "line": 1064
           },
           {
             "name": "ParticleInstance",
             "kind": "struct",
             "description": "Per-particle render data for a single frame.  Produced by `ParticleSystem::build_render_commands()` and consumed by the GPU renderer's `DrawParticleSystem` arm. All positions are in world space.  # Fields - `x` — `f32`. - `y` — `f32`. - `r` — `f32`. - `g` — `f32`. - `b` — `f32`. - `a` — `f32`. - `rotation` — `f32`. - `size` — `f32`. - `shape` — `ParticleRenderShape`. - `texture_key` — `Option<TextureKey>`. - `quad` — `Option<[f32; 4]>`. - `quad_tex_dims` — `Option<(f32, f32)>`.",
             "file": "src/render/renderer.rs",
-            "line": 1116
+            "line": 1119
           },
           {
             "name": "DrawableKind",
             "kind": "enum",
             "description": "Type discriminator for resources that can be passed to lurek.graphic.draw.  Used to dispatch the polymorphic draw(drawable, ...) Lua API to the correct RenderCommand variant based on resource type.  # Variants - Image(TextureKey) — A loaded texture (Image). - Canvas(CanvasKey) — An off-screen render target. - SpriteBatch(SpriteBatchKey) — A batched sprite collection. - Mesh(MeshKey) — A custom geometry mesh.",
             "file": "src/render/renderer.rs",
-            "line": 1156
+            "line": 1159
           },
           {
             "name": "PathSegment",
             "kind": "enum",
             "description": "A single segment of a vector path, used with `RenderCommand::DrawPath`.  # Variants - `MoveTo` — Move the pen to an absolute position without drawing. - `LineTo` — Draw a straight line to the given position. - `QuadTo` — Draw a quadratic Bézier curve: one control point, one end point. - `CubicTo` — Draw a cubic Bézier curve: two control points, one end point.",
             "file": "src/render/renderer.rs",
-            "line": 1175
+            "line": 1178
           },
           {
             "name": "GradientDirection",
             "kind": "enum",
             "description": "Direction for a two-stop linear or radial gradient.  # Variants - `Horizontal` — Gradient flows left → right. - `Vertical` — Gradient flows top → bottom. - `DiagDown` — Gradient flows top-left → bottom-right. - `DiagUp` — Gradient flows bottom-left → top-right. - `Radial` — Radial gradient expanding from the rectangle centre outward.",
             "file": "src/render/renderer.rs",
-            "line": 1195
+            "line": 1198
           },
           {
             "name": "HexOrientation",
             "kind": "enum",
             "description": "Orientation for a hexagonal tile cell.  # Variants - `PointyTop` — Pointy-top hexagon (flat sides left/right). - `FlatTop` — Flat-top hexagon (flat sides top/bottom).",
             "file": "src/render/renderer.rs",
-            "line": 1214
+            "line": 1217
           },
           {
             "name": "BevelStyle",
             "kind": "enum",
             "description": "Visual style for a bevelled rectangle.  # Variants - `Raised` — Raised 3-D appearance (highlight top-left, shadow bottom-right). - `Sunken` — Sunken 3-D appearance (shadow top-left, highlight bottom-right). - `Ridge` — Double ridge border on all sides. - `Groove` — Double groove border on all sides. - `Flat` — Flat border (same colour all sides).",
             "file": "src/render/renderer.rs",
-            "line": 1230
+            "line": 1233
           },
           {
             "name": "PhysicsDebugShape",
             "kind": "struct",
             "description": "Per-collider geometry snapshot extracted from the physics world for GPU debug rendering.  Produced by `physics::World::extract_debug_shapes()` and consumed by `RenderCommand::DrawPhysicsDebug`. Keeping geometry data in this struct prevents the renderer from importing the physics crate.  # Fields - `x` — `f32`. AABB centre or circle/capsule origin in world space (X axis). - `y` — `f32`. AABB centre or circle/capsule origin in world space (Y axis). - `half_w` — `f32`. Half-width (box) or radius (circle) in world units. - `half_h` — `f32`. Half-height (box) in world units; equal to `half_w` for circles. - `angle` — `f32`. Body rotation in radians. - `is_static` — `bool`. True when the collider belongs to a static body. - `is_sleeping` — `bool`. True when the body is sleeping. - `is_sensor` — `bool`. True when the collider is a sensor (trigger volume). - `hull_verts` — `Vec<[f32; 2]>`. Convex hull vertices in body-local space (empty for box/circle). - `is_circle` — `bool`. True when the shape is a circle (use `half_w` as radius).",
             "file": "src/render/renderer.rs",
-            "line": 1261
+            "line": 1264
           },
           {
             "name": "PhysicsDebugConfig",
             "kind": "struct",
             "description": "Appearance parameters for `RenderCommand::DrawPhysicsDebug`.  # Fields - `body_color` — `[f32; 4]`. Colour for dynamic bodies. - `static_color` — `[f32; 4]`. Colour for static bodies. - `sleep_color` — `[f32; 4]`. Colour for sleeping bodies. - `sensor_color` — `[f32; 4]`. Colour for sensor colliders. - `line_width` — `f32`. Stroke width in screen pixels.",
             "file": "src/render/renderer.rs",
-            "line": 1295
+            "line": 1298
           },
           {
             "name": "SpineSlotDraw",
             "kind": "struct",
             "description": "One textured slot from a Spine skeleton for GPU rendering.  Produced by the spine CPU module and consumed by `RenderCommand::DrawSpineSkeleton`. Keeps the renderer free of a spine-crate import.  # Fields - `texture_key` — `TextureKey`. Texture atlas key for this slot's attachment. - `corners` — `[Vec2; 4]`. Four screen-space corner positions: top-left, top-right, bottom-right, bottom-left. - `uvs` — `[Vec2; 4]`. Normalised UV coordinates in the same winding order as `corners`. - `color` — `[f32; 4]`. RGBA tint for this slot. - `blend_mode` — `BlendMode`. Blend mode for this slot.",
             "file": "src/render/renderer.rs",
-            "line": 1332
+            "line": 1335
           }
         ]
       },
@@ -13016,35 +13072,49 @@
             "kind": "struct",
             "description": "Metadata extracted from a save slot.  # Fields - `slot` â€” `String`. Slot name. - `timestamp` â€” `f64`. Unix epoch timestamp. - `version` â€” `i32`. Schema version. - `summary` â€” `String`. Optional summary string.",
             "file": "src/save/save_manager.rs",
-            "line": 18
+            "line": 21
           },
           {
             "name": "SaveManager",
             "kind": "struct",
             "description": "Pure-data save manager providing registration of named collectors, schema versioning, dirty-state tracking, and auto-save timer.  Actual serialisation and filesystem calls happen on the Lua side; this struct tracks the bookkeeping.",
             "file": "src/save/save_manager.rs",
-            "line": 35
+            "line": 38
           },
           {
             "name": "serialize_table",
             "kind": "fn",
             "description": "Serialize a simple Lua-compatible value hierarchy into a `return { ... }` string.  Supports nil, bool, number (f64), string, and nested tables (HashMap). Does not handle userdata, functions, or circular references.  # Parameters - `data` â€” `&HashMap<String, SaveValue>`. The table data to serialize. - `depth` â€” `u32`. Current nesting depth (internal; call with `0`).  # Returns `Result<String, String>`.",
             "file": "src/save/save_manager.rs",
-            "line": 249
+            "line": 252
           },
           {
             "name": "serialize_value",
             "kind": "fn",
             "description": "Serialize a single value.  # Parameters - `value` â€” `&SaveValue`. The value to serialize. - `depth` â€” `u32`. Current nesting depth.  # Returns `Result<String, String>`.",
             "file": "src/save/save_manager.rs",
-            "line": 283
+            "line": 286
           },
           {
             "name": "SaveValue",
             "kind": "enum",
             "description": "A simple value type matching the Lua subset we can serialize.  # Variants - `Nil` â€” Lua nil. - `Bool` â€” Lua boolean. - `Number` â€” Lua number. - `Str` â€” Lua string. - `Table` â€” Lua table (string keys only for save data).",
             "file": "src/save/save_manager.rs",
-            "line": 302
+            "line": 305
+          },
+          {
+            "name": "compress_save_content",
+            "kind": "fn",
+            "description": "Compress a serialised save string with LZ4, then base64-encode it.  The returned string has the form: ```text --[[COMPRESSED]] return \"<base64>\" ```  # Parameters - `plain` — `&str`. The raw `return { ... }` save content.  # Returns `Result<String, String>` — the wrapped, encoded payload, or an error message.",
+            "file": "src/save/save_manager.rs",
+            "line": 398
+          },
+          {
+            "name": "decompress_save_content",
+            "kind": "fn",
+            "description": "Detect and decode a compressed save file, or pass through an uncompressed one.  If `raw` starts with the `--[[COMPRESSED]]` marker, the second line is expected to contain `return \"<base64>\"`. The base64 payload is decoded and LZ4-decompressed back to the original `return { ... }` string.  Uncompressed content is returned unchanged.  # Parameters - `raw` — `&str`. The raw file content read from disk.  # Returns `Result<String, String>` — the decompressed content, or an error message.",
+            "file": "src/save/save_manager.rs",
+            "line": 417
           }
         ]
       },
@@ -13772,6 +13842,33 @@
           }
         ]
       },
+      "terminal::highlighter": {
+        "module_doc": "Text highlighting algorithm for the terminal module.  Splits text into coloured spans by matching highlight rules. This pure-Rust implementation is used by `lurek.terminal.printHighlighted` and can be reused by future language bindings (Python, TypeScript) without `mlua`.",
+        "source_file": "src/terminal/highlighter.rs",
+        "items": [
+          {
+            "name": "HighlightRule",
+            "kind": "struct",
+            "description": "A text highlighting rule: find `pattern` as a plain substring and apply `fg`/`bg` colors.",
+            "file": "src/terminal/highlighter.rs",
+            "line": 9
+          },
+          {
+            "name": "ColoredSpan",
+            "kind": "struct",
+            "description": "A colored text span produced by the highlight algorithm.",
+            "file": "src/terminal/highlighter.rs",
+            "line": 19
+          },
+          {
+            "name": "highlight_spans",
+            "kind": "fn",
+            "description": "Splits `text` into colored spans by matching `rules` left-to-right.  Rules are checked at every position; the earliest match wins. Unmatched text is emitted with `default_fg` and no background colour.  # Parameters - `text` — The input text to highlight. - `rules` — Ordered highlighting rules; first positional match wins. - `default_fg` — Foreground colour for unmatched text.",
+            "file": "src/terminal/highlighter.rs",
+            "line": 37
+          }
+        ]
+      },
       "terminal": {
         "module_doc": "Grid-based character-cell terminal emulator and widget toolkit.  The `terminal` module provides a 2D grid of [`TCell`] records together with a lightweight widget system for text-mode UIs such as roguelikes, debug consoles, and retro adventure interfaces.  Grid dimensions are capped at 512 columns by 256 rows. All public coordinate parameters are 1-based while internal storage is 0-based.  ## Tier  `terminal` is a Tier 2 engine extension. It may depend on `math`, `engine`, and Tier 1 modules. It must not import other Tier 2 modules.",
         "source_file": "src/terminal/mod.rs",
@@ -13796,6 +13893,13 @@
             "description": "Tab-completion engine for TextBox inputs.",
             "file": "src/terminal/mod.rs",
             "line": 23
+          },
+          {
+            "name": "highlighter",
+            "kind": "mod",
+            "description": "Text highlighting algorithm for keyword-based colouring.",
+            "file": "src/terminal/mod.rs",
+            "line": 25
           }
         ]
       },
@@ -14956,7 +15060,7 @@
             "kind": "struct",
             "description": "Central GUI coordinator: widget pool, focus, toasts, and theme.  The context owns a flat `Vec<WidgetKind>` indexed by widget ID.  Index `0` is always the invisible root `Panel`.  New widgets are appended with `add_*` methods that return the widget's index.  Focus is tracked by `focused_widget: Option<usize>`.  The toast queue is a separate `Vec<Toast>` that is updated and drained by `update(dt)`.  # Fields - `widgets` — `Vec<WidgetKind>`. Flat pool of all widgets. - `focused_widget` — `Option<usize>`. Index of the focused widget. - `toasts` — `Vec<Toast>`. Active toast notifications. - `theme` — `Option<Theme>`. Active theme. - `pending_events` — `Vec<GuiEvent>`. Interaction events queued since the last drain. - `dirty` — `bool`. Set to `true` on any structural change; cleared by `flush_cache()`. - `viewport_w` — `f32`. Viewport width (set via `set_viewport`). - `viewport_h` — `f32`. Viewport height (set via `set_viewport`).",
             "file": "src/ui/context.rs",
-            "line": 309
+            "line": 313
           }
         ]
       },
@@ -15213,6 +15317,13 @@
             "description": "A notification badge displaying a numeric count or short label.  When `count > max_display`, [`Badge::display_text`] returns the clamped string (e.g., `\"99+\"` when `max_display = 99`).  # Fields - `base` — `WidgetBase`. Shared widget properties. - `count` — `u32`. Numeric badge count. - `max_display` — `u32`. Highest value shown literally; larger values show `\"N+\"`.",
             "file": "src/ui/extras.rs",
             "line": 1125
+          },
+          {
+            "name": "CustomWidget",
+            "kind": "struct",
+            "description": "A fully Lua-driven widget with custom rendering.  Carries only the shared [`WidgetBase`] — all visual output is produced by the Lua `on_draw` callback registered via `widget:setOnDraw(fn)`.  # Fields - `base` — `WidgetBase`. Shared widget properties.",
+            "file": "src/ui/extras.rs",
+            "line": 1184
           }
         ]
       },
@@ -15381,7 +15492,7 @@
             "kind": "struct",
             "description": "Shared base properties embedded by every concrete widget.  `WidgetBase` does not carry rendering or input-handling logic — it stores the common fields that the Lua API and the layout engine operate on. Concrete widgets (e.g. `Button`, `Label`) embed a `WidgetBase` and add type-specific data.  # Fields - `id` — `String`. Optional identifier for `findById` lookup. - `widget_type` — `WidgetType`. Discriminator for theme key lookup. - `x` — `f32`. Horizontal position relative to parent. - `y` — `f32`. Vertical position relative to parent. - `width` — `f32`. Widget width in pixels. - `height` — `f32`. Widget height in pixels. - `visible` — `bool`. Whether the widget is drawn and receives events. - `enabled` — `bool`. Whether the widget accepts input. - `state` — `WidgetState`. Current visual/interaction state. - `tooltip` — `String`. Tooltip text (displayed externally). - `z_order` — `i32`. Draw layer; higher values draw on top. - `padding` — `[f32; 4]`. Inner padding `[top, right, bottom, left]`. - `margin` — `[f32; 4]`. Outer margin `[top, right, bottom, left]`. - `min_width` — `f32`. Minimum width constraint. - `min_height` — `f32`. Minimum height constraint. - `max_width` — `f32`. Maximum width constraint (`f32::INFINITY` = none). - `max_height` — `f32`. Maximum height constraint (`f32::INFINITY` = none). - `anchor_left` — `Option<f32>`. Left anchor edge offset. - `anchor_top` — `Option<f32>`. Top anchor edge offset. - `anchor_right` — `Option<f32>`. Right anchor edge offset. # Fields - `anchor_bottom` — `Option<f32>`. Bottom anchor edge offset. - `anchor_center_x` — `Option<f32>`. Horizontal centre anchor. - `anchor_center_y` — `Option<f32>`. Vertical centre anchor. - `flex_grow` — `f32`. Flexbox grow factor. - `flex_shrink` — `f32`. Flexbox shrink factor. - `computed_rect` — `crate::math::Rect`. Computed screen-space rectangle after layout. - `is_visible` — `bool`. Whether this widget is visible after layout (not clipped by parent).",
             "file": "src/ui/widget.rs",
-            "line": 367
+            "line": 372
           }
         ]
       },
@@ -15698,7 +15809,15 @@
     }
   },
   "tests": {
-    "rust": [],
+    "rust": [
+      {
+        "file": "tests/examples_load_test.rs",
+        "module": "examples_load",
+        "name": "examples_load_all",
+        "description": "",
+        "line": 37
+      }
+    ],
     "lua": [
       {
         "file": "tests/lua/config/test_config.lua",

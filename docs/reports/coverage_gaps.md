@@ -10,30 +10,44 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (0 items)
+## 1. Rust→Lua Gaps (5 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
 
-*All public Rust functions appear to be exposed to Lua.*
+### `i18n::format`
+
+- `days_to_ymd` — Converts days since Unix epoch to `(year, month, day)`. `src/i18n/format.rs:86`
+- `locale_separators` — Returns `(decimal_separator, thousands_separator)` for the g `src/i18n/format.rs:9`
+- `month_name_tables` — Returns (long_month_names, short_month_names) for English. `src/i18n/format.rs:102`
+
+### `particle::render`
+
+- `expand_particle_commands` — Expand particle render commands for textured particles.  Wal `src/particle/render.rs:63`
+
+### `terminal::highlighter`
+
+- `highlight_spans` — Splits `text` into colored spans by matching `rules` left-to `src/terminal/highlighter.rs:37`
 
 ---
 
 ## 2. Rust Docstring Issues (0 items)
 
 Public Rust items with missing or very short descriptions (< 25 chars).
-These appear as `// (undocumented)` in `docs/API/rust-api.md`.
+These appear as `// (undocumented)` in `docs/reports/rust-api.md`.
 
 *All public Rust items have adequate docstrings.*
 
 ---
 
-## 3. Lua Docstring Issues (0 items)
+## 3. Lua Docstring Issues (1 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
-These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
+These appear without documentation in `docs/lua-api.md` and IntelliSense.
 
-*All Lua API items have adequate descriptions.*
+### `particle`
+
+- `module` **`lurek.particle`** — *(no description)*
 
 ---
 

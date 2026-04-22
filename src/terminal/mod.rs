@@ -21,6 +21,8 @@ mod widget;
 pub mod ansi;
 /// Tab-completion engine for TextBox inputs.
 pub mod completion;
+/// Text highlighting algorithm for keyword-based colouring.
+pub mod highlighter;
 
 pub use cell::TCell;
 pub use terminal_state::Terminal;

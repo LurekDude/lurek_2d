@@ -2511,3 +2511,82 @@ describe("Missing explicit test for MapBlock:getWeight", function()
         -- TODO: add assertion for MapBlock:getWeight
     end)
 end)
+
+-- =========================================================================
+-- Phase 08: tilemap tile step/exit callbacks
+-- =========================================================================
+describe("tilemap tile step/exit callbacks", function()
+    it("onTileStep exists on TileMap userdata", function()
+        if lurek.tilemap and lurek.tilemap.newMap then
+            local m = lurek.tilemap.newMap(16, 16)
+            if m then
+                expect_equal(type(m.onTileStep), "function")
+            end
+        end
+    end)
+
+    it("onTileExit exists on TileMap userdata", function()
+        if lurek.tilemap and lurek.tilemap.newMap then
+            local m = lurek.tilemap.newMap(16, 16)
+            if m then
+                expect_equal(type(m.onTileExit), "function")
+            end
+        end
+    end)
+
+    it("fireTileStep exists on TileMap userdata", function()
+        if lurek.tilemap and lurek.tilemap.newMap then
+            local m = lurek.tilemap.newMap(16, 16)
+            if m then
+                expect_equal(type(m.fireTileStep), "function")
+            end
+        end
+    end)
+
+    it("fireTileExit exists on TileMap userdata", function()
+        if lurek.tilemap and lurek.tilemap.newMap then
+            local m = lurek.tilemap.newMap(16, 16)
+            if m then
+                expect_equal(type(m.fireTileExit), "function")
+            end
+        end
+    end)
+
+    it("onTileStep accepts a function without error", function()
+        if lurek.tilemap and lurek.tilemap.newMap then
+            local m = lurek.tilemap.newMap(16, 16)
+            if m and m.onTileStep then
+                local ok = pcall(function()
+                    m:onTileStep(1, function(entity, tx, ty) end)
+                end)
+                expect_true(ok)
+            end
+        end
+    end)
+
+    it("onTileExit accepts a function without error", function()
+        if lurek.tilemap and lurek.tilemap.newMap then
+            local m = lurek.tilemap.newMap(16, 16)
+            if m and m.onTileExit then
+                local ok = pcall(function()
+                    m:onTileExit(1, function(entity, tx, ty) end)
+                end)
+                expect_true(ok)
+            end
+        end
+    end)
+
+    it("fireTileStep invokes registered callback", function()
+        if lurek.tilemap and lurek.tilemap.newMap then
+            local m = lurek.tilemap.newMap(16, 16)
+            if m and m.onTileStep and m.fireTileStep then
+                local called = false
+                m:onTileStep(5, function(entity, tx, ty)
+                    called = true
+                end)
+                m:fireTileStep(5, {id = 1}, 2, 3)
+                expect_true(called)
+            end
+        end
+    end)
+end)

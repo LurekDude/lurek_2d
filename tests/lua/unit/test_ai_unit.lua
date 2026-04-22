@@ -4440,3 +4440,120 @@ describe("Missing explicit test for AILod:tierName", function()
         -- TODO: add assertion for AILod:tierName
     end)
 end)
+
+-- =========================================================================
+-- Extensibility Hooks (Phase 01)
+-- =========================================================================
+
+-- @description Verifies the newGuard factory is exported as a function.
+describe("lurek.ai extensibility factories", function()
+    -- @tests lurek.ai.newGuard
+    it("has newGuard factory", function()
+        assert.is_function(lurek.ai.newGuard, "newGuard should be a function")
+    end)
+end)
+
+-- @description Tests the custom decision model callback mechanism.
+describe("custom decision model", function()
+    -- @tests Agent:setCustomModel
+    -- @description Sets a custom decision model callback on an agent and verifies
+    -- it is invoked when the world is updated.
+    it("can set custom model on agent and callback fires on update", function()
+        local world = lurek.ai.newWorld()
+        local agent = world:addAgent("test_custom_agent")
+        local called = false
+        agent:setCustomModel(function(ag, bb, dt)
+            called = true
+        end)
+        world:update(0.016)
+        assert.is_true(called, "custom model callback should be called on update")
+    end)
+
+    -- @description Verifies getDecisionModel returns "custom" after setCustomModel.
+    it("getDecisionModel returns 'custom' after setCustomModel", function()
+        local world = lurek.ai.newWorld()
+        local agent = world:addAgent("model_check_agent")
+        agent:setCustomModel(function(ag, bb, dt) end)
+        assert.equal("custom", agent:getDecisionModel(),
+            "decision model name should be 'custom'")
+    end)
+end)
+
+-- @description Tests the BT Guard decorator factory and structural properties.
+describe("BT Guard decorator", function()
+    -- @tests lurek.ai.newGuard
+    -- @description Creates a guard node via newGuard and checks its type.
+    it("creates guard node via newGuard", function()
+        local action = lurek.ai.newAction(function(ag, bb, dt) return "success" end)
+        local guard = lurek.ai.newGuard(function(ag, bb) return true end, action)
+        assert.is_not_nil(guard, "Guard node should be created")
+        assert.equal("guard", guard:getNodeType(), "node type should be 'guard'")
+    end)
+
+    -- @description Verifies a guard node reports exactly one child.
+    it("guard has child count 1", function()
+        local action = lurek.ai.newAction(function(ag, bb, dt) return "success" end)
+        local guard = lurek.ai.newGuard(function(ag, bb) return false end, action)
+        assert.equal(1, guard:getChildCount(), "Guard should have 1 child")
+    end)
+end)
+
+-- @description Tests addConsideration accepting a Lua function as a custom curve.
+describe("custom utility response curve", function()
+    -- @tests UtilityAI:addConsideration
+    -- @description addConsideration should not error when the curve argument is a function.
+    it("addConsideration accepts function as curve without error", function()
+        local ua = lurek.ai.newUtilityAI()
+        ua:addAction("test_action", function() return 0.5 end)
+        local ok = pcall(function()
+            ua:addConsideration(
+                "test_action",
+                "distance_axis",
+                function() return 0.8 end,  -- scorer
+                function(x) return x * x end  -- custom curve fn
+            )
+        end)
+        assert.is_true(ok, "addConsideration with function curve should succeed")
+    end)
+
+    -- @description addConsideration with a string curve should still work.
+    it("addConsideration accepts string curve without error", function()
+        local ua = lurek.ai.newUtilityAI()
+        ua:addAction("action_b", function() return 0.3 end)
+        local ok = pcall(function()
+            ua:addConsideration(
+                "action_b",
+                "proximity",
+                function() return 0.5 end,
+                "linear",
+                1.0, 0.0, 0.0
+            )
+        end)
+        assert.is_true(ok, "addConsideration with string curve should succeed")
+    end)
+end)
+
+-- @description Tests addCustomBehavior on a SteeringManager.
+describe("custom steering behavior", function()
+    -- @tests SteeringManager:addCustomBehavior
+    it("addCustomBehavior adds one behavior to the manager", function()
+        local sm = lurek.ai.newSteeringManager()
+        local before = sm:getBehaviorCount()
+        sm:addCustomBehavior(function(ag, dt) return 10, 0 end, 1.0)
+        assert.equal(before + 1, sm:getBehaviorCount(),
+            "behavior count should increase by 1")
+    end)
+
+    -- @tests SteeringManager:applyCustomSteering
+    it("applyCustomSteering returns a force pair without error", function()
+        local sm = lurek.ai.newSteeringManager()
+        -- applyCustomSteering needs an agent userdata — without a world it must
+        -- still not panic; pass nil as a smoke test.
+        local ok = pcall(function()
+            sm:applyCustomSteering(nil, 0.016)
+        end)
+        -- Even with nil agent (no custom behaviors) it should not crash.
+        assert.is_true(ok, "applyCustomSteering with no custom behaviors should not error")
+    end)
+end)
+

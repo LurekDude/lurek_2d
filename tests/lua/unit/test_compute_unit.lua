@@ -1678,3 +1678,73 @@ describe("Missing explicit test for Array:typeOf", function()
         -- TODO: add assertion for Array:typeOf
     end)
 end)
+
+-- =========================================================================
+-- Phase 05 — Lua extensibility hooks
+-- =========================================================================
+
+describe("Array:map", function()
+    -- @tests Array:map
+    it("map method exists", function()
+        local a = lurek.compute.fromTable({1, 2, 3})
+        expect_equal(type(a.map), "function")
+    end)
+
+    it("map applies callback element-wise", function()
+        local a = lurek.compute.fromTable({2, 4, 6})
+        local b = a:map(function(x) return x / 2 end)
+        local t = b:toTable()
+        expect_equal(t[1], 1)
+        expect_equal(t[2], 2)
+        expect_equal(t[3], 3)
+    end)
+end)
+
+describe("Array:eval", function()
+    -- @tests Array:eval
+    it("eval method exists", function()
+        local a = lurek.compute.fromTable({1, 2, 3})
+        expect_equal(type(a.eval), "function")
+    end)
+
+    it("eval transforms elements with expression", function()
+        local a = lurek.compute.fromTable({1, 2, 3})
+        local b = a:eval("x * x")
+        local t = b:toTable()
+        expect_equal(t[1], 1)
+        expect_equal(t[2], 4)
+        expect_equal(t[3], 9)
+    end)
+end)
+
+describe("Array:reduce", function()
+    -- @tests Array:reduce
+    it("reduce method exists", function()
+        local a = lurek.compute.fromTable({1, 2, 3, 4})
+        expect_equal(type(a.reduce), "function")
+    end)
+
+    it("reduce computes sum", function()
+        local a = lurek.compute.fromTable({1, 2, 3, 4})
+        local total = a:reduce(function(acc, x) return acc + x end, 0)
+        expect_equal(total, 10)
+    end)
+end)
+
+describe("Array:scan", function()
+    -- @tests Array:scan
+    it("scan method exists", function()
+        local a = lurek.compute.fromTable({1, 2, 3})
+        expect_equal(type(a.scan), "function")
+    end)
+
+    it("scan computes running sum", function()
+        local a = lurek.compute.fromTable({1, 2, 3, 4})
+        local b = a:scan(function(acc, x) return acc + x end, 0)
+        local t = b:toTable()
+        expect_equal(t[1], 1)
+        expect_equal(t[2], 3)
+        expect_equal(t[3], 6)
+        expect_equal(t[4], 10)
+    end)
+end)

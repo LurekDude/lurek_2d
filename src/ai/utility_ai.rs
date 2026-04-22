@@ -45,6 +45,7 @@ use mlua::RegistryKey;
 /// - `Logistic` — Logistic variant.
 /// - `Logit` — Logit variant.
 /// - `Step` — Step variant.
+/// - `Custom` — Custom variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ResponseCurve {
     /// Linear: output = p1 * input + p2.
@@ -57,6 +58,14 @@ pub enum ResponseCurve {
     Logit,
     /// Step: output = p2 if input >= p1, else p3.
     Step,
+    /// A user-defined Lua function maps `f64 → f64` for this axis.
+    /// `callback_id` is an opaque key into the Lua API layer's callback registry.
+    /// The actual Lua call is performed by the API layer; `apply()` returns the
+    /// raw `input` as an identity transform when invoked on the domain side.
+    Custom {
+        /// Opaque ID referencing the Lua curve callback in the API-layer registry.
+        callback_id: u32,
+    },
 }
 
 impl ResponseCurve {
@@ -108,6 +117,8 @@ impl ResponseCurve {
                     p3
                 }
             }
+            // Invoked by LuaUtilityAI; domain code returns identity for Custom.
+            Self::Custom { .. } => input,
         }
     }
 }

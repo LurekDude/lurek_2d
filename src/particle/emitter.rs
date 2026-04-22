@@ -57,6 +57,12 @@ pub struct ParticleSystem {
     pub bounce_bounds: Option<BounceBounds>,
     /// Child emitter systems updated each frame alongside this system.
     pub sub_systems: Vec<ParticleSystem>,
+    /// Indices of particles spawned this frame with `EmissionShape::Custom` that need
+    /// their position overridden by the Lua API layer before the next render.
+    pub pending_custom_offsets: Vec<usize>,
+    /// World-space positions and velocities of particles that died during the last `update()`.
+    /// Each entry is `(world_x, world_y, vx, vy)`.  Drained by the Lua API layer each frame.
+    pub pending_deaths: Vec<(f32, f32, f32, f32)>,
 }
 
 impl ParticleSystem {
@@ -82,6 +88,8 @@ impl ParticleSystem {
             attractors: Vec::new(),
             bounce_bounds: None,
             sub_systems: Vec::new(),
+            pending_custom_offsets: Vec::new(),
+            pending_deaths: Vec::new(),
         }
     }
 
@@ -218,21 +226,23 @@ impl ParticleSystem {
         // --- Phase 2: remove dead particles; optionally spawn death sub-bursts ---
         // When death_emitter is configured, each dying particle spawns a child burst
         // at its final world position, enabling cascading effects (e.g. firework stages).
+        // In both branches we also collect into pending_deaths so the Lua API layer can
+        // invoke the setOnDeathBatch callback if one is registered.
         if self.config.death_emitter.is_some() && self.config.death_burst_count > 0 {
             let death_cfg = self.config.death_emitter.as_ref().unwrap().as_ref().clone();
             let burst = self.config.death_burst_count;
             let ex = self.emitter_x;
             let ey = self.emitter_y;
-            let mut death_positions: Vec<(f32, f32)> = Vec::new();
+            let mut dead_data: Vec<(f32, f32, f32, f32)> = Vec::new();
             self.particles.retain(|p| {
                 if p.life <= 0.0 {
-                    death_positions.push((ex + p.x, ey + p.y));
+                    dead_data.push((ex + p.x, ey + p.y, p.vx, p.vy));
                     false
                 } else {
                     true
                 }
             });
-            for (dx, dy) in death_positions {
+            for &(dx, dy, _, _) in &dead_data {
                 let mut sub = ParticleSystem::new(death_cfg.clone());
                 sub.emitter_x = dx;
                 sub.emitter_y = dy;
@@ -240,8 +250,20 @@ impl ParticleSystem {
                 sub.stop(); // burst only — no continuous emission
                 self.sub_systems.push(sub);
             }
+            self.pending_deaths.extend(dead_data);
         } else {
-            self.particles.retain(|p| p.life > 0.0);
+            let ex = self.emitter_x;
+            let ey = self.emitter_y;
+            let mut dead_data: Vec<(f32, f32, f32, f32)> = Vec::new();
+            self.particles.retain(|p| {
+                if p.life <= 0.0 {
+                    dead_data.push((ex + p.x, ey + p.y, p.vx, p.vy));
+                    false
+                } else {
+                    true
+                }
+            });
+            self.pending_deaths.extend(dead_data);
         }
 
         // Update child sub-systems (death bursts)
@@ -315,9 +337,16 @@ impl ParticleSystem {
             shape_seed: fastrand::u32(..),
         };
 
-        match self.config.insert_mode {
-            InsertMode::Top => self.particles.push(particle),
-            InsertMode::Bottom => self.particles.insert(0, particle),
+        let new_idx = match self.config.insert_mode {
+            InsertMode::Top => {
+                let idx = self.particles.len();
+                self.particles.push(particle);
+                idx
+            }
+            InsertMode::Bottom => {
+                self.particles.insert(0, particle);
+                0
+            }
             InsertMode::Random => {
                 let idx = if self.particles.is_empty() {
                     0
@@ -325,7 +354,11 @@ impl ParticleSystem {
                     fastrand::usize(..=self.particles.len())
                 };
                 self.particles.insert(idx, particle);
+                idx
             }
+        };
+        if matches!(self.config.emission_shape, EmissionShape::Custom { .. }) {
+            self.pending_custom_offsets.push(new_idx);
         }
     }
 
@@ -356,6 +389,8 @@ impl ParticleSystem {
         self.particles.clear();
         self.emit_accumulator = 0.0;
         self.emitter_age = 0.0;
+        self.pending_custom_offsets.clear();
+        self.pending_deaths.clear();
     }
 
     /// Activates the emitter, beginning particle emission.
@@ -631,5 +666,41 @@ impl ParticleSystem {
     /// Removes the bounce boundaries from this system. Particles will no longer be contained.
     pub fn clear_bounds(&mut self) {
         self.bounce_bounds = None;
+    }
+
+    // ── Extensibility ──────────────────────────────────────────────────────────
+
+    /// Adds a child emitter that updates and renders alongside this system.
+    ///
+    /// @param config : ParticleConfig  Configuration for the child emitter.
+    /// @return usize  0-based index of the new sub-system.
+    pub fn add_sub_system(&mut self, config: ParticleConfig) -> usize {
+        let sub = ParticleSystem::new(config);
+        self.sub_systems.push(sub);
+        self.sub_systems.len() - 1
+    }
+
+    /// Returns the number of direct child sub-systems.
+    ///
+    /// @return usize
+    pub fn sub_system_count(&self) -> usize {
+        self.sub_systems.len()
+    }
+
+    /// Takes and returns all entries from `pending_deaths`, leaving the vec empty.
+    /// Each entry is `(world_x, world_y, vx, vy)` of a particle that died last frame.
+    ///
+    /// @return Vec<(f32, f32, f32, f32)>
+    pub fn drain_pending_deaths(&mut self) -> Vec<(f32, f32, f32, f32)> {
+        std::mem::take(&mut self.pending_deaths)
+    }
+
+    /// Takes and returns all entries from `pending_custom_offsets`, leaving the vec empty.
+    /// Each entry is the index into `self.particles` of a newly spawned particle whose
+    /// position should be set by the Lua API layer's custom emission shape callback.
+    ///
+    /// @return Vec<usize>
+    pub fn drain_custom_offsets(&mut self) -> Vec<usize> {
+        std::mem::take(&mut self.pending_custom_offsets)
     }
 }

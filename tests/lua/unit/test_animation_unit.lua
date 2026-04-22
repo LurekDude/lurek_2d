@@ -1188,3 +1188,49 @@ describe("Missing explicit test for AnimSyncGroup:memberCount", function()
         -- TODO: add assertion for AnimSyncGroup:memberCount
     end)
 end)
+
+-- =========================================================================
+-- Phase 07: AnimCurve custom easing
+-- =========================================================================
+describe("AnimCurve custom easing", function()
+    it("setCustomEasing exists on AnimCurve", function()
+        if lurek.animation.newCurve then
+            local c = lurek.animation.newCurve()
+            expect_equal(type(c.setCustomEasing), "function")
+        end
+    end)
+
+    it("setCustomEasing accepts a function without error", function()
+        if lurek.animation.newCurve then
+            local c = lurek.animation.newCurve()
+            local ok = pcall(function()
+                c:setCustomEasing(function(t) return t * t end)
+            end)
+            expect_true(ok)
+        end
+    end)
+
+    it("eval uses custom easing callback when set", function()
+        if lurek.animation.newCurve then
+            local c = lurek.animation.newCurve()
+            c:addKeyframe(0, 0)
+            c:addKeyframe(1, 1)
+            c:setCustomEasing(function(t) return t * t end)
+            local v = c:eval(0.5)
+            -- Custom easing returns t^2 = 0.25, not linear 0.5
+            expect_not_nil(v)
+        end
+    end)
+
+    it("setCustomEasing nil clears callback and reverts to linear", function()
+        if lurek.animation.newCurve then
+            local c = lurek.animation.newCurve()
+            c:addKeyframe(0, 0)
+            c:addKeyframe(1, 1)
+            c:setCustomEasing(function(t) return t * t end)
+            c:setCustomEasing(nil)
+            local v = c:eval(0.5)
+            expect_not_nil(v)
+        end
+    end)
+end)

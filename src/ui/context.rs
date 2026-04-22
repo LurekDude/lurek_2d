@@ -23,8 +23,8 @@ use crate::ui::controls::{
     SpinBox, Switch, TabBar, TextInput,
 };
 use crate::ui::extras::{
-    Accordion, Badge, ColorPicker, Dialog, GUITable, ImageWidget, MenuBar, MenuItem, Separator,
-    Spacer, StatusBar, Toast, Toolbar, TooltipPanel, TreeView,
+    Accordion, Badge, ColorPicker, CustomWidget, Dialog, GUITable, ImageWidget, MenuBar, MenuItem,
+    Separator, Spacer, StatusBar, Toast, Toolbar, TooltipPanel, TreeView,
 };
 use crate::ui::theme::Theme;
 use crate::ui::widget::{WidgetBase, WidgetState};
@@ -165,6 +165,8 @@ pub enum WidgetKind {
     Switch(Switch),
     /// Wraps a [`Badge`].
     Badge(Badge),
+    /// Wraps a [`CustomWidget`].
+    Custom(CustomWidget),
 }
 
 impl WidgetKind {
@@ -209,6 +211,7 @@ impl WidgetKind {
             Self::SpinBox(w) => &w.base,
             Self::Switch(w) => &w.base,
             Self::Badge(w) => &w.base,
+            Self::Custom(w) => &w.base,
         }
     }
 
@@ -253,6 +256,7 @@ impl WidgetKind {
             Self::SpinBox(w) => &mut w.base,
             Self::Switch(w) => &mut w.base,
             Self::Badge(w) => &mut w.base,
+            Self::Custom(w) => &mut w.base,
         }
     }
 
@@ -832,6 +836,18 @@ impl GuiContext {
     pub fn add_badge(&mut self, count: u32) -> usize {
         let idx = self.widgets.len();
         self.widgets.push(WidgetKind::Badge(Badge::new(count)));
+        self.dirty = true;
+        idx
+    }
+
+    /// Add a custom Lua-driven widget and return its pool index.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn add_custom_widget(&mut self) -> usize {
+        let idx = self.widgets.len();
+        self.widgets
+            .push(WidgetKind::Custom(CustomWidget::new()));
         self.dirty = true;
         idx
     }

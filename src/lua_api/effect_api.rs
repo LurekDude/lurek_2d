@@ -204,6 +204,29 @@ impl LuaUserData for LuaPostFxEffect {
             this.inner.borrow_mut().set_parameter("saturation", v);
             Ok(())
         });
+
+        // -- enableAutoUniforms --
+        /// Enables auto-injection of common uniforms into shader slot p[3] each frame.
+        /// @return nil
+        methods.add_method_mut("enableAutoUniforms", |_, this, ()| {
+            this.inner.borrow_mut().auto_uniforms = true;
+            Ok(())
+        });
+
+        // -- disableAutoUniforms --
+        /// Disables auto-injection of common uniforms into shader slot p[3].
+        /// @return nil
+        methods.add_method_mut("disableAutoUniforms", |_, this, ()| {
+            this.inner.borrow_mut().auto_uniforms = false;
+            Ok(())
+        });
+
+        // -- isAutoUniforms --
+        /// Returns whether auto-uniform injection is enabled for this effect.
+        /// @return boolean
+        methods.add_method("isAutoUniforms", |_, this, ()| {
+            Ok(this.inner.borrow().auto_uniforms)
+        });
     }
 }
 
@@ -483,6 +506,7 @@ impl LuaUserData for LuaPostFxStack {
                         effect_name: e.get_type_name().to_string(),
                         params: e.params.clone(),
                         shader_id: e.shader_id,
+                        auto_uniforms: e.auto_uniforms,
                     }
                 })
                 .collect();

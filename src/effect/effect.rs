@@ -24,6 +24,7 @@ use crate::log_msg;
 /// - `params` — Named float parameters controlling the shader (e.g., `"threshold"`, `"intensity"`).
 /// - `enabled` — Whether this effect is active within its parent stack.
 /// - `shader_id` — Optional custom shader handle; only used for `Custom` effects.
+/// - `auto_uniforms` — When `true`, the engine injects time/frame/resolution into `p[3]` each frame.
 #[derive(Clone, Debug)]
 pub struct PostFxEffect {
     /// The type of this effect.
@@ -34,6 +35,11 @@ pub struct PostFxEffect {
     pub enabled: bool,
     /// Optional custom shader ID (used only for `Custom` effects).
     pub shader_id: Option<usize>,
+    /// When `true`, the engine injects `(time, frame, width, height)` into `p[3]` each frame.
+    ///
+    /// Slot layout: `p[3].x` = total_time (s), `p[3].y` = frame_count (f32), `p[3].z` = width, `p[3].w` = height.
+    /// Slots `p[0]..p[2]` remain free for user parameters set via `set_parameter`.
+    pub auto_uniforms: bool,
 }
 
 impl PostFxEffect {
@@ -56,6 +62,7 @@ impl PostFxEffect {
             effect_type,
             enabled: true,
             shader_id: None,
+            auto_uniforms: false,
         }
     }
 
@@ -78,6 +85,7 @@ impl PostFxEffect {
             params: HashMap::new(),
             enabled: true,
             shader_id: Some(shader_id),
+            auto_uniforms: false,
         }
     }
 

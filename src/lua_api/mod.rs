@@ -159,6 +159,9 @@ pub mod patterns_api;
 /// Shared `LunaType` trait and `add_type_methods` helper for typed UserData objects.
 pub mod lua_types;
 
+/// Shared opaque callback registry used by all extensibility bindings.
+pub mod callback_registry;
+
 /// Lua VM factory: [`create_lua_vm`] and [`create_test_vm`].
 pub mod register;
 pub use register::{create_lua_vm, create_test_vm};

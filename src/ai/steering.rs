@@ -198,6 +198,16 @@ pub enum SteeringBehaviorType {
         /// Common steering data.
         base: SteeringBase,
     },
+    /// A user-defined Lua callback computes a custom steering force.
+    /// `callback_id` is opaque; the actual Lua call is performed by
+    /// `LuaSteeringManager::applyCustomSteering` in the API layer.
+    /// `calculate()` returns zero force for this variant.
+    Custom {
+        /// Opaque ID referencing the Lua callback in the API-layer registry.
+        callback_id: u32,
+        /// Common steering data (weight and enabled state).
+        base: SteeringBase,
+    },
 }
 
 impl SteeringBehaviorType {
@@ -213,7 +223,8 @@ impl SteeringBehaviorType {
             | Self::Wander { base, .. }
             | Self::Pursue { base, .. }
             | Self::Evade { base, .. }
-            | Self::Flock { base, .. } => base,
+            | Self::Flock { base, .. }
+            | Self::Custom { base, .. } => base,
         }
     }
 
@@ -229,7 +240,8 @@ impl SteeringBehaviorType {
             | Self::Wander { base, .. }
             | Self::Pursue { base, .. }
             | Self::Evade { base, .. }
-            | Self::Flock { base, .. } => base,
+            | Self::Flock { base, .. }
+            | Self::Custom { base, .. } => base,
         }
     }
 
@@ -246,6 +258,7 @@ impl SteeringBehaviorType {
             Self::Pursue { .. } => "pursue",
             Self::Evade { .. } => "evade",
             Self::Flock { .. } => "flock",
+            Self::Custom { .. } => "custom",
         }
     }
 
@@ -355,6 +368,9 @@ impl SteeringBehaviorType {
                 // The force is computed externally and this returns (0,0) as a baseline.
                 (0.0, 0.0)
             }
+            // Custom behavior: force computation handled by LuaSteeringManager::applyCustomSteering.
+            // Returns (0, 0) here; the Lua API layer invokes the callback separately.
+            Self::Custom { .. } => (0.0, 0.0),
         }
     }
 }
