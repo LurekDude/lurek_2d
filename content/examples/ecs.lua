@@ -1,23 +1,10 @@
 -- content/examples/ecs.lua
--- Scaffolded coverage of the lurek.ecs API (47 items).
+-- Hand-written coverage of the lurek.ecs API (47 items).
 --
--- Every --@api-stub: block below is a SCAFFOLD. The body must be
--- replaced by hand with a 3-6 line real usage snippet showing how to
--- call the API in real game context, written by reading:
---   * src/lua_api/ecs_api.rs   (Lua binding, arg types, return shape)
---   * src/ecs/                 (semantics, side effects)
---   * docs/specs/ecs.md        (canonical reference)
---
--- Snippet rules (love2d-wiki style):
---   * NO `return` at top-level (breaks the file).
---   * NO `pcall` defensive wrappers, NO `if false then`.
---   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
---     `function lurek.update(dt) ... end` callbacks so the file loads.
---   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
---     colours like {1, 0.5, 0, 1}.
---   * Keep the two `--` comment lines: 1) what the API does (use the
---     existing description), 2) one line of practical advice.
+-- Components are plain Lua tables stored under string names per entity
+-- (e.g. "position", "velocity", "health"). Systems are tables with
+-- update/render/event-handler functions called by the universe in
+-- priority order.
 --
 -- Run: cargo run -- content/examples/ecs.lua
 
@@ -25,379 +12,498 @@
 
 --@api-stub: lurek.ecs.newUniverse
 -- Creates a new empty ECS universe.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: lurek.ecs.newUniverse
-  local _todo = "TODO: write a real lurek.ecs.newUniverse usage example"
-  print(_todo)
+-- Call once at startup and reuse the returned world for all entity, component, and system work.
+do  -- lurek.ecs.newUniverse
+  local world = lurek.ecs.newUniverse()
+  local hero = world:spawn()
+  world:set(hero, "position", { x = 0, y = 0 })
+  lurek.log.info("universe ready, first id=" .. hero, "ecs")
 end
 
 -- ── Universe methods ──
 
 --@api-stub: Universe:spawn
 -- Creates a new entity and returns its packed ID.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:spawn
-  local _todo = "TODO: write a real Universe:spawn usage example"
-  print(_todo)
+-- The ID is a stable handle until killed; pair every spawn with the components that define it.
+do  -- Universe:spawn
+  local world = lurek.ecs.newUniverse()
+  local enemy = world:spawn()
+  world:set(enemy, "position", { x = 320, y = 240 })
+  world:set(enemy, "health",   { hp = 5, max = 5 })
 end
 
 --@api-stub: Universe:kill
 -- Destroys the entity with the given ID, freeing its slot for reuse.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:kill
-  local _todo = "TODO: write a real Universe:kill usage example"
-  print(_todo)
+-- Use after a death animation finishes; the slot is recycled so cached IDs become stale.
+do  -- Universe:kill
+  local world = lurek.ecs.newUniverse()
+  local bullet = world:spawn()
+  world:set(bullet, "position", { x = 100, y = 100 })
+  world:kill(bullet)
 end
 
 --@api-stub: Universe:isAlive
 -- Returns true if the entity ID is currently alive.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:isAlive
-  local _todo = "TODO: write a real Universe:isAlive usage example"
-  print(_todo)
+-- Always check before using a stored ID — slots are recycled and packed IDs disambiguate generations.
+do  -- Universe:isAlive
+  local world = lurek.ecs.newUniverse()
+  local id = world:spawn()
+  world:kill(id)
+  if not world:isAlive(id) then lurek.log.debug("target gone", "ecs") end
 end
 
 --@api-stub: Universe:get
 -- Returns the component value for an entity, or nil if missing.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:get
-  local _todo = "TODO: write a real Universe:get usage example"
-  print(_todo)
+-- Mutate the returned table in place to update component state without an extra :set call.
+do  -- Universe:get
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:set(e, "position", { x = 10, y = 20 })
+  local pos = world:get(e, "position")
+  pos.x = pos.x + 1
 end
 
 --@api-stub: Universe:has
 -- Returns true if the entity has the named component.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:has
-  local _todo = "TODO: write a real Universe:has usage example"
-  print(_todo)
+-- Branch on this before reading or applying optional behaviour like a "stunned" flag.
+do  -- Universe:has
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:set(e, "stunned", { ticks = 30 })
+  if world:has(e, "stunned") then lurek.log.debug("skip ai", "ecs") end
 end
 
 --@api-stub: Universe:remove
 -- Removes a component from an entity.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:remove
-  local _todo = "TODO: write a real Universe:remove usage example"
-  print(_todo)
+-- Use to drop transient state (e.g. "burning", "frozen") without killing the entity itself.
+do  -- Universe:remove
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:set(e, "burning", { ticks = 60 })
+  world:remove(e, "burning")
 end
 
 --@api-stub: Universe:getComponents
 -- Returns all component names for an entity.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getComponents
-  local _todo = "TODO: write a real Universe:getComponents usage example"
-  print(_todo)
+-- Useful for save-system snapshots, debug overlays, and editor inspectors.
+do  -- Universe:getComponents
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:set(e, "position", { x = 0, y = 0 })
+  world:set(e, "sprite",   { path = "img/hero.png" })
+  for _, name in ipairs(world:getComponents(e)) do lurek.log.debug(name, "inspect") end
 end
 
 --@api-stub: Universe:query
 -- Returns entity IDs that have all listed component names.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:query
-  local _todo = "TODO: write a real Universe:query usage example"
-  print(_todo)
+-- Drive every system loop from a query so logic stays data-driven instead of hard-coding entity lists.
+do  -- Universe:query
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:set(e, "position", { x = 0, y = 0 })
+  world:set(e, "velocity", { x = 1, y = 0 })
+  for _, id in ipairs(world:query("position", "velocity")) do
+    local p, v = world:get(id, "position"), world:get(id, "velocity")
+    p.x, p.y = p.x + v.x, p.y + v.y
+  end
 end
 
 --@api-stub: Universe:getEntities
 -- Returns all alive entity IDs.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getEntities
-  local _todo = "TODO: write a real Universe:getEntities usage example"
-  print(_todo)
+-- Reach for query() instead in hot loops; this is for debug counts, save/load, and editors.
+do  -- Universe:getEntities
+  local world = lurek.ecs.newUniverse()
+  for _ = 1, 5 do world:spawn() end
+  local all = world:getEntities()
+  lurek.log.info("total entities=" .. #all, "ecs")
 end
 
 --@api-stub: Universe:getEntityCount
 -- Returns the number of alive entities.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getEntityCount
-  local _todo = "TODO: write a real Universe:getEntityCount usage example"
-  print(_todo)
+-- Cheaper than #getEntities — call it from HUD/debug overlays every frame.
+do  -- Universe:getEntityCount
+  local world = lurek.ecs.newUniverse()
+  for _ = 1, 12 do world:spawn() end
+  if world:getEntityCount() > 1000 then lurek.log.warn("entity budget exceeded", "ecs") end
 end
 
 --@api-stub: Universe:removeSystem
 -- Removes a system table from the universe.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:removeSystem
-  local _todo = "TODO: write a real Universe:removeSystem usage example"
-  print(_todo)
+-- Use to detach pause-incompatible systems (e.g. AI) when the game enters a menu.
+do  -- Universe:removeSystem
+  local world = lurek.ecs.newUniverse()
+  local ai_system = { update = function() end }
+  world:addSystem(ai_system, { priority = 50 })
+  world:removeSystem(ai_system)
 end
 
 --@api-stub: Universe:update
 -- Calls update(system, world, dt) on each registered system in priority order.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:update
-  local _todo = "TODO: write a real Universe:update usage example"
-  print(_todo)
+-- Drive it from lurek.process(dt) once per frame so all systems share the same timestep.
+do  -- Universe:update
+  local world = lurek.ecs.newUniverse()
+  local move_system = {
+    update = function(_, w, dt)
+      for _, id in ipairs(w:query("position", "velocity")) do
+        local p, v = w:get(id, "position"), w:get(id, "velocity")
+        p.x, p.y = p.x + v.x * dt, p.y + v.y * dt
+      end
+    end
+  }
+  world:addSystem(move_system, { priority = 10 })
+  function lurek.process(dt) world:update(dt) end
 end
 
 --@api-stub: Universe:render
 -- Calls render(system, world) on each registered system in priority order.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:render
-  local _todo = "TODO: write a real Universe:render usage example"
-  print(_todo)
+-- Wire it into lurek.render so draw order follows system priority instead of spawn order.
+do  -- Universe:render
+  local world = lurek.ecs.newUniverse()
+  local draw_system = {
+    render = function(_, w)
+      for _, id in ipairs(w:query("position", "sprite")) do
+        local p = w:get(id, "position")
+        lurek.graphic.rectangle("fill", p.x, p.y, 16, 16)
+      end
+    end
+  }
+  world:addSystem(draw_system, { priority = 100 })
+  function lurek.render() world:render() end
 end
 
 --@api-stub: Universe:emit
 -- Emits a named event to all systems that implement the handler, in priority order.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:emit
-  local _todo = "TODO: write a real Universe:emit usage example"
-  print(_todo)
+-- Decouple input/AI/audio: emit("damage", id, 10) and let any system with a damage(self,w,id,n) handler react.
+do  -- Universe:emit
+  local world = lurek.ecs.newUniverse()
+  local hp_system = {
+    damage = function(_, w, id, amount)
+      local h = w:get(id, "health"); h.hp = h.hp - amount
+    end
+  }
+  world:addSystem(hp_system)
+  local target = world:spawn(); world:set(target, "health", { hp = 10, max = 10 })
+  world:emit("damage", target, 3)
 end
 
 --@api-stub: Universe:getSystemCount
 -- Returns the number of registered systems.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getSystemCount
-  local _todo = "TODO: write a real Universe:getSystemCount usage example"
-  print(_todo)
+-- Useful in startup logging to confirm the expected pipeline shape.
+do  -- Universe:getSystemCount
+  local world = lurek.ecs.newUniverse()
+  world:addSystem({ update = function() end })
+  world:addSystem({ render = function() end })
+  lurek.log.info("systems registered=" .. world:getSystemCount(), "ecs")
 end
 
 --@api-stub: Universe:clear
--- Removes all entities, components, tags, layers, and systems.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:clear
-  local _todo = "TODO: write a real Universe:clear usage example"
-  print(_todo)
+-- Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
+-- Call between levels to reset gameplay state while keeping authored blueprint definitions.
+do  -- Universe:clear
+  local world = lurek.ecs.newUniverse()
+  for _ = 1, 5 do world:spawn() end
+  world:clear()
+  lurek.log.info("after clear count=" .. world:getEntityCount(), "ecs")
 end
 
 --@api-stub: Universe:release
 -- Releases all universe state, equivalent to clear.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:release
-  local _todo = "TODO: write a real Universe:release usage example"
-  print(_todo)
+-- Prefer at full shutdown / new-game boundaries to make the intent explicit.
+do  -- Universe:release
+  local world = lurek.ecs.newUniverse()
+  world:spawn()
+  world:release()
 end
 
 --@api-stub: Universe:addTag
 -- Attaches a string tag to an entity.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:addTag
-  local _todo = "TODO: write a real Universe:addTag usage example"
-  print(_todo)
+-- Use sparingly for one-off labels ("player", "boss"); prefer bitmap tags for high-volume flags.
+do  -- Universe:addTag
+  local world = lurek.ecs.newUniverse()
+  local hero = world:spawn()
+  world:addTag(hero, "player")
+  world:addTag(hero, "alive")
 end
 
 --@api-stub: Universe:removeTag
 -- Removes a string tag from an entity.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:removeTag
-  local _todo = "TODO: write a real Universe:removeTag usage example"
-  print(_todo)
+-- Pair with addTag when state changes (e.g. drop "alive" when the death animation begins).
+do  -- Universe:removeTag
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:addTag(e, "alive")
+  world:removeTag(e, "alive")
 end
 
 --@api-stub: Universe:hasTag
 -- Returns true if the entity carries the given tag.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:hasTag
-  local _todo = "TODO: write a real Universe:hasTag usage example"
-  print(_todo)
+-- Branch on this in collision/AI handlers to skip non-targets without scanning components.
+do  -- Universe:hasTag
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:addTag(e, "player")
+  if world:hasTag(e, "player") then lurek.log.debug("hit player", "ecs") end
 end
 
 --@api-stub: Universe:getTags
 -- Returns all string tags for an entity.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getTags
-  local _todo = "TODO: write a real Universe:getTags usage example"
-  print(_todo)
+-- Useful for debug HUDs and editors; keep call sites out of inner loops.
+do  -- Universe:getTags
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:addTag(e, "player"); world:addTag(e, "invincible")
+  for _, t in ipairs(world:getTags(e)) do lurek.log.debug(t, "tags") end
 end
 
 --@api-stub: Universe:getEntitiesByTag
 -- Returns all alive entities with the given string tag.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getEntitiesByTag
-  local _todo = "TODO: write a real Universe:getEntitiesByTag usage example"
-  print(_todo)
+-- Use for unique-ish groups like "enemy"; for high-volume flags prefer queryBitmapTag.
+do  -- Universe:getEntitiesByTag
+  local world = lurek.ecs.newUniverse()
+  for _ = 1, 3 do local id = world:spawn(); world:addTag(id, "enemy") end
+  local enemies = world:getEntitiesByTag("enemy")
+  lurek.log.info("enemy count=" .. #enemies, "ecs")
 end
 
 --@api-stub: Universe:setLayer
 -- Sets the layer for an entity.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:setLayer
-  local _todo = "TODO: write a real Universe:setLayer usage example"
-  print(_todo)
+-- Layers control draw/sort order — use small integers (e.g. 0=floor, 10=actor, 20=ui).
+do  -- Universe:setLayer
+  local world = lurek.ecs.newUniverse()
+  local floor = world:spawn(); world:setLayer(floor, 0)
+  local actor = world:spawn(); world:setLayer(actor, 10)
 end
 
 --@api-stub: Universe:getLayer
 -- Returns the layer for an entity, defaulting to zero.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getLayer
-  local _todo = "TODO: write a real Universe:getLayer usage example"
-  print(_todo)
+-- Use in custom render systems that need explicit z-comparison logic.
+do  -- Universe:getLayer
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn(); world:setLayer(e, 5)
+  if world:getLayer(e) >= 5 then lurek.log.debug("foreground", "ecs") end
 end
 
 --@api-stub: Universe:getEntitiesByLayer
 -- Returns all alive entities on a specific layer.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getEntitiesByLayer
-  local _todo = "TODO: write a real Universe:getEntitiesByLayer usage example"
-  print(_todo)
+-- Render layer-by-layer to guarantee draw order without sorting every frame.
+do  -- Universe:getEntitiesByLayer
+  local world = lurek.ecs.newUniverse()
+  for i = 1, 4 do local id = world:spawn(); world:setLayer(id, i % 2) end
+  local fg = world:getEntitiesByLayer(1)
+  lurek.log.debug("layer1=" .. #fg, "ecs")
 end
 
 --@api-stub: Universe:getEntitiesSorted
 -- Returns all alive entities sorted by layer then ID.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getEntitiesSorted
-  local _todo = "TODO: write a real Universe:getEntitiesSorted usage example"
-  print(_todo)
+-- Cheap one-pass walk for back-to-front rendering; cache between frames if entity set is stable.
+do  -- Universe:getEntitiesSorted
+  local world = lurek.ecs.newUniverse()
+  local a = world:spawn(); world:setLayer(a, 2)
+  local b = world:spawn(); world:setLayer(b, 0)
+  local order = world:getEntitiesSorted()
+  for _, id in ipairs(order) do lurek.log.debug("draw=" .. id, "ecs") end
 end
 
 --@api-stub: Universe:defineTag
 -- Defines a bitmap tag name, returning its bit index.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:defineTag
-  local _todo = "TODO: write a real Universe:defineTag usage example"
-  print(_todo)
+-- Define every bitmap tag at startup so query sites never race the first :bitmapTag call.
+do  -- Universe:defineTag
+  local world = lurek.ecs.newUniverse()
+  local bit_player = world:defineTag("player")
+  local bit_enemy  = world:defineTag("enemy")
+  lurek.log.info("player bit=" .. bit_player .. " enemy bit=" .. bit_enemy, "ecs")
 end
 
 --@api-stub: Universe:bitmapTag
 -- Adds a bitmap tag to an entity.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:bitmapTag
-  local _todo = "TODO: write a real Universe:bitmapTag usage example"
-  print(_todo)
+-- 64-tag bitset gives O(1) tag check and fast multi-tag intersection — use for hot per-frame flags.
+do  -- Universe:bitmapTag
+  local world = lurek.ecs.newUniverse()
+  world:defineTag("solid")
+  local block = world:spawn()
+  world:bitmapTag(block, "solid")
 end
 
 --@api-stub: Universe:bitmapUntag
 -- Removes a bitmap tag from an entity.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:bitmapUntag
-  local _todo = "TODO: write a real Universe:bitmapUntag usage example"
-  print(_todo)
+-- Use when a temporary state ends, e.g. clearing "invincible" after the i-frames timer expires.
+do  -- Universe:bitmapUntag
+  local world = lurek.ecs.newUniverse()
+  world:defineTag("invincible")
+  local hero = world:spawn(); world:bitmapTag(hero, "invincible")
+  world:bitmapUntag(hero, "invincible")
 end
 
 --@api-stub: Universe:hasBitmapTag
 -- Returns true if the entity has the given bitmap tag.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:hasBitmapTag
-  local _todo = "TODO: write a real Universe:hasBitmapTag usage example"
-  print(_todo)
+-- Faster than hasTag for hot collision/AI checks once the tag has been defined.
+do  -- Universe:hasBitmapTag
+  local world = lurek.ecs.newUniverse()
+  world:defineTag("solid")
+  local block = world:spawn(); world:bitmapTag(block, "solid")
+  if world:hasBitmapTag(block, "solid") then lurek.log.debug("collide", "phys") end
 end
 
 --@api-stub: Universe:queryBitmapTag
 -- Returns all alive entities with the given bitmap tag.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:queryBitmapTag
-  local _todo = "TODO: write a real Universe:queryBitmapTag usage example"
-  print(_todo)
+-- Drive your collision broadphase or AI scan from this — single u64 mask compare per entity.
+do  -- Universe:queryBitmapTag
+  local world = lurek.ecs.newUniverse()
+  world:defineTag("enemy")
+  for _ = 1, 4 do local id = world:spawn(); world:bitmapTag(id, "enemy") end
+  for _, id in ipairs(world:queryBitmapTag("enemy")) do lurek.log.debug("enemy=" .. id, "ai") end
 end
 
 --@api-stub: Universe:queryBitmapAny
 -- Returns all alive entities with any of the listed bitmap tags.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:queryBitmapAny
-  local _todo = "TODO: write a real Universe:queryBitmapAny usage example"
-  print(_todo)
+-- Use for "anything dangerous": queryBitmapAny({"enemy", "hazard", "trap"}).
+do  -- Universe:queryBitmapAny
+  local world = lurek.ecs.newUniverse()
+  world:defineTag("enemy"); world:defineTag("hazard")
+  local a = world:spawn(); world:bitmapTag(a, "enemy")
+  local b = world:spawn(); world:bitmapTag(b, "hazard")
+  local danger = world:queryBitmapAny({ "enemy", "hazard" })
+  lurek.log.info("danger count=" .. #danger, "ai")
 end
 
 --@api-stub: Universe:queryBitmapAll
 -- Returns all alive entities with all of the listed bitmap tags.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:queryBitmapAll
-  local _todo = "TODO: write a real Universe:queryBitmapAll usage example"
-  print(_todo)
+-- Use for compound predicates: "alive AND solid AND visible" without a multi-component query.
+do  -- Universe:queryBitmapAll
+  local world = lurek.ecs.newUniverse()
+  world:defineTag("solid"); world:defineTag("visible")
+  local b = world:spawn(); world:bitmapTag(b, "solid"); world:bitmapTag(b, "visible")
+  for _, id in ipairs(world:queryBitmapAll({ "solid", "visible" })) do
+    lurek.log.debug("draw block=" .. id, "ecs")
+  end
 end
 
 --@api-stub: Universe:getBitmapTagBit
 -- Returns the bit index for a bitmap tag name, or nil if undefined.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getBitmapTagBit
-  local _todo = "TODO: write a real Universe:getBitmapTagBit usage example"
-  print(_todo)
+-- Useful when bridging to native code or for asserting startup tag tables match expectations.
+do  -- Universe:getBitmapTagBit
+  local world = lurek.ecs.newUniverse()
+  world:defineTag("player")
+  local bit = world:getBitmapTagBit("player")
+  if bit then lurek.log.info("player tag stored at bit " .. bit, "ecs") end
 end
 
 --@api-stub: Universe:hasBlueprint
 -- Returns true if a blueprint with the given name exists.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:hasBlueprint
-  local _todo = "TODO: write a real Universe:hasBlueprint usage example"
-  print(_todo)
+-- Guard before spawnBlueprint to surface a clean error when content data fails to load.
+do  -- Universe:hasBlueprint
+  local world = lurek.ecs.newUniverse()
+  world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
+  if world:hasBlueprint("goblin") then lurek.log.info("goblin ready", "ecs") end
 end
 
 --@api-stub: Universe:removeBlueprint
 -- Removes a blueprint definition.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:removeBlueprint
-  local _todo = "TODO: write a real Universe:removeBlueprint usage example"
-  print(_todo)
+-- Use when hot-reloading a content folder so the next spawnBlueprint sees the fresh definition.
+do  -- Universe:removeBlueprint
+  local world = lurek.ecs.newUniverse()
+  world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
+  world:removeBlueprint("goblin")
 end
 
 --@api-stub: Universe:listBlueprints
 -- Returns all defined blueprint names.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:listBlueprints
-  local _todo = "TODO: write a real Universe:listBlueprints usage example"
-  print(_todo)
+-- Useful for debug pickers and editor entity-spawn dropdowns.
+do  -- Universe:listBlueprints
+  local world = lurek.ecs.newUniverse()
+  world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
+  world:defineBlueprint("orc",    { health = { hp = 7, max = 7 } })
+  for _, name in ipairs(world:listBlueprints()) do lurek.log.debug(name, "blueprint") end
 end
 
 --@api-stub: Universe:getBlueprintComponents
 -- Returns a deep copy of a blueprint's component table, or nil.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getBlueprintComponents
-  local _todo = "TODO: write a real Universe:getBlueprintComponents usage example"
-  print(_todo)
+-- Inspect or templatize from a blueprint without mutating the canonical definition.
+do  -- Universe:getBlueprintComponents
+  local world = lurek.ecs.newUniverse()
+  world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
+  local comps = world:getBlueprintComponents("goblin")
+  if comps then lurek.log.info("goblin starts at hp=" .. comps.health.hp, "ecs") end
 end
 
 --@api-stub: Universe:getParent
 -- Returns the parent entity ID, or nil if unparented.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getParent
-  local _todo = "TODO: write a real Universe:getParent usage example"
-  print(_todo)
+-- Use to walk up scene-graph hierarchies for transform inheritance or selection focus.
+do  -- Universe:getParent
+  local world = lurek.ecs.newUniverse()
+  local parent = world:spawn()
+  local child  = world:spawn()
+  world:setParent(child, parent)
+  if world:getParent(child) == parent then lurek.log.debug("attached", "scene") end
 end
 
 --@api-stub: Universe:getChildren
 -- Returns all direct child entity IDs.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getChildren
-  local _todo = "TODO: write a real Universe:getChildren usage example"
-  print(_todo)
+-- Iterate to apply effects (tint, hide) to every child of a container without recursion.
+do  -- Universe:getChildren
+  local world = lurek.ecs.newUniverse()
+  local root = world:spawn()
+  for _ = 1, 3 do local c = world:spawn(); world:setParent(c, root) end
+  for _, id in ipairs(world:getChildren(root)) do lurek.log.debug("child=" .. id, "scene") end
 end
 
 --@api-stub: Universe:killRecursive
 -- Kills an entity and all its descendants recursively.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:killRecursive
-  local _todo = "TODO: write a real Universe:killRecursive usage example"
-  print(_todo)
+-- Drop a whole prefab in one call — wagon + driver + cargo all die together.
+do  -- Universe:killRecursive
+  local world = lurek.ecs.newUniverse()
+  local wagon = world:spawn()
+  local driver = world:spawn(); world:setParent(driver, wagon)
+  world:killRecursive(wagon)
 end
 
 --@api-stub: Universe:serialize
 -- Serializes all alive entities to a Lua table snapshot.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:serialize
-  local _todo = "TODO: write a real Universe:serialize usage example"
-  print(_todo)
+-- Pair with lurek.fs and a TOML/JSON encoder to write save files; deserialize() restores it.
+do  -- Universe:serialize
+  local world = lurek.ecs.newUniverse()
+  local hero = world:spawn(); world:set(hero, "position", { x = 5, y = 7 })
+  local snapshot = world:serialize()
+  lurek.log.info("snapshot entries=" .. #snapshot, "save")
 end
 
 --@api-stub: Universe:deserialize
 -- Restores entity state from a snapshot produced by serialize().
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:deserialize
-  local _todo = "TODO: write a real Universe:deserialize usage example"
-  print(_todo)
+-- Clears live entities first; blueprints and registered systems survive — you keep your pipeline.
+do  -- Universe:deserialize
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn(); world:set(e, "position", { x = 1, y = 2 })
+  local snap = world:serialize()
+  world:clear()
+  world:deserialize(snap)
 end
 
 --@api-stub: Universe:flushObservers
 -- Dispatches all pending component-add and component-remove events to registered callbacks.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:flushObservers
-  local _todo = "TODO: write a real Universe:flushObservers usage example"
-  print(_todo)
+-- Call once per frame at a known point so observer side-effects never fire mid-system iteration.
+do  -- Universe:flushObservers
+  local world = lurek.ecs.newUniverse()
+  world:onComponentAdded("health", function(id) lurek.log.info("hp added to " .. id, "ecs") end)
+  local e = world:spawn(); world:set(e, "health", { hp = 10, max = 10 })
+  function lurek.process() world:flushObservers() end
 end
 
 --@api-stub: Universe:getRelated
 -- Returns all entity IDs reachable from `from` via the named relationship.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:getRelated
-  local _todo = "TODO: write a real Universe:getRelated usage example"
-  print(_todo)
+-- Model "owns", "targets", "follows" without polluting components — relationships stay queryable.
+do  -- Universe:getRelated
+  local world = lurek.ecs.newUniverse()
+  local hero = world:spawn()
+  local sword = world:spawn(); world:addRelation(hero, "wields", sword)
+  for _, item in ipairs(world:getRelated(hero, "wields")) do lurek.log.debug("equipped=" .. item, "ecs") end
 end
 
 --@api-stub: Universe:clearRelations
 -- Removes all directed named relationships of type `name` from entity `from`.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/ecs_api.rs and docs/specs/ecs.md).
-do  -- TODO: Universe:clearRelations
-  local _todo = "TODO: write a real Universe:clearRelations usage example"
-  print(_todo)
+-- Wipe an entire follower group, equip slot, or aggro list in one call when the source despawns.
+do  -- Universe:clearRelations
+  local world = lurek.ecs.newUniverse()
+  local boss = world:spawn()
+  for _ = 1, 3 do local m = world:spawn(); world:addRelation(boss, "minions", m) end
+  world:clearRelations(boss, "minions")
 end
-
