@@ -1,23 +1,10 @@
 -- content/examples/spine.lua
--- Scaffolded coverage of the lurek.spine API (20 items).
+-- Hand-written coverage of the lurek.spine API (20 items).
 --
--- Every --@api-stub: block below is a SCAFFOLD. The body must be
--- replaced by hand with a 3-6 line real usage snippet showing how to
--- call the API in real game context, written by reading:
---   * src/lua_api/spine_api.rs   (Lua binding, arg types, return shape)
---   * src/spine/                 (semantics, side effects)
---   * docs/specs/spine.md        (canonical reference)
---
--- Snippet rules (love2d-wiki style):
---   * NO `return` at top-level (breaks the file).
---   * NO `pcall` defensive wrappers, NO `if false then`.
---   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
---     `function lurek.update(dt) ... end` callbacks so the file loads.
---   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
---     colours like {1, 0.5, 0, 1}.
---   * Keep the two `--` comment lines: 1) what the API does (use the
---     existing description), 2) one line of practical advice.
+-- The lurek.spine namespace builds skeletal-animation rigs out of bones,
+-- slots, skins and keyframe timelines; `newSkeleton` produces a Skeleton
+-- userdata that owns an animation library, while `newSkeletonAnimation`
+-- produces a clip that can be added to one or more skeletons.
 --
 -- Run: cargo run -- content/examples/spine.lua
 
@@ -25,165 +12,230 @@
 
 --@api-stub: lurek.spine.newSkeleton
 -- Creates a new empty skeleton with the given name.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: lurek.spine.newSkeleton
-  local _todo = "TODO: write a real lurek.spine.newSkeleton usage example"
-  print(_todo)
+-- Build the bone hierarchy with addBone/addChildBone right after construction; the name is used in logs and lookups.
+do  -- lurek.spine.newSkeleton
+  local hero = lurek.spine.newSkeleton("hero")
+  local root = hero:addBone("root", { x = 320, y = 240 })
+  hero:addChildBone("torso", root, { y = -40 })
+  lurek.log.info("hero rig built with " .. hero:boneCount() .. " bones", "spine")
 end
 
 --@api-stub: lurek.spine.newSkeletonAnimation
 -- Creates a new empty SkeletonAnimation clip with the given name and duration.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: lurek.spine.newSkeletonAnimation
-  local _todo = "TODO: write a real lurek.spine.newSkeletonAnimation usage example"
-  print(_todo)
+-- Pick a duration that matches the longest keyframe time you intend to add; loops wrap modulo this value.
+do  -- lurek.spine.newSkeletonAnimation
+  local idle = lurek.spine.newSkeletonAnimation("idle", 1.5)
+  idle:addKeyframe(0, "y", 0.0,  0, "ease_in_out")
+  idle:addKeyframe(0, "y", 0.75, 4, "ease_in_out")
+  idle:addKeyframe(0, "y", 1.5,  0, "ease_in_out")
 end
 
 -- ── Skeleton methods ──
 
 --@api-stub: Skeleton:findBone
 -- Returns the index of the named bone, or nil if not found.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:findBone
-  local _todo = "TODO: write a real Skeleton:findBone usage example"
-  print(_todo)
+-- Cache the returned index at load time; later per-frame calls should reuse it instead of looking up by name.
+do  -- Skeleton:findBone
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root")
+  rig:addChildBone("head", 0)
+  local head_idx = rig:findBone("head")
+  if head_idx then lurek.log.debug("head bone at index " .. head_idx, "spine") end
 end
 
 --@api-stub: Skeleton:findSlot
 -- Returns the index of the named slot, or nil if not found.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:findSlot
-  local _todo = "TODO: write a real Skeleton:findSlot usage example"
-  print(_todo)
+-- Use to resolve attachment slots before swapping skins or reading slot attachment names at runtime.
+do  -- Skeleton:findSlot
+  local rig = lurek.spine.newSkeleton("npc")
+  local b = rig:addBone("torso")
+  rig:addSlot("chest", b, "shirt_default")
+  local slot_idx = rig:findSlot("chest")
+  if slot_idx then lurek.log.debug("chest slot at " .. slot_idx, "spine") end
 end
 
 --@api-stub: Skeleton:updateWorldTransforms
 -- Propagates local transforms down the bone hierarchy to compute world positions.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:updateWorldTransforms
-  local _todo = "TODO: write a real Skeleton:updateWorldTransforms usage example"
-  print(_todo)
+-- Call after mutating bones via setPosition or IK before reading world positions or rendering.
+do  -- Skeleton:updateWorldTransforms
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root", { x = 100, y = 100 })
+  rig:addChildBone("arm", 0, { x = 20 })
+  rig:setPosition(200, 150)
+  rig:updateWorldTransforms()
 end
 
 --@api-stub: Skeleton:getBoneWorld
 -- Returns the world-space transform of a bone as a table, or nil if out of range.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:getBoneWorld
-  local _todo = "TODO: write a real Skeleton:getBoneWorld usage example"
-  print(_todo)
+-- The result has x, y, rotation, scale_x, scale_y — handy for spawning particles or muzzle flashes at a bone.
+do  -- Skeleton:getBoneWorld
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("muzzle", { x = 50, y = 0 })
+  rig:updateWorldTransforms()
+  local t = rig:getBoneWorld(0)
+  if t then lurek.log.info("muzzle world x=" .. t.x .. " y=" .. t.y, "spine") end
 end
 
 --@api-stub: Skeleton:setPosition
 -- Sets the root bone position and propagates world transforms.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:setPosition
-  local _todo = "TODO: write a real Skeleton:setPosition usage example"
-  print(_todo)
+-- Use once per frame to follow the player or world entity that owns the rig; updateWorldTransforms is implied.
+do  -- Skeleton:setPosition
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root")
+  local player = { x = 0, y = 0 }
+  function lurek.process(dt)
+    player.x = player.x + 60 * dt
+    rig:setPosition(player.x, player.y)
+  end
 end
 
 --@api-stub: Skeleton:boneCount
 -- Returns the total number of bones.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:boneCount
-  local _todo = "TODO: write a real Skeleton:boneCount usage example"
-  print(_todo)
+-- Useful as a sanity check after loading a rig from data, or when iterating timelines by index.
+do  -- Skeleton:boneCount
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root"); rig:addChildBone("torso", 0); rig:addChildBone("head", 1)
+  if rig:boneCount() < 3 then
+    lurek.log.warn("rig is missing bones: " .. rig:boneCount(), "spine")
+  end
 end
 
 --@api-stub: Skeleton:slotCount
 -- Returns the total number of slots.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:slotCount
-  local _todo = "TODO: write a real Skeleton:slotCount usage example"
-  print(_todo)
+-- Pair with findSlot to validate that every named slot expected by the art pipeline is present.
+do  -- Skeleton:slotCount
+  local rig = lurek.spine.newSkeleton("npc")
+  local b = rig:addBone("torso")
+  rig:addSlot("chest", b); rig:addSlot("belt", b)
+  lurek.log.info("rig exposes " .. rig:slotCount() .. " attachment slots", "spine")
 end
 
 --@api-stub: Skeleton:drawToImage
 -- Renders the skeleton as a stick-figure debug view into a new ImageData.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:drawToImage
-  local _todo = "TODO: write a real Skeleton:drawToImage usage example"
-  print(_todo)
+-- Use for tooling or in-game debug overlays; promote the result to a texture with newImage to draw it on screen.
+do  -- Skeleton:drawToImage
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root", { x = 64, y = 64 })
+  rig:addChildBone("arm", 0, { x = 32 })
+  rig:updateWorldTransforms()
+  local debug_tex
+  function lurek.init() debug_tex = lurek.render.newImage(rig:drawToImage(128, 128)) end
+  function lurek.render() lurek.render.draw(debug_tex, 16, 16) end
 end
 
 --@api-stub: Skeleton:stopAnimation
 -- Stops the current skeletal animation.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:stopAnimation
-  local _todo = "TODO: write a real Skeleton:stopAnimation usage example"
-  print(_todo)
+-- Call when leaving an AI state (e.g. cancel walk on death) so the playhead does not advance further.
+do  -- Skeleton:stopAnimation
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root")
+  local walk = lurek.spine.newSkeletonAnimation("walk", 0.6)
+  rig:addAnimation(walk)
+  rig:playAnimation("walk", true)
+  rig:stopAnimation()
 end
 
 --@api-stub: Skeleton:updateAnimation
 -- Advances the playing animation by `dt` seconds and applies keyframes.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:updateAnimation
-  local _todo = "TODO: write a real Skeleton:updateAnimation usage example"
-  print(_todo)
+-- Call from lurek.process(dt) so timelines stay frame-rate independent.
+do  -- Skeleton:updateAnimation
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root")
+  local clip = lurek.spine.newSkeletonAnimation("bob", 1.0)
+  clip:addKeyframe(0, "y", 0, 0); clip:addKeyframe(0, "y", 1.0, 8)
+  rig:addAnimation(clip); rig:playAnimation("bob", true)
+  function lurek.process(dt) rig:updateAnimation(dt) end
 end
 
 --@api-stub: Skeleton:getAnimationTime
 -- Returns the current playback time in seconds of the active animation.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:getAnimationTime
-  local _todo = "TODO: write a real Skeleton:getAnimationTime usage example"
-  print(_todo)
+-- Use to sync external systems (audio, VFX, gameplay) to the animation's current playhead.
+do  -- Skeleton:getAnimationTime
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root")
+  local clip = lurek.spine.newSkeletonAnimation("attack", 0.4)
+  rig:addAnimation(clip); rig:playAnimation("attack", false)
+  function lurek.process(dt)
+    rig:updateAnimation(dt)
+    if rig:getAnimationTime() > 0.2 then lurek.log.debug("attack past hit-frame", "spine") end
+  end
 end
 
 --@api-stub: Skeleton:addAnimation
 -- Adds a SkeletonAnimation to this skeleton's library.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:addAnimation
-  local _todo = "TODO: write a real Skeleton:addAnimation usage example"
-  print(_todo)
+-- Build all clips at load time then refer to them by name via playAnimation; the animation is consumed by this call.
+do  -- Skeleton:addAnimation
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root")
+  local idle = lurek.spine.newSkeletonAnimation("idle", 1.0)
+  local walk = lurek.spine.newSkeletonAnimation("walk", 0.6)
+  rig:addAnimation(idle); rig:addAnimation(walk)
 end
 
 --@api-stub: Skeleton:addSkin
 -- Registers a new empty skin by name.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:addSkin
-  local _todo = "TODO: write a real Skeleton:addSkin usage example"
-  print(_todo)
+-- Create one skin per visual variant (e.g. "default", "armoured"), then populate via setSkinMapping.
+do  -- Skeleton:addSkin
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addSkin("default"); rig:addSkin("armoured")
+  rig:setSkinMapping("armoured", "chest", "plate_chest")
 end
 
 --@api-stub: Skeleton:setSkin
 -- Activates the named skin for attachment lookups.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:setSkin
-  local _todo = "TODO: write a real Skeleton:setSkin usage example"
-  print(_todo)
+-- Returns true on success; switch skins when the player equips a new outfit or reaches a new chapter.
+do  -- Skeleton:setSkin
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addSkin("default"); rig:addSkin("night")
+  if not rig:setSkin("night") then
+    lurek.log.warn("night skin missing, staying on default", "spine")
+  end
 end
 
 --@api-stub: Skeleton:getSkin
 -- Returns the name of the currently active skin, or nil.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: Skeleton:getSkin
-  local _todo = "TODO: write a real Skeleton:getSkin usage example"
-  print(_todo)
+-- Persist this value with the save game so the rig restores the same look on reload.
+do  -- Skeleton:getSkin
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addSkin("default"); rig:setSkin("default")
+  local current = rig:getSkin() or "default"
+  lurek.log.info("active skin: " .. current, "spine")
 end
 
 -- ── SkeletonAnimation methods ──
 
 --@api-stub: SkeletonAnimation:getDuration
 -- Returns the total duration of the animation in seconds.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: SkeletonAnimation:getDuration
-  local _todo = "TODO: write a real SkeletonAnimation:getDuration usage example"
-  print(_todo)
+-- Use to schedule follow-up state transitions (e.g. queue idle once attack completes).
+do  -- SkeletonAnimation:getDuration
+  local clip = lurek.spine.newSkeletonAnimation("attack", 0.45)
+  local timer = 0
+  function lurek.process(dt)
+    timer = timer + dt
+    if timer >= clip:getDuration() then timer = 0 end
+  end
 end
 
 --@api-stub: SkeletonAnimation:getEvents
 -- Returns a list of event names that fall in the half-open interval `(from, to]`.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: SkeletonAnimation:getEvents
-  local _todo = "TODO: write a real SkeletonAnimation:getEvents usage example"
-  print(_todo)
+-- Poll with the playhead window each frame to fire footsteps, hit-frames, or sound cues exactly once.
+do  -- SkeletonAnimation:getEvents
+  local clip = lurek.spine.newSkeletonAnimation("walk", 0.8)
+  clip:addEventKey(0.2, "footstep_left"); clip:addEventKey(0.6, "footstep_right")
+  local prev = 0
+  function lurek.process(dt)
+    local now = prev + dt
+    for _, ev in ipairs(clip:getEvents(prev, now)) do lurek.log.debug("event " .. ev.name, "spine") end
+    prev = now % clip:getDuration()
+  end
 end
 
 --@api-stub: SkeletonAnimation:getTimelineCount
 -- Returns the number of bone timelines in this animation.
--- TODO: replace this scaffold with a real usage snippet (see src/lua_api/spine_api.rs and docs/specs/spine.md).
-do  -- TODO: SkeletonAnimation:getTimelineCount
-  local _todo = "TODO: write a real SkeletonAnimation:getTimelineCount usage example"
-  print(_todo)
+-- Use as a quick complexity check when loading content; very large clips may need profiling.
+do  -- SkeletonAnimation:getTimelineCount
+  local clip = lurek.spine.newSkeletonAnimation("idle", 1.0)
+  clip:addKeyframe(0, "y", 0, 0); clip:addKeyframe(0, "y", 0.5, 4)
+  clip:addKeyframe(1, "rotation", 0, 0); clip:addKeyframe(1, "rotation", 0.5, 0.1)
+  lurek.log.info("idle clip uses " .. clip:getTimelineCount() .. " timelines", "spine")
 end
-
