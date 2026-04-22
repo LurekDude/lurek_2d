@@ -2,7 +2,7 @@
 --- Covers: Province, AdjacencyEdge, ProvinceDefinition, BorderSegment,
 ---         BorderStyle, ProvinceMap, EventBus, MapMode, free functions.
 
-package.path = "./content/library/?/init.lua;" .. package.path
+package.path = "./library/?/init.lua;" .. package.path
 
 local pm = require("library.province_map")
 

@@ -105,13 +105,13 @@
         "module": "ai",
         "name": "BehaviorTree::new",
         "file": "src/ai/behavior_tree.rs",
-        "line": 317
+        "line": 320
       },
       {
         "module": "ai",
         "name": "BehaviorTree::debug_state",
         "file": "src/ai/behavior_tree.rs",
-        "line": 373
+        "line": 376
       },
       {
         "module": "ai",
@@ -8973,7 +8973,7 @@
         "module": "lua_api",
         "name": "register",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3321
+        "line": 3318
       },
       {
         "module": "lua_api",
@@ -24812,112 +24812,112 @@
         "lua_name": "AIWorld:type",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 183
+        "line": 184
       },
       {
         "module": "ai",
         "lua_name": "AIWorld:typeOf",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 189
+        "line": 190
       },
       {
         "module": "ai",
         "lua_name": "Agent:getName",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 213
+        "line": 214
       },
       {
         "module": "ai",
         "lua_name": "Agent:setPosition",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 220
+        "line": 221
       },
       {
         "module": "ai",
         "lua_name": "Agent:getPosition",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 231
+        "line": 232
       },
       {
         "module": "ai",
         "lua_name": "Agent:setVelocity",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 245
+        "line": 246
       },
       {
         "module": "ai",
         "lua_name": "Agent:getVelocity",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 256
+        "line": 257
       },
       {
         "module": "ai",
         "lua_name": "Agent:setMaxSpeed",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 269
+        "line": 270
       },
       {
         "module": "ai",
         "lua_name": "Agent:getMaxSpeed",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 280
+        "line": 281
       },
       {
         "module": "ai",
         "lua_name": "Agent:setMaxForce",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 293
+        "line": 294
       },
       {
         "module": "ai",
         "lua_name": "Agent:getMaxForce",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 304
+        "line": 305
       },
       {
         "module": "ai",
         "lua_name": "Agent:setPriority",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 317
+        "line": 318
       },
       {
         "module": "ai",
         "lua_name": "Agent:getPriority",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 328
+        "line": 329
       },
       {
         "module": "ai",
         "lua_name": "Agent:setDecisionModel",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 341
+        "line": 342
       },
       {
         "module": "ai",
         "lua_name": "Agent:getDecisionModel",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 354
+        "line": 355
       },
       {
         "module": "ai",
         "lua_name": "Agent:setCustomModel",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 368
+        "line": 369
       },
       {
         "module": "ai",
@@ -25253,1211 +25253,1211 @@
         "lua_name": "QLearner:chooseAction",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1259
+        "line": 1257
       },
       {
         "module": "ai",
         "lua_name": "QLearner:bestAction",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1267
+        "line": 1265
       },
       {
         "module": "ai",
         "lua_name": "QLearner:getQValue",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1296
+        "line": 1294
       },
       {
         "module": "ai",
         "lua_name": "QLearner:endEpisode",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1324
+        "line": 1322
       },
       {
         "module": "ai",
         "lua_name": "QLearner:getEpisodeCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1332
+        "line": 1330
       },
       {
         "module": "ai",
         "lua_name": "QLearner:getStateCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1339
+        "line": 1337
       },
       {
         "module": "ai",
         "lua_name": "QLearner:getActionCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1346
+        "line": 1344
       },
       {
         "module": "ai",
         "lua_name": "QLearner:setLearningRate",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1354
+        "line": 1352
       },
       {
         "module": "ai",
         "lua_name": "QLearner:getLearningRate",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1362
+        "line": 1360
       },
       {
         "module": "ai",
         "lua_name": "QLearner:setDiscountFactor",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1370
+        "line": 1368
       },
       {
         "module": "ai",
         "lua_name": "QLearner:getDiscountFactor",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1378
+        "line": 1376
       },
       {
         "module": "ai",
         "lua_name": "QLearner:setExplorationRate",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1386
+        "line": 1384
       },
       {
         "module": "ai",
         "lua_name": "QLearner:getExplorationRate",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1394
+        "line": 1392
       },
       {
         "module": "ai",
         "lua_name": "QLearner:setExplorationDecay",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1402
+        "line": 1400
       },
       {
         "module": "ai",
         "lua_name": "QLearner:getExplorationDecay",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1410
+        "line": 1408
       },
       {
         "module": "ai",
         "lua_name": "QLearner:serialize",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1417
+        "line": 1415
       },
       {
         "module": "ai",
         "lua_name": "QLearner:deserialize",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1425
+        "line": 1423
       },
       {
         "module": "ai",
         "lua_name": "QLearner:type",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1436
+        "line": 1434
       },
       {
         "module": "ai",
         "lua_name": "QLearner:typeOf",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1442
+        "line": 1440
       },
       {
         "module": "ai",
         "lua_name": "UtilityAI:evaluate",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1485
+        "line": 1483
       },
       {
         "module": "ai",
         "lua_name": "UtilityAI:getActionCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1495
+        "line": 1493
       },
       {
         "module": "ai",
         "lua_name": "UtilityAI:getLastAction",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1502
+        "line": 1500
       },
       {
         "module": "ai",
         "lua_name": "UtilityAI:type",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1590
+        "line": 1587
       },
       {
         "module": "ai",
         "lua_name": "UtilityAI:typeOf",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1596
+        "line": 1593
       },
       {
         "module": "ai",
         "lua_name": "GOAPPlanner:getActionCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1729
+        "line": 1726
       },
       {
         "module": "ai",
         "lua_name": "GOAPPlanner:getGoalCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1736
+        "line": 1733
       },
       {
         "module": "ai",
         "lua_name": "GOAPPlanner:getMaxIterations",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1743
+        "line": 1740
       },
       {
         "module": "ai",
         "lua_name": "GOAPPlanner:setMaxIterations",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1751
+        "line": 1748
       },
       {
         "module": "ai",
         "lua_name": "GOAPPlanner:type",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1759
+        "line": 1756
       },
       {
         "module": "ai",
         "lua_name": "GOAPPlanner:typeOf",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1765
+        "line": 1762
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:addLayer",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1787
+        "line": 1784
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:hasLayer",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1796
+        "line": 1793
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:decay",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1881
+        "line": 1878
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:clearLayer",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1890
+        "line": 1887
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:clearAll",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1898
+        "line": 1895
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:getMaxPosition",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1907
+        "line": 1904
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:getMinPosition",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1915
+        "line": 1912
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:getWidth",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1953
+        "line": 1950
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:getHeight",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1958
+        "line": 1955
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:getCellSize",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1963
+        "line": 1960
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:type",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1970
+        "line": 1967
       },
       {
         "module": "ai",
         "lua_name": "InfluenceMap:typeOf",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1976
+        "line": 1973
       },
       {
         "module": "ai",
         "lua_name": "Squad:getName",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 1997
+        "line": 1994
       },
       {
         "module": "ai",
         "lua_name": "Squad:addMember",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2005
+        "line": 2002
       },
       {
         "module": "ai",
         "lua_name": "Squad:removeMember",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2014
+        "line": 2011
       },
       {
         "module": "ai",
         "lua_name": "Squad:getMemberCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2022
+        "line": 2019
       },
       {
         "module": "ai",
         "lua_name": "Squad:getMembers",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2029
+        "line": 2026
       },
       {
         "module": "ai",
         "lua_name": "Squad:setLeader",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2042
+        "line": 2039
       },
       {
         "module": "ai",
         "lua_name": "Squad:getLeader",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2050
+        "line": 2047
       },
       {
         "module": "ai",
         "lua_name": "Squad:getFormation",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2074
+        "line": 2071
       },
       {
         "module": "ai",
         "lua_name": "Squad:getFormationSpacing",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2081
+        "line": 2078
       },
       {
         "module": "ai",
         "lua_name": "Squad:getBlackboard",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2104
+        "line": 2101
       },
       {
         "module": "ai",
         "lua_name": "Squad:type",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2114
+        "line": 2111
       },
       {
         "module": "ai",
         "lua_name": "Squad:typeOf",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2120
+        "line": 2117
       },
       {
         "module": "ai",
         "lua_name": "CommandQueue:cancelCurrent",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2209
+        "line": 2206
       },
       {
         "module": "ai",
         "lua_name": "CommandQueue:clear",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2216
+        "line": 2213
       },
       {
         "module": "ai",
         "lua_name": "CommandQueue:getCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2224
+        "line": 2221
       },
       {
         "module": "ai",
         "lua_name": "CommandQueue:isEmpty",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2229
+        "line": 2226
       },
       {
         "module": "ai",
         "lua_name": "CommandQueue:getCurrentType",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2234
+        "line": 2231
       },
       {
         "module": "ai",
         "lua_name": "CommandQueue:getCurrentTarget",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2241
+        "line": 2238
       },
       {
         "module": "ai",
         "lua_name": "CommandQueue:type",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2248
+        "line": 2245
       },
       {
         "module": "ai",
         "lua_name": "CommandQueue:typeOf",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2254
+        "line": 2251
       },
       {
         "module": "ai",
         "lua_name": "TraitProfile:set",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2276
+        "line": 2273
       },
       {
         "module": "ai",
         "lua_name": "TraitProfile:get",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2284
+        "line": 2281
       },
       {
         "module": "ai",
         "lua_name": "TraitProfile:getBase",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2291
+        "line": 2288
       },
       {
         "module": "ai",
         "lua_name": "TraitProfile:removeModifiers",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2314
+        "line": 2311
       },
       {
         "module": "ai",
         "lua_name": "TraitProfile:update",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2322
+        "line": 2319
       },
       {
         "module": "ai",
         "lua_name": "TraitProfile:has",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2330
+        "line": 2327
       },
       {
         "module": "ai",
         "lua_name": "TraitProfile:traitCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2336
+        "line": 2333
       },
       {
         "module": "ai",
         "lua_name": "TraitProfile:archetype",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2342
+        "line": 2339
       },
       {
         "module": "ai",
         "lua_name": "StimulusWorld:remove",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2406
+        "line": 2403
       },
       {
         "module": "ai",
         "lua_name": "StimulusWorld:update",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2413
+        "line": 2410
       },
       {
         "module": "ai",
         "lua_name": "StimulusWorld:clear",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2427
+        "line": 2424
       },
       {
         "module": "ai",
         "lua_name": "ContextSteering:addWander",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2461
+        "line": 2458
       },
       {
         "module": "ai",
         "lua_name": "ContextSteering:addAvoidBounds",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2490
+        "line": 2487
       },
       {
         "module": "ai",
         "lua_name": "ContextSteering:clearBehaviors",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2497
+        "line": 2494
       },
       {
         "module": "ai",
         "lua_name": "ContextSteering:chosenMagnitude",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2518
+        "line": 2515
       },
       {
         "module": "ai",
         "lua_name": "ContextSteering:slotCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2524
+        "line": 2521
       },
       {
         "module": "ai",
         "lua_name": "NeedSystem:addNeed",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2546
+        "line": 2543
       },
       {
         "module": "ai",
         "lua_name": "NeedSystem:update",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2554
+        "line": 2551
       },
       {
         "module": "ai",
         "lua_name": "NeedSystem:mostUrgent",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2561
+        "line": 2558
       },
       {
         "module": "ai",
         "lua_name": "NeedSystem:satisfy",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2569
+        "line": 2566
       },
       {
         "module": "ai",
         "lua_name": "NeedSystem:valueOf",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2577
+        "line": 2574
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:pushEvent",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2596
+        "line": 2593
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:update",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2604
+        "line": 2601
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:tension",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2611
+        "line": 2608
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:phase",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2615
+        "line": 2612
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:spawnRateFactor",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2621
+        "line": 2618
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:lootFactor",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2627
+        "line": 2624
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:ambientIntensity",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2633
+        "line": 2630
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:setTension",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2640
+        "line": 2637
       },
       {
         "module": "ai",
         "lua_name": "AIDirector:reset",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2647
+        "line": 2644
       },
       {
         "module": "ai",
         "lua_name": "HTNDomain:addPrimitive",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2670
+        "line": 2667
       },
       {
         "module": "ai",
         "lua_name": "HTNDomain:taskCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2736
+        "line": 2733
       },
       {
         "module": "ai",
         "lua_name": "EmotionModel:trigger",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2818
+        "line": 2815
       },
       {
         "module": "ai",
         "lua_name": "EmotionModel:get",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2826
+        "line": 2823
       },
       {
         "module": "ai",
         "lua_name": "EmotionModel:dominant",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2832
+        "line": 2829
       },
       {
         "module": "ai",
         "lua_name": "EmotionModel:isActive",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2839
+        "line": 2836
       },
       {
         "module": "ai",
         "lua_name": "EmotionModel:update",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2846
+        "line": 2843
       },
       {
         "module": "ai",
         "lua_name": "EmotionModel:reset",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2853
+        "line": 2850
       },
       {
         "module": "ai",
         "lua_name": "ORCASolver:setPosition",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2906
+        "line": 2903
       },
       {
         "module": "ai",
         "lua_name": "ORCASolver:compute",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2916
+        "line": 2913
       },
       {
         "module": "ai",
         "lua_name": "ORCASolver:getSafeVelocity",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2924
+        "line": 2921
       },
       {
         "module": "ai",
         "lua_name": "ORCASolver:agentCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2936
+        "line": 2933
       },
       {
         "module": "ai",
         "lua_name": "NeuralNet:forward",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2969
+        "line": 2966
       },
       {
         "module": "ai",
         "lua_name": "NeuralNet:setWeights",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2981
+        "line": 2978
       },
       {
         "module": "ai",
         "lua_name": "NeuralNet:getWeights",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2987
+        "line": 2984
       },
       {
         "module": "ai",
         "lua_name": "NeuralNet:paramCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 2998
+        "line": 2995
       },
       {
         "module": "ai",
         "lua_name": "NeuralNet:layerCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3004
+        "line": 3001
       },
       {
         "module": "ai",
         "lua_name": "GeneticAlgorithm:evolve",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3022
+        "line": 3019
       },
       {
         "module": "ai",
         "lua_name": "GeneticAlgorithm:generation",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3029
+        "line": 3026
       },
       {
         "module": "ai",
         "lua_name": "GeneticAlgorithm:popSize",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3035
+        "line": 3032
       },
       {
         "module": "ai",
         "lua_name": "GeneticAlgorithm:setFitness",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3043
+        "line": 3040
       },
       {
         "module": "ai",
         "lua_name": "GeneticAlgorithm:getGenes",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3053
+        "line": 3050
       },
       {
         "module": "ai",
         "lua_name": "GeneticAlgorithm:bestGenes",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3066
+        "line": 3063
       },
       {
         "module": "ai",
         "lua_name": "Bandit:select",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3091
+        "line": 3088
       },
       {
         "module": "ai",
         "lua_name": "Bandit:update",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3099
+        "line": 3096
       },
       {
         "module": "ai",
         "lua_name": "Bandit:bestArm",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3106
+        "line": 3103
       },
       {
         "module": "ai",
         "lua_name": "Bandit:reset",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3112
+        "line": 3109
       },
       {
         "module": "ai",
         "lua_name": "Bandit:armCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3119
+        "line": 3116
       },
       {
         "module": "ai",
         "lua_name": "Bandit:totalPulls",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3125
+        "line": 3122
       },
       {
         "module": "ai",
         "lua_name": "Neuroevolution:evolve",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3143
+        "line": 3140
       },
       {
         "module": "ai",
         "lua_name": "Neuroevolution:setFitness",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3152
+        "line": 3149
       },
       {
         "module": "ai",
         "lua_name": "Neuroevolution:chromosomeToNet",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3161
+        "line": 3158
       },
       {
         "module": "ai",
         "lua_name": "Neuroevolution:bestNetwork",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3171
+        "line": 3168
       },
       {
         "module": "ai",
         "lua_name": "Neuroevolution:bestFitness",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3180
+        "line": 3177
       },
       {
         "module": "ai",
         "lua_name": "Neuroevolution:popSize",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3186
+        "line": 3183
       },
       {
         "module": "ai",
         "lua_name": "Neuroevolution:generation",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3192
+        "line": 3189
       },
       {
         "module": "ai",
         "lua_name": "StrategyAI:addGoal",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3211
+        "line": 3208
       },
       {
         "module": "ai",
         "lua_name": "StrategyAI:addTag",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3219
+        "line": 3216
       },
       {
         "module": "ai",
         "lua_name": "StrategyAI:removeTag",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3227
+        "line": 3224
       },
       {
         "module": "ai",
         "lua_name": "StrategyAI:update",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3236
+        "line": 3233
       },
       {
         "module": "ai",
         "lua_name": "StrategyAI:forceEvaluate",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3246
+        "line": 3243
       },
       {
         "module": "ai",
         "lua_name": "StrategyAI:activeGoal",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3255
+        "line": 3252
       },
       {
         "module": "ai",
         "lua_name": "StrategyAI:timeUntilNext",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3261
+        "line": 3258
       },
       {
         "module": "ai",
         "lua_name": "AILod:shouldUpdate",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3294
+        "line": 3291
       },
       {
         "module": "ai",
         "lua_name": "AILod:tierCount",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3300
+        "line": 3297
       },
       {
         "module": "ai",
         "lua_name": "AILod:tierName",
         "kind": "method",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3307
+        "line": 3304
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newWorld",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3327
+        "line": 3324
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newBlackboard",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3340
+        "line": 3337
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newStateMachine",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3352
+        "line": 3349
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newBehaviorTree",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3364
+        "line": 3361
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newSelector",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3376
+        "line": 3373
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newSequence",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3391
+        "line": 3388
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newParallel",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3408
+        "line": 3405
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newInverter",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3428
+        "line": 3425
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newRepeater",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3446
+        "line": 3443
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newSucceeder",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3465
+        "line": 3462
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newAction",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3483
+        "line": 3480
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newCondition",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3497
+        "line": 3494
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newGuard",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3513
+        "line": 3510
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newSteeringManager",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3539
+        "line": 3538
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newQLearner",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3554
+        "line": 3553
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newUtilityAI",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3566
+        "line": 3565
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newGOAPPlanner",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3579
+        "line": 3578
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newInfluenceMap",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3594
+        "line": 3593
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newSquad",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3607
+        "line": 3606
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newCommandQueue",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3619
+        "line": 3618
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newTraitProfile",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3631
+        "line": 3630
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newStimulusWorld",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3643
+        "line": 3642
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newContextSteering",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3656
+        "line": 3655
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newNeedSystem",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3669
+        "line": 3668
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newAIDirector",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3681
+        "line": 3680
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newHTNDomain",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3693
+        "line": 3692
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newMCTSEngine",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3709
+        "line": 3708
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newEmotionModel",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3727
+        "line": 3726
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newORCASolver",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3740
+        "line": 3739
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newNeuralNet",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3752
+        "line": 3751
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newGeneticAlgorithm",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3767
+        "line": 3766
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newBandit",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3785
+        "line": 3784
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newNeuroevolution",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3809
+        "line": 3808
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newStrategyAI",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3840
+        "line": 3839
       },
       {
         "module": "ai",
         "lua_name": "lurek.ai.newAILod",
         "kind": "function",
         "file": "src/lua_api/ai_api.rs",
-        "line": 3852
+        "line": 3851
       },
       {
         "module": "animation",

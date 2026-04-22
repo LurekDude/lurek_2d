@@ -284,7 +284,10 @@ impl BTNode {
             BTNode::Selector { children, .. }
             | BTNode::Sequence { children, .. }
             | BTNode::Parallel { children, .. } => children.len(),
-            BTNode::Inverter { .. } | BTNode::Repeater { .. } | BTNode::Succeeder { .. } | BTNode::Guard { .. } => 1,
+            BTNode::Inverter { .. }
+            | BTNode::Repeater { .. }
+            | BTNode::Succeeder { .. }
+            | BTNode::Guard { .. } => 1,
             BTNode::Action { .. } | BTNode::Condition { .. } => 0,
         }
     }
@@ -338,9 +341,9 @@ fn count_bt_nodes(node: &BTNode) -> usize {
         BTNode::Selector { children, .. }
         | BTNode::Sequence { children, .. }
         | BTNode::Parallel { children, .. } => children.iter().map(count_bt_nodes).sum(),
-        BTNode::Inverter { child }
-        | BTNode::Succeeder { child }
-        | BTNode::Guard { child, .. } => count_bt_nodes(child),
+        BTNode::Inverter { child } | BTNode::Succeeder { child } | BTNode::Guard { child, .. } => {
+            count_bt_nodes(child)
+        }
         BTNode::Repeater { child, .. } => count_bt_nodes(child),
         BTNode::Action { .. } | BTNode::Condition { .. } => 0,
     }
@@ -395,9 +398,18 @@ mod tests {
 
     #[test]
     fn parallel_policy_parse() {
-        assert_eq!(ParallelPolicy::parse_str("requireAll"), ParallelPolicy::RequireAll);
-        assert_eq!(ParallelPolicy::parse_str("requireOne"), ParallelPolicy::RequireOne);
-        assert_eq!(ParallelPolicy::parse_str("unknown"), ParallelPolicy::RequireOne);
+        assert_eq!(
+            ParallelPolicy::parse_str("requireAll"),
+            ParallelPolicy::RequireAll
+        );
+        assert_eq!(
+            ParallelPolicy::parse_str("requireOne"),
+            ParallelPolicy::RequireOne
+        );
+        assert_eq!(
+            ParallelPolicy::parse_str("unknown"),
+            ParallelPolicy::RequireOne
+        );
     }
 
     #[test]

@@ -1,4 +1,4 @@
-# Lurek2D — Test Suite Overview
+﻿# Lurek2D â€” Test Suite Overview
 
 Lurek2D uses a **two-tier test model**: Rust integration tests and Lua BDD tests.
 Both tiers are executed via `cargo test`.
@@ -18,34 +18,34 @@ Both tiers are executed via `cargo test`.
 
 ```
 tests/
-├── README.md              ← this file
-├── fixtures/              ← shared test assets (images, audio, data files)
-│
-├── rust/                  ← Rust integration tests (all registered in Cargo.toml)
-│   ├── unit/              ← per-module Rust unit tests (one file per engine module)
-│   ├── stress/            ← throughput + allocation pressure tests
-│   ├── golden/            ← deterministic snapshot tests (graphics, audio, text)
-│   ├── config/            ← engine configuration loading tests
-│   ├── security/          ← sandbox audit, path-traversal tests
-│   ├── ext/               ← cross-module Rust smoke tests
-│   └── fixtures/          ← Rust-specific test assets
-│
-└── lua/                   ← Lua BDD tests (dispatched by tests/lua/harness.rs)
-    ├── harness.rs         ← Rust dispatcher — one #[test] per .lua file
-    ├── init.lua           ← BDD framework (describe/it/expect_*)
-    ├── unit/              ← one file per engine module (lurek.* API surface)
-    ├── content/library/           ← one file per Lunasome library in content/library/
-    ├── integration/       ← tests BETWEEN ≥2 modules (name: test_<a>_<b>.lua)
-    ├── stress/            ← Lua throughput tests (high iteration counts)
-    ├── security/          ← Lua sandboxing + nil-spam + path-traversal
-    ├── golden/            ← deterministic Lua output tests
-    ├── config/            ← configuration loading tests
-    ├── content/demos/             ← one file per demo in content/demos/
-    ├── performance/       ← Lua benchmark helpers
-    └── fixtures/          ← Lua-specific test assets
+â”śâ”€â”€ README.md              â† this file
+â”śâ”€â”€ fixtures/              â† shared test assets (images, audio, data files)
+â”‚
+â”śâ”€â”€ rust/                  â† Rust integration tests (all registered in Cargo.toml)
+â”‚   â”śâ”€â”€ unit/              â† per-module Rust unit tests (one file per engine module)
+â”‚   â”śâ”€â”€ stress/            â† throughput + allocation pressure tests
+â”‚   â”śâ”€â”€ golden/            â† deterministic snapshot tests (graphics, audio, text)
+â”‚   â”śâ”€â”€ config/            â† engine configuration loading tests
+â”‚   â”śâ”€â”€ security/          â† sandbox audit, path-traversal tests
+â”‚   â”śâ”€â”€ ext/               â† cross-module Rust smoke tests
+â”‚   â””â”€â”€ fixtures/          â† Rust-specific test assets
+â”‚
+â””â”€â”€ lua/                   â† Lua BDD tests (dispatched by tests/lua/harness.rs)
+    â”śâ”€â”€ harness.rs         â† Rust dispatcher â€” one #[test] per .lua file
+    â”śâ”€â”€ init.lua           â† BDD framework (describe/it/expect_*)
+    â”śâ”€â”€ unit/              â† one file per engine module (lurek.* API surface)
+    â”śâ”€â”€ library/           â† one file per Lunasome library in library/
+    â”śâ”€â”€ integration/       â† tests BETWEEN â‰Ą2 modules (name: test_<a>_<b>.lua)
+    â”śâ”€â”€ stress/            â† Lua throughput tests (high iteration counts)
+    â”śâ”€â”€ security/          â† Lua sandboxing + nil-spam + path-traversal
+    â”śâ”€â”€ golden/            â† deterministic Lua output tests
+    â”śâ”€â”€ config/            â† configuration loading tests
+    â”śâ”€â”€ content/demos/             â† one file per demo in content/demos/
+    â”śâ”€â”€ performance/       â† Lua benchmark helpers
+    â””â”€â”€ fixtures/          â† Lua-specific test assets
 ```
 
-> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are pure-Lua libraries and tested in `tests/lua/content/library/`.
+> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are pure-Lua libraries and tested in `tests/lua/library/`.
 > **Note**: `tests/lua/content/examples/` should not be used. Examples are documentation and are not testable in the BDD harness.
 
 ## Tier 1: Rust Tests
@@ -53,9 +53,9 @@ tests/
 Rust tests live under `tests/rust/` and are registered in `Cargo.toml`.
 They import from the crate root and run entirely headless (no GPU, audio, or window).
 
-**Naming convention**: `<subject>_<scenario>_<expected>` — no `test_` prefix.
+**Naming convention**: `<subject>_<scenario>_<expected>` â€” no `test_` prefix.
 
-**Float comparisons**: always `assert!((a - b).abs() < 1e-5)` — never `assert_eq!` on `f32`.
+**Float comparisons**: always `assert!((a - b).abs() < 1e-5)` â€” never `assert_eq!` on `f32`.
 
 ## Tier 2: Lua BDD Tests
 
@@ -73,7 +73,7 @@ Each `.lua` file must be registered with a `#[test]` entry in `harness.rs`.
 | `expect_type(val, type)` | Type assertion |
 | `expect_error(fn)` | Assert function raises an error |
 | `expect_not_nil(val)` | Non-nil assertion |
-| `test_summary()` | **Mandatory** — prints pass/fail totals at end of file |
+| `test_summary()` | **Mandatory** â€” prints pass/fail totals at end of file |
 
 **Constraint**: Lua tests must not create windows, play audio, or write outside `target/`.
 
@@ -82,8 +82,8 @@ Each `.lua` file must be registered with a `#[test]` entry in `harness.rs`.
 | Category | Path | Scope |
 |---|---|---|
 | **unit** | `tests/lua/unit/` | One engine module per file (lurek.* API) |
-| **library** | `tests/lua/content/library/` | One Lunasome library per file |
-| **integration** | `tests/lua/integration/` | Tests between ≥2 distinct modules |
+| **library** | `tests/lua/library/` | One Lunasome library per file |
+| **integration** | `tests/lua/integration/` | Tests between â‰Ą2 distinct modules |
 | **stress** | `tests/lua/stress/` | High-iteration throughput/load tests |
 | **security** | `tests/lua/security/` | Sandbox, nil spam, path traversal |
 | **golden** | `tests/lua/golden/` | Deterministic output comparison |
@@ -119,4 +119,5 @@ Run these before every commit:
 ```powershell
 cargo test && cargo clippy -- -D warnings
 ```
+
 

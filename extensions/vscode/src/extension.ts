@@ -183,7 +183,7 @@ async function getApiDocCommand(): Promise<void> {
 
   if (!apiDocPath || !fs.existsSync(apiDocPath)) {
     vscode.window.showWarningMessage(
-      "API reference file not found. Expected docs/lurek.lua or docs/lua-api.md."
+      "API reference file not found. Expected docs/api/lurek.lua or docs/api/lurek.md."
     );
     return;
   }

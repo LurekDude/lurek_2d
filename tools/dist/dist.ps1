@@ -160,7 +160,7 @@ if (Test-Path $LibrarySource) {
     $LibraryDest = Join-Path $PackageDir 'library'
     if (Test-Path $LibraryDest) { Remove-Item $LibraryDest -Recurse -Force }
     Copy-Item $LibrarySource -Destination $LibraryDest -Recurse -Force
-    Write-OK "Copied content/library/"
+    Write-OK "Copied library/"
 }
 
 # Copy API docs  (lua-api.md, lurek.lua LuaCATS stubs)
@@ -212,8 +212,8 @@ Lunasome standard libraries (library\)
              inventory, item, quest, stats, and more.
 
   Usage in your game:
-    local inventory = require("content/library/inventory")
-    local quest     = require("content/library/quest")
+    local inventory = require("library.inventory")
+    local quest     = require("library.quest")
 
 API Reference (docs\)
 ----------------------

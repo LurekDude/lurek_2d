@@ -383,7 +383,7 @@ def main() -> int:
     p.add_argument('--report',    action='store_true', help='CI gate: exit 1 if any gaps exist')
     p.add_argument('--no-stubs',  action='store_true', help='With --report: also fail if any stub blocks remain')
     p.add_argument('--module',    metavar='NAME',      help='Filter to one module')
-    p.add_argument('--markdown',  metavar='FILE',      nargs='?', const='docs/quality/example_coverage.md', help='Export Markdown report to FILE')
+    p.add_argument('--markdown',  metavar='FILE',      nargs='?', const='logs/reports/example_coverage.md', help='Export Markdown report to FILE')
     args = p.parse_args()
 
     if not API_JSON.exists():

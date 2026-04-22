@@ -334,9 +334,9 @@ impl Default for Config {
                 width: 800,
                 height: 600,
                 title: if cfg!(debug_assertions) {
-                    format!("Lurek2D v{} [DEBUG]", env!("CARGO_PKG_VERSION"))
+                    "Lurek2D [DEBUG]".to_string()
                 } else {
-                    format!("Lurek2D v{}", env!("CARGO_PKG_VERSION"))
+                    "Lurek2D".to_string()
                 },
                 vsync: true,
                 fullscreen: false,

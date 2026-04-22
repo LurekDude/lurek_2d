@@ -1,14 +1,14 @@
-<p align="center">
+﻿<p align="center">
   <img src="assets/splash.png" alt="Lurek2D" width="720" />
 </p>
 
 <p align="center">
-  <strong>A ~10 MB 2D game engine.</strong> Rust core · Lua scripting · wgpu GPU rendering · AI-first design.
+  <strong>A ~10 MB 2D game engine.</strong> Rust core Â· Lua scripting Â· wgpu GPU rendering Â· AI-first design.
 </p>
 
 ---
 
-One binary. One scripting language. Drop `lurek2d` next to `main.lua` — your game runs. No installer, no DLLs, no months-long learning curve.
+One binary. One scripting language. Drop `lurek2d` next to `main.lua` â€” your game runs. No installer, no DLLs, no months-long learning curve.
 
 ---
 
@@ -35,7 +35,7 @@ end
 cargo run -- path/to/your/game   # No project files. No config required.
 ```
 
-An empty `main.lua` is valid. With no game argument, the engine shows a built-in splash screen — drag-and-drop a folder onto the window to load it.
+An empty `main.lua` is valid. With no game argument, the engine shows a built-in splash screen â€” drag-and-drop a folder onto the window to load it.
 
 ---
 
@@ -50,7 +50,7 @@ Lurek2D ships 46 Rust modules organized in four tiers. All are MIT-licensed firs
 | `engine` | App lifecycle, `Config`, `SharedState`, `EngineError`, typed resource pools (`SlotMap`) |
 | `math` | `Vec2` / `Mat3` / `Rect`, easing (22 functions), noise (Perlin/simplex/fBm), Bezier, triangulation |
 
-### Tier 1 — Core Subsystems
+### Tier 1 â€” Core Subsystems
 
 | Module | Description |
 |---|---|
@@ -58,8 +58,8 @@ Lurek2D ships 46 Rust modules organized in four tiers. All are MIT-licensed firs
 | `audio` | Sound loading and playback (WAV / OGG / MP3 / FLAC), streaming, buses, volume / pitch / pan |
 | `sound` | Audio source types and lifecycle management |
 | `physics` | 2D rigid-body simulation via rapier2d: bodies, shapes, 11 joint types, raycasting, collision events |
-| `input` | Keyboard, mouse, gamepad (gilrs), touch — state queries and event callbacks |
-| `camera` | 2D camera with viewport, zoom, screen↔world transforms |
+| `input` | Keyboard, mouse, gamepad (gilrs), touch â€” state queries and event callbacks |
+| `camera` | 2D camera with viewport, zoom, screenâ†”world transforms |
 | `animation` | Keyframe animation, sprite-sheet playback |
 | `image` | Image loading, pixel manipulation, format conversion |
 | `timer` | Frame clock, delta-time, fixed-step ticker |
@@ -74,7 +74,7 @@ Lurek2D ships 46 Rust modules organized in four tiers. All are MIT-licensed firs
 | `automation` | Lua-scriptable task runners and build automation |
 | `log` | Structured engine logging facade |
 
-### Tier 2 — Engine Extensions
+### Tier 2 â€” Engine Extensions
 
 | Module | Description |
 |---|---|
@@ -84,7 +84,7 @@ Lurek2D ships 46 Rust modules organized in four tiers. All are MIT-licensed firs
 | `save` | Slot-based save / load with versioning |
 | `mods` | Mod loader with sandboxed per-mod Lua VMs |
 | `graph` | General graph data structures and traversal algorithms |
-| `pathfind` | Navigation grids, A★, HPA★, flow fields |
+| `pathfind` | Navigation grids, Aâ…, HPAâ…, flow fields |
 | `ai` | FSMs, behaviour trees, GOAP planner, steering behaviours, influence maps, shared blackboard |
 | `dataframe` | Tabular data structure, CSV I/O, column-oriented query API |
 | `ui` | Immediate-mode UI widget toolkit |
@@ -140,27 +140,27 @@ function lurek.render_ui()   end  -- every frame (HUD layer)
 
 ```
 Lua game scripts
-        ▼
-content/library/   ← Tier 3: Lunasome — pure-Lua game mechanics (no Rust internals)
-        ▼
-src/lua_api/       ← Bridge: registers the lurek.* namespace
-        ▼
-Tier 2 extensions  ← particle, tilemap, scene, ai, pathfinding, gui, …
-        ▼
-Tier 1 core        ← graphics, audio, physics, input, timer, filesystem, …
-        ▼
-Baseline           ← math (leaf, no deps) · engine (lifecycle, SharedState)
+        â–Ľ
+library/   â† Tier 3: Lunasome â€” pure-Lua game mechanics (no Rust internals)
+        â–Ľ
+src/lua_api/       â† Bridge: registers the lurek.* namespace
+        â–Ľ
+Tier 2 extensions  â† particle, tilemap, scene, ai, pathfinding, gui, â€¦
+        â–Ľ
+Tier 1 core        â† graphics, audio, physics, input, timer, filesystem, â€¦
+        â–Ľ
+Baseline           â† math (leaf, no deps) Â· engine (lifecycle, SharedState)
 ```
 
 **Rules**: tiers only import downward. No cross-imports within the same tier. Domain modules never import `lua_api`. See [docs/architecture/engine-architecture.md](docs/architecture/engine-architecture.md) for the full spec.
 
-**Rendering**: `RenderCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After the callback returns, `GpuRenderer` processes the queue in wgpu render passes — no GPU calls inside Lua closures.
+**Rendering**: `RenderCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After the callback returns, `GpuRenderer` processes the queue in wgpu render passes â€” no GPU calls inside Lua closures.
 
-**State**: Resources (textures, fonts, meshes, canvases, …) live in typed `SlotMap` pools in `SharedState`. Keys are opaque typed handles — no string lookups at runtime.
+**State**: Resources (textures, fonts, meshes, canvases, â€¦) live in typed `SlotMap` pools in `SharedState`. Keys are opaque typed handles â€” no string lookups at runtime.
 
-**Boot**: `conf.lua` → `Config` → winit window + wgpu device + rodio mixer → LuaJIT VM → `main.lua` → event loop.
+**Boot**: `conf.lua` â†’ `Config` â†’ winit window + wgpu device + rodio mixer â†’ LuaJIT VM â†’ `main.lua` â†’ event loop.
 
-**AI-first contributor workflow**: this repo is built by humans prompting agents. The CAG layer (`.github/`) defines the agents, skills, and prompts that drive that work — see [docs/architecture/cag-system.md](docs/architecture/cag-system.md) for the full reference.
+**AI-first contributor workflow**: this repo is built by humans prompting agents. The CAG layer (`.github/`) defines the agents, skills, and prompts that drive that work â€” see [docs/architecture/cag-system.md](docs/architecture/cag-system.md) for the full reference.
 
 ---
 
@@ -168,13 +168,13 @@ Baseline           ← math (leaf, no deps) · engine (lifecycle, SharedState)
 
 | Component | Location | Description |
 |---|---|---|
-| **Engine binary** | `src/` | The `lurek2d` executable — the entire runtime |
-| **Lua API reference** | `docs/lua-api.md` | Full `lurek.*` function signatures and descriptions |
-| **Rust API reference** | `docs/reports/rust-api.md` | Engine internals for contributors |
+| **Engine binary** | `src/` | The `lurek2d` executable â€” the entire runtime |
+| **Lua API reference** | `docs/api/lurek.md` | Full `lurek.*` function signatures and descriptions |
+| **Rust API reference** | `docs/api/rust.md` | Engine internals for contributors |
 | **VS Code extension** | `extensions/vscode/` | IntelliSense, MCP server, CAG tooling, debug workflows |
-| **Demos** | `content/demos/` | Playable examples across 8 genres (action, arcade, RPG, strategy, …) |
+| **Demos** | `content/demos/` | Playable examples across 8 genres (action, arcade, RPG, strategy, â€¦) |
 | **API examples** | `content/examples/` | Single-file scripts demonstrating one `lurek.*` module each |
-| **Lua libraries** | `content/library/` | Pure-Lua game-mechanics modules: inventory, quest, dialog, combat, economy, … |
+| **Lua libraries** | `library/` | Pure-Lua game-mechanics modules: inventory, quest, dialog, combat, economy, â€¦ |
 | **Plugins** | `content/plugins/` | In-progress third-party plugin layer (future) |
 | **CAG system** | `.github/` | 20 Copilot agents, 30 skills, and prompts for AI-assisted development |
 
@@ -188,7 +188,7 @@ Baseline           ← math (leaf, no deps) · engine (lifecycle, SharedState)
 
 ### Lua Libraries (Lunasome)
 
-`content/library/` ships production-ready pure-Lua modules — no Rust required:
+`library/` ships production-ready pure-Lua modules â€” no Rust required:
 
 | Library | Description |
 |---|---|
@@ -205,12 +205,12 @@ Baseline           ← math (leaf, no deps) · engine (lifecycle, SharedState)
 | `quest` | Quest tracker with objectives, stages, and rewards |
 | `stats` | Attribute and derived-stat system |
 
-### CAG — AI-First Development
+### CAG â€” AI-First Development
 
 Lurek2D's `.github/` layer is a complete Copilot Agent Graph (CAG):
 
 - **20 agents** cover every role: Manager, Developer, Renderer, Physicist, Audio-Eng, Tester, Reviewer, Doc-Writer, Security, and more
-- **30+ skills** provide domain knowledge: GPU programming, Lua API design, physics, audio, threading, testing, …
+- **30+ skills** provide domain knowledge: GPU programming, Lua API design, physics, audio, threading, testing, â€¦
 - **Prompts and instructions** ensure every agent uses the engine correctly without clarifying questions
 
 If you develop with GitHub Copilot, the CAG turns your AI assistant into a specialized Lurek2D co-developer.
@@ -221,7 +221,7 @@ If you develop with GitHub Copilot, the CAG turns your AI assistant into a speci
 
 | Component | Library | Version |
 |---|---|---|
-| Language | Rust stable | ≥ 1.78 |
+| Language | Rust stable | â‰Ą 1.78 |
 | Scripting | LuaJIT via mlua | 0.9 |
 | Rendering | wgpu | 22 |
 | Windowing + input | winit | 0.30 |
@@ -240,7 +240,7 @@ Lurek2D is **MIT-licensed**. All first-party code, docs, demos, examples, and to
 | Artifact | License |
 |---|---|
 | Engine (`src/`) | MIT |
-| Lua libraries (`content/library/`) | MIT |
+| Lua libraries (`library/`) | MIT |
 | Demos and examples (`content/demos/`, `content/examples/`) | MIT |
 | VS Code extension (`extensions/vscode/`) | MIT |
 | Tools and docs (`tools/`, `docs/`) | MIT |
@@ -300,12 +300,13 @@ All direct Cargo dependencies are permissive (MIT, Apache-2.0, Zlib, or Unlicens
 
 Lurek2D's visual identity tells a story:
 
-- **🌙 Moon** — Lua means "moon" in Portuguese. The crescent represents the scripting layer.
-- **⚙️ Gear** — The Rust engine core. Industrial-strength, memory-safe.
-- **🟡 Pacman shape** — The gear eats game scripts and runs them.
-- **🧊 Cube** — The industry giants orbit Lurek2D, not the reverse.
+- **đźŚ™ Moon** â€” Lua means "moon" in Portuguese. The crescent represents the scripting layer.
+- **âš™ď¸Ź Gear** â€” The Rust engine core. Industrial-strength, memory-safe.
+- **đźźˇ Pacman shape** â€” The gear eats game scripts and runs them.
+- **đź§Š Cube** â€” The industry giants orbit Lurek2D, not the reverse.
 
 ---
 
-[Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [License](LICENSE)
+[Contributing](CONTRIBUTING.md) Â· [Security](SECURITY.md) Â· [License](LICENSE)
+
 

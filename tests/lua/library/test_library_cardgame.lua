@@ -2,7 +2,7 @@
 --- Covers: CardTypeDef, Card, Stack, Slot, CardPool, StackManager,
 ---         DeckBuilder, StackHistory, CardGroup, and the module registry.
 
-package.path = "./content/library/?/init.lua;" .. package.path
+package.path = "./library/?/init.lua;" .. package.path
 
 local cg = require("library.cardgame")
 

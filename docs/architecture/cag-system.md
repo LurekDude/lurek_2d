@@ -117,7 +117,7 @@ Every agent declares ≥ 1 persona in its frontmatter. The personas describe **w
 
 - **EngDev** — engine contributors writing Rust core code, refactoring modules, tuning the build.
 - **GameDev** — game authors using the `lurek.*` Lua API in `content/games/` and `content/demos/`.
-- **Modder** — third-party Lua authors building reusable libraries under `content/library/` or plugins under `content/plugins/`.
+- **Modder** — third-party Lua authors building reusable libraries under `library/` or plugins under `content/plugins/`.
 - **Player** — end users running shipped games; cares about stability, UX, accessibility, install size.
 - **GameTest** — QA writing Lua tests in `tests/lua/` and validating game-level behaviour.
 - **EngTest** — engine-test engineers writing Rust unit/integration/fuzz tests, performance benches, and security checks.
@@ -298,7 +298,7 @@ Any "yes" without remediation is a session-level blocker. The sweep records its 
 - **Prompt** — A user-invocable task playbook under `.github/prompts/`, typically launched via `/<name>`.
 - **System prompt** — `.github/copilot-instructions.md`; the only CAG file always in context.
 - **Persona** — One of six target user profiles served by the engine and CAG layer (EngDev, GameDev, Modder, Player, GameTest, EngTest).
-- **Plugin** — A Lurek2D Rust crate (or Cargo feature) that provides an optional engine subsystem with a `lurek.<namespace>` Lua surface. Tiered as CORE-KEEP / TIER-1-PLUGIN / TIER-2-PLUGIN / THIRD-PARTY-PLUGIN per `docs/architecture/plugins.md`. Pure-Lua libraries under `content/library/` are NOT plugins in this sense.
+- **Plugin** — A Lurek2D Rust crate (or Cargo feature) that provides an optional engine subsystem with a `lurek.<namespace>` Lua surface. Tiered as CORE-KEEP / TIER-1-PLUGIN / TIER-2-PLUGIN / THIRD-PARTY-PLUGIN per `docs/architecture/plugins.md`. Pure-Lua libraries under `library/` are NOT plugins in this sense.
 - **Handover** — A structured packet (bullets in a routing-table row) passed between agents at a routing boundary.
 - **Handbook** — Contributor and game-author onboarding manual at `docs/handbook.md`. Pair with `docs/architecture/README.md` for navigation; pair with `docs/specs/` for module-level reference.
 - **Routing** — The decision an agent makes to delegate the next step to another agent via its `routes_to` field.

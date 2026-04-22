@@ -1,7 +1,7 @@
-# Lurek2D — Lua BDD Tests
+﻿# Lurek2D â€” Lua BDD Tests
 
 Lua tests exercise the `lurek.*` API surface through a Behaviour-Driven Development framework.
-They run headless inside a minimal Lua VM — no GPU, audio, or window is required.
+They run headless inside a minimal Lua VM â€” no GPU, audio, or window is required.
 
 ## Quick Run
 
@@ -20,11 +20,11 @@ cargo test lua_test_<module> -- --nocapture
 
 | Directory | Purpose |
 |---|---|
-| `harness.rs` | Rust dispatcher — one `#[test]` entry per `.lua` file |
-| `init.lua` | BDD framework — `describe`, `it`, `expect_*`, `test_summary` |
+| `harness.rs` | Rust dispatcher â€” one `#[test]` entry per `.lua` file |
+| `init.lua` | BDD framework â€” `describe`, `it`, `expect_*`, `test_summary` |
 | `unit/` | Per-module tests for a single `lurek.*` namespace |
 | `integration/` | Tests that span multiple `lurek.*` modules |
-| `content/library/` | Tests for `content/library/` Lunasome modules |
+| `library/` | Tests for `library/` Lunasome modules |
 | `stress/` | Performance and capacity tests |
 | `security/` | Lua sandbox and input validation tests |
 | `golden/` | Deterministic output comparison tests |
@@ -46,7 +46,7 @@ describe("module.subfeature", function()
     end)
 end)
 
-test_summary()  -- REQUIRED — must be the last line in every test file
+test_summary()  -- REQUIRED â€” must be the last line in every test file
 ```
 
 ### Assertion Functions
@@ -67,7 +67,7 @@ test_summary()  -- REQUIRED — must be the last line in every test file
 
 ### `test_summary()`
 
-**Mandatory** — must be the last statement in every test file. Prints total/pass/fail counts.
+**Mandatory** â€” must be the last statement in every test file. Prints total/pass/fail counts.
 If any test failed, the Rust harness marks the test as failed.
 
 ## Adding a New Test
@@ -110,16 +110,16 @@ fn lua_test_<module>() {
 
 ## Test Naming Conventions
 
-- File: `test_<module>.lua` — matches the `lurek.<module>` namespace
+- File: `test_<module>.lua` â€” matches the `lurek.<module>` namespace
 - `describe` block: `"<module>.<subfeature>"` or `"<module> <behaviour>"`
-- `it` block: starts with a verb — `"creates"`, `"returns"`, `"raises an error when"`, `"does not"`, ...
+- `it` block: starts with a verb â€” `"creates"`, `"returns"`, `"raises an error when"`, `"does not"`, ...
 
-## Library Tests (`content/library/`)
+## Library Tests (`library/`)
 
-Tests for `content/library/` Lunasome modules live in `tests/lua/content/library/`:
+Tests for `library/` Lunasome modules live in `tests/lua/library/`:
 
 ```
-tests/lua/content/library/test_library_<name>.lua
+tests/lua/library/test_library_<name>.lua
 ```
 
 These use the same BDD framework and are registered in `harness.rs` as:
@@ -127,6 +127,7 @@ These use the same BDD framework and are registered in `harness.rs` as:
 ```rust
 #[test]
 fn lua_test_library_<name>() {
-    run_lua_test("content/library/test_library_<name>.lua");
+    run_lua_test("library/test_library_<name>.lua");
 }
 ```
+

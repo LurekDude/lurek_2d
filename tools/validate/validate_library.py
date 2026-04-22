@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(".").resolve()
-LIBRARY_DIR = ROOT / "content" / "library"
+LIBRARY_DIR = ROOT / "library"
 TESTS_DIR = ROOT / "tests" / "lua" / "library"
 
 
@@ -72,12 +72,12 @@ def validate_one(lib_dir: Path, strict: bool = False) -> list[dict]:
                 "message": "init.lua does not end with a return statement",
             })
 
-        # Check has LDoc tags
-        has_ldoc = bool(re.search(r"^---\s*@", text, re.MULTILINE))
+        # Check has LDoc tags  (accept both `-- @` and `--- @` styles; gen_lib_docs.py parses both)
+        has_ldoc = bool(re.search(r"^--+\s*@", text, re.MULTILINE))
         if not has_ldoc:
             findings.append({
                 "level": "ERROR" if strict else "WARN", "library": name,
-                "message": "init.lua has no LDoc-style annotations (--- @...)",
+                "message": "init.lua has no LDoc-style annotations (-- @... or --- @...)",
             })
 
         # Check no raw global writes

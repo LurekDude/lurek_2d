@@ -192,7 +192,7 @@ def show_agent_hints(summary: "ptl.ParseSummary") -> None:
         elif kind == "require_missing":
             print(f"\n  [{clr(RED, f'{len(tests):d}×')}] require missing: '{clr(YELLOW, name)}'")
             print(f"       Affects: {clr(DIM, tests_str)}")
-            print(f"       Fix: check content/library/{name.replace('.','/')} or use correct path")
+            print(f"       Fix: check library/{name.replace('.','/')} or use correct path")
 
 
 def main() -> int:

@@ -46,6 +46,11 @@ impl WebSocketManager {
         }
     }
 
+    /// Returns `true` if there are no active WebSocket connections.
+    pub fn is_empty(&self) -> bool {
+        self.connections.is_empty()
+    }
+
     /// Open a new WebSocket connection.
     ///
     /// Sends a `WsEvent::Open` on success or `WsEvent::Error` on failure.

@@ -21,7 +21,7 @@ export async function browseApi(): Promise<void> {
   const apiPath = resolveWorkspaceApiDocPath(root);
   if (!apiPath || !fs.existsSync(apiPath)) {
     vscode.window.showWarningMessage(
-      "API reference not found. Expected docs/lurek.lua or docs/lua-api.md."
+      "API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md."
     );
     return;
   }
@@ -70,7 +70,7 @@ export async function openApiDocs(): Promise<void> {
   const apiPath = resolveWorkspaceApiDocPath(root);
   if (!apiPath || !fs.existsSync(apiPath)) {
     vscode.window.showWarningMessage(
-      "API reference not found. Expected docs/lurek.lua or docs/lua-api.md."
+      "API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md."
     );
     return;
   }

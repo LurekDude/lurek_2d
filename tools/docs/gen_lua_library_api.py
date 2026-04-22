@@ -701,8 +701,8 @@ def main():
         description='Generate API reference docs from Lurek2D Lua library files.'
     )
     parser.add_argument(
-        '--output', default='docs/reports/lua_library_api_reference.md',
-        help='Output Markdown file path (default: docs/reports/lua_library_api_reference.md)'
+        '--output', default='logs/reports/lua_library_api_reference.md',
+        help='Output Markdown file path (default: logs/reports/lua_library_api_reference.md)'
     )
     parser.add_argument(
         '--library-dir', default='library',

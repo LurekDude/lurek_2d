@@ -58,7 +58,7 @@ ROOT = Path(__file__).resolve().parents[2]
 API_JSON = ROOT / "logs" / "lua_api_data.json"
 LUA_UNIT_TESTS = ROOT / "tests" / "lua" / "unit"
 OUTPUT_JSON = ROOT / "logs" / "unit_test_coverage.json"
-OUTPUT_MD = ROOT / "docs" / "quality" / "unit_test_coverage.md"
+OUTPUT_MD = ROOT / "logs" / "reports" / "unit_test_coverage.md"
 
 # ── Data types ─────────────────────────────────────────────────────────────────
 
@@ -701,6 +701,8 @@ def main() -> int:
         print(format_summary(data, strict=args.strict))
 
     if args.save:
+        OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+        OUTPUT_MD.parent.mkdir(parents=True, exist_ok=True)
         OUTPUT_JSON.write_text(json.dumps(data, indent=2), encoding="utf-8")
         md = format_markdown(data, strict=args.strict)
         OUTPUT_MD.write_text(md, encoding="utf-8")

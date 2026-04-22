@@ -4557,3 +4557,32 @@ describe("custom steering behavior", function()
     end)
 end)
 
+
+-- =========================================================================
+-- Lua extensibility: Agent:setCustomModel
+-- =========================================================================
+
+-- @description Verifies that Agent:setCustomModel installs a Lua callback as the
+--   decision model and that getDecisionModel returns "custom" afterwards.
+describe("Agent:setCustomModel extensibility hook", function()
+    -- @tests Agent:setCustomModel
+    -- @tests Agent:getDecisionModel
+    it("setCustomModel marks agent with custom model", function()
+        local world = lurek.ai.newWorld()
+        local agent = world:addAgent("test_agent")
+        agent:setCustomModel(function(ag, bb, dt) end)
+        assert.equal("custom", agent:getDecisionModel(),
+            "getDecisionModel should return 'custom' after setCustomModel")
+    end)
+
+    it("setCustomModel callback is invoked via world:update without error", function()
+        local world = lurek.ai.newWorld()
+        local agent = world:addAgent("cb_agent")
+        local called = false
+        agent:setCustomModel(function(ag, bb, dt)
+            called = true
+        end)
+        world:update(0.016)
+        assert.is_true(called, "custom model callback should be called by world:update")
+    end)
+end)

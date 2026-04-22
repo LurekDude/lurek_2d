@@ -2,12 +2,12 @@
 """
 gen_luadoc.py — Generate LuaCATS type-annotation stubs for the Lurek2D VS Code extension.
 
-Reads logs/lua_api_data.json and emits docs/lurek.lua — a LuaCATS
+Reads logs/lua_api_data.json and emits docs/api/lurek.lua — a LuaCATS
 stub file that gives the VS Code Lua language server full type information
 for the lurek.* API. Consumed by the vscode-extension IntelliSense provider.
 
 Usage:
-    python tools/docs/gen_luadoc.py                 # -> docs/lurek.lua
+    python tools/docs/gen_luadoc.py                 # -> docs/api/lurek.lua
 """
 import json
 import os
@@ -15,7 +15,7 @@ import re
 
 WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 INPUT_FILE = os.path.join(WORKSPACE_ROOT, "logs", "lua_api_data.json")
-OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "lurek.lua")
+OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "api", "lurek.lua")
 
 def guess_type(text, is_return=False):
     t = text.lower()
@@ -259,6 +259,7 @@ def main():
                 name = f"lurek.{lua_ns}.{func['name']}"
             write_function_doc(out, func, name)
 
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(out))
 

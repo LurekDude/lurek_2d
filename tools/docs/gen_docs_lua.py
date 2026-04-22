@@ -6,7 +6,7 @@ Each function/method is rendered in a Lua code block:
     name( param : type, optional : type? ) -> ReturnType  -- description
 
 Usage:
-    python tools/gen_docs_lua.py                   # -> docs/lua-api.md
+    python tools/gen_docs_lua.py                   # -> docs/api/lurek.md
     python tools/gen_docs_lua.py --output FILE
     python tools/gen_docs_lua.py --check           # coverage check only
 """
@@ -15,7 +15,7 @@ from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 INPUT_FILE  = WORKSPACE_ROOT / "logs" / "lua_api_data.json"
-OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "lua-api.md"
+OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "api" / "lurek.md"
 
 _MODULE_ORDER = [
     "render","graphics_ext","window","input","timer","math","math_ext",

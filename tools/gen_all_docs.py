@@ -2,17 +2,20 @@
 """Convenience runner: regenerate the full Lurek2D documentation pipeline in one command.
 
 Steps:
-    1. gen_rust_api_data.py     -> logs/rust_api_data.json    (Rust master JSON)
-    2. gen_lua_api_data.py      -> logs/lua_api_data.json     (Lua master JSON)
-    3. gen_luadoc.py            -> docs/lurek.lua              (LuaCATS stubs)
-    4. gen_docs_lua.py          -> docs/lua-api.md            (compact Lua API reference)
-    5. gen_docs_rust.py         -> docs/reports/rust-api.md           (compact Rust API reference)
-    6. gen_wiki_api.py          -> docs/wiki/API-Reference.md          (game-developer cheatsheet)
-    7. doc_coverage.py          -> logs/doc_coverage.json    (docstring coverage analytics)
-    8. test_coverage.py         -> logs/test_coverage.json   (test coverage analytics)
-    9. gen_test_docs.py --mode rust  -> docs/reports/test_docs_rust.md
-   10. gen_test_docs.py --mode lua   -> docs/reports/test_docs_lua.md
-   11. gen_coverage_gaps.py     -> docs/reports/coverage_gaps.md      (API gap report)
+    1.  gen_rust_api_data.py         -> logs/rust_api_data.json           (Rust master JSON)
+    2.  gen_lua_api_data.py          -> logs/lua_api_data.json            (Lua master JSON)
+    3.  gen_luadoc.py                -> docs/api/lurek.lua                (LuaCATS stubs)
+    4.  gen_docs_lua.py              -> docs/api/lurek.md                 (Lua API reference)
+    5.  gen_docs_rust.py             -> docs/api/rust.md                  (Rust API reference)
+    6.  gen_wiki_api.py              -> docs/wiki/API-Reference.md        (game-dev cheatsheet)
+    7.  doc_coverage.py              -> logs/doc_coverage.json            (docstring coverage JSON)
+    8.  test_coverage.py             -> logs/test_coverage.json           (test coverage JSON)
+    9.  gen_test_docs.py --mode rust -> logs/reports/test_docs_rust.md
+   10.  gen_test_docs.py --mode lua  -> logs/reports/test_docs_lua.md
+   11.  gen_coverage_gaps.py         -> logs/reports/coverage_gaps.md     (API gap report)
+   12.  example_coverage.py          -> logs/reports/example_coverage.md  (example coverage)
+   13.  test_coverage.py             -> logs/reports/test_coverage.md     (test coverage report)
+   14.  lua_api_test_coverage.py     -> logs/reports/lua_test_coverage.md (Lua test coverage)
 
 Usage:
     python tools/gen_all_docs.py          # run all steps
@@ -31,9 +34,9 @@ if hasattr(sys.stdout, "reconfigure"):
 SCRIPTS = [
     ("docs/gen_rust_api_data.py", "Rust JSON (logs/rust_api_data.json)"),
     ("docs/gen_lua_api_data.py",  "Lua JSON (logs/lua_api_data.json)"),
-    ("docs/gen_luadoc.py",        "LuaCATS Stubs (docs/lurek.lua)"),
-    ("docs/gen_docs_lua.py",      "Lua API reference (docs/lua-api.md)"),
-    ("docs/gen_docs_rust.py",     "Rust API reference (docs/reports/rust-api.md)"),
+    ("docs/gen_luadoc.py",        "LuaCATS Stubs (docs/api/lurek.lua)"),
+    ("docs/gen_docs_lua.py",      "Lua API reference (docs/api/lurek.md)"),
+    ("docs/gen_docs_rust.py",     "Rust API reference (docs/api/rust.md)"),
     ("docs/gen_wiki_api.py",      "Wiki cheatsheet (docs/wiki/API-Reference.md)"),
     ("audit/doc_coverage.py",      "Doc coverage analytics (logs/doc_coverage.json)"),
     ("audit/test_coverage.py",     "Test coverage analytics (logs/test_coverage.json)"),
@@ -41,14 +44,18 @@ SCRIPTS = [
 
 # Scripts that need extra arguments (script_name, args_list, label)
 SCRIPTS_WITH_ARGS = [
-    ("docs/gen_test_docs.py", ["--mode", "rust", "--output", "docs/reports/test_docs_rust.md"],
-     "Rust test docs (docs/reports/test_docs_rust.md)"),
-    ("docs/gen_test_docs.py", ["--mode", "lua",  "--output", "docs/reports/test_docs_lua.md"],
-     "Lua test docs (docs/reports/test_docs_lua.md)"),
-    ("audit/example_coverage.py", ["--markdown", "docs/reports/example_coverage.md"],
-     "Example coverage (docs/reports/example_coverage.md)"),
+    ("docs/gen_test_docs.py", ["--mode", "rust", "--output", "logs/reports/test_docs_rust.md"],
+     "Rust test docs (logs/reports/test_docs_rust.md)"),
+    ("docs/gen_test_docs.py", ["--mode", "lua",  "--output", "logs/reports/test_docs_lua.md"],
+     "Lua test docs (logs/reports/test_docs_lua.md)"),
+    ("audit/example_coverage.py", ["--markdown", "logs/reports/example_coverage.md"],
+     "Example coverage (logs/reports/example_coverage.md)"),
     ("audit/gen_coverage_gaps.py", [],
-     "Coverage gaps (docs/reports/coverage_gaps.md)"),
+     "Coverage gaps (logs/reports/coverage_gaps.md)"),
+    ("audit/test_coverage.py", ["--output", "logs/reports/test_coverage.md"],
+     "Test coverage report (logs/reports/test_coverage.md)"),
+    ("audit/lua_api_test_coverage.py", ["--report", "--output", "logs/reports/lua_test_coverage.md"],
+     "Lua API test coverage (logs/reports/lua_test_coverage.md)"),
 ]
 
 

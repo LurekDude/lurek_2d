@@ -3,7 +3,7 @@
 gen_engine_docs.py — Generate per-module documentation for Lurek2D Rust engine source.
 
 Reads all src/**/*.rs EXCEPT src/lua_api/ and produces one Markdown file per
-top-level module (e.g. src/timer/*.rs → docs/reports/engine/timer.md).
+top-level module (e.g. src/timer/*.rs → logs/reports/engine/timer.md).
 
 Parses standard Rust docstring conventions as used in this codebase:
 
@@ -24,11 +24,11 @@ Parses standard Rust docstring conventions as used in this codebase:
 
     pub struct / pub enum / pub fn / pub trait / pub type
 
-Output goes to docs/reports/engine/<module>.md.
+Output goes to logs/reports/engine/<module>.md.
 Intended audience: Lurek2D engine contributors (Rust developers).
 
 Usage:
-    python tools/gen_engine_docs.py                     # all modules → docs/reports/engine/
+    python tools/gen_engine_docs.py                     # all modules → logs/reports/engine/
     python tools/gen_engine_docs.py --module timer      # single module
     python tools/gen_engine_docs.py --src DIR           # custom source root (default: src/)
     python tools/gen_engine_docs.py --output DIR        # custom output dir
@@ -56,7 +56,7 @@ from typing import Dict, List, Optional, Tuple
 
 _ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_SRC = _ROOT / "src"
-DEFAULT_OUT = _ROOT / "docs" / "reports" / "engine"
+DEFAULT_OUT = _ROOT / "logs" / "reports" / "engine"
 EXCLUDE_DIR = "lua_api"
 
 # ---------------------------------------------------------------------------
@@ -529,7 +529,7 @@ def main(argv=None) -> int:
     )
     ap.add_argument(
         "--output", "-o", type=Path, default=DEFAULT_OUT,
-        help="Output directory (default: docs/reports/engine/)",
+        help="Output directory (default: logs/reports/engine/)",
     )
     ap.add_argument("--module", "-m", help="Process only this module (e.g. timer)")
     ap.add_argument("--dry-run", action="store_true", help="Print to stdout, write no files")

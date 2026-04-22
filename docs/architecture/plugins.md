@@ -38,11 +38,11 @@
 
 ### Non-goals
 
-- **Hot-reload of native plugins** at runtime. Out of scope for v1; live-reload is reserved for pure-Lua content under `content/library/` and `content/plugins/`.
+- **Hot-reload of native plugins** at runtime. Out of scope for v1; live-reload is reserved for pure-Lua content under `library/` and `content/plugins/`.
 - **Arbitrary FFI sandboxing**. Plugins run with the same trust as the core engine. Users install plugins the same way they install the engine.
 - **Mobile / WASM plugins**. Constraint **A-02** keeps the project desktop-only; plugin targets follow.
 - **A package manager / marketplace**. Plugins are distributed as archives or source crates; discovery happens via documentation, not a registry.
-- **Replacing existing pure-Lua extensibility**. Lunasome libraries under [content/library/](../../content/library/) remain the recommended path for game-side reuse.
+- **Replacing existing pure-Lua extensibility**. Lunasome libraries under [library/](../../library/) remain the recommended path for game-side reuse.
 
 ---
 
@@ -82,12 +82,12 @@ A **Lurek2D plugin** is a Rust crate that:
 
 Plugins are **NOT**:
 
-- Pure-Lua libraries — those live in [content/library/](../../content/library/) and follow the [library-authoring](../../.github/skills/library-authoring/SKILL.md) skill.
+- Pure-Lua libraries — those live in [library/](../../library/) and follow the [library-authoring](../../.github/skills/library-authoring/SKILL.md) skill.
 - Game scripts under `content/games/` — those use `lurek.*` and Lunasome.
 - Pure asset bundles — those mount via `GameFS` or archive mounting.
 - Mods loaded through the `mods` module — those are sandboxed Lua at runtime.
 
-Each plugin owns one or more `lurek.<namespace>` tables and has its own slice of [docs/specs/](../specs/) and [docs/reports/](../reports/). When the candidate list (§5) becomes plugins, their existing specs and API references move with them.
+Each plugin owns one or more `lurek.<namespace>` tables and has its own slice of [docs/specs/](../specs/) and [logs/reports/](../../logs/reports/). When the candidate list (§5) becomes plugins, their existing specs and API references move with them.
 
 A plugin exposes the same registration shape required by **C-02**:
 
@@ -196,7 +196,7 @@ Each plugin builds as a `cdylib` exposing a documented C ABI entry point. The en
 
 ### Option C — Lua-first plugins (already available)
 
-Many "plugin" candidates can be implemented in pure Lua against existing `lurek.*` APIs. The Lunasome library under [content/library/](../../content/library/) and the [library-authoring](../../.github/skills/library-authoring/SKILL.md) skill define this path.
+Many "plugin" candidates can be implemented in pure Lua against existing `lurek.*` APIs. The Lunasome library under [library/](../../library/) and the [library-authoring](../../.github/skills/library-authoring/SKILL.md) skill define this path.
 
 - **Pros**: zero engine changes; immediate; hot-reloadable; no ABI surface.
 - **Cons**: cannot expose new GPU / OS / native-FFI capabilities; performance ceiling is LuaJIT.

@@ -13,7 +13,7 @@ Usage:
     python tools/audit_module.py --tier 2          # all Tier 2 modules
     python tools/audit_module.py --all             # every src/ module
     python tools/audit_module.py --json            # JSON output
-    python tools/audit_module.py --all --docs-quality  # write docs/quality/<module>.md
+    python tools/audit_module.py --all --docs-quality  # write logs/reports/module-quality/<module>.md
     python tools/audit_module.py --help
 
 Exit codes:
@@ -1328,7 +1328,7 @@ def audit_module(module: str) -> Tuple[str, List[Check], str]:
 
 
 def format_quality_report(module: str, checks: List[Check], result: str, date: str) -> str:
-    """Generate a Markdown quality report for docs/quality/<module>.md."""
+    """Generate a Markdown quality report for logs/reports/module-quality/<module>.md."""
     errors = [c for c in checks if c.verdict == ERROR]
     warnings = [c for c in checks if c.verdict == WARN]
     passes = [c for c in checks if c.verdict == PASS]
@@ -1440,7 +1440,7 @@ def main() -> int:
     parser.add_argument("--output", metavar="FILE",
                         help="Save report to file")
     parser.add_argument("--docs-quality", action="store_true",
-                        help="Write per-module Markdown reports to docs/quality/<module>.md")
+                        help="Write per-module Markdown reports to logs/reports/module-quality/<module>.md")
     args = parser.parse_args()
 
     modules = resolve_modules(args)
@@ -1481,7 +1481,7 @@ def main() -> int:
     if len(modules) > 1 and not args.json:
         passed = sum(1 for r in results if r["result"] == "PASS")
         failed = len(results) - passed
-        print(f"\n{passed}/{len(results)} passed — {failed} failed — reports in docs/quality/",
+        print(f"\n{passed}/{len(results)} passed — {failed} failed — reports in logs/reports/module-quality/",
               flush=True)
 
     if args.json:

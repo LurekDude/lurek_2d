@@ -1,4 +1,4 @@
-# Contributing to Lurek2D
+﻿# Contributing to Lurek2D
 
 Lurek2D is a desktop-only 2D engine written in Rust that runs Lua game scripts. Read [docs/architecture/philosophy.md](docs/architecture/philosophy.md) and [docs/architecture/engine-architecture.md](docs/architecture/engine-architecture.md) before making structural changes.
 
@@ -6,22 +6,22 @@ Lurek2D is a desktop-only 2D engine written in Rust that runs Lua game scripts. 
 
 ## Setup
 
-**Prerequisites**: Rust stable ≥ 1.78, Cargo, Python 3.10+ (for tooling scripts).
+**Prerequisites**: Rust stable â‰Ą 1.78, Cargo, Python 3.10+ (for tooling scripts).
 
 ```bash
 git clone https://github.com/LurekDude/luna_2d.git
 cd lurek2d
-cargo build                              # debug build → build/debug/lurek2d
+cargo build                              # debug build â†’ build/debug/lurek2d
 cargo run -- content/demos/hello_world  # verify it works
 ```
 
 Release build:
 
 ```bash
-cargo build --release                   # → build/release/lurek2d (~10 MB)
+cargo build --release                   # â†’ build/release/lurek2d (~10 MB)
 ```
 
-The build output directory is `build/` (not `target/`) — configured via `.cargo/config.toml`.
+The build output directory is `build/` (not `target/`) â€” configured via `.cargo/config.toml`.
 
 ---
 
@@ -38,7 +38,7 @@ cargo test
 During development, prefer scoped commands to avoid saturating CPU:
 
 ```bash
-cargo check                             # type-check only (~2–5 s incremental)
+cargo check                             # type-check only (~2â€“5 s incremental)
 cargo test --test <module>_tests        # one Rust test suite
 cargo test lua_test_<module>            # one Lua test suite
 cargo clippy --lib                      # lint library only
@@ -48,19 +48,19 @@ cargo clippy --lib                      # lint library only
 
 ## Contributing to Different Areas
 
-### Engine (Rust source — `src/`)
+### Engine (Rust source â€” `src/`)
 
-- Read `src/<module>/AGENT.md` before touching a module — it lists invariants and patterns.
+- Read `src/<module>/AGENT.md` before touching a module â€” it lists invariants and patterns.
 - No `unsafe` without a `// SAFETY:` comment explaining the invariant.
-- Per-frame code must not heap-allocate — grow buffers at startup.
+- Per-frame code must not heap-allocate â€” grow buffers at startup.
 - Add `///` doc-comments to every new `pub` item. Verify: `python tools/docs/collect_docs.py --report-missing` must exit 0.
-- Use `log::info!` / `log::debug!` / `log::warn!` / `log::error!` — never `println!`.
-- No `.unwrap()` or `.expect()` in production paths — use `?` or return a `LuaError`.
+- Use `log::info!` / `log::debug!` / `log::warn!` / `log::error!` â€” never `println!`.
+- No `.unwrap()` or `.expect()` in production paths â€” use `?` or return a `LuaError`.
 - Regenerate API docs after any `lurek.*` binding change: `python tools/gen_all_docs.py --skip-legacy`.
 
 ### Tests (`tests/`)
 
-Lurek2D has two test layers — both run **headless** (no window, GPU, or audio device needed):
+Lurek2D has two test layers â€” both run **headless** (no window, GPU, or audio device needed):
 
 **Rust tests** (`tests/rust/`):
 
@@ -68,8 +68,8 @@ Lurek2D has two test layers — both run **headless** (no window, GPU, or audio 
 cargo test --test <module>_tests -- --nocapture
 ```
 
-- Name tests `<subject>_<scenario>_<expected>` — no `test_` prefix.
-- Float comparisons: `assert!((val - expected).abs() < 1e-5)` — never `assert_eq!` on floats.
+- Name tests `<subject>_<scenario>_<expected>` â€” no `test_` prefix.
+- Float comparisons: `assert!((val - expected).abs() < 1e-5)` â€” never `assert_eq!` on floats.
 - Bug fixes require a regression test first.
 
 **Lua BDD tests** (`tests/lua/`):
@@ -80,44 +80,44 @@ cargo test lua_test_<category>_<name> -- --nocapture
 
 - Use `describe` / `it` / `expect_equal` / `expect_error` from `tests/lua/init.lua`.
 - Every file must end with `test_summary()`.
-- New `.lua` test file → add a matching `#[test] fn lua_test_<category>_<name>()` in `tests/lua/harness.rs`.
+- New `.lua` test file â†’ add a matching `#[test] fn lua_test_<category>_<name>()` in `tests/lua/harness.rs`.
 - Lua tests must not call GPU, audio, or window APIs.
 - New `lurek.*` functions need at least one Lua test before merge.
 
 ### Demos (`content/demos/`)
 
-Demos are playable showcases, organized by genre (`action/`, `arcade/`, `rpg/`, `strategy/`, …).
+Demos are playable showcases, organized by genre (`action/`, `arcade/`, `rpg/`, `strategy/`, â€¦).
 
 - Each demo needs: `main.lua`, `conf.lua` (optional), `README.md`, `screen.png`.
 - Every demo must have a matching test in `tests/lua/content/demos/test_demo_<name>.lua`.
 - Register new demos in `content/demos/README.md`.
 - Demos must run with `cargo run -- content/demos/<name>` and exit cleanly.
-- Use `content/library/` modules and `lurek.*` API — no engine Rust internals.
+- Use `library/` modules and `lurek.*` API â€” no engine Rust internals.
 
 ### API Examples (`content/examples/`)
 
-Examples are single-file documentation scripts — one per `lurek.*` module.
+Examples are single-file documentation scripts â€” one per `lurek.*` module.
 
 - One script, one module, one concept. Keep it under ~80 lines where possible.
 - No external assets unless strictly necessary.
 - Must be runnable: `cargo run -- content/examples/<module>.lua`.
 - Add a line to `content/examples/README.md` describing what it demonstrates.
 
-### Lua Libraries (`content/library/`)
+### Lua Libraries (`library/`)
 
 Libraries are pure-Lua game-mechanics modules with no Rust internals.
 
-- May only call `lurek.*` public API — never `require` engine internals.
+- May only call `lurek.*` public API â€” never `require` engine internals.
 - Each library lives in its own subfolder with `init.lua` and a `README.md`.
-- Add tests under `tests/lua/content/library/test_<name>.lua`.
-- Keep libraries self-contained — minimal cross-library dependencies.
+- Add tests under `tests/lua/library/test_<name>.lua`.
+- Keep libraries self-contained â€” minimal cross-library dependencies.
 
 ### VS Code Extension (`extensions/vscode/`)
 
 See [`extensions/vscode/README.md`](extensions/vscode/README.md) and [docs/architecture/vscode-architecture.md](docs/architecture/vscode-architecture.md).
 
 - TypeScript source is in `extensions/vscode/src/`.
-- The extension reads API data from `docs/` — regenerate with `python tools/gen_all_docs.py` after engine API changes.
+- The extension reads API data from `docs/` â€” regenerate with `python tools/gen_all_docs.py` after engine API changes.
 - Test the extension with `F5` launch in VS Code (Extension Development Host).
 - Keep MCP server endpoints in sync with engine API additions.
 
@@ -142,8 +142,9 @@ The `.github/` directory contains agents, skills, prompts, and the system prompt
 
 ## Pull Requests
 
-- Keep changes focused — one logical change per PR.
+- Keep changes focused â€” one logical change per PR.
 - Describe user-visible behavior, test coverage, and scope limits in the PR description.
-- Stage only files directly changed by the task — never `git add .`.
+- Stage only files directly changed by the task â€” never `git add .`.
 - Commit format: `type(scope): description` (types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`).
-- Security issues: follow [SECURITY.md](SECURITY.md) — do not post exploit details publicly.
+- Security issues: follow [SECURITY.md](SECURITY.md) â€” do not post exploit details publicly.
+

@@ -1,4 +1,4 @@
-# tools/validate — Schema & Structure Validators
+﻿# tools/validate â€” Schema & Structure Validators
 
 Scripts that **check** files conform to required schemas, contracts, or
 structural rules. Each script exits 1 on failure and prints a report.
@@ -8,12 +8,12 @@ structural rules. Each script exits 1 on failure and prints a report.
 | Script | Purpose | Key args |
 |---|---|---|
 | `cag_validate.py` | Validate all `.github/` CAG files (system prompt, agents, skills, prompts) against the templates in `work/cag-system-overhaul-20260418/reports/standards/`. Implements rules `E001-E004/W005`, `E101-E107/W108`, `E201-E205/W206`, `E301-E305/W306`. | `--type system_prompt\|agent\|skill\|prompt`, `--file <path>`, `--baseline`, `--write-baseline`, `--report <path>`, `--format text\|json` |
-| `check_callbacks.py` | Verify `gen_docs_lua._callbacks()` output has no embedded newlines | — |
+| `check_callbacks.py` | Verify `gen_docs_lua._callbacks()` output has no embedded newlines | â€” |
 | `validate_game.py` | Validate a game/demo directory structure | `--all-examples`, `--all-demos` |
 | `validate_lua_api.py` | Validate `src/lua_api/*_api.rs` against SKILL.md contract | file path or dir |
-| `validate_module_coverage.py` | Verify every `src/` module has a matching `docs/specs/*.md` | — |
+| `validate_module_coverage.py` | Verify every `src/` module has a matching `docs/specs/*.md` | â€” |
 | `validate_changelog.py` | Validate `docs/CHANGELOG.md` structure: version ordering, duplicates, dates | `--strict`, `--format text\|json` |
-| `validate_library.py` | Validate `content/library/` entries: required files, LDoc tags, return tables | `--library NAME`, `--strict`, `--format text\|json` |
+| `validate_library.py` | Validate `library/` entries: required files, LDoc tags, return tables | `--library NAME`, `--strict`, `--format text\|json` |
 
 The shared module `_cag_common.py` (frontmatter parser, link extractor, file
 discovery) is re-used by the audit-side tools `tools/audit/cag_link_check.py`,
@@ -29,7 +29,7 @@ supports a baseline workflow:
 # template changes):
 python tools/validate/cag_validate.py --write-baseline
 
-# Run in baseline mode — exits 0 unless new violations appear vs baseline:
+# Run in baseline mode â€” exits 0 unless new violations appear vs baseline:
 python tools/validate/cag_validate.py --baseline
 ```
 
@@ -66,3 +66,4 @@ python tools/validate/validate_changelog.py --strict
 python tools/validate/validate_library.py
 python tools/validate/validate_library.py --library camera_utils --strict
 ```
+

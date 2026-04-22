@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(".").resolve()
 WIKI_DIR = ROOT / "docs" / "wiki"
 SRC_DIR = ROOT / "src"
-LIBRARY_DIR = ROOT / "content" / "library"
+LIBRARY_DIR = ROOT / "library"
 
 # Modules that are internal and don't need wiki pages
 INTERNAL_MODULES = {

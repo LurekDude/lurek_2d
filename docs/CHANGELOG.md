@@ -2,13 +2,26 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.6] - 2026-04-22
+
+### docs-layout-reorg — cleanup, path fixes, TST-01 compliance
+
+- **refactor(docs): delete docs/reports/, docs/lua-api.md, docs/lurek.lua** — These stale generated artefacts conflicted with the canonical `docs/api/lurek.md`, `docs/api/lurek.lua`, and `logs/reports/`. All architecture doc references updated to point at the correct locations (`logs/reports/`, `docs/api/lurek.md`).
+- **refactor(docs): fix spec files ai.md, compute.md, particle.md** — Removed duplicate `### * Methods (new)` subsections and `## Lua Extensibility Hooks` sections from the three spec files. New methods are already listed in their canonical `### * Methods` sections; no information was lost.
+- **fix(window): remove duplicate version in window title** — `Config::default()` now sets the window title to `"Lurek2D"` (or `"Lurek2D [DEBUG]"`) without an embedded version string. The splash helper appends the version separately, eliminating the `v0.5.0 v0.5.0` duplicate shown in some configurations.
+- **refactor(tools): repoint generator default output paths** — `tools/docs/gen_lua_library_api.py`, `tools/docs/gen_engine_docs.py`, and `tools/docs/gen_lua_dev_docs.py` now default to `logs/reports/` subtrees instead of `docs/reports/`. `tools/gen_all_docs.py` pipeline extended with `test_coverage.md` and `lua_test_coverage.md` steps.
+- **fix(rust): compile errors — WebSocketManager, state_machine, runtime_tests** — Added `WebSocketManager::is_empty()` (`src/network/websocket.rs`); made `compare_nums` and `parse_condition` `pub` in `src/animation/state_machine.rs` for integration test visibility; updated `tests/rust/unit/runtime_tests.rs` to use `c.modules.render` (renamed from `c.modules.graphics`).
+- **test(lua): TST-01 coverage for particle and AI extensibility** — Added `Agent:setCustomModel` describe blocks to `tests/lua/unit/test_ai_unit.lua`; added `ParticleSystem:addSubSystem`, `setCustomEmissionShape`, `setOnDeathBatch`, and `lurek.particle.fromTOML` describe blocks to `tests/lua/unit/test_particle_unit.lua`.
+
 ## [0.20.5] - 2026-04-22
 
 ### CAG Sweep — session `lua-extensibility-review-20260422`
 
 - **chore(cag): fix E003 system prompt byte overflow** — Trimmed 19 bytes from the Sessions discovery directive in `.github/copilot-instructions.md` (8207 → 8188 bytes; cap 8192). `python tools/validate/cag_validate.py` now exits 0 with 0 errors / 0 warnings.
 
+### Phase 3 — docs-layout-reorg-20260422 output repointing
 
+- **refactor(docs): repoint canonical generated outputs to frozen docs/api and logs/reports paths** — Updated the doc generators and `tools/gen_all_docs.py` so canonical LuaCATS and API references now write to `docs/api/`, coverage and test reports write to `logs/reports/`, Lunasome aggregate docs write only to `docs/library/lunasome.md`, and the VS Code extension now prefers the new `docs/api/lurek.lua` and `docs/api/lurek.md` paths.
 
 ### Phase 10 — Example coverage stubs and UI bug fixes
 

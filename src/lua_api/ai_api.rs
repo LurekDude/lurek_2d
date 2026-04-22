@@ -166,7 +166,8 @@ impl LuaUserData for LuaAIWorld {
                 // Look up the Lua function (drops the borrow before calling).
                 let func_opt: Option<LuaFunction> = {
                     let cb = this.custom_callbacks.borrow();
-                    cb.get(callback_id).and_then(|key| lua.registry_value(key).ok())
+                    cb.get(callback_id)
+                        .and_then(|key| lua.registry_value(key).ok())
                 };
                 if let Some(func) = func_opt {
                     if let Err(e) = func.call::<_, ()>((lua_agent, lua_bb, dt)) {
@@ -370,8 +371,7 @@ impl LuaUserData for LuaAgent {
             let callback_id = this.callbacks.borrow_mut().register(key);
             let mut w = this.world.borrow_mut();
             if let Some(idx) = w.get_agent_index(&this.name) {
-                w.agents[idx].decision_model =
-                    crate::ai::DecisionModel::Custom { callback_id };
+                w.agents[idx].decision_model = crate::ai::DecisionModel::Custom { callback_id };
             }
             Ok(())
         });
@@ -1200,10 +1200,7 @@ impl LuaUserData for LuaSteeringManager {
                     sm.behaviors
                         .iter()
                         .filter_map(|b| {
-                            if let crate::ai::SteeringBehaviorType::Custom {
-                                callback_id,
-                                base,
-                            } = b
+                            if let crate::ai::SteeringBehaviorType::Custom { callback_id, base } = b
                             {
                                 if base.enabled {
                                     Some((*callback_id, base.weight))
@@ -1220,7 +1217,8 @@ impl LuaUserData for LuaSteeringManager {
                 for (callback_id, weight) in behaviors {
                     let func_opt: Option<LuaFunction> = {
                         let cb = this.custom_callbacks.borrow();
-                        cb.get(callback_id).and_then(|key| lua.registry_value(key).ok())
+                        cb.get(callback_id)
+                            .and_then(|key| lua.registry_value(key).ok())
                     };
                     if let Some(func) = func_opt {
                         match func.call::<_, (f32, f32)>((agent_ud.clone(), dt)) {
@@ -1540,8 +1538,7 @@ impl LuaUserData for LuaUtilityAI {
                         let callback_id = this.custom_callbacks.borrow_mut().register(curve_key);
                         let curve = ResponseCurve::Custom { callback_id };
                         let mut ua = this.inner.borrow_mut();
-                        if let Some(action) =
-                            ua.actions.iter_mut().find(|a| a.name == action_name)
+                        if let Some(action) = ua.actions.iter_mut().find(|a| a.name == action_name)
                         {
                             action.considerations.push(Consideration {
                                 name,
@@ -3512,25 +3509,27 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @return BTNode
     tbl.set(
         "newGuard",
-        lua.create_function(|lua, (predicate, child_ud): (LuaFunction, LuaAnyUserData)| {
-            let key = lua.create_registry_value(predicate)?;
-            let child = child_ud.borrow::<LuaBTNode>()?;
-            // Take ownership of the child node (leaves a placeholder Sequence behind),
-            // matching the same move-out pattern used by setChild/addChild.
-            let taken = std::mem::replace(
-                &mut *child.inner.borrow_mut(),
-                BTNode::Sequence {
-                    children: Vec::new(),
-                    running_idx: 0,
-                },
-            );
-            Ok(LuaBTNode {
-                inner: Rc::new(RefCell::new(BTNode::Guard {
-                    predicate: key,
-                    child: Box::new(taken),
-                })),
-            })
-        })?,
+        lua.create_function(
+            |lua, (predicate, child_ud): (LuaFunction, LuaAnyUserData)| {
+                let key = lua.create_registry_value(predicate)?;
+                let child = child_ud.borrow::<LuaBTNode>()?;
+                // Take ownership of the child node (leaves a placeholder Sequence behind),
+                // matching the same move-out pattern used by setChild/addChild.
+                let taken = std::mem::replace(
+                    &mut *child.inner.borrow_mut(),
+                    BTNode::Sequence {
+                        children: Vec::new(),
+                        running_idx: 0,
+                    },
+                );
+                Ok(LuaBTNode {
+                    inner: Rc::new(RefCell::new(BTNode::Guard {
+                        predicate: key,
+                        child: Box::new(taken),
+                    })),
+                })
+            },
+        )?,
     )?;
 
     // â”€â”€ newSteeringManager â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -3858,7 +3857,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-        /// Provides comprehensive artificial intelligence routines and types.
+    /// Provides comprehensive artificial intelligence routines and types.
     lurek.set("ai", tbl)?;
     Ok(())
 }

@@ -7,7 +7,7 @@ their /// doc comments, and generates a rich Markdown reference or reports
 missing/incomplete documentation.
 
 Usage:
-    python tools/collect_docs.py                  # generate docs/reports/api_generated.md
+    python tools/collect_docs.py                  # generate logs/reports/api-generated.md
     python tools/collect_docs.py --report-missing # print items missing docs (exit 1 if any)
     python tools/collect_docs.py --suggest        # print starter /// lines for undocumented items
     python tools/collect_docs.py --output FILE    # custom output path
@@ -33,7 +33,7 @@ from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 SRC_DIR = WORKSPACE_ROOT / "src"
-OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "reports" / "api_generated.md"
+OUTPUT_FILE = WORKSPACE_ROOT / "logs" / "reports" / "api-generated.md"
 
 # Matches the beginning of a pub item declaration (at any indentation level).
 _PUB_DECL_RE = re.compile(

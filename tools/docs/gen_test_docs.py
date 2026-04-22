@@ -7,9 +7,9 @@ Markdown documents describing what each module tests, coverage statistics, and
 a prioritised list of uncovered items.
 
 Usage:
-    python tools/gen_test_docs.py                          # docs/reports/test_docs.md (all)
-    python tools/gen_test_docs.py --mode rust              # docs/reports/test_docs_rust.md
-    python tools/gen_test_docs.py --mode lua               # docs/reports/test_docs_lua.md
+    python tools/gen_test_docs.py                          # logs/reports/test_docs.md (all)
+    python tools/gen_test_docs.py --mode rust              # logs/reports/test_docs_rust.md
+    python tools/gen_test_docs.py --mode lua               # logs/reports/test_docs_lua.md
     python tools/gen_test_docs.py --output FILE            # custom output path
     python tools/gen_test_docs.py --input FILE             # custom input JSON path
     python tools/gen_test_docs.py --help
@@ -29,9 +29,9 @@ from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_INPUT = WORKSPACE_ROOT / "logs" / "test_coverage.json"
-DEFAULT_OUTPUT = WORKSPACE_ROOT / "docs" / "reports" / "test_docs.md"
-DEFAULT_OUTPUT_RUST = WORKSPACE_ROOT / "docs" / "reports" / "test_docs_rust.md"
-DEFAULT_OUTPUT_LUA = WORKSPACE_ROOT / "docs" / "reports" / "test_docs_lua.md"
+DEFAULT_OUTPUT = WORKSPACE_ROOT / "logs" / "reports" / "test_docs.md"
+DEFAULT_OUTPUT_RUST = WORKSPACE_ROOT / "logs" / "reports" / "test_docs_rust.md"
+DEFAULT_OUTPUT_LUA = WORKSPACE_ROOT / "logs" / "reports" / "test_docs_lua.md"
 TESTS_DIR = WORKSPACE_ROOT / "tests" / "rust"
 
 # Matches a Rust test function

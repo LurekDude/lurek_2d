@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-04-22T21:25:34.852782+00:00",
+    "generated": "2026-04-22T22:26:17.437199+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "0.20.0",
     "stats": {
@@ -94,14 +94,14 @@
             "kind": "struct",
             "description": "Root container for a behavior tree instance.  Wraps an optional root [`BTNode`] and caches the [`BTStatus`] from the last tick. The `last_status` is useful for external code (e.g., the Lua API) to query what the tree decided without re-ticking it.  An empty tree (root = None) is valid — it returns `Success` without doing anything.  # Fields - `root` — `Option<BTNode>`. - `last_status` — `BTStatus`.",
             "file": "src/ai/behavior_tree.rs",
-            "line": 304
+            "line": 307
           },
           {
             "name": "BtDebugState",
             "kind": "struct",
             "description": "A snapshot of a [`BehaviorTree`]'s current diagnostic state.  Returned by [`BehaviorTree::debug_state`] and exposed to Lua via `bt:getDebugState()`.  # Fields - `node_count` — Total number of nodes in the tree (0 for an empty tree). - `last_status` — The status string returned by the most recent tick.",
             "file": "src/ai/behavior_tree.rs",
-            "line": 357
+            "line": 360
           }
         ]
       },

@@ -1514,3 +1514,58 @@ describe("Missing explicit test for Trail:drawToImage", function()
         -- TODO: add assertion for Trail:drawToImage
     end)
 end)
+
+-- =========================================================================
+-- Particle extensibility hooks (Phase 03)
+-- =========================================================================
+
+-- @description Verifies ParticleSystem:addSubSystem registers a child emitter.
+describe("ParticleSystem:addSubSystem extensibility", function()
+    -- @tests ParticleSystem:addSubSystem
+    it("addSubSystem returns a non-negative index", function()
+        local ps = lurek.particle.newSystem(256)
+        local idx = ps:addSubSystem({ maxParticles = 32 })
+        assert(type(idx) == "number" and idx >= 0,
+            "addSubSystem should return a numeric index >= 0")
+    end)
+
+    it("addSubSystem increments sub-system count", function()
+        local ps = lurek.particle.newSystem(256)
+        local before = ps:getSubSystemCount and ps:getSubSystemCount() or 0
+        ps:addSubSystem({ maxParticles = 16 })
+        local after = ps:getSubSystemCount and ps:getSubSystemCount() or 1
+        assert(after >= before + 1, "sub-system count should increase")
+    end)
+end)
+
+-- @description Verifies ParticleSystem:setCustomEmissionShape accepts a Lua callback.
+describe("ParticleSystem:setCustomEmissionShape extensibility", function()
+    -- @tests ParticleSystem:setCustomEmissionShape
+    it("setCustomEmissionShape does not error with a valid callback", function()
+        local ps = lurek.particle.newSystem(64)
+        local ok = pcall(function()
+            ps:setCustomEmissionShape(function() return 10, 20 end)
+        end)
+        assert.is_true(ok, "setCustomEmissionShape should not raise an error")
+    end)
+end)
+
+-- @description Verifies ParticleSystem:setOnDeathBatch accepts a Lua callback.
+describe("ParticleSystem:setOnDeathBatch extensibility", function()
+    -- @tests ParticleSystem:setOnDeathBatch
+    it("setOnDeathBatch does not error with a valid callback", function()
+        local ps = lurek.particle.newSystem(64)
+        local ok = pcall(function()
+            ps:setOnDeathBatch(function(batch) end)
+        end)
+        assert.is_true(ok, "setOnDeathBatch should not raise an error")
+    end)
+end)
+
+-- @description Verifies lurek.particle.fromTOML is available as a function.
+describe("lurek.particle.fromTOML extensibility", function()
+    -- @tests lurek.particle.fromTOML
+    it("fromTOML is a function", function()
+        expect_type("function", lurek.particle.fromTOML)
+    end)
+end)

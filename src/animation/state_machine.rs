@@ -348,7 +348,7 @@ impl AnimStateMachine {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /// Applies a comparison operator to two `f32` values.
-fn compare_nums(lhs: f32, rhs: f32, op: &ConditionOp) -> bool {
+pub fn compare_nums(lhs: f32, rhs: f32, op: &ConditionOp) -> bool {
     match op {
         ConditionOp::Gt => lhs > rhs,
         ConditionOp::Lt => lhs < rhs,
@@ -368,7 +368,7 @@ fn compare_nums(lhs: f32, rhs: f32, op: &ConditionOp) -> bool {
 ///
 /// # Returns
 /// `Result<TransitionCondition, String>`.
-fn parse_condition(s: &str) -> Result<TransitionCondition, String> {
+pub fn parse_condition(s: &str) -> Result<TransitionCondition, String> {
     let s = s.trim();
 
     // Try multi-char operators first to avoid partial matches (e.g. ">=" before ">").

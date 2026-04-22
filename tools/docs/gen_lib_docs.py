@@ -3,10 +3,8 @@
 
 Scans ``content/library/**/init.lua`` for LDoc-style docstrings and emits:
 
-* one Markdown page per library at ``docs/reports/libs/lib_<name>.md``
-* a single aggregate index at ``docs/reports/library-docs.md`` (mirrors the
-  layout of ``docs/lua-api.md``)
-* (optional) a wiki mirror under ``docs/wiki/`` if that folder exists
+* a single aggregate index at ``docs/library/lunasome.md`` (mirrors the
+  layout of ``docs/api/lurek.md``)
 
 LDoc tags recognised (see work/library-overhaul-20260418/reports/P6_doc_generator_spec.md):
 
@@ -20,16 +18,16 @@ LDoc tags recognised (see work/library-overhaul-20260418/reports/P6_doc_generato
 * ``@return description``             – untyped return value
 * ``@field name type description``    – module/table field
 * ``@usage``                          – followed by indented Lua code lines
-* ``@see lurek.<ns>.<fn>``            – cross-link into ``lua-api.md``
-* ``@see library.<name>.<fn>``        – cross-link into ``library-docs.md``
+* ``@see lurek.<ns>.<fn>``            – cross-link into ``docs/api/lurek.md``
+* ``@see library.<name>.<fn>``        – cross-link into ``lunasome.md``
 * ``@raise description``              – raised-error description
 * ``@within section``                 – grouping label inside the module
 
 Usage:
-    python tools/docs/gen_lib_docs.py                  # generate all
-    python tools/docs/gen_lib_docs.py --module dialog  # just one library
+    python tools/docs/gen_lib_docs.py                  # generate docs/library/lunasome.md
+    python tools/docs/gen_lib_docs.py --module dialog  # generate aggregate from one library
     python tools/docs/gen_lib_docs.py --check          # validate, exit 1 on errors
-    python tools/docs/gen_lib_docs.py --no-aggregate   # skip library-docs.md
+    python tools/docs/gen_lib_docs.py --no-aggregate   # skip lunasome.md
 """
 
 from __future__ import annotations
@@ -42,10 +40,8 @@ from pathlib import Path
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-LIB_DIR = REPO_ROOT / "content" / "library"
-OUT_DIR = REPO_ROOT / "docs" / "reports" / "libs"
-AGGREGATE_PATH = REPO_ROOT / "docs" / "reports" / "library-docs.md"
-WIKI_DIR = REPO_ROOT / "docs" / "wiki"
+LIB_DIR = REPO_ROOT / "library"
+AGGREGATE_PATH = REPO_ROOT / "docs" / "library" / "lunasome.md"
 
 VALID_STATUS = {"full", "partial", "stub", "proxy"}
 
@@ -355,8 +351,8 @@ def _slug(target: str) -> str:
 def _render_see(see_list: list[str], from_libs_dir: bool) -> str:
     if not see_list:
         return ""
-    rel_lua = "../lua-api.md" if from_libs_dir else "lua-api.md"
-    rel_lib = "../library-docs.md" if from_libs_dir else "library-docs.md"
+    rel_lua = "../../api/lurek.md" if from_libs_dir else "../api/lurek.md"
+    rel_lib = "../library/lunasome.md" if from_libs_dir else "lunasome.md"
     out = []
     for tgt in see_list:
         head = tgt.split(None, 1)[0]
@@ -662,20 +658,9 @@ def _validate_module(module_name: str, path: Path, info: dict) -> list[tuple[str
 
 
 def generate_per_module(modules: dict) -> int:
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    written = 0
-    for module_name in sorted(modules.keys()):
-        path, info = modules[module_name]
-        md = render_module_md(module_name, info)
-        out_path = OUT_DIR / f"lib_{module_name}.md"
-        out_path.write_text(md, encoding="utf-8", newline="\n")
-        written += 1
-        print(f"  → {out_path.relative_to(REPO_ROOT).as_posix()} "
-              f"({len(info['functions'])} fn, {len(info['fields'])} fields)")
-        if WIKI_DIR.exists():
-            wiki_path = WIKI_DIR / f"Library-{module_name.replace('_', '-').title()}.md"
-            wiki_path.write_text(md, encoding="utf-8", newline="\n")
-    return written
+    """Retained for compatibility; per-library Markdown outputs are retired."""
+    print("Per-library library pages are retired; aggregate-only output is canonical.")
+    return 0
 
 
 def generate_aggregate(modules: dict) -> None:
@@ -740,7 +725,7 @@ def main() -> int:
     parser.add_argument("--module", metavar="NAME",
                         help="Process only the named library (e.g. dialog)")
     parser.add_argument("--no-aggregate", action="store_true",
-                        help="Skip writing docs/reports/library-docs.md")
+                        help="Skip writing docs/library/lunasome.md")
     args = parser.parse_args()
 
     modules = scan_library()
@@ -757,10 +742,7 @@ def main() -> int:
     if args.check:
         return run_check(modules)
 
-    print(f"Generating per-library docs → {OUT_DIR.relative_to(REPO_ROOT).as_posix()}/")
-    generate_per_module(modules)
-
-    if not args.no_aggregate and not args.module:
+    if not args.no_aggregate:
         print("Generating aggregate library reference …")
         generate_aggregate(modules)
 

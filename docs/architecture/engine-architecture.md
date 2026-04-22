@@ -31,7 +31,7 @@
     - [Platform Services](#platform-services)
     - [Feature Systems](#feature-systems)
     - [Edge / Integration](#edge--integration)
-    - [Lunasome (content/library/)](#lunasome-contentlibrary)
+    - [Lunasome (library/)](#lunasome-contentlibrary)
   - [Module Internal File Structure Standard](#module-internal-file-structure-standard)
     - [Required Files](#required-files)
     - [Standard Optional Files](#standard-optional-files)
@@ -159,7 +159,7 @@ acyclic (Zen Rule 6).
 │  No render, audio, input, physics, or Lua imports (Zen Rule 9)      │
 └─────────────────────────────────────────────────────────────────────┘
 
-   content/library/ (LUNASOME)
+   library/ (LUNASOME)
    Pure-Lua standard libraries — consume only public lurek.* APIs.
    No Rust engine internals. No require() of engine source files.
 ```
@@ -269,7 +269,7 @@ and key types. Modules are listed alphabetically within each group.
 | `pipeline`    | Asset pipeline utilities                                      | Pipeline stages              |
 | `bin`         | Binary entry points, CLI arg parsing                          | `main()`                     |
 
-### Lunasome (content/library/)
+### Lunasome (library/)
 
 Pure-Lua gameplay libraries. Each consumes only public `lurek.*` APIs:
 
@@ -1057,7 +1057,7 @@ Future Cargo feature flag work to enable modular builds:
 | **baseline** | Foundations + Core Runtime + Edge/Integration (lua_api, app)                |
 | **core**     | baseline + Platform Services (render, audio, physics, input, image, window) |
 | **extended** | core + Feature Systems (all game-domain modules)                            |
-| **lunasome** | extended + shipped `content/library/` Lua libraries                         |
+| **lunasome** | extended + shipped `library/` Lua libraries                         |
 
 Purpose: Users who only need rendering and input can build `core`.
 Users who want the full engine experience use `extended` or `lunasome`.

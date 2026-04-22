@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-22T21:25:35.851862+00:00",
+  "generated_at": "2026-04-22T22:26:18.554945+00:00",
   "summary": {
     "rust": {
       "total": 5293,
@@ -242,7 +242,7 @@
       "source": "rust",
       "module": "ai",
       "file": "src/ai/behavior_tree.rs",
-      "line": 304,
+      "line": 307,
       "kind": "struct",
       "name": "BehaviorTree",
       "has_doc": true
@@ -251,7 +251,7 @@
       "source": "rust",
       "module": "ai",
       "file": "src/ai/behavior_tree.rs",
-      "line": 317,
+      "line": 320,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -260,7 +260,7 @@
       "source": "rust",
       "module": "ai",
       "file": "src/ai/behavior_tree.rs",
-      "line": 357,
+      "line": 360,
       "kind": "struct",
       "name": "BtDebugState",
       "has_doc": true
@@ -269,7 +269,7 @@
       "source": "rust",
       "module": "ai",
       "file": "src/ai/behavior_tree.rs",
-      "line": 373,
+      "line": 376,
       "kind": "fn",
       "name": "debug_state",
       "has_doc": true
@@ -20366,7 +20366,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ai_api.rs",
-      "line": 3321,
+      "line": 3318,
       "kind": "fn",
       "name": "register",
       "has_doc": true

@@ -11,6 +11,8 @@ export interface ApiEntry {
 
 export function resolveWorkspaceApiDocPath(root: string): string | undefined {
   const candidates = [
+    path.join(root, "docs", "api", "lurek.lua"),
+    path.join(root, "docs", "api", "lurek.md"),
     path.join(root, "docs", "lurek.lua"),
     path.join(root, "docs", "lua-api.md"),
   ];

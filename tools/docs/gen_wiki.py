@@ -35,7 +35,7 @@ from textwrap import dedent
 ROOT     = Path(__file__).resolve().parent.parent.parent
 SPECS    = ROOT / "docs" / "specs"
 EXAMPLES = ROOT / "content" / "examples"
-LIBRARY  = ROOT / "content" / "library"
+LIBRARY  = ROOT / "library"
 DEMOS    = ROOT / "content" / "demos"
 TOOLS    = ROOT / "tools"
 DOCS     = ROOT / "docs"

@@ -15,7 +15,7 @@ showing three categories of issues:
      helpful documentation in lua-api.md.
 
 Usage:
-    python tools/gen_coverage_gaps.py                    # -> docs/reports/coverage_gaps.md
+    python tools/gen_coverage_gaps.py                    # -> logs/reports/coverage_gaps.md
     python tools/gen_coverage_gaps.py --output FILE      # custom output path
     python tools/gen_coverage_gaps.py --rust-input FILE  # custom Rust JSON
     python tools/gen_coverage_gaps.py --lua-input FILE   # custom Lua JSON
@@ -34,7 +34,7 @@ from pathlib import Path
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 RUST_INPUT = WORKSPACE_ROOT / "logs" / "rust_api_data.json"
 LUA_INPUT = WORKSPACE_ROOT / "logs" / "lua_api_data.json"
-OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "reports" / "coverage_gaps.md"
+OUTPUT_FILE = WORKSPACE_ROOT / "logs" / "reports" / "coverage_gaps.md"
 
 # Rust modules that are deliberately not exposed to Lua (engine internals, CLI, etc.)
 _INTERNAL_MODULES = {
@@ -340,7 +340,7 @@ def generate_report(rust_data: dict, lua_data: dict) -> str:
     lines.append(f"## 2. Rust Docstring Issues ({len(rust_bad_docs)} items)")
     lines.append("")
     lines.append(f"Public Rust items with missing or very short descriptions (< {_MIN_DESC_LENGTH} chars).")
-    lines.append("These appear as `// (undocumented)` in `docs/reports/rust-api.md`.")
+    lines.append("These appear as `// (undocumented)` in `docs/api/rust.md`.")
     lines.append("")
 
     if rust_bad_docs:
@@ -367,7 +367,7 @@ def generate_report(rust_data: dict, lua_data: dict) -> str:
     lines.append(f"## 3. Lua Docstring Issues ({len(lua_bad_docs)} items)")
     lines.append("")
     lines.append(f"Lua API items with missing or very short descriptions (< {_MIN_DESC_LENGTH} chars).")
-    lines.append("These appear without documentation in `docs/lua-api.md` and IntelliSense.")
+    lines.append("These appear without documentation in `docs/api/lurek.md` and IntelliSense.")
     lines.append("")
 
     if lua_bad_docs:

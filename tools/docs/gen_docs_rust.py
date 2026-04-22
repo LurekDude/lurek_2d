@@ -10,7 +10,7 @@ Each public item is rendered in a Rust code block:
 Includes per-module and overall docstring coverage statistics.
 
 Usage:
-    python tools/gen_docs_rust.py                   # -> docs/reports/rust-api.md
+    python tools/gen_docs_rust.py                   # -> docs/api/rust.md
     python tools/gen_docs_rust.py --output FILE     # custom output path
     python tools/gen_docs_rust.py --input FILE      # custom input path
 
@@ -26,7 +26,7 @@ from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 INPUT_FILE = WORKSPACE_ROOT / "logs" / "rust_api_data.json"
-OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "reports" / "rust-api.md"
+OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "api" / "rust.md"
 
 # Modules to skip (test utilities, build scripts, etc.)
 _SKIP_MODS = {"main", "root", "lib"}

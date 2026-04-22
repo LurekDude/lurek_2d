@@ -133,7 +133,7 @@ cargo test
   └── Lua BDD Harness ─────────────────────────────────────────────┘
       └── tests/lua/harness.rs
           ├── unit/           One file per engine module (API surface)
-          ├── content/library/        One file per Lunasome library
+          ├── library/        One file per Lunasome library
           ├── integration/    Tests BETWEEN two or more modules
           ├── stress/         Throughput + allocation Lua tests
           ├── security/       Lua sandboxing + input validation
@@ -146,7 +146,7 @@ cargo test
 
 - **Rust tests** cover internal engine contracts: struct invariants, error handling, resource lifecycle, mathematical correctness. Direct crate access allows testing private-via-crate internals.
 - **Lua tests** cover the public `lurek.*` API surface: function signatures, return types, error messages, and end-to-end workflows. They run in the same VM game scripts use, catching API regressions from the user's perspective.
-- **Library tests** (`tests/lua/content/library/`) exclusively test Lunasome pure-Lua libraries (`content/library/`). These were formerly tested via `tests/rust/game/` which is now retired — game systems (battle, cardgame, combat, crafting, inventory, quest, stats) live in `content/library/` — they are Lunasome libraries, not engine modules.
+- **Library tests** (`tests/lua/library/`) exclusively test Lunasome pure-Lua libraries (`library/`). These were formerly tested via `tests/rust/game/` which is now retired — game systems (battle, cardgame, combat, crafting, inventory, quest, stats) live in `library/` — they are Lunasome libraries, not engine modules.
 
 ---
 
@@ -240,7 +240,7 @@ tests/
     │   ├── test_terminal.lua
     │   └── ...
     │
-    ├── content/library/                     One file per Lunasome library in content/library/
+    ├── library/                     One file per Lunasome library in library/
     │   ├── test_library_battle.lua
     │   ├── test_library_cardgame.lua
     │   ├── test_library_combat.lua
@@ -354,7 +354,7 @@ The screenshot is written to `<demo_dir>/screenshot_smoke.png` (relative to repo
 
 ### tests/rust/game/ — Retired
 
-`tests/rust/game/` previously held Rust tests for game systems (battle, cardgame, combat, crafting, inventory, quest, stats). Those systems are now **pure-Lua libraries** in `content/library/`. Their tests live in `tests/lua/content/library/`. Do not add new files to `tests/rust/game/`.
+`tests/rust/game/` previously held Rust tests for game systems (battle, cardgame, combat, crafting, inventory, quest, stats). Those systems are now **pure-Lua libraries** in `library/`. Their tests live in `tests/lua/library/`. Do not add new files to `tests/rust/game/`.
 
 ---
 
@@ -377,7 +377,7 @@ The screenshot is written to `<demo_dir>/screenshot_smoke.png` (relative to repo
 | **Security** | `tests/rust/security/` | Sandbox audit, path-traversal guards | `security_tests.rs`: GameFS escapes |
 | **Ext** | `tests/rust/ext/` | Cross-module Rust smoke tests | `graphics_ext_tests.rs`: mesh + texture |
 
-> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are now pure-Lua libraries tested in `tests/lua/content/library/`.
+> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are now pure-Lua libraries tested in `tests/lua/library/`.
 
 ### Test Structure Pattern
 
@@ -430,7 +430,7 @@ All Lua tests use a custom BDD framework defined in `tests/lua/init.lua`. This f
 | Category | Path | Scope | Rule |
 |---|---|---|---|
 | **Unit** | `tests/lua/unit/` | One engine module per file (API surface) | One `.lua` per `lurek.*` namespace |
-| **Library** | `tests/lua/content/library/` | One Lunasome library per file | One `.lua` per `content/library/<name>` |
+| **Library** | `tests/lua/library/` | One Lunasome library per file | One `.lua` per `library/<name>` |
 | **Integration** | `tests/lua/integration/` | Tests between ≥2 modules | Name: `test_<moduleA>_<moduleB>.lua` |
 | **Stress** | `tests/lua/stress/` | Throughput + allocation from Lua | High iteration counts, timing checks |
 | **Security** | `tests/lua/security/` | Sandboxing + input validation | Nil spam, path traversal, bad types |
@@ -563,13 +563,13 @@ test_summary()
 
 ### Library Test Template
 
-Library tests live in `tests/lua/content/library/` and use `require()` to load from `content/library/`.
+Library tests live in `tests/lua/library/` and use `require()` to load from `library/`.
 
 ```lua
--- tests/lua/content/library/test_library_combat.lua
+-- tests/lua/library/test_library_combat.lua
 -- Tests for the Lunasome combat library
 
-local combat = require("content/library/combat")
+local combat = require("library/combat")
 
 -- @description Groups combat-library attack resolution cases.
 describe("combat library", function()
@@ -856,7 +856,7 @@ Choose the correct category:
 | You are testing... | Category | Path |
 |---|---|---|
 | A `lurek.*` engine API function | **unit** | `tests/lua/unit/test_<module>.lua` |
-| A Lunasome library in `content/library/` | **library** | `tests/lua/content/library/test_library_<name>.lua` |
+| A Lunasome library in `library/` | **library** | `tests/lua/library/test_library_<name>.lua` |
 | Interaction between ≥2 modules | **integration** | `tests/lua/integration/test_<a>_<b>.lua` |
 | High-load / many iterations | **stress** | `tests/lua/stress/test_<topic>_stress.lua` |
 | Nil spam / bad inputs / sandbox | **security** | `tests/lua/security/test_<topic>.lua` |
