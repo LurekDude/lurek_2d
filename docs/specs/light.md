@@ -157,7 +157,7 @@ The `shadow.rs` source file introduces `ShadowCaster` as a dedicated first-class
 - `lurek.light.getLightCount`: Returns the number of lights in the world.
 - `lurek.light.getOccluderCount`: Returns the number of occluders in the world.
 - `lurek.light.getMaxLights`: Returns the maximum number of lights processed per frame.
-- `lurek.light.setMaxLights`: Sets the maximum number of lights processed per frame (clamped 1–256).
+- `lurek.light.setMaxLights`: Sets the maximum number of lights processed per frame (clamped 1â€“256).
 - `lurek.light.clear`: Removes all lights and occluders, resets ambient to default.
 - `lurek.light.setGroupEnabled`: Sets the enabled state for all lights in the given group.
 - `lurek.light.setGroupIntensity`: Sets the intensity for all lights in the given group.
@@ -172,7 +172,6 @@ The `shadow.rs` source file introduces `ShadowCaster` as a dedicated first-class
 - `Light:getPosition`: Returns the light's world-space position.
 - `Light:setRadius`: Sets the light's influence radius.
 - `Light:getRadius`: Returns the light's influence radius.
-- `Light:setColor`: Sets the light's tint color.
 - `Light:getColor`: Returns the light's tint color as (r, g, b, a).
 - `Light:setIntensity`: Sets the brightness multiplier.
 - `Light:getIntensity`: Returns the brightness multiplier.
@@ -215,13 +214,20 @@ The `shadow.rs` source file introduces `ShadowCaster` as a dedicated first-class
 - `Light:isVolumetric`: Returns whether this light hints at volumetric scattering.
 - `Light:remove`: Removes this light from the world.
 - `Light:isValid`: Returns whether this light handle is still valid.
+- `Light:addFlicker`: Convenience method to set a flicker effect using amplitude range and
+- `Light:updateTransition`: Advances the active transition by `dt` seconds and applies the
+- `Light:stopTransition`: Cancels the active light transition.
+- `Light:transitionProgress`: Returns the fractional progress `[0, 1]` of the active transition,
+- `Light:setCookie`: Sets the texture path used as a light cookie (mask) for projection.
+- `Light:getCookie`: Returns the current cookie texture path, or `nil` if unset.
+- `Light:clearCookie`: Removes the cookie texture assignment.
 
 ### `Occluder` Methods
 - `Occluder:setVertices`: Replaces the polygon vertices from a flat table {x1,y1,x2,y2,...}.
 - `Occluder:getVertices`: Returns the polygon vertices as a flat table {x1,y1,x2,y2,...}.
 - `Occluder:setPosition`: Sets the translation offset applied to all vertices.
 - `Occluder:getPosition`: Returns the translation offset as (x, y).
-- `Occluder:setOpacity`: Sets the shadow opacity (0.0–1.0).
+- `Occluder:setOpacity`: Sets the shadow opacity (0.0â€“1.0).
 - `Occluder:getOpacity`: Returns the shadow opacity.
 - `Occluder:setLightMask`: Sets the light interaction bitmask.
 - `Occluder:getLightMask`: Returns the light interaction bitmask.
@@ -229,14 +235,6 @@ The `shadow.rs` source file introduces `ShadowCaster` as a dedicated first-class
 - `Occluder:isEnabled`: Returns whether this occluder is active.
 - `Occluder:remove`: Removes this occluder from the world.
 - `Occluder:isValid`: Returns whether this occluder handle is still valid.
-- `Occluder:addFlicker`: Convenience method to set a flicker effect using amplitude range and
-- `Occluder:transitionTo`: Begins a smooth linear transition of the light's color, intensity,
-- `Occluder:updateTransition`: Advances the active transition by `dt` seconds and applies the
-- `Occluder:stopTransition`: Cancels the active light transition.
-- `Occluder:transitionProgress`: Returns the fractional progress `[0, 1]` of the active transition,
-- `Occluder:setCookie`: Sets the texture path used as a light cookie (mask) for projection.
-- `Occluder:getCookie`: Returns the current cookie texture path, or `nil` if unset.
-- `Occluder:clearCookie`: Removes the cookie texture assignment.
 
 ## References
 

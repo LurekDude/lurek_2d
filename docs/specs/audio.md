@@ -28,10 +28,10 @@ The `Bus` type has been extended with duck-target support: `set_duck_target` and
 - `bus.rs`: Named audio bus for grouping sources under shared volume, pitch, and pause controls.
 - `decoder.rs`: Streaming audio decoder for chunked PCM reading.
 - `dsp.rs`: Digital signal processing effects for the Lurek2D audio pipeline.
+- `facade.rs`: Audio device facade: enumeration and selection of playback devices.
 - `midi.rs`: MIDI SoundFont state management.
 - `midi_player.rs`: Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM via sine-additive synthesis, and plays through a rodio `Sink`.
 - `mixer.rs`: Core audio mixer that owns every loaded sound and drives playback through rodio.
-- `mixer_tests.rs`: Unit tests for `mixer.rs` (split to sibling file — mixer.rs exceeds 1000 lines).
 - `mod.rs`: Audio subsystem for Lurek2D games.
 - `offline.rs`: Offline audio processing utilities.
 - `pool.rs`: Polyphonic sound pool for round-robin voice allocation.
@@ -93,6 +93,9 @@ The `Bus` type has been extended with duck-target support: `set_duck_target` and
 - `ActiveEffect::process` (`dsp.rs`): Applies this effect's DSP algorithm to a single PCM sample.
 - `SharedEffectGraph::new` (`dsp.rs`): Creates an empty `SharedEffectGraph` with no effects in the chain.
 - `new` (`dsp.rs`): Wraps an inner audio source with a dynamic DSP effect chain.
+- `get_playback_devices` (`facade.rs`): Returns the names of all available audio output devices.
+- `get_playback_device` (`facade.rs`): Returns the name of the currently active audio output device.
+- `set_playback_device` (`facade.rs`): Selects the audio output device by name.
 - `MidiState::new` (`midi.rs`): Create a new empty MidiState with no SoundFont loaded.
 - `MidiState::set_soundfont` (`midi.rs`): Load a SoundFont from raw SF2 data.
 - `MidiState::has_soundfont` (`midi.rs`): Check whether a SoundFont is currently loaded.
@@ -140,9 +143,9 @@ The `Bus` type has been extended with duck-target support: `set_duck_target` and
 - `MidiPlayer::bus_key` (`midi_player.rs`): Returns the audio bus key, if assigned.
 - `MidiPlayer::play_state` (`midi_player.rs`): Returns the current playback state.
 - `MidiPlayer::get_output_sample_rate` (`midi_player.rs`): Returns the PCM output sample rate in Hz.
-- `MidiPlayer::set_output_sample_rate` (`midi_player.rs`): Sets the PCM output sample rate in Hz (clamped to 8000–192000).
+- `MidiPlayer::set_output_sample_rate` (`midi_player.rs`): Sets the PCM output sample rate in Hz (clamped to 8000â€“192000).
 - `MidiPlayer::get_output_channels` (`midi_player.rs`): Returns the PCM output channel count (1 = mono, 2 = stereo).
-- `MidiPlayer::set_output_channels` (`midi_player.rs`): Sets the PCM output channel count (clamped to 1–2).
+- `MidiPlayer::set_output_channels` (`midi_player.rs`): Sets the PCM output channel count (clamped to 1â€“2).
 - `QueueableSource::new` (`mixer.rs`): Creates a new `QueueableSource` with all buffer slots free.
 - `QueueableSource::queue_buffer` (`mixer.rs`): Pushes a buffer of f32 PCM samples into the queue.
 - `QueueableSource::free_buffer_count` (`mixer.rs`): Returns the number of buffer slots currently available.
@@ -230,9 +233,6 @@ The `Bus` type has been extended with duck-target support: `set_duck_target` and
 - `Mixer::get_bus_peak` (`mixer.rs`): Returns the peak signal level for the named bus.
 - `Mixer::get_bus_rms` (`mixer.rs`): Returns the RMS signal level for the named bus.
 - `Mixer::new_pool` (`mixer.rs`): Loads `voice_count` copies of the file at `file_path` and returns a [`crate::audio::SoundPool`].
-- `get_playback_devices` (`mod.rs`): Returns the names of all available audio output devices.
-- `get_playback_device` (`mod.rs`): Returns the name of the currently active audio output device.
-- `set_playback_device` (`mod.rs`): Selects the audio output device by name.
 - `process_offline` (`offline.rs`): Decodes `input_path`, applies `effects` in series, and writes the result to `output_path`.
 - `normalize_file` (`offline.rs`): Normalises the peak amplitude of `input_path` to `target_level` and writes to `output_path`.
 - `SoundPool::new` (`pool.rs`): Creates a new `SoundPool` from a set of pre-loaded voice keys.
@@ -336,7 +336,7 @@ The `Bus` type has been extended with duck-target support: `set_duck_target` and
 - `lurek.audio.getDopplerScale`: Returns the current Doppler scale.
 - `lurek.audio.setDistanceModel`: Sets the distance attenuation model.
 - `lurek.audio.getDistanceModel`: Returns the current distance model name.
-- `lurek.audio.setMeter`: Sets the master peak meter level (0.0–1.0).
+- `lurek.audio.setMeter`: Sets the master peak meter level (0.0â€“1.0).
 - `lurek.audio.getMeter`: Returns the stored master peak meter level.
 - `lurek.audio.newMidiPlayer`: Creates a MIDI player, optionally loading a file.
 - `lurek.audio.newSoundData`: Creates a SoundData from a file or as a silent buffer.
@@ -452,9 +452,9 @@ The `Bus` type has been extended with duck-target support: `set_duck_target` and
 - `MidiPlayer:setOnNoteOff`: Registers a note-off callback (stub).
 - `MidiPlayer:setOnEnd`: Registers a playback-end callback (stub).
 - `MidiPlayer:getSampleRate`: Returns the PCM output sample rate in Hz.
-- `MidiPlayer:setSampleRate`: Sets the PCM output sample rate in Hz (clamped 8000–192000).
+- `MidiPlayer:setSampleRate`: Sets the PCM output sample rate in Hz (clamped 8000â€“192000).
 - `MidiPlayer:getChannels`: Returns the PCM output channel count (1 = mono, 2 = stereo).
-- `MidiPlayer:setChannels`: Sets the PCM output channel count (clamped 1–2).
+- `MidiPlayer:setChannels`: Sets the PCM output channel count (clamped 1â€“2).
 - `MidiPlayer:type`: Returns the type name of this object.
 - `MidiPlayer:typeOf`: Returns true if this object is of the given type.
 

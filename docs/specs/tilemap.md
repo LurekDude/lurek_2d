@@ -61,6 +61,7 @@ named polygon overlays with hit-testing and label support.
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`,
 `runtime`, `image`. Lua bridge in `src/lua_api/tilemap_api.rs` as
 `lurek.tilemap.*`.
+
 ## Files
 
 - `autotile_sheet.rs`: Defines autotile lookup tables for blob-47, composite-48, and minimal-16 layouts and applies those rules onto a `TileSet`.
@@ -410,7 +411,7 @@ named polygon overlays with hit-testing and label support.
 - `lurek.tilemap.newMapGen`: Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size.
 - `lurek.tilemap.loadTMX`: Parses a TMX XML string and returns a table with map metadata and layers.
 - `lurek.tilemap.fromLDtk`: Parses an LDtk JSON export string and returns a TileMap.
-- `lurek.tilemap.newLargeMapRenderer`: Creates a LargeMapRenderer for chunk-level occlusion culling on maps > 200×200 tiles.
+- `lurek.tilemap.newLargeMapRenderer`: Creates a LargeMapRenderer for chunk-level occlusion culling on maps > 200Ă—200 tiles.
 
 ### `AutoTileSheet` Methods
 - `AutoTileSheet:getLayout`: Returns the layout variant as a string.
@@ -521,7 +522,10 @@ named polygon overlays with hit-testing and label support.
 - `TileMap:setOrientation`: Sets the map orientation from a string ("topdown", "sideview", "isometric", or "hexagonal").
 - `TileMap:render`: Renders the tile map to the screen at the given offset.
 - `TileMap:drawToImage`: Renders the tile map to a CPU ImageData using the given tile pixel size.
-- `TileMap:toNavGrid`: Converts the given layer into a 2D navigation grid.
+- `TileMap:onTileStep`: Register a callback for when an entity steps on a tile with the given GID.
+- `TileMap:onTileExit`: Register a callback for when an entity exits a tile with the given GID.
+- `TileMap:fireTileStep`: Fire the tile step callback for the given GID (call each frame while entity is on tile).
+- `TileMap:fireTileExit`: Fire the tile exit callback for the given GID (call when entity leaves tile).
 
 ### `TileSet` Methods
 - `TileSet:getFirstGid`: Returns the first global ID assigned to this tileset.

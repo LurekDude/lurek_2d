@@ -88,6 +88,7 @@ GROUPS = {
         "automation",
         "sprite",
         "spine",
+        "globe",
     },
     "Edge/Integration": {
         "app",
@@ -621,7 +622,12 @@ def build_spec(module: str, lua_parser) -> tuple[str, dict]:
     rust_tests = lookup_info(info_maps, "Rust test path(s)", "Rust Tests") or "None found in the workspace"
     lua_tests = lookup_info(info_maps, "Lua test path(s)", "Lua Tests") or "None found in the workspace"
 
-    group = lookup_info(info_maps, "Module group", "Group") or module_group(module)
+    group = module_group(module)
+    if group == "Edge/Integration":
+        # Fall back to spec/agent metadata only if not explicitly in GROUPS
+        meta_group = lookup_info(info_maps, "Module group", "Group")
+        if meta_group and module not in {m for mods in GROUPS.values() for m in mods}:
+            group = meta_group
     summary_text = first_non_empty(spec_sections["summary"], agent_sections["summary"], legacy_sections["summary"])
     if not summary_text:
         summary_text = (

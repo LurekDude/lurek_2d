@@ -243,7 +243,6 @@ The graph traversal surface has been enriched with explicit BFS and DFS iteratio
 - `Graph:mst`: Returns edge IDs forming a minimum spanning tree (Kruskal, undirected view).
 - `Graph:colorGraph`: Assigns each node the smallest non-negative integer colour not shared with any
 - `Graph:isBipartite`: Returns `true` when the graph can be 2-coloured (bipartite check via BFS).
-- `Graph:astar`: Finds the shortest path between two nodes using A*.
 - `Graph:processDemand`: Processes all supply/demand declarations and fires event callbacks.
 - `Graph:getStats`: Returns a statistics snapshot table.
 - `Graph:type`: Returns the type name of this object.

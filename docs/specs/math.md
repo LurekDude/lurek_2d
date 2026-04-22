@@ -29,8 +29,10 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 
 - `aabb_tree.rs`: Dynamic axis-aligned bounding box (AABB) tree for broad-phase queries.
 - `bezier.rs`: Implements arbitrary-order Bezier curves with evaluation, derivative, editing, rendering, and transform helpers.
+- `circle.rs`: Circle value type for 2D collision geometry and containment queries.
 - `color.rs`: Defines the shared RGBA value type plus byte conversion, packed RGB output, HSV conversion, and gamma helpers.
 - `easing.rs`: Houses the named easing curve functions and the string-based dispatcher used by tweening code and Lua bindings.
+- `facade.rs`: Foundational math free functions: `lerp`, `remap`, `clamp`, `sign`, `smoothstep`, `inverse_lerp`.
 - `geometry.rs`: Collects free-standing geometry utilities such as circle tests, polygon measurements, segment tests, line rasterization, convex hull, and triangulation helpers.
 - `mat3.rs`: Implements the 3x3 affine matrix used for 2D transforms, point transforms, composition, and inversion.
 - `mod.rs`: Re-exports the public math surface so other modules and the Lua bridge can depend on one stable module root.
@@ -40,6 +42,7 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `random.rs`: Wraps `fastrand` in a deterministic, serializable RNG API that matches engine and Lua expectations.
 - `rect.rs`: Provides axis-aligned rectangles for overlap, containment, and intersection queries used across gameplay and rendering code.
 - `spatial_hash.rs`: Implements a uniform-grid broad-phase index for fast rectangle, circle, and segment spatial queries.
+- `sphere.rs`: Spherical math helpers used by `src/globe/`.
 - `spline.rs`: Interpolating and approximating splines: Catmull-Rom and Hermite.
 - `transform.rs`: Wraps `Mat3` in a mutable 2D transform object with chainable translate, rotate, scale, and shear operations.
 - `tween.rs`: Implements low-level numeric interpolation over one or more values and explicitly stays below the higher-level `src/tween/` feature system.
@@ -52,6 +55,7 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `AabbEntry` (`struct`, `aabb_tree.rs`): A single entry stored at a leaf node of the AABB tree.
 - `AabbTree` (`struct`, `aabb_tree.rs`): A dynamic bounding-volume hierarchy for efficient AABB overlap queries.
 - `BezierCurve` (`struct`, `bezier.rs`): Editable Bezier curve object for path sampling, tangents, and authorable curve manipulation. It supports both math-heavy tooling and Lua scripting use cases.
+- `Circle` (`struct`, `circle.rs`): A circle defined by its centre and radius.
 - `Color` (`struct`, `color.rs`): Shared RGBA value type for color transport across rendering-facing APIs. It keeps color conversion logic out of renderer-specific code.
 - `Mat3` (`struct`, `mat3.rs`): Affine 2D matrix for transform composition and point mapping. Higher-level transform code builds on this instead of rolling custom matrix math.
 - `DistType` (`enum`, `noise_generator.rs`): Selects the distance metric used by Worley noise queries. This lets callers choose the visual character of cellular patterns without changing generator internals.
@@ -63,6 +67,7 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `Rect` (`struct`, `rect.rs`): Axis-aligned rectangle for cheap containment and overlap checks. It is the basic AABB type used by layout and collision-adjacent code.
 - `SpatialItem` (`struct`, `spatial_hash.rs`): Stored record for an object indexed by `SpatialHash`. It keeps the query structure decoupled from any particular gameplay object type.
 - `SpatialHash` (`struct`, `spatial_hash.rs`): Broad-phase query structure for coarse spatial lookup by AABB, circle, or segment. It is a utility index, not a full collision or physics system.
+- `Mat3x3` (`struct`, `sphere.rs`): Column-major 3Ã—3 rotation matrix, used for camera orbit and axial tilt.
 - `CatmullRomSpline` (`struct`, `spline.rs`): A Catmull-Rom spline through a sequence of control points.
 - `HermiteSpline` (`struct`, `spline.rs`): A cubic Hermite spline segment defined by two endpoints and their tangents.
 - `Transform` (`struct`, `transform.rs`): Mutable 2D transform object that exposes a script-friendly API over `Mat3`. It is the ergonomic surface for composition and point conversion.
@@ -79,20 +84,13 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `AabbTree::remove` (`aabb_tree.rs`): Removes the entry with the given `id` from the tree.
 - `AabbTree::query` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs overlap the query rectangle.
 - `AabbTree::query_point` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs contain the point `(x, y)`.
-- `AabbTree::query_circle` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs overlap the query circle (cx, cy, radius).
-- `AabbTree::query_segment` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs are crossed by the line segment from (x1,y1) to (x2,y2).
-- `AabbTree::update` (`aabb_tree.rs`): Updates the AABB for an existing entry.
+- `AabbTree::query_circle` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs overlap the given circle.
+- `AabbTree::query_segment` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs overlap the line segment from `(x1, y1)` to `(x2, y2)`.
+- `AabbTree::update` (`aabb_tree.rs`): - `min_x`, `min_y` — New minimum corner.
 - `AabbTree::contains` (`aabb_tree.rs`): Returns `true` if an entry with the given `id` exists in the tree.
 - `AabbTree::len` (`aabb_tree.rs`): Returns the number of entries currently in the tree.
 - `AabbTree::is_empty` (`aabb_tree.rs`): Returns `true` if the tree contains no entries.
 - `AabbTree::clear` (`aabb_tree.rs`): Removes all entries and resets the tree to the empty state.
-- `Circle::new` (`circle.rs`): Creates a `Circle` with center `(x, y)` and `radius` (clamped to 0 if negative).
-- `Circle::center` (`circle.rs`): Returns the center as `Vec2`.
-- `Circle::area` (`circle.rs`): Returns π r².
-- `Circle::perimeter` (`circle.rs`): Returns 2 π r.
-- `Circle::contains` (`circle.rs`): Returns `true` if the point `(px, py)` is inside or on the circle.
-- `Circle::intersects` (`circle.rs`): Returns `true` if the two circles overlap.
-- `Circle::aabb` (`circle.rs`): Returns the axis-aligned bounding box as `(x1, y1, x2, y2)`.
 - `BezierCurve::new` (`bezier.rs`): Create a new Bezier curve from control points.
 - `BezierCurve::evaluate` (`bezier.rs`): Evaluate the curve at parameter `t` using De Casteljau's algorithm.
 - `BezierCurve::render` (`bezier.rs`): Render the curve as a polyline with the given number of segments.
@@ -109,13 +107,23 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `BezierCurve::length` (`bezier.rs`): Approximate the total arc length of the curve.
 - `BezierCurve::get_interpolated_position` (`bezier.rs`): Evaluate the curve position at parameter `t` and return it as an `(x, y)` tuple.
 - `BezierCurve::get_interpolated_angle` (`bezier.rs`): Return the angle of the curve tangent at parameter `t` in radians.
+- `Circle::new` (`circle.rs`): Creates a new `Circle` centred at `(x, y)` with the given `radius`.
+- `Circle::center` (`circle.rs`): Returns the centre as a `Vec2`.
+- `Circle::area` (`circle.rs`): Returns the area of the circle (`π r²`).
+- `Circle::perimeter` (`circle.rs`): Returns the perimeter (circumference) of the circle (`2 π r`).
+- `Circle::contains` (`circle.rs`): Returns `true` if the point `(px, py)` lies inside or on the boundary of this circle.
+- `Circle::intersects` (`circle.rs`): Returns `true` if this circle overlaps with `other`.
+- `Circle::aabb` (`circle.rs`): Returns the axis-aligned bounding box of this circle as `(min_x, min_y, max_x, max_y)`.
 - `Color::new` (`color.rs`): Creates a color from `f32` RGBA components in `[0.0, 1.0]`.
 - `Color::from_u8` (`color.rs`): Creates a color from `u8` RGBA components in `[0, 255]`, normalizing to `[0.0, 1.0]`.
 - `Color::to_u8` (`color.rs`): Converts the color to `u8` RGBA components, each in `[0, 255]`.
 - `Color::to_rgb_u32` (`color.rs`): Converts the color to a packed `u32` RGB value suitable for packed pixel buffers.
+- `Color::from_hex` (`color.rs`): Creates a color from a hex string such as `"#FF8000"`, `"#FF8000FF"`, or `"FF8000"`.
+- `Color::to_hsl` (`color.rs`): Converts the color to HSL (hue, saturation, lightness).
 - `hsv_to_rgb` (`color.rs`): Convert an HSV color to RGB byte components.
 - `gamma_to_linear` (`color.rs`): Convert a single sRGB gamma-space color component to linear space.
 - `linear_to_gamma` (`color.rs`): Convert a single linear-space color component to sRGB gamma space.
+- `hsl_to_rgb` (`color.rs`): Convert an HSL color to a `Color` (alpha defaults to 1.0).
 - `linear` (`easing.rs`): Linear interpolation — no easing.
 - `ease_in_quad` (`easing.rs`): Quadratic ease-in — starts slow, accelerates.
 - `ease_out_quad` (`easing.rs`): Quadratic ease-out — starts fast, decelerates.
@@ -134,11 +142,20 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `ease_in_out_expo` (`easing.rs`): Exponential ease-in-out — sharp S-curve with exponential tails.
 - `ease_in_elastic` (`easing.rs`): Elastic ease-in — spring-like overshoot at the start.
 - `ease_out_elastic` (`easing.rs`): Elastic ease-out — spring-like overshoot at the end.
+- `ease_in_out_elastic` (`easing.rs`): Elastic ease-in-out — spring-like overshoot at both ends.
 - `ease_out_bounce` (`easing.rs`): Bounce ease-out — simulates a bouncing ball landing.
 - `ease_in_bounce` (`easing.rs`): Bounce ease-in — simulates a bouncing ball launching.
+- `ease_in_out_bounce` (`easing.rs`): Bounce ease-in-out — bouncing at both ends.
 - `ease_in_back` (`easing.rs`): Back ease-in — pulls back before accelerating past the start.
 - `ease_out_back` (`easing.rs`): Back ease-out — overshoots the target then settles back.
+- `ease_in_out_back` (`easing.rs`): Back ease-in-out — pulls back at start, overshoots at end.
 - `apply` (`easing.rs`): Looks up an easing function by name and applies it to progress value `t`.
+- `lerp` (`facade.rs`): Linear interpolation between `a` and `b` by factor `t` in [0, 1].
+- `remap` (`facade.rs`): Remap `v` from `[in_min, in_max]` to `[out_min, out_max]`.
+- `clamp` (`facade.rs`): Clamp `v` to the range `[min, max]`.
+- `sign` (`facade.rs`): Returns the sign of `v`: `1.0` if positive, `-1.0` if negative, `0.0` if zero.
+- `smoothstep` (`facade.rs`): Hermite smooth interpolation between 0 and 1 when `x` is in `[edge0, edge1]`.
+- `inverse_lerp` (`facade.rs`): Inverse linear interpolation: returns the `t` factor such that `lerp(a, b, t) ≈ v`.
 - `angle_between` (`geometry.rs`): Returns the angle in radians from (x1, y1) to (x2, y2).
 - `circle_contains_point` (`geometry.rs`): Returns true if the point (px, py) is inside the circle centered at (cx, cy) with radius r.
 - `circle_intersects_circle` (`geometry.rs`): Returns true if two circles overlap.
@@ -163,11 +180,16 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `Mat3::transform_point` (`mat3.rs`): Applies the matrix transform to a 2D point using homogeneous coordinates.
 - `lerp` (`mod.rs`): Linear interpolation between `a` and `b` by factor `t` in [0, 1].
 - `remap` (`mod.rs`): Remap `v` from `[in_min, in_max]` to `[out_min, out_max]`.
+- `clamp` (`mod.rs`): Clamp `v` to the range `[min, max]`.
+- `sign` (`mod.rs`): Returns the sign of `v`: `1.0` if positive, `-1.0` if negative, `0.0` if zero.
+- `smoothstep` (`mod.rs`): Hermite smooth interpolation between 0 and 1 when `x` is in `[edge0, edge1]`.
+- `inverse_lerp` (`mod.rs`): Inverse linear interpolation: returns the `t` factor such that `lerp(a, b, t) ≈ v`.
 - `perlin2d` (`noise_functions.rs`): Generates 2D Perlin noise at the given coordinates.
 - `simplex2d` (`noise_functions.rs`): Generates 2D Simplex noise at the given coordinates.
 - `simplex_noise_2d` (`noise_functions.rs`): Returns 2D simplex noise for the given coordinates using seed 0.
 - `simplex_noise_3d` (`noise_functions.rs`): Returns 3D simplex noise for the given coordinates using seed 0.
 - `fbm` (`noise_functions.rs`): Generates fractal Brownian motion noise by layering multiple octaves of Perlin noise.
+- `fade` (`noise_functions.rs`): Quintic fade curve for smooth interpolation: 6t^5 - 15t^4 + 10t^3.
 - `perlin3d` (`noise_functions.rs`): Generates 3D Perlin noise at the given coordinates.
 - `perlin4d` (`noise_functions.rs`): Generates 4D Perlin noise at the given coordinates.
 - `NoiseGenerator::new` (`noise_generator.rs`): Creates a new generator with the given seed.
@@ -209,6 +231,9 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `Rect::contains` (`rect.rs`): Returns `true` if the given point lies within or on the boundary of the rectangle.
 - `Rect::intersects` (`rect.rs`): Returns `true` if this rectangle overlaps with `other`.
 - `Rect::intersect` (`rect.rs`): Computes the rectangle intersection of `self` and `other`.
+- `Rect::union` (`rect.rs`): Returns the smallest rectangle that contains both `self` and `other`.
+- `Rect::from_center` (`rect.rs`): Creates a rectangle centered at `(cx, cy)` with the given width and height.
+- `Rect::from_points` (`rect.rs`): Creates the smallest axis-aligned bounding rectangle that contains all given points.
 - `SpatialHash::new` (`spatial_hash.rs`): Creates an empty spatial hash with the given cell size.
 - `SpatialHash::cell_size` (`spatial_hash.rs`): Returns the cell size.
 - `SpatialHash::item_count` (`spatial_hash.rs`): Returns the number of items in the hash.
@@ -219,11 +244,26 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `SpatialHash::query_rect` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs overlap the query rectangle.
 - `SpatialHash::query_circle` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs overlap the query circle.
 - `SpatialHash::query_segment` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs are intersected by a line
+- `Mat3x3::identity` (`sphere.rs`): 3Ã—3 identity.
+- `Mat3x3::from_cols` (`sphere.rs`): Construct from three column vectors.
+- `Mat3x3::mul_vec` (`sphere.rs`): Apply this rotation to a `Vec3`: returns `M * v`.
+- `Mat3x3::mul_mat` (`sphere.rs`): Matrix product `self * other`.
+- `lat_lon_to_unit` (`sphere.rs`): Convert (latitude_deg, longitude_deg) on the unit sphere to a 3D unit vector.
+- `unit_to_lat_lon` (`sphere.rs`): Inverse of `lat_lon_to_unit`.
+- `great_circle_distance` (`sphere.rs`): Great-circle distance in radians between two lat/lon points on a unit sphere.
+- `great_circle_path` (`sphere.rs`): Sample `n` points along the great circle between two lat/lon endpoints.
+- `ray_sphere_intersect` (`sphere.rs`): Rayâ€“sphere intersection.
+- `axial_tilt_mat` (`sphere.rs`): Rotation matrix around the X axis (axial-tilt convention).
+- `rot_x` (`sphere.rs`): Rotation about the X axis by `angle_deg` degrees.
+- `rot_y` (`sphere.rs`): Rotation about the Y axis (longitude / orbit yaw) by `angle_deg` degrees.
+- `rot_z` (`sphere.rs`): Rotation about the Z axis by `angle_deg` degrees.
 - `CatmullRomSpline::new` (`spline.rs`): Create a spline from the given control points.
 - `CatmullRomSpline::sample` (`spline.rs`): Sample the spline at a global parameter `t` in [0, 1] spanning the whole curve.
 - `CatmullRomSpline::sample_segment` (`spline.rs`): Sample a specific segment by index at local parameter `t` in [0, 1].
 - `CatmullRomSpline::len` (`spline.rs`): Number of control points.
 - `CatmullRomSpline::is_empty` (`spline.rs`): Returns `true` if there are no control points.
+- `CatmullRomSpline::add_point` (`spline.rs`): Appends a control point to the end of the spline.
+- `CatmullRomSpline::remove_point` (`spline.rs`): Removes the control point at the given index.
 - `HermiteSpline::new` (`spline.rs`): Create a Hermite spline with explicit endpoints and tangents.
 - `HermiteSpline::sample` (`spline.rs`): Evaluate the spline at parameter `t` in [0, 1].
 - `Transform::new` (`transform.rs`): Create an identity transform (no translation, rotation, or scale).
@@ -238,6 +278,7 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `Transform::inverse_transform_point` (`transform.rs`): Transform a point from world space back to local space.
 - `Transform::inverse` (`transform.rs`): Compute the inverse of this transform.
 - `Transform::matrix` (`transform.rs`): Get the internal matrix (for renderer integration).
+- `Transform::decompose` (`transform.rs`): Decomposes this transform's matrix into translation, rotation, and scale.
 - `Tween::new` (`tween.rs`): Creates a new tween with the given duration and easing name.
 - `Tween::add_value` (`tween.rs`): Adds a value to interpolate.
 - `Tween::update` (`tween.rs`): Advances the clock by `dt` seconds.
@@ -263,9 +304,12 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `Vec2::rotate` (`vec2.rs`): Returns a copy of this vector rotated by `angle` radians around the origin.
 - `Vec2::perpendicular` (`vec2.rs`): Returns the perpendicular (normal) vector, rotated 90° counter-clockwise.
 - `Vec2::cross` (`vec2.rs`): Returns the 2D cross product (perpendicular dot product) with `other`.
+- `Vec2::from_angle` (`vec2.rs`): Creates a unit vector from an angle in radians, measured from the positive X axis.
+- `Vec2::reflect` (`vec2.rs`): Reflects this vector about a surface normal (normal must be unit length).
 - `Vec3::new` (`vec3.rs`): Create a new vector with the given components.
 - `Vec3::zero` (`vec3.rs`): The zero vector (0, 0, 0).
 - `Vec3::one` (`vec3.rs`): The unit vector (1, 1, 1).
+- `Vec3::splat` (`vec3.rs`): Creates a vector with all three components set to `v`.
 - `Vec3::dot` (`vec3.rs`): Dot product of this vector and `other`.
 - `Vec3::cross` (`vec3.rs`): Cross product of this vector and `other`.
 - `Vec3::length` (`vec3.rs`): Euclidean length (magnitude) of this vector.
@@ -316,6 +360,9 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `lurek.math.inBounce`: Bounce ease-in — reverse bounce effect that accelerates into the motion.
 - `lurek.math.inBack`: Back ease-in — overshoots slightly before settling at the target.
 - `lurek.math.outBack`: Back ease-out — overshoots the target then snaps back into place.
+- `lurek.math.inOutElastic`: Elastic ease-in-out — spring-like oscillation on both ends.
+- `lurek.math.inOutBounce`: Bounce ease-in-out — bouncing motion on both ends.
+- `lurek.math.inOutBack`: Back ease-in-out — overshoot on both ends.
 - `lurek.math.triangulate`: Triangulates a simple polygon given as a flat table {x1,y1, x2,y2, ...}.
 - `lurek.math.isConvex`: Returns true if the polygon (flat table {x1,y1,...}) is convex.
 - `lurek.math.gammaToLinear`: Converts a gamma-encoded sRGB value to linear space.
@@ -370,9 +417,18 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `lurek.math.hermite`: Creates a Hermite spline defined by two endpoints and tangents.
 - `lurek.math.lerp`: Linear interpolation between two numbers: a + (b - a) * t.
 - `lurek.math.remap`: Remaps `v` from [in_min, in_max] to [out_min, out_max].
+- `lurek.math.clamp`: Clamps `v` between `min` and `max`.
+- `lurek.math.sign`: Returns -1, 0, or 1 depending on the sign of `v`.
+- `lurek.math.smoothstep`: Hermite smoothstep between `edge0` and `edge1`.
+- `lurek.math.inverseLerp`: Returns the interpolation parameter t for `v` in [a, b].
+- `lurek.math.hslToRgb`: Converts HSL (h: 0-360, s: 0-1, l: 0-1) to RGBA (r, g, b, a) floats.
+- `lurek.math.fromHex`: Parses a hex color string (#RRGGBB or #RRGGBBAA) into (r, g, b, a) floats.
+- `lurek.math.rgbToHsl`: Converts RGBA floats to HSL (h: 0-360, s: 0-1, l: 0-1).
+- `lurek.math.rectUnion`: Returns the union (bounding box) of two rectangles.
+- `lurek.math.rectFromCenter`: Creates a rectangle centered at (cx, cy) with the given width and height.
 - `lurek.math.polygonClip`: Clips a polygon against a single half-plane using the Sutherland-Hodgman algorithm.
 - `lurek.math.aabbTree`: Creates a new empty AABB tree for efficient broad-phase overlap queries.
-- `lurek.math.newCircle(x, y, radius)`: Creates a `Circle` value object with center `(x, y)` and the given `radius`.
+- `lurek.math.newCircle`: Creates a new Circle value type with the given centre and radius.
 - `lurek.math.polygonIntersection`: Computes the intersection of two convex polygons using the Sutherland-Hodgman
 - `lurek.math.polygonUnion`: Computes the approximate union of two convex polygons as the convex hull of
 - `lurek.math.polygonDifference`: Computes the approximate difference `A - B` (the part of A not covered by B).
@@ -381,22 +437,10 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 ### `AabbTree` Methods
 - `AabbTree:remove`: Removes the entry with the given id.
 - `AabbTree:queryPoint`: Returns the ids of all entries whose AABBs contain the given point.
-- `AabbTree:queryCircle`: Returns the ids of all entries whose AABBs overlap a circle `(cx, cy, radius)`.
-- `AabbTree:querySegment`: Returns the ids of all entries whose AABBs are crossed by the segment from `(x1,y1)` to `(x2,y2)`.
 - `AabbTree:contains`: Returns true if an entry with the given id exists in the tree.
 - `AabbTree:len`: Returns the number of entries in the tree.
 - `AabbTree:isEmpty`: Returns true if the tree contains no entries.
 - `AabbTree:clear`: Removes all entries from the tree.
-
-### `Circle` Methods
-- `Circle:area()`: Returns π r².
-- `Circle:perimeter()`: Returns 2 π r.
-- `Circle:contains(px, py)`: Returns true if the point lies inside or on the circle.
-- `Circle:intersects(other)`: Returns true if the two circles overlap.
-- `Circle:aabb()`: Returns `x1, y1, x2, y2` — the AABB enclosing the circle.
-- `Circle:x()`: Returns the center x coordinate.
-- `Circle:y()`: Returns the center y coordinate.
-- `Circle:radius()`: Returns the radius.
 
 ### `BezierCurve` Methods
 - `BezierCurve:evaluate`: Evaluates the curve at parameter t, returning (x, y).
@@ -414,6 +458,18 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `CatmullRom:sample`: Sample the spline at global t in [0, 1].
 - `CatmullRom:sampleSegment`: Sample a specific segment at local t in [0, 1].
 - `CatmullRom:len`: Number of control points.
+- `CatmullRom:addPoint`: Appends a control point to the spline.
+- `CatmullRom:removePoint`: Removes the control point at `index` (0-based) and returns it.
+
+### `Circle` Methods
+- `Circle:area`: Returns the area of the circle (π r²).
+- `Circle:perimeter`: Returns the circumference of the circle (2 π r).
+- `Circle:contains`: Returns true if the point (px, py) lies inside or on the boundary.
+- `Circle:intersects`: Returns true if this circle overlaps another circle.
+- `Circle:aabb`: Returns the axis-aligned bounding box as (min_x, min_y, max_x, max_y).
+- `Circle:x`: Returns the circle centre X.
+- `Circle:y`: Returns the circle centre Y.
+- `Circle:radius`: Returns the circle radius.
 
 ### `Hermite` Methods
 - `Hermite:sample`: Evaluate the spline at parameter t in [0, 1].
@@ -455,6 +511,7 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `Transform:inverse`: Returns a new Transform that undoes this transform.
 - `Transform:clone`: Returns a copy of this transform.
 - `Transform:getMatrix`: Returns the 3x3 matrix as a flat table of 9 numbers (row-major).
+- `Transform:decompose`: Decomposes this transform into translation, rotation, and scale.
 
 ### `Tween` Methods
 - `Tween:update`: Advances the clock by dt seconds. Returns true when complete.
@@ -485,6 +542,7 @@ Three new source files add major computational capabilities. `voronoi.rs` introd
 - `Vec2:rotate`: Returns a new vector rotated by the given angle in radians.
 - `Vec2:perpendicular`: Returns the perpendicular vector (-y, x).
 - `Vec2:cross`: Returns the 2D cross product (scalar) with another vector.
+- `Vec2:reflect`: Reflects this vector off a surface with the given normal.
 
 ### `Vec3` Methods
 - `Vec3:length`: Returns the Euclidean length of the vector.

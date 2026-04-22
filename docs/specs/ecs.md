@@ -69,9 +69,9 @@ Additional query and filter methods have been added to `Universe`, expanding the
 - `Universe::unpack_gen` (`universe.rs`): Extracts the generation counter from a packed entity ID.
 - `Universe::spawn` (`universe.rs`): Spawns a new entity and returns its ID.
 - `Universe::kill` (`universe.rs`): Kills an entity, cleaning up all associated data and recycling the ID.
-- `Universe::set_parent` (`universe.rs`): Sets or clears the parent of `ecs`.
-- `Universe::get_parent` (`universe.rs`): Returns the parent of `ecs`, or `None` if unparented.
-- `Universe::get_children` (`universe.rs`): Returns the direct children of `ecs`.
+- `Universe::set_parent` (`universe.rs`): Sets or clears the parent of `entity`.
+- `Universe::get_parent` (`universe.rs`): Returns the parent of `entity`, or `None` if unparented.
+- `Universe::get_children` (`universe.rs`): Returns the direct children of `entity`.
 - `Universe::kill_recursive` (`universe.rs`): Kills `root` and all of its descendants recursively.
 - `Universe::is_alive` (`universe.rs`): Returns whether an entity ID is currently alive.
 - `Universe::get_entity_count` (`universe.rs`): Returns the number of alive entities.
@@ -112,11 +112,11 @@ Additional query and filter methods have been added to `Universe`, expanding the
 - `Universe::remove_system` (`universe.rs`): Removes a system by pointer identity from the system list.
 - `Universe::get_system_count` (`universe.rs`): Returns the number of registered systems.
 - `Universe::clear` (`universe.rs`): Clears all entities, components, tags, layers, and systems.
-- `take_component_events` (`universe.rs`): Takes and clears all pending component-add and component-remove events.
-- `query_not` (`universe.rs`): Returns alive entities that have ALL `with` components and NONE of the `without` components.
-- `spawn_bulk` (`universe.rs`): Spawns `count` entities from a blueprint, applying the same optional overrides to each.
-- `serialize_to_table` (`universe.rs`): Serializes all alive entities to a Lua table snapshot.
-- `deserialize_from_table` (`universe.rs`): Restores entity state from a snapshot produced by `serialize_to_table`.
+- `Universe::take_component_events` (`universe.rs`): Takes and clears all pending component-add and component-remove events.
+- `Universe::query_not` (`universe.rs`): Returns alive entities that have ALL `with` components and NONE of the `without` components.
+- `Universe::spawn_bulk` (`universe.rs`): Spawns `count` entities from a blueprint, applying the same optional overrides to each.
+- `Universe::serialize_to_table` (`universe.rs`): Serializes all alive entities to a Lua table snapshot.
+- `Universe::deserialize_from_table` (`universe.rs`): Restores entity state from a snapshot produced by `serialize_to_table`.
 - `deep_copy_table` (`universe.rs`): Deep-copies a Lua table recursively.
 
 ## Lua API Reference
@@ -131,16 +131,13 @@ Additional query and filter methods have been added to `Universe`, expanding the
 - `Universe:spawn`: Creates a new entity and returns its packed ID.
 - `Universe:kill`: Destroys the entity with the given ID, freeing its slot for reuse.
 - `Universe:isAlive`: Returns true if the entity ID is currently alive.
-- `Universe:set`: Sets a component value on an entity.
 - `Universe:get`: Returns the component value for an entity, or nil if missing.
 - `Universe:has`: Returns true if the entity has the named component.
 - `Universe:remove`: Removes a component from an entity.
 - `Universe:getComponents`: Returns all component names for an entity.
 - `Universe:query`: Returns entity IDs that have all listed component names.
-- `Universe:each`: Calls callback(id, value) for every entity with the named component.
 - `Universe:getEntities`: Returns all alive entity IDs.
 - `Universe:getEntityCount`: Returns the number of alive entities.
-- `Universe:addSystem`: Adds a system table to the universe with an optional priority (lower = earlier).
 - `Universe:removeSystem`: Removes a system table from the universe.
 - `Universe:update`: Calls update(system, world, dt) on each registered system in priority order.
 - `Universe:render`: Calls render(system, world) on each registered system in priority order.
@@ -172,18 +169,11 @@ Additional query and filter methods have been added to `Universe`, expanding the
 - `Universe:getParent`: Returns the parent entity ID, or nil if unparented.
 - `Universe:getChildren`: Returns all direct child entity IDs.
 - `Universe:killRecursive`: Kills an entity and all its descendants recursively.
-- `Universe:queryNot`: Returns entity IDs that have all `with` components and none of the `without` components.
 - `Universe:serialize`: Serializes all alive entities to a Lua table snapshot.
 - `Universe:deserialize`: Restores entity state from a snapshot produced by serialize().
-- `Universe:onComponentAdded`: Registers a callback to fire when a component is added to any entity.
-- `Universe:onComponentRemoved`: Registers a callback to fire when a component is removed from any entity.
 - `Universe:flushObservers`: Dispatches all pending component-add and component-remove events to registered callbacks.
-- `Universe:spawnBulk`: Spawns `count` entities from a blueprint, returns an array of entity IDs.
-- `Universe:addRelation`: Adds a directed named relationship from entity `from` to entity `to`.
 - `Universe:getRelated`: Returns all entity IDs reachable from `from` via the named relationship.
-- `Universe:removeRelation`: Removes the directed named relationship from entity `from` to entity `to`.
 - `Universe:clearRelations`: Removes all directed named relationships of type `name` from entity `from`.
-- `Universe:hasRelation`: Returns true if a directed named relationship from `from` to `to` exists.
 
 ## References
 

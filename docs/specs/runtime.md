@@ -34,13 +34,14 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 ## Types
 
 - `Config` (`struct`, `config.rs`): Top-level engine configuration.
-- `GraphicsConfig` (`struct`, `config.rs`): GPU backend and power-preference settings resolved once at engine startup.
+- `RenderConfig` (`struct`, `config.rs`): GPU backend and power-preference settings resolved once at engine startup.
 - `WindowConfig` (`struct`, `config.rs`): Window dimensions, title, vsync, fullscreen, and resize settings.
 - `ModulesConfig` (`struct`, `config.rs`): Flags to enable or disable optional engine subsystems.
 - `PerformanceConfig` (`struct`, `config.rs`): Frame rate cap and other performance tuning options.
 - `ErrorCategory` (`enum`, `error.rs`): Error category for grouping related engine errors.
 - `EngineError` (`enum`, `error.rs`): All possible error conditions that can occur in the Lurek2D engine.
 - `EngineResult` (`type`, `error.rs`): Convenience alias for `Result<T, EngineError>` used throughout the engine.
+- `ErrorSnapshot` (`struct`, `error.rs`): A serialisable snapshot of an engine error.
 - `MessageCatalog` (`struct`, `messages.rs`): Immutable map from stable message ID (e.g.
 - `TextureKey` (`struct`, `resource_keys.rs`): Key for texture resources stored in SharedState.
 - `FontKey` (`struct`, `resource_keys.rs`): Key for font resources stored in SharedState.
@@ -65,13 +66,15 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 
 ## Functions
 
-- `ModulesConfig::validate_and_fix` (`config.rs`): Enforces dependency constraints so that a partially-disabled config is never internally inconsistent. Current rules: `minimap`, `particle`, `ui`, `effect`, `parallax`, `terminal`, `animation`, `tilemap`, `raycaster`, `camera`, `globe`, and `spine` all require `graphics`; `spine` additionally requires `animation`.
-- `Config::load` (`config.rs`): Loads engine configuration from the game directory. Tries `conf.toml`; returns defaults if absent.
+- `ModulesConfig::validate_and_fix` (`config.rs`): Enforces dependency constraints so that a partially-disabled config is never internally inconsistent.
+- `Config::load` (`config.rs`): Loads engine configuration from the game directory.
 - `Config::load_from_conf_toml` (`config.rs`): Loads engine configuration from `conf.toml` in the game directory.
 - `ErrorCategory::as_str` (`error.rs`): Returns the category name as a lowercase string.
 - `EngineError::code` (`error.rs`): Returns the stable error code for this variant.
 - `EngineError::category` (`error.rs`): Returns the error category for this variant.
 - `EngineError::recovery_hint` (`error.rs`): Returns a human-readable recovery hint for this error variant.
+- `ErrorSnapshot::to_json` (`error.rs`): Serialises the snapshot to a compact JSON string.
+- `EngineError::snapshot` (`error.rs`): Creates an [`ErrorSnapshot`] capturing all diagnostic fields of this error.
 - `set_log_level` (`log_messages.rs`): Sets the global log level at runtime (called from `lurek.runtime.setLogLevel`).
 - `get_log_level` (`log_messages.rs`): Returns the current log level name.
 - `MessageCatalog::from_toml` (`messages.rs`): Parse the embedded TOML source and build a flat ID → text map.
@@ -97,18 +100,6 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 ## Lua API Reference
 
 - Namespace: `lurek.runtime.setLogLevel`
-
-### New in 0.15.0
-
-**Error category additions**
-
-`ErrorCategory::Filesystem` was added. `EngineError::FileSystemError` now maps to this category (previously mapped to `System`). `ErrorCategory::as_str()` returns `"filesystem"`.
-
-**ErrorSnapshot serialisation**
-
-`ErrorSnapshot` struct added to `src/runtime/error.rs`. Fields: `message: String`, `code: &'static str`, `category: &'static str`, `recovery_hint: &'static str`. `ErrorSnapshot::to_json()` serialises to a compact JSON object. `EngineError::snapshot()` constructs an `ErrorSnapshot` from any `EngineError`.
-
-Lua: `lurek.runtime.errorSnapshot(message)` — wraps `message` as a `LuaError`, calls `.snapshot().to_json()`, and returns a JSON string with `message`, `code`, `category`, and `recovery_hint` fields.
 
 ## References
 

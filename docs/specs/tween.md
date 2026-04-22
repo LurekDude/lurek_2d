@@ -93,7 +93,7 @@ The `tween` module provides property animation through interpolated value transi
 - `lurek.tween.registerEasing`: Registers a custom easing function under `name`. `fn(t)` receives 0..1, returns 0..1.
 - `lurek.tween.getEasingNames`: Returns a list of all available easing names (built-in + custom).
 - `lurek.tween.newState`: Creates a standalone tween timing state without registering it with the engine.
-- `lurek.tween.to`: Sugar for `tween()` with `target` first — natural read order.
+- `lurek.tween.to`: Sugar for `tween()` with `target` first â€” natural read order.
 - `lurek.tween.spring`: Creates a physics-based spring animation that drives named fields on `target_table`
 
 ### `Spring` Methods

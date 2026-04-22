@@ -28,6 +28,7 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `bin_pack.rs`: Implements the Lurek2D-native binary pack format with readable named tokens such as `u32`, `f64`, `str`, and endian modifiers.
 - `byte_data.rs`: Defines the owned byte-buffer type used to construct, mutate, clone, and expose raw bytes to Lua.
 - `compress.rs`: Provides whole-buffer compression and decompression for deflate, gzip, zlib, and LZ4 formats.
+- `data_writer.rs`: Write-cursor companion to [`DataView`](super::DataView).
 - `dataview.rs`: Implements a read-only typed cursor over shared bytes with bounds-checked little-endian accessors.
 - `encode.rs`: Handles base64 and hex encoding and decoding for binary payload transport.
 - `hash.rs`: Computes MD5, SHA-1, SHA-256, and SHA-512 digests over in-memory data.
@@ -42,6 +43,7 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `BinValue` (`enum`, `bin_pack.rs`): Tagged value enum used by the named-token pack format. It is the bridge between dynamically typed inputs and strongly typed binary writes and reads.
 - `ByteData` (`struct`, `byte_data.rs`): Primary owned byte buffer for Lua and Rust interop. It is the mutable container that other helpers serialize into or read from.
 - `CompressFormat` (`enum`, `compress.rs`): Supported compression backends for whole-buffer compression and decompression. It keeps format parsing and dispatch explicit rather than stringly typed deep in the implementation.
+- `DataWriter` (`struct`, `data_writer.rs`): A growable byte buffer with a write cursor.
 - `DataView` (`struct`, `dataview.rs`): Read-only window over shared bytes with typed accessors. It exists for cheap inspection of binary payloads without copying or mutating them.
 - `LuaDataView` (`struct`, `dataview.rs`): Lua-facing wrapper over `DataView`. Keeping it separate lets the domain type stay free of Lua-specific method registration.
 - `EncodeFormat` (`enum`, `encode.rs`): Supported binary-to-text encoding modes. It is the small dispatch enum behind the base64 and hex helpers.
@@ -55,19 +57,38 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `read` (`bin_pack.rs`): Read values from a binary buffer according to a Lurek2D format string.
 - `measure_size` (`bin_pack.rs`): Compute the total byte size that `write` would produce for the given format string.
 - `ByteData::new` (`byte_data.rs`): Create a zero-filled buffer of the given size.
-- `ByteData::from_bytes` (`byte_data.rs`): Create from an existing byte vector.
-- `ByteData::from_string` (`byte_data.rs`): Create from a string.
+- `ByteData::from_bytes` (`byte_data.rs`): Create from an existing byte vector, taking ownership.
+- `ByteData::from_string` (`byte_data.rs`): Create from a UTF-8 string, copying the string’s bytes into the buffer.
 - `ByteData::len` (`byte_data.rs`): Get the size of the buffer in bytes.
-- `ByteData::is_empty` (`byte_data.rs`): Check if the buffer is empty.
+- `ByteData::is_empty` (`byte_data.rs`): Check if the buffer contains zero bytes.
 - `ByteData::get_byte` (`byte_data.rs`): Get a byte at the given offset (0-based).
 - `ByteData::set_byte` (`byte_data.rs`): Set a byte at the given offset (0-based).
 - `ByteData::get_string` (`byte_data.rs`): Get the data as a lossy UTF-8 string.
 - `ByteData::as_bytes` (`byte_data.rs`): Returns a reference to the raw byte slice.
 - `ByteData::as_bytes_mut` (`byte_data.rs`): Get a mutable reference to the raw bytes.
 - `ByteData::clone_data` (`byte_data.rs`): Clones the internal byte buffer into a new standalone `ByteData` instance.
-- `CompressFormat::parse_str` (`compress.rs`): Parse a format name string.
+- `CompressFormat::parse_str` (`compress.rs`): Parse a format name string (case-insensitive).
 - `compress` (`compress.rs`): Compress data using the specified format and compression level (0-9).
 - `decompress` (`compress.rs`): Decompress data using the specified format.
+- `DataWriter::new` (`data_writer.rs`): Creates a new empty `DataWriter`.
+- `DataWriter::with_capacity` (`data_writer.rs`): Creates a `DataWriter` pre-allocated with `capacity` bytes.
+- `DataWriter::tell` (`data_writer.rs`): Returns the current cursor position.
+- `DataWriter::len` (`data_writer.rs`): Returns the number of bytes written so far.
+- `DataWriter::is_empty` (`data_writer.rs`): Returns `true` if no bytes have been written.
+- `DataWriter::seek` (`data_writer.rs`): Moves the write cursor to `pos`.
+- `DataWriter::into_bytes` (`data_writer.rs`): Consumes the writer and returns the underlying byte vector.
+- `DataWriter::as_bytes` (`data_writer.rs`): Returns a shared reference to the written bytes.
+- `DataWriter::write_u8` (`data_writer.rs`): Writes a single byte and advances the cursor.
+- `DataWriter::write_i8` (`data_writer.rs`): Writes an `i8` and advances the cursor.
+- `DataWriter::write_u16_le` (`data_writer.rs`): Writes a little-endian `u16` and advances the cursor.
+- `DataWriter::write_u16_be` (`data_writer.rs`): Writes a big-endian `u16` and advances the cursor.
+- `DataWriter::write_i16_le` (`data_writer.rs`): Writes a little-endian `i16` and advances the cursor.
+- `DataWriter::write_u32_le` (`data_writer.rs`): Writes a little-endian `u32` and advances the cursor.
+- `DataWriter::write_i32_le` (`data_writer.rs`): Writes a little-endian `i32` and advances the cursor.
+- `DataWriter::write_f32_le` (`data_writer.rs`): Writes a little-endian `f32` and advances the cursor.
+- `DataWriter::write_f64_le` (`data_writer.rs`): Writes a little-endian `f64` and advances the cursor.
+- `DataWriter::write_string` (`data_writer.rs`): Writes a length-prefixed UTF-8 string (4-byte LE length + bytes).
+- `DataWriter::write_bytes` (`data_writer.rs`): Writes raw bytes and advances the cursor.
 - `DataView::new` (`dataview.rs`): Creates a new view spanning the entire buffer.
 - `DataView::new_slice` (`dataview.rs`): Creates a view starting at `offset` covering `size` bytes.
 - `DataView::get_size` (`dataview.rs`): Returns the number of bytes in this view.
@@ -80,10 +101,10 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `DataView::get_f32` (`dataview.rs`): Reads a little-endian `f32` at `idx`.
 - `DataView::get_f64` (`dataview.rs`): Reads a little-endian `f64` at `idx`.
 - `LuaDataView::new` (`dataview.rs`): Creates a new `LuaDataView` wrapping the given `DataView`.
-- `EncodeFormat::parse_str` (`encode.rs`): Parse a format name string.
+- `EncodeFormat::parse_str` (`encode.rs`): Parse a format name string (case-insensitive).
 - `encode` (`encode.rs`): Encode bytes into a string using the specified format.
 - `decode` (`encode.rs`): Decode a string back into bytes using the specified format.
-- `HashAlgorithm::parse_str` (`hash.rs`): Parse an algorithm name string.
+- `HashAlgorithm::parse_str` (`hash.rs`): Parse an algorithm name string (case-insensitive).
 - `hash` (`hash.rs`): Compute the hash of data using the specified algorithm, returned as a hex string.
 - `crc32` (`hash.rs`): Compute the CRC-32 checksum of `data`, returned as a `u64` in the range `[0, 2³²)`.
 - `to_msgpack` (`msgpack.rs`): Serializes a `serde_json::Value` to MessagePack bytes.
@@ -120,8 +141,7 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `lurek.data.encode`: Encodes binary data using the given format (base64, hex).
 - `lurek.data.decode`: Decodes encoded text back to binary (base64, hex).
 - `lurek.data.hash`: Returns the cryptographic hash of the input (md5, sha1, sha256, sha512).
-- `lurek.data.crc32`: Returns the CRC-32 checksum of the input string as an integer in `[0, 2³²)`.
-- `lurek.data.newByteData`: Creates a new mutable byte buffer from a size or string.
+- `lurek.data.crc32`: Returns the CRC-32 checksum of the input data as an integer.
 - `lurek.data.newDataView`: Creates a read-only windowed view into a byte string.
 - `lurek.data.write`: Writes values using the Lurek2D Binary Pack Format.
 - `lurek.data.read`: Reads values using the Lurek2D Binary Pack Format.
@@ -131,6 +151,7 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `lurek.data.newRingBuffer`: Creates a fixed-capacity ring buffer that can store any Lua value.
 - `lurek.data.toMsgPack`: Serializes a Lua value (table, string, number, boolean, or nil) to MessagePack binary.
 - `lurek.data.fromMsgPack`: Deserializes a MessagePack binary string back into a Lua value.
+- `lurek.data.newWriter`: Creates a new write-cursor for building binary data.
 
 ### `DataView` Methods
 - `DataView:getUInt8`: Reads an unsigned 8-bit integer at the given offset.
@@ -143,6 +164,23 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `DataView:getDouble`: Reads a 64-bit float at the given offset.
 - `DataView:getSize`: Returns the size of this view in bytes.
 
+### `DataWriter` Methods
+- `DataWriter:writeU8`: Writes an unsigned 8-bit integer.
+- `DataWriter:writeI8`: Writes a signed 8-bit integer.
+- `DataWriter:writeU16LE`: Writes an unsigned 16-bit LE integer.
+- `DataWriter:writeU16BE`: Writes an unsigned 16-bit BE integer.
+- `DataWriter:writeI16LE`: Writes a signed 16-bit LE integer.
+- `DataWriter:writeU32LE`: Writes an unsigned 32-bit LE integer.
+- `DataWriter:writeI32LE`: Writes a signed 32-bit LE integer.
+- `DataWriter:writeF32LE`: Writes a 32-bit LE float.
+- `DataWriter:writeF64LE`: Writes a 64-bit LE float.
+- `DataWriter:writeString`: Writes a length-prefixed UTF-8 string (4-byte LE length + bytes).
+- `DataWriter:writeBytes`: Writes raw bytes from a Lua string.
+- `DataWriter:seek`: Moves the write cursor to the given position.
+- `DataWriter:tell`: Returns the current write cursor position.
+- `DataWriter:len`: Returns the total buffer length.
+- `DataWriter:toBytes`: Returns the buffer contents as a Lua string.
+
 ### `RingBuffer` Methods
 - `RingBuffer:push`: Pushes a value onto the ring buffer.
 - `RingBuffer:pop`: Removes and returns the oldest element, or nil if the buffer is empty.
@@ -151,7 +189,6 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `RingBuffer:len`: Returns the number of elements currently in the buffer.
 - `RingBuffer:capacity`: Returns the maximum number of elements the buffer can hold.
 - `RingBuffer:isEmpty`: Returns true if the buffer contains no elements.
-- `RingBuffer:isFull`: Returns true if the buffer has reached its capacity.
 - `RingBuffer:clear`: Removes all elements from the buffer, releasing their registry entries.
 - `RingBuffer:toTable`: Returns all elements as an array table ordered oldest-first.
 
@@ -161,26 +198,6 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `mlua:getByte`: Get a byte at the specified offset.
 - `mlua:setByte`: Set a byte at the specified offset.
 - `mlua:clone`: Clone the ByteData.
-
-### `DataWriter` Methods
-
-Created via `lurek.data.newWriter()`. Provides a sequential binary write buffer with a movable cursor.
-
-- `DataWriter:writeU8(v)`: Writes one unsigned byte.
-- `DataWriter:writeI8(v)`: Writes one signed byte.
-- `DataWriter:writeU16LE(v)`: Writes a 16-bit unsigned integer, little-endian.
-- `DataWriter:writeU16BE(v)`: Writes a 16-bit unsigned integer, big-endian.
-- `DataWriter:writeI16LE(v)`: Writes a 16-bit signed integer, little-endian.
-- `DataWriter:writeU32LE(v)`: Writes a 32-bit unsigned integer, little-endian.
-- `DataWriter:writeI32LE(v)`: Writes a 32-bit signed integer, little-endian.
-- `DataWriter:writeF32LE(v)`: Writes a 32-bit IEEE 754 float, little-endian.
-- `DataWriter:writeF64LE(v)`: Writes a 64-bit IEEE 754 double, little-endian.
-- `DataWriter:writeString(s)`: Writes a 4-byte LE length prefix followed by the raw UTF-8 bytes of `s`.
-- `DataWriter:writeBytes(s)`: Appends the raw bytes of string `s` without any length prefix.
-- `DataWriter:seek(pos)`: Moves the write cursor to byte offset `pos`. Zero-extends the buffer if `pos` is past the current end.
-- `DataWriter:tell()`: Returns the current write cursor position.
-- `DataWriter:len()`: Returns the total length of the buffer in bytes.
-- `DataWriter:toBytes()`: Returns the buffer contents as a Lua string.
 
 ## References
 

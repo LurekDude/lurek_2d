@@ -227,7 +227,6 @@ Additional source files extend the hardware input surface. `gamepad.rs` consolid
 - `Combo:feed`: Feed a key-press event into the combo detector.
 - `Combo:tick`: Advance the internal clock by `dt` seconds and check for timeouts.
 - `Combo:reset`: Reset the detector to its initial idle state, cancelling any in-progress sequence.
-- `Combo:progress`: Returns the number of steps matched so far (0 when idle).
 - `Combo:totalSteps`: Returns the total number of steps in the combo sequence.
 - `Combo:isInProgress`: Returns true if the detector is currently mid-sequence.
 - `Combo:getStep`: Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.

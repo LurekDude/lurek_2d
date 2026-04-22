@@ -2,7 +2,7 @@
 
 ## General Info
 
-- Module group: `Feature Systems.`
+- Module group: `Feature Systems`
 - Source path: `src/spine/`
 - Lua API path(s): `src/lua_api/spine_api.rs`
 - Primary Lua namespace: `lurek.spine`
@@ -79,12 +79,12 @@ Updated spine animation methods expand the Lua-accessible surface for runtime sk
 - `Skeleton::get_skin` (`skeleton.rs`): Returns the name of the currently active skin.
 - `Skeleton::set_skin_mapping` (`skeleton.rs`): Registers a slot-to-attachment mapping within a named skin.
 - `Skeleton::get_slot_attachment` (`skeleton.rs`): Returns the effective attachment name for a slot, consulting the active skin first.
-- `slot_count` (`skeleton.rs`): Returns the number of slots in this skeleton.
-- `update_world_transforms` (`skeleton.rs`): Propagates local transforms down the bone hierarchy to compute world transforms.
-- `draw_to_image` (`skeleton.rs`): Renders the skeleton as a stick figure to an `ImageData`.
-- `draw_bones_to_image` (`skeleton.rs`): Draw skeleton with colour-coded joints and bone labels.
+- `Skeleton::slot_count` (`skeleton.rs`): Returns the number of slots in this skeleton.
+- `Skeleton::update_world_transforms` (`skeleton.rs`): Propagates local transforms down the bone hierarchy to compute world transforms.
+- `Skeleton::draw_to_image` (`skeleton.rs`): Renders the skeleton as a stick figure to an `ImageData`.
+- `Skeleton::draw_bones_to_image` (`skeleton.rs`): Draw skeleton with colour-coded joints and bone labels.
 - `Slot::new` (`slot.rs`): Creates a new slot bound to a bone with default white colour and no attachment.
-- `EasingType::apply` (`timeline.rs`): Applies the easing curve to a normalised time value `t ∈ [0, 1]`.
+- `EasingType::apply` (`timeline.rs`): Applies the easing curve to a normalised time value `t â [0, 1]`.
 - `BoneTimeline::new` (`timeline.rs`): Creates a new empty timeline for the given bone and property.
 - `BoneTimeline::add_key` (`timeline.rs`): Appends a keyframe at `time` with `value` and the given easing.
 - `BoneTimeline::evaluate` (`timeline.rs`): Evaluates the timeline at `time`, interpolating between surrounding keyframes.
@@ -124,6 +124,7 @@ Updated spine animation methods expand the Lua-accessible surface for runtime sk
 
 ### `SkeletonAnimation` Methods
 - `SkeletonAnimation:getDuration`: Returns the total duration of the animation in seconds.
+- `SkeletonAnimation:getEvents`: Returns a list of event names that fall in the half-open interval `(from, to]`.
 - `SkeletonAnimation:getTimelineCount`: Returns the number of bone timelines in this animation.
 
 ## References

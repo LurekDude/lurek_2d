@@ -61,6 +61,7 @@ the same types. The canonical implementation lives entirely in
 
 **Scope boundary**: Feature Systems tier. Depends on `filesystem`, `runtime`,
 `serial`. Lua bridge in `src/lua_api/save_api.rs` as `lurek.save.*`.
+
 ## Files
 
 - `mod.rs`: Declares the save submodules and re-exports the public save manager, value, metadata, serialization-facing types, and compression helpers.
@@ -117,6 +118,8 @@ the same types. The canonical implementation lives entirely in
 - `serialize_table` (`save_manager.rs`): Serialize a simple Lua-compatible value hierarchy into a `return { ...
 - `serialize_value` (`save_manager.rs`): Serialize a single value.
 - `SaveValue::from_lua` (`save_manager.rs`): Converts a [`LuaValue`] into a [`SaveValue`] for Rust-side serialization.
+- `compress_save_content` (`save_manager.rs`): Compress a serialised save string with LZ4, then base64-encode it.
+- `decompress_save_content` (`save_manager.rs`): Detect and decode a compressed save file, or pass through an uncompressed one.
 
 ## Lua API Reference
 
@@ -146,12 +149,12 @@ the same types. The canonical implementation lives entirely in
 - `SaveManager:save`: Collects data and writes it to a slot file.
 - `SaveManager:load`: Loads data from a slot file, applies migrations, and restores.
 - `SaveManager:delete`: Deletes a save file for the given slot.
-- `SaveManager:exists`: Returns whether a save file exists for the given slot.
 - `SaveManager:getSlots`: Returns a list of all save slots with metadata.
 - `SaveManager:getSlotInfo`: Returns metadata for a single slot, or nil if not found.
 
 ## References
 
+- `data`: Imports or references `src/data/`. Cross-group dependency from ``Feature Systems`` into `Foundations`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 
 ## Notes

@@ -45,6 +45,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `sprite_manager.rs`: Batch sprite manager with depth-sorted projection for raycaster scenes.
 - `sprite_projection.rs`: Projects billboard sprites into screen space with depth and size data.
 - `visibility.rs`: Builds visibility polygons and related field-of-view data from 2D geometry.
+- `visualization.rs`: Diagnostic and visualization helpers for [`Raycaster2D`].
 
 ## Types
 
@@ -102,12 +103,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Raycaster2D::cast_rays_flat` (`dda.rs`): Casts multiple rays and returns a flat `Vec<f32>` with 5 values per ray.
 - `Raycaster2D::line_of_sight` (`dda.rs`): Checks line of sight between two points using DDA traversal.
 - `Raycaster2D::project_sprite` (`dda.rs`): Projects a world-space sprite onto screen space.
-- `Raycaster2D::draw_top_down_to_image` (`dda.rs`): Render a top-down map view to an image.
-- `Raycaster2D::draw_view_to_image` (`dda.rs`): Render a first-person column view to an image.
-- `Raycaster2D::draw_depth_map_to_image` (`dda.rs`): Render a depth-map column view with sky gradient and cell-value coloring.
-- `Raycaster2D::draw_line_of_sight_to_image` (`dda.rs`): Render a line-of-sight test between two points overlaid on the grid.
-- `Raycaster2D::draw_camera_sweep_to_image` (`dda.rs`): Render a mosaic of first-person views from evenly-spaced angles.
-- `Raycaster2D::draw_textured_view_to_image` (`dda.rs`): Draw a first-person textured raycaster view with procedural textures.
 - `Raycaster2D::cast_floor_row` (`dda.rs`): Computes floor (or ceiling) texture coordinates for one horizontal screen row.
 - `DepthBuffer::new` (`depth_buffer.rs`): Creates a new depth buffer with the given width, initialized to `f32::MAX`.
 - `DepthBuffer::clear` (`depth_buffer.rs`): Clears all depth values to `f32::MAX`.
@@ -149,6 +144,12 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `SpriteManager::clear` (`sprite_manager.rs`): Removes all sprites from the manager.
 - `SpriteManager::sort_by_distance` (`sprite_manager.rs`): Returns references to visible sprites sorted back-to-front (farthest first).
 - `field_of_view` (`visibility.rs`): Computes a visibility polygon by casting rays at segment endpoints.
+- `Raycaster2D::draw_top_down_to_image` (`visualization.rs`): Render a top-down map view to an image.
+- `Raycaster2D::draw_view_to_image` (`visualization.rs`): Render a first-person column view to an image.
+- `Raycaster2D::draw_depth_map_to_image` (`visualization.rs`): Render a depth-map column view with sky gradient and cell-value coloring.
+- `Raycaster2D::draw_line_of_sight_to_image` (`visualization.rs`): Render a line-of-sight test between two points overlaid on the grid.
+- `Raycaster2D::draw_camera_sweep_to_image` (`visualization.rs`): Render a mosaic of first-person views from evenly-spaced angles.
+- `Raycaster2D::draw_textured_view_to_image` (`visualization.rs`): Draw a first-person textured raycaster view with procedural textures.
 
 ## Lua API Reference
 
@@ -198,6 +199,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Raycaster:isBlocked`: Returns true when the cell at (x, y) is a wall (value > 0).
 - `Raycaster:width`: Returns the grid width in cells.
 - `Raycaster:height`: Returns the grid height in cells.
+- `Raycaster:setWallAlpha`: Sets the opacity for a wall tile type. Alpha is clamped to [0, 1].
 - `Raycaster:getWallAlpha`: Returns the opacity for a wall tile type. Returns 1.0 if not set.
 
 ### `SpriteManager` Methods

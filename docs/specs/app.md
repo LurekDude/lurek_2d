@@ -31,6 +31,8 @@ Because `App` imports from virtually every other module (render, audio, input, l
 
 ## Types
 
+- `RunState` (`enum`, `app.rs`): Tracks whether the engine is running normally, showing an error, or shutting down.
+- `LurekApp` (`struct`, `app.rs`): Lurek2D application state managed by the winit event loop.
 - `App` (`struct`, `app.rs`): Public entry point used to launch the engine with loaded configuration and optional startup error context. It is the outward-facing runtime shell around the real application lifecycle.
 - `App` (`struct`, `app_winit.rs`): Public entry point used to launch the engine with loaded configuration and optional startup error context. It is the outward-facing runtime shell around the real application lifecycle.
 - `DebugOverlay` (`struct`, `debug_overlay.rs`): Small runtime overlay for FPS and draw-call visibility. It is useful when changes affect per-frame diagnostics rather than the full devtools subsystem.
@@ -38,7 +40,13 @@ Because `App` imports from virtually every other module (render, audio, input, l
 
 ## Functions
 
-- `App::new` (`app.rs`): Creates a new `App` with the given `Config` and an optional conf.lua error.
+- `recompute_viewport` (`app.rs`): Recomputes viewport scale and offset based on game and window dimensions.
+- `splash_window_title` (`app.rs`): Returns the splash-mode window title with the engine version appended.
+- `fit_contain_size` (`app.rs`): Computes the largest size that fits `src` inside `max` while preserving aspect ratio.
+- `LurekApp::new` (`app.rs`): Creates a new [`LurekApp`] from the given configuration and game-folder path.
+- `LurekApp::resolve_present_mode` (`app.rs`): Selects the best available [`wgpu::PresentMode`] for the given `requested_mode` integer.
+- `LurekApp::init_lua` (`app.rs`): Re-initialises the Lua VM and per-game pipeline state for a new game session.
+- `App::new` (`app.rs`): Creates a new `App` with the given `Config` and an optional conf.toml error.
 - `App::run` (`app.rs`): Initialises the GPU, window, Lua VM, and runs the event loop until the game exits.
 - `App::new` (`app_winit.rs`): Creates a new `App` with the given `Config`.
 - `App::run` (`app_winit.rs`): Initialises the GPU, window, Lua VM, and runs the event loop until the game exits.

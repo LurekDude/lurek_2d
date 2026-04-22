@@ -2,7 +2,7 @@
 
 ## General Info
 
-- Module group: `Feature Systems.`
+- Module group: `Feature Systems`
 - Source path: `src/sprite/`
 - Lua API path(s): `src/lua_api/sprite_api.rs`
 - Primary Lua namespace: `lurek.sprite`
@@ -59,6 +59,7 @@ verifying grid layout and named group assignments during authoring.
 
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`,
 `runtime`. Lua bridge in `src/lua_api/sprite_api.rs` as `lurek.sprite.*`.
+
 ## Files
 
 - `atlas.rs`: TexturePacker JSON atlas importer and named region lookup.
@@ -130,8 +131,8 @@ verifying grid layout and named group assignments during authoring.
 - Namespace: `lurek.sprite`
 
 ### Module Functions
-- `lurek.sprite.newSheet`: Creates a sprite sheet with a uniform grid of `frame_w × frame_h` frames.
-- `lurek.sprite.newRPGMakerSheet`: Creates an RPGMaker VX/Ace character sheet (3 cols × 4 rows) with "down", "left", "right", "up" groups.
+- `lurek.sprite.newSheet`: Creates a sprite sheet with a uniform grid of `frame_w Ă— frame_h` frames.
+- `lurek.sprite.newRPGMakerSheet`: Creates an RPGMaker VX/Ace character sheet (3 cols Ă— 4 rows) with "down", "left", "right", "up" groups.
 - `lurek.sprite.parseAtlas`: Parses a TexturePacker JSON string (hash or array format) and returns a SpriteAtlas.
 - `lurek.sprite.newAtlasSheet`: Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
 - `lurek.sprite.parseAsepriteAtlas`: Parses an Aseprite JSON export string and returns a `SpriteAtlas`.

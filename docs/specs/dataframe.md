@@ -167,6 +167,7 @@ Additional column-operation methods have been added to `DataFrame`, expanding th
 - `DataFrame:select`: Selects a subset of columns, returns a new DataFrame.
 - `DataFrame:unique`: Returns unique values in a column as a table.
 - `DataFrame:groupBy`: Groups rows by column value, returns a table of DataFrames keyed by value.
+- `DataFrame:groupByObj`: Groups rows by column value, returns a GroupedFrame object supporting aggregate().
 - `DataFrame:merge`: Appends rows from another DataFrame in-place.
 - `DataFrame:countBy`: Counts distinct values in a column, returns a DataFrame with value and count columns.
 - `DataFrame:dropNil`: Removes rows where the given column is nil, returns a new DataFrame.
@@ -210,6 +211,9 @@ Additional column-operation methods have been added to `DataFrame`, expanding th
 - `Database:type`: Returns the type name of this object.
 - `Database:typeOf`: Returns true if this object is of the given type.
 
+### `GroupedFrame` Methods
+- `GroupedFrame:aggregate`: Apply a Lua function to aggregate a column's values per group.
+
 ## References
 
 - No top-level `crate::<module>` imports were detected in this module's Rust source files.
@@ -218,33 +222,3 @@ Additional column-operation methods have been added to `DataFrame`, expanding th
 
 - Keep this module reference synchronized with `src/dataframe/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
-
-## Lua Extensibility
-
-### `df:groupByObj(col)` → `GroupedFrame`
-
-Returns a `GroupedFrame` UserData object grouping rows by the given column. Unlike
-`df:groupBy(col)` which returns a plain Lua table, `groupByObj` returns an object
-that supports aggregate operations.
-
-### `grouped:aggregate(col_name, fn)` → `DataFrame`
-
-Applies a Lua aggregation callback to each group's values for the named column.
-
-**Parameters:**
-- `col_name` `string` — column whose values are aggregated per group
-- `fn` `function(values: table) → number` — receives a Lua array of numeric values, returns the aggregate scalar
-
-**Returns:** A new `DataFrame` with two columns: `group_key` and `<col_name>`.
-
-**Example:**
-```lua
-local df = lurek.dataframe.fromCSV("category,value\na,1\na,2\nb,10")
-local g = df:groupByObj("category")
-local totals = g:aggregate("value", function(vals)
-    local s = 0
-    for _, v in ipairs(vals) do s = s + v end
-    return s
-end)
--- totals has 2 rows: {a, 3} and {b, 10}
-```

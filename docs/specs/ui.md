@@ -98,6 +98,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `GUITable` (`struct`, `extras.rs`): A data table widget with sortable columns and selectable rows.
 - `ImageWidget` (`struct`, `extras.rs`): An image display widget.
 - `Badge` (`struct`, `extras.rs`): A notification badge displaying a numeric count or short label.
+- `CustomWidget` (`struct`, `extras.rs`): A fully Lua-driven widget with custom rendering.
 - `WidgetDef` (`struct`, `layout_loader.rs`): Tree node describing a single widget and its optional children.
 - `LayoutDef` (`struct`, `layout_loader.rs`): Top-level TOML layout descriptor.
 - `WidgetStyle` (`struct`, `theme.rs`): A concrete set of colors, borders, radius, and font-size values used by theme lookup.
@@ -179,6 +180,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `GuiContext::add_spin_box` (`context.rs`): Add a spin box and return its pool index.
 - `GuiContext::add_switch` (`context.rs`): Add a toggle switch and return its pool index.
 - `GuiContext::add_badge` (`context.rs`): Add a badge and return its pool index.
+- `GuiContext::add_custom_widget` (`context.rs`): Add a custom Lua-driven widget and return its pool index.
 - `GuiContext::set_default_theme` (`context.rs`): Install the built-in dark theme as the active theme.
 - `GuiContext::set_viewport` (`context.rs`): Set the logical viewport size (used for anchoring and relative layout).
 - `GuiContext::flush_cache` (`context.rs`): Mark the render cache as clean and return `true` if the context was dirty.
@@ -304,6 +306,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Badge::new` (`extras.rs`): Create a new badge.
 - `Badge::display_text` (`extras.rs`): Return the text that should be rendered inside the badge.
 - `Badge::set_count` (`extras.rs`): Set the count.
+- `CustomWidget::new` (`extras.rs`): Create a new custom widget.
 - `load_layout_def` (`layout_loader.rs`): Recursively build a widget tree from a `WidgetDef` into a `GuiContext`. Returns the pool index of the created root widget.
 - `load_layout_toml` (`layout_loader.rs`): Parse a TOML source string into a `LayoutDef` then delegate to `load_layout_def`. Returns the pool index of the created root widget.
 - `render_to_image` (`layout_loader.rs`): Run the layout pass, software-rasterise each visible widget rectangle in a representative colour, and save the result as a PNG. Headless-safe.
@@ -530,7 +533,8 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Image_Widget:textinput`: Forwards text input to the focused text input widget.
 - `Image_Widget:wheelmoved`: Forwards a mouse wheel event to the GUI.
 - `Image_Widget:update`: Advances toast timers, removes expired toasts, and dispatches pending GUI events.
-- `Image_Widget:draw`: Headless compatibility stub for GUI draw.
+- `Image_Widget:draw`: Invokes all registered on_draw callbacks, each receiving the widget's
+- `Image_Widget:newCustomWidget`: Creates a new widget with custom Lua-driven rendering.
 - `Image_Widget:getWidgetCount`: Returns the total widget count in the context.
 - `Image_Widget:drawToImage`: Renders the UI widget tree to a CPU ImageData at the given resolution.
 - `Image_Widget:newLineChart`: Creates a new line chart.
@@ -551,9 +555,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Image_Widget:setViewport`: Sets the viewport dimensions used for anchor constraints and layout.
 - `Image_Widget:flushCache`: Returns true if the widget tree changed since the last call, then resets the flag.
 - `Image_Widget:update_bindings`: Updates all widgets that have a data-binding key registered via `:bind(key)`.
-- `Image_Widget:loadLayout`: Load a widget tree from a Lua table definition and attach it to the UI
-- `Image_Widget:loadLayoutFile`: Load a widget tree from a TOML layout file and attach it to the UI root.
-- `Image_Widget:renderToImage`: Render the current UI widget tree to a PNG file for testing purposes.
 - `Image_Widget:loadLayout`: Load a widget tree from a Lua table definition and attach it to the UI
 - `Image_Widget:loadLayoutFile`: Load a widget tree from a TOML layout file and attach it to the UI root.
 - `Image_Widget:renderToImage`: Render the current UI widget tree to a PNG file for testing purposes.
@@ -781,55 +782,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `math`: Imports or references `math` from `src/math/`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
-
-## Custom Widget Extensibility
-
-The `lurek.ui` API exposes two mechanisms for Lua-driven custom rendering:
-
-### `lurek.ui.newCustomWidget(config?)`
-
-Creates a new `WidgetType::Custom` widget backed by a `CustomWidget` struct that
-carries only a `WidgetBase`. No Rust-side rendering is applied; the entire visual
-output is driven from Lua via the `on_draw` callback.
-
-**Parameters:**
-- `config` (optional table): `{ id?, x?, y?, width?, height?, visible?, enabled? }`
-
-**Returns:** widget handle table (same as all other `new*` factories)
-
-```lua
-local w = lurek.ui.newCustomWidget({
-    x = 50, y = 50, width = 300, height = 200, id = "health_bar"
-})
-```
-
-### `widget:setOnDraw(fn)`
-
-Registers a per-widget draw callback. The callback receives one argument: a rect
-table `{ x, y, w, h }` containing the widget's computed screen-space bounds.
-
-```lua
-w:setOnDraw(function(rect)
-    lurek.graphic.setColor(0, 1, 0, 1)
-    lurek.graphic.fillRect(rect.x, rect.y, rect.w, rect.h)
-end)
-```
-
-### `lurek.ui.draw()`
-
-Iterates all registered `on_draw` callbacks and invokes each one with the
-widget's computed `{ x, y, w, h }` rect. Call this from your `lurek.render`
-callback after `lurek.ui.update(dt)`.
-
-```lua
-function lurek.render()
-    lurek.ui.draw()
-end
-```
-
-**Design note:** `on_draw` callbacks are stored as `LuaRegistryKey` values in the
-`GuiCallbacks` struct in `src/lua_api/ui_api.rs`. Domain code in `src/ui/` has no
-Lua dependency; the callback invocation lives entirely in the API layer.
 
 ## Notes
 

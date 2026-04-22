@@ -64,11 +64,19 @@ The new `registry.rs` file introduces `ModRegistry`, a typed name-to-value store
 ### Module Functions
 - `lurek.mods.newMod`: Creates a new Mod from an info table with at least an `id` field.
 - `lurek.mods.newModManager`: Creates a new empty ModManager.
+- `lurek.mods.newRegistry`: Creates a new empty ContentRegistry for mod-contributed assets.
 - `lurek.mods.checkApiVersion`: Checks whether a mod's required `api_version` is compatible with the given `host_version`.
+
+### `ContentRegistry` Methods
+- `ContentRegistry:registerType`: Register a new content type.
+- `ContentRegistry:register`: Register a content entry.
+- `ContentRegistry:get`: Retrieve a content entry.
+- `ContentRegistry:getAll`: Get all entries for a type.
+- `ContentRegistry:getTypes`: Get all registered type names.
 
 ### `Mod` Methods
 - `Mod:getId`: Returns the unique mod identifier
-- `Mod:getName`: Returns the display name
+- `Mod:getName`: Returns the localized or human-readable display name of the mod.
 - `Mod:getVersion`: Returns the version string
 - `Mod:getAuthor`: Returns the author name string from this mod's metadata manifest
 - `Mod:getDescription`: Returns the mod description

@@ -162,9 +162,9 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `lurek.compute.ones`: Creates a one-filled array with the given shape and optional dtype.
 - `lurek.compute.range`: Creates a 1D array from start to stop with optional step and dtype.
 - `lurek.compute.fromTable`: Creates an array from a Lua table of numbers with optional shape and dtype.
-- `lurek.compute.gaussianKernel`: Creates a size×size Gaussian kernel array.
-- `lurek.compute.rotate2dMatrix`: Creates a 2×2 rotation matrix for the given angle in radians.
-- `lurek.compute.affine2d`: Creates a 3×3 homogeneous affine matrix.
+- `lurek.compute.gaussianKernel`: Creates a sizeĂ—size Gaussian kernel array.
+- `lurek.compute.rotate2dMatrix`: Creates a 2Ă—2 rotation matrix for the given angle in radians.
+- `lurek.compute.affine2d`: Creates a 3Ă—3 homogeneous affine matrix.
 - `lurek.compute.fft`: Computes the discrete Fourier transform of a 1D real-valued sample array.
 - `lurek.compute.ifft`: Computes the inverse discrete Fourier transform.
 - `lurek.compute.fftMagnitude`: Returns the magnitude spectrum `|X[k]|` of a real-valued sample array.
@@ -185,7 +185,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Array:pow`: Raises each element to a scalar exponent.
 - `Array:sqrt`: Element-wise square root.
 - `Array:abs`: Element-wise absolute value.
-- `Array:neg`: Returns a new Array with every element negated (multiplied by −1).
+- `Array:neg`: Returns a new Array with every element negated (multiplied by â’1).
 - `Array:clamp`: Clamps each element to the given range.
 - `Array:threshold`: Returns a mask array with 1.0 where elements >= val, else 0.0.
 - `Array:countNonZero`: Returns the count of nonzero elements.
@@ -210,7 +210,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Array:erode`: Morphological erosion with a diamond structuring element.
 - `Array:cumsum`: Cumulative sum of all elements (flattened).
 - `Array:diff`: Discrete difference applied `order` times.
-- `Array:percentile`: Compute the p-th percentile (0–100).
+- `Array:percentile`: Compute the p-th percentile (0â€“100).
 - `Array:covariance`: Population covariance with another 1D array.
 - `Array:pearsonCorr`: Pearson correlation coefficient with another 1D array.
 - `Array:normalizeRange`: Linearly rescale values to [out_min, out_max].
@@ -218,18 +218,18 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Array:convolve1d`: 1D convolution with a kernel array (full output).
 - `Array:correlate1d`: 1D cross-correlation with a template array (valid output).
 - `Array:normalizeVec`: L2-normalise a 1D vector.
-- `Array:outer`: Outer product of two 1D vectors → 2D array [m, n].
+- `Array:outer`: Outer product of two 1D vectors â†’ 2D array [m, n].
 - `Array:cross2d`: Signed 2D cross product with another length-2 array.
-- `Array:transformPoints`: Apply this 2×2 or 3×3 matrix to an [N,2] points array.
+- `Array:transformPoints`: Apply this 2Ă—2 or 3Ă—3 matrix to an [N,2] points array.
 - `Array:sobel`: Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
-- `Array:linsolve`: Solve A·x = b where this array is A (square [n,n]) and b is a 1D vector.
+- `Array:linsolve`: Solve AÂ·x = b where this array is A (square [n,n]) and b is a 1D vector.
 - `Array:luDecompose`: Decomposes this square matrix into L and U factors with partial pivoting.
-- `Array:type`: Returns the type name "Array".
-- `Array:typeOf`: Returns true when the given name matches "Array" or a parent type.
 - `Array:map`: Apply a Lua callback element-wise, returning a new Array of the same shape.
 - `Array:eval`: Evaluate a Lua expression string element-wise, returning a new Array.
-- `Array:reduce`: Fold the array left-to-right with an accumulator, returning a scalar.
-- `Array:scan`: Running accumulation — like reduce but returns every intermediate result as an Array.
+- `Array:reduce`: Fold the array left-to-right with an accumulator.
+- `Array:scan`: Running accumulation — like reduce but returns every intermediate result.
+- `Array:type`: Returns the type name "Array".
+- `Array:typeOf`: Returns true when the given name matches "Array" or a parent type.
 
 ## References
 

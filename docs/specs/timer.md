@@ -28,11 +28,13 @@ The timer module has been extended with physics step controls: `setPhysicsMaxSte
 - `clock.rs`: `Clock` struct � frame delta, total time, FPS, and rolling average
 - `mod.rs`: Re-exports `Clock` and `Scheduler`; provides free function `sleep()`
 - `scheduler.rs`: `Scheduler` and `ScheduledEvent` � delayed and repeating events
+- `sleep.rs`: Thread-blocking sleep helper used by `lurek.timer.sleep`.
 
 ## Types
 
 - `Clock` (`struct`, `clock.rs`): Tracks per-frame delta time, accumulated total time, and a rolling FPS measurement.
 - `ScheduledEvent` (`struct`, `scheduler.rs`): A single scheduled event with optional name and pause state.
+- `FrameEvent` (`struct`, `scheduler.rs`): A frame-count–based scheduled event.
 - `Scheduler` (`struct`, `scheduler.rs`): Manages a collection of timed events (one-shot and repeating).
 
 ## Functions
@@ -45,12 +47,13 @@ The timer module has been extended with physics step controls: `setPhysicsMaxSte
 - `Clock::frame_count` (`clock.rs`): Returns the total number of frames that have elapsed since the clock was created.
 - `Clock::elapsed` (`clock.rs`): Returns a live high-resolution elapsed time since the clock was created, in seconds.
 - `Clock::average_delta` (`clock.rs`): Returns the average delta time over the last N frames (up to 60).
-- `sleep` (`mod.rs`): Suspends the current thread for the given number of seconds.
 - `Scheduler::new` (`scheduler.rs`): Create a new empty Scheduler with time-scale 1.0.
 - `Scheduler::after` (`scheduler.rs`): Schedule a one-shot callback after `delay` seconds.
 - `Scheduler::after_named` (`scheduler.rs`): Schedule a one-shot callback with a `name` for cancel-by-name support.
 - `Scheduler::every` (`scheduler.rs`): Schedule a repeating callback at `interval` seconds.
 - `Scheduler::every_named` (`scheduler.rs`): Schedule a named repeating callback.
+- `Scheduler::after_frames` (`scheduler.rs`): Schedule a one-shot event that fires after `n` frames.
+- `Scheduler::every_frames` (`scheduler.rs`): Schedule a repeating event that fires every `n` frames.
 - `Scheduler::cancel` (`scheduler.rs`): Cancel a scheduled event by its ID.
 - `Scheduler::cancel_named` (`scheduler.rs`): Cancel a scheduled event by its name.
 - `Scheduler::cancel_all` (`scheduler.rs`): Cancel all scheduled events.
@@ -68,9 +71,11 @@ The timer module has been extended with physics step controls: `setPhysicsMaxSte
 - `Scheduler::set_time_scale` (`scheduler.rs`): Set the global time-scale multiplier for this scheduler.
 - `Scheduler::get_time_scale` (`scheduler.rs`): Returns the current global time-scale.
 - `Scheduler::update` (`scheduler.rs`): Advance all non-paused timers by `dt * time_scale` seconds.
+- `Scheduler::update_frames` (`scheduler.rs`): Advance all non-paused frame-based events by one frame.
 - `Scheduler::count` (`scheduler.rs`): Get the number of active (non-expired) scheduled events.
 - `Scheduler::active_ids` (`scheduler.rs`): Get the IDs of all active events.
 - `Scheduler::is_empty` (`scheduler.rs`): Returns `true` if no events are scheduled.
+- `sleep` (`sleep.rs`): Suspends the current thread for the given number of seconds.
 
 ## Lua API Reference
 
@@ -88,7 +93,7 @@ The timer module has been extended with physics step controls: `setPhysicsMaxSte
 - `lurek.timer.getPhysicsDelta`: Returns the fixed timestep used by `process_physics` callbacks (seconds).
 - `lurek.timer.setPhysicsDelta`: Sets the fixed timestep for `process_physics` callbacks (seconds).
 - `lurek.timer.getPhysicsMaxSteps`: Returns the maximum number of physics sub-steps allowed per frame.
-- `lurek.timer.setPhysicsMaxSteps`: Sets the maximum number of physics sub-steps allowed per frame (clamped 1–64).
+- `lurek.timer.setPhysicsMaxSteps`: Sets the maximum number of physics sub-steps allowed per frame (clamped 1â€“64).
 - `lurek.timer.sleep`: Suspends execution for the given number of seconds.
 - `lurek.timer.newScheduler`: Creates a new independent Scheduler for managing timed callbacks.
 - `lurek.timer.chain`: Creates a new Scheduler loaded with a sequenced one-shot chain.
@@ -99,10 +104,10 @@ The timer module has been extended with physics step controls: `setPhysicsMaxSte
 - `lurek.timer.waitSeconds`: Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
 - `lurek.timer.waitFrames`: Yields the current Lua coroutine for at least `frames` engine frames.
 - `lurek.timer.tickWaits`: Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
-- `lurek.timer.delay`: Coroutine-based yield-for-duration sugar; alias for `waitSeconds`. Call from a coroutine to pause execution for `seconds`. Requires `tickWaits()` per frame.
 
 ### `Scheduler` Methods
 - `Scheduler:after`: Schedules a callback to fire once after a delay.
+- `Scheduler:afterFrames`: Schedules a callback to fire once after `n` frames.
 - `Scheduler:cancel`: Cancels a scheduled event by its numeric ID.
 - `Scheduler:cancelNamed`: Cancels a scheduled event by its string name.
 - `Scheduler:cancelAll`: Cancels all scheduled events and returns the count removed.
@@ -122,9 +127,7 @@ The timer module has been extended with physics step controls: `setPhysicsMaxSte
 - `Scheduler:setTimeScale`: Sets a global time-scale multiplier for this scheduler.
 - `Scheduler:getTimeScale`: Returns the current time-scale multiplier.
 - `Scheduler:update`: Advances all timers by dt seconds, firing due callbacks.
-- `Scheduler:afterFrames`: Schedules a one-shot callback that fires after exactly `n` calls to `updateFrames`. Returns an event ID.
-- `Scheduler:everyFrames`: Schedules a repeating callback that fires every `n` calls to `updateFrames`, for `count` repetitions (default: infinite). Returns an event ID.
-- `Scheduler:updateFrames`: Advances all frame-based events by one tick, firing due callbacks. Returns the number of callbacks that fired this call.
+- `Scheduler:updateFrames`: Advances frame-based events by one frame, firing due callbacks.
 
 ## References
 

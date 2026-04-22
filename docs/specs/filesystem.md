@@ -84,6 +84,7 @@ Two additional types expand the runtime I/O surface. `FileWatcher` (from `watche
 - `GameFS::write_bytes` (`vfs.rs`): Writes raw bytes to `path`, which must stay inside the `save/` subdirectory.
 - `GameFS::exists` (`vfs.rs`): Returns `true` if the file or directory at `path` exists within the game directory.
 - `GameFS::list` (`vfs.rs`): Lists all entries in the directory at `path` relative to the game directory.
+- `GameFS::list_recursive` (`vfs.rs`): Lists all entries recursively under `path`, returning paths relative to `path`.
 - `GameFS::get_directory_items` (`vfs.rs`): Get sorted directory items relative to `base_dir`.
 - `GameFS::is_file` (`vfs.rs`): Check if the given path refers to a regular file.
 - `GameFS::is_directory` (`vfs.rs`): Check if the given path refers to a directory.
@@ -110,6 +111,8 @@ Two additional types expand the runtime I/O surface. `FileWatcher` (from `watche
 - `GameFS::move_file` (`vfs.rs`): Moves (renames) a file within the `save/` directory.
 - `GameFS::remove_dir` (`vfs.rs`): Recursively removes a directory and all its contents within the `save/` directory.
 - `GameFS::glob` (`vfs.rs`): Returns a list of paths inside the game root that match a simple glob pattern.
+- `GameFS::stat` (`vfs.rs`): Returns lightweight file-size statistics for a path without loading file contents.
+- `GameFS::create_temp_file` (`vfs.rs`): Creates a temporary file inside the `save/` sandbox and returns its relative path.
 - `FileWatcher::new` (`watcher.rs`): Creates an empty [`FileWatcher`] with no watched paths.
 - `FileWatcher::watch` (`watcher.rs`): Adds `path` to the watch list.
 - `FileWatcher::unwatch` (`watcher.rs`): Removes `path` from the watch list.
@@ -121,6 +124,8 @@ Two additional types expand the runtime I/O surface. `FileWatcher` (from `watche
 - `ZipMount::read_file` (`zip_mount.rs`): Reads the contents of `virtual_path` from the ZIP.
 - `ZipMount::contains` (`zip_mount.rs`): Returns `true` if `virtual_path` exists in this ZIP mount.
 - `ZipMount::list_files` (`zip_mount.rs`): Returns a sorted list of all virtual file paths exposed by this mount.
+- `normalise` (`zip_mount.rs`): Normalise a path: collapse duplicate slashes, strip leading slash.
+- `is_traversal` (`zip_mount.rs`): Returns `true` if any path component is `..`, or if the path starts with a drive letter (Windows absolute), to prevent traversal attacks.
 
 ## Lua API Reference
 
@@ -160,6 +165,11 @@ Two additional types expand the runtime I/O surface. `FileWatcher` (from `watche
 - `lurek.filesystem.move`: Moves (renames) a file within the `save/` directory.
 - `lurek.filesystem.removeDir`: Recursively deletes a directory and all its contents within `save/`.
 - `lurek.filesystem.glob`: Returns a sorted list of paths matching a simple wildcard pattern.
+- `lurek.filesystem.listRecursive`: Returns a sorted list of all files under `path`, recursively.
+- `lurek.filesystem.stat`: Returns lightweight file statistics for the given path.
+- `lurek.filesystem.createTempFile`: Creates an empty temporary file in the `save/` sandbox and returns its
+- `lurek.filesystem.mkdir`: Creates a directory (and any missing parents) relative to the game root.
+- `lurek.filesystem.toAbsolutePath`: Resolves a path relative to the game root to an absolute OS path string.
 
 ### `FileData` Methods
 - `FileData:getSize`: Returns the file size in bytes.
@@ -183,12 +193,6 @@ Two additional types expand the runtime I/O surface. `FileWatcher` (from `watche
 - `ZipMount:contains`: Returns true if `virtual_path` exists inside this ZIP mount.
 - `ZipMount:listFiles`: Returns a sorted array of all virtual paths exposed by this ZIP mount.
 - `ZipMount:prefix`: Returns the virtual path prefix this archive was mounted under.
-
-### New in 0.15.0 (Lua API)
-
-- `lurek.filesystem.listRecursive(path)` — Recursively lists all files under `path` (relative to the game root). Returns a flat array of path strings. Raises a Lua error on path-traversal attempts (`..` in path) or if the directory cannot be read.
-- `lurek.filesystem.stat(path)` — Returns a table `{ size: integer, isFile: boolean, isDir: boolean }` for the file or directory at `path` (sandboxed). Raises on path-traversal or missing entry.
-- `lurek.filesystem.createTempFile(prefix?)` — Creates an empty scratch file under `save/` and returns its relative path. Each call generates a unique name. `prefix` is sanitised (alphanumeric, `_`, `-`; max 32 chars).
 
 ## References
 

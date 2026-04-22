@@ -2,11 +2,11 @@
 
 ## General Info
 
-- Module group: `Foundations.`
+- Module group: `Foundations`
 - Source path: `src/procgen/`
 - Lua API path(s): `src/lua_api/procgen_api.rs`
 - Primary Lua namespace: `lurek.procgen`
-- Rust test path(s): `src/procgen/noise_tests.rs` (sibling), plus inline `#[cfg(test)]` in all other `.rs` files
+- Rust test path(s): src/procgen/noise_tests.rs (sibling), plus inline #[cfg(test)] in all other .rs files
 - Lua test path(s): none found in the workspace
 
 ## Summary
@@ -55,6 +55,7 @@ sample points with guaranteed minimum spacing for natural object scatter.
 
 **Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in
 `src/lua_api/procgen_api.rs` as `lurek.procgen.*`.
+
 ## Files
 
 - `bsp.rs`: Binary Space Partitioning dungeon generator.
@@ -90,8 +91,6 @@ sample points with guaranteed minimum spacing for natural object scatter.
 - `FractalType` (`enum`, `noise.rs`): Fractal type for multi-octave noise.
 - `MapGenOptions` (`struct`, `noise.rs`): Options for 2D noise map generation.
 - `NoiseGenerator` (`struct`, `noise.rs`): Seeded procedural noise generator.
-- `NoiseGrid` (`struct`, `render.rs`): Sampled noise buffer that can be exported as render commands or a CPU image.
-- `NoiseGrid` (`struct`, `render.rs`): Sampled noise buffer that can be exported as render commands or a CPU image.
 - `NoiseGrid` (`struct`, `render.rs`): Sampled noise buffer that can be exported as render commands or a CPU image.
 - `Room` (`struct`, `rooms.rs`): A placed room in the dungeon.
 - `RoomsOpts` (`struct`, `rooms.rs`): Options for rooms-and-corridors generation.
@@ -153,11 +152,8 @@ sample points with guaranteed minimum spacing for natural object scatter.
 - `poisson_disk` (`poisson.rs`): Generates Poisson disk sample points using Bridson's algorithm.
 - `NoiseGrid::from_perlin` (`render.rs`): Sample periodic Perlin noise onto a grid and return a plain data buffer.
 - `NoiseGrid::to_rgba_bytes` (`render.rs`): Return a greyscale RGBA byte buffer (4 bytes per pixel, `width * height * 4` total).
-- `NoiseGrid::from_perlin` (`render.rs`): Sample periodic Perlin noise onto a grid and return a plain data buffer.
-- `NoiseGrid::to_rgba_bytes` (`render.rs`): Return a greyscale RGBA byte buffer (4 bytes per pixel, `width * height * 4` total).
-- `NoiseGrid::from_perlin` (`render.rs`): Sample periodic Perlin noise onto a grid.
 - `NoiseGrid::generate_render_commands` (`render.rs`): Generate render commands visualising the noise grid as a greyscale tile mosaic.
-- `NoiseGrid::draw_to_image` (`render.rs`): Render the noise grid to a CPU image.
+- `NoiseGrid::draw_to_image` (`render.rs`): Render the noise grid to a CPU image (one pixel per cell).
 - `rooms_dungeon` (`rooms.rs`): Generate a rooms-and-corridors dungeon.
 - `voronoi_diagram` (`voronoi.rs`): Generates a Voronoi diagram over a `width × height` grid for the given seed points.
 - `wfc_generate` (`wfc.rs`): Generate a WFC tile grid.
@@ -208,7 +204,8 @@ sample points with guaranteed minimum spacing for natural object scatter.
 
 ## References
 
-- No top-level `crate::<module>` imports were detected in this module's Rust source files.
+- `image`: Imports or references `src/image/`. Cross-group dependency from ``Foundations.`` into `Platform Services`.
+- `render`: Imports or references `src/render/`. Cross-group dependency from ``Foundations.`` into `Platform Services`.
 
 ## Notes
 

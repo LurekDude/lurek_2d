@@ -45,6 +45,7 @@ propagate automatically to every binary variant without duplication.
 
 **Scope boundary**: Edge/Integration tier. A Cargo `[[bin]]` target, not a
 `mod` in the library tree. No types, no public functions, no Lua API surface.
+
 ## Files
 
 - `lurekc.rs`: Minimal console-less launcher for Windows builds that applies the windows_subsystem attribute and then delegates straight to lurek2d::lurek_run(). This file should stay intentionally tiny because it is only a wrapper binary.

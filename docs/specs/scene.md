@@ -2,7 +2,7 @@
 
 ## General Info
 
-- Module group: `Feature Systems.`
+- Module group: `Feature Systems`
 - Source path: `src/scene/`
 - Lua API path(s): `src/lua_api/scene_api.rs`
 - Primary Lua namespace: `lurek.scene`
@@ -39,8 +39,6 @@ New scene transition helper methods have been added to `SceneStack`, making comm
 - `SceneStack` (`struct`, `stack.rs`): Main scene-flow owner for stack order, registry lookups, stored data keys, and active transition state.
 - `TransitionType` (`enum`, `transition.rs`): Enum for no transition, fade, and slide directions.
 - `EasingType` (`enum`, `transition.rs`): Easing curve applied to normalized transition progress.
-- `ActiveTransition` (`struct`, `transition.rs`): Timer and progress record for one transition in flight.
-- `TransitionType` (`enum`, `transition.rs`): Enum for no transition, fade, and slide directions.
 - `ActiveTransition` (`struct`, `transition.rs`): Timer and progress record for one transition in flight.
 
 ## Functions
@@ -97,11 +95,6 @@ New scene transition helper methods have been added to `SceneStack`, making comm
 - `ActiveTransition::progress_eased` (`transition.rs`): Easing-adjusted progress of the transition.
 - `ActiveTransition::is_complete` (`transition.rs`): Whether the transition has completed.
 - `ActiveTransition::update` (`transition.rs`): Advance the transition timer by `dt` seconds.
-- `TransitionType::from_lua_str` (`transition.rs`): Parse a transition type from a Lua string.
-- `ActiveTransition::new` (`transition.rs`): Create a new active transition.
-- `ActiveTransition::progress` (`transition.rs`): Normalized progress of the transition, clamped to [0, 1].
-- `ActiveTransition::is_complete` (`transition.rs`): Whether the transition has completed.
-- `ActiveTransition::update` (`transition.rs`): Advance the transition timer by `dt` seconds.
 
 ## Lua API Reference
 
@@ -138,7 +131,8 @@ New scene transition helper methods have been added to `SceneStack`, making comm
 - `lurek.scene.removeData`: Removes a value from the inter-scene data store by key.
 - `lurek.scene.newDepthSorter`: Creates a new DepthSorter for z-ordered draw batching.
 - `lurek.scene.new`: Creates a scene instance directly from a methods table.
-- `lurek.scene.define`: Creates a reusable scene class — returns a zero-argument constructor function.
+- `lurek.scene.newScene`: Alias for `lurek.scene.new`. Creates a scene instance from a methods table.
+- `lurek.scene.define`: Creates a reusable scene class â€” returns a zero-argument constructor function.
 - `lurek.scene.getTransitionProgressEased`: Returns the easing-adjusted transition progress from 0.0 to 1.0.
 - `lurek.scene.pushOverlay`: Pushes a scene as a non-pausing overlay over the current top scene.
 - `lurek.scene.isOverlay`: Returns true if the current top scene was pushed as an overlay.

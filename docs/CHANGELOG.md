@@ -2,6 +2,15 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.8] - 2026-04-23
+
+### docs(api): Lunasome library API docs, spec regeneration
+
+- **feat(tools): gen_lib_docs.py generates docs/api/library.md + docs/api/library.lua** — Added `render_api_md()` (same header/Contents/section style as `docs/api/lurek.md`) and `render_luacats()` (LuaCATS stubs in same style as `docs/api/lurek.lua`) to `tools/docs/gen_lib_docs.py`. Both files are now written unconditionally on every run. `gen_all_docs.py` pipeline step 7 updated to call `gen_lib_docs.py` and document the new outputs.
+- **docs(api): docs/api/library.md** — New human-readable Lunasome library API reference: Contents section listing all 22 libraries with function counts, then per-library sections with module functions and class-method breakdowns. Matches lurek.md format.
+- **docs(api): docs/api/library.lua** — New LuaCATS stub file for Lunasome libraries: `---@meta` header, `---@class` annotations per library, `---@param`/`---@return` annotations per function. Matches lurek.lua format.
+- **fix(tools): gen_module_specs.py adds globe to Feature Systems** — `globe` module was classified as `Edge/Integration` because it was absent from the `GROUPS` dict. Added to `Feature Systems`. Group-lookup logic updated to prefer `GROUPS` over existing spec content when the module is explicitly listed. Regenerated all 51 spec files.
+
 ## [0.20.7] - 2026-04-23
 
 ### refactor(layout): logs/data, logs/quality, expanded spec summaries, wiki at root

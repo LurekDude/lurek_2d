@@ -77,7 +77,7 @@ The `EventBus` has been extended with deferred-dispatch support: `push_deferred(
 - `lurek.event.pump`: Syncs OS-level events into the queue (no-op in Lurek2D push model).
 - `lurek.event.wait`: Blocks until the next event arrives or the optional timeout elapses.
 - `lurek.event.restart`: Requests that the engine restart at the beginning of the next frame.
-- `lurek.event.quit`: Alias for `exit()` — requests the engine to stop at the end of the current frame.
+- `lurek.event.quit`: Alias for `exit()` â€” requests the engine to stop at the end of the current frame.
 - `lurek.event.pushDeferred`: Pushes a named event to the deferred buffer; it will not reach the main queue
 - `lurek.event.flushDeferred`: Moves all buffered deferred events into the main event queue and clears the buffer.
 - `lurek.event.enableHistory`: Enables event history recording, keeping the last `capacity` pushed events.

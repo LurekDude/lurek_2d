@@ -55,6 +55,7 @@ messages for post-run inspection.
 
 **Scope boundary**: Feature Systems tier. Depends on `math`, `runtime`. Lua
 bridge in `src/lua_api/pipeline_api.rs` as `lurek.pipeline.*`.
+
 ## Files
 
 - `dag.rs`: Defines Pipeline and the graph-level algorithms such as dependency validation, topological ordering, and parallel-group calculation. This is the core file for execution-order semantics.
@@ -139,12 +140,12 @@ bridge in `src/lua_api/pipeline_api.rs` as `lurek.pipeline.*`.
 - `Pipeline:getResult`: Returns the current result table built from step states, or nil.
 - `Pipeline:getContext`: Returns the stored async context table, or nil.
 - `Pipeline:setOnComplete`: Sets the callback to invoke when the pipeline completes.
+- `Pipeline:setOnStepComplete`: Sets the callback to invoke each time a step completes successfully.
 - `Pipeline:setOnStepError`: Sets the callback to invoke each time a step fails.
 - `Pipeline:getName`: Returns the pipeline's name.
 - `Pipeline:setName`: Sets the pipeline's name.
 - `Pipeline:toTable`: Serialises the pipeline definition to a Lua table (no callbacks).
 - `Pipeline:type`: Returns the type name of this object.
-- `Pipeline:addConditional`: Adds a step with a runtime condition guard: the step is skipped when `when_fn()` returns false.
 - `Pipeline:onProgress`: Registers a callback invoked after every step with `(step_name, status)`.
 - `Pipeline:toAscii`: Returns a multi-line ASCII string visualising the pipeline DAG.
 - `Pipeline:typeOf`: Returns the type identifier string of this pipeline stage object.

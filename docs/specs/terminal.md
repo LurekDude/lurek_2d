@@ -42,6 +42,8 @@ Three source files extend the terminal's text-mode surface. The existing `ansi.r
 - `AnsiSpan` (`struct`, `ansi.rs`): A contiguous run of characters that share the same style attributes.
 - `TCell` (`struct`, `cell.rs`): One terminal cell with a character codepoint and foreground or background colors.
 - `CompletionEngine` (`struct`, `completion.rs`): Maintains a list of completion candidates and a per-prefix cycling cursor.
+- `HighlightRule` (`struct`, `highlighter.rs`): A text highlighting rule: find `pattern` as a plain substring and apply `fg`/`bg` colors.
+- `ColoredSpan` (`struct`, `highlighter.rs`): A colored text span produced by the highlight algorithm.
 - `TerminalEvent` (`enum`, `terminal_state.rs`): Internal event enum used when terminal widget interactions need to report changes.
 - `Terminal` (`struct`, `terminal_state.rs`): The main character-grid surface. It owns cells, cursor state, terminal widgets, and the state needed to route text or pointer input.
 - `BorderStyle` (`enum`, `widget.rs`): Selects the line-drawing character set used for borders.
@@ -62,6 +64,7 @@ Three source files extend the terminal's text-mode surface. The existing `ansi.r
 - `CompletionEngine::completions_for` (`completion.rs`): Returns all candidates that start with `prefix`, in sorted order.
 - `CompletionEngine::next_completion` (`completion.rs`): Returns the next candidate for `prefix`, cycling on repeated calls with the same prefix.
 - `CompletionEngine::reset` (`completion.rs`): Resets the cycling cursor without clearing candidates.
+- `highlight_spans` (`highlighter.rs`): Splits `text` into colored spans by matching `rules` left-to-right.
 - `Terminal::generate_render_commands` (`render.rs`): Generate GPU render commands for this terminal grid.
 - `Terminal::draw_to_image` (`render.rs`): Render the terminal grid to a CPU image for headless testing.
 - `Terminal::new` (`terminal_state.rs`): Create a new terminal grid with the given dimensions.

@@ -274,7 +274,7 @@ Updated pattern type methods expand the scripting surface for several patterns. 
 - `Blackboard:watch`: Subscribes to changes on a specific key (or "*" for all changes).
 - `Blackboard:unwatch`: Removes a watcher subscription by id.
 - `Blackboard:getRevision`: Returns the monotonic revision counter (incremented on every write).
-- `Blackboard:snapshot`: Returns all facts as a flat key→value table.
+- `Blackboard:snapshot`: Returns all facts as a flat keyâ†’value table.
 - `Blackboard:clearAll`: Clears all facts from the blackboard.
 
 ### `CommandStack` Methods

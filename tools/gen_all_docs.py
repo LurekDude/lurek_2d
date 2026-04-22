@@ -8,14 +8,15 @@ Steps:
     4.  gen_docs_lua.py              -> docs/api/lurek.md                 (Lua API reference)
     5.  gen_docs_rust.py             -> docs/api/rust.md                  (Rust API reference)
     6.  gen_wiki_api.py              -> wiki/API-Reference.md        (game-dev cheatsheet)
-    7.  doc_coverage.py              -> logs/data/doc_coverage.json            (docstring coverage JSON)
-    8.  test_coverage.py             -> logs/data/test_coverage.json           (test coverage JSON)
-    9.  gen_test_docs.py --mode rust -> logs/reports/test_docs_rust.md
-   10.  gen_test_docs.py --mode lua  -> logs/reports/test_docs_lua.md
-   11.  gen_coverage_gaps.py         -> logs/reports/coverage_gaps.md     (API gap report)
-   12.  example_coverage.py          -> logs/reports/example_coverage.md  (example coverage)
-   13.  test_coverage.py             -> logs/reports/test_coverage.md     (test coverage report)
-   14.  lua_api_test_coverage.py     -> logs/reports/lua_test_coverage.md (Lua test coverage)
+    7.  gen_lib_docs.py              -> docs/api/library.md + docs/api/library.lua  (Lunasome library API)
+    8.  doc_coverage.py              -> logs/data/doc_coverage.json            (docstring coverage JSON)
+    9.  test_coverage.py             -> logs/data/test_coverage.json           (test coverage JSON)
+   10.  gen_test_docs.py --mode rust -> logs/reports/test_docs_rust.md
+   11.  gen_test_docs.py --mode lua  -> logs/reports/test_docs_lua.md
+   12.  gen_coverage_gaps.py         -> logs/reports/coverage_gaps.md     (API gap report)
+   13.  example_coverage.py          -> logs/reports/example_coverage.md  (example coverage)
+   14.  test_coverage.py             -> logs/reports/test_coverage.md     (test coverage report)
+   15.  lua_api_test_coverage.py     -> logs/reports/lua_test_coverage.md (Lua test coverage)
 
 Usage:
     python tools/gen_all_docs.py          # run all steps
@@ -38,6 +39,7 @@ SCRIPTS = [
     ("docs/gen_docs_lua.py",      "Lua API reference (docs/api/lurek.md)"),
     ("docs/gen_docs_rust.py",     "Rust API reference (docs/api/rust.md)"),
     ("docs/gen_wiki_api.py",      "Wiki cheatsheet (wiki/API-Reference.md)"),
+    ("docs/gen_lib_docs.py",      "Library API (docs/api/library.md + library.lua)"),
     ("audit/doc_coverage.py",      "Doc coverage analytics (logs/data/doc_coverage.json)"),
     ("audit/test_coverage.py",     "Test coverage analytics (logs/data/test_coverage.json)"),
 ]

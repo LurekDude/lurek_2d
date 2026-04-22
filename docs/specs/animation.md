@@ -127,6 +127,8 @@ Three new source files extend the module's capabilities. `blend.rs` introduces `
 - `AnimStateMachine::force_state` (`state_machine.rs`): Forces a transition to the named state, playing the associated clip.
 - `AnimStateMachine::get_animation` (`state_machine.rs`): Returns an immutable reference to the owned animation.
 - `AnimStateMachine::get_animation_mut` (`state_machine.rs`): Returns a mutable reference to the owned animation.
+- `compare_nums` (`state_machine.rs`): Applies a comparison operator to two `f32` values.
+- `parse_condition` (`state_machine.rs`): Parses a condition string such as `"speed > 0.1"` or `"jumping == true"`.
 - `AnimSyncGroup::new` (`sync_group.rs`): Creates an empty `AnimSyncGroup`.
 - `AnimSyncGroup::add` (`sync_group.rs`): Adds an animation key to the group.
 - `AnimSyncGroup::remove` (`sync_group.rs`): Removes an animation key from the group.
@@ -152,12 +154,14 @@ Three new source files extend the module's capabilities. `blend.rs` introduces `
 - `AnimCurve:eval`: Returns the interpolated value at the given time using the curve's easing.
 - `AnimCurve:setEasing`: Sets the easing kind applied between all keyframe segments.
 - `AnimCurve:keyframeCount`: Returns the number of keyframes currently stored.
+- `AnimCurve:setCustomEasing`: Set a custom Lua easing function for this curve.
 - `AnimCurve:clear`: Removes all keyframes from this animation curve, resetting it to empty.
 
 ### `AnimStateMachine` Methods
 - `AnimStateMachine:update`: Advances the FSM by `dt` seconds, evaluating transitions.
 - `AnimStateMachine:getState`: Returns the name of the currently active state.
 - `AnimStateMachine:forceState`: Immediately jumps to the named state, bypassing transition conditions.
+- `AnimStateMachine:setParam`: Sets an FSM parameter value (number, boolean, or integer supported).
 - `AnimStateMachine:getQuad`: Returns the source quad for the current animation frame, or nil.
 
 ### `AnimSyncGroup` Methods
@@ -168,9 +172,6 @@ Three new source files extend the module's capabilities. `blend.rs` introduces `
 
 ### `Animation` Methods
 - `Animation:addFrame`: Adds a single frame to the frame pool by source rectangle.
-- `Animation:addFramesFromGrid`: Slices a sprite-sheet grid into frames and appends them.
-- `Animation:addClip`: Adds a named clip from explicit frame indices.
-- `Animation:addClipFromGrid`: Adds a named clip sliced from a sprite-sheet grid.
 - `Animation:play`: Starts playback of the named clip.
 - `Animation:stop`: Stops playback and resets to frame 0.
 - `Animation:pause`: Pauses playback at the current frame.
@@ -188,6 +189,7 @@ Three new source files extend the module's capabilities. `blend.rs` introduces `
 - `Animation:getCurrentFrame`: Returns the current position within the active clip (0-based).
 - `Animation:setFrame`: Sets the playback position within the current clip.
 - `Animation:getBlendState`: Returns the two quads and blend factor during a crossfade, or nil when not blending.
+- `Animation:drawToImage`: Renders the current animation frame into a new ImageData (white bg, blue frame rect).
 
 ### `BlendLayerSet` Methods
 - `BlendLayerSet:removeLayer`: Removes a blend layer by name.

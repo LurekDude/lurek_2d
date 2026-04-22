@@ -54,6 +54,7 @@ encoders for binary storage formats.
 **Scope boundary**: Foundations tier. Depends only on external crates (toml,
 serde_json, csv, rmp-serde, roxmltree, indexmap). Lua bridge in
 `src/lua_api/serial_api.rs` as `lurek.serial.*`.
+
 ## Files
 
 - `csv.rs`: Parses and writes CSV using `CsvOptions`, with support for header-based row maps or positional row sequences.
@@ -81,7 +82,7 @@ serde_json, csv, rmp-serde, roxmltree, indexmap). Lua bridge in
 - `to_lua` (`lua_table.rs`): Converts a `SerialValue` tree into a Lua value tree.
 - `from_lua` (`lua_table.rs`): Converts a Lua value tree into a `SerialValue` tree.
 - `encode` (`msgpack.rs`): Encode a `SerialValue` tree to MessagePack bytes.
-- `decode` (`msgpack.rs`): Decode MessagePack bytes into a `SerialValue` tree.
+- `decode` (`msgpack.rs`): Parse an XML string into a `SerialValue` tree.
 - `validate` (`schema.rs`): Validate a `SerialValue` tree against a schema.
 - `from_toml` (`toml.rs`): Parse a TOML string into a `SerialValue`.
 - `to_toml` (`toml.rs`): Serialize a `SerialValue` to a TOML string.

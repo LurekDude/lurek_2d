@@ -217,6 +217,7 @@ The new `bidir.rs` source file introduces `BidirSearch`, a bidirectional A* impl
 - `UnitPathfinder::clear_cache` (`unit_pathfinder.rs`): Remove all cached path results.
 - `UnitPathfinder::get_cache_size` (`unit_pathfinder.rs`): Number of entries currently in the cache.
 - `UnitPathfinder::set_cache_max_size` (`unit_pathfinder.rs`): Set the maximum cache size.
+- `UnitPathfinder::nav_grid` (`unit_pathfinder.rs`): Returns a reference to the shared navigation grid.
 
 ## Lua API Reference
 
@@ -256,19 +257,11 @@ The new `bidir.rs` source file introduces `BidirSearch`, a bidirectional A* impl
 - `FlowField:typeOf`: Returns true if this object is of the given type.
 
 ### `HexGrid` Methods
-- `HexGrid:setBlocked`: Mark/unmark a cell as blocked (1-based coordinates).
 - `HexGrid:setCost`: Set movement cost for a cell (1-based coordinates).
 - `HexGrid:isBlocked`: Returns true if a cell is blocked (1-based coordinates).
-- `HexGrid:findPath`: Find A* path between two cells (1-based coordinates).
-- `HexGrid:lineOfSight`: Returns true if there is an unobstructed line between two cells (1-based).
-- `HexGrid:fieldOfView`: Returns all cells visible from origin within max_range (1-based coordinates).
-- `HexGrid:rangeOfMovement`: Returns all cells reachable from origin within movement budget (1-based).
-- `HexGrid:distance`: Hex-distance between two cells.
 
 ### `JpsGrid` Methods
-- `JpsGrid:setBlocked`: Mark/unmark a cell as blocked (1-based coordinates).
 - `JpsGrid:isBlocked`: Returns true if the cell is blocked (1-based coordinates).
-- `JpsGrid:findPath`: Find a JPS path between two cells (1-based coordinates).
 
 ### `NavGrid` Methods
 - `NavGrid:getWidth`: Returns the grid width in cells.

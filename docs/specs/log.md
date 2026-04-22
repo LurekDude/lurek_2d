@@ -53,14 +53,16 @@ each registered sink so tooling can display active log destinations at runtime.
 
 **Scope boundary**: Core Runtime tier. Depends on `runtime`. Lua bridge in
 `src/lua_api/log_api.rs` as `lurek.log.*`.
+
 ## Files
 
+- `facade.rs`: Structured logging facade exposed to Lua through `lurek.log.*`.
 - `mod.rs`: Defines the small public domain surface for setting and querying the active log level and re-exports sink-related types.
 - `sinks.rs`: Implements sink filtering and fan-out, including file-backed sinks, bounded memory sinks, and the registry that tracks active outputs.
 
 ## Types
 
-- `LogFields` (`type`, `mod.rs`): Sorted map of structured key-value log fields.
+- `LogFields` (`type`, `facade.rs`): Sorted map of structured key-value log fields.
 - `SinkLevel` (`enum`, `sinks.rs`): Severity threshold used by sink filtering. It keeps file and memory sinks consistent even when the Lua caller uses string level names.
 - `MemoryEntry` (`struct`, `sinks.rs`): Captured log record stored by memory sinks. It is intentionally small so Lua tooling can inspect recent messages without coupling to the Rust `log` crate.
 - `RotatingFileSink` (`struct`, `sinks.rs`): A file sink that rotates the log file when it exceeds a maximum size.
@@ -70,12 +72,12 @@ each registered sink so tooling can display active log destinations at runtime.
 
 ## Functions
 
-- `log_structured` (`mod.rs`): Emits a structured log message with key-value `fields` through the Rust `log` crate.
-- `set_level` (`mod.rs`): Sets the active log level to the named value.
-- `get_level` (`mod.rs`): Returns the current log level name as a static string (e.g.
-- `enabled_for` (`mod.rs`): Returns `true` when messages at `level` would be emitted under the current filter.
-- `SinkLevel::from_str` (`sinks.rs`): Parses a level string ("debug", "info", "warn", "error").
-- `SinkLevel::as_str` (`sinks.rs`): Returns a short lowercase string representation.
+- `log_structured` (`facade.rs`): Emits a structured log message with key-value `fields` through the Rust `log` crate.
+- `set_level` (`facade.rs`): Sets the active log level to the named value.
+- `get_level` (`facade.rs`): Returns the current log level name as a static string (e.g.
+- `enabled_for` (`facade.rs`): Returns `true` when messages at `level` would be emitted under the current filter.
+- `SinkLevel::from_str` (`sinks.rs`): Parses a level string (case-insensitive).
+- `SinkLevel::as_str` (`sinks.rs`): Returns the canonical uppercase display string (`"DEBUG"`, `"INFO"`, `"WARN"`, `"ERROR"`).
 - `RotatingFileSink::open` (`sinks.rs`): Opens or creates a rotating file sink at `path`.
 - `RotatingFileSink::write_with_rotation` (`sinks.rs`): Appends `message` to the active log file, rotating if the size threshold is exceeded.
 - `RotatingFileSink::flush` (`sinks.rs`): Flushes the underlying OS write buffer.
@@ -86,7 +88,7 @@ each registered sink so tooling can display active log destinations at runtime.
 - `Sink::write_structured` (`sinks.rs`): Dispatches a structured log entry with key-value `fields` to this sink.
 - `Sink::type_name` (`sinks.rs`): Returns the sink type name string.
 - `Sink::path` (`sinks.rs`): Returns the path for a file sink, or `None`.
-- `Sink::read_memory` (`sinks.rs`): Reads all memory entries and optionally drains them.
+- `Sink::read_memory` (`sinks.rs`): Reads all entries from a memory sink and optionally drains them.
 - `Sink::flush` (`sinks.rs`): Flushes a file sink (no-op on memory sinks).
 - `SinkRegistry::new` (`sinks.rs`): Creates an empty registry.
 - `SinkRegistry::add` (`sinks.rs`): Adds a sink, returning its assigned id.

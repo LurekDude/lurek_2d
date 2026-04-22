@@ -370,8 +370,8 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `SteeringManager::add_flock` (`steering.rs`): Adds a Flock behavior for group movement among named neighbors.
 - `SteeringManager::set_combine_mode_str` (`steering.rs`): Sets the combination mode from a Lua string (`"weighted"` or `"priority"`).
 - `SteeringManager::last_force` (`steering.rs`): Returns the force vector computed during the last `calculate()` call.
-- `set_cell_size` (`steering.rs`): Sets the cell size used by the spatial-hash neighbourhood search.
-- `set_use_spatial_hash` (`steering.rs`): Enables or disables spatial-hash bucketing for neighbourhood queries.
+- `SteeringManager::set_cell_size` (`steering.rs`): Sets the cell size used by the spatial-hash neighbourhood search.
+- `SteeringManager::set_use_spatial_hash` (`steering.rs`): Enables or disables spatial-hash bucketing for neighbourhood queries.
 - `StrategicGoal::new` (`strategy.rs`): Creates a new goal with full priority and no preconditions.
 - `StrategicGoal::require_tag` (`strategy.rs`): Adds a precondition tag requirement.
 - `StrategicGoal::is_eligible` (`strategy.rs`): Returns `true` if all precondition tags are present in `active_tags`.
@@ -441,6 +441,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `lurek.ai.newSucceeder`: Creates a BT succeeder decorator.
 - `lurek.ai.newAction`: Creates a BT action leaf with a Lua callback.
 - `lurek.ai.newCondition`: Creates a BT condition leaf with a Lua predicate.
+- `lurek.ai.newGuard`: Creates a BT Guard decorator. The predicate is evaluated before each tick;
 - `lurek.ai.newSteeringManager`: Creates a new steering behavior manager.
 - `lurek.ai.newQLearner`: Creates a tabular Q-learner.
 - `lurek.ai.newUtilityAI`: Creates a new utility AI evaluator.
@@ -472,11 +473,10 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `AIDirector:spawnRateFactor`: Returns or performs spawn rate factor.
 - `AIDirector:lootFactor`: Returns or performs loot factor.
 - `AIDirector:ambientIntensity`: Returns or performs ambient intensity.
-- `AIDirector:setTension`: Sets the global narrative tension level (0–1 scale).
+- `AIDirector:setTension`: Sets the global narrative tension level (0â€“1 scale).
 - `AIDirector:reset`: Resets or clears the state.
 
 ### `AILod` Methods
-- `AILod:tierFor`: Returns or performs tier for.
 - `AILod:shouldUpdate`: Returns or performs should update.
 - `AILod:tierCount`: Returns or performs tier count.
 - `AILod:tierName`: Returns or performs tier name.
@@ -487,7 +487,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `AIWorld:removeAgent`: Removes an agent by its userdata handle.
 - `AIWorld:getAgentCount`: Returns the number of registered agents.
 - `AIWorld:getGlobalBlackboard`: Returns a snapshot of the world-level blackboard.
-- `AIWorld:update`: Advances all agents by dt seconds.
+- `AIWorld:update`: Advances all agents by dt seconds, then invokes any custom-model callbacks.
 - `AIWorld:type`: Returns the type name of this object.
 - `AIWorld:typeOf`: Returns true if this object is of the given type.
 
@@ -505,7 +505,7 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Agent:getPriority`: Returns the agent's scheduling priority.
 - `Agent:setDecisionModel`: Sets the active decision model.
 - `Agent:getDecisionModel`: Returns the name of the current decision model.
-- `Agent:setCustomModel`: Installs a `fn(agent, blackboard, dt)` Lua callback as the agent's decision model. Called each frame by `world:update(dt)`.
+- `Agent:setCustomModel`: Installs a Lua-driven decision model on this agent.
 - `Agent:addTag`: Adds a tag to this agent.
 - `Agent:removeTag`: Removes a tag from this agent.
 - `Agent:hasTag`: Returns true if the agent has the given tag.
@@ -564,17 +564,13 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `CommandQueue:typeOf`: Returns true if this object is of the given type.
 
 ### `ContextSteering` Methods
-- `ContextSteering:addSeekTarget`: Adds a world-space target that this agent steers towards.
 - `ContextSteering:addWander`: Adds a wander behavior with jitter and weight to the context steering evaluator.
-- `ContextSteering:addAvoidPoint`: Adds a world-space point that this agent steers away from.
 - `ContextSteering:addAvoidBounds`: Registers a rectangular region this agent must avoid.
 - `ContextSteering:clearBehaviors`: Resets or clears the behaviors.
-- `ContextSteering:evaluate`: Evaluates and returns the computed result.
 - `ContextSteering:chosenMagnitude`: Returns or performs chosen magnitude.
 - `ContextSteering:slotCount`: Returns or performs slot count.
 
 ### `EmotionModel` Methods
-- `EmotionModel:add`: Adds an emotion category with the given name and initial intensity to the model.
 - `EmotionModel:trigger`: Returns or performs trigger.
 - `EmotionModel:get`: Returns the current float value of this emotion dimension.
 - `EmotionModel:dominant`: Returns or performs dominant.
@@ -600,8 +596,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 
 ### `HTNDomain` Methods
 - `HTNDomain:addPrimitive`: Registers a primitive HTN task with a direct operator function.
-- `HTNDomain:addCompound`: Registers a compound HTN task that decomposes into sub-tasks.
-- `HTNDomain:plan`: Runs planning and returns the resulting action sequence.
 - `HTNDomain:taskCount`: Returns or performs task count.
 
 ### `InfluenceMap` Methods
@@ -626,7 +620,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `NeedSystem:valueOf`: Returns or performs value of.
 
 ### `NeuralNet` Methods
-- `NeuralNet:addLayer`: Adds a neural network layer with inputs, outputs, and an activation function.
 - `NeuralNet:forward`: Returns or performs forward.
 - `NeuralNet:setWeights`: Overwrites all connection weights with values from a flat table.
 - `NeuralNet:getWeights`: Returns a flat table of all connection weight values in the network.
@@ -643,8 +636,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `Neuroevolution:generation`: Returns or performs generation.
 
 ### `ORCASolver` Methods
-- `ORCASolver:addAgent`: Adds an ORCA agent at the given position with radius and max speed to the solver.
-- `ORCASolver:setPreferredVelocity`: Sets the preferred velocity.
 - `ORCASolver:setPosition`: Sets the agent's current world-space position for ORCA velocity computation.
 - `ORCASolver:compute`: Computes and returns the result.
 - `ORCASolver:getSafeVelocity`: Returns the safe velocity.
@@ -699,19 +690,14 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `SteeringManager:setCombineMode`: Sets the force combination mode.
 - `SteeringManager:getCombineMode`: Returns the current combination mode.
 - `SteeringManager:getLastSteering`: Returns the last computed steering force.
-- `SteeringManager:addCustomBehavior`: Registers a `fn(agent, dt) → dx, dy` Lua callback as a custom steering behavior.
-- `SteeringManager:applyCustomSteering`: Invokes all custom steering callbacks and returns the combined `(fx, fy)` force.
 - `SteeringManager:type`: Returns the type name of this object.
 - `SteeringManager:typeOf`: Returns true if this object is of the given type.
 - `SteeringManager:setSpatialHashCellSize`: Sets the cell size used by the spatial-hash neighbourhood search.
 - `SteeringManager:enableSpatialHash`: Enables or disables spatial-hash bucketing for neighbourhood queries.
 
 ### `StimulusWorld` Methods
-- `StimulusWorld:addVisual`: Adds a visual stimulus at the specified world position with radius and intensity.
-- `StimulusWorld:addAuditory`: Registers an auditory stimulus at a world-space position.
 - `StimulusWorld:remove`: Removes the specified item.
 - `StimulusWorld:update`: Advances the simulation by one time step.
-- `StimulusWorld:count`: Returns or performs count.
 - `StimulusWorld:clear`: Resets or clears the state.
 
 ### `StrategyAI` Methods
@@ -727,7 +713,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `TraitProfile:set`: Sets the base value of this trait, replacing any previous base.
 - `TraitProfile:get`: Returns the current float value of this emotion dimension.
 - `TraitProfile:getBase`: Returns the unmodified base value of this trait before modifiers.
-- `TraitProfile:addModifier`: Adds a named modifier that adjusts the trait value by a delta.
 - `TraitProfile:removeModifiers`: Removes the specified modifiers.
 - `TraitProfile:update`: Advances the simulation by one time step.
 - `TraitProfile:has`: Returns true if a item is present.
@@ -740,7 +725,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `UtilityAI:getLastAction`: Returns the name of the last chosen action, or nil.
 - `UtilityAI:type`: Returns the type name of this object.
 - `UtilityAI:typeOf`: Returns true if this object is of the given type.
-- `UtilityAI:addConsideration`: Adds a multi-axis consideration to a named action; accepts a string curve name or a `fn(x) → y` Lua function for a custom curve.
 
 ## References
 

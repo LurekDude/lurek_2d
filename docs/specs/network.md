@@ -116,7 +116,9 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 - `TcpConnectionManager::close` (`tcp.rs`): Close a TCP connection.
 - `TcpConnectionManager::poll_all` (`tcp.rs`): Poll all active connections for incoming data.
 - `TcpConnectionManager::close_all` (`tcp.rs`): Close all active TCP connections.
+- `TcpConnectionManager::is_empty` (`tcp.rs`): Returns `true` if there are no active TCP connections.
 - `WebSocketManager::new` (`websocket.rs`): Create a new empty WebSocket manager.
+- `WebSocketManager::is_empty` (`websocket.rs`): Returns `true` if there are no active WebSocket connections.
 - `WebSocketManager::connect` (`websocket.rs`): Open a new WebSocket connection.
 - `WebSocketManager::send` (`websocket.rs`): Send data on an existing WebSocket connection.
 - `WebSocketManager::close` (`websocket.rs`): Close a WebSocket connection with a close frame.
@@ -142,8 +144,6 @@ _Plugin candidacy: this module is a candidate for the plugin tier under proposed
 ### `NetworkHost` Methods
 - `NetworkHost:service`: Polls the network for one event, returning an event table or nil.
 - `NetworkHost:flush`: Flushes all pending sends immediately.
-- `NetworkHost:disconnect`: Gracefully disconnects a peer.
-- `NetworkHost:disconnectNow`: Immediately disconnects a peer without handshake.
 - `NetworkHost:resetPeer`: Resets a peer connection immediately without notifying the remote side.
 - `NetworkHost:ping`: Sends a ping to a peer to measure round-trip time.
 - `NetworkHost:getRoundTripTime`: Returns the round-trip time estimate for a peer in milliseconds.

@@ -6,7 +6,7 @@
 - Source path: `src/render/`
 - Lua API path(s): `src/lua_api/render_api.rs`
 - Primary Lua namespace: `lurek.render`
-- Rust test path(s): `src/render/` (inline `#[cfg(test)]` in canvas, decal_surface, draw_layer, font, image_effect, mesh, shader, shape), `src/render/renderer_tests.rs`, `src/render/postfx_pipeline_tests.rs`
+- Rust test path(s): src/render/ (inline #[cfg(test)] in canvas, decal_surface, draw_layer, font, image_effect, mesh, shader, shape), src/render/renderer_tests.rs, src/render/postfx_pipeline_tests.rs
 - Lua test path(s): none found in the workspace
 
 ## Summary
@@ -128,8 +128,6 @@ Additional `RenderCommand` variants have been added to the central enum, expandi
 - `PostFxPipeline::new` (`postfx_pipeline.rs`): Instantiate the post-FX pipeline for `surface_format`.
 - `PostFxPipeline::register_custom` (`postfx_pipeline.rs`): Register a custom WGSL fragment shader under `name`.
 - `PostFxPipeline::apply` (`postfx_pipeline.rs`): Execute a sequence of post-FX passes then composite the result onto `target_view`.
-- `apply` (`postfx_pipeline.rs`): The function allocates (or reuses) two ping-pong textures, dispatches each pass, then does a final copy pass to `target_view`.
-- `apply` (`postfx_pipeline.rs`): The function allocates (or reuses) two ping-pong textures, dispatches each pass, then does a final copy pass to `target_view`.
 - `TextSpan::new` (`renderer.rs`): Creates a new span with the given text, RGBA colour, and scale.
 - `Shader::new` (`shader.rs`): Creates a new shader from WGSL source code.
 - `Shader::send` (`shader.rs`): Sets a uniform value by name.
@@ -182,7 +180,7 @@ Additional `RenderCommand` variants have been added to the central enum, expandi
 - `lurek.render.getFontWidth`: Returns the pixel width of text in the given font.
 - `lurek.render.getFontHeight`: Returns the line height of the given font.
 - `lurek.render.getFontLineHeight`: Returns the line height of the given font (alias for getFontHeight).
-- `lurek.render.setFontLineHeight`: Sets the line height of the given font (stub — returns nil; fonts are immutable in headless mode).
+- `lurek.render.setFontLineHeight`: Sets the line height of the given font (stub â€” returns nil; fonts are immutable in headless mode).
 - `lurek.render.getFontAscent`: Returns the ascent of the given font.
 - `lurek.render.getFontDescent`: Returns the descent of the given font.
 - `lurek.render.getFontWrap`: Returns wrapped lines and the maximum line width.
@@ -231,8 +229,8 @@ Additional `RenderCommand` variants have been added to the central enum, expandi
 - `lurek.render.drawNineSlice`: Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
 - `lurek.render.newShape`: Creates a new empty [`CompoundShape`] stored in the resource pool.
 - `lurek.render.newDrawLayer`: Creates a new z-ordered draw-call queue.
-- `lurek.render.drawQuadBezier`: Queues a quadratic Bézier curve from (x1,y1) to (x2,y2) with one control point.
-- `lurek.render.drawCubicBezier`: Queues a cubic Bézier curve from (x1,y1) to (x2,y2) with two control points.
+- `lurek.render.drawQuadBezier`: Queues a quadratic BĂ©zier curve from (x1,y1) to (x2,y2) with one control point.
+- `lurek.render.drawCubicBezier`: Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
 - `lurek.render.drawPath`: Queues a multi-segment vector path.
 - `lurek.render.drawGradientRect`: Queues a gradient-filled rectangle. color1/color2 are {r,g,b,a} tables.
 - `lurek.render.drawColoredPolygon`: Queues a convex polygon with per-vertex colours.
@@ -245,7 +243,7 @@ Additional `RenderCommand` variants have been added to the central enum, expandi
 - `lurek.render.pushLayer`: Begins a named compositing layer with optional alpha and blend mode.
 - `lurek.render.popLayer`: Ends and composites the named layer back to its parent.
 - `lurek.render.drawQuadBezier`: Must be called inside lurek.render or lurek.render_ui.
-- `lurek.render.drawCubicBezier`: Queues a cubic Bézier curve from (x1,y1) to (x2,y2) with two control points.
+- `lurek.render.drawCubicBezier`: Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
 - `lurek.render.drawPath`: Queues a multi-segment vector path.
 - `lurek.render.drawGradientRect`: Queues a gradient-filled rectangle. Both colors are RGBA tables {r,g,b,a} or positional {[1]=r,[2]=g,[3]=b,[4]=a}.
 - `lurek.render.drawColoredPolygon`: Queues a convex polygon with per-vertex colours.

@@ -210,8 +210,8 @@ Three new source files add dedicated post-processing presets as first-class type
 - `Overlay:setAmbientEnabled`: Enables or disables the ambient light layer.
 - `Overlay:isAmbientEnabled`: Returns whether the ambient light layer is active.
 - `Overlay:getAmbientColor`: Returns the current ambient tint as r, g, b, a components.
-- `Overlay:setTimeOfDay`: Sets the simulated time-of-day (0–24) which drives ambient colour.
-- `Overlay:getTimeOfDay`: Returns the current simulated time-of-day (0–24).
+- `Overlay:setTimeOfDay`: Sets the simulated time-of-day (0â€“24) which drives ambient colour.
+- `Overlay:getTimeOfDay`: Returns the current simulated time-of-day (0â€“24).
 - `Overlay:setFogEnabled`: Enables or disables the fog layer.
 - `Overlay:isFogEnabled`: Returns whether the fog layer is active.
 - `Overlay:setFogDensity`: Sets the fog density (0.0 = clear, 1.0 = fully opaque).
@@ -219,15 +219,15 @@ Three new source files add dedicated post-processing presets as first-class type
 - `Overlay:getFogColor`: Returns the current fog tint as r, g, b, a components.
 - `Overlay:setHeatHazeEnabled`: Enables or disables the heat-haze distortion layer.
 - `Overlay:isHeatHazeEnabled`: Returns whether the heat-haze layer is active.
-- `Overlay:setHeatHazeIntensity`: Sets the heat-haze distortion intensity (0.0–1.0).
+- `Overlay:setHeatHazeIntensity`: Sets the heat-haze distortion intensity (0.0â€“1.0).
 - `Overlay:getHeatHazeIntensity`: Returns the current heat-haze distortion intensity.
 - `Overlay:setVignetteEnabled`: Enables or disables the screen-edge vignette layer.
 - `Overlay:isVignetteEnabled`: Returns whether the vignette layer is active.
-- `Overlay:setVignetteStrength`: Sets the vignette darkening strength (0.0–1.0).
+- `Overlay:setVignetteStrength`: Sets the vignette darkening strength (0.0â€“1.0).
 - `Overlay:getVignetteStrength`: Returns the current vignette strength.
 - `Overlay:setFilmGrainEnabled`: Enables or disables the film-grain noise layer.
 - `Overlay:isFilmGrainEnabled`: Returns whether the film-grain layer is active.
-- `Overlay:setFilmGrainIntensity`: Sets the film-grain noise intensity (0.0–1.0).
+- `Overlay:setFilmGrainIntensity`: Sets the film-grain noise intensity (0.0â€“1.0).
 - `Overlay:getFilmGrainIntensity`: Returns the current film-grain intensity.
 - `Overlay:setCloudShadows`: Enables or disables scrolling cloud-shadow projection.
 - `Overlay:isCloudShadowsEnabled`: Returns whether cloud shadows are active.
@@ -243,9 +243,9 @@ Three new source files add dedicated post-processing presets as first-class type
 - `Overlay:isWeatherEnabled`: Returns whether the weather particle system is active.
 - `Overlay:setWeather`: Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen").
 - `Overlay:getWeather`: Returns the name of the current weather type.
-- `Overlay:setWeatherIntensity`: Sets the particle spawn rate multiplier (0.0–1.0).
+- `Overlay:setWeatherIntensity`: Sets the particle spawn rate multiplier (0.0â€“1.0).
 - `Overlay:getWeatherIntensity`: Returns the current weather intensity.
-- `Overlay:setWindDirection`: Sets the wind direction in radians (0 = right, π/2 = down).
+- `Overlay:setWindDirection`: Sets the wind direction in radians (0 = right, Ď€/2 = down).
 - `Overlay:getWindDirection`: Returns the current wind direction in radians.
 - `Overlay:setWindSpeed`: Sets the wind speed applied to weather particles in units per second.
 - `Overlay:getWindSpeed`: Returns the current wind speed.
@@ -282,6 +282,9 @@ Three new source files add dedicated post-processing presets as first-class type
 - `PostFxEffect:setBrightness`: Sets the brightness parameter of this effect.
 - `PostFxEffect:setContrast`: Sets the contrast parameter of this effect.
 - `PostFxEffect:setSaturation`: Sets the saturation parameter of this effect.
+- `PostFxEffect:enableAutoUniforms`: Enables auto-injection of common uniforms into shader slot p[3] each frame.
+- `PostFxEffect:disableAutoUniforms`: Disables auto-injection of common uniforms into shader slot p[3].
+- `PostFxEffect:isAutoUniforms`: Returns whether auto-uniform injection is enabled for this effect.
 
 ### `PostFxStack` Methods
 - `PostFxStack:add`: Appends a PostFxEffect to the end of the pipeline.
@@ -303,56 +306,6 @@ Three new source files add dedicated post-processing presets as first-class type
 - `PostFxStack:endCapture`: Ends scene capture for post-processing.
 - `PostFxStack:apply`: Applies all enabled effects in the stack and composites the result to screen.
 - `PostFxStack:type`: Returns the type name "PostFxStack".
-
-## Custom WGSL Shaders
-
-### Creating Custom Effects
-
-Use `lurek.render.newShader(wgsl_source)` to compile a WGSL fragment shader, then
-wrap it in a post-processing effect with `lurek.effect.newCustomEffect(shader_id)`.
-
-Fragment shaders receive:
-- `@group(0) @binding(0)` — source texture (`texture_2d<f32>`)
-- `@group(0) @binding(1)` — sampler
-- `@group(0) @binding(2)` — parameter buffer (`PostFxParams`)
-
-Entry point must accept `@location(0) color: vec4<f32>` and `@location(1) uv: vec2<f32>`,
-and return `@location(0) vec4<f32>`.
-
-### Auto-Uniforms
-
-Call `effect:enableAutoUniforms()` to have the engine inject common values into
-parameter slot `p[3]` each frame:
-
-| Slot | Field | Description |
-|------|-------|-------------|
-| `p[3].x` | time | Total elapsed seconds (f32) |
-| `p[3].y` | frame | Frame count cast to f32 |
-| `p[3].z` | width | Render target width in pixels |
-| `p[3].w` | height | Render target height in pixels |
-
-Access in WGSL:
-
-```wgsl
-struct PostFxParams { p: array<vec4<f32>, 4>, }
-@group(0) @binding(2) var<uniform> params: PostFxParams;
-
-// In fragment main:
-let time       = params.p[3].x;
-let frame      = params.p[3].y;
-let resolution = params.p[3].zw;
-```
-
-**Convention:** Slots `p[0]..p[2]` are free for user parameters (set via `effect:setParameter(name, value)`).
-Slot `p[3]` is reserved for auto-uniforms when enabled. Do not overlap.
-
-### Auto-Uniform API
-
-| Method | Description |
-|--------|-------------|
-| `effect:enableAutoUniforms()` | Enable p[3] auto-injection |
-| `effect:disableAutoUniforms()` | Disable p[3] auto-injection |
-| `effect:isAutoUniforms()` | Returns current flag (boolean) |
 - `PostFxStack:typeOf`: Returns true when the given name matches "PostFxStack" or a parent type.
 - `PostFxStack:setFeedback`: Sets the feedback loop intensity. At `0.0` (default) there is no
 - `PostFxStack:getFeedback`: Returns the current feedback loop intensity `[0.0, 1.0]`.

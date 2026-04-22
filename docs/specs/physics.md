@@ -2,11 +2,11 @@
 
 ## General Info
 
-- Module group: `Platform Services.`
+- Module group: `Platform Services`
 - Source path: `src/physics/`
 - Lua API path(s): `src/lua_api/physics_api.rs`
 - Primary Lua namespace: `lurek.physics`
-- Rust test path(s): `src/physics/world_tests.rs`, inline `#[cfg(test)]` in `body.rs`, `shape.rs`, `zone.rs`, `cellular.rs`, `terrain.rs`, `render.rs`, `collision_helpers.rs`
+- Rust test path(s): src/physics/world_tests.rs, inline #[cfg(test)] in body.rs, shape.rs, zone.rs, cellular.rs, terrain.rs, render.rs, collision_helpers.rs
 - Lua test path(s): none found in the workspace
 
 ## Summary
@@ -257,6 +257,10 @@ _Plugin candidacy: CORE-KEEP — physics is fundamental to 2D games and too cent
 - `lurek.physics.drawDebugGpu`: Extracts collider geometry from a World and queues a GPU physics debug
 - `lurek.physics.newTerrain`: Creates a destructible terrain grid.
 - `lurek.physics.newCellular`: Creates a falling-sand cellular automaton grid.
+- `lurek.physics.testAABB`: Returns true when two axis-aligned bounding boxes overlap.
+- `lurek.physics.testCircles`: Returns true when two circles overlap.
+- `lurek.physics.testPoint`: Returns true when point (px, py) lies inside the AABB.
+- `lurek.physics.testCircleAABB`: Returns true when a circle overlaps an AABB.
 
 ### `Body` Methods
 - `Body:getId`: Returns the body's integer ID.
@@ -308,12 +312,9 @@ _Plugin candidacy: CORE-KEEP — physics is fundamental to 2D games and too cent
 ### `Cellular` Methods
 - `Cellular:setCell`: Sets the material of a cell.
 - `Cellular:getCell`: Returns the material at `(cx, cy)` as an integer constant.
-- `Cellular:fillRect`: Fills a rectangular region of cells with the given material.
-- `Cellular:fillCircle`: Fills a circle of cells with the given material.
 - `Cellular:step`: Advances the simulation by one tick.
 - `Cellular:stepN`: Advances the simulation by `n` ticks.
 - `Cellular:toImageData`: Returns the full grid as an RGBA byte string using the default colour palette.
-- `Cellular:toImageDataRegion`: Returns a sub-region as an RGBA byte string.
 - `Cellular:countCells`: Counts cells of the given material type.
 - `Cellular:findCells`: Returns positions of all cells of the given material as an array of `{x, y}` tables.
 - `Cellular:toBytes`: Serialises the grid to a byte string.
@@ -332,15 +333,11 @@ _Plugin candidacy: CORE-KEEP — physics is fundamental to 2D games and too cent
 ### `Terrain` Methods
 - `Terrain:setCell`: Sets a single terrain cell to solid or empty.
 - `Terrain:getCell`: Returns whether a cell is solid.
-- `Terrain:fillCircle`: Fills a circle of cells centred at world position `(wx, wy)`.
-- `Terrain:fillRect`: Fills a rectangular region of cells.
 - `Terrain:fillAll`: Sets every cell in the grid to `solid`.
 - `Terrain:flush`: Rebuilds physics bodies for all dirty chunks.
 - `Terrain:isDirty`: Returns `true` when at least one chunk needs flushing.
 - `Terrain:collapseColumns`: Removes unsupported cells, returning the number of cells that fell.
 - `Terrain:solidPositions`: Returns the world-space centres of all solid cells as an array of `{x, y}` tables.
-- `Terrain:spawnDebris`: Spawns dynamic debris bodies at the given positions.
-- `Terrain:toImageData`: Returns the terrain as an RGBA byte string.
 - `Terrain:toBytes`: Serialises the terrain grid to a byte string for save/load.
 - `Terrain:loadFromBytes`: Loads terrain cell data from bytes produced by `toBytes`.
 
@@ -377,12 +374,10 @@ _Plugin candidacy: CORE-KEEP — physics is fundamental to 2D games and too cent
 - `World:clearBeginContact`: Removes the begin-contact callback.
 - `World:setEndContact`: Registers a Lua function called with (bodyIdA, bodyIdB) when two
 - `World:clearEndContact`: Removes the end-contact callback.
-- `World:setBodyData`: Attaches arbitrary Lua data to a body for retrieval in collision callbacks.
 - `World:getBodyData`: Returns the Lua data previously attached to a body, or nil if none is set.
 - `World:clearBodyData`: Removes the Lua data attached to a body.
 - `World:setBodyCCD`: Enables or disables Continuous Collision Detection for a body.
 - `World:getBodyCCD`: Returns whether CCD is enabled for a body.
-- `World:setBodyOneWay`: Marks a body as a one-way platform.  Bodies approaching from the
 - `World:clearBodyOneWay`: Removes the one-way platform flag from a body.
 - `World:getBodyOneWay`: Returns the one-way normal for a body, or nil if not configured.
 - `World:setJointBreakForce`: Sets the relative-velocity threshold above which a joint breaks.
@@ -393,7 +388,6 @@ _Plugin candidacy: CORE-KEEP — physics is fundamental to 2D games and too cent
 - `World:setSolverIterations`: Sets the number of constraint solver iterations per step.
 - `World:getSolverIterations`: Returns the current number of solver iterations per step.
 - `World:newBodies`: Creates multiple bodies in one call.
-- `World:stepFixed`: Steps the world using a fixed sub-step size to consume accumulated time.
 - `World:addZone`: Creates a rectangular gravity/damping zone and returns a LuaZone handle.
 - `World:getZoneEvents`: Returns zone enter/leave events produced by the most recent step.
 
@@ -404,11 +398,8 @@ _Plugin candidacy: CORE-KEEP — physics is fundamental to 2D games and too cent
 - `Zone:setLayerMask`: Sets the layer bitmask; only bodies whose `layer & mask != 0` are affected.
 - `Zone:setCircle`: Replaces the zone boundary with a circle.
 - `Zone:setGravityDirectional`: Sets directional gravity inside the zone.
-- `Zone:setGravityPoint`: Sets point-attractor gravity inside the zone.
-- `Zone:setGravityRepulsor`: Sets point-repulsor gravity inside the zone.
 - `Zone:setGravityZero`: Suppresses gravity inside the zone (zero-g pocket).
 - `Zone:setLinearDampingOverride`: Sets an optional linear damping override for bodies inside the zone.
-- `Zone:setAngularDampingOverride`: Sets an optional angular damping override for bodies inside the zone.
 - `Zone:destroy`: Removes the zone from the world.
 
 ## References

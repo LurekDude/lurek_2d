@@ -28,13 +28,13 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `config.rs`: Defines ParticleConfig and the enums that control emission shape, area distribution, insert mode, emitter state, and relative motion.
 - `emission.rs`: Computes spawn offsets from the configured area-distribution and emission-shape rules.
 - `emitter.rs`: Defines ParticleSystem, including spawning, simulation updates, emitter lifecycle, and batched render-command generation.
-- `emitter_tests.rs`: Unit tests for ParticleSystem (split from emitter.rs for file-size management).
 - `math.rs`: Defines interpolation and random-sampling helpers used during particle updates.
 - `mod.rs`: Declares the particle submodules and re-exports the public emitter, config, particle, trail, and helper types.
 - `particle.rs`: Defines Particle, the live per-particle state record used during simulation.
 - `render.rs`: Provides standard `generate_render_commands` wrappers for particle systems and trails, plus `expand_particle_commands` which splits textured particles into individual `DrawQuad`/`DrawImageEx` commands.
 - `shapes.rs`: Defines ParticleShape, the geometric primitive enum for untextured particle rendering.
 - `trail.rs`: Defines Trail and TrailPoint for fading ribbon effects built from timestamped points.
+- `visualization.rs`: Particle system visualization / diagnostic renderers.
 
 ## Types
 
@@ -54,6 +54,7 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 
 ## Functions
 
+- `ParticleConfig::from_toml_str` (`config.rs`): Parses a TOML string into a `ParticleConfig`.
 - `emission_offset` (`emission.rs`): Compute an emission offset `(dx, dy)` based on the config's area distribution.
 - `emission_shape_offset` (`emission.rs`): Compute an emission offset `(dx, dy)` based on the emission shape.
 - `ParticleSystem::new` (`emitter.rs`): Creates a new particle system with the given configuration positioned at `(0, 0)`.
@@ -79,14 +80,10 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `ParticleSystem::attractor_count` (`emitter.rs`): Returns the number of attractors currently attached to this system.
 - `ParticleSystem::set_bounds` (`emitter.rs`): Sets axis-aligned bounce boundaries with a restitution coefficient.
 - `ParticleSystem::clear_bounds` (`emitter.rs`): Removes the bounce boundaries from this system.
-- `ParticleSystem::draw_to_image` (`emitter.rs`): Each particle is drawn with its color interpolated from age.
-- `ParticleSystem::draw_explosion_to_image` (`emitter.rs`): Render an explosion burst: particles radiate from center with age-based red-to-yellow coloring.
-- `ParticleSystem::draw_rain_to_image` (`emitter.rs`): Render particles styled as falling rain streaks.
-- `ParticleSystem::draw_spark_trail_to_image` (`emitter.rs`): Render particles as hot orange sparks with short trails.
-- `ParticleSystem::draw_over_image` (`emitter.rs`): Render a lifecycle strip showing the particle count at each step.
-- `ParticleSystem::paint_onto` (`emitter.rs`): Paint live spark particles onto an existing mutable image.
-- `ParticleSystem::draw_lifecycle_to_image` (`emitter.rs`): Renders a bar chart of particle lifecycle counts over time into an `ImageData` frame.
-- `lerp` (`math.rs`): Linearly interpolate between `a` and `b` by factor `t`.
+- `ParticleSystem::add_sub_system` (`emitter.rs`): Adds a child emitter that updates and renders alongside this system.
+- `ParticleSystem::sub_system_count` (`emitter.rs`): Returns the number of direct child sub-systems.
+- `ParticleSystem::drain_pending_deaths` (`emitter.rs`): Takes and returns all entries from `pending_deaths`, leaving the vec empty.
+- `ParticleSystem::drain_custom_offsets` (`emitter.rs`): Takes and returns all entries from `pending_custom_offsets`, leaving the vec empty.
 - `interpolate_sizes` (`math.rs`): Interpolate a multi-stop size array at normalised time `t` (0 = birth, 1 = death).
 - `interpolate_colors` (`math.rs`): Interpolate a multi-stop color array at normalised time `t` (0 = birth, 1 = death).
 - `interpolate_alphas` (`math.rs`): Interpolate a multi-stop alpha array at normalised time `t` (0 = birth, 1 = death).
@@ -94,6 +91,7 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `rand_normal` (`math.rs`): Approximate a standard-normal random value using Box-Muller transform.
 - `ParticleSystem::generate_render_commands` (`render.rs`): Generate render commands for all live particles at world origin.
 - `Trail::generate_render_commands` (`render.rs`): Generate render commands for the trail ribbon.
+- `expand_particle_commands` (`render.rs`): Expand particle render commands for textured particles.
 - `Trail::new` (`trail.rs`): Creates a new trail with the given lifetime and starting width.
 - `Trail::push_point` (`trail.rs`): Pushes a new point at the head of the trail.
 - `Trail::update` (`trail.rs`): Advances point ages by `dt` seconds and removes expired points.
@@ -108,6 +106,13 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `Trail::set_tail_color` (`trail.rs`): Sets the color at the tail (oldest) end of the trail.
 - `Trail::build_render_commands` (`trail.rs`): Generates render commands to draw the trail as a tapered quad strip.
 - `Trail::draw_to_image` (`trail.rs`): Render the trail ribbon to an image with color interpolation.
+- `draw_to_image` (`visualization.rs`): Render all live particles to an `ImageData`.
+- `draw_explosion_to_image` (`visualization.rs`): Render an explosion burst: particles radiate from center with age-based red-to-yellow coloring.
+- `draw_rain_to_image` (`visualization.rs`): Render particles styled as falling rain streaks.
+- `draw_spark_trail_to_image` (`visualization.rs`): Render particles as hot orange sparks with short trails.
+- `draw_over_image` (`visualization.rs`): Render particles over a provided background image.
+- `paint_onto` (`visualization.rs`): Paint live spark particles onto an existing mutable image.
+- `draw_lifecycle_to_image` (`visualization.rs`): Renders a bar chart of particle lifecycle counts over time into an `ImageData` frame.
 
 ## Lua API Reference
 
@@ -117,6 +122,7 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 ### Module Functions
 - `lurek.particle.newSystem`: Creates a new particle system and stores it in the engine pool.
 - `lurek.particle.newTrail`: Creates a new trail ribbon effect.
+- `lurek.particle.fromTOML`: Creates a new particle system from a TOML config file.
 
 ### `ParticleSystem` Methods
 - `ParticleSystem:update`: Advances the particle simulation by dt seconds.
@@ -158,13 +164,13 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `ParticleSystem:getLinearDamping`: Returns linear damping range.
 - `ParticleSystem:setSizes`: Sets size keyframes (varargs: each number is one keyframe).
 - `ParticleSystem:getSizes`: Returns size keyframes as a Lua table.
-- `ParticleSystem:setSizeVariation`: Sets size variation (0–1).
+- `ParticleSystem:setSizeVariation`: Sets size variation (0â€“1).
 - `ParticleSystem:getSizeVariation`: Returns the maximum random size variation applied to newly emitted particles.
 - `ParticleSystem:setRotation`: Sets initial rotation range in radians.
 - `ParticleSystem:getRotation`: Returns initial rotation range.
 - `ParticleSystem:setSpin`: Sets angular velocity range.
 - `ParticleSystem:getSpin`: Returns angular velocity range.
-- `ParticleSystem:setSpinVariation`: Sets spin variation (0–1).
+- `ParticleSystem:setSpinVariation`: Sets spin variation (0â€“1).
 - `ParticleSystem:getSpinVariation`: Returns the maximum random angular velocity variation for new particles.
 - `ParticleSystem:setRelativeRotation`: Sets whether particle rotation follows velocity direction.
 - `ParticleSystem:hasRelativeRotation`: Returns whether relative rotation is enabled.
@@ -190,14 +196,11 @@ Additional emitter control methods have been added to `ParticleSystem`, enabling
 - `ParticleSystem:clearAttractors`: Removes all attractors from this particle system.
 - `ParticleSystem:getAttractorCount`: Returns the number of attractors currently registered on this system.
 - `ParticleSystem:clearBounds`: Removes the bounding rectangle so particles can move freely.
-- `ParticleSystem:addSubEmitter`: Attaches a sub-emitter that bursts when a particle dies.
-- `ParticleSystem:setFlipbook`: Configures sprite-sheet flipbook animation by dividing the texture into a grid.
 - `ParticleSystem:getFlipbook`: Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
-- `ParticleSystem:addSubSystem`: Adds a persistent child emitter that updates and renders alongside this system. Returns a 1-based index.
-- `ParticleSystem:subSystemCount`: Returns the number of direct child sub-systems.
-- `ParticleSystem:setCustomEmissionShape`: Registers a Lua `function() -> (offset_x, offset_y)` callback invoked for each newly spawned particle when using the `Custom` emission shape.
-- `ParticleSystem:setOnDeathBatch`: Registers a Lua `function(batch)` callback invoked after each `update()` with a table array of `{x, y, vx, vy}` entries for all particles that died that frame.
-- `lurek.particle.fromTOML`: Loads a TOML-serialized `ParticleConfig` from a file path and returns a new `ParticleSystem`.
+- `ParticleSystem:addSubSystem`: Adds a child emitter that updates and renders with this system.
+- `ParticleSystem:subSystemCount`: Returns the number of direct child sub-systems attached to this emitter.
+- `ParticleSystem:setCustomEmissionShape`: Sets a Lua function that returns (offset_x, offset_y) for each newly spawned
+- `ParticleSystem:setOnDeathBatch`: Sets a Lua function called after each update() with all particles that died
 
 ### `Trail` Methods
 - `Trail:pushPoint`: Appends a new point to the trail head.

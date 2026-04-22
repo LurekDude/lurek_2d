@@ -120,8 +120,8 @@ Three new source files add coordination primitives for advanced threading scenar
 - `ThreadPool:collect`: Retrieves the next result from the pool's output channel (non-blocking).
 - `ThreadPool:size`: Returns the number of workers in this pool.
 - `ThreadPool:join`: Blocks until all workers in the pool have finished execution.
-- `ThreadPool:getInputChannel`: Returns the shared input Channel (main → workers).
-- `ThreadPool:getOutputChannel`: Returns the shared output Channel (workers → main).
+- `ThreadPool:getInputChannel`: Returns the shared input Channel (main â†’ workers).
+- `ThreadPool:getOutputChannel`: Returns the shared output Channel (workers â†’ main).
 
 ## References
 
