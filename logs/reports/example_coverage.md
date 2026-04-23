@@ -1,15 +1,4 @@
-# Example Coverage Report
-
-> Generated: 2026-04-23
-
-## Summary Table
-
-| Metric | Value |
-| --- | --- |
-| Total API items | ? |
-| Covered by examples | ? |
-| Missing examples | ? |
-
+# Example Coverage & Quality Report
 
 | Module | Namespace | Example File | Coverage | Stubs | Total | Length (lines) | Comments | Docstrings |
 |---|---|---|---|---|---|---|---|---|
@@ -20,7 +9,7 @@
 | `camera` | `lurek.camera` | `camera.lua` | 36 | 0 | 36 | 337 | 120 | 36 |
 | `compute` | `lurek.compute` | `compute.lua` | 71 | 0 | 71 | 688 | 225 | 71 |
 | `data` | `lurek.data` | `data.lua` | 57 | 0 | 57 | 541 | 186 | 57 |
-| `dataframe` | `lurek.dataframe` | `dataframe.lua` | 66 | 0 | 66 | 657 | 211 | 66 |
+| `dataframe` | `lurek.dataframe` | `dataframe.lua` | 70 | 7 | 88 | 801 | 256 | 70 |
 | `debugbridge` | `lurek.debugbridge` | `debugbridge.lua` | 14 | 0 | 14 | 198 | 75 | 14 |
 | `devtools` | `lurek.devtools` | `devtools.lua` | 48 | 0 | 48 | 485 | 159 | 48 |
 | `docs` | `lurek.docs` | `docs.lua` | 75 | 0 | 75 | 763 | 240 | 75 |
@@ -62,6 +51,6 @@
 | `tween` | `lurek.tween` | `tween.lua` | 35 | 0 | 35 | 371 | 121 | 35 |
 | `ui` | `lurek.ui` | `ui.lua` | 364 | 0 | 364 | 3147 | 1144 | 364 |
 | `window` | `lurek.window` | `window.lua` | 50 | 0 | 50 | 492 | 160 | 50 |
-| **TOTAL** | | | **3682** | **0** | **3682** | **36711** | **11929** | **3682** |
+| **TOTAL** | | | **3686** | **7** | **3704** | **36855** | **11974** | **3686** |
 
-**Overall Coverage (including stubs):** 100.0%
+**Overall Coverage (including stubs):** 99.7%
