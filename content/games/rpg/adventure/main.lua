@@ -305,16 +305,17 @@ end
 ------------------------------------------------------------------------
 -- Init
 ------------------------------------------------------------------------
+
 function lurek.init()
-    lurek.input.addAction("up",        {"w", "up"})
-    lurek.input.addAction("down",      {"s", "down"})
-    lurek.input.addAction("left",      {"a", "left"})
-    lurek.input.addAction("right",     {"d", "right"})
-    lurek.input.addAction("interact",  {"e"})
-    lurek.input.addAction("tab",       {"tab"})
-    lurek.input.addAction("use_item",  {"u"})
-    lurek.input.addAction("combine",   {"c"})
-    lurek.input.addAction("quit",      {"escape"})
+    lurek.input.bind("up",        {"w", "up"})
+    lurek.input.bind("down",      {"s", "down"})
+    lurek.input.bind("left",      {"a", "left"})
+    lurek.input.bind("right",     {"d", "right"})
+    lurek.input.bind("interact",  {"e"})
+    lurek.input.bind("tab",       {"tab"})
+    lurek.input.bind("use_item",  {"u"})
+    lurek.input.bind("combine",   {"c"})
+    lurek.input.bind("quit",      {"escape"})
 
     -- Particle systems
     sparkle_ps = lurek.particle.new({
@@ -340,14 +341,14 @@ function lurek.init()
     })
 end
 
-function lurek.ready()
+local function _ready_setup()
     game_state = STATE.TITLE
 end
 
 ------------------------------------------------------------------------
 -- Process
 ------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     title_blink = title_blink + dt
 
     -- Quit
@@ -494,7 +495,7 @@ lurek.process(function(dt)
     lurek.render.setBackgroundColor(pal.bg[1], pal.bg[2], pal.bg[3])
     local fps = lurek.timer.getFPS()
     lurek.window.setTitle("The Lost Egg — Lurek2D [FPS: " .. fps .. "]")
-end)
+end
 
 ------------------------------------------------------------------------
 -- Draw helpers
@@ -608,7 +609,7 @@ end
 ------------------------------------------------------------------------
 -- Render (world)
 ------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if game_state == STATE.TITLE then
         -- Title screen background
         lurek.render.setColor(0.05, 0.03, 0.08, 1)
@@ -685,12 +686,12 @@ lurek.render(function()
         lurek.render.setColor(1, 1, 0.6, pickup_anim.alpha)
         lurek.render.print(pickup_anim.text, pickup_anim.x - 20, pickup_anim.y, 16)
     end
-end)
+end
 
 ------------------------------------------------------------------------
 -- Render UI
 ------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if game_state == STATE.TITLE or game_state == STATE.WIN then return end
 
     -- Room name banner
@@ -810,4 +811,4 @@ lurek.render_ui(function()
         lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
         lurek.render.print("[Tab] Cycle   [E] Interact   [C] Inventory   [Arrows] Move", 140, SCREEN_H - 14, 10)
     end
-end)
+end

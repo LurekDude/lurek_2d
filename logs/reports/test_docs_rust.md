@@ -166,8 +166,8 @@
 - `Animation::get_blend_state` in `src/animation/controller.rs:472`
 - `Animation::load_from_aseprite` in `src/animation/controller.rs:567`
 - `AnimCurve::keyframe_count` in `src/animation/curve.rs:88`
-- `AnimStateMachine::set_param_int` in `src/animation/state_machine.rs:219`
-- `AnimStateMachine::get_animation_mut` in `src/animation/state_machine.rs:343`
+- `AnimStateMachine::set_param_int` in `src/animation/state_machine.rs:228`
+- `AnimStateMachine::get_animation_mut` in `src/animation/state_machine.rs:355`
 
 ### `app` — 13/19 (68.4%)
 
@@ -190,8 +190,8 @@
 - `recompute_viewport` in `src/app/app.rs:63`
 - `splash_window_title` in `src/app/app.rs:129`
 - `fit_contain_size` in `src/app/app.rs:143`
-- `LurekApp::resolve_present_mode` in `src/app/app.rs:328`
-- `LurekApp::init_lua` in `src/app/app.rs:535`
+- `LurekApp::resolve_present_mode` in `src/app/app.rs:337`
+- `LurekApp::init_lua` in `src/app/app.rs:544`
 - `ErrorScreen::from_lua_error` in `src/app/error_screen.rs:80`
 
 ### `audio` — 167/210 (79.5%)

@@ -462,6 +462,7 @@ local function reset_game()
 end
 
 -- ── lurek.init ────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Raycaster FPS — Lurek2D")
     lurek.render.setBackgroundColor(0, 0, 0)
@@ -483,10 +484,10 @@ function lurek.init()
     reset_game()
 end
 
-lurek.ready(function() end)
+local function _ready_setup() end)
 
 -- ── lurek.process ─────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
@@ -666,10 +667,10 @@ lurek.process(function(dt)
     update_popups(dt)
     update_weather(dt)
     cam:update(dt)
-end)
+end
 
 -- ── lurek.render — 3D viewport ────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if current_state == STATE.TITLE then return end
     cam:apply()
 
@@ -804,10 +805,10 @@ lurek.render(function()
     end
 
     cam:reset()
-end)
+end
 
 -- ── lurek.render_ui — HUD, minimap, weather, popups ───────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- === TITLE SCREEN ===
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.8, 0.15, 0.1, 1)
@@ -969,4 +970,4 @@ lurek.render_ui(function()
     -- FPS
     lurek.render.setColor(0.3, 0.3, 0.4, 1)
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
-end)
+end

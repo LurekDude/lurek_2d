@@ -5,7 +5,7 @@
 | Category | Covered | Total | Coverage |
 |----------|---------|-------|----------|
 | Rust public functions | 3228 | 4155 | 77.7% |
-| Lua API functions | 3704 | 3704 | 100.0% |
+| Lua API functions | 4079 | 4102 | 99.4% |
 
 ## Rust Coverage by Module
 
@@ -67,54 +67,54 @@
 
 | Module | Covered | Total | Coverage |
 |--------|---------|-------|----------|
-| ai | 242 | 242 | 100.0% |
-| animation | 46 | 46 | 100.0% |
-| audio | 212 | 212 | 100.0% |
+| ai | 291 | 292 | 99.7% |
+| animation | 53 | 53 | 100.0% |
+| audio | 214 | 215 | 99.5% |
 | automation | 28 | 28 | 100.0% |
-| camera | 36 | 36 | 100.0% |
-| compute | 71 | 71 | 100.0% |
-| data | 57 | 57 | 100.0% |
-| dataframe | 88 | 88 | 100.0% |
+| camera | 47 | 47 | 100.0% |
+| compute | 76 | 77 | 98.7% |
+| data | 61 | 61 | 100.0% |
+| dataframe | 114 | 116 | 98.3% |
 | debugbridge | 14 | 14 | 100.0% |
 | devtools | 48 | 48 | 100.0% |
 | docs | 75 | 75 | 100.0% |
-| ecs | 47 | 47 | 100.0% |
-| effect | 145 | 145 | 100.0% |
+| ecs | 61 | 61 | 100.0% |
+| effect | 157 | 158 | 99.4% |
 | engine | 10 | 10 | 100.0% |
-| event | 22 | 22 | 100.0% |
+| event | 26 | 26 | 100.0% |
 | filesystem | 54 | 54 | 100.0% |
-| globe | 44 | 44 | 100.0% |
-| graph | 111 | 111 | 100.0% |
+| globe | 53 | 53 | 100.0% |
+| graph | 126 | 126 | 100.0% |
 | i18n | 31 | 31 | 100.0% |
-| image | 68 | 68 | 100.0% |
-| input | 80 | 80 | 100.0% |
-| light | 83 | 83 | 100.0% |
+| image | 80 | 80 | 100.0% |
+| input | 81 | 81 | 100.0% |
+| light | 86 | 86 | 100.0% |
 | log | 18 | 18 | 100.0% |
-| math | 204 | 204 | 100.0% |
-| minimap | 56 | 56 | 100.0% |
-| mods | 46 | 46 | 100.0% |
-| network | 38 | 38 | 100.0% |
-| parallax | 43 | 43 | 100.0% |
-| particle | 89 | 89 | 100.0% |
-| pathfind | 65 | 65 | 100.0% |
+| math | 220 | 223 | 98.7% |
+| minimap | 76 | 76 | 100.0% |
+| mods | 47 | 47 | 100.0% |
+| network | 47 | 47 | 100.0% |
+| parallax | 44 | 44 | 100.0% |
+| particle | 96 | 98 | 98.0% |
+| pathfind | 89 | 90 | 98.9% |
 | patterns | 170 | 170 | 100.0% |
-| physics | 151 | 151 | 100.0% |
-| pipeline | 60 | 60 | 100.0% |
+| physics | 189 | 193 | 97.9% |
+| pipeline | 61 | 62 | 98.4% |
 | procgen | 29 | 29 | 100.0% |
-| raycaster | 42 | 42 | 100.0% |
-| render | 183 | 183 | 100.0% |
-| save | 22 | 22 | 100.0% |
+| raycaster | 55 | 59 | 93.2% |
+| render | 197 | 197 | 100.0% |
+| save | 26 | 26 | 100.0% |
 | scene | 53 | 53 | 100.0% |
 | serial | 10 | 10 | 100.0% |
-| spine | 20 | 20 | 100.0% |
-| sprite | 18 | 18 | 100.0% |
+| spine | 30 | 30 | 100.0% |
+| sprite | 20 | 20 | 100.0% |
 | system | 26 | 26 | 100.0% |
-| terminal | 82 | 82 | 100.0% |
+| terminal | 84 | 84 | 100.0% |
 | thread | 37 | 37 | 100.0% |
-| tilemap | 138 | 138 | 100.0% |
-| timer | 43 | 43 | 100.0% |
+| tilemap | 166 | 168 | 98.8% |
+| timer | 47 | 47 | 100.0% |
 | tween | 35 | 35 | 100.0% |
-| ui | 364 | 364 | 100.0% |
+| ui | 371 | 371 | 100.0% |
 | window | 50 | 50 | 100.0% |
 
 ## Uncovered Rust Functions (top 50)
@@ -170,3 +170,29 @@
 - `StimulusWorld::add_custom` in `src/ai/perception.rs:262`
 - `StimulusWorld::stimuli` in `src/ai/perception.rs:306`
 - ... and 877 more
+
+## Uncovered Lua API Functions (top 50)
+
+- `InfluenceMap:stampInfluence` (method) in `src/lua_api/ai_api.rs:1843`
+- `Bus:setDuckTarget` (method) in `src/lua_api/audio_api.rs:535`
+- `Array:eigenPower` (method) in `src/lua_api/compute_api.rs:855`
+- `DataFrame:withRollingMin` (method) in `src/lua_api/dataframe_api.rs:737`
+- `DataFrame:withRollingMax` (method) in `src/lua_api/dataframe_api.rs:754`
+- `Overlay:triggerShake` (method) in `src/lua_api/effect_api.rs:743`
+- `NoiseGenerator:worley3d` (method) in `src/lua_api/math_api.rs:1203`
+- `NoiseGenerator:warpDomain` (method) in `src/lua_api/math_api.rs:1328`
+- `NoiseGenerator:generateMap` (method) in `src/lua_api/math_api.rs:1339`
+- `Trail:setHeadColor` (method) in `src/lua_api/particle_api.rs:1420`
+- `Trail:setTailColor` (method) in `src/lua_api/particle_api.rs:1436`
+- `FlowField:calculateMulti` (method) in `src/lua_api/pathfind_api.rs:604`
+- `World:setJointMotorSpeed` (method) in `src/lua_api/physics_api.rs:690`
+- `World:setJointLimitsEnabled` (method) in `src/lua_api/physics_api.rs:711`
+- `World:setJointLimits` (method) in `src/lua_api/physics_api.rs:727`
+- `World:setMouseJointTarget` (method) in `src/lua_api/physics_api.rs:749`
+- `Pipeline:addSubPipeline` (method) in `src/lua_api/pipeline_api.rs:1212`
+- `Raycaster:drawView` (method) in `src/lua_api/raycaster_api.rs:554`
+- `Raycaster:drawDepthMap` (method) in `src/lua_api/raycaster_api.rs:575`
+- `Raycaster:drawLineOfSight` (method) in `src/lua_api/raycaster_api.rs:604`
+- `Raycaster:drawCameraSweep` (method) in `src/lua_api/raycaster_api.rs:624`
+- `ChunkMap:getChunksInView` (method) in `src/lua_api/tilemap_api.rs:1150`
+- `MapBlock:setSide` (method) in `src/lua_api/tilemap_api.rs:1592`

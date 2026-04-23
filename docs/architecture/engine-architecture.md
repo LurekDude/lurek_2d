@@ -433,11 +433,11 @@ Every frame follows a fixed callback sequence. All callbacks are **optional**
 │  4. lurek.process_late(dt)                                     │
 │     Post-physics logic: camera follow, constraint resolution   │
 │                                                                │
-│  5. lurek.render()                                             │
+│  5. lurek.draw()                                               │
 │     Push RenderCommands for WORLD layer                        │
 │     Domain modules auto-collect: particle, tilemap, etc.       │
 │                                                                │
-│  6. lurek.render_ui()                                          │
+│  6. lurek.draw_ui()                                            │
 │     Push RenderCommands for UI layer (drawn on top of world)   │
 │     UI auto-collect: gui widgets, terminal overlay             │
 │                                                                │
@@ -477,8 +477,8 @@ function exists before calling it. An empty `main.lua` is valid.
 | `lurek.process`         | `(dt)`                      | Every frame                              | Game logic, animation, AI                      |
 | `lurek.process_physics` | `(dt)`                      | Fixed timestep (may fire 0..N per frame) | Physics stepping, collision response           |
 | `lurek.process_late`    | `(dt)`                      | Every frame, after physics               | Camera follow, constraint resolution           |
-| `lurek.render`          | `()`                        | Every frame                              | Push RenderCommands for world layer            |
-| `lurek.render_ui`       | `()`                        | Every frame                              | Push RenderCommands for UI layer               |
+| `lurek.draw`            | `()`                        | Every frame                              | Push RenderCommands for world layer            |
+| `lurek.draw_ui`         | `()`                        | Every frame                              | Push RenderCommands for UI layer               |
 | `lurek.keypressed`      | `(key, scancode, isrepeat)` | On key down                              | Keyboard input                                 |
 | `lurek.keyreleased`     | `(key, scancode)`           | On key up                                | Keyboard release                               |
 | `lurek.mousepressed`    | `(x, y, button)`            | On mouse button down                     | Mouse click                                    |

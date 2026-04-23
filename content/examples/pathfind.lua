@@ -687,3 +687,243 @@ do  -- JpsGrid:isBlocked
   end
 end
 
+
+--@api-stub: FlowField:calculate
+-- Computes the flow field toward a single target cell.
+-- After calculation, every cell has a direction vector steering toward the target.
+do  -- FlowField:calculate
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local ff = lurek.pathfind.newFlowField(grid)
+  ff:calculate(16, 16)
+  lurek.log.info("flow field calculated", "pathfind")
+end
+
+--@api-stub: FlowField:calculateMulti
+-- Computes a flow field toward multiple target cells simultaneously.
+-- Cells flow toward whichever target is nearest in cost terms.
+do  -- FlowField:calculateMulti
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local ff = lurek.pathfind.newFlowField(grid)
+  ff:calculateMulti({{8,8},{24,24}})
+  lurek.log.info("multi-target flow field done", "pathfind")
+end
+
+--@api-stub: HexGrid:distance
+-- Returns the axial (cube-coordinate) distance between two hex cells.
+-- Used to measure movement cost or attack range on hex maps.
+do  -- HexGrid:distance
+  local hg = lurek.pathfind.newHexGrid(16, 16)
+  local d = hg:distance(0, 0, 5, 3)
+  lurek.log.info("hex distance: " .. d, "pathfind")
+end
+
+--@api-stub: HexGrid:fieldOfView
+-- Returns a set of hex cells visible from (ox, oy) within radius r.
+-- Blocked cells occlude cells behind them; returns a table of {q,r} pairs.
+do  -- HexGrid:fieldOfView
+  local hg = lurek.pathfind.newHexGrid(16, 16)
+  local visible = hg:fieldOfView(8, 8, 4)
+  lurek.log.info("visible cells: " .. #visible, "pathfind")
+end
+
+--@api-stub: NavGrid:fillRect
+-- Sets all cells within a world-space rectangle to blocked (or unblocked).
+-- Faster than looping over individual setBlocked calls for bulk terrain setup.
+do  -- NavGrid:fillRect
+  local grid = lurek.pathfind.newNavGrid(64, 64)
+  grid:fillRect(10, 10, 20, 20, true)
+  lurek.log.info("rect filled", "pathfind")
+end
+
+--@api-stub: UnitPathfinder:findNearestWalkable
+-- Returns the closest walkable cell to the given position.
+-- Use when a target is blocked and you need an approximation point.
+do  -- UnitPathfinder:findNearestWalkable
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local pf = lurek.pathfind.newPathfinder(grid)
+  local cx, cy = pf:findNearestWalkable(15, 15, 5)
+  lurek.log.info("nearest walkable: " .. cx .. "," .. cy, "pathfind")
+end
+
+--@api-stub: UnitPathfinder:findPartialPath
+-- Finds the longest partial path toward an unreachable goal.
+-- Returns the path that gets closest within the cost budget.
+do  -- UnitPathfinder:findPartialPath
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  grid:fillRect(15, 0, 15, 31, true)
+  local pf = lurek.pathfind.newPathfinder(grid)
+  local path = pf:findPartialPath(0, 16, 30, 16)
+  lurek.log.info("partial path length: " .. #path, "pathfind")
+end
+
+--@api-stub: UnitPathfinder:findPath
+-- Finds the optimal path between two grid cells using A* on the NavGrid.
+-- Returns a table of {x, y} step cells from start to goal (exclusive of start).
+do  -- UnitPathfinder:findPath
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local pf = lurek.pathfind.newPathfinder(grid)
+  local path = pf:findPath(0, 0, 31, 31)
+  lurek.log.info("path steps: " .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: PathGrid:findPath
+-- Finds a path on a PathGrid using the smooth cell-based pathfinder.
+-- Returns a table of waypoint positions; smoother than NavGrid paths.
+do  -- PathGrid:findPath
+  local pg = lurek.pathfind.newPathGrid(32, 32, 16)
+  local path = pg:findPath(0, 0, 31, 31)
+  lurek.log.info("path grid path: " .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: HexGrid:findPath
+-- Finds the shortest path on a hex grid from start to goal hex cell.
+-- Returns a table of {q, r} axial coordinate pairs.
+do  -- HexGrid:findPath
+  local hg = lurek.pathfind.newHexGrid(16, 16)
+  local path = hg:findPath(0, 0, 8, 4)
+  lurek.log.info("hex path: " .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: JpsGrid:findPath
+-- Finds the shortest path on a uniform-cost jump-point-search grid.
+-- Much faster than A* for open maps; returns table of {x,y} positions.
+do  -- JpsGrid:findPath
+  local jg = lurek.pathfind.newJpsGrid(64, 64)
+  local path = jg:findPath(0, 0, 63, 63)
+  lurek.log.info("jps path: " .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: UnitPathfinder:findPathBidirectional
+-- Finds the shortest path using bidirectional A* for improved performance.
+-- Especially faster on long paths in large grids; result is equivalent to A*.
+do  -- UnitPathfinder:findPathBidirectional
+  local grid = lurek.pathfind.newNavGrid(64, 64)
+  local pf = lurek.pathfind.newPathfinder(grid)
+  local path = pf:findPathBidirectional(0, 0, 63, 63)
+  lurek.log.info("bidir path: " .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: UnitPathfinder:findPathSmooth
+-- Finds an A* path and applies post-processing to remove unnecessary waypoints.
+-- Returns a shorter path that agents can traverse with fewer turns.
+do  -- UnitPathfinder:findPathSmooth
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local pf = lurek.pathfind.newPathfinder(grid)
+  local path = pf:findPathSmooth(0, 0, 31, 31)
+  lurek.log.info("smooth path: " .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: PathGrid:findPathSmoothed
+-- Finds and post-smooths a path on a PathGrid using the Theta* algorithm.
+-- Produces direct line-of-sight segments where the terrain allows it.
+do  -- PathGrid:findPathSmoothed
+  local pg = lurek.pathfind.newPathGrid(32, 32, 16)
+  local path = pg:findPathSmoothed(0, 0, 30, 30)
+  lurek.log.info("smoothed path: " .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: AiFlowField:getGoal
+-- Returns the target cell (x, y) this flow field was calculated toward.
+-- Use to verify which goal is active before re-computing on goal change.
+do  -- AiFlowField:getGoal
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local pff = lurek.pathfind.newPathFlowField(grid)
+  pff:setGoal(16, 16)
+  local gx, gy = pff:getGoal()
+  lurek.log.info("goal: " .. gx .. "," .. gy, "pathfind")
+end
+
+--@api-stub: UnitPathfinder:heuristicDistance
+-- Returns the heuristic distance estimate between two cells (octile or Manhattan).
+-- Useful for pre-screening distant goals before committing to a full search.
+do  -- UnitPathfinder:heuristicDistance
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local pf = lurek.pathfind.newPathfinder(grid)
+  local h = pf:heuristicDistance(0, 0, 20, 15)
+  lurek.log.info("heuristic: " .. h, "pathfind")
+end
+
+--@api-stub: UnitPathfinder:isReachable
+-- Returns true if the goal cell is reachable from the start without crossing blocked cells.
+-- Faster than findPath when you only need a boolean reachability check.
+do  -- UnitPathfinder:isReachable
+  local grid = lurek.pathfind.newNavGrid(16, 16)
+  local pf = lurek.pathfind.newPathfinder(grid)
+  local ok = pf:isReachable(0, 0, 15, 15)
+  lurek.log.info("reachable: " .. tostring(ok), "pathfind")
+end
+
+--@api-stub: NavGrid:isWalkable
+-- Returns true if the given grid cell is not blocked and within bounds.
+-- Use before spawning agents or placing objects to verify walkability.
+do  -- NavGrid:isWalkable
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  grid:setBlocked(10, 10, true)
+  lurek.log.info("walkable 10,10: " .. tostring(grid:isWalkable(10, 10)), "pathfind")
+end
+
+--@api-stub: UnitPathfinder:lineOfSight
+-- Returns true if there are no blocked cells between two grid positions.
+-- Uses Bresenham ray-cast; faster than findPath for LOS-only queries.
+do  -- UnitPathfinder:lineOfSight
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local pf = lurek.pathfind.newPathfinder(grid)
+  local los = pf:lineOfSight(0, 0, 15, 15)
+  lurek.log.info("los: " .. tostring(los), "pathfind")
+end
+
+--@api-stub: HexGrid:lineOfSight
+-- Returns true if there is unobstructed line-of-sight between two hex cells.
+-- Uses the hex supergrid LOS algorithm; blocked cells break the sight line.
+do  -- HexGrid:lineOfSight
+  local hg = lurek.pathfind.newHexGrid(16, 16)
+  local los = hg:lineOfSight(0, 0, 8, 4)
+  lurek.log.info("hex los: " .. tostring(los), "pathfind")
+end
+
+--@api-stub: HexGrid:rangeOfMovement
+-- Returns all hex cells reachable from the origin within a given move-point budget.
+-- Respects cell costs and blocked cells; result is a table of {q,r} pairs.
+do  -- HexGrid:rangeOfMovement
+  local hg = lurek.pathfind.newHexGrid(16, 16)
+  local cells = hg:rangeOfMovement(8, 8, 3)
+  lurek.log.info("cells in range: " .. #cells, "pathfind")
+end
+
+--@api-stub: NavGrid:setBlocked
+-- Sets a single grid cell as blocked (true) or walkable (false).
+-- Invalidates cached paths that cross this cell; use setDirty() for bulk updates.
+do  -- NavGrid:setBlocked
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  grid:setBlocked(8, 8, true)
+  lurek.log.info("cell 8,8 blocked", "pathfind")
+end
+
+--@api-stub: HexGrid:setBlocked
+-- Marks a hex cell as impassable on the hex grid.
+-- Blocked cells are excluded from pathfinding and fieldOfView calculations.
+do  -- HexGrid:setBlocked
+  local hg = lurek.pathfind.newHexGrid(16, 16)
+  hg:setBlocked(4, 4, true)
+  lurek.log.info("hex cell 4,4 blocked", "pathfind")
+end
+
+--@api-stub: JpsGrid:setBlocked
+-- Marks a cell as impassable on the JPS uniform-cost grid.
+-- JPS rebuilds its jump-point cache lazily; no explicit rebuild needed.
+do  -- JpsGrid:setBlocked
+  local jg = lurek.pathfind.newJpsGrid(32, 32)
+  jg:setBlocked(15, 15, true)
+  lurek.log.info("jps cell blocked", "pathfind")
+end
+
+--@api-stub: FlowField:steer
+-- Returns the recommended velocity vector (vx, vy) for an agent at world position (x, y).
+-- Interpolates between nearby cell direction vectors for smooth movement.
+do  -- FlowField:steer
+  local grid = lurek.pathfind.newNavGrid(32, 32)
+  local ff = lurek.pathfind.newFlowField(grid)
+  ff:calculate(16, 16)
+  local vx, vy = ff:steer(8, 8)
+  lurek.log.info("steer: " .. vx .. "," .. vy, "pathfind")
+end

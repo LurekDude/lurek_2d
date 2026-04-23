@@ -147,6 +147,7 @@ lurek.input.bind("cam_right", "d")
 lurek.input.bind("quit",      "escape")
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("RTS — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.12, 0.06, 1.0)
@@ -178,11 +179,11 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if death_sparks then death_sparks:update(dt) end
     if select_ring  then select_ring:update(dt)  end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
     if state ~= "play" then return end
 
     -- Camera scroll
@@ -194,11 +195,11 @@ lurek.process(function(dt)
     cam.y = math.max(0, math.min(MAP_H - H + ui_panel_h, cam.y))
 
     -- Mouse world pos
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     local wx, wy = mx + cam.x, my + cam.y
 
     -- Select units
-    if lurek.input.isActionJustPressed("select") then
+    if lurek.input.wasActionPressed("select") then
         selected = {}
         for _, e in ipairs(entities) do
             if e.team == "player" and e.kind == UNIT and e.hp > 0 then
@@ -211,7 +212,7 @@ lurek.process(function(dt)
     end
 
     -- Order selected units
-    if lurek.input.isActionJustPressed("order") then
+    if lurek.input.wasActionPressed("order") then
         for _, id in ipairs(selected) do
             local e = find_entity(id)
             if e and e.hp > 0 then
@@ -223,7 +224,7 @@ lurek.process(function(dt)
     end
 
     -- Train unit at barracks
-    if lurek.input.isActionJustPressed("train") then
+    if lurek.input.wasActionPressed("train") then
         for _, e in ipairs(entities) do
             if e.kind == BUILD and e.btype == "barracks" and e.trainCD <= 0 then
                 if resources.gold >= 50 then
@@ -344,10 +345,10 @@ lurek.process(function(dt)
         end
         if enemies_left == 0 then state = "victory" end
     end
-end)
+end
 
 -- ── Render world ──────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Map background tint
     lurek.render.rectangle(0, 0, W, H - ui_panel_h, { color = {0.08,0.14,0.08,1} })
 
@@ -392,10 +393,10 @@ lurek.render(function()
 
     if death_sparks then death_sparks:draw() end
     if select_ring  then select_ring:draw()  end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     -- Panel
     lurek.render.rectangle(0, H - ui_panel_h, W, ui_panel_h, { color = {0.1,0.1,0.1,0.9} })
 

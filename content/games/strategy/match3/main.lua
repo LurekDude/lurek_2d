@@ -217,6 +217,7 @@ lurek.input.bind("click", "mouse1")
 lurek.input.bind("quit",  "escape")
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Match 3 — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.04, 0.10, 1.0)
@@ -245,12 +246,12 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if match_sparks then match_sparks:update(dt) end
     if bomb_burst   then bomb_burst:update(dt)   end
     if drop_dust    then drop_dust:update(dt)    end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
     if game_state == "gameover" or game_state == "win" then return end
 
     -- Swap animation
@@ -314,11 +315,11 @@ lurek.process(function(dt)
 
     -- Idle: handle click selection / swap
     if game_state == "idle" then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local c = math.floor((mx - GRID_X) / CELL) + 1
         local r = math.floor((my - GRID_Y) / CELL) + 1
 
-        if lurek.input.isActionJustPressed("click") then
+        if lurek.input.wasActionPressed("click") then
             if c >= 1 and c <= GRID_SIZE and r >= 1 and r <= GRID_SIZE then
                 if sel_r == nil then
                     sel_r, sel_c = r, c
@@ -339,10 +340,10 @@ lurek.process(function(dt)
             end
         end
     end
-end)
+end
 
 -- ── Render ────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Board background
     lurek.render.rectangle(GRID_X - 6, GRID_Y - 6, GRID_SIZE*CELL + 12, GRID_SIZE*CELL + 12, { color = {0.15,0.12,0.2,1} })
 
@@ -373,10 +374,10 @@ lurek.render(function()
     if match_sparks then match_sparks:draw() end
     if bomb_burst   then bomb_burst:draw()   end
     if drop_dust    then drop_dust:draw()    end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     lurek.render.rectangle(0, 0, W, GRID_Y - 4, { color = {0.08,0.06,0.14,1} })
     lurek.render.print("Score: " .. score, 14, 10, { color = {1,1,0.3,1}, size = 18 })
     lurek.render.print("Moves: " .. moves_left, 240, 10, { color = {0.4,0.9,0.4,1}, size = 18 })

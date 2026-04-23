@@ -407,7 +407,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|_, opts: LuaTable| {
             let axiom: String = opts.get("axiom").unwrap_or_else(|_| String::from("F"));
             let iterations: u32 = opts.get("iterations").unwrap_or(3);
-            let mut rules: Vec<(char, &'static str)> = Vec::new();
+            let rules: Vec<(char, &'static str)> = Vec::new();
             let rule_strings: Vec<(char, String)> = opts
                 .get::<_, Option<LuaTable>>("rules")
                 .unwrap_or(None)
@@ -908,7 +908,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|_, opts: LuaTable| {
             let axiom: String = opts.get("axiom").unwrap_or_else(|_| String::from("F"));
             let iterations: u32 = opts.get("iterations").unwrap_or(3);
-            let mut rules: Vec<(char, &'static str)> = Vec::new();
+            let rules: Vec<(char, &'static str)> = Vec::new();
             let rule_strings: Vec<(char, String)> = opts
                 .get::<_, Option<LuaTable>>("rules")
                 .unwrap_or(None)

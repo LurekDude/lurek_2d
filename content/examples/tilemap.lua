@@ -624,7 +624,7 @@ do  -- TileMap:render
   local map = lurek.tilemap.newTileMap(16, 16)
   map:addLayer("background", 32, 32)
   local cam_x, cam_y = 0, 0
-  function lurek.render() map:render(-cam_x, -cam_y) end
+  function lurek.draw() map:render(-cam_x, -cam_y) end
 end
 
 --@api-stub: TileMap:drawToImage
@@ -1325,4 +1325,326 @@ do  -- TileMap:fireTileExit
     tm:fireTileExit(5, 1, 2, 3)
   end
   lurek.log.debug("fireTileExit called", "tilemap")
+end
+
+--@api-stub: TileMap:applyAutoTile
+-- Applies auto-tiling rules to every cell in all layers using the attached TileSet.
+-- Call after bulk map edits to recalculate all tile border variants at once.
+do  -- TileMap:applyAutoTile
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:fill(1, 1, 32, 32, 1)
+  tm:applyAutoTile(1)
+  lurek.log.info("auto-tile applied", "tilemap")
+end
+
+--@api-stub: TileMap:applyAutoTile8
+-- Applies 8-direction auto-tiling to the entire map, considering diagonal neighbours.
+-- Produces more natural corners and borders than the 4-direction variant.
+do  -- TileMap:applyAutoTile8
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:fill(1, 1, 32, 32, 1)
+  tm:applyAutoTile8(1)
+  lurek.log.info("8-way auto-tile applied", "tilemap")
+end
+
+--@api-stub: TileMap:applyAutoTile8At
+-- Applies 8-direction auto-tiling rules only at a specific cell and its neighbours.
+-- Faster than a full applyAutoTile8 when only a single cell has changed.
+do  -- TileMap:applyAutoTile8
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:setTile(1, 5, 5, 1)
+  tm:applyAutoTile8At(1, 5, 5)
+  lurek.log.info("8-way at-cell applied", "tilemap")
+end
+
+--@api-stub: TileMap:applyAutoTileAt
+-- Applies 4-direction auto-tiling rules at a single cell and its cardinal neighbours.
+-- Cheaper than a full map pass when editing tiles interactively.
+do  -- TileMap:applyAutoTileAt
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:setTile(1, 8, 8, 1)
+  tm:applyAutoTileAt(1, 8, 8)
+  lurek.log.info("auto-tile at-cell applied", "tilemap")
+end
+
+--@api-stub: AutoTileSheet:applyToTileSet
+-- Copies the auto-tile quads and rules from this sheet into a TileSet.
+-- Call once after loading the sheet; the TileSet then supports applyAutoTile.
+do  -- AutoTileSheet:applyToTileSet
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local ats = lurek.tilemap.newAutoTileSheet("autotile.png", 16, 16)
+  ats:applyToTileSet(ts, 1)
+  lurek.log.info("auto-tile sheet applied to tileset", "tilemap")
+end
+
+--@api-stub: TileMap:checkEntities
+-- Tests all registered entity rectangles against solid tiles and fires overlap callbacks.
+-- Call each frame before physics to handle tile-based collision responses.
+do  -- TileMap:checkEntities
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:checkEntities({{x=40,y=40,w=16,h=16,id="player"}},
+    function(eid, tx, ty) lurek.log.info("overlap at " .. tx .. "," .. ty, "tilemap") end)
+  lurek.log.info("entities checked", "tilemap")
+end
+
+--@api-stub: ChunkMap:fillRect
+-- Fills a rectangle of cells in the chunk map with the given tile GID.
+-- Works across chunk boundaries; loads chunks if needed.
+do  -- ChunkMap:fillRect
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local cm = lurek.tilemap.newChunkMap(ts, 16, 16, 16)
+  cm:fillRect(0, 0, 31, 31, 1)
+  lurek.log.info("chunk rect filled", "tilemap")
+end
+
+--@api-stub: MapGen:generate
+-- Runs the map generator and returns a 2D table of tile GIDs.
+-- Generator parameters are set at construction; call once per new level.
+do  -- MapGen:generate
+  local gen = lurek.tilemap.newMapGen({width=32,height=32,seed=42,type="dungeon"})
+  local tiles = gen:generate()
+  lurek.log.info("generated rows: " .. #tiles, "tilemap")
+end
+
+--@api-stub: TileSet:getAutoTileId
+-- Returns the tile GID for a given 4-bit auto-tile bitmask.
+-- Used internally by applyAutoTile; call directly for custom rendering.
+do  -- TileSet:getAutoTileId
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local gid = ts:getAutoTileId(0b1111)
+  lurek.log.info("auto-tile gid: " .. (gid or -1), "tilemap")
+end
+
+--@api-stub: TileSet:getAutoTileId8
+-- Returns the tile GID for a given 8-bit auto-tile bitmask (8-direction variant).
+-- bitmask encodes N/NE/E/SE/S/SW/W/NW neighbours as individual bits.
+do  -- TileSet:getAutoTileId8
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local gid = ts:getAutoTileId8(0b11111111)
+  lurek.log.info("8-way auto-tile gid: " .. (gid or -1), "tilemap")
+end
+
+--@api-stub: ChunkMap:getChunksInView
+-- Returns a list of chunk coordinate pairs currently overlapping the camera viewport.
+-- Use to decide which chunks to stream in or render each frame.
+do  -- ChunkMap:getChunksInView
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local cm = lurek.tilemap.newChunkMap(ts, 16, 16, 16)
+  local chunks = cm:getChunksInView(0, 0, 320, 240)
+  lurek.log.info("chunks in view: " .. #chunks, "tilemap")
+end
+
+--@api-stub: IsoMap:getTilePart
+-- Returns the tile GID for a specific named part of an isometric tile at (x, y, level).
+-- Parts split a tile into floor, wall, top, and decorations for layered rendering.
+do  -- IsoMap:getTilePart
+  local im = lurek.tilemap.newIsoMap(16, 16, 32, 16)
+  im:addLevel()
+  local gid = im:getTilePart(0, 0, 1, "floor")
+  lurek.log.info("tile part gid: " .. (gid or 0), "tilemap")
+end
+
+--@api-stub: TileMap:onTileEnter
+-- Registers a callback that fires when an entity moves onto a cell with the given GID.
+-- Use for trigger tiles: damage zones, teleporters, chest-open triggers.
+do  -- TileMap:onTileEnter
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:onTileEnter(5, function(entity, tx, ty)
+    lurek.log.info("entered tile 5 at " .. tx .. "," .. ty, "tilemap")
+  end)
+  lurek.log.info("tile enter callback registered", "tilemap")
+end
+
+--@api-stub: TileMap:rectOverlapsSolid
+-- Returns true if a world-space rectangle overlaps any solid tile.
+-- Use for AABB-based pre-collision tests before physics resolution.
+do  -- TileMap:rectOverlapsSolid
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  ts:setSolid(1, true)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:setTile(1, 3, 3, 1)
+  local hit = tm:rectOverlapsSolid(48, 48, 16, 16)
+  lurek.log.info("overlap: " .. tostring(hit), "tilemap")
+end
+
+--@api-stub: TileSet:setAnimation
+-- Assigns a looping frame sequence to a tile GID for animated tiles.
+-- frames is a table of GIDs; duration is total seconds for one full cycle.
+do  -- TileSet:setAnimation
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  ts:setAnimation(5, {5, 6, 7, 8}, 0.5)
+  lurek.log.info("tile animation set", "tilemap")
+end
+
+--@api-stub: TileSet:setAutoTileRule
+-- Defines a 4-direction auto-tile rule: when neighbours match the bitmask, use this GID.
+-- Use to register custom terrain transitions beyond the default ruleset.
+do  -- TileSet:setAutoTileRule
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  ts:setAutoTileRule(0b1111, 10)
+  lurek.log.info("auto-tile rule set", "tilemap")
+end
+
+--@api-stub: TileSet:setAutoTileRule8
+-- Defines an 8-direction auto-tile rule for diagonal-neighbour aware tile selection.
+-- bitmask encodes all 8 neighbours; pass the desired GID for that configuration.
+do  -- TileSet:setAutoTileRule8
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  ts:setAutoTileRule8(0b11111111, 20)
+  lurek.log.info("8-way auto-tile rule set", "tilemap")
+end
+
+--@api-stub: TileMap:setLayerColor
+-- Sets the tint colour for an entire map layer, blending with individual tile tints.
+-- Use to apply a day/night atmosphere tint to background layers.
+do  -- TileMap:setLayerColor
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:addLayer("background")
+  tm:setLayerColor("background", 0.7, 0.8, 1.0, 1.0)
+  lurek.log.info("layer colour set", "tilemap")
+end
+
+--@api-stub: TileMap:setLayerOffset
+-- Sets a pixel offset for a named layer, shifting it relative to the base grid.
+-- Use for decorative layers that need sub-tile alignment.
+do  -- TileMap:setLayerOffset
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:addLayer("decals")
+  tm:setLayerOffset("decals", 4, -2)
+  lurek.log.info("layer offset set", "tilemap")
+end
+
+--@api-stub: TileMap:setLayerParallax
+-- Sets a parallax scroll factor for a named layer.
+-- factor < 1 makes the layer scroll slower than the camera (background effect).
+do  -- TileMap:setLayerParallax
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:addLayer("bg_hills")
+  tm:setLayerParallax("bg_hills", 0.4)
+  lurek.log.info("parallax set", "tilemap")
+end
+
+--@api-stub: TileMap:setLayerVisible
+-- Shows or hides a named map layer without removing it.
+-- Toggle for editing workflow or conditional HUD layers.
+do  -- TileMap:setLayerVisible
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:addLayer("collision_debug")
+  tm:setLayerVisible("collision_debug", false)
+  lurek.log.info("layer hidden", "tilemap")
+end
+
+--@api-stub: LargeMapRenderer:setMapData
+-- Loads tile data into the large-map renderer from a flat GID table.
+-- table length must equal width*height; row-major order, starting from top-left.
+do  -- LargeMapRenderer:setMapData
+  local r = lurek.tilemap.newLargeMapRenderer(128, 128, 16, 16)
+  local data = {}
+  for i=1,128*128 do data[i]=1 end
+  r:setMapData(data)
+  lurek.log.info("large map data loaded", "tilemap")
+end
+
+--@api-stub: MapBlock:setSide
+-- Sets the tile GID for a specific side face (N/S/E/W) of a 3D map block cell.
+-- Side faces are used for isometric and first-person wall rendering.
+do  -- MapBlock:setSide
+  local mb = lurek.tilemap.newMapBlock(8, 8)
+  mb:setSide(3, 3, "north", 5)
+  lurek.log.info("block side set", "tilemap")
+end
+
+--@api-stub: TileMap:setTile
+-- Sets the tile GID at (x, y) in the specified layer.
+-- GID=0 clears the cell; non-zero GIDs reference tiles in the attached TileSet.
+do  -- TileMap:setTile
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:setTile(1, 4, 5, 2)
+  lurek.log.info("tile GID set: " .. tm:getTile(1, 4, 5), "tilemap")
+end
+
+--@api-stub: ChunkMap:setTile
+-- Sets the tile GID at a world-space cell in the chunk map, loading the chunk if needed.
+-- Chunks are loaded/created on demand; the cell persists until explicitly cleared.
+do  -- ChunkMap:setTile
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local cm = lurek.tilemap.newChunkMap(ts, 16, 16, 16)
+  cm:setTile(20, 20, 3)
+  lurek.log.info("chunk tile set", "tilemap")
+end
+
+--@api-stub: IsoMap:setTilePart
+-- Sets the tile GID for a specific named part of an isometric cell at (x, y, level).
+-- Parts allow multi-layer isometric tiles: floor, walls, top decoration.
+do  -- IsoMap:setTilePart
+  local im = lurek.tilemap.newIsoMap(16, 16, 32, 16)
+  im:addLevel()
+  im:setTilePart(2, 3, 1, "floor", 5)
+  lurek.log.info("iso tile part set", "tilemap")
+end
+
+--@api-stub: TileMap:setTileTint
+-- Sets the RGBA tint for a specific tile cell in a layer.
+-- Tint multiplies the tile's texture colour; (1,1,1,1) means no tint change.
+do  -- TileMap:setTileTint
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:setTile(1, 5, 5, 1)
+  tm:setTileTint(1, 5, 5, 1.0, 0.5, 0.5, 1.0)
+  lurek.log.info("tile tint set", "tilemap")
+end
+
+--@api-stub: TileMap:setViewport
+-- Restricts rendering to the given world-space rectangle.
+-- Tiles outside the viewport are skipped; update each frame with the camera region.
+do  -- TileMap:setViewport
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:setViewport(0, 0, 320, 240)
+  lurek.log.info("tilemap viewport set", "tilemap")
+end
+
+--@api-stub: TileMap:sweepRect
+-- Sweeps a moving rectangle through the map and returns the first solid-tile hit.
+-- Returns the resolved position and hit normal; returns nil if no collision.
+do  -- TileMap:sweepRect
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  ts:setSolid(1, true)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:setTile(1, 5, 5, 1)
+  local hit = tm:sweepRect(0, 80, 16, 16, 100, 0)
+  lurek.log.info("sweep hit: " .. tostring(hit ~= nil), "tilemap")
+end
+
+--@api-stub: TileMap:toNavGrid
+-- Converts the tile map's solid-tile pattern into a NavGrid for pathfinding.
+-- Solid tiles become blocked cells; returns a lurek.pathfind NavGrid.
+do  -- TileMap:toNavGrid
+  local ts = lurek.tilemap.newTileSet("tileset.png", 16, 16)
+  ts:setSolid(1, true)
+  local tm = lurek.tilemap.newTileMap(ts, 16, 16)
+  tm:fill(1, 5, 5, 8, 8, 1)
+  local grid = tm:toNavGrid()
+  lurek.log.info("nav grid: " .. grid:getWidth() .. "x" .. grid:getHeight(), "tilemap")
+end
+
+--@api-stub: MapBlock:setTile
+-- Sets the floor tile GID at a specific (x, y) cell in a MapBlock grid.
+-- Used to configure the base terrain for isometric block rendering.
+do  -- MapBlock:setTile
+  local mb = lurek.tilemap.newMapBlock(8, 8)
+  mb:setTile(2, 3, 1)
+  mb:setTile(4, 4, 2)
+  lurek.log.info("map block tiles set", "tilemap")
 end

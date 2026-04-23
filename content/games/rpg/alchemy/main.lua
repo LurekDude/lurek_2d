@@ -204,13 +204,13 @@ function lurek.init()
     lurek.camera.reset()
 end
 
-function lurek.ready()
+local function _ready_setup()
     set_message("Welcome to the Alchemy Lab!", 3)
 end
 
 -- ── Process ─────────────────────────────────────────────────────────────────
 
-lurek.process(function(delta)
+function lurek.process(delta)
     dt = delta
     title_blink = title_blink + delta
 
@@ -223,11 +223,11 @@ lurek.process(function(delta)
 
     -- ── Title ───────────────────────────────────────────────────────────
     if state == STATE_TITLE then
-        if lurek.input.isActionJustPressed("enter") then
+        if lurek.input.wasActionPressed("enter") then
             state = STATE_CRAFTING
             set_message("Select ingredients with 1-6", 3)
         end
-        if lurek.input.isActionJustPressed("escape") then
+        if lurek.input.wasActionPressed("escape") then
             lurek.event.quit()
         end
         return
@@ -245,13 +245,13 @@ lurek.process(function(delta)
 
     -- ── Shop ────────────────────────────────────────────────────────────
     if state == STATE_SHOP then
-        if lurek.input.isActionJustPressed("escape") or lurek.input.isActionJustPressed("shop") then
+        if lurek.input.wasActionPressed("escape") or lurek.input.wasActionPressed("shop") then
             state = STATE_CRAFTING
             return
         end
         -- buy ingredients 1-6
         for i = 1, 6 do
-            if lurek.input.isActionJustPressed("ingredient" .. i) then
+            if lurek.input.wasActionPressed("ingredient" .. i) then
                 local ing = ingredients[i]
                 if gold >= ing.cost then
                     gold = gold - ing.cost
@@ -263,7 +263,7 @@ lurek.process(function(delta)
             end
         end
         -- sell potions: use 7,8,9,0 mapped or just cycle through
-        if lurek.input.isActionJustPressed("bottle") and #inventory > 0 then
+        if lurek.input.wasActionPressed("bottle") and #inventory > 0 then
             local potion = table.remove(inventory, 1)
             gold = gold + potion.value
             set_message("Sold " .. potion.name .. " (+" .. potion.value .. "g)", 1.5)
@@ -274,11 +274,11 @@ lurek.process(function(delta)
 
     -- ── Crafting ────────────────────────────────────────────────────────
 
-    if lurek.input.isActionJustPressed("escape") then
+    if lurek.input.wasActionPressed("escape") then
         lurek.event.quit()
     end
 
-    if lurek.input.isActionJustPressed("shop") then
+    if lurek.input.wasActionPressed("shop") then
         state = STATE_SHOP
         set_message("SHOP — 1-6 buy, B sell potion, S/Esc close", 3)
         return
@@ -286,7 +286,7 @@ lurek.process(function(delta)
 
     -- add ingredient to mortar
     for i = 1, 6 do
-        if lurek.input.isActionJustPressed("ingredient" .. i) then
+        if lurek.input.wasActionPressed("ingredient" .. i) then
             if stock[i] > 0 and #mortar < 3 and not is_grinding and not ground then
                 stock[i] = stock[i] - 1
                 table.insert(mortar, i)
@@ -301,7 +301,7 @@ lurek.process(function(delta)
     end
 
     -- grind
-    if lurek.input.isActionJustPressed("grind") and #mortar > 0 and not is_grinding and not ground then
+    if lurek.input.wasActionPressed("grind") and #mortar > 0 and not is_grinding and not ground then
         is_grinding = true
         grind_timer = 0
         tween_to(anim, "grind_bar", 1, grind_duration)
@@ -329,7 +329,7 @@ lurek.process(function(delta)
     end
 
     -- add ground to cauldron
-    if lurek.input.isActionJustPressed("grind") and ground and not is_grinding then
+    if lurek.input.wasActionPressed("grind") and ground and not is_grinding then
         if not cauldron then
             cauldron = { fire = 0, water = 0, earth = 0, air = 0 }
         end
@@ -344,7 +344,7 @@ lurek.process(function(delta)
     end
 
     -- heat / cool
-    if lurek.input.isActionJustPressed("heat") and cauldron then
+    if lurek.input.wasActionPressed("heat") and cauldron then
         temperature = math.min(temperature + 10, 100)
         tween_to(anim, "temp_display", temperature, 0.3)
         if temperature > 85 then
@@ -355,7 +355,7 @@ lurek.process(function(delta)
         spawn_particles(400, 420, 5, 1.0, 0.4, 0.1, 0.5, 40)
     end
 
-    if lurek.input.isActionJustPressed("cool") and cauldron then
+    if lurek.input.wasActionPressed("cool") and cauldron then
         temperature = math.max(temperature - 10, 0)
         tween_to(anim, "temp_display", temperature, 0.3)
         set_message("Cooling... " .. temperature .. "°", 1)
@@ -371,7 +371,7 @@ lurek.process(function(delta)
     end
 
     -- bottle
-    if lurek.input.isActionJustPressed("bottle") and cauldron and not brewing_done then
+    if lurek.input.wasActionPressed("bottle") and cauldron and not brewing_done then
         local result = try_brew()
         if result == "weak" then
             -- still produces but half value — pick best match or generic
@@ -422,11 +422,11 @@ lurek.process(function(delta)
             clear_workbench()
         end
     end
-end)
+end
 
 -- ── Render (world) ──────────────────────────────────────────────────────────
 
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then
         -- dark background vignette
         lurek.render.setColor(0.18, 0.12, 0.08, 1)
@@ -562,11 +562,11 @@ lurek.render(function()
     end
 
     draw_particles()
-end)
+end
 
 -- ── Render UI (HUD / overlays) ──────────────────────────────────────────────
 
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- FPS
     lurek.render.setColor(1, 1, 1, 0.4)
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), 720, 8, 10)
@@ -712,4 +712,4 @@ lurek.render_ui(function()
         lurek.render.setColor(1, 1, 1, 0.6 * s)
         lurek.render.print(#discovered .. " / 5 recipes found", 310, 350, 14)
     end
-end)
+end

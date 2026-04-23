@@ -152,6 +152,7 @@ lurek.input.bind("next_level",   "n")
 lurek.input.bind("quit",         "escape")
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Physics Puzzle — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.08, 0.12, 1.0)
@@ -203,18 +204,18 @@ function lurek.process(dt)
     if win_burst     then win_burst:update(dt)     end
     if bounce_sparks then bounce_sparks:update(dt) end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
 
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     preview.x = mx
     preview.y = my
 
     if state == "win" or state == "fail" then
-        if lurek.input.isActionJustPressed("reset") then
+        if lurek.input.wasActionPressed("reset") then
             placed = {}
             state  = "place"
             sim_time = 0
-        elseif state == "win" and lurek.input.isActionJustPressed("next_level") then
+        elseif state == "win" and lurek.input.wasActionPressed("next_level") then
             level   = level < #LEVELS and level + 1 or 1
             placed  = {}
             state   = "place"
@@ -225,15 +226,15 @@ function lurek.process(dt)
     end
 
     if state == "place" then
-        if lurek.input.isActionJustPressed("rotate_cw")  then preview.angle = preview.angle + 15 end
-        if lurek.input.isActionJustPressed("rotate_ccw") then preview.angle = preview.angle - 15 end
+        if lurek.input.wasActionPressed("rotate_cw")  then preview.angle = preview.angle + 15 end
+        if lurek.input.wasActionPressed("rotate_ccw") then preview.angle = preview.angle - 15 end
 
-        if lurek.input.isActionJustPressed("next_shape") then
+        if lurek.input.wasActionPressed("next_shape") then
             shape_idx = (shape_idx % #SHAPE_ORDER) + 1
             preview.type = SHAPE_ORDER[shape_idx]
         end
 
-        if lurek.input.isActionJustPressed("place") then
+        if lurek.input.wasActionPressed("place") then
             local lv  = LEVELS[level]
             if #placed < lv.budgets then
                 local sh = SHAPES[preview.type]
@@ -248,7 +249,7 @@ function lurek.process(dt)
             end
         end
 
-        if lurek.input.isActionJustPressed("run") then
+        if lurek.input.wasActionPressed("run") then
             sim_time = 0
             reset_sim()
         end
@@ -262,7 +263,7 @@ function lurek.process(dt)
 end
 
 -- ── Render world ──────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     local lv = LEVELS[level]
 
     -- Walls
@@ -298,10 +299,10 @@ lurek.render(function()
     if ball_trail    then ball_trail:draw()    end
     if win_burst     then win_burst:draw()     end
     if bounce_sparks then bounce_sparks:draw() end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     local lv = LEVELS[level]
     lurek.render.print("Level " .. level .. ": " .. lv.title, 14, 10, { color = {1,0.9,0.3,1}, size = 15 })
     lurek.render.print("Budget: " .. #placed .. "/" .. lv.budgets, 400, 10, { color = {0.7,0.9,1.0,1}, size = 15 })

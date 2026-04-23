@@ -378,37 +378,37 @@ end
 
 -- ─── Engine callbacks ───────────────────────────────────────────
 
-lurek.setTitle("Lemmings — Lurek2D")
-lurek.setBackgroundColor(0.05, 0.05, 0.15)
+lurek.window.setTitle("Lemmings — Lurek2D")
+lurek.render.setBackgroundColor(0.05, 0.05, 0.15)
 
 function lurek.init()
     lurek.window.setTitle("Lemmings — Lurek2D")
 end
 
-function lurek.ready()
+local function _ready_setup()
     state = STATE_TITLE
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     -- track mouse
-    cursor_x, cursor_y = lurek.input.getMousePosition()
+    cursor_x, cursor_y = lurek.input.mouse.getPosition()
 
     if state == STATE_TITLE then
-        if lurek.input.isKeyPressed("return") or lurek.input.isKeyPressed("space") then
+        if lurek.input.keyboard.isDown("return") or lurek.input.keyboard.isDown("space") then
             level = 1
             load_level(level)
         end
-        if lurek.input.isKeyPressed("escape") then
+        if lurek.input.keyboard.isDown("escape") then
             lurek.event.quit()
         end
         return
     end
 
     if state == STATE_GAME_OVER then
-        if lurek.input.isKeyPressed("return") or lurek.input.isKeyPressed("space") then
+        if lurek.input.keyboard.isDown("return") or lurek.input.keyboard.isDown("space") then
             state = STATE_TITLE
         end
-        if lurek.input.isKeyPressed("escape") then
+        if lurek.input.keyboard.isDown("escape") then
             lurek.event.quit()
         end
         return
@@ -417,7 +417,7 @@ lurek.process(function(dt)
     if state == STATE_LEVEL_COMPLETE or state == STATE_FAILED then
         update_tweens(dt)
         update_particles(dt)
-        if lurek.input.isKeyPressed("return") or lurek.input.isKeyPressed("space") then
+        if lurek.input.keyboard.isDown("return") or lurek.input.keyboard.isDown("space") then
             if state == STATE_LEVEL_COMPLETE then
                 level = level + 1
                 load_level(level)
@@ -425,14 +425,14 @@ lurek.process(function(dt)
                 load_level(level)
             end
         end
-        if lurek.input.isKeyPressed("escape") then
+        if lurek.input.keyboard.isDown("escape") then
             lurek.event.quit()
         end
         return
     end
 
     -- PLAYING
-    if lurek.input.isKeyPressed("escape") then
+    if lurek.input.keyboard.isDown("escape") then
         lurek.event.quit()
         return
     end
@@ -450,10 +450,10 @@ lurek.process(function(dt)
     end
 
     -- job keys
-    if lurek.input.isKeyPressed("1") then try_assign_job("blocker") end
-    if lurek.input.isKeyPressed("2") then try_assign_job("digger") end
-    if lurek.input.isKeyPressed("3") then try_assign_job("builder") end
-    if lurek.input.isKeyPressed("4") then try_assign_job("basher") end
+    if lurek.input.keyboard.isDown("1") then try_assign_job("blocker") end
+    if lurek.input.keyboard.isDown("2") then try_assign_job("digger") end
+    if lurek.input.keyboard.isDown("3") then try_assign_job("builder") end
+    if lurek.input.keyboard.isDown("4") then try_assign_job("basher") end
 
     -- blocker collision
     for _, lem in ipairs(lemmings) do
@@ -493,9 +493,9 @@ lurek.process(function(dt)
             start_fanfare("FAILED — " .. saved_count .. "/" .. NEEDED .. " saved")
         end
     end
-end)
+end
 
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE or state == STATE_GAME_OVER then return end
 
     local ox, oy = 0, 100
@@ -613,9 +613,9 @@ lurek.render(function()
     lurek.render.setColor(1, 1, 1, 0.5)
     lurek.render.rectangle(cursor_x - 1, cursor_y - 8, 2, 16)
     lurek.render.rectangle(cursor_x - 8, cursor_y - 1, 16, 2)
-end)
+end
 
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then
         lurek.render.setColor(0.3, 0.7, 1, 1)
         lurek.render.print("LEMMINGS", 260, 180, 48)
@@ -699,4 +699,4 @@ lurek.render_ui(function()
         lurek.render.print("Saved: " .. saved_count .. "   Lost: " .. dead_count, 290, 280, 18)
         lurek.render.print("Press ENTER to continue", 280, 310, 14)
     end
-end)
+end

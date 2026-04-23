@@ -288,19 +288,19 @@ function lurek.process(dt)
     if lootSparkle then lootSparkle:update(dt) end
     if combatFlash then combatFlash:update(dt) end
 
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     if state == STATE_TITLE then
-        if lurek.input.isActionJustPressed("next_room") then
+        if lurek.input.wasActionPressed("next_room") then
             enterNextRoom()
             enterNextRoom()
         end
 
     elseif state == STATE_COMBAT then
-        if lurek.input.isActionJustPressed("next_room") then
+        if lurek.input.wasActionPressed("next_room") then
             if combat.done then
                 if combat.won then
                     generateLoot()
@@ -313,29 +313,29 @@ function lurek.process(dt)
         end
 
     elseif state == STATE_LOOT then
-        if lurek.input.isActionJustPressed("next_room") then
+        if lurek.input.wasActionPressed("next_room") then
             collectLoot()
             state = STATE_ROOM
             enterNextRoom()
         end
-        if lurek.input.isActionJustPressed("equip") then
+        if lurek.input.wasActionPressed("equip") then
             collectLoot()
             autoEquip()
         end
 
     elseif state == STATE_ROOM then
-        if lurek.input.isActionJustPressed("equip") then autoEquip() end
-        if lurek.input.isActionJustPressed("buy") then
+        if lurek.input.wasActionPressed("equip") then autoEquip() end
+        if lurek.input.wasActionPressed("buy") then
             if player.gold >= 5 then
                 player.gold = player.gold - 5
                 player.hp   = math.min(player.hp + 30, player.maxHp)
                 hpBarDisplay.value = player.hp / player.maxHp
             end
         end
-        if lurek.input.isActionJustPressed("next_room") then enterNextRoom() end
+        if lurek.input.wasActionPressed("next_room") then enterNextRoom() end
 
     elseif state == STATE_GAME_OVER then
-        if lurek.input.isActionJustPressed("next_room") then
+        if lurek.input.wasActionPressed("next_room") then
             state = STATE_TITLE
             lurek.window.setTitle("Loot RPG — Lurek2D")
         end
@@ -352,7 +352,7 @@ end
 -- Render (world)
 -- ============================================================
 
-function lurek.render()
+function lurek.draw()
     if lootSparkle then lootSparkle:draw() end
     if combatFlash then combatFlash:draw() end
 end
@@ -487,7 +487,7 @@ local function renderGameOver()
     lurek.render.print("Press SPACE to return to title", 260, 400, { color = {1.0, 1.0, 1.0, 0.6}, size = 16 })
 end
 
-function lurek.render_ui()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
     lurek.render.print("FPS: " .. math.floor(fps), 720, 8, { color = {0.5, 0.5, 0.5, 1.0}, size = 12 })
 

@@ -125,6 +125,7 @@ lurek.input.bind("start",   "space")
 lurek.input.bind("quit",    "escape")
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Party Games — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.04, 0.12, 1.0)
@@ -147,11 +148,11 @@ function lurek.process(dt)
     if celebration_sys then celebration_sys:update(dt) end
     if flash_t > 0 then flash_t = flash_t - dt end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
 
     -- Menu
     if state == "menu" then
-        if lurek.input.isActionJustPressed("start") then
+        if lurek.input.wasActionPressed("start") then
             round    = 1
             mini_idx = 0
             scores   = { 0, 0 }
@@ -166,7 +167,7 @@ function lurek.process(dt)
     -- ── Reaction ──────────────────────────────────────────
     if state == "reaction" then
         if reaction.done then
-            if lurek.input.isActionJustPressed("start") then next_mini() end
+            if lurek.input.wasActionPressed("start") then next_mini() end
             return
         end
         if not reaction.signal then
@@ -176,14 +177,14 @@ function lurek.process(dt)
                 reaction.signal_timer = os.clock()
             end
         else
-            if lurek.input.isActionJustPressed("p1_r") then
+            if lurek.input.wasActionPressed("p1_r") then
                 local t = os.clock() - reaction.signal_timer
                 reaction.winner    = 1
                 reaction.done      = true
                 reaction.show_time = t
                 scores[1]          = scores[1] + 1
                 flash(0.2, 0.9, 0.3)
-            elseif lurek.input.isActionJustPressed("p2_r") then
+            elseif lurek.input.wasActionPressed("p2_r") then
                 local t = os.clock() - reaction.signal_timer
                 reaction.winner    = 2
                 reaction.done      = true
@@ -198,7 +199,7 @@ function lurek.process(dt)
     -- ── Memory ────────────────────────────────────────────
     if state == "memory" then
         if memory.done then
-            if lurek.input.isActionJustPressed("start") then next_mini() end
+            if lurek.input.wasActionPressed("start") then next_mini() end
             return
         end
         if memory.stage == "show" then
@@ -219,7 +220,7 @@ function lurek.process(dt)
     -- ── Typing ────────────────────────────────────────────
     if state == "typing" then
         if typing.done then
-            if lurek.input.isActionJustPressed("start") then next_mini() end
+            if lurek.input.wasActionPressed("start") then next_mini() end
         end
         return
     end
@@ -227,14 +228,14 @@ function lurek.process(dt)
     -- ── Math ──────────────────────────────────────────────
     if state == "math" then
         if math_game.done then
-            if lurek.input.isActionJustPressed("start") then next_mini() end
+            if lurek.input.wasActionPressed("start") then next_mini() end
         end
         return
     end
 end
 
 -- Helper to handle text input for math and typing (simplified polling)
-lurek.process(function(dt)
+function lurek.process(dt)
     if state ~= "typing" and state ~= "math" then return end
 
     local letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -281,10 +282,10 @@ lurek.process(function(dt)
             end
         end
     end
-end)
+end
 
 -- ── Render world ──────────────────────────────────────────
-function lurek.render()
+function lurek.draw()
     if celebration_sys then celebration_sys:draw() end
     -- Flash overlay
     if flash_t > 0 and flash_col then
@@ -294,7 +295,7 @@ function lurek.render()
 end
 
 -- ── Render UI ─────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     if state == "menu" then
         lurek.render.print("PARTY GAMES", 240, 180, { color = {1,0.8,0.2,1}, size = 48 })
         lurek.render.print("Press SPACE to start", 268, 280, { color = {0.7,0.7,0.7,1}, size = 18 })

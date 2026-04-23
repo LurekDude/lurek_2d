@@ -263,6 +263,7 @@ lurek.input.bind("escape", "quit")
 -- ---------------------------------------------------------------------------
 -- Callbacks
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Modding Demo — Lurek2D")
     lurek.render.setBackgroundColor(COL_BG[1], COL_BG[2], COL_BG[3])
@@ -295,12 +296,12 @@ function lurek.init()
     ps_coin:setSizes(3, 1)
 end
 
-function lurek.ready()
+local function _ready_setup()
     title_timer = 0
     tw_preview.alpha = 0.0
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Title auto-advance
     if current_state == STATE_TITLE then
         title_timer = title_timer + dt
@@ -392,8 +393,8 @@ lurek.process(function(dt)
         player.vx, player.vy = 0, 0
         if lurek.input.down("nav_up")   then player.vy = -spd end
         if lurek.input.down("nav_down") then player.vy =  spd end
-        if lurek.input.isDown("left")   then player.vx = -spd end
-        if lurek.input.isDown("right")  then player.vx =  spd end
+        if lurek.input.isActionDown("left")   then player.vx = -spd end
+        if lurek.input.isActionDown("right")  then player.vx =  spd end
         player.x = clamp(player.x + player.vx * dt, PLAYER_SIZE, SCREEN_W - PLAYER_SIZE)
         player.y = clamp(player.y + player.vy * dt, PLAYER_SIZE, SCREEN_H - PLAYER_SIZE)
 
@@ -458,12 +459,12 @@ lurek.process(function(dt)
     if lurek.input.pressed("quit") then
         lurek.event.quit()
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render: world layer
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state ~= STATE_TEST then return end
     if tw_test_fade.alpha < 0.01 then return end
 
@@ -507,12 +508,12 @@ lurek.render(function()
     -- Particles
     lurek.render.draw(ps_activate)
     lurek.render.draw(ps_coin)
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render: UI layer
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     -- -----------------------------------------------------------------------
@@ -723,4 +724,4 @@ lurek.render_ui(function()
                 COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], ea)
         end
     end
-end)
+end

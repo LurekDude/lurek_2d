@@ -181,6 +181,7 @@ end
 ------------------------------------------------------------------------
 -- lurek.init
 ------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Dungeon Crawler — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.05)
@@ -202,12 +203,12 @@ function lurek.init()
     reveal_around(player.gx, player.gy)
 end
 
-lurek.ready(function() end)
+local function _ready_setup() end)
 
 ------------------------------------------------------------------------
 -- lurek.process
 ------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
@@ -341,12 +342,12 @@ lurek.process(function(dt)
     end
 
     cam:update(dt)
-end)
+end
 
 ------------------------------------------------------------------------
 -- lurek.render — 3D viewport: ceiling, floor, raycasted walls, torches
 ------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if state == STATE.TITLE then return end
     cam:apply()
 
@@ -423,12 +424,12 @@ lurek.render(function()
     lurek.render.rectangle("line", VP_X, VP_Y, VP_W, VP_H)
 
     cam:reset()
-end)
+end
 
 ------------------------------------------------------------------------
 -- lurek.render_ui — minimap, compass, score, weather, particles
 ------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- === TITLE SCREEN ===
     if state == STATE.TITLE then
         lurek.render.setColor(0.5, 0.2, 0.7, 1)
@@ -590,4 +591,4 @@ lurek.render_ui(function()
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.5, 1)
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), PX, 575, 11)
-end)
+end

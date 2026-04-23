@@ -164,7 +164,10 @@ impl AnimStateMachine {
     pub fn add_state(&mut self, name: &str, clip: &str, looping: bool) {
         self.states.insert(
             name.to_string(),
-            AnimStateConfig { clip: clip.to_string(), looping },
+            AnimStateConfig {
+                clip: clip.to_string(),
+                looping,
+            },
         );
     }
 
@@ -188,7 +191,11 @@ impl AnimStateMachine {
                 });
             }
             Err(e) => {
-                log::warn!("AnimStateMachine: invalid condition '{}': {}", condition_str, e);
+                log::warn!(
+                    "AnimStateMachine: invalid condition '{}': {}",
+                    condition_str,
+                    e
+                );
             }
         }
     }
@@ -199,7 +206,8 @@ impl AnimStateMachine {
     /// - `name` — `&str`. Parameter name.
     /// - `value` — `f32`.
     pub fn set_param_float(&mut self, name: &str, value: f32) {
-        self.params.insert(name.to_string(), AnimParamValue::Float(value));
+        self.params
+            .insert(name.to_string(), AnimParamValue::Float(value));
     }
 
     /// Sets a boolean parameter.
@@ -208,7 +216,8 @@ impl AnimStateMachine {
     /// - `name` — `&str`. Parameter name.
     /// - `value` — `bool`.
     pub fn set_param_bool(&mut self, name: &str, value: bool) {
-        self.params.insert(name.to_string(), AnimParamValue::Bool(value));
+        self.params
+            .insert(name.to_string(), AnimParamValue::Bool(value));
     }
 
     /// Sets an integer parameter.
@@ -217,7 +226,8 @@ impl AnimStateMachine {
     /// - `name` — `&str`. Parameter name.
     /// - `value` — `i32`.
     pub fn set_param_int(&mut self, name: &str, value: i32) {
-        self.params.insert(name.to_string(), AnimParamValue::Int(value));
+        self.params
+            .insert(name.to_string(), AnimParamValue::Int(value));
     }
 
     /// Returns a reference to the current value of a named parameter.
@@ -246,7 +256,9 @@ impl AnimStateMachine {
     /// Checks all transitions from the current state and fires the first match.
     fn check_transitions(&mut self) {
         let current = self.current.clone();
-        let transitions: Vec<_> = self.transitions.iter()
+        let transitions: Vec<_> = self
+            .transitions
+            .iter()
             .filter(|t| t.from == current)
             .cloned()
             .collect();
@@ -394,11 +406,18 @@ pub fn parse_condition(s: &str) -> Result<TransitionCondition, String> {
                 ConditionValue::Bool(false)
             } else {
                 let n: f32 = value_str.parse().map_err(|_| {
-                    format!("parse_condition: cannot parse value '{}' as number", value_str)
+                    format!(
+                        "parse_condition: cannot parse value '{}' as number",
+                        value_str
+                    )
                 })?;
                 ConditionValue::Number(n)
             };
-            return Ok(TransitionCondition { param, op: op.clone(), value });
+            return Ok(TransitionCondition {
+                param,
+                op: op.clone(),
+                value,
+            });
         }
     }
 

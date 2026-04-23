@@ -213,28 +213,28 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Boulder Dash — Lurek2D")
-    lurek.setBackgroundColor(0.06, 0.04, 0.02)
+    lurek.render.setBackgroundColor(0.06, 0.04, 0.02)
     math.randomseed(os.time())
 end
 
-function lurek.ready()
+local function _ready_setup()
     -- Ready
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     if state == TITLE then
-        if lurek.input.isActionJustPressed("ui_accept") then
+        if lurek.input.wasActionPressed("ui_accept") then
             level = 1
             lives = 3
             generate_level(level)
             state = PLAYING
         end
-        if lurek.input.isActionJustPressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.emit("quit")
         end
 
     elseif state == PLAYING then
-        if lurek.input.isActionJustPressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.emit("quit")
         end
 
@@ -275,10 +275,10 @@ lurek.process(function(dt)
 
             -- Player input
             local dx, dy = 0, 0
-            if lurek.input.isActionJustPressed("up") then dy = -1 end
-            if lurek.input.isActionJustPressed("down") then dy = 1 end
-            if lurek.input.isActionJustPressed("left") then dx = -1 end
-            if lurek.input.isActionJustPressed("right") then dx = 1 end
+            if lurek.input.wasActionPressed("up") then dy = -1 end
+            if lurek.input.wasActionPressed("down") then dy = 1 end
+            if lurek.input.wasActionPressed("left") then dx = -1 end
+            if lurek.input.wasActionPressed("right") then dx = 1 end
 
             if dx ~= 0 or dy ~= 0 then
                 local nx, ny = px + dx, py + dy
@@ -363,7 +363,7 @@ lurek.process(function(dt)
 
     elseif state == LEVEL_COMPLETE then
         level_flash = level_flash - dt * 1.5
-        if lurek.input.isActionJustPressed("ui_accept") then
+        if lurek.input.wasActionPressed("ui_accept") then
             level = level + 1
             if level > #LEVELS then
                 -- Won all levels, back to title
@@ -375,20 +375,20 @@ lurek.process(function(dt)
         end
 
     elseif state == GAME_OVER then
-        if lurek.input.isActionJustPressed("ui_accept") then
+        if lurek.input.wasActionPressed("ui_accept") then
             state = TITLE
         end
-        if lurek.input.isActionJustPressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.emit("quit")
         end
     end
-end)
+end
 
 -- ============================================================================
 -- Rendering: cave, objects, particles
 -- ============================================================================
 
-lurek.render(function()
+function lurek.draw()
     if state == TITLE then return end
     if state == GAME_OVER then return end
 
@@ -460,13 +460,13 @@ lurek.render(function()
     if level_flash > 0 then
         lurek.render.rectangle(0, 0, 800, 600, 1, 1, 1, level_flash * 0.3)
     end
-end)
+end
 
 -- ============================================================================
 -- UI rendering: HUD, title, game over
 -- ============================================================================
 
-function lurek.render_ui()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     if state == TITLE then

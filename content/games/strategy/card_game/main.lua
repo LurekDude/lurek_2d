@@ -513,6 +513,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Engine callbacks
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Card Game — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.05, 0.1)
@@ -523,7 +524,7 @@ function lurek.init()
     reset_game()
 end
 
-function lurek.ready()
+local function _ready_setup()
     state = STATE_TITLE
     title_timer = 0
 end
@@ -531,7 +532,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Process
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Shake decay
     if shake_timer > 0 then
         shake_timer = shake_timer - dt
@@ -547,11 +548,11 @@ lurek.process(function(dt)
     -- ===== TITLE =====
     if state == STATE_TITLE then
         title_timer = title_timer + dt
-        if lurek.input.isPressed("select") or lurek.input.isPressed("end_turn") then
+        if lurek.input.keyboard.isDown("select") or lurek.input.keyboard.isDown("end_turn") then
             reset_game()
             start_player_turn()
         end
-        if lurek.input.isPressed("quit") then
+        if lurek.input.keyboard.isDown("quit") then
             lurek.event.signal("quit")
         end
         return
@@ -559,12 +560,12 @@ lurek.process(function(dt)
 
     -- ===== GAME OVER =====
     if state == STATE_GAME_OVER then
-        if lurek.input.isPressed("select") or lurek.input.isPressed("end_turn") then
+        if lurek.input.keyboard.isDown("select") or lurek.input.keyboard.isDown("end_turn") then
             reset_game()
             state = STATE_TITLE
             title_timer = 0
         end
-        if lurek.input.isPressed("quit") then
+        if lurek.input.keyboard.isDown("quit") then
             lurek.event.signal("quit")
         end
         return
@@ -592,10 +593,10 @@ lurek.process(function(dt)
     -- ===== PLAYER TURN =====
     if state ~= STATE_PLAYER_TURN then return end
 
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
 
     -- End turn
-    if lurek.input.isPressed("end_turn") then
+    if lurek.input.keyboard.isDown("end_turn") then
         -- Player creatures attack
         for _, c in ipairs(player.field) do
             resolve_creature_attack(c, enemy.field, enemy)
@@ -609,13 +610,13 @@ lurek.process(function(dt)
     end
 
     -- Quit
-    if lurek.input.isPressed("quit") then
+    if lurek.input.keyboard.isDown("quit") then
         lurek.event.signal("quit")
         return
     end
 
     -- Card selection / playing
-    if lurek.input.isPressed("select") then
+    if lurek.input.keyboard.isDown("select") then
         -- If we have a spell selected, look for target
         if selected_spell then
             if selected_spell.effect == "fireball" then
@@ -707,12 +708,12 @@ lurek.process(function(dt)
             end
         end
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render — battlefield (world-space with camera)
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE or state == STATE_GAME_OVER then return end
 
     local cam = lurek.camera.getPosition()
@@ -780,12 +781,12 @@ lurek.render(function()
         local alpha = clamp(p.life / p.max_life, 0, 1)
         lurek.render.circle(p.x + ox, p.y + oy, p.size, p.r, p.g, p.b, alpha)
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI — hand, HUD, mana, HP, title, game over
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- ===== TITLE =====
     if state == STATE_TITLE then
         lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.05, 0.1, 1)
@@ -946,4 +947,4 @@ lurek.render_ui(function()
 
     -- FPS
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12, 0.3, 0.3, 0.3, 1)
-end)
+end

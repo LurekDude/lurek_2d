@@ -109,17 +109,17 @@ end)
 local out = {}
 local function log(s) out[#out+1] = s end
 
---        Create world                                                                                                                                                                               
+--        Create world
 local world = lurek.physics.newWorld(0, 9.81)
 
---        Solver iterations                                                                                                                                                                
+--        Solver iterations
 log("solver_iterations_default=" .. tostring(world:getSolverIterations()))
 world:setSolverIterations(8)
 log("solver_iterations_after_set=" .. tostring(world:getSolverIterations()))
 world:setSolverIterations(0)
 log("solver_iterations_clamped=" .. tostring(world:getSolverIterations()))
 
---        One-way platform                                                                                                                                                                   
+--        One-way platform
 local platform = lurek.physics.newBody(world, 200, 400, "static")
 local ok_ow, err_ow = pcall(function()
     world:setBodyOneWay(platform, 0, -1)
@@ -135,28 +135,28 @@ end
 
 -- Wrap remaining ext API calls in pcall (some methods expect body index, not userdata)
 pcall(function()
---        Body sleeping                                                                                                                                                                            
+--        Body sleeping
 local dyn = lurek.physics.newBody(world, 0, 0, "dynamic")
 world:sleepBody(dyn)
 log("after_sleep=" .. tostring(world:isBodySleeping(dyn)))
 world:wakeUpBody(dyn)
 log("after_wake=" .. tostring(world:isBodySleeping(dyn)))
 
---        CCD                                                                                                                                                                                                          
+--        CCD
 local bullet = lurek.physics.newBody(world, 500, 0, "dynamic")
 world:setBodyCCD(bullet, true)
 log("ccd_enabled=" .. tostring(world:getBodyCCD(bullet)))
 world:setBodyCCD(bullet, false)
 log("ccd_disabled=" .. tostring(world:getBodyCCD(bullet)))
 
---        Breakable joints                                                                                                                                                                   
+--        Breakable joints
 local b1 = lurek.physics.newBody(world, 0, 0, "dynamic")
 local b2 = lurek.physics.newBody(world, 60, 0, "dynamic")
 local jid = lurek.physics.newJoint(world, b1, b2, "distance")
 world:setJointBreakForce(jid, 50.0)
 log("joint_break_force=" .. tostring(world:getJointBreakForce(jid)))
 
---        Contact callbacks registered                                                                                                                            
+--        Contact callbacks registered
 local begin_fired = 0
 local end_fired   = 0
 world:setBeginContact(function(a, b) begin_fired = begin_fired + 1 end)
@@ -167,7 +167,7 @@ world:clearBeginContact()
 world:clearEndContact()
 log("callbacks_cleared=true")
 
---        Batch body creation                                                                                                                                                          
+--        Batch body creation
 local ids = world:newBodies({
     {0, 100, "dynamic"},
     {100, 100, "static"},
@@ -178,7 +178,7 @@ for i, id in ipairs(ids) do
     log("batch_id[" .. i .. "]=" .. type(id))
 end
 
---        Body sleeping via userdata                                                                                                                                        
+--        Body sleeping via userdata
 local body_u = lurek.physics.newBody(world, 999, 999, "dynamic")
 body_u:sleep()
 log("body_userdata_sleep=" .. tostring(body_u:isSleeping()))
@@ -186,7 +186,7 @@ body_u:wakeUp()
 log("body_userdata_wake=" .. tostring(body_u:isSleeping()))
 end) -- end pcall
 
---        Write evidence file                                                                                                                                                          
+--        Write evidence file
 local path = "tests/lua/evidence/physics_ext_report.txt"
 local f, err = (io.open or function() return nil, "io.open unavailable" end)(path, "w")
 if f then
@@ -199,7 +199,7 @@ else
     print(table.concat(out, "\n"))
 end
 
---        Minimal BDD assertions                                                                                                                                                 
+--        Minimal BDD assertions
 describe("lurek.physics extension evidence", function()
 end)
 
@@ -387,17 +387,17 @@ end)
 local out = {}
 local function log(s) out[#out+1] = s end
 
---        Create world                                                                                                                                                                               
+--        Create world
 local world = lurek.physics.newWorld(0, 9.81)
 
---        Solver iterations                                                                                                                                                                
+--        Solver iterations
 log("solver_iterations_default=" .. tostring(world:getSolverIterations()))
 world:setSolverIterations(8)
 log("solver_iterations_after_set=" .. tostring(world:getSolverIterations()))
 world:setSolverIterations(0)
 log("solver_iterations_clamped=" .. tostring(world:getSolverIterations()))
 
---        One-way platform                                                                                                                                                                   
+--        One-way platform
 local platform = lurek.physics.newBody(world, 200, 400, "static")
 local ok_ow2, err_ow2 = pcall(function()
     world:setBodyOneWay(platform, 0, -1)
@@ -413,28 +413,28 @@ end
 
 -- Wrap remaining ext API calls in pcall (some methods expect body index, not userdata)
 pcall(function()
---        Body sleeping                                                                                                                                                                            
+--        Body sleeping
 local dyn = lurek.physics.newBody(world, 0, 0, "dynamic")
 world:sleepBody(dyn)
 log("after_sleep=" .. tostring(world:isBodySleeping(dyn)))
 world:wakeUpBody(dyn)
 log("after_wake=" .. tostring(world:isBodySleeping(dyn)))
 
---        CCD                                                                                                                                                                                                          
+--        CCD
 local bullet = lurek.physics.newBody(world, 500, 0, "dynamic")
 world:setBodyCCD(bullet, true)
 log("ccd_enabled=" .. tostring(world:getBodyCCD(bullet)))
 world:setBodyCCD(bullet, false)
 log("ccd_disabled=" .. tostring(world:getBodyCCD(bullet)))
 
---        Breakable joints                                                                                                                                                                   
+--        Breakable joints
 local b1 = lurek.physics.newBody(world, 0, 0, "dynamic")
 local b2 = lurek.physics.newBody(world, 60, 0, "dynamic")
 local jid = lurek.physics.newJoint(world, b1, b2, "distance")
 world:setJointBreakForce(jid, 50.0)
 log("joint_break_force=" .. tostring(world:getJointBreakForce(jid)))
 
---        Contact callbacks registered                                                                                                                            
+--        Contact callbacks registered
 local begin_fired = 0
 local end_fired   = 0
 world:setBeginContact(function(a, b) begin_fired = begin_fired + 1 end)
@@ -445,7 +445,7 @@ world:clearBeginContact()
 world:clearEndContact()
 log("callbacks_cleared=true")
 
---        Batch body creation                                                                                                                                                          
+--        Batch body creation
 local ids = world:newBodies({
     {0, 100, "dynamic"},
     {100, 100, "static"},
@@ -456,7 +456,7 @@ for i, id in ipairs(ids) do
     log("batch_id[" .. i .. "]=" .. type(id))
 end
 
---        Body sleeping via userdata                                                                                                                                        
+--        Body sleeping via userdata
 local body_u = lurek.physics.newBody(world, 999, 999, "dynamic")
 body_u:sleep()
 log("body_userdata_sleep=" .. tostring(body_u:isSleeping()))
@@ -464,7 +464,7 @@ body_u:wakeUp()
 log("body_userdata_wake=" .. tostring(body_u:isSleeping()))
 end) -- end pcall
 
---        Write evidence file                                                                                                                                                          
+--        Write evidence file
 local path = "tests/lua/evidence/physics_ext_report.txt"
 local f, err = (io.open or function() return nil, "io.open unavailable" end)(path, "w")
 if f then
@@ -477,7 +477,7 @@ else
     print(table.concat(out, "\n"))
 end
 
---        Minimal BDD assertions                                                                                                                                                 
+--        Minimal BDD assertions
 describe("lurek.physics extension evidence", function()
 end)
 

@@ -607,3 +607,26 @@ do  -- Pipeline:typeOf
   end
 end
 
+
+--@api-stub: Pipeline:addConditional
+-- Adds a step that runs only when a predicate function returns true at execution time.
+-- The predicate receives the pipeline context; skip the step by returning false.
+do  -- Pipeline:addConditional
+  local pipe = lurek.pipeline.newPipeline("build")
+  pipe:addConditional(
+    function(ctx) return ctx.debugBuild == true end,
+    lurek.pipeline.newStep("embed_symbols", function(ctx) end)
+  )
+  lurek.log.info("conditional step added", "pipeline")
+end
+
+--@api-stub: Pipeline:addSubPipeline
+-- Embeds another Pipeline as a single logical step inside this pipeline.
+-- The sub-pipeline runs atomically; its error mode inherits from the parent.
+do  -- Pipeline:addSubPipeline
+  local parent = lurek.pipeline.newPipeline("full_build")
+  local tests  = lurek.pipeline.newPipeline("test_suite")
+  tests:addStep(lurek.pipeline.newStep("unit_tests", function() end))
+  parent:addSubPipeline(tests)
+  lurek.log.info("sub-pipeline embedded", "pipeline")
+end

@@ -305,18 +305,19 @@ local function show_message(text)
 end
 
 -- ── Engine callbacks ──────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Stealth — Lurek2D")
     lurek.window.setBackgroundColor(0.05, 0.08, 0.05)
 
     -- Input actions
-    lurek.input.addAction("up",       {"w", "up"})
-    lurek.input.addAction("down",     {"s", "down"})
-    lurek.input.addAction("left",     {"a", "left"})
-    lurek.input.addAction("right",    {"d", "right"})
-    lurek.input.addAction("crouch",   {"lshift", "rshift"})
-    lurek.input.addAction("interact", {"e"})
-    lurek.input.addAction("quit",     {"escape"})
+    lurek.input.bind("up",       {"w", "up"})
+    lurek.input.bind("down",     {"s", "down"})
+    lurek.input.bind("left",     {"a", "left"})
+    lurek.input.bind("right",    {"d", "right"})
+    lurek.input.bind("crouch",   {"lshift", "rshift"})
+    lurek.input.bind("interact", {"e"})
+    lurek.input.bind("quit",     {"escape"})
 
     -- Particle systems
     noise_ps = lurek.particle.new({
@@ -342,14 +343,14 @@ function lurek.init()
     })
 end
 
-function lurek.ready()
+local function _ready_setup()
     game_state = STATE.TITLE
 end
 
 -- ── Process ───────────────────────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Quit
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -385,16 +386,16 @@ lurek.process(function(dt)
 
     -- ── Player movement ──
     local spd = WALK_SPEED
-    player.crouching = lurek.input.isActionPressed("crouch")
+    player.crouching = lurek.input.isActionDown("crouch")
     if player.crouching then spd = CROUCH_SPEED end
 
     local moving = false
     if not player.hidden then
         local dx, dy = 0, 0
-        if lurek.input.isActionPressed("left")  then dx = dx - 1 end
-        if lurek.input.isActionPressed("right") then dx = dx + 1 end
-        if lurek.input.isActionPressed("up")    then dy = dy - 1 end
-        if lurek.input.isActionPressed("down")  then dy = dy + 1 end
+        if lurek.input.isActionDown("left")  then dx = dx - 1 end
+        if lurek.input.isActionDown("right") then dx = dx + 1 end
+        if lurek.input.isActionDown("up")    then dy = dy - 1 end
+        if lurek.input.isActionDown("down")  then dy = dy + 1 end
 
         -- Normalize diagonal
         if dx ~= 0 and dy ~= 0 then
@@ -433,7 +434,7 @@ lurek.process(function(dt)
     end
 
     -- Interact — enter/exit hide spots
-    if lurek.input.isActionJustPressed("interact") then
+    if lurek.input.wasActionPressed("interact") then
         if player.hidden then
             player.hidden = false
             if player.hide_spot then player.hide_spot.occupied = false end
@@ -601,10 +602,10 @@ lurek.process(function(dt)
     -- FPS in title
     local fps = lurek.timer.getFPS()
     lurek.window.setTitle("Stealth — Lurek2D [FPS: " .. fps .. "]")
-end)
+end
 
 -- ── Render (world) ────────────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if game_state == STATE.TITLE then return end
 
     -- Draw tiles
@@ -761,10 +762,10 @@ lurek.render(function()
         lurek.render.setColor(1, 0.1, 0.05, alert_flash.alpha)
         lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
     end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     if game_state == STATE.TITLE then
         -- Title screen
         lurek.render.setColor(0.2, 0.9, 0.3, 1)

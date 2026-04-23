@@ -387,6 +387,7 @@ local function try_select_colonist(mx, my)
 end
 
 -- ── Init ────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Colony Sim — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.15, 0.1)
@@ -406,13 +407,13 @@ function lurek.init()
     lurek.input.bind("quit",           "escape")
 end
 
-function lurek.ready()
+local function _ready_setup()
     generate_map()
     init_colonists()
 end
 
 -- ── Process ─────────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     dt = dt * speed_mult
 
     if state == "TITLE" then
@@ -490,7 +491,7 @@ lurek.process(function(dt)
 
     -- Input: click
     if lurek.input.pressed("select") then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         if build_mode then
             try_place_building(mx, my, build_mode)
         else
@@ -516,10 +517,10 @@ lurek.process(function(dt)
     elseif #colonists == 0 and state == "PLAYING" then
         state = "GAME_OVER"
     end
-end)
+end
 
 -- ── Render (world) ──────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if state == "TITLE" then
         lurek.render.print("COLONY SIM", 200, 180, {size = 48, color = {0.9, 0.8, 0.3, 1}})
         lurek.render.print("BUILD YOUR SETTLEMENT", 220, 250, {size = 20, color = {0.7, 0.7, 0.7, 1}})
@@ -590,7 +591,7 @@ lurek.render(function()
 
     -- Build mode cursor
     if build_mode then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local col = math.floor(mx / TILE_SIZE)
         local row = math.floor(my / TILE_SIZE)
         local px = col * TILE_SIZE
@@ -598,10 +599,10 @@ lurek.render(function()
         local clr = BUILD_COLORS[build_mode] or {1, 1, 1}
         lurek.render.rectangle(px, py, TILE_SIZE, TILE_SIZE, {color = {clr[1], clr[2], clr[3], 0.4}})
     end
-end)
+end
 
 -- ── Render UI (HUD overlay) ─────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     if state ~= "PLAYING" then return end
 
     local W = 800

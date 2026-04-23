@@ -1252,3 +1252,165 @@ do  -- Graph:typeOf
   end
 end
 
+
+--@api-stub: Node:addDemand
+-- Registers a demand for a resource type on this node.
+-- The graph supply/demand system routes items from supply nodes to demand nodes.
+do  -- Node:addDemand
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("warehouse")
+  n:addDemand("food", 50)
+  lurek.log.info("demand added", "graph")
+end
+
+--@api-stub: Graph:addEdge
+-- Adds a directed or bidirectional edge between two nodes by name.
+-- Returns an Edge handle for further configuration of capacity and travel time.
+do  -- Graph:addEdge
+  local g = lurek.graph.newGraph()
+  local a = g:addNode("city_a")
+  local b = g:addNode("city_b")
+  local e = g:addEdge("city_a", "city_b", {capacity=100, bidirectional=true})
+  lurek.log.info("edges: " .. g:getEdgeCount(), "graph")
+end
+
+--@api-stub: Graph:addItem
+-- Adds an existing item to a named node directly (bypassing createItem).
+-- Use when you pre-build items outside the graph and inject them.
+do  -- Graph:addItem
+  local g = lurek.graph.newGraph()
+  g:addNode("depot")
+  local item = g:createItem("wood", "depot")
+  g:addItem("depot", item)
+  lurek.log.info("item count: " .. g:getItemCount(), "graph")
+end
+
+--@api-stub: Graph:addNode
+-- Creates a named node in the graph and returns its Node handle.
+-- Nodes represent cities, depots, or production facilities in a logistics graph.
+do  -- Graph:addNode
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("mine")
+  n:setCapacity(200)
+  lurek.log.info("nodes: " .. g:getNodeCount(), "graph")
+end
+
+--@api-stub: Node:addSupply
+-- Registers a supply source for a resource type on this node.
+-- The graph solver routes supply toward demand nodes along weighted edges.
+do  -- Node:addSupply
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("mine")
+  n:addSupply("ore", 100)
+  lurek.log.info("supply added", "graph")
+end
+
+--@api-stub: Graph:astar
+-- Finds the shortest path between two nodes using A*.
+-- Returns a table of node names or nil if no path exists.
+do  -- Graph:astar
+  local g = lurek.graph.newGraph()
+  g:addNode("A"); g:addNode("B"); g:addNode("C")
+  g:addEdge("A","B",{weight=1}); g:addEdge("B","C",{weight=1})
+  local path = g:astar("A","C")
+  lurek.log.info("path length: " .. (path and #path or 0), "graph")
+end
+
+--@api-stub: Graph:createItem
+-- Creates a new item of the given type at the named node.
+-- Returns a GraphItem handle; items are transported along edges by the graph solver.
+do  -- Graph:createItem
+  local g = lurek.graph.newGraph()
+  g:addNode("factory")
+  local item = g:createItem("widget", "factory")
+  lurek.log.info("item alive: " .. tostring(item:isAlive()), "graph")
+end
+
+--@api-stub: Graph:findPath
+-- Returns the lowest-cost path between two nodes as a table of node names.
+-- Uses the edge weight attribute; returns nil if target is unreachable.
+do  -- Graph:findPath
+  local g = lurek.graph.newGraph()
+  g:addNode("A"); g:addNode("B")
+  g:addEdge("A","B",{weight=2})
+  local p = g:findPath("A","B")
+  lurek.log.info("found path: " .. (p and #p or 0) .. " nodes", "graph")
+end
+
+--@api-stub: Graph:findPathForItem
+-- Finds the optimal path for an item given its type constraints and allowed edges.
+-- Some edges may restrict allowed item types; this variant respects those filters.
+do  -- Graph:findPathForItem
+  local g = lurek.graph.newGraph()
+  g:addNode("source"); g:addNode("sink")
+  g:addEdge("source","sink",{capacity=100})
+  local item = g:createItem("ore","source")
+  local p = g:findPathForItem(item,"source","sink")
+  lurek.log.info("item path: " .. (p and #p or 0), "graph")
+end
+
+--@api-stub: Graph:getDistance
+-- Returns the shortest-path distance between two nodes by edge weight sum.
+-- Returns math.huge if the target is not reachable from the source.
+do  -- Graph:getDistance
+  local g = lurek.graph.newGraph()
+  g:addNode("X"); g:addNode("Y")
+  g:addEdge("X","Y",{weight=5})
+  local d = g:getDistance("X","Y")
+  lurek.log.info("distance X->Y: " .. d, "graph")
+end
+
+--@api-stub: Graph:getEdgeBetween
+-- Returns the Edge handle for the edge connecting two nodes, or nil if absent.
+-- Use to query or modify an edge without keeping a reference from addEdge.
+do  -- Graph:getEdgeBetween
+  local g = lurek.graph.newGraph()
+  g:addNode("A"); g:addNode("B")
+  g:addEdge("A","B",{capacity=50})
+  local e = g:getEdgeBetween("A","B")
+  lurek.log.info("edge capacity: " .. e:getCapacity(), "graph")
+end
+
+--@api-stub: Graph:getReachable
+-- Returns all nodes reachable from a source node within an optional max-cost.
+-- Result is a table of node names; useful for range-of-movement or supply radius.
+do  -- Graph:getReachable
+  local g = lurek.graph.newGraph()
+  for _, n in ipairs({"A","B","C"}) do g:addNode(n) end
+  g:addEdge("A","B",{weight=1}); g:addEdge("B","C",{weight=1})
+  local reachable = g:getReachable("A", 5)
+  lurek.log.info("reachable: " .. #reachable, "graph")
+end
+
+--@api-stub: Graph:on
+-- Registers a callback for a named graph event ("item_arrived", "edge_broken", etc.).
+-- Returns a listener id for later removal; multiple callbacks can share the same event.
+do  -- Graph:on
+  local g = lurek.graph.newGraph()
+  g:on("item_arrived", function(item, node)
+    lurek.log.info("item arrived at " .. node, "graph")
+  end)
+  lurek.log.info("listener registered", "graph")
+end
+
+--@api-stub: Graph:sendItem
+-- Routes an item from its current node toward a destination, traversing edges each update.
+-- Item moves by travel-time; subscribe to "item_arrived" to know when it lands.
+do  -- Graph:sendItem
+  local g = lurek.graph.newGraph()
+  g:addNode("A"); g:addNode("B")
+  g:addEdge("A","B",{travelTime=2.0,capacity=100})
+  local item = g:createItem("gold","A")
+  g:sendItem(item,"B")
+  lurek.log.info("item dispatched", "graph")
+end
+
+--@api-stub: Node:setConversion
+-- Sets a type conversion rule on this node: input type + amount -> output type.
+-- Conversion fires automatically when enough input items accumulate.
+do  -- Node:setConversion
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("smelter")
+  n:setConversion("ore", 2, "ingot", 1)
+  lurek.log.info("conversion set", "graph")
+end

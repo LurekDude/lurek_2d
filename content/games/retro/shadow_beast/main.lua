@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- Shadow of the Beast — Lurek2D
 -- ============================================================================
 -- Category : retro
@@ -14,8 +14,6 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local SCREEN_W, SCREEN_H = 800, 600
 
@@ -135,8 +133,8 @@ end
 local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
-        gfx.setColor(p.r, p.g, p.b, a)
-        gfx.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.setColor(p.r, p.g, p.b, a)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -169,8 +167,8 @@ end
 
 local function draw_atmo_motes()
     for _, m in ipairs(atmo_motes) do
-        gfx.setColor(0.6, 0.5, 0.8, m.alpha)
-        gfx.drawCircle("fill", m.x, m.y, m.size)
+        lurek.render.setColor(0.6, 0.5, 0.8, m.alpha)
+        lurek.render.drawCircle("fill", m.x, m.y, m.size)
     end
 end
 
@@ -250,8 +248,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.init()
     lurek.window.setTitle("Shadow of the Beast — Lurek2D")
-    gfx.setBackgroundColor(0.05, 0.02, 0.15)
-    lurek.window.showFPS(true)
+    lurek.render.setBackgroundColor(0.05, 0.02, 0.15)
 
     lurek.input.bind("left", "a")
     lurek.input.bind("right", "d")
@@ -482,69 +479,69 @@ end
 local function draw_parallax()
     -- Layer 0: Sky gradient (static)
     local c = PARALLAX[1].color
-    gfx.setColor(c[1], c[2], c[3], 1)
-    gfx.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+    lurek.render.setColor(c[1], c[2], c[3], 1)
+    lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
     -- Moon
     local moon_x = 600 - scroll_x * 0.02
-    gfx.setColor(0.9, 0.85, 0.7, 0.9)
-    gfx.drawCircle("fill", moon_x, 100, 50)
+    lurek.render.setColor(0.9, 0.85, 0.7, 0.9)
+    lurek.render.drawCircle("fill", moon_x, 100, 50)
     -- Moon glow
-    gfx.setColor(0.9, 0.85, 0.7, 0.15)
-    gfx.drawCircle("fill", moon_x, 100, 80)
-    gfx.setColor(0.9, 0.85, 0.7, 0.06)
-    gfx.drawCircle("fill", moon_x, 100, 120)
+    lurek.render.setColor(0.9, 0.85, 0.7, 0.15)
+    lurek.render.drawCircle("fill", moon_x, 100, 80)
+    lurek.render.setColor(0.9, 0.85, 0.7, 0.06)
+    lurek.render.drawCircle("fill", moon_x, 100, 120)
 
     -- Layer 1: Far mountains
     local c1 = PARALLAX[2].color
     local off1 = (scroll_x * PARALLAX[2].speed) % SCREEN_W
-    gfx.setColor(c1[1], c1[2], c1[3], 1)
+    lurek.render.setColor(c1[1], c1[2], c1[3], 1)
     for ix = -1, 2 do
         local bx = ix * 400 - off1
         -- Mountain silhouettes
-        gfx.drawTriangle("fill",
+        lurek.render.drawTriangle("fill",
             bx, 450, bx + 200, 280, bx + 400, 450)
-        gfx.drawTriangle("fill",
+        lurek.render.drawTriangle("fill",
             bx + 150, 450, bx + 320, 310, bx + 500, 450)
     end
-    gfx.drawRect("fill", 0, 450, SCREEN_W, 150)
+    lurek.render.rectangle("fill", 0, 450, SCREEN_W, 150)
 
     -- Layer 2: Mid trees
     local c2 = PARALLAX[3].color
     local off2 = (scroll_x * PARALLAX[3].speed) % 200
-    gfx.setColor(c2[1], c2[2], c2[3], 1)
+    lurek.render.setColor(c2[1], c2[2], c2[3], 1)
     for ix = -1, 5 do
         local tx = ix * 200 - off2
         -- Tree trunk
-        gfx.drawRect("fill", tx + 90, 400, 12, 80)
+        lurek.render.rectangle("fill", tx + 90, 400, 12, 80)
         -- Tree canopy
-        gfx.drawTriangle("fill", tx + 60, 420, tx + 96, 340, tx + 132, 420)
-        gfx.drawTriangle("fill", tx + 65, 390, tx + 96, 320, tx + 127, 390)
+        lurek.render.drawTriangle("fill", tx + 60, 420, tx + 96, 340, tx + 132, 420)
+        lurek.render.drawTriangle("fill", tx + 65, 390, tx + 96, 320, tx + 127, 390)
     end
-    gfx.drawRect("fill", 0, 480, SCREEN_W, 120)
+    lurek.render.rectangle("fill", 0, 480, SCREEN_W, 120)
 
     -- Layer 3: Near hills
     local c3 = PARALLAX[4].color
     local off3 = (scroll_x * PARALLAX[4].speed) % 300
-    gfx.setColor(c3[1], c3[2], c3[3], 1)
+    lurek.render.setColor(c3[1], c3[2], c3[3], 1)
     for ix = -1, 4 do
         local hx = ix * 300 - off3
-        gfx.drawTriangle("fill", hx, 520, hx + 150, 440, hx + 300, 520)
+        lurek.render.drawTriangle("fill", hx, 520, hx + 150, 440, hx + 300, 520)
     end
-    gfx.drawRect("fill", 0, 500, SCREEN_W, 100)
+    lurek.render.rectangle("fill", 0, 500, SCREEN_W, 100)
 
     -- Layer 4: Ground
     local c4 = PARALLAX[5].color
-    gfx.setColor(c4[1], c4[2], c4[3], 1)
-    gfx.drawRect("fill", 0, GROUND_Y, SCREEN_W, SCREEN_H - GROUND_Y)
+    lurek.render.setColor(c4[1], c4[2], c4[3], 1)
+    lurek.render.rectangle("fill", 0, GROUND_Y, SCREEN_W, SCREEN_H - GROUND_Y)
 
     -- Ground detail lines
     local off4 = (scroll_x * PARALLAX[5].speed) % 60
-    gfx.setColor(0.18, 0.12, 0.22, 0.5)
+    lurek.render.setColor(0.18, 0.12, 0.22, 0.5)
     for ix = -1, 15 do
         local gx = ix * 60 - off4
-        gfx.drawRect("fill", gx, GROUND_Y, 30, 2)
-        gfx.drawRect("fill", gx + 15, GROUND_Y + 8, 20, 1)
+        lurek.render.rectangle("fill", gx, GROUND_Y, 30, 2)
+        lurek.render.rectangle("fill", gx + 15, GROUND_Y + 8, 20, 1)
     end
 end
 
@@ -563,37 +560,37 @@ local function draw_player()
 
     -- Legs (two rectangles, animate walk)
     local leg_offset = math.sin(player.anim) * 4
-    gfx.setColor(fr * 0.7, fg * 0.7, fb * 0.7, 1)
-    gfx.drawRect("fill", px - 7, py - 10 + leg_offset, 5, 10)
-    gfx.drawRect("fill", px + 2, py - 10 - leg_offset, 5, 10)
+    lurek.render.setColor(fr * 0.7, fg * 0.7, fb * 0.7, 1)
+    lurek.render.rectangle("fill", px - 7, py - 10 + leg_offset, 5, 10)
+    lurek.render.rectangle("fill", px + 2, py - 10 - leg_offset, 5, 10)
 
     -- Body
-    gfx.setColor(fr, fg, fb, 1)
-    gfx.drawRect("fill", px - 10, py - PLAYER_H + 6, 20, 18)
+    lurek.render.setColor(fr, fg, fb, 1)
+    lurek.render.rectangle("fill", px - 10, py - PLAYER_H + 6, 20, 18)
 
     -- Head
-    gfx.setColor(fr * 1.1, fg * 1.1, fb * 0.9, 1)
-    gfx.drawRect("fill", px - 6, py - PLAYER_H - 2, 12, 10)
+    lurek.render.setColor(fr * 1.1, fg * 1.1, fb * 0.9, 1)
+    lurek.render.rectangle("fill", px - 6, py - PLAYER_H - 2, 12, 10)
 
     -- Eyes (two red dots)
-    gfx.setColor(1.0, 0.2, 0.1, 1)
+    lurek.render.setColor(1.0, 0.2, 0.1, 1)
     if player.facing > 0 then
-        gfx.drawRect("fill", px, py - PLAYER_H + 1, 2, 2)
-        gfx.drawRect("fill", px + 4, py - PLAYER_H + 1, 2, 2)
+        lurek.render.rectangle("fill", px, py - PLAYER_H + 1, 2, 2)
+        lurek.render.rectangle("fill", px + 4, py - PLAYER_H + 1, 2, 2)
     else
-        gfx.drawRect("fill", px - 6, py - PLAYER_H + 1, 2, 2)
-        gfx.drawRect("fill", px - 2, py - PLAYER_H + 1, 2, 2)
+        lurek.render.rectangle("fill", px - 6, py - PLAYER_H + 1, 2, 2)
+        lurek.render.rectangle("fill", px - 2, py - PLAYER_H + 1, 2, 2)
     end
 
     -- Attack arm extension
     if player.attacking then
-        gfx.setColor(fr, fg, fb, 1)
+        lurek.render.setColor(fr, fg, fb, 1)
         local arm_x = player.facing > 0 and px + 10 or px - 30
-        gfx.drawRect("fill", arm_x, py - PLAYER_H + 10, 20, 6)
+        lurek.render.rectangle("fill", arm_x, py - PLAYER_H + 10, 20, 6)
         -- Fist
-        gfx.setColor(1.0, 0.8, 0.3, 0.8)
+        lurek.render.setColor(1.0, 0.8, 0.3, 0.8)
         local fist_x = player.facing > 0 and px + 28 or px - 32
-        gfx.drawRect("fill", fist_x, py - PLAYER_H + 8, 6, 8)
+        lurek.render.rectangle("fill", fist_x, py - PLAYER_H + 8, 6, 8)
     end
 end
 
@@ -607,59 +604,59 @@ local function draw_enemies()
 
         if e.kind == "ground" then
             -- Dark creature silhouette
-            gfx.setColor(er, eg, eb, 1)
-            gfx.drawRect("fill", e.x - e.w / 2, e.y - e.h, e.w, e.h)
+            lurek.render.setColor(er, eg, eb, 1)
+            lurek.render.rectangle("fill", e.x - e.w / 2, e.y - e.h, e.w, e.h)
             -- Glowing eyes
-            gfx.setColor(0.9, 0.3, 0.1, 1)
-            gfx.drawRect("fill", e.x - 5, e.y - e.h + 5, 3, 3)
-            gfx.drawRect("fill", e.x + 3, e.y - e.h + 5, 3, 3)
+            lurek.render.setColor(0.9, 0.3, 0.1, 1)
+            lurek.render.rectangle("fill", e.x - 5, e.y - e.h + 5, 3, 3)
+            lurek.render.rectangle("fill", e.x + 3, e.y - e.h + 5, 3, 3)
 
         elseif e.kind == "fly" then
             -- Wing shape
-            gfx.setColor(er * 0.8, eg * 0.8, eb * 1.2, 1)
+            lurek.render.setColor(er * 0.8, eg * 0.8, eb * 1.2, 1)
             local wing = math.sin(e.anim * 6) * 6
-            gfx.drawTriangle("fill",
+            lurek.render.drawTriangle("fill",
                 e.x - 16, e.y - wing, e.x, e.y - e.h / 2, e.x - 4, e.y)
-            gfx.drawTriangle("fill",
+            lurek.render.drawTriangle("fill",
                 e.x + 16, e.y - wing, e.x, e.y - e.h / 2, e.x + 4, e.y)
             -- Body
-            gfx.setColor(er, eg, eb, 1)
-            gfx.drawRect("fill", e.x - 5, e.y - 12, 10, 12)
+            lurek.render.setColor(er, eg, eb, 1)
+            lurek.render.rectangle("fill", e.x - 5, e.y - 12, 10, 12)
             -- Eye
-            gfx.setColor(1.0, 0.6, 0.1, 1)
-            gfx.drawRect("fill", e.x - 2, e.y - 10, 4, 3)
+            lurek.render.setColor(1.0, 0.6, 0.1, 1)
+            lurek.render.rectangle("fill", e.x - 2, e.y - 10, 4, 3)
 
         elseif e.kind == "spike" then
             -- Three spike triangles
-            gfx.setColor(0.4, 0.2, 0.3, 1)
-            gfx.drawTriangle("fill",
+            lurek.render.setColor(0.4, 0.2, 0.3, 1)
+            lurek.render.drawTriangle("fill",
                 e.x - 12, GROUND_Y, e.x - 4, GROUND_Y - 14, e.x + 4, GROUND_Y)
-            gfx.drawTriangle("fill",
+            lurek.render.drawTriangle("fill",
                 e.x - 4, GROUND_Y, e.x + 4, GROUND_Y - 18, e.x + 12, GROUND_Y)
-            gfx.drawTriangle("fill",
+            lurek.render.drawTriangle("fill",
                 e.x + 4, GROUND_Y, e.x + 12, GROUND_Y - 12, e.x + 20, GROUND_Y)
 
         elseif e.kind == "boss" then
             -- Large beast silhouette
-            gfx.setColor(er * 1.5, eg, eb * 1.3, 1)
-            gfx.drawRect("fill", e.x - e.w / 2, e.y - e.h, e.w, e.h)
+            lurek.render.setColor(er * 1.5, eg, eb * 1.3, 1)
+            lurek.render.rectangle("fill", e.x - e.w / 2, e.y - e.h, e.w, e.h)
             -- Horns
-            gfx.setColor(0.5, 0.2, 0.3, 1)
-            gfx.drawTriangle("fill",
+            lurek.render.setColor(0.5, 0.2, 0.3, 1)
+            lurek.render.drawTriangle("fill",
                 e.x - 20, e.y - e.h, e.x - 28, e.y - e.h - 20, e.x - 12, e.y - e.h)
-            gfx.drawTriangle("fill",
+            lurek.render.drawTriangle("fill",
                 e.x + 20, e.y - e.h, e.x + 28, e.y - e.h - 20, e.x + 12, e.y - e.h)
             -- Eyes
-            gfx.setColor(1.0, 0.1, 0.0, 1)
-            gfx.drawRect("fill", e.x - 14, e.y - e.h + 14, 6, 5)
-            gfx.drawRect("fill", e.x + 8, e.y - e.h + 14, 6, 5)
+            lurek.render.setColor(1.0, 0.1, 0.0, 1)
+            lurek.render.rectangle("fill", e.x - 14, e.y - e.h + 14, 6, 5)
+            lurek.render.rectangle("fill", e.x + 8, e.y - e.h + 14, 6, 5)
             -- HP bar
             local bar_w = 50
             local hp_frac = e.hp / BOSS_HP
-            gfx.setColor(0.2, 0.0, 0.0, 0.8)
-            gfx.drawRect("fill", e.x - bar_w / 2, e.y - e.h - 12, bar_w, 6)
-            gfx.setColor(0.9, 0.1, 0.1, 0.9)
-            gfx.drawRect("fill", e.x - bar_w / 2, e.y - e.h - 12, bar_w * hp_frac, 6)
+            lurek.render.setColor(0.2, 0.0, 0.0, 0.8)
+            lurek.render.rectangle("fill", e.x - bar_w / 2, e.y - e.h - 12, bar_w, 6)
+            lurek.render.setColor(0.9, 0.1, 0.1, 0.9)
+            lurek.render.rectangle("fill", e.x - bar_w / 2, e.y - e.h - 12, bar_w * hp_frac, 6)
         end
     end
 end
@@ -703,7 +700,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Render (world)
 -- ---------------------------------------------------------------------------
-function lurek.render()
+function lurek.draw()
     draw_parallax()
 
     if current_state == STATE.TITLE then
@@ -720,75 +717,75 @@ function lurek.render()
         draw_enemies()
         draw_particles()
         -- Dead player on ground
-        gfx.setColor(0.4, 0.2, 0.3, 0.6)
-        gfx.drawRect("fill", player.x - 16, GROUND_Y - 8, 32, 8)
+        lurek.render.setColor(0.4, 0.2, 0.3, 0.6)
+        lurek.render.rectangle("fill", player.x - 16, GROUND_Y - 8, 32, 8)
     end
 end
 
 -- ---------------------------------------------------------------------------
 -- Render UI (HUD, titles, overlays)
 -- ---------------------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     if current_state == STATE.TITLE then
         -- Title
-        gfx.setColor(0.85, 0.7, 0.95, 1)
-        gfx.drawText("SHADOW OF THE BEAST", SCREEN_W / 2 - 150, 180, 32)
-        gfx.setColor(0.6, 0.45, 0.7, 0.8)
-        gfx.drawText("A Lurek2D Tribute to Psygnosis", SCREEN_W / 2 - 140, 225, 16)
+        lurek.render.setColor(0.85, 0.7, 0.95, 1)
+        lurek.render.drawText("SHADOW OF THE BEAST", SCREEN_W / 2 - 150, 180, 32)
+        lurek.render.setColor(0.6, 0.45, 0.7, 0.8)
+        lurek.render.drawText("A Lurek2D Tribute to Psygnosis", SCREEN_W / 2 - 140, 225, 16)
         -- Controls
-        gfx.setColor(0.5, 0.4, 0.6, 0.7)
-        gfx.drawText("A/D  Move   |   SPACE  Jump   |   F  Attack", SCREEN_W / 2 - 180, 340, 14)
+        lurek.render.setColor(0.5, 0.4, 0.6, 0.7)
+        lurek.render.drawText("A/D  Move   |   SPACE  Jump   |   F  Attack", SCREEN_W / 2 - 180, 340, 14)
         -- Prompt
         local pulse = 0.5 + 0.5 * math.abs(math.sin(lurek.timer.getTime() * 2.5))
-        gfx.setColor(0.8, 0.6, 0.9, pulse)
-        gfx.drawText("Press ENTER to begin", SCREEN_W / 2 - 90, 420, 18)
+        lurek.render.setColor(0.8, 0.6, 0.9, pulse)
+        lurek.render.drawText("Press ENTER to begin", SCREEN_W / 2 - 90, 420, 18)
 
     elseif current_state == STATE.PLAYING then
         -- HP icons
         for i = 1, PLAYER_MAX_HP do
             if i <= player.hp then
-                gfx.setColor(0.9, 0.2, 0.2, 1)
+                lurek.render.setColor(0.9, 0.2, 0.2, 1)
             else
-                gfx.setColor(0.3, 0.1, 0.1, 0.5)
+                lurek.render.setColor(0.3, 0.1, 0.1, 0.5)
             end
-            gfx.drawRect("fill", 10 + (i - 1) * 22, 10, 16, 16)
+            lurek.render.rectangle("fill", 10 + (i - 1) * 22, 10, 16, 16)
             -- Cross on HP icon
             if i <= player.hp then
-                gfx.setColor(1.0, 0.5, 0.5, 1)
-                gfx.drawRect("fill", 14 + (i - 1) * 22, 13, 8, 2)
-                gfx.drawRect("fill", 17 + (i - 1) * 22, 12, 2, 6)
+                lurek.render.setColor(1.0, 0.5, 0.5, 1)
+                lurek.render.rectangle("fill", 14 + (i - 1) * 22, 13, 8, 2)
+                lurek.render.rectangle("fill", 17 + (i - 1) * 22, 12, 2, 6)
             end
         end
 
         -- Score
-        gfx.setColor(0.8, 0.7, 0.9, 1)
-        gfx.drawText("SCORE: " .. score, SCREEN_W - 180, 12, 16)
+        lurek.render.setColor(0.8, 0.7, 0.9, 1)
+        lurek.render.drawText("SCORE: " .. score, SCREEN_W - 180, 12, 16)
 
         -- Distance
-        gfx.setColor(0.6, 0.5, 0.7, 0.8)
-        gfx.drawText("DIST: " .. math.floor(distance), SCREEN_W - 180, 32, 14)
+        lurek.render.setColor(0.6, 0.5, 0.7, 0.8)
+        lurek.render.drawText("DIST: " .. math.floor(distance), SCREEN_W - 180, 32, 14)
 
         -- Boss warning
         if boss_active then
             local flash = math.abs(math.sin(lurek.timer.getTime() * 4))
-            gfx.setColor(1.0, 0.2, 0.1, flash * 0.8)
-            gfx.drawText("!! BOSS !!", SCREEN_W / 2 - 40, 50, 20)
+            lurek.render.setColor(1.0, 0.2, 0.1, flash * 0.8)
+            lurek.render.drawText("!! BOSS !!", SCREEN_W / 2 - 40, 50, 20)
         end
 
     elseif current_state == STATE.GAME_OVER then
         -- Fade overlay
-        gfx.setColor(0.0, 0.0, 0.0, 0.6)
-        gfx.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
-        gfx.setColor(0.9, 0.3, 0.3, 1)
-        gfx.drawText("GAME OVER", SCREEN_W / 2 - 80, 220, 32)
+        lurek.render.setColor(0.9, 0.3, 0.3, 1)
+        lurek.render.drawText("GAME OVER", SCREEN_W / 2 - 80, 220, 32)
 
-        gfx.setColor(0.7, 0.5, 0.8, 1)
-        gfx.drawText("Score: " .. score, SCREEN_W / 2 - 50, 280, 20)
-        gfx.drawText("Distance: " .. math.floor(distance), SCREEN_W / 2 - 70, 310, 16)
+        lurek.render.setColor(0.7, 0.5, 0.8, 1)
+        lurek.render.drawText("Score: " .. score, SCREEN_W / 2 - 50, 280, 20)
+        lurek.render.drawText("Distance: " .. math.floor(distance), SCREEN_W / 2 - 70, 310, 16)
 
         local pulse = 0.5 + 0.5 * math.abs(math.sin(lurek.timer.getTime() * 2.5))
-        gfx.setColor(0.6, 0.5, 0.7, pulse)
-        gfx.drawText("Press ENTER to try again", SCREEN_W / 2 - 110, 380, 18)
+        lurek.render.setColor(0.6, 0.5, 0.7, pulse)
+        lurek.render.drawText("Press ENTER to try again", SCREEN_W / 2 - 110, 380, 18)
     end
 end

@@ -244,6 +244,7 @@ lurek.input.bind("quit",    "escape")
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Vehicle Builder — Lurek2D")
     lurek.window.setBackgroundColor(0.1, 0.1, 0.12)
@@ -253,7 +254,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Ready
 -- ---------------------------------------------------------------------------
-function lurek.ready()
+local function _ready_setup()
     -- place a starter frame in center
     local cr = math.floor(GRID_ROWS / 2)
     local cc = math.floor(GRID_COLS / 2)
@@ -264,14 +265,14 @@ end
 -- ---------------------------------------------------------------------------
 -- Process
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     title_timer = title_timer + dt
 
     update_particles(dt)
     update_tweens(dt)
 
     -- Quit
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         if current_state == STATE.BUILDING then
             lurek.event.quit()
         elseif current_state == STATE.TESTING then
@@ -288,7 +289,7 @@ lurek.process(function(dt)
     -- TITLE
     -- -----------------------------------------------------------------------
     if current_state == STATE.TITLE then
-        if lurek.input.isActionJustPressed("place") then
+        if lurek.input.wasActionPressed("place") then
             current_state = STATE.BUILDING
         end
         return
@@ -299,16 +300,16 @@ lurek.process(function(dt)
     -- -----------------------------------------------------------------------
     if current_state == STATE.BUILDING then
         -- Part selection
-        if lurek.input.isActionJustPressed("part_f") then selected_part = PART.FRAME;   delete_mode = false end
-        if lurek.input.isActionJustPressed("part_w") then selected_part = PART.WHEEL;   delete_mode = false end
-        if lurek.input.isActionJustPressed("part_e") then selected_part = PART.ENGINE;  delete_mode = false end
-        if lurek.input.isActionJustPressed("part_a") then selected_part = PART.ARMOR;   delete_mode = false end
-        if lurek.input.isActionJustPressed("part_b") then selected_part = PART.BOOSTER; delete_mode = false end
-        if lurek.input.isActionJustPressed("delete") then delete_mode = not delete_mode end
+        if lurek.input.wasActionPressed("part_f") then selected_part = PART.FRAME;   delete_mode = false end
+        if lurek.input.wasActionPressed("part_w") then selected_part = PART.WHEEL;   delete_mode = false end
+        if lurek.input.wasActionPressed("part_e") then selected_part = PART.ENGINE;  delete_mode = false end
+        if lurek.input.wasActionPressed("part_a") then selected_part = PART.ARMOR;   delete_mode = false end
+        if lurek.input.wasActionPressed("part_b") then selected_part = PART.BOOSTER; delete_mode = false end
+        if lurek.input.wasActionPressed("delete") then delete_mode = not delete_mode end
 
         -- Place / delete
-        if lurek.input.isActionJustPressed("place") then
-            local mx, my = lurek.input.getMousePosition()
+        if lurek.input.wasActionPressed("place") then
+            local mx, my = lurek.input.mouse.getPosition()
             local gc = math.floor((mx - GRID_X) / CELL) + 1
             local gr = math.floor((my - GRID_Y) / CELL) + 1
             if gc >= 1 and gc <= GRID_COLS and gr >= 1 and gr <= GRID_ROWS then
@@ -331,7 +332,7 @@ lurek.process(function(dt)
         end
 
         -- Switch to test
-        if lurek.input.isActionJustPressed("test") then
+        if lurek.input.wasActionPressed("test") then
             if stats.wheels > 0 and stats.engines > 0 then
                 -- Init test
                 test.x = 100
@@ -360,7 +361,7 @@ lurek.process(function(dt)
     -- -----------------------------------------------------------------------
     if current_state == STATE.TESTING then
         if not test.alive or test.finished then
-            if lurek.input.isActionJustPressed("place") or lurek.input.isActionJustPressed("build") then
+            if lurek.input.wasActionPressed("place") or lurek.input.wasActionPressed("build") then
                 test.score = math.floor(test.distance)
                 current_state = STATE.RESULTS
             end
@@ -368,7 +369,7 @@ lurek.process(function(dt)
         end
 
         -- Boost
-        if lurek.input.isActionJustPressed("boost") and stats.boosters > 0 and not test.boosting then
+        if lurek.input.wasActionPressed("boost") and stats.boosters > 0 and not test.boosting then
             test.boosting = true
             test.boost_timer = BOOST_DUR
         end
@@ -497,7 +498,7 @@ lurek.process(function(dt)
     -- RESULTS
     -- -----------------------------------------------------------------------
     if current_state == STATE.RESULTS then
-        if lurek.input.isActionJustPressed("build") then
+        if lurek.input.wasActionPressed("build") then
             -- advance track or loop
             if test.finished and track_index < #TRACKS then
                 track_index = track_index + 1
@@ -512,12 +513,12 @@ lurek.process(function(dt)
             current_state = STATE.BUILDING
         end
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render — world-space drawing (vehicle, track)
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     -- -----------------------------------------------------------------------
     -- TITLE
     -- -----------------------------------------------------------------------
@@ -566,7 +567,7 @@ lurek.render(function()
         end
 
         -- Hover preview
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local hc = math.floor((mx - GRID_X) / CELL) + 1
         local hr = math.floor((my - GRID_Y) / CELL) + 1
         if hc >= 1 and hc <= GRID_COLS and hr >= 1 and hr <= GRID_ROWS and not grid[hr][hc] then
@@ -700,12 +701,12 @@ lurek.render(function()
         lurek.render.print("Press B to return to build mode", 250, 420, 14)
         lurek.render.setColor(1, 1, 1, 1)
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI — HUD panels, stats, budget (screen-space)
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if current_state == STATE.BUILDING then
         -- Top bar
         lurek.render.setColor(0.12, 0.12, 0.15, 0.9)
@@ -791,4 +792,4 @@ lurek.render_ui(function()
     end
 
     lurek.render.setColor(1, 1, 1, 1)
-end)
+end

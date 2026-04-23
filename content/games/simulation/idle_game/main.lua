@@ -213,19 +213,19 @@ function lurek.init()
     lurek.input.bind("quit",         "escape")
 end
 
-function lurek.ready()
+local function _ready_setup()
     gold_per_second = compute_gps()
 end
 
-lurek.process(function(dt)
-    if lurek.input.justPressed("quit") then
+function lurek.process(dt)
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     -- ── TITLE state ─────────────────────────────────────────────────────
     if state == STATE_TITLE then
-        if lurek.input.justPressed("click") then
+        if lurek.input.wasActionPressed("click") then
             state = STATE_PLAYING
         end
         return
@@ -233,9 +233,9 @@ lurek.process(function(dt)
 
     -- ── PRESTIGE_CONFIRM state ──────────────────────────────────────────
     if state == STATE_PRESTIGE then
-        if lurek.input.justPressed("click") then
+        if lurek.input.wasActionPressed("click") then
             do_prestige()
-        elseif lurek.input.justPressed("quit") then
+        elseif lurek.input.wasActionPressed("quit") then
             state = STATE_PLAYING
         end
         return
@@ -244,7 +244,7 @@ lurek.process(function(dt)
     -- ── PLAYING state ───────────────────────────────────────────────────
 
     -- Manual click
-    if lurek.input.justPressed("click") then
+    if lurek.input.wasActionPressed("click") then
         do_click()
     end
 
@@ -262,18 +262,18 @@ lurek.process(function(dt)
     end
 
     -- Buy producers
-    if lurek.input.justPressed("cursor_buy")  then buy_producer(1) end
-    if lurek.input.justPressed("worker_buy")  then buy_producer(2) end
-    if lurek.input.justPressed("factory_buy") then buy_producer(3) end
-    if lurek.input.justPressed("robot_buy")   then buy_producer(4) end
-    if lurek.input.justPressed("ai_buy")      then buy_producer(5) end
+    if lurek.input.wasActionPressed("cursor_buy")  then buy_producer(1) end
+    if lurek.input.wasActionPressed("worker_buy")  then buy_producer(2) end
+    if lurek.input.wasActionPressed("factory_buy") then buy_producer(3) end
+    if lurek.input.wasActionPressed("robot_buy")   then buy_producer(4) end
+    if lurek.input.wasActionPressed("ai_buy")      then buy_producer(5) end
 
     -- Buy click upgrades
-    if lurek.input.justPressed("better_click") then buy_click_upgrade(1) end
-    if lurek.input.justPressed("super_click")  then buy_click_upgrade(2) end
+    if lurek.input.wasActionPressed("better_click") then buy_click_upgrade(1) end
+    if lurek.input.wasActionPressed("super_click")  then buy_click_upgrade(2) end
 
     -- Prestige
-    if lurek.input.justPressed("prestige") and gold >= 1000000 then
+    if lurek.input.wasActionPressed("prestige") and gold >= 1000000 then
         state = STATE_PRESTIGE
     end
 
@@ -329,10 +329,10 @@ lurek.process(function(dt)
 
     -- Check achievements
     check_achievements()
-end)
+end
 
 -- ── Render: game world visuals ──────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then
         -- Title screen
         lurek.render.print("IDLE GAME", W / 2 - 120, H / 3, { size = 48, color = {1, 0.85, 0.2, 1} })
@@ -386,10 +386,10 @@ lurek.render(function()
         lurek.render.rectangle(cx, cy, 10, 6, { color = {0.25, 0.22, 0.3, 0.6}, filled = true })
     end
     lurek.render.rectangle(0, cy - 2, W, 2, { color = {0.35, 0.3, 0.4, 0.8}, filled = true })
-end)
+end
 
 -- ── Render UI: panels, stats, upgrades ──────────────────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then return end
 
     -- ── Gold display (top center) ───────────────────────────────────────
@@ -489,4 +489,4 @@ lurek.render_ui(function()
 
     -- ── FPS ─────────────────────────────────────────────────────────────
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), 5, 5, { size = 11, color = {0.4, 0.4, 0.5, 0.7} })
-end)
+end

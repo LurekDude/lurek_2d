@@ -196,7 +196,7 @@ local function apply_preset(idx)
     psys:setSpin(-1, 1)
     psys:setRotation(0, math.pi * 2)
 
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     if idx == 6 then
         psys:setPosition(SCREEN_W / 2, 10)
     else
@@ -276,20 +276,21 @@ lurek.input.bind("quit", "escape")
 -- ============================================================
 -- Init
 -- ============================================================
+
 function lurek.init()
     lurek.window.setTitle("Particles Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
     lurek.camera.setPosition(0, 0)
 end
 
-function lurek.ready()
+local function _ready_setup()
     -- system created on first preset switch
 end
 
 -- ============================================================
 -- Process
 -- ============================================================
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS
     fps_count = fps_count + 1
     fps_timer = fps_timer + dt
@@ -378,7 +379,7 @@ lurek.process(function(dt)
 
     -- Mouse follow (except snow which emits from top)
     if psys then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         if preset_index == 6 then
             psys:setPosition(SCREEN_W / 2, 10)
         else
@@ -438,12 +439,12 @@ lurek.process(function(dt)
         preset_tween_timer = preset_tween_timer + dt
         preset_tween_alpha = clamp(preset_tween_timer / PRESET_TWEEN_DUR, 0, 1)
     end
-end)
+end
 
 -- ============================================================
 -- Render: particles (world-space)
 -- ============================================================
-function lurek.render()
+function lurek.draw()
     if state == STATE_TITLE then return end
 
     -- Draw the particle system
@@ -459,7 +460,7 @@ end
 -- ============================================================
 -- Render UI: HUD, preset name, stats, title screen
 -- ============================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- ── Title screen ───────────────────────────────────────
     if state == STATE_TITLE then
         local a = title_alpha
@@ -553,4 +554,4 @@ lurek.render_ui(function()
     -- FPS
     lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
     lurek.render.print("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 18)
-end)
+end

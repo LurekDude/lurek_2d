@@ -9,6 +9,7 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+
 local SCREEN_W, SCREEN_H = 800, 600
 
 local STATE = { TITLE = 1, PLAYING = 2, GAME_OVER = 3 }
@@ -379,7 +380,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Process
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     if lurek.input.pressed("quit") then
         lurek.event.quit()
         return
@@ -620,12 +621,12 @@ lurek.process(function(dt)
             start_wave()
         end
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render (game world)
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     cam:apply()
 
     -- -----------------------------------------------------------------------
@@ -761,12 +762,12 @@ lurek.render(function()
         lurek.render.setColor(0.7, 0.7, 0.7, 1)
         lurek.render.print("PRESS ENTER TO RESTART", SCREEN_W / 2 - 100, SCREEN_H / 2 + 60)
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI (HUD — not affected by camera)
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if current_state ~= STATE.PLAYING then return end
 
     -- Score
@@ -810,4 +811,4 @@ lurek.render_ui(function()
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
     lurek.render.print("FPS: " .. fps, SCREEN_W - 80, SCREEN_H - 20)
-end)
+end

@@ -368,7 +368,7 @@ end
 -------------------------------------------------
 -- Callbacks
 -------------------------------------------------
-lurek.setBackgroundColor(0.1, 0.12, 0.08)
+lurek.render.setBackgroundColor(0.1, 0.12, 0.08)
 
 lurek.input.bind("place", "mouse1")
 lurek.input.bind("station_mode", "s")
@@ -384,11 +384,11 @@ function lurek.init()
     generate_map()
 end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.camera.setPosition(0, 0)
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     if lurek.input.pressed("quit") then
         lurek.event.quit()
         return
@@ -420,7 +420,7 @@ lurek.process(function(dt)
         if #stations >= 2 and #trains < MAX_TRAINS and gold >= 100 then
             mode = "track"
             -- find a station near mouse or use first available pair
-            local mx, my = lurek.input.getMousePosition()
+            local mx, my = lurek.input.mouse.getPosition()
             local gx = math.floor((mx - MAP_X) / TILE)
             local gy = math.floor((my - MAP_Y) / TILE)
             local nearest = nil
@@ -437,10 +437,10 @@ lurek.process(function(dt)
 
     -- Click handling
     if lurek.input.pressed("place") and not route_pick then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         handle_click(mx, my)
     elseif lurek.input.pressed("place") and route_pick then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         handle_click(mx, my)
     end
 
@@ -499,12 +499,12 @@ lurek.process(function(dt)
             victory_time = 0
         end
     end
-end)
+end
 
 -------------------------------------------------
 -- Render: map, tracks, trains
 -------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then
         return
     end
@@ -653,12 +653,12 @@ lurek.render(function()
         lurek.render.setColor(p.r, p.g, p.b, p.a)
         lurek.render.rectangle(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
-end)
+end
 
 -------------------------------------------------
 -- Render UI: stats, mode indicator, title/victory
 -------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then
         -- Title screen
         lurek.render.setColor(0.9, 0.8, 0.3, 1)
@@ -751,4 +751,4 @@ lurek.render_ui(function()
         lurek.render.print(tw.name .. ": " .. prodName .. "→" .. wantName ..
             " [" .. tw.stock .. "]", 10, hud_y + 36 + (i - 1) * 14)
     end
-end)
+end

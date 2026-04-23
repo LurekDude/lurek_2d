@@ -3145,3 +3145,77 @@ do  -- Image_Widget:newCustomWidget
   print("newCustomWidget: ok")
 end
 
+
+--@api-stub: BarChart:addCategory
+-- Adds a named category (x-axis label) to the bar chart.
+-- Each series value maps to one category; add categories before adding series data.
+do  -- BarChart:addCategory
+  local chart = lurek.ui.newBarChart and lurek.ui.Image_Widget and nil
+  lurek.log.info("BarChart:addCategory usage: chart:addCategory('Jan')", "ui")
+  local bc = lurek.ui.newBarChart(200, 100)
+  bc:addCategory("Jan")
+  bc:addCategory("Feb")
+  lurek.log.info("categories added", "ui")
+end
+
+--@api-stub: AreaChart:addLayer
+-- Adds a new stacked area series layer to the area chart.
+-- Multiple layers stack vertically; each is filled with a distinct colour.
+do  -- AreaChart:addLayer
+  local ac = lurek.ui.newAreaChart(300, 150)
+  ac:addLayer("series_a", {1,0.3,0.3,0.7}, {10,20,15,30,25})
+  ac:addLayer("series_b", {0.3,0.6,1,0.7}, {5,10,8,14,12})
+  lurek.log.info("area layers added", "ui")
+end
+
+--@api-stub: PieChart:addSegment
+-- Adds a named slice to the pie chart with a value and colour.
+-- Values are relative; the chart normalises them to 360 degrees automatically.
+do  -- PieChart:addSegment
+  local pc = lurek.ui.newPieChart(150, 150)
+  pc:addSegment("Wheat",  40, {0.9, 0.8, 0.3, 1})
+  pc:addSegment("Sheep",  25, {0.8, 0.9, 0.5, 1})
+  pc:addSegment("Forest", 35, {0.2, 0.7, 0.3, 1})
+  lurek.log.info("pie segments added", "ui")
+end
+
+--@api-stub: LineChart:addSeries
+-- Adds a named data series to the line chart with a colour and data points.
+-- Multiple series are drawn overlapping; use distinct colours to differentiate.
+do  -- LineChart:addSeries
+  local lc = lurek.ui.newLineChart(300, 150)
+  lc:addSeries("revenue", {0.2, 0.8, 0.4, 1}, {10, 20, 15, 35, 30})
+  lc:addSeries("cost",    {0.9, 0.3, 0.2, 1}, {8,  12, 10, 18, 20})
+  lurek.log.info("line series added", "ui")
+end
+
+--@api-stub: BarChart:addSeries
+-- Adds a named data series to the bar chart with a colour and values.
+-- Each value in the table maps to the corresponding category index.
+do  -- BarChart:addSeries
+  local bc = lurek.ui.newBarChart(300, 150)
+  bc:addCategory("Q1"); bc:addCategory("Q2")
+  bc:addSeries("sales",   {0.2, 0.6, 0.9, 1}, {120, 180})
+  bc:addSeries("returns", {0.9, 0.3, 0.2, 1}, {10,  15})
+  lurek.log.info("bar series added", "ui")
+end
+
+--@api-stub: ScatterPlot:addSeries
+-- Adds a named point series to the scatter plot with colour and (x, y) data pairs.
+-- Each series is a flat table {x1,y1, x2,y2, ...} of coordinate pairs.
+do  -- ScatterPlot:addSeries
+  local sp = lurek.ui.newScatterPlot(200, 200)
+  sp:addSeries("players", {0.2, 0.7, 1, 1}, {10,20, 30,40, 50,35, 70,55})
+  sp:setXRange(0, 100); sp:setYRange(0, 80)
+  lurek.log.info("scatter series added", "ui")
+end
+
+--@api-stub: Theme:setStyle
+-- Sets a named style property on the theme (e.g., button colour, font size).
+-- Themes apply hierarchically; widget-level styles override theme defaults.
+do  -- Theme:setStyle
+  local theme = lurek.ui.newTheme()
+  theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
+  theme:setStyle("button.text_color",  {1, 1, 1, 1})
+  lurek.log.info("theme styles set", "ui")
+end

@@ -491,3 +491,14 @@ do  -- ContentRegistry:getTypes
   local types = reg:getTypes()
   lurek.log.debug("type count=" .. #types, "mods")
 end
+
+--@api-stub: Mod:setHook
+-- Registers a callback for a named engine hook point on this mod.
+-- Hooks let mods intercept engine events (on_save, on_load, on_entity_spawn, etc.).
+do  -- Mod:setHook
+  local mod = lurek.mods.newMod({id="example_mod", name="Example", version="1.0"})
+  mod:setHook("on_save", function(ctx)
+    lurek.log.info("mod saving extra data", "mods")
+  end)
+  lurek.log.info("hook registered: " .. tostring(mod:hasHook("on_save")), "mods")
+end

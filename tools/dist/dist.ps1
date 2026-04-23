@@ -101,15 +101,15 @@ $SizeBefore = [math]::Round((Get-Item $DestBinary).Length / 1MB, 2)
 Write-OK "Copied lurek2d.exe ($SizeBefore MB)"
 
 # -- Optional UPX compression --------------------------------------------------
-# UPX packs the executable using LZMA; typical result: 40-55% of original size.
+# UPX --best uses UCL/NRV compression (no LZMA): ~40% of original size.
+# Faster startup decompression than --lzma. Targets ~8 MB from a 20 MB binary.
 # Install: https://upx.github.io/  (place upx.exe anywhere on PATH)
-# Caveats: adds ~100 ms startup decompression; some AV scanners flag UPX'd bins.
+# Caveats: some AV scanners flag UPX'd bins.
 $upx = Get-Command upx -ErrorAction SilentlyContinue
 if ($upx) {
     Write-Step "UPX found -- compressing lurek2d.exe ..."
-    # --lzma -6 = medium LZMA compression: fast packing, still ~50% size reduction.
-    # Avoids --best/-9 which adds minutes with minimal extra gain.
-    & upx --lzma -6 $DestBinary 2>&1 | ForEach-Object { Write-Host "    $_" }
+    # --best = maximum UCL compression (no LZMA): faster startup, ~8 MB result
+    & upx --best $DestBinary 2>&1 | ForEach-Object { Write-Host "    $_" }
     if ($LASTEXITCODE -eq 0) {
         $SizeAfter = [math]::Round((Get-Item $DestBinary).Length / 1MB, 2)
         Write-OK "UPX compressed: $SizeBefore MB � $SizeAfter MB"

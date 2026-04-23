@@ -401,6 +401,7 @@ lurek.input.bind("quit", "escape")
 ------------------------------------------------------------------------
 -- lurek.init
 ------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Creature Collector — Lurek2D")
     lurek.render.setBackgroundColor(0.2, 0.4, 0.15)
@@ -414,7 +415,7 @@ end
 ------------------------------------------------------------------------
 -- lurek.process — game logic
 ------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     local fps = lurek.timer.getFPS()
     lurek.window.setTitle("Creature Collector — Lurek2D | FPS: " .. math.floor(fps))
 
@@ -438,7 +439,7 @@ lurek.process(function(dt)
     end
 
     -- quit
-    if lurek.input.isActionPressed("quit") then
+    if lurek.input.isActionDown("quit") then
         lurek.event.quit()
         return
     end
@@ -447,7 +448,7 @@ lurek.process(function(dt)
     -- TITLE
     -------------------------------------------------------
     if state == STATE_TITLE then
-        if lurek.input.isActionPressed("choice1") then
+        if lurek.input.isActionDown("choice1") then
             state = STATE_OVERWORLD
         end
 
@@ -500,10 +501,10 @@ lurek.process(function(dt)
     -- BATTLE — choosing action
     -------------------------------------------------------
     elseif state == STATE_BATTLE then
-        if lurek.input.isActionPressed("choice1") then
+        if lurek.input.isActionDown("choice1") then
             battle_phase = "fight_select"
             fight_move = 0
-        elseif lurek.input.isActionPressed("choice2") then
+        elseif lurek.input.isActionDown("choice2") then
             -- catch attempt
             local hp_ratio = enemy.hp / enemy.max_hp
             local chance = 0.30
@@ -528,10 +529,10 @@ lurek.process(function(dt)
                 blog("Oh no! " .. enemy.name .. " broke free!")
                 enemy_turn()
             end
-        elseif lurek.input.isActionPressed("choice3") then
+        elseif lurek.input.isActionDown("choice3") then
             battle_phase = "switch"
             switch_menu = 1
-        elseif lurek.input.isActionPressed("choice4") then
+        elseif lurek.input.isActionDown("choice4") then
             blog("Got away safely!")
             enemy = nil
             state = STATE_OVERWORLD
@@ -547,9 +548,9 @@ lurek.process(function(dt)
     -- fight_select sub-phase
     if battle_phase == "fight_select" and (state == STATE_BATTLE or state == STATE_BATTLE_ACTION) then
         state = STATE_BATTLE_ACTION
-        if lurek.input.isActionPressed("choice1") then
+        if lurek.input.isActionDown("choice1") then
             fight_move = 1
-        elseif lurek.input.isActionPressed("choice2") then
+        elseif lurek.input.isActionDown("choice2") then
             fight_move = 2
         end
         if fight_move > 0 and enemy then
@@ -591,7 +592,7 @@ lurek.process(function(dt)
     if battle_phase == "switch" and (state == STATE_BATTLE or state == STATE_BATTLE_ACTION) then
         state = STATE_BATTLE_ACTION
         for i = 1, math.min(#party, 3) do
-            if lurek.input.isActionPressed("choice" .. i) then
+            if lurek.input.isActionDown("choice" .. i) then
                 if party[i].hp > 0 then
                     active_idx = i
                     blog("Go, " .. party[active_idx].name .. "!")
@@ -604,12 +605,12 @@ lurek.process(function(dt)
             end
         end
     end
-end)
+end
 
 ------------------------------------------------------------------------
 -- lurek.render — overworld (map + player), camera follows player
 ------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if state == STATE_OVERWORLD then
         local cam_x = player.col * TILE - 400
         local cam_y = player.row * TILE - 300
@@ -680,12 +681,12 @@ lurek.render(function()
         local sz = p.size * alpha
         lurek.render.rectangle(p.x - sz/2, p.y - sz/2, sz, sz, p.r, p.g, p.b, alpha)
     end
-end)
+end
 
 ------------------------------------------------------------------------
 -- lurek.render_ui — HUD, battle overlays, menus
 ------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     -------------------------------------------------------
     -- TITLE screen
     -------------------------------------------------------
@@ -829,4 +830,4 @@ lurek.render_ui(function()
         lurek.render.print("Caught: " .. total_caught .. "/6  |  Battles: " .. total_battles, 220, 340, 16, 0.6, 0.6, 0.6)
         lurek.render.print("Press ESC to quit", 300, 500, 16, 0.5, 0.5, 0.5)
     end
-end)
+end

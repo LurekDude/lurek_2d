@@ -110,7 +110,7 @@ end
 -- Returns true if the simulator is actively playing a script.
 -- Use to gate UI hints like "Press ESC to skip" so they only appear during automated cutscenes.
 do  -- lurek.automation.isRunning
-  function lurek.render_ui()
+  function lurek.draw_ui()
     if lurek.automation.isRunning() then
       lurek.render.print("[AUTO] press ESC to skip", 8, 8)
     end
@@ -142,7 +142,7 @@ end
 -- Returns the index of the next step to be dispatched.
 -- Combine with `getStepCount` to render a progress indicator for long demo scripts.
 do  -- lurek.automation.getCurrentStep
-  function lurek.render_ui()
+  function lurek.draw_ui()
     local i = lurek.automation.getCurrentStep()
     local n = lurek.automation.getStepCount()
     lurek.render.print("step " .. i .. " / " .. n, 8, 24)
@@ -165,7 +165,7 @@ end
 -- Returns the name of the active script, or nil if idle.
 -- Display in a debug HUD to confirm which scenario is currently driving the engine.
 do  -- lurek.automation.getCurrentScript
-  function lurek.render_ui()
+  function lurek.draw_ui()
     local name = lurek.automation.getCurrentScript() or "(idle)"
     lurek.render.print("script: " .. name, 8, 40)
   end
@@ -175,7 +175,7 @@ end
 -- Returns seconds elapsed since playback started.
 -- Use to drive synchronised visuals (e.g. fade-in tied to the same clock the script uses).
 do  -- lurek.automation.getElapsedTime
-  function lurek.render_ui()
+  function lurek.draw_ui()
     local t = lurek.automation.getElapsedTime()
     lurek.render.print(string.format("t = %.2fs", t), 8, 56)
   end
@@ -288,11 +288,11 @@ end
 -- Returns whether the highlight overlay hint is active.
 -- Branch your render code on this so the highlight ring only paints when the toggle is on.
 do  -- lurek.automation.isHighlightMode
-  local gfx = lurek.render
-  function lurek.render()
+
+  function lurek.draw()
     if lurek.automation.isHighlightMode() then
-      gfx.setColor(1, 1, 0, 0.5)
-      gfx.circle("line", 320, 240, 24)
+      lurek.render.setColor(1, 1, 0, 0.5)
+      lurek.render.circle("line", 320, 240, 24)
     end
   end
 end
@@ -320,7 +320,7 @@ end
 --   * NO `return` at top-level (breaks the file).
 --   * NO `pcall` defensive wrappers, NO `if false then`.
 --   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
+--     `function lurek.draw() ... end` or
 --     `function lurek.update(dt) ... end` callbacks so the file loads.
 --   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
 --     colours like {1, 0.5, 0, 1}.

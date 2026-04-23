@@ -126,6 +126,7 @@ lurek.input.bind("confirm",    "space")
 lurek.input.bind("quit",       "escape")
 
 -- ── Init ─────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Deckbuilder — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.06, 0.14, 1.0)
@@ -158,7 +159,7 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if hit_particles  then hit_particles:update(dt)  end
     if card_particles then card_particles:update(dt) end
 
@@ -168,11 +169,11 @@ lurek.process(function(dt)
         if log_messages[i].timer <= 0 then table.remove(log_messages, i) end
     end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
 
     -- Title
     if state.turn == "title" then
-        if lurek.input.isActionJustPressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             start_fight(1)
         end
         return
@@ -180,12 +181,12 @@ lurek.process(function(dt)
 
     -- Reward screen
     if state.turn == "reward" then
-        if lurek.input.isActionJustPressed("pick1") and state.reward then
+        if lurek.input.wasActionPressed("pick1") and state.reward then
             draw_pile[#draw_pile + 1] = make_card(state.reward[1])
             state.reward = nil
             state.floor  = state.floor + 1
             if state.floor > #MONSTERS then state.turn = "win" else start_fight(state.floor) end
-        elseif lurek.input.isActionJustPressed("pick2") and state.reward then
+        elseif lurek.input.wasActionPressed("pick2") and state.reward then
             draw_pile[#draw_pile + 1] = make_card(state.reward[2])
             state.reward = nil
             state.floor  = state.floor + 1
@@ -196,7 +197,7 @@ lurek.process(function(dt)
 
     -- Win / lose
     if state.turn == "win" or state.turn == "lost" then
-        if lurek.input.isActionJustPressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             player = { hp = 50, maxHp = 50, block = 0 }
             start_fight(1)
         end
@@ -207,7 +208,7 @@ lurek.process(function(dt)
     if state.turn == "player" then
         local card_keys = { "card1","card2","card3","card4","card5" }
         for i, key in ipairs(card_keys) do
-            if lurek.input.isActionJustPressed(key) and hand[i] then
+            if lurek.input.wasActionPressed(key) and hand[i] then
                 local card = hand[i]
                 if state.energy >= card.cost then
                     state.energy = state.energy - card.cost
@@ -245,7 +246,7 @@ lurek.process(function(dt)
             end
         end
 
-        if lurek.input.isActionJustPressed("end_turn") then
+        if lurek.input.wasActionPressed("end_turn") then
             discard_hand()
             -- Enemy turn
             if monster.stun and monster.stun > 0 then
@@ -266,16 +267,16 @@ lurek.process(function(dt)
             start_player_turn()
         end
     end
-end)
+end
 
 -- ── Render world ──────────────────────────────────────────
-function lurek.render()
+function lurek.draw()
     if hit_particles  then hit_particles:draw()  end
     if card_particles then card_particles:draw() end
 end
 
 -- ── Render UI ─────────────────────────────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     local t = state.turn
     if t == "win" then
         lurek.render.print("YOU WIN!", 280, 220, { color = {1,0.9,0.2,1}, size = 48 })
@@ -337,4 +338,4 @@ lurek.render_ui(function()
     end
 
     lurek.render.print("1-5: play card  Enter: end turn  Esc: quit", 20, H - 20, { color = {0.4,0.4,0.4,1}, size = 12 })
-end)
+end

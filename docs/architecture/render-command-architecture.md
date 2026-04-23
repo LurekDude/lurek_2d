@@ -177,8 +177,8 @@ tick_frame():
   └────────────────────────────────────────────────────────────────┘
   ┌─ COLLECT PHASE ────────────────────────────────────────────────┐
   │  4. Clear render_commands buffer                               │
-  │  5. Call Lua: lurek.render()             - game draw commands   │
-  │  6. Call Lua: lurek.render_ui()          - UI draw commands    │
+  │  5. Call Lua: lurek.draw()               - game draw commands   │
+  │  6. Call Lua: lurek.draw_ui()             - UI draw commands    │
   │  7. Auto: particle_sys.generate_render_commands() → extend     │
   │  8. Auto: tilemap.generate_render_commands()      → extend     │
   │  9. Auto: parallax.generate_render_commands()     → extend     │
@@ -219,7 +219,7 @@ App collects commands in this order (back to front):
 6. Particles
 7. Post-processing (BeginPostFx / ApplyPostFx) — wraps the above
 8. Light pass — GPU composites light buffer over the scene
-9. UI / HUD (from lurek.render_ui() + ui_ctx.generate_render_commands())
+9. UI / HUD (from lurek.draw_ui() + ui_ctx.generate_render_commands())
 10. Debug overlay (always on top)
 ```
 
@@ -336,7 +336,7 @@ Complete data flow from game script to pixel:
 ```
 main.lua
   │
-  │  lurek.render()  /  lurek.render_ui()
+  │  lurek.draw()  /  lurek.draw_ui()
   ▼
 src/lua_api/*_api.rs            (Lua API layer — thin glue only)
   │  pushes RenderCommand into SharedState.render_commands

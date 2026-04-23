@@ -443,9 +443,10 @@ lurek.input.bind("opt_3", "3")
 lurek.input.bind("opt_4", "4")
 
 -- Init
-lurek.init(function()
+
+function lurek.init()
   lurek.window.setTitle("Sports Manager — Lurek2D")
-  lurek.setBackgroundColor(0.08, 0.12, 0.08)
+  lurek.render.setBackgroundColor(0.08, 0.12, 0.08)
 
   -- Build roster
   for i = 1, ROSTER_SIZE do
@@ -458,10 +459,10 @@ lurek.init(function()
   init_league()
   init_schedule()
   refresh_market()
-end)
+end
 
 -- Process
-lurek.process(function(delta)
+function lurek.process(delta)
   dt = delta
   title_blink = title_blink + delta
 
@@ -514,7 +515,7 @@ lurek.process(function(delta)
       state = STATE_OFFICE
     end
     if lurek.input.pressed("select") then
-      local mx, my = lurek.input.getMousePosition()
+      local mx, my = lurek.input.mouse.getPosition()
       for i, p in ipairs(roster) do
         local py = 80 + (i - 1) * 30
         if my >= py and my < py + 28 and mx >= 40 and mx <= 760 then
@@ -645,10 +646,10 @@ lurek.process(function(delta)
       training_done = false
     end
   end
-end)
+end
 
 -- Render: pitch / match visuals
-lurek.render(function()
+function lurek.draw()
   if state == STATE_MATCH then
     -- draw pitch
     lurek.render.setColor(0.15, 0.55, 0.15, 1)
@@ -706,10 +707,10 @@ lurek.render(function()
     lurek.render.setColor(p.r, p.g, p.b, a)
     lurek.render.circle("fill", p.x, p.y, p.size)
   end
-end)
+end
 
 -- Render UI: menus, tables, stats
-lurek.render_ui(function()
+function lurek.draw_ui()
   lurek.render.setColor(1, 1, 1, 1)
 
   -- FPS
@@ -994,4 +995,4 @@ lurek.render_ui(function()
     lurek.render.setColor(1, 1, 1, 0.5 + 0.5 * math.sin(title_blink * 3))
     lurek.render.print("Press ENTER to play again", SCREEN_W / 2 - 100, SCREEN_H - 50)
   end
-end)
+end

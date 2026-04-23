@@ -264,6 +264,7 @@ lurek.input.bind("nav_up",     "up")
 lurek.input.bind("nav_down",   "down")
 
 -- ── Init ────────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Mining — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.03, 0.02)
@@ -271,12 +272,12 @@ function lurek.init()
     generate_mine()
 end
 
-function lurek.ready()
+local function _ready_setup()
     state = "TITLE"
 end
 
 -- ── Process ─────────────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     fps = lurek.timer.getFPS()
 
     if state == "TITLE" then
@@ -394,10 +395,10 @@ lurek.process(function(dt)
 
     update_particles(dt)
     update_tweens(dt)
-end)
+end
 
 -- ── Render (world) ──────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if state ~= "MINING" then return end
 
     lurek.camera.set(0, -cam_y)
@@ -475,10 +476,10 @@ lurek.render(function()
     end
 
     lurek.camera.reset()
-end)
+end
 
 -- ── Render UI ───────────────────────────────────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == "TITLE" then
         lurek.render.setColor(0.85, 0.7, 0.2, 1)
         lurek.render.print("MINING", W / 2 - 80, H / 3, 48)
@@ -596,4 +597,4 @@ lurek.render_ui(function()
         lurek.render.setColor(0.7, 0.7, 0.5, 0.6 + math.sin(lurek.timer.getTime() * 2) * 0.3)
         lurek.render.print("Press S to open shop  |  L to place ladder (5g)", W / 2 - 180, H - 30, 14)
     end
-end)
+end

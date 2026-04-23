@@ -13,6 +13,7 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+
 local SCREEN_W, SCREEN_H = 800, 600
 local TILE       = 32
 local MAP_COLS   = 25
@@ -823,7 +824,7 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.1, 0.1, 0.12)
 end
 
-function lurek.ready()
+local function _ready_setup()
     game_time = 0
 end
 
@@ -887,7 +888,7 @@ function lurek.process(dt)
 
     -- Placement
     if lurek.input.wasActionPressed("place") then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local col, row = screen_to_grid(mx, my)
         if row >= 1 then -- not on HUD
             try_place(col, row)
@@ -897,7 +898,7 @@ function lurek.process(dt)
     update_playing(dt)
 end
 
-function lurek.render()
+function lurek.draw()
     if current_state == STATE.PLAYING then
         draw_grid()
         draw_ore_tiles()
@@ -909,7 +910,7 @@ function lurek.render()
     end
 end
 
-function lurek.render_ui()
+function lurek.draw_ui()
     if current_state == STATE.TITLE then
         draw_title()
     elseif current_state == STATE.PLAYING then

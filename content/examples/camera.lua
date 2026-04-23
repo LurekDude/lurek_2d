@@ -335,3 +335,111 @@ do  -- Camera2D:getEffectOffset
   local ox, oy = cam:getEffectOffset()
   lurek.log.debug("sway offset " .. ox .. "," .. oy, "camera")
 end
+
+--@api-stub: Camera2D:apply
+-- Applies the camera transform to the render stack.
+-- Call inside lurek.render() before drawing world-space objects; pop with lurek.render.pop().
+do  -- Camera2D:apply
+  local cam = lurek.camera.new()
+  cam:setPosition(400, 300)
+  cam:setZoom(1.5)
+  cam:apply()
+  lurek.log.info("camera applied", "camera")
+end
+
+--@api-stub: Camera2D:attach
+-- Attaches the camera so it is automatically applied each render frame.
+-- No manual apply() call needed; the engine uses the last attached camera.
+do  -- Camera2D:attach
+  local cam = lurek.camera.new()
+  cam:setPosition(200, 150)
+  cam:attach()
+  lurek.log.info("camera attached", "camera")
+end
+
+--@api-stub: Camera2D:detach
+-- Detaches the camera from automatic rendering, restoring the identity transform.
+-- Call when switching to HUD or UI rendering that uses screen-space coordinates.
+do  -- Camera2D:detach
+  local cam = lurek.camera.new()
+  cam:attach()
+  cam:detach()
+  lurek.log.info("camera detached", "camera")
+end
+
+--@api-stub: Camera2D:followPath
+-- Makes the camera follow a pre-defined waypoint path over time.
+-- Pass a table of {x, y} waypoints and a speed; fires a callback when the path ends.
+do  -- Camera2D:followPath
+  local cam = lurek.camera.new()
+  local path = {{x=0,y=0},{x=200,y=100},{x=400,y=0}}
+  cam:followPath(path, 120, function() lurek.log.info("path done", "camera") end)
+  lurek.log.info("following path", "camera")
+end
+
+--@api-stub: lurek.camera.newCamera
+-- Creates a named Camera2D and registers it with the camera manager.
+-- Named cameras can be retrieved later by name for scene-switching.
+do  -- lurek.camera.newCamera
+  local cam = lurek.camera.newCamera("level_cam")
+  cam:setPosition(400, 300)
+  cam:setZoom(1.0)
+  lurek.log.info("named camera created", "camera")
+end
+
+--@api-stub: Camera2D:reset
+-- Resets position, zoom, and rotation to defaults and clears all active effects.
+-- Use at scene transitions to avoid leftover state from the previous scene.
+do  -- Camera2D:reset
+  local cam = lurek.camera.new()
+  cam:setZoom(2.5)
+  cam:reset()
+  lurek.log.info("zoom after reset: " .. cam:getZoom(), "camera")
+end
+
+--@api-stub: Camera2D:setBounds
+-- Clamps camera movement so the visible area never exceeds the given world rectangle.
+-- Prevents the camera from showing empty space past level edges.
+do  -- Camera2D:setBounds
+  local cam = lurek.camera.new()
+  cam:setBounds(0, 0, 3200, 2400)
+  cam:setPosition(400, 300)
+  lurek.log.info("bounds set", "camera")
+end
+
+--@api-stub: Camera2D:setParallaxFactor
+-- Sets the scroll factor for a named parallax layer relative to the camera.
+-- factor=0 pins the layer (sky), factor=1 moves with the world.
+do  -- Camera2D:setParallaxFactor
+  local cam = lurek.camera.new()
+  cam:setParallaxFactor("bg_mountains", 0.3)
+  cam:setParallaxFactor("bg_clouds", 0.15)
+  lurek.log.info("parallax factors set", "camera")
+end
+
+--@api-stub: Camera2D:setViewport
+-- Restricts rendering to a sub-region of the window (split-screen or minimap).
+-- Values are in window pixels; set to nil to restore full-window rendering.
+do  -- Camera2D:setViewport
+  local cam = lurek.camera.new()
+  cam:setViewport(0, 0, 640, 480)
+  lurek.log.info("viewport set", "camera")
+end
+
+--@api-stub: Camera2D:startBreathing
+-- Starts a subtle breathing oscillation that adds life to a static camera.
+-- amplitude controls pixel displacement; period controls cycle time in seconds.
+do  -- Camera2D:startBreathing
+  local cam = lurek.camera.new()
+  cam:startBreathing(2.0, 4.0)
+  lurek.log.info("breathing: " .. tostring(cam:isBreathing()), "camera")
+end
+
+--@api-stub: Camera2D:startSway
+-- Starts a sinusoidal lateral sway effect (boat rocking, earthquake tremor).
+-- amplitude is pixels, frequency is cycles-per-second, damping decays the effect.
+do  -- Camera2D:startSway
+  local cam = lurek.camera.new()
+  cam:startSway(5.0, 0.8, 0.95)
+  lurek.log.info("sway active: " .. tostring(cam:isSway()), "camera")
+end

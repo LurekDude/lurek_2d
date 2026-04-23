@@ -354,17 +354,17 @@ function lurek.init()
     lurek.input.bind("quit", "escape")
 end
 
-function lurek.ready()
+local function _ready_setup()
     init_tower()
 end
 
-lurek.process(function(delta)
+function lurek.process(delta)
     dt = delta
     frame_count = frame_count + 1
     update_tweens(dt)
     update_particles(dt)
 
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         if state == "PLAYING" then
             state = "TITLE"
         else
@@ -374,7 +374,7 @@ lurek.process(function(delta)
     end
 
     if state == "TITLE" then
-        if lurek.input.isActionJustPressed("place") then
+        if lurek.input.wasActionPressed("place") then
             state = "PLAYING"
             init_tower()
         end
@@ -382,7 +382,7 @@ lurek.process(function(delta)
     end
 
     if state == "VICTORY" then
-        if lurek.input.isActionJustPressed("place") then
+        if lurek.input.wasActionPressed("place") then
             state = "TITLE"
         end
         return
@@ -401,28 +401,28 @@ lurek.process(function(delta)
     camera_y = camera_y + (target_camera_y - camera_y) * math.min(1.0, 4.0 * dt)
 
     -- Input: select build actions
-    if lurek.input.isActionJustPressed("floor") then
+    if lurek.input.wasActionPressed("floor") then
         build_mode = true
         selected_room = nil
-    elseif lurek.input.isActionJustPressed("office") then
+    elseif lurek.input.wasActionPressed("office") then
         selected_room = "office"; build_mode = false
-    elseif lurek.input.isActionJustPressed("apartment") then
+    elseif lurek.input.wasActionPressed("apartment") then
         selected_room = "apartment"; build_mode = false
-    elseif lurek.input.isActionJustPressed("shop") then
+    elseif lurek.input.wasActionPressed("shop") then
         selected_room = "shop"; build_mode = false
-    elseif lurek.input.isActionJustPressed("restaurant") then
+    elseif lurek.input.wasActionPressed("restaurant") then
         selected_room = "restaurant"; build_mode = false
-    elseif lurek.input.isActionJustPressed("gym") then
+    elseif lurek.input.wasActionPressed("gym") then
         selected_room = "gym"; build_mode = false
-    elseif lurek.input.isActionJustPressed("elevator") then
+    elseif lurek.input.wasActionPressed("elevator") then
         buy_elevator()
         build_mode = false
         selected_room = nil
     end
 
     -- Place with mouse
-    if lurek.input.isActionJustPressed("place") then
-        local mx, my = lurek.input.getMousePosition()
+    if lurek.input.wasActionPressed("place") then
+        local mx, my = lurek.input.mouse.getPosition()
         if build_mode then
             add_floor()
             build_mode = false
@@ -453,9 +453,9 @@ lurek.process(function(delta)
             build_anim[idx] = nil
         end
     end
-end)
+end
 
-lurek.render(function()
+function lurek.draw()
     if state ~= "PLAYING" then return end
 
     -- Draw sky gradient (simple two-band)
@@ -542,9 +542,9 @@ lurek.render(function()
         local alpha = g.life / g.max_life * 0.5
         lurek.render.circle(g.x, g.y - camera_y, g.radius, 1.0, 0.9, 0.3, alpha)
     end
-end)
+end
 
-function lurek.render_ui()
+function lurek.draw_ui()
     if state == "TITLE" then
         lurek.render.rectangle(0, 0, 800, 600, 0.1, 0.1, 0.2, 1.0)
         lurek.render.print("TOWER SIM", 240, 160, 48)

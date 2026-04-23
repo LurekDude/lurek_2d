@@ -15,6 +15,7 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+
 local SCREEN_W, SCREEN_H = 800, 600
 
 local GRAVITY       = 700
@@ -687,7 +688,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Render — world scene
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     cam:attach()
 
     local s = scenes[current_scene] or scenes[1]
@@ -808,12 +809,12 @@ lurek.render(function()
     draw_particles()
 
     cam:detach()
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI — HUD overlay
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- ── TITLE screen ───────────────────────────────────────────
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
@@ -927,4 +928,4 @@ lurek.render_ui(function()
         lurek.render.setColor(0, 0, 0, fade_alpha)
         lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
     end
-end)
+end

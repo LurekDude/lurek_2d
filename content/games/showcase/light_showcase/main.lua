@@ -245,20 +245,21 @@ end
 -- ============================================================
 -- Init
 -- ============================================================
+
 function lurek.init()
     lurek.window.setTitle("Light Showcase — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.05)
     lurek.camera.setPosition(0, 0)
 end
 
-function lurek.ready()
+local function _ready_setup()
     -- nothing extra needed
 end
 
 -- ============================================================
 -- Process
 -- ============================================================
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS
     fps_count = fps_count + 1
     fps_timer = fps_timer + dt
@@ -311,7 +312,7 @@ lurek.process(function(dt)
     if math.abs(slide_offset - slide_target) < 0.5 then slide_offset = slide_target end
 
     -- Mouse position
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
 
     -- Per-screen updates
     if state == STATE_SCREEN_1 then
@@ -339,12 +340,12 @@ lurek.process(function(dt)
     -- Ambient particles
     spawn_ambient_particles(state)
     update_particles(dt)
-end)
+end
 
 -- ============================================================
 -- Render: light scenes (world-space)
 -- ============================================================
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then return end
 
     local ox = slide_offset
@@ -635,12 +636,12 @@ lurek.render(function()
         lurek.render.setColor(p.r, p.g, p.b, p.a)
         lurek.render.circleFill(p.x + ox, p.y, p.size)
     end
-end)
+end
 
 -- ============================================================
 -- Render UI: labels, descriptions, navigation
 -- ============================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- Title screen
     if state == STATE_TITLE then
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 2)
@@ -742,4 +743,4 @@ lurek.render_ui(function()
     lurek.render.rectangle(0, SCREEN_H - 28, SCREEN_W, 28)
     lurek.render.setColor(0.45, 0.45, 0.55, 0.8)
     lurek.render.print("<Left/Right> Navigate   |   1-8 Jump   |   ESC Quit", SCREEN_W / 2 - 200, NAV_Y)
-end)
+end

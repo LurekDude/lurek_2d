@@ -130,7 +130,7 @@ end
 -- Returns whether the window is minimized.
 -- Skip GPU-heavy work (post-fx, particles) while minimized to avoid wasted frames.
 do  -- lurek.window.isMinimized
-  function lurek.render()
+  function lurek.draw()
     if lurek.window.isMinimized() then
       return
     end
@@ -150,7 +150,7 @@ end
 -- Returns whether the window is visible.
 -- Check before issuing any draw call when running on platforms that may hide the surface.
 do  -- lurek.window.isVisible
-  function lurek.render()
+  function lurek.draw()
     if not lurek.window.isVisible() then
       return
     end

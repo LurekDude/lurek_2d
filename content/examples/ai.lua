@@ -2296,3 +2296,513 @@ do  -- SteeringManager:applyCustomSteering
   local fx, fy = sm:applyCustomSteering(agent, 0.016)
   lurek.log.debug("custom force=" .. fx .. "," .. fy, "ai")
 end
+
+--@api-stub: EmotionModel:add
+-- Registers a named emotion dimension with initial value, decay rate, and max intensity.
+-- Call once per emotion at init; trigger() adds intensity, update() decays it each frame.
+do  -- EmotionModel:add
+  local em = lurek.ai.newEmotionModel()
+  em:add("fear", 0.0, 0.08, 1.0)
+  em:add("anger", 0.0, 0.06, 1.0)
+  lurek.log.info("emotions registered", "ai")
+end
+
+--@api-stub: GOAPPlanner:addAction
+-- Registers a GOAP action with a cost, execution callback, and optional tags.
+-- Actions form the GOAP action space; the planner selects sequences by minimising total cost.
+do  -- GOAPPlanner:addAction
+  local planner = lurek.ai.newGOAPPlanner()
+  planner:addAction("pickupKey", 2.0, function() lurek.log.info("pickup key", "ai") end)
+  planner:addAction("unlockDoor", 1.0, function() lurek.log.info("unlock door", "ai") end)
+  planner:addGoal("door_open", 1.0)
+end
+
+--@api-stub: UtilityAI:addAction
+-- Registers a named utility action with a scoring function.
+-- The evaluator calls all score functions and returns the action with the highest result.
+do  -- UtilityAI:addAction
+  local uai = lurek.ai.newUtilityAI()
+  uai:addAction("heal", function() return 0.9 end)
+  uai:addAction("attack", function() return 0.4 end)
+  local best = uai:evaluate()
+  lurek.log.info("best action: " .. (best or "none"), "ai")
+end
+
+--@api-stub: AIWorld:addAgent
+-- Adds a named agent to the AI world and returns an Agent handle.
+-- Agents are ticked each world:update(dt); name must be unique within the world.
+do  -- AIWorld:addAgent
+  local world = lurek.ai.newWorld()
+  world:addAgent("guard_01")
+  world:addAgent("guard_02")
+  lurek.log.info("agents: " .. world:getAgentCount(), "ai")
+end
+
+--@api-stub: SteeringManager:addArrive
+-- Adds an arrive behaviour that decelerates the agent as it approaches the target.
+-- Slower final approach than addSeek; use for parking-style movement to a destination.
+do  -- SteeringManager:addArrive
+  local sm = lurek.ai.newSteeringManager()
+  sm:addArrive(400, 300, 1.0)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  lurek.log.info("arrive: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: StimulusWorld:addAuditory
+-- Adds an auditory stimulus at the given position with radius and loudness.
+-- Agents query the StimulusWorld for nearby sounds rather than iterating each other.
+do  -- StimulusWorld:addAuditory
+  local sw = lurek.ai.newStimulusWorld()
+  sw:addAuditory(200, 150, 1.2, 100, 0.8, "footstep")
+  lurek.log.info("stimuli: " .. sw:count(), "ai")
+end
+
+--@api-stub: ContextSteering:addAvoidPoint
+-- Adds a repulsor point to the context steering danger map.
+-- Increase weight to create stronger avoidance of pillars, hazard tiles, etc.
+do  -- ContextSteering:addAvoidPoint
+  local cs = lurek.ai.newContextSteering(16)
+  cs:addAvoidPoint(300, 200, 64, 1.5)
+  cs:addAvoidPoint(100, 350, 48, 1.0)
+  local fx, fy = cs:evaluate(150, 150)
+  lurek.log.info("context steer: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: HTNDomain:addCompound
+-- Adds a compound task (method list) to the HTN domain.
+-- Compound tasks decompose into primitives; the planner tries methods in order until one succeeds.
+do  -- HTNDomain:addCompound
+  local d = lurek.ai.newHTNDomain()
+  d:addPrimitive("attack", {"has_weapon"}, {"enemy_dead"}, {})
+  d:addCompound("defeat_enemy", {{"has_weapon"}, {"use_weapon"}})
+  lurek.log.info("htn tasks: " .. d:taskCount(), "ai")
+end
+
+--@api-stub: SteeringManager:addEvade
+-- Adds an evade behaviour that flees from a predicted future target position.
+-- Predicts where the target will be and steers away from that projected point.
+do  -- SteeringManager:addEvade
+  local sm = lurek.ai.newSteeringManager()
+  sm:addEvade(400, 300, 80, 50, 1.0)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  lurek.log.info("evade: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: SteeringManager:addFlee
+-- Adds a flee behaviour that steers directly away from the threat position.
+-- Unlike addEvade, flee reacts to current position not predicted future position.
+do  -- SteeringManager:addFlee
+  local sm = lurek.ai.newSteeringManager()
+  sm:addFlee(400, 300, 1.0)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  lurek.log.info("flee: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: SteeringManager:addFlock
+-- Adds a flocking behaviour combining separation, alignment, and cohesion.
+-- Pass a neighbour radius and the per-component weights as a table or individual args.
+do  -- SteeringManager:addFlock
+  local sm = lurek.ai.newSteeringManager()
+  sm:addFlock(80, 1.0, 0.8, 0.6)
+  local fx, fy = sm:calculate(200, 200, 10, 0, 100)
+  lurek.log.info("flock: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: GOAPPlanner:addGoal
+-- Adds a named world-state goal with a priority weight.
+-- Higher-priority goals are preferred when multiple goals are satisfiable simultaneously.
+do  -- GOAPPlanner:addGoal
+  local planner = lurek.ai.newGOAPPlanner()
+  planner:addAction("rest", 1.0, function() end)
+  planner:addGoal("is_rested", 1.0)
+  planner:addGoal("is_safe", 2.0)
+  lurek.log.info("goal count: " .. planner:getGoalCount(), "ai")
+end
+
+--@api-stub: InfluenceMap:addLayer
+-- Adds a named influence layer to the map grid.
+-- Layers are independent float grids; each can represent threat, resource, or patrol density.
+do  -- InfluenceMap:addLayer
+  local im = lurek.ai.newInfluenceMap(32, 32, 16)
+  im:addLayer("threat")
+  im:addLayer("resource")
+  lurek.log.info("has threat layer: " .. tostring(im:hasLayer("threat")), "ai")
+end
+
+--@api-stub: TraitProfile:addModifier
+-- Adds a named transient modifier to a trait value.
+-- Modifiers stack additively; remove them by tag when the buff/debuff expires.
+do  -- TraitProfile:addModifier
+  local traits = lurek.ai.newTraitProfile()
+  traits:set("courage", 0.5)
+  traits:addModifier("courage", "fear_potion", -0.3)
+  lurek.log.info("effective courage: " .. traits:get("courage"), "ai")
+end
+
+--@api-stub: SteeringManager:addPursue
+-- Adds a pursue behaviour that steers toward the predicted future position of a target.
+-- More effective than addSeek against moving targets; uses linear prediction.
+do  -- SteeringManager:addPursue
+  local sm = lurek.ai.newSteeringManager()
+  sm:addPursue(400, 300, 80, 50, 1.0)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  lurek.log.info("pursue: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: SteeringManager:addSeek
+-- Adds a seek behaviour that steers directly toward the target position.
+-- The simplest steering force; weight=1.0 uses the full max-force budget.
+do  -- SteeringManager:addSeek
+  local sm = lurek.ai.newSteeringManager()
+  sm:addSeek(500, 400, 1.0)
+  local fx, fy = sm:calculate(100, 100, 0, 0, 150)
+  lurek.log.info("seek force: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: ContextSteering:addSeekTarget
+-- Adds a seek target to the context steering desire map.
+-- Multiple seek targets blend via the slot weights; the final direction maximises total desire.
+do  -- ContextSteering:addSeekTarget
+  local cs = lurek.ai.newContextSteering(16)
+  cs:addSeekTarget(500, 300, 1.0)
+  cs:addSeekTarget(400, 400, 0.6)
+  local fx, fy = cs:evaluate(200, 200)
+  lurek.log.info("context direction: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: StateMachine:addTransition
+-- Adds a conditional transition between two states.
+-- Transition fires when the predicate returns true during the FSM's update pass.
+do  -- StateMachine:addTransition
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", {})
+  fsm:addState("alert", {})
+  fsm:addTransition("patrol", "alert", function() return true end)
+  fsm:setInitialState("patrol")
+  lurek.log.info("state: " .. (fsm:getCurrentState() or "nil"), "ai")
+end
+
+--@api-stub: StimulusWorld:addVisual
+-- Adds a visual stimulus at the given position with a view cone and distance.
+-- Agents can query for nearby visuals in their perception radius each tick.
+do  -- StimulusWorld:addVisual
+  local sw = lurek.ai.newStimulusWorld()
+  sw:addVisual(300, 200, 0, 180, 200, 1.0, "player")
+  sw:addAuditory(300, 200, 1.0, 80, 0.5, "footstep")
+  lurek.log.info("stimuli count: " .. sw:count(), "ai")
+end
+
+--@api-stub: SteeringManager:addWander
+-- Adds a wander behaviour producing smooth random-direction steering.
+-- Adjust circleRadius and maxTurnRate to control how erratic the wandering appears.
+do  -- SteeringManager:addWander
+  local sm = lurek.ai.newSteeringManager()
+  sm:addWander(25, 50, 8, 0.4)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  lurek.log.info("wander: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: InfluenceMap:blend
+-- Blends a source layer into a destination layer by weight.
+-- Use to combine threat and resource maps into a single priority surface for decision-making.
+do  -- InfluenceMap:blend
+  local im = lurek.ai.newInfluenceMap(32, 32, 16)
+  im:addLayer("threat")
+  im:addLayer("resource")
+  im:stampInfluence("threat", 256, 256, 64, 1.0, 1.0)
+  im:blend("threat", "resource", 0.5)
+  lurek.log.info("blend complete", "ai")
+end
+
+--@api-stub: SteeringManager:calculate
+-- Calculates the combined steering force for the current agent state.
+-- Returns two floats (fx, fy); apply them to the agent's velocity each physics step.
+do  -- SteeringManager:calculate
+  local sm = lurek.ai.newSteeringManager()
+  sm:addSeek(400, 300, 1.0)
+  local fx, fy = sm:calculate(100, 100, 0, 0, 120)
+  lurek.log.info("steering force: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: StimulusWorld:count
+-- Returns the total number of active stimuli in the perception world.
+-- Use to check whether any stimulus exists before querying agents.
+do  -- StimulusWorld:count
+  local sw = lurek.ai.newStimulusWorld()
+  sw:addAuditory(200, 100, 1.0, 80, 0.8, "gunshot")
+  local n = sw:count()
+  lurek.log.info("active stimuli: " .. n, "ai")
+end
+
+--@api-stub: CommandQueue:enqueue
+-- Appends a command to the back of the queue.
+-- The first argument is the command type tag; the callback fires when it becomes active.
+do  -- CommandQueue:enqueue
+  local q = lurek.ai.newCommandQueue()
+  q:enqueue("move", function() end, {x=300, y=200})
+  q:enqueue("attack", function() end, {targetId="enemy_01"})
+  lurek.log.info("queue count: " .. q:getCount(), "ai")
+end
+
+--@api-stub: ContextSteering:evaluate
+-- Evaluates all context slots and returns the best-fit steering direction as (fx, fy).
+-- Call once per frame after adding seek/avoid behaviours; reads the combined context map.
+do  -- ContextSteering:evaluate
+  local cs = lurek.ai.newContextSteering(16)
+  cs:addSeekTarget(500, 300, 1.0)
+  cs:addAvoidPoint(350, 250, 50, 1.0)
+  local fx, fy = cs:evaluate(200, 200)
+  lurek.log.info("evaluated: " .. fx .. "," .. fy, "ai")
+end
+
+--@api-stub: Blackboard:getBool
+-- Retrieves a boolean value by key; returns false if the key does not exist.
+-- Pair with setBool to drive FSM transitions from shared perception data.
+do  -- Blackboard:getBool
+  local bb = lurek.ai.newBlackboard()
+  bb:setBool("player_spotted", true)
+  local spotted = bb:getBool("player_spotted")
+  lurek.log.info("player spotted: " .. tostring(spotted), "ai")
+end
+
+--@api-stub: Squad:getFormationPosition
+-- Returns the world-space position for a named member in the current formation.
+-- Drive each member agent toward their formation slot each frame.
+do  -- Squad:getFormationPosition
+  local squad = lurek.ai.newSquad("alpha")
+  squad:addMember("guard_01")
+  squad:setFormation("wedge", 32)
+  local px, py = squad:getFormationPosition("guard_01", 400, 300, 0)
+  lurek.log.info("slot: " .. px .. "," .. py, "ai")
+end
+
+--@api-stub: InfluenceMap:getInfluence
+-- Returns the influence value at the specified grid cell.
+-- Returns 0 for cells outside the grid boundary or unpopulated layers.
+do  -- InfluenceMap:getInfluence
+  local im = lurek.ai.newInfluenceMap(32, 32, 16)
+  im:addLayer("threat")
+  im:stampInfluence("threat", 256, 256, 64, 1.0, 0.9)
+  local v = im:getInfluence("threat", 16, 16)
+  lurek.log.info("influence at centre: " .. v, "ai")
+end
+
+--@api-stub: Blackboard:getNumber
+-- Retrieves a numeric value by key; returns 0 if the key does not exist.
+-- Persistent across frames; ideal for caching sensor readings between ticks.
+do  -- Blackboard:getNumber
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("threat_level", 0.75)
+  local t = bb:getNumber("threat_level")
+  lurek.log.info("threat: " .. t, "ai")
+end
+
+--@api-stub: Blackboard:getString
+-- Retrieves a string value by key; returns an empty string if not set.
+-- Use to store target names, state tags, or short command strings.
+do  -- Blackboard:getString
+  local bb = lurek.ai.newBlackboard()
+  bb:setString("last_enemy", "goblin_03")
+  local name = bb:getString("last_enemy")
+  lurek.log.info("last enemy: " .. name, "ai")
+end
+
+--@api-stub: QLearner:learn
+-- Updates the Q-value for a (state, action) pair using the Bellman equation.
+-- Call after receiving a reward signal; negative rewards teach avoidance.
+do  -- QLearner:learn
+  local ql = lurek.ai.newQLearner(8, 4)
+  ql:setLearningRate(0.1)
+  ql:learn(2, 1, 1.0, 3)
+  local qv = ql:getQValue(2, 1)
+  lurek.log.info("Q(2,1)=" .. qv, "ai")
+end
+
+--@api-stub: GOAPPlanner:plan
+-- Runs the GOAP solver and returns an ordered list of action names to achieve goals.
+-- Pass the current world state as a key/value table; returns nil if no plan is found.
+do  -- GOAPPlanner:plan
+  local planner = lurek.ai.newGOAPPlanner()
+  planner:addAction("eat", 1.0, function() end)
+  planner:addGoal("not_hungry", 1.0)
+  local actions = planner:plan({hungry=true})
+  lurek.log.info("plan length: " .. (actions and #actions or 0), "ai")
+end
+
+--@api-stub: HTNDomain:plan
+-- Decomposes the root compound task into a primitive task sequence using HTN planning.
+-- Returns an ordered list of primitive task names or nil if decomposition fails.
+do  -- HTNDomain:plan
+  local d = lurek.ai.newHTNDomain()
+  d:addPrimitive("move", {}, {}, {})
+  d:addCompound("patrol", {{"move"}})
+  local plan = d:plan("patrol", {})
+  lurek.log.info("htn plan steps: " .. (plan and #plan or 0), "ai")
+end
+
+--@api-stub: InfluenceMap:propagate
+-- Propagates influence values across the grid using an exponential decay kernel.
+-- Higher decay makes influence spread farther; call each AI tick or on stimulus events.
+do  -- InfluenceMap:propagate
+  local im = lurek.ai.newInfluenceMap(32, 32, 16)
+  im:addLayer("threat")
+  im:stampInfluence("threat", 256, 256, 48, 1.0, 0.8)
+  im:propagate("threat", 0.85)
+  lurek.log.info("propagation done", "ai")
+end
+
+--@api-stub: CommandQueue:pushFront
+-- Inserts a high-priority command at the front of the queue, bypassing queued orders.
+-- Use for interrupt commands (take cover, flee) that must execute immediately.
+do  -- CommandQueue:pushFront
+  local q = lurek.ai.newCommandQueue()
+  q:enqueue("patrol", function() end, {})
+  q:pushFront("flee", function() end, {threatX=300, threatY=200})
+  lurek.log.info("front command: " .. q:getCurrentType(), "ai")
+end
+
+--@api-stub: InfluenceMap:queryRect
+-- Returns a table of cells with influence above a threshold within a world-space rect.
+-- Use for tactical decisions: find the safest or most resource-rich region to move toward.
+do  -- InfluenceMap:queryRect
+  local im = lurek.ai.newInfluenceMap(32, 32, 16)
+  im:addLayer("resource")
+  im:setInfluence("resource", 10, 10, 1.0)
+  local cells = im:queryRect("resource", 100, 100, 300, 300, 0.5)
+  lurek.log.info("cells found: " .. #cells, "ai")
+end
+
+--@api-stub: CommandQueue:replace
+-- Replaces the current front command with a new one without discarding the rest of the queue.
+-- Useful for retargeting the active order (update move destination mid-execution).
+do  -- CommandQueue:replace
+  local q = lurek.ai.newCommandQueue()
+  q:enqueue("move", function() end, {x=200, y=100})
+  q:replace("attack", function() end, {targetId="bandit_01"})
+  lurek.log.info("replaced: " .. q:getCurrentType(), "ai")
+end
+
+--@api-stub: MCTSEngine:search
+-- Runs Monte Carlo Tree Search and returns the best action index from the root state.
+-- iterations (set at construction) controls quality vs. latency; more = better decisions.
+do  -- MCTSEngine:search
+  local mcts = lurek.ai.newMCTSEngine(100, 1.41, 16, 42)
+  local actions = function(s) return {1, 2, 3} end
+  local apply   = function(s, a) return s + a end
+  local eval    = function(s) return s % 5 end
+  local best = mcts:search(0, actions, apply, eval)
+  lurek.log.info("best action: " .. best, "ai")
+end
+
+--@api-stub: GOAPPlanner:setEffect
+-- Defines the world-state effect of an action (what changes after it executes).
+-- Effects are key/value pairs applied to the world state when the action completes.
+do  -- GOAPPlanner:setEffect
+  local planner = lurek.ai.newGOAPPlanner()
+  planner:addAction("openDoor", 1.0, function() end)
+  planner:setEffect("openDoor", "door_locked", false)
+  lurek.log.info("effect registered", "ai")
+end
+
+--@api-stub: Squad:setFormation
+-- Sets the formation type and inter-agent spacing for the squad.
+-- Supported types include "line", "wedge", "column", "circle", "scatter".
+do  -- Squad:setFormation
+  local squad = lurek.ai.newSquad("bravo")
+  squad:addMember("soldier_01")
+  squad:addMember("soldier_02")
+  squad:setFormation("wedge", 40)
+  lurek.log.info("formation: " .. squad:getFormation(), "ai")
+end
+
+--@api-stub: GOAPPlanner:setGoalState
+-- Sets the required world-state value for a named goal key.
+-- The planner tries to satisfy all registered goals; only goals with matching state are active.
+do  -- GOAPPlanner:setGoalState
+  local planner = lurek.ai.newGOAPPlanner()
+  planner:addGoal("enemy_dead", 1.0)
+  planner:setGoalState("enemy_dead", "is_dead", true)
+  lurek.log.info("goal state set", "ai")
+end
+
+--@api-stub: InfluenceMap:setInfluence
+-- Sets the influence value at a specific grid cell directly.
+-- Use for hard-coded obstacles or guaranteed zones without radius spreading.
+do  -- InfluenceMap:setInfluence
+  local im = lurek.ai.newInfluenceMap(32, 32, 16)
+  im:addLayer("hazard")
+  im:setInfluence("hazard", 8, 8, 1.0)
+  lurek.log.info("cell 8,8 hazard: " .. im:getInfluence("hazard", 8, 8), "ai")
+end
+
+--@api-stub: GOAPPlanner:setPrecondition
+-- Sets a world-state precondition on an action (what must be true before it can run).
+-- An action is only selected when all its preconditions are satisfied by the current state.
+do  -- GOAPPlanner:setPrecondition
+  local planner = lurek.ai.newGOAPPlanner()
+  planner:addAction("shoot", 1.0, function() end)
+  planner:setPrecondition("shoot", "has_ammo", true)
+  lurek.log.info("precondition set", "ai")
+end
+
+--@api-stub: ORCASolver:setPreferredVelocity
+-- Sets the desired velocity for a registered ORCA agent before each solve step.
+-- Call once per agent per frame, then call compute() to get safe velocities.
+do  -- ORCASolver:setPreferredVelocity
+  local orca = lurek.ai.newORCASolver(2.0)
+  local idx = orca:addAgent(100, 100, 14, 80)
+  orca:setPreferredVelocity(idx, 60, 0)
+  orca:compute()
+  local vx, vy = orca:getSafeVelocity(idx)
+  lurek.log.info("safe vel: " .. vx .. "," .. vy, "ai")
+end
+
+--@api-stub: QLearner:setQValue
+-- Directly sets a Q-table entry, bypassing the Bellman update.
+-- Use to seed the Q-table from designer-authored data or a loaded checkpoint.
+do  -- QLearner:setQValue
+  local ql = lurek.ai.newQLearner(8, 4)
+  ql:setQValue(0, 2, 0.85)
+  local v = ql:getQValue(0, 2)
+  lurek.log.info("Q(0,2)=" .. v, "ai")
+end
+
+--@api-stub: InfluenceMap:stampInfluence
+-- Stamps a radial influence blob centred on world-space (cx, cy) with given radius.
+-- decay controls how fast influence falls off with distance from centre (0=flat, 1=sharp).
+do  -- InfluenceMap:stampInfluence
+  local im = lurek.ai.newInfluenceMap(32, 32, 16)
+  im:addLayer("threat")
+  im:stampInfluence("threat", 256, 256, 96, 1.0, 0.75)
+  lurek.log.info("stamped threat blob", "ai")
+end
+
+--@api-stub: AILod:tierFor
+-- Returns the LOD tier index (0=highest, N=lowest) for a given world-space distance.
+-- Use to throttle AI update rate for distant agents and save CPU budget.
+do  -- AILod:tierFor
+  local lod = lurek.ai.newAILod()
+  local tier = lod:tierFor(350)
+  lurek.log.info("lod tier at 350: " .. tier, "ai")
+end
+
+--@api-stub: ORCASolver:addAgent
+-- Registers an agent with the ORCA solver so it participates in velocity planning.
+-- Each agent needs a position, preferred velocity, radius, and max speed.
+do  -- ORCASolver:addAgent
+  local solver = lurek.ai.newORCASolver()
+  solver:addAgent(1, 200, 300, 50, 100)
+  solver:update(1/60)
+  lurek.log.info("ORCA agent added", "ai")
+end
+
+--@api-stub: NeuralNet:addLayer
+-- Adds a hidden layer with the specified neuron count and activation function.
+-- Call before NeuralNet:build() to define the network architecture.
+do  -- NeuralNet:addLayer
+  local net = lurek.ai.newNeuralNet()
+  net:addLayer(4, "relu")
+  net:addLayer(4, "relu")
+  net:build(2, 1)
+  lurek.log.info("layer count: " .. net:getLayerCount(), "ai")
+end

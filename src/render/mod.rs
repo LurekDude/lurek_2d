@@ -1,7 +1,7 @@
 //! GPU rendering layer backed by wgpu 22.
 //!
 //! Implements a deferred `RenderCommand` queue: Lua callbacks push draw commands into
-//! `SharedState::pending_commands` during `lurek.render()` / `lurek.render_ui()`; after all
+//! `SharedState::pending_commands` during `lurek.draw()` / `lurek.draw_ui()`; after all
 //! callbacks return, [`gpu_renderer::GpuRenderer::render_frame()`] processes the queue,
 //! batches compatible draw calls, and presents the swapchain surface. No GPU work is done
 //! inside a Lua closure.

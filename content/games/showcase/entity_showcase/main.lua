@@ -352,16 +352,17 @@ end
 -- ============================================================
 -- Callbacks
 -- ============================================================
+
 function lurek.init()
     lurek.window.setTitle("Entity Showcase — Lurek2D")
     lurek.window.setBackgroundColor(0.06, 0.08, 0.1)
 end
 
-function lurek.ready()
+local function _ready_setup()
     title_timer = 0
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS
     fps_count = fps_count + 1
     fps_timer = fps_timer + dt
@@ -406,7 +407,7 @@ lurek.process(function(dt)
 
     -- Entity selection via mouse click
     if lurek.input.pressed("select") then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local best_id = nil
         local best_dist = ENTITY_RADIUS + 4
         for _, id in ipairs(entity_order) do
@@ -528,12 +529,12 @@ lurek.process(function(dt)
 
     update_particles(dt)
     update_event_log(dt)
-end)
+end
 
 -- ============================================================
 -- Render: world-space entities
 -- ============================================================
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then return end
 
     -- Draw entities
@@ -591,12 +592,12 @@ lurek.render(function()
         lurek.render.setColor(p.r, p.g, p.b, p.a)
         lurek.render.circle("fill", p.x, p.y, p.size)
     end
-end)
+end
 
 -- ============================================================
 -- Render UI: panels, HUD, instructions
 -- ============================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- Title screen
     if state == STATE_TITLE then
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
@@ -720,4 +721,4 @@ lurek.render_ui(function()
             lurek.render.print(ev.text, 16, SCREEN_H - 18 - i * 15, 10)
         end
     end
-end)
+end

@@ -470,12 +470,13 @@ lurek.input.bind("confirm",    "return")
 -- ---------------------------------------------------------------------------
 -- Callbacks
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Physics Sandbox — Lurek2D")
     lurek.window.setBackgroundColor(0.06, 0.06, 0.08)
 end
 
-function lurek.ready()
+local function _ready_setup()
     title_timer = 0
 end
 
@@ -494,7 +495,7 @@ end
 -- Process: SANDBOX
 -- ---------------------------------------------------------------------------
 local function process_sandbox(dt)
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
 
     -- mode switches
     if lurek.input.wasActionPressed("build") then
@@ -712,7 +713,7 @@ local function render_sandbox()
 
     -- build mode drag preview
     if current_mode == MODE.BUILD and dragging_build then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local x1 = math.min(drag_start_x, mx)
         local y1 = math.min(drag_start_y, my)
         local x2 = math.max(drag_start_x, mx)
@@ -726,7 +727,7 @@ local function render_sandbox()
 
     -- destroy mode cursor indicator
     if current_mode == MODE.DESTROY then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         lurek.render.circle(mx, my, EXPLOSION_RADIUS,
             { r = 1.0, g = 0.3, b = 0.2, a = 0.15 })
         lurek.render.circle(mx, my, 8,
@@ -735,7 +736,7 @@ local function render_sandbox()
 
     -- rope mode indicator
     if current_mode == MODE.ROPE and rope_first then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local a = objects[rope_first]
         if a then
             lurek.render.line(a.x, a.y, mx, my,
@@ -747,7 +748,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Render dispatch
 -- ---------------------------------------------------------------------------
-function lurek.render()
+function lurek.draw()
     if current_state == STATE.TITLE then
         render_title()
     elseif current_state == STATE.SANDBOX then
@@ -758,7 +759,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Render UI (HUD overlay)
 -- ---------------------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     if current_state ~= STATE.SANDBOX then return end
 
     local fps = lurek.timer.getFPS()

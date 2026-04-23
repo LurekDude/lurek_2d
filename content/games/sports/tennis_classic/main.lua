@@ -248,12 +248,13 @@ local function is_in_service_box(bx, by, serving_from_bottom)
 end
 
 -- ── Input bindings ────────────────────────────────────────────────
+
 function lurek.init()
     lurek.render.setBackgroundColor(0.2, 0.4, 0.2)
     lurek.window.setTitle("Tennis Classic — Lurek2D")
 
     camera = lurek.camera.new()
-    lurek.camera.attach(camera)
+    camera:apply()
 
     lurek.input.bind("move_up", "w")
     lurek.input.bind("move_down", "s")
@@ -284,7 +285,7 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if lurek.input.pressed("quit") then
         lurek.event.quit()
         return
@@ -616,10 +617,10 @@ lurek.process(function(dt)
             ai_react_timer = 0
         end
     end
-end)
+end
 
 -- ── Render (world-space: court, players, ball) ────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Court background (green)
     lurek.render.rectangle(COURT_L, COURT_T, COURT_W, COURT_H, 0.18, 0.55, 0.18, 1.0)
 
@@ -683,10 +684,10 @@ lurek.render(function()
     lurek.particle.draw(dust_particles)
     lurek.particle.draw(ace_particles)
     lurek.particle.draw(net_particles)
-end)
+end
 
 -- ── Render UI (screen-space: score, messages) ─────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     if state == ST.TITLE then
@@ -756,4 +757,4 @@ lurek.render_ui(function()
 
     -- FPS
     lurek.render.print("FPS: " .. fps, W - 70, H - 20, 12, 0.5, 0.5, 0.5, 1)
-end)
+end

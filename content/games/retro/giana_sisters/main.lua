@@ -208,23 +208,23 @@ end
 -- Callbacks
 -- ============================================================================
 
-lurek.setTitle("Giana Sisters — Lurek2D")
-lurek.setBackgroundColor(0.1, 0.1, 0.3)
+lurek.window.setTitle("Giana Sisters — Lurek2D")
+lurek.render.setBackgroundColor(0.1, 0.1, 0.3)
 
 function lurek.init()
   load_level(1)
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
   -- Global quit
-  if lurek.input.isPressed("escape") then
+  if lurek.input.keyboard.isDown("escape") then
     lurek.event.quit()
     return
   end
 
   -- ---- TITLE ----
   if state == TITLE then
-    if lurek.input.isPressed("return") then
+    if lurek.input.keyboard.isDown("return") then
       state = PLAYING
       score = 0
       gem_count = 0
@@ -237,7 +237,7 @@ lurek.process(function(dt)
 
   -- ---- GAME OVER ----
   if state == GAME_OVER then
-    if lurek.input.isPressed("return") then
+    if lurek.input.keyboard.isDown("return") then
       state = TITLE
     end
     return
@@ -263,12 +263,12 @@ lurek.process(function(dt)
 
   -- Input
   local move_x = 0
-  if lurek.input.isDown("a") or lurek.input.isDown("left") then move_x = move_x - 1 end
-  if lurek.input.isDown("d") or lurek.input.isDown("right") then move_x = move_x + 1 end
+  if lurek.input.isActionDown("a") or lurek.input.isActionDown("left") then move_x = move_x - 1 end
+  if lurek.input.isActionDown("d") or lurek.input.isActionDown("right") then move_x = move_x + 1 end
   if move_x ~= 0 then player.facing = move_x end
 
   player.vx = move_x * SPEED
-  if (lurek.input.isPressed("space") or lurek.input.isPressed("w") or lurek.input.isPressed("up")) and player.on_ground then
+  if (lurek.input.keyboard.isDown("space") or lurek.input.keyboard.isDown("w") or lurek.input.keyboard.isDown("up")) and player.on_ground then
     player.vy = JUMP_VEL
     player.on_ground = false
   end
@@ -495,13 +495,13 @@ lurek.process(function(dt)
       table.remove(tweens, i)
     end
   end
-end)
+end
 
 -- ============================================================================
 -- Render: world
 -- ============================================================================
 
-lurek.render(function()
+function lurek.draw()
   if state == TITLE or state == GAME_OVER then return end
 
   local ox = -math.floor(cam_x)
@@ -601,13 +601,13 @@ lurek.render(function()
   if flash_alpha > 0 then
     lurek.render.rectangle(0, 0, 800, 600, 1, 1, 1, flash_alpha * 0.5)
   end
-end)
+end
 
 -- ============================================================================
 -- Render: UI
 -- ============================================================================
 
-lurek.render_ui(function()
+function lurek.draw_ui()
   -- ---- TITLE SCREEN ----
   if state == TITLE then
     lurek.render.rectangle(0, 0, 800, 600, 0.05, 0.05, 0.2, 1)
@@ -688,4 +688,4 @@ lurek.render_ui(function()
     lurek.render.rectangle(302, 37, bar_w, 16, 1.0, 0.9, 0.2, 0.9)
     lurek.render.print("STAR POWER " .. remaining .. "s", 340, 38, 14, 1, 1, 1, 1)
   end
-end)
+end

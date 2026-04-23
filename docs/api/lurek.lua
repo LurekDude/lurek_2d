@@ -63,6 +63,14 @@ function AILod:shouldUpdate(tier, frame) end
 ---@return integer
 function AILod:tierCount() end
 
+--- Returns or performs tier for.
+---@param ax any
+---@param ay any
+---@param rx any
+---@param ry any
+---@return integer
+function AILod:tierFor(ax, ay, rx, ry) end
+
 --- Returns or performs tier name.
 ---@param tier any
 ---@return string
@@ -324,13 +332,31 @@ local Blackboard = {}
 ---@return nil
 function Blackboard:clear() end
 
+--- Returns the boolean for the given key, or default.
+---@param key any
+---@param default? any (optional)
+---@return boolean
+function Blackboard:getBool(key, default) end
+
 --- Returns all local keys as a table.
 ---@return table
 function Blackboard:getKeys() end
 
+--- Returns the number for the given key, or default.
+---@param key any
+---@param default? any (optional)
+---@return number
+function Blackboard:getNumber(key, default) end
+
 --- Returns the number of local entries.
 ---@return integer
 function Blackboard:getSize() end
+
+--- Returns the string for the given key, or default.
+---@param key any
+---@param default? any (optional)
+---@return string
+function Blackboard:getString(key, default) end
 
 --- Returns true if a value exists under the key.
 ---@param key any
@@ -381,6 +407,13 @@ function CommandQueue:cancelCurrent() end
 ---@return nil
 function CommandQueue:clear() end
 
+--- Appends a command to the back of the queue.
+---@param kind any
+---@param callback any
+---@param opts? any (optional)
+---@return nil
+function CommandQueue:enqueue(kind, callback, opts) end
+
 --- Returns the number of queued commands.
 ---@return integer
 function CommandQueue:getCount() end
@@ -396,6 +429,20 @@ function CommandQueue:getCurrentType() end
 --- Returns true if there are no queued commands.
 ---@return boolean
 function CommandQueue:isEmpty() end
+
+--- Inserts a command at the front, interrupting the current one.
+---@param kind any
+---@param callback any
+---@param opts? any (optional)
+---@return nil
+function CommandQueue:pushFront(kind, callback, opts) end
+
+--- Clears the queue and enqueues one new command.
+---@param kind any
+---@param callback any
+---@param opts? any (optional)
+---@return nil
+function CommandQueue:replace(kind, callback, opts) end
 
 --- Returns the type name of this object.
 ---@return string
@@ -420,6 +467,21 @@ local ContextSteering = {}
 ---@return nil
 function ContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weight) end
 
+--- Adds a world-space point that this agent steers away from.
+---@param x any
+---@param y any
+---@param radius any
+---@param weight any
+---@return nil
+function ContextSteering:addAvoidPoint(x, y, radius, weight) end
+
+--- Adds a world-space target that this agent steers towards.
+---@param tx any
+---@param ty any
+---@param weight any
+---@return nil
+function ContextSteering:addSeekTarget(tx, ty, weight) end
+
 --- Adds a wander behavior with jitter and weight to the context steering evaluator.
 ---@param jitter any
 ---@param weight any
@@ -434,6 +496,14 @@ function ContextSteering:chosenMagnitude() end
 ---@return nil
 function ContextSteering:clearBehaviors() end
 
+--- Evaluates and returns the computed result.
+---@param ax any
+---@param ay any
+---@param vx any
+---@param vy any
+---@return number
+function ContextSteering:evaluate(ax, ay, vx, vy) end
+
 --- Returns or performs slot count.
 ---@return integer
 function ContextSteering:slotCount() end
@@ -441,6 +511,14 @@ function ContextSteering:slotCount() end
 --- Lua wrapper for [`crate::ai::emotion::EmotionModel`].
 ---@class EmotionModel
 local EmotionModel = {}
+
+--- Adds an emotion category with the given name and initial intensity to the model.
+---@param name any
+---@param rest any
+---@param decay any
+---@param min_vis any
+---@return nil
+function EmotionModel:add(name, rest, decay, min_vis) end
 
 --- Returns or performs dominant.
 ---@return string|nil
@@ -475,6 +553,19 @@ function EmotionModel:update(dt) end
 ---@class GOAPPlanner
 local GOAPPlanner = {}
 
+--- Adds a GOAP action with optional cost and callback.
+---@param name any
+---@param cost? any (optional)
+---@param callback? any (optional)
+---@return nil
+function GOAPPlanner:addAction(name, cost, callback) end
+
+--- Adds a planning goal with optional priority.
+---@param name any
+---@param priority? any (optional)
+---@return nil
+function GOAPPlanner:addGoal(name, priority) end
+
 --- Returns the number of registered actions.
 ---@return integer
 function GOAPPlanner:getActionCount() end
@@ -487,10 +578,37 @@ function GOAPPlanner:getGoalCount() end
 ---@return integer
 function GOAPPlanner:getMaxIterations() end
 
+--- Runs A* planning and returns an action sequence table.
+---@param world_state_tbl any
+---@param max_depth? any (optional)
+---@return table
+function GOAPPlanner:plan(world_state_tbl, max_depth) end
+
+--- Sets a boolean effect on an action.
+---@param action_name any
+---@param key any
+---@param value any
+---@return nil
+function GOAPPlanner:setEffect(action_name, key, value) end
+
+--- Sets a boolean condition on a goal.
+---@param goal_name any
+---@param key any
+---@param value any
+---@return nil
+function GOAPPlanner:setGoalState(goal_name, key, value) end
+
 --- Sets the maximum A* planning iterations (0 = unlimited).
 ---@param n any
 ---@return nil
 function GOAPPlanner:setMaxIterations(n) end
+
+--- Sets a boolean precondition on an action.
+---@param action_name any
+---@param key any
+---@param value any
+---@return nil
+function GOAPPlanner:setPrecondition(action_name, key, value) end
 
 --- Returns the type name of this object.
 ---@return string
@@ -536,6 +654,12 @@ function GeneticAlgorithm:setFitness(idx, fitness) end
 ---@class HTNDomain
 local HTNDomain = {}
 
+--- Registers a compound HTN task that decomposes into sub-tasks.
+---@param comp_name any
+---@param methods_table any
+---@return nil
+function HTNDomain:addCompound(comp_name, methods_table) end
+
 --- Registers a primitive HTN task with a direct operator function.
 ---@param name any
 ---@param preconds any
@@ -543,6 +667,12 @@ local HTNDomain = {}
 ---@param clears any
 ---@return nil
 function HTNDomain:addPrimitive(name, preconds, effects, clears) end
+
+--- Runs planning and returns the resulting action sequence.
+---@param root_task any
+---@param state_table any
+---@return table|nil
+function HTNDomain:plan(root_task, state_table) end
 
 --- Returns or performs task count.
 ---@return integer
@@ -556,6 +686,15 @@ local InfluenceMap = {}
 ---@param name any
 ---@return nil
 function InfluenceMap:addLayer(name) end
+
+--- Blends two layers into a destination layer.
+---@param layer_a any
+---@param weight_a any
+---@param layer_b any
+---@param weight_b any
+---@param dest any
+---@return nil
+function InfluenceMap:blend(layer_a, weight_a, layer_b, weight_b, dest) end
 
 --- Removes all influence values from every layer in the map.
 ---@return nil
@@ -580,6 +719,13 @@ function InfluenceMap:getCellSize() end
 ---@return integer
 function InfluenceMap:getHeight() end
 
+--- Returns the influence value at a cell (1-based).
+---@param layer any
+---@param x any
+---@param y any
+---@return number
+function InfluenceMap:getInfluence(layer, x, y) end
+
 --- Returns the world-space position of the maximum value.
 ---@param layer any
 ---@return number
@@ -599,6 +745,39 @@ function InfluenceMap:getWidth() end
 ---@return boolean
 function InfluenceMap:hasLayer(name) end
 
+--- Propagates influence values with momentum.
+---@param layer any
+---@param momentum? any (optional)
+---@return nil
+function InfluenceMap:propagate(layer, momentum) end
+
+--- Returns the summed influence in a world-space rectangle.
+---@param layer any
+---@param wx any
+---@param wy any
+---@param ww any
+---@param wh any
+---@return number
+function InfluenceMap:queryRect(layer, wx, wy, ww, wh) end
+
+--- Sets the influence value at a cell (1-based).
+---@param layer any
+---@param x any
+---@param y any
+---@param value any
+---@return nil
+function InfluenceMap:setInfluence(layer, x, y, value) end
+
+--- Stamps influence in a radial area.
+---@param layer any
+---@param wx any
+---@param wy any
+---@param radius any
+---@param value any
+---@param falloff? any (optional)
+---@return nil
+function InfluenceMap:stampInfluence(layer, wx, wy, radius, value, falloff) end
+
 --- Returns the type name of this object.
 ---@return string
 function InfluenceMap:type() end
@@ -607,6 +786,18 @@ function InfluenceMap:type() end
 ---@param name any
 ---@return boolean
 function InfluenceMap:typeOf(name) end
+
+--- Lua wrapper for [`crate::ai::mcts::MCTSEngine`].
+---@class MCTSEngine
+local MCTSEngine = {}
+
+--- Uses Lua closures for game logic. All closures receive/return integer states.
+---@param root_state integer
+---@param get_actions function(state)
+---@param apply_action function(state
+---@param evaluate function(state)
+---@return integer|nil
+function MCTSEngine:search(root_state, get_actions, apply_action, evaluate) end
 
 --- Lua wrapper for [`crate::ai::needs::NeedSystem`].
 ---@class NeedSystem
@@ -643,6 +834,13 @@ function NeedSystem:valueOf(name) end
 --- Lua wrapper for [`crate::ai::neural_net::NeuralNet`].
 ---@class NeuralNet
 local NeuralNet = {}
+
+--- Adds a neural network layer with inputs, outputs, and an activation function.
+---@param inputs any
+---@param outputs any
+---@param activation any
+---@return nil
+function NeuralNet:addLayer(inputs, outputs, activation) end
 
 --- Returns or performs forward.
 ---@param input any
@@ -705,6 +903,14 @@ function Neuroevolution:setFitness(idx, fitness) end
 ---@class ORCASolver
 local ORCASolver = {}
 
+--- Adds an ORCA agent at the given position with radius and max speed to the solver.
+---@param x any
+---@param y any
+---@param radius any
+---@param max_speed any
+---@return integer
+function ORCASolver:addAgent(x, y, radius, max_speed) end
+
 --- Returns or performs agent count.
 ---@return integer
 function ORCASolver:agentCount() end
@@ -725,6 +931,13 @@ function ORCASolver:getSafeVelocity(idx) end
 ---@param y any
 ---@return nil
 function ORCASolver:setPosition(idx, x, y) end
+
+--- Sets the preferred velocity.
+---@param idx any
+---@param pvx any
+---@param pvy any
+---@return nil
+function ORCASolver:setPreferredVelocity(idx, pvx, pvy) end
 
 --- Lua-side wrapper around a [`QLearner`].
 ---@class QLearner
@@ -783,6 +996,14 @@ function QLearner:getQValue(state, action) end
 ---@return integer
 function QLearner:getStateCount() end
 
+--- Performs one Bellman Q-learning update (1-based indices).
+---@param state any
+---@param action any
+---@param reward any
+---@param next_state any
+---@return nil
+function QLearner:learn(state, action, reward, next_state) end
+
 --- Serializes the Q-table to a JSON string.
 ---@return string
 function QLearner:serialize() end
@@ -806,6 +1027,13 @@ function QLearner:setExplorationRate(v) end
 ---@param v any
 ---@return nil
 function QLearner:setLearningRate(v) end
+
+--- Overwrites the Q-value for a state-action pair (1-based).
+---@param state any
+---@param action any
+---@param value any
+---@return nil
+function QLearner:setQValue(state, action, value) end
 
 --- Returns the type name of this object.
 ---@return string
@@ -833,6 +1061,13 @@ function Squad:getBlackboard() end
 ---@return string
 function Squad:getFormation() end
 
+--- Computes the world-space position for a member index (1-based).
+---@param member_idx any
+---@param leader_x any
+---@param leader_y any
+---@return number
+function Squad:getFormationPosition(member_idx, leader_x, leader_y) end
+
 --- Returns the formation spacing in world units.
 ---@return number
 function Squad:getFormationSpacing() end
@@ -858,6 +1093,12 @@ function Squad:getName() end
 ---@return nil
 function Squad:removeMember(name) end
 
+--- Sets the formation type and optional spacing.
+---@param ftype any
+---@param spacing? any (optional)
+---@return nil
+function Squad:setFormation(ftype, spacing) end
+
 --- Sets the squad leader by name.
 ---@param name any
 ---@return nil
@@ -881,6 +1122,14 @@ local StateMachine = {}
 ---@param opts any
 ---@return nil
 function StateMachine:addState(name, opts) end
+
+--- Adds a guarded transition between states.
+---@param from any
+---@param to any
+---@param guard? any (optional)
+---@param priority? any (optional)
+---@return nil
+function StateMachine:addTransition(from, to, guard, priority) end
 
 --- Forces a transition to the named state.
 ---@param name any
@@ -912,6 +1161,81 @@ function StateMachine:typeOf(name) end
 --- Lua-side wrapper around a [`SteeringManager`].
 ---@class SteeringManager
 local SteeringManager = {}
+
+--- Adds an Arrive behavior with deceleration.
+---@param tx any
+---@param ty any
+---@param slowing? any (optional)
+---@param weight? any (optional)
+---@return nil
+function SteeringManager:addArrive(tx, ty, slowing, weight) end
+
+--- Registers a Lua callback as a custom steering behavior.
+---@param func any
+---@param weight? any (optional)
+---@return nil
+function SteeringManager:addCustomBehavior(func, weight) end
+
+--- Adds an Evade behavior fleeing from a named agent.
+---@param threat_name? any (optional)
+---@param weight? any (optional)
+---@return nil
+function SteeringManager:addEvade(threat_name, weight) end
+
+--- Adds a Flee behavior away from the target.
+---@param tx any
+---@param ty any
+---@param panic_dist? any (optional)
+---@param weight? any (optional)
+---@return nil
+function SteeringManager:addFlee(tx, ty, panic_dist, weight) end
+
+--- Adds a Flock behavior for group movement.
+---@param neighborRadius? number? (optional)
+---@param sepWeight? number? (optional)
+---@param alignWeight? number? (optional)
+---@param cohWeight? number? (optional)
+---@param weight? number? (optional)
+---@return nil
+function SteeringManager:addFlock(neighborRadius, sepWeight, alignWeight, cohWeight, weight) end
+
+--- Adds a Pursue behavior targeting a named agent.
+---@param target_name? any (optional)
+---@param weight? any (optional)
+---@return nil
+function SteeringManager:addPursue(target_name, weight) end
+
+--- Adds a Seek behavior toward the target.
+---@param tx any
+---@param ty any
+---@param weight? any (optional)
+---@return nil
+function SteeringManager:addSeek(tx, ty, weight) end
+
+--- Adds a Wander behavior for random meandering.
+---@param radius? number? (optional)
+---@param dist? number? (optional)
+---@param jitter? number? (optional)
+---@param weight? number? (optional)
+---@return nil
+function SteeringManager:addWander(radius, dist, jitter, weight) end
+
+--- Invokes all registered custom steering callbacks and returns the combined force.
+---@param agent_ud any
+---@param dt any
+---@return number
+function SteeringManager:applyCustomSteering(agent_ud, dt) end
+
+--- Computes the combined steering force for the given agent state.
+---@param px any
+---@param py any
+---@param vx any
+---@param vy any
+---@param max_speed any
+---@param max_force any
+---@param dt any
+---@return number
+function SteeringManager:calculate(px, py, vx, vy, max_speed, max_force, dt) end
 
 --- Enables or disables spatial-hash bucketing for neighbourhood queries.
 ---@param enabled any
@@ -953,9 +1277,32 @@ function SteeringManager:typeOf(name) end
 ---@class StimulusWorld
 local StimulusWorld = {}
 
+--- Registers an auditory stimulus at a world-space position.
+---@param x number
+---@param y number
+---@param intensity number
+---@param radius number
+---@param decay_rate number
+---@param tag string|nil
+---@return integer
+function StimulusWorld:addAuditory(x, y, intensity, radius, decay_rate, tag) end
+
+--- Adds a visual stimulus at the specified world position with radius and intensity.
+---@param x any
+---@param y any
+---@param intensity any
+---@param radius any
+---@param tag? any (optional)
+---@return integer
+function StimulusWorld:addVisual(x, y, intensity, radius, tag) end
+
 --- Resets or clears the state.
 ---@return nil
 function StimulusWorld:clear() end
+
+--- Returns or performs count.
+---@return integer
+function StimulusWorld:count() end
 
 --- Removes the specified item.
 ---@param id any
@@ -1009,6 +1356,14 @@ function StrategyAI:update(dt, scorer_fn) end
 ---@class TraitProfile
 local TraitProfile = {}
 
+--- Adds a named modifier that adjusts the trait value by a delta.
+---@param trait_name any
+---@param delta any
+---@param duration? any (optional)
+---@param source any
+---@return nil
+function TraitProfile:addModifier(trait_name, delta, duration, source) end
+
 --- Returns or performs archetype.
 ---@return string|nil
 function TraitProfile:archetype() end
@@ -1051,6 +1406,25 @@ function TraitProfile:update(dt) end
 --- Lua-side wrapper around a [`UtilityAI`].
 ---@class UtilityAI
 local UtilityAI = {}
+
+--- Adds a scored action with optional momentum weight.
+---@param name any
+---@param scorer_fn any
+---@param weight? any (optional)
+---@return nil
+function UtilityAI:addAction(name, scorer_fn, weight) end
+
+--- Adds a multi-axis consideration to a named action.
+---@param actionName string
+---@param name string
+---@param scorerFn function()
+---@param curve string
+---@param p1? number? (optional)
+---@param p2? number? (optional)
+---@param p3? number? (optional)
+---@param weight? number? (optional)
+---@return nil
+function UtilityAI:addConsideration(actionName, name, scorerFn, curve, p1, p2, p3, weight) end
 
 --- Evaluates all actions and returns the best action name, or nil.
 ---@return string?
@@ -1283,6 +1657,20 @@ function AnimCurve:setEasing(mode) end
 ---@class AnimStateMachine
 local AnimStateMachine = {}
 
+--- Registers a new named state that plays a clip from the embedded animation.
+---@param name any
+---@param clip any
+---@param looping any
+---@return nil
+function AnimStateMachine:addState(name, clip, looping) end
+
+--- Adds a conditional transition between two states.
+---@param from_state any
+---@param to_state any
+---@param condition any
+---@return nil
+function AnimStateMachine:addTransition(from_state, to_state, condition) end
+
 --- Immediately jumps to the named state, bypassing transition conditions.
 ---@param name any
 ---@return boolean
@@ -1333,6 +1721,27 @@ function AnimSyncGroup:remove(handle) end
 ---@class Animation
 local Animation = {}
 
+--- Adds a named clip from explicit frame indices.
+---@param name any
+---@param indices_tbl any
+---@param fps any
+---@param looping any
+---@return nil
+function Animation:addClip(name, indices_tbl, fps, looping) end
+
+--- Adds a named clip sliced from a sprite-sheet grid.
+---@param name string
+---@param tex_w integer
+---@param tex_h integer
+---@param frame_w integer
+---@param frame_h integer
+---@param start integer
+---@param count integer
+---@param fps number
+---@param looping boolean
+---@return nil
+function Animation:addClipFromGrid(name, tex_w, tex_h, frame_w, frame_h, start, count, fps, looping) end
+
 --- Adds a single frame to the frame pool by source rectangle.
 ---@param x any
 ---@param y any
@@ -1340,6 +1749,22 @@ local Animation = {}
 ---@param h any
 ---@return integer
 function Animation:addFrame(x, y, w, h) end
+
+--- Slices a sprite-sheet grid into frames and appends them.
+---@param tw any
+---@param th any
+---@param fw any
+---@param fh any
+---@param start any
+---@param count any
+---@return integer
+function Animation:addFramesFromGrid(tw, th, fw, fh, start, count) end
+
+--- Begins a smooth crossfade from the current clip to a new named clip.
+---@param clip_name any
+---@param duration any
+---@return boolean
+function Animation:crossfade(clip_name, duration) end
 
 --- Renders the current animation frame into a new ImageData (white bg, blue frame rect).
 ---@param w any
@@ -1422,6 +1847,14 @@ function Animation:update(dt) end
 --- Lua-side wrapper around a [`BlendLayerSet`] blend layer compositor.
 ---@class BlendLayerSet
 local BlendLayerSet = {}
+
+--- Appends a new blend layer.
+---@param name any
+---@param clip_name any
+---@param weight any
+---@param bones? any (optional)
+---@return boolean
+function BlendLayerSet:addLayer(name, clip_name, weight, bones) end
 
 --- Returns the blend weight of a named layer, or nil if not found.
 ---@param name any
@@ -1518,6 +1951,12 @@ function Bus:pause() end
 --- Resumes all sources on this bus.
 ---@return nil
 function Bus:resume() end
+
+--- Configures this bus to duck (lower the volume of) another bus when
+---@param target_name any
+---@param duck_vol any
+---@return nil
+function Bus:setDuckTarget(target_name, duck_vol) end
 
 --- Sets the pitch multiplier for all sources on this bus.
 ---@param pitch any
@@ -1711,6 +2150,12 @@ function MidiPlayer:seek(secs) end
 ---@param bus_val any
 ---@return nil
 function MidiPlayer:setBus(bus_val) end
+
+--- Sets the GM instrument for a MIDI channel (1-indexed).
+---@param ch any
+---@param inst any
+---@return nil
+function MidiPlayer:setChannelInstrument(ch, inst) end
 
 --- Mutes or unmutes a MIDI channel (1-indexed).
 ---@param ch any
@@ -1971,6 +2416,19 @@ function Source:tell() end
 
 ---@class mlua
 local mlua = {}
+
+--- Draws the waveform onto an ImageData buffer.
+---@param target ImageData
+---@param x integer
+---@param y integer
+---@param w integer
+---@param h integer
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return nil
+function mlua:drawWaveform(target, x, y, w, h, r, g, b, a) end
 
 --- Get the bit depth.
 ---@return integer
@@ -2699,6 +3157,14 @@ lurek.camera = {}
 ---@class Camera2D
 local Camera2D = {}
 
+--- Applies this camera's transform to the render stack.
+---@return nil
+function Camera2D:apply() end
+
+--- Alias for `apply()`. Applies this camera's transform to the render stack.
+---@return nil
+function Camera2D:attach() end
+
 --- Removes all parallax factor overrides.
 ---@return nil
 function Camera2D:clearParallaxFactors() end
@@ -2706,6 +3172,16 @@ function Camera2D:clearParallaxFactors() end
 --- Clears the follow target so the camera stops tracking.
 ---@return nil
 function Camera2D:clearTarget() end
+
+--- Alias for `reset()`. Pops the camera transform from the render stack.
+---@return nil
+function Camera2D:detach() end
+
+--- Animates the camera along a sequence of world-space waypoints over
+---@param points any
+---@param duration any
+---@return nil
+function Camera2D:followPath(points, duration) end
 
 --- Returns the current sway x, y world-space offset.
 ---@return number
@@ -2768,6 +3244,18 @@ function Camera2D:pathProgress() end
 ---@return nil
 function Camera2D:removeBounds() end
 
+--- Pops the camera transform from the render stack.
+---@return nil
+function Camera2D:reset() end
+
+--- Sets world-space bounds for camera clamping.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function Camera2D:setBounds(x, y, w, h) end
+
 --- Sets the dead zone half-extents for camera follow.
 ---@param w any
 ---@param h any
@@ -2783,6 +3271,12 @@ function Camera2D:setFollowSmooth(speed) end
 ---@param mul any
 ---@return nil
 function Camera2D:setLookAhead(mul) end
+
+--- Sets the parallax scroll factor for the named render layer.
+---@param layer any
+---@param factor any
+---@return nil
+function Camera2D:setParallaxFactor(layer, factor) end
 
 --- Sets the camera's world-space position.
 ---@param x any
@@ -2801,6 +3295,14 @@ function Camera2D:setRotation(r) end
 ---@return nil
 function Camera2D:setTarget(x, y) end
 
+--- Sets the viewport rectangle in screen pixels.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function Camera2D:setViewport(x, y, w, h) end
+
 --- Sets the uniform zoom factor (1.0 = natural size).
 ---@param zoom any
 ---@return nil
@@ -2811,6 +3313,20 @@ function Camera2D:setZoom(zoom) end
 ---@param duration any
 ---@return nil
 function Camera2D:shake(intensity, duration) end
+
+--- Starts a subtle periodic zoom oscillation for a "living camera" feel.
+---@param amplitude? any (optional)
+---@param rate? any (optional)
+---@return nil
+function Camera2D:startBreathing(amplitude, rate) end
+
+--- Starts a sinusoidal x/y offset oscillation (e.g., boat rocking).
+---@param amplitude_x any
+---@param amplitude_y any
+---@param frequency any
+---@param decay? any (optional)
+---@return nil
+function Camera2D:startSway(amplitude_x, amplitude_y, frequency, decay) end
 
 --- Stops the active breathing effect.
 ---@return nil
@@ -2871,6 +3387,10 @@ function Camera2D:zoomTo(target_zoom, duration) end
 ---@param vw any
 ---@param vh any
 function lurek.camera.new(vw, vh) end
+
+---@param vw? any (optional)
+---@param vh? any (optional)
+function lurek.camera.newCamera(vw, vh) end
 
 ---@class lurek.compute
 lurek.compute = {}
@@ -2986,6 +3506,12 @@ function Array:dilate(radius) end
 ---@return number
 function Array:dot(other) end
 
+--- Computes the dominant eigenvalue and its eigenvector using power iteration.
+---@param max_iter? any (optional)
+---@param tol? any (optional)
+---@return table
+function Array:eigenPower(max_iter, tol) end
+
 --- Morphological erosion with a diamond structuring element.
 ---@param radius any
 ---@return Array
@@ -3001,6 +3527,13 @@ function Array:eval(expr) end
 ---@return nil
 function Array:fill(val) end
 
+--- Flood fill from a 1-based (row, col) with a new value.
+---@param row any
+---@param col any
+---@param val any
+---@return Array
+function Array:floodFill(row, col, val) end
+
 --- Returns the element at the given 1-based indices.
 ---@param args any
 ---@return number
@@ -3014,6 +3547,14 @@ function Array:getDataType() end
 ---@return integer
 function Array:getDimensions() end
 
+--- Extracts a rectangular sub-region (1-based row, col).
+---@param row any
+---@param col any
+---@param rows any
+---@param cols any
+---@return Array
+function Array:getRegion(row, col, rows, cols) end
+
 --- Returns the shape as a table of dimension sizes.
 ---@return table
 function Array:getShape() end
@@ -3021,6 +3562,13 @@ function Array:getShape() end
 --- Returns the total number of elements.
 ---@return integer
 function Array:getSize() end
+
+--- Compute a histogram. Returns a table of {lo, hi, count} tables.
+---@param bins any
+---@param lo? any (optional)
+---@param hi? any (optional)
+---@return table
+function Array:histogram(bins, lo, hi) end
 
 --- Returns false (CPU arrays only).
 ---@return boolean
@@ -3116,6 +3664,13 @@ function Array:scan(func, init) end
 ---@return nil
 function Array:set(args) end
 
+--- Copies a source array into this array at the given 1-based position.
+---@param row any
+---@param col any
+---@param source any
+---@return nil
+function Array:setRegion(row, col, source) end
+
 --- Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
 ---@return table
 function Array:sobel() end
@@ -3155,6 +3710,12 @@ function Array:type() end
 ---@param name any
 ---@return boolean
 function Array:typeOf(name) end
+
+--- Selects elements from this where mask is nonzero, else from other.
+---@param mask any
+---@param other any
+---@return Array
+function Array:where(mask, other) end
 
 --- Standardise values to zero mean and unit variance.
 ---@return Array
@@ -3359,6 +3920,10 @@ function RingBuffer:clear() end
 ---@return boolean
 function RingBuffer:isEmpty() end
 
+--- Returns true if the buffer has reached its capacity.
+---@return boolean
+function RingBuffer:isFull() end
+
 --- Returns the number of elements currently in the buffer.
 ---@return integer
 function RingBuffer:len() end
@@ -3391,6 +3956,12 @@ local mlua = {}
 ---@return ByteData
 function mlua:clone() end
 
+--- Returns the value of a single bit within the buffer.
+---@param byte_offset any
+---@param bit_offset any
+---@return boolean
+function mlua:getBit(byte_offset, bit_offset) end
+
 --- Get a byte at the specified offset.
 ---@param offset any
 ---@return integer
@@ -3403,6 +3974,20 @@ function mlua:getSize() end
 --- Get the string representation.
 ---@return string
 function mlua:getString() end
+
+--- Reads `count` consecutive bits starting at `byte_offset`/`bit_offset`
+---@param byte_offset any
+---@param bit_offset any
+---@param count any
+---@return nil
+function mlua:readBits(byte_offset, bit_offset, count) end
+
+--- Sets or clears a single bit within the buffer.
+---@param byte_offset any
+---@param bit_offset any
+---@param value any
+---@return nil
+function mlua:setBit(byte_offset, bit_offset, value) end
 
 --- Set a byte at the specified offset.
 ---@param offset any
@@ -3526,6 +4111,12 @@ lurek.dataframe = {}
 ---@class DataFrame
 local DataFrame = {}
 
+--- Adds a new column with an optional default value.
+---@param name any
+---@param default? any (optional)
+---@return nil
+function DataFrame:addColumn(name, default) end
+
 --- Adds a row from an optional table of name-value pairs, returns 1-based index.
 ---@param row_tbl? any (optional)
 ---@return integer
@@ -3536,6 +4127,12 @@ function DataFrame:addRow(row_tbl) end
 ---@return nil
 function DataFrame:addRowBatch(rows) end
 
+--- Applies a function to each value in a column, replacing cells with results.
+---@param col_val any
+---@param func any
+---@return nil
+function DataFrame:apply(col_val, func) end
+
 --- Returns a deep copy of this DataFrame.
 ---@return DataFrame
 function DataFrame:clone() end
@@ -3543,6 +4140,12 @@ function DataFrame:clone() end
 --- Returns a table of column names.
 ---@return table
 function DataFrame:columns() end
+
+--- Pearson correlation coefficient between two numeric columns.
+---@param col_a any
+---@param col_b any
+---@return number
+function DataFrame:corr(col_a, col_b) end
 
 --- Compute a correlation matrix for all numeric columns.
 ---@return DataFrame
@@ -3577,6 +4180,13 @@ function DataFrame:entropy(col) end
 ---@return nil
 function DataFrame:fillNil(col, val) end
 
+--- Filters rows where column matches a condition, returns a new DataFrame.
+---@param col any
+---@param op any
+---@param val any
+---@return DataFrame
+function DataFrame:filter(col, op, val) end
+
 --- Returns all values in a column as a table.
 ---@param col any
 ---@return table
@@ -3598,6 +4208,13 @@ function DataFrame:getRow(row) end
 ---@return LuaValue
 function DataFrame:getValue(row, col) end
 
+--- Aggregate agg_col grouped by group_col using the named function.
+---@param group_col any
+---@param agg_col any
+---@param fn_name any
+---@return DataFrame
+function DataFrame:groupAgg(group_col, agg_col, fn_name) end
+
 --- Groups rows by column value, returns a table of DataFrames keyed by value.
 ---@param col any
 ---@return table
@@ -3612,6 +4229,14 @@ function DataFrame:groupByObj(col) end
 ---@param n? any (optional)
 ---@return DataFrame
 function DataFrame:head(n) end
+
+--- Joins with another DataFrame on matching columns.
+---@param other DataFrame
+---@param this_col string|integer
+---@param other_col string|integer
+---@param join_type? string? (optional)
+---@return DataFrame
+function DataFrame:join(other, this_col, other_col, join_type) end
 
 --- Returns the maximum numeric value in a column.
 ---@param col any
@@ -3647,14 +4272,50 @@ function DataFrame:modeVal(col) end
 ---@return integer
 function DataFrame:ncols() end
 
+--- Add a min-max normalized column scaled to [out_min, out_max].
+---@param col any
+---@param out_min any
+---@param out_max any
+---@param name any
+---@return nil
+function DataFrame:normalizeCol(col, out_min, out_max, name) end
+
 --- Returns the number of rows.
 ---@return integer
 function DataFrame:nrows() end
+
+--- Return a new DataFrame with only outlier rows (|z-score| > threshold).
+---@param col any
+---@param threshold? any (optional)
+---@return DataFrame
+function DataFrame:outliers(col, threshold) end
+
+--- Create a pivot table.
+---@param row_col any
+---@param col_col any
+---@param val_col any
+---@return DataFrame
+function DataFrame:pivot(row_col, col_col, val_col) end
+
+--- Reshapes a long-format DataFrame into wide format.
+---@param row_key string|integer
+---@param col_key string|integer
+---@param value_key string|integer
+---@param agg? string? (optional)
+---@return DataFrame
+function DataFrame:pivotTable(row_key, col_key, value_key, agg) end
 
 --- Executes a SQL query against this DataFrame.
 ---@param sql_str any
 ---@return DataFrame
 function DataFrame:query(sql_str) end
+
+--- Returns a new DataFrame with a dense-rank column appended.
+---@param col any
+---@param order? any (optional)
+---@param result_col? any (optional)
+---@return DataFrame
+function DataFrame:rank(col, order, result_col) end
 
 --- Removes a column by name or index.
 ---@param col any
@@ -3671,6 +4332,20 @@ function DataFrame:removeRow(row) end
 ---@param new_name any
 ---@return nil
 function DataFrame:rename(col, new_name) end
+
+--- Returns a new DataFrame with a rolling mean column appended.
+---@param col any
+---@param window any
+---@param result_col? any (optional)
+---@return DataFrame
+function DataFrame:rollingMean(col, window, result_col) end
+
+--- Returns a new DataFrame with a rolling sum column appended.
+---@param col any
+---@param window any
+---@param result_col? any (optional)
+---@return DataFrame
+function DataFrame:rollingSum(col, window, result_col) end
 
 --- Returns a random sample of n rows.
 ---@param n any
@@ -3689,11 +4364,24 @@ function DataFrame:select(cols) end
 ---@return nil
 function DataFrame:setColumnFromF64(col, values) end
 
+--- Sets a single cell value.
+---@param row any
+---@param col any
+---@param val any
+---@return nil
+function DataFrame:setValue(row, col, val) end
+
 --- Returns rows from start to end (1-based, inclusive).
 ---@param start any
 ---@param end any
 ---@return DataFrame
 function DataFrame:slice(start, end) end
+
+--- Sorts by column, returns a new DataFrame.
+---@param col any
+---@param ascending? any (optional)
+---@return DataFrame
+function DataFrame:sort(col, ascending) end
 
 --- Returns the population standard deviation of numeric values in a column.
 ---@param col any
@@ -3750,15 +4438,74 @@ function DataFrame:unique(col) end
 ---@return number
 function DataFrame:variance(col) end
 
+--- Add a cumulative-sum column.
+---@param col any
+---@param name any
+---@return nil
+function DataFrame:withCumsum(col, name) end
+
 --- Returns a new DataFrame with an additional computed column named `col_name`.
 ---@param col_name any
 ---@param expr any
 ---@return DataFrame
 function DataFrame:withEval(col_name, expr) end
 
+--- Add a percent-change-from-previous-row column.
+---@param col any
+---@param name any
+---@return nil
+function DataFrame:withPctChange(col, name) end
+
+--- Add a rank column (1-based, ties averaged).
+---@param col any
+---@param asc? any (optional)
+---@param name any
+---@return nil
+function DataFrame:withRank(col, asc, name) end
+
+--- Add a rolling maximum column.
+---@param col any
+---@param window any
+---@param name any
+---@return nil
+function DataFrame:withRollingMax(col, window, name) end
+
+--- Add a rolling mean column. Rows with insufficient history get nil.
+---@param col any
+---@param window any
+---@param name any
+---@return nil
+function DataFrame:withRollingMean(col, window, name) end
+
+--- Add a rolling minimum column.
+---@param col any
+---@param window any
+---@param name any
+---@return nil
+function DataFrame:withRollingMin(col, window, name) end
+
+--- Add a rolling sum column.
+---@param col any
+---@param window any
+---@param name any
+---@return nil
+function DataFrame:withRollingSum(col, window, name) end
+
+--- Add a z-score column for the given numeric column.
+---@param col any
+---@param name any
+---@return nil
+function DataFrame:zscoreCol(col, name) end
+
 --- Lua-side wrapper around a shared [`Database`].
 ---@class Database
 local Database = {}
+
+--- Adds or replaces a table by cloning the given DataFrame.
+---@param name any
+---@param df_ud any
+---@return nil
+function Database:addTable(name, df_ud) end
 
 --- Drops every table from this in-memory database, leaving it empty.
 ---@return nil
@@ -3847,6 +4594,12 @@ function VecFrame:colCast(col, dtype) end
 ---@param col any
 function VecFrame:colCeil(col) end
 
+--- Clamp every element of a Float64 column to [min, max].
+---@param col any
+---@param min_val any
+---@param max_val any
+function VecFrame:colClamp(col, min_val, max_val) end
+
 --- Divide every element of a Float64 column by a scalar.
 ---@param col any
 ---@param val any
@@ -3864,6 +4617,13 @@ function VecFrame:colMul(col, val) end
 --- Negate every element of a Float64 column.
 ---@param col any
 function VecFrame:colNeg(col) end
+
+--- Compute out[i] = left[i] op right[i] for every row.
+---@param out_col any
+---@param left_col any
+---@param op any
+---@param right_col any
+function VecFrame:colOp(out_col, left_col, op, right_col) end
 
 --- Apply square root to every element of a Float64 column.
 ---@param col any
@@ -3883,6 +4643,13 @@ function VecFrame:colType(col) end
 ---@return table
 function VecFrame:columns() end
 
+--- Build a boolean row mask: mask[i] = col[i] cmp_op val.
+---@param col any
+---@param cmp_op any
+---@param val any
+---@return table
+function VecFrame:filterMask(col, cmp_op, val) end
+
 --- Return the number of columns.
 ---@return integer
 function VecFrame:ncols() end
@@ -3896,6 +4663,12 @@ function VecFrame:nrows() end
 ---@param op any
 ---@return table
 function VecFrame:parReduce(cols_tbl, op) end
+
+--- Apply a scalar op in parallel to multiple Float64 columns.
+---@param cols_tbl any
+---@param op any
+---@param val any
+function VecFrame:parScalarOp(cols_tbl, op, val) end
 
 --- Reduce an entire numeric column to a single value.
 ---@param col any
@@ -4621,6 +5394,19 @@ lurek.ecs = {}
 ---@class Universe
 local Universe = {}
 
+--- Adds a directed named relationship from entity `from` to entity `to`.
+---@param from any
+---@param name any
+---@param to any
+---@return nil
+function Universe:addRelation(from, name, to) end
+
+--- Adds a system table to the universe with an optional priority (lower = earlier).
+---@param system any
+---@param opts? any (optional)
+---@return nil
+function Universe:addSystem(system, opts) end
+
 --- Attaches a string tag to an entity.
 ---@param id any
 ---@param tag any
@@ -4649,6 +5435,12 @@ function Universe:clear() end
 ---@return nil
 function Universe:clearRelations(from, name) end
 
+--- Defines a blueprint from a component table.
+---@param name any
+---@param components any
+---@return nil
+function Universe:defineBlueprint(name, components) end
+
 --- Defines a bitmap tag name, returning its bit index.
 ---@param name any
 ---@return integer
@@ -4659,10 +5451,23 @@ function Universe:defineTag(name) end
 ---@return nil
 function Universe:deserialize(snapshot) end
 
+--- Calls callback(id, value) for every entity with the named component.
+---@param name any
+---@param callback any
+---@return nil
+function Universe:each(name, callback) end
+
 --- Emits a named event to all systems that implement the handler, in priority order.
 ---@param args any
 ---@return nil
 function Universe:emit(args) end
+
+--- Defines a blueprint by extending a parent with overrides.
+---@param name any
+---@param parent any
+---@param overrides any
+---@return nil
+function Universe:extendBlueprint(name, parent, overrides) end
 
 --- Dispatches all pending component-add and component-remove events to registered callbacks.
 ---@return nil
@@ -4758,6 +5563,13 @@ function Universe:hasBitmapTag(id, name) end
 ---@return boolean
 function Universe:hasBlueprint(name) end
 
+--- Returns true if a directed named relationship from `from` to `to` exists.
+---@param from any
+---@param name any
+---@param to any
+---@return boolean
+function Universe:hasRelation(from, name, to) end
+
 --- Returns true if the entity carries the given tag.
 ---@param id any
 ---@param tag any
@@ -4783,6 +5595,18 @@ function Universe:killRecursive(id) end
 ---@return table
 function Universe:listBlueprints() end
 
+--- Registers a callback to fire when a component is added to any entity.
+---@param name any
+---@param cb any
+---@return nil
+function Universe:onComponentAdded(name, cb) end
+
+--- Registers a callback to fire when a component is removed from any entity.
+---@param name any
+---@param cb any
+---@return nil
+function Universe:onComponentRemoved(name, cb) end
+
 --- Returns entity IDs that have all listed component names.
 ---@param args any
 ---@return table
@@ -4803,6 +5627,12 @@ function Universe:queryBitmapAny(names) end
 ---@return table
 function Universe:queryBitmapTag(name) end
 
+--- Returns entity IDs that have all `with` components and none of the `without` components.
+---@param with_tbl any
+---@param without_tbl any
+---@return table
+function Universe:queryNot(with_tbl, without_tbl) end
+
 --- Releases all universe state, equivalent to clear.
 ---@return nil
 function Universe:release() end
@@ -4817,6 +5647,13 @@ function Universe:remove(id, name) end
 ---@param name any
 ---@return nil
 function Universe:removeBlueprint(name) end
+
+--- Removes the directed named relationship from entity `from` to entity `to`.
+---@param from any
+---@param name any
+---@param to any
+---@return nil
+function Universe:removeRelation(from, name, to) end
 
 --- Removes a system table from the universe.
 ---@param system any
@@ -4837,15 +5674,41 @@ function Universe:render() end
 ---@return table
 function Universe:serialize() end
 
+--- Sets a component value on an entity.
+---@param id any
+---@param name any
+---@param value any
+---@return nil
+function Universe:set(id, name, value) end
+
 --- Sets the layer for an entity.
 ---@param id any
 ---@param layer any
 ---@return nil
 function Universe:setLayer(id, layer) end
 
+--- Sets or clears the parent of an entity.
+---@param child_id any
+---@param parent_id? any (optional)
+---@return nil
+function Universe:setParent(child_id, parent_id) end
+
 --- Creates a new entity and returns its packed ID.
 ---@return integer
 function Universe:spawn() end
+
+--- Spawns an entity from a blueprint with optional overrides.
+---@param name any
+---@param overrides? any (optional)
+---@return integer
+function Universe:spawnBlueprint(name, overrides) end
+
+--- Spawns `count` entities from a blueprint, returns an array of entity IDs.
+---@param name any
+---@param count any
+---@param overrides? any (optional)
+---@return table
+function Universe:spawnBulk(name, count, overrides) end
 
 --- Calls update(system, world, dt) on each registered system in priority order.
 ---@param dt any
@@ -4934,6 +5797,24 @@ function Overlay:clear() end
 ---@param h any
 ---@return ImageData
 function Overlay:drawToImage(w, h) end
+
+--- Animates a full-screen colour fade; alpha defaults to 1.0, duration to 1.0 s.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@param dur? any (optional)
+---@return nil
+function Overlay:fade(r, g, b, a, dur) end
+
+--- Triggers a full-screen colour flash; alpha defaults to 1.0, duration to 0.2 s.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@param dur? any (optional)
+---@return nil
+function Overlay:flash(r, g, b, a, dur) end
 
 --- Returns the current ambient tint as r, g, b, a components.
 ---@return number
@@ -5081,6 +5962,14 @@ function Overlay:render() end
 ---@return nil
 function Overlay:resize(w, h) end
 
+--- Sets the ambient light tint colour; alpha defaults to 1.0.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Overlay:setAmbientColor(r, g, b, a) end
+
 --- Enables or disables the ambient light layer.
 ---@param v any
 ---@return nil
@@ -5126,6 +6015,14 @@ function Overlay:setFilmGrainEnabled(v) end
 ---@return nil
 function Overlay:setFilmGrainIntensity(v) end
 
+--- Sets the fog tint colour; alpha defaults to 1.0.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Overlay:setFogColor(r, g, b, a) end
+
 --- Sets the fog density (0.0 = clear, 1.0 = fully opaque).
 ---@param v any
 ---@return nil
@@ -5146,6 +6043,14 @@ function Overlay:setHeatHazeEnabled(v) end
 ---@return nil
 function Overlay:setHeatHazeIntensity(v) end
 
+--- Sets the lightning flash tint colour; alpha defaults to 1.0.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Overlay:setLightningColor(r, g, b, a) end
+
 --- Sets the simulated time-of-day (0â€“24) which drives ambient colour.
 ---@param v any
 ---@return nil
@@ -5160,6 +6065,21 @@ function Overlay:setVignetteEnabled(v) end
 ---@param v any
 ---@return nil
 function Overlay:setVignetteStrength(v) end
+
+--- Enables the water UV-distortion overlay and sets its wave parameters.
+---@param amplitude any
+---@param frequency any
+---@param speed any
+---@return nil
+function Overlay:setWater(amplitude, frequency, speed) end
+
+--- Sets the water tint colour and blend strength.
+---@param r any
+---@param g any
+---@param b any
+---@param strength any
+---@return nil
+function Overlay:setWaterTint(r, g, b, strength) end
 
 --- Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen").
 ---@param name any
@@ -5192,9 +6112,33 @@ function Overlay:setWindSpeed(v) end
 ---@return nil
 function Overlay:shake(intensity, dur) end
 
+--- Triggers a screen fade effect to the given colour and alpha.
+---@param r any
+---@param g any
+---@param b any
+---@param target_alpha any
+---@param duration any
+---@return nil
+function Overlay:triggerFade(r, g, b, target_alpha, duration) end
+
+--- Triggers a screen-wide colour flash effect.
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+---@param duration any
+---@return nil
+function Overlay:triggerFlash(r, g, b, a, duration) end
+
 --- Triggers a lightning flash effect.
 ---@return nil
 function Overlay:triggerLightning() end
+
+--- Triggers a screen shake effect with the given intensity and duration.
+---@param intensity any
+---@param duration any
+---@return nil
+function Overlay:triggerShake(intensity, duration) end
 
 --- Returns the type name of this object ("Overlay").
 ---@return string
@@ -5225,6 +6169,12 @@ function PostFxEffect:enableAutoUniforms() end
 --- Returns the type name of this effect (alias for getTypeName).
 ---@return string
 function PostFxEffect:getEffectType() end
+
+--- Returns a named parameter value, or the default if not set.
+---@param name any
+---@param default? any (optional)
+---@return number
+function PostFxEffect:getParameter(name, default) end
 
 --- Returns a list of all parameter names on this effect.
 ---@return table
@@ -5382,6 +6332,12 @@ function PostFxStack:getHeight() end
 ---@return integer
 function PostFxStack:getWidth() end
 
+--- Inserts a PostFxEffect at a specific 1-based position in the pipeline.
+---@param position any
+---@param effect_ud any
+---@return nil
+function PostFxStack:insert(position, effect_ud) end
+
 --- Returns whether the stack is currently capturing the scene.
 ---@return boolean
 function PostFxStack:isCapturing() end
@@ -5409,6 +6365,12 @@ function PostFxStack:remove(effect_ud) end
 ---@param h any
 ---@return nil
 function PostFxStack:resize(w, h) end
+
+--- Enables or disables the effect at the given 1-based position.
+---@param position any
+---@param enabled any
+---@return nil
+function PostFxStack:setEnabled(position, enabled) end
 
 --- Sets the feedback loop intensity. At `0.0` (default) there is no
 ---@param factor any
@@ -5592,6 +6554,12 @@ function Signal:clear(name) end
 ---@return integer
 function Signal:clearAll() end
 
+--- Subscribes to an event name or wildcard pattern. When the pattern contains
+---@param name any
+---@param func any
+---@return nil
+function Signal:connect(name, func) end
+
 --- Emits the named event, calling all registered callbacks with extra arguments.
 ---@param args any
 ---@return nil
@@ -5605,6 +6573,25 @@ function Signal:getCount(name) end
 --- Returns the total callback count across all events.
 ---@return integer
 function Signal:getTotalCount() end
+
+--- Registers a one-shot callback that fires at most once then auto-removes itself.
+---@param name any
+---@param callback any
+---@return integer
+function Signal:once(name, callback) end
+
+--- Registers a callback for the named event and returns its handle ID.
+---@param name any
+---@param callback any
+---@return integer
+function Signal:register(name, callback) end
+
+--- Registers a callback with a filter predicate. The callback only fires if the
+---@param name any
+---@param callback any
+---@param filter any
+---@return integer
+function Signal:registerWithFilter(name, callback, filter) end
 
 --- Removes a subscription by handle ID.
 ---@param handle any
@@ -5961,6 +6948,36 @@ lurek.globe = {}
 ---@class Globe
 local Globe = {}
 
+--- Add an arc (great-circle path between two lat/lon points).
+---@param lat1 any
+---@param lon1 any
+---@param lat2 any
+---@param lon2 any
+---@param steps? any (optional)
+---@return integer
+function Globe:addArc(lat1, lon1, lat2, lon2, steps) end
+
+--- Add a text label. Returns label ID.
+---@param ltype any
+---@param lat any
+---@param lon any
+---@param text any
+---@return integer
+function Globe:addLabel(ltype, lat, lon, text) end
+
+--- Add or replace a named thematic layer.
+---@param name any
+---@param z_order? any (optional)
+function Globe:addLayer(name, z_order) end
+
+--- Add a marker. Returns marker ID.
+---@param mtype any
+---@param lat any
+---@param lon any
+---@param label? any (optional)
+---@return integer
+function Globe:addMarker(mtype, lat, lon, label) end
+
 --- Adds a province from a table {id, centroid={lat,lon}, vertices={{lat,lon},...},
 ---@param p any
 ---@return boolean
@@ -6043,6 +7060,12 @@ function Globe:pickLatLon(sx, sy) end
 ---@return integer
 function Globe:provinceCount() end
 
+--- Return all provinces reachable within `max_cost` steps from `start_id`.
+---@param start_id any
+---@param max_cost any
+---@return table<integer
+function Globe:reachable(start_id, max_cost) end
+
 --- Removes an arc from the globe map by its unique string identifier.
 ---@param id any
 function Globe:removeArc(id) end
@@ -6103,15 +7126,36 @@ function Globe:setLabelVisible(id, vis) end
 ---@param alpha any
 function Globe:setLayerAlpha(name, alpha) end
 
+--- Set a per-province color override on a layer.
+---@param layer any
+---@param id any
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+function Globe:setLayerColor(layer, id, r, g, b, a) end
+
 --- Sets whether this specific texture layer is visible on the globe.
 ---@param name any
 ---@param vis any
 function Globe:setLayerVisible(name, vis) end
 
+--- Set a string attribute on a marker.
+---@param id any
+---@param key any
+---@param val any
+function Globe:setMarkerAttr(id, key, val) end
+
 --- Sets whether this specific marker is visible on the globe.
 ---@param id any
 ---@param vis any
 function Globe:setMarkerVisible(id, vis) end
+
+--- Sets a string attribute on a province.
+---@param id any
+---@param key any
+---@param val any
+function Globe:setProvinceAttr(id, key, val) end
 
 --- Set planet rotation (degrees).
 ---@param deg any
@@ -6141,6 +7185,12 @@ function GlobeRegistry:get(name) end
 --- Returns a table of all globe names.
 ---@return table<string>
 function GlobeRegistry:names() end
+
+--- Create a globe with the given name and optional spec table.
+---@param name any
+---@param spec_tbl? any (optional)
+---@return Globe
+function GlobeRegistry:new(name, spec_tbl) end
 
 --- Removes a globe from the central registry by its string name.
 ---@param name any
@@ -6324,13 +7374,69 @@ function Edge:typeOf(name) end
 ---@class Graph
 local Graph = {}
 
+--- Adds a directed edge between two nodes and returns its handle.
+---@param from_ud any
+---@param to_ud any
+---@param edge_type? any (optional)
+---@return Edge
+function Graph:addEdge(from_ud, to_ud, edge_type) end
+
+--- Places an item at a node.
+---@param item_ud any
+---@param node_ud any
+---@return boolean
+function Graph:addItem(item_ud, node_ud) end
+
+--- Adds a node and returns its handle.
+---@param node_type? any (optional)
+---@param capacity? any (optional)
+---@return Node
+function Graph:addNode(node_type, capacity) end
+
+--- Finds the shortest path between two nodes using A*.
+---@param from_node any
+---@param to_node any
+---@return table?
+function Graph:astar(from_node, to_node) end
+
 --- Assigns each node the smallest non-negative integer colour not shared with any
 ---@return table
 function Graph:colorGraph() end
 
+--- Creates a new unplaced item and returns its handle.
+---@param item_type? any (optional)
+---@param decay_time? any (optional)
+---@return GraphItem
+function Graph:createItem(item_type, decay_time) end
+
+--- Finds the shortest path between two nodes using Dijkstra.
+---@param from_ud any
+---@param to_ud any
+---@return table?
+function Graph:findPath(from_ud, to_ud) end
+
+--- Finds the shortest path for a specific item, filtering by item type.
+---@param item_ud any
+---@param from_ud any
+---@param to_ud any
+---@return table?
+function Graph:findPathForItem(item_ud, from_ud, to_ud) end
+
 --- Returns weakly connected components as a table of tables of Node handles.
 ---@return table
 function Graph:getComponents() end
+
+--- Returns the shortest path distance, or nil if unreachable.
+---@param from_ud any
+---@param to_ud any
+---@return number?
+function Graph:getDistance(from_ud, to_ud) end
+
+--- Returns the edge between two nodes, or nil if none exists.
+---@param from_ud any
+---@param to_ud any
+---@return nil
+function Graph:getEdgeBetween(from_ud, to_ud) end
 
 --- Returns the number of edges in the graph.
 ---@return integer
@@ -6360,6 +7466,12 @@ function Graph:getNodeCount() end
 --- Returns a table of all Node handles.
 ---@return table
 function Graph:getNodes() end
+
+--- Returns a table of Node handles reachable from the given node.
+---@param from_ud any
+---@param max_dist? any (optional)
+---@return table
+function Graph:getReachable(from_ud, max_dist) end
 
 --- Returns a statistics snapshot table.
 ---@return table
@@ -6392,6 +7504,12 @@ function Graph:isBipartite() end
 ---@return table
 function Graph:mst() end
 
+--- Registers a callback for a graph simulation event.
+---@param event_name any
+---@param func any
+---@return nil
+function Graph:on(event_name, func) end
+
 --- Processes all supply/demand declarations and fires event callbacks.
 ---@return nil
 function Graph:processDemand() end
@@ -6410,6 +7528,12 @@ function Graph:removeItem(item_ud) end
 ---@param node_ud any
 ---@return boolean
 function Graph:removeNode(node_ud) end
+
+--- Sends an item onto an edge to begin transit.
+---@param item_ud any
+---@param edge_ud any
+---@return boolean
+function Graph:sendItem(item_ud, edge_ud) end
 
 --- Runs one discrete simulation step and fires event callbacks.
 ---@return nil
@@ -6497,6 +7621,19 @@ function GraphItem:typeOf(name) end
 --- Lua handle for a node inside a `Graph`.
 ---@class Node
 local Node = {}
+
+--- Declares a demand for the given item type, quantity, and priority.
+---@param item_type any
+---@param quantity any
+---@param priority? any (optional)
+---@return nil
+function Node:addDemand(item_type, quantity, priority) end
+
+--- Declares a supply of the given item type and quantity at this node.
+---@param item_type any
+---@param quantity any
+---@return nil
+function Node:addSupply(item_type, quantity) end
 
 --- Attaches a string tag to this node for fast group queries.
 ---@param tag any
@@ -6635,6 +7772,14 @@ function Node:setActive(a) end
 ---@param c any
 ---@return nil
 function Node:setCapacity(c) end
+
+--- Adds or replaces a conversion rule on this node.
+---@param in_type string
+---@param out_type string
+---@param in_count? integer? (optional)
+---@param out_count? integer? (optional)
+---@return nil
+function Node:setConversion(in_type, out_type, in_count, out_count) end
 
 --- Sets the flow mode from a string.
 ---@param m any
@@ -6932,6 +8077,12 @@ function LayeredImage:layerCount() end
 ---@return ImageData
 function LayeredImage:merge() end
 
+--- Moves a layer from one position to another, shifting layers in between.
+---@param from_idx any
+---@param to_idx any
+---@return boolean
+function LayeredImage:moveLayer(from_idx, to_idx) end
+
 --- Removes the layer at the given 1-based index. Returns true on success.
 ---@param index any
 ---@return boolean
@@ -6941,6 +8092,12 @@ function LayeredImage:removeLayer(index) end
 ---@param path any
 ---@return nil
 function LayeredImage:save(path) end
+
+--- Replaces a layer's pixel buffer with a copy of the given ImageData.
+---@param index any
+---@param img any
+---@return boolean
+function LayeredImage:setLayer(index, img) end
 
 --- Renames the layer at the given index to the new name string.
 ---@param index any
@@ -6977,6 +8134,18 @@ function PaletteLUT:clear() end
 --- Returns the number of colour mapping entries.
 ---@return integer
 function PaletteLUT:getColorCount() end
+
+--- Appends a colour mapping entry to the palette: when a pixel exactly matching
+---@param fr any
+---@param fg any
+---@param fb any
+---@param fa any
+---@param tr any
+---@param tg any
+---@param tb any
+---@param ta any
+---@return nil
+function PaletteLUT:setColor(fr, fg, fb, fa, tr, tg, tb, ta) end
 
 --- Lua-side wrapper around [`ProvinceGrid`].
 ---@class ProvinceGrid
@@ -7017,6 +8186,13 @@ function mlua:alphaMask(factor) end
 ---@return nil
 function mlua:applyPaletteLut(lut_ud) end
 
+--- Blits the source ImageData onto this image at (dst_x, dst_y) using Porter-Duff over.
+---@param src_ud any
+---@param dst_x any
+---@param dst_y any
+---@return nil
+function mlua:blit(src_ud, dst_x, dst_y) end
+
 --- Blur.
 ---@param radius any
 ---@return nil
@@ -7032,6 +8208,12 @@ function mlua:brightness(factor) end
 ---@return nil
 function mlua:contrast(factor) end
 
+--- Applies a custom NxN convolution kernel to the image and returns a new ImageData.
+---@param kernel_t any
+---@param ksize any
+---@return ImageData
+function mlua:convolve(kernel_t, ksize) end
+
 --- Crop.
 ---@param x any
 ---@param y any
@@ -7044,6 +8226,41 @@ function mlua:crop(x, y, w, h) end
 ---@param other_ud any
 ---@return integer
 function mlua:diff(other_ud) end
+
+--- Draws a filled circle onto the image.
+---@param cx any
+---@param cy any
+---@param radius any
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+---@return nil
+function mlua:drawCircle(cx, cy, radius, r, g, b, a) end
+
+--- Draws a line using Bresenham's algorithm.
+---@param x0 any
+---@param y0 any
+---@param x1 any
+---@param y1 any
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+---@return nil
+function mlua:drawLine(x0, y0, x1, y1, r, g, b, a) end
+
+--- Draws a filled rectangle onto the image.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+---@return nil
+function mlua:drawRect(x, y, w, h, r, g, b, a) end
 
 --- Encode.
 ---@param format any
@@ -7085,6 +8302,14 @@ function mlua:getHeight() end
 ---@return nil
 function mlua:getPixel(x, y) end
 
+--- Returns a copy of the rectangular sub-region as a new ImageData.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function mlua:getRegion(x, y, w, h) end
+
 --- Returns the string.
 ---@return table|nil
 function mlua:getString() end
@@ -7116,6 +8341,13 @@ function mlua:mapPixels(func) end
 ---@return nil
 function mlua:noise(amount) end
 
+--- Copies pixels from `source` onto this image starting at (dx, dy).
+---@param src_ud any
+---@param dx any
+---@param dy any
+---@return nil
+function mlua:paste(src_ud, dx, dy) end
+
 --- Posterize.
 ---@param levels any
 ---@return nil
@@ -7146,6 +8378,14 @@ function mlua:saturation(factor) end
 ---@return nil
 function mlua:sepia() end
 
+---@param x any
+---@param y any
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+function mlua:setPixel(x, y, r, g, b, a) end
+
 --- Replaces all pixel data from a raw RGBA byte string.
 ---@param bytes any
 ---@return nil
@@ -7159,6 +8399,12 @@ function mlua:sharpen() end
 ---@param value any
 ---@return nil
 function mlua:threshold(value) end
+
+---@param tr any
+---@param tg any
+---@param tb any
+---@param factor any
+function mlua:tint(tr, tg, tb, factor) end
 
 --- Returns true if the file at the given path is a DDS file.
 ---@param filename any
@@ -7232,6 +8478,10 @@ function Combo:getStep(index) end
 --- Returns true if the detector is currently mid-sequence.
 ---@return boolean
 function Combo:isInProgress() end
+
+--- Returns the number of steps matched so far (0 when idle).
+---@return integer
+function Combo:progress() end
 
 --- Reset the detector to its initial idle state, cancelling any in-progress sequence.
 ---@return nil
@@ -7741,6 +8991,14 @@ function Light:setAttenuation(c, l, q) end
 ---@return nil
 function Light:setBlendMode(mode) end
 
+--- Sets the light's tint color.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Light:setColor(r, g, b, a) end
+
 --- Sets the texture path used as a light cookie (mask) for projection.
 ---@param path any
 ---@return nil
@@ -7818,6 +9076,14 @@ function Light:setPosition(x, y) end
 ---@return nil
 function Light:setRadius(r) end
 
+--- Sets the shadow region color.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Light:setShadowColor(r, g, b, a) end
+
 --- Sets whether this light casts shadows.
 ---@param b any
 ---@return nil
@@ -7850,6 +9116,12 @@ function Light:stopTransition() end
 --- Returns the fractional progress `[0, 1]` of the active transition,
 ---@return number
 function Light:transitionProgress() end
+
+--- Begins a smooth linear transition of the light's color, intensity,
+---@param target any
+---@param duration any
+---@return nil
+function Light:transitionTo(target, duration) end
 
 --- Advances the active transition by `dt` seconds and applies the
 ---@param dt any
@@ -8128,6 +9400,15 @@ function AabbTree:clear() end
 ---@return boolean
 function AabbTree:contains(id) end
 
+--- Inserts an entry with the given AABB into the tree.
+---@param id any
+---@param min_x any
+---@param min_y any
+---@param max_x any
+---@param max_y any
+---@return nil
+function AabbTree:insert(id, min_x, min_y, max_x, max_y) end
+
 --- Returns true if the tree contains no entries.
 ---@return boolean
 function AabbTree:isEmpty() end
@@ -8135,6 +9416,14 @@ function AabbTree:isEmpty() end
 --- Returns the number of entries in the tree.
 ---@return integer
 function AabbTree:len() end
+
+--- Returns the ids of all entries whose AABBs overlap the query rectangle.
+---@param min_x any
+---@param min_y any
+---@param max_x any
+---@param max_y any
+---@return table
+function AabbTree:query(min_x, min_y, max_x, max_y) end
 
 --- Returns the ids of all entries whose AABBs contain the given point.
 ---@param x any
@@ -8146,6 +9435,15 @@ function AabbTree:queryPoint(x, y) end
 ---@param id any
 ---@return boolean
 function AabbTree:remove(id) end
+
+--- Updates the AABB for an existing entry.
+---@param id any
+---@param min_x any
+---@param min_y any
+---@param max_x any
+---@param max_y any
+---@return boolean
+function AabbTree:update(id, min_x, min_y, max_x, max_y) end
 
 --- Lua-side wrapper around a [`BezierCurve`].
 ---@class BezierCurve
@@ -8168,6 +9466,13 @@ function BezierCurve:getControlPointCount() end
 --- Returns a new BezierCurve representing the first derivative.
 ---@return BezierCurve
 function BezierCurve:getDerivative() end
+
+--- Inserts a control point. If index is given (1-based), inserts at that position.
+---@param x any
+---@param y any
+---@param index? any (optional)
+---@return nil
+function BezierCurve:insertControlPoint(x, y, index) end
 
 --- Returns the approximate arc length of the curve.
 ---@return number
@@ -8196,6 +9501,13 @@ function BezierCurve:rotate(angle, ox, oy) end
 ---@param oy any
 ---@return nil
 function BezierCurve:scale(s, ox, oy) end
+
+--- Sets the control point at 1-based index.
+---@param index any
+---@param x any
+---@param y any
+---@return boolean
+function BezierCurve:setControlPoint(index, x, y) end
 
 --- Translates all control points by (dx, dy).
 ---@param dx any
@@ -8284,6 +9596,23 @@ function Hermite:sample(t) end
 ---@class NoiseGenerator
 local NoiseGenerator = {}
 
+--- Returns fractal Brownian motion noise at (x, y).
+---@param x number
+---@param y number
+---@param octaves? integer? (optional)
+---@param lacunarity? number? (optional)
+---@param persistence? number? (optional)
+---@param kind? string? (optional)
+---@return number
+function NoiseGenerator:fbm(x, y, octaves, lacunarity, persistence, kind) end
+
+--- Generates a 2D noise map as a flat table (row-major).
+---@param w any
+---@param h any
+---@param opts? any (optional)
+---@return table
+function NoiseGenerator:generateMap(w, h, opts) end
+
 --- Returns the current seed.
 ---@return integer
 function NoiseGenerator:getSeed() end
@@ -8314,6 +9643,16 @@ function NoiseGenerator:perlin3d(x, y, z) end
 ---@return number
 function NoiseGenerator:perlin4d(x, y, z, w) end
 
+--- Returns ridged multi-fractal noise at (x, y).
+---@param x number
+---@param y number
+---@param octaves? integer? (optional)
+---@param lacunarity? number? (optional)
+---@param persistence? number? (optional)
+---@param kind? string? (optional)
+---@return number
+function NoiseGenerator:ridged(x, y, octaves, lacunarity, persistence, kind) end
+
 --- Sets the seed and rebuilds the permutation table.
 ---@param seed any
 ---@return nil
@@ -8336,6 +9675,40 @@ function NoiseGenerator:simplex2d(x, y) end
 ---@param z any
 ---@return number
 function NoiseGenerator:simplex3d(x, y, z) end
+
+--- Returns turbulence noise at (x, y).
+---@param x number
+---@param y number
+---@param octaves? integer? (optional)
+---@param lacunarity? number? (optional)
+---@param persistence? number? (optional)
+---@param kind? string? (optional)
+---@return number
+function NoiseGenerator:turbulence(x, y, octaves, lacunarity, persistence, kind) end
+
+--- Applies domain warping, returning offset (x, y).
+---@param x any
+---@param y any
+---@param strength any
+---@return number
+function NoiseGenerator:warpDomain(x, y, strength) end
+
+--- Returns 2D Worley (cellular) noise at (x, y).
+---@param x any
+---@param y any
+---@param dist_name? any (optional)
+---@param f2? any (optional)
+---@return number
+function NoiseGenerator:worley2d(x, y, dist_name, f2) end
+
+--- Returns 3D Worley (cellular) noise at (x, y, z).
+---@param x any
+---@param y any
+---@param z any
+---@param dist_name? any (optional)
+---@param f2? any (optional)
+---@return number
+function NoiseGenerator:worley3d(x, y, z, dist_name, f2) end
 
 --- Lua-side wrapper around a [`RandomGenerator`].
 ---@class RandomGenerator
@@ -8365,6 +9738,12 @@ function RandomGenerator:randomFloat(min, max) end
 ---@return integer
 function RandomGenerator:randomInt(min, max) end
 
+--- Returns a random number from a normal (Gaussian) distribution.
+---@param stddev? any (optional)
+---@param mean? any (optional)
+---@return number
+function RandomGenerator:randomNormal(stddev, mean) end
+
 --- Sets the seed, fully resetting the generator state.
 ---@param seed any
 ---@return nil
@@ -8391,10 +9770,51 @@ function SpatialHash:getCellSize() end
 ---@return integer
 function SpatialHash:getItemCount() end
 
+--- Inserts an item with the given AABB.
+---@param id any
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function SpatialHash:insert(id, x, y, w, h) end
+
+--- Returns IDs of items overlapping the query circle.
+---@param cx any
+---@param cy any
+---@param radius any
+---@return table
+function SpatialHash:queryCircle(cx, cy, radius) end
+
+--- Returns IDs of items overlapping the query rectangle.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return table
+function SpatialHash:queryRect(x, y, w, h) end
+
+--- Returns IDs of items whose AABBs are intersected by the line segment.
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return table
+function SpatialHash:querySegment(x1, y1, x2, y2) end
+
 --- Removes an item by its ID.
 ---@param id any
 ---@return nil
 function SpatialHash:remove(id) end
+
+--- Updates an existing item's AABB.
+---@param id any
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function SpatialHash:update(id, x, y, w, h) end
 
 --- Lua-side wrapper around a [`Transform`].
 ---@class Transform
@@ -8436,6 +9856,18 @@ function Transform:rotate(angle) end
 ---@param sy? any (optional)
 ---@return nil
 function Transform:scale(sx, sy) end
+
+--- Replaces the transform with full transformation parameters.
+---@param x number
+---@param y number
+---@param angle? number? (optional)
+---@param sx? number? (optional)
+---@param sy? number? (optional)
+---@param ox? number? (optional)
+---@param oy? number? (optional)
+---@param kx? number? (optional)
+---@param ky? number? (optional)
+function Transform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 --- Applies horizontal and vertical shear factors to this transform matrix.
 ---@param kx any
@@ -9302,6 +10734,37 @@ lurek.minimap = {}
 ---@class Minimap
 local Minimap = {}
 
+--- Adds a persistent marker and returns its auto-assigned ID.
+---@param x number
+---@param y number
+---@param desc? string? (optional)
+---@param r? number? (optional)
+---@param g? number? (optional)
+---@param b? number? (optional)
+---@param a? number? (optional)
+---@return integer
+function Minimap:addMarker(x, y, desc, r, g, b, a) end
+
+--- Registers a new object type and returns its 1-based index.
+---@param name any
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return integer
+function Minimap:addObjectType(name, r, g, b, a) end
+
+--- Adds an animated ping at grid coordinates with a duration and optional color.
+---@param x number
+---@param y number
+---@param duration number
+---@param r? number? (optional)
+---@param g? number? (optional)
+---@param b? number? (optional)
+---@param a? number? (optional)
+---@return nil
+function Minimap:addPing(x, y, duration, r, g, b, a) end
+
 --- Removes the animation from a marker, reverting it to static.
 ---@param id any
 ---@return nil
@@ -9323,6 +10786,24 @@ function Minimap:clearPath(id) end
 --- Clears the viewport rectangle overlay.
 ---@return nil
 function Minimap:clearViewportRect() end
+
+--- Draws a custom line segment on the minimap overlay.
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param color_tbl any
+---@return nil
+function Minimap:drawLine(x1, y1, x2, y2, color_tbl) end
+
+--- Draws a custom rectangle on the minimap overlay.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param color_tbl any
+---@return nil
+function Minimap:drawRect(x, y, w, h, color_tbl) end
 
 --- Renders the minimap grid to a CPU ImageData.
 ---@param pixel_size any
@@ -9378,6 +10859,14 @@ function Minimap:getGridSize() end
 --- Returns the grid width in cells.
 ---@return integer
 function Minimap:getGridWidth() end
+
+--- Returns hover tooltip text for the element under screen coordinates, or nil.
+---@param sx any
+---@param sy any
+---@param mx any
+---@param my any
+---@return string?
+function Minimap:getHoverInfo(sx, sy, mx, my) end
 
 --- Returns the index of the currently active render layer.
 ---@return integer
@@ -9437,6 +10926,14 @@ function Minimap:getViewportRect() end
 ---@return number
 function Minimap:getZoom() end
 
+--- Converts grid coordinates to screen coordinates.
+---@param gx any
+---@param gy any
+---@param mx any
+---@param my any
+---@return number
+function Minimap:gridToScreen(gx, gy, mx, my) end
+
 --- Returns whether a marker with the given ID exists.
 ---@param id any
 ---@return boolean
@@ -9479,6 +10976,14 @@ function Minimap:removeObject(id) end
 ---@return nil
 function Minimap:render(x, y) end
 
+--- Converts screen coordinates to grid coordinates.
+---@param sx any
+---@param sy any
+---@param mx any
+---@param my any
+---@return number
+function Minimap:screenToGrid(sx, sy, mx, my) end
+
 --- Sets whether anti-aliasing is enabled.
 ---@param enabled any
 ---@return nil
@@ -9506,6 +11011,14 @@ function Minimap:setColorMode(mode) end
 ---@return nil
 function Minimap:setDisplaySize(w, h) end
 
+--- Sets the fog overlay color.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Minimap:setFogColor(r, g, b, a) end
+
 --- Sets the entire fog grid from a flat 1-based table (0=hidden, 1=explored, 2=visible).
 ---@param data any
 ---@return nil
@@ -9528,10 +11041,85 @@ function Minimap:setFogLevel(x, y, level) end
 ---@return nil
 function Minimap:setLayer(layer) end
 
+--- Stores tile data for a specific layer index.
+---@param layer any
+---@param data_tbl any
+---@return nil
+function Minimap:setLayerData(layer, data_tbl) end
+
+--- Attaches an animation to a marker. Does nothing if the ID does not exist.
+---@param id any
+---@param anim_type any
+---@param speed any
+---@return nil
+function Minimap:setMarkerAnimation(id, anim_type, speed) end
+
+--- Sets or updates a tracked object on the minimap.
+---@param id any
+---@param x any
+---@param y any
+---@param type_idx any
+---@param owner? any (optional)
+---@return nil
+function Minimap:setObject(id, x, y, type_idx, owner) end
+
+--- Sets whether an object type (1-based index) is visible.
+---@param type_idx any
+---@param visible any
+---@return nil
+function Minimap:setObjectTypeVisible(type_idx, visible) end
+
+--- Sets the display color for an owner/faction.
+---@param owner any
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Minimap:setOwnerColor(owner, r, g, b, a) end
+
+--- Sets the terrain type at a 1-based grid position.
+---@param x any
+---@param y any
+---@param terrain_type any
+---@return nil
+function Minimap:setTerrain(x, y, terrain_type) end
+
+--- Sets the display color for a terrain type.
+---@param terrain_type any
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Minimap:setTerrainColor(terrain_type, r, g, b, a) end
+
 --- Sets terrain types from a flat 1-based Lua table of integers (row-major).
 ---@param data any
 ---@return nil
 function Minimap:setTerrainData(data) end
+
+--- Sets a hover tooltip string for a terrain type ID.
+---@param type_id any
+---@param desc any
+---@return nil
+function Minimap:setTileDescription(type_id, desc) end
+
+--- Sets the viewport rectangle color.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Minimap:setViewportColor(r, g, b, a) end
+
+--- Sets the viewport rectangle overlay in grid coordinates.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function Minimap:setViewportRect(x, y, w, h) end
 
 --- Sets whether the viewport rectangle is visible.
 ---@param visible any
@@ -9542,6 +11130,12 @@ function Minimap:setViewportVisible(visible) end
 ---@param zoom any
 ---@return nil
 function Minimap:setZoom(zoom) end
+
+--- Displays a pathfinding route on the minimap and returns its path ID.
+---@param points_tbl any
+---@param color_tbl any
+---@return nil
+function Minimap:showPath(points_tbl, color_tbl) end
 
 --- Returns the type name of this object.
 ---@return string
@@ -9698,6 +11292,12 @@ function Mod:setConfigSchema(schema) end
 ---@return nil
 function Mod:setEnabled(enabled) end
 
+--- Registers a named hook callback, replacing any existing one
+---@param name any
+---@param func any
+---@return nil
+function Mod:setHook(name, func) end
+
 --- Lua-side wrapper around [`ModManager`].
 ---@class ModManager
 local ModManager = {}
@@ -9795,9 +11395,41 @@ lurek.network = {}
 ---@class NetworkHost
 local NetworkHost = {}
 
+--- Broadcasts data to all connected peers on a channel.
+---@param channel_id any
+---@param data any
+---@param reliable? any (optional)
+---@return nil
+function NetworkHost:broadcast(channel_id, data, reliable) end
+
+--- Initiates a connection to a remote host, returning the peer ID.
+---@param addr_str any
+---@param channels? any (optional)
+---@param data? any (optional)
+---@return integer
+function NetworkHost:connect(addr_str, channels, data) end
+
 --- Destroys the host, closing the underlying socket.
 ---@return nil
 function NetworkHost:destroy() end
+
+--- Gracefully disconnects a peer.
+---@param peer_id any
+---@param data? any (optional)
+---@return nil
+function NetworkHost:disconnect(peer_id, data) end
+
+--- Disconnects a peer after all queued packets have been sent.
+---@param peer_id any
+---@param data? any (optional)
+---@return nil
+function NetworkHost:disconnectLater(peer_id, data) end
+
+--- Immediately disconnects a peer without handshake.
+---@param peer_id any
+---@param data? any (optional)
+---@return nil
+function NetworkHost:disconnectNow(peer_id, data) end
 
 --- Flushes all pending sends immediately.
 ---@return nil
@@ -9873,9 +11505,23 @@ function NetworkHost:ping(peer_id) end
 ---@return nil
 function NetworkHost:resetPeer(peer_id) end
 
+--- Sends data to a specific peer on a channel.
+---@param peer_id any
+---@param channel_id any
+---@param data any
+---@param reliable? any (optional)
+---@return nil
+function NetworkHost:send(peer_id, channel_id, data, reliable) end
+
 --- Polls the network for one event, returning an event table or nil.
 ---@return table?
 function NetworkHost:service() end
+
+--- Sets the bandwidth limits in bytes per second.
+---@param incoming? any (optional)
+---@param outgoing? any (optional)
+---@return nil
+function NetworkHost:setBandwidthLimit(incoming, outgoing) end
 
 --- Sets the channel limit for future connections.
 ---@param limit any
@@ -9885,6 +11531,19 @@ function NetworkHost:setChannelLimit(limit) end
 --- Lua-side wrapper around [`NetworkRuntime`] for async HTTP/TCP/WebSocket.
 ---@class NetworkRuntime
 local NetworkRuntime = {}
+
+--- Convenience: sends an HTTP GET request.
+---@param url any
+---@param headers? any (optional)
+---@return nil
+function NetworkRuntime:httpGet(url, headers) end
+
+--- Convenience: sends an HTTP POST request.
+---@param url any
+---@param body any
+---@param headers? any (optional)
+---@return nil
+function NetworkRuntime:httpPost(url, body, headers) end
 
 --- Sends an HTTP request asynchronously. Poll with `poll()` for the response.
 ---@param opts any
@@ -10058,6 +11717,14 @@ function ParallaxLayer:setAutoscroll(vx, vy) end
 ---@return nil
 function ParallaxLayer:setBlendMode(mode) end
 
+--- Clamps the scroll offset to a world-pixel range on each axis.
+---@param min_x any
+---@param min_y any
+---@param max_x any
+---@param max_y any
+---@return nil
+function ParallaxLayer:setClamp(min_x, min_y, max_x, max_y) end
+
 --- Sets the floating-point draw depth for fine-grained layer ordering.
 ---@param z any
 ---@return nil
@@ -10205,6 +11872,20 @@ lurek.particle = {}
 --- Lua-side handle to a particle system stored in SharedState.
 ---@class ParticleSystem
 local ParticleSystem = {}
+
+--- Adds a gravity well that pulls (positive strength) or repels
+---@param x any
+---@param y any
+---@param strength any
+---@param radius any
+---@return nil
+function ParticleSystem:addAttractor(x, y, strength, radius) end
+
+--- Attaches a sub-emitter that bursts when a particle dies.
+---@param config_tbl any
+---@param burst_count? any (optional)
+---@return nil
+function ParticleSystem:addSubEmitter(config_tbl, burst_count) end
 
 --- Adds a child emitter that updates and renders with this system.
 ---@param config_tbl any
@@ -10394,6 +12075,15 @@ function ParticleSystem:reset() end
 ---@return nil
 function ParticleSystem:resume() end
 
+--- Constrains all particles to an axis-aligned bounding rectangle.
+---@param xmin any
+---@param xmax any
+---@param ymin any
+---@param ymax any
+---@param restitution any
+---@return nil
+function ParticleSystem:setBounds(xmin, xmax, ymin, ymax, restitution) end
+
 --- Sets the maximum number of particles (resizes the pool).
 ---@param n any
 ---@return nil
@@ -10433,6 +12123,13 @@ function ParticleSystem:setEmissionRate(rate) end
 ---@return nil
 function ParticleSystem:setEmitterLifetime(t) end
 
+--- Configures sprite-sheet flipbook animation by dividing the texture into a grid.
+---@param cols any
+---@param rows any
+---@param fps any
+---@return nil
+function ParticleSystem:setFlipbook(cols, rows, fps) end
+
 --- Sets the gravity acceleration applied to all active particles each frame.
 ---@param gx any
 ---@param gy any
@@ -10443,6 +12140,14 @@ function ParticleSystem:setGravity(gx, gy) end
 ---@param mode any
 ---@return nil
 function ParticleSystem:setInsertMode(mode) end
+
+--- Sets linear acceleration range.
+---@param xmin any
+---@param ymin any
+---@param xmax any
+---@param ymax any
+---@return nil
+function ParticleSystem:setLinearAcceleration(xmin, ymin, xmax, ymax) end
 
 --- Sets linear damping range.
 ---@param min any
@@ -10472,6 +12177,12 @@ function ParticleSystem:setParticleLifetime(min, max) end
 ---@param y any
 ---@return nil
 function ParticleSystem:setPosition(x, y) end
+
+--- Sets radial acceleration range.
+---@param min any
+---@param max any
+---@return nil
+function ParticleSystem:setRadialAcceleration(min, max) end
 
 --- Sets whether particle rotation follows velocity direction.
 ---@param v any
@@ -10520,6 +12231,12 @@ function ParticleSystem:setSpinVariation(v) end
 ---@param spread any
 ---@return nil
 function ParticleSystem:setSpread(spread) end
+
+--- Sets tangential acceleration range.
+---@param min any
+---@param max any
+---@return nil
+function ParticleSystem:setTangentialAcceleration(min, max) end
 
 --- Starts or restarts particle emission.
 ---@return nil
@@ -10590,6 +12307,14 @@ function Trail:getWidth() end
 ---@return nil
 function Trail:pushPoint(x, y) end
 
+--- Sets the colour at the newest end of the trail.
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+---@return nil
+function Trail:setHeadColor(r, g, b, a) end
+
 --- Sets how long each trail point persists in seconds.
 ---@param lifetime any
 ---@return nil
@@ -10599,6 +12324,14 @@ function Trail:setLifetime(lifetime) end
 ---@param distance any
 ---@return nil
 function Trail:setMinDistance(distance) end
+
+--- Sets the colour at the oldest end of the trail.
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+---@return nil
+function Trail:setTailColor(r, g, b, a) end
 
 --- Sets the start and end width of the trail ribbon.
 ---@param start any
@@ -10646,6 +12379,10 @@ function AiFlowField:getDirection(x, y) end
 ---@return number
 function AiFlowField:getDistance(x, y) end
 
+--- Returns the goal cell (1-based coordinates) or nil if unset.
+---@return nil
+function AiFlowField:getGoal() end
+
 --- Returns the flow field grid height in cells.
 ---@return integer
 function AiFlowField:getHeight() end
@@ -10677,6 +12414,19 @@ function AiFlowField:typeOf(name) end
 ---@class FlowField
 local FlowField = {}
 
+--- Computes the flow field toward a single target (1-based coordinates).
+---@param tx any
+---@param ty any
+---@param unit_size? any (optional)
+---@return nil
+function FlowField:calculate(tx, ty, unit_size) end
+
+--- Computes the flow field toward multiple targets (1-based coordinates).
+---@param targets any
+---@param unit_size? any (optional)
+---@return nil
+function FlowField:calculateMulti(targets, unit_size) end
+
 --- Returns the integrated cost to the nearest target (1-based coordinates).
 ---@param x any
 ---@param y any
@@ -10703,6 +12453,15 @@ function FlowField:getTargets() end
 ---@return boolean
 function FlowField:isCalculated() end
 
+--- Converts a world-space position into a velocity vector via the flow field.
+---@param wx any
+---@param wy any
+---@param speed any
+---@param tw any
+---@param th any
+---@return number
+function FlowField:steer(wx, wy, speed, tw, th) end
+
 --- Returns the type name of this object.
 ---@return string
 function FlowField:type() end
@@ -10716,11 +12475,56 @@ function FlowField:typeOf(name) end
 ---@class HexGrid
 local HexGrid = {}
 
+--- Hex-distance between two cells.
+---@param c1 any
+---@param r1 any
+---@param c2 any
+---@param r2 any
+---@return integer
+function HexGrid:distance(c1, r1, c2, r2) end
+
+--- Returns all cells visible from origin within max_range (1-based coordinates).
+---@param col any
+---@param row any
+---@param max_range any
+---@return table
+function HexGrid:fieldOfView(col, row, max_range) end
+
+--- Find A* path between two cells (1-based coordinates).
+---@param fc any
+---@param fr any
+---@param tc any
+---@param tr any
+---@return table?
+function HexGrid:findPath(fc, fr, tc, tr) end
+
 --- Returns true if a cell is blocked (1-based coordinates).
 ---@param col any
 ---@param row any
 ---@return boolean
 function HexGrid:isBlocked(col, row) end
+
+--- Returns true if there is an unobstructed line between two cells (1-based).
+---@param fc any
+---@param fr any
+---@param tc any
+---@param tr any
+---@return boolean
+function HexGrid:lineOfSight(fc, fr, tc, tr) end
+
+--- Returns all cells reachable from origin within movement budget (1-based).
+---@param col any
+---@param row any
+---@param budget any
+---@return table
+function HexGrid:rangeOfMovement(col, row, budget) end
+
+--- Mark/unmark a cell as blocked (1-based coordinates).
+---@param col any
+---@param row any
+---@param blocked any
+---@return nil
+function HexGrid:setBlocked(col, row, blocked) end
 
 --- Set movement cost for a cell (1-based coordinates).
 ---@param col any
@@ -10733,11 +12537,26 @@ function HexGrid:setCost(col, row, cost) end
 ---@class JpsGrid
 local JpsGrid = {}
 
+--- Find a JPS path between two cells (1-based coordinates).
+---@param fx any
+---@param fy any
+---@param tx any
+---@param ty any
+---@return table?
+function JpsGrid:findPath(fx, fy, tx, ty) end
+
 --- Returns true if the cell is blocked (1-based coordinates).
 ---@param x any
 ---@param y any
 ---@return boolean
 function JpsGrid:isBlocked(x, y) end
+
+--- Mark/unmark a cell as blocked (1-based coordinates).
+---@param x any
+---@param y any
+---@param blocked any
+---@return nil
+function JpsGrid:setBlocked(x, y, blocked) end
 
 --- Lua-side wrapper around a [`NavGrid`] with optional HPA★ abstract graph.
 ---@class NavGrid
@@ -10751,6 +12570,15 @@ function NavGrid:clearDirty() end
 ---@param cost any
 ---@return nil
 function NavGrid:fill(cost) end
+
+--- Sets all cells in a rectangle to the given cost (1-based coordinates).
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param cost any
+---@return nil
+function NavGrid:fillRect(x, y, w, h, cost) end
 
 --- Returns the current HPA★ chunk size.
 ---@return integer
@@ -10784,6 +12612,13 @@ function NavGrid:getWidth() end
 ---@return boolean
 function NavGrid:isBlocked(x, y) end
 
+--- Returns true if a unit footprint is fully walkable (1-based coordinates).
+---@param x any
+---@param y any
+---@param unit_size? any (optional)
+---@return boolean
+function NavGrid:isWalkable(x, y, unit_size) end
+
 --- Overwrites the grid from a raw byte string (row-major, one byte per cell).
 ---@param data any
 ---@return nil
@@ -10796,6 +12631,13 @@ function NavGrid:rebuildAbstract() end
 --- Exports the cost grid as a byte string (row-major, one byte per cell).
 ---@return string
 function NavGrid:saveToString() end
+
+--- Marks a cell as blocked or unblocked (1-based coordinates).
+---@param x any
+---@param y any
+---@param blocked any
+---@return nil
+function NavGrid:setBlocked(x, y, blocked) end
 
 --- Sets the HPA★ chunk size.
 ---@param size any
@@ -10834,6 +12676,22 @@ function NavGrid:typeOf(name) end
 --- Lua-side wrapper around a [`PathGrid`] (A★ weighted grid with per-cell cost).
 ---@class PathGrid
 local PathGrid = {}
+
+--- Finds an A★ path returning world-space waypoints (1-based coordinates).
+---@param sx any
+---@param sy any
+---@param gx any
+---@param gy any
+---@return table?
+function PathGrid:findPath(sx, sy, gx, gy) end
+
+--- Finds a smoothed A★ path with string-pulling (1-based coordinates).
+---@param sx any
+---@param sy any
+---@param gx any
+---@param gy any
+---@return table?
+function PathGrid:findPathSmoothed(sx, sy, gx, gy) end
 
 --- Returns the world-space size of each cell.
 ---@return number
@@ -10890,6 +12748,52 @@ local UnitPathfinder = {}
 ---@return nil
 function UnitPathfinder:clearCache() end
 
+--- Finds the nearest walkable cell within a radius (1-based coordinates).
+---@param x any
+---@param y any
+---@param max_radius any
+---@param unit_size? any (optional)
+---@return nil
+function UnitPathfinder:findNearestWalkable(x, y, max_radius, unit_size) end
+
+--- Finds a partial path with a node expansion limit (1-based coordinates).
+---@param x1 integer
+---@param y1 integer
+---@param x2 integer
+---@param y2 integer
+---@param maxNodes integer
+---@param unitSize? integer? (optional)
+---@return table
+function UnitPathfinder:findPartialPath(x1, y1, x2, y2, maxNodes, unitSize) end
+
+--- Finds an A★ path between two cells (1-based coordinates).
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param unit_size? any (optional)
+---@return table?
+function UnitPathfinder:findPath(x1, y1, x2, y2, unit_size) end
+
+--- Finds a path using bidirectional A★, expanding from start and goal simultaneously
+---@param x1 integer
+---@param y1 integer
+---@param x2 integer
+---@param y2 integer
+---@param unitSize? integer? (optional)
+---@param maxNodes? integer? (optional)
+---@return nil
+function UnitPathfinder:findPathBidirectional(x1, y1, x2, y2, unitSize, maxNodes) end
+
+--- Finds a Theta★ smoothed path between two cells (1-based coordinates).
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param unit_size? any (optional)
+---@return table?
+function UnitPathfinder:findPathSmooth(x1, y1, x2, y2, unit_size) end
+
 --- Returns the number of entries in the path cache.
 ---@return integer
 function UnitPathfinder:getCacheSize() end
@@ -10904,9 +12808,35 @@ function UnitPathfinder:getPathCost(path) end
 ---@return number
 function UnitPathfinder:getPathLength(path) end
 
+--- Returns the octile heuristic distance between two cells (1-based coordinates).
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return number
+function UnitPathfinder:heuristicDistance(x1, y1, x2, y2) end
+
 --- Returns true if path result caching is enabled.
 ---@return boolean
 function UnitPathfinder:isCacheEnabled() end
+
+--- Returns true if a path exists between two cells (1-based coordinates).
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param unit_size? any (optional)
+---@return boolean
+function UnitPathfinder:isReachable(x1, y1, x2, y2, unit_size) end
+
+--- Returns true if there is a clear line of sight between two cells (1-based coordinates).
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param unit_size? any (optional)
+---@return boolean
+function UnitPathfinder:lineOfSight(x1, y1, x2, y2, unit_size) end
 
 --- Enables or disables path result caching.
 ---@param enabled any
@@ -11890,6 +13820,14 @@ function Body:applyAngularImpulse(impulse) end
 ---@return nil
 function Body:applyForce(fx, fy) end
 
+--- Applies a force at a specific world-space point.
+---@param fx any
+---@param fy any
+---@param px any
+---@param py any
+---@return nil
+function Body:applyForceAtPoint(fx, fy, px, py) end
+
 --- Applies a linear impulse to the body.
 ---@param ix any
 ---@param iy any
@@ -12092,6 +14030,23 @@ local Cellular = {}
 ---@return integer
 function Cellular:countCells(t) end
 
+--- Fills a circle of cells with the given material.
+---@param cx any
+---@param cy any
+---@param r any
+---@param t any
+---@return nil
+function Cellular:fillCircle(cx, cy, r, t) end
+
+--- Fills a rectangular region of cells with the given material.
+---@param cx0 any
+---@param cy0 any
+---@param cw any
+---@param ch any
+---@param t any
+---@return nil
+function Cellular:fillRect(cx0, cy0, cw, ch, t) end
+
 --- Returns positions of all cells of the given material as an array of `{x, y}` tables.
 ---@param t any
 ---@return table
@@ -12131,6 +14086,14 @@ function Cellular:toBytes() end
 --- Returns the full grid as an RGBA byte string using the default colour palette.
 ---@return nil
 function Cellular:toImageData() end
+
+--- Returns a sub-region as an RGBA byte string.
+---@param cx0 any
+---@param cy0 any
+---@param cw any
+---@param ch any
+---@return nil
+function Cellular:toImageDataRegion(cx0, cy0, cw, ch) end
 
 --- Lua-side standalone shape object (circle, rectangle, edge, polygon, chain).
 ---@class PhysicsShape
@@ -12185,6 +14148,23 @@ function Terrain:collapseColumns() end
 ---@return nil
 function Terrain:fillAll(solid) end
 
+--- Fills a circle of cells centred at world position `(wx, wy)`.
+---@param wx any
+---@param wy any
+---@param radius any
+---@param solid any
+---@return nil
+function Terrain:fillCircle(wx, wy, radius, solid) end
+
+--- Fills a rectangular region of cells.
+---@param wx any
+---@param wy any
+---@param w any
+---@param h any
+---@param solid any
+---@return nil
+function Terrain:fillRect(wx, wy, w, h, solid) end
+
 --- Rebuilds physics bodies for all dirty chunks.
 ---@return nil
 function Terrain:flush() end
@@ -12215,13 +14195,135 @@ function Terrain:setCell(cx, cy, solid) end
 ---@return table
 function Terrain:solidPositions() end
 
+--- Spawns dynamic debris bodies at the given positions.
+---@param positions any
+---@param mass any
+---@param restitution any
+---@return nil
+function Terrain:spawnDebris(positions, mass, restitution) end
+
 --- Serialises the terrain grid to a byte string for save/load.
 ---@return string
 function Terrain:toBytes() end
 
+--- Returns the terrain as an RGBA byte string.
+---@param sr any
+---@param sg any
+---@param sb any
+---@param er any
+---@param eg any
+---@param eb any
+---@return nil
+function Terrain:toImageData(sr, sg, sb, er, eg, eb) end
+
 --- Lua-side handle wrapping a physics World.
 ---@class World
 local World = {}
+
+--- Creates a distance joint between two bodies.
+---@param a any
+---@param b any
+---@param ax1 any
+---@param ay1 any
+---@param ax2 any
+---@param ay2 any
+---@param len any
+---@return integer
+function World:addDistanceJoint(a, b, ax1, ay1, ax2, ay2, len) end
+
+--- Adds an extra fixture (collider) to a body.
+---@param bodyId integer
+---@param shapeType string
+---@return integer
+function World:addFixture(bodyId, shapeType) end
+
+--- Creates a friction joint that resists relative motion.
+---@param a any
+---@param b any
+---@param ax any
+---@param ay any
+---@param max_f any
+---@param max_t any
+---@return integer
+function World:addFrictionJoint(a, b, ax, ay, max_f, max_t) end
+
+--- Creates a gear joint (stub — falls back to weld joint).
+---@param a any
+---@param b any
+---@param ax any
+---@param ay any
+---@return integer
+function World:addGearJoint(a, b, ax, ay) end
+
+--- Creates a motor joint that drives body_b toward body_a.
+---@param a any
+---@param b any
+---@param factor any
+---@return integer
+function World:addMotorJoint(a, b, factor) end
+
+--- Creates a mouse joint connecting a body to a target point.
+---@param body_id any
+---@param tx any
+---@param ty any
+---@param max_f any
+---@return integer
+function World:addMouseJoint(body_id, tx, ty, max_f) end
+
+--- Creates a prismatic (slider) joint between two bodies.
+---@param a any
+---@param b any
+---@param ax any
+---@param ay any
+---@param axis_x any
+---@param axis_y any
+---@return integer
+function World:addPrismaticJoint(a, b, ax, ay, axis_x, axis_y) end
+
+--- Creates a pulley joint (stub — falls back to weld joint).
+---@param a any
+---@param b any
+---@param ax any
+---@param ay any
+---@return integer
+function World:addPulleyJoint(a, b, ax, ay) end
+
+--- Creates a revolute (pin) joint between two bodies.
+---@param a any
+---@param b any
+---@param ax any
+---@param ay any
+---@return integer
+function World:addRevoluteJoint(a, b, ax, ay) end
+
+--- Creates a rope joint with a maximum distance.
+---@param a any
+---@param b any
+---@param ax1 any
+---@param ay1 any
+---@param ax2 any
+---@param ay2 any
+---@param max any
+---@return integer
+function World:addRopeJoint(a, b, ax1, ay1, ax2, ay2, max) end
+
+--- Creates a weld (rigid) joint between two bodies.
+---@param a any
+---@param b any
+---@param ax any
+---@param ay any
+---@return integer
+function World:addWeldJoint(a, b, ax, ay) end
+
+--- Creates a wheel joint (prismatic + rotation).
+---@param a any
+---@param b any
+---@param ax any
+---@param ay any
+---@param axis_x any
+---@param axis_y any
+---@return integer
+function World:addWheelJoint(a, b, ax, ay, axis_x, axis_y) end
 
 --- Creates a rectangular gravity/damping zone and returns a LuaZone handle.
 ---@param x any
@@ -12262,6 +14364,15 @@ function World:destroyBody(id) end
 ---@param jid any
 ---@return nil
 function World:destroyJoint(jid) end
+
+--- Draws physics objects for debugging
+---@param target ImageData
+---@param r number
+---@param g number
+---@param b number
+---@param a number
+---@return nil
+function World:drawDebug(target, r, g, b, a) end
 
 --- Returns the number of fixtures on a body.
 ---@param body_id any
@@ -12389,6 +14500,76 @@ function World:newBodies(specs) end
 ---@return Body
 function World:newBody(x, y, bt) end
 
+--- Creates a new chain body from a flat vertex table and adds it to the world.
+---@param x any
+---@param y any
+---@param tbl any
+---@param closed any
+---@param bt any
+---@return Body
+function World:newChainBody(x, y, tbl, closed, bt) end
+
+--- Creates a new circular body and adds it to the world.
+---@param x any
+---@param y any
+---@param radius any
+---@param bt any
+---@return Body
+function World:newCircleBody(x, y, radius, bt) end
+
+--- Creates a new edge (line segment) body and adds it to the world.
+---@param x any
+---@param y any
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param bt any
+---@return Body
+function World:newEdgeBody(x, y, x1, y1, x2, y2, bt) end
+
+--- Creates a new polygon body from a flat vertex table and adds it to the world.
+---@param x any
+---@param y any
+---@param tbl any
+---@param bt any
+---@return Body
+function World:newPolygonBody(x, y, tbl, bt) end
+
+--- Returns body IDs within an axis-aligned bounding box.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return table
+function World:queryAABB(x, y, w, h) end
+
+--- Casts a ray and returns the nearest hit, or nil.
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return table|nil
+function World:raycast(x1, y1, x2, y2) end
+
+--- Casts a ray and returns all hits.
+---@param x1 any
+---@param y1 any
+---@param dx any
+---@param dy any
+---@param max_dist any
+---@return table
+function World:raycastAll(x1, y1, dx, dy, max_dist) end
+
+--- Casts a ray and returns the closest hit using the query pipeline.
+---@param x1 any
+---@param y1 any
+---@param dx any
+---@param dy any
+---@param max_dist any
+---@return table|nil
+function World:raycastClosest(x1, y1, dx, dy, max_dist) end
+
 --- Registers a Lua function called with (bodyIdA, bodyIdB) when two
 ---@param f any
 ---@return nil
@@ -12400,6 +14581,19 @@ function World:setBeginContact(f) end
 ---@return nil
 function World:setBodyCCD(id, enabled) end
 
+--- Attaches arbitrary Lua data to a body for retrieval in collision callbacks.
+---@param id any
+---@param value any
+---@return nil
+function World:setBodyData(id, value) end
+
+--- Marks a body as a one-way platform.  Bodies approaching from the
+---@param id any
+---@param nx any
+---@param ny any
+---@return nil
+function World:setBodyOneWay(id, nx, ny) end
+
 --- Changes the simulation type of the body: `"dynamic"`, `"static"`, or `"kinematic"`.
 ---@param id any
 ---@param bt any
@@ -12410,6 +14604,27 @@ function World:setBodyType(id, bt) end
 ---@param f any
 ---@return nil
 function World:setEndContact(f) end
+
+--- Sets friction on a fixture by index.
+---@param body_id any
+---@param fix_idx any
+---@param friction any
+---@return nil
+function World:setFixtureFriction(body_id, fix_idx, friction) end
+
+--- Sets restitution on a fixture by index.
+---@param body_id any
+---@param fix_idx any
+---@param restitution any
+---@return nil
+function World:setFixtureRestitution(body_id, fix_idx, restitution) end
+
+--- Sets whether a fixture is a sensor.
+---@param body_id any
+---@param fix_idx any
+---@param sensor any
+---@return nil
+function World:setFixtureSensor(body_id, fix_idx, sensor) end
 
 --- Sets the world gravity vector; default is `(0, 9.81)` (downward).
 ---@param gx any
@@ -12423,10 +14638,36 @@ function World:setGravity(gx, gy) end
 ---@return nil
 function World:setJointBreakForce(jid, f) end
 
+--- Sets the angular limits on a joint.
+---@param jid any
+---@param lower any
+---@param upper any
+---@return nil
+function World:setJointLimits(jid, lower, upper) end
+
+--- Enables or disables angular limits on a joint.
+---@param jid any
+---@param enabled any
+---@return nil
+function World:setJointLimitsEnabled(jid, enabled) end
+
+--- Sets the motor speed on a joint's angular axis.
+---@param jid any
+---@param speed any
+---@return nil
+function World:setJointMotorSpeed(jid, speed) end
+
 --- Sets the pixels-per-meter scaling factor.
 ---@param ppm any
 ---@return nil
 function World:setMeter(ppm) end
+
+--- Updates the target position of a mouse joint.
+---@param jid any
+---@param x any
+---@param y any
+---@return nil
+function World:setMouseJointTarget(jid, x, y) end
 
 --- Sets the number of constraint solver iterations per step.
 ---@param n any
@@ -12442,6 +14683,13 @@ function World:sleepBody(id) end
 ---@param dt any
 ---@return nil
 function World:step(dt) end
+
+--- Steps the world using a fixed sub-step size to consume accumulated time.
+---@param accum any
+---@param step_dt any
+---@param max_steps any
+---@return nil
+function World:stepFixed(accum, step_dt, max_steps) end
 
 --- Converts a pixel value to physics units.
 ---@param px any
@@ -12470,6 +14718,11 @@ function Zone:destroy() end
 ---@return integer
 function Zone:getId() end
 
+--- Sets an optional angular damping override for bodies inside the zone.
+---@param value? any (optional)
+---@return nil
+function Zone:setAngularDampingOverride(value) end
+
 --- Replaces the zone boundary with a circle.
 ---@param cx any
 ---@param cy any
@@ -12487,6 +14740,20 @@ function Zone:setEnabled(enabled) end
 ---@param gy any
 ---@return nil
 function Zone:setGravityDirectional(gx, gy) end
+
+--- Sets point-attractor gravity inside the zone.
+---@param cx any
+---@param cy any
+---@param strength any
+---@return nil
+function Zone:setGravityPoint(cx, cy, strength) end
+
+--- Sets point-repulsor gravity inside the zone.
+---@param cx any
+---@param cy any
+---@param strength any
+---@return nil
+function Zone:setGravityRepulsor(cx, cy, strength) end
 
 --- Suppresses gravity inside the zone (zero-g pocket).
 ---@return nil
@@ -12674,10 +14941,25 @@ lurek.pipeline = {}
 ---@class Pipeline
 local Pipeline = {}
 
+--- Adds a step with a runtime condition guard: the step is skipped when `when_fn()` returns false.
+---@param name any
+---@param deps_tbl any
+---@param cb any
+---@param cond any
+---@return Pipeline
+function Pipeline:addConditional(name, deps_tbl, cb, cond) end
+
 --- Adds a step to the pipeline. Returns self for chaining.
 ---@param step_ud any
 ---@return Pipeline
 function Pipeline:addStep(step_ud) end
+
+--- Inlines all steps from `sub_pipeline` into this pipeline, prefixing
+---@param sub_ud any
+---@param alias any
+---@param deps_tbl? any (optional)
+---@return nil
+function Pipeline:addSubPipeline(sub_ud, alias, deps_tbl) end
 
 --- Cancels all pending and waiting steps.
 ---@return nil
@@ -13158,6 +15440,14 @@ lurek.raycaster = {}
 ---@class DoorManager
 local DoorManager = {}
 
+--- Registers a door at grid position (x, y).
+---@param x any
+---@param y any
+---@param dir_str any
+---@param speed any
+---@return nil
+function DoorManager:addDoor(x, y, dir_str, speed) end
+
 --- Begins closing the door at the given index.
 ---@param index any
 ---@return nil
@@ -13244,6 +15534,17 @@ function PointLight:intensity() end
 ---@return number
 function PointLight:radius() end
 
+--- Updates all light properties at once.
+---@param x any
+---@param y any
+---@param r any
+---@param g any
+---@param b any
+---@param radius any
+---@param intensity any
+---@return nil
+function PointLight:set(x, y, r, g, b, radius, intensity) end
+
 --- Returns the type string "PointLight".
 ---@return string
 function PointLight:type() end
@@ -13263,6 +15564,113 @@ function PointLight:y() end
 --- Lua-side wrapper around a [`Raycaster2D`] grid.
 ---@class Raycaster
 local Raycaster = {}
+
+--- Builds a raycaster scene and stores it in SharedState for GPU rendering.
+---@param params table
+---@param lights table|nil
+---@param sprites table|nil
+---@param wall_textures table|nil
+---@return nil
+function Raycaster:buildScene(params, lights, sprites, wall_textures) end
+
+--- Computes floor (or ceiling) texture UV coordinates for one horizontal screen row.
+---@param cam_x number
+---@param cam_y number
+---@param dir_x number
+---@param dir_y number
+---@param plane_x number
+---@param plane_y number
+---@param row integer
+---@return table
+function Raycaster:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, row) end
+
+--- Casts a single ray and returns a hit table, or nil if nothing was hit.
+---@param ox any
+---@param oy any
+---@param angle any
+---@param max_dist any
+---@return table|nil
+function Raycaster:castRay(ox, oy, angle, max_dist) end
+
+--- Casts a ray collecting up to max_hits wall layers, continuing through
+---@param ox any
+---@param oy any
+---@param angle any
+---@param max_dist any
+---@param max_hits? any (optional)
+---@return table
+function Raycaster:castRayMulti(ox, oy, angle, max_dist, max_hits) end
+
+--- Casts multiple rays across a field of view, returns an array of hit tables.
+---@param ox any
+---@param oy any
+---@param angle any
+---@param fov any
+---@param count any
+---@param max_dist any
+---@return table
+function Raycaster:castRays(ox, oy, angle, fov, count, max_dist) end
+
+--- Casts multiple rays and returns a flat array of 5 floats per ray.
+---@param ox any
+---@param oy any
+---@param angle any
+---@param fov any
+---@param count any
+---@param max_dist any
+---@return table
+function Raycaster:castRaysFlat(ox, oy, angle, fov, count, max_dist) end
+
+--- Renders a mosaic of first-person views from evenly spaced angles to an ImageData.
+---@param x any
+---@param y any
+---@param fov any
+---@param max_dist any
+---@param num_frames any
+---@param fw any
+---@param fh any
+---@return ImageData
+function Raycaster:drawCameraSweep(x, y, fov, max_dist, num_frames, fw, fh) end
+
+--- Renders a depth-map column view to an ImageData.
+---@param px number
+---@param py number
+---@param angle number
+---@param fov number
+---@param num_rays integer
+---@param width integer
+---@param height integer
+---@param max_dist number
+---@return ImageData
+function Raycaster:drawDepthMap(px, py, angle, fov, num_rays, width, height, max_dist) end
+
+--- Renders a line-of-sight test between two points to an ImageData.
+---@param ax any
+---@param ay any
+---@param bx any
+---@param by any
+---@param scale any
+---@return ImageData
+function Raycaster:drawLineOfSight(ax, ay, bx, by, scale) end
+
+--- Renders a top-down grid view with player marker to an ImageData.
+---@param px any
+---@param py any
+---@param angle any
+---@param scale any
+---@return ImageData
+function Raycaster:drawTopDown(px, py, angle, scale) end
+
+--- Renders a first-person column view to an ImageData.
+---@param px any
+---@param py any
+---@param angle any
+---@param fov any
+---@param w any
+---@param h any
+---@param max_dist any
+---@return ImageData
+function Raycaster:drawView(px, py, angle, fov, w, h, max_dist) end
 
 --- Returns the cell value at (x, y).
 ---@param x any
@@ -13284,6 +15692,25 @@ function Raycaster:height() end
 ---@param y any
 ---@return boolean
 function Raycaster:isBlocked(x, y) end
+
+--- Checks line of sight between two points using DDA traversal.
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return boolean
+function Raycaster:lineOfSight(x1, y1, x2, y2) end
+
+--- Projects a world-space sprite onto screen space.
+---@param sx any
+---@param sy any
+---@param px any
+---@param py any
+---@param pa any
+---@param fov any
+---@param screen_w any
+---@return table
+function Raycaster:projectSprite(sx, sy, px, py, pa, fov, screen_w) end
 
 --- Sets the cell value at grid position (x, y).
 ---@param x any
@@ -13311,6 +15738,14 @@ function Raycaster:width() end
 ---@class SpriteManager
 local SpriteManager = {}
 
+--- Adds a sprite at world position (x, y) and returns its unique id.
+---@param x any
+---@param y any
+---@param texture any
+---@param scale? any (optional)
+---@return integer
+function SpriteManager:add(x, y, texture, scale) end
+
 --- Removes all sprites from the manager.
 ---@return nil
 function SpriteManager:clear() end
@@ -13332,6 +15767,13 @@ function SpriteManager:setPosition(id, x, y) end
 ---@param visible any
 ---@return nil
 function SpriteManager:setVisible(id, visible) end
+
+--- Returns an array of visible sprites sorted back-to-front from camera position.
+---@param cam_x any
+---@param cam_y any
+---@param cam_angle any
+---@return table
+function SpriteManager:sortAndProject(cam_x, cam_y, cam_angle) end
 
 --- Returns the type string "SpriteManager".
 ---@return string
@@ -13533,6 +15975,13 @@ function Image:typeOf() end
 ---@class ImageData
 local ImageData = {}
 
+--- Blits the source ImageData onto this image at (dst_x, dst_y) using Porter-Duff `over`.
+---@param src_ud any
+---@param dst_x any
+---@param dst_y any
+---@return nil
+function ImageData:blit(src_ud, dst_x, dst_y) end
+
 --- Returns the sum of absolute per-channel differences between this image and `other`.
 ---@param other_ud any
 ---@return integer
@@ -13541,6 +15990,14 @@ function ImageData:diff(other_ud) end
 --- Returns the pixel height of this image buffer.
 ---@return integer
 function ImageData:getHeight() end
+
+--- Returns a copy of the rectangular sub-region as a new ImageData.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function ImageData:getRegion(x, y, w, h) end
 
 --- Returns the pixel width of this image buffer.
 ---@return integer
@@ -13606,6 +16063,14 @@ function Mesh:typeOf() end
 ---@class NineSlice
 local NineSlice = {}
 
+--- Compatibility stub: queuing handled by lurek.graphic.drawNineSlice.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function NineSlice:draw(x, y, w, h) end
+
 --- Returns the four inset values as (top, right, bottom, left).
 ---@return number
 function NineSlice:getInsets() end
@@ -13634,6 +16099,14 @@ function Quad:getTextureDimensions() end
 --- Returns the quad viewport rectangle.
 ---@return number
 function Quad:getViewport() end
+
+--- Sets the quad viewport rectangle.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function Quad:setViewport(x, y, w, h) end
 
 --- Returns the type name of this object.
 ---@return string
@@ -13674,9 +16147,48 @@ function Shader:typeOf() end
 ---@class Shape
 local Shape = {}
 
+--- Queues an arc command.
+---@param mode string
+---@param x number
+---@param y number
+---@param r number
+---@param astart number
+---@param aend number
+---@param segments? integer? (optional)
+---@return nil
+function Shape:arc(mode, x, y, r, astart, aend, segments) end
+
+--- Queues a circle command.
+---@param mode any
+---@param x any
+---@param y any
+---@param r any
+---@return nil
+function Shape:circle(mode, x, y, r) end
+
 --- Removes all commands and resets the shape to empty.
 ---@return nil
 function Shape:clear() end
+
+--- Queues a draw command for this shape at the given position.
+---@param x number
+---@param y number
+---@param rotation? number? (optional)
+---@param sx? number? (optional)
+---@param sy? number? (optional)
+---@param ox? number? (optional)
+---@param oy? number? (optional)
+---@return nil
+function Shape:draw(x, y, rotation, sx, sy, ox, oy) end
+
+--- Queues an ellipse command.
+---@param mode any
+---@param x any
+---@param y any
+---@param rx any
+---@param ry any
+---@return nil
+function Shape:ellipse(mode, x, y, rx, ry) end
 
 --- Returns the number of drawing commands currently stored.
 ---@return integer
@@ -13690,14 +16202,59 @@ function Shape:getCommandCount() end
 ---@return nil
 function Shape:line(x1, y1, x2, y2) end
 
+--- Queues a polygon command from variadic (x, y) coordinate pairs.
+---@param mode any
+---@param coords any
+---@return nil
+function Shape:polygon(mode, coords) end
+
 --- Queues a polyline command from variadic (x, y) coordinate pairs.
 ---@return nil
 function Shape:polyline() end
+
+--- Queues a rectangle command.
+---@param mode any
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function Shape:rectangle(mode, x, y, w, h) end
+
+--- Queues a rounded rectangle command.
+---@param mode any
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param rx any
+---@param ry? any (optional)
+---@return nil
+function Shape:roundedRectangle(mode, x, y, w, h, rx, ry) end
+
+--- Sets the drawing color for subsequent primitives.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Shape:setColor(r, g, b, a) end
 
 --- Sets the stroke width for subsequent outlined primitives.
 ---@param w any
 ---@return nil
 function Shape:setLineWidth(w) end
+
+--- Queues a triangle command.
+---@param mode any
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param x3 any
+---@param y3 any
+---@return nil
+function Shape:triangle(mode, x1, y1, x2, y2, x3, y3) end
 
 --- Returns the type name of this object.
 ---@return string
@@ -13711,6 +16268,12 @@ function Shape:typeOf(name) end
 --- Lua-side handle to a sprite batch stored in SharedState.
 ---@class SpriteBatch
 local SpriteBatch = {}
+
+--- Adds a sprite entry to this batch.
+---@param x number
+---@param y number
+---@return integer?
+function SpriteBatch:add(x, y) end
 
 --- Removes all sprites from this batch.
 ---@return nil
@@ -13897,7 +16460,7 @@ function lurek.render.drawIsoCubeTile(sx, sy, halfW, halfH, opts) end
 ---@param opts? any (optional)
 function lurek.render.drawIsoCubeTile(sx, sy, half_w, half_h, opts) end
 
---- Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
+--- Queues a 9-slice draw call inside lurek.draw / lurek.draw_ui.
 ---@param slice any
 ---@param x any
 ---@param y any
@@ -13928,7 +16491,7 @@ function lurek.render.drawPath(path, mode, close) end
 ---@param segments? integer? (optional)
 function lurek.render.drawQuadBezier(x1, y1, cx, cy, x2, y2, segments) end
 
---- Must be called inside lurek.render or lurek.render_ui.
+--- Must be called inside lurek.draw or lurek.draw_ui.
 ---@param x1 any
 ---@param y1 any
 ---@param cx any
@@ -14390,6 +16953,12 @@ lurek.save = {}
 ---@class SaveManager
 local SaveManager = {}
 
+--- Registers a migration function for upgrading from a schema version
+---@param from_ver any
+---@param func any
+---@return nil
+function SaveManager:addMigration(from_ver, func) end
+
 --- Collects data from all registered collectors into a table with metadata
 ---@return table
 function SaveManager:collect() end
@@ -14402,6 +16971,17 @@ function SaveManager:delete(slot) end
 --- Disables automatic periodic saving; manual `write()` calls still work.
 ---@return nil
 function SaveManager:disableAutoSave() end
+
+--- Enables auto-save with a given interval and target slot
+---@param interval any
+---@param slot any
+---@return nil
+function SaveManager:enableAutoSave(interval, slot) end
+
+--- Returns whether a save file exists for the given slot.
+---@param slot any
+---@return boolean
+function SaveManager:exists(slot) end
 
 --- Returns the current schema version
 ---@return integer
@@ -14446,6 +17026,13 @@ function SaveManager:onAfterLoad(func) end
 ---@param func any
 ---@return nil
 function SaveManager:onBeforeSave(func) end
+
+--- Registers a named module with collector and restorer callbacks
+---@param name any
+---@param collect_fn any
+---@param restore_fn any
+---@return nil
+function SaveManager:register(name, collect_fn, restore_fn) end
 
 --- Resets all state, removing callbacks and clearing the manager
 ---@return nil
@@ -14833,10 +17420,44 @@ local Skeleton = {}
 ---@return nil
 function Skeleton:addAnimation(anim_ud) end
 
+--- Adds a root bone with optional local transform and returns its index.
+---@param name any
+---@param opts? any (optional)
+---@return integer
+function Skeleton:addBone(name, opts) end
+
+--- Adds a child bone attached to a parent and returns its index.
+---@param name any
+---@param parent_idx any
+---@param opts? any (optional)
+---@return integer
+function Skeleton:addChildBone(name, parent_idx, opts) end
+
+--- Adds a two-bone IK constraint and returns its index.
+---@param name any
+---@param chain_tbl any
+---@param bend_positive? any (optional)
+---@return integer
+function Skeleton:addIKConstraint(name, chain_tbl, bend_positive) end
+
 --- Registers a new empty skin by name.
 ---@param name any
 ---@return nil
 function Skeleton:addSkin(name) end
+
+--- Adds a slot bound to a bone and returns its index.
+---@param name any
+---@param bone_idx any
+---@param attachment? any (optional)
+---@return integer
+function Skeleton:addSlot(name, bone_idx, attachment) end
+
+--- Evaluates `anim` at `time` and blends the result into this skeleton
+---@param anim_ud any
+---@param time any
+---@param blend_weight? any (optional)
+---@return nil
+function Skeleton:blendAnimation(anim_ud, time, blend_weight) end
 
 --- Returns the total number of bones.
 ---@return integer
@@ -14871,6 +17492,19 @@ function Skeleton:getBoneWorld(idx) end
 ---@return string?
 function Skeleton:getSkin() end
 
+--- Starts playback of the named skeletal animation clip.
+---@param name any
+---@param looping? any (optional)
+---@return boolean
+function Skeleton:playAnimation(name, looping) end
+
+--- Sets the world-space target position for the named IK constraint.
+---@param name any
+---@param x any
+---@param y any
+---@return boolean
+function Skeleton:setIKTarget(name, x, y) end
+
 --- Sets the root bone position and propagates world transforms.
 ---@param x any
 ---@param y any
@@ -14881,6 +17515,13 @@ function Skeleton:setPosition(x, y) end
 ---@param name any
 ---@return boolean
 function Skeleton:setSkin(name) end
+
+--- Registers a slot-to-attachment mapping in the named skin.
+---@param skin any
+---@param slot any
+---@param attachment any
+---@return nil
+function Skeleton:setSkinMapping(skin, slot, attachment) end
 
 --- Returns the total number of slots.
 ---@return integer
@@ -14902,6 +17543,22 @@ function Skeleton:updateWorldTransforms() end
 --- Lua-side wrapper around a [`SkeletonAnimation`] keyframe clip.
 ---@class SkeletonAnimation
 local SkeletonAnimation = {}
+
+--- Adds a named event marker at `time` seconds in the animation.
+---@param time any
+---@param name any
+---@param value? any (optional)
+---@return nil
+function SkeletonAnimation:addEventKey(time, name, value) end
+
+--- Adds a keyframe to the bone timeline for the given property and bone index.
+---@param bone_idx integer
+---@param property string
+---@param time number
+---@param value number
+---@param easing? string? (optional)
+---@return nil
+function SkeletonAnimation:addKeyframe(bone_idx, property, time, value, easing) end
 
 --- Returns the total duration of the animation in seconds.
 ---@return number
@@ -14953,6 +17610,13 @@ function SpriteAtlas:getByIndex(index) end
 ---@return table?
 function SpriteAtlas:getEntry(name) end
 
+--- Returns a copy of the named region with `flip_x` and `flip_y` flags set.
+---@param name any
+---@param flip_x any
+---@param flip_y any
+---@return table?
+function SpriteAtlas:getFlipped(name, flip_x, flip_y) end
+
 --- Lua-side wrapper around a [`SpriteSheet`] frame-grid calculator.
 ---@class SpriteSheet
 local SpriteSheet = {}
@@ -14999,6 +17663,13 @@ function SpriteSheet:getGroupNames() end
 ---@return table
 function SpriteSheet:getRow(row) end
 
+--- Registers a named frame group starting at `start_frame` with `count` frames.
+---@param name any
+---@param start any
+---@param count any
+---@return nil
+function SpriteSheet:nameGroup(name, start, count) end
+
 --- Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
 ---@param atlas_ud any
 ---@param sw any
@@ -15036,113 +17707,114 @@ lurek.system = {}
 --- Serialises an engine error message to a compact JSON string.
 ---@param msg any
 ---@return string
-function lurek.system.errorSnapshot(msg) end
+function lurek.runtime.errorSnapshot(msg) end
 
 --- Returns the CPU architecture string for the current machine.
 ---@return string
-function lurek.system.getArch() end
+function lurek.runtime.getArch() end
 
 --- Returns the command-line arguments as a table.
 ---@return table
-function lurek.system.getArgs() end
+function lurek.runtime.getArgs() end
 
 --- Returns the output table from the most recently completed runBatch call.
 ---@param results any
 ---@return integer
-function lurek.system.getBatchResults(results) end
+function lurek.runtime.getBatchResults(results) end
 
 --- Returns the current contents of the system clipboard.
 ---@return string
-function lurek.system.getClipboardText() end
+function lurek.runtime.getClipboardText() end
 
 --- Returns whether the debug overlay is currently visible.
-function lurek.system.getDebugOverlay() end
+function lurek.runtime.getDebugOverlay() end
 
 --- Returns the value of an environment variable, or nil if not set.
 ---@param name any
-function lurek.system.getEnv(name) end
+---@return string?
+function lurek.runtime.getEnv(name) end
 
 --- Returns a table of system information including OS name, CPU model, and installed RAM.
 ---@return table
-function lurek.system.getInfo() end
+function lurek.runtime.getInfo() end
 
 --- Returns the last unhandled error message, or nil.
 ---@return table?
-function lurek.system.getLastError() end
+function lurek.runtime.getLastError() end
 
 --- Returns the name of the current minimum log level for runtime messages.
-function lurek.system.getLogLevel() end
+function lurek.runtime.getLogLevel() end
 
 --- Returns the total amount of installed system RAM in megabytes.
 ---@return integer
-function lurek.system.getMemorySize() end
+function lurek.runtime.getMemorySize() end
 
 --- Resolves a stable runtime message ID such as 'L001' to its human-readable text.
 ---@param id any
 ---@return string
-function lurek.system.getMessage(id) end
+function lurek.runtime.getMessage(id) end
 
 --- Returns the total number of message entries loaded into the runtime message catalog.
 ---@return integer
-function lurek.system.getMessageCount() end
+function lurek.runtime.getMessageCount() end
 
 --- Returns the host operating system name ('Windows', 'Linux', 'macOS').
 ---@return string
-function lurek.system.getOS() end
+function lurek.runtime.getOS() end
 
 --- Returns battery state, percentage charged, and estimated time remaining.
 ---@return table
-function lurek.system.getPowerInfo() end
+function lurek.runtime.getPowerInfo() end
 
 --- Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
 ---@return table
-function lurek.system.getPreferredLocales() end
+function lurek.runtime.getPreferredLocales() end
 
 --- Returns the number of logical CPU cores available.
 ---@return integer
-function lurek.system.getProcessorCount() end
+function lurek.runtime.getProcessorCount() end
 
 --- Returns the Lurek2D engine version string.
 ---@return string
-function lurek.system.getVersion() end
+function lurek.runtime.getVersion() end
 
 --- Returns true when the runtime message catalog contains the given stable message ID.
 ---@param id any
 ---@return boolean
-function lurek.system.hasMessage(id) end
+function lurek.runtime.hasMessage(id) end
 
 --- Emit a log message from Lua at the specified level.
 ---@param level any
 ---@param message any
-function lurek.system.log(level, message) end
+function lurek.runtime.log(level, message) end
 
 --- Opens a URL in the system's default browser.
 ---@param url any
 ---@return boolean
-function lurek.system.openURL(url) end
+function lurek.runtime.openURL(url) end
 
 --- Parses a command-line argument string and returns a structured key/value table.
 ---@param args? any (optional)
 ---@return table
-function lurek.system.parseArgs(args) end
+function lurek.runtime.parseArgs(args) end
 
 --- Runs a list of shell commands in parallel and returns immediately without blocking.
 ---@param tasks any
 ---@param opts? any (optional)
 ---@return table
-function lurek.system.runBatch(tasks, opts) end
+function lurek.runtime.runBatch(tasks, opts) end
 
 --- Replaces the system clipboard contents with the given string.
 ---@param text any
-function lurek.system.setClipboardText(text) end
+function lurek.runtime.setClipboardText(text) end
 
 --- Shows or hides the FPS/draw-call debug overlay.
 ---@param enabled any
-function lurek.system.setDebugOverlay(enabled) end
+function lurek.runtime.setDebugOverlay(enabled) end
 
 --- Sets the minimum severity level for runtime log messages.
 ---@param level any
-function lurek.system.setLogLevel(level) end
+function lurek.runtime.setLogLevel(level) end
 
 ---@class lurek.terminal
 lurek.terminal = {}
@@ -15198,6 +17870,13 @@ function Terminal:getWidgetCount() end
 ---@param key any
 ---@return boolean
 function Terminal:keypressed(key) end
+
+--- Routes a mouse press to widgets using pixel coordinates.
+---@param px any
+---@param py any
+---@param button? any (optional)
+---@return nil
+function Terminal:mousepressed(px, py, button) end
 
 --- Detaches a widget from this terminal.
 ---@param widget_ud any
@@ -15333,6 +18012,14 @@ function Widget:removeChild(child_ud) end
 ---@param index any
 ---@return nil
 function Widget:removeItem(index) end
+
+--- Sets the colour of a label or border widget.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Widget:setColor(r, g, b, a) end
 
 --- Sets whether the widget accepts input.
 ---@param enabled any
@@ -15764,6 +18451,13 @@ lurek.tilemap = {}
 ---@class AutoTileSheet
 local AutoTileSheet = {}
 
+--- Applies autotile rules from this sheet to a TileSet.
+---@param ts_ud any
+---@param type_name any
+---@param start_gid? any (optional)
+---@return nil
+function AutoTileSheet:applyToTileSet(ts_ud, type_name, start_gid) end
+
 --- Returns the bitmask value associated with a 1-based local tile ID.
 ---@param tile_id any
 ---@return integer
@@ -15811,9 +18505,28 @@ function ChunkMap:chunkTileRange(cx, cy) end
 ---@return nil
 function ChunkMap:clearTile(x, y) end
 
+--- Fills the rectangular tile region with a GID.
+---@param x0 any
+---@param y0 any
+---@param x1 any
+---@param y1 any
+---@param gid any
+---@return nil
+function ChunkMap:fillRect(x0, y0, x1, y1, gid) end
+
 --- Returns the chunk size (tiles per side).
 ---@return integer
 function ChunkMap:getChunkSize() end
+
+--- Returns chunk coordinates whose world-pixel footprint overlaps the given viewport.
+---@param vx any
+---@param vy any
+---@param vw any
+---@param vh any
+---@param tw any
+---@param th any
+---@return table
+function ChunkMap:getChunksInView(vx, vy, vw, vh, tw, th) end
 
 --- Returns a table of all currently loaded chunk coordinates as {{cx, cy}, ...}.
 ---@return table
@@ -15883,6 +18596,14 @@ function IsoMap:getPartOrder() end
 ---@return integer
 function IsoMap:getTileHeight() end
 
+--- Reads the GID in the part slot of tile (x, y) on level z (1-based z, x, y; 0-based part).
+---@param z any
+---@param x any
+---@param y any
+---@param part any
+---@return integer
+function IsoMap:getTilePart(z, x, y, part) end
+
 --- Returns the tile footprint width in pixels.
 ---@return integer
 function IsoMap:getTileWidth() end
@@ -15918,6 +18639,15 @@ function IsoMap:setOrigin(x, y) end
 ---@param order any
 ---@return nil
 function IsoMap:setPartOrder(order) end
+
+--- Writes a GID into the part slot of tile (x, y) on level z (1-based z, x, y; 0-based part).
+---@param z any
+---@param x any
+---@param y any
+---@param part any
+---@param gid any
+---@return nil
+function IsoMap:setTilePart(z, x, y, part, gid) end
 
 --- Projects isometric tile coordinates (tx, ty, tz) to screen pixels.
 ---@param tx any
@@ -15991,6 +18721,13 @@ function LargeMapRenderer:setLodEnabled(enabled) end
 ---@param levels any
 ---@return nil
 function LargeMapRenderer:setLodThresholds(levels) end
+
+--- Loads a flat array of tile IDs (row-major) covering width Ă— height tiles.
+---@param data any
+---@param width any
+---@param height any
+---@return nil
+function LargeMapRenderer:setMapData(data, width, height) end
 
 --- Sets a single tile ID at (x, y).  Coordinates are 0-based.
 ---@param x any
@@ -16068,10 +18805,36 @@ function MapBlock:getWidthInSegments() end
 ---@return nil
 function MapBlock:setName(name) end
 
+--- Sets the side connection ID for a segment on a given edge.
+---@param edge_str any
+---@param segment any
+---@param side_id any
+---@return nil
+function MapBlock:setSide(edge_str, segment, side_id) end
+
+--- Sets the GID of a tile at (x, y) on the given layer (1-based).
+---@param layer any
+---@param x any
+---@param y any
+---@param gid any
+---@return nil
+function MapBlock:setTile(layer, x, y, gid) end
+
 --- Sets the placement weight.
 ---@param weight any
 ---@return nil
 function MapBlock:setWeight(weight) end
+
+--- Lua-side wrapper for a map generator (size preset or explicit dimensions).
+---@class MapGen
+local MapGen = {}
+
+--- Generates a TileMap using the group's blocks and an optional script index, seed, and layer name.
+---@param script_idx? any (optional)
+---@param seed? any (optional)
+---@param layer_name? any (optional)
+---@return TileMap
+function MapGen:generate(script_idx, seed, layer_name) end
 
 --- Lua-side wrapper around a [`MapGroup`].
 ---@class MapGroup
@@ -16132,6 +18895,40 @@ function TileMap:addLayer(name, w, h) end
 ---@param ts_ud any
 ---@return nil
 function TileMap:addTileSet(ts_ud) end
+
+--- Applies 4-bit cardinal autotile rules to every tile on layer (1-based).
+---@param layer any
+---@param type_name any
+---@return nil
+function TileMap:applyAutoTile(layer, type_name) end
+
+--- Applies 8-bit directional autotile rules to every tile on layer (1-based).
+---@param layer any
+---@param type_name any
+---@return nil
+function TileMap:applyAutoTile8(layer, type_name) end
+
+--- Applies 8-bit directional autotile at a single cell and its 3x3 neighborhood (1-based).
+---@param layer any
+---@param x any
+---@param y any
+---@param type_name any
+---@return nil
+function TileMap:applyAutoTile8At(layer, x, y, type_name) end
+
+--- Applies 4-bit cardinal autotile at a single cell and its 3x3 neighborhood (1-based).
+---@param layer any
+---@param x any
+---@param y any
+---@param type_name any
+---@return nil
+function TileMap:applyAutoTileAt(layer, x, y, type_name) end
+
+--- Checks a list of entity positions against registered tile callbacks and fires matches.
+---@param layer any
+---@param entities any
+---@return nil
+function TileMap:checkEntities(layer, entities) end
 
 --- Clears a tile (sets GID to 0) at (x, y) on the given layer (1-based).
 ---@param layer any
@@ -16243,6 +19040,12 @@ function TileMap:getViewport() end
 ---@return boolean
 function TileMap:isSolid(layer, x, y) end
 
+--- Registers a callback fired when any entity's tile GID matches `gid`.
+---@param gid any
+---@param func any
+---@return nil
+function TileMap:onTileEnter(gid, func) end
+
 --- Register a callback for when an entity exits a tile with the given GID.
 ---@param gid any
 ---@param func any
@@ -16255,22 +19058,104 @@ function TileMap:onTileExit(gid, func) end
 ---@return nil
 function TileMap:onTileStep(gid, func) end
 
+--- Returns true if any solid tile overlaps the given world-space rectangle on layer (1-based).
+---@param layer any
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return boolean
+function TileMap:rectOverlapsSolid(layer, x, y, w, h) end
+
 --- Renders the tile map to the screen at the given offset.
 ---@param ox? any (optional)
 ---@param oy? any (optional)
 ---@return nil
 function TileMap:render(ox, oy) end
 
+--- Sets the RGBA tint color for a layer.
+---@param idx any
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+---@return nil
+function TileMap:setLayerColor(idx, r, g, b, a) end
+
+--- Sets the pixel offset for a layer.
+---@param idx any
+---@param ox any
+---@param oy any
+---@return nil
+function TileMap:setLayerOffset(idx, ox, oy) end
+
+--- Sets the parallax scrolling factor for a layer.
+---@param idx any
+---@param px any
+---@param py any
+---@return nil
+function TileMap:setLayerParallax(idx, px, py) end
+
+--- Sets layer visibility.
+---@param idx any
+---@param visible any
+---@return nil
+function TileMap:setLayerVisible(idx, visible) end
+
 --- Sets the map orientation from a string ("topdown", "sideview", "isometric", or "hexagonal").
 ---@param orientation any
 ---@return nil
 function TileMap:setOrientation(orientation) end
+
+--- Sets the GID of a tile at (x, y) on the given layer (1-based).
+---@param layer any
+---@param x any
+---@param y any
+---@param gid any
+---@return nil
+function TileMap:setTile(layer, x, y, gid) end
+
+--- Sets a per-tile RGBA tint override (1-based layer, x, y).
+---@param layer any
+---@param x any
+---@param y any
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+---@return nil
+function TileMap:setTileTint(layer, x, y, r, g, b, a) end
+
+--- Sets the viewport rectangle for rendering culling.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function TileMap:setViewport(x, y, w, h) end
+
+--- Performs a swept AABB collision test against solid tiles on layer (1-based).
+---@param layer any
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param dx any
+---@param dy any
+---@return nil
+function TileMap:sweepRect(layer, x, y, w, h, dx, dy) end
 
 --- Converts tile coordinates to world pixel coordinates (1-based input).
 ---@param tx any
 ---@param ty any
 ---@return number
 function TileMap:tileToWorld(tx, ty) end
+
+--- Converts the given layer into a 2D navigation grid.
+---@param layer any
+---@param gids_tbl any
+---@return table
+function TileMap:toNavGrid(layer, gids_tbl) end
 
 --- Advances tile animation timers by dt seconds.
 ---@param dt any
@@ -16291,6 +19176,18 @@ local TileSet = {}
 ---@param tile_id any
 ---@return table?
 function TileSet:getAnimation(tile_id) end
+
+--- Looks up the 1-based local tile ID for a 4-bit cardinal autotile bitmask, or nil.
+---@param type_name any
+---@param bitmask any
+---@return integer?
+function TileSet:getAutoTileId(type_name, bitmask) end
+
+--- Looks up the 1-based local tile ID for an 8-bit directional autotile bitmask, or nil.
+---@param type_name any
+---@param bitmask any
+---@return integer?
+function TileSet:getAutoTileId8(type_name, bitmask) end
 
 --- Returns the number of tile columns in the atlas texture.
 ---@return integer
@@ -16333,6 +19230,26 @@ function TileSet:getTileWidth() end
 ---@param tile_id any
 ---@return boolean
 function TileSet:isSolid(tile_id) end
+
+--- Sets the animation frames for a 1-based local tile ID from a table of {tileid, duration}.
+---@param tile_id any
+---@param frames any
+---@return nil
+function TileSet:setAnimation(tile_id, frames) end
+
+--- Registers a 4-bit cardinal autotile rule. tileId is 1-based.
+---@param type_name any
+---@param bitmask any
+---@param tile_id any
+---@return nil
+function TileSet:setAutoTileRule(type_name, bitmask, tile_id) end
+
+--- Registers an 8-bit directional autotile rule. tileId is 1-based.
+---@param type_name any
+---@param bitmask any
+---@param tile_id any
+---@return nil
+function TileSet:setAutoTileRule8(type_name, bitmask, tile_id) end
 
 --- Sets whether a 1-based local tile ID is solid for collision purposes.
 ---@param tile_id any
@@ -16553,6 +19470,13 @@ function Scheduler:after(delay, func) end
 ---@return integer
 function Scheduler:afterFrames(n, func) end
 
+--- Schedules a named one-shot callback, replacing any existing event with the same name.
+---@param name any
+---@param delay any
+---@param func any
+---@return integer
+function Scheduler:afterNamed(name, delay, func) end
+
 --- Cancels a scheduled event by its numeric ID.
 ---@param id any
 ---@return boolean
@@ -16566,6 +19490,28 @@ function Scheduler:cancelAll() end
 ---@param name any
 ---@return boolean
 function Scheduler:cancelNamed(name) end
+
+--- Schedules a callback to fire repeatedly at the given interval.
+---@param interval any
+---@param func any
+---@param count? any (optional)
+---@return integer
+function Scheduler:every(interval, func, count) end
+
+--- Schedules a callback to fire every `n` frames.
+---@param n any
+---@param func any
+---@param count? any (optional)
+---@return integer
+function Scheduler:everyFrames(n, func, count) end
+
+--- Schedules a named repeating callback, replacing any existing event with the same name.
+---@param name any
+---@param interval any
+---@param func any
+---@param count? any (optional)
+---@return integer
+function Scheduler:everyNamed(name, interval, func, count) end
 
 --- Returns the number of active scheduled events.
 ---@return integer
@@ -16977,6 +19923,15 @@ function Accordion:toggleSection(section_idx) end
 ---@class AreaChart
 local AreaChart = {}
 
+--- Adds a stacked layer with values and colour.
+---@param name any
+---@param vals_tbl any
+---@param r any
+---@param g any
+---@param b any
+---@return nil
+function AreaChart:addLayer(name, vals_tbl, r, g, b) end
+
 --- Renders the area chart into an existing ImageData.
 ---@param target ImageData
 ---@return nil
@@ -17007,6 +19962,20 @@ function Badge:setCount(count) end
 --- Lua wrapper for a grouped bar chart renderer.
 ---@class BarChart
 local BarChart = {}
+
+--- Adds a category group with per-series values.
+---@param label any
+---@param vals_tbl any
+---@return nil
+function BarChart:addCategory(label, vals_tbl) end
+
+--- Adds a bar series with a name and colour.
+---@param name any
+---@param r any
+---@param g any
+---@param b any
+---@return nil
+function BarChart:addSeries(name, r, g, b) end
 
 --- Renders the bar chart into an existing ImageData.
 ---@param target ImageData
@@ -17773,6 +20742,15 @@ function Layout:setWrap(wrap) end
 ---@class LineChart
 local LineChart = {}
 
+--- Adds a named data series to the chart.
+---@param name any
+---@param pts_tbl any
+---@param r any
+---@param g any
+---@param b any
+---@return nil
+function LineChart:addSeries(name, pts_tbl, r, g, b) end
+
 --- Renders the line chart into an existing ImageData.
 ---@param target ImageData
 ---@return nil
@@ -17948,6 +20926,15 @@ function Panel:setTitle(title) end
 ---@class PieChart
 local PieChart = {}
 
+--- Adds a labelled pie segment.
+---@param label any
+---@param value any
+---@param r any
+---@param g any
+---@param b any
+---@return nil
+function PieChart:addSegment(label, value, r, g, b) end
+
 --- Renders the pie chart into an existing ImageData.
 ---@param target ImageData
 ---@return nil
@@ -18023,6 +21010,15 @@ function Radio_Button:setText(text) end
 --- Lua wrapper for a scatter plot renderer.
 ---@class ScatterPlot
 local ScatterPlot = {}
+
+--- Adds a named data series.
+---@param name any
+---@param pts_tbl any
+---@param r any
+---@param g any
+---@param b any
+---@return nil
+function ScatterPlot:addSeries(name, pts_tbl, r, g, b) end
 
 --- Renders the scatter plot into an existing ImageData.
 ---@param target ImageData
@@ -18372,6 +21368,17 @@ function Text_Input:setPlaceholder(text) end
 ---@param text any
 ---@return nil
 function Text_Input:setText(text) end
+
+--- Lua-side wrapper around a GUI [`Theme`].
+---@class Theme
+local Theme = {}
+
+--- Sets a style for a (widget_type, state) pair.
+---@param widget_type any
+---@param state any
+---@param style_table any
+---@return nil
+function Theme:setStyle(widget_type, state, style_table) end
 
 --- Adds Toast-specific methods.
 ---@class Toast

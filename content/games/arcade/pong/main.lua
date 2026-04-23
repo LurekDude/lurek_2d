@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 --  Pong — Classic two-player paddle game
 -- ----------------------------------------------------------------------------
 --  Category : arcade
@@ -11,8 +11,6 @@
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local W, H          = 800, 600
 local PADDLE_W      = 14
@@ -82,7 +80,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Pong — Lurek2D")
-    gfx.setBackgroundColor(0.05, 0.05, 0.05)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.05)
 
     -- Action-based input bindings
     lurek.input.bind("p1_up",   {"w"})
@@ -223,46 +221,46 @@ end
 
 -- ── World rendering ──────────────────────────────────────────────────────
 
-function lurek.render()
+function lurek.draw()
     -- ── TITLE state ──────────────────────────────────────────────────────
     if state == STATE.TITLE then
         -- Title
-        gfx.setColor(1, 1, 1)
-        gfx.print("PONG", W / 2 - 80, H / 3 - 20, 5)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("PONG", W / 2 - 80, H / 3 - 20, 5)
 
         -- Blinking prompt
         if math.floor(title_blink * 2) % 2 == 0 then
-            gfx.setColor(0.8, 0.8, 0.8)
-            gfx.print("PRESS ENTER TO START", W / 2 - 150, H / 2 + 20, 2)
+            lurek.render.setColor(0.8, 0.8, 0.8)
+            lurek.render.print("PRESS ENTER TO START", W / 2 - 150, H / 2 + 20, 2)
         end
 
         -- Controls info
-        gfx.setColor(0.4, 0.4, 0.4)
-        gfx.print("P1: W / S       P2: Up / Down", W / 2 - 175, H * 0.7, 1.5)
-        gfx.print("First to " .. WIN_SCORE .. " wins", W / 2 - 80, H * 0.7 + 30, 1.5)
+        lurek.render.setColor(0.4, 0.4, 0.4)
+        lurek.render.print("P1: W / S       P2: Up / Down", W / 2 - 175, H * 0.7, 1.5)
+        lurek.render.print("First to " .. WIN_SCORE .. " wins", W / 2 - 80, H * 0.7 + 30, 1.5)
         return
     end
 
     -- ── PLAYING / GAME_OVER shared world ─────────────────────────────────
 
     -- Center dashed line
-    gfx.setColor(0.25, 0.25, 0.25)
+    lurek.render.setColor(0.25, 0.25, 0.25)
     for i = 0, H, 24 do
-        gfx.rectangle("fill", W / 2 - 2, i, 4, 12)
+        lurek.render.rectangle("fill", W / 2 - 2, i, 4, 12)
     end
 
     -- Paddles
-    gfx.setColor(1, 1, 1)
-    gfx.rectangle("fill", p1.x, p1.y, PADDLE_W, PADDLE_H)
-    gfx.rectangle("fill", p2.x, p2.y, PADDLE_W, PADDLE_H)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.rectangle("fill", p1.x, p1.y, PADDLE_W, PADDLE_H)
+    lurek.render.rectangle("fill", p2.x, p2.y, PADDLE_W, PADDLE_H)
 
     -- Ball (flash yellow after score)
     if flash_timer > 0 then
-        gfx.setColor(1, 1, 0)
+        lurek.render.setColor(1, 1, 0)
     else
-        gfx.setColor(1, 1, 1)
+        lurek.render.setColor(1, 1, 1)
     end
-    gfx.rectangle("fill", ball.x, ball.y, BALL_SIZE, BALL_SIZE)
+    lurek.render.rectangle("fill", ball.x, ball.y, BALL_SIZE, BALL_SIZE)
 
     -- Particle sparks
     if sparks then
@@ -271,35 +269,35 @@ function lurek.render()
 
     -- Game-over overlay
     if state == STATE.GAME_OVER then
-        gfx.setColor(0, 0, 0, 0.6)
-        gfx.rectangle("fill", 0, 0, W, H)
-        gfx.setColor(1, 0.9, 0.1)
-        gfx.print("Player " .. winner .. " Wins!", W / 2 - 130, H / 2 - 30, 3)
-        gfx.setColor(0.7, 0.7, 0.7)
-        gfx.print("Press R to restart", W / 2 - 100, H / 2 + 20, 2)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.9, 0.1)
+        lurek.render.print("Player " .. winner .. " Wins!", W / 2 - 130, H / 2 - 30, 3)
+        lurek.render.setColor(0.7, 0.7, 0.7)
+        lurek.render.print("Press R to restart", W / 2 - 100, H / 2 + 20, 2)
     end
 end
 
 -- ── HUD / overlay rendering ─────────────────────────────────────────────
 
-function lurek.render_ui()
+function lurek.draw_ui()
     if state == STATE.TITLE then return end
 
     -- Score display with tween pop effect
     local s = score_pop.scale
-    gfx.setColor(1, 1, 1)
-    gfx.print(tostring(p1.score), W / 2 - 70, 18, 4 * s)
-    gfx.print(tostring(p2.score), W / 2 + 38, 18, 4 * s)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(tostring(p1.score), W / 2 - 70, 18, 4 * s)
+    lurek.render.print(tostring(p2.score), W / 2 + 38, 18, 4 * s)
 
     -- Controls hint
-    gfx.setColor(0.4, 0.4, 0.4)
-    gfx.print("P1: W/S", 8, H - 18, 1)
-    gfx.print("P2: Up/Down", W - 112, H - 18, 1)
+    lurek.render.setColor(0.4, 0.4, 0.4)
+    lurek.render.print("P1: W/S", 8, H - 18, 1)
+    lurek.render.print("P2: Up/Down", W - 112, H - 18, 1)
 
     -- FPS counter
     local fps = lurek.timer.getFPS()
-    gfx.setColor(0.3, 0.3, 0.3)
-    gfx.print("FPS: " .. math.floor(fps), W - 80, 4, 1)
+    lurek.render.setColor(0.3, 0.3, 0.3)
+    lurek.render.print("FPS: " .. math.floor(fps), W - 80, 4, 1)
 end
 
 -- ── Input events ─────────────────────────────────────────────────────────

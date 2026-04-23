@@ -243,6 +243,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Engine callbacks
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Rhythm Game — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.02, 0.08)
@@ -278,11 +279,11 @@ function lurek.init()
     end
 end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.window.setTitle("Rhythm Game — Lurek2D")
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     local fps = lurek.timer.getFPS()
     title_timer = title_timer + dt
 
@@ -462,12 +463,12 @@ lurek.process(function(dt)
         current_state = STATE_RESULTS
         result_grade = calc_grade()
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render: lanes, notes, effects
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state == STATE_TITLE then
         -- Pulsing background
         local pulse = math.sin(title_timer * 2) * 0.05 + 0.1
@@ -555,12 +556,12 @@ lurek.render(function()
     -- Draw particles
     if hit_particles then lurek.particle.draw(hit_particles) end
     if combo_particles then lurek.particle.draw(combo_particles) end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI: score, combo, life, grade
 -- ---------------------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     if current_state == STATE_RESULTS then
         -- Results screen
         local grade_colors = {

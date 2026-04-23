@@ -219,6 +219,7 @@ end
 -- ============================================================================
 -- Input bindings
 -- ============================================================================
+
 function lurek.init()
     lurek.window.setTitle("Survival Crafting — Lurek2D")
     lurek.render.setBackgroundColor(0.30, 0.65, 0.20)
@@ -237,7 +238,7 @@ function lurek.init()
     math.randomseed(os.time())
 end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.camera.setPosition(0, 0)
 end
 
@@ -254,15 +255,15 @@ end
 -- ============================================================================
 -- Process
 -- ============================================================================
-lurek.process(function(dt)
-    if lurek.input.isActionJustPressed("quit") then
+function lurek.process(dt)
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     -- Title screen
     if state == STATE_TITLE then
-        if lurek.input.isActionJustPressed("start") then
+        if lurek.input.wasActionPressed("start") then
             start_game()
         end
         return
@@ -270,7 +271,7 @@ lurek.process(function(dt)
 
     -- Game over
     if state == STATE_GAME_OVER then
-        if lurek.input.isActionJustPressed("start") then
+        if lurek.input.wasActionPressed("start") then
             start_game()
         end
         return
@@ -278,7 +279,7 @@ lurek.process(function(dt)
 
     -- Craft menu toggle
     if state == STATE_CRAFT then
-        if lurek.input.isActionJustPressed("craft") then
+        if lurek.input.wasActionPressed("craft") then
             state = STATE_PLAYING
         end
         -- Crafting choices via number keys
@@ -346,7 +347,7 @@ lurek.process(function(dt)
     player.move_cd = player.move_cd - dt
     if player.move_cd <= 0 and not mining.active then
         for name, dir in pairs(DIR) do
-            if lurek.input.isActionPressed(name) then
+            if lurek.input.isActionDown(name) then
                 local nx = player.gx + dir.dx
                 local ny = player.gy + dir.dy
                 player.facing = name
@@ -364,7 +365,7 @@ lurek.process(function(dt)
     end
 
     -- Mining
-    if lurek.input.isActionJustPressed("mine") and not mining.active then
+    if lurek.input.wasActionPressed("mine") and not mining.active then
         local dir = DIR[player.facing]
         if dir then
             local tx = player.gx + dir.dx
@@ -406,7 +407,7 @@ lurek.process(function(dt)
     end
 
     -- Eat berry
-    if lurek.input.isActionJustPressed("eat") and inventory.berry > 0 then
+    if lurek.input.wasActionPressed("eat") and inventory.berry > 0 then
         inventory.berry = inventory.berry - 1
         player.hunger = math.min(100, player.hunger + BERRY_HUNGER)
         local wx = (player.gx - 1) * TILE + TILE / 2
@@ -415,13 +416,13 @@ lurek.process(function(dt)
     end
 
     -- Craft menu open
-    if lurek.input.isActionJustPressed("craft") then
+    if lurek.input.wasActionPressed("craft") then
         state = STATE_CRAFT
         return
     end
 
     -- Place wall
-    if lurek.input.isActionJustPressed("place") and inventory.wall > 0 then
+    if lurek.input.wasActionPressed("place") and inventory.wall > 0 then
         local dir = DIR[player.facing]
         if dir then
             local tx = player.gx + dir.dx
@@ -468,12 +469,12 @@ lurek.process(function(dt)
     camera_x = camera_x + (target_cx - camera_x) * math.min(1, dt * 6)
     camera_y = camera_y + (target_cy - camera_y) * math.min(1, dt * 6)
     lurek.camera.setPosition(camera_x, camera_y)
-end)
+end
 
 -- ============================================================================
 -- Render (world space)
 -- ============================================================================
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE or state == STATE_GAME_OVER then return end
 
     -- Draw map tiles
@@ -550,12 +551,12 @@ lurek.render(function()
             0.02, 0.02, 0.08, night_alpha
         )
     end
-end)
+end
 
 -- ============================================================================
 -- Render UI (screen space)
 -- ============================================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     -- TITLE SCREEN
@@ -667,4 +668,4 @@ lurek.render_ui(function()
         )
         lurek.render.print("Press C to close", 330, 420, 13, 0.5, 0.5, 0.4, 1)
     end
-end)
+end

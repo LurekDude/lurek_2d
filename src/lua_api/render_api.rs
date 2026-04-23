@@ -1260,7 +1260,7 @@ impl LuaUserData for LuaShape {
         // -- draw --
         /// Queues a draw command for this shape at the given position.
         ///
-        /// Must be called from a `lurek.render` or `lurek.render_ui` callback.
+        /// Must be called from a `lurek.draw` or `lurek.draw_ui` callback.
         /// @param x        : number   world X
         /// @param y        : number   world Y
         /// @param rotation : number?  radians, default 0
@@ -3492,7 +3492,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- drawNineSlice --
-    /// Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
+    /// Queues a 9-slice draw call inside lurek.draw / lurek.draw_ui.
     /// @param slice : NineSlice
     /// @param x : number
     /// @param y : number
@@ -3536,7 +3536,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Creates a new empty [`CompoundShape`] stored in the resource pool.
     ///
     /// Build up primitives with `shape:rectangle()`, `shape:circle()`, etc.
-    /// Call `shape:draw(x, y)` inside `lurek.render` or `lurek.render_ui` to
+    /// Call `shape:draw(x, y)` inside `lurek.draw` or `lurek.draw_ui` to
     /// replay all commands with a unified affine transform each frame.
     ///
     /// @return Shape
@@ -3568,7 +3568,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- drawQuadBezier --
     /// Queues a quadratic BĂ©zier curve from (x1,y1) to (x2,y2) with one control point.
-    /// Must be called inside lurek.render or lurek.render_ui.
+    /// Must be called inside lurek.draw or lurek.draw_ui.
     /// @param x1 : number
     /// @param y1 : number
     /// @param cx : number
@@ -3598,7 +3598,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- drawCubicBezier --
     /// Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
-    /// Must be called inside lurek.render or lurek.render_ui.
+    /// Must be called inside lurek.draw or lurek.draw_ui.
     /// @param x1 : number
     /// @param y1 : number
     /// @param cx1 : number
@@ -4089,7 +4089,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-    /// Must be called inside lurek.render or lurek.render_ui.
+    /// Must be called inside lurek.draw or lurek.draw_ui.
     /// @param x1 : number
     /// @param y1 : number
     /// @param cx : number
@@ -4115,7 +4115,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- drawCubicBezier --
     /// Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
-    /// Must be called inside lurek.render or lurek.render_ui.
+    /// Must be called inside lurek.draw or lurek.draw_ui.
     /// @param x1 : number
     /// @param y1 : number
     /// @param cx1 : number

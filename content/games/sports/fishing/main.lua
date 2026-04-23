@@ -1,4 +1,5 @@
 --[[
+
   Fishing — Lurek2D
   Category: sports
 
@@ -209,11 +210,11 @@ function lurek.init()
   math.randomseed(os.time())
 end
 
-function lurek.ready()
+local function _ready_setup()
   show_message("", 0)
 end
 
-lurek.process(function(delta)
+function lurek.process(delta)
   dt = delta
 
   -- Message timer
@@ -223,7 +224,7 @@ lurek.process(function(delta)
   end
 
   -- Quit
-  if lurek.input.isPressed("quit") then
+  if lurek.input.keyboard.isDown("quit") then
     lurek.event.quit()
     return
   end
@@ -272,7 +273,7 @@ lurek.process(function(delta)
 
   -- TITLE
   if state == STATE_TITLE then
-    if lurek.input.isPressed("cast_reel") then
+    if lurek.input.keyboard.isDown("cast_reel") then
       start_game()
     end
     return
@@ -280,7 +281,7 @@ lurek.process(function(delta)
 
   -- GAME OVER
   if state == STATE_GAMEOVER then
-    if lurek.input.isPressed("cast_reel") then
+    if lurek.input.keyboard.isDown("cast_reel") then
       state = STATE_TITLE
     end
     return
@@ -288,7 +289,7 @@ lurek.process(function(delta)
 
   -- BUCKET VIEW
   if state == STATE_BUCKET then
-    if lurek.input.isPressed("cast_reel") then
+    if lurek.input.keyboard.isDown("cast_reel") then
       state = STATE_FISHING
       reset_cast()
     end
@@ -310,15 +311,15 @@ lurek.process(function(delta)
   end
 
   -- Bait selection
-  if lurek.input.isPressed("bait1") then bait_index = 1; show_message("Bait: Worm", 1.5) end
-  if lurek.input.isPressed("bait2") then bait_index = 2; show_message("Bait: Fly", 1.5) end
-  if lurek.input.isPressed("bait3") then bait_index = 3; show_message("Bait: Deep Bait", 1.5) end
+  if lurek.input.keyboard.isDown("bait1") then bait_index = 1; show_message("Bait: Worm", 1.5) end
+  if lurek.input.keyboard.isDown("bait2") then bait_index = 2; show_message("Bait: Fly", 1.5) end
+  if lurek.input.keyboard.isDown("bait3") then bait_index = 3; show_message("Bait: Deep Bait", 1.5) end
 
   -- FISHING state
   if state == STATE_FISHING then
     if cast_x == 0 then
       -- Charging
-      if lurek.input.isDown("cast_reel") then
+      if lurek.input.isActionDown("cast_reel") then
         charging = true
         power = clamp(power + dt * 80, 0, 100)
       elseif charging then
@@ -366,7 +367,7 @@ lurek.process(function(delta)
           if bobber_dip_tween.t >= bobber_dip_tween.dur then bobber_dip_tween = nil end
         end
 
-        if lurek.input.isPressed("cast_reel") then
+        if lurek.input.keyboard.isDown("cast_reel") then
           -- Hooked!
           state = STATE_CATCHING
           fish_x = cast_x
@@ -383,7 +384,7 @@ lurek.process(function(delta)
       end
 
       -- Bucket view shortcut
-      if lurek.input.isPressed("bait1") and cast_x > 0 then
+      if lurek.input.keyboard.isDown("bait1") and cast_x > 0 then
         -- already handled above
       end
     end
@@ -405,7 +406,7 @@ lurek.process(function(delta)
       tension = tension - 0.05 * dt
     end
 
-    if lurek.input.isDown("cast_reel") then
+    if lurek.input.isActionDown("cast_reel") then
       -- Reeling in
       fish_x = fish_x - REEL_SPEED * dt
       tension = tension + 0.15 * dt
@@ -459,9 +460,9 @@ lurek.process(function(delta)
       end
     end
   end
-end)
+end
 
-lurek.render(function()
+function lurek.draw()
   -- Sky gradient
   local sky_r, sky_g, sky_b = 0.4, 0.6, 0.9
   if is_night then sky_r, sky_g, sky_b = 0.05, 0.05, 0.15 end
@@ -548,9 +549,9 @@ lurek.render(function()
       lurek.render.circle(sx, sy, 1.5, 1.0, 1.0, 0.8, flicker)
     end
   end
-end)
+end
 
-lurek.render_ui(function()
+function lurek.draw_ui()
   local fps = lurek.timer.getFPS()
   lurek.render.print("FPS: " .. fps, SCREEN_W - 80, 10, 1, 1, 1, 0.5)
 
@@ -662,4 +663,4 @@ lurek.render_ui(function()
   if message ~= "" then
     lurek.render.print(message, SCREEN_W / 2 - #message * 3.5, SCREEN_H / 2 - 80, 1.0, 1.0, 0.6, 0.9)
   end
-end)
+end

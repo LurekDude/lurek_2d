@@ -665,7 +665,7 @@ do  -- ParticleSystem:render
   fx:setPosition(200, 200)
   fx:start()
   function lurek.process(dt) fx:update(dt) end
-  function lurek.render() fx:render() end
+  function lurek.draw() fx:render() end
 end
 
 --@api-stub: ParticleSystem:clone
@@ -938,4 +938,95 @@ do  -- lurek.particle.fromTOML
     local ps = lurek.particle.fromTOML(toml_str)
     lurek.log.debug("fromTOML: " .. tostring(ps), "particle")
   end
+end
+
+--@api-stub: ParticleSystem:addAttractor
+-- Adds a point attractor that pulls or repels particles during their lifetime.
+-- Negative strength repels; call multiple times to create complex force fields.
+do  -- ParticleSystem:addAttractor
+  local ps = lurek.particle.newSystem(1000)
+  ps:addAttractor(400, 300, 80, -50)
+  ps:start()
+  lurek.log.info("attractor added", "particle")
+end
+
+--@api-stub: ParticleSystem:addSubEmitter
+-- Attaches a child emitter that spawns when each particle from the parent dies.
+-- Use for chain explosions: each fragment spawns a spark sub-emitter on death.
+do  -- ParticleSystem:addSubEmitter
+  local parent = lurek.particle.newSystem(200)
+  local sparks  = lurek.particle.newSystem(50)
+  parent:addSubEmitter(sparks, "on_death")
+  parent:start()
+  lurek.log.info("sub emitter count: " .. parent:subSystemCount(), "particle")
+end
+
+--@api-stub: ParticleSystem:setBounds
+-- Constrains particle movement to a world-space rectangle; particles bounce or die at edges.
+-- Pass bounce=true to reflect velocity; false causes particles to be killed on contact.
+do  -- ParticleSystem:setBounds
+  local ps = lurek.particle.newSystem(500)
+  ps:setBounds(0, 0, 800, 600, false)
+  ps:start()
+  lurek.log.info("bounds set", "particle")
+end
+
+--@api-stub: ParticleSystem:setFlipbook
+-- Sets a flipbook animation sheet so particles cycle through sprite frames over their lifetime.
+-- cols*rows must equal or exceed the desired frame count.
+do  -- ParticleSystem:setFlipbook
+  local ps = lurek.particle.newSystem(300)
+  ps:setFlipbook(4, 4, 16)
+  ps:start()
+  lurek.log.info("flipbook set", "particle")
+end
+
+--@api-stub: Trail:setHeadColor
+-- Sets the RGBA colour at the start (head) of a particle trail.
+-- The trail interpolates between head and tail colour along its length.
+do  -- Trail:setHeadColor
+  local trail = lurek.particle.newTrail()
+  trail:setHeadColor(1.0, 0.8, 0.0, 1.0)
+  trail:setTailColor(1.0, 0.2, 0.0, 0.0)
+  lurek.log.info("trail head colour set", "particle")
+end
+
+--@api-stub: ParticleSystem:setLinearAcceleration
+-- Sets a constant linear (x, y) acceleration applied to all particles each frame.
+-- Use for gravity (0, 200) or wind effects with a positive x component.
+do  -- ParticleSystem:setLinearAcceleration
+  local ps = lurek.particle.newSystem(500)
+  ps:setLinearAcceleration(0, 200, 0, 250)
+  ps:start()
+  lurek.log.info("linear accel set", "particle")
+end
+
+--@api-stub: ParticleSystem:setRadialAcceleration
+-- Sets a centripetal/centrifugal acceleration along the particle's radial direction.
+-- Positive pushes outward from the emitter origin; negative pulls inward.
+do  -- ParticleSystem:setRadialAcceleration
+  local ps = lurek.particle.newSystem(400)
+  ps:setRadialAcceleration(50, 100)
+  ps:start()
+  lurek.log.info("radial accel set", "particle")
+end
+
+--@api-stub: Trail:setTailColor
+-- Sets the RGBA colour at the end (tail) of a particle trail.
+-- Fade the alpha to 0 for a natural dissipating effect.
+do  -- Trail:setTailColor
+  local trail = lurek.particle.newTrail()
+  trail:setHeadColor(0.5, 0.8, 1.0, 1.0)
+  trail:setTailColor(0.3, 0.5, 1.0, 0.0)
+  lurek.log.info("trail tail colour set", "particle")
+end
+
+--@api-stub: ParticleSystem:setTangentialAcceleration
+-- Sets a tangential (perpendicular to radius) acceleration that curves particle paths.
+-- Positive rotates clockwise; negative rotates anticlockwise for spiral effects.
+do  -- ParticleSystem:setTangentialAcceleration
+  local ps = lurek.particle.newSystem(400)
+  ps:setTangentialAcceleration(30, 80)
+  ps:start()
+  lurek.log.info("tangential accel set", "particle")
 end

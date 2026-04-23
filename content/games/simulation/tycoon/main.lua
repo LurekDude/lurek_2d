@@ -90,7 +90,7 @@ end
 
 -- ── Helper: which business is clicked ───────────────────────────────────
 local function biz_at_mouse()
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     for i, b in ipairs(businesses) do
         if b.owned then
             local y = biz_y(i) + b.slide_y
@@ -274,12 +274,12 @@ function lurek.init()
     lurek.input.bind("quit",     "escape")
 end
 
-function lurek.ready()
+local function _ready_setup()
     gold_per_second = compute_gps()
 end
 
-lurek.process(function(dt)
-    if lurek.input.justPressed("quit") then
+function lurek.process(dt)
+    if lurek.input.wasActionPressed("quit") then
         if state == STATE_PRESTIGE then
             state = STATE_PLAYING
             return
@@ -291,7 +291,7 @@ lurek.process(function(dt)
     -- ── TITLE ───────────────────────────────────────────────────────────
     if state == STATE_TITLE then
         title_pulse = title_pulse + dt * 2.5
-        if lurek.input.justPressed("collect") or lurek.input.justPressed("select") then
+        if lurek.input.wasActionPressed("collect") or lurek.input.wasActionPressed("select") then
             state = STATE_PLAYING
         end
         return
@@ -299,7 +299,7 @@ lurek.process(function(dt)
 
     -- ── PRESTIGE_CONFIRM ────────────────────────────────────────────────
     if state == STATE_PRESTIGE then
-        if lurek.input.justPressed("collect") then
+        if lurek.input.wasActionPressed("collect") then
             do_prestige()
         end
         update_particles(prestige_particles, dt)
@@ -309,18 +309,18 @@ lurek.process(function(dt)
     -- ── PLAYING ─────────────────────────────────────────────────────────
 
     -- Mode toggles
-    mode_manager = lurek.input.isDown("manage")
-    mode_upgrade = lurek.input.isDown("upgrade")
+    mode_manager = lurek.input.isActionDown("manage")
+    mode_upgrade = lurek.input.isActionDown("upgrade")
 
     -- Buy businesses
     for i = 1, 6 do
-        if lurek.input.justPressed("buy" .. i) then
+        if lurek.input.wasActionPressed("buy" .. i) then
             buy_business(i)
         end
     end
 
     -- Mouse click interactions
-    if lurek.input.justPressed("select") then
+    if lurek.input.wasActionPressed("select") then
         local idx = biz_at_mouse()
         if idx then
             if mode_manager then
@@ -332,12 +332,12 @@ lurek.process(function(dt)
     end
 
     -- Collect with space
-    if lurek.input.justPressed("collect") then
+    if lurek.input.wasActionPressed("collect") then
         collect_ready()
     end
 
     -- Prestige
-    if lurek.input.justPressed("prestige") and gold >= 100000 then
+    if lurek.input.wasActionPressed("prestige") and gold >= 100000 then
         state = STATE_PRESTIGE
     end
 
@@ -395,13 +395,13 @@ lurek.process(function(dt)
     update_particles(particles, dt)
     update_particles(flash_particles, dt)
     update_particles(prestige_particles, dt)
-end)
+end
 
 -- ══════════════════════════════════════════════════════════════════════════
 -- Render — business bars and progress
 -- ══════════════════════════════════════════════════════════════════════════
 
-lurek.render(function()
+function lurek.draw()
     -- ── TITLE ───────────────────────────────────────────────────────────
     if state == STATE_TITLE then
         local pulse = 0.7 + 0.3 * math.sin(title_pulse)
@@ -477,13 +477,13 @@ lurek.render(function()
         local a = math.max(0, p.life / 0.7)
         lurek.render.rectangle(p.x, p.y, p.size, p.size, p.r, p.g, p.b, a)
     end
-end)
+end
 
 -- ══════════════════════════════════════════════════════════════════════════
 -- Render UI — gold, stats, controls
 -- ══════════════════════════════════════════════════════════════════════════
 
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then return end
     if state == STATE_PRESTIGE then return end
 
@@ -525,4 +525,4 @@ lurek.render_ui(function()
 
     -- FPS
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), W - 80, H - 20, 11, 0.3, 0.3, 0.3, 0.5)
-end)
+end

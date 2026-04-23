@@ -9,6 +9,7 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+
 local SCREEN_W, SCREEN_H = 800, 600
 
 local STATE = { TITLE = 1, PLAYING = 2, GAME_OVER = 3 }
@@ -269,7 +270,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Process
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Quit
     if lurek.input.pressed("quit") then
         lurek.event.quit()
@@ -545,12 +546,12 @@ lurek.process(function(dt)
     if alien_count <= 0 then
         next_wave()
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render (game world)
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     cam:apply()
 
     if current_state == STATE.TITLE then
@@ -655,12 +656,12 @@ lurek.render(function()
     end
 
     cam:reset()
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI (HUD overlay — screen space)
 -- ---------------------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     -- Score
     lurek.render.setColor(1, 1, 1, 1)
     lurek.render.print("SCORE: " .. tostring(score), 10, 8)

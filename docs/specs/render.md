@@ -240,7 +240,7 @@ The `render` module is Lurek2D's GPU rendering layer backed by wgpu 22. Its arch
 - `lurek.render.saveScreenshot`: Queues a screenshot to be saved after the current frame.
 - `lurek.render.captureScreenshot`: Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
 - `lurek.render.newNineSlice`: Creates a 9-slice descriptor from a texture and inset values.
-- `lurek.render.drawNineSlice`: Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
+- `lurek.render.drawNineSlice`: Queues a 9-slice draw call inside lurek.render / lurek.draw_ui.
 - `lurek.render.newShape`: Creates a new empty [`CompoundShape`] stored in the resource pool.
 - `lurek.render.newDrawLayer`: Creates a new z-ordered draw-call queue.
 - `lurek.render.drawQuadBezier`: Queues a quadratic BĂ©zier curve from (x1,y1) to (x2,y2) with one control point.
@@ -256,7 +256,7 @@ The `render` module is Lurek2D's GPU rendering layer backed by wgpu 22. Its arch
 - `lurek.render.drawBevelRect`: Queues a beveled border rectangle with inner fill.
 - `lurek.render.pushLayer`: Begins a named compositing layer with optional alpha and blend mode.
 - `lurek.render.popLayer`: Ends and composites the named layer back to its parent.
-- `lurek.render.drawQuadBezier`: Must be called inside lurek.render or lurek.render_ui.
+- `lurek.render.drawQuadBezier`: Must be called inside lurek.render or lurek.draw_ui.
 - `lurek.render.drawCubicBezier`: Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
 - `lurek.render.drawPath`: Queues a multi-segment vector path.
 - `lurek.render.drawGradientRect`: Queues a gradient-filled rectangle. Both colors are RGBA tables {r,g,b,a} or positional {[1]=r,[2]=g,[3]=b,[4]=a}.

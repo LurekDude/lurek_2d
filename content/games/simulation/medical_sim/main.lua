@@ -276,6 +276,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Input bindings
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Medical Sim — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.1, 0.12)
@@ -294,14 +295,14 @@ end
 -- ---------------------------------------------------------------------------
 -- Ready
 -- ---------------------------------------------------------------------------
-function lurek.ready()
+local function _ready_setup()
     initGame()
 end
 
 -- ---------------------------------------------------------------------------
 -- Process
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     fps = lurek.timer.getFPS()
 
     if lurek.input.wasActionPressed("quit") then
@@ -367,7 +368,7 @@ lurek.process(function(dt)
 
     -- Selection via click
     if lurek.input.wasActionPressed("select") then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local found = false
 
         -- Check if clicking a waiting patient
@@ -494,12 +495,12 @@ lurek.process(function(dt)
     -- Update particles & tweens
     updateParticles(dt)
     updateTweens(dt)
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render (world-space)
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state ~= STATE.PLAYING then return end
 
     -- Draw departments
@@ -584,12 +585,12 @@ lurek.render(function()
         local a = math.max(0, p.life / p.maxLife)
         lurek.render.rectangle(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size, p.r, p.g, p.b, a)
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI (screen-space HUD & menus)
 -- ---------------------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     -- ---- TITLE SCREEN ----
     if current_state == STATE.TITLE then
         lurek.render.print("MEDICAL SIM", 200, 180, 48, 0.9, 0.3, 0.3, 1)

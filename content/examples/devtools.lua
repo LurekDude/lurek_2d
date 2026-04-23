@@ -323,7 +323,7 @@ end
 -- Returns whether the console is considered open.
 -- Branch UI rendering on this so you don't draw the REPL when it's hidden.
 do  -- lurek.devtools.isConsoleOpen
-  function lurek.render_ui()
+  function lurek.draw_ui()
     if lurek.devtools.isConsoleOpen() then
       -- console panel would be drawn here
     end

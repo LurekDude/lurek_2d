@@ -202,9 +202,10 @@ end
 -- ============================================================================
 -- Callbacks
 -- ============================================================================
+
 function lurek.init()
     lurek.window.setTitle("Cannon Fodder — Lurek2D")
-    lurek.setBackgroundColor(0.1, 0.2, 0.05)
+    lurek.render.setBackgroundColor(0.1, 0.2, 0.05)
 
     lurek.input.action("up",      {"w", "up"})
     lurek.input.action("down",    {"s", "down"})
@@ -215,7 +216,7 @@ function lurek.init()
     lurek.input.action("quit",    {"escape"})
 end
 
-function lurek.ready()
+local function _ready_setup()
     state = STATE.TITLE
     title_blink_timer = 0
 end
@@ -223,7 +224,7 @@ end
 -- ============================================================================
 -- Process
 -- ============================================================================
-lurek.process(function(dt)
+function lurek.process(dt)
     if lurek.input.action_just_pressed("quit") then
         lurek.event.quit()
         return
@@ -558,12 +559,12 @@ lurek.process(function(dt)
             mission_banner_alpha = 1
         end
     end
-end)
+end
 
 -- ============================================================================
 -- Render — world space (jungle, soldiers, enemies, bullets, trees, flag)
 -- ============================================================================
-lurek.render(function()
+function lurek.draw()
     local ox, oy = -cam_x, -cam_y
 
     -- Ground — dark jungle green gradient strips
@@ -645,12 +646,12 @@ lurek.render(function()
     if flash_alpha > 0 then
         lurek.render.rectangleangle(0, 0, 800, 600, 1.0, 0.9, 0.5, flash_alpha)
     end
-end)
+end
 
 -- ============================================================================
 -- Render UI — HUD overlay (score, grenades, mission, soldier count)
 -- ============================================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE.TITLE then
         -- Title screen
         lurek.render.rectangleangle(0, 0, 800, 600, 0.05, 0.08, 0.02)
@@ -717,4 +718,4 @@ lurek.render_ui(function()
         lurek.render.print("MISSION " .. current_mission .. " COMPLETE!", 220, 250, 32, 0.2, 0.9, 0.3)
         lurek.render.print("+500 BONUS", 340, 290, 18, 0.9, 0.85, 0.3)
     end
-end)
+end

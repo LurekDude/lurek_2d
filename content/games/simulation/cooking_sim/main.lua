@@ -165,6 +165,7 @@ lurek.input.bind("escape", "quit")
 ------------------------------------------------------------
 -- Callbacks
 ------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Cooking Sim — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.1, 0.05)
@@ -173,7 +174,7 @@ function lurek.init()
     fill_customer_queue()
 end
 
-function lurek.ready()
+local function _ready_setup()
     gold = 0
     day = 1
     satisfaction = 100
@@ -183,7 +184,7 @@ end
 ------------------------------------------------------------
 -- Process
 ------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     local fps = lurek.timer.getFPS()
     lurek.window.setTitle(string.format("Cooking Sim — Day %d | Gold: %d | FPS: %d", day, gold, fps))
 
@@ -220,17 +221,17 @@ lurek.process(function(dt)
 
     if state == STATES.TITLE then
         title_blink = title_blink + dt
-        if lurek.input.isActionJustPressed("action") then
+        if lurek.input.wasActionPressed("action") then
             start_day()
         end
-        if lurek.input.isActionJustPressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.quit()
         end
         return
     end
 
     if state == STATES.DAY_END then
-        if lurek.input.isActionJustPressed("action") then
+        if lurek.input.wasActionPressed("action") then
             -- Buy ingredients
             if gold >= INGREDIENT_PACK_COST then
                 gold = gold - INGREDIENT_PACK_COST
@@ -239,7 +240,7 @@ lurek.process(function(dt)
                 end
             end
         end
-        if lurek.input.isActionJustPressed("place") then
+        if lurek.input.wasActionPressed("place") then
             day = day + 1
             if satisfaction <= 0 then
                 state = STATES.GAME_OVER
@@ -247,14 +248,14 @@ lurek.process(function(dt)
                 start_day()
             end
         end
-        if lurek.input.isActionJustPressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.quit()
         end
         return
     end
 
     if state == STATES.GAME_OVER then
-        if lurek.input.isActionJustPressed("action") or lurek.input.isActionJustPressed("place") then
+        if lurek.input.wasActionPressed("action") or lurek.input.wasActionPressed("place") then
             gold = 0
             day = 1
             satisfaction = 100
@@ -262,7 +263,7 @@ lurek.process(function(dt)
             reset_inventory()
             state = STATES.TITLE
         end
-        if lurek.input.isActionJustPressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.quit()
         end
         return
@@ -277,25 +278,25 @@ lurek.process(function(dt)
     end
 
     -- Station navigation
-    if lurek.input.isActionJustPressed("left") then
+    if lurek.input.wasActionPressed("left") then
         current_station = math.max(1, current_station - 1)
     end
-    if lurek.input.isActionJustPressed("right") then
+    if lurek.input.wasActionPressed("right") then
         current_station = math.min(4, current_station + 1)
     end
 
     -- Ingredient browsing
-    if lurek.input.isActionJustPressed("up") then
+    if lurek.input.wasActionPressed("up") then
         selected_ingredient = selected_ingredient - 1
         if selected_ingredient < 1 then selected_ingredient = #INGREDIENTS end
     end
-    if lurek.input.isActionJustPressed("down") then
+    if lurek.input.wasActionPressed("down") then
         selected_ingredient = selected_ingredient + 1
         if selected_ingredient > #INGREDIENTS then selected_ingredient = 1 end
     end
 
     -- Place ingredient at Prep Station
-    if lurek.input.isActionJustPressed("place") and current_station == 1 then
+    if lurek.input.wasActionPressed("place") and current_station == 1 then
         local ingr = INGREDIENTS[selected_ingredient]
         if inventory[ingr] and inventory[ingr] > 0 and #placed_ingredients < 3 then
             inventory[ingr] = inventory[ingr] - 1
@@ -306,7 +307,7 @@ lurek.process(function(dt)
     end
 
     -- Action at stations
-    if lurek.input.isActionJustPressed("action") then
+    if lurek.input.wasActionPressed("action") then
         local sname = STATION_NAMES[current_station]
 
         if sname == "Prep Station" then
@@ -396,12 +397,12 @@ lurek.process(function(dt)
 
     -- Tween gold display
     gold_display = gold_display + (gold - gold_display) * dt * 4
-end)
+end
 
 ------------------------------------------------------------
 -- Render — kitchen scene
 ------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if state ~= STATES.PLAYING then return end
 
     -- Draw stations
@@ -463,12 +464,12 @@ lurek.render(function()
         local alpha = p.life / p.max_life
         lurek.render.rectangle(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size, p.r, p.g, p.b, alpha * 0.8)
     end
-end)
+end
 
 ------------------------------------------------------------
 -- Render UI — HUD, orders, inventory, overlays
 ------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATES.TITLE then
         local alpha = 0.7 + 0.3 * math.sin(title_blink * 3)
         lurek.render.print("COOKING SIM", SCREEN_W / 2 - 100, 160, 36, 1, 0.85, 0.3, 1)
@@ -559,4 +560,4 @@ lurek.render_ui(function()
         end
     end
     lurek.render.print(hint, 16, SCREEN_H - 24, 12, 0.6, 0.6, 0.6, 0.8)
-end)
+end

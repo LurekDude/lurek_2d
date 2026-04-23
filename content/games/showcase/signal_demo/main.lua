@@ -356,13 +356,14 @@ lurek.input.bind("quit",  "escape")
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Signal Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.06, 0.10)
     lurek.camera.setPosition(0, 0)
 end
 
-function lurek.ready()
+local function _ready_setup()
     -- Engine particle systems per signal type
     hit_ps = lurek.particle.newSystem({
         maxParticles = 200, emissionRate = 0,
@@ -407,7 +408,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Process
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     if current_state == STATE.TITLE then
@@ -474,12 +475,12 @@ lurek.process(function(dt)
             sub.flash = clamp(sub.flash - dt * 3, 0, 1)
         end
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render — game scene
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state == STATE.TITLE then
         -- Title screen
         local a = title_alpha
@@ -575,12 +576,12 @@ lurek.render(function()
         lurek.render.print("Level reached: " .. level, 270, 335, 15,
             0.7, 0.7, 0.7, ta * 0.7)
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI — panels (subscriber list, event log, stats)
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if current_state == STATE.TITLE then return end
 
     local fps = lurek.timer.getFPS and lurek.timer.getFPS() or 0
@@ -648,4 +649,4 @@ lurek.render_ui(function()
             stats.fired, stats.subscribers, stats.chain_reactions, format_time(game_time)),
         20, 34, 13, 0.7, 0.7, 0.75, 0.85
     )
-end)
+end

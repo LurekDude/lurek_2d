@@ -163,7 +163,7 @@ end
 -- Call from lurek.render to overlay collider outlines via the GPU pipeline (no ImageData needed).
 do  -- lurek.physics.drawDebugGpu
   local world = lurek.physics.newWorld(0, 9.81)
-  function lurek.render()
+  function lurek.draw()
     lurek.physics.drawDebugGpu(world, { bodyColor = {0, 1, 0, 1}, lineWidth = 2.0 })
   end
 end
@@ -1474,4 +1474,451 @@ do  -- lurek.physics.testPoint
     local hit = lurek.physics.testPoint(5, 5, 0, 0, 10, 10)
     lurek.log.debug("point-in-AABB=" .. tostring(hit), "physics")
   end
+end
+
+--@api-stub: World:addDistanceJoint
+-- Creates a distance joint keeping two bodies at a fixed separation.
+-- damping and frequency control spring-like oscillation; 0 damping = rigid rod.
+do  -- World:addDistanceJoint
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 100, "dynamic")
+  local b = world:newBody(200, 100, "dynamic")
+  local jid = world:addDistanceJoint(a:getId(), b:getId(), 100, 0.9, 5.0)
+  lurek.log.info("distance joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addFixture
+-- Attaches a shape fixture to an existing body with friction and restitution.
+-- Multiple fixtures give a body a composite collision shape.
+do  -- World:addFixture
+  local world = lurek.physics.newWorld()
+  local b = world:newBody(200, 200, "dynamic")
+  local fid = world:addFixture(b:getId(), "circle", {radius=16, friction=0.4, restitution=0.3})
+  lurek.log.info("fixture id: " .. fid, "physics")
+end
+
+--@api-stub: World:addFrictionJoint
+-- Creates a friction joint that resists relative linear and angular motion.
+-- maxForce and maxTorque cap the damping; use for ice-skating or surface drag.
+do  -- World:addFrictionJoint
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 100, "dynamic")
+  local b = world:newBody(100, 100, "static")
+  local jid = world:addFrictionJoint(a:getId(), b:getId(), 50, 10)
+  lurek.log.info("friction joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addGearJoint
+-- Links two revolute or prismatic joints so their motion stays coupled by a ratio.
+-- Simulates gear trains; both joints must already exist in the same world.
+do  -- World:addGearJoint
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 200, "dynamic")
+  local b = world:newBody(200, 200, "dynamic")
+  local c = world:newBody(150, 200, "static")
+  local j1 = world:addRevoluteJoint(c:getId(), a:getId(), 100, 200)
+  local j2 = world:addRevoluteJoint(c:getId(), b:getId(), 200, 200)
+  local jid = world:addGearJoint(j1, j2, 2.0)
+  lurek.log.info("gear joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addMotorJoint
+-- Creates a motor joint that drives one body to match the position/angle of another.
+-- maxForce and maxTorque control how aggressively the motor corrects offset.
+do  -- World:addMotorJoint
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 100, "dynamic")
+  local b = world:newBody(200, 200, "dynamic")
+  local jid = world:addMotorJoint(a:getId(), b:getId(), 100, 50)
+  lurek.log.info("motor joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addMouseJoint
+-- Creates a spring-like joint from a body to a moving screen position (drag-and-drop).
+-- maxForce prevents the joint from exploding when the target moves quickly.
+do  -- World:addMouseJoint
+  local world = lurek.physics.newWorld()
+  local b = world:newBody(200, 200, "dynamic")
+  local jid = world:addMouseJoint(b:getId(), 200, 200, 1000)
+  lurek.log.info("mouse joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addPrismaticJoint
+-- Creates a prismatic joint allowing translation along one axis only.
+-- Use for sliding doors, pistons, or elevator platforms.
+do  -- World:addPrismaticJoint
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 300, "static")
+  local b = world:newBody(100, 200, "dynamic")
+  local jid = world:addPrismaticJoint(a:getId(), b:getId(), 0, -1)
+  lurek.log.info("prismatic joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addPulleyJoint
+-- Creates a pulley joint constraining two bodies through a fixed rope length.
+-- lengthA + lengthB == total rope; a ratio != 1 simulates a block-and-tackle.
+do  -- World:addPulleyJoint
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 200, "dynamic")
+  local b = world:newBody(300, 200, "dynamic")
+  local jid = world:addPulleyJoint(a:getId(), b:getId(), 100, 100, 300, 100, 100, 100, 1.0)
+  lurek.log.info("pulley joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addRevoluteJoint
+-- Creates a revolute (hinge) joint at a world-space anchor point.
+-- Bodies can rotate freely about the anchor; add limits to constrain the angle.
+do  -- World:addRevoluteJoint
+  local world = lurek.physics.newWorld()
+  local door = world:newBody(200, 200, "dynamic")
+  local wall  = world:newBody(200, 200, "static")
+  local jid = world:addRevoluteJoint(wall:getId(), door:getId(), 200, 200)
+  lurek.log.info("revolute joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addRopeJoint
+-- Creates a rope joint that prevents two bodies from exceeding a max distance.
+-- Slack means bodies can be closer; maxLength is the hard upper limit.
+do  -- World:addRopeJoint
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 100, "dynamic")
+  local b = world:newBody(100, 200, "dynamic")
+  local jid = world:addRopeJoint(a:getId(), b:getId(), 120)
+  lurek.log.info("rope joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addWeldJoint
+-- Welds two bodies together at their current relative positions.
+-- frequency and damping add slight spring flexibility to prevent solver jitter.
+do  -- World:addWeldJoint
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(150, 200, "dynamic")
+  local b = world:newBody(170, 200, "dynamic")
+  local jid = world:addWeldJoint(a:getId(), b:getId(), 160, 200, 10, 0.7)
+  lurek.log.info("weld joint: " .. jid, "physics")
+end
+
+--@api-stub: World:addWheelJoint
+-- Creates a wheel joint for vehicle suspension: translation + rotation + motor.
+-- Adjust frequency and damping to tune suspension stiffness and bounce.
+do  -- World:addWheelJoint
+  local world = lurek.physics.newWorld()
+  local chassis = world:newBody(200, 200, "dynamic")
+  local wheel   = world:newBody(200, 240, "dynamic")
+  local jid = world:addWheelJoint(chassis:getId(), wheel:getId(), 200, 240, 0, -1, 5.0, 0.7)
+  lurek.log.info("wheel joint: " .. jid, "physics")
+end
+
+--@api-stub: Body:applyForceAtPoint
+-- Applies a force at an off-centre world-space point, generating torque.
+-- Use for realistic drag, thrust, or projectile impact forces.
+do  -- Body:applyForceAtPoint
+  local world = lurek.physics.newWorld()
+  local b = world:newBody(200, 200, "dynamic")
+  b:applyForceAtPoint(100, 0, 220, 200)
+  lurek.log.info("force at point applied", "physics")
+end
+
+--@api-stub: World:drawDebug
+-- Renders physics shapes, joints, and AABBs using the engine's debug draw API.
+-- Call inside lurek.render() to overlay the physics debug visualisation.
+do  -- World:drawDebug
+  local world = lurek.physics.newWorld()
+  world:newBody(200, 200, "static")
+  function lurek.render()
+    world:drawDebug()
+  end
+  lurek.log.info("drawDebug hooked", "physics")
+end
+
+--@api-stub: Terrain:fillCircle
+-- Fills a circular region of the destructible terrain with a given cell value.
+-- Used to create craters; value=0 makes cells empty (air), 1=solid.
+do  -- Terrain:fillCircle
+  local terrain = lurek.physics.newTerrain(64, 64, 8)
+  terrain:fillAll(1)
+  terrain:fillCircle(32, 32, 10, 0)
+  terrain:flush()
+  lurek.log.info("terrain crater dug", "physics")
+end
+
+--@api-stub: Cellular:fillCircle
+-- Fills a circular region of a cellular automaton grid with a given state value.
+-- Useful for initialising cave seeds or spawning growth patches.
+do  -- Cellular:fillCircle
+  local ca = lurek.physics.newCellular(64, 64)
+  ca:fillCircle(32, 32, 20, 1)
+  lurek.log.info("cellular circle filled", "physics")
+end
+
+--@api-stub: Terrain:fillRect
+-- Fills a rectangular region of the destructible terrain with the given cell value.
+-- value=1 places solid material; value=0 removes it.
+do  -- Terrain:fillRect
+  local terrain = lurek.physics.newTerrain(64, 64, 8)
+  terrain:fillRect(10, 10, 40, 40, 1)
+  terrain:flush()
+  lurek.log.info("terrain rect filled", "physics")
+end
+
+--@api-stub: Cellular:fillRect
+-- Fills a rectangular region of a cellular automaton grid with a given state.
+-- Use to create initial conditions for cave generation or life simulations.
+do  -- Cellular:fillRect
+  local ca = lurek.physics.newCellular(32, 32)
+  ca:fillRect(4, 4, 28, 28, 1)
+  lurek.log.info("cellular rect filled", "physics")
+end
+
+--@api-stub: World:newChainBody
+-- Creates a chain-shape body from a sequence of vertices.
+-- Chain shapes are one-sided and ideal for long terrain contours or platforms.
+do  -- World:newChainBody
+  local world = lurek.physics.newWorld()
+  local verts = {0,400, 200,380, 400,400, 600,390, 800,400}
+  local b = world:newChainBody(verts, "static")
+  lurek.log.info("chain body: " .. b:getId(), "physics")
+end
+
+--@api-stub: World:newCircleBody
+-- Creates a circle-shaped body at (x, y) with the given radius and type.
+-- Faster and more stable than polygon approximations for round objects.
+do  -- World:newCircleBody
+  local world = lurek.physics.newWorld()
+  local b = world:newCircleBody(300, 200, 20, "dynamic")
+  lurek.log.info("circle body: " .. b:getId(), "physics")
+end
+
+--@api-stub: World:newEdgeBody
+-- Creates a single one-sided edge between two points as a static body.
+-- Use for thin walls, platforms, or invisible boundaries.
+do  -- World:newEdgeBody
+  local world = lurek.physics.newWorld()
+  local b = world:newEdgeBody(0, 400, 800, 400, "static")
+  lurek.log.info("edge body: " .. b:getId(), "physics")
+end
+
+--@api-stub: World:newPolygonBody
+-- Creates a convex polygon body from a vertex table (max 8 vertices).
+-- Vertices must be in counter-clockwise order; Box2D auto-computes the centroid.
+do  -- World:newPolygonBody
+  local world = lurek.physics.newWorld()
+  local verts = {-20,-10, 20,-10, 20,10, -20,10}
+  local b = world:newPolygonBody(300, 200, verts, "dynamic")
+  lurek.log.info("polygon body: " .. b:getId(), "physics")
+end
+
+--@api-stub: World:queryAABB
+-- Returns all body IDs whose fixtures overlap the given axis-aligned bounding box.
+-- Use for cheap broad-phase spatial queries before narrow-phase shape tests.
+do  -- World:queryAABB
+  local world = lurek.physics.newWorld()
+  world:newCircleBody(100, 100, 20, "static")
+  local hits = world:queryAABB(80, 80, 130, 130)
+  lurek.log.info("AABB hits: " .. #hits, "physics")
+end
+
+--@api-stub: World:raycast
+-- Fires a ray and returns the first hit body id, normal, and fraction.
+-- Returns nil if no body is hit; fraction is in [0,1] along the ray.
+do  -- World:raycast
+  local world = lurek.physics.newWorld()
+  world:newCircleBody(200, 200, 30, "static")
+  local id, nx, ny, frac = world:raycast(0, 200, 400, 200)
+  lurek.log.info("raycast hit: " .. tostring(id), "physics")
+end
+
+--@api-stub: World:raycastAll
+-- Returns all bodies hit by a ray as a table of {id, normal, fraction} records.
+-- Sorted by fraction (nearest first); useful for piercing shots.
+do  -- World:raycastAll
+  local world = lurek.physics.newWorld()
+  world:newCircleBody(100, 200, 20, "static")
+  world:newCircleBody(300, 200, 20, "static")
+  local hits = world:raycastAll(0, 200, 400, 200)
+  lurek.log.info("all hits: " .. #hits, "physics")
+end
+
+--@api-stub: World:raycastClosest
+-- Returns only the closest body hit by a ray as {id, normal, fraction}.
+-- Faster than raycastAll when only the nearest obstacle matters.
+do  -- World:raycastClosest
+  local world = lurek.physics.newWorld()
+  world:newCircleBody(150, 200, 20, "static")
+  local hit = world:raycastClosest(0, 200, 400, 200)
+  lurek.log.info("closest hit: " .. tostring(hit and hit.id), "physics")
+end
+
+--@api-stub: Zone:setAngularDampingOverride
+-- Sets an angular damping coefficient applied to all bodies inside this zone.
+-- Override is only active while the body remains within the zone boundary.
+do  -- Zone:setAngularDampingOverride
+  local world = lurek.physics.newWorld()
+  local z = world:addZone(100, 100, 300, 300)
+  z:setAngularDampingOverride(5.0)
+  lurek.log.info("zone angular damping set", "physics")
+end
+
+--@api-stub: World:setBodyData
+-- Attaches arbitrary Lua data to a body for retrieval in collision callbacks.
+-- Common use: store the entity id or component table that owns the body.
+do  -- World:setBodyData
+  local world = lurek.physics.newWorld()
+  local b = world:newBody(200, 200, "dynamic")
+  world:setBodyData(b:getId(), {entityId=42, type="player"})
+  lurek.log.info("body data set", "physics")
+end
+
+--@api-stub: World:setBodyOneWay
+-- Marks a body as a one-way platform: only collides from one direction.
+-- Pass the allowed normal direction (0,-1 = top surface; 0,1 = bottom).
+do  -- World:setBodyOneWay
+  local world = lurek.physics.newWorld()
+  local platform = world:newBody(400, 300, "static")
+  world:setBodyOneWay(platform:getId(), 0, -1)
+  lurek.log.info("one-way platform set", "physics")
+end
+
+--@api-stub: World:setFixtureFriction
+-- Sets the friction coefficient on an existing fixture by its id.
+-- Values in [0,1]; 0=ice, 1=rubber; default is 0.5.
+do  -- World:setFixtureFriction
+  local world = lurek.physics.newWorld()
+  local b = world:newBody(200, 200, "dynamic")
+  local fid = world:addFixture(b:getId(), "box", {width=32,height=32})
+  world:setFixtureFriction(fid, 0.1)
+  lurek.log.info("fixture friction set", "physics")
+end
+
+--@api-stub: World:setFixtureRestitution
+-- Sets the restitution (bounciness) on an existing fixture.
+-- 0 = completely inelastic; 1 = perfectly elastic bounce.
+do  -- World:setFixtureRestitution
+  local world = lurek.physics.newWorld()
+  local b = world:newBody(200, 200, "dynamic")
+  local fid = world:addFixture(b:getId(), "circle", {radius=16})
+  world:setFixtureRestitution(fid, 0.8)
+  lurek.log.info("restitution set", "physics")
+end
+
+--@api-stub: World:setFixtureSensor
+-- Marks a fixture as a sensor so it receives collision events but exerts no force.
+-- Sensors detect overlaps without preventing movement; ideal for trigger zones.
+do  -- World:setFixtureSensor
+  local world = lurek.physics.newWorld()
+  local b = world:newBody(200, 200, "static")
+  local fid = world:addFixture(b:getId(), "circle", {radius=40})
+  world:setFixtureSensor(fid, true)
+  lurek.log.info("sensor fixture set", "physics")
+end
+
+--@api-stub: Zone:setGravityPoint
+-- Sets gravity in the zone to pull bodies toward a point attractor.
+-- strength > 0 pulls inward (planet gravity); < 0 pushes outward (explosion).
+do  -- Zone:setGravityPoint
+  local world = lurek.physics.newWorld()
+  local z = world:addZone(0, 0, 800, 600)
+  z:setGravityPoint(400, 300, 500)
+  lurek.log.info("gravity point set", "physics")
+end
+
+--@api-stub: Zone:setGravityRepulsor
+-- Sets gravity in the zone to push bodies away from a repulsor point.
+-- strength controls force magnitude; useful for explosive force zones.
+do  -- Zone:setGravityRepulsor
+  local world = lurek.physics.newWorld()
+  local z = world:addZone(200, 200, 600, 400)
+  z:setGravityRepulsor(400, 300, 300)
+  lurek.log.info("gravity repulsor set", "physics")
+end
+
+--@api-stub: World:setJointLimits
+-- Sets the angular or linear limits for an existing constrained joint.
+-- For revolute joints: min/max are angles in radians; for prismatic: metres.
+do  -- World:setJointLimits
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 200, "static")
+  local b = world:newBody(100, 100, "dynamic")
+  local jid = world:addRevoluteJoint(a:getId(), b:getId(), 100, 200)
+  world:setJointLimits(jid, -math.pi/4, math.pi/4)
+  lurek.log.info("joint limits set", "physics")
+end
+
+--@api-stub: World:setJointLimitsEnabled
+-- Enables or disables the angular/linear limits on an existing joint.
+-- Toggle without removing the joint to implement retractable constraints.
+do  -- World:setJointLimitsEnabled
+  local world = lurek.physics.newWorld()
+  local a = world:newBody(100, 200, "static")
+  local b = world:newBody(100, 100, "dynamic")
+  local jid = world:addRevoluteJoint(a:getId(), b:getId(), 100, 200)
+  world:setJointLimitsEnabled(jid, true)
+  lurek.log.info("joint limits enabled", "physics")
+end
+
+--@api-stub: World:setJointMotorSpeed
+-- Sets the motor speed for a revolute or prismatic joint motor.
+-- Positive and negative values drive in opposite directions.
+do  -- World:setJointMotorSpeed
+  local world = lurek.physics.newWorld()
+  local axle = world:newBody(200, 200, "static")
+  local wheel = world:newBody(200, 240, "dynamic")
+  local jid = world:addRevoluteJoint(axle:getId(), wheel:getId(), 200, 220)
+  world:setJointMotorSpeed(jid, 2.0)
+  lurek.log.info("motor speed: 2.0 rad/s", "physics")
+end
+
+--@api-stub: World:setMouseJointTarget
+-- Updates the target world position for an existing mouse joint each frame.
+-- Call inside lurek.process(dt) with the current mouse world coordinates.
+do  -- World:setMouseJointTarget
+  local world = lurek.physics.newWorld()
+  local b = world:newBody(300, 200, "dynamic")
+  local jid = world:addMouseJoint(b:getId(), 300, 200, 2000)
+  world:setMouseJointTarget(jid, 350, 250)
+  lurek.log.info("mouse joint target updated", "physics")
+end
+
+--@api-stub: Terrain:spawnDebris
+-- Spawns dynamic debris bodies for cells removed from the terrain.
+-- Returns a table of new body ids; debris bodies settle under gravity.
+do  -- Terrain:spawnDebris
+  local world = lurek.physics.newWorld()
+  local terrain = lurek.physics.newTerrain(32, 32, 8)
+  terrain:fillAll(1)
+  terrain:fillCircle(16, 16, 6, 0)
+  terrain:flush()
+  local debris = terrain:spawnDebris(world)
+  lurek.log.info("debris count: " .. #debris, "physics")
+end
+
+--@api-stub: World:stepFixed
+-- Advances the physics world by a fixed timestep with an optional substep count.
+-- Use instead of step() for deterministic simulations requiring fixed-rate updates.
+do  -- World:stepFixed
+  local world = lurek.physics.newWorld()
+  world:stepFixed(1/60, 6, 2)
+  lurek.log.info("fixed step done", "physics")
+end
+
+--@api-stub: Terrain:toImageData
+-- Converts the terrain cell grid to an ImageData for rendering or saving.
+-- Solid cells are opaque white; empty cells are transparent black.
+do  -- Terrain:toImageData
+  local terrain = lurek.physics.newTerrain(32, 32, 8)
+  terrain:fillAll(1)
+  terrain:fillCircle(16, 16, 8, 0)
+  terrain:flush()
+  local img = terrain:toImageData()
+  lurek.log.info("terrain image: " .. img:getWidth() .. "x" .. img:getHeight(), "physics")
+end
+
+--@api-stub: Cellular:toImageDataRegion
+-- Converts a rectangular sub-region of the cellular grid to an ImageData.
+-- More efficient than toImageData() when only part of the grid needs rendering.
+do  -- Cellular:toImageDataRegion
+  local ca = lurek.physics.newCellular(64, 64)
+  ca:fillRect(0, 0, 63, 63, 1)
+  local img = ca:toImageDataRegion(10, 10, 40, 40)
+  lurek.log.info("region img: " .. img:getWidth() .. "x" .. img:getHeight(), "physics")
 end

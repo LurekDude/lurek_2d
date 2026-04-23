@@ -191,11 +191,11 @@ function lurek.init()
     reset_targets()
 end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.camera.init(W, H)
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     title_blink = title_blink + dt
 
     -- Animate score display
@@ -223,14 +223,14 @@ lurek.process(function(dt)
     end
 
     -- Quit
-    if lurek.input.isActionPressed("quit") then
+    if lurek.input.isActionDown("quit") then
         lurek.event.quit()
         return
     end
 
     -- ── TITLE ──
     if state == STATE_TITLE then
-        if lurek.input.isActionPressed("plunge") then
+        if lurek.input.isActionDown("plunge") then
             start_game()
         end
         return
@@ -238,7 +238,7 @@ lurek.process(function(dt)
 
     -- ── GAME OVER ──
     if state == STATE_GAME_OVER then
-        if lurek.input.isActionPressed("plunge") then
+        if lurek.input.isActionDown("plunge") then
             state = STATE_TITLE
         end
         return
@@ -297,7 +297,7 @@ lurek.process(function(dt)
     end
 
     -- ── Tilt ──
-    if lurek.input.isActionPressed("tilt") then
+    if lurek.input.isActionDown("tilt") then
         ball.x = ball.x + (math.random() * 40 - 20)
         ball.y = ball.y + (math.random() * 40 - 20)
         ball.vx = ball.vx + (math.random() * 100 - 50)
@@ -441,11 +441,11 @@ lurek.process(function(dt)
         ball.vx = ball.vx / spd * 1200
         ball.vy = ball.vy / spd * 1200
     end
-end)
+end
 
 -- ─── Render — table, ball, obstacles ─────────────────────────────────
 
-lurek.render(function()
+function lurek.draw()
     -- Table background
     lurek.render.setColor(0.08, 0.08, 0.12, 1)
     lurek.render.rectangle("fill", TABLE_X, TABLE_Y, TABLE_W, TABLE_H)
@@ -527,11 +527,11 @@ lurek.render(function()
     local drain_left = flippers.left.px + 20
     local drain_right = flippers.right.px - 20
     lurek.render.rectangle("fill", drain_left, TABLE_Y + TABLE_H - 6, drain_right - drain_left, 6)
-end)
+end
 
 -- ─── Render UI — score, balls, state overlays ───────────────────────
 
-function lurek.render_ui()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     -- Score bar

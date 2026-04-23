@@ -365,6 +365,7 @@ local function select_choice(idx)
 end
 
 -- ── lurek.init ────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Dialog Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.1, 0.15)
@@ -373,14 +374,14 @@ function lurek.init()
 end
 
 -- ── lurek.ready ───────────────────────────────────────────────
-function lurek.ready()
+local function _ready_setup()
 
 end
 
 -- ── lurek.process ─────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS display
-    if lurek.input.isPressed("f3") then fps_visible = not fps_visible end
+    if lurek.input.keyboard.isDown("f3") then fps_visible = not fps_visible end
 
     -- Typewriter update
     if #typewriter_text < #typewriter_target then
@@ -422,7 +423,7 @@ lurek.process(function(dt)
     if state == "TITLE" then
         title_alpha = math.min(title_alpha + dt * 2, 1)
         title_prompt_alpha = 0.5 + math.sin(lurek.timer.getTime() * 3) * 0.4
-        if lurek.input.isPressed("return") then
+        if lurek.input.keyboard.isDown("return") then
             state = "DIALOG"
             relationships = { sage = 0, merchant = 0, guard = 0 }
             flags = {}
@@ -435,15 +436,15 @@ lurek.process(function(dt)
     end
 
     -- Quit
-    if lurek.input.isPressed(actions.quit) then lurek.event.quit() end
+    if lurek.input.keyboard.isDown(actions.quit) then lurek.event.quit() end
 
     -- Skip typewriter
-    if lurek.input.isPressed(actions.skip) then
+    if lurek.input.keyboard.isDown(actions.skip) then
         skip_typewriter()
     end
 
     -- Auto advance toggle
-    if lurek.input.isPressed(actions.auto) then
+    if lurek.input.keyboard.isDown(actions.auto) then
         auto_advance = not auto_advance
         auto_timer = 0
     end
@@ -468,7 +469,7 @@ lurek.process(function(dt)
                     advance_dialog()
                 end
             end
-            if lurek.input.isPressed(actions.advance) then
+            if lurek.input.keyboard.isDown(actions.advance) then
                 auto_timer = 0
                 advance_dialog()
             end
@@ -476,21 +477,21 @@ lurek.process(function(dt)
 
     -- State: CHOICE
     elseif state == "CHOICE" then
-        if lurek.input.isPressed(actions.choice1) then select_choice(1) end
-        if lurek.input.isPressed(actions.choice2) then select_choice(2) end
-        if lurek.input.isPressed(actions.choice3) then select_choice(3) end
+        if lurek.input.keyboard.isDown(actions.choice1) then select_choice(1) end
+        if lurek.input.keyboard.isDown(actions.choice2) then select_choice(2) end
+        if lurek.input.keyboard.isDown(actions.choice3) then select_choice(3) end
 
     -- State: FINISHED
     elseif state == "FINISHED" then
-        if lurek.input.isPressed(actions.advance) then
+        if lurek.input.keyboard.isDown(actions.advance) then
             state = "TITLE"
             title_alpha = 0
         end
     end
-end)
+end
 
 -- ── lurek.render — background scenes ──────────────────────────
-lurek.render(function()
+function lurek.draw()
     if state == "TITLE" then return end
 
     if scene_name == "forest" then
@@ -594,10 +595,10 @@ lurek.render(function()
             lurek.render.circle("fill", sx, sy, 2)
         end
     end
-end)
+end
 
 -- ── lurek.render_ui — dialog box, speakers, choices, log ──────
-lurek.render_ui(function()
+function lurek.draw_ui()
     local t = lurek.timer.getTime()
 
     -- FPS counter
@@ -725,4 +726,4 @@ lurek.render_ui(function()
         lurek.render.setColor(p.r, p.g, p.b, a)
         lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
-end)
+end

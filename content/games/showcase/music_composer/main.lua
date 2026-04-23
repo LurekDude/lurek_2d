@@ -224,9 +224,10 @@ end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Music Composer — Lurek2D")
-    lurek.setBackgroundColor(COL_BG[1], COL_BG[2], COL_BG[3])
+    lurek.render.setBackgroundColor(COL_BG[1], COL_BG[2], COL_BG[3])
     setup_input()
     init_tracks()
 
@@ -265,7 +266,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Ready
 -- ---------------------------------------------------------------------------
-function lurek.ready()
+local function _ready_setup()
     current_state = STATE.TITLE
     title_timer = 0
 end
@@ -275,7 +276,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
     -- Quit
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -289,7 +290,7 @@ function lurek.process(dt)
     if current_state == STATE.TITLE then
         title_timer = title_timer + dt
         title_pulse = title_pulse + dt * 3
-        if lurek.input.isActionJustPressed("play") then
+        if lurek.input.wasActionPressed("play") then
             current_state = STATE.COMPOSING
             playing = false
             play_beat = 1
@@ -301,43 +302,43 @@ function lurek.process(dt)
 
     -- === COMPOSING state ===
     -- Track switching
-    if lurek.input.isActionJustPressed("track1") then
+    if lurek.input.wasActionPressed("track1") then
         active_track = 1
-    elseif lurek.input.isActionJustPressed("track2") then
+    elseif lurek.input.wasActionPressed("track2") then
         active_track = 2
-    elseif lurek.input.isActionJustPressed("track3") then
+    elseif lurek.input.wasActionPressed("track3") then
         active_track = 3
     end
 
     -- Mute toggle
-    if lurek.input.isActionJustPressed("mute") then
+    if lurek.input.wasActionPressed("mute") then
         muted[active_track] = not muted[active_track]
     end
 
     -- BPM control
-    if lurek.input.isActionJustPressed("bpm_up") then
+    if lurek.input.wasActionPressed("bpm_up") then
         bpm = math.min(bpm + 5, BPM_MAX)
     end
-    if lurek.input.isActionJustPressed("bpm_down") then
+    if lurek.input.wasActionPressed("bpm_down") then
         bpm = math.max(bpm - 5, BPM_MIN)
     end
 
     -- Clear
-    if lurek.input.isActionJustPressed("clear") then
+    if lurek.input.wasActionPressed("clear") then
         clear_track(active_track)
     end
-    if lurek.input.isActionJustPressed("clear_all") then
+    if lurek.input.wasActionPressed("clear_all") then
         clear_all()
     end
 
     -- Presets
-    if lurek.input.isActionJustPressed("preset") then
+    if lurek.input.wasActionPressed("preset") then
         preset_index = (preset_index % 3) + 1
         apply_preset(preset_index)
     end
 
     -- Play / pause
-    if lurek.input.isActionJustPressed("play") then
+    if lurek.input.wasActionPressed("play") then
         playing = not playing
         if playing then
             ps_cursor:start()
@@ -348,7 +349,7 @@ function lurek.process(dt)
 
     -- Mouse click → toggle note
     if lurek.input.isMousePressed(1) then
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local col, row = pixel_to_grid(mx, my)
         if col and row then
             tracks[active_track][row][col] = not tracks[active_track][row][col]
@@ -404,7 +405,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Render — grid, notes, cursor
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state == STATE.TITLE then
         return
     end
@@ -487,12 +488,12 @@ lurek.render(function()
     end
 
     camera:detach()
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI — piano keys, HUD, controls
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if current_state == STATE.TITLE then
         -- Title screen
         local cx = SCREEN_W * 0.5
@@ -612,4 +613,4 @@ lurek.render_ui(function()
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(COL_TEXT_DIM[1], COL_TEXT_DIM[2], COL_TEXT_DIM[3], 0.4)
     lurek.render.print(string.format("%d FPS", fps), SCREEN_W - 60, SCREEN_H - 20)
-end)
+end

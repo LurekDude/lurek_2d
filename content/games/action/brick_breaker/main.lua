@@ -127,6 +127,7 @@ local function apply_pu(k)
 end
 
 -- ── Init ──────────────────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Brick Breaker — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
@@ -154,7 +155,7 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     blink = blink + dt
     if lurek.input.wasActionPressed("quit") then lurek.event.quit(); return end
 
@@ -268,10 +269,10 @@ lurek.process(function(dt)
         elseif pu.y > H then pr[#pr+1]=i end
     end
     for i=#pr,1,-1 do table.remove(powerups, pr[i]) end
-end)
+end
 
 -- ── Render (world) ────────────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Bricks
     for _,br in ipairs(bricks) do
         if br.alive then
@@ -312,10 +313,10 @@ lurek.render(function()
     if flash.alpha > 0.01 then
         lurek.render.rectangle("fill", 0,0, W,H, 1,1,1, flash.alpha*0.3)
     end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
     local a = math.sin(blink*3)*0.5+0.5
 

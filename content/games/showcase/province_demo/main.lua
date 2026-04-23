@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- Province Demo — Lurek2D
 -- Category: showcase
 -- Procedural Voronoi-like province map with terrain, ownership, fog of war,
@@ -6,8 +6,6 @@
 -- ============================================================================
 
 -- ── Constants ──────────────────────────────────────────────────────────
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local SCREEN_W      = 800
 local SCREEN_H      = 600
@@ -445,7 +443,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Province Demo — Lurek2D")
-    gfx.setBackgroundColor(0.05, 0.08, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.08, 0.1)
 
     setup_bindings()
     generate_map()
@@ -477,7 +475,7 @@ function lurek.process(dt)
     if state == STATE_TITLE then
         title_alpha = math.min(title_alpha + dt * 1.2, 1)
         title_sub_alpha = math.min(title_sub_alpha + dt * 0.8, 1)
-        if lurek.input.actionPressed("select") or lurek.input.actionPressed("mode") then
+        if lurek.input.wasActionPressed("select") or lurek.input.wasActionPressed("mode") then
             state = STATE_VIEWING
             particle_burst(SCREEN_W / 2, SCREEN_H / 2, 30, 0.4, 0.7, 1.0, 80, 1.0)
         end
@@ -485,23 +483,23 @@ function lurek.process(dt)
     end
 
     -- ── VIEWING state input ────────────────────────────────────────
-    if lurek.input.actionPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
     end
 
-    if lurek.input.actionPressed("mode") then
+    if lurek.input.wasActionPressed("mode") then
         display_mode = display_mode % 3 + 1
         color_blend = 0
         tween_to({}, "unused", 0, 0, "linear") -- trigger re-render smoothly
         particle_burst(SCREEN_W / 2, 20, 15, 0.8, 0.8, 0.2, 60, 0.5)
     end
 
-    if lurek.input.actionPressed("fog") then
+    if lurek.input.wasActionPressed("fog") then
         fog_enabled = not fog_enabled
         particle_burst(SCREEN_W / 2, 20, 10, 0.5, 0.5, 0.8, 40, 0.5)
     end
 
-    if lurek.input.actionPressed("generate") then
+    if lurek.input.wasActionPressed("generate") then
         generate_map()
         selected_id = nil
         path_cells = {}
@@ -512,17 +510,17 @@ function lurek.process(dt)
 
     -- Ownership assignment
     if selected_id and provinces[selected_id] then
-        if lurek.input.actionPressed("owner1") then
+        if lurek.input.wasActionPressed("owner1") then
             provinces[selected_id].owner = OWNER_RED
             local c = OWNER_COLORS[OWNER_RED]
             particle_burst(provinces[selected_id].cx * CELL_SIZE, provinces[selected_id].cy * CELL_SIZE, 12, c[1], c[2], c[3], 30, 0.6)
         end
-        if lurek.input.actionPressed("owner2") then
+        if lurek.input.wasActionPressed("owner2") then
             provinces[selected_id].owner = OWNER_BLUE
             local c = OWNER_COLORS[OWNER_BLUE]
             particle_burst(provinces[selected_id].cx * CELL_SIZE, provinces[selected_id].cy * CELL_SIZE, 12, c[1], c[2], c[3], 30, 0.6)
         end
-        if lurek.input.actionPressed("owner3") then
+        if lurek.input.wasActionPressed("owner3") then
             provinces[selected_id].owner = OWNER_GREEN
             local c = OWNER_COLORS[OWNER_GREEN]
             particle_burst(provinces[selected_id].cx * CELL_SIZE, provinces[selected_id].cy * CELL_SIZE, 12, c[1], c[2], c[3], 30, 0.6)
@@ -530,8 +528,8 @@ function lurek.process(dt)
     end
 
     -- Province selection (left click)
-    if lurek.input.actionPressed("select") then
-        local mx, my = lurek.input.getMousePosition()
+    if lurek.input.wasActionPressed("select") then
+        local mx, my = lurek.input.mouse.getPosition()
         local pid = province_at_mouse(mx, my)
         if pid and is_visible(pid) then
             selected_id = pid
@@ -548,8 +546,8 @@ function lurek.process(dt)
     end
 
     -- Pathfinding (right click)
-    if lurek.input.actionPressed("path") and selected_id then
-        local mx, my = lurek.input.getMousePosition()
+    if lurek.input.wasActionPressed("path") and selected_id then
+        local mx, my = lurek.input.mouse.getPosition()
         local target = province_at_mouse(mx, my)
         if target and target ~= selected_id and is_visible(target) then
             local p = find_path(selected_id, target)
@@ -572,13 +570,13 @@ end
 
 -- ── Render (world-space map) ───────────────────────────────────────────
 
-function lurek.render()
+function lurek.draw()
     if state == STATE_TITLE then
         -- Title background gradient effect
         for y = 0, 5 do
             local a = 0.03 + y * 0.01
-            gfx.setColor(0.1, 0.15, 0.25, a)
-            gfx.rectangle("fill", 0, y * 100, SCREEN_W, 100)
+            lurek.render.setColor(0.1, 0.15, 0.25, a)
+            lurek.render.rectangle("fill", 0, y * 100, SCREEN_W, 100)
         end
         return
     end
@@ -610,75 +608,75 @@ function lurek.render()
                     b = math.min(b + 0.3, 1)
                 end
 
-                gfx.setColor(r, g, b, 1)
-                gfx.rectangle("fill", px, py, CELL_SIZE, CELL_SIZE)
+                lurek.render.setColor(r, g, b, 1)
+                lurek.render.rectangle("fill", px, py, CELL_SIZE, CELL_SIZE)
 
                 -- Border cells: darker outline
                 if is_border_cell(x, y) then
-                    gfx.setColor(r * 0.5, g * 0.5, b * 0.5, 0.8)
-                    gfx.rectangle("line", px, py, CELL_SIZE, CELL_SIZE)
+                    lurek.render.setColor(r * 0.5, g * 0.5, b * 0.5, 0.8)
+                    lurek.render.rectangle("line", px, py, CELL_SIZE, CELL_SIZE)
                 end
             else
                 -- Fog
-                gfx.setColor(0.08, 0.08, 0.1, 1)
-                gfx.rectangle("fill", px, py, CELL_SIZE, CELL_SIZE)
+                lurek.render.setColor(0.08, 0.08, 0.1, 1)
+                lurek.render.rectangle("fill", px, py, CELL_SIZE, CELL_SIZE)
             end
         end
     end
 
     -- Draw path lines
     if #path_cells > 1 then
-        gfx.setColor(0.3, 0.85, 1.0, 0.9)
+        lurek.render.setColor(0.3, 0.85, 1.0, 0.9)
         for i = 1, #path_cells - 1 do
             local a = provinces[path_cells[i]]
             local b = provinces[path_cells[i + 1]]
             if a and b then
-                gfx.line(a.cx * CELL_SIZE, a.cy * CELL_SIZE, b.cx * CELL_SIZE, b.cy * CELL_SIZE)
+                lurek.render.line(a.cx * CELL_SIZE, a.cy * CELL_SIZE, b.cx * CELL_SIZE, b.cy * CELL_SIZE)
             end
         end
         -- Path endpoints
         local s = provinces[path_cells[1]]
         local e = provinces[path_cells[#path_cells]]
         if s then
-            gfx.setColor(0.2, 1.0, 0.4, 1)
-            gfx.circle("fill", s.cx * CELL_SIZE, s.cy * CELL_SIZE, 4)
+            lurek.render.setColor(0.2, 1.0, 0.4, 1)
+            lurek.render.circle("fill", s.cx * CELL_SIZE, s.cy * CELL_SIZE, 4)
         end
         if e then
-            gfx.setColor(1.0, 0.3, 0.2, 1)
-            gfx.circle("fill", e.cx * CELL_SIZE, e.cy * CELL_SIZE, 4)
+            lurek.render.setColor(1.0, 0.3, 0.2, 1)
+            lurek.render.circle("fill", e.cx * CELL_SIZE, e.cy * CELL_SIZE, 4)
         end
     end
 
     -- Particles (world space)
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
-        gfx.setColor(p.r, p.g, p.b, a * 0.8)
-        gfx.circle("fill", p.x, p.y, p.size * a)
+        lurek.render.setColor(p.r, p.g, p.b, a * 0.8)
+        lurek.render.circle("fill", p.x, p.y, p.size * a)
     end
 end
 
 -- ── Render UI (screen-space overlays) ──────────────────────────────────
 
-function lurek.render_ui()
+function lurek.draw_ui()
     if state == STATE_TITLE then
-        gfx.setColor(0.4, 0.7, 1.0, title_alpha)
-        gfx.print("PROVINCE MAP", SCREEN_W / 2 - 100, SCREEN_H / 2 - 40)
-        gfx.setColor(0.6, 0.8, 0.9, title_sub_alpha * 0.7)
-        gfx.print("PROCEDURAL WORLD", SCREEN_W / 2 - 80, SCREEN_H / 2 + 10)
-        gfx.setColor(0.5, 0.5, 0.6, math.abs(math.sin(title_alpha * 3.14)) * 0.6)
-        gfx.print("Click to begin", SCREEN_W / 2 - 55, SCREEN_H / 2 + 60)
+        lurek.render.setColor(0.4, 0.7, 1.0, title_alpha)
+        lurek.render.print("PROVINCE MAP", SCREEN_W / 2 - 100, SCREEN_H / 2 - 40)
+        lurek.render.setColor(0.6, 0.8, 0.9, title_sub_alpha * 0.7)
+        lurek.render.print("PROCEDURAL WORLD", SCREEN_W / 2 - 80, SCREEN_H / 2 + 10)
+        lurek.render.setColor(0.5, 0.5, 0.6, math.abs(math.sin(title_alpha * 3.14)) * 0.6)
+        lurek.render.print("Click to begin", SCREEN_W / 2 - 55, SCREEN_H / 2 + 60)
         return
     end
 
     -- Top HUD bar
-    gfx.setColor(0.0, 0.0, 0.0, 0.6)
-    gfx.rectangle("fill", 0, 0, SCREEN_W, 22)
-    gfx.setColor(0.9, 0.9, 0.9, 1)
-    gfx.print("Mode: " .. MODE_NAMES[display_mode] .. " (M)  |  Fog: " .. (fog_enabled and "ON" or "OFF") .. " (F)  |  G=New Map  |  1/2/3=Assign Owner", 8, 4)
+    lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
+    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 22)
+    lurek.render.setColor(0.9, 0.9, 0.9, 1)
+    lurek.render.print("Mode: " .. MODE_NAMES[display_mode] .. " (M)  |  Fog: " .. (fog_enabled and "ON" or "OFF") .. " (F)  |  G=New Map  |  1/2/3=Assign Owner", 8, 4)
 
     -- FPS
-    gfx.setColor(0.6, 0.6, 0.3, 1)
-    gfx.print("FPS: " .. fps_display, SCREEN_W - 70, 4)
+    lurek.render.setColor(0.6, 0.6, 0.3, 1)
+    lurek.render.print("FPS: " .. fps_display, SCREEN_W - 70, 4)
 
     -- Detail panel (right side)
     if selected_id and provinces[selected_id] then
@@ -688,56 +686,56 @@ function lurek.render_ui()
         local ph = 160
 
         -- Panel background
-        gfx.setColor(0.05, 0.05, 0.1, 0.85)
-        gfx.rectangle("fill", px, 30, pw, ph)
-        gfx.setColor(0.3, 0.5, 0.8, 0.8)
-        gfx.rectangle("line", px, 30, pw, ph)
+        lurek.render.setColor(0.05, 0.05, 0.1, 0.85)
+        lurek.render.rectangle("fill", px, 30, pw, ph)
+        lurek.render.setColor(0.3, 0.5, 0.8, 0.8)
+        lurek.render.rectangle("line", px, 30, pw, ph)
 
         -- Province details
-        gfx.setColor(1.0, 0.9, 0.5, 1)
-        gfx.print(prov.name, px + 8, 38)
+        lurek.render.setColor(1.0, 0.9, 0.5, 1)
+        lurek.render.print(prov.name, px + 8, 38)
 
-        gfx.setColor(0.8, 0.8, 0.8, 1)
-        gfx.print("Terrain: " .. TERRAIN_NAMES[prov.terrain], px + 8, 58)
-        gfx.print("Owner: " .. OWNER_NAMES[prov.owner], px + 8, 74)
-        gfx.print("Population: " .. prov.population, px + 8, 90)
-        gfx.print("Cells: " .. #prov.cells, px + 8, 106)
+        lurek.render.setColor(0.8, 0.8, 0.8, 1)
+        lurek.render.print("Terrain: " .. TERRAIN_NAMES[prov.terrain], px + 8, 58)
+        lurek.render.print("Owner: " .. OWNER_NAMES[prov.owner], px + 8, 74)
+        lurek.render.print("Population: " .. prov.population, px + 8, 90)
+        lurek.render.print("Cells: " .. #prov.cells, px + 8, 106)
 
         local ncount = #prov.neighbors
-        gfx.print("Neighbors: " .. ncount, px + 8, 122)
+        lurek.render.print("Neighbors: " .. ncount, px + 8, 122)
 
         if #path_cells > 1 then
             local total_cost = 0
             for _, pid in ipairs(path_cells) do
                 total_cost = total_cost + (TERRAIN_COSTS[provinces[pid].terrain] or 1)
             end
-            gfx.setColor(0.3, 0.85, 1.0, 1)
-            gfx.print("Path cost: " .. total_cost, px + 8, 145)
+            lurek.render.setColor(0.3, 0.85, 1.0, 1)
+            lurek.render.print("Path cost: " .. total_cost, px + 8, 145)
         end
 
         -- Owner color swatch
         local oc = OWNER_COLORS[prov.owner]
-        gfx.setColor(oc[1], oc[2], oc[3], 1)
-        gfx.rectangle("fill", px + pw - 20, 38, 12, 12)
+        lurek.render.setColor(oc[1], oc[2], oc[3], 1)
+        lurek.render.rectangle("fill", px + pw - 20, 38, 12, 12)
     end
 
     -- Statistics panel (bottom)
     local counts, total_pop, terrain_dist = compute_stats()
     local sy = SCREEN_H - 60
-    gfx.setColor(0.0, 0.0, 0.0, 0.6)
-    gfx.rectangle("fill", 0, sy, SCREEN_W, 60)
-    gfx.setColor(0.8, 0.8, 0.8, 1)
-    gfx.print("Provinces: " .. #provinces .. "  |  Total Pop: " .. total_pop, 8, sy + 4)
+    lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
+    lurek.render.rectangle("fill", 0, sy, SCREEN_W, 60)
+    lurek.render.setColor(0.8, 0.8, 0.8, 1)
+    lurek.render.print("Provinces: " .. #provinces .. "  |  Total Pop: " .. total_pop, 8, sy + 4)
 
     -- Owner counts
     local ox = 8
     local oy = sy + 22
     for owner = 0, 3 do
         local c = OWNER_COLORS[owner]
-        gfx.setColor(c[1], c[2], c[3], 1)
-        gfx.rectangle("fill", ox, oy, 10, 10)
-        gfx.setColor(0.8, 0.8, 0.8, 1)
-        gfx.print(OWNER_NAMES[owner] .. ": " .. counts[owner], ox + 14, oy)
+        lurek.render.setColor(c[1], c[2], c[3], 1)
+        lurek.render.rectangle("fill", ox, oy, 10, 10)
+        lurek.render.setColor(0.8, 0.8, 0.8, 1)
+        lurek.render.print(OWNER_NAMES[owner] .. ": " .. counts[owner], ox + 14, oy)
         ox = ox + 110
     end
 
@@ -746,8 +744,8 @@ function lurek.render_ui()
     local ty = sy + 40
     for _, name in ipairs({"Plains", "Forest", "Mountain", "Desert", "Coast"}) do
         local cnt = terrain_dist[name] or 0
-        gfx.setColor(0.6, 0.7, 0.6, 1)
-        gfx.print(name .. ":" .. cnt, tx, ty)
+        lurek.render.setColor(0.6, 0.7, 0.6, 1)
+        lurek.render.print(name .. ":" .. cnt, tx, ty)
         tx = tx + 100
     end
 end

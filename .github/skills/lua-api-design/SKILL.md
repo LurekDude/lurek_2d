@@ -62,6 +62,16 @@ These are the canonical mlua patterns enforced in this codebase:
 
 ---
 
+### Callback-Key Collision Rule (philosophy.md C-06)
+
+**Never let a planned callback name shadow an API module key.** If a callback key matches an API module name (e.g. `render`), writing `function lurek.render()` overwrites the API table and crashes all `lurek.render.*` calls.
+
+Rule: **fix in `src/app/app.rs` — rename the callback string**. Never work around with a local alias (`local gfx = lurek.render` hides a design bug).
+
+Current non-colliding callback keys: `init`, `ready`, `process`, `process_physics`, `process_late`, `draw`, `draw_ui`, `keypressed`, `keyreleased`, `textinput`, `mousepressed`, `mousereleased`, `mousemoved`, `wheelmoved`, `resize`, `gamepadpressed`, `gamepadreleased`, `gamepadaxis`, `joystickadded`, `joystickremoved`, `exit`, `focus`, `visible`. History: `render`/`render_ui` were renamed to `draw`/`draw_ui` (v0.20.1) to fix this.
+
+---
+
 ### File Anatomy
 ### 1. File Header
 

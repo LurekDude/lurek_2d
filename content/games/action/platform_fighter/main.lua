@@ -371,6 +371,7 @@ local function update_fighter(f, dt, move_left, move_right, do_jump, do_attack, 
 end
 
 -- ── lurek.init ───────────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Platform Fighter — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.2, 0.35)
@@ -427,12 +428,12 @@ function lurek.init()
 end
 
 -- ── lurek.ready ──────────────────────────────────────────────────────────
-function lurek.ready()
+local function _ready_setup()
     lurek.camera.setPosition(0, 0)
 end
 
 -- ── lurek.process ────────────────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Quit
     if lurek.input.pressed("quit") then
         lurek.event.quit()
@@ -522,7 +523,7 @@ lurek.process(function(dt)
             game_state = STATES.TITLE
         end
     end
-end)
+end
 
 -- ── Draw helpers ─────────────────────────────────────────────────────────
 local function draw_platform(plat, color)
@@ -590,7 +591,7 @@ local function draw_blast_indicators()
 end
 
 -- ── lurek.render ─────────────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- ── TITLE ────────────────────────────────────────────────────────
     if game_state == STATES.TITLE then
         lurek.render.print("PLATFORM FIGHTER", SCREEN_W * 0.5 - 140, 180, 32, 1, 1, 1, 1)
@@ -625,10 +626,10 @@ lurek.render(function()
     for _, proj in ipairs(projectiles) do
         draw_projectile(proj)
     end
-end)
+end
 
 -- ── lurek.render_ui ──────────────────────────────────────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     if game_state == STATES.TITLE then return end
     if not p1 or not p2 then return end
 
@@ -707,4 +708,4 @@ lurek.render_ui(function()
         lurek.render.print("PRESS ENTER TO RETURN", SCREEN_W * 0.5 - 120,
                            SCREEN_H * 0.5 + 30, 16, 0.8, 0.8, 0.8, 1)
     end
-end)
+end

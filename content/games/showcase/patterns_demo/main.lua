@@ -487,16 +487,17 @@ end
 -- ============================================================
 -- Callbacks
 -- ============================================================
+
 function lurek.init()
     lurek.window.setTitle("Patterns Demo — Lurek2D")
     lurek.window.setBackgroundColor(0.08, 0.06, 0.1)
 end
 
-function lurek.ready()
+local function _ready_setup()
     title_timer = 0
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS
     fps_count = fps_count + 1
     fps_timer = fps_timer + dt
@@ -565,12 +566,12 @@ lurek.process(function(dt)
 
     update_particles(dt)
     update_log(dt)
-end)
+end
 
 -- ============================================================
 -- Render: world-space demo visualizations
 -- ============================================================
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then return end
 
     -- Demo area border
@@ -687,12 +688,12 @@ lurek.render(function()
         lurek.render.setColor(p.r, p.g, p.b, p.a)
         lurek.render.circle("fill", p.x, p.y, p.size)
     end
-end)
+end
 
 -- ============================================================
 -- Render UI: tabs, pseudocode panel, log, HUD
 -- ============================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- Title screen
     if state == STATE_TITLE then
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
@@ -772,4 +773,4 @@ lurek.render_ui(function()
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.6, 0.7)
     lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 70, TAB_H + 8, 10)
-end)
+end

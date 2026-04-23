@@ -354,9 +354,23 @@ def _collect_module_doc(api_file: Path) -> str:
     return "\n".join(doc_parts).strip()
 
 
+# Maps Rust module names (derived from src/lua_api/<name>_api.rs) to the Lua
+# namespace key actually registered via lurek.set("<key>", ...).
+# Only entries that DIFFER from the Rust module name are listed here.
+_LUA_NAMESPACE_OVERRIDE: Dict[str, str] = {
+    # system_api.rs registers as lurek.set("runtime", ...) — not "system"
+    "system": "runtime",
+}
+
+
 def _determine_module_name(api_file: Path) -> str:
     stem = api_file.stem.replace("_api", "")
     return stem
+
+
+def _lua_namespace(module: str) -> str:
+    """Return the Lua-visible namespace key for a Rust module name."""
+    return _LUA_NAMESPACE_OVERRIDE.get(module, module)
 
 
 def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
@@ -399,6 +413,10 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
     method_self_re = re.compile(
         r'methods\.add_method(?:_mut)?\(\s*"(\w+)"\s*,\s*Self::(\w+)'
     )
+    # NEW: multi-line add_method — method name on next line
+    # methods.add_method_mut(
+    #     "methodName",  ← matched by name_next_re
+    method_multiline_re = re.compile(r'methods\.add_method(?:_mut)?\(\s*$')
     impl_re = re.compile(r'^\s*impl(?:<[^>]*>)?\s+(?:LuaUserData\s+for\s+)?(\w+)')
     add_method_re = re.compile(r'fn\s+add_(\w+)_methods\(')
 
@@ -447,7 +465,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                     docstring = _collect_docstring_above(lines, i)
                     owner = current_widget_type if current_widget_type else ""
                     kind = "method" if owner else "function"
-                    lua_name = f"{owner}:{func_name}" if owner else f"lurek.{module}.{func_name}"
+                    lua_name = f"{owner}:{func_name}" if owner else f"lurek.{_lua_namespace(module)}.{func_name}"
 
                     if not docstring and owner:
                         docstring = f"/// Returns a value for {func_name} (auto-generated)."
@@ -475,7 +493,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             docstring = _collect_docstring_above(lines, i)
             owner = current_widget_type if current_widget_type else ""
             kind = "method" if owner else "function"
-            lua_name = f"{owner}:{func_name}" if owner else f"lurek.{module}.{func_name}"
+            lua_name = f"{owner}:{func_name}" if owner else f"lurek.{_lua_namespace(module)}.{func_name}"
 
             if not docstring and owner:
                 docstring = f"/// Returns a value for {func_name} (auto-generated)."
@@ -518,6 +536,30 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 inferred_return=_parse_tagged_return(docstring),
             ))
 
+        # Multi-line add_method: method name on the next line
+        if not method_m and method_multiline_re.search(stripped) and i + 1 < len(lines):
+            next_stripped = lines[i + 1].strip()
+            name_m = name_next_re.match(next_stripped)
+            if name_m:
+                func_name = name_m.group(1)
+                owner = current_impl_type or "Unknown"
+                display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
+                docstring = _collect_docstring_above(lines, i)
+                desc = _first_desc_line(docstring)
+                params, returns = _extract_params_returns(docstring)
+                inferred = _infer_signature(lines, i)
+                functions.append(LuaFunction(
+                    module=module, name=func_name,
+                    lua_name=f"{display_owner}:{func_name}",
+                    owner_type=display_owner, description=desc,
+                    full_doc=docstring, params=params,
+                    returns=returns, line=i + 1,
+                    file=rel_path, kind="method",
+                    inferred_sig=inferred,
+                    typed_params=_parse_tagged_params(docstring),
+                    inferred_return=_parse_tagged_return(docstring),
+                ))
+
         # NEW: methods.add_method("luaName", Self::fn_name) — named fn pattern
         method_self_m = method_self_re.search(stripped)
         if method_self_m:
@@ -551,7 +593,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             if not set_inline_re.search(stripped) or rust_fn:
                 owner = current_widget_type if current_widget_type else ""
                 kind = "method" if owner else "function"
-                lua_name = f"{owner}:{func_name}" if owner else f"lurek.{module}.{func_name}"
+                lua_name = f"{owner}:{func_name}" if owner else f"lurek.{_lua_namespace(module)}.{func_name}"
                 # Look up docstring from the named pub fn declaration
                 docstring = _find_pub_fn_docstring(rust_fn) or _collect_docstring_above(lines, i)
                 desc = _first_desc_line(docstring)

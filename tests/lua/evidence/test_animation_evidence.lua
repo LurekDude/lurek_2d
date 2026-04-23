@@ -3,7 +3,7 @@
 
 local OUT = "tests/output/animation/"
 
---                  helpers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  helpers
 
 --- Build a fake sprite-sheet ImageData (8 frames of 16x16, laid out in a 4x2 grid).
 --- Each frame is a different hue so we can visually verify the correct frame is selected.
@@ -41,7 +41,7 @@ local function make_sprite_sheet()
     return img, FRAME_W, FRAME_H, COLS * FRAME_W, ROWS * FRAME_H
 end
 
---                  tests                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  tests
 
 -- @description Builds basic Animator clips and exercises playback state toggles before any visual evidence is written.
 describe("Evidence: lurek.animation Animator creation", function()
@@ -51,12 +51,12 @@ end)
 describe("Evidence: lurek.animation addClipFromGrid quad selection", function()
 
     -- @covers lurek.animation.new
-    -- @covers Animator:addClipFromGrid
-    -- @covers Animator:play
-    -- @covers Animator:update
-    -- @covers Animator:getQuad
+    -- @covers Animation:addClipFromGrid
+    -- @covers Animation:play
+    -- @covers Animation:update
+    -- @covers Animation:getQuad
     -- @evidence file
-    -- @covers Animator:pollEvents
+    -- @covers Animation:pollEvents
     -- @description Steps through every frame of a sprite-sheet clip and writes a PNG grid showing the selected source quads.
     it("addClipFromGrid produces correct UV quads -    PNG evidence: frame_grid", function()
         local img, FW, FH, TW, TH = make_sprite_sheet()
@@ -120,10 +120,10 @@ end)
 describe("Evidence: animation speed scaling visual", function()
 
     -- @covers lurek.animation.new
-    -- @covers Animator:addClip
-    -- @covers Animator:setSpeed
-    -- @covers Animator:update
-    -- @covers Animator:getQuad
+    -- @covers Animation:addClip
+    -- @covers Animation:setSpeed
+    -- @covers Animation:update
+    -- @covers Animation:getQuad
     -- @evidence file
     -- @description Renders a two-lane timing comparison that shows a 2x-speed clip advances through frame quads faster than the baseline clip.
     it("speed 2x advances twice as fast -    PNG evidence: speed_compare", function()

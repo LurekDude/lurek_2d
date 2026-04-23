@@ -683,3 +683,212 @@ do  -- PaletteLUT:clear
   lut:clear()
   lurek.log.info("lut reset, count=" .. lut:getColorCount(), "image")
 end
+
+--@api-stub: mlua (ImageData):blit
+-- Copies pixels from a source ImageData onto this one at the given destination offset.
+-- Respects the destination's dimensions; source pixels outside bounds are clipped.
+do  -- mlua (ImageData):blit
+  local dst = lurek.image.newImageData(64, 64)
+  local src = lurek.image.newImageData(16, 16)
+  src:fill(1, 0.5, 0, 1)
+  dst:blit(src, 24, 24)
+  lurek.log.info("blit complete", "image")
+end
+
+--@api-stub: mlua (ImageData):convolve
+-- Applies a convolution kernel to the image for blur, sharpen, or edge-detect.
+-- kernel is a flat table of numbers; size must be sqrt(#kernel) x sqrt(#kernel).
+do  -- mlua (ImageData):convolve
+  local img = lurek.image.newImageData(32, 32)
+  img:fill(1, 1, 1, 1)
+  local blur3x3 = {1,2,1,2,4,2,1,2,1}
+  img:convolve(blur3x3, 1/16)
+  lurek.log.info("convolution done", "image")
+end
+
+--@api-stub: mlua (ImageData):drawCircle
+-- Draws a filled or outlined circle at (cx, cy) with the given radius and colour.
+-- filled=true draws solid fill; false draws outline only at lineWidth pixels.
+do  -- mlua (ImageData):drawCircle
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(0, 0, 0, 1)
+  img:drawCircle(32, 32, 20, 1, 0.5, 0, 1, true)
+  lurek.log.info("circle drawn", "image")
+end
+
+--@api-stub: mlua (ImageData):drawLine
+-- Draws an anti-aliased line from (x1,y1) to (x2,y2) with the given RGBA colour.
+-- Line width defaults to 1 pixel; thicker lines require Bresenham widening.
+do  -- mlua (ImageData):drawLine
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(0, 0, 0, 1)
+  img:drawLine(4, 4, 60, 60, 1, 1, 0, 1)
+  lurek.log.info("line drawn", "image")
+end
+
+--@api-stub: mlua (ImageData):drawRect
+-- Draws a filled or outlined rectangle at (x,y) with the given size and colour.
+-- filled=true draws solid fill; false draws the outline only.
+do  -- mlua (ImageData):drawRect
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(0, 0, 0, 1)
+  img:drawRect(10, 10, 40, 30, 0, 1, 0.5, 1, true)
+  lurek.log.info("rect drawn", "image")
+end
+
+--@api-stub: mlua (ImageData):getRegion
+-- Returns a new ImageData containing a rectangular sub-region of this image.
+-- Crop coordinates are (x, y, width, height); raises if out-of-bounds.
+do  -- mlua (ImageData):getRegion
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(1, 0, 0, 1)
+  local region = img:getRegion(10, 10, 20, 20)
+  lurek.log.info("region size: " .. region:getWidth() .. "x" .. region:getHeight(), "image")
+end
+
+--@api-stub: LayeredImage:moveLayer
+-- Moves a layer from one index to another in the layer stack.
+-- Reordering layers changes the composite draw order; index 1 is the bottom.
+do  -- LayeredImage:moveLayer
+  local li = lurek.image.newLayeredImage(64, 64)
+  li:addLayer()
+  li:addLayer()
+  li:moveLayer(1, 2)
+  lurek.log.info("layer moved", "image")
+end
+
+--@api-stub: mlua (ImageData):paste
+-- Pastes another ImageData onto this one at (dx, dy) using alpha compositing.
+-- Transparent source pixels do not overwrite the destination.
+do  -- mlua (ImageData):paste
+  local base = lurek.image.newImageData(64, 64)
+  local overlay = lurek.image.newImageData(16, 16)
+  overlay:fill(0, 0, 1, 0.5)
+  base:paste(overlay, 24, 24)
+  lurek.log.info("paste complete", "image")
+end
+
+--@api-stub: PaletteLUT:setColor
+-- Sets a palette remap entry: pixels matching from_r,g,b,a are replaced with to_r,g,b,a.
+-- applyPaletteLut() on ImageData uses all registered entries in one GPU pass.
+do  -- PaletteLUT:setColor
+  local lut = lurek.image.newPaletteLut()
+  lut:setColor(1, 0, 0, 1, 0, 1, 0, 1)
+  lurek.log.info("lut entries: " .. lut:getColorCount(), "image")
+end
+
+--@api-stub: LayeredImage:setLayer
+-- Replaces the ImageData for a specific layer index.
+-- The replacement must match the layered image dimensions exactly.
+do  -- LayeredImage:setLayer
+  local li = lurek.image.newLayeredImage(32, 32)
+  li:addLayer()
+  local newData = lurek.image.newImageData(32, 32)
+  newData:fill(0.5, 0.5, 1, 1)
+  li:setLayer(1, newData)
+  lurek.log.info("layer set", "image")
+end
+
+--@api-stub: mlua (ImageData):setPixel
+-- Sets the RGBA colour of the pixel at (x, y); coordinates are 0-based.
+-- Raises an error if (x,y) is outside the image dimensions.
+do  -- mlua (ImageData):setPixel
+  local img = lurek.image.newImageData(16, 16)
+  img:setPixel(7, 7, 1, 0, 0, 1)
+  local r, g, b, a = img:getPixel(7, 7)
+  lurek.log.info("pixel r=" .. r, "image")
+end
+
+--@api-stub: mlua (ImageData):tint
+-- Multiplies every pixel's RGB channels by the given colour, preserving alpha.
+-- Use to apply a team colour tint or seasonal palette shift to a sprite sheet.
+do  -- mlua (ImageData):tint
+  local img = lurek.image.newImageData(32, 32)
+  img:fill(1, 1, 1, 1)
+  img:tint(1.0, 0.3, 0.3)
+  lurek.log.info("tint applied", "image")
+end
+
+--@api-stub: mlua:blit
+-- Copies pixel data from a source ImageData onto this one at (dx, dy).
+-- Pixels that fall outside the destination boundary are clipped.
+do  -- mlua:blit
+  local src = lurek.image.newImageData(32, 32)
+  local dst = lurek.image.newImageData(64, 64)
+  dst:blit(src, 16, 16)
+  lurek.log.info("blit done", "image")
+end
+
+--@api-stub: mlua:convolve
+-- Applies a convolution kernel to this ImageData and returns a new ImageData.
+-- kernel is a flat table of numbers; rows and cols define the kernel dimensions.
+do  -- mlua:convolve
+  local img = lurek.image.newImageData(64, 64)
+  local blurred = img:convolve({1,2,1, 2,4,2, 1,2,1}, 3, 3, 16)
+  lurek.log.info("convolved: " .. blurred:getWidth(), "image")
+end
+
+--@api-stub: mlua:drawCircle
+-- Draws a filled or outlined circle onto this ImageData at (cx, cy) with radius r.
+-- color is an RGBA table; mode is "fill" or "line".
+do  -- mlua:drawCircle
+  local img = lurek.image.newImageData(128, 128)
+  img:drawCircle(64, 64, 30, {1, 0, 0, 1}, "fill")
+  lurek.log.info("circle drawn on ImageData", "image")
+end
+
+--@api-stub: mlua:drawLine
+-- Draws a line segment onto this ImageData from (x1, y1) to (x2, y2).
+-- color is an RGBA table; width controls the line thickness in pixels.
+do  -- mlua:drawLine
+  local img = lurek.image.newImageData(128, 128)
+  img:drawLine(0, 0, 127, 127, {0, 1, 0, 1}, 2)
+  lurek.log.info("line drawn on ImageData", "image")
+end
+
+--@api-stub: mlua:drawRect
+-- Draws a filled or outlined rectangle onto this ImageData.
+-- color is an RGBA table; mode is "fill" or "line".
+do  -- mlua:drawRect
+  local img = lurek.image.newImageData(128, 128)
+  img:drawRect(10, 10, 60, 40, {0, 0, 1, 1}, "fill")
+  lurek.log.info("rect drawn on ImageData", "image")
+end
+
+--@api-stub: mlua:getRegion
+-- Returns a new ImageData containing a rectangular sub-region of this image.
+-- Region is defined by (x, y, w, h); out-of-bounds areas are filled with zeros.
+do  -- mlua:getRegion
+  local img = lurek.image.newImageData(128, 128)
+  local region = img:getRegion(0, 0, 32, 32)
+  lurek.log.info("region: " .. region:getWidth() .. "x" .. region:getHeight(), "image")
+end
+
+--@api-stub: mlua:paste
+-- Pastes a source ImageData onto this one at (dx, dy), blending with alpha.
+-- Uses standard alpha compositing (source-over); non-destructive paste.
+do  -- mlua:paste
+  local src = lurek.image.newImageData(32, 32)
+  local dst = lurek.image.newImageData(64, 64)
+  dst:paste(src, 16, 16)
+  lurek.log.info("paste done", "image")
+end
+
+--@api-stub: mlua:setPixel
+-- Sets the RGBA colour of a single pixel at (x, y) in this ImageData.
+-- Values are in [0, 1]; changes take effect immediately without a flush call.
+do  -- mlua:setPixel
+  local img = lurek.image.newImageData(16, 16)
+  img:setPixel(8, 8, 1.0, 0.0, 0.5, 1.0)
+  local r, g, b, a = img:getPixel(8, 8)
+  lurek.log.info("pixel r=" .. r, "image")
+end
+
+--@api-stub: mlua:tint
+-- Multiplies every pixel of this ImageData by the given RGBA tint colour in-place.
+-- Use to apply a global colour grade or team-colour shift to a sprite sheet.
+do  -- mlua:tint
+  local img = lurek.image.newImageData(64, 64)
+  img:tint(1.0, 0.8, 0.6, 1.0)
+  lurek.log.info("tint applied", "image")
+end

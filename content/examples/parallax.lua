@@ -4,12 +4,10 @@
 -- The lurek.parallax namespace builds layered scrolling backgrounds:
 -- each ParallaxLayer wraps a texture and moves at a fractional camera
 -- speed; ParallaxSet groups layers and sorts them by z. Some blocks
--- below define `function lurek.render()` callbacks which would shadow
+-- below define `function lurek.draw()` callbacks which would shadow
 -- the lurek.render namespace, so we capture it once into `gfx` here.
 --
 -- Run: cargo run -- content/examples/parallax.lua
-
-local gfx = lurek.render
 
 -- ── lurek.parallax.* functions ──
 
@@ -18,7 +16,7 @@ local gfx = lurek.render
 -- The `texture` field is mandatory; everything else has a sensible default and can be tuned later via setters.
 do  -- lurek.parallax.newLayer
   function lurek.init()
-    local sky_tex = gfx.newImage("assets/parallax/sky.png")
+    local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
     local sky = lurek.parallax.newLayer({
       texture = sky_tex, scroll_factor_x = 0.15, scroll_factor_y = 0.0, z = 0,
     })
@@ -44,7 +42,7 @@ end
 -- Useful in generic code that walks a list of mixed userdata to dispatch on shape.
 do  -- ParallaxLayer:type
   function lurek.init()
-    local layer = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/clouds.png") })
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     if layer:type() == "ParallaxLayer" then
       lurek.log.debug("got a parallax layer", "scene")
     end
@@ -57,7 +55,7 @@ end
 do  -- ParallaxLayer:update
   local clouds
   function lurek.init()
-    clouds = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/clouds.png"), autoscroll_x = 12 })
+    clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png"), autoscroll_x = 12 })
   end
   function lurek.process(dt) clouds:update(dt) end
 end
@@ -68,9 +66,9 @@ end
 do  -- ParallaxLayer:render
   local hills
   function lurek.init()
-    hills = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/hills.png"), scroll_factor_x = 0.4 })
+    hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png"), scroll_factor_x = 0.4 })
   end
-  function lurek.render() hills:render(240, 0) end
+  function lurek.draw() hills:render(240, 0) end
 end
 
 --@api-stub: ParallaxLayer:renderAuto
@@ -79,9 +77,9 @@ end
 do  -- ParallaxLayer:renderAuto
   local mountains
   function lurek.init()
-    mountains = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/mountains.png"), scroll_factor_x = 0.25 })
+    mountains = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mountains.png"), scroll_factor_x = 0.25 })
   end
-  function lurek.render() mountains:renderAuto() end
+  function lurek.draw() mountains:renderAuto() end
 end
 
 --@api-stub: ParallaxLayer:resetAutoscroll
@@ -89,7 +87,7 @@ end
 -- Call when changing scenes so the new screen begins drift from a known origin instead of mid-frame.
 do  -- ParallaxLayer:resetAutoscroll
   function lurek.init()
-    local fog = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/fog.png"), autoscroll_x = 8 })
+    local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png"), autoscroll_x = 8 })
     fog:resetAutoscroll()
   end
 end
@@ -99,7 +97,7 @@ end
 -- 0 = locked sky, 1 = locked to world; pick ~0.2 for far layers and ~0.7 for near layers.
 do  -- ParallaxLayer:setScrollFactor
   function lurek.init()
-    local mid = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/treeline.png") })
+    local mid = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/treeline.png") })
     mid:setScrollFactor(0.6, 1.0)
   end
 end
@@ -109,7 +107,7 @@ end
 -- Read it back to confirm a runtime configuration tweak landed before the next render frame.
 do  -- ParallaxLayer:getScrollFactor
   function lurek.init()
-    local layer = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png"), scroll_factor_x = 0.3 })
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), scroll_factor_x = 0.3 })
     local fx, fy = layer:getScrollFactor()
     lurek.log.debug("scroll factor x=" .. fx .. " y=" .. fy, "parallax")
   end
@@ -120,7 +118,7 @@ end
 -- Use to nudge a layer down a few pixels so its horizon meets the tilemap.
 do  -- ParallaxLayer:setOffset
   function lurek.init()
-    local horizon = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/horizon.png") })
+    local horizon = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/horizon.png") })
     horizon:setOffset(0, 96)
   end
 end
@@ -130,7 +128,7 @@ end
 -- Save it into the user's preferences so a custom horizon nudge survives between sessions.
 do  -- ParallaxLayer:getOffset
   function lurek.init()
-    local layer = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png"), offset_y = 32 })
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), offset_y = 32 })
     local ox, oy = layer:getOffset()
     lurek.log.debug("offset x=" .. ox .. " y=" .. oy, "parallax")
   end
@@ -141,7 +139,7 @@ end
 -- Combine with setScrollFactor(0,0) for a layer that drifts independently of camera (e.g. clouds at dawn).
 do  -- ParallaxLayer:setAutoscroll
   function lurek.init()
-    local clouds = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/clouds.png") })
+    local clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     clouds:setScrollFactor(0, 0)
     clouds:setAutoscroll(20, 0)
   end
@@ -152,7 +150,7 @@ end
 -- Useful for HUD wind-direction indicators driven off the same source data as the cloud drift.
 do  -- ParallaxLayer:getAutoscroll
   function lurek.init()
-    local clouds = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/clouds.png"), autoscroll_x = 15 })
+    local clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png"), autoscroll_x = 15 })
     local vx, vy = clouds:getAutoscroll()
     lurek.log.debug("wind vx=" .. vx .. " vy=" .. vy, "weather")
   end
@@ -163,7 +161,7 @@ end
 -- Enable X repeat for an endless side-scroller backdrop; leave Y off for fixed-height skylines.
 do  -- ParallaxLayer:setRepeat
   function lurek.init()
-    local sky = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png") })
+    local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setRepeat(true, false)
   end
 end
@@ -173,7 +171,7 @@ end
 -- Use sx=2,sy=2 for chunky pixel-art backgrounds rendered at 2x logical resolution.
 do  -- ParallaxLayer:setScale
   function lurek.init()
-    local pixels = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/pixel_sky.png") })
+    local pixels = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/pixel_sky.png") })
     pixels:setScale(2.0, 2.0)
   end
 end
@@ -183,7 +181,7 @@ end
 -- Lower z draws first; pick z=0 for sky, z=10 for hills, z=20 for trees so a set sorts naturally.
 do  -- ParallaxLayer:setZ
   function lurek.init()
-    local trees = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/trees.png") })
+    local trees = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/trees.png") })
     trees:setZ(20)
   end
 end
@@ -193,7 +191,7 @@ end
 -- Read inside a debug overlay that lists every layer in render order to verify the sort.
 do  -- ParallaxLayer:getZ
   function lurek.init()
-    local layer = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png"), z = 5 })
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), z = 5 })
     if layer:getZ() < 10 then
       lurek.log.debug("background layer", "parallax")
     end
@@ -205,7 +203,7 @@ end
 -- Fade in over a few frames after a scene transition; set 0 to hide and skip the GPU upload.
 do  -- ParallaxLayer:setOpacity
   function lurek.init()
-    local fog = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/fog.png") })
+    local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     fog:setOpacity(0.6)
   end
 end
@@ -215,7 +213,7 @@ end
 -- Drive a tween from the current value rather than assuming 1.0 so partial fades chain smoothly.
 do  -- ParallaxLayer:getOpacity
   function lurek.init()
-    local fog = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/fog.png"), opacity = 0.5 })
+    local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png"), opacity = 0.5 })
     local a = fog:getOpacity()
     lurek.log.debug("fog opacity=" .. a, "weather")
   end
@@ -226,7 +224,7 @@ end
 -- Tint a sky layer towards orange (1, 0.6, 0.4, 1) for sunset without re-authoring the texture.
 do  -- ParallaxLayer:setTint
   function lurek.init()
-    local sky = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png") })
+    local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setTint(1.0, 0.6, 0.4, 1.0)
   end
 end
@@ -236,7 +234,7 @@ end
 -- Useful when interpolating from a previously authored colour to a new one across a day-night cycle.
 do  -- ParallaxLayer:getTint
   function lurek.init()
-    local sky = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png") })
+    local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setTint(0.5, 0.6, 1.0, 1.0)
     local r, g, b, a = sky:getTint()
     lurek.log.debug("tint=" .. r .. "," .. g .. "," .. b .. "," .. a, "parallax")
@@ -248,7 +246,7 @@ end
 -- Use "additive" for light gods-rays / glow layers; reset to "normal" for opaque backdrops.
 do  -- ParallaxLayer:setBlendMode
   function lurek.init()
-    local rays = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/godrays.png") })
+    local rays = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/godrays.png") })
     rays:setBlendMode("additive")
   end
 end
@@ -258,7 +256,7 @@ end
 -- Compare against the saved scene mode at load time to detect whether a debug toggle left it dirty.
 do  -- ParallaxLayer:getBlendMode
   function lurek.init()
-    local rays = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/godrays.png"), blend_mode = "additive" })
+    local rays = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/godrays.png"), blend_mode = "additive" })
     if rays:getBlendMode() ~= "normal" then
       lurek.log.debug("non-default blend on rays", "parallax")
     end
@@ -270,7 +268,7 @@ end
 -- Hide individual layers (e.g. weather effects) without disturbing the rest of the set's z order.
 do  -- ParallaxLayer:setVisible
   function lurek.init()
-    local rain = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/rain.png") })
+    local rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
     rain:setVisible(false)
   end
 end
@@ -281,7 +279,7 @@ end
 do  -- ParallaxLayer:isVisible
   local rain
   function lurek.init()
-    rain = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/rain.png") })
+    rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
   end
   function lurek.process(dt)
     if rain:isVisible() then rain:update(dt) end
@@ -293,7 +291,7 @@ end
 -- Call when a level transitions from a fixed-size area into an open world chunk with no horizontal bound.
 do  -- ParallaxLayer:clearClamp
   function lurek.init()
-    local hills = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/hills.png") })
+    local hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png") })
     hills:setRepeat(true, false)
     hills:clearClamp()
   end
@@ -304,7 +302,7 @@ end
 -- Faster shortcut than two setRepeat calls when the layer is meant as an endless skybox.
 do  -- ParallaxLayer:setTiling
   function lurek.init()
-    local stars = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/stars.png") })
+    local stars = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/stars.png") })
     stars:setTiling(true)
   end
 end
@@ -314,7 +312,7 @@ end
 -- Use in a debug HUD line to confirm a level designer's tiling toggle actually took effect.
 do  -- ParallaxLayer:getTiling
   function lurek.init()
-    local stars = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/stars.png") })
+    local stars = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/stars.png") })
     stars:setTiling(true)
     if stars:getTiling() then
       lurek.log.debug("starfield tiling on", "parallax")
@@ -327,7 +325,7 @@ end
 -- Override when a texture is non-square or you want it tiled at a finer interval than its native size.
 do  -- ParallaxLayer:setTileSize
   function lurek.init()
-    local pattern = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/pattern.png") })
+    local pattern = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/pattern.png") })
     pattern:setTiling(true)
     pattern:setTileSize(128, 128)
   end
@@ -338,7 +336,7 @@ end
 -- Use depths like 10.5 to slip a new layer between two existing integer-z layers without resorting them.
 do  -- ParallaxLayer:setDepth
   function lurek.init()
-    local mist = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/mist.png") })
+    local mist = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mist.png") })
     mist:setZ(10)
     mist:setDepth(10.5)
   end
@@ -349,7 +347,7 @@ end
 -- Pair with getZ to render a "z=10 (depth 10.50)" debug label so designers can tune layering live.
 do  -- ParallaxLayer:getDepth
   function lurek.init()
-    local mist = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/mist.png") })
+    local mist = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mist.png") })
     mist:setDepth(10.5)
     lurek.log.debug("mist depth=" .. mist:getDepth(), "parallax")
   end
@@ -375,8 +373,8 @@ end
 do  -- ParallaxSet:addLayer
   function lurek.init()
     local backdrop = lurek.parallax.newSet("woods")
-    local sky = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png"), z = 0 })
-    local trees = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/trees.png"), z = 20 })
+    local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), z = 0 })
+    local trees = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/trees.png"), z = 20 })
     backdrop:addLayer(sky)
     backdrop:addLayer(trees)
   end
@@ -388,7 +386,7 @@ end
 do  -- ParallaxSet:removeLayerAt
   function lurek.init()
     local backdrop = lurek.parallax.newSet("storm")
-    local rain = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/rain.png") })
+    local rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
     backdrop:addLayer(rain)
     backdrop:removeLayerAt(1)
   end
@@ -400,7 +398,7 @@ end
 do  -- ParallaxSet:layerCount
   function lurek.init()
     local backdrop = lurek.parallax.newSet("count_demo")
-    local sky = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png") })
+    local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     backdrop:addLayer(sky)
     lurek.log.debug("layers=" .. backdrop:layerCount(), "scene")
   end
@@ -412,7 +410,7 @@ end
 do  -- ParallaxSet:sortByZ
   function lurek.init()
     local backdrop = lurek.parallax.newSet("sortable")
-    local hills = lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/hills.png") })
+    local hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png") })
     backdrop:addLayer(hills)
     hills:setZ(15)
     backdrop:sortByZ()
@@ -449,7 +447,7 @@ do  -- ParallaxSet:update
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("ambient")
-    backdrop:addLayer(lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/clouds.png"), autoscroll_x = 8 }))
+    backdrop:addLayer(lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png"), autoscroll_x = 8 }))
   end
   function lurek.process(dt) backdrop:update(dt) end
 end
@@ -461,9 +459,9 @@ do  -- ParallaxSet:render
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("preview")
-    backdrop:addLayer(lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/sky.png") }))
+    backdrop:addLayer(lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") }))
   end
-  function lurek.render() backdrop:render(0, 0) end
+  function lurek.draw() backdrop:render(0, 0) end
 end
 
 --@api-stub: ParallaxSet:renderAuto
@@ -473,9 +471,9 @@ do  -- ParallaxSet:renderAuto
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("scene")
-    backdrop:addLayer(lurek.parallax.newLayer({ texture = gfx.newImage("assets/parallax/hills.png"), scroll_factor_x = 0.4 }))
+    backdrop:addLayer(lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png"), scroll_factor_x = 0.4 }))
   end
-  function lurek.render() backdrop:renderAuto() end
+  function lurek.draw() backdrop:renderAuto() end
 end
 
 --@api-stub: ParallaxSet:getName
@@ -511,7 +509,7 @@ end
 --   * NO `return` at top-level (breaks the file).
 --   * NO `pcall` defensive wrappers, NO `if false then`.
 --   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
+--     `function lurek.draw() ... end` or
 --     `function lurek.update(dt) ... end` callbacks so the file loads.
 --   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
 --     colours like {1, 0.5, 0, 1}.
@@ -521,3 +519,12 @@ end
 -- Run: cargo run -- content/examples/parallax.lua
 
 -- ── lurek.parallax.* functions ──
+
+--@api-stub: ParallaxLayer:setClamp
+-- Enables edge clamping so the layer texture does not tile beyond its bounds.
+-- Use for layers with defined edges (mountain silhouettes, foreground props).
+do  -- ParallaxLayer:setClamp
+  local layer = lurek.parallax.newLayer("bg_mountains.png", 0.3)
+  layer:setClamp(true)
+  lurek.log.info("clamp enabled", "parallax")
+end

@@ -531,7 +531,7 @@ end
 do  -- Minimap:render
   local mm
   function lurek.init() mm = lurek.minimap.newMinimap(48, 32, 200, 140) end
-  function lurek.render() mm:render(20, 20) end
+  function lurek.draw() mm:render(20, 20) end
 end
 
 --@api-stub: Minimap:drawToImage
@@ -542,4 +542,196 @@ do  -- Minimap:drawToImage
   mm:setTerrain(1, 1, 1)
   local img = mm:drawToImage(8)
   lurek.log.info("snapshot: " .. img:getWidth() .. "x" .. img:getHeight(), "minimap")
+end
+
+--@api-stub: Minimap:addMarker
+-- Adds a named waypoint marker at a grid cell with optional colour override.
+-- Markers persist across frames; remove by id with removeMarker().
+do  -- Minimap:addMarker
+  local mm = lurek.minimap.newMinimap(64, 64, 4)
+  local id = mm:addMarker(20, 30, "quest_marker", {1, 1, 0, 1})
+  lurek.log.info("marker id: " .. id, "minimap")
+end
+
+--@api-stub: Minimap:addObjectType
+-- Registers a named object type with a default colour for rendering.
+-- Object types control how setObject() icons appear on the minimap.
+do  -- Minimap:addObjectType
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:addObjectType("enemy", {1, 0, 0, 1})
+  mm:addObjectType("ally",  {0, 0.5, 1, 1})
+  lurek.log.info("object types: " .. mm:getObjectTypeCount(), "minimap")
+end
+
+--@api-stub: Minimap:addPing
+-- Adds a temporary animated ping at a grid cell that fades out over duration seconds.
+-- Use for unit selection highlights or tactical markers in multiplayer.
+do  -- Minimap:addPing
+  local mm = lurek.minimap.newMinimap(64, 64, 4)
+  mm:addPing(32, 32, 2.0, {0, 1, 1, 1})
+  lurek.log.info("ping added; count: " .. mm:getPingCount(), "minimap")
+end
+
+--@api-stub: Minimap:drawLine
+-- Draws a persistent overlay line between two grid cells with a colour.
+-- Lines are rendered on top of terrain; call clearOverlay() to remove all lines.
+do  -- Minimap:drawLine
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:drawLine(0, 0, 31, 31, {1, 1, 0, 1})
+  lurek.log.info("overlay line drawn", "minimap")
+end
+
+--@api-stub: Minimap:drawRect
+-- Draws a persistent overlay rectangle between two grid cells with a colour.
+-- Use to highlight selection boxes or zone boundaries on the minimap.
+do  -- Minimap:drawRect
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:drawRect(5, 5, 20, 20, {0, 1, 0, 0.5})
+  lurek.log.info("overlay rect drawn", "minimap")
+end
+
+--@api-stub: Minimap:getHoverInfo
+-- Returns the grid cell and any object/terrain description under the screen cursor.
+-- Call from mousemoved to implement minimap hover tooltips.
+do  -- Minimap:getHoverInfo
+  local mm = lurek.minimap.newMinimap(64, 64, 4)
+  mm:setTerrain(10, 10, "forest")
+  local info = mm:getHoverInfo(40, 40)
+  lurek.log.info("hover info: " .. tostring(info), "minimap")
+end
+
+--@api-stub: Minimap:gridToScreen
+-- Converts a minimap grid cell to screen pixel coordinates.
+-- Inverse of screenToGrid; use for placing HUD elements above minimap cells.
+do  -- Minimap:gridToScreen
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  local sx, sy = mm:gridToScreen(16, 16)
+  lurek.log.info("grid 16,16 -> screen " .. sx .. "," .. sy, "minimap")
+end
+
+--@api-stub: Minimap:screenToGrid
+-- Converts screen pixel coordinates to the nearest minimap grid cell.
+-- Use in mouse-click handlers to translate HUD clicks to world actions.
+do  -- Minimap:screenToGrid
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  local gx, gy = mm:screenToGrid(64, 64)
+  lurek.log.info("screen -> grid: " .. gx .. "," .. gy, "minimap")
+end
+
+--@api-stub: Minimap:setFogColor
+-- Sets the RGBA colour used to render fog-of-war cells on the minimap.
+-- Default is black; use a semi-transparent dark colour for explored-but-hidden regions.
+do  -- Minimap:setFogColor
+  local mm = lurek.minimap.newMinimap(64, 64, 4)
+  mm:setFogEnabled(true)
+  mm:setFogColor(0.0, 0.0, 0.1, 0.7)
+  lurek.log.info("fog colour set", "minimap")
+end
+
+--@api-stub: Minimap:setLayerData
+-- Sets a flat table of terrain or overlay values for a named layer.
+-- Table must have width*height entries in row-major order.
+do  -- Minimap:setLayerData
+  local mm = lurek.minimap.newMinimap(8, 8, 8)
+  local data = {}
+  for i = 1, 64 do data[i] = (i % 2 == 0) and 1 or 0 end
+  mm:setLayerData("custom_layer", data)
+  lurek.log.info("layer data set", "minimap")
+end
+
+--@api-stub: Minimap:setMarkerAnimation
+-- Sets a looping icon animation for a marker type by name.
+-- Pass a table of icon frame indices and a frames-per-second rate.
+do  -- Minimap:setMarkerAnimation
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:setMarkerAnimation("quest_marker", {1, 2, 3, 4}, 4)
+  lurek.log.info("marker animation set", "minimap")
+end
+
+--@api-stub: Minimap:setObject
+-- Places a named object at a grid cell with its registered type for rendering.
+-- Objects appear as coloured icons; update their position by calling setObject again.
+do  -- Minimap:setObject
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:addObjectType("unit", {0, 0.7, 1, 1})
+  mm:setObject("hero_01", 16, 16, "unit")
+  lurek.log.info("object count: " .. mm:getObjectCount(), "minimap")
+end
+
+--@api-stub: Minimap:setObjectTypeVisible
+-- Shows or hides all objects of a registered type on the minimap.
+-- Use to toggle unit icons by army or faction without removing them.
+do  -- Minimap:setObjectTypeVisible
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:addObjectType("enemy", {1, 0, 0, 1})
+  mm:setObjectTypeVisible("enemy", false)
+  lurek.log.info("enemy visible: " .. tostring(mm:isObjectTypeVisible("enemy")), "minimap")
+end
+
+--@api-stub: Minimap:setOwnerColor
+-- Sets the colour for a named owner (faction/player) used by coloured province rendering.
+-- Call once per faction at init; provinces tagged with that owner use this colour.
+do  -- Minimap:setOwnerColor
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:setOwnerColor("player_red",   {0.9, 0.1, 0.1, 1})
+  mm:setOwnerColor("player_blue",  {0.1, 0.2, 0.9, 1})
+  lurek.log.info("owner colours set", "minimap")
+end
+
+--@api-stub: Minimap:setTerrain
+-- Sets the terrain type for a single grid cell.
+-- Terrain types are registered with setTerrainColor; unknown types fall back to white.
+do  -- Minimap:setTerrain
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:setTerrainColor("water", {0.2, 0.4, 0.9, 1})
+  mm:setTerrain(5, 10, "water")
+  lurek.log.info("terrain set", "minimap")
+end
+
+--@api-stub: Minimap:setTerrainColor
+-- Registers a colour for a named terrain type.
+-- Cells set to this terrain type render in the registered colour on the minimap.
+do  -- Minimap:setTerrainColor
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:setTerrainColor("forest",  {0.1, 0.6, 0.1, 1})
+  mm:setTerrainColor("desert",  {0.9, 0.8, 0.4, 1})
+  lurek.log.info("terrain colours registered", "minimap")
+end
+
+--@api-stub: Minimap:setTileDescription
+-- Attaches a short text description to a terrain type for tooltip display.
+-- Returned by getHoverInfo when the player hovers over cells of this terrain.
+do  -- Minimap:setTileDescription
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  mm:setTerrainColor("mountain", {0.5, 0.5, 0.5, 1})
+  mm:setTileDescription("mountain", "Impassable rock face")
+  lurek.log.info("tile description set", "minimap")
+end
+
+--@api-stub: Minimap:setViewportColor
+-- Sets the RGBA colour of the viewport rectangle drawn on the minimap.
+-- The viewport shows which portion of the world the main camera sees.
+do  -- Minimap:setViewportColor
+  local mm = lurek.minimap.newMinimap(64, 64, 4)
+  mm:setViewportColor(1, 1, 0, 0.8)
+  lurek.log.info("viewport colour set", "minimap")
+end
+
+--@api-stub: Minimap:setViewportRect
+-- Sets the viewport rectangle shown on the minimap in world-space coordinates.
+-- Update each frame based on the main camera's visible area.
+do  -- Minimap:setViewportRect
+  local mm = lurek.minimap.newMinimap(64, 64, 4)
+  mm:setViewportRect(100, 100, 800, 600)
+  lurek.log.info("viewport rect set", "minimap")
+end
+
+--@api-stub: Minimap:showPath
+-- Draws a path as a sequence of connected line segments on the minimap overlay.
+-- Pass a table of {x,y} grid cell positions; cleared by clearPath().
+do  -- Minimap:showPath
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  local path = {{x=5,y=5},{x=10,y=10},{x=20,y=15}}
+  mm:showPath(path, {1, 0.5, 0, 1})
+  lurek.log.info("path shown", "minimap")
 end

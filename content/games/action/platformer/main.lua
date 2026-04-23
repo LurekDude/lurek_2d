@@ -222,15 +222,16 @@ local function on_moving_platform()
 end
 
 -- ── Engine callbacks ──────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Platformer — Lurek2D")
     lurek.window.setBackgroundColor(0.3, 0.5, 0.8)
 
     -- Input actions
-    lurek.input.addAction("left",  {"a", "left"})
-    lurek.input.addAction("right", {"d", "right"})
-    lurek.input.addAction("jump",  {"space", "w", "up"})
-    lurek.input.addAction("quit",  {"escape"})
+    lurek.input.bind("left",  {"a", "left"})
+    lurek.input.bind("right", {"d", "right"})
+    lurek.input.bind("jump",  {"space", "w", "up"})
+    lurek.input.bind("quit",  {"escape"})
 
     -- Particle systems
     dust_ps = lurek.particle.new({
@@ -263,15 +264,15 @@ function lurek.init()
     })
 end
 
-function lurek.ready()
+local function _ready_setup()
     load_level(1)
 end
 
 -- ── Process ───────────────────────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     title_blink = title_blink + dt
 
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -306,8 +307,8 @@ lurek.process(function(dt)
 
     -- ── Playing ───────────────────────────────────────────────────────────
     local move_x = 0
-    if lurek.input.isActionPressed("left")  then move_x = move_x - 1 end
-    if lurek.input.isActionPressed("right") then move_x = move_x + 1 end
+    if lurek.input.isActionDown("left")  then move_x = move_x - 1 end
+    if lurek.input.isActionDown("right") then move_x = move_x + 1 end
     if move_x ~= 0 then player.facing = move_x end
 
     player.vx = move_x * PLAYER_SPEED
@@ -320,7 +321,7 @@ lurek.process(function(dt)
     end
 
     -- Jump
-    if lurek.input.isActionJustPressed("jump") and player.coyote > 0 then
+    if lurek.input.wasActionPressed("jump") and player.coyote > 0 then
         player.vy = JUMP_VEL
         player.on_ground = false
         player.coyote = 0
@@ -540,10 +541,10 @@ lurek.process(function(dt)
     coin_ps:update(dt)
     stomp_ps:update(dt)
     death_ps:update(dt)
-end)
+end
 
 -- ── Render (world space) ──────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if game_state == STATE.TITLE then return end
 
     local ox = -cam_x
@@ -634,10 +635,10 @@ lurek.render(function()
     coin_ps:draw()
     stomp_ps:draw()
     death_ps:draw()
-end)
+end
 
 -- ── Render UI (screen space) ──────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     -- ── Title screen ──────────────────────────────────────────────────────
     if game_state == STATE.TITLE then
         lurek.render.setColor(0.2, 0.4, 0.9, 1)

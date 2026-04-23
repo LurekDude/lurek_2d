@@ -1813,3 +1813,198 @@ do  -- AabbTree:clear
   t:insert(1, 0, 0, 16, 16)
   t:clear()
 end
+
+--@api-stub: NoiseGenerator:fbm
+-- Generates fractional Brownian motion noise at (x, y) using multiple octaves.
+-- octaves, lacunarity, and gain control detail, frequency growth, and amplitude decay.
+do  -- NoiseGenerator:fbm
+  local ng = lurek.math.newNoiseGenerator(42)
+  local v = ng:fbm(0.3, 0.7, 6, 2.0, 0.5)
+  lurek.log.info("fbm noise: " .. v, "math")
+end
+
+--@api-stub: NoiseGenerator:generateMap
+-- Generates a 2D noise map into a flat table of width*height floats.
+-- scale controls zoom; offsets shift the sample window across the noise field.
+do  -- NoiseGenerator:generateMap
+  local ng = lurek.math.newNoiseGenerator(99)
+  local map = ng:generateMap(32, 32, 0.05, 0.0, 0.0)
+  lurek.log.info("map size: " .. #map, "math")
+end
+
+--@api-stub: SpatialHash:insert
+-- Inserts an item with a bounding rectangle into the spatial hash.
+-- item can be any value (entity id, table); duplicate inserts accumulate.
+do  -- SpatialHash:insert
+  local sh = lurek.math.newSpatialHash(64)
+  sh:insert("entity_01", 100, 100, 32, 32)
+  sh:insert("entity_02", 200, 150, 32, 32)
+  lurek.log.info("items: " .. sh:getItemCount(), "math")
+end
+
+--@api-stub: AabbTree:insert
+-- Inserts an axis-aligned bounding box into the dynamic AABB tree.
+-- Returns a proxy id for later update() or remove() calls.
+do  -- AabbTree:insert
+  local tree = lurek.math.aabbTree()
+  local id1 = tree:insert(10, 10, 50, 50, "entity_a")
+  local id2 = tree:insert(80, 80, 120, 120, "entity_b")
+  lurek.log.info("tree len: " .. tree:len(), "math")
+end
+
+--@api-stub: BezierCurve:insertControlPoint
+-- Inserts a new control point at the given parameter t along the curve.
+-- The curve order increases by 1; use for interactive path editing.
+do  -- BezierCurve:insertControlPoint
+  local bc = lurek.math.newBezierCurve({0,0, 100,50, 200,0})
+  bc:insertControlPoint(100, 25, 0.5)
+  lurek.log.info("ctrl pts: " .. bc:getControlPointCount(), "math")
+end
+
+--@api-stub: AabbTree:query
+-- Returns all proxies whose bounding boxes overlap the given AABB query rectangle.
+-- Result is a table of user-data values passed to insert().
+do  -- AabbTree:query
+  local tree = lurek.math.aabbTree()
+  tree:insert(0, 0, 40, 40, "box_a")
+  tree:insert(60, 60, 100, 100, "box_b")
+  local hits = tree:query(10, 10, 50, 50)
+  lurek.log.info("hits: " .. #hits, "math")
+end
+
+--@api-stub: SpatialHash:queryCircle
+-- Returns all items whose AABB overlaps a circle with given centre and radius.
+-- Faster than a broad-phase distance check for sparse grids of large objects.
+do  -- SpatialHash:queryCircle
+  local sh = lurek.math.newSpatialHash(32)
+  sh:insert("e1", 100, 100, 16, 16)
+  sh:insert("e2", 500, 500, 16, 16)
+  local hits = sh:queryCircle(110, 110, 50)
+  lurek.log.info("circle hits: " .. #hits, "math")
+end
+
+--@api-stub: SpatialHash:queryRect
+-- Returns all items whose bounding rectangles overlap the query AABB.
+-- Use for broad-phase collision detection before narrow-phase checks.
+do  -- SpatialHash:queryRect
+  local sh = lurek.math.newSpatialHash(64)
+  sh:insert("player", 100, 100, 32, 32)
+  sh:insert("enemy", 128, 100, 32, 32)
+  local hits = sh:queryRect(90, 90, 170, 150)
+  lurek.log.info("rect hits: " .. #hits, "math")
+end
+
+--@api-stub: SpatialHash:querySegment
+-- Returns all items whose bounding rectangles are crossed by a line segment.
+-- Use for bullet-traces, line-of-sight culling, and ray-vs-entity checks.
+do  -- SpatialHash:querySegment
+  local sh = lurek.math.newSpatialHash(64)
+  sh:insert("wall", 200, 100, 240, 300)
+  local hits = sh:querySegment(0, 200, 400, 200)
+  lurek.log.info("segment hits: " .. #hits, "math")
+end
+
+--@api-stub: RandomGenerator:randomNormal
+-- Returns a normally-distributed random float with the given mean and stddev.
+-- Uses the Box-Muller transform; negative values are possible.
+do  -- RandomGenerator:randomNormal
+  local rng = lurek.math.newRandomGenerator(12345)
+  local v = rng:randomNormal(0, 1)
+  lurek.log.info("normal sample: " .. v, "math")
+end
+
+--@api-stub: NoiseGenerator:ridged
+-- Returns ridged multifractal noise value at (x, y); ridge lines appear as sharp peaks.
+-- Useful for mountain ranges, lightning bolt textures, and cracks.
+do  -- NoiseGenerator:ridged
+  local ng = lurek.math.newNoiseGenerator(7)
+  local v = ng:ridged(0.5, 0.5, 5, 2.0, 0.5)
+  lurek.log.info("ridged: " .. v, "math")
+end
+
+--@api-stub: BezierCurve:setControlPoint
+-- Moves the control point at the given index to a new (x, y) position.
+-- Index is 1-based; changes the curve shape without altering the degree.
+do  -- BezierCurve:setControlPoint
+  local bc = lurek.math.newBezierCurve({0,0, 100,0, 200,0})
+  bc:setControlPoint(2, 100, 80)
+  local cx, cy = bc:getControlPoint(2)
+  lurek.log.info("ctrl pt 2: " .. cx .. "," .. cy, "math")
+end
+
+--@api-stub: Transform:setTransformation
+-- Resets and sets all transformation parameters (tx,ty, r, sx,sy, ox,oy, kx,ky).
+-- Equivalent to reset() + translate() + rotate() + scale() in one call.
+do  -- Transform:setTransformation
+  local t = lurek.math.newTransform()
+  t:setTransformation(100, 200, 0.5, 2.0, 2.0, 16, 16, 0, 0)
+  local x, y = t:transformPoint(0, 0)
+  lurek.log.info("transformed origin: " .. x .. "," .. y, "math")
+end
+
+--@api-stub: NoiseGenerator:turbulence
+-- Returns turbulence noise: sum of |perlin(x*f^i, y*f^i)| across octaves.
+-- Produces cloudy, billowing textures suitable for fog or smoke.
+do  -- NoiseGenerator:turbulence
+  local ng = lurek.math.newNoiseGenerator(55)
+  local v = ng:turbulence(0.4, 0.6, 5, 2.0, 0.5)
+  lurek.log.info("turbulence: " .. v, "math")
+end
+
+--@api-stub: Tween:update
+-- Advances the tween by dt seconds and returns the current interpolated value.
+-- Call each frame; tween reports isComplete() = true when it reaches the end.
+do  -- Tween:update
+  local tw = lurek.math.newTween(1.0, "inOutQuad")
+  tw:addValue("x", 0, 200)
+  tw:update(0.5)
+  lurek.log.info("x at t=0.5: " .. tw:getValue("x"), "math")
+end
+
+--@api-stub: SpatialHash:update
+-- Updates the stored AABB for an item already in the hash.
+-- Must be called each frame for moving objects to keep queries accurate.
+do  -- SpatialHash:update
+  local sh = lurek.math.newSpatialHash(64)
+  sh:insert("player", 100, 100, 32, 32)
+  sh:update("player", 110, 105, 32, 32)
+  lurek.log.info("player position updated", "math")
+end
+
+--@api-stub: NoiseGenerator:warpDomain
+-- Returns domain-warped noise by distorting (x,y) with a secondary noise field.
+-- Produces swirling, organic shapes; warp_scale controls the distortion magnitude.
+do  -- NoiseGenerator:warpDomain
+  local ng = lurek.math.newNoiseGenerator(101)
+  local v = ng:warpDomain(0.3, 0.3, 0.8, 4, 2.0, 0.5)
+  lurek.log.info("warped: " .. v, "math")
+end
+
+--@api-stub: NoiseGenerator:worley2d
+-- Returns the 2D Worley (cellular) noise F1 distance at (x, y).
+-- Lower values near cell centres; use for stone textures, voronoi patterns.
+do  -- NoiseGenerator:worley2d
+  local ng = lurek.math.newNoiseGenerator(321)
+  local v = ng:worley2d(0.25, 0.75)
+  lurek.log.info("worley2d: " .. v, "math")
+end
+
+--@api-stub: NoiseGenerator:worley3d
+-- Returns the 3D Worley (cellular) noise F1 distance at (x, y, z).
+-- Use for volumetric textures, animated flowing patterns, or fog density fields.
+do  -- NoiseGenerator:worley3d
+  local ng = lurek.math.newNoiseGenerator(654)
+  local v = ng:worley3d(0.1, 0.5, 0.9)
+  lurek.log.info("worley3d: " .. v, "math")
+end
+
+--@api-stub: AabbTree:update
+-- Advances the dynamic bounding-volume tree, refreshing moved body bounds.
+-- Call once per frame after updating body positions to maintain query accuracy.
+do  -- AabbTree:update
+  local tree = lurek.math.newAabbTree()
+  local id = tree:insert(100, 100, 132, 132, "entity_1")
+  tree:move(id, 110, 110, 142, 142)
+  tree:update()
+  lurek.log.info("AABB tree updated", "math")
+end

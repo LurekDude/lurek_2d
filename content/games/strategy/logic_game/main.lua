@@ -119,6 +119,7 @@ lurek.input.bind("next_lvl",  "n")
 lurek.input.bind("quit",      "escape")
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Logic Game — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.06, 0.12, 1.0)
@@ -149,18 +150,18 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if step_particles then step_particles:update(dt) end
     if win_particles  then win_particles:update(dt)  end
 
     if msg_timer > 0 then msg_timer = msg_timer - dt end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
 
     if run_done then
-        if lurek.input.isActionJustPressed("reset") then
+        if lurek.input.wasActionPressed("reset") then
             load_level(level_idx)
-        elseif run_win and lurek.input.isActionJustPressed("next_lvl") then
+        elseif run_win and lurek.input.wasActionPressed("next_lvl") then
             level_idx = level_idx < #LEVELS and level_idx + 1 or 1
             load_level(level_idx)
         end
@@ -204,9 +205,9 @@ lurek.process(function(dt)
     end
 
     -- Edit mode
-    if lurek.input.isActionJustPressed("slot_prev") then
+    if lurek.input.wasActionPressed("slot_prev") then
         selected = math.max(1, selected - 1)
-    elseif lurek.input.isActionJustPressed("slot_next") then
+    elseif lurek.input.wasActionPressed("slot_next") then
         selected = math.min(#program, selected + 1)
     end
 
@@ -218,26 +219,26 @@ lurek.process(function(dt)
         cmd_wait  = "wait",
     }
     for key, val in pairs(cmd_map) do
-        if lurek.input.isActionJustPressed(key) then
+        if lurek.input.wasActionPressed(key) then
             program[selected] = val
             if selected < #program then selected = selected + 1 end
         end
     end
 
-    if lurek.input.isActionJustPressed("run") then
+    if lurek.input.wasActionPressed("run") then
         running   = true
         run_timer = 0.0
         run_step  = 0
         robot     = { x = LEVELS[level_idx].robot.x, y = LEVELS[level_idx].robot.y }
     end
 
-    if lurek.input.isActionJustPressed("reset") then
+    if lurek.input.wasActionPressed("reset") then
         load_level(level_idx)
     end
-end)
+end
 
 -- ── Render world ──────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Grid
     for r = 1, ROWS do
         for c = 1, COLS do
@@ -251,10 +252,10 @@ lurek.render(function()
 
     if step_particles then step_particles:draw() end
     if win_particles  then win_particles:draw()  end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     local lv = LEVELS[level_idx]
     lurek.render.print("Level " .. level_idx .. ": " .. lv.title, 40, 14, { color = {1,0.9,0.3,1}, size = 16 })
     lurek.render.print("Program (" .. #program .. " slots):", 40, 520, { color = {0.7,0.7,0.9,1}, size = 14 })
@@ -275,4 +276,4 @@ lurek.render_ui(function()
     if msg_timer > 0 and msg ~= "" then
         lurek.render.print(msg, 40, 494, { color = {1,0.9,0.4,1}, size = 13 })
     end
-end)
+end

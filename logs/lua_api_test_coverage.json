@@ -1,28 +1,28 @@
 {
   "meta": {
-    "generated": "2026-04-23T11:45:37.880380+00:00",
+    "generated": "2026-04-23T18:13:35.230482+00:00",
     "generator": "tools/audit/lua_api_test_coverage.py",
     "mode": "hybrid",
     "module_filter": null,
-    "total_api_functions": 3704,
-    "marker_covered": 256,
-    "heuristic_covered": 3312,
-    "total_covered": 3606,
-    "coverage_pct": 97.4
+    "total_api_functions": 4102,
+    "marker_covered": 431,
+    "heuristic_covered": 3578,
+    "total_covered": 4048,
+    "coverage_pct": 98.7
   },
   "modules": {
     "ai": {
-      "total": 242,
-      "marker_covered": 6,
-      "heuristic_covered": 231,
-      "covered": 237,
+      "total": 292,
+      "marker_covered": 7,
+      "heuristic_covered": 279,
+      "covered": 286,
       "coverage_pct": 97.9,
       "uncovered": [
         {
-          "lua_name": "Blackboard:has",
+          "lua_name": "InfluenceMap:stampInfluence",
           "kind": "method",
           "file": "src/lua_api/ai_api.rs",
-          "line": 530
+          "line": 1843
         },
         {
           "lua_name": "TraitProfile:set",
@@ -43,6 +43,12 @@
           "line": 2327
         },
         {
+          "lua_name": "EmotionModel:add",
+          "kind": "method",
+          "file": "src/lua_api/ai_api.rs",
+          "line": 2801
+        },
+        {
           "lua_name": "EmotionModel:get",
           "kind": "method",
           "file": "src/lua_api/ai_api.rs",
@@ -56,43 +62,39 @@
         "tests/lua/integration/test_ai_physics.lua",
         "tests/lua/integration/test_ecs_ai.lua",
         "tests/lua/security/test_render.lua",
-        "tests/lua/stress/test_ai_stress.lua"
+        "tests/lua/stress/test_ai_stress.lua",
+        "tests/lua/unit/test_patterns_unit.lua"
       ]
     },
     "animation": {
-      "total": 46,
-      "marker_covered": 1,
+      "total": 53,
+      "marker_covered": 10,
       "heuristic_covered": 43,
-      "covered": 44,
-      "coverage_pct": 95.7,
-      "uncovered": [
-        {
-          "lua_name": "BlendLayerSet:len",
-          "kind": "method",
-          "file": "src/lua_api/animation_api.rs",
-          "line": 525
-        },
-        {
-          "lua_name": "AnimSyncGroup:add",
-          "kind": "method",
-          "file": "src/lua_api/animation_api.rs",
-          "line": 786
-        }
-      ],
+      "covered": 53,
+      "coverage_pct": 100.0,
+      "uncovered": [],
       "test_files": [
         "tests/lua/evidence/test_animation_evidence.lua",
         "tests/lua/integration/test_animation_timer.lua",
         "tests/lua/integration/test_render_animation.lua",
-        "tests/lua/integration/test_tween_animation.lua"
+        "tests/lua/integration/test_tween_animation.lua",
+        "tests/lua/unit/test_animation_unit.lua"
       ]
     },
     "audio": {
-      "total": 212,
+      "total": 215,
       "marker_covered": 19,
-      "heuristic_covered": 193,
-      "covered": 212,
-      "coverage_pct": 100.0,
-      "uncovered": [],
+      "heuristic_covered": 195,
+      "covered": 214,
+      "coverage_pct": 99.5,
+      "uncovered": [
+        {
+          "lua_name": "Bus:setDuckTarget",
+          "kind": "method",
+          "file": "src/lua_api/audio_api.rs",
+          "line": 535
+        }
+      ],
       "test_files": [
         "tests/lua/evidence/test_audio_evidence.lua",
         "tests/lua/evidence/test_render_evidence.lua",
@@ -111,135 +113,53 @@
       "test_files": []
     },
     "camera": {
-      "total": 36,
-      "marker_covered": 1,
-      "heuristic_covered": 35,
-      "covered": 36,
+      "total": 47,
+      "marker_covered": 4,
+      "heuristic_covered": 43,
+      "covered": 47,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
-        "tests/lua/integration/test_parallax_camera.lua"
+        "tests/lua/evidence/test_camera_evidence.lua",
+        "tests/lua/integration/test_input_camera.lua",
+        "tests/lua/integration/test_parallax_camera.lua",
+        "tests/lua/integration/test_render_camera.lua",
+        "tests/lua/integration/test_scene_camera.lua",
+        "tests/lua/integration/test_tilemap_camera.lua",
+        "tests/lua/integration/test_tween_camera.lua",
+        "tests/lua/stress/test_camera_stress.lua",
+        "tests/lua/unit/test_camera_unit.lua"
       ]
     },
     "compute": {
-      "total": 71,
-      "marker_covered": 4,
-      "heuristic_covered": 54,
-      "covered": 58,
-      "coverage_pct": 81.7,
+      "total": 77,
+      "marker_covered": 17,
+      "heuristic_covered": 59,
+      "covered": 76,
+      "coverage_pct": 98.7,
       "uncovered": [
         {
-          "lua_name": "lurek.compute.fft",
-          "kind": "function",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 1122
-        },
-        {
-          "lua_name": "Array:get",
+          "lua_name": "Array:eigenPower",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 143
-        },
-        {
-          "lua_name": "Array:set",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 154
-        },
-        {
-          "lua_name": "Array:pow",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 276
-        },
-        {
-          "lua_name": "Array:abs",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 292
-        },
-        {
-          "lua_name": "Array:neg",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 300
-        },
-        {
-          "lua_name": "Array:any",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 414
-        },
-        {
-          "lua_name": "Array:all",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 419
-        },
-        {
-          "lua_name": "Array:sum",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 426
-        },
-        {
-          "lua_name": "Array:min",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 458
-        },
-        {
-          "lua_name": "Array:max",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 474
-        },
-        {
-          "lua_name": "Array:dot",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 500
-        },
-        {
-          "lua_name": "Array:map",
-          "kind": "method",
-          "file": "src/lua_api/compute_api.rs",
-          "line": 881
+          "line": 855
         }
       ],
       "test_files": [
         "tests/lua/evidence/test_render_evidence.lua",
         "tests/lua/integration/test_compute_dataframe.lua",
         "tests/lua/security/test_render.lua",
-        "tests/lua/stress/test_compute_stress.lua"
+        "tests/lua/stress/test_compute_stress.lua",
+        "tests/lua/unit/test_compute_unit.lua"
       ]
     },
     "data": {
-      "total": 57,
-      "marker_covered": 7,
-      "heuristic_covered": 47,
-      "covered": 54,
-      "coverage_pct": 94.7,
-      "uncovered": [
-        {
-          "lua_name": "RingBuffer:pop",
-          "kind": "method",
-          "file": "src/lua_api/data_api.rs",
-          "line": 131
-        },
-        {
-          "lua_name": "RingBuffer:len",
-          "kind": "method",
-          "file": "src/lua_api/data_api.rs",
-          "line": 159
-        },
-        {
-          "lua_name": "DataWriter:len",
-          "kind": "method",
-          "file": "src/lua_api/data_api.rs",
-          "line": 852
-        }
-      ],
+      "total": 61,
+      "marker_covered": 10,
+      "heuristic_covered": 51,
+      "covered": 61,
+      "coverage_pct": 100.0,
+      "uncovered": [],
       "test_files": [
         "tests/lua/evidence/test_render_evidence.lua",
         "tests/lua/integration/test_compute_dataframe.lua",
@@ -250,15 +170,16 @@
         "tests/lua/security/test_render.lua",
         "tests/lua/security/test_runtime.lua",
         "tests/lua/stress/test_data_stress.lua",
-        "tests/lua/stress/test_serial_stress.lua"
+        "tests/lua/stress/test_serial_stress.lua",
+        "tests/lua/unit/test_data_unit.lua"
       ]
     },
     "dataframe": {
-      "total": 88,
-      "marker_covered": 6,
-      "heuristic_covered": 80,
-      "covered": 86,
-      "coverage_pct": 97.7,
+      "total": 116,
+      "marker_covered": 7,
+      "heuristic_covered": 105,
+      "covered": 112,
+      "coverage_pct": 96.6,
       "uncovered": [
         {
           "lua_name": "DataFrame:min",
@@ -271,6 +192,18 @@
           "kind": "method",
           "file": "src/lua_api/dataframe_api.rs",
           "line": 551
+        },
+        {
+          "lua_name": "DataFrame:withRollingMin",
+          "kind": "method",
+          "file": "src/lua_api/dataframe_api.rs",
+          "line": 737
+        },
+        {
+          "lua_name": "DataFrame:withRollingMax",
+          "kind": "method",
+          "file": "src/lua_api/dataframe_api.rs",
+          "line": 754
         }
       ],
       "test_files": [
@@ -293,26 +226,14 @@
     },
     "devtools": {
       "total": 48,
-      "marker_covered": 31,
+      "marker_covered": 33,
       "heuristic_covered": 15,
-      "covered": 46,
-      "coverage_pct": 95.8,
-      "uncovered": [
-        {
-          "lua_name": "lurek.devtools.log",
-          "kind": "function",
-          "file": "src/lua_api/devtools_api.rs",
-          "line": 170
-        },
-        {
-          "lua_name": "ReplConsole:len",
-          "kind": "method",
-          "file": "src/lua_api/devtools_api.rs",
-          "line": 918
-        }
-      ],
+      "covered": 48,
+      "coverage_pct": 100.0,
+      "uncovered": [],
       "test_files": [
-        "tests/lua/integration/test_devtools.lua"
+        "tests/lua/integration/test_devtools.lua",
+        "tests/lua/unit/test_devtools_unit.lua"
       ]
     },
     "docs": {
@@ -327,11 +248,11 @@
       ]
     },
     "ecs": {
-      "total": 47,
-      "marker_covered": 6,
-      "heuristic_covered": 40,
-      "covered": 46,
-      "coverage_pct": 97.9,
+      "total": 61,
+      "marker_covered": 7,
+      "heuristic_covered": 53,
+      "covered": 60,
+      "coverage_pct": 98.4,
       "uncovered": [
         {
           "lua_name": "Universe:has",
@@ -359,11 +280,11 @@
       ]
     },
     "effect": {
-      "total": 145,
-      "marker_covered": 5,
-      "heuristic_covered": 138,
-      "covered": 143,
-      "coverage_pct": 98.6,
+      "total": 158,
+      "marker_covered": 7,
+      "heuristic_covered": 148,
+      "covered": 155,
+      "coverage_pct": 98.1,
       "uncovered": [
         {
           "lua_name": "PostFxStack:add",
@@ -376,6 +297,12 @@
           "kind": "method",
           "file": "src/lua_api/effect_api.rs",
           "line": 398
+        },
+        {
+          "lua_name": "Overlay:triggerShake",
+          "kind": "method",
+          "file": "src/lua_api/effect_api.rs",
+          "line": 743
         }
       ],
       "test_files": [
@@ -384,25 +311,20 @@
     },
     "engine": {
       "total": 10,
-      "marker_covered": 0,
+      "marker_covered": 1,
       "heuristic_covered": 9,
-      "covered": 9,
-      "coverage_pct": 90.0,
-      "uncovered": [
-        {
-          "lua_name": "lurek.engine.fps",
-          "kind": "function",
-          "file": "src/lua_api/engine_api.rs",
-          "line": 83
-        }
-      ],
-      "test_files": []
+      "covered": 10,
+      "coverage_pct": 100.0,
+      "uncovered": [],
+      "test_files": [
+        "tests/lua/unit/test_engine_unit.lua"
+      ]
     },
     "event": {
-      "total": 22,
-      "marker_covered": 3,
-      "heuristic_covered": 19,
-      "covered": 22,
+      "total": 26,
+      "marker_covered": 4,
+      "heuristic_covered": 22,
+      "covered": 26,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
@@ -426,51 +348,34 @@
       ]
     },
     "globe": {
-      "total": 44,
-      "marker_covered": 0,
-      "heuristic_covered": 40,
-      "covered": 40,
-      "coverage_pct": 90.9,
-      "uncovered": [
-        {
-          "lua_name": "lurek.globe.new",
-          "kind": "function",
-          "file": "src/lua_api/globe_api.rs",
-          "line": 718
-        },
-        {
-          "lua_name": "lurek.globe.get",
-          "kind": "function",
-          "file": "src/lua_api/globe_api.rs",
-          "line": 744
-        },
-        {
-          "lua_name": "Globe:pan",
-          "kind": "method",
-          "file": "src/lua_api/globe_api.rs",
-          "line": 171
-        },
-        {
-          "lua_name": "GlobeRegistry:get",
-          "kind": "method",
-          "file": "src/lua_api/globe_api.rs",
-          "line": 624
-        }
-      ],
-      "test_files": []
+      "total": 53,
+      "marker_covered": 5,
+      "heuristic_covered": 48,
+      "covered": 53,
+      "coverage_pct": 100.0,
+      "uncovered": [],
+      "test_files": [
+        "tests/lua/unit/test_globe_unit.lua"
+      ]
     },
     "graph": {
-      "total": 111,
-      "marker_covered": 3,
-      "heuristic_covered": 107,
-      "covered": 110,
-      "coverage_pct": 99.1,
+      "total": 126,
+      "marker_covered": 8,
+      "heuristic_covered": 116,
+      "covered": 124,
+      "coverage_pct": 98.4,
       "uncovered": [
         {
           "lua_name": "Graph:mst",
           "kind": "method",
           "file": "src/lua_api/graph_api.rs",
           "line": 1590
+        },
+        {
+          "lua_name": "Graph:on",
+          "kind": "method",
+          "file": "src/lua_api/graph_api.rs",
+          "line": 1688
         }
       ],
       "test_files": [
@@ -496,15 +401,17 @@
       "test_files": []
     },
     "image": {
-      "total": 68,
-      "marker_covered": 2,
-      "heuristic_covered": 66,
-      "covered": 68,
+      "total": 80,
+      "marker_covered": 12,
+      "heuristic_covered": 68,
+      "covered": 80,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
         "tests/lua/evidence/test_effect_evidence.lua",
         "tests/lua/evidence/test_image_evidence.lua",
+        "tests/lua/evidence/test_imagedata_evidence.lua",
+        "tests/lua/evidence/test_layers_evidence.lua",
         "tests/lua/evidence/test_light_evidence.lua",
         "tests/lua/evidence/test_math_evidence.lua",
         "tests/lua/evidence/test_minimap_evidence.lua",
@@ -522,19 +429,19 @@
       ]
     },
     "input": {
-      "total": 80,
+      "total": 81,
       "marker_covered": 0,
-      "heuristic_covered": 80,
-      "covered": 80,
+      "heuristic_covered": 81,
+      "covered": 81,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": []
     },
     "light": {
-      "total": 83,
+      "total": 86,
       "marker_covered": 1,
-      "heuristic_covered": 82,
-      "covered": 83,
+      "heuristic_covered": 85,
+      "covered": 86,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
@@ -553,123 +460,37 @@
       "test_files": []
     },
     "math": {
-      "total": 204,
-      "marker_covered": 23,
-      "heuristic_covered": 163,
-      "covered": 186,
-      "coverage_pct": 91.2,
+      "total": 223,
+      "marker_covered": 65,
+      "heuristic_covered": 155,
+      "covered": 220,
+      "coverage_pct": 98.7,
       "uncovered": [
         {
-          "lua_name": "lurek.math.fbm",
-          "kind": "function",
-          "file": "src/lua_api/math_api.rs",
-          "line": 1763
-        },
-        {
-          "lua_name": "lurek.math.rad",
-          "kind": "function",
-          "file": "src/lua_api/math_api.rs",
-          "line": 2423
-        },
-        {
-          "lua_name": "lurek.math.deg",
-          "kind": "function",
-          "file": "src/lua_api/math_api.rs",
-          "line": 2432
-        },
-        {
-          "lua_name": "lurek.math.tan",
-          "kind": "function",
-          "file": "src/lua_api/math_api.rs",
-          "line": 2453
-        },
-        {
-          "lua_name": "lurek.math.exp",
-          "kind": "function",
-          "file": "src/lua_api/math_api.rs",
-          "line": 2526
-        },
-        {
-          "lua_name": "lurek.math.log",
-          "kind": "function",
-          "file": "src/lua_api/math_api.rs",
-          "line": 2533
-        },
-        {
-          "lua_name": "lurek.math.pow",
-          "kind": "function",
-          "file": "src/lua_api/math_api.rs",
-          "line": 2548
-        },
-        {
-          "lua_name": "Vec2:dot",
+          "lua_name": "NoiseGenerator:worley3d",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 65
+          "line": 1203
         },
         {
-          "lua_name": "Vec2:x",
+          "lua_name": "NoiseGenerator:warpDomain",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 78
+          "line": 1328
         },
         {
-          "lua_name": "Vec2:y",
+          "lua_name": "NoiseGenerator:generateMap",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 83
-        },
-        {
-          "lua_name": "Vec3:dot",
-          "kind": "method",
-          "file": "src/lua_api/math_api.rs",
-          "line": 285
-        },
-        {
-          "lua_name": "Vec3:add",
-          "kind": "method",
-          "file": "src/lua_api/math_api.rs",
-          "line": 329
-        },
-        {
-          "lua_name": "Vec3:sub",
-          "kind": "method",
-          "file": "src/lua_api/math_api.rs",
-          "line": 341
-        },
-        {
-          "lua_name": "CatmullRom:len",
-          "kind": "method",
-          "file": "src/lua_api/math_api.rs",
-          "line": 404
-        },
-        {
-          "lua_name": "Tween:set",
-          "kind": "method",
-          "file": "src/lua_api/math_api.rs",
-          "line": 935
-        },
-        {
-          "lua_name": "Circle:x",
-          "kind": "method",
-          "file": "src/lua_api/math_api.rs",
-          "line": 1444
-        },
-        {
-          "lua_name": "Circle:y",
-          "kind": "method",
-          "file": "src/lua_api/math_api.rs",
-          "line": 1449
-        },
-        {
-          "lua_name": "AabbTree:len",
-          "kind": "method",
-          "file": "src/lua_api/math_api.rs",
-          "line": 1554
+          "line": 1339
         }
       ],
       "test_files": [
+        "tests/lua/evidence/test_bezier_evidence.lua",
+        "tests/lua/evidence/test_easing_evidence.lua",
+        "tests/lua/evidence/test_geometry_evidence.lua",
         "tests/lua/evidence/test_math_evidence.lua",
+        "tests/lua/evidence/test_noise_evidence.lua",
         "tests/lua/evidence/test_render_evidence.lua",
         "tests/lua/evidence/test_tween_evidence.lua",
         "tests/lua/integration/test_math_physics.lua",
@@ -678,14 +499,15 @@
         "tests/lua/security/test_render.lua",
         "tests/lua/stress/test_data_stress.lua",
         "tests/lua/stress/test_math_stress.lua",
-        "tests/lua/stress/test_tween_stress.lua"
+        "tests/lua/stress/test_tween_stress.lua",
+        "tests/lua/unit/test_math_unit.lua"
       ]
     },
     "minimap": {
-      "total": 56,
-      "marker_covered": 5,
-      "heuristic_covered": 51,
-      "covered": 56,
+      "total": 76,
+      "marker_covered": 7,
+      "heuristic_covered": 69,
+      "covered": 76,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
@@ -694,11 +516,11 @@
       ]
     },
     "mods": {
-      "total": 46,
+      "total": 47,
       "marker_covered": 0,
-      "heuristic_covered": 45,
-      "covered": 45,
-      "coverage_pct": 97.8,
+      "heuristic_covered": 46,
+      "covered": 46,
+      "coverage_pct": 97.9,
       "uncovered": [
         {
           "lua_name": "ContentRegistry:get",
@@ -710,19 +532,21 @@
       "test_files": []
     },
     "network": {
-      "total": 38,
-      "marker_covered": 0,
-      "heuristic_covered": 38,
-      "covered": 38,
+      "total": 47,
+      "marker_covered": 2,
+      "heuristic_covered": 45,
+      "covered": 47,
       "coverage_pct": 100.0,
       "uncovered": [],
-      "test_files": []
+      "test_files": [
+        "tests/lua/unit/test_network_unit.lua"
+      ]
     },
     "parallax": {
-      "total": 43,
+      "total": 44,
       "marker_covered": 2,
-      "heuristic_covered": 41,
-      "covered": 43,
+      "heuristic_covered": 42,
+      "covered": 44,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
@@ -730,12 +554,25 @@
       ]
     },
     "particle": {
-      "total": 89,
-      "marker_covered": 13,
-      "heuristic_covered": 76,
-      "covered": 89,
-      "coverage_pct": 100.0,
-      "uncovered": [],
+      "total": 98,
+      "marker_covered": 14,
+      "heuristic_covered": 82,
+      "covered": 96,
+      "coverage_pct": 98.0,
+      "uncovered": [
+        {
+          "lua_name": "Trail:setHeadColor",
+          "kind": "method",
+          "file": "src/lua_api/particle_api.rs",
+          "line": 1420
+        },
+        {
+          "lua_name": "Trail:setTailColor",
+          "kind": "method",
+          "file": "src/lua_api/particle_api.rs",
+          "line": 1436
+        }
+      ],
       "test_files": [
         "tests/lua/evidence/test_particle_evidence.lua",
         "tests/lua/evidence/test_render_evidence.lua",
@@ -743,12 +580,19 @@
       ]
     },
     "pathfind": {
-      "total": 65,
-      "marker_covered": 5,
-      "heuristic_covered": 60,
-      "covered": 65,
-      "coverage_pct": 100.0,
-      "uncovered": [],
+      "total": 90,
+      "marker_covered": 8,
+      "heuristic_covered": 81,
+      "covered": 89,
+      "coverage_pct": 98.9,
+      "uncovered": [
+        {
+          "lua_name": "FlowField:calculateMulti",
+          "kind": "method",
+          "file": "src/lua_api/pathfind_api.rs",
+          "line": 604
+        }
+      ],
       "test_files": [
         "tests/lua/evidence/test_pathfind_evidence.lua",
         "tests/lua/evidence/test_render_evidence.lua",
@@ -761,131 +605,11 @@
     },
     "patterns": {
       "total": 170,
-      "marker_covered": 2,
+      "marker_covered": 22,
       "heuristic_covered": 140,
-      "covered": 142,
-      "coverage_pct": 83.5,
+      "covered": 162,
+      "coverage_pct": 95.3,
       "uncovered": [
-        {
-          "lua_name": "EventBus:on",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 45
-        },
-        {
-          "lua_name": "EventBus:off",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 57
-        },
-        {
-          "lua_name": "ObjectPool:add",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 173
-        },
-        {
-          "lua_name": "ServiceLocator:has",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 470
-        },
-        {
-          "lua_name": "Factory:has",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 574
-        },
-        {
-          "lua_name": "Blackboard:set",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 810
-        },
-        {
-          "lua_name": "Blackboard:get",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 846
-        },
-        {
-          "lua_name": "Blackboard:has",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 859
-        },
-        {
-          "lua_name": "Observer:set",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 972
-        },
-        {
-          "lua_name": "Observer:get",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 993
-        },
-        {
-          "lua_name": "PriorityQueue:pop",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1217
-        },
-        {
-          "lua_name": "PriorityQueue:len",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1253
-        },
-        {
-          "lua_name": "Ring:sum",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1343
-        },
-        {
-          "lua_name": "Ring:len",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1353
-        },
-        {
-          "lua_name": "Mediator:on",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1614
-        },
-        {
-          "lua_name": "Mediator:off",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1626
-        },
-        {
-          "lua_name": "Strategy:set",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1760
-        },
-        {
-          "lua_name": "Strategy:has",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1791
-        },
-        {
-          "lua_name": "Stack:pop",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1877
-        },
-        {
-          "lua_name": "Stack:len",
-          "kind": "method",
-          "file": "src/lua_api/patterns_api.rs",
-          "line": 1902
-        },
         {
           "lua_name": "Queue:len",
           "kind": "method",
@@ -936,16 +660,42 @@
         }
       ],
       "test_files": [
-        "tests/lua/stress/test_patterns_stress.lua"
+        "tests/lua/stress/test_patterns_stress.lua",
+        "tests/lua/unit/test_patterns_unit.lua"
       ]
     },
     "physics": {
-      "total": 151,
-      "marker_covered": 17,
-      "heuristic_covered": 134,
-      "covered": 151,
-      "coverage_pct": 100.0,
-      "uncovered": [],
+      "total": 193,
+      "marker_covered": 29,
+      "heuristic_covered": 160,
+      "covered": 189,
+      "coverage_pct": 97.9,
+      "uncovered": [
+        {
+          "lua_name": "World:setJointMotorSpeed",
+          "kind": "method",
+          "file": "src/lua_api/physics_api.rs",
+          "line": 690
+        },
+        {
+          "lua_name": "World:setJointLimitsEnabled",
+          "kind": "method",
+          "file": "src/lua_api/physics_api.rs",
+          "line": 711
+        },
+        {
+          "lua_name": "World:setJointLimits",
+          "kind": "method",
+          "file": "src/lua_api/physics_api.rs",
+          "line": 727
+        },
+        {
+          "lua_name": "World:setMouseJointTarget",
+          "kind": "method",
+          "file": "src/lua_api/physics_api.rs",
+          "line": 749
+        }
+      ],
       "test_files": [
         "tests/lua/evidence/test_physics_evidence.lua",
         "tests/lua/evidence/test_render_evidence.lua",
@@ -960,21 +710,28 @@
         "tests/lua/integration/test_physics_worms.lua",
         "tests/lua/integration/test_tilemap_physics.lua",
         "tests/lua/security/test_render.lua",
-        "tests/lua/stress/test_physics_stress.lua"
+        "tests/lua/stress/test_physics_stress.lua",
+        "tests/lua/unit/test_physics_unit.lua"
       ]
     },
     "pipeline": {
-      "total": 60,
+      "total": 62,
       "marker_covered": 0,
-      "heuristic_covered": 59,
-      "covered": 59,
-      "coverage_pct": 98.3,
+      "heuristic_covered": 60,
+      "covered": 60,
+      "coverage_pct": 96.8,
       "uncovered": [
         {
           "lua_name": "Pipeline:run",
           "kind": "method",
           "file": "src/lua_api/pipeline_api.rs",
           "line": 762
+        },
+        {
+          "lua_name": "Pipeline:addSubPipeline",
+          "kind": "method",
+          "file": "src/lua_api/pipeline_api.rs",
+          "line": 1212
         }
       ],
       "test_files": []
@@ -987,41 +744,55 @@
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
+        "tests/lua/evidence/test_cellular_sand_evidence.lua",
         "tests/lua/evidence/test_procgen_evidence.lua",
         "tests/lua/evidence/test_render_evidence.lua"
       ]
     },
     "raycaster": {
-      "total": 42,
-      "marker_covered": 4,
-      "heuristic_covered": 36,
-      "covered": 40,
-      "coverage_pct": 95.2,
+      "total": 59,
+      "marker_covered": 13,
+      "heuristic_covered": 42,
+      "covered": 55,
+      "coverage_pct": 93.2,
       "uncovered": [
         {
-          "lua_name": "PointLight:x",
+          "lua_name": "Raycaster:drawView",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 213
+          "line": 554
         },
         {
-          "lua_name": "PointLight:y",
+          "lua_name": "Raycaster:drawDepthMap",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 216
+          "line": 575
+        },
+        {
+          "lua_name": "Raycaster:drawLineOfSight",
+          "kind": "method",
+          "file": "src/lua_api/raycaster_api.rs",
+          "line": 604
+        },
+        {
+          "lua_name": "Raycaster:drawCameraSweep",
+          "kind": "method",
+          "file": "src/lua_api/raycaster_api.rs",
+          "line": 624
         }
       ],
       "test_files": [
         "tests/lua/evidence/test_raycaster_evidence.lua",
-        "tests/lua/evidence/test_render_evidence.lua"
+        "tests/lua/evidence/test_render_evidence.lua",
+        "tests/lua/unit/test_raycaster_unit.lua"
       ]
     },
     "render": {
-      "total": 183,
+      "total": 197,
       "marker_covered": 13,
-      "heuristic_covered": 168,
-      "covered": 181,
-      "coverage_pct": 98.9,
+      "heuristic_covered": 180,
+      "covered": 193,
+      "coverage_pct": 98.0,
       "uncovered": [
         {
           "lua_name": "lurek.render.arc",
@@ -1034,6 +805,18 @@
           "kind": "function",
           "file": "src/lua_api/render_api.rs",
           "line": 2871
+        },
+        {
+          "lua_name": "SpriteBatch:add",
+          "kind": "method",
+          "file": "src/lua_api/render_api.rs",
+          "line": 517
+        },
+        {
+          "lua_name": "Shape:arc",
+          "kind": "method",
+          "file": "src/lua_api/render_api.rs",
+          "line": 1225
         }
       ],
       "test_files": [
@@ -1048,10 +831,10 @@
       ]
     },
     "save": {
-      "total": 22,
-      "marker_covered": 4,
-      "heuristic_covered": 18,
-      "covered": 22,
+      "total": 26,
+      "marker_covered": 5,
+      "heuristic_covered": 21,
+      "covered": 26,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
@@ -1064,36 +847,18 @@
     },
     "scene": {
       "total": 53,
-      "marker_covered": 2,
+      "marker_covered": 5,
       "heuristic_covered": 48,
-      "covered": 50,
-      "coverage_pct": 94.3,
-      "uncovered": [
-        {
-          "lua_name": "lurek.scene.pop",
-          "kind": "function",
-          "file": "src/lua_api/scene_api.rs",
-          "line": 252
-        },
-        {
-          "lua_name": "lurek.scene.new",
-          "kind": "function",
-          "file": "src/lua_api/scene_api.rs",
-          "line": 764
-        },
-        {
-          "lua_name": "DepthSorter:add",
-          "kind": "method",
-          "file": "src/lua_api/scene_api.rs",
-          "line": 68
-        }
-      ],
+      "covered": 53,
+      "coverage_pct": 100.0,
+      "uncovered": [],
       "test_files": [
         "tests/lua/evidence/test_scene_evidence.lua",
         "tests/lua/integration/test_ai_ecs_scene.lua",
         "tests/lua/integration/test_save_ecs_scene.lua",
         "tests/lua/integration/test_scene_ecs.lua",
-        "tests/lua/stress/test_scene_stress.lua"
+        "tests/lua/stress/test_scene_stress.lua",
+        "tests/lua/unit/test_scene_unit.lua"
       ]
     },
     "serial": {
@@ -1109,46 +874,51 @@
       ]
     },
     "spine": {
-      "total": 20,
-      "marker_covered": 5,
-      "heuristic_covered": 15,
-      "covered": 20,
+      "total": 30,
+      "marker_covered": 10,
+      "heuristic_covered": 20,
+      "covered": 30,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
-        "tests/lua/evidence/test_spine_evidence.lua"
+        "tests/lua/evidence/test_spine_evidence.lua",
+        "tests/lua/unit/test_spine_unit.lua"
       ]
     },
     "sprite": {
-      "total": 18,
+      "total": 20,
       "marker_covered": 0,
-      "heuristic_covered": 18,
-      "covered": 18,
+      "heuristic_covered": 20,
+      "covered": 20,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": []
     },
     "system": {
       "total": 26,
-      "marker_covered": 0,
-      "heuristic_covered": 25,
+      "marker_covered": 5,
+      "heuristic_covered": 20,
       "covered": 25,
       "coverage_pct": 96.2,
       "uncovered": [
         {
-          "lua_name": "lurek.system.log",
+          "lua_name": "lurek.runtime.log",
           "kind": "function",
           "file": "src/lua_api/system_api.rs",
           "line": 382
         }
       ],
-      "test_files": []
+      "test_files": [
+        "tests/lua/config/test_config.lua",
+        "tests/lua/integration/test_data_system.lua",
+        "tests/lua/integration/test_runtime_system.lua"
+      ]
     },
     "terminal": {
-      "total": 82,
+      "total": 84,
       "marker_covered": 0,
-      "heuristic_covered": 80,
-      "covered": 80,
+      "heuristic_covered": 82,
+      "covered": 82,
       "coverage_pct": 97.6,
       "uncovered": [
         {
@@ -1186,12 +956,25 @@
       ]
     },
     "tilemap": {
-      "total": 138,
-      "marker_covered": 11,
-      "heuristic_covered": 127,
-      "covered": 138,
-      "coverage_pct": 100.0,
-      "uncovered": [],
+      "total": 168,
+      "marker_covered": 12,
+      "heuristic_covered": 154,
+      "covered": 166,
+      "coverage_pct": 98.8,
+      "uncovered": [
+        {
+          "lua_name": "ChunkMap:getChunksInView",
+          "kind": "method",
+          "file": "src/lua_api/tilemap_api.rs",
+          "line": 1150
+        },
+        {
+          "lua_name": "MapBlock:setSide",
+          "kind": "method",
+          "file": "src/lua_api/tilemap_api.rs",
+          "line": 1592
+        }
+      ],
       "test_files": [
         "tests/lua/evidence/test_render_evidence.lua",
         "tests/lua/evidence/test_tilemap_evidence.lua",
@@ -1202,10 +985,10 @@
       ]
     },
     "timer": {
-      "total": 43,
+      "total": 47,
       "marker_covered": 4,
-      "heuristic_covered": 39,
-      "covered": 43,
+      "heuristic_covered": 43,
+      "covered": 47,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
@@ -1219,39 +1002,28 @@
     },
     "tween": {
       "total": 35,
-      "marker_covered": 5,
+      "marker_covered": 7,
       "heuristic_covered": 28,
-      "covered": 33,
-      "coverage_pct": 94.3,
-      "uncovered": [
-        {
-          "lua_name": "lurek.tween.to",
-          "kind": "function",
-          "file": "src/lua_api/tween_api.rs",
-          "line": 386
-        },
-        {
-          "lua_name": "TweenState:t",
-          "kind": "method",
-          "file": "src/lua_api/tween_api.rs",
-          "line": 57
-        }
-      ],
+      "covered": 35,
+      "coverage_pct": 100.0,
+      "uncovered": [],
       "test_files": [
         "tests/lua/integration/test_cardgame_tween_integration.lua",
         "tests/lua/integration/test_tween_animation.lua",
         "tests/lua/integration/test_tween_camera.lua",
-        "tests/lua/integration/test_tween_ecs.lua"
+        "tests/lua/integration/test_tween_ecs.lua",
+        "tests/lua/unit/test_tween_unit.lua"
       ]
     },
     "ui": {
-      "total": 364,
-      "marker_covered": 5,
-      "heuristic_covered": 359,
-      "covered": 364,
+      "total": 371,
+      "marker_covered": 16,
+      "heuristic_covered": 355,
+      "covered": 371,
       "coverage_pct": 100.0,
       "uncovered": [],
       "test_files": [
+        "tests/lua/evidence/test_charts_evidence.lua",
         "tests/lua/evidence/test_ui_evidence.lua"
       ]
     },
@@ -1268,71 +1040,6 @@
     }
   },
   "orphaned_markers": [
-    {
-      "file": "tests/lua/config/test_config.lua",
-      "line": 4,
-      "marker": "lurek.runtime.getOS"
-    },
-    {
-      "file": "tests/lua/config/test_config.lua",
-      "line": 5,
-      "marker": "lurek.runtime.getVersion"
-    },
-    {
-      "file": "tests/lua/config/test_config.lua",
-      "line": 81,
-      "marker": "lurek.runtime.getVersion"
-    },
-    {
-      "file": "tests/lua/config/test_config.lua",
-      "line": 89,
-      "marker": "lurek.runtime.getOS"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 54,
-      "marker": "Animator:addClipFromGrid"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 55,
-      "marker": "Animator:play"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 56,
-      "marker": "Animator:update"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 57,
-      "marker": "Animator:getQuad"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 59,
-      "marker": "Animator:pollEvents"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 123,
-      "marker": "Animator:addClip"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 124,
-      "marker": "Animator:setSpeed"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 125,
-      "marker": "Animator:update"
-    },
-    {
-      "file": "tests/lua/evidence/test_animation_evidence.lua",
-      "line": 126,
-      "marker": "Animator:getQuad"
-    },
     {
       "file": "tests/lua/evidence/test_audio_evidence.lua",
       "line": 10,
@@ -1550,11 +1257,6 @@
     },
     {
       "file": "tests/lua/evidence/test_camera_evidence.lua",
-      "line": 65,
-      "marker": "lurek.camera.newCamera"
-    },
-    {
-      "file": "tests/lua/evidence/test_camera_evidence.lua",
       "line": 66,
       "marker": "Camera:getZoom"
     },
@@ -1590,11 +1292,6 @@
     },
     {
       "file": "tests/lua/evidence/test_camera_evidence.lua",
-      "line": 116,
-      "marker": "lurek.camera.newCamera"
-    },
-    {
-      "file": "tests/lua/evidence/test_camera_evidence.lua",
       "line": 117,
       "marker": "Camera:getRotation"
     },
@@ -1620,11 +1317,6 @@
     },
     {
       "file": "tests/lua/evidence/test_camera_evidence.lua",
-      "line": 142,
-      "marker": "lurek.camera.newCamera"
-    },
-    {
-      "file": "tests/lua/evidence/test_camera_evidence.lua",
       "line": 143,
       "marker": "Camera:setBounds"
     },
@@ -1644,24 +1336,29 @@
       "marker": "Camera:getPosition"
     },
     {
-      "file": "tests/lua/evidence/test_camera_evidence.lua",
-      "line": 182,
-      "marker": "lurek.camera.newCamera"
+      "file": "tests/lua/evidence/test_charts_evidence.lua",
+      "line": 11,
+      "marker": "lurek.ui.newLineChart"
     },
     {
-      "file": "tests/lua/evidence/test_effect_evidence.lua",
-      "line": 31,
-      "marker": "Overlay:triggerFlash"
+      "file": "tests/lua/evidence/test_charts_evidence.lua",
+      "line": 35,
+      "marker": "lurek.ui.newBarChart"
     },
     {
-      "file": "tests/lua/evidence/test_effect_evidence.lua",
-      "line": 62,
-      "marker": "Overlay:triggerFade"
+      "file": "tests/lua/evidence/test_charts_evidence.lua",
+      "line": 58,
+      "marker": "lurek.ui.newScatterPlot"
     },
     {
-      "file": "tests/lua/evidence/test_effect_evidence.lua",
-      "line": 92,
-      "marker": "Overlay:triggerFlash"
+      "file": "tests/lua/evidence/test_charts_evidence.lua",
+      "line": 85,
+      "marker": "lurek.ui.newPieChart"
+    },
+    {
+      "file": "tests/lua/evidence/test_charts_evidence.lua",
+      "line": 105,
+      "marker": "lurek.ui.newAreaChart"
     },
     {
       "file": "tests/lua/evidence/test_effect_evidence.lua",
@@ -1760,21 +1457,6 @@
     },
     {
       "file": "tests/lua/evidence/test_effect_evidence.lua",
-      "line": 386,
-      "marker": "Overlay:triggerFlash"
-    },
-    {
-      "file": "tests/lua/evidence/test_effect_evidence.lua",
-      "line": 417,
-      "marker": "Overlay:triggerFade"
-    },
-    {
-      "file": "tests/lua/evidence/test_effect_evidence.lua",
-      "line": 447,
-      "marker": "Overlay:triggerFlash"
-    },
-    {
-      "file": "tests/lua/evidence/test_effect_evidence.lua",
       "line": 526,
       "marker": "ImageData:grayscale"
     },
@@ -1869,24 +1551,34 @@
       "marker": "ImageData:flipHorizontal"
     },
     {
-      "file": "tests/lua/evidence/test_graph_evidence.lua",
-      "line": 77,
-      "marker": "Graph:findPath"
+      "file": "tests/lua/evidence/test_gui_evidence.lua",
+      "line": 11,
+      "marker": "lurek.ui.loadLayout"
     },
     {
-      "file": "tests/lua/evidence/test_graph_evidence.lua",
-      "line": 80,
-      "marker": "Graph:addNode"
+      "file": "tests/lua/evidence/test_gui_evidence.lua",
+      "line": 12,
+      "marker": "lurek.ui.renderToImage"
     },
     {
-      "file": "tests/lua/evidence/test_graph_evidence.lua",
-      "line": 81,
-      "marker": "Graph:addEdge"
+      "file": "tests/lua/evidence/test_gui_evidence.lua",
+      "line": 32,
+      "marker": "lurek.ui.loadLayout"
     },
     {
-      "file": "tests/lua/evidence/test_graph_evidence.lua",
-      "line": 110,
-      "marker": "Graph:findPath"
+      "file": "tests/lua/evidence/test_gui_evidence.lua",
+      "line": 33,
+      "marker": "lurek.ui.renderToImage"
+    },
+    {
+      "file": "tests/lua/evidence/test_gui_evidence.lua",
+      "line": 66,
+      "marker": "lurek.ui.loadLayout"
+    },
+    {
+      "file": "tests/lua/evidence/test_gui_evidence.lua",
+      "line": 67,
+      "marker": "lurek.ui.renderToImage"
     },
     {
       "file": "tests/lua/evidence/test_image_evidence.lua",
@@ -2479,6 +2171,66 @@
       "marker": "ImageData:sharpen"
     },
     {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 12,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 13,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 14,
+      "marker": "ImageData:getPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 42,
+      "marker": "ImageData:drawRect"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 43,
+      "marker": "ImageData:drawCircle"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 44,
+      "marker": "ImageData:drawLine"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 61,
+      "marker": "ImageData:blur"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 62,
+      "marker": "ImageData:brightness"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 63,
+      "marker": "ImageData:contrast"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 64,
+      "marker": "ImageData:grayscale"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 97,
+      "marker": "ImageData:getDimensions"
+    },
+    {
+      "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+      "line": 98,
+      "marker": "ImageData:crop"
+    },
+    {
       "file": "tests/lua/evidence/test_light_evidence.lua",
       "line": 10,
       "marker": "LightSource:setColor"
@@ -2560,483 +2312,408 @@
     },
     {
       "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 64,
+      "line": 5,
+      "marker": "lurek.math.newVec2"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 39,
+      "marker": "lurek.math.newVec2"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 63,
+      "marker": "lurek.math.randomSeed"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 111,
       "marker": "ImageData:fill"
     },
     {
       "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 77,
+      "line": 124,
       "marker": "ImageData:fill"
     },
     {
       "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 78,
+      "line": 125,
       "marker": "ImageData:setPixel"
     },
     {
       "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 97,
+      "line": 144,
       "marker": "ImageData:fill"
     },
     {
       "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 98,
+      "line": 145,
       "marker": "ImageData:drawLine"
     },
     {
       "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 99,
+      "line": 146,
       "marker": "ImageData:drawRect"
     },
     {
       "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 100,
-      "marker": "ImageData:drawCircle"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 132,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 133,
-      "marker": "ImageData:drawCircle"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 134,
-      "marker": "ImageData:paste"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 152,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 153,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 154,
-      "marker": "ImageData:noise"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 169,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 170,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 171,
-      "marker": "ImageData:flipHorizontal"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 189,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 190,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 191,
-      "marker": "ImageData:flipVertical"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 211,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 212,
-      "marker": "ImageData:rotate90cw"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 226,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 227,
-      "marker": "ImageData:drawRect"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 228,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 243,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 244,
-      "marker": "ImageData:drawCircle"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 245,
-      "marker": "ImageData:resizeNearest"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 260,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 261,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 262,
-      "marker": "ImageData:mapPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 283,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 284,
-      "marker": "ImageData:drawCircle"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 285,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 286,
-      "marker": "ImageData:blur"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 301,
-      "marker": "lurek.math.perlinFast"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 303,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 324,
-      "marker": "lurek.math.simplex"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 326,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 372,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 385,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 386,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 405,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 406,
-      "marker": "ImageData:drawLine"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 407,
-      "marker": "ImageData:drawRect"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 408,
-      "marker": "ImageData:drawCircle"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 440,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 441,
-      "marker": "ImageData:drawCircle"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 442,
-      "marker": "ImageData:paste"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 460,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 461,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 462,
-      "marker": "ImageData:noise"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 477,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 478,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 479,
-      "marker": "ImageData:flipHorizontal"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 497,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 498,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 499,
-      "marker": "ImageData:flipVertical"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 519,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 520,
-      "marker": "ImageData:rotate90cw"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 534,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 535,
-      "marker": "ImageData:drawRect"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 536,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 551,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 552,
-      "marker": "ImageData:drawCircle"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 553,
-      "marker": "ImageData:resizeNearest"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 568,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 569,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 570,
-      "marker": "ImageData:mapPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 591,
-      "marker": "ImageData:fill"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 592,
-      "marker": "ImageData:drawCircle"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 593,
-      "marker": "ImageData:crop"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 594,
-      "marker": "ImageData:blur"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 609,
-      "marker": "lurek.math.perlinFast"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 611,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 632,
-      "marker": "lurek.math.simplex"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 634,
-      "marker": "ImageData:setPixel"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 1327,
-      "marker": "NoiseGenerator:fbm"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 1347,
-      "marker": "NoiseGenerator:worley2d"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 1367,
-      "marker": "NoiseGenerator:ridged"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 1387,
-      "marker": "NoiseGenerator:turbulence"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 1469,
-      "marker": "NoiseGenerator:fbm"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 1489,
-      "marker": "NoiseGenerator:worley2d"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 1509,
-      "marker": "NoiseGenerator:ridged"
-    },
-    {
-      "file": "tests/lua/evidence/test_math_evidence.lua",
-      "line": 1529,
-      "marker": "NoiseGenerator:turbulence"
-    },
-    {
-      "file": "tests/lua/evidence/test_minimap_evidence.lua",
-      "line": 20,
-      "marker": "Minimap:setTerrainColor"
-    },
-    {
-      "file": "tests/lua/evidence/test_minimap_evidence.lua",
-      "line": 21,
-      "marker": "Minimap:setTerrain"
-    },
-    {
-      "file": "tests/lua/evidence/test_minimap_evidence.lua",
-      "line": 77,
-      "marker": "Minimap:setTerrain"
-    },
-    {
-      "file": "tests/lua/evidence/test_minimap_evidence.lua",
       "line": 147,
-      "marker": "Minimap:setTerrainColor"
+      "marker": "ImageData:drawCircle"
     },
     {
-      "file": "tests/lua/evidence/test_minimap_evidence.lua",
-      "line": 148,
-      "marker": "Minimap:setTerrain"
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 179,
+      "marker": "ImageData:fill"
     },
     {
-      "file": "tests/lua/evidence/test_minimap_evidence.lua",
-      "line": 204,
-      "marker": "Minimap:setTerrain"
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 180,
+      "marker": "ImageData:drawCircle"
     },
     {
-      "file": "tests/lua/evidence/test_particle_evidence.lua",
-      "line": 170,
-      "marker": "ParticleSystem:addAttractor"
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 181,
+      "marker": "ImageData:paste"
     },
     {
-      "file": "tests/lua/evidence/test_particle_evidence.lua",
-      "line": 382,
-      "marker": "ParticleSystem:addAttractor"
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 199,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 200,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 201,
+      "marker": "ImageData:noise"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 216,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 217,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 218,
+      "marker": "ImageData:flipHorizontal"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 236,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 237,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 238,
+      "marker": "ImageData:flipVertical"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 258,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 259,
+      "marker": "ImageData:rotate90cw"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 273,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 274,
+      "marker": "ImageData:drawRect"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 275,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 290,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 291,
+      "marker": "ImageData:drawCircle"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 292,
+      "marker": "ImageData:resizeNearest"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 307,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 308,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 309,
+      "marker": "ImageData:mapPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 330,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 331,
+      "marker": "ImageData:drawCircle"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 332,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 333,
+      "marker": "ImageData:blur"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 348,
+      "marker": "lurek.math.perlinFast"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 350,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 371,
+      "marker": "lurek.math.simplex"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 373,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 419,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 432,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 433,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 452,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 453,
+      "marker": "ImageData:drawLine"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 454,
+      "marker": "ImageData:drawRect"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 455,
+      "marker": "ImageData:drawCircle"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 487,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 488,
+      "marker": "ImageData:drawCircle"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 489,
+      "marker": "ImageData:paste"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 507,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 508,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 509,
+      "marker": "ImageData:noise"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 524,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 525,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 526,
+      "marker": "ImageData:flipHorizontal"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 544,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 545,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 546,
+      "marker": "ImageData:flipVertical"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 566,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 567,
+      "marker": "ImageData:rotate90cw"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 581,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 582,
+      "marker": "ImageData:drawRect"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 583,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 598,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 599,
+      "marker": "ImageData:drawCircle"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 600,
+      "marker": "ImageData:resizeNearest"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 615,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 616,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 617,
+      "marker": "ImageData:mapPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 638,
+      "marker": "ImageData:fill"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 639,
+      "marker": "ImageData:drawCircle"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 640,
+      "marker": "ImageData:crop"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 641,
+      "marker": "ImageData:blur"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 656,
+      "marker": "lurek.math.perlinFast"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 658,
+      "marker": "ImageData:setPixel"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 679,
+      "marker": "lurek.math.simplex"
+    },
+    {
+      "file": "tests/lua/evidence/test_math_evidence.lua",
+      "line": 681,
+      "marker": "ImageData:setPixel"
     },
     {
       "file": "tests/lua/evidence/test_pathfind_evidence.lua",
-      "line": 72,
+      "line": 90,
       "marker": "lurek.pathfind.newUnitPathfinder"
     },
     {
       "file": "tests/lua/evidence/test_pathfind_evidence.lua",
-      "line": 97,
+      "line": 115,
       "marker": "lurek.pathfind.newUnitPathfinder"
-    },
-    {
-      "file": "tests/lua/evidence/test_pathfind_evidence.lua",
-      "line": 98,
-      "marker": "UnitPathfinder:findPath"
-    },
-    {
-      "file": "tests/lua/evidence/test_pathfind_evidence.lua",
-      "line": 121,
-      "marker": "FlowField:calculate"
     },
     {
       "file": "tests/lua/evidence/test_physics_evidence.lua",
@@ -3077,11 +2754,6 @@
       "file": "tests/lua/evidence/test_physics_evidence.lua",
       "line": 619,
       "marker": "LuaCellular:toImageData"
-    },
-    {
-      "file": "tests/lua/evidence/test_raycaster_evidence.lua",
-      "line": 13,
-      "marker": "Raycaster:castRaysFlat"
     },
     {
       "file": "tests/lua/evidence/test_render_evidence.lua",
@@ -3290,11 +2962,6 @@
     },
     {
       "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 938,
-      "marker": "TileMap:setTile"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
       "line": 982,
       "marker": "ImageData:fill"
     },
@@ -3470,38 +3137,8 @@
     },
     {
       "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 1454,
-      "marker": "TileMap:setTile"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 1494,
-      "marker": "NavGrid:setBlocked"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
       "line": 1496,
       "marker": "Pathfinder:findPath"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 1555,
-      "marker": "NoiseGenerator:fbm"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 1557,
-      "marker": "Minimap:setTerrain"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 1605,
-      "marker": "NoiseGenerator:fbm"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 1608,
-      "marker": "Raycaster:castRays"
     },
     {
       "file": "tests/lua/evidence/test_render_evidence.lua",
@@ -3512,11 +3149,6 @@
       "file": "tests/lua/evidence/test_render_evidence.lua",
       "line": 1781,
       "marker": "NdArray:sum"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 1796,
-      "marker": "DataFrame:addColumn"
     },
     {
       "file": "tests/lua/evidence/test_render_evidence.lua",
@@ -3542,11 +3174,6 @@
       "file": "tests/lua/evidence/test_render_evidence.lua",
       "line": 1933,
       "marker": "NdArray:sum"
-    },
-    {
-      "file": "tests/lua/evidence/test_render_evidence.lua",
-      "line": 1948,
-      "marker": "DataFrame:addColumn"
     },
     {
       "file": "tests/lua/evidence/test_render_evidence.lua",
@@ -3684,54 +3311,24 @@
       "marker": "ImageData:drawLine"
     },
     {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 10,
-      "marker": "Skeleton:addBone"
-    },
-    {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
+      "file": "tests/lua/evidence/test_shapes_evidence.lua",
       "line": 11,
-      "marker": "Skeleton:addChildBone"
+      "marker": "ImageData:drawRect"
     },
     {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 12,
-      "marker": "Skeleton:addSlot"
+      "file": "tests/lua/evidence/test_shapes_evidence.lua",
+      "line": 51,
+      "marker": "ImageData:drawCircle"
     },
     {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 45,
-      "marker": "Skeleton:addBone"
+      "file": "tests/lua/evidence/test_shapes_evidence.lua",
+      "line": 76,
+      "marker": "ImageData:drawLine"
     },
     {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 46,
-      "marker": "Skeleton:addChildBone"
-    },
-    {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 87,
-      "marker": "Skeleton:addBone"
-    },
-    {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 88,
-      "marker": "Skeleton:addChildBone"
-    },
-    {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 89,
-      "marker": "Skeleton:addSlot"
-    },
-    {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 122,
-      "marker": "Skeleton:addBone"
-    },
-    {
-      "file": "tests/lua/evidence/test_spine_evidence.lua",
-      "line": 123,
-      "marker": "Skeleton:addChildBone"
+      "file": "tests/lua/evidence/test_shapes_evidence.lua",
+      "line": 100,
+      "marker": "ImageData:paste"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -3780,11 +3377,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 176,
-      "marker": "LineChart:addSeries"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 177,
       "marker": "Chart:drawToImage"
     },
@@ -3815,16 +3407,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 197,
-      "marker": "BarChart:addSeries"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 198,
-      "marker": "BarChart:addCategory"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 199,
       "marker": "Chart:drawToImage"
     },
@@ -3832,11 +3414,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 216,
       "marker": "lurek.ui.newScatterPlot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 219,
-      "marker": "ScatterPlot:addSeries"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -3850,11 +3427,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 242,
-      "marker": "PieChart:addSegment"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 243,
       "marker": "Chart:drawToImage"
     },
@@ -3865,11 +3437,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 260,
-      "marker": "AreaChart:addLayer"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 261,
       "marker": "Chart:drawToImage"
     },
@@ -3877,11 +3444,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 292,
       "marker": "lurek.ui.newLineChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 295,
-      "marker": "LineChart:addSeries"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -3915,16 +3477,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 316,
-      "marker": "BarChart:addSeries"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 317,
-      "marker": "BarChart:addCategory"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 318,
       "marker": "Chart:drawToImage"
     },
@@ -3932,11 +3484,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 335,
       "marker": "lurek.ui.newScatterPlot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 338,
-      "marker": "ScatterPlot:addSeries"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -3950,11 +3497,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 361,
-      "marker": "PieChart:addSegment"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 362,
       "marker": "Chart:drawToImage"
     },
@@ -3962,11 +3504,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 377,
       "marker": "lurek.ui.newAreaChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 379,
-      "marker": "AreaChart:addLayer"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -4119,36 +3656,6 @@
       "marker": "lurek.compute.newBuffer"
     },
     {
-      "file": "tests/lua/integration/test_data_system.lua",
-      "line": 11,
-      "marker": "lurek.runtime.getClipboardText"
-    },
-    {
-      "file": "tests/lua/integration/test_data_system.lua",
-      "line": 12,
-      "marker": "lurek.runtime.getOS"
-    },
-    {
-      "file": "tests/lua/integration/test_data_system.lua",
-      "line": 13,
-      "marker": "lurek.runtime.setClipboardText"
-    },
-    {
-      "file": "tests/lua/integration/test_data_system.lua",
-      "line": 85,
-      "marker": "lurek.runtime.getOS"
-    },
-    {
-      "file": "tests/lua/integration/test_data_system.lua",
-      "line": 96,
-      "marker": "lurek.runtime.setClipboardText"
-    },
-    {
-      "file": "tests/lua/integration/test_data_system.lua",
-      "line": 97,
-      "marker": "lurek.runtime.getClipboardText"
-    },
-    {
       "file": "tests/lua/integration/test_devtools.lua",
       "line": 26,
       "marker": "lurek.devtools.info"
@@ -4287,11 +3794,6 @@
       "file": "tests/lua/integration/test_input_camera.lua",
       "line": 7,
       "marker": "lurek.input.getMousePosition"
-    },
-    {
-      "file": "tests/lua/integration/test_input_camera.lua",
-      "line": 8,
-      "marker": "lurek.camera.newCamera"
     },
     {
       "file": "tests/lua/integration/test_input_camera.lua",
@@ -4534,121 +4036,11 @@
       "marker": "lurek.animation.resume"
     },
     {
-      "file": "tests/lua/integration/test_render_camera.lua",
-      "line": 8,
-      "marker": "lurek.camera.newCamera"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 7,
-      "marker": "lurek.runtime.getOS"
-    },
-    {
       "file": "tests/lua/integration/test_runtime_system.lua",
       "line": 8,
       "marker": "lurek.runtime.clipboard"
     },
     {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 9,
-      "marker": "lurek.runtime.getClipboardText"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 10,
-      "marker": "lurek.runtime.getInfo"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 11,
-      "marker": "lurek.runtime.getVersion"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 12,
-      "marker": "lurek.runtime.setClipboardText"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 22,
-      "marker": "lurek.runtime.getOS"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 29,
-      "marker": "lurek.runtime.getOS"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 37,
-      "marker": "lurek.runtime.getOS"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 50,
-      "marker": "lurek.runtime.getVersion"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 57,
-      "marker": "lurek.runtime.getVersion"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 65,
-      "marker": "lurek.runtime.getVersion"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 76,
-      "marker": "lurek.runtime.getInfo"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 83,
-      "marker": "lurek.runtime.getInfo"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 91,
-      "marker": "lurek.runtime.getInfo"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 99,
-      "marker": "lurek.runtime.getInfo"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 100,
-      "marker": "lurek.runtime.getVersion"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 107,
-      "marker": "lurek.runtime.getInfo"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 115,
-      "marker": "lurek.runtime.getInfo"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 146,
-      "marker": "lurek.runtime.setClipboardText"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 153,
-      "marker": "lurek.runtime.getClipboardText"
-    },
-    {
-      "file": "tests/lua/integration/test_runtime_system.lua",
-      "line": 160,
-      "marker": "lurek.runtime.getClipboardText"
-    },
-    {
       "file": "tests/lua/integration/test_save_tilemap.lua",
       "line": 9,
       "marker": "lurek.tilemap.newTilemap"
@@ -4664,11 +4056,6 @@
       "marker": "lurek.tilemap.getTile"
     },
     {
-      "file": "tests/lua/integration/test_scene_camera.lua",
-      "line": 8,
-      "marker": "lurek.camera.newCamera"
-    },
-    {
       "file": "tests/lua/integration/test_tilemap_camera.lua",
       "line": 8,
       "marker": "lurek.tilemap.newTilemap"
@@ -4682,11 +4069,6 @@
       "file": "tests/lua/integration/test_tilemap_camera.lua",
       "line": 10,
       "marker": "lurek.tilemap.getTile"
-    },
-    {
-      "file": "tests/lua/integration/test_tilemap_camera.lua",
-      "line": 11,
-      "marker": "lurek.camera.newCamera"
     },
     {
       "file": "tests/lua/integration/test_tilemap_physics.lua",
@@ -4697,11 +4079,6 @@
       "file": "tests/lua/integration/test_timer_math.lua",
       "line": 8,
       "marker": "lurek.math.pi"
-    },
-    {
-      "file": "tests/lua/integration/test_tween_camera.lua",
-      "line": 9,
-      "marker": "lurek.camera.newCamera"
     },
     {
       "file": "tests/lua/stress/test_ai_stress.lua",
@@ -4750,28 +4127,13 @@
     },
     {
       "file": "tests/lua/stress/test_camera_stress.lua",
-      "line": 6,
-      "marker": "lurek.camera.newCamera"
-    },
-    {
-      "file": "tests/lua/stress/test_camera_stress.lua",
       "line": 7,
       "marker": "Camera:setPosition"
     },
     {
       "file": "tests/lua/stress/test_camera_stress.lua",
-      "line": 21,
-      "marker": "lurek.camera.newCamera"
-    },
-    {
-      "file": "tests/lua/stress/test_camera_stress.lua",
       "line": 22,
       "marker": "Camera:setZoom"
-    },
-    {
-      "file": "tests/lua/stress/test_camera_stress.lua",
-      "line": 36,
-      "marker": "lurek.camera.newCamera"
     },
     {
       "file": "tests/lua/stress/test_camera_stress.lua",
@@ -4854,26 +4216,6 @@
       "marker": "NdArray:mean"
     },
     {
-      "file": "tests/lua/stress/test_dataframe_stress.lua",
-      "line": 7,
-      "marker": "DataFrame:addColumn"
-    },
-    {
-      "file": "tests/lua/stress/test_dataframe_stress.lua",
-      "line": 52,
-      "marker": "DataFrame:addColumn"
-    },
-    {
-      "file": "tests/lua/stress/test_dataframe_stress.lua",
-      "line": 85,
-      "marker": "DataFrame:addColumn"
-    },
-    {
-      "file": "tests/lua/stress/test_ecs_stress.lua",
-      "line": 45,
-      "marker": "Universe:set"
-    },
-    {
       "file": "tests/lua/stress/test_ecs_stress.lua",
       "line": 122,
       "marker": "lurek.ecs.defineBlueprint"
@@ -4905,18 +4247,8 @@
     },
     {
       "file": "tests/lua/stress/test_event_stress.lua",
-      "line": 7,
-      "marker": "Signal:connect"
-    },
-    {
-      "file": "tests/lua/stress/test_event_stress.lua",
       "line": 36,
       "marker": "lurek.event.new"
-    },
-    {
-      "file": "tests/lua/stress/test_event_stress.lua",
-      "line": 37,
-      "marker": "Signal:connect"
     },
     {
       "file": "tests/lua/stress/test_event_stress.lua",
@@ -4927,41 +4259,6 @@
       "file": "tests/lua/stress/test_event_stress.lua",
       "line": 53,
       "marker": "lurek.event.new"
-    },
-    {
-      "file": "tests/lua/stress/test_event_stress.lua",
-      "line": 54,
-      "marker": "Signal:connect"
-    },
-    {
-      "file": "tests/lua/stress/test_graph_stress.lua",
-      "line": 7,
-      "marker": "Graph:addNode"
-    },
-    {
-      "file": "tests/lua/stress/test_graph_stress.lua",
-      "line": 8,
-      "marker": "Graph:addEdge"
-    },
-    {
-      "file": "tests/lua/stress/test_graph_stress.lua",
-      "line": 31,
-      "marker": "Graph:addNode"
-    },
-    {
-      "file": "tests/lua/stress/test_graph_stress.lua",
-      "line": 32,
-      "marker": "Graph:addEdge"
-    },
-    {
-      "file": "tests/lua/stress/test_graph_stress.lua",
-      "line": 71,
-      "marker": "Graph:createItem"
-    },
-    {
-      "file": "tests/lua/stress/test_graph_stress.lua",
-      "line": 72,
-      "marker": "Graph:addItem"
     },
     {
       "file": "tests/lua/stress/test_image_stress.lua",
@@ -5022,51 +4319,6 @@
       "file": "tests/lua/stress/test_particle_stress.lua",
       "line": 30,
       "marker": "lurek.particle.isActive"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 8,
-      "marker": "UnitPathfinder:findPath"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 21,
-      "marker": "NavGrid:setBlocked"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 22,
-      "marker": "UnitPathfinder:findPath"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 40,
-      "marker": "NavGrid:setBlocked"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 41,
-      "marker": "UnitPathfinder:findPath"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 65,
-      "marker": "UnitPathfinder:findPath"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 87,
-      "marker": "NavGrid:setBlocked"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 88,
-      "marker": "UnitPathfinder:findPath"
-    },
-    {
-      "file": "tests/lua/stress/test_pathfind_stress.lua",
-      "line": 122,
-      "marker": "FlowField:calculate"
     },
     {
       "file": "tests/lua/stress/test_patterns_stress.lua",
@@ -5219,16 +4471,6 @@
       "marker": "LuaZone:setGravityZero"
     },
     {
-      "file": "tests/lua/stress/test_save_stress.lua",
-      "line": 7,
-      "marker": "SaveManager:register"
-    },
-    {
-      "file": "tests/lua/stress/test_scene_stress.lua",
-      "line": 25,
-      "marker": "Universe:set"
-    },
-    {
       "file": "tests/lua/stress/test_serial_stress.lua",
       "line": 6,
       "marker": "lurek.serial.base64Encode"
@@ -5262,26 +4504,6 @@
       "file": "tests/lua/stress/test_thread_stress.lua",
       "line": 80,
       "marker": "Channel:tryPop"
-    },
-    {
-      "file": "tests/lua/stress/test_tilemap_stress.lua",
-      "line": 10,
-      "marker": "TileMap:setTile"
-    },
-    {
-      "file": "tests/lua/stress/test_tilemap_stress.lua",
-      "line": 35,
-      "marker": "TileMap:setTile"
-    },
-    {
-      "file": "tests/lua/stress/test_tilemap_stress.lua",
-      "line": 68,
-      "marker": "TileMap:setTile"
-    },
-    {
-      "file": "tests/lua/stress/test_tilemap_stress.lua",
-      "line": 120,
-      "marker": "TileMap:setTile"
     },
     {
       "file": "tests/lua/stress/test_tween_stress.lua",

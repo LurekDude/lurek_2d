@@ -8,6 +8,9 @@
 --
 -- Run: cargo run -- content/examples/effect.lua
 
+-- Capture lurek.render draw API BEFORE any `function lurek.draw()` definition
+-- overwrites the lurek.render slot with the callback function.
+
 -- ── lurek.effect.* functions ──
 
 --@api-stub: lurek.effect.newEffect
@@ -45,7 +48,7 @@ end
 -- Presets are 'retro_tv', 'horror', 'dream', 'neon', 'sepia_age' — saves wiring up effects by hand.
 do  -- lurek.effect.newPresetStack
   local crt = lurek.effect.newPresetStack("retro_tv", 1280, 720)
-  function lurek.render()
+  function lurek.draw()
     crt:beginCapture(); crt:endCapture(); crt:apply()
   end
 end
@@ -454,7 +457,7 @@ end
 -- Use as an assertion inside your render code to make sure beginCapture/endCapture are correctly paired.
 do  -- PostFxStack:isCapturing
   local stack = lurek.effect.newStack()
-  function lurek.render()
+  function lurek.draw()
     stack:beginCapture()
     assert(stack:isCapturing(), "post-fx capture should be active here")
     stack:endCapture(); stack:apply()
@@ -467,7 +470,7 @@ end
 do  -- PostFxStack:beginCapture
   local stack = lurek.effect.newStack()
   stack:add(lurek.effect.newEffect("bloom"))
-  function lurek.render()
+  function lurek.draw()
     stack:beginCapture()
     -- scene draws happen here
     stack:endCapture(); stack:apply()
@@ -479,7 +482,7 @@ end
 -- Closes the capture started by beginCapture; must come BEFORE apply() so the GPU knows the source is finalised.
 do  -- PostFxStack:endCapture
   local stack = lurek.effect.newStack()
-  function lurek.render()
+  function lurek.draw()
     stack:beginCapture()
     stack:endCapture()
     stack:apply()
@@ -492,7 +495,7 @@ end
 do  -- PostFxStack:apply
   local stack = lurek.effect.newStack()
   stack:add(lurek.effect.newEffect("bloom"))
-  function lurek.render()
+  function lurek.draw()
     stack:beginCapture(); stack:endCapture()
     stack:apply()
   end
@@ -692,7 +695,7 @@ end
 do  -- Overlay:getShakeOffset
   local overlay = lurek.effect.newOverlay()
   overlay:shake(8.0, 0.4)
-  function lurek.render()
+  function lurek.draw()
     local ox, oy = overlay:getShakeOffset()
     lurek.log.debug("shake ox=" .. ox .. " oy=" .. oy, "shake")
   end
@@ -704,7 +707,7 @@ end
 do  -- Overlay:isActive
   local overlay = lurek.effect.newOverlay()
   if overlay:isActive() then
-    function lurek.render() overlay:render() end
+    function lurek.draw() overlay:render() end
   end
 end
 
@@ -1228,7 +1231,7 @@ end
 -- Call inside lurek.render_ui after world geometry; emits the overlay's screen-space passes.
 do  -- Overlay:render
   local overlay = lurek.effect.newOverlay()
-  function lurek.render_ui()
+  function lurek.draw_ui()
     overlay:render()
   end
 end
@@ -1426,14 +1429,13 @@ do  -- enableAutoUniforms
   local stack = lurek.effect.newStack(1280, 720)
   stack:add(wave_effect)
 
-  function lurek.render()
+  function lurek.draw()
     stack:beginCapture()
     -- draw scene here
     stack:endCapture()
     stack:apply()
   end
 end
-
 
 --@api-stub: PostFxEffect:enableAutoUniforms
 -- Enable auto-uniform injection for this effect.
@@ -1461,4 +1463,128 @@ do  -- PostFxEffect:disableAutoUniforms
   fx:enableAutoUniforms()
   fx:disableAutoUniforms()
   lurek.log.debug("auto_uniforms=" .. tostring(fx:isAutoUniforms()), "fx")
+end
+
+--@api-stub: Overlay:fade
+-- Starts a fade effect on the overlay (typically a screen-fade to/from black).
+-- duration controls the fade time; callback fires when the fade completes.
+do  -- Overlay:fade
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:fade(1.0, function() lurek.log.info("fade complete", "effect") end)
+  lurek.log.info("fade started", "effect")
+end
+
+--@api-stub: Overlay:flash
+-- Triggers a quick full-screen flash at the given colour and duration.
+-- Use for muzzle flash, impact hits, or screen-blind on explosion.
+do  -- Overlay:flash
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:flash(0.15, 1, 1, 1, 1)
+  lurek.log.info("flash triggered", "effect")
+end
+
+--@api-stub: PostFxEffect:getParameter
+-- Returns the current value of a named shader parameter on the effect.
+-- Use to inspect or save effect state before applying a temporary override.
+do  -- PostFxEffect:getParameter
+  local stack = lurek.effect.newStack(800, 600)
+  stack:add("bloom")
+  local effect = stack:getEffect(1)
+  local intensity = effect:getParameter("intensity")
+  lurek.log.info("bloom intensity: " .. tostring(intensity), "effect")
+end
+
+--@api-stub: PostFxStack:insert
+-- Inserts an effect at a specific index position in the post-fx stack.
+-- Existing effects at that index and above are shifted up by one position.
+do  -- PostFxStack:insert
+  local stack = lurek.effect.newStack(800, 600)
+  stack:add("crt")
+  stack:insert(1, "vignette")
+  lurek.log.info("stack count: " .. stack:getEffectCount(), "effect")
+end
+
+--@api-stub: Overlay:setAmbientColor
+-- Sets the ambient light colour used by the overlay's 2D lighting pass.
+-- RGBA values in [0,1]; lower alpha brightens the scene through the ambient layer.
+do  -- Overlay:setAmbientColor
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:setAmbientEnabled(true)
+  overlay:setAmbientColor(0.1, 0.1, 0.3, 0.6)
+  lurek.log.info("ambient colour set", "effect")
+end
+
+--@api-stub: PostFxStack:setEnabled
+-- Enables or disables the entire post-fx stack without removing any effects.
+-- Useful for toggling all post-processing via a graphics quality setting.
+do  -- PostFxStack:setEnabled
+  local stack = lurek.effect.newStack(800, 600)
+  stack:add("bloom")
+  stack:setEnabled(false)
+  lurek.log.info("stack enabled: " .. tostring(stack:isEnabled()), "effect")
+end
+
+--@api-stub: Overlay:setFogColor
+-- Sets the RGB colour of the atmospheric fog overlay.
+-- Enable fog first with setFogEnabled(true); colour affects both near and far fog.
+do  -- Overlay:setFogColor
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:setFogEnabled(true)
+  overlay:setFogColor(0.6, 0.6, 0.7)
+  lurek.log.info("fog colour set", "effect")
+end
+
+--@api-stub: Overlay:setLightningColor
+-- Sets the colour of lightning flash bursts on the overlay.
+-- White-blue (1, 0.95, 0.8) mimics natural lightning; called before triggerLightning.
+do  -- Overlay:setLightningColor
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:setLightningColor(0.9, 0.95, 1.0)
+  lurek.log.info("lightning colour set", "effect")
+end
+
+--@api-stub: Overlay:setWater
+-- Enables and configures the water distortion shader on the overlay.
+-- amplitude and frequency control the ripple waviness; speed controls animation rate.
+do  -- Overlay:setWater
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:setWater(0.02, 12.0, 1.5, true)
+  lurek.log.info("water effect set", "effect")
+end
+
+--@api-stub: Overlay:setWaterTint
+-- Sets the RGBA tint applied to the water distortion pass.
+-- Use a blue-green tint to simulate being underwater.
+do  -- Overlay:setWaterTint
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:setWater(0.02, 12.0, 1.5, true)
+  overlay:setWaterTint(0.2, 0.6, 0.8, 0.5)
+  lurek.log.info("water tint set", "effect")
+end
+
+--@api-stub: Overlay:triggerFade
+-- Immediately starts a screen fade-in or fade-out with given duration and colour.
+-- direction: "in" fades to transparent, "out" fades to the target colour.
+do  -- Overlay:triggerFade
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:triggerFade("out", 1.5, 0, 0, 0)
+  lurek.log.info("fade out triggered", "effect")
+end
+
+--@api-stub: Overlay:triggerFlash
+-- Triggers a one-shot full-screen colour flash, useful for explosions or damage feedback.
+-- Pass RGBA and duration in seconds; alpha starts at 1 and fades to 0.
+do  -- Overlay:triggerFlash
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:triggerFlash(1.0, 0.0, 0.0, 0.8, 0.12)
+  lurek.log.info("flash triggered", "effect")
+end
+
+--@api-stub: Overlay:triggerShake
+-- Triggers a screen shake effect with given magnitude and duration.
+-- magnitude is in world-pixels; combine with triggerFlash for big impacts.
+do  -- Overlay:triggerShake
+  local overlay = lurek.effect.newOverlay(800, 600)
+  overlay:triggerShake(8.0, 0.4)
+  lurek.log.info("shake triggered", "effect")
 end

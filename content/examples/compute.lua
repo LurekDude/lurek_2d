@@ -686,3 +686,61 @@ do  -- Array:scan
   lurek.log.debug("scan prefix[4]: " .. tostring(prefix:toTable()[4]), "compute")
 end
 
+
+--@api-stub: Array:eigenPower
+-- Runs power iteration to find the dominant eigenvalue of a square matrix.
+-- Returns (eigenvalue, eigenvector); iterations controls precision vs cost.
+do  -- Array:eigenPower
+  local A = lurek.compute.fromTable({{2,1},{1,2}}, "f32")
+  local eigval, eigvec = A:eigenPower(50)
+  lurek.log.info("dominant eigenvalue: " .. eigval, "compute")
+end
+
+--@api-stub: Array:floodFill
+-- Flood-fills a 2D array starting from (row, col), replacing old_val with new_val.
+-- Uses 4-connectivity; returns the count of cells changed.
+do  -- Array:floodFill
+  local grid = lurek.compute.zeros(8, 8, "u8")
+  grid:fill(1)
+  grid:set(3, 3, 0)
+  local n = grid:floodFill(3, 3, 0, 255)
+  lurek.log.info("flood filled cells: " .. n, "compute")
+end
+
+--@api-stub: Array:getRegion
+-- Returns a new Array containing the rectangular sub-array [r0:r1, c0:c1].
+-- The result is a copy; modifying it does not affect the original array.
+do  -- Array:getRegion
+  local a = lurek.compute.range(0, 63, "u8"):reshape(8, 8)
+  local patch = a:getRegion(2, 2, 5, 5)
+  lurek.log.info("patch shape: " .. patch:getShape()[1] .. "x" .. patch:getShape()[2], "compute")
+end
+
+--@api-stub: Array:histogram
+-- Computes a frequency histogram of the array values into the specified number of bins.
+-- Returns a new 1D Array of bin counts; useful for exposure analysis or terrain stats.
+do  -- Array:histogram
+  local a = lurek.compute.fromTable({1,2,2,3,3,3,4,4,4,4}, "i32")
+  local hist = a:histogram(4)
+  lurek.log.info("hist bins: " .. hist:getSize(), "compute")
+end
+
+--@api-stub: Array:setRegion
+-- Copies values from a source Array into a rectangular region of this Array.
+-- Source must match the region dimensions; used for tile-stamping and atlas assembly.
+do  -- Array:setRegion
+  local canvas = lurek.compute.zeros(16, 16, "u8")
+  local stamp = lurek.compute.ones(4, 4, "u8")
+  canvas:setRegion(6, 6, stamp)
+  lurek.log.info("region set", "compute")
+end
+
+--@api-stub: Array:where
+-- Returns a new Array selecting elements from true_val where mask is non-zero, else false_val.
+-- Mask, true_val, and false_val can be Arrays or scalar numbers.
+do  -- Array:where
+  local a = lurek.compute.fromTable({1,2,3,4,5,6}, "i32")
+  local mask = a:threshold(3)
+  local result = a:where(mask, a, lurek.compute.zeros(6, 1, "i32"))
+  lurek.log.info("where size: " .. result:getSize(), "compute")
+end

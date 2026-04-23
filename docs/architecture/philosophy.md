@@ -184,8 +184,9 @@ These constraints formalize the [module group model](engine-architecture.md#modu
 | **C-01** | Active | All Lua-facing APIs live under the `lurek.*` namespace. No bare globals, no engine-prefixed names, no alternative top-level tables.                                                                                             |
 | **C-02** | Active | Every `lua_api` sub-module exposes exactly one `pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`.                                                                                 |
 | **C-03** | Active | API functions must have **sensible defaults** — never require parameters a beginner would always pass as the same value. Overloaded param counts are preferred over config tables for simple APIs.                              |
-| **C-04** | Active | Every callback (`lurek.init`, `lurek.ready`, `lurek.process`, `lurek.process_physics`, `lurek.process_late`, `lurek.render`, `lurek.render_ui`, `lurek.keypressed`, etc.) is **optional**. An empty `main.lua` is a valid game. |
+| **C-04** | Active | Every callback (`lurek.init`, `lurek.ready`, `lurek.process`, `lurek.process_physics`, `lurek.process_late`, `lurek.draw`, `lurek.draw_ui`, `lurek.keypressed`, etc.) is **optional**. An empty `main.lua` is a valid game. |
 | **C-05** | Active | Lua API is **synchronous from the script's perspective**. Any asynchronous work happens in Rust threads and communicates results via `Channel`. The Lua VM never blocks on I/O or network.                                      |
+| **C-06** | Active | **Callback names must not shadow API module keys.** `lurek.<name>()` defines a callback that overwrites the `lurek` table slot `<name>`. If a planned callback key equals an existing API module name (e.g. the draw callback was briefly named `render`, shadowing `lurek.render`), the callback key **must** be renamed in `src/app/app.rs`. Never work around the collision with a local alias in Lua scripts — that disguises an engine design bug. |
 
 ---
 

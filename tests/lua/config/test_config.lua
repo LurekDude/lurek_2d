@@ -13,14 +13,14 @@
 -- accessible after the engine boots.
 --
 -- NOTE: lurek.conf(t) is a write-once function called during startup
--- (before the window opens). These tests verify the READ path only         
+-- (before the window opens). These tests verify the READ path only
 -- they do not attempt to re-configure a running engine.
 
 require("tests/lua/init")
 
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 -- 1. lurek.conf existence
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 
 -- @description Covers suite: lurek.conf function.
 describe("lurek.conf function", function()
@@ -30,9 +30,9 @@ describe("lurek.conf function", function()
     pending("lurek.conf is a function — lurek.conf not yet exposed to Lua")
 end)
 
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 -- 2. lurek.window namespace mirrors conf.window
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 
 -- @description Covers suite: lurek.window runtime values.
 describe("lurek.window runtime values", function()
@@ -66,9 +66,9 @@ describe("lurek.window runtime values", function()
     end)
 end)
 
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 -- 3. Modules table
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 
 -- @description Covers suite: lurek.runtime module flags.
 describe("lurek.runtime module flags", function()
@@ -95,9 +95,9 @@ describe("lurek.runtime module flags", function()
     end)
 end)
 
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 -- 4. lurek.conf merge semantics (introspection via lurek.window)
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 
 -- @description Covers suite: lurek.conf merge semantics.
 describe("lurek.conf merge semantics", function()
@@ -134,9 +134,9 @@ describe("lurek.conf merge semantics", function()
     end)
 end)
 
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 -- 5. conf.lua conf() call does not crash with various overrides
---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+--
 
 -- @description Covers suite: lurek.conf call-time safety.
 describe("lurek.conf call-time safety", function()

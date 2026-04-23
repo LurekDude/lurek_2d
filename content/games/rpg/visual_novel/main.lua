@@ -538,6 +538,7 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Visual Novel — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
@@ -548,16 +549,16 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.ready
 -- ---------------------------------------------------------------------------
-function lurek.ready()
+local function _ready_setup()
 
 end
 
 -- ---------------------------------------------------------------------------
 -- lurek.process
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS toggle
-    if lurek.input.isPressed("f3") then fps_visible = not fps_visible end
+    if lurek.input.keyboard.isDown("f3") then fps_visible = not fps_visible end
 
     -- Update particles
     update_particles(dt)
@@ -585,7 +586,7 @@ lurek.process(function(dt)
     if current_state == STATE.TITLE then
         title_alpha = math.min(title_alpha + dt * 2, 1)
         title_pulse = 0.5 + math.sin(lurek.timer.getTime() * 3) * 0.4
-        if lurek.input.isPressed("return") or lurek.input.isPressed(actions.advance) then
+        if lurek.input.keyboard.isDown("return") or lurek.input.keyboard.isDown(actions.advance) then
             -- Start game
             affection = { Luna = 0, Sol = 0, Nova = 0 }
             dialog_log = {}
@@ -600,20 +601,20 @@ lurek.process(function(dt)
     end
 
     -- Quit
-    if lurek.input.isPressed(actions.quit) then lurek.event.quit() end
+    if lurek.input.keyboard.isDown(actions.quit) then lurek.event.quit() end
 
     -- History toggle
-    if lurek.input.isPressed(actions.history) then
+    if lurek.input.keyboard.isDown(actions.history) then
         show_history = not show_history
     end
 
     -- Skip mode toggle
-    if lurek.input.isPressed(actions.skip) then
+    if lurek.input.keyboard.isDown(actions.skip) then
         skip_mode = not skip_mode
     end
 
     -- Auto-advance toggle
-    if lurek.input.isPressed(actions.auto) then
+    if lurek.input.keyboard.isDown(actions.auto) then
         auto_advance = not auto_advance
         auto_timer = 0
     end
@@ -635,7 +636,7 @@ lurek.process(function(dt)
                 end
             end
             -- Manual advance
-            if lurek.input.isPressed(actions.advance) then
+            if lurek.input.keyboard.isDown(actions.advance) then
                 auto_timer = 0
                 advance()
             end
@@ -646,9 +647,9 @@ lurek.process(function(dt)
     -- ── CHOICE state ──────────────────────────────────────────
     elseif current_state == STATE.CHOICE then
         skip_mode = false  -- disable skip at choices
-        if lurek.input.isPressed(actions.choice1) then select_choice(1) end
-        if lurek.input.isPressed(actions.choice2) then select_choice(2) end
-        if lurek.input.isPressed(actions.choice3) then select_choice(3) end
+        if lurek.input.keyboard.isDown(actions.choice1) then select_choice(1) end
+        if lurek.input.keyboard.isDown(actions.choice2) then select_choice(2) end
+        if lurek.input.keyboard.isDown(actions.choice3) then select_choice(3) end
 
     -- ── ENDING state ──────────────────────────────────────────
     elseif current_state == STATE.ENDING then
@@ -659,17 +660,17 @@ lurek.process(function(dt)
             spawn_sparkle(math.random(100, 700), math.random(50, 400), 3,
                           ec.color[1], ec.color[2], ec.color[3])
         end
-        if lurek.input.isPressed(actions.advance) then
+        if lurek.input.keyboard.isDown(actions.advance) then
             current_state = STATE.TITLE
             title_alpha = 0
         end
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- lurek.render — backgrounds + character portraits
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state == STATE.TITLE then return end
 
     -- Scene background
@@ -729,12 +730,12 @@ lurek.render(function()
         lurek.render.setColor(p.r, p.g, p.b, alpha)
         lurek.render.circle("fill", p.x, p.y, p.size)
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- lurek.render_ui — dialog box, text, choices, affection, history
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     local t = lurek.timer.getTime()
 
     -- FPS
@@ -932,4 +933,4 @@ lurek.render_ui(function()
             lurek.render.print(opt.text, 90, cy, 0, 0.85, 0.85)
         end
     end
-end)
+end

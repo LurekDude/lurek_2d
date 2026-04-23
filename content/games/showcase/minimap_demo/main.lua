@@ -257,30 +257,6 @@ lurek.input.bind("zoom_in",    "=")   -- plus key
 lurek.input.bind("zoom_out",   "-")
 lurek.input.bind("quit",       "escape")
 
-lurek.input.on("toggle_map", "pressed", function()
-    if state == "EXPLORING" then
-        minimap_show = not minimap_show
-    end
-end)
-
-lurek.input.on("zoom_in", "pressed", function()
-    if state == "EXPLORING" and minimap_show then
-        minimap_target_size = clamp(minimap_target_size + MINIMAP_STEP, MINIMAP_MIN, MINIMAP_MAX)
-        tween_add(_G, "minimap_size", minimap_target_size, 0.25, "ease_out")
-    end
-end)
-
-lurek.input.on("zoom_out", "pressed", function()
-    if state == "EXPLORING" and minimap_show then
-        minimap_target_size = clamp(minimap_target_size - MINIMAP_STEP, MINIMAP_MIN, MINIMAP_MAX)
-        tween_add(_G, "minimap_size", minimap_target_size, 0.25, "ease_out")
-    end
-end)
-
-lurek.input.on("quit", "pressed", function()
-    lurek.event.quit()
-end)
-
 -- ── Callbacks ──────────────────────────────────────────────────────────
 
 function lurek.init()
@@ -296,13 +272,13 @@ function lurek.init()
     update_visibility()
 end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.window.setTitle("Minimap Demo — Lurek2D")
     -- fade in title
     tween_add(_G, "title_alpha", 1, 0.8, "ease_out")
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     tweens_update(dt)
     particles_update(dt)
 
@@ -312,18 +288,19 @@ lurek.process(function(dt)
         if title_prompt_alpha >= 1 then title_prompt_alpha = 1; title_prompt_dir = -1 end
         if title_prompt_alpha <= 0.2 then title_prompt_alpha = 0.2; title_prompt_dir = 1 end
 
-        if lurek.input.isPressed("move_up") or lurek.input.isPressed("move_down")
-           or lurek.input.isPressed("move_left") or lurek.input.isPressed("move_right") then
+        if lurek.input.isActionDown("move_up") or lurek.input.isActionDown("move_down")
+           or lurek.input.isActionDown("move_left") or lurek.input.isActionDown("move_right") then
             state = "EXPLORING"
         end
+        if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
         return
     end
 
     -- EXPLORING state
-    move_up    = lurek.input.isDown("move_up")
-    move_down  = lurek.input.isDown("move_down")
-    move_left  = lurek.input.isDown("move_left")
-    move_right = lurek.input.isDown("move_right")
+    move_up    = lurek.input.isActionDown("move_up")
+    move_down  = lurek.input.isActionDown("move_down")
+    move_left  = lurek.input.isActionDown("move_left")
+    move_right = lurek.input.isActionDown("move_right")
 
     local dx, dy = 0, 0
     if move_up    then dy = dy - 1 end
@@ -390,6 +367,20 @@ lurek.process(function(dt)
         end
     end
 
+    -- minimap toggle/zoom/quit
+    if lurek.input.wasActionPressed("toggle_map") then
+        minimap_show = not minimap_show
+    end
+    if lurek.input.wasActionPressed("zoom_in") and minimap_show then
+        minimap_target_size = clamp(minimap_target_size + MINIMAP_STEP, MINIMAP_MIN, MINIMAP_MAX)
+        tween_add(_G, "minimap_size", minimap_target_size, 0.25, "ease_out")
+    end
+    if lurek.input.wasActionPressed("zoom_out") and minimap_show then
+        minimap_target_size = clamp(minimap_target_size - MINIMAP_STEP, MINIMAP_MIN, MINIMAP_MAX)
+        tween_add(_G, "minimap_size", minimap_target_size, 0.25, "ease_out")
+    end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
+
     -- update FPS title
     local fps = lurek.timer.getFPS()
     local exp = count_explored()
@@ -397,11 +388,11 @@ lurek.process(function(dt)
         "Minimap Demo | FPS: %d | Explored: %d/%d | Discoveries: %d/%d",
         fps, exp, WORLD_W * WORLD_H, discovered, NUM_POIS
     ))
-end)
+end
 
 -- ── Render: world view ─────────────────────────────────────────────────
 
-lurek.render(function()
+function lurek.draw()
     if state == "TITLE" then
         return
     end
@@ -465,11 +456,11 @@ lurek.render(function()
     lurek.render.rectangle(player_draw_x - 1, player_draw_y + PLAYER_SIZE, PLAYER_SIZE + 2, 1)
     lurek.render.rectangle(player_draw_x - 1, player_draw_y, 1, PLAYER_SIZE)
     lurek.render.rectangle(player_draw_x + PLAYER_SIZE, player_draw_y, 1, PLAYER_SIZE)
-end)
+end
 
 -- ── Render UI: minimap, fog, stats, title ──────────────────────────────
 
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == "TITLE" then
         -- title screen
         lurek.render.setColor(1, 1, 1, title_alpha)
@@ -600,4 +591,4 @@ lurek.render_ui(function()
             lurek.render.print("WASD: move | M: minimap | +/-: zoom | ESC: quit", 10, 10, 12)
         end
     end
-end)
+end

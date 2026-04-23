@@ -1,14 +1,14 @@
--- ============================================================================
---  Infiltration — Gadget/stealth puzzle infiltration game
+﻿-- ============================================================================
+--  Infiltration â€” Gadget/stealth puzzle infiltration game
 -- ----------------------------------------------------------------------------
 --  Category : action
 --  Run with : cargo run -- content/games/action/infiltration
 --
---  Controls (bound as input actions — see lurek.init):
+--  Controls (bound as input actions â€” see lurek.init):
 --    up/down/left/right : W/S/A/D or arrow keys
---    gadget1            : 1  (Keycard — opens keycard doors)
---    gadget2            : 2  (EMP — disables cameras 8s)
---    gadget3            : 3  (Lockpick — opens mechanical doors)
+--    gadget1            : 1  (Keycard â€” opens keycard doors)
+--    gadget2            : 2  (EMP â€” disables cameras 8s)
+--    gadget3            : 3  (Lockpick â€” opens mechanical doors)
 --    interact           : E  (hack terminal / hack door sequence)
 --    quit               : Escape
 --
@@ -16,7 +16,12 @@
 --    window, render, input, time, signal, particles, tween
 -- ============================================================================
 
--- ── Constants ─────────────────────────────────────────────────────────────
+-- â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- drawText shim: old API used in this demo (render.drawText -> lurek.render.print + setColor)
+local function drawText(text, x, y, size, r, g, b, a)
+    if r then lurek.render.setColor(r, g or 1, b or 1, a or 1) end
+    lurek.render.print(text, x, y, size or 14)
+end
 local SCREEN_W, SCREEN_H = 800, 600
 local TILE               = 40
 local GRID_COLS          = 20
@@ -49,11 +54,11 @@ local C_CAM_BODY = {0.8,  0.2,  0.2}
 local C_CAM_CONE = {1.0,  0.3,  0.3, 0.15}
 local C_CAM_OFF  = {0.3,  0.3,  0.3, 0.08}
 
--- ── States ────────────────────────────────────────────────────────────────
+-- â”€â”€ States â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 local STATE = { TITLE = 1, PLAYING = 2, HACKING = 3, WON = 4, CAUGHT = 5 }
 local state = STATE.TITLE
 
--- ── Map layout ────────────────────────────────────────────────────────────
+-- â”€â”€ Map layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -- 20x15 grid: 1=wall, 0=floor, 2=keycard door, 3=hack door, 4=lock door,
 -- 5=terminal, 6=vault, 7=exit, 8=camera mount
 local MAP = {
@@ -77,14 +82,14 @@ local MAP = {
 -- Working copy of map (doors get removed when opened)
 local map = {}
 
--- ── Camera definitions ────────────────────────────────────────────────────
+-- â”€â”€ Camera definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 local cameras = {}
 local CAM_RANGE     = 4        -- tiles of vision
 local CAM_HALF_ARC  = math.pi / 4  -- 45 deg half-arc
 local CAM_ROTATE_SP = 0.8      -- radians/sec
 local CAM_DISABLE_T = 8.0      -- seconds EMP lasts
 
--- ── Player state ──────────────────────────────────────────────────────────
+-- â”€â”€ Player state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 local player = { gx = 2, gy = 2, move_cd = 0 }
 local MOVE_COOLDOWN = 0.12
 
@@ -119,7 +124,7 @@ local hack_particles = nil
 local tween_alert_pulse = nil
 local tween_cam_fade    = nil
 
--- ── Helpers ───────────────────────────────────────────────────────────────
+-- â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 local function show_msg(text, dur)
     msg_text  = text
@@ -192,7 +197,7 @@ local function reset_game()
     gadgets[3].uses = gadgets[3].max
 end
 
--- ── Camera vision check ───────────────────────────────────────────────────
+-- â”€â”€ Camera vision check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 local function cam_sees_player(cam)
     if cam.disabled > 0 then return false end
     local dx = player.gx - cam.gx
@@ -216,7 +221,7 @@ local function cam_sees_player(cam)
     return true
 end
 
--- ── Generate hack sequence ────────────────────────────────────────────────
+-- â”€â”€ Generate hack sequence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 local function start_hack(door_gx, door_gy)
     hack.sequence = {}
     for i = 1, 4 do
@@ -229,9 +234,9 @@ local function start_hack(door_gx, door_gy)
     show_msg("HACK: Match the wire sequence!", 10)
 end
 
--- ── lurek.init ────────────────────────────────────────────────────────────
+-- â”€â”€ lurek.init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function lurek.init()
-    lurek.window.setTitle("Infiltration — Lurek2D")
+    lurek.window.setTitle("Infiltration â€” Lurek2D")
     lurek.window.setBackgroundColor(0.02, 0.02, 0.04)
 
     lurek.input.bind("up",      {"w", "up"})
@@ -268,15 +273,15 @@ function lurek.init()
     })
 end
 
--- ── lurek.ready ───────────────────────────────────────────────────────────
-function lurek.ready()
+-- â”€â”€ lurek.ready â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+local function _ready_setup()
     reset_game()
 end
 
--- ── lurek.process ─────────────────────────────────────────────────────────
-lurek.process(function(dt)
+-- â”€â”€ lurek.process â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function lurek.process(dt)
     -- Quit
-    if lurek.input.justPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -288,29 +293,29 @@ lurek.process(function(dt)
     emp_particles:update(dt)
     hack_particles:update(dt)
 
-    -- ── TITLE ─────────────────────────────────────────────────────────
+    -- â”€â”€ TITLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if state == STATE.TITLE then
-        if lurek.input.justPressed("interact") then
+        if lurek.input.wasActionPressed("interact") then
             reset_game()
             state = STATE.PLAYING
         end
         return
     end
 
-    -- ── WON / CAUGHT ──────────────────────────────────────────────────
+    -- â”€â”€ WON / CAUGHT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if state == STATE.WON or state == STATE.CAUGHT then
-        if lurek.input.justPressed("interact") then
+        if lurek.input.wasActionPressed("interact") then
             state = STATE.TITLE
         end
         return
     end
 
-    -- ── HACKING ───────────────────────────────────────────────────────
+    -- â”€â”€ HACKING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if state == STATE.HACKING then
         hack.timer = hack.timer + dt
         -- Check number key presses
         for k = 1, 4 do
-            if lurek.input.justPressed("hack" .. k) then
+            if lurek.input.wasActionPressed("hack" .. k) then
                 if hack.sequence[hack.input_idx] == k then
                     hack.input_idx = hack.input_idx + 1
                     local px = player.gx * TILE - TILE / 2
@@ -324,7 +329,7 @@ lurek.process(function(dt)
                         state = STATE.PLAYING
                     end
                 else
-                    -- Failed — reset sequence
+                    -- Failed â€” reset sequence
                     hack.input_idx = 1
                     show_msg("WRONG WIRE! Restarting sequence...", 1.5)
                     alert = math.min(100, alert + 10)
@@ -337,13 +342,13 @@ lurek.process(function(dt)
         return
     end
 
-    -- ── PLAYING ───────────────────────────────────────────────────────
+    -- â”€â”€ PLAYING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     -- Timer
     timer_left = timer_left - dt
     if timer_left <= 0 then
         timer_left = 0
         state = STATE.CAUGHT
-        show_msg("TIME'S UP — MISSION FAILED", 5)
+        show_msg("TIME'S UP â€” MISSION FAILED", 5)
         return
     end
 
@@ -351,10 +356,10 @@ lurek.process(function(dt)
     player.move_cd = math.max(0, player.move_cd - dt)
     if player.move_cd <= 0 then
         local dx, dy = 0, 0
-        if lurek.input.isDown("up")    then dy = -1 end
-        if lurek.input.isDown("down")  then dy =  1 end
-        if lurek.input.isDown("left")  then dx = -1 end
-        if lurek.input.isDown("right") then dx =  1 end
+        if lurek.input.isActionDown("up")    then dy = -1 end
+        if lurek.input.isActionDown("down")  then dy =  1 end
+        if lurek.input.isActionDown("left")  then dx = -1 end
+        if lurek.input.isActionDown("right") then dx =  1 end
         if dx ~= 0 or dy ~= 0 then
             -- Try horizontal first, then vertical
             if dx ~= 0 and is_walkable(player.gx + dx, player.gy) then
@@ -368,16 +373,16 @@ lurek.process(function(dt)
     end
 
     -- Gadget usage
-    if lurek.input.justPressed("gadget1") then
+    if lurek.input.wasActionPressed("gadget1") then
         use_gadget(1)
-    elseif lurek.input.justPressed("gadget2") then
+    elseif lurek.input.wasActionPressed("gadget2") then
         use_gadget(2)
-    elseif lurek.input.justPressed("gadget3") then
+    elseif lurek.input.wasActionPressed("gadget3") then
         use_gadget(3)
     end
 
     -- Interact
-    if lurek.input.justPressed("interact") then
+    if lurek.input.wasActionPressed("interact") then
         do_interact()
     end
 
@@ -409,19 +414,19 @@ lurek.process(function(dt)
     -- Caught
     if alert >= 100 then
         state = STATE.CAUGHT
-        show_msg("ALERT MAXIMUM — YOU'VE BEEN CAUGHT!", 5)
+        show_msg("ALERT MAXIMUM â€” YOU'VE BEEN CAUGHT!", 5)
         return
     end
 
-    -- Check win — on exit tile with data
+    -- Check win â€” on exit tile with data
     if tile_at(player.gx, player.gy) == T_EXIT and has_data then
         state = STATE.WON
         local bonus = vault_open and " + VAULT BONUS!" or ""
         show_msg("MISSION COMPLETE! Data extracted" .. bonus, 5)
     end
-end)
+end
 
--- ── Helpers called from process ───────────────────────────────────────────
+-- â”€â”€ Helpers called from process â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function update_alert_decay(dt)
     if alert > 0 then
@@ -449,7 +454,7 @@ end
 function use_gadget(idx)
     local g = gadgets[idx]
     if g.uses <= 0 then
-        show_msg(g.name .. " — no uses remaining!", 1.5)
+        show_msg(g.name .. " â€” no uses remaining!", 1.5)
         return
     end
 
@@ -460,7 +465,7 @@ function use_gadget(idx)
             if tile_at(nx, ny) == T_DOOR_KEY then
                 map[ny][nx] = T_FLOOR
                 g.uses = g.uses - 1
-                show_msg("Keycard used — door opened", 1.5)
+                show_msg("Keycard used â€” door opened", 1.5)
                 return
             end
         end
@@ -477,7 +482,7 @@ function use_gadget(idx)
         emp_particles:emit(px, py, 40)
         -- Tween: camera disable fade
         tween_cam_fade = { t = 0, dur = 0.6 }
-        show_msg("EMP PULSE — cameras disabled!", 2.0)
+        show_msg("EMP PULSE â€” cameras disabled!", 2.0)
 
     elseif idx == 3 then -- Lockpick
         local dirs = {{0,-1},{0,1},{-1,0},{1,0}}
@@ -486,7 +491,7 @@ function use_gadget(idx)
             if tile_at(nx, ny) == T_DOOR_LCK then
                 map[ny][nx] = T_FLOOR
                 g.uses = g.uses - 1
-                show_msg("Lock picked — door opened", 1.5)
+                show_msg("Lock picked â€” door opened", 1.5)
                 return
             end
         end
@@ -500,7 +505,7 @@ function do_interact()
     -- Terminal: hack to get data
     if t == T_TERMINAL and not has_data then
         has_data = true
-        show_msg("DATA DOWNLOADED — reach the exit!", 2.5)
+        show_msg("DATA DOWNLOADED â€” reach the exit!", 2.5)
         local px = player.gx * TILE - TILE / 2
         local py = player.gy * TILE - TILE / 2
         hack_particles:emit(px, py, 20)
@@ -525,7 +530,7 @@ function do_interact()
         end
         if total_used >= 3 then
             vault_open = true
-            show_msg("VAULT CRACKED — bonus objective complete!", 2.5)
+            show_msg("VAULT CRACKED â€” bonus objective complete!", 2.5)
         else
             show_msg("Vault requires all 3 gadget types to be used first", 2.0)
         end
@@ -535,11 +540,11 @@ function do_interact()
     show_msg("Nothing to interact with here", 1.0)
 end
 
--- ── lurek.render — map, player, cameras ───────────────────────────────────
-lurek.render(function()
+-- â”€â”€ lurek.render â€” map, player, cameras â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function lurek.draw()
     if state == STATE.TITLE then return end
 
-    local render = lurek.render
+    local render = gfx
 
     -- Draw floor grid
     for y = 1, GRID_ROWS do
@@ -551,40 +556,40 @@ lurek.render(function()
             -- Floor checkerboard
             if t == T_FLOOR then
                 local c = ((x + y) % 2 == 0) and C_FLOOR or C_FLOOR2
-                render.drawRect(px, py, TILE, TILE, c[1], c[2], c[3], 1)
+                render.rectangle(px, py, TILE, TILE, c[1], c[2], c[3], 1)
 
             elseif t == T_WALL then
-                render.drawRect(px, py, TILE, TILE, C_WALL[1], C_WALL[2], C_WALL[3], 1)
+                render.rectangle(px, py, TILE, TILE, C_WALL[1], C_WALL[2], C_WALL[3], 1)
 
             elseif t == T_DOOR_KEY then
-                render.drawRect(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
-                render.drawRect(px + 4, py + 4, TILE - 8, TILE - 8, C_DOOR_KEY[1], C_DOOR_KEY[2], C_DOOR_KEY[3], 1)
+                render.rectangle(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
+                render.rectangle(px + 4, py + 4, TILE - 8, TILE - 8, C_DOOR_KEY[1], C_DOOR_KEY[2], C_DOOR_KEY[3], 1)
 
             elseif t == T_DOOR_HCK then
-                render.drawRect(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
-                render.drawRect(px + 4, py + 4, TILE - 8, TILE - 8, C_DOOR_HCK[1], C_DOOR_HCK[2], C_DOOR_HCK[3], 1)
+                render.rectangle(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
+                render.rectangle(px + 4, py + 4, TILE - 8, TILE - 8, C_DOOR_HCK[1], C_DOOR_HCK[2], C_DOOR_HCK[3], 1)
 
             elseif t == T_DOOR_LCK then
-                render.drawRect(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
-                render.drawRect(px + 4, py + 4, TILE - 8, TILE - 8, C_DOOR_LCK[1], C_DOOR_LCK[2], C_DOOR_LCK[3], 1)
+                render.rectangle(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
+                render.rectangle(px + 4, py + 4, TILE - 8, TILE - 8, C_DOOR_LCK[1], C_DOOR_LCK[2], C_DOOR_LCK[3], 1)
 
             elseif t == T_TERMINAL then
-                render.drawRect(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
-                render.drawRect(px + 6, py + 6, TILE - 12, TILE - 12, C_TERMINAL[1], C_TERMINAL[2], C_TERMINAL[3], 1)
+                render.rectangle(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
+                render.rectangle(px + 6, py + 6, TILE - 12, TILE - 12, C_TERMINAL[1], C_TERMINAL[2], C_TERMINAL[3], 1)
                 -- Blinking indicator
                 if math.floor(lurek.timer.getTime() * 3) % 2 == 0 then
-                    render.drawRect(px + 14, py + 14, 12, 12, 0.0, 1.0, 0.3, 0.8)
+                    render.rectangle(px + 14, py + 14, 12, 12, 0.0, 1.0, 0.3, 0.8)
                 end
 
             elseif t == T_VAULT then
-                render.drawRect(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
+                render.rectangle(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
                 local vc = vault_open and {0.4, 0.9, 0.4} or C_VAULT
-                render.drawRect(px + 4, py + 4, TILE - 8, TILE - 8, vc[1], vc[2], vc[3], 1)
+                render.rectangle(px + 4, py + 4, TILE - 8, TILE - 8, vc[1], vc[2], vc[3], 1)
 
             elseif t == T_EXIT then
-                render.drawRect(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
+                render.rectangle(px, py, TILE, TILE, C_FLOOR[1], C_FLOOR[2], C_FLOOR[3], 1)
                 local pulse = 0.5 + 0.5 * math.sin(lurek.timer.getTime() * 4)
-                render.drawRect(px + 2, py + 2, TILE - 4, TILE - 4, C_EXIT[1] * pulse, C_EXIT[2] * pulse, C_EXIT[3] * pulse, 0.7)
+                render.rectangle(px + 2, py + 2, TILE - 4, TILE - 4, C_EXIT[1] * pulse, C_EXIT[2] * pulse, C_EXIT[3] * pulse, 0.7)
             end
         end
     end
@@ -606,7 +611,7 @@ lurek.render(function()
                 local fx = cx + math.cos(cam.angle) * dist
                 local fy = cy + math.sin(cam.angle) * dist
                 local alpha = cone_col[4] * (1 - step / (CAM_RANGE * 2 + 1))
-                render.drawRect(fx - spread / 2, fy - spread / 2, spread, spread,
+                render.rectangle(fx - spread / 2, fy - spread / 2, spread, spread,
                     cone_col[1], cone_col[2], cone_col[3], alpha)
             end
             -- Camera body
@@ -624,16 +629,16 @@ lurek.render(function()
     -- Particles
     emp_particles:draw()
     hack_particles:draw()
-end)
+end
 
--- ── lurek.render_ui — HUD ─────────────────────────────────────────────────
-lurek.render_ui(function()
-    local render = lurek.render
+-- â”€â”€ lurek.render_ui â€” HUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function lurek.draw_ui()
+    local render = gfx
 
-    -- ── TITLE SCREEN ──────────────────────────────────────────────────
+    -- â”€â”€ TITLE SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if state == STATE.TITLE then
-        render.drawText("SYSTEM INFILTRATION", SCREEN_W / 2 - 180, 120, 32, 0.3, 0.9, 1.0, 1)
-        render.drawText("─────────────────────────────", SCREEN_W / 2 - 180, 160, 16, 0.2, 0.5, 0.7, 0.6)
+        drawText("SYSTEM INFILTRATION", SCREEN_W / 2 - 180, 120, 32, 0.3, 0.9, 1.0, 1)
+        drawText("â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€", SCREEN_W / 2 - 180, 160, 16, 0.2, 0.5, 0.7, 0.6)
 
         local y = 200
         local briefing = {
@@ -643,11 +648,11 @@ lurek.render_ui(function()
             "Reach the exit before time runs out.",
             "",
             "GADGETS:",
-            "  [1] Keycard  (3x) — Opens electronic doors",
-            "  [2] EMP      (2x) — Disables all cameras for 8 sec",
-            "  [3] Lockpick (3x) — Opens mechanical locks",
+            "  [1] Keycard  (3x) â€” Opens electronic doors",
+            "  [2] EMP      (2x) â€” Disables all cameras for 8 sec",
+            "  [3] Lockpick (3x) â€” Opens mechanical locks",
             "",
-            "  [E] Interact — Hack terminals & wire-doors",
+            "  [E] Interact â€” Hack terminals & wire-doors",
             "",
             "Avoid camera detection. Alert at 100 = CAUGHT.",
             "Bonus: crack the vault using all 3 gadget types.",
@@ -655,89 +660,89 @@ lurek.render_ui(function()
             "Press [E] to begin mission",
         }
         for _, line in ipairs(briefing) do
-            render.drawText(line, 180, y, 16, 0.7, 0.8, 0.9, 0.9)
+            drawText(line, 180, y, 16, 0.7, 0.8, 0.9, 0.9)
             y = y + 22
         end
         return
     end
 
-    -- ── WON SCREEN ────────────────────────────────────────────────────
+    -- â”€â”€ WON SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if state == STATE.WON then
-        render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0, 0, 0, 0.7)
-        render.drawText("MISSION COMPLETE", SCREEN_W / 2 - 150, 200, 32, 0.2, 1.0, 0.4, 1)
+        render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0, 0, 0, 0.7)
+        drawText("MISSION COMPLETE", SCREEN_W / 2 - 150, 200, 32, 0.2, 1.0, 0.4, 1)
         local time_str = string.format("Time remaining: %d seconds", math.floor(timer_left))
-        render.drawText(time_str, SCREEN_W / 2 - 120, 260, 18, 0.7, 0.9, 0.7, 1)
+        drawText(time_str, SCREEN_W / 2 - 120, 260, 18, 0.7, 0.9, 0.7, 1)
         if vault_open then
-            render.drawText("VAULT BONUS ACHIEVED", SCREEN_W / 2 - 120, 300, 18, 0.9, 0.9, 0.2, 1)
+            drawText("VAULT BONUS ACHIEVED", SCREEN_W / 2 - 120, 300, 18, 0.9, 0.9, 0.2, 1)
         end
-        render.drawText("Press [E] to return to title", SCREEN_W / 2 - 130, 380, 16, 0.5, 0.7, 0.8, 0.8)
+        drawText("Press [E] to return to title", SCREEN_W / 2 - 130, 380, 16, 0.5, 0.7, 0.8, 0.8)
         return
     end
 
-    -- ── CAUGHT SCREEN ─────────────────────────────────────────────────
+    -- â”€â”€ CAUGHT SCREEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if state == STATE.CAUGHT then
-        render.drawRect(0, 0, SCREEN_W, SCREEN_H, 0.15, 0, 0, 0.7)
-        render.drawText("MISSION FAILED", SCREEN_W / 2 - 130, 200, 32, 1.0, 0.2, 0.2, 1)
+        render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.15, 0, 0, 0.7)
+        drawText("MISSION FAILED", SCREEN_W / 2 - 130, 200, 32, 1.0, 0.2, 0.2, 1)
         local reason = timer_left <= 0 and "Time expired" or "Alert level critical"
-        render.drawText(reason, SCREEN_W / 2 - 80, 260, 18, 0.9, 0.5, 0.5, 1)
-        render.drawText("Press [E] to return to title", SCREEN_W / 2 - 130, 340, 16, 0.5, 0.7, 0.8, 0.8)
+        drawText(reason, SCREEN_W / 2 - 80, 260, 18, 0.9, 0.5, 0.5, 1)
+        drawText("Press [E] to return to title", SCREEN_W / 2 - 130, 340, 16, 0.5, 0.7, 0.8, 0.8)
         return
     end
 
-    -- ── HUD — playing / hacking ───────────────────────────────────────
+    -- â”€â”€ HUD â€” playing / hacking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     -- Timer
     local t_col = timer_left < 30 and {1.0, 0.3, 0.3} or {0.7, 0.9, 0.7}
     local time_str = string.format("TIME: %d:%02d", math.floor(timer_left / 60), math.floor(timer_left) % 60)
-    render.drawText(time_str, SCREEN_W - 140, 10, 18, t_col[1], t_col[2], t_col[3], 1)
+    drawText(time_str, SCREEN_W - 140, 10, 18, t_col[1], t_col[2], t_col[3], 1)
 
     -- Alert bar background
-    render.drawRect(10, 10, 200, 20, 0.15, 0.15, 0.2, 0.8)
+    render.rectangle(10, 10, 200, 20, 0.15, 0.15, 0.2, 0.8)
     -- Alert bar fill
     local bar_w = (alert / 100) * 196
     local ar, ag, ab = 0.2 + 0.8 * (alert / 100), 0.8 - 0.6 * (alert / 100), 0.2
     -- Glow pulse when rising
     local glow = alert_bar_glow * 0.3
-    render.drawRect(12, 12, bar_w, 16, ar + glow, ag + glow, ab, 1)
+    render.rectangle(12, 12, bar_w, 16, ar + glow, ag + glow, ab, 1)
     -- Alert label
-    render.drawText(string.format("ALERT: %d%%", math.floor(alert)), 14, 12, 14, 1, 1, 1, 0.9)
+    drawText(string.format("ALERT: %d%%", math.floor(alert)), 14, 12, 14, 1, 1, 1, 0.9)
 
     -- Gadget slots
     local gy = 40
     for i, g in ipairs(gadgets) do
         local gc = g.color
         local alpha = g.uses > 0 and 1.0 or 0.3
-        render.drawRect(10, gy, 160, 22, 0.1, 0.1, 0.15, 0.8)
-        render.drawRect(12, gy + 2, 18, 18, gc[1], gc[2], gc[3], alpha)
+        render.rectangle(10, gy, 160, 22, 0.1, 0.1, 0.15, 0.8)
+        render.rectangle(12, gy + 2, 18, 18, gc[1], gc[2], gc[3], alpha)
         local label = string.format("[%d] %s: %d/%d", i, g.name, g.uses, g.max)
-        render.drawText(label, 34, gy + 3, 14, gc[1], gc[2], gc[3], alpha)
+        drawText(label, 34, gy + 3, 14, gc[1], gc[2], gc[3], alpha)
         gy = gy + 26
     end
 
     -- Data status
     local data_label = has_data and "DATA: ACQUIRED" or "DATA: NOT YET"
     local dc = has_data and {0.2, 1.0, 0.4} or {0.5, 0.5, 0.5}
-    render.drawText(data_label, 10, gy + 4, 14, dc[1], dc[2], dc[3], 1)
+    drawText(data_label, 10, gy + 4, 14, dc[1], dc[2], dc[3], 1)
 
     -- Vault status
     if vault_open then
-        render.drawText("VAULT: OPEN", 10, gy + 22, 14, 0.9, 0.9, 0.2, 1)
+        drawText("VAULT: OPEN", 10, gy + 22, 14, 0.9, 0.9, 0.2, 1)
     end
 
     -- FPS
-    render.drawText(string.format("FPS: %d", lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 20, 12, 0.4, 0.4, 0.5, 0.6)
+    drawText(string.format("FPS: %d", lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 20, 12, 0.4, 0.4, 0.5, 0.6)
 
     -- Message
     if msg_timer > 0 then
         local ma = math.min(1.0, msg_timer)
-        render.drawRect(SCREEN_W / 2 - 200, SCREEN_H - 60, 400, 30, 0.05, 0.05, 0.1, 0.85 * ma)
-        render.drawText(msg_text, SCREEN_W / 2 - 190, SCREEN_H - 55, 14, 0.9, 0.9, 0.3, ma)
+        render.rectangle(SCREEN_W / 2 - 200, SCREEN_H - 60, 400, 30, 0.05, 0.05, 0.1, 0.85 * ma)
+        drawText(msg_text, SCREEN_W / 2 - 190, SCREEN_H - 55, 14, 0.9, 0.9, 0.3, ma)
     end
 
-    -- ── HACKING overlay ───────────────────────────────────────────────
+    -- â”€â”€ HACKING overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if state == STATE.HACKING then
-        render.drawRect(SCREEN_W / 2 - 150, SCREEN_H / 2 - 80, 300, 160, 0.05, 0.05, 0.12, 0.95)
-        render.drawText("WIRE HACK", SCREEN_W / 2 - 40, SCREEN_H / 2 - 70, 18, 0.9, 0.7, 0.1, 1)
+        render.rectangle(SCREEN_W / 2 - 150, SCREEN_H / 2 - 80, 300, 160, 0.05, 0.05, 0.12, 0.95)
+        drawText("WIRE HACK", SCREEN_W / 2 - 40, SCREEN_H / 2 - 70, 18, 0.9, 0.7, 0.1, 1)
 
         local wire_colors = {
             {0.9, 0.2, 0.2}, -- 1 = red
@@ -750,7 +755,7 @@ lurek.render_ui(function()
         -- Show sequence
         local sx = SCREEN_W / 2 - 100
         local sy = SCREEN_H / 2 - 30
-        render.drawText("Sequence:", sx, sy, 14, 0.7, 0.7, 0.8, 1)
+        drawText("Sequence:", sx, sy, 14, 0.7, 0.7, 0.8, 1)
         sy = sy + 20
         for i, w in ipairs(hack.sequence) do
             local wc = wire_colors[w]
@@ -758,12 +763,13 @@ lurek.render_ui(function()
             local current = i == hack.input_idx
             local a = done and 0.3 or 1.0
             local label = string.format("[%d] %s", w, wire_names[w])
-            if done then label = label .. " ✓" end
-            if current then label = "→ " .. label end
-            render.drawText(label, sx + 10, sy, 16, wc[1], wc[2], wc[3], a)
+            if done then label = label .. " âś“" end
+            if current then label = "â†’ " .. label end
+            drawText(label, sx + 10, sy, 16, wc[1], wc[2], wc[3], a)
             sy = sy + 22
         end
 
-        render.drawText("Press 1-4 to match wires", SCREEN_W / 2 - 80, SCREEN_H / 2 + 60, 12, 0.5, 0.5, 0.6, 0.8)
+        drawText("Press 1-4 to match wires", SCREEN_W / 2 - 80, SCREEN_H / 2 + 60, 12, 0.5, 0.5, 0.6, 0.8)
     end
-end)
+end
+

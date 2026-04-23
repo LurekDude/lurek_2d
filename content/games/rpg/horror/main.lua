@@ -243,14 +243,15 @@ local SCARE_MESSAGES = {
 ------------------------------------------------------------------------
 -- Init
 ------------------------------------------------------------------------
-lurek.init(function()
-    lurek.input.addAction("up",        {"w", "up"})
-    lurek.input.addAction("down",      {"s", "down"})
-    lurek.input.addAction("left",      {"a", "left"})
-    lurek.input.addAction("right",     {"d", "right"})
-    lurek.input.addAction("flashlight",{"f"})
-    lurek.input.addAction("interact",  {"e"})
-    lurek.input.addAction("quit",      {"escape"})
+
+function lurek.init()
+    lurek.input.bind("up",        {"w", "up"})
+    lurek.input.bind("down",      {"s", "down"})
+    lurek.input.bind("left",      {"a", "left"})
+    lurek.input.bind("right",     {"d", "right"})
+    lurek.input.bind("flashlight",{"f"})
+    lurek.input.bind("interact",  {"e"})
+    lurek.input.bind("quit",      {"escape"})
 
     -- Particle systems
     dust_ps = lurek.particle.new({
@@ -285,9 +286,9 @@ lurek.init(function()
 
     -- Init keys_found
     for i = 1, #KEY_POSITIONS do keys_found[i] = false end
-end)
+end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.render.setBackgroundColor(0.01, 0.01, 0.02)
     game_state = STATE.TITLE
 end
@@ -295,7 +296,7 @@ end
 ------------------------------------------------------------------------
 -- Process
 ------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     title_time = title_time + dt
 
     -- Quit
@@ -578,12 +579,12 @@ lurek.process(function(dt)
     lurek.render.setBackgroundColor(0.01, 0.01, 0.02)
     local fps = lurek.timer.getFPS()
     lurek.window.setTitle("Horror — Lurek2D [FPS: " .. fps .. "]")
-end)
+end
 
 ------------------------------------------------------------------------
 -- Render (world)
 ------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if game_state == STATE.TITLE then
         -- Dark background
         lurek.render.setColor(0.02, 0.01, 0.03, 1)
@@ -791,12 +792,12 @@ lurek.render(function()
             SCREEN_W, SCREEN_H
         )
     end
-end)
+end
 
 ------------------------------------------------------------------------
 -- Render UI
 ------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if game_state == STATE.TITLE or game_state == STATE.DEAD or game_state == STATE.WON then
         return
     end
@@ -888,4 +889,4 @@ lurek.render_ui(function()
             lurek.render.print("[E] close", SCREEN_W - 180, 370, 11)
         end
     end
-end)
+end

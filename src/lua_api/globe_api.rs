@@ -10,20 +10,14 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 
-use crate::globe::fog::FogStore;
-use crate::globe::label::LabelStore;
-use crate::globe::layer::LayerStore;
 use crate::globe::loader;
-use crate::globe::marker::MarkerStore;
-use crate::globe::picking::{pick, PickResult};
-use crate::globe::projection::OrbitCamera;
 use crate::globe::registry::{Globe, GlobeRegistry};
 use crate::globe::types::{
-    GlobeError, GlobeSpec, Label, LabelStyle, Layer, LodTier, Marker, MarkerStyle, Province,
+    GlobeSpec, LabelStyle, Layer, LodTier, MarkerStyle, Province,
     MAX_PROVINCES,
 };
 use crate::math::sphere::{
-    great_circle_distance, great_circle_path, lat_lon_to_unit, unit_to_lat_lon,
+    great_circle_distance, great_circle_path, lat_lon_to_unit,
 };
 
 // ── LuaGlobe ────────────────────────────────────────────────────────────────
@@ -35,6 +29,7 @@ use crate::math::sphere::{
 pub struct LuaGlobe {
     reg: Arc<Mutex<GlobeRegistry>>,
     name: String,
+    #[allow(dead_code)]
     state: Rc<RefCell<SharedState>>,
 }
 

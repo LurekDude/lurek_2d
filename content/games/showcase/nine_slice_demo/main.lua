@@ -5,6 +5,7 @@
 -- Run with: cargo run -- content/games/showcase/nine_slice_demo
 
 -- ── Constants ──────────────────────────────────────────────────────────
+
 local SCREEN_W, SCREEN_H = 800, 600
 local SLICE              = 16          -- corner size in pixels
 local MIN_PANEL_W        = 48
@@ -251,49 +252,6 @@ local function switch_style(n)
     particle_spawn(SCREEN_W * 0.5, SCREEN_H * 0.35, 18, s.corner[1], s.corner[2], s.corner[3], 0.9, 70)
 end
 
-lurek.input.on("style_1", "pressed", function() if state ~= "TITLE" then switch_style(1) end end)
-lurek.input.on("style_2", "pressed", function() if state ~= "TITLE" then switch_style(2) end end)
-lurek.input.on("style_3", "pressed", function() if state ~= "TITLE" then switch_style(3) end end)
-lurek.input.on("style_4", "pressed", function() if state ~= "TITLE" then switch_style(4) end end)
-lurek.input.on("style_5", "pressed", function() if state ~= "TITLE" then switch_style(5) end end)
-
-lurek.input.on("toggle_grid", "pressed", function()
-    if state ~= "TITLE" then show_grid = not show_grid end
-end)
-
-lurek.input.on("compare", "pressed", function()
-    if state == "EDITING" then
-        state = "COMPARE"
-    elseif state == "COMPARE" then
-        state = "EDITING"
-    end
-end)
-
-lurek.input.on("resize_left", "pressed", function()
-    if state == "TITLE" then state = "EDITING"; return end
-    target_w = clamp(target_w - RESIZE_STEP, MIN_PANEL_W, MAX_PANEL_W)
-    tween_add(_G, "panel_w", target_w, TWEEN_SPEED, "ease_out")
-end)
-lurek.input.on("resize_right", "pressed", function()
-    if state == "TITLE" then state = "EDITING"; return end
-    target_w = clamp(target_w + RESIZE_STEP, MIN_PANEL_W, MAX_PANEL_W)
-    tween_add(_G, "panel_w", target_w, TWEEN_SPEED, "ease_out")
-end)
-lurek.input.on("resize_up", "pressed", function()
-    if state == "TITLE" then state = "EDITING"; return end
-    target_h = clamp(target_h - RESIZE_STEP, MIN_PANEL_H, MAX_PANEL_H)
-    tween_add(_G, "panel_h", target_h, TWEEN_SPEED, "ease_out")
-end)
-lurek.input.on("resize_down", "pressed", function()
-    if state == "TITLE" then state = "EDITING"; return end
-    target_h = clamp(target_h + RESIZE_STEP, MIN_PANEL_H, MAX_PANEL_H)
-    tween_add(_G, "panel_h", target_h, TWEEN_SPEED, "ease_out")
-end)
-
-lurek.input.on("quit", "pressed", function()
-    lurek.event.quit()
-end)
-
 -- ── Callbacks ──────────────────────────────────────────────────────────
 
 function lurek.init()
@@ -302,7 +260,7 @@ function lurek.init()
     math.randomseed(os.time())
 end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.window.setTitle("Nine Slice Demo — Lurek2D")
     tween_add(_G, "title_alpha", 1, 0.7, "ease_out")
 end
@@ -310,6 +268,37 @@ end
 function lurek.process(dt)
     tweens_update(dt)
     particles_update(dt)
+
+    -- style switch / resize / quit (from removed lurek.input.on blocks)
+    for i = 1, 5 do
+        if lurek.input.wasActionPressed("style_" .. i) then
+            if state ~= "TITLE" then switch_style(i) end
+        end
+    end
+    if lurek.input.wasActionPressed("toggle_grid") then
+        if state ~= "TITLE" then show_grid = not show_grid end
+    end
+    if lurek.input.wasActionPressed("compare") then
+        if state == "EDITING" then state = "COMPARE"
+        elseif state == "COMPARE" then state = "EDITING" end
+    end
+    if lurek.input.wasActionPressed("resize_left") then
+        if state == "TITLE" then state = "EDITING"
+        else target_w = clamp(target_w - RESIZE_STEP, MIN_PANEL_W, MAX_PANEL_W); tween_add(_G, "panel_w", target_w, TWEEN_SPEED, "ease_out") end
+    end
+    if lurek.input.wasActionPressed("resize_right") then
+        if state == "TITLE" then state = "EDITING"
+        else target_w = clamp(target_w + RESIZE_STEP, MIN_PANEL_W, MAX_PANEL_W); tween_add(_G, "panel_w", target_w, TWEEN_SPEED, "ease_out") end
+    end
+    if lurek.input.wasActionPressed("resize_up") then
+        if state == "TITLE" then state = "EDITING"
+        else target_h = clamp(target_h - RESIZE_STEP, MIN_PANEL_H, MAX_PANEL_H); tween_add(_G, "panel_h", target_h, TWEEN_SPEED, "ease_out") end
+    end
+    if lurek.input.wasActionPressed("resize_down") then
+        if state == "TITLE" then state = "EDITING"
+        else target_h = clamp(target_h + RESIZE_STEP, MIN_PANEL_H, MAX_PANEL_H); tween_add(_G, "panel_h", target_h, TWEEN_SPEED, "ease_out") end
+    end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     if state == "TITLE" then
         title_prompt_alpha = title_prompt_alpha + title_prompt_dir * dt * 2
@@ -328,13 +317,13 @@ end
 
 -- ── Render: world-space (empty for this UI demo) ───────────────────────
 
-function lurek.render()
+function lurek.draw()
     -- nothing in world space for this showcase
 end
 
 -- ── Render UI ──────────────────────────────────────────────────────────
 
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- ── TITLE state ────────────────────────────────────────────────────
     if state == "TITLE" then
         lurek.render.setColor(1, 1, 1, title_alpha)
@@ -459,4 +448,4 @@ lurek.render_ui(function()
         "Arrows: resize | 1-5: style | G: grid | C: compare | ESC: quit",
         10, SCREEN_H - 16, 10
     )
-end)
+end

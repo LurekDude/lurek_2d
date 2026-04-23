@@ -1,4 +1,5 @@
 --[[
+
   Drift Racing — Lurek2D
   Category: sports
 
@@ -486,7 +487,7 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.15, 0.2, 0.1)
 end
 
-function lurek.ready()
+local function _ready_setup()
     state = "TITLE"
 end
 
@@ -538,7 +539,7 @@ function lurek.process(delta)
     lurek.window.setTitle(string.format("Drift Racing — FPS: %d", lurek.timer.getFPS()))
 end
 
-lurek.render(function()
+function lurek.draw()
     if state == "RACING" then
         lurek.render.push()
         lurek.render.translate(-camera_x, -camera_y)
@@ -603,9 +604,9 @@ lurek.render(function()
 
         lurek.render.pop()
     end
-end)
+end
 
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == "TITLE" then
         lurek.render.setColor(1, 0.85, 0.1, 1)
         lurek.render.print("DRIFT RACING", SCREEN_W / 2 - 120, SCREEN_H / 2 - 60, 0, 3, 3)
@@ -697,4 +698,4 @@ lurek.render_ui(function()
         lurek.render.setColor(0.6, 0.6, 0.6, 0.7 + 0.3 * math.sin(lurek.timer.getTime() * 3))
         lurek.render.print("Press W for track select", SCREEN_W / 2 - 90, 420)
     end
-end)
+end

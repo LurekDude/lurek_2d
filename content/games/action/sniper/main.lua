@@ -6,14 +6,14 @@
 ]]
 
 -- Action inputs
-lurek.input.bindAction("aim_up", {"w", "up"})
-lurek.input.bindAction("aim_down", {"s", "down"})
-lurek.input.bindAction("aim_left", {"a", "left"})
-lurek.input.bindAction("aim_right", {"d", "right"})
-lurek.input.bindAction("fire", {"space"})
-lurek.input.bindAction("hold_breath", {"lshift", "rshift"})
-lurek.input.bindAction("quit", {"escape"})
-lurek.input.bindAction("start", {"return"})
+lurek.input.bind("aim_up", {"w", "up"})
+lurek.input.bind("aim_down", {"s", "down"})
+lurek.input.bind("aim_left", {"a", "left"})
+lurek.input.bind("aim_right", {"d", "right"})
+lurek.input.bind("fire", {"space"})
+lurek.input.bind("hold_breath", {"lshift", "rshift"})
+lurek.input.bind("quit", {"escape"})
+lurek.input.bind("start", {"return"})
 
 -- Constants
 local W, H = 800, 600
@@ -277,19 +277,20 @@ end
 --------------------------------------------------------------
 -- Engine callbacks
 --------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Sniper — Lurek2D")
-    lurek.setBackgroundColor(0.3, 0.35, 0.25)
-    lurek.showFPS(true)
+    lurek.render.setBackgroundColor(0.3, 0.35, 0.25)
+
     math.randomseed(os.time())
 end
 
-function lurek.ready()
+local function _ready_setup()
     -- Ready
 end
 
-lurek.process(function(dt)
-    if lurek.input.isActionPressed("quit") then
+function lurek.process(dt)
+    if lurek.input.isActionDown("quit") then
         lurek.event.quit()
         return
     end
@@ -320,7 +321,7 @@ lurek.process(function(dt)
     end
 
     if state == STATE_TITLE then
-        if lurek.input.isActionPressed("start") then
+        if lurek.input.isActionDown("start") then
             total_score = 0
             total_shots_fired = 0
             total_hits = 0
@@ -372,7 +373,7 @@ lurek.process(function(dt)
         scope_y = scope_y + sway_offset_y * dt * 10
 
         -- Fire
-        if lurek.input.isActionPressed("fire") then
+        if lurek.input.isActionDown("fire") then
             fire_bullet()
         end
 
@@ -430,7 +431,7 @@ lurek.process(function(dt)
         end
 
     elseif state == STATE_ROUND_END then
-        if lurek.input.isActionPressed("start") then
+        if lurek.input.isActionDown("start") then
             if current_round < 3 then
                 start_round(current_round + 1)
             else
@@ -439,16 +440,16 @@ lurek.process(function(dt)
         end
 
     elseif state == STATE_GAME_OVER then
-        if lurek.input.isActionPressed("start") then
+        if lurek.input.isActionDown("start") then
             state = STATE_TITLE
         end
     end
-end)
+end
 
 --------------------------------------------------------------
 -- Render: terrain, targets, bullet, trail, scope
 --------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     -- Ground
     lurek.render.rectangle(ground.x, ground.y, ground.w, ground.h, {0.25, 0.35, 0.15, 1})
 
@@ -506,12 +507,12 @@ lurek.render(function()
         -- Center dot
         lurek.render.circle(scope_x, scope_y, 2, {1, 0.2, 0.2, 0.9})
     end
-end)
+end
 
 --------------------------------------------------------------
 -- Render UI: HUD, wind, score, round info, title/game over
 --------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     if state == STATE_TITLE then
         lurek.render.print("SNIPER", W / 2 - 80, H / 2 - 60, 48, {0.9, 0.85, 0.7, 1})
         lurek.render.print("Ballistics Puzzle", W / 2 - 70, H / 2, 18, {0.7, 0.7, 0.6, 1})

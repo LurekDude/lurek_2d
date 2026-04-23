@@ -242,12 +242,16 @@ pub struct LurekApp {
     auto_screenshot_path: Option<PathBuf>,
     /// Minimum number of rendered game frames to wait before capturing (default 3).
     auto_screenshot_frames: u32,
+    /// Wall-clock seconds after game start to wait before capturing (overrides frame count when set).
+    auto_screenshot_time: Option<f32>,
     /// `true` once the auto-screenshot has been written (prevents double-capture).
     auto_screenshot_done: bool,
     /// Count of rendered game frames since `has_game` became `true`.
     auto_screenshot_frame_count: u32,
     /// Wall-clock time when the first game frame started (used as a safety-exit deadline).
     auto_screenshot_start: Option<Instant>,
+    /// Explicit initial window position in physical pixels, bypasses monitor centering.
+    window_pos: Option<(i32, i32)>,
 
     /// Keeps a drag-dropped `.lurek` / `.lurek` archive's temporary extraction directory alive.
     ///
@@ -258,6 +262,7 @@ pub struct LurekApp {
 
 impl LurekApp {
     /// Creates a new [`LurekApp`] from the given configuration and game-folder path.
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         config: Config,
         game_dir: PathBuf,
@@ -265,6 +270,8 @@ impl LurekApp {
         explicit_game_dir: bool,
         auto_screenshot_path: Option<PathBuf>,
         auto_screenshot_frames: u32,
+        auto_screenshot_time: Option<f32>,
+        window_pos: Option<(i32, i32)>,
     ) -> Self {
         let window_vsync_mode = if config.window.vsync { 1 } else { 0 };
 
@@ -305,9 +312,11 @@ impl LurekApp {
             render_cmd_buf: Vec::new(),
             auto_screenshot_path,
             auto_screenshot_frames,
+            auto_screenshot_time,
             auto_screenshot_done: false,
             auto_screenshot_frame_count: 0,
             auto_screenshot_start: None,
+            window_pos,
             lurek_temp_dir: None,
         }
     }
@@ -971,7 +980,7 @@ impl LurekApp {
         }
 
         // â”€â”€ 5c. Lua render callback (draw order 4 â€” game world) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        if let Err(e) = call_lua_callback_checked(lua, "render", ()) {
+        if let Err(e) = call_lua_callback_checked(lua, "draw", ()) {
             self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
             return;
         }
@@ -1070,7 +1079,7 @@ impl LurekApp {
         }
 
         // â”€â”€ 6. render_ui (UI/HUD overlay pass) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        if let Err(e) = call_lua_callback_checked(lua, "render_ui", ()) {
+        if let Err(e) = call_lua_callback_checked(lua, "draw_ui", ()) {
             self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
             return;
         }
@@ -1190,11 +1199,21 @@ impl LurekApp {
         let screenshot_supported = self.surface_usage.contains(wgpu::TextureUsages::COPY_SRC);
         let capture_screenshot = screenshot_request.is_some() && screenshot_supported;
 
-        // Auto-screenshot: capture pixels this frame once enough frames have been rendered.
+        // Auto-screenshot: capture pixels this frame once enough frames/time have elapsed.
+        // When --screenshot-time is set, use wall-clock elapsed; otherwise use frame count.
+        let auto_screenshot_ready = match self.auto_screenshot_time {
+            Some(secs) => {
+                self.auto_screenshot_start
+                    .map(|s| s.elapsed().as_secs_f32() >= secs)
+                    .unwrap_or(false)
+                    && self.auto_screenshot_frame_count >= 3
+            }
+            None => self.auto_screenshot_frame_count >= self.auto_screenshot_frames,
+        };
         let should_auto_capture = screenshot_supported
             && !self.auto_screenshot_done
             && self.auto_screenshot_path.is_some()
-            && self.auto_screenshot_frame_count >= self.auto_screenshot_frames;
+            && auto_screenshot_ready;
 
         let screenshot_pixels = {
             let s_ref = state.borrow();
@@ -1953,6 +1972,9 @@ impl ApplicationHandler for LurekApp {
             window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(
                 startup_monitor.clone(),
             )));
+        } else if let Some((wx, wy)) = self.window_pos {
+            // Explicit position supplied (e.g. from --window-x / --window-y).
+            window.set_outer_position(winit::dpi::PhysicalPosition::new(wx, wy));
         } else if let Some(monitor) = startup_monitor.as_ref() {
             center_window_on_monitor(
                 window.as_ref(),
@@ -2599,6 +2621,8 @@ impl App {
         explicit_game_dir: bool,
         screenshot_path: Option<PathBuf>,
         screenshot_frames: u32,
+        screenshot_time: Option<f32>,
+        window_pos: Option<(i32, i32)>,
     ) {
         init_logging(
             &game_dir,
@@ -2628,6 +2652,8 @@ impl App {
             explicit_game_dir,
             screenshot_path,
             screenshot_frames,
+            screenshot_time,
+            window_pos,
         );
         event_loop.run_app(&mut app).expect("Event loop error");
 

@@ -310,7 +310,8 @@ end
 ------------------------------------------------------------
 -- Initialization
 ------------------------------------------------------------
-lurek.init(function()
+
+function lurek.init()
     lurek.window.setTitle("Zoo Tycoon — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.15, 0.1)
     camera = lurek.camera.new()
@@ -326,12 +327,12 @@ lurek.init(function()
     for c = 9, 12 do
         grid[GRID_ROWS][c] = TILE_PATH
     end
-end)
+end
 
 ------------------------------------------------------------
 -- Input bindings
 ------------------------------------------------------------
-function lurek.ready()
+local function _ready_setup()
     lurek.input.bind("build_path",    "1")
     lurek.input.bind("build_fence",   "2")
     lurek.input.bind("build_water",   "3")
@@ -352,13 +353,13 @@ end
 ------------------------------------------------------------
 -- Update
 ------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     fps = lurek.timer.getFPS()
     titleBlink = titleBlink + dt
 
     -- Title screen
     if state == STATE_TITLE then
-        if lurek.input.isActionJustPressed("select") then
+        if lurek.input.wasActionPressed("select") then
             state = STATE_PLAYING
         end
         return
@@ -366,14 +367,14 @@ lurek.process(function(dt)
 
     -- Victory screen
     if state == STATE_VICTORY then
-        if lurek.input.isActionJustPressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.quit()
         end
         return
     end
 
     -- Quit
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         if shopOpen then
             shopOpen = false
         else
@@ -383,7 +384,7 @@ lurek.process(function(dt)
     end
 
     -- Animal shop toggle
-    if lurek.input.isActionJustPressed("animals") then
+    if lurek.input.wasActionPressed("animals") then
         shopOpen = not shopOpen
         buildMode = nil
         deleteMode = false
@@ -392,7 +393,7 @@ lurek.process(function(dt)
     -- Animal shop purchases
     if shopOpen then
         for i = 1, 5 do
-            if lurek.input.isActionJustPressed("buy" .. i) then
+            if lurek.input.wasActionPressed("buy" .. i) then
                 local def = ANIMAL_DEFS[i]
                 if gold >= def.cost then
                     -- Place animal: user must click a valid enclosure next
@@ -407,25 +408,25 @@ lurek.process(function(dt)
     else
         -- Build mode selection (only when shop is closed)
         if not shopOpen then
-            if lurek.input.isActionJustPressed("build_path")  then buildMode = TILE_PATH;  deleteMode = false; shopOpen = false end
-            if lurek.input.isActionJustPressed("build_fence") then buildMode = TILE_FENCE; deleteMode = false; shopOpen = false end
-            if lurek.input.isActionJustPressed("build_water") then buildMode = TILE_WATER; deleteMode = false; shopOpen = false end
-            if lurek.input.isActionJustPressed("build_food")  then buildMode = TILE_FOOD;  deleteMode = false; shopOpen = false end
-            if lurek.input.isActionJustPressed("build_shop")  then buildMode = TILE_SHOP;  deleteMode = false; shopOpen = false end
-            if lurek.input.isActionJustPressed("build_bench") then buildMode = TILE_BENCH; deleteMode = false; shopOpen = false end
+            if lurek.input.wasActionPressed("build_path")  then buildMode = TILE_PATH;  deleteMode = false; shopOpen = false end
+            if lurek.input.wasActionPressed("build_fence") then buildMode = TILE_FENCE; deleteMode = false; shopOpen = false end
+            if lurek.input.wasActionPressed("build_water") then buildMode = TILE_WATER; deleteMode = false; shopOpen = false end
+            if lurek.input.wasActionPressed("build_food")  then buildMode = TILE_FOOD;  deleteMode = false; shopOpen = false end
+            if lurek.input.wasActionPressed("build_shop")  then buildMode = TILE_SHOP;  deleteMode = false; shopOpen = false end
+            if lurek.input.wasActionPressed("build_bench") then buildMode = TILE_BENCH; deleteMode = false; shopOpen = false end
         end
     end
 
     -- Delete mode
-    if lurek.input.isActionJustPressed("delete") then
+    if lurek.input.wasActionPressed("delete") then
         deleteMode = not deleteMode
         buildMode = nil
         shopOpen = false
     end
 
     -- Click to build / delete / place animal
-    if lurek.input.isActionJustPressed("select") and not shopOpen then
-        local mx, my = lurek.input.getMousePosition()
+    if lurek.input.wasActionPressed("select") and not shopOpen then
+        local mx, my = lurek.input.mouse.getPosition()
         local row, col = screenToTile(mx, my)
         if row and col then
             if deleteMode then
@@ -581,12 +582,12 @@ lurek.process(function(dt)
 
     updateParticles(dt)
     updateTweens(dt)
-end)
+end
 
 ------------------------------------------------------------
 -- Render — zoo grid, animals, visitors
 ------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     camera:attach()
 
     -- Draw grid
@@ -641,12 +642,12 @@ lurek.render(function()
     end
 
     camera:detach()
-end)
+end
 
 ------------------------------------------------------------
 -- Render UI — HUD, menus, stats, rating
 ------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then
         -- Title screen
         lurek.render.rectangle(0, 0, 800, 600, 0.05, 0.1, 0.05, 1)
@@ -747,4 +748,4 @@ lurek.render_ui(function()
             lurek.render.print(needStr, 380, y + 12, 12, 0.6, 0.75, 0.5, textAlpha)
         end
     end
-end)
+end

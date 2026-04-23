@@ -191,12 +191,11 @@ codegen-units = 256
 opt-level = 1
 
 [profile.release]
-# SIZE-FIRST — opt-level="z" is the only setting that reaches the ~20 MB raw
-# binary target (opt=s → 25 MB, opt=3 → 32 MB). Performance is near-identical
-# to "s" for a game engine (GPU-bound; CPU differences are in the noise).
-# lto="fat" + codegen-units=1 = maximum cross-crate dead-code elimination.
+# MAXIMUM PERFORMANCE — opt-level=3 enables full inlining, loop unrolling, and
+# all LLVM optimizations. Binary is larger (~32 MB raw) but runs fastest.
+# lto="fat" + codegen-units=1 = whole-program dead-code elimination.
 # strip=true + panic=abort remove all symbol tables and unwind machinery.
-opt-level = "z"
+opt-level = 3
 lto = "fat"
 codegen-units = 1
 strip = true
@@ -204,8 +203,8 @@ panic = "abort"
 overflow-checks = false
 debug = false
 
-# DISTRIBUTION profile — inherits all release settings (opt=z, fat LTO, strip).
-# No overrides needed; dist.ps1 applies UPX -6 --lzma on top to reach ~5 MB.
+# DISTRIBUTION profile — inherits everything from release (opt-level=3, fat LTO,
+# strip, panic=abort). dist.ps1 applies UPX --best on top → ~8-9 MB package.
 [profile.dist]
 inherits = "release"
 

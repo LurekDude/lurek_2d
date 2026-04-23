@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 --  Fighting Game — 1v1 Player vs AI with combos, super meter, best of 3
 -- ----------------------------------------------------------------------------
 --  Category : action
@@ -15,8 +15,6 @@
 -- ============================================================================
 
 -- ── Constants ─────────────────────────────────────────────────────────────
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local SCREEN_W, SCREEN_H = 800, 600
 local GROUND_Y           = 480          -- stage floor top
@@ -294,17 +292,17 @@ end
 -- ── lurek.init ────────────────────────────────────────────────────────────
 function lurek.init()
     lurek.window.setTitle("Fighting Game — Lurek2D")
-    gfx.setBackgroundColor(0.08, 0.05, 0.15)
+    lurek.render.setBackgroundColor(0.08, 0.05, 0.15)
 
     -- Input actions
-    lurek.input.addAction("left",  {"a", "left"})
-    lurek.input.addAction("right", {"d", "right"})
-    lurek.input.addAction("jump",  {"w", "up"})
-    lurek.input.addAction("punch", {"f"})
-    lurek.input.addAction("kick",  {"g"})
-    lurek.input.addAction("block", {"h"})
-    lurek.input.addAction("super", {"q"})
-    lurek.input.addAction("quit",  {"escape"})
+    lurek.input.bind("left",  {"a", "left"})
+    lurek.input.bind("right", {"d", "right"})
+    lurek.input.bind("jump",  {"w", "up"})
+    lurek.input.bind("punch", {"f"})
+    lurek.input.bind("kick",  {"g"})
+    lurek.input.bind("block", {"h"})
+    lurek.input.bind("super", {"q"})
+    lurek.input.bind("quit",  {"escape"})
 
     -- Particles — hit sparks (orange)
     hit_sparks = lurek.particle.new({
@@ -363,7 +361,7 @@ function lurek.process(dt)
     end
 
     -- Quit
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -410,21 +408,21 @@ function lurek.process(dt)
     -- Player input
     p1.blocking = false
     if p1.stunned <= 0 then
-        if lurek.input.isActionPressed("left") then
+        if lurek.input.isActionDown("left") then
             p1.vx = -MOVE_SPEED
             p1.facing = -1
-        elseif lurek.input.isActionPressed("right") then
+        elseif lurek.input.isActionDown("right") then
             p1.vx = MOVE_SPEED
             p1.facing = 1
         end
-        if lurek.input.isActionJustPressed("jump") and p1.grounded then
+        if lurek.input.wasActionPressed("jump") and p1.grounded then
             p1.vy = JUMP_VEL
             p1.grounded = false
         end
-        if lurek.input.isActionJustPressed("punch") then start_attack(p1, PUNCH) end
-        if lurek.input.isActionJustPressed("kick")  then start_attack(p1, KICK)  end
-        if lurek.input.isActionJustPressed("super") then start_attack(p1, SUPER) end
-        if lurek.input.isActionPressed("block") then
+        if lurek.input.wasActionPressed("punch") then start_attack(p1, PUNCH) end
+        if lurek.input.wasActionPressed("kick")  then start_attack(p1, KICK)  end
+        if lurek.input.wasActionPressed("super") then start_attack(p1, SUPER) end
+        if lurek.input.isActionDown("block") then
             p1.blocking = true
         end
     end
@@ -469,42 +467,42 @@ local function draw_fighter(f, body_r, body_g, body_b, accent_r, accent_g, accen
     local x, y = f.x, f.y
 
     -- Legs (two small rectangles)
-    gfx.setColor(body_r * 0.7, body_g * 0.7, body_b * 0.7, 1)
-    gfx.drawRect("fill", x + 4, y + FIGHTER_H - 16, 12, 16)
-    gfx.drawRect("fill", x + FIGHTER_W - 16, y + FIGHTER_H - 16, 12, 16)
+    lurek.render.setColor(body_r * 0.7, body_g * 0.7, body_b * 0.7, 1)
+    lurek.render.rectangle("fill", x + 4, y + FIGHTER_H - 16, 12, 16)
+    lurek.render.rectangle("fill", x + FIGHTER_W - 16, y + FIGHTER_H - 16, 12, 16)
 
     -- Body
-    gfx.setColor(body_r, body_g, body_b, 1)
-    gfx.drawRect("fill", x, y, FIGHTER_W, FIGHTER_H - 16)
+    lurek.render.setColor(body_r, body_g, body_b, 1)
+    lurek.render.rectangle("fill", x, y, FIGHTER_W, FIGHTER_H - 16)
 
     -- Head accent stripe
-    gfx.setColor(accent_r, accent_g, accent_b, 1)
-    gfx.drawRect("fill", x + 8, y + 4, FIGHTER_W - 16, 12)
+    lurek.render.setColor(accent_r, accent_g, accent_b, 1)
+    lurek.render.rectangle("fill", x + 8, y + 4, FIGHTER_W - 16, 12)
 
     -- Arm (extends toward facing)
     if f.atk_timer > 0 and f.cur_attack then
         -- Attacking arm — extended
         local arm_len = f.cur_attack.range * 0.6
         local arm_x = f.facing == 1 and (x + FIGHTER_W) or (x - arm_len)
-        gfx.setColor(accent_r, accent_g, accent_b, 1)
-        gfx.drawRect("fill", arm_x, y + 20, arm_len, 10)
+        lurek.render.setColor(accent_r, accent_g, accent_b, 1)
+        lurek.render.rectangle("fill", arm_x, y + 20, arm_len, 10)
     else
         -- Resting arm
         local arm_x = f.facing == 1 and (x + FIGHTER_W - 4) or (x - 8)
-        gfx.setColor(body_r * 0.8, body_g * 0.8, body_b * 0.8, 1)
-        gfx.drawRect("fill", arm_x, y + 22, 12, 8)
+        lurek.render.setColor(body_r * 0.8, body_g * 0.8, body_b * 0.8, 1)
+        lurek.render.rectangle("fill", arm_x, y + 22, 12, 8)
     end
 
     -- Block indicator
     if f.blocking then
-        gfx.setColor(1, 1, 1, 0.3)
-        gfx.drawRect("fill", x - 4, y - 4, FIGHTER_W + 8, FIGHTER_H + 4)
+        lurek.render.setColor(1, 1, 1, 0.3)
+        lurek.render.rectangle("fill", x - 4, y - 4, FIGHTER_W + 8, FIGHTER_H + 4)
     end
 
     -- Stun indicator
     if f.stunned > 0 then
-        gfx.setColor(1, 1, 0, 0.4)
-        gfx.drawRect("fill", x, y - 6, FIGHTER_W, 4)
+        lurek.render.setColor(1, 1, 0, 0.4)
+        lurek.render.rectangle("fill", x, y - 6, FIGHTER_W, 4)
     end
 
     -- Attack hitbox overlay
@@ -514,13 +512,13 @@ local function draw_fighter(f, body_r, body_g, body_b, accent_r, accent_g, accen
         local alpha = atk == SUPER and 0.35 or 0.2
         local hr, hg, hb = 1, 0.3, 0.3
         if atk == SUPER then hr, hg, hb = 1, 1, 0.2 end
-        gfx.setColor(hr, hg, hb, alpha)
-        gfx.drawRect("fill", hb_x, y, atk.range, FIGHTER_H)
+        lurek.render.setColor(hr, hg, hb, alpha)
+        lurek.render.rectangle("fill", hb_x, y, atk.range, FIGHTER_H)
     end
 end
 
 -- ── lurek.render ─────────────────────────────────────────────────────────
-function lurek.render()
+function lurek.draw()
     -- Camera shake offset
     local ox, oy = 0, 0
     if shake_timer > 0 then
@@ -531,23 +529,23 @@ function lurek.render()
 
     if state == STATE.TITLE then
         -- Title background accents
-        gfx.setColor(0.15, 0.08, 0.25, 1)
-        gfx.drawRect("fill", 100, 180, 600, 200)
+        lurek.render.setColor(0.15, 0.08, 0.25, 1)
+        lurek.render.rectangle("fill", 100, 180, 600, 200)
         return
     end
 
     -- Stage floor
-    gfx.setColor(0.35, 0.22, 0.12, 1)
-    gfx.drawRect("fill", 0, GROUND_Y, SCREEN_W, SCREEN_H - GROUND_Y)
+    lurek.render.setColor(0.35, 0.22, 0.12, 1)
+    lurek.render.rectangle("fill", 0, GROUND_Y, SCREEN_W, SCREEN_H - GROUND_Y)
 
     -- Stage floor line
-    gfx.setColor(0.5, 0.35, 0.18, 1)
-    gfx.drawRect("fill", 0, GROUND_Y, SCREEN_W, 3)
+    lurek.render.setColor(0.5, 0.35, 0.18, 1)
+    lurek.render.rectangle("fill", 0, GROUND_Y, SCREEN_W, 3)
 
     -- Stage side walls (decorative)
-    gfx.setColor(0.2, 0.12, 0.08, 1)
-    gfx.drawRect("fill", 0, GROUND_Y - 120, 8, 120)
-    gfx.drawRect("fill", SCREEN_W - 8, GROUND_Y - 120, 8, 120)
+    lurek.render.setColor(0.2, 0.12, 0.08, 1)
+    lurek.render.rectangle("fill", 0, GROUND_Y - 120, 8, 120)
+    lurek.render.rectangle("fill", SCREEN_W - 8, GROUND_Y - 120, 8, 120)
 
     -- Fighters
     draw_fighter(p1, 0.2, 0.4, 0.9,  0.3, 0.8, 0.9)   -- blue body, cyan accent
@@ -560,28 +558,28 @@ function lurek.render()
 end
 
 -- ── lurek.render_ui ──────────────────────────────────────────────────────
-function lurek.render_ui()
-    gfx.setColor(1, 1, 1, 1)
+function lurek.draw_ui()
+    lurek.render.setColor(1, 1, 1, 1)
 
     -- ── TITLE SCREEN ─────────────────────────────────────────────────
     if state == STATE.TITLE then
-        gfx.setColor(0.3, 0.6, 1.0, 1)
-        gfx.print("FIGHTING GAME", SCREEN_W * 0.5 - 130, 200, 0, 3, 3)
-        gfx.setColor(0.9, 0.4, 0.2, 1)
-        gfx.print("Player vs AI — Best of 3 Rounds", SCREEN_W * 0.5 - 145, 260, 0, 1.2, 1.2)
+        lurek.render.setColor(0.3, 0.6, 1.0, 1)
+        lurek.render.print("FIGHTING GAME", SCREEN_W * 0.5 - 130, 200, 0, 3, 3)
+        lurek.render.setColor(0.9, 0.4, 0.2, 1)
+        lurek.render.print("Player vs AI — Best of 3 Rounds", SCREEN_W * 0.5 - 145, 260, 0, 1.2, 1.2)
 
         if math.floor(title_blink * 2) % 2 == 0 then
-            gfx.setColor(1, 1, 1, 0.9)
-            gfx.print("PRESS ENTER", SCREEN_W * 0.5 - 75, 340, 0, 1.5, 1.5)
+            lurek.render.setColor(1, 1, 1, 0.9)
+            lurek.render.print("PRESS ENTER", SCREEN_W * 0.5 - 75, 340, 0, 1.5, 1.5)
         end
 
         -- Controls
-        gfx.setColor(0.6, 0.6, 0.6, 1)
-        gfx.print("A/D = Move   W = Jump   F = Punch   G = Kick", 160, 430)
-        gfx.print("H = Block   Q = Super   ESC = Quit", 200, 455)
+        lurek.render.setColor(0.6, 0.6, 0.6, 1)
+        lurek.render.print("A/D = Move   W = Jump   F = Punch   G = Kick", 160, 430)
+        lurek.render.print("H = Block   Q = Super   ESC = Quit", 200, 455)
 
-        gfx.setColor(0.4, 0.4, 0.4, 1)
-        gfx.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 18)
+        lurek.render.setColor(0.4, 0.4, 0.4, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 18)
         return
     end
 
@@ -591,29 +589,29 @@ function lurek.render_ui()
     local bar_y = 20
 
     -- P1 HP bar (left side)
-    gfx.setColor(0.2, 0.2, 0.2, 0.8)
-    gfx.drawRect("fill", 20, bar_y, bar_w, bar_h)
+    lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
+    lurek.render.rectangle("fill", 20, bar_y, bar_w, bar_h)
     local p1_frac = clamp(p1.hp_display / p1.max_hp, 0, 1)
     local p1r = 0.2 + (1 - p1_frac) * 0.8
     local p1g = p1_frac * 0.8
-    gfx.setColor(p1r, p1g, 0.1, 1)
-    gfx.drawRect("fill", 20, bar_y, bar_w * p1_frac, bar_h)
-    gfx.setColor(1, 1, 1, 1)
-    gfx.print("P1", 24, bar_y + 2)
-    gfx.print(math.floor(p1.hp) .. " HP", 20 + bar_w - 50, bar_y + 2)
+    lurek.render.setColor(p1r, p1g, 0.1, 1)
+    lurek.render.rectangle("fill", 20, bar_y, bar_w * p1_frac, bar_h)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("P1", 24, bar_y + 2)
+    lurek.render.print(math.floor(p1.hp) .. " HP", 20 + bar_w - 50, bar_y + 2)
 
     -- P2 HP bar (right side)
     local p2_bar_x = SCREEN_W - 20 - bar_w
-    gfx.setColor(0.2, 0.2, 0.2, 0.8)
-    gfx.drawRect("fill", p2_bar_x, bar_y, bar_w, bar_h)
+    lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
+    lurek.render.rectangle("fill", p2_bar_x, bar_y, bar_w, bar_h)
     local p2_frac = clamp(p2.hp_display / p2.max_hp, 0, 1)
     local p2r = 0.2 + (1 - p2_frac) * 0.8
     local p2g = p2_frac * 0.8
-    gfx.setColor(p2r, p2g, 0.1, 1)
-    gfx.drawRect("fill", p2_bar_x + bar_w * (1 - p2_frac), bar_y, bar_w * p2_frac, bar_h)
-    gfx.setColor(1, 1, 1, 1)
-    gfx.print("AI", p2_bar_x + bar_w - 24, bar_y + 2)
-    gfx.print(math.floor(p2.hp) .. " HP", p2_bar_x + 4, bar_y + 2)
+    lurek.render.setColor(p2r, p2g, 0.1, 1)
+    lurek.render.rectangle("fill", p2_bar_x + bar_w * (1 - p2_frac), bar_y, bar_w * p2_frac, bar_h)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("AI", p2_bar_x + bar_w - 24, bar_y + 2)
+    lurek.render.print(math.floor(p2.hp) .. " HP", p2_bar_x + 4, bar_y + 2)
 
     -- ── SUPER METER ─────────────────────────────────────────────────
     local meter_w = 120
@@ -621,81 +619,81 @@ function lurek.render_ui()
     local meter_y = bar_y + bar_h + 6
 
     -- P1 meter
-    gfx.setColor(0.15, 0.15, 0.15, 0.7)
-    gfx.drawRect("fill", 20, meter_y, meter_w, meter_h)
+    lurek.render.setColor(0.15, 0.15, 0.15, 0.7)
+    lurek.render.rectangle("fill", 20, meter_y, meter_w, meter_h)
     local m1_frac = clamp(p1.meter_display / METER_MAX, 0, 1)
     if p1.meter >= METER_MAX then
-        gfx.setColor(1.0, 0.9, 0.1, 1)
+        lurek.render.setColor(1.0, 0.9, 0.1, 1)
     else
-        gfx.setColor(0.2, 0.5, 0.9, 0.9)
+        lurek.render.setColor(0.2, 0.5, 0.9, 0.9)
     end
-    gfx.drawRect("fill", 20, meter_y, meter_w * m1_frac, meter_h)
-    gfx.setColor(0.7, 0.7, 0.7, 1)
-    gfx.print("SUPER", 20 + meter_w + 6, meter_y - 2, 0, 0.8, 0.8)
+    lurek.render.rectangle("fill", 20, meter_y, meter_w * m1_frac, meter_h)
+    lurek.render.setColor(0.7, 0.7, 0.7, 1)
+    lurek.render.print("SUPER", 20 + meter_w + 6, meter_y - 2, 0, 0.8, 0.8)
 
     -- P2 meter
     local m2_x = SCREEN_W - 20 - meter_w
-    gfx.setColor(0.15, 0.15, 0.15, 0.7)
-    gfx.drawRect("fill", m2_x, meter_y, meter_w, meter_h)
+    lurek.render.setColor(0.15, 0.15, 0.15, 0.7)
+    lurek.render.rectangle("fill", m2_x, meter_y, meter_w, meter_h)
     local m2_frac = clamp(p2.meter_display / METER_MAX, 0, 1)
     if p2.meter >= METER_MAX then
-        gfx.setColor(1.0, 0.9, 0.1, 1)
+        lurek.render.setColor(1.0, 0.9, 0.1, 1)
     else
-        gfx.setColor(0.9, 0.3, 0.2, 0.9)
+        lurek.render.setColor(0.9, 0.3, 0.2, 0.9)
     end
-    gfx.drawRect("fill", m2_x + meter_w * (1 - m2_frac), meter_y, meter_w * m2_frac, meter_h)
-    gfx.setColor(0.7, 0.7, 0.7, 1)
-    gfx.print("SUPER", m2_x - 50, meter_y - 2, 0, 0.8, 0.8)
+    lurek.render.rectangle("fill", m2_x + meter_w * (1 - m2_frac), meter_y, meter_w * m2_frac, meter_h)
+    lurek.render.setColor(0.7, 0.7, 0.7, 1)
+    lurek.render.print("SUPER", m2_x - 50, meter_y - 2, 0, 0.8, 0.8)
 
     -- ── ROUND SCORE ─────────────────────────────────────────────────
-    gfx.setColor(1, 1, 1, 1)
-    gfx.print("ROUND " .. round_num, SCREEN_W * 0.5 - 30, 8)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("ROUND " .. round_num, SCREEN_W * 0.5 - 30, 8)
 
     -- Win dots
     for i = 1, ROUNDS_TO_WIN do
         local dot_r = i <= p1.wins and 0.3 or 0.2
         local dot_g = i <= p1.wins and 0.8 or 0.2
         local dot_b = i <= p1.wins and 1.0 or 0.2
-        gfx.setColor(dot_r, dot_g, dot_b, 1)
-        gfx.drawRect("fill", 20 + (i - 1) * 18, 8, 12, 12)
+        lurek.render.setColor(dot_r, dot_g, dot_b, 1)
+        lurek.render.rectangle("fill", 20 + (i - 1) * 18, 8, 12, 12)
     end
     for i = 1, ROUNDS_TO_WIN do
         local dot_r = i <= p2.wins and 1.0 or 0.2
         local dot_g = i <= p2.wins and 0.3 or 0.2
         local dot_b = 0.2
-        gfx.setColor(dot_r, dot_g, dot_b, 1)
-        gfx.drawRect("fill", SCREEN_W - 20 - i * 18, 8, 12, 12)
+        lurek.render.setColor(dot_r, dot_g, dot_b, 1)
+        lurek.render.rectangle("fill", SCREEN_W - 20 - i * 18, 8, 12, 12)
     end
 
     -- ── COMBO COUNTER ───────────────────────────────────────────────
     if p1.combo > 1 then
-        gfx.setColor(1.0, 0.8, 0.1, 1)
-        gfx.print(p1.combo .. " HIT COMBO!", p1.x - 20, p1.y - 30, 0, 1.2, 1.2)
+        lurek.render.setColor(1.0, 0.8, 0.1, 1)
+        lurek.render.print(p1.combo .. " HIT COMBO!", p1.x - 20, p1.y - 30, 0, 1.2, 1.2)
     end
     if p2.combo > 1 then
-        gfx.setColor(1.0, 0.4, 0.1, 1)
-        gfx.print(p2.combo .. " HIT COMBO!", p2.x - 20, p2.y - 30, 0, 1.2, 1.2)
+        lurek.render.setColor(1.0, 0.4, 0.1, 1)
+        lurek.render.print(p2.combo .. " HIT COMBO!", p2.x - 20, p2.y - 30, 0, 1.2, 1.2)
     end
 
     -- ── ROUND TEXT OVERLAY ──────────────────────────────────────────
     if round_text_alpha > 0.01 then
-        gfx.setColor(1, 1, 1, round_text_alpha)
-        gfx.print(round_text, SCREEN_W * 0.5 - 100, SCREEN_H * 0.4, 0, 2, 2)
+        lurek.render.setColor(1, 1, 1, round_text_alpha)
+        lurek.render.print(round_text, SCREEN_W * 0.5 - 100, SCREEN_H * 0.4, 0, 2, 2)
     end
 
     -- ── MATCH OVER ──────────────────────────────────────────────────
     if state == STATE.MATCH_OVER then
-        gfx.setColor(0, 0, 0, 0.6)
-        gfx.drawRect("fill", 0, SCREEN_H * 0.3, SCREEN_W, 120)
-        gfx.setColor(1, 0.9, 0.2, 1)
-        gfx.print(match_winner, SCREEN_W * 0.5 - 120, SCREEN_H * 0.35, 0, 3, 3)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 0, SCREEN_H * 0.3, SCREEN_W, 120)
+        lurek.render.setColor(1, 0.9, 0.2, 1)
+        lurek.render.print(match_winner, SCREEN_W * 0.5 - 120, SCREEN_H * 0.35, 0, 3, 3)
         if math.floor(title_blink * 2) % 2 == 0 then
-            gfx.setColor(1, 1, 1, 0.8)
-            gfx.print("PRESS ENTER", SCREEN_W * 0.5 - 75, SCREEN_H * 0.35 + 60, 0, 1.5, 1.5)
+            lurek.render.setColor(1, 1, 1, 0.8)
+            lurek.render.print("PRESS ENTER", SCREEN_W * 0.5 - 75, SCREEN_H * 0.35 + 60, 0, 1.5, 1.5)
         end
     end
 
     -- FPS
-    gfx.setColor(0.4, 0.4, 0.4, 1)
-    gfx.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 18)
+    lurek.render.setColor(0.4, 0.4, 0.4, 1)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 18)
 end

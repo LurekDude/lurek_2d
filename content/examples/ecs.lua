@@ -168,7 +168,7 @@ do  -- Universe:render
     end
   }
   world:addSystem(draw_system, { priority = 100 })
-  function lurek.render() world:render() end
+  function lurek.draw() world:render() end
 end
 
 --@api-stub: Universe:emit
@@ -506,4 +506,155 @@ do  -- Universe:clearRelations
   local boss = world:spawn()
   for _ = 1, 3 do local m = world:spawn(); world:addRelation(boss, "minions", m) end
   world:clearRelations(boss, "minions")
+end
+
+--@api-stub: Universe:addRelation
+-- Adds a directed relation from one entity to another with a typed tag.
+-- Relations model parent/child, attacker/target, or equipment/owner semantics.
+do  -- Universe:addRelation
+  local u = lurek.ecs.newUniverse()
+  local parent = u:spawn()
+  local child  = u:spawn()
+  u:addRelation(child, "child_of", parent)
+  lurek.log.info("relation added", "ecs")
+end
+
+--@api-stub: Universe:addSystem
+-- Registers a system function that processes entities matching a component query.
+-- Systems run in registration order inside universe:update(); pass a query table and callback.
+do  -- Universe:addSystem
+  local u = lurek.ecs.newUniverse()
+  u:addSystem({query={"Position", "Velocity"}}, function(entity, pos, vel)
+    lurek.log.info("system tick", "ecs")
+  end)
+  lurek.log.info("system count: " .. u:getSystemCount(), "ecs")
+end
+
+--@api-stub: Universe:defineBlueprint
+-- Defines a named entity blueprint with a default component set.
+-- Blueprints let you spawn pre-configured entities without repeating component setup.
+do  -- Universe:defineBlueprint
+  local u = lurek.ecs.newUniverse()
+  u:defineBlueprint("enemy", {Health={max=100}, Position={x=0,y=0}})
+  lurek.log.info("blueprint defined", "ecs")
+end
+
+--@api-stub: Universe:each
+-- Iterates all living entities matching the query, calling callback(entity, ...) for each.
+-- More convenient than query() when side effects are needed on every matching entity.
+do  -- Universe:each
+  local u = lurek.ecs.newUniverse()
+  local e = u:spawn()
+  u:set(e, "Tag", {})
+  u:each({"Tag"}, function(eid, tag)
+    lurek.log.info("entity: " .. eid, "ecs")
+  end)
+end
+
+--@api-stub: Universe:extendBlueprint
+-- Creates a new blueprint by inheriting from an existing one and overriding components.
+-- Child blueprints merge with parent; conflicts are resolved in favour of the child.
+do  -- Universe:extendBlueprint
+  local u = lurek.ecs.newUniverse()
+  u:defineBlueprint("unit", {Health={max=100}, Position={x=0,y=0}})
+  u:extendBlueprint("boss", "unit", {Health={max=500}})
+  lurek.log.info("boss extended from unit", "ecs")
+end
+
+--@api-stub: Universe:hasRelation
+-- Returns true if a directed relation with the given tag exists from source to target.
+-- Use before removeRelation to avoid errors on non-existent relations.
+do  -- Universe:hasRelation
+  local u = lurek.ecs.newUniverse()
+  local a = u:spawn(); local b = u:spawn()
+  u:addRelation(a, "ally", b)
+  lurek.log.info("has ally: " .. tostring(u:hasRelation(a, "ally", b)), "ecs")
+end
+
+--@api-stub: Universe:onComponentAdded
+-- Registers an observer callback that fires whenever a component type is added to any entity.
+-- Useful for reacting to component initialisation without polling in a system.
+do  -- Universe:onComponentAdded
+  local u = lurek.ecs.newUniverse()
+  u:onComponentAdded("Health", function(eid, comp)
+    lurek.log.info("health added to " .. eid, "ecs")
+  end)
+  local e = u:spawn()
+  u:set(e, "Health", {hp=100})
+end
+
+--@api-stub: Universe:onComponentRemoved
+-- Registers an observer callback that fires whenever a component type is removed from any entity.
+-- Use to clean up external resources when a component is destroyed.
+do  -- Universe:onComponentRemoved
+  local u = lurek.ecs.newUniverse()
+  u:onComponentRemoved("Sprite", function(eid)
+    lurek.log.info("sprite removed from " .. eid, "ecs")
+  end)
+  local e = u:spawn()
+  u:set(e, "Sprite", {path="hero.png"})
+  u:remove(e, "Sprite")
+end
+
+--@api-stub: Universe:queryNot
+-- Returns all living entities that do NOT have all of the excluded component types.
+-- Useful for finding entities missing a component, e.g. units without a patrol path.
+do  -- Universe:queryNot
+  local u = lurek.ecs.newUniverse()
+  local e1 = u:spawn(); u:set(e1, "Health", {hp=100})
+  local e2 = u:spawn()
+  local uninjured = u:queryNot({"Health"})
+  lurek.log.info("without health: " .. #uninjured, "ecs")
+end
+
+--@api-stub: Universe:removeRelation
+-- Removes a directed relation with the given tag between two entities.
+-- No-op if the relation does not exist; check with hasRelation first if needed.
+do  -- Universe:removeRelation
+  local u = lurek.ecs.newUniverse()
+  local a = u:spawn(); local b = u:spawn()
+  u:addRelation(a, "ally", b)
+  u:removeRelation(a, "ally", b)
+  lurek.log.info("relation removed", "ecs")
+end
+
+--@api-stub: Universe:set
+-- Adds or replaces a component on an entity with the provided data table.
+-- If the component already exists it is overwritten; fires onComponentAdded only on first add.
+do  -- Universe:set
+  local u = lurek.ecs.newUniverse()
+  local e = u:spawn()
+  u:set(e, "Position", {x=100, y=200})
+  u:set(e, "Velocity", {vx=5, vy=0})
+  lurek.log.info("components set on entity " .. e, "ecs")
+end
+
+--@api-stub: Universe:setParent
+-- Establishes a parent-child hierarchy between two entities.
+-- Children are destroyed when the parent is killed via killRecursive.
+do  -- Universe:setParent
+  local u = lurek.ecs.newUniverse()
+  local parent = u:spawn()
+  local child  = u:spawn()
+  u:setParent(child, parent)
+  lurek.log.info("parent: " .. u:getParent(child), "ecs")
+end
+
+--@api-stub: Universe:spawnBlueprint
+-- Spawns a new entity from a pre-defined blueprint with optional component overrides.
+-- Overrides are merged with the blueprint defaults; returns the new entity id.
+do  -- Universe:spawnBlueprint
+  local u = lurek.ecs.newUniverse()
+  u:defineBlueprint("goblin", {Health={max=40}, Position={x=0,y=0}})
+  local e = u:spawnBlueprint("goblin", {Position={x=300,y=200}})
+  lurek.log.info("spawned blueprint entity: " .. e, "ecs")
+end
+
+--@api-stub: Universe:spawnBulk
+-- Spawns multiple entities at once, optionally applying a template to each.
+-- Much faster than calling spawn() in a loop; returns a table of new entity ids.
+do  -- Universe:spawnBulk
+  local u = lurek.ecs.newUniverse()
+  local ids = u:spawnBulk(50, {Health={max=100}, Position={x=0,y=0}})
+  lurek.log.info("bulk spawned: " .. #ids, "ecs")
 end

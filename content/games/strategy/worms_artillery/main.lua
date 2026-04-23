@@ -155,11 +155,11 @@ function lurek.update(dt)
         if turn_timer <= 0 then next_turn(); return end
 
         -- Rotate aim
-        if lurek.input.isDown("left")  then aim_angle = aim_angle - 1.5 * dt end
-        if lurek.input.isDown("right") then aim_angle = aim_angle + 1.5 * dt end
+        if lurek.input.isActionDown("left")  then aim_angle = aim_angle - 1.5 * dt end
+        if lurek.input.isActionDown("right") then aim_angle = aim_angle + 1.5 * dt end
         -- Adjust power
-        if lurek.input.isDown("up")   then fire_power = math.min(POWER_MAX, fire_power + 120*dt) end
-        if lurek.input.isDown("down") then fire_power = math.max(POWER_MIN, fire_power - 120*dt) end
+        if lurek.input.isActionDown("up")   then fire_power = math.min(POWER_MAX, fire_power + 120*dt) end
+        if lurek.input.isActionDown("down") then fire_power = math.max(POWER_MIN, fire_power - 120*dt) end
 
     elseif state == STATE.FLYING then
         proj.vx = proj.vx + wind * dt

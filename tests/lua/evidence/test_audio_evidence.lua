@@ -283,7 +283,7 @@ end)
 local OUT = "tests/output/audio/"
 local SR  = 22050   -- sample rate for all tests
 
---                  helpers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  helpers
 
 --- Returns the peak absolute sample value (0..1) for a SoundData
 local function peak_amplitude(sd)
@@ -309,7 +309,7 @@ local function waveform_compare(sd_before, sd_after, label_before, label_after, 
     lurek.image.savePNG(img, path)
 end
 
---                  Low-pass filter                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Low-pass filter
 
 -- @description Exercises the low-pass DSP path with analytical amplitude checks and a before/after waveform render.
 describe("Evidence: lurek.audio applyLowpass", function()
@@ -329,7 +329,7 @@ describe("Evidence: lurek.audio applyLowpass", function()
 
 end)
 
---                  High-pass filter                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  High-pass filter
 
 -- @description Exercises the high-pass DSP path with analytical comparisons and waveform evidence.
 describe("Evidence: lurek.audio applyHighpass", function()
@@ -347,7 +347,7 @@ describe("Evidence: lurek.audio applyHighpass", function()
 
 end)
 
---                  Bandpass filter                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Bandpass filter
 
 -- @description Exercises the band-pass filter with in-band and out-of-band signals plus file evidence from filtered noise.
 describe("Evidence: lurek.audio applyBandpass", function()
@@ -365,13 +365,13 @@ describe("Evidence: lurek.audio applyBandpass", function()
 
 end)
 
---                  Gain                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  Gain
 
 -- @description Covers gain scaling and clipping behavior on SoundData buffers.
 describe("Evidence: lurek.audio applyGain", function()
 end)
 
---                  Mix                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Mix
 
 -- @description Covers additive mixing using both a silence control case and a waveform-rendered combined signal.
 describe("Evidence: lurek.audio mixInto", function()
@@ -390,7 +390,7 @@ describe("Evidence: lurek.audio mixInto", function()
 
 end)
 
---                  Filter sweep visual                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Filter sweep visual
 
 -- @description Produces a strip of filtered-noise waveform lanes to show how lowering or raising cutoff changes the visible signal envelope.
 describe("Evidence: lurek.audio filter sweep PNG", function()
@@ -434,7 +434,7 @@ local OUT = "tests/output/audio/"
 local SR  = 44100
 local DUR = 0.05  -- 50 ms -    short but enough to measure waveform properties
 
---                  helpers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  helpers
 
 --- Compute RMS of a SoundData buffer
 local function rms(sd)
@@ -466,38 +466,38 @@ local function waveform_strip(img, sd, lane, lanes_total, colour)
     sd:drawWaveform(img, 0, y, img:getWidth(), h_per_lane, r, g, b, 255)
 end
 
---                  Sine wave                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Sine wave
 
 -- @description Covers synthesized sine-wave generation, basic amplitude properties, and buffer sizing.
 describe("Evidence: lurek.audio newSineWave", function()
 end)
 
---                  Square wave                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Square wave
 
 -- @description Covers square-wave generation and its characteristic amplitude and RMS behavior.
 describe("Evidence: lurek.audio newSquareWave", function()
 end)
 
---                  Sawtooth wave                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Sawtooth wave
 
 -- @description Covers sawtooth-wave construction and its expected amplitude distribution.
 describe("Evidence: lurek.audio newSawtoothWave", function()
 end)
 
---                  Triangle wave                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Triangle wave
 
 -- @description Covers triangle-wave construction and its expected peak and RMS properties.
 describe("Evidence: lurek.audio newTriangleWave", function()
 end)
 
---                  White noise                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  White noise
 
 -- @description Covers deterministic white-noise generation, amplitude limits, and seed repeatability.
 describe("Evidence: lurek.audio newWhiteNoise", function()
 end)
 
 
---                  Visual evidence: all five waveforms on one PNG                                                                                                                                                                                                                         
+--                  Visual evidence: all five waveforms on one PNG
 
 -- @description Writes visual and audio evidence comparing all generator outputs side by side.
 describe("Evidence: lurek.audio waveform PNG", function()
@@ -557,7 +557,7 @@ describe("Evidence: lurek.audio waveform PNG", function()
 
 end)
 
---                  Manual sample synthesis (FM / ADSR / drum)                                                                                                                                                                                                                                                                 
+--                  Manual sample synthesis (FM / ADSR / drum)
 
 -- @description Builds several hand-authored synthesis examples to document more advanced sample authoring workflows.
 describe("Evidence: lurek.audio manual sample synthesis", function()

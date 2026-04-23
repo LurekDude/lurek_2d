@@ -1,4 +1,4 @@
-﻿//! `lurek.particle` â€” Emitter-based 2D particle systems and trail ribbons.
+//! `lurek.particle` â€” Emitter-based 2D particle systems and trail ribbons.
 
 use super::callback_registry::CallbackRegistry;
 use super::SharedState;

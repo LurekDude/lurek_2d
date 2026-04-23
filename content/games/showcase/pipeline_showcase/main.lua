@@ -201,7 +201,8 @@ end
 -- ============================================================
 -- Input bindings
 -- ============================================================
-function lurek.ready()
+
+function lurek.init()
     lurek.render.setBackgroundColor(0.06, 0.06, 0.08)
     lurek.window.setTitle("Pipeline Showcase — Lurek2D")
     lurek.camera.setPosition(0, 0)
@@ -227,7 +228,7 @@ end
 -- ============================================================
 -- process(dt) — callback index 2
 -- ============================================================
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS
     fps_timer = fps_timer + dt
     fps_count = fps_count + 1
@@ -247,22 +248,22 @@ lurek.process(function(dt)
         update_particles(dt)
 
         -- Input check even on title
-        if lurek.input.isActionPressed("scene_1") then switch_scene(STATE_SCENE_1) end
-        if lurek.input.isActionPressed("scene_2") then switch_scene(STATE_SCENE_2) end
-        if lurek.input.isActionPressed("scene_3") then switch_scene(STATE_SCENE_3) end
-        if lurek.input.isActionPressed("quit") then lurek.event.quit() end
+        if lurek.input.isActionDown("scene_1") then switch_scene(STATE_SCENE_1) end
+        if lurek.input.isActionDown("scene_2") then switch_scene(STATE_SCENE_2) end
+        if lurek.input.isActionDown("scene_3") then switch_scene(STATE_SCENE_3) end
+        if lurek.input.isActionDown("quit") then lurek.event.quit() end
         return
     end
 
     -- Input: scene switching
-    if lurek.input.isActionPressed("scene_1") then switch_scene(STATE_SCENE_1) end
-    if lurek.input.isActionPressed("scene_2") then switch_scene(STATE_SCENE_2) end
-    if lurek.input.isActionPressed("scene_3") then switch_scene(STATE_SCENE_3) end
-    if lurek.input.isActionPressed("quit") then lurek.event.quit() end
+    if lurek.input.isActionDown("scene_1") then switch_scene(STATE_SCENE_1) end
+    if lurek.input.isActionDown("scene_2") then switch_scene(STATE_SCENE_2) end
+    if lurek.input.isActionDown("scene_3") then switch_scene(STATE_SCENE_3) end
+    if lurek.input.isActionDown("quit") then lurek.event.quit() end
 
     -- Input: toggle callbacks
     for i = 1, 6 do
-        if lurek.input.isActionPressed("toggle_" .. i) then
+        if lurek.input.isActionDown("toggle_" .. i) then
             pipe_enabled[i] = not pipe_enabled[i]
             local bx = PIPE_X0 + (i - 1) * (PIPE_BOX_W + PIPE_GAP) + PIPE_BOX_W / 2
             if pipe_enabled[i] then
@@ -292,7 +293,7 @@ lurek.process(function(dt)
     update_particles(dt)
 
     pipe_times_ms[2] = (lurek.timer.getTime() - t0) * 1000
-end)
+end
 
 -- ============================================================
 -- process_physics(dt) — callback index 3
@@ -337,7 +338,7 @@ lurek.process_physics(function(dt)
     end
 
     pipe_times_ms[3] = (lurek.timer.getTime() - t0) * 1000
-end)
+end
 
 -- ============================================================
 -- process_late(dt) — callback index 4
@@ -383,12 +384,12 @@ lurek.process_late(function(dt)
     end
 
     pipe_times_ms[4] = (lurek.timer.getTime() - t0) * 1000
-end)
+end
 
 -- ============================================================
 -- render() — callback index 5 (simulation world)
 -- ============================================================
-lurek.render(function()
+function lurek.draw()
     -- Title screen
     if state == STATE_TITLE then
         local alpha = clamp(title_timer / TITLE_FADE_IN, 0, 1)
@@ -433,12 +434,12 @@ lurek.render(function()
     end
 
     pipe_times_ms[5] = (lurek.timer.getTime() - t0) * 1000
-end)
+end
 
 -- ============================================================
 -- render_ui() — callback index 6 (pipeline diagram + stats)
 -- ============================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then return end
 
     if not is_pipe_active(6) then return end
@@ -573,4 +574,4 @@ lurek.render_ui(function()
     for i = 1, PIPE_COUNT do
         pipe_fired[i] = false
     end
-end)
+end

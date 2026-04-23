@@ -420,8 +420,8 @@ end
 -- Mash processing
 -- ---------------------------------------------------------------------------
 local function process_mash(dt)
-    local pressed_a = lurek.input.isPressed("run_left")
-    local pressed_d = lurek.input.isPressed("run_right")
+    local pressed_a = lurek.input.keyboard.isDown("run_left")
+    local pressed_d = lurek.input.keyboard.isDown("run_right")
 
     if pressed_a and p_last_key ~= "a" then
         p_mash_power = clamp(p_mash_power + 12 * (p_stamina / p_max_stamina), 0, 100)
@@ -487,7 +487,7 @@ local function update_long_jump(dt)
         process_mash(dt)
         px = px + p_speed * dt
 
-        if lurek.input.isPressed("action") and px >= BOARD_X - 20 and px <= BOARD_X + 20 then
+        if lurek.input.keyboard.isDown("action") and px >= BOARD_X - 20 and px <= BOARD_X + 20 then
             -- Jump
             p_airborne = true
             local angle_factor = 0.7 + 0.3 * (clamp(px - BOARD_X + 20, 0, 40) / 40)
@@ -574,7 +574,7 @@ local function update_javelin(dt)
         end
     elseif angle_set then
         -- Waiting for throw release
-        if lurek.input.isPressed("action") then
+        if lurek.input.keyboard.isDown("action") then
             throw_released = true
             event_timer = 0
             p_vy = -p_speed * math.sin(math.rad(angle))
@@ -584,7 +584,7 @@ local function update_javelin(dt)
         process_mash(dt)
         px = px + p_speed * dt
 
-        if lurek.input.isPressed("action") and p_speed > 30 then
+        if lurek.input.keyboard.isDown("action") and p_speed > 30 then
             angle_set = true
             angle = 0
         end
@@ -641,7 +641,7 @@ local function update_high_jump(dt)
         process_mash(dt)
         px = px + p_speed * dt
 
-        if lurek.input.isPressed("action") and math.abs(px - BAR_X) < 60 then
+        if lurek.input.keyboard.isDown("action") and math.abs(px - BAR_X) < 60 then
             hj_jumping = true
             local jump_power = clamp(p_speed / MAX_SPEED, 0.3, 1.0)
             p_vy = -(450 * jump_power)
@@ -662,7 +662,7 @@ local function update_hurdles(dt)
     event_timer = event_timer + dt
 
     -- Jump
-    if lurek.input.isPressed("action") and not p_airborne then
+    if lurek.input.keyboard.isDown("action") and not p_airborne then
         p_airborne = true
         p_vy = -350
         ps_dust:setPosition(px, TRACK_Y)
@@ -726,6 +726,7 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.render.setBackgroundColor(0.6, 0.3, 0.2)
     lurek.window.setTitle("Track & Field — Lurek2D")
@@ -736,7 +737,7 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.ready
 -- ---------------------------------------------------------------------------
-function lurek.ready()
+local function _ready_setup()
     current_state = STATE.TITLE
 end
 
@@ -745,7 +746,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
     -- Quit
-    if lurek.input.isPressed("quit") then
+    if lurek.input.keyboard.isDown("quit") then
         lurek.event.signal("quit")
         return
     end
@@ -758,7 +759,7 @@ function lurek.process(dt)
 
     -- Title
     if current_state == STATE.TITLE then
-        if lurek.input.isPressed("action") then
+        if lurek.input.keyboard.isDown("action") then
             p_stamina = p_max_stamina
             medals = { gold = 0, silver = 0, bronze = 0 }
             total_points = 0
@@ -805,7 +806,7 @@ function lurek.process(dt)
 
     -- Final screen
     if current_state == STATE.FINAL then
-        if lurek.input.isPressed("action") then
+        if lurek.input.keyboard.isDown("action") then
             current_state = STATE.TITLE
         end
         return
@@ -885,7 +886,7 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.render
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state == STATE.TITLE or current_state == STATE.FINAL then
         return
     end
@@ -942,12 +943,12 @@ lurek.render(function()
     lurek.particle.draw(ps_confetti)
 
     if camera then camera:detach() end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- lurek.render_ui
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- Title screen
     if current_state == STATE.TITLE then
         lurek.render.setColor(COL_DARK[1], COL_DARK[2], COL_DARK[3])
@@ -1109,4 +1110,4 @@ lurek.render_ui(function()
     lurek.render.print(string.format("B:%d", medals.bronze), mx + 90, 10)
     lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
     lurek.render.print(string.format("Pts:%d", total_points), mx + 130, 10)
-end)
+end

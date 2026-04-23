@@ -375,6 +375,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Wildlife Photo — Lurek2D")
     lurek.render.setBackgroundColor(bg_r, bg_g, bg_b)
@@ -423,7 +424,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Update
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Quit / back
     if lurek.input.wasActionPressed("quit") then
         if current_state == STATES.ALBUM then
@@ -546,12 +547,12 @@ lurek.process(function(dt)
     ps_leaves:update(dt)
     ps_firefly:update(dt)
     ps_footprint:update(dt)
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render (world)
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state == STATES.TITLE then return end
     if current_state == STATES.ALBUM then return end
     if current_state == STATES.COMPLETE then return end
@@ -639,12 +640,12 @@ lurek.render(function()
     end
 
     camera:detach()
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI (HUD overlay)
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     local W, H = SCREEN_W, SCREEN_H
 
     -- ─── TITLE ───
@@ -781,4 +782,4 @@ lurek.render_ui(function()
 
     -- Camera flash particles (screen space)
     ps_flash:draw()
-end)
+end

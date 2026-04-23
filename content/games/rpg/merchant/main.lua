@@ -305,6 +305,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Engine callbacks
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Merchant — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.12, 0.08)
@@ -312,17 +313,17 @@ function lurek.init()
     reset_game()
 end
 
-function lurek.ready()
+local function _ready_setup()
     current_state = STATE.TITLE
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Title screen
     if current_state == STATE.TITLE then
-        if lurek.input.isPressed("return") or lurek.input.isPressed("space") then
+        if lurek.input.keyboard.isDown("return") or lurek.input.keyboard.isDown("space") then
             current_state = STATE.TRADING
         end
-        if lurek.input.isPressed("escape") then
+        if lurek.input.keyboard.isDown("escape") then
             lurek.event.signal("quit")
         end
         return
@@ -330,11 +331,11 @@ lurek.process(function(dt)
 
     -- Game over
     if current_state == STATE.GAME_OVER then
-        if lurek.input.isPressed("return") or lurek.input.isPressed("space") then
+        if lurek.input.keyboard.isDown("return") or lurek.input.keyboard.isDown("space") then
             reset_game()
             current_state = STATE.TITLE
         end
-        if lurek.input.isPressed("escape") then
+        if lurek.input.keyboard.isDown("escape") then
             lurek.event.signal("quit")
         end
         return
@@ -342,7 +343,7 @@ lurek.process(function(dt)
 
     -- Ledger view
     if current_state == STATE.LEDGER then
-        if lurek.input.isPressed("l") or lurek.input.isPressed("escape") then
+        if lurek.input.keyboard.isDown("l") or lurek.input.keyboard.isDown("escape") then
             current_state = STATE.TRADING
         end
         return
@@ -381,7 +382,7 @@ lurek.process(function(dt)
     -- Input: trading
     if current_state == STATE.TRADING or current_state == STATE.CUSTOMER then
         -- Toggle sell mode
-        if lurek.input.isPressed("s") then
+        if lurek.input.keyboard.isDown("s") then
             sell_mode = not sell_mode
             if sell_mode then
                 add_message("SELL MODE — press 1-8 to sell", 1.0, 0.7, 0.2)
@@ -392,7 +393,7 @@ lurek.process(function(dt)
 
         -- Buy/sell items 1-8
         for i = 1, 8 do
-            if lurek.input.isPressed(tostring(i)) then
+            if lurek.input.keyboard.isDown(tostring(i)) then
                 if sell_mode then
                     sell_item(i)
                 else
@@ -402,22 +403,22 @@ lurek.process(function(dt)
         end
 
         -- Auto-buy
-        if lurek.input.isPressed("a") then
+        if lurek.input.keyboard.isDown("a") then
             auto_buy()
         end
 
         -- Restock
-        if lurek.input.isPressed("r") then
+        if lurek.input.keyboard.isDown("r") then
             restock_shelf()
         end
 
         -- Ledger
-        if lurek.input.isPressed("l") then
+        if lurek.input.keyboard.isDown("l") then
             current_state = STATE.LEDGER
         end
 
         -- Quit
-        if lurek.input.isPressed("escape") then
+        if lurek.input.keyboard.isDown("escape") then
             lurek.event.signal("quit")
         end
     end
@@ -426,12 +427,12 @@ lurek.process(function(dt)
     update_particles(dt)
     update_tweens(dt)
     update_messages(dt)
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render — shop scene background
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state == STATE.TITLE or current_state == STATE.GAME_OVER or current_state == STATE.LEDGER then
         return
     end
@@ -465,12 +466,12 @@ lurek.render(function()
         local alpha = clamp(p.life / p.max_life, 0, 1)
         lurek.render.circle(p.x, p.y, p.size, p.r, p.g, p.b, alpha)
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI — HUD, shelf, inventory, messages
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- ===== TITLE SCREEN =====
     if current_state == STATE.TITLE then
         lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.12, 0.09, 0.06, 1)
@@ -609,4 +610,4 @@ lurek.render_ui(function()
 
     -- FPS
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), SCREEN_W - 80, SCREEN_H - 18, 11, 0.4, 0.4, 0.4, 1)
-end)
+end

@@ -235,8 +235,15 @@ pub fn lurek_run() {
     // Parse CLI arguments. Supported flags:
     //   --screenshot=<path>        Absolute output path for the auto-screenshot PNG.
     //   --screenshot-frames=<n>    Rendered game frames to wait before capturing (default 3).
+    //   --screenshot-time=<s>      Wall-clock seconds after game start before capturing.
+    //                              Takes priority over --screenshot-frames when both are set.
+    //   --window-x=<n>             Initial window X position in physical pixels.
+    //   --window-y=<n>             Initial window Y position in physical pixels.
     let mut screenshot_path: Option<std::path::PathBuf> = None;
     let mut screenshot_frames: u32 = 3;
+    let mut screenshot_time: Option<f32> = None;
+    let mut window_x: Option<i32> = None;
+    let mut window_y: Option<i32> = None;
     let mut game_arg: Option<String> = None;
 
     for arg in env::args().skip(1) {
@@ -245,6 +252,18 @@ pub fn lurek_run() {
         } else if let Some(val) = arg.strip_prefix("--screenshot-frames=") {
             if let Ok(n) = val.parse::<u32>() {
                 screenshot_frames = n;
+            }
+        } else if let Some(val) = arg.strip_prefix("--screenshot-time=") {
+            if let Ok(s) = val.parse::<f32>() {
+                screenshot_time = Some(s);
+            }
+        } else if let Some(val) = arg.strip_prefix("--window-x=") {
+            if let Ok(n) = val.parse::<i32>() {
+                window_x = Some(n);
+            }
+        } else if let Some(val) = arg.strip_prefix("--window-y=") {
+            if let Ok(n) = val.parse::<i32>() {
+                window_y = Some(n);
             }
         } else if !arg.starts_with("--") {
             game_arg = Some(arg);
@@ -299,6 +318,8 @@ pub fn lurek_run() {
         explicit_game_dir,
         screenshot_path,
         screenshot_frames,
+        screenshot_time,
+        window_x.zip(window_y),
     );
 }
 

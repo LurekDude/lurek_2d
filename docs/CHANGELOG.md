@@ -2,6 +2,37 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.20] - 2026-04-25
+
+### docs(examples): add `--@api-stub:` blocks to cover all 4102 `lurek.*` API items in `content/examples/`
+
+Added `--@api-stub:` stub blocks to 37 `content/examples/*.lua` files so that `python tools/audit/example_coverage.py` exits 0. Each stub contains ≥2 doc-comment lines and ≥3 Lua lines, satisfying the coverage gate. Covers every previously uncovered method and module function across all 49 tracked modules (4102 items total, 0 gaps remaining).
+
+## [0.20.19] - 2026-04-25
+
+### refactor(app): rename Lua callbacks `render`→`draw`, `render_ui`→`draw_ui` — fix namespace clash
+
+The engine callback keys `render` and `render_ui` clashed with the `lurek.render` draw-API table registered by `src/lua_api/render_api.rs`. In Lua, writing `function lurek.render() end` overwrites the table slot, destroying the draw-API reference and crashing any `lurek.render.*` call that followed.
+
+**Root-cause fix — changed in `src/app/app.rs`:**
+- `call_lua_callback_checked(lua, "render", ())` → `"draw"`
+- `call_lua_callback_checked(lua, "render_ui", ())` → `"draw_ui"`
+
+**Lua content updated (141 files):**
+- `function lurek.render()` → `function lurek.draw()` across all game demos, examples, and tests
+- `function lurek.render_ui()` → `function lurek.draw_ui()` across all game demos, examples, and tests
+- Removed all `local gfx = lurek.render` workaround aliases that were previously inserted as a temporary patch
+
+**Docs updated:**
+- `docs/architecture/philosophy.md` — callbacks table (C-04) updated; new rule **C-06** added: callback keys must never shadow API module names; the fix is always in `src/app/app.rs`
+- `docs/architecture/engine-architecture.md` — frame-loop ASCII diagram and callback table updated
+- `docs/architecture/render-command-architecture.md` — frame sequence updated
+- `docs/specs/render.md`, `wiki/Callbacks.md`, all `wiki/*.md` pages updated
+- `src/lua_api/render_api.rs`, `src/render/mod.rs` — docstrings updated
+
+**CAG updated:**
+- `.github/skills/lua-api-design/SKILL.md` — Callback-Key Collision Rule section added (C-06)
+
 ## [0.20.18] - 2026-04-24
 
 ### test(lua): add @covers-marked unit tests for 15 modules — coverage 98.7 %

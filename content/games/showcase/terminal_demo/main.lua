@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- Terminal Demo — Lurek2D
 -- ============================================================================
 -- Category : showcase
@@ -14,8 +14,6 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local SCREEN_W, SCREEN_H = 800, 600
 local GRID_COLS = 80
@@ -95,14 +93,14 @@ local function grid_y(row) return (row - 1) * CELL_H end
 
 local function draw_char(ch, col, row, color, alpha)
     local c = color or COL_GREEN
-    gfx.setColor(c[1], c[2], c[3], alpha or 1)
-    gfx.drawText(ch, grid_x(col), grid_y(row))
+    lurek.render.setColor(c[1], c[2], c[3], alpha or 1)
+    lurek.render.drawText(ch, grid_x(col), grid_y(row))
 end
 
 local function draw_string(str, col, row, color, alpha)
     local c = color or COL_GREEN
-    gfx.setColor(c[1], c[2], c[3], alpha or 1)
-    gfx.drawText(str, grid_x(col), grid_y(row))
+    lurek.render.setColor(c[1], c[2], c[3], alpha or 1)
+    lurek.render.drawText(str, grid_x(col), grid_y(row))
 end
 
 local function draw_box(c1, r1, c2, r2, color)
@@ -208,7 +206,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.init()
     lurek.window.setTitle("Terminal Demo — Lurek2D")
-    gfx.setBackgroundColor(0, 0, 0)
+    lurek.render.setBackgroundColor(0, 0, 0)
 
     lurek.input.bind("nav_up",    { "up" })
     lurek.input.bind("nav_down",  { "down" })
@@ -382,24 +380,24 @@ end
 -- ---------------------------------------------------------------------------
 -- Render — world-space effects (scanlines, particles)
 -- ---------------------------------------------------------------------------
-function lurek.render()
+function lurek.draw()
     camera:attach()
 
     -- CRT scanlines
-    gfx.setColor(0, 0.12, 0.04, 0.2)
+    lurek.render.setColor(0, 0.12, 0.04, 0.2)
     for y = 0, SCREEN_H, 3 do
-        gfx.drawLine(0, y, SCREEN_W, y)
+        lurek.render.line(0, y, SCREEN_W, y)
     end
 
     -- Error flash overlay
     if flash_timer > 0 then
         local a = flash_timer / 0.3 * 0.15
-        gfx.setColor(1, 0.1, 0, a)
-        gfx.drawRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.setColor(1, 0.1, 0, a)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
     end
 
     -- Particles
-    gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
     ps_complete:draw()
     ps_flash:draw()
 
@@ -409,7 +407,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Render UI — terminal grid, all pages, HUD
 -- ---------------------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     local fps  = lurek.timer.getFPS()
     local pnum = current_page_num()
     local ox   = math.floor(page_offset_x)
@@ -602,6 +600,6 @@ function lurek.render_ui()
     end
 
     -- ── HUD ───────────────────────────────────────────────────
-    gfx.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.4)
-    gfx.drawText(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 18)
+    lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.4)
+    lurek.render.drawText(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 18)
 end

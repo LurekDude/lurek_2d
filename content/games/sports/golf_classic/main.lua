@@ -289,11 +289,11 @@ function lurek.init()
     make_holes()
 end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.camera.init(W, H)
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     title_blink = title_blink + dt
 
     -- Update particles
@@ -307,14 +307,14 @@ lurek.process(function(dt)
         if p.life <= 0 then table.remove(particles, i) end
     end
 
-    if lurek.input.isActionPressed("quit") then
+    if lurek.input.isActionDown("quit") then
         lurek.event.quit()
         return
     end
 
     -- ── TITLE ──
     if state == S_TITLE then
-        if lurek.input.isActionPressed("shoot") then
+        if lurek.input.isActionDown("shoot") then
             hole_strokes = {}
             current_hole = 1
             setup_hole(1)
@@ -324,7 +324,7 @@ lurek.process(function(dt)
 
     -- ── SCORECARD ──
     if state == S_SCORECARD then
-        if lurek.input.isActionPressed("shoot") then
+        if lurek.input.isActionDown("shoot") then
             state = S_TITLE
         end
         return
@@ -346,7 +346,7 @@ lurek.process(function(dt)
     end
 
     -- Mouse aim
-    aim_x, aim_y = lurek.input.getMousePosition()
+    aim_x, aim_y = lurek.input.mouse.getPosition()
 
     -- ── AIMING ──
     if state == S_AIMING then
@@ -478,11 +478,11 @@ lurek.process(function(dt)
             state = S_AIMING
         end
     end
-end)
+end
 
 -- ── Render — course, ball, hole ───────────────────────────────────
 
-lurek.render(function()
+function lurek.draw()
     if state == S_TITLE or state == S_SCORECARD then return end
 
     local h = holes[current_hole]
@@ -560,11 +560,11 @@ lurek.render(function()
             lurek.render.circle("fill", holes[current_hole].target.x, holes[current_hole].target.y, r)
         end
     end
-end)
+end
 
 -- ── Render UI — HUD, power bar, scores ────────────────────────────
 
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- ── TITLE SCREEN ──
     if state == S_TITLE then
         lurek.render.setColor(0.05, 0.2, 0.05, 1)
@@ -711,4 +711,4 @@ lurek.render_ui(function()
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), W - 90, H - 20)
-end)
+end

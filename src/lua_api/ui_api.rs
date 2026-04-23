@@ -8,7 +8,7 @@ use std::rc::Rc;
 use super::SharedState;
 use crate::ui::containers::LayoutDirection;
 use crate::ui::context::{GuiContext, GuiEvent, WidgetKind};
-use crate::ui::extras::{AccordionSection, Badge, TableColumn, Toast};
+use crate::ui::extras::{AccordionSection, TableColumn, Toast};
 use crate::ui::theme::{Theme, WidgetStyle};
 use crate::ui::widget::{WidgetState, WidgetType};
 

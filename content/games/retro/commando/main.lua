@@ -9,6 +9,7 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
+
 local SCREEN_W, SCREEN_H = 800, 600
 
 local STATE = { TITLE = 1, PLAYING = 2, GAME_OVER = 3 }
@@ -426,16 +427,16 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.process — logic update
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Quit
-    if lurek.input.isKeyPressed("escape") then
+    if lurek.input.keyboard.isDown("escape") then
         lurek.event.quit()
         return
     end
 
     -- ---- TITLE ----
     if current_state == STATE.TITLE then
-        if lurek.input.isKeyPressed("return") then
+        if lurek.input.keyboard.isDown("return") then
             reset_game()
         end
         return
@@ -443,7 +444,7 @@ lurek.process(function(dt)
 
     -- ---- GAME OVER ----
     if current_state == STATE.GAME_OVER then
-        if lurek.input.isKeyPressed("return") then
+        if lurek.input.keyboard.isDown("return") then
             current_state = STATE.TITLE
         end
         update_particles(dt)
@@ -512,7 +513,7 @@ lurek.process(function(dt)
     end
 
     -- Grenade
-    if lurek.input.isKeyPressed("g") then
+    if lurek.input.keyboard.isDown("g") then
         throw_grenade()
     end
 
@@ -708,12 +709,12 @@ lurek.process(function(dt)
 
     update_particles(dt)
     update_score_pops(dt)
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- lurek.render — world drawing
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.08, 0.18, 0.06, 1)
         lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
@@ -796,12 +797,12 @@ lurek.render(function()
     -- Particles & score pops
     draw_particles()
     draw_score_pops()
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- lurek.render_ui — HUD overlay
 -- ---------------------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     if current_state == STATE.TITLE then
         -- Title screen
         lurek.render.setColor(0.2, 0.8, 0.15, 1)

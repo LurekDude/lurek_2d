@@ -130,6 +130,7 @@ lurek.input.bind("start_wave",   "space")
 lurek.input.bind("quit",         "escape")
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Maze Defense — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.08, 0.05, 1.0)
@@ -150,16 +151,16 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if particle_sys then particle_sys:update(dt) end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
 
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     hover_c, hover_r = mouse_to_cell(mx, my)
 
     if state == "build" then
-        if lurek.input.isActionJustPressed("place_wall") then
+        if lurek.input.wasActionPressed("place_wall") then
             local c, r = hover_c, hover_r
             if c >= 1 and c <= COLS and r >= 1 and r <= ROWS
                and grid[r][c] == EMPTY and gold >= 10 then
@@ -174,7 +175,7 @@ lurek.process(function(dt)
             end
         end
 
-        if lurek.input.isActionJustPressed("place_tower") then
+        if lurek.input.wasActionPressed("place_tower") then
             local c, r = hover_c, hover_r
             if c >= 1 and c <= COLS and r >= 1 and r <= ROWS
                and grid[r][c] == EMPTY and gold >= 25 then
@@ -191,7 +192,7 @@ lurek.process(function(dt)
             end
         end
 
-        if lurek.input.isActionJustPressed("start_wave") then
+        if lurek.input.wasActionPressed("start_wave") then
             wave     = wave + 1
             state    = "combat"
             wave_cd  = 0.0
@@ -282,10 +283,10 @@ lurek.process(function(dt)
             gold    = gold + 20
         end
     end
-end)
+end
 
 -- ── Render world ──────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Grid
     for r = 1, ROWS do
         for c = 1, COLS do
@@ -330,10 +331,10 @@ lurek.render(function()
     end
 
     if particle_sys then particle_sys:draw() end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     lurek.render.print("Gold: " .. gold, 14, 8, { color = {1,0.85,0.2,1}, size = 15 })
     lurek.render.print("Lives: " .. lives, 130, 8, { color = {0.3,1.0,0.3,1}, size = 15 })
     lurek.render.print("Wave: " .. wave .. "/5", 240, 8, { color = {0.7,0.7,1.0,1}, size = 15 })

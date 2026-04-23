@@ -7,6 +7,7 @@
 ----------------------------------------
 -- Constants
 ----------------------------------------
+
 local TILE_SIZE   = 24
 local MAP_W       = 30
 local MAP_H       = 24
@@ -451,7 +452,7 @@ end
 ----------------------------------------
 -- Engine callbacks
 ----------------------------------------
-lurek.setBackgroundColor(0.05, 0.05, 0.08)
+lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
 
 lurek.input.bind("move_up",    {"up", "w"})
 lurek.input.bind("move_down",  {"down", "s"})
@@ -466,19 +467,19 @@ function lurek.init()
     player = make_player()
 end
 
-function lurek.ready()
+local function _ready_setup()
     -- Ready
 end
 
 function lurek.process(dt)
     -- Input handling
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     if state == STATE_TITLE then
-        if lurek.input.isActionJustPressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             state = STATE_PLAYING
             player = make_player()
             floor_num = 1
@@ -490,12 +491,12 @@ function lurek.process(dt)
             add_message("Welcome to the dungeon! Floor 1")
         end
     elseif state == STATE_PLAYING then
-        if lurek.input.isActionJustPressed("move_up") then try_move(0, -1) end
-        if lurek.input.isActionJustPressed("move_down") then try_move(0, 1) end
-        if lurek.input.isActionJustPressed("move_left") then try_move(-1, 0) end
-        if lurek.input.isActionJustPressed("move_right") then try_move(1, 0) end
+        if lurek.input.wasActionPressed("move_up") then try_move(0, -1) end
+        if lurek.input.wasActionPressed("move_down") then try_move(0, 1) end
+        if lurek.input.wasActionPressed("move_left") then try_move(-1, 0) end
+        if lurek.input.wasActionPressed("move_right") then try_move(1, 0) end
     elseif state == STATE_GAMEOVER then
-        if lurek.input.isActionJustPressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             state = STATE_TITLE
         end
     end
@@ -510,7 +511,7 @@ end
 ----------------------------------------
 -- Rendering: dungeon, player, enemies
 ----------------------------------------
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then return end
     if state == STATE_GAMEOVER then return end
 
@@ -606,12 +607,12 @@ lurek.render(function()
         lurek.render.setColor(t.r, t.g, t.b, alpha)
         lurek.render.print(t.text, t.x - 8, t.y)
     end
-end)
+end
 
 ----------------------------------------
 -- UI rendering: stats, messages, minimap
 ----------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then
         lurek.render.setColor(0.8, 0.6, 1, 1)
         lurek.render.print("ROGUELIKE", 290, 200, 0, 2.5, 2.5)
@@ -721,4 +722,4 @@ lurek.render_ui(function()
             lurek.render.rectangle("fill", mm_x + e.x * mm_s, mm_y + e.y * mm_s, mm_s, mm_s)
         end
     end
-end)
+end

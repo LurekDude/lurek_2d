@@ -234,15 +234,16 @@ local function sky_color()
 end
 
 -- ── Engine callbacks ──────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Vertical Climber — Lurek2D")
     lurek.window.setBackgroundColor(0.6, 0.75, 0.9)
 
     -- Input actions
-    lurek.input.addAction("left",  {"a", "left"})
-    lurek.input.addAction("right", {"d", "right"})
-    lurek.input.addAction("shoot", {"space", "w"})
-    lurek.input.addAction("quit",  {"escape"})
+    lurek.input.bind("left",  {"a", "left"})
+    lurek.input.bind("right", {"d", "right"})
+    lurek.input.bind("shoot", {"space", "w"})
+    lurek.input.bind("quit",  {"escape"})
 
     -- Camera
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)
@@ -285,15 +286,15 @@ function lurek.init()
     })
 end
 
-function lurek.ready()
+local function _ready_setup()
     generate_initial_platforms()
 end
 
 -- ── Process ───────────────────────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     title_blink = title_blink + dt
 
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -318,12 +319,12 @@ lurek.process(function(dt)
 
     -- Horizontal movement
     local move_x = 0
-    if lurek.input.isActionPressed("left")  then move_x = move_x - 1 end
-    if lurek.input.isActionPressed("right") then move_x = move_x + 1 end
+    if lurek.input.isActionDown("left")  then move_x = move_x - 1 end
+    if lurek.input.isActionDown("right") then move_x = move_x + 1 end
     player.vx = move_x * PLAYER_SPEED
 
     -- Shooting
-    if lurek.input.isActionJustPressed("shoot") then
+    if lurek.input.wasActionPressed("shoot") then
         bullets[#bullets + 1] = {
             x = player.x + PLAYER_W / 2 - BULLET_SIZE / 2,
             y = player.y - BULLET_SIZE,
@@ -504,10 +505,10 @@ lurek.process(function(dt)
     spring_ps:update(dt)
     enemy_ps:update(dt)
     bullet_ps:update(dt)
-end)
+end
 
 -- ── Render (world space) ──────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if game_state == STATE.TITLE then return end
 
     local oy = -cam_y
@@ -611,10 +612,10 @@ lurek.render(function()
     spring_ps:draw()
     enemy_ps:draw()
     bullet_ps:draw()
-end)
+end
 
 -- ── Render UI (screen space) ──────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     -- ── Title screen ──────────────────────────────────────────────────────

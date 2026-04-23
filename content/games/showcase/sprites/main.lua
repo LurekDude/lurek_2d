@@ -5,6 +5,7 @@
 -- ============================================================
 -- Constants
 -- ============================================================
+
 local SCREEN_W = 800
 local SCREEN_H = 600
 local PLAYER_SPEED = 150
@@ -232,7 +233,7 @@ lurek.input.bind("start",       { "return" })
 -- ============================================================
 -- Init
 -- ============================================================
-lurek.init(function()
+function lurek.init()
     lurek.window.setTitle("Sprites Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.15, 0.1)
 
@@ -294,19 +295,19 @@ lurek.init(function()
     end
 
     lurek.camera.setPosition(0, 0)
-end)
+end
 
 -- ============================================================
 -- Ready
 -- ============================================================
-function lurek.ready()
+local function _ready_setup()
     -- nothing extra
 end
 
 -- ============================================================
 -- Process
 -- ============================================================
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS
     fps_count = fps_count + 1
     fps_timer = fps_timer + dt
@@ -348,10 +349,10 @@ lurek.process(function(dt)
 
     -- Movement
     local dx, dy = 0, 0
-    if lurek.input.isActionPressed("move_up")    then dy = dy - 1 end
-    if lurek.input.isActionPressed("move_down")  then dy = dy + 1 end
-    if lurek.input.isActionPressed("move_left")  then dx = dx - 1 end
-    if lurek.input.isActionPressed("move_right") then dx = dx + 1 end
+    if lurek.input.isActionDown("move_up")    then dy = dy - 1 end
+    if lurek.input.isActionDown("move_down")  then dy = dy + 1 end
+    if lurek.input.isActionDown("move_left")  then dx = dx - 1 end
+    if lurek.input.isActionDown("move_right") then dx = dx + 1 end
 
     player.moving = (dx ~= 0 or dy ~= 0)
 
@@ -459,12 +460,12 @@ lurek.process(function(dt)
         trail_on = not trail_on
         if not trail_on then trail_positions = {} end
     end
-end)
+end
 
 -- ============================================================
 -- Render (world space)
 -- ============================================================
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then return end
 
     local s = sprite_scale
@@ -522,12 +523,12 @@ lurek.render(function()
         lurek.render.setColor(1, 1, 0.3, p.alpha)
         lurek.render.print(p.text, p.x, p.y, 3)
     end
-end)
+end
 
 -- ============================================================
 -- Render UI (screen space)
 -- ============================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then
         -- Title screen
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 3)
@@ -586,4 +587,4 @@ lurek.render_ui(function()
     -- Controls hint
     lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
     lurek.render.print("WASD:move  +/-:scale  C:tint  T:trail  ESC:quit", 10, SCREEN_H - 10, 1)
-end)
+end

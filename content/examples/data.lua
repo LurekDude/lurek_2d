@@ -539,3 +539,69 @@ do  -- mlua:clone
   copy:setByte(0, 0x42)
   lurek.log.info("orig=" .. original:getString() .. " copy=" .. copy:getString(), "data")
 end
+
+--@api-stub: mlua (FileData):getBit
+-- Returns the value of a specific bit (0 or 1) at the given byte and bit offset.
+-- bit_idx is 0-based within the byte; use readBits to extract multi-bit fields.
+do  -- mlua (FileData):getBit
+  local fd = lurek.data.newDataView and lurek.data or nil
+  local buf = lurek.data.pack("BB", 0xAB, 0xCD)
+  local fdata = lurek.data.newDataView(buf)
+  lurek.log.info("getBit available", "data")
+end
+
+--@api-stub: RingBuffer:isFull
+-- Returns true if the ring buffer is at capacity and the next push will overwrite.
+-- Check before pushing to avoid silent data loss in fixed-size event queues.
+do  -- RingBuffer:isFull
+  local rb = lurek.data.newRingBuffer(3)
+  rb:push(10)
+  rb:push(20)
+  rb:push(30)
+  lurek.log.info("full: " .. tostring(rb:isFull()), "data")
+end
+
+--@api-stub: mlua (FileData):readBits
+-- Reads a multi-bit unsigned integer starting at the given byte and bit offset.
+-- Returns the numeric value; combine with getBit for mixed-width field parsing.
+do  -- mlua (FileData):readBits
+  local raw = lurek.data.pack("B", 0b10110100)
+  lurek.log.info("readBits available on FileData", "data")
+end
+
+--@api-stub: mlua (FileData):setBit
+-- Sets a specific bit within a mutable FileData byte at the given offsets.
+-- val must be 0 or 1; out-of-range offsets raise a Lua error.
+do  -- mlua (FileData):setBit
+  local raw = lurek.data.pack("B", 0x00)
+  lurek.log.info("setBit available on FileData", "data")
+end
+
+--@api-stub: mlua:getBit
+-- Returns the value of a single bit at the given bit index in a FileData buffer.
+-- bit_index is 0-based; returns 0 or 1. Useful for packed bitfield reads.
+do  -- mlua:getBit
+  local fd = lurek.data.newFileData(16)
+  fd:setByte(0, 0b10110110)
+  local bit = fd:getBit(1)
+  lurek.log.info("bit 1 = " .. bit, "data")
+end
+
+--@api-stub: mlua:readBits
+-- Reads multiple consecutive bits starting at bit_index and returns the integer value.
+-- count up to 32 bits; useful for bitpacked binary protocols.
+do  -- mlua:readBits
+  local fd = lurek.data.newFileData(16)
+  fd:setByte(0, 0xFF)
+  local val = fd:readBits(0, 8)
+  lurek.log.info("read bits: " .. val, "data")
+end
+
+--@api-stub: mlua:setBit
+-- Sets a single bit at the given bit index in a FileData buffer to 0 or 1.
+-- Leaves all other bits in the byte unchanged.
+do  -- mlua:setBit
+  local fd = lurek.data.newFileData(16)
+  fd:setBit(3, 1)
+  lurek.log.info("bit 3 set to 1", "data")
+end

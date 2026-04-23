@@ -248,7 +248,7 @@ end
 --   * NO `return` at top-level (breaks the file).
 --   * NO `pcall` defensive wrappers, NO `if false then`.
 --   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
+--     `function lurek.draw() ... end` or
 --     `function lurek.update(dt) ... end` callbacks so the file loads.
 --   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
 --     colours like {1, 0.5, 0, 1}.
@@ -258,3 +258,23 @@ end
 -- Run: cargo run -- content/examples/sprite.lua
 
 -- ── lurek.sprite.* functions ──
+
+--@api-stub: SpriteAtlas:getFlipped
+-- Returns a flipped variant entry (flipped-X, flipped-Y, or both) for a sprite name.
+-- Use for mirroring walk cycles without duplicate atlas entries.
+do  -- SpriteAtlas:getFlipped
+  local atlas = lurek.sprite.parseAtlas("atlas_data.lua")
+  local entry = atlas:getFlipped("hero_run_01", "x")
+  lurek.log.info("flipped entry: " .. tostring(entry ~= nil), "sprite")
+end
+
+--@api-stub: SpriteSheet:nameGroup
+-- Assigns a friendly group name to a row of frames for convenient clip building.
+-- After naming, getGroupFrames("walk") returns that row's frame indices.
+do  -- SpriteSheet:nameGroup
+  local sheet = lurek.sprite.newSheet("hero_sheet.png", 32, 32)
+  sheet:nameGroup("walk", 1)
+  sheet:nameGroup("run",  2)
+  local frames = sheet:getGroupFrames("walk")
+  lurek.log.info("walk frames: " .. #frames, "sprite")
+end

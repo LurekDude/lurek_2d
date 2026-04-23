@@ -2251,3 +2251,48 @@ do  -- mlua:setSample
     sd:setSample(0, 0.0)
   end
 end
+
+--@api-stub: mlua (SoundData):drawWaveform
+-- Renders the SoundData buffer as a waveform into an ImageData object.
+-- Useful for visualising recorded audio or showing a UI waveform preview.
+do  -- mlua (SoundData):drawWaveform
+  function lurek.init()
+    local sd = lurek.audio.newSoundData(44100, 44100, 16, 1)
+    local img = sd:drawWaveform(512, 64)
+    lurek.log.info("waveform size: " .. img:getWidth(), "audio")
+  end
+end
+
+--@api-stub: MidiPlayer:setChannelInstrument
+-- Sets the General MIDI program number (instrument) for a MIDI channel.
+-- Channel 9 is drums by convention; all others use GM program numbers 1-128.
+do  -- MidiPlayer:setChannelInstrument
+  function lurek.init()
+    local midi = lurek.audio.newMidiPlayer()
+    midi:setChannelInstrument(0, 41)
+    lurek.log.info("channel 0 instrument: " .. midi:getChannelInstrument(0), "audio")
+  end
+end
+
+--@api-stub: Bus:setDuckTarget
+-- Configures automatic ducking: when this bus is active, the target bus volume is reduced.
+-- Pass the target bus name and a duck factor (0=silence, 1=no duck) and release time.
+do  -- Bus:setDuckTarget
+  function lurek.init()
+    lurek.audio.newBus("music")
+    lurek.audio.newBus("sfx")
+    local sfxBus = lurek.audio.newBus("sfx_active")
+    sfxBus:setDuckTarget("music", 0.3, 0.5)
+    lurek.log.info("duck target set", "audio")
+  end
+end
+
+--@api-stub: mlua:drawWaveform
+-- Renders the waveform of a SoundData object into an ImageData as a line chart.
+-- Use to show audio visualisations in the game HUD or a level editor.
+do  -- mlua:drawWaveform
+  local sd = lurek.audio.newSoundData("music/loop.ogg")
+  local img = lurek.image.newImageData(256, 64)
+  sd:drawWaveform(img, 0, 0, 256, 64)
+  lurek.log.info("waveform drawn", "audio")
+end

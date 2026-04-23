@@ -474,3 +474,105 @@ do  -- GlobeRegistry:names
   lurek.log.info("first registered = " .. g:getName(), "globe")
 end
 
+
+--@api-stub: Globe:addArc
+-- Draws a great-circle arc between two provinces on the globe surface.
+-- Arcs are used for trade routes, attack vectors, or diplomatic connections.
+do  -- Globe:addArc
+  local g = lurek.globe.new({width=64, height=64, cellSize=16})
+  g:addProvince(1, 0, 0, {})
+  g:addProvince(2, 5, 5, {})
+  local arcId = g:addArc(1, 2, {color={1,0.5,0,1}, width=2})
+  lurek.log.info("arc id: " .. arcId, "globe")
+end
+
+--@api-stub: Globe:addLabel
+-- Adds a floating text label anchored to a province or world-space position.
+-- Labels scale with zoom and can be shown/hidden independently of provinces.
+do  -- Globe:addLabel
+  local g = lurek.globe.new({width=64, height=64, cellSize=16})
+  g:addProvince(1, 3, 3, {})
+  local lid = g:addLabel(1, "Capital City")
+  lurek.log.info("label id: " .. lid, "globe")
+end
+
+--@api-stub: Globe:addLayer
+-- Adds a named render layer with a default colour to the globe.
+-- Layers stack visually; province colours override the layer's default tint.
+do  -- Globe:addLayer
+  local g = lurek.globe.new({width=64, height=64, cellSize=16})
+  g:addLayer("terrain", {0.4, 0.7, 0.3, 1.0})
+  g:addLayer("borders", {0.0, 0.0, 0.0, 1.0})
+  lurek.log.info("layers added", "globe")
+end
+
+--@api-stub: Globe:addMarker
+-- Places a named icon marker at a province cell or lat-lon position.
+-- Markers persist until removeMarker is called; they can carry custom attributes.
+do  -- Globe:addMarker
+  local g = lurek.globe.new({width=64, height=64, cellSize=16})
+  g:addProvince(5, 2, 2, {})
+  local mid = g:addMarker(5, "capital_icon", {})
+  lurek.log.info("marker id: " .. mid, "globe")
+end
+
+--@api-stub: lurek.globe.new
+-- Creates a new Globe with the given grid dimensions and cell size.
+-- Globe wraps a hex/square province map with camera pan/zoom and rendering.
+do  -- lurek.globe.new
+  local g = lurek.globe.new({width=32, height=32, cellSize=20})
+  g:addProvince(1, 0, 0, {name="Start"})
+  lurek.log.info("globe province count: " .. g:provinceCount(), "globe")
+end
+
+--@api-stub: Globe:reachable
+-- Returns all province ids reachable from a source province within move_cost steps.
+-- Uses Dijkstra over the province graph; blocked provinces are excluded.
+do  -- Globe:reachable
+  local g = lurek.globe.new({width=32, height=32, cellSize=16})
+  for i=1,5 do g:addProvince(i, i, 0, {}) end
+  local ids = g:reachable(1, 3)
+  lurek.log.info("reachable count: " .. #ids, "globe")
+end
+
+--@api-stub: Globe:setLayerColor
+-- Sets the fill colour for a named province on a specific render layer.
+-- Use to show resource overlay, fog-of-war, or diplomatic ownership.
+do  -- Globe:setLayerColor
+  local g = lurek.globe.new({width=32, height=32, cellSize=16})
+  g:addProvince(1, 0, 0, {})
+  g:addLayer("ownership", {1,1,1,1})
+  g:setLayerColor(1, "ownership", {1, 0.3, 0.3, 0.8})
+  lurek.log.info("layer colour set", "globe")
+end
+
+--@api-stub: Globe:setMarkerAttr
+-- Sets a custom key-value attribute on an existing marker by its id.
+-- Use to store game data (owner, type, health) without a separate lookup table.
+do  -- Globe:setMarkerAttr
+  local g = lurek.globe.new({width=32, height=32, cellSize=16})
+  g:addProvince(1, 0, 0, {})
+  local mid = g:addMarker(1, "fort_icon", {})
+  g:setMarkerAttr(mid, "strength", 5)
+  lurek.log.info("marker attr set", "globe")
+end
+
+--@api-stub: Globe:setProvinceAttr
+-- Sets a custom key-value attribute on a province by its id.
+-- Attributes persist through updates and can be queried in game logic.
+do  -- Globe:setProvinceAttr
+  local g = lurek.globe.new({width=32, height=32, cellSize=16})
+  g:addProvince(3, 1, 1, {})
+  g:setProvinceAttr(3, "population", 12000)
+  lurek.log.info("attr: " .. g:getProvinceAttr(3, "population"), "globe")
+end
+
+--@api-stub: GlobeRegistry:new
+-- Creates a new GlobeRegistry that manages named globe instances.
+-- Useful for multi-world setups where planets are swapped at runtime.
+do  -- GlobeRegistry:new
+  local reg = lurek.globe.newRegistry()
+  local g = reg:new("world_a", 512, 512)
+  reg:setActive("world_a")
+  lurek.log.info("registry globe created", "globe")
+end

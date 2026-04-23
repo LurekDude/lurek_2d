@@ -146,13 +146,13 @@ function lurek.update(dt)
     end
 
     -- Ship controls
-    if lurek.input.isDown("a") or lurek.input.isDown("left") then
+    if lurek.input.isActionDown("a") or lurek.input.isActionDown("left") then
         ship.angle = ship.angle - ROT_SPEED * dt
     end
-    if lurek.input.isDown("d") or lurek.input.isDown("right") then
+    if lurek.input.isActionDown("d") or lurek.input.isActionDown("right") then
         ship.angle = ship.angle + ROT_SPEED * dt
     end
-    if lurek.input.isDown("w") or lurek.input.isDown("up") then
+    if lurek.input.isActionDown("w") or lurek.input.isActionDown("up") then
         ship.vx = ship.vx + math.cos(ship.angle) * THRUST * dt
         ship.vy = ship.vy + math.sin(ship.angle) * THRUST * dt
         fuel = math.max(0, fuel - dt * 2)

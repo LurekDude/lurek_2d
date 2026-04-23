@@ -162,6 +162,7 @@ lurek.input.bind("hill_large", "3")
 lurek.input.bind("quit", "escape")
 
 -- ─── Init ────────────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Ski Jump — Lurek2D")
     lurek.window.setBackgroundColor(0.7, 0.8, 0.95)
@@ -173,18 +174,18 @@ end
 function lurek.process(delta)
     dt = delta
 
-    if lurek.input.isActionPressed("quit") then
+    if lurek.input.isActionDown("quit") then
         lurek.event.quit()
         return
     end
 
     -- hill selection from title
     if state == "TITLE" or state == "FINAL" then
-        if lurek.input.isActionPressed("hill_small") then hill = 1; compute_ramp() end
-        if lurek.input.isActionPressed("hill_normal") then hill = 2; compute_ramp() end
-        if lurek.input.isActionPressed("hill_large") then hill = 3; compute_ramp() end
+        if lurek.input.isActionDown("hill_small") then hill = 1; compute_ramp() end
+        if lurek.input.isActionDown("hill_normal") then hill = 2; compute_ramp() end
+        if lurek.input.isActionDown("hill_large") then hill = 3; compute_ramp() end
 
-        if lurek.input.isActionPressed("jump") then
+        if lurek.input.isActionDown("jump") then
             round = 1
             round_scores = {}
             start_round()
@@ -216,7 +217,7 @@ function lurek.process(delta)
         end
 
         -- jump trigger
-        if lurek.input.isActionPressed("jump") and skier_t > 0.8 then
+        if lurek.input.isActionDown("jump") and skier_t > 0.8 then
             local dist_from_end = math.abs(skier_t - 1.0) * HILLS[hill].ramp_len
             local launch_angle
             if dist_from_end < 5 then
@@ -322,7 +323,7 @@ function lurek.process(delta)
         end
 
         -- space for telemark landing bonus
-        if lurek.input.isActionPressed("jump") and landing_quality == "smooth" then
+        if lurek.input.isActionDown("jump") and landing_quality == "smooth" then
             style_points = style_points + 4
         end
 
@@ -347,7 +348,7 @@ function lurek.process(delta)
         wobble_timer = math.max(0, wobble_timer - dt)
         tumble_timer = math.max(0, tumble_timer - dt)
 
-        if lurek.input.isActionPressed("jump") and shown_judges >= JUDGES then
+        if lurek.input.isActionDown("jump") and shown_judges >= JUDGES then
             table.insert(round_scores, total_score())
             round = round + 1
             if round > MAX_ROUNDS then
@@ -369,7 +370,7 @@ function lurek.process(delta)
 end
 
 -- ─── Render (world) ──────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if state == "TITLE" or state == "FINAL" then return end
 
     local ox, oy = -cam_x, -cam_y
@@ -469,10 +470,10 @@ lurek.render(function()
         lurek.render.drawTriangle(tx, ty - 40, tx - 15, ty, tx + 15, ty)
         lurek.render.drawTriangle(tx, ty - 60, tx - 10, ty - 25, tx + 10, ty - 25)
     end
-end)
+end
 
 -- ─── Render UI (HUD) ────────────────────────────────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     if state == "TITLE" then
@@ -612,4 +613,4 @@ lurek.render_ui(function()
             lurek.render.print("Space to continue", SCREEN_W / 2 - 60, 240, 14)
         end
     end
-end)
+end

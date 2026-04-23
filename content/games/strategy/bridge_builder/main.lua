@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 --  Bridge Builder — Engineer bridges across canyons
 -- ----------------------------------------------------------------------------
 --  Category : strategy
@@ -19,8 +19,6 @@
 -- ============================================================================
 
 -- ── Constants ─────────────────────────────────────────────────────────────
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local SCREEN_W, SCREEN_H = 800, 600
 local NODE_RADIUS        = 6
@@ -351,7 +349,7 @@ end
 -- ===========================================================================
 function lurek.init()
     lurek.window.setTitle("Bridge Builder — Lurek2D")
-    gfx.setBackgroundColor(0.5, 0.7, 0.9)
+    lurek.render.setBackgroundColor(0.5, 0.7, 0.9)
 
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
@@ -541,7 +539,7 @@ function lurek.process(dt)
 
         -- Mouse interaction
         if lurek.input.wasActionPressed("place") then
-            local mx, my = lurek.input.getMousePosition()
+            local mx, my = lurek.input.mouse.getPosition()
 
             if delete_mode then
                 -- Delete beam near click
@@ -631,34 +629,34 @@ end
 -- ===========================================================================
 --  lurek.render() — world-space drawing (canyon, beams, vehicle)
 -- ===========================================================================
-function lurek.render()
+function lurek.draw()
     cam:apply()
 
     -- ── Sky gradient (simple bands) ───────────────────────────────────
     if state ~= STATE.TITLE and state ~= STATE.LEVEL_SELECT then
         -- Distant hills
-        gfx.setColor(0.35, 0.55, 0.35, 0.4)
-        gfx.fillRect(0, cliff_y - 80, SCREEN_W, 80)
+        lurek.render.setColor(0.35, 0.55, 0.35, 0.4)
+        lurek.render.fillRect(0, cliff_y - 80, SCREEN_W, 80)
 
         -- Left cliff
-        gfx.setColor(0.35, 0.28, 0.22)
-        gfx.fillRect(0, cliff_y, cliff_left_x, SCREEN_H - cliff_y)
+        lurek.render.setColor(0.35, 0.28, 0.22)
+        lurek.render.fillRect(0, cliff_y, cliff_left_x, SCREEN_H - cliff_y)
         -- Cliff top grass
-        gfx.setColor(0.3, 0.6, 0.2)
-        gfx.fillRect(0, cliff_y - 6, cliff_left_x, 8)
+        lurek.render.setColor(0.3, 0.6, 0.2)
+        lurek.render.fillRect(0, cliff_y - 6, cliff_left_x, 8)
 
         -- Right cliff
-        gfx.setColor(0.35, 0.28, 0.22)
-        gfx.fillRect(cliff_right_x, cliff_y, SCREEN_W - cliff_right_x, SCREEN_H - cliff_y)
-        gfx.setColor(0.3, 0.6, 0.2)
-        gfx.fillRect(cliff_right_x, cliff_y - 6, SCREEN_W - cliff_right_x, 8)
+        lurek.render.setColor(0.35, 0.28, 0.22)
+        lurek.render.fillRect(cliff_right_x, cliff_y, SCREEN_W - cliff_right_x, SCREEN_H - cliff_y)
+        lurek.render.setColor(0.3, 0.6, 0.2)
+        lurek.render.fillRect(cliff_right_x, cliff_y - 6, SCREEN_W - cliff_right_x, 8)
 
         -- River
-        gfx.setColor(0.15, 0.35, 0.7, 0.85)
-        gfx.fillRect(cliff_left_x, river_y, cliff_right_x - cliff_left_x, river_h)
+        lurek.render.setColor(0.15, 0.35, 0.7, 0.85)
+        lurek.render.fillRect(cliff_left_x, river_y, cliff_right_x - cliff_left_x, river_h)
         -- River surface shimmer
-        gfx.setColor(0.3, 0.5, 0.9, 0.3)
-        gfx.fillRect(cliff_left_x, river_y, cliff_right_x - cliff_left_x, 3)
+        lurek.render.setColor(0.3, 0.5, 0.9, 0.3)
+        lurek.render.fillRect(cliff_left_x, river_y, cliff_right_x - cliff_left_x, 3)
 
         -- ── Beams ─────────────────────────────────────────────────────
         for _, b in ipairs(beams) do
@@ -666,16 +664,16 @@ function lurek.render()
             if a and c then
                 local bt = BEAM_TYPES[b.type]
                 if b.broken then
-                    gfx.setColor(0.3, 0.2, 0.15, 0.5)
+                    lurek.render.setColor(0.3, 0.2, 0.15, 0.5)
                 elseif state == STATE.TESTING and b.stress > 0 then
                     local sr, sg, sb = stress_color(b.stress)
-                    gfx.setColor(sr, sg, sb)
+                    lurek.render.setColor(sr, sg, sb)
                 else
-                    gfx.setColor(bt.r, bt.g, bt.b)
+                    lurek.render.setColor(bt.r, bt.g, bt.b)
                 end
                 -- Draw thick beam as multiple lines
                 for offset = -bt.thick / 2, bt.thick / 2, 1 do
-                    gfx.line(a.x, a.y + offset, c.x, c.y + offset)
+                    lurek.render.line(a.x, a.y + offset, c.x, c.y + offset)
                 end
             end
         end
@@ -683,34 +681,34 @@ function lurek.render()
         -- ── Nodes ─────────────────────────────────────────────────────
         for i, n in ipairs(nodes) do
             if n.fixed then
-                gfx.setColor(0.8, 0.7, 0.3)
+                lurek.render.setColor(0.8, 0.7, 0.3)
             elseif i == selected_node then
-                gfx.setColor(1.0, 1.0, 0.2)
+                lurek.render.setColor(1.0, 1.0, 0.2)
             else
-                gfx.setColor(0.9, 0.9, 0.9)
+                lurek.render.setColor(0.9, 0.9, 0.9)
             end
-            gfx.fillCircle(n.x, n.y, NODE_RADIUS)
+            lurek.render.fillCircle(n.x, n.y, NODE_RADIUS)
             -- Dark outline
-            gfx.setColor(0.2, 0.2, 0.2)
-            gfx.circle(n.x, n.y, NODE_RADIUS)
+            lurek.render.setColor(0.2, 0.2, 0.2)
+            lurek.render.circle(n.x, n.y, NODE_RADIUS)
         end
 
         -- ── Vehicle ───────────────────────────────────────────────────
         if vehicle and (state == STATE.TESTING or state == STATE.SUCCESS) then
             -- Body
             if vehicle.weight >= 2.0 then
-                gfx.setColor(0.7, 0.3, 0.2)  -- truck: red
+                lurek.render.setColor(0.7, 0.3, 0.2)  -- truck: red
             else
-                gfx.setColor(0.3, 0.5, 0.7)  -- car: blue
+                lurek.render.setColor(0.3, 0.5, 0.7)  -- car: blue
             end
-            gfx.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h)
+            lurek.render.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h)
             -- Wheels
-            gfx.setColor(0.15, 0.15, 0.15)
-            gfx.fillCircle(vehicle.x + 6,            vehicle.y + vehicle.h, 4)
-            gfx.fillCircle(vehicle.x + vehicle.w - 6, vehicle.y + vehicle.h, 4)
+            lurek.render.setColor(0.15, 0.15, 0.15)
+            lurek.render.fillCircle(vehicle.x + 6,            vehicle.y + vehicle.h, 4)
+            lurek.render.fillCircle(vehicle.x + vehicle.w - 6, vehicle.y + vehicle.h, 4)
             -- Window
-            gfx.setColor(0.6, 0.8, 1.0, 0.7)
-            gfx.fillRect(vehicle.x + vehicle.w * 0.55, vehicle.y + 2, vehicle.w * 0.3, vehicle.h * 0.45)
+            lurek.render.setColor(0.6, 0.8, 1.0, 0.7)
+            lurek.render.fillRect(vehicle.x + vehicle.w * 0.55, vehicle.y + 2, vehicle.w * 0.3, vehicle.h * 0.45)
         end
     end
 
@@ -720,59 +718,59 @@ end
 -- ===========================================================================
 --  lurek.render_ui() — HUD overlay (budget, tools, stress info, menus)
 -- ===========================================================================
-function lurek.render_ui()
+function lurek.draw_ui()
     local dt_str = string.format("FPS: %d", lurek.timer.getFPS())
-    gfx.setColor(1, 1, 1, 0.4)
-    gfx.print(dt_str, SCREEN_W - 80, 4, 1.0)
+    lurek.render.setColor(1, 1, 1, 0.4)
+    lurek.render.print(dt_str, SCREEN_W - 80, 4, 1.0)
 
     -- ── TITLE ─────────────────────────────────────────────────────────
     if state == STATE.TITLE then
-        gfx.setColor(0.2, 0.15, 0.1)
-        gfx.fillRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.setColor(0.2, 0.15, 0.1)
+        lurek.render.fillRect(0, 0, SCREEN_W, SCREEN_H)
 
-        gfx.setColor(1.0, 0.85, 0.3)
-        gfx.print("BRIDGE BUILDER", SCREEN_W / 2 - 150, 140, 4)
+        lurek.render.setColor(1.0, 0.85, 0.3)
+        lurek.render.print("BRIDGE BUILDER", SCREEN_W / 2 - 150, 140, 4)
 
-        gfx.setColor(0.7, 0.6, 0.5)
-        gfx.print("ENGINEER YOUR WAY", SCREEN_W / 2 - 100, 210, 2)
+        lurek.render.setColor(0.7, 0.6, 0.5)
+        lurek.render.print("ENGINEER YOUR WAY", SCREEN_W / 2 - 100, 210, 2)
 
         -- Blinking prompt
         if math.floor(title_blink * 2) % 2 == 0 then
-            gfx.setColor(1, 1, 1)
-            gfx.print("PRESS ENTER TO START", SCREEN_W / 2 - 120, 340, 2)
+            lurek.render.setColor(1, 1, 1)
+            lurek.render.print("PRESS ENTER TO START", SCREEN_W / 2 - 120, 340, 2)
         end
 
-        gfx.setColor(0.5, 0.45, 0.4)
-        gfx.print("R — Road     S — Steel     C — Cable",  200, 430, 1.3)
-        gfx.print("T — Test     Z — Undo      D — Delete", 200, 455, 1.3)
-        gfx.print("Click to place nodes and connect beams", 200, 480, 1.3)
-        gfx.print("Escape — Quit",                          200, 505, 1.3)
+        lurek.render.setColor(0.5, 0.45, 0.4)
+        lurek.render.print("R — Road     S — Steel     C — Cable",  200, 430, 1.3)
+        lurek.render.print("T — Test     Z — Undo      D — Delete", 200, 455, 1.3)
+        lurek.render.print("Click to place nodes and connect beams", 200, 480, 1.3)
+        lurek.render.print("Escape — Quit",                          200, 505, 1.3)
         return
     end
 
     -- ── LEVEL SELECT ──────────────────────────────────────────────────
     if state == STATE.LEVEL_SELECT then
-        gfx.setColor(0.15, 0.12, 0.1)
-        gfx.fillRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.setColor(0.15, 0.12, 0.1)
+        lurek.render.fillRect(0, 0, SCREEN_W, SCREEN_H)
 
-        gfx.setColor(1.0, 0.85, 0.3)
-        gfx.print("SELECT LEVEL", SCREEN_W / 2 - 100, 40, 3)
+        lurek.render.setColor(1.0, 0.85, 0.3)
+        lurek.render.print("SELECT LEVEL", SCREEN_W / 2 - 100, 40, 3)
 
         for i, lv in ipairs(LEVELS) do
             local y = 100 + (i - 1) * 55
             if i <= levels_unlocked then
-                gfx.setColor(0.9, 0.85, 0.7)
-                gfx.print(string.format("[%d]  %s", i, lv.name), 180, y, 2)
-                gfx.setColor(0.5, 0.5, 0.45)
-                gfx.print(string.format("Gap: %dpx   Budget: %dg   Weight: %.1fx", lv.gap, lv.budget, lv.vehicle_weight), 220, y + 24, 1.1)
+                lurek.render.setColor(0.9, 0.85, 0.7)
+                lurek.render.print(string.format("[%d]  %s", i, lv.name), 180, y, 2)
+                lurek.render.setColor(0.5, 0.5, 0.45)
+                lurek.render.print(string.format("Gap: %dpx   Budget: %dg   Weight: %.1fx", lv.gap, lv.budget, lv.vehicle_weight), 220, y + 24, 1.1)
             else
-                gfx.setColor(0.35, 0.3, 0.25)
-                gfx.print(string.format("[%d]  LOCKED", i), 180, y, 2)
+                lurek.render.setColor(0.35, 0.3, 0.25)
+                lurek.render.print(string.format("[%d]  LOCKED", i), 180, y, 2)
             end
         end
 
-        gfx.setColor(0.5, 0.45, 0.4)
-        gfx.print("Press 1-8 to select   |   Escape to quit", 180, SCREEN_H - 40, 1.2)
+        lurek.render.setColor(0.5, 0.45, 0.4)
+        lurek.render.print("Press 1-8 to select   |   Escape to quit", 180, SCREEN_H - 40, 1.2)
         return
     end
 
@@ -780,57 +778,57 @@ function lurek.render_ui()
     local lv = LEVELS[current_level]
 
     -- Top bar background
-    gfx.setColor(0.0, 0.0, 0.0, 0.6)
-    gfx.fillRect(0, 0, SCREEN_W, 36)
+    lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
+    lurek.render.fillRect(0, 0, SCREEN_W, 36)
 
     -- Level name
-    gfx.setColor(1.0, 0.85, 0.3)
-    gfx.print(string.format("Level %d: %s", current_level, lv.name), 10, 8, 1.5)
+    lurek.render.setColor(1.0, 0.85, 0.3)
+    lurek.render.print(string.format("Level %d: %s", current_level, lv.name), 10, 8, 1.5)
 
     -- Budget
     local remaining = budget_total - budget_spent
     if remaining < budget_total * 0.2 then
-        gfx.setColor(1.0, 0.3, 0.3)
+        lurek.render.setColor(1.0, 0.3, 0.3)
     elseif remaining < budget_total * 0.5 then
-        gfx.setColor(1.0, 0.8, 0.2)
+        lurek.render.setColor(1.0, 0.8, 0.2)
     else
-        gfx.setColor(0.3, 1.0, 0.4)
+        lurek.render.setColor(0.3, 1.0, 0.4)
     end
-    gfx.print(string.format("Budget: %d / %dg", remaining, budget_total), SCREEN_W / 2 - 60, 8, 1.5)
+    lurek.render.print(string.format("Budget: %d / %dg", remaining, budget_total), SCREEN_W / 2 - 60, 8, 1.5)
 
     -- Beam count
-    gfx.setColor(0.7, 0.7, 0.8)
-    gfx.print(string.format("Beams: %d", #beams), SCREEN_W - 100, 8, 1.3)
+    lurek.render.setColor(0.7, 0.7, 0.8)
+    lurek.render.print(string.format("Beams: %d", #beams), SCREEN_W - 100, 8, 1.3)
 
     -- ── Tool palette (building mode only) ─────────────────────────────
     if state == STATE.BUILDING then
         local tool_y = SCREEN_H - 50
-        gfx.setColor(0.0, 0.0, 0.0, 0.5)
-        gfx.fillRect(0, tool_y - 5, SCREEN_W, 55)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
+        lurek.render.fillRect(0, tool_y - 5, SCREEN_W, 55)
 
         local tools = { "road", "steel", "cable" }
         for idx, t in ipairs(tools) do
             local tx = 20 + (idx - 1) * 180
             local bt = BEAM_TYPES[t]
             if beam_type == t and not delete_mode then
-                gfx.setColor(1.0, 1.0, 0.3)
-                gfx.rect(tx - 4, tool_y - 2, 160, 38)
+                lurek.render.setColor(1.0, 1.0, 0.3)
+                lurek.render.rect(tx - 4, tool_y - 2, 160, 38)
             end
-            gfx.setColor(bt.r, bt.g, bt.b)
-            gfx.fillRect(tx, tool_y + 10, 40, bt.thick * 2)
-            gfx.setColor(0.9, 0.9, 0.9)
-            gfx.print(string.format("%s (%s) %dg", bt.label, string.upper(string.sub(t, 1, 1)), bt.cost), tx + 50, tool_y + 5, 1.2)
+            lurek.render.setColor(bt.r, bt.g, bt.b)
+            lurek.render.fillRect(tx, tool_y + 10, 40, bt.thick * 2)
+            lurek.render.setColor(0.9, 0.9, 0.9)
+            lurek.render.print(string.format("%s (%s) %dg", bt.label, string.upper(string.sub(t, 1, 1)), bt.cost), tx + 50, tool_y + 5, 1.2)
         end
 
         -- Delete mode indicator
         if delete_mode then
-            gfx.setColor(1.0, 0.3, 0.2)
-            gfx.print("DELETE MODE (D)", SCREEN_W - 160, tool_y + 10, 1.4)
+            lurek.render.setColor(1.0, 0.3, 0.2)
+            lurek.render.print("DELETE MODE (D)", SCREEN_W - 160, tool_y + 10, 1.4)
         end
 
         -- Hint
-        gfx.setColor(0.6, 0.6, 0.65)
-        gfx.print("T = Test   Z = Undo   Esc = Back", SCREEN_W / 2 - 120, tool_y + 32, 1.0)
+        lurek.render.setColor(0.6, 0.6, 0.65)
+        lurek.render.print("T = Test   Z = Undo   Esc = Back", SCREEN_W / 2 - 120, tool_y + 32, 1.0)
     end
 
     -- ── Testing progress bar ──────────────────────────────────────────
@@ -838,45 +836,45 @@ function lurek.render_ui()
         local bar_w = 200
         local bar_x = SCREEN_W / 2 - bar_w / 2
         local bar_y = SCREEN_H - 24
-        gfx.setColor(0.2, 0.2, 0.2, 0.6)
-        gfx.fillRect(bar_x, bar_y, bar_w, 12)
+        lurek.render.setColor(0.2, 0.2, 0.2, 0.6)
+        lurek.render.fillRect(bar_x, bar_y, bar_w, 12)
         local prog = clamp(vehicle.progress, 0, 1)
-        gfx.setColor(0.3, 0.8, 0.4)
-        gfx.fillRect(bar_x, bar_y, bar_w * prog, 12)
-        gfx.setColor(1, 1, 1)
-        gfx.print("TESTING...", bar_x + bar_w / 2 - 30, bar_y - 16, 1.2)
+        lurek.render.setColor(0.3, 0.8, 0.4)
+        lurek.render.fillRect(bar_x, bar_y, bar_w * prog, 12)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("TESTING...", bar_x + bar_w / 2 - 30, bar_y - 16, 1.2)
     end
 
     -- ── SUCCESS overlay ───────────────────────────────────────────────
     if state == STATE.SUCCESS then
-        gfx.setColor(0.0, 0.0, 0.0, 0.5)
-        gfx.fillRect(0, SCREEN_H / 2 - 80, SCREEN_W, 160)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
+        lurek.render.fillRect(0, SCREEN_H / 2 - 80, SCREEN_W, 160)
 
-        gfx.setColor(0.3, 1.0, 0.4)
-        gfx.print("SUCCESS!", SCREEN_W / 2 - 70, SCREEN_H / 2 - 60, 3.5)
+        lurek.render.setColor(0.3, 1.0, 0.4)
+        lurek.render.print("SUCCESS!", SCREEN_W / 2 - 70, SCREEN_H / 2 - 60, 3.5)
 
-        gfx.setColor(1.0, 0.95, 0.7)
-        gfx.print(result_msg, SCREEN_W / 2 - 180, SCREEN_H / 2 + 5, 1.3)
+        lurek.render.setColor(1.0, 0.95, 0.7)
+        lurek.render.print(result_msg, SCREEN_W / 2 - 180, SCREEN_H / 2 + 5, 1.3)
 
-        gfx.setColor(1.0, 0.85, 0.3)
-        gfx.print(string.format("Score: %d", math.floor(score_display.value)), SCREEN_W / 2 - 50, SCREEN_H / 2 + 35, 2)
+        lurek.render.setColor(1.0, 0.85, 0.3)
+        lurek.render.print(string.format("Score: %d", math.floor(score_display.value)), SCREEN_W / 2 - 50, SCREEN_H / 2 + 35, 2)
 
-        gfx.setColor(0.6, 0.6, 0.65)
-        gfx.print("Press Enter to continue", SCREEN_W / 2 - 90, SCREEN_H / 2 + 65, 1.2)
+        lurek.render.setColor(0.6, 0.6, 0.65)
+        lurek.render.print("Press Enter to continue", SCREEN_W / 2 - 90, SCREEN_H / 2 + 65, 1.2)
     end
 
     -- ── FAIL overlay ──────────────────────────────────────────────────
     if state == STATE.FAIL then
-        gfx.setColor(0.0, 0.0, 0.0, 0.5)
-        gfx.fillRect(0, SCREEN_H / 2 - 60, SCREEN_W, 120)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
+        lurek.render.fillRect(0, SCREEN_H / 2 - 60, SCREEN_W, 120)
 
-        gfx.setColor(1.0, 0.3, 0.2)
-        gfx.print("BRIDGE FAILED!", SCREEN_W / 2 - 110, SCREEN_H / 2 - 45, 3.5)
+        lurek.render.setColor(1.0, 0.3, 0.2)
+        lurek.render.print("BRIDGE FAILED!", SCREEN_W / 2 - 110, SCREEN_H / 2 - 45, 3.5)
 
-        gfx.setColor(0.9, 0.7, 0.6)
-        gfx.print(result_msg, SCREEN_W / 2 - 140, SCREEN_H / 2 + 10, 1.3)
+        lurek.render.setColor(0.9, 0.7, 0.6)
+        lurek.render.print(result_msg, SCREEN_W / 2 - 140, SCREEN_H / 2 + 10, 1.3)
 
-        gfx.setColor(0.6, 0.6, 0.65)
-        gfx.print("Press Enter to try again", SCREEN_W / 2 - 95, SCREEN_H / 2 + 40, 1.2)
+        lurek.render.setColor(0.6, 0.6, 0.65)
+        lurek.render.print("Press Enter to try again", SCREEN_W / 2 - 95, SCREEN_H / 2 + 40, 1.2)
     end
 end

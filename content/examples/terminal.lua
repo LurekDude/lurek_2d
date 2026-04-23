@@ -432,7 +432,7 @@ end
 do  -- Terminal:render
   local term = lurek.terminal.newTerminal(80, 25)
   term:addWidget(lurek.terminal.newLabel(2, 2, "HUD"))
-  function lurek.render() term:render(0, 0) end
+  function lurek.draw() term:render(0, 0) end
 end
 
 --@api-stub: Terminal:setFont
@@ -803,4 +803,23 @@ do  -- Widget:getChild
   panel:addChild(lurek.terminal.newLabel(1, 1, "first"))
   local first = panel:getChild(1)
   if first then lurek.log.debug("got first child", "term") end
+end
+
+--@api-stub: Terminal:mousepressed
+-- Forwards a mouse-press event to the terminal UI for widget interaction.
+-- Call from lurek's mouse callback or equivalent input handler each frame.
+do  -- Terminal:mousepressed
+  local term = lurek.terminal.newTerminal(80, 24)
+  term:mousepressed(10, 5, 1)
+  lurek.log.info("mouse event forwarded", "terminal")
+end
+
+--@api-stub: Widget:setColor
+-- Sets the foreground text or icon colour for a terminal widget.
+-- Use ANSI-style RGB values in [0,1] to theme individual widgets.
+do  -- Widget:setColor
+  local btn = lurek.terminal.newButton()
+  btn:setText("OK")
+  btn:setColor(0.2, 0.9, 0.3)
+  lurek.log.info("widget colour set", "terminal")
 end

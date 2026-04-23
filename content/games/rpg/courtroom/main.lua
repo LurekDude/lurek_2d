@@ -237,14 +237,14 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.15, 0.1, 0.08)
 end
 
-lurek.ready(function() end)
+local function _ready_setup() end)
 
-lurek.process(function(dt)
+function lurek.process(dt)
     local fps = lurek.timer.getFPS()
     lurek.window.setTitle(string.format("Courtroom Drama — Lurek2D | FPS: %d", fps))
 
     -- Quit
-    if lurek.input.isPressed(actions.quit) then
+    if lurek.input.keyboard.isDown(actions.quit) then
         lurek.event.signal("quit")
         return
     end
@@ -332,7 +332,7 @@ lurek.process(function(dt)
 
     -- State machine input
     if state == "TITLE" then
-        if lurek.input.isPressed(actions.advance) then
+        if lurek.input.keyboard.isDown(actions.advance) then
             credibility = 100
             cred_display = 100
             jury_meter = 0
@@ -342,7 +342,7 @@ lurek.process(function(dt)
         end
 
     elseif state == "CASE_INTRO" then
-        if lurek.input.isPressed(actions.advance) and #typewriter_text >= #typewriter_target then
+        if lurek.input.keyboard.isDown(actions.advance) and #typewriter_text >= #typewriter_target then
             dialog_index = dialog_index + 1
             if dialog_index > #dialog_queue then
                 start_testimony()
@@ -356,11 +356,11 @@ lurek.process(function(dt)
             -- Selecting evidence for objection
             for idx = 1, 3 do
                 local key = actions["choice" .. idx]
-                if lurek.input.isPressed(key) then
+                if lurek.input.keyboard.isDown(key) then
                     process_objection(idx)
                 end
             end
-            if lurek.input.isPressed(actions.evidence) then
+            if lurek.input.keyboard.isDown(actions.evidence) then
                 objection_mode = false
                 set_typewriter(cases[current_case].testimony[testimony_line])
             end
@@ -368,7 +368,7 @@ lurek.process(function(dt)
             -- Choosing question
             for idx = 1, 3 do
                 local key = actions["choice" .. idx]
-                if lurek.input.isPressed(key) then
+                if lurek.input.keyboard.isDown(key) then
                     question_mode = false
                     local q = cases[current_case].questions[idx]
                     if q then
@@ -376,13 +376,13 @@ lurek.process(function(dt)
                     end
                 end
             end
-            if lurek.input.isPressed(actions.question) then
+            if lurek.input.keyboard.isDown(actions.question) then
                 question_mode = false
                 set_typewriter(cases[current_case].testimony[testimony_line])
             end
         else
             -- Normal testimony navigation
-            if lurek.input.isPressed(actions.advance) and #typewriter_text >= #typewriter_target then
+            if lurek.input.keyboard.isDown(actions.advance) and #typewriter_text >= #typewriter_target then
                 testimony_line = testimony_line + 1
                 local c = cases[current_case]
                 if testimony_line > #c.testimony then
@@ -391,7 +391,7 @@ lurek.process(function(dt)
                 set_typewriter(c.testimony[testimony_line])
             end
 
-            if lurek.input.isPressed(actions.objection) then
+            if lurek.input.keyboard.isDown(actions.objection) then
                 objection_mode = true
                 flash_color = {1, 0.6, 0}
                 flash_alpha = 0.6
@@ -400,18 +400,18 @@ lurek.process(function(dt)
                 set_typewriter("Select evidence (1/2/3) or press E to cancel:")
             end
 
-            if lurek.input.isPressed(actions.question) then
+            if lurek.input.keyboard.isDown(actions.question) then
                 question_mode = true
                 set_typewriter("Choose a question (1/2/3) or press Q to cancel:")
             end
 
-            if lurek.input.isPressed(actions.evidence) then
+            if lurek.input.keyboard.isDown(actions.evidence) then
                 show_evidence = not show_evidence
             end
         end
 
     elseif state == "VERDICT" then
-        if lurek.input.isPressed(actions.advance) and #typewriter_text >= #typewriter_target then
+        if lurek.input.keyboard.isDown(actions.advance) and #typewriter_text >= #typewriter_target then
             if case_won then
                 if current_case < 3 then
                     start_case(current_case + 1)
@@ -429,16 +429,16 @@ lurek.process(function(dt)
         end
 
     elseif state == "GAME_OVER" then
-        if lurek.input.isPressed(actions.advance) then
+        if lurek.input.keyboard.isDown(actions.advance) then
             state = "TITLE"
             verdict_confetti = {}
             gavel_sparks = {}
         end
     end
-end)
+end
 
 -- Draw courtroom scene elements
-lurek.render(function()
+function lurek.draw()
     -- Courtroom background walls
     lurek.render.setColor(0.25, 0.18, 0.12, 1)
     lurek.render.rectangle("fill", 0, 0, 800, 600)
@@ -517,10 +517,10 @@ lurek.render(function()
         lurek.render.setColor(flash_color[1], flash_color[2], flash_color[3], flash_alpha * 0.4)
         lurek.render.rectangle("fill", 0, 0, 800, 600)
     end
-end)
+end
 
 -- Draw UI elements
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == "TITLE" then
         -- Title screen
         lurek.render.setColor(0.9, 0.75, 0.3, 1)
@@ -710,4 +710,4 @@ lurek.render_ui(function()
             lurek.render.rectangle("fill", c.x, c.y, c.size, c.size)
         end
     end
-end)
+end

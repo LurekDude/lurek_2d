@@ -676,6 +676,7 @@ end
 
 --@api-stub: lurek.dataframe.fromVec
 -- Converts a VecFrame back to a DataFrame.
+-- Round-trip after bulk column operations: toVec() → ops → fromVec().
 do  -- lurek.dataframe.fromVec
   local df = lurek.dataframe.fromCSV("hp,mp\n100,50\n200,80\n")
   local vf = lurek.dataframe.toVec(df)
@@ -696,6 +697,7 @@ end
 
 --@api-stub: VecFrame:colMul
 -- Multiply every element of a Float64 column by a scalar.
+-- Useful for applying damage multipliers or stat scaling across all rows at once.
 do  -- VecFrame:colMul
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("dmg\n10\n15\n20\n"))
   vf:colMul("dmg", 1.5)    -- apply 1.5x damage multiplier to all rows
@@ -713,16 +715,22 @@ end
 
 --@api-stub: VecFrame:colAbs
 -- Replace every element with its absolute value.
+-- Useful for converting signed deltas (e.g. position offsets) to distances.
 do  -- VecFrame:colAbs
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("delta\n-3\n4\n-1\n"))
   vf:colAbs("delta")
+  local df = vf:toDataFrame()
+  lurek.log.info("abs delta[0] = " .. tostring(df:get(0, "delta")))
 end
 
 --@api-stub: VecFrame:colSqrt
 -- Apply square root to every element of a Float64 column.
+-- Convert squared distances to Euclidean distances without a Lua loop.
 do  -- VecFrame:colSqrt
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("dist_sq\n9\n16\n25\n"))
   vf:colSqrt("dist_sq")   -- dist_sq becomes 3, 4, 5
+  local df = vf:toDataFrame()
+  lurek.log.info("dist[0] = " .. tostring(df:get(0, "dist_sq")))
 end
 
 --@api-stub: VecFrame:colOp
@@ -757,6 +765,7 @@ end
 
 --@api-stub: VecFrame:applyMask
 -- Return a new VecFrame with only the rows where mask[i] is true.
+-- Combine with filterMask for fast predicate-based row selection.
 do  -- VecFrame:applyMask
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n10\n50\n90\n"))
   local mask = vf:filterMask("hp", ">=", 50)
@@ -766,9 +775,11 @@ end
 
 --@api-stub: VecFrame:colType
 -- Return the dtype name of a column: "float64" | "int64" | "bool" | "text".
+-- Inspect the column type before choosing a scalar op or cast target.
 do  -- VecFrame:colType
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n10\n20\n"))
-  lurek.log.info("hp dtype: " .. vf:colType("hp"))  -- "float64"
+  local dtype = vf:colType("hp")
+  lurek.log.info("hp dtype: " .. dtype)  -- "float64"
 end
 
 --@api-stub: VecFrame:parReduce
@@ -793,9 +804,385 @@ end
 
 --@api-stub: VecFrame:toDataFrame
 -- Convert a VecFrame back to a DataFrame (same as lurek.dataframe.fromVec).
+-- Use as the last step after bulk VecFrame ops before displaying or saving data.
 do  -- VecFrame:toDataFrame
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("v\n1\n2\n3\n"))
   vf:colAdd("v", 10)
   local df2 = vf:toDataFrame()
   lurek.log.info("v[0] = " .. tostring(df2:get(0, "v")))  -- 11
+end
+
+--@api-stub: VecFrame:colSub
+-- Subtract a scalar from every element of a Float64 column.
+-- Useful for reducing stats by a fixed amount (e.g. applying stamina drain).
+do  -- VecFrame:colSub
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("stamina\n100\n80\n60\n"))
+  vf:colSub("stamina", 10)
+  local df2 = vf:toDataFrame()
+  lurek.log.info("stamina[0] after drain = " .. tostring(df2:get(0, "stamina")))  -- 90
+end
+
+--@api-stub: VecFrame:colDiv
+-- Divide every element of a Float64 column by a scalar.
+-- Normalise a column to a [0, 1] range by dividing by its maximum value.
+do  -- VecFrame:colDiv
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("score\n100\n200\n150\n"))
+  vf:colDiv("score", 200)
+  local df2 = vf:toDataFrame()
+  lurek.log.info("normalised score[1] = " .. tostring(df2:get(1, "score")))  -- 1.0
+end
+
+--@api-stub: VecFrame:colFloor
+-- Round every element of a Float64 column down to the nearest integer.
+-- Snap fractional coordinates to tile positions without a Lua loop.
+do  -- VecFrame:colFloor
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("x\n1.9\n2.1\n3.7\n"))
+  vf:colFloor("x")
+  local df2 = vf:toDataFrame()
+  lurek.log.info("floored x[2] = " .. tostring(df2:get(2, "x")))  -- 3
+end
+
+--@api-stub: VecFrame:colCeil
+-- Round every element of a Float64 column up to the nearest integer.
+-- Compute minimum tile coverage for fractional world coordinates.
+do  -- VecFrame:colCeil
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("y\n1.1\n2.5\n3.0\n"))
+  vf:colCeil("y")
+  local df2 = vf:toDataFrame()
+  lurek.log.info("ceiled y[0] = " .. tostring(df2:get(0, "y")))  -- 2
+end
+
+--@api-stub: VecFrame:colNeg
+-- Negate every element of a Float64 column (multiply by -1).
+-- Flip velocity or force columns to reverse direction without a loop.
+do  -- VecFrame:colNeg
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("vy\n3\n-2\n0\n"))
+  vf:colNeg("vy")
+  local df2 = vf:toDataFrame()
+  lurek.log.info("negated vy[0] = " .. tostring(df2:get(0, "vy")))  -- -3
+end
+
+--@api-stub: VecFrame:colCast
+-- Cast a column to a new dtype: "float64" | "int64" | "bool" | "text".
+-- Convert an integer column to float before arithmetic, or text for display.
+do  -- VecFrame:colCast
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("level\n1\n2\n3\n"))
+  vf:colCast("level", "float64")
+  lurek.log.info("level dtype after cast: " .. vf:colType("level"))  -- "float64"
+  local df2 = vf:toDataFrame()
+  lurek.log.info("level[0] as float = " .. tostring(df2:get(0, "level")))
+end
+
+--@api-stub: VecFrame:nrows
+-- Return the number of rows in this VecFrame.
+-- Use to guard slice/applyMask calls or to log frame dimensions.
+do  -- VecFrame:nrows
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("v\n10\n20\n30\n"))
+  lurek.log.info("VecFrame rows: " .. vf:nrows())  -- 3
+  local df2 = vf:toDataFrame()
+  assert(vf:nrows() == df2:nrows())
+end
+
+--@api-stub: VecFrame:ncols
+-- Return the number of columns in this VecFrame.
+-- Check column count after toVec to confirm all DataFrame columns were kept.
+do  -- VecFrame:ncols
+  local df = lurek.dataframe.fromCSV("hp,mp,atk\n10,5,8\n")
+  local vf = lurek.dataframe.toVec(df)
+  lurek.log.info("VecFrame cols: " .. vf:ncols())  -- 3
+  assert(vf:ncols() == df:ncols())
+end
+
+--@api-stub: VecFrame:columns
+-- Return a table of column name strings in this VecFrame.
+-- Iterate column names to build dynamic UI headers or log schemas.
+do  -- VecFrame:columns
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("a,b,c\n1,2,3\n"))
+  local cols = vf:columns()
+  for i, name in ipairs(cols) do
+    lurek.log.info("col " .. i .. ": " .. name)
+  end
+end
+
+--@api-stub: VecFrame:type
+-- Return the type name of this object ("VecFrame").
+-- Use in generic dispatch code that handles both VecFrame and DataFrame userdata.
+do  -- VecFrame:type
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("x\n1\n"))
+  if vf:type() == "VecFrame" then
+    lurek.log.info("got a VecFrame, rows=" .. vf:nrows())
+  end
+end
+
+--@api-stub: VecFrame:typeOf
+-- Return true if this object is of the given type.
+-- Inheritance-style check — also returns true for the generic "Object" supertype.
+do  -- VecFrame:typeOf
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("x\n1\n"))
+  if vf:typeOf("Object") then
+    lurek.log.info("VecFrame is an Object")
+  end
+end
+
+--@api-stub: DataFrame:addColumn
+-- Adds a new column to the DataFrame from a Lua table of values.
+-- Column length must match nrows(); use nil to append an empty column.
+do  -- DataFrame:addColumn
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({name="Alice", score=85})
+  df:addColumn("grade", {"A"})
+  lurek.log.info("cols: " .. df:ncols(), "dataframe")
+end
+
+--@api-stub: Database:addTable
+-- Adds a named DataFrame to the Database for SQL-style querying.
+-- Table name must be unique; adding a duplicate name replaces the previous table.
+do  -- Database:addTable
+  local db = lurek.dataframe.newDatabase()
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({id=1, name="Alice"})
+  db:addTable("users", df)
+  lurek.log.info("tables: " .. db:tableCount(), "dataframe")
+end
+
+--@api-stub: DataFrame:apply
+-- Applies a Lua function to every element of a column and stores results in a new column.
+-- Signature: fn(value) -> new_value; nil return keeps the original value.
+do  -- DataFrame:apply
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({score=60})
+  df:addRow({score=80})
+  df:apply("score", "grade", function(v) return v >= 70 and "pass" or "fail" end)
+  lurek.log.info("grade col added", "dataframe")
+end
+
+--@api-stub: DataFrame:corr
+-- Returns the Pearson correlation coefficient between two numeric columns.
+-- Values near 1 indicate strong positive correlation, near -1 strong negative.
+do  -- DataFrame:corr
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({x=1, y=2})
+  df:addRow({x=3, y=4})
+  df:addRow({x=5, y=6})
+  local r = df:corr("x", "y")
+  lurek.log.info("correlation: " .. r, "dataframe")
+end
+
+--@api-stub: DataFrame:filter
+-- Returns a new DataFrame containing only rows where the predicate function returns true.
+-- Predicate receives the row table; does not modify the original frame.
+do  -- DataFrame:filter
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({age=20, name="Alice"})
+  df:addRow({age=35, name="Bob"})
+  local adults = df:filter(function(row) return row.age >= 21 end)
+  lurek.log.info("adults: " .. adults:nrows(), "dataframe")
+end
+
+--@api-stub: DataFrame:groupAgg
+-- Groups rows by a column and aggregates another column using a named function.
+-- Supported aggregators: "sum", "mean", "count", "min", "max".
+do  -- DataFrame:groupAgg
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({team="A", score=10})
+  df:addRow({team="A", score=20})
+  df:addRow({team="B", score=30})
+  local out = df:groupAgg("team", "score", "sum")
+  lurek.log.info("group agg rows: " .. out:nrows(), "dataframe")
+end
+
+--@api-stub: DataFrame:join
+-- Joins two DataFrames on a shared key column, returning a new merged frame.
+-- join_type: "inner" (default), "left", "right", or "outer".
+do  -- DataFrame:join
+  local left  = lurek.dataframe.newDataFrame()
+  local right = lurek.dataframe.newDataFrame()
+  left:addRow({id=1, name="Alice"})
+  right:addRow({id=1, dept="Eng"})
+  local merged = left:join(right, "id", "inner")
+  lurek.log.info("joined rows: " .. merged:nrows(), "dataframe")
+end
+
+--@api-stub: DataFrame:normalizeCol
+-- Normalises a numeric column to the [0, 1] range in-place.
+-- Uses min-max scaling; column min and max are computed from the data.
+do  -- DataFrame:normalizeCol
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({val=10}) ; df:addRow({val=50}) ; df:addRow({val=90})
+  df:normalizeCol("val")
+  lurek.log.info("normalized col", "dataframe")
+end
+
+--@api-stub: DataFrame:outliers
+-- Returns a new DataFrame containing rows whose column value is an outlier.
+-- Outliers are defined as more than threshold standard deviations from the mean.
+do  -- DataFrame:outliers
+  local df = lurek.dataframe.newDataFrame()
+  for i=1,10 do df:addRow({v=i}) end
+  df:addRow({v=1000})
+  local out = df:outliers("v", 2.0)
+  lurek.log.info("outliers: " .. out:nrows(), "dataframe")
+end
+
+--@api-stub: VecFrame:parScalarOp
+-- Applies a scalar operation to all cells of a VecFrame in parallel.
+-- op is one of "+", "-", "*", "/"; faster than loop-based column iteration.
+do  -- VecFrame:parScalarOp
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromTable({
+    x = {1.0, 2.0, 3.0}, y = {4.0, 5.0, 6.0}
+  }))
+  local scaled = vf:parScalarOp("*", 2.0)
+  lurek.log.info("par scalar done", "dataframe")
+end
+
+--@api-stub: DataFrame:pivot
+-- Pivots the DataFrame: unique values of pivot_col become new columns.
+-- values_col provides the cell values; aggregation is "first" by default.
+do  -- DataFrame:pivot
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({name="Alice", month="Jan", val=100})
+  df:addRow({name="Alice", month="Feb", val=120})
+  local p = df:pivot("name", "month", "val")
+  lurek.log.info("pivot cols: " .. p:ncols(), "dataframe")
+end
+
+--@api-stub: DataFrame:pivotTable
+-- Creates a pivot table with row/column grouping and an aggregation function.
+-- More powerful than pivot(); supports multi-index and custom aggregators.
+do  -- DataFrame:pivotTable
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({region="N", product="A", sales=50})
+  df:addRow({region="N", product="B", sales=70})
+  local pt = df:pivotTable("region", "product", "sales", "sum")
+  lurek.log.info("pivot table rows: " .. pt:nrows(), "dataframe")
+end
+
+--@api-stub: DataFrame:rank
+-- Returns a new DataFrame with a rank column added, ranked by the given column.
+-- Ties use the "average" method by default; method can be "min", "max", "first".
+do  -- DataFrame:rank
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({score=80}) ; df:addRow({score=95}) ; df:addRow({score=72})
+  local ranked = df:rank("score")
+  lurek.log.info("rank col added", "dataframe")
+end
+
+--@api-stub: DataFrame:rollingMean
+-- Returns a new DataFrame with rolling mean applied to a numeric column.
+-- window is the number of preceding rows (inclusive); edge rows get nil/NaN.
+do  -- DataFrame:rollingMean
+  local df = lurek.dataframe.newDataFrame()
+  for i=1,5 do df:addRow({v=i*2}) end
+  local out = df:rollingMean("v", 3)
+  lurek.log.info("rolling mean rows: " .. out:nrows(), "dataframe")
+end
+
+--@api-stub: DataFrame:rollingSum
+-- Returns a new DataFrame with rolling sum applied to a numeric column.
+-- Useful for computing moving-window totals such as rolling revenue sums.
+do  -- DataFrame:rollingSum
+  local df = lurek.dataframe.newDataFrame()
+  for i=1,5 do df:addRow({v=i}) end
+  local out = df:rollingSum("v", 3)
+  lurek.log.info("rolling sum rows: " .. out:nrows(), "dataframe")
+end
+
+--@api-stub: DataFrame:setValue
+-- Sets the value at (row_index, column_name) in place.
+-- row_index is 1-based; raises an error for out-of-bounds or unknown column.
+do  -- DataFrame:setValue
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({score=50, name="Alice"})
+  df:setValue(1, "score", 90)
+  lurek.log.info("updated score: " .. df:getValue(1, "score"), "dataframe")
+end
+
+--@api-stub: DataFrame:sort
+-- Sorts the DataFrame in-place by one or more columns.
+-- Pass asc=true for ascending (default); multi-key sort via a table of column names.
+do  -- DataFrame:sort
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({score=80}) ; df:addRow({score=60}) ; df:addRow({score=95})
+  df:sort("score", true)
+  lurek.log.info("sorted first: " .. df:getValue(1, "score"), "dataframe")
+end
+
+--@api-stub: DataFrame:withCumsum
+-- Returns a new DataFrame with a cumulative-sum column derived from a source column.
+-- The resulting column is appended with the suffix "_cumsum" by default.
+do  -- DataFrame:withCumsum
+  local df = lurek.dataframe.newDataFrame()
+  for i=1,4 do df:addRow({v=i}) end
+  local out = df:withCumsum("v")
+  lurek.log.info("cumsum col added", "dataframe")
+end
+
+--@api-stub: DataFrame:withPctChange
+-- Returns a new DataFrame with a percentage-change column derived from a source column.
+-- First row is nil/NaN; subsequent rows show (current-prev)/prev*100.
+do  -- DataFrame:withPctChange
+  local df = lurek.dataframe.newDataFrame()
+  for _, v in ipairs({100,110,121,133}) do df:addRow({price=v}) end
+  local out = df:withPctChange("price")
+  lurek.log.info("pct change col added", "dataframe")
+end
+
+--@api-stub: DataFrame:withRank
+-- Returns a new DataFrame with a rank column added for a numeric source column.
+-- Ties default to average ranking; the new column is named source.."_rank".
+do  -- DataFrame:withRank
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({pts=10}) ; df:addRow({pts=30}) ; df:addRow({pts=20})
+  local out = df:withRank("pts")
+  lurek.log.info("rank col added", "dataframe")
+end
+
+--@api-stub: DataFrame:withRollingMax
+-- Returns a new DataFrame with a rolling-maximum column derived from a source column.
+-- Useful for computing peak values within a sliding time window.
+do  -- DataFrame:withRollingMax
+  local df = lurek.dataframe.newDataFrame()
+  for _, v in ipairs({3,1,4,1,5,9,2,6}) do df:addRow({v=v}) end
+  local out = df:withRollingMax("v", 3)
+  lurek.log.info("rolling max col added", "dataframe")
+end
+
+--@api-stub: DataFrame:withRollingMean
+-- Returns a new DataFrame with a rolling-mean column appended for a source column.
+-- Equivalent to rolling mean but returns a new frame instead of mutating in place.
+do  -- DataFrame:withRollingMean
+  local df = lurek.dataframe.newDataFrame()
+  for i=1,5 do df:addRow({temp=20+i}) end
+  local out = df:withRollingMean("temp", 3)
+  lurek.log.info("rolling mean col added", "dataframe")
+end
+
+--@api-stub: DataFrame:withRollingMin
+-- Returns a new DataFrame with a rolling-minimum column derived from a source column.
+-- Useful for tracking the recent low value of a time series.
+do  -- DataFrame:withRollingMin
+  local df = lurek.dataframe.newDataFrame()
+  for _, v in ipairs({5,3,8,2,7,1}) do df:addRow({v=v}) end
+  local out = df:withRollingMin("v", 3)
+  lurek.log.info("rolling min col added", "dataframe")
+end
+
+--@api-stub: DataFrame:withRollingSum
+-- Returns a new DataFrame with a rolling-sum column derived from a source column.
+-- Useful for sliding-window revenue totals or event-count aggregations.
+do  -- DataFrame:withRollingSum
+  local df = lurek.dataframe.newDataFrame()
+  for i=1,5 do df:addRow({sales=i*10}) end
+  local out = df:withRollingSum("sales", 3)
+  lurek.log.info("rolling sum col added", "dataframe")
+end
+
+--@api-stub: DataFrame:zscoreCol
+-- Z-score normalises a numeric column in-place: (x-mean)/stddev.
+-- After normalisation the column has mean≈0 and stddev≈1.
+do  -- DataFrame:zscoreCol
+  local df = lurek.dataframe.newDataFrame()
+  for i=1,6 do df:addRow({v=i*5}) end
+  df:zscoreCol("v")
+  lurek.log.info("zscore normalised", "dataframe")
 end

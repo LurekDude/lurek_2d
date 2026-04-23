@@ -591,7 +591,7 @@ local function dart_update(dt)
         dart.crosshair_x = dart.cx + wx
         dart.crosshair_y = dart.cy + wy
 
-        if lurek.input.isActionPressed("power") and dart.darts_in_turn > 0 then
+        if lurek.input.isActionDown("power") and dart.darts_in_turn > 0 then
             dart.thrown = true
             dart.throw_anim = 0.3
             dart.hit_x = dart.crosshair_x
@@ -633,23 +633,23 @@ function lurek.init()
     lurek.window.setBackgroundColor(0.1, 0.1, 0.15)
 end
 
-function lurek.ready()
+local function _ready_setup()
     lurek.camera.init(W, H)
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     title_blink = title_blink + dt
     update_particles(dt)
     update_tweens(dt)
 
-    if lurek.input.isActionPressed("quit") then
+    if lurek.input.isActionDown("quit") then
         lurek.event.quit()
         return
     end
 
     -- ── TITLE ──
     if state == S_TITLE then
-        if lurek.input.isActionPressed("power") then
+        if lurek.input.isActionDown("power") then
             state = S_SPORT_SELECT
         end
         return
@@ -658,7 +658,7 @@ lurek.process(function(dt)
     -- ── SPORT SELECT ──
     if state == S_SPORT_SELECT then
         for i = 1, 4 do
-            if lurek.input.isActionPressed("select" .. i) then
+            if lurek.input.isActionDown("select" .. i) then
                 sport = i
                 if i == 1 then archery_reset()
                 elseif i == 2 then bball_reset()
@@ -700,7 +700,7 @@ lurek.process(function(dt)
 
     -- ── FINAL SCORES ──
     if state == S_FINAL_SCORES then
-        if lurek.input.isActionPressed("power") then
+        if lurek.input.isActionDown("power") then
             -- Reset everything
             scores = { 0, 0, 0, 0 }
             medals = { "", "", "", "" }
@@ -708,12 +708,12 @@ lurek.process(function(dt)
         end
         return
     end
-end)
+end
 
 -- ═══════════════════════════════════════════════════════════════════
 -- Render — field, projectiles, targets
 -- ═══════════════════════════════════════════════════════════════════
-lurek.render(function()
+function lurek.draw()
     if state == S_PLAYING then
         if sport == 1 then
             -- Archery field
@@ -820,12 +820,12 @@ lurek.render(function()
     for _, p in ipairs(particles) do
         lurek.render.circle(p.x, p.y, p.size, p.r, p.g, p.b)
     end
-end)
+end
 
 -- ═══════════════════════════════════════════════════════════════════
 -- Render UI — HUD, scores, power bars, menus
 -- ═══════════════════════════════════════════════════════════════════
-lurek.render_ui(function()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
     lurek.render.print(string.format("FPS: %d", fps), W - 80, 10, 14, 0.6, 0.6, 0.6)
 
@@ -945,4 +945,4 @@ lurek.render_ui(function()
             end
         end
     end
-end)
+end

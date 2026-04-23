@@ -151,6 +151,18 @@ _INTERNAL_MODULES = {
     # Widget tree builder helpers — load_layout_def / load_layout_toml are called
     # inside lurek.ui.loadLayout / .loadLayoutToml closures in ui_api.rs
     "ui::layout_loader",
+    # Animation state-machine internals — compare_nums / parse_condition are private
+    # helpers used by the Lua-facing state machine transition evaluator
+    "animation::state_machine",
+    # i18n date/locale primitives — days_to_ymd, locale_separators, month_name_tables
+    # are called inside lurek.i18n.* closures in i18n_api.rs; not standalone Lua fns
+    "i18n::format",
+    # Particle render helper — expand_particle_commands is called inside the render
+    # loop in particle_api.rs; not exposed as a standalone lurek.particle function
+    "particle::render",
+    # Terminal syntax highlighter — highlight_spans is called inside
+    # lurek.terminal.highlight in terminal_api.rs; not a standalone Lua function
+    "terminal::highlighter",
 }
 
 # Minimum description length to be considered "documented"

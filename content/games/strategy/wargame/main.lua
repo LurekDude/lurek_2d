@@ -235,6 +235,7 @@ lurek.input.bind("quit",      "escape")
 local hover_c, hover_r = 0, 0
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Wargame — Lurek2D")
     lurek.render.setBackgroundColor(0.07, 0.07, 0.05, 1.0)
@@ -271,7 +272,7 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if attack_sparks then attack_sparks:update(dt) end
     if death_sparks  then death_sparks:update(dt)  end
     if move_dust     then move_dust:update(dt)     end
@@ -281,15 +282,15 @@ lurek.process(function(dt)
         if log[i].timer <= 0 then table.remove(log, i) end
     end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
     if state == "win" or state == "lose" then return end
 
     if state == "enemy_turn" then enemy_ai(dt) return end
 
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     hover_c, hover_r = pixel_to_hex(mx, my)
 
-    if lurek.input.isActionJustPressed("end_turn") and turn == "player" then
+    if lurek.input.wasActionPressed("end_turn") and turn == "player" then
         for _, u in ipairs(units) do
             if u.team == "enemy" then u.moved = false ; u.attacked = false end
         end
@@ -300,7 +301,7 @@ lurek.process(function(dt)
         return
     end
 
-    if lurek.input.isActionJustPressed("click") then
+    if lurek.input.wasActionPressed("click") then
         local hc, hr = hover_c, hover_r
         if hc < 1 or hc > COLS or hr < 1 or hr > ROWS then return end
 
@@ -365,10 +366,10 @@ lurek.process(function(dt)
             if p  == 0 then state = "lose" end
         end
     end
-end)
+end
 
 -- ── Render world ──────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Hex tiles
     for r = 1, ROWS do
         for c = 1, COLS do
@@ -419,10 +420,10 @@ lurek.render(function()
     if attack_sparks then attack_sparks:draw() end
     if death_sparks  then death_sparks:draw()  end
     if move_dust     then move_dust:draw()     end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     lurek.render.rectangle(0, 0, W, OY - 4, { color = {0.08,0.08,0.06,1} })
     local turn_col = turn == "player" and {0.3,0.9,0.4,1} or {0.9,0.3,0.3,1}
     lurek.render.print(turn == "player" and "YOUR TURN" or "ENEMY TURN", 12, 8, { color = turn_col, size = 16 })
@@ -442,4 +443,4 @@ lurek.render_ui(function()
         lurek.render.rectangle(240, 220, 400, 100, { color = {0,0,0,0.88} })
         lurek.render.print("DEFEATED", 320, 248, { color = {0.9,0.2,0.2,1}, size = 34 })
     end
-end)
+end

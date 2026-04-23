@@ -132,6 +132,7 @@ lurek.input.bind("next_turn",  "n")
 lurek.input.bind("quit",       "escape")
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Hex Strategy — Lurek2D")
     lurek.render.setBackgroundColor(0.04, 0.06, 0.1, 1.0)
@@ -159,16 +160,16 @@ function lurek.process(dt)
     if city_sparkle then city_sparkle:update(dt) end
     if info_timer > 0 then info_timer = info_timer - dt end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
-    if lurek.input.isActionJustPressed("next_turn") then next_turn() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("next_turn") then next_turn() return end
 
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     local hq, hr = pixel_to_hex(mx, my)
     local hkey   = hex_key(hq, hr)
     local hex    = hexes[hkey]
 
     -- Select hex
-    if lurek.input.isActionJustPressed("click") then
+    if lurek.input.wasActionPressed("click") then
         if hex then
             selected = hex
             -- If unowned and adjacent to owned: expand (cost 30g + 10w)
@@ -189,7 +190,7 @@ function lurek.process(dt)
     end
 
     -- Build city on selected owned hex (cost 50g + 20w + 20f)
-    if lurek.input.isActionJustPressed("build_city") then
+    if lurek.input.wasActionPressed("build_city") then
         if selected and selected.owner == "player" and not selected.city then
             if resources.gold >= 50 and resources.wood >= 20 and resources.food >= 20 then
                 resources.gold = resources.gold - 50
@@ -210,7 +211,7 @@ function lurek.process(dt)
 end
 
 -- ── Render ────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Draw each hex
     for _, h in pairs(hexes) do
         local cx, cy = hex_to_pixel(h.q, h.r)
@@ -241,10 +242,10 @@ lurek.render(function()
 
     if expand_burst then expand_burst:draw() end
     if city_sparkle then city_sparkle:draw() end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     lurek.render.rectangle(0, 0, W, 44, { color = {0.06,0.08,0.08,0.92} })
     lurek.render.print("Gold:" .. math.floor(resources.gold), 10, 8, { color = {1,0.85,0.2,1}, size = 13 })
     lurek.render.print("Wood:" .. math.floor(resources.wood), 110, 8, { color = {0.5,0.8,0.3,1}, size = 13 })

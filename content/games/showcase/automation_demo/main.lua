@@ -235,6 +235,7 @@ lurek.input.bind("quit",    "escape")
 -- ============================================================
 -- Callbacks
 -- ============================================================
+
 function lurek.init()
     lurek.window.setTitle("Automation Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.1, 0.15)
@@ -242,11 +243,11 @@ function lurek.init()
     title_timer = 0
 end
 
-function lurek.ready()
+local function _ready_setup()
     -- ready
 end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS counter
     fps_timer = fps_timer + dt
     fps_count = fps_count + 1
@@ -301,7 +302,7 @@ lurek.process(function(dt)
             spawn_particles(30, 30, 1, 0.2, 0.2, 1, 8)
         end
 
-        local mx, my = lurek.input.getMousePosition()
+        local mx, my = lurek.input.mouse.getPosition()
         add_event("mouse_move", { x = mx, y = my })
 
         if lurek.input.isMousePressed(1) then
@@ -353,7 +354,7 @@ lurek.process(function(dt)
 
     -- Input handling (only in IDLE)
     if state == STATE_IDLE or state == STATE_RECORDING then
-        if lurek.input.isActionPressed("record") then
+        if lurek.input.isActionDown("record") then
             if state == STATE_RECORDING then
                 stop_recording()
             else
@@ -363,50 +364,50 @@ lurek.process(function(dt)
     end
 
     if state == STATE_IDLE then
-        if lurek.input.isActionPressed("play") then
+        if lurek.input.isActionDown("play") then
             start_playback()
         end
-        if lurek.input.isActionPressed("clear") then
+        if lurek.input.isActionDown("clear") then
             recorded_events = {}
             canvas_rects = {}
             next_color_idx = 1
             show_message("Cleared all events and canvas")
             spawn_particles(SCREEN_W / 2, SCREEN_H / 2, 0.5, 0.5, 1, 8, 40)
         end
-        if lurek.input.isActionPressed("test") then
+        if lurek.input.isActionDown("test") then
             run_autotest()
         end
-        if lurek.input.isActionPressed("speed1") then
+        if lurek.input.isActionDown("speed1") then
             playback_speed = 0.5
             show_message("Speed: 0.5x")
         end
-        if lurek.input.isActionPressed("speed2") then
+        if lurek.input.isActionDown("speed2") then
             playback_speed = 1.0
             show_message("Speed: 1x")
         end
-        if lurek.input.isActionPressed("speed3") then
+        if lurek.input.isActionDown("speed3") then
             playback_speed = 2.0
             show_message("Speed: 2x")
         end
 
         -- Canvas drawing in idle mode
         if lurek.input.isMousePressed(1) then
-            local mx, my = lurek.input.getMousePosition()
+            local mx, my = lurek.input.mouse.getPosition()
             if my > CANVAS_Y and my < CANVAS_Y + CANVAS_H then
                 place_rect(mx, my)
             end
         end
     end
 
-    if lurek.input.isActionPressed("quit") then
+    if lurek.input.isActionDown("quit") then
         lurek.event.quit()
     end
-end)
+end
 
 -- ============================================================
 -- Render: world-space (canvas content)
 -- ============================================================
-lurek.render(function()
+function lurek.draw()
     -- Canvas background
     lurek.render.setColor(0.08, 0.08, 0.12, 1)
     lurek.render.rectangle(0, CANVAS_Y, SCREEN_W, CANVAS_H)
@@ -438,12 +439,12 @@ lurek.render(function()
         lurek.render.setColor(0.1, 0.8, 0.4, 1)
         lurek.render.circleOutline(ghost_x, ghost_y, GHOST_RADIUS + 2)
     end
-end)
+end
 
 -- ============================================================
 -- Render UI: HUD, timeline, messages
 -- ============================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- Title screen
     if state == STATE_TITLE then
         local alpha = 1.0
@@ -565,4 +566,4 @@ lurek.render_ui(function()
         lurek.render.setColor(1, 1, 1, alpha)
         lurek.render.print(message_text, SCREEN_W / 2 - 180, SCREEN_H / 2 - 8)
     end
-end)
+end

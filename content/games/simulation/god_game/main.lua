@@ -421,7 +421,7 @@ lurek.input.bind("quit", "escape")
 
 -- ─── Callbacks ─────────────────────────────────────────────
 
-lurek.init(function()
+function lurek.init()
     lurek.window.setTitle("God Game — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.1, 0.15)
     generate_world()
@@ -442,18 +442,18 @@ lurek.init(function()
         local gy = math.random(3, GRID_H - 2)
         spawn_villager("rival", gx, gy)
     end
-end)
+end
 
-lurek.process(function(dt)
+function lurek.process(dt)
     if state == TITLE then
-        if lurek.input.isActionJustPressed("raise") then
+        if lurek.input.wasActionPressed("raise") then
             state = PLAYING
         end
         return
     end
 
     if state == VICTORY or state == GAME_OVER then
-        if lurek.input.isActionJustPressed("raise") then
+        if lurek.input.wasActionPressed("raise") then
             -- Restart
             state = TITLE
             villagers = {}
@@ -470,15 +470,15 @@ lurek.process(function(dt)
         return
     end
 
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     -- Game speed
-    if lurek.input.isActionJustPressed("speed1") then game_speed = 1 end
-    if lurek.input.isActionJustPressed("speed2") then game_speed = 2 end
-    if lurek.input.isActionJustPressed("speed3") then game_speed = 3 end
+    if lurek.input.wasActionPressed("speed1") then game_speed = 1 end
+    if lurek.input.wasActionPressed("speed2") then game_speed = 2 end
+    if lurek.input.wasActionPressed("speed3") then game_speed = 3 end
 
     game_time = game_time + dt * game_speed
 
@@ -486,23 +486,23 @@ lurek.process(function(dt)
     cursor_gx, cursor_gy = screen_to_grid(lurek.input.getMouseX(), lurek.input.getMouseY())
 
     -- Terrain sculpting
-    if lurek.input.isActionPressed("raise") then
+    if lurek.input.isActionDown("raise") then
         if in_grid(cursor_gx, cursor_gy) and grid[cursor_gy][cursor_gx] < MOUNTAIN then
             set_terrain(cursor_gx, cursor_gy, grid[cursor_gy][cursor_gx] + 1)
         end
     end
-    if lurek.input.isActionPressed("lower") then
+    if lurek.input.isActionDown("lower") then
         if in_grid(cursor_gx, cursor_gy) and grid[cursor_gy][cursor_gx] > WATER then
             set_terrain(cursor_gx, cursor_gy, grid[cursor_gy][cursor_gx] - 1)
         end
     end
 
     -- Miracles
-    if lurek.input.isActionJustPressed("rain") then miracle_rain() end
-    if lurek.input.isActionJustPressed("earthquake") then miracle_earthquake() end
-    if lurek.input.isActionJustPressed("lightning") then miracle_lightning() end
-    if lurek.input.isActionJustPressed("blessing") then miracle_blessing() end
-    if lurek.input.isActionJustPressed("wall") then place_wall() end
+    if lurek.input.wasActionPressed("rain") then miracle_rain() end
+    if lurek.input.wasActionPressed("earthquake") then miracle_earthquake() end
+    if lurek.input.wasActionPressed("lightning") then miracle_lightning() end
+    if lurek.input.wasActionPressed("blessing") then miracle_blessing() end
+    if lurek.input.wasActionPressed("wall") then place_wall() end
 
     -- Update villagers
     for _, v in ipairs(villagers) do update_villager(v, dt) end
@@ -567,9 +567,9 @@ lurek.process(function(dt)
     -- Win/lose checks
     if population >= WIN_POP then state = VICTORY end
     if population <= 0 and game_time > 5 then state = GAME_OVER end
-end)
+end
 
-lurek.render(function()
+function lurek.draw()
     if state == TITLE then
         return
     end
@@ -638,9 +638,9 @@ lurek.render(function()
     for _, p in ipairs(particles) do
         lurek.render.circle(p.x, p.y, 2, p.r, p.g, p.b, p.a)
     end
-end)
+end
 
-function lurek.render_ui()
+function lurek.draw_ui()
     if state == TITLE then
         lurek.render.print("GOD GAME", 240, 180, 48, 0.9, 0.85, 0.6, 1)
         lurek.render.print("SHAPE THE WORLD", 260, 250, 20, 0.7, 0.7, 0.6, 0.8)

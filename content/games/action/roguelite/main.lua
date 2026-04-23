@@ -513,6 +513,7 @@ end
 -- ══════════════════════════════════════════════════════════════════════════
 --  lurek.init — one-time setup
 -- ══════════════════════════════════════════════════════════════════════════
+
 function lurek.init()
     lurek.window.setTitle("Roguelite — Lurek2D")
     lurek.window.setBackgroundColor(0.08, 0.06, 0.04)
@@ -536,7 +537,7 @@ end
 -- ══════════════════════════════════════════════════════════════════════════
 --  lurek.ready — create particles & tweens after GPU init
 -- ══════════════════════════════════════════════════════════════════════════
-function lurek.ready()
+local function _ready_setup()
     death_burst = lurek.particle.new({
         maxParticles = 60,
         emitRate     = 0,
@@ -583,7 +584,7 @@ end
 -- ══════════════════════════════════════════════════════════════════════════
 --  lurek.process — game logic each frame
 -- ══════════════════════════════════════════════════════════════════════════
-lurek.process(function(dt)
+function lurek.process(dt)
     if lurek.input.pressed("quit") then lurek.event.quit() end
 
     -- ── Title ─────────────────────────────────────────────────────────
@@ -754,12 +755,12 @@ lurek.process(function(dt)
     if slash_sparks then lurek.particle.update(slash_sparks, dt) end
     if dash_trail   then lurek.particle.update(dash_trail, dt) end
     if proj_sparks  then lurek.particle.update(proj_sparks, dt) end
-end)
+end
 
 -- ══════════════════════════════════════════════════════════════════════════
 --  lurek.render — world-space drawing
 -- ══════════════════════════════════════════════════════════════════════════
-lurek.render(function()
+function lurek.draw()
     if state == STATE.TITLE or state == STATE.GAME_OVER or state == STATE.PERK_SELECT then return end
 
     -- ── Arena background ──────────────────────────────────────────────
@@ -886,12 +887,12 @@ lurek.render(function()
     if slash_sparks then lurek.particle.draw(slash_sparks) end
     if dash_trail   then lurek.particle.draw(dash_trail) end
     if proj_sparks  then lurek.particle.draw(proj_sparks) end
-end)
+end
 
 -- ══════════════════════════════════════════════════════════════════════════
 --  lurek.render_ui — screen-space HUD
 -- ══════════════════════════════════════════════════════════════════════════
-lurek.render_ui(function()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     -- ── Title screen ──────────────────────────────────────────────────
@@ -1029,4 +1030,4 @@ lurek.render_ui(function()
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
     lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 20, 11)
-end)
+end

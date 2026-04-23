@@ -26,7 +26,7 @@ end
 -- Returns the current frames-per-second measurement.
 -- Sample once per second to drive an HUD readout; the engine averages internally.
 do  -- lurek.timer.getFPS
-  function lurek.render_ui()
+  function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
     if fps < 30 then
       lurek.log.warn("low fps: " .. fps, "perf")
@@ -38,7 +38,7 @@ end
 -- Returns the total elapsed time since engine start in seconds.
 -- Good for animation phases; engine-time, so it is paused when the engine is paused.
 do  -- lurek.timer.getTime
-  function lurek.render()
+  function lurek.draw()
     local t = lurek.timer.getTime()
     local pulse = 0.5 + 0.5 * math.sin(t * 2.0)
     lurek.log.debug("pulse=" .. pulse, "fx")
@@ -196,7 +196,7 @@ end
 -- Returns the exponential moving-average of frame deltas in seconds.
 -- Use for HUD frame-time graphs where raw delta is too jittery to read.
 do  -- lurek.timer.getSmoothedDelta
-  function lurek.render_ui()
+  function lurek.draw_ui()
     local sdt = lurek.timer.getSmoothedDelta()
     local ms = sdt * 1000
     lurek.log.debug(string.format("frame %.2fms", ms), "hud")
@@ -470,4 +470,48 @@ do  -- Scheduler:updateFrames
   local sched = lurek.timer.newScheduler()
   sched:everyFrames(15, function() lurek.log.debug("quarter-second tick", "test") end)
   function lurek.process() sched:updateFrames() end
+end
+
+--@api-stub: Scheduler:afterNamed
+-- Schedules a named one-shot callback after a delay; cancel by name with cancelNamed().
+-- Named timers can be reset or cancelled without keeping a numeric id.
+do  -- Scheduler:afterNamed
+  local sched = lurek.timer.newScheduler()
+  sched:afterNamed("respawn", 3.0, function()
+    lurek.log.info("respawn fired", "timer")
+  end)
+  lurek.log.info("named timer registered", "timer")
+end
+
+--@api-stub: Scheduler:every
+-- Schedules a repeating callback at a given interval in seconds.
+-- Returns a numeric id for cancellation; repeat continues until cancel() is called.
+do  -- Scheduler:every
+  local sched = lurek.timer.newScheduler()
+  local id = sched:every(1.0, function()
+    lurek.log.info("tick", "timer")
+  end)
+  lurek.log.info("repeating id: " .. id, "timer")
+end
+
+--@api-stub: Scheduler:everyFrames
+-- Schedules a repeating callback every N game frames.
+-- Frame-based timers are unaffected by delta-time spikes; useful for fixed-rate effects.
+do  -- Scheduler:everyFrames
+  local sched = lurek.timer.newScheduler()
+  local id = sched:everyFrames(30, function()
+    lurek.log.info("every 30 frames", "timer")
+  end)
+  lurek.log.info("frame-rate timer id: " .. id, "timer")
+end
+
+--@api-stub: Scheduler:everyNamed
+-- Schedules a named repeating callback at the given interval.
+-- Named repeating timers can be paused, resumed, or cancelled by name.
+do  -- Scheduler:everyNamed
+  local sched = lurek.timer.newScheduler()
+  sched:everyNamed("regen", 2.0, function()
+    lurek.log.info("hp regen", "timer")
+  end)
+  lurek.log.info("named repeating timer registered", "timer")
 end

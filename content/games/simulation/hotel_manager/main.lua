@@ -113,7 +113,7 @@ end
 local camera
 local fps = 0
 
-lurek.init(function()
+function lurek.init()
     lurek.window.setTitle("Hotel Manager — Lurek2D")
     lurek.render.setBackgroundColor(0.12, 0.1, 0.08)
     camera = lurek.camera.new()
@@ -126,12 +126,12 @@ lurek.init(function()
         rooms[1][c] = { type = 1, dirty = 0, occupant = nil, cleanTimer = 0 }
     end
     hasElevator[1] = true
-end)
+end
 
 ------------------------------------------------------------
 -- Input bindings
 ------------------------------------------------------------
-function lurek.ready()
+local function _ready_setup()
     lurek.input.bind("build_standard", "1")
     lurek.input.bind("build_deluxe",   "2")
     lurek.input.bind("build_suite",    "3")
@@ -145,44 +145,44 @@ end
 ------------------------------------------------------------
 -- Update
 ------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     fps = lurek.timer.getFPS()
 
     if state == STATE_TITLE then
-        if lurek.input.isActionJustPressed("select") then
+        if lurek.input.wasActionPressed("select") then
             state = STATE_PLAYING
         end
         return
     end
 
     if state == STATE_VICTORY then
-        if lurek.input.isActionJustPressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.quit()
         end
         return
     end
 
-    if lurek.input.isActionJustPressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     -- Mode selection
-    if lurek.input.isActionJustPressed("build_standard") then mode = "build1" end
-    if lurek.input.isActionJustPressed("build_deluxe")   then mode = "build2" end
-    if lurek.input.isActionJustPressed("build_suite")    then mode = "build3" end
-    if lurek.input.isActionJustPressed("clean")          then mode = "clean" end
-    if lurek.input.isActionJustPressed("upgrade")        then mode = "upgrade" end
+    if lurek.input.wasActionPressed("build_standard") then mode = "build1" end
+    if lurek.input.wasActionPressed("build_deluxe")   then mode = "build2" end
+    if lurek.input.wasActionPressed("build_suite")    then mode = "build3" end
+    if lurek.input.wasActionPressed("clean")          then mode = "clean" end
+    if lurek.input.wasActionPressed("upgrade")        then mode = "upgrade" end
 
     -- Hire cleaner
-    if lurek.input.isActionJustPressed("hire") and gold >= CLEANER_COST then
+    if lurek.input.wasActionPressed("hire") and gold >= CLEANER_COST then
         gold = gold - CLEANER_COST
         cleaners = cleaners + 1
     end
 
     -- Click handling
-    if lurek.input.isActionJustPressed("select") then
-        local mx, my = lurek.input.getMousePosition()
+    if lurek.input.wasActionPressed("select") then
+        local mx, my = lurek.input.mouse.getPosition()
         local row, col = screenToGrid(mx, my)
         if row and col then
             if mode and mode:sub(1, 5) == "build" then
@@ -385,12 +385,12 @@ lurek.process(function(dt)
     if rating >= 5.0 and gold >= 1000 then
         state = STATE_VICTORY
     end
-end)
+end
 
 ------------------------------------------------------------
 -- Render — world
 ------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then return end
 
     camera:attach()
@@ -480,12 +480,12 @@ lurek.render(function()
     end
 
     camera:detach()
-end)
+end
 
 ------------------------------------------------------------
 -- Render — UI
 ------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if state == STATE_TITLE then
         lurek.render.setColor(0.85, 0.72, 0.2, 1)
         lurek.render.print("HOTEL MANAGER", 220, 180, 360, "center", 0, 3, 3)
@@ -553,4 +553,4 @@ lurek.render_ui(function()
     -- Guests count
     lurek.render.setColor(0.7, 0.9, 0.7, 1)
     lurek.render.print("Guests: " .. #guests .. "  Total: " .. totalGuests, 580, 6)
-end)
+end

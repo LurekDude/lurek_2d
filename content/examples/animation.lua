@@ -348,7 +348,7 @@ do  -- AnimStateMachine:getQuad
   anim:addFrame(0, 0, 32, 32); anim:addClip("idle", {0}, 4, true)
   local fsm = lurek.animation.newStateMachine(anim, "idle")
   fsm:addState("idle", "idle", true)
-  function lurek.render() local q = fsm:getQuad(); if q then lurek.log.debug("fsm quad w=" .. q.w, "anim") end end
+  function lurek.draw() local q = fsm:getQuad(); if q then lurek.log.debug("fsm quad w=" .. q.w, "anim") end end
 end
 
 -- ── BlendLayerSet methods ──
@@ -433,7 +433,7 @@ do  -- AnimCurve:eval
   local fade = lurek.animation.newCurve()
   fade:addKeyframe(0.0, 0.0); fade:addKeyframe(1.0, 1.0)
   local alpha = fade:eval(0.25)
-  function lurek.render() lurek.render.setColor(1, 1, 1, alpha) end
+  function lurek.draw() lurek.render.setColor(1, 1, 1, alpha) end
 end
 
 --@api-stub: AnimCurve:setEasing
@@ -514,4 +514,91 @@ do  -- AnimCurve:setCustomEasing
     end)
     lurek.log.debug("custom easing attached", "anim")
   end
+end
+
+--@api-stub: Animation:addClip
+-- Adds a named clip defined by a sequence of frame indices, FPS, and looping flag.
+-- Clips reference frames already in the pool; multiple clips can share frames.
+do  -- Animation:addClip
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addFrame(32, 0, 32, 32)
+  anim:addClip("walk", {0, 1}, 8, true)
+  anim:play("walk")
+  lurek.log.info("clip count: " .. anim:getClipCount(), "anim")
+end
+
+--@api-stub: Animation:addClipFromGrid
+-- Adds a named clip by specifying the row (or range) in a sprite-sheet grid.
+-- Calculates frame indices automatically from the grid layout registered via addFramesFromGrid.
+do  -- Animation:addClipFromGrid
+  local anim = lurek.animation.new()
+  anim:addFramesFromGrid(0, 0, 128, 128, 4, 4, 16)
+  anim:addClipFromGrid("run", 1, 0, 3, 8, true)
+  anim:play("run")
+  lurek.log.info("clip from grid added", "anim")
+end
+
+--@api-stub: Animation:addFramesFromGrid
+-- Populates the frame pool from a uniform grid, adding count frames starting at offset.
+-- Use instead of addFrame when the sprite sheet has regular tile-size cells.
+do  -- Animation:addFramesFromGrid
+  local anim = lurek.animation.new()
+  local n = anim:addFramesFromGrid(0, 0, 64, 64, 4, 2, 8)
+  lurek.log.info("frames added: " .. n, "anim")
+end
+
+--@api-stub: BlendLayerSet:addLayer
+-- Adds a named blend layer with a clip name, initial weight, and optional bone mask.
+-- Layers above index 0 blend onto the base; use masks to restrict to upper-body bones.
+do  -- BlendLayerSet:addLayer
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 64, 64)
+  anim:addClip("run", {0}, 8, true)
+  local bls = lurek.animation.newBlendLayerSet()
+  bls:addLayer("base", "run", 1.0)
+  bls:addLayer("aim", "aim", 0.9, {"spine", "arm_r"})
+  lurek.log.info("layers: " .. bls:len(), "anim")
+end
+
+--@api-stub: AnimStateMachine:addState
+-- Adds a named state to the FSM with an associated clip name and looping flag.
+-- States drive Animation playback; transitions switch between them automatically.
+do  -- AnimStateMachine:addState
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 1, true)
+  anim:addClip("run", {0}, 8, true)
+  local fsm = lurek.animation.newStateMachine(anim, "idle")
+  fsm:addState("idle", "idle", true)
+  fsm:addState("run", "run", true)
+  lurek.log.info("state machine ready", "anim")
+end
+
+--@api-stub: AnimStateMachine:addTransition
+-- Adds a parameter-driven transition from one FSM state to another.
+-- The transition fires when setParam changes the named parameter to match the trigger value.
+do  -- AnimStateMachine:addTransition
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 1, true)
+  anim:addClip("run", {0}, 8, true)
+  local fsm = lurek.animation.newStateMachine(anim, "idle")
+  fsm:addState("idle", "idle", true)
+  fsm:addState("run", "run", true)
+  fsm:addTransition("idle", "run", "speed", ">", 0)
+  lurek.log.info("transition added", "anim")
+end
+
+--@api-stub: Animation:crossfade
+-- Blends from the current clip to a new clip over a given duration in seconds.
+-- Smoother than an instant play() switch; the blend weight transitions linearly.
+do  -- Animation:crossfade
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 4, true)
+  anim:addClip("run", {0}, 8, true)
+  anim:play("idle")
+  anim:crossfade("run", 0.2)
+  lurek.log.info("crossfade started", "anim")
 end

@@ -134,6 +134,7 @@ lurek.input.bind("quit",       "escape")
 local hover_c, hover_r = 0, 0
 
 -- ── Init ──────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Tower Defense — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.08, 0.05, 1.0)
@@ -174,24 +175,24 @@ function lurek.init()
 end
 
 -- ── Process ───────────────────────────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
     if hit_sparks  then hit_sparks:update(dt)  end
     if death_burst then death_burst:update(dt) end
     if place_flash then place_flash:update(dt) end
 
-    if lurek.input.isActionJustPressed("quit") then lurek.event.quit() return end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
     if game_state == "gameover" or game_state == "victory" then return end
 
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     hover_c = math.floor((mx - OX) / CELL) + 1
     hover_r = math.floor((my - OY) / CELL) + 1
 
     -- Tower type cycling
-    if lurek.input.isActionJustPressed("next_type") then sel_type = (sel_type % #TYPE_ORDER) + 1 end
-    if lurek.input.isActionJustPressed("prev_type") then sel_type = (sel_type - 2) % #TYPE_ORDER + 1 end
+    if lurek.input.wasActionPressed("next_type") then sel_type = (sel_type % #TYPE_ORDER) + 1 end
+    if lurek.input.wasActionPressed("prev_type") then sel_type = (sel_type - 2) % #TYPE_ORDER + 1 end
 
     -- Place tower
-    if lurek.input.isActionJustPressed("place") then
+    if lurek.input.wasActionPressed("place") then
         local c, r = hover_c, hover_r
         if c >= 1 and c <= COLS and r >= 1 and r <= ROWS and not is_path(c, r) and not build_map[r][c] then
             local ttype = TYPE_ORDER[sel_type]
@@ -214,7 +215,7 @@ lurek.process(function(dt)
     end
 
     -- Send wave
-    if lurek.input.isActionJustPressed("send_wave") and game_state == "build" then
+    if lurek.input.wasActionPressed("send_wave") and game_state == "build" then
         wave_num  = wave_num + 1
         queue_wave(wave_num)
         game_state = "combat"
@@ -324,10 +325,10 @@ lurek.process(function(dt)
             end
         end
     end
-end)
+end
 
 -- ── Render world ──────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     -- Grid
     for r = 1, ROWS do
         for c = 1, COLS do
@@ -376,10 +377,10 @@ lurek.render(function()
     if hit_sparks  then hit_sparks:draw()  end
     if death_burst then death_burst:draw() end
     if place_flash then place_flash:draw() end
-end)
+end
 
 -- ── Render UI ─────────────────────────────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     -- Top bar
     lurek.render.rectangle(0, 0, W, OY - 2, { color = {0.08,0.1,0.08,1} })
     lurek.render.print("Gold: " .. gold, 12, 6, { color = {1,0.85,0.2,1}, size = 14 })

@@ -10,29 +10,12 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (7 items)
+## 1. Rust→Lua Gaps (0 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
 
-### `animation::state_machine`
-
-- `compare_nums` — Applies a comparison operator to two `f32` values. `src/animation/state_machine.rs:351`
-- `parse_condition` — Parses a condition string such as `"speed > 0.1"` or `"jumpi `src/animation/state_machine.rs:371`
-
-### `i18n::format`
-
-- `days_to_ymd` — Converts days since Unix epoch to `(year, month, day)`. `src/i18n/format.rs:86`
-- `locale_separators` — Returns `(decimal_separator, thousands_separator)` for the g `src/i18n/format.rs:9`
-- `month_name_tables` — Returns (long_month_names, short_month_names) for English. `src/i18n/format.rs:102`
-
-### `particle::render`
-
-- `expand_particle_commands` — Expand particle render commands for textured particles.  Wal `src/particle/render.rs:63`
-
-### `terminal::highlighter`
-
-- `highlight_spans` — Splits `text` into colored spans by matching `rules` left-to `src/terminal/highlighter.rs:37`
+*All public Rust functions appear to be exposed to Lua.*
 
 ---
 
@@ -45,14 +28,27 @@ These appear as `// (undocumented)` in `docs/api/rust.md`.
 
 ---
 
-## 3. Lua Docstring Issues (1 items)
+## 3. Lua Docstring Issues (5 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/api/lurek.md` and IntelliSense.
 
-### `particle`
+### `camera`
 
-- `module` **`lurek.particle`** — *(no description)*
+- `function` **`lurek.camera.newCamera`** — *(no description)*
+
+### `dataframe`
+
+- `method` **`DataFrame:pivot`** — *"Create a pivot table."* (too short)
+
+### `render`
+
+- `method` **`Shape:arc`** — *"Queues an arc command."* (too short)
+- `method` **`Shape:circle`** — *"Queues a circle command."* (too short)
+
+### `tilemap`
+
+- `method` **`TileMap:setLayerVisible`** — *"Sets layer visibility."* (too short)
 
 ---
 

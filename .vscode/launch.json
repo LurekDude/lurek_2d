@@ -32,7 +32,7 @@
             "console": "integratedTerminal"
         },
         // ─── 🚀 RELEASE ───────────────────────────────────────────────────────
-        // [profile.release]: opt-level=z, fat LTO, stripped, panic=abort.
+        // [profile.release]: opt-level=3, fat LTO, stripped, panic=abort.
         // ~20 MB raw binary. Use dist.ps1 to apply UPX and ship at ~5 MB.
         {
             "type": "lldb",

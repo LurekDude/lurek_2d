@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 --  Horde Survivor — Vampire Survivors-style top-down horde survival
 -- ----------------------------------------------------------------------------
 --  Category : action
@@ -14,8 +14,6 @@
 -- ============================================================================
 
 -- ── Constants ─────────────────────────────────────────────────────────────
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local SCREEN_W, SCREEN_H = 800, 600
 local ARENA_W,  ARENA_H  = 1600, 1200
@@ -224,7 +222,7 @@ end
 -- ── Init ──────────────────────────────────────────────────────────────────
 function lurek.init()
     lurek.window.setTitle("Horde Survivor — Lurek2D")
-    gfx.setBackgroundColor(0.1, 0.12, 0.08)
+    lurek.render.setBackgroundColor(0.1, 0.12, 0.08)
 
     lurek.input.bind("up",    {"w"})
     lurek.input.bind("down",  {"s"})
@@ -288,14 +286,14 @@ end
 
 -- ── Process ───────────────────────────────────────────────────────────────
 function lurek.process(dt)
-    if lurek.input.isPressed("quit") then
+    if lurek.input.keyboard.isDown("quit") then
         lurek.event.quit()
         return
     end
 
     -- ── TITLE ─────────────────────────────────────────────────────────
     if current_state == STATE.TITLE then
-        if lurek.input.isPressed("pick1") or lurek.input.isPressed("pick2") or lurek.input.isPressed("pick3") then
+        if lurek.input.keyboard.isDown("pick1") or lurek.input.keyboard.isDown("pick2") or lurek.input.keyboard.isDown("pick3") then
             reset_game()
             current_state = STATE.PLAYING
         end
@@ -304,7 +302,7 @@ function lurek.process(dt)
 
     -- ── GAME OVER ─────────────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
-        if lurek.input.isPressed("pick1") then
+        if lurek.input.keyboard.isDown("pick1") then
             reset_game()
             current_state = STATE.PLAYING
         end
@@ -314,7 +312,7 @@ function lurek.process(dt)
     -- ── LEVEL UP ──────────────────────────────────────────────────────
     if current_state == STATE.LEVEL_UP then
         for i = 1, 3 do
-            if lurek.input.isPressed("pick" .. i) and upgrade_choices[i] then
+            if lurek.input.keyboard.isDown("pick" .. i) and upgrade_choices[i] then
                 upgrade_choices[i].apply()
                 current_state = STATE.PLAYING
                 break
@@ -331,10 +329,10 @@ function lurek.process(dt)
 
     -- Player movement
     local mx, my = 0, 0
-    if lurek.input.isDown("up")    then my = my - 1 end
-    if lurek.input.isDown("down")  then my = my + 1 end
-    if lurek.input.isDown("left")  then mx = mx - 1 end
-    if lurek.input.isDown("right") then mx = mx + 1 end
+    if lurek.input.isActionDown("up")    then my = my - 1 end
+    if lurek.input.isActionDown("down")  then my = my + 1 end
+    if lurek.input.isActionDown("left")  then mx = mx - 1 end
+    if lurek.input.isActionDown("right") then mx = mx + 1 end
     if mx ~= 0 or my ~= 0 then
         local len = math.sqrt(mx * mx + my * my)
         mx, my = mx / len, my / len
@@ -491,42 +489,42 @@ function lurek.process(dt)
 end
 
 -- ── Render (world space — affected by camera) ─────────────────────────────
-function lurek.render()
+function lurek.draw()
     cam:apply()
 
     if current_state == STATE.TITLE then
-        gfx.setColor(0.3, 0.35, 0.25)
-        gfx.drawRectangle("fill", 0, 0, ARENA_W, ARENA_H)
+        lurek.render.setColor(0.3, 0.35, 0.25)
+        lurek.render.drawRectangle("fill", 0, 0, ARENA_W, ARENA_H)
         return
     end
 
     -- Arena ground
-    gfx.setColor(0.15, 0.18, 0.12)
-    gfx.drawRectangle("fill", 0, 0, ARENA_W, ARENA_H)
+    lurek.render.setColor(0.15, 0.18, 0.12)
+    lurek.render.drawRectangle("fill", 0, 0, ARENA_W, ARENA_H)
 
     -- Arena border
-    gfx.setColor(0.08, 0.1, 0.06)
-    gfx.drawRectangle("fill", -50, -50, ARENA_W + 100, 50)
-    gfx.drawRectangle("fill", -50, ARENA_H, ARENA_W + 100, 50)
-    gfx.drawRectangle("fill", -50, 0, 50, ARENA_H)
-    gfx.drawRectangle("fill", ARENA_W, 0, 50, ARENA_H)
+    lurek.render.setColor(0.08, 0.1, 0.06)
+    lurek.render.drawRectangle("fill", -50, -50, ARENA_W + 100, 50)
+    lurek.render.drawRectangle("fill", -50, ARENA_H, ARENA_W + 100, 50)
+    lurek.render.drawRectangle("fill", -50, 0, 50, ARENA_H)
+    lurek.render.drawRectangle("fill", ARENA_W, 0, 50, ARENA_H)
 
     -- Ground detail — subtle grid
-    gfx.setColor(0.13, 0.16, 0.1, 0.3)
+    lurek.render.setColor(0.13, 0.16, 0.1, 0.3)
     for gx = 0, ARENA_W, 100 do
-        gfx.drawLine(gx, 0, gx, ARENA_H)
+        lurek.render.line(gx, 0, gx, ARENA_H)
     end
     for gy = 0, ARENA_H, 100 do
-        gfx.drawLine(0, gy, ARENA_W, gy)
+        lurek.render.line(0, gy, ARENA_W, gy)
     end
 
     -- XP gems (green diamonds)
     for _, g in ipairs(xp_gems) do
-        gfx.setColor(0.2, 0.9, 0.3)
+        lurek.render.setColor(0.2, 0.9, 0.3)
         local s = XP_GEM_SIZE
-        gfx.drawPolygon("fill", g.x, g.y - s, g.x + s, g.y, g.x, g.y + s, g.x - s, g.y)
-        gfx.setColor(0.5, 1, 0.6)
-        gfx.drawPolygon("fill", g.x, g.y - s * 0.5, g.x + s * 0.5, g.y, g.x, g.y + s * 0.5, g.x - s * 0.5, g.y)
+        lurek.render.drawPolygon("fill", g.x, g.y - s, g.x + s, g.y, g.x, g.y + s, g.x - s, g.y)
+        lurek.render.setColor(0.5, 1, 0.6)
+        lurek.render.drawPolygon("fill", g.x, g.y - s * 0.5, g.x + s * 0.5, g.y, g.x, g.y + s * 0.5, g.x - s * 0.5, g.y)
     end
 
     -- Enemies
@@ -535,45 +533,45 @@ function lurek.render()
         local flash_r = math.min(1, c[1] + e.flash * 0.5)
         local flash_g = math.min(1, c[2] + e.flash * 0.5)
         local flash_b = math.min(1, c[3] + e.flash * 0.5)
-        gfx.setColor(flash_r, flash_g, flash_b)
-        gfx.drawCircle("fill", e.x, e.y, ENEMY_SIZE[e.etype])
+        lurek.render.setColor(flash_r, flash_g, flash_b)
+        lurek.render.drawCircle("fill", e.x, e.y, ENEMY_SIZE[e.etype])
 
         -- Inner detail
-        gfx.setColor(c[1] * 0.6, c[2] * 0.6, c[3] * 0.6)
-        gfx.drawCircle("fill", e.x, e.y, ENEMY_SIZE[e.etype] * 0.5)
+        lurek.render.setColor(c[1] * 0.6, c[2] * 0.6, c[3] * 0.6)
+        lurek.render.drawCircle("fill", e.x, e.y, ENEMY_SIZE[e.etype] * 0.5)
 
         -- Exploder warning ring
         if e.etype == ENEMY_EXPLODER then
-            gfx.setColor(0.2, 0.9, 0.4, 0.3)
-            gfx.drawCircle("line", e.x, e.y, ENEMY_SIZE[e.etype] + 3)
+            lurek.render.setColor(0.2, 0.9, 0.4, 0.3)
+            lurek.render.drawCircle("line", e.x, e.y, ENEMY_SIZE[e.etype] + 3)
         end
     end
 
     -- Projectiles (orbiting)
     for _, p in ipairs(projectiles) do
-        gfx.setColor(1, 0.9, 0.4)
-        gfx.drawCircle("fill", p.x, p.y, PROJ_RADIUS)
-        gfx.setColor(1, 1, 0.8)
-        gfx.drawCircle("fill", p.x, p.y, PROJ_RADIUS * 0.5)
+        lurek.render.setColor(1, 0.9, 0.4)
+        lurek.render.drawCircle("fill", p.x, p.y, PROJ_RADIUS)
+        lurek.render.setColor(1, 1, 0.8)
+        lurek.render.drawCircle("fill", p.x, p.y, PROJ_RADIUS * 0.5)
     end
 
     -- Orbit ring (subtle)
-    gfx.setColor(1, 0.9, 0.4, 0.15)
-    gfx.drawCircle("line", player.x, player.y, proj_orbit_r)
+    lurek.render.setColor(1, 0.9, 0.4, 0.15)
+    lurek.render.drawCircle("line", player.x, player.y, proj_orbit_r)
 
     -- Player
     local pa = (invuln_timer > 0 and math.floor(invuln_timer * 10) % 2 == 0) and 0.4 or 1.0
-    gfx.setColor(0.3, 0.7, 1.0, pa)
-    gfx.drawCircle("fill", player.x, player.y, PLAYER_RADIUS)
+    lurek.render.setColor(0.3, 0.7, 1.0, pa)
+    lurek.render.drawCircle("fill", player.x, player.y, PLAYER_RADIUS)
     -- Direction indicator
-    gfx.setColor(0.6, 0.9, 1.0, pa)
-    gfx.drawCircle("fill",
+    lurek.render.setColor(0.6, 0.9, 1.0, pa)
+    lurek.render.drawCircle("fill",
         player.x + player.dir_x * PLAYER_RADIUS * 0.7,
         player.y + player.dir_y * PLAYER_RADIUS * 0.7,
         PLAYER_RADIUS * 0.35)
     -- Player outline
-    gfx.setColor(0.2, 0.5, 0.8, pa)
-    gfx.drawCircle("line", player.x, player.y, PLAYER_RADIUS)
+    lurek.render.setColor(0.2, 0.5, 0.8, pa)
+    lurek.render.drawCircle("line", player.x, player.y, PLAYER_RADIUS)
 
     -- Particles
     death_burst:draw()
@@ -582,75 +580,75 @@ function lurek.render()
 
     -- Damage flash overlay
     if damage_flash > 0 then
-        gfx.setColor(1, 0.2, 0.1, damage_flash)
-        gfx.drawRectangle("fill",
+        lurek.render.setColor(1, 0.2, 0.1, damage_flash)
+        lurek.render.drawRectangle("fill",
             player.x - SCREEN_W / 2, player.y - SCREEN_H / 2,
             SCREEN_W, SCREEN_H)
     end
 end
 
 -- ── Render UI (screen space — NOT affected by camera) ─────────────────────
-function lurek.render_ui()
+function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     -- ── TITLE ─────────────────────────────────────────────────────────
     if current_state == STATE.TITLE then
-        gfx.setColor(1, 0.9, 0.3)
-        gfx.print("HORDE SURVIVOR", SCREEN_W / 2 - 120, 180, 32)
-        gfx.setColor(0.8, 0.8, 0.8)
-        gfx.print("Survive the endless horde!", SCREEN_W / 2 - 110, 230, 16)
-        gfx.setColor(0.6, 0.9, 0.6)
-        gfx.print("Press 1, 2, or 3 to start", SCREEN_W / 2 - 100, 320, 16)
-        gfx.setColor(0.5, 0.5, 0.5)
-        gfx.print("WASD = move  |  Auto-attack", SCREEN_W / 2 - 110, 370, 14)
-        gfx.setColor(0.4, 0.4, 0.4)
-        gfx.print(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
+        lurek.render.setColor(1, 0.9, 0.3)
+        lurek.render.print("HORDE SURVIVOR", SCREEN_W / 2 - 120, 180, 32)
+        lurek.render.setColor(0.8, 0.8, 0.8)
+        lurek.render.print("Survive the endless horde!", SCREEN_W / 2 - 110, 230, 16)
+        lurek.render.setColor(0.6, 0.9, 0.6)
+        lurek.render.print("Press 1, 2, or 3 to start", SCREEN_W / 2 - 100, 320, 16)
+        lurek.render.setColor(0.5, 0.5, 0.5)
+        lurek.render.print("WASD = move  |  Auto-attack", SCREEN_W / 2 - 110, 370, 14)
+        lurek.render.setColor(0.4, 0.4, 0.4)
+        lurek.render.print(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
         return
     end
 
     -- ── GAME OVER ─────────────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
-        gfx.setColor(0, 0, 0, 0.6)
-        gfx.drawRectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
-        gfx.setColor(1, 0.3, 0.3)
-        gfx.print("GAME OVER", SCREEN_W / 2 - 80, 150, 32)
-        gfx.setColor(0.9, 0.9, 0.9)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.drawRectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.setColor(1, 0.3, 0.3)
+        lurek.render.print("GAME OVER", SCREEN_W / 2 - 80, 150, 32)
+        lurek.render.setColor(0.9, 0.9, 0.9)
         local time_str = string.format("%d:%02d", math.floor(game_time / 60), math.floor(game_time) % 60)
-        gfx.print("Time: " .. time_str, SCREEN_W / 2 - 60, 220, 18)
-        gfx.print("Kills: " .. kills, SCREEN_W / 2 - 60, 250, 18)
-        gfx.print("Level: " .. level, SCREEN_W / 2 - 60, 280, 18)
-        gfx.setColor(0.6, 0.9, 0.6)
-        gfx.print("Press 1 to restart", SCREEN_W / 2 - 80, 340, 16)
-        gfx.setColor(0.4, 0.4, 0.4)
-        gfx.print(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
+        lurek.render.print("Time: " .. time_str, SCREEN_W / 2 - 60, 220, 18)
+        lurek.render.print("Kills: " .. kills, SCREEN_W / 2 - 60, 250, 18)
+        lurek.render.print("Level: " .. level, SCREEN_W / 2 - 60, 280, 18)
+        lurek.render.setColor(0.6, 0.9, 0.6)
+        lurek.render.print("Press 1 to restart", SCREEN_W / 2 - 80, 340, 16)
+        lurek.render.setColor(0.4, 0.4, 0.4)
+        lurek.render.print(string.format("FPS: %d", fps), 10, SCREEN_H - 20, 12)
         return
     end
 
     -- ── LEVEL UP overlay ──────────────────────────────────────────────
     if current_state == STATE.LEVEL_UP then
-        gfx.setColor(0, 0, 0, 0.65)
-        gfx.drawRectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
-        gfx.setColor(1, 1, 0.3)
-        gfx.print("LEVEL UP!", SCREEN_W / 2 - 70, 120, 28)
-        gfx.setColor(0.9, 0.9, 0.9)
-        gfx.print("Choose an upgrade:", SCREEN_W / 2 - 80, 170, 16)
+        lurek.render.setColor(0, 0, 0, 0.65)
+        lurek.render.drawRectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.setColor(1, 1, 0.3)
+        lurek.render.print("LEVEL UP!", SCREEN_W / 2 - 70, 120, 28)
+        lurek.render.setColor(0.9, 0.9, 0.9)
+        lurek.render.print("Choose an upgrade:", SCREEN_W / 2 - 80, 170, 16)
 
         for i, u in ipairs(upgrade_choices) do
             local bx = SCREEN_W / 2 - 160
             local by = 210 + (i - 1) * 80
             -- Card background
-            gfx.setColor(0.15, 0.2, 0.15, 0.9)
-            gfx.drawRectangle("fill", bx, by, 320, 65)
-            gfx.setColor(0.4, 0.8, 0.4)
-            gfx.drawRectangle("line", bx, by, 320, 65)
+            lurek.render.setColor(0.15, 0.2, 0.15, 0.9)
+            lurek.render.drawRectangle("fill", bx, by, 320, 65)
+            lurek.render.setColor(0.4, 0.8, 0.4)
+            lurek.render.drawRectangle("line", bx, by, 320, 65)
             -- Number
-            gfx.setColor(1, 0.9, 0.3)
-            gfx.print(tostring(i), bx + 10, by + 12, 28)
+            lurek.render.setColor(1, 0.9, 0.3)
+            lurek.render.print(tostring(i), bx + 10, by + 12, 28)
             -- Name and desc
-            gfx.setColor(1, 1, 1)
-            gfx.print(u.name, bx + 45, by + 12, 18)
-            gfx.setColor(0.7, 0.7, 0.7)
-            gfx.print(u.desc, bx + 45, by + 38, 13)
+            lurek.render.setColor(1, 1, 1)
+            lurek.render.print(u.name, bx + 45, by + 12, 18)
+            lurek.render.setColor(0.7, 0.7, 0.7)
+            lurek.render.print(u.desc, bx + 45, by + 38, 13)
         end
         return
     end
@@ -662,46 +660,46 @@ function lurek.render_ui()
     local bar_h = 16
     local bar_x = 10
     local bar_y = 10
-    gfx.setColor(0.2, 0.2, 0.2, 0.8)
-    gfx.drawRectangle("fill", bar_x, bar_y, bar_w, bar_h)
+    lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
+    lurek.render.drawRectangle("fill", bar_x, bar_y, bar_w, bar_h)
     local hp_frac = hp / PLAYER_MAX_HP
     local hp_color_r = 1 - hp_frac
     local hp_color_g = hp_frac
-    gfx.setColor(hp_color_r, hp_color_g, 0.1, 0.9)
-    gfx.drawRectangle("fill", bar_x, bar_y, bar_w * hp_frac, bar_h)
-    gfx.setColor(1, 1, 1)
-    gfx.print(string.format("HP %d/%d", hp, PLAYER_MAX_HP), bar_x + 4, bar_y + 1, 12)
+    lurek.render.setColor(hp_color_r, hp_color_g, 0.1, 0.9)
+    lurek.render.drawRectangle("fill", bar_x, bar_y, bar_w * hp_frac, bar_h)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(string.format("HP %d/%d", hp, PLAYER_MAX_HP), bar_x + 4, bar_y + 1, 12)
 
     -- XP bar
     local xp_y = bar_y + bar_h + 4
-    gfx.setColor(0.2, 0.2, 0.2, 0.8)
-    gfx.drawRectangle("fill", bar_x, xp_y, bar_w, 10)
+    lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
+    lurek.render.drawRectangle("fill", bar_x, xp_y, bar_w, 10)
     local xp_frac = xp / xp_to_next
-    gfx.setColor(0.3, 0.8, 1.0, 0.9)
-    gfx.drawRectangle("fill", bar_x, xp_y, bar_w * xp_frac, 10)
-    gfx.setColor(1, 1, 1)
-    gfx.print(string.format("XP %d/%d", xp, xp_to_next), bar_x + 4, xp_y - 1, 10)
+    lurek.render.setColor(0.3, 0.8, 1.0, 0.9)
+    lurek.render.drawRectangle("fill", bar_x, xp_y, bar_w * xp_frac, 10)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(string.format("XP %d/%d", xp, xp_to_next), bar_x + 4, xp_y - 1, 10)
 
     -- Level
-    gfx.setColor(1, 0.9, 0.3)
-    gfx.print("Lv " .. level, bar_x + bar_w + 10, bar_y, 16)
+    lurek.render.setColor(1, 0.9, 0.3)
+    lurek.render.print("Lv " .. level, bar_x + bar_w + 10, bar_y, 16)
 
     -- Kill counter
-    gfx.setColor(0.9, 0.5, 0.5)
-    gfx.print("Kills: " .. kills, SCREEN_W - 130, 10, 14)
+    lurek.render.setColor(0.9, 0.5, 0.5)
+    lurek.render.print("Kills: " .. kills, SCREEN_W - 130, 10, 14)
 
     -- Timer
     local time_str = string.format("%d:%02d", math.floor(game_time / 60), math.floor(game_time) % 60)
-    gfx.setColor(0.9, 0.9, 0.9)
-    gfx.print(time_str, SCREEN_W / 2 - 20, 10, 18)
+    lurek.render.setColor(0.9, 0.9, 0.9)
+    lurek.render.print(time_str, SCREEN_W / 2 - 20, 10, 18)
 
     -- Stats line
-    gfx.setColor(0.6, 0.6, 0.6)
-    gfx.print(string.format("DMG:%d  ORB:%d  SPD:%.0f%%  PIERCE:%d",
+    lurek.render.setColor(0.6, 0.6, 0.6)
+    lurek.render.print(string.format("DMG:%d  ORB:%d  SPD:%.0f%%  PIERCE:%d",
         proj_damage, proj_count, speed_mult * 100, proj_pierce),
         10, SCREEN_H - 22, 11)
 
     -- FPS
-    gfx.setColor(0.4, 0.4, 0.4)
-    gfx.print(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20, 12)
+    lurek.render.setColor(0.4, 0.4, 0.4)
+    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20, 12)
 end

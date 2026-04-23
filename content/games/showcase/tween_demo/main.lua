@@ -185,6 +185,7 @@ lurek.input.bind("quit",         "escape")
 -- ============================================================
 -- Init
 -- ============================================================
+
 function lurek.init()
     lurek.window.setTitle("Tween Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.06, 0.1)
@@ -194,7 +195,7 @@ end
 -- ============================================================
 -- Ready
 -- ============================================================
-function lurek.ready()
+local function _ready_setup()
     -- Burst particles: animation cycle complete
     psys_burst = lurek.particle.newSystem(MAX_PARTICLES)
     psys_burst:setEmissionRate(0)
@@ -233,7 +234,7 @@ end
 -- ============================================================
 -- Process
 -- ============================================================
-lurek.process(function(dt)
+function lurek.process(dt)
     -- FPS
     fps_count = fps_count + 1
     fps_timer = fps_timer + dt
@@ -345,12 +346,12 @@ lurek.process(function(dt)
     -- Update particles
     if psys_burst then psys_burst:update(dt) end
     if psys_flash then psys_flash:update(dt) end
-end)
+end
 
 -- ============================================================
 -- Render: animated rectangles + particles (world-space)
 -- ============================================================
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE then return end
 
     for i = 1, NUM_EASINGS do
@@ -410,12 +411,12 @@ lurek.render(function()
 
     -- Burst particles (world-space)
     if psys_burst then psys_burst:render() end
-end)
+end
 
 -- ============================================================
 -- Render UI: labels, curve graph, controls, title
 -- ============================================================
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- ── Title screen ───────────────────────────────────────
     if state == STATE_TITLE then
         local a = title_alpha
@@ -559,4 +560,4 @@ lurek.render_ui(function()
 
     -- Flash particles (UI layer)
     if psys_flash then psys_flash:render() end
-end)
+end

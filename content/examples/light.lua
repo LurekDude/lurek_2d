@@ -759,3 +759,32 @@ do  -- Occluder:isValid
     lurek.log.debug("wall removed", "light")
   end
 end
+
+--@api-stub: Light:setColor
+-- Sets the RGB colour of the light source.
+-- Warm (1, 0.8, 0.5) for candles; cool (0.7, 0.8, 1) for moonlight.
+do  -- Light:setColor
+  local lt = lurek.light.newLight(200, 300, 150)
+  lt:setColor(1.0, 0.85, 0.5)
+  lurek.log.info("light colour set", "light")
+end
+
+--@api-stub: Light:setShadowColor
+-- Sets the RGBA colour used where the light casts shadows.
+-- Full black (0,0,0,1) for harsh shadows; tinted for indirect-light approximation.
+do  -- Light:setShadowColor
+  local lt = lurek.light.newLight(200, 300, 120)
+  lt:setShadowEnabled(true)
+  lt:setShadowColor(0.0, 0.0, 0.1, 0.85)
+  lurek.log.info("shadow colour set", "light")
+end
+
+--@api-stub: Light:transitionTo
+-- Smoothly interpolates the light's position, radius, and colour to target values.
+-- duration in seconds; fires optional callback on completion.
+do  -- Light:transitionTo
+  local lt = lurek.light.newLight(100, 100, 80)
+  lt:transitionTo({x=400, y=300, radius=200, r=1, g=0.5, b=0}, 2.0,
+    function() lurek.log.info("transition done", "light") end)
+  lurek.log.info("transition started", "light")
+end

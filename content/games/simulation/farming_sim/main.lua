@@ -161,6 +161,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Input Setup
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Farming Sim — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.15, 0.05)
@@ -211,7 +212,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Update
 -- ---------------------------------------------------------------------------
-lurek.process(function(dt)
+function lurek.process(dt)
     -- Quit
     if lurek.input.wasActionPressed("quit") then
         if current_state == STATE.MARKET then
@@ -422,12 +423,12 @@ lurek.process(function(dt)
     ps_rain:update(dt)
     ps_growth:update(dt)
     ps_plant:update(dt)
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render (world)
 -- ---------------------------------------------------------------------------
-lurek.render(function()
+function lurek.draw()
     -- Title screen
     if current_state == STATE.TITLE then
         lurek.render.print("FARMING SIM", 200, 180, { size = 48, color = { 0.9, 0.80, 0.20, 1 } })
@@ -505,12 +506,12 @@ lurek.render(function()
     if is_raining then
         lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, { color = { 0.15, 0.20, 0.35, 0.12 } })
     end
-end)
+end
 
 -- ---------------------------------------------------------------------------
 -- Render UI (HUD overlay)
 -- ---------------------------------------------------------------------------
-lurek.render_ui(function()
+function lurek.draw_ui()
     if current_state == STATE.TITLE or current_state == STATE.VICTORY then return end
 
     local W = SCREEN_W
@@ -590,4 +591,4 @@ lurek.render_ui(function()
 
     -- Controls hint
     lurek.render.print("Q=Wheat E=Carrot R=Tomato", W - 210, bot_y + 5, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
-end)
+end

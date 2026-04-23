@@ -9,7 +9,6 @@ use super::SharedState;
 use crate::math::Vec2;
 use crate::physics::{
     Body, BodyType, CellType, CellularWorld, PhysicsZone, RaycastHit, Shape, TerrainMap, World,
-    ZoneGravityMode,
 };
 
 // -------------------------------------------------------------------------------

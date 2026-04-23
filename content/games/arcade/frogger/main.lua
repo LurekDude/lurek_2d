@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- Frogger — Lurek2D
 -- ============================================================================
 -- Category : arcade
@@ -9,8 +9,6 @@
 -- ---------------------------------------------------------------------------
 -- Constants
 -- ---------------------------------------------------------------------------
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local SCREEN_W, SCREEN_H = 800, 600
 
@@ -157,8 +155,8 @@ end
 local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
-        gfx.setColor(p.r, p.g, p.b, a)
-        gfx.drawRect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.setColor(p.r, p.g, p.b, a)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -190,8 +188,8 @@ end
 
 local function draw_score_pops()
     for _, sp in ipairs(score_pops) do
-        gfx.setColor(1, 1, 0, sp.alpha)
-        gfx.print(sp.text, sp.x, sp.y, 1)
+        lurek.render.setColor(1, 1, 0, sp.alpha)
+        lurek.render.print(sp.text, sp.x, sp.y, 1)
     end
 end
 
@@ -332,7 +330,7 @@ end
 -- ---------------------------------------------------------------------------
 function lurek.init()
     lurek.window.setTitle("Frogger — Lurek2D")
-    gfx.setBackgroundColor(0.02, 0.02, 0.06)
+    lurek.render.setBackgroundColor(0.02, 0.02, 0.06)
 
     -- Action-based input
     lurek.input.bind("up",    {"up",    "w"})
@@ -566,56 +564,56 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.render — world drawing
 -- ---------------------------------------------------------------------------
-function lurek.render()
+function lurek.draw()
     cam:apply()
 
     -- ── Water band (rows 0-5) ─────────────────────────────────
-    gfx.setColor(0.05, 0.15, 0.45, 1)
-    gfx.drawRect("fill", 0, row_y(HOME_ROW), SCREEN_W, TILE * 6)
+    lurek.render.setColor(0.05, 0.15, 0.45, 1)
+    lurek.render.rectangle("fill", 0, row_y(HOME_ROW), SCREEN_W, TILE * 6)
 
     -- ── Road band (rows 7-11) ─────────────────────────────────
-    gfx.setColor(0.18, 0.18, 0.2, 1)
-    gfx.drawRect("fill", 0, row_y(ROAD_TOP), SCREEN_W, TILE * 5)
+    lurek.render.setColor(0.18, 0.18, 0.2, 1)
+    lurek.render.rectangle("fill", 0, row_y(ROAD_TOP), SCREEN_W, TILE * 5)
 
     -- Road lane dividers
-    gfx.setColor(0.5, 0.5, 0.2, 0.5)
+    lurek.render.setColor(0.5, 0.5, 0.2, 0.5)
     for r = ROAD_TOP, ROAD_BOT - 1 do
         local ly = row_y(r) + TILE
         for dx = 0, SCREEN_W, 40 do
-            gfx.drawRect("fill", dx, ly - 1, 20, 2)
+            lurek.render.rectangle("fill", dx, ly - 1, 20, 2)
         end
     end
 
     -- ── Safe zones ────────────────────────────────────────────
     -- Start zone (row 12)
-    gfx.setColor(0.1, 0.35, 0.1, 1)
-    gfx.drawRect("fill", 0, row_y(START_ROW), SCREEN_W, TILE)
+    lurek.render.setColor(0.1, 0.35, 0.1, 1)
+    lurek.render.rectangle("fill", 0, row_y(START_ROW), SCREEN_W, TILE)
     -- Middle safe zone (row 6)
-    gfx.setColor(0.1, 0.35, 0.1, 1)
-    gfx.drawRect("fill", 0, row_y(MID_SAFE), SCREEN_W, TILE)
+    lurek.render.setColor(0.1, 0.35, 0.1, 1)
+    lurek.render.rectangle("fill", 0, row_y(MID_SAFE), SCREEN_W, TILE)
 
     -- ── Home slots ────────────────────────────────────────────
     for idx, h in ipairs(HOME_SLOTS) do
         if h.filled then
-            gfx.setColor(0.1, 0.8, 0.1, 1)
+            lurek.render.setColor(0.1, 0.8, 0.1, 1)
         else
-            gfx.setColor(0.03, 0.06, 0.15, 1)
+            lurek.render.setColor(0.03, 0.06, 0.15, 1)
         end
-        gfx.drawRect("fill", h.x, row_y(HOME_ROW) + 4, TILE, TILE - 8)
+        lurek.render.rectangle("fill", h.x, row_y(HOME_ROW) + 4, TILE, TILE - 8)
         -- Slot outline
-        gfx.setColor(0.3, 0.3, 0.4, 1)
-        gfx.drawRect("line", h.x, row_y(HOME_ROW) + 4, TILE, TILE - 8)
+        lurek.render.setColor(0.3, 0.3, 0.4, 1)
+        lurek.render.rectangle("line", h.x, row_y(HOME_ROW) + 4, TILE, TILE - 8)
     end
 
     -- Bonus fly
     if fly.active then
         local h = HOME_SLOTS[fly.slot]
         if h and not h.filled then
-            gfx.setColor(1, 0.9, 0.1, 0.9)
-            gfx.circle("fill", h.x + TILE / 2, row_y(HOME_ROW) + TILE / 2, 6)
-            gfx.setColor(0.6, 0.4, 0, 1)
-            gfx.circle("fill", h.x + TILE / 2 - 5, row_y(HOME_ROW) + TILE / 2 - 2, 2)
-            gfx.circle("fill", h.x + TILE / 2 + 5, row_y(HOME_ROW) + TILE / 2 - 2, 2)
+            lurek.render.setColor(1, 0.9, 0.1, 0.9)
+            lurek.render.circle("fill", h.x + TILE / 2, row_y(HOME_ROW) + TILE / 2, 6)
+            lurek.render.setColor(0.6, 0.4, 0, 1)
+            lurek.render.circle("fill", h.x + TILE / 2 - 5, row_y(HOME_ROW) + TILE / 2 - 2, 2)
+            lurek.render.circle("fill", h.x + TILE / 2 + 5, row_y(HOME_ROW) + TILE / 2 - 2, 2)
         end
     end
 
@@ -624,26 +622,26 @@ function lurek.render()
         local def = lane.def
         for _, obj in ipairs(lane.objects) do
             if def.kind == "car" then
-                gfx.setColor(0.9, 0.2, 0.2, 1)
-                gfx.drawRect("fill", obj.x, obj.y, obj.w, TILE - 8)
+                lurek.render.setColor(0.9, 0.2, 0.2, 1)
+                lurek.render.rectangle("fill", obj.x, obj.y, obj.w, TILE - 8)
                 -- Windshield
-                gfx.setColor(0.5, 0.8, 1, 0.7)
+                lurek.render.setColor(0.5, 0.8, 1, 0.7)
                 local wx = (def.dir == 1) and (obj.x + obj.w - 10) or (obj.x + 2)
-                gfx.drawRect("fill", wx, obj.y + 4, 8, TILE - 16)
+                lurek.render.rectangle("fill", wx, obj.y + 4, 8, TILE - 16)
             elseif def.kind == "truck" then
-                gfx.setColor(0.85, 0.65, 0.1, 1)
-                gfx.drawRect("fill", obj.x, obj.y, obj.w, TILE - 8)
+                lurek.render.setColor(0.85, 0.65, 0.1, 1)
+                lurek.render.rectangle("fill", obj.x, obj.y, obj.w, TILE - 8)
                 -- Cab
-                gfx.setColor(0.7, 0.5, 0.05, 1)
+                lurek.render.setColor(0.7, 0.5, 0.05, 1)
                 local cx = (def.dir == 1) and (obj.x + obj.w - 16) or obj.x
-                gfx.drawRect("fill", cx, obj.y + 2, 16, TILE - 12)
+                lurek.render.rectangle("fill", cx, obj.y + 2, 16, TILE - 12)
             elseif def.kind == "log" then
-                gfx.setColor(0.45, 0.28, 0.1, 1)
-                gfx.drawRect("fill", obj.x, obj.y, obj.w, TILE - 8)
+                lurek.render.setColor(0.45, 0.28, 0.1, 1)
+                lurek.render.rectangle("fill", obj.x, obj.y, obj.w, TILE - 8)
                 -- Wood grain lines
-                gfx.setColor(0.35, 0.2, 0.05, 0.5)
-                gfx.drawRect("fill", obj.x + 6, obj.y + 8, obj.w - 12, 2)
-                gfx.drawRect("fill", obj.x + 10, obj.y + TILE - 16, obj.w - 20, 2)
+                lurek.render.setColor(0.35, 0.2, 0.05, 0.5)
+                lurek.render.rectangle("fill", obj.x + 6, obj.y + 8, obj.w - 12, 2)
+                lurek.render.rectangle("fill", obj.x + 10, obj.y + TILE - 16, obj.w - 20, 2)
             elseif def.kind == "turtle" then
                 local tt = turtle_timers[li]
                 if tt then
@@ -653,24 +651,24 @@ function lurek.render()
                         -- Blinking — draw semi-transparent
                         local blink = math.sin(tt.timer * 20) > 0
                         if blink then
-                            gfx.setColor(0.1, 0.4, 0.2, 0.5)
+                            lurek.render.setColor(0.1, 0.4, 0.2, 0.5)
                             local tw = (TILE - 8) / 2
                             local shells = math.floor(obj.w / (tw + 6))
                             for s = 0, shells - 1 do
-                                gfx.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 2)
+                                lurek.render.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 2)
                             end
                         end
                     else
-                        gfx.setColor(0.1, 0.45, 0.2, 1)
+                        lurek.render.setColor(0.1, 0.45, 0.2, 1)
                         local tw = (TILE - 8) / 2
                         local shells = math.floor(obj.w / (tw + 6))
                         for s = 0, shells - 1 do
-                            gfx.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 2)
+                            lurek.render.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 2)
                         end
                         -- Shell detail
-                        gfx.setColor(0.05, 0.3, 0.1, 0.6)
+                        lurek.render.setColor(0.05, 0.3, 0.1, 0.6)
                         for s = 0, shells - 1 do
-                            gfx.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 4)
+                            lurek.render.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 4)
                         end
                     end
                 end
@@ -683,20 +681,20 @@ function lurek.render()
         local fx, fy = frog_visual.x, frog_visual.y
 
         -- Body
-        gfx.setColor(0.15, 0.75, 0.15, 1)
-        gfx.drawRect("fill", fx, fy, FROG_SIZE, FROG_SIZE)
+        lurek.render.setColor(0.15, 0.75, 0.15, 1)
+        lurek.render.rectangle("fill", fx, fy, FROG_SIZE, FROG_SIZE)
 
         -- Lighter belly
-        gfx.setColor(0.3, 0.9, 0.3, 1)
-        gfx.drawRect("fill", fx + 6, fy + 8, FROG_SIZE - 12, FROG_SIZE - 12)
+        lurek.render.setColor(0.3, 0.9, 0.3, 1)
+        lurek.render.rectangle("fill", fx + 6, fy + 8, FROG_SIZE - 12, FROG_SIZE - 12)
 
         -- Eyes (white + black pupil)
-        gfx.setColor(1, 1, 1, 1)
-        gfx.circle("fill", fx + 6, fy + 4, 4)
-        gfx.circle("fill", fx + FROG_SIZE - 6, fy + 4, 4)
-        gfx.setColor(0, 0, 0, 1)
-        gfx.circle("fill", fx + 6, fy + 4, 2)
-        gfx.circle("fill", fx + FROG_SIZE - 6, fy + 4, 2)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.circle("fill", fx + 6, fy + 4, 4)
+        lurek.render.circle("fill", fx + FROG_SIZE - 6, fy + 4, 4)
+        lurek.render.setColor(0, 0, 0, 1)
+        lurek.render.circle("fill", fx + 6, fy + 4, 2)
+        lurek.render.circle("fill", fx + FROG_SIZE - 6, fy + 4, 2)
     end
 
     -- ── Particles ─────────────────────────────────────────────
@@ -709,18 +707,18 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.render_ui — HUD overlay (screen space)
 -- ---------------------------------------------------------------------------
-function lurek.render_ui()
+function lurek.draw_ui()
     -- ── TITLE SCREEN ──────────────────────────────────────────
     if current_state == STATE.TITLE then
-        gfx.setColor(0.05, 0.15, 0.45, 1)
-        gfx.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.setColor(0.05, 0.15, 0.45, 1)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         -- Title
-        gfx.setColor(0.1, 0.9, 0.1, 1)
-        gfx.print("F R O G G E R", SCREEN_W / 2 - 100, 100, 2)
+        lurek.render.setColor(0.1, 0.9, 0.1, 1)
+        lurek.render.print("F R O G G E R", SCREEN_W / 2 - 100, 100, 2)
 
         -- ASCII frog art
-        gfx.setColor(0.2, 0.8, 0.2, 1)
+        lurek.render.setColor(0.2, 0.8, 0.2, 1)
         local frog_art = {
             "    @..@    ",
             "   (----)   ",
@@ -729,70 +727,70 @@ function lurek.render_ui()
             "    ~~~~    ",
         }
         for i, line in ipairs(frog_art) do
-            gfx.print(line, SCREEN_W / 2 - 72, 180 + i * 22, 1.4)
+            lurek.render.print(line, SCREEN_W / 2 - 72, 180 + i * 22, 1.4)
         end
 
         -- Instructions
-        gfx.setColor(1, 1, 1, 0.9)
-        gfx.print("Guide the frog across roads and rivers!", SCREEN_W / 2 - 160, 350, 1)
-        gfx.print("Ride logs and turtles — don't fall in!", SCREEN_W / 2 - 155, 375, 1)
-        gfx.print("Fill all 5 home slots to win!", SCREEN_W / 2 - 120, 400, 1)
+        lurek.render.setColor(1, 1, 1, 0.9)
+        lurek.render.print("Guide the frog across roads and rivers!", SCREEN_W / 2 - 160, 350, 1)
+        lurek.render.print("Ride logs and turtles — don't fall in!", SCREEN_W / 2 - 155, 375, 1)
+        lurek.render.print("Fill all 5 home slots to win!", SCREEN_W / 2 - 120, 400, 1)
 
         -- Blink "PRESS ENTER"
         local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
-            gfx.setColor(1, 1, 0, 1)
-            gfx.print("PRESS ENTER", SCREEN_W / 2 - 70, 470, 1.5)
+            lurek.render.setColor(1, 1, 0, 1)
+            lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 70, 470, 1.5)
         end
 
         -- High score
         if high_score > 0 then
-            gfx.setColor(0.8, 0.8, 0.2, 1)
-            gfx.print("HIGH SCORE: " .. high_score, SCREEN_W / 2 - 70, 530, 1)
+            lurek.render.setColor(0.8, 0.8, 0.2, 1)
+            lurek.render.print("HIGH SCORE: " .. high_score, SCREEN_W / 2 - 70, 530, 1)
         end
         return
     end
 
     -- ── GAME OVER ─────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
-        gfx.setColor(0, 0, 0, 0.7)
-        gfx.drawRect("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
-        gfx.setColor(1, 0.2, 0.2, 1)
-        gfx.print("GAME OVER", SCREEN_W / 2 - 90, 200, 2.5)
+        lurek.render.setColor(1, 0.2, 0.2, 1)
+        lurek.render.print("GAME OVER", SCREEN_W / 2 - 90, 200, 2.5)
 
-        gfx.setColor(1, 1, 1, 1)
-        gfx.print("SCORE: " .. score, SCREEN_W / 2 - 60, 280, 1.5)
-        gfx.print("LEVEL: " .. level, SCREEN_W / 2 - 50, 320, 1.2)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("SCORE: " .. score, SCREEN_W / 2 - 60, 280, 1.5)
+        lurek.render.print("LEVEL: " .. level, SCREEN_W / 2 - 50, 320, 1.2)
 
         if score >= high_score and score > 0 then
-            gfx.setColor(1, 1, 0, 1)
-            gfx.print("NEW HIGH SCORE!", SCREEN_W / 2 - 80, 360, 1.2)
+            lurek.render.setColor(1, 1, 0, 1)
+            lurek.render.print("NEW HIGH SCORE!", SCREEN_W / 2 - 80, 360, 1.2)
         end
 
         local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
-            gfx.setColor(1, 1, 1, 0.9)
-            gfx.print("PRESS ENTER TO RETRY", SCREEN_W / 2 - 110, 430, 1.2)
+            lurek.render.setColor(1, 1, 1, 0.9)
+            lurek.render.print("PRESS ENTER TO RETRY", SCREEN_W / 2 - 110, 430, 1.2)
         end
         return
     end
 
     -- ── PLAYING HUD ───────────────────────────────────────────
     -- Score
-    gfx.setColor(1, 1, 1, 1)
-    gfx.print("SCORE: " .. score, 10, 6, 1)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("SCORE: " .. score, 10, 6, 1)
 
     -- Level
-    gfx.print("LVL " .. level, SCREEN_W / 2 - 25, 6, 1)
+    lurek.render.print("LVL " .. level, SCREEN_W / 2 - 25, 6, 1)
 
     -- Lives (draw small frogs)
     for i = 1, lives do
-        gfx.setColor(0.15, 0.75, 0.15, 1)
-        gfx.drawRect("fill", SCREEN_W - 30 * i, 6, 16, 16)
-        gfx.setColor(1, 1, 1, 1)
-        gfx.circle("fill", SCREEN_W - 30 * i + 4, 9, 2)
-        gfx.circle("fill", SCREEN_W - 30 * i + 12, 9, 2)
+        lurek.render.setColor(0.15, 0.75, 0.15, 1)
+        lurek.render.rectangle("fill", SCREEN_W - 30 * i, 6, 16, 16)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.circle("fill", SCREEN_W - 30 * i + 4, 9, 2)
+        lurek.render.circle("fill", SCREEN_W - 30 * i + 12, 9, 2)
     end
 
     -- Timer bar (bottom)
@@ -800,20 +798,20 @@ function lurek.render_ui()
     local bar_x = SCREEN_W / 2 - TIMER_BAR_W / 2
     local bar_y = SCREEN_H - 22
     -- Background
-    gfx.setColor(0.2, 0.2, 0.2, 0.8)
-    gfx.drawRect("fill", bar_x, bar_y, TIMER_BAR_W, TIMER_BAR_H)
+    lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
+    lurek.render.rectangle("fill", bar_x, bar_y, TIMER_BAR_W, TIMER_BAR_H)
     -- Fill (green → yellow → red)
     local tr = (timer_pct < 0.5) and 1.0 or (1.0 - (timer_pct - 0.5) * 2)
     local tg = (timer_pct > 0.5) and 1.0 or (timer_pct * 2)
-    gfx.setColor(tr, tg, 0.1, 1)
-    gfx.drawRect("fill", bar_x + 1, bar_y + 1, (TIMER_BAR_W - 2) * timer_pct, TIMER_BAR_H - 2)
+    lurek.render.setColor(tr, tg, 0.1, 1)
+    lurek.render.rectangle("fill", bar_x + 1, bar_y + 1, (TIMER_BAR_W - 2) * timer_pct, TIMER_BAR_H - 2)
     -- Label
-    gfx.setColor(1, 1, 1, 0.8)
-    gfx.print("TIME", bar_x - 40, bar_y, 1)
+    lurek.render.setColor(1, 1, 1, 0.8)
+    lurek.render.print("TIME", bar_x - 40, bar_y, 1)
 
     -- FPS
-    gfx.setColor(0.5, 0.5, 0.5, 0.6)
-    gfx.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 0.8)
+    lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 0.8)
 end
 
 -- ---------------------------------------------------------------------------

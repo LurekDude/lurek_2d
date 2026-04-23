@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-23T11:45:09.596947+00:00",
+  "generated_at": "2026-04-23T18:13:32.511126+00:00",
   "summary": {
     "rust": {
       "total": 5330,
@@ -4157,7 +4157,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 261,
+      "line": 266,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -4166,7 +4166,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 328,
+      "line": 337,
       "kind": "fn",
       "name": "resolve_present_mode",
       "has_doc": true
@@ -4175,7 +4175,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 535,
+      "line": 544,
       "kind": "fn",
       "name": "init_lua",
       "has_doc": true
@@ -4184,7 +4184,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 2570,
+      "line": 2592,
       "kind": "struct",
       "name": "App",
       "has_doc": true
@@ -4193,7 +4193,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 2585,
+      "line": 2607,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -4202,7 +4202,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 2596,
+      "line": 2618,
       "kind": "fn",
       "name": "run",
       "has_doc": true
@@ -20897,7 +20897,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/camera_api.rs",
-      "line": 20,
+      "line": 21,
       "kind": "struct",
       "name": "LuaCamera2D",
       "has_doc": true
@@ -20906,7 +20906,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/camera_api.rs",
-      "line": 471,
+      "line": 515,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -21176,7 +21176,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 35,
+      "line": 29,
       "kind": "struct",
       "name": "LuaGlobe",
       "has_doc": true
@@ -21185,7 +21185,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 590,
+      "line": 585,
       "kind": "struct",
       "name": "LuaGlobeRegistry",
       "has_doc": true
@@ -21194,7 +21194,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 706,
+      "line": 701,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -21707,7 +21707,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 98,
+      "line": 97,
       "kind": "struct",
       "name": "LuaWorld",
       "has_doc": true
@@ -21716,7 +21716,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1236,
+      "line": 1235,
       "kind": "struct",
       "name": "LuaZone",
       "has_doc": true
@@ -21725,7 +21725,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1414,
+      "line": 1413,
       "kind": "struct",
       "name": "LuaTerrain",
       "has_doc": true
@@ -21734,7 +21734,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1620,
+      "line": 1619,
       "kind": "struct",
       "name": "LuaCellular",
       "has_doc": true
@@ -21743,7 +21743,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1794,
+      "line": 1793,
       "kind": "struct",
       "name": "LuaBody",
       "has_doc": true
@@ -21752,7 +21752,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2237,
+      "line": 2236,
       "kind": "struct",
       "name": "LuaPhysicsShape",
       "has_doc": true
@@ -21761,7 +21761,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2388,
+      "line": 2387,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -48095,7 +48095,7 @@
       "source": "lua_api",
       "module": "globe_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 856,
+      "line": 851,
       "kind": "fn",
       "name": "MAX_PROVINCES",
       "has_doc": true
@@ -48104,7 +48104,7 @@
       "source": "lua_api",
       "module": "globe_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 860,
+      "line": 855,
       "kind": "fn",
       "name": "LOD_FAR",
       "has_doc": true
@@ -48113,7 +48113,7 @@
       "source": "lua_api",
       "module": "globe_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 862,
+      "line": 857,
       "kind": "fn",
       "name": "LOD_MID",
       "has_doc": true
@@ -48122,7 +48122,7 @@
       "source": "lua_api",
       "module": "globe_api",
       "file": "src/lua_api/globe_api.rs",
-      "line": 864,
+      "line": 859,
       "kind": "fn",
       "name": "LOD_NEAR",
       "has_doc": true
@@ -48302,7 +48302,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2794,
+      "line": 2793,
       "kind": "fn",
       "name": "CELL_AIR",
       "has_doc": true
@@ -48311,7 +48311,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2796,
+      "line": 2795,
       "kind": "fn",
       "name": "CELL_SAND",
       "has_doc": true
@@ -48320,7 +48320,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2798,
+      "line": 2797,
       "kind": "fn",
       "name": "CELL_WATER",
       "has_doc": true
@@ -48329,7 +48329,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2800,
+      "line": 2799,
       "kind": "fn",
       "name": "CELL_ROCK",
       "has_doc": true
@@ -48338,7 +48338,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2802,
+      "line": 2801,
       "kind": "fn",
       "name": "CELL_FIRE",
       "has_doc": true
@@ -48347,7 +48347,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2804,
+      "line": 2803,
       "kind": "fn",
       "name": "CELL_GAS",
       "has_doc": true

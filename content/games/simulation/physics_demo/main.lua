@@ -313,7 +313,7 @@ end
 
 -- ═════════════════════════ CALLBACKS ═════════════════════════
 
-lurek.init(function()
+function lurek.init()
   lurek.window.setTitle("Physics Demo — Lurek2D")
   lurek.render.setBackgroundColor(0.08, 0.08, 0.1)
 
@@ -354,7 +354,7 @@ lurek.init(function()
 
   -- ramp placement
   lurek.input.bind("key_r", function()
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     ramps[#ramps + 1] = {
       x = mx - 40, y = my - 10, w = 80, h = 40,
       dir = (math.random() > 0.5) and "right" or "left",
@@ -363,7 +363,7 @@ lurek.init(function()
 
   -- pin nearest object
   lurek.input.bind("key_p", function()
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     local best_i, best_d = nil, math.huge
     for i, o in ipairs(objects) do
       local d = dist(mx, my, o.x, o.y)
@@ -383,7 +383,7 @@ lurek.init(function()
       state = "RUNNING"
       return
     end
-    local mx, my = lurek.input.getMousePosition()
+    local mx, my = lurek.input.mouse.getPosition()
     local idx = find_at(mx, my)
     if idx then
       dragging = idx
@@ -400,14 +400,14 @@ lurek.init(function()
   lurek.input.bind("key_escape", function()
     lurek.event.quit()
   end)
-end)
+end
 
-function lurek.ready()
+local function _ready_setup()
   lurek.camera.reset()
 end
 
 -- ───────────────────────── process ───────────────────────────
-lurek.process(function(dt)
+function lurek.process(dt)
   if state == "TITLE" then
     title_timer = title_timer + dt
     return
@@ -425,7 +425,7 @@ lurek.process(function(dt)
       end
       dragging = nil
     else
-      local mx, my = lurek.input.getMousePosition()
+      local mx, my = lurek.input.mouse.getPosition()
       throw_vx = (mx - prev_mouse_x) / math.max(sdt, 0.001)
       throw_vy = (my - prev_mouse_y) / math.max(sdt, 0.001)
       throw_vx = clamp(throw_vx, -1200, 1200)
@@ -487,10 +487,10 @@ lurek.process(function(dt)
 
   -- particles
   update_particles(sdt)
-end)
+end
 
 -- ───────────────────────── render (world) ────────────────────
-lurek.render(function()
+function lurek.draw()
   if state == "TITLE" then
     return
   end
@@ -550,10 +550,10 @@ lurek.render(function()
     lurek.render.setColor(p.r, p.g, p.b, p.a)
     lurek.render.circleFill(p.x, p.y, p.size)
   end
-end)
+end
 
 -- ───────────────────────── render_ui (HUD) ───────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
   if state == "TITLE" then
     -- title screen
     local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
@@ -609,4 +609,4 @@ lurek.render_ui(function()
   -- bottom help
   lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
   lurek.render.print("R=Ramp  P=Pin  C=Clear  Click=Spawn/Drag  ESC=Quit", 10, SCREEN_H - 20, 12)
-end)
+end

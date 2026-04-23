@@ -100,7 +100,7 @@ end
 -- Draws all scenes in the stack from bottom to top (legacy name; prefer `render`).
 -- Call inside `lurek.render` only when migrating older code; new scenes should implement `render`.
 do  -- lurek.scene.draw
-  function lurek.render()
+  function lurek.draw()
     lurek.scene.draw()
   end
 end
@@ -109,7 +109,7 @@ end
 -- Draws all scenes in the stack from bottom to top.
 -- Always call this from `lurek.render`; overlays draw on top of the background scene automatically.
 do  -- lurek.scene.render
-  function lurek.render()
+  function lurek.draw()
     lurek.scene.render()
   end
 end
@@ -118,7 +118,7 @@ end
 -- Draws UI overlay for all scenes in the stack from bottom to top.
 -- Pair with `lurek.scene.render` so HUD/menus draw above world content.
 do  -- lurek.scene.renderUi
-  function lurek.render_ui()
+  function lurek.draw_ui()
     lurek.scene.renderUi()
   end
 end
@@ -306,10 +306,10 @@ end
 -- Returns the easing-adjusted transition progress from 0.0 to 1.0.
 -- Use for visual blends (alpha, slide offset) so the curve matches the easing chosen on push.
 do  -- lurek.scene.getTransitionProgressEased
-  local gfx = lurek.render
-  function lurek.render()
+
+  function lurek.draw()
     local p = lurek.scene.getTransitionProgressEased()
-    gfx.setColor(0, 0, 0, 1 - p)
+    lurek.render.setColor(0, 0, 0, 1 - p)
   end
 end
 
@@ -464,7 +464,7 @@ end
 -- Drive this from `lurek.render`: rebuild + flush every frame so depth is always current.
 do  -- DepthSorter:flush
   local sorter = lurek.scene.newDepthSorter()
-  function lurek.render()
+  function lurek.draw()
     sorter:add(function() lurek.log.debug("frame draw", "render") end, 0)
     sorter:flush()
   end

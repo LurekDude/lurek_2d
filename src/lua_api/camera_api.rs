@@ -10,6 +10,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::camera::{Camera2D, CameraPath, ZoomTween};
+use crate::render::renderer::RenderCommand;
 use std::collections::HashMap;
 
 // -------------------------------------------------------------------------------
@@ -24,8 +25,8 @@ pub struct LuaCamera2D {
     /// Active smooth-zoom tween, if any.
     zoom_tween: RefCell<Option<ZoomTween>>,
     /// Per-layer parallax scale factors (`layer_name â†’ factor`).
-    parallax: RefCell<HashMap<String, f32>>,
-}
+    parallax: RefCell<HashMap<String, f32>>,    /// Shared engine state for queuing render commands.
+    state: Rc<RefCell<SharedState>>,}
 
 impl LuaUserData for LuaCamera2D {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
@@ -362,6 +363,49 @@ impl LuaUserData for LuaCamera2D {
             Ok(())
         });
 
+        // -- apply --
+        /// Applies this camera's transform to the render stack.
+        /// Must be paired with a matching `reset()` call after all scene drawing.
+        /// Equivalent to `gfx.push()` followed by translate/scale/rotate by camera state.
+        /// @return nil
+        methods.add_method("apply", |_, this, ()| {
+            let cmds = this.inner.borrow().begin_render_commands();
+            this.state.borrow_mut().render_commands.extend(cmds);
+            Ok(())
+        });
+
+        // -- reset --
+        /// Pops the camera transform from the render stack.
+        /// Must be called after `apply()` once all scene drawing is done.
+        /// @return nil
+        methods.add_method("reset", |_, this, ()| {
+            this.state
+                .borrow_mut()
+                .render_commands
+                .push(RenderCommand::PopTransform);
+            Ok(())
+        });
+
+        // -- attach --
+        /// Alias for `apply()`. Applies this camera's transform to the render stack.
+        /// @return nil
+        methods.add_method("attach", |_, this, ()| {
+            let cmds = this.inner.borrow().begin_render_commands();
+            this.state.borrow_mut().render_commands.extend(cmds);
+            Ok(())
+        });
+
+        // -- detach --
+        /// Alias for `reset()`. Pops the camera transform from the render stack.
+        /// @return nil
+        methods.add_method("detach", |_, this, ()| {
+            this.state
+                .borrow_mut()
+                .render_commands
+                .push(RenderCommand::PopTransform);
+            Ok(())
+        });
+
         // â”€â”€ Camera effects â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         // -- zoomPulse --
@@ -466,9 +510,9 @@ impl LuaUserData for LuaCamera2D {
 ///
 /// @param lua : &Lua
 /// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param state : Rc<RefCell<SharedState>>
 ///
-pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
+pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- new --
@@ -476,23 +520,26 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param viewport_w : number
     /// @param viewport_h : number
     /// Camera2D
+    let s = state.clone();
     tbl.set(
         "new",
-        lua.create_function(|lua, (vw, vh): (f32, f32)| {
+        lua.create_function(move |lua, (vw, vh): (f32, f32)| {
             lua.create_userdata(LuaCamera2D {
                 inner: Rc::new(RefCell::new(Camera2D::new(vw, vh))),
                 path: RefCell::new(None),
                 zoom_tween: RefCell::new(None),
                 parallax: RefCell::new(HashMap::new()),
+                state: s.clone(),
             })
         })?,
     )?;
 
-    // -- newCamera -- (alias for `new`, default 800Ă—600 if called with no args)
+    // -- newCamera -- (alias for `new`, default 800×600 if called with no args)
+    // Creates a new camera object to view the game world.
+    let s = state.clone();
     tbl.set(
-        /// Creates a new camera object to view the game world.
         "newCamera",
-        lua.create_function(|lua, (vw, vh): (Option<f32>, Option<f32>)| {
+        lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
             let vw = vw.unwrap_or(800.0);
             let vh = vh.unwrap_or(600.0);
             lua.create_userdata(LuaCamera2D {
@@ -500,6 +547,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 path: RefCell::new(None),
                 zoom_tween: RefCell::new(None),
                 parallax: RefCell::new(HashMap::new()),
+                state: s.clone(),
             })
         })?,
     )?;

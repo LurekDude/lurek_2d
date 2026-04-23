@@ -878,7 +878,7 @@ impl LuaUserData for LuaArray {
         /// Apply a Lua callback element-wise, returning a new Array of the same shape.
         /// @param fn function(value: number) → number — called for each element
         /// @return Array — new array with transformed values
-        methods.add_method("map", |lua, this, func: LuaFunction| {
+        methods.add_method("map", |_lua, this, func: LuaFunction| {
             let src = &this.inner;
             let n = src.size();
             let mut out = NdArray::zeros(src.shape(), src.dtype())
@@ -934,7 +934,7 @@ impl LuaUserData for LuaArray {
         /// @param fn function(acc: number, value: number) → number — accumulator function
         /// @param init number — initial accumulator value
         /// @return Array — array of cumulative values (same length as input)
-        methods.add_method("scan", |lua, this, (func, init): (LuaFunction, f64)| {
+        methods.add_method("scan", |_lua, this, (func, init): (LuaFunction, f64)| {
             let src = &this.inner;
             let n = src.size();
             let mut out = NdArray::zeros(src.shape(), src.dtype())

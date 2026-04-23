@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 --  Donkey Kong — Climb sloped platforms to rescue Pauline
 -- ----------------------------------------------------------------------------
 --  Category : arcade
@@ -16,8 +16,6 @@
 -- ============================================================================
 
 -- ── Game-wide constants ───────────────────────────────────────────────────
--- Capture lurek.render API table before `function lurek.render()` shadows it.
-local gfx = lurek.render
 
 local SCREEN_W, SCREEN_H = 960, 540
 local GRAVITY             = 600
@@ -245,7 +243,7 @@ end
 -- ═══════════════════════════════════════════════════════════════════════════
 function lurek.init()
     lurek.window.setTitle("Donkey Kong — Lurek2D")
-    gfx.setBackgroundColor(0.05, 0.05, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
 
     -- Input bindings
     lurek.input.bind("left",  {"a", "left"})
@@ -616,30 +614,30 @@ end
 local function draw_dk()
     local x, y = dk.x, dk.y
     -- Body
-    gfx.setColor(0.45, 0.25, 0.1, 1)
-    gfx.rectangle("fill", x + 4, y + 16, 32, 28)
+    lurek.render.setColor(0.45, 0.25, 0.1, 1)
+    lurek.render.rectangle("fill", x + 4, y + 16, 32, 28)
     -- Head
-    gfx.setColor(0.55, 0.3, 0.12, 1)
-    gfx.rectangle("fill", x + 8, y, 24, 18)
+    lurek.render.setColor(0.55, 0.3, 0.12, 1)
+    lurek.render.rectangle("fill", x + 8, y, 24, 18)
     -- Eyes
-    gfx.setColor(1, 1, 1, 1)
-    gfx.rectangle("fill", x + 14, y + 4, 5, 5)
-    gfx.rectangle("fill", x + 23, y + 4, 5, 5)
-    gfx.setColor(0, 0, 0, 1)
-    gfx.rectangle("fill", x + 16, y + 5, 3, 3)
-    gfx.rectangle("fill", x + 25, y + 5, 3, 3)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.rectangle("fill", x + 14, y + 4, 5, 5)
+    lurek.render.rectangle("fill", x + 23, y + 4, 5, 5)
+    lurek.render.setColor(0, 0, 0, 1)
+    lurek.render.rectangle("fill", x + 16, y + 5, 3, 3)
+    lurek.render.rectangle("fill", x + 25, y + 5, 3, 3)
     -- Mouth
-    gfx.setColor(0.3, 0.15, 0.05, 1)
-    gfx.rectangle("fill", x + 15, y + 12, 10, 4)
+    lurek.render.setColor(0.3, 0.15, 0.05, 1)
+    lurek.render.rectangle("fill", x + 15, y + 12, 10, 4)
     -- Arms (right arm animates during throw)
-    gfx.setColor(0.45, 0.25, 0.1, 1)
-    gfx.rectangle("fill", x - 4, y + 18, 8, 20)  -- left arm
+    lurek.render.setColor(0.45, 0.25, 0.1, 1)
+    lurek.render.rectangle("fill", x - 4, y + 18, 8, 20)  -- left arm
     local arm_offset = math.floor(dk.arm_angle * 12)
-    gfx.rectangle("fill", x + 36, y + 18 - arm_offset, 8, 20)  -- right arm
+    lurek.render.rectangle("fill", x + 36, y + 18 - arm_offset, 8, 20)  -- right arm
     -- Legs
-    gfx.setColor(0.4, 0.2, 0.08, 1)
-    gfx.rectangle("fill", x + 8, y + 44, 10, 8)
-    gfx.rectangle("fill", x + 22, y + 44, 10, 8)
+    lurek.render.setColor(0.4, 0.2, 0.08, 1)
+    lurek.render.rectangle("fill", x + 8, y + 44, 10, 8)
+    lurek.render.rectangle("fill", x + 22, y + 44, 10, 8)
 end
 
 -- Draw Mario (player) as blue/red rectangles
@@ -648,36 +646,36 @@ local function draw_player()
     local flash = hammer.active and (math.floor(hammer.timer * 8) % 2 == 0)
     -- Hat (red)
     if flash then
-        gfx.setColor(1, 1, 0, 1)
+        lurek.render.setColor(1, 1, 0, 1)
     else
-        gfx.setColor(0.9, 0.15, 0.1, 1)
+        lurek.render.setColor(0.9, 0.15, 0.1, 1)
     end
-    gfx.rectangle("fill", x, y, player.w, 6)
+    lurek.render.rectangle("fill", x, y, player.w, 6)
     -- Face
-    gfx.setColor(0.95, 0.75, 0.55, 1)
-    gfx.rectangle("fill", x + 2, y + 6, 12, 6)
+    lurek.render.setColor(0.95, 0.75, 0.55, 1)
+    lurek.render.rectangle("fill", x + 2, y + 6, 12, 6)
     -- Body (blue overalls)
     if flash then
-        gfx.setColor(1, 1, 0, 1)
+        lurek.render.setColor(1, 1, 0, 1)
     else
-        gfx.setColor(0.1, 0.2, 0.8, 1)
+        lurek.render.setColor(0.1, 0.2, 0.8, 1)
     end
-    gfx.rectangle("fill", x + 1, y + 12, 14, 8)
+    lurek.render.rectangle("fill", x + 1, y + 12, 14, 8)
     -- Legs
-    gfx.setColor(0.1, 0.2, 0.8, 1)
-    gfx.rectangle("fill", x + 2, y + 20, 5, 4)
-    gfx.rectangle("fill", x + 9, y + 20, 5, 4)
+    lurek.render.setColor(0.1, 0.2, 0.8, 1)
+    lurek.render.rectangle("fill", x + 2, y + 20, 5, 4)
+    lurek.render.rectangle("fill", x + 9, y + 20, 5, 4)
 
     -- Hammer (if active, draw above player)
     if hammer.active then
-        gfx.setColor(0.6, 0.4, 0.2, 1)
+        lurek.render.setColor(0.6, 0.4, 0.2, 1)
         local hx = x + (player.facing > 0 and player.w or -10)
         local hy = y - 4
         -- Handle
-        gfx.rectangle("fill", hx + 2, hy, 4, 14)
+        lurek.render.rectangle("fill", hx + 2, hy, 4, 14)
         -- Head (T-shape)
-        gfx.setColor(0.5, 0.5, 0.5, 1)
-        gfx.rectangle("fill", hx - 2, hy - 4, 12, 6)
+        lurek.render.setColor(0.5, 0.5, 0.5, 1)
+        lurek.render.rectangle("fill", hx - 2, hy - 4, 12, 6)
     end
 end
 
@@ -685,39 +683,39 @@ end
 local function draw_pauline()
     local x, y = pauline.x, pauline.y
     -- Hair
-    gfx.setColor(0.9, 0.75, 0.2, 1)
-    gfx.rectangle("fill", x + 2, y - 4, 10, 6)
+    lurek.render.setColor(0.9, 0.75, 0.2, 1)
+    lurek.render.rectangle("fill", x + 2, y - 4, 10, 6)
     -- Dress (pink)
-    gfx.setColor(1, 0.4, 0.6, 1)
-    gfx.rectangle("fill", x, y + 2, 14, 16)
+    lurek.render.setColor(1, 0.4, 0.6, 1)
+    lurek.render.rectangle("fill", x, y + 2, 14, 16)
     -- Face
-    gfx.setColor(0.95, 0.75, 0.55, 1)
-    gfx.rectangle("fill", x + 3, y - 2, 8, 6)
+    lurek.render.setColor(0.95, 0.75, 0.55, 1)
+    lurek.render.rectangle("fill", x + 3, y - 2, 8, 6)
 end
 
 -- Draw a barrel
 local function draw_barrel(b)
-    gfx.setColor(0.6, 0.35, 0.1, 1)
-    gfx.circle("fill", b.x, b.y, b.r)
+    lurek.render.setColor(0.6, 0.35, 0.1, 1)
+    lurek.render.circle("fill", b.x, b.y, b.r)
     -- Barrel bands
-    gfx.setColor(0.4, 0.22, 0.05, 1)
-    gfx.circle("line", b.x, b.y, b.r)
-    gfx.circle("line", b.x, b.y, b.r * 0.5)
+    lurek.render.setColor(0.4, 0.22, 0.05, 1)
+    lurek.render.circle("line", b.x, b.y, b.r)
+    lurek.render.circle("line", b.x, b.y, b.r * 0.5)
 end
 
 -- Draw a ladder
 local function draw_ladder(lad)
     local x, top, bot = lad.x, lad.top, lad.bottom
     -- Two vertical rails
-    gfx.setColor(0.6, 0.8, 1, 0.7)
-    gfx.rectangle("fill", x - 6, top, 2, bot - top)
-    gfx.rectangle("fill", x + 4, top, 2, bot - top)
+    lurek.render.setColor(0.6, 0.8, 1, 0.7)
+    lurek.render.rectangle("fill", x - 6, top, 2, bot - top)
+    lurek.render.rectangle("fill", x + 4, top, 2, bot - top)
     -- Rungs
     local rung_spacing = 12
     local ny = math.floor((bot - top) / rung_spacing)
     for i = 0, ny do
         local ry = top + i * rung_spacing
-        gfx.rectangle("fill", x - 6, ry, 12, 2)
+        lurek.render.rectangle("fill", x - 6, ry, 12, 2)
     end
 end
 
@@ -728,36 +726,36 @@ local function draw_hammer_pickup()
     local x, y = hammer_spawn.x, hammer_spawn.y
     local pulse = 0.7 + 0.3 * math.sin(lurek.timer.getTime() * 6)
     -- Handle
-    gfx.setColor(0.6, 0.4, 0.2, pulse)
-    gfx.rectangle("fill", x + 4, y + 4, 4, 10)
+    lurek.render.setColor(0.6, 0.4, 0.2, pulse)
+    lurek.render.rectangle("fill", x + 4, y + 4, 4, 10)
     -- Head (T-shape)
-    gfx.setColor(0.7, 0.7, 0.7, pulse)
-    gfx.rectangle("fill", x, y, 14, 6)
+    lurek.render.setColor(0.7, 0.7, 0.7, pulse)
+    lurek.render.rectangle("fill", x, y, 14, 6)
 end
 
 -- ═══════════════════════════════════════════════════════════════════════════
 --  lurek.render — world drawing
 -- ═══════════════════════════════════════════════════════════════════════════
-function lurek.render()
+function lurek.draw()
     cam:apply()
 
     if state == STATE.TITLE then
         -- DK silhouette art (large rectangles)
-        gfx.setColor(0.4, 0.22, 0.08, 1)
+        lurek.render.setColor(0.4, 0.22, 0.08, 1)
         -- Body
-        gfx.rectangle("fill", SCREEN_W / 2 - 60, 140, 120, 100)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 60, 140, 120, 100)
         -- Head
-        gfx.rectangle("fill", SCREEN_W / 2 - 40, 100, 80, 50)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 40, 100, 80, 50)
         -- Arms
-        gfx.rectangle("fill", SCREEN_W / 2 - 80, 160, 25, 60)
-        gfx.rectangle("fill", SCREEN_W / 2 + 55, 160, 25, 60)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 80, 160, 25, 60)
+        lurek.render.rectangle("fill", SCREEN_W / 2 + 55, 160, 25, 60)
         -- Legs
-        gfx.rectangle("fill", SCREEN_W / 2 - 40, 240, 30, 40)
-        gfx.rectangle("fill", SCREEN_W / 2 + 10, 240, 30, 40)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 40, 240, 30, 40)
+        lurek.render.rectangle("fill", SCREEN_W / 2 + 10, 240, 30, 40)
         -- Eyes
-        gfx.setColor(1, 0.3, 0.1, 1)
-        gfx.rectangle("fill", SCREEN_W / 2 - 20, 115, 14, 12)
-        gfx.rectangle("fill", SCREEN_W / 2 + 8, 115, 14, 12)
+        lurek.render.setColor(1, 0.3, 0.1, 1)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 20, 115, 14, 12)
+        lurek.render.rectangle("fill", SCREEN_W / 2 + 8, 115, 14, 12)
 
         cam:reset()
         return
@@ -765,7 +763,7 @@ function lurek.render()
 
     -- ── Draw platforms ────────────────────────────────────────────────
     for _, plat in ipairs(platforms) do
-        gfx.setColor(0.8, 0.15, 0.1, 1)
+        lurek.render.setColor(0.8, 0.15, 0.1, 1)
         -- Draw platform as thick line (two rectangles for thickness)
         local x1, y1, x2, y2 = plat[1], plat[2], plat[3], plat[4]
         local len = math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
@@ -777,16 +775,16 @@ function lurek.render()
             local sy = y1 + t0 * (y2 - y1)
             local ex = x1 + t1 * (x2 - x1)
             local sw = (ex - sx)
-            gfx.rectangle("fill", sx, sy - 3, sw + 1, 8)
+            lurek.render.rectangle("fill", sx, sy - 3, sw + 1, 8)
         end
         -- Girder detail lines
-        gfx.setColor(0.6, 0.1, 0.08, 1)
+        lurek.render.setColor(0.6, 0.1, 0.08, 1)
         for s = 0, segments - 1, 2 do
             local t0 = s / segments
             local sx = x1 + t0 * (x2 - x1)
             local sy = y1 + t0 * (y2 - y1)
             local sw = (x2 - x1) / segments
-            gfx.rectangle("fill", sx, sy - 1, sw, 3)
+            lurek.render.rectangle("fill", sx, sy - 1, sw, 3)
         end
     end
 
@@ -809,7 +807,7 @@ function lurek.render()
     draw_player()
 
     -- ── Draw particles ────────────────────────────────────────────────
-    gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
     sparks:draw()
     dust:draw()
 
@@ -819,12 +817,12 @@ function lurek.render()
         if hs > 0 then
             local hx = (player.x + pauline.x) / 2 + 5
             local hy = math.min(player.y, pauline.y) - 30
-            gfx.setColor(1, 0.2, 0.4, hs)
+            lurek.render.setColor(1, 0.2, 0.4, hs)
             -- Heart shape from rectangles
             local s = hs * 12
-            gfx.rectangle("fill", hx - s, hy, s, s)
-            gfx.rectangle("fill", hx, hy, s, s)
-            gfx.rectangle("fill", hx - s * 0.5, hy + s * 0.5, s, s)
+            lurek.render.rectangle("fill", hx - s, hy, s, s)
+            lurek.render.rectangle("fill", hx, hy, s, s)
+            lurek.render.rectangle("fill", hx - s * 0.5, hy + s * 0.5, s, s)
         end
     end
 
@@ -834,76 +832,76 @@ end
 -- ═══════════════════════════════════════════════════════════════════════════
 --  lurek.render_ui — HUD overlay (screen space)
 -- ═══════════════════════════════════════════════════════════════════════════
-function lurek.render_ui()
+function lurek.draw_ui()
     if state == STATE.TITLE then
         -- Title text
-        gfx.setColor(1, 0.85, 0.2, 1)
-        gfx.print("DONKEY KONG", SCREEN_W / 2 - 110, 40, 3)
+        lurek.render.setColor(1, 0.85, 0.2, 1)
+        lurek.render.print("DONKEY KONG", SCREEN_W / 2 - 110, 40, 3)
 
         -- Blink prompt
         if math.floor(title_blink * 2) % 2 == 0 then
-            gfx.setColor(1, 1, 1, 0.9)
-            gfx.print("Press SPACE to start", SCREEN_W / 2 - 100, 340, 1.5)
+            lurek.render.setColor(1, 1, 1, 0.9)
+            lurek.render.print("Press SPACE to start", SCREEN_W / 2 - 100, 340, 1.5)
         end
 
         -- Controls
-        gfx.setColor(0.6, 0.6, 0.7, 1)
-        gfx.print("A/D or Arrows: Move   W/S: Climb   Space: Jump", SCREEN_W / 2 - 200, 400, 1)
+        lurek.render.setColor(0.6, 0.6, 0.7, 1)
+        lurek.render.print("A/D or Arrows: Move   W/S: Climb   Space: Jump", SCREEN_W / 2 - 200, 400, 1)
 
         -- FPS
-        gfx.setColor(0.4, 0.4, 0.5, 1)
-        gfx.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
+        lurek.render.setColor(0.4, 0.4, 0.5, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
         return
     end
 
     if state == STATE.GAME_OVER then
-        gfx.setColor(0.9, 0.15, 0.1, 1)
-        gfx.print("GAME OVER", SCREEN_W / 2 - 90, SCREEN_H / 2 - 30, 3)
-        gfx.setColor(1, 1, 1, 0.8)
-        gfx.print("Score: " .. score, SCREEN_W / 2 - 50, SCREEN_H / 2 + 20, 1.5)
-        gfx.print("Press SPACE", SCREEN_W / 2 - 55, SCREEN_H / 2 + 50, 1)
+        lurek.render.setColor(0.9, 0.15, 0.1, 1)
+        lurek.render.print("GAME OVER", SCREEN_W / 2 - 90, SCREEN_H / 2 - 30, 3)
+        lurek.render.setColor(1, 1, 1, 0.8)
+        lurek.render.print("Score: " .. score, SCREEN_W / 2 - 50, SCREEN_H / 2 + 20, 1.5)
+        lurek.render.print("Press SPACE", SCREEN_W / 2 - 55, SCREEN_H / 2 + 50, 1)
 
-        gfx.setColor(0.4, 0.4, 0.5, 1)
-        gfx.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
+        lurek.render.setColor(0.4, 0.4, 0.5, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
         return
     end
 
     if state == STATE.WIN_ANIM then
-        gfx.setColor(1, 0.85, 0.3, 1)
-        gfx.print("RESCUED!", SCREEN_W / 2 - 70, 20, 2.5)
-        gfx.setColor(1, 1, 1, 0.8)
-        gfx.print("Score: " .. score .. "   Wave: " .. wave, SCREEN_W / 2 - 80, 60, 1.2)
+        lurek.render.setColor(1, 0.85, 0.3, 1)
+        lurek.render.print("RESCUED!", SCREEN_W / 2 - 70, 20, 2.5)
+        lurek.render.setColor(1, 1, 1, 0.8)
+        lurek.render.print("Score: " .. score .. "   Wave: " .. wave, SCREEN_W / 2 - 80, 60, 1.2)
 
-        gfx.setColor(0.4, 0.4, 0.5, 1)
-        gfx.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
+        lurek.render.setColor(0.4, 0.4, 0.5, 1)
+        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, 4, 1)
         return
     end
 
     -- ── Playing HUD ───────────────────────────────────────────────────
     -- Score
-    gfx.setColor(1, 1, 1, 1)
-    gfx.print("SCORE: " .. score, 10, 6, 1.2)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("SCORE: " .. score, 10, 6, 1.2)
 
     -- Lives
-    gfx.setColor(0.9, 0.15, 0.1, 1)
+    lurek.render.setColor(0.9, 0.15, 0.1, 1)
     for i = 1, lives do
-        gfx.rectangle("fill", SCREEN_W - 30 * i, 6, 20, 12)
+        lurek.render.rectangle("fill", SCREEN_W - 30 * i, 6, 20, 12)
     end
 
     -- Wave
-    gfx.setColor(0.7, 0.7, 0.8, 1)
-    gfx.print("WAVE " .. wave, SCREEN_W / 2 - 30, 6, 1.2)
+    lurek.render.setColor(0.7, 0.7, 0.8, 1)
+    lurek.render.print("WAVE " .. wave, SCREEN_W / 2 - 30, 6, 1.2)
 
     -- Hammer timer
     if hammer.active then
-        gfx.setColor(1, 0.9, 0.2, 1)
+        lurek.render.setColor(1, 0.9, 0.2, 1)
         local bar_w = 80 * (hammer.timer / HAMMER_DURATION)
-        gfx.rectangle("fill", SCREEN_W / 2 - 40, 24, bar_w, 6)
-        gfx.setColor(1, 1, 1, 0.8)
-        gfx.print("HAMMER!", SCREEN_W / 2 - 28, 20, 1)
+        lurek.render.rectangle("fill", SCREEN_W / 2 - 40, 24, bar_w, 6)
+        lurek.render.setColor(1, 1, 1, 0.8)
+        lurek.render.print("HAMMER!", SCREEN_W / 2 - 28, 20, 1)
     end
 
     -- FPS
-    gfx.setColor(0.4, 0.4, 0.5, 1)
-    gfx.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 16, 1)
+    lurek.render.setColor(0.4, 0.4, 0.5, 1)
+    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 4, SCREEN_H - 16, 1)
 end

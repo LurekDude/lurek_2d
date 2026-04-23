@@ -833,3 +833,13 @@ do  -- InputRecording:frameCount
     lurek.log.warn("recording has no input events", "replay")
   end
 end
+
+--@api-stub: Combo:progress
+-- Returns a value in [0,1] representing how far through the combo the player is.
+-- Use to drive a progress bar or visual indicator during combo window.
+do  -- Combo:progress
+  local combo = lurek.input.newCombo({"right","right","attack"})
+  combo:feed("right")
+  local pct = combo:progress()
+  lurek.log.info("combo progress: " .. pct, "input")
+end

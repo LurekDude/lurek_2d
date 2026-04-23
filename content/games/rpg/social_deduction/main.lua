@@ -425,17 +425,18 @@ local function tally_votes()
 end
 
 -- ── Callbacks ──────────────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Social Deduction — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
     lurek.tween.to(1.0, function(t) title_alpha = t end, { ease = "outQuad" })
 end
 
-function lurek.ready()
+local function _ready_setup()
 
 end
 
-lurek.process(function(delta)
+function lurek.process(delta)
     dt = delta
     frame_count = frame_count + 1
 
@@ -614,10 +615,10 @@ lurek.process(function(delta)
     if frame_count % 30 == 0 then
         lurek.window.setTitle("Social Deduction — " .. tostring(math.floor(1 / dt)) .. " FPS")
     end
-end)
+end
 
 -- ── Render (world space) ───────────────────────────────────────────────────
-lurek.render(function()
+function lurek.draw()
     if state == STATE_TITLE or state == STATE_GAME_OVER then return end
 
     local px, py = players[1].x, players[1].y
@@ -686,10 +687,10 @@ lurek.render(function()
             end
         end
     end
-end)
+end
 
 -- ── Render UI (screen space) ───────────────────────────────────────────────
-lurek.render_ui(function()
+function lurek.draw_ui()
     -- ── Title screen ───────────────────────────────────────────────────
     if state == STATE_TITLE then
         lurek.render.setColor(0.9, 0.1, 0.15, title_alpha)
@@ -819,4 +820,4 @@ lurek.render_ui(function()
             lurek.render.print(vote_result.message, 180, 460)
         end
     end
-end)
+end

@@ -155,7 +155,7 @@ end
 -- Returns whether a screenshot is currently requested.
 -- Use to draw a "capturing..." toast for one frame, or to skip expensive UI before the capture.
 do  -- lurek.debugbridge.isScreenshotRequested
-  function lurek.render_ui()
+  function lurek.draw_ui()
     if lurek.debugbridge.isScreenshotRequested() then
       lurek.render.print("capturing...", 8, 8)
     end
@@ -186,7 +186,7 @@ end
 --   * NO `return` at top-level (breaks the file).
 --   * NO `pcall` defensive wrappers, NO `if false then`.
 --   * Wrap GPU / audio / physics calls inside
---     `function lurek.render() ... end` or
+--     `function lurek.draw() ... end` or
 --     `function lurek.update(dt) ... end` callbacks so the file loads.
 --   * Use REAL values: paths like "sfx/jump.ogg", keys like "space",
 --     colours like {1, 0.5, 0, 1}.
