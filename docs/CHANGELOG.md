@@ -2,6 +2,21 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.28] - 2026-04-23
+
+### fix(api): fix misplaced docstring for `newByteData`; regenerate API JSON
+
+- **`src/lua_api/data_api.rs`**: `newByteData` had its `///` docstring placed INSIDE the
+  `tbl.set(` call (after the opening paren, before the string name). The parser looks for
+  `///` ABOVE `tbl.set(`, so the function was silently omitted from the API JSON. Moved the
+  docstring to the correct position above `tbl.set(`.
+- **`logs/data/lua_api_data.json`** regenerated: now 4103 functions across 49 modules.
+  `newByteData`, `toVec`, and `fromVec` are now captured (the last two were present in source
+  but the JSON was stale).
+- **`extensions/vscode/data/lurek-api.json`** regenerated: now 1133 functions (up from 1129).
+- Extension rebuilt and reinstalled. `lurek.data.newByteData`, `lurek.dataframe.toVec`, and
+  `lurek.dataframe.fromVec` no longer produce false "unknown function" warnings.
+
 ## [0.20.27] - 2026-04-23
 
 ### fix(ext): fix API IntelliSense missing + eliminate remaining diagnostic cascade

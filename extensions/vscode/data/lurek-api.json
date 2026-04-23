@@ -1,6 +1,6 @@
 {
   "version": "auto-generated",
-  "generated": "2026-04-23",
+  "generated": "2026-04-24",
   "modules": [
     {
       "name": "ai",
@@ -3291,6 +3291,17 @@
           "returnType": "nil",
           "isMethod": false,
           "objectType": null
+        },
+        {
+          "name": "newCamera",
+          "fullPath": "lurek.camera.newCamera",
+          "signature": "([vw], [vh])",
+          "description": "",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
         }
       ],
       "methods": []
@@ -3793,6 +3804,17 @@
           "objectType": null
         },
         {
+          "name": "newByteData",
+          "fullPath": "lurek.data.newByteData",
+          "signature": "(value)",
+          "description": "Instantiates a raw byte data container object.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "newDataView",
           "fullPath": "lurek.data.newDataView",
           "signature": "(raw, [offset], [size])",
@@ -4113,6 +4135,42 @@
               "type": "integer",
               "description": "",
               "optional": true
+            }
+          ],
+          "returns": "DataFrame",
+          "returnType": "DataFrame",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "toVec",
+          "fullPath": "lurek.dataframe.toVec",
+          "signature": "(df)",
+          "description": "Converts a DataFrame to a VecFrame for vectorized column operations.",
+          "parameters": [
+            {
+              "name": "df",
+              "type": "DataFrame",
+              "description": "",
+              "optional": false
+            }
+          ],
+          "returns": "VecFrame",
+          "returnType": "VecFrame",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "fromVec",
+          "fullPath": "lurek.dataframe.fromVec",
+          "signature": "(vf)",
+          "description": "Converts a VecFrame back to a DataFrame.",
+          "parameters": [
+            {
+              "name": "vf",
+              "type": "VecFrame",
+              "description": "",
+              "optional": false
             }
           ],
           "returns": "DataFrame",
@@ -12634,7 +12692,7 @@
     },
     {
       "name": "particle",
-      "description": "",
+      "description": "`lurek.particle` â€” Emitter-based 2D particle systems and trail ribbons.",
       "functions": [
         {
           "name": "newSystem",
@@ -16918,7 +16976,7 @@
           "name": "drawNineSlice",
           "fullPath": "lurek.render.drawNineSlice",
           "signature": "(slice, x, y, w, h)",
-          "description": "Queues a 9-slice draw call inside lurek.render / lurek.render_ui.",
+          "description": "Queues a 9-slice draw call inside lurek.draw / lurek.draw_ui.",
           "parameters": [
             {
               "name": "slice",
@@ -17456,7 +17514,7 @@
           "name": "drawQuadBezier",
           "fullPath": "lurek.render.drawQuadBezier",
           "signature": "(x1, y1, cx, cy, x2, y2, [segments])",
-          "description": "Must be called inside lurek.render or lurek.render_ui.",
+          "description": "Must be called inside lurek.draw or lurek.draw_ui.",
           "parameters": [
             {
               "name": "x1",
@@ -19325,7 +19383,7 @@
       "functions": [
         {
           "name": "getOS",
-          "fullPath": "lurek.system.getOS",
+          "fullPath": "lurek.runtime.getOS",
           "signature": "()",
           "description": "Returns the host operating system name ('Windows', 'Linux', 'macOS').",
           "parameters": [],
@@ -19336,7 +19394,7 @@
         },
         {
           "name": "getVersion",
-          "fullPath": "lurek.system.getVersion",
+          "fullPath": "lurek.runtime.getVersion",
           "signature": "()",
           "description": "Returns the Lurek2D engine version string.",
           "parameters": [],
@@ -19347,7 +19405,7 @@
         },
         {
           "name": "getProcessorCount",
-          "fullPath": "lurek.system.getProcessorCount",
+          "fullPath": "lurek.runtime.getProcessorCount",
           "signature": "()",
           "description": "Returns the number of logical CPU cores available.",
           "parameters": [],
@@ -19358,7 +19416,7 @@
         },
         {
           "name": "getMemorySize",
-          "fullPath": "lurek.system.getMemorySize",
+          "fullPath": "lurek.runtime.getMemorySize",
           "signature": "()",
           "description": "Returns the total amount of installed system RAM in megabytes.",
           "parameters": [],
@@ -19369,7 +19427,7 @@
         },
         {
           "name": "openURL",
-          "fullPath": "lurek.system.openURL",
+          "fullPath": "lurek.runtime.openURL",
           "signature": "(url)",
           "description": "Opens a URL in the system's default browser.",
           "parameters": [
@@ -19387,7 +19445,7 @@
         },
         {
           "name": "getPreferredLocales",
-          "fullPath": "lurek.system.getPreferredLocales",
+          "fullPath": "lurek.runtime.getPreferredLocales",
           "signature": "()",
           "description": "Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').",
           "parameters": [],
@@ -19398,7 +19456,7 @@
         },
         {
           "name": "getPowerInfo",
-          "fullPath": "lurek.system.getPowerInfo",
+          "fullPath": "lurek.runtime.getPowerInfo",
           "signature": "()",
           "description": "Returns battery state, percentage charged, and estimated time remaining.",
           "parameters": [],
@@ -19409,7 +19467,7 @@
         },
         {
           "name": "getInfo",
-          "fullPath": "lurek.system.getInfo",
+          "fullPath": "lurek.runtime.getInfo",
           "signature": "()",
           "description": "Returns a table of system information including OS name, CPU model, and installed RAM.",
           "parameters": [],
@@ -19420,7 +19478,7 @@
         },
         {
           "name": "getMessage",
-          "fullPath": "lurek.system.getMessage",
+          "fullPath": "lurek.runtime.getMessage",
           "signature": "(id)",
           "description": "Resolves a stable runtime message ID such as 'L001' to its human-readable text.",
           "parameters": [
@@ -19438,7 +19496,7 @@
         },
         {
           "name": "hasMessage",
-          "fullPath": "lurek.system.hasMessage",
+          "fullPath": "lurek.runtime.hasMessage",
           "signature": "(id)",
           "description": "Returns true when the runtime message catalog contains the given stable message ID.",
           "parameters": [
@@ -19456,7 +19514,7 @@
         },
         {
           "name": "getMessageCount",
-          "fullPath": "lurek.system.getMessageCount",
+          "fullPath": "lurek.runtime.getMessageCount",
           "signature": "()",
           "description": "Returns the total number of message entries loaded into the runtime message catalog.",
           "parameters": [],
@@ -19467,7 +19525,7 @@
         },
         {
           "name": "setClipboardText",
-          "fullPath": "lurek.system.setClipboardText",
+          "fullPath": "lurek.runtime.setClipboardText",
           "signature": "(text)",
           "description": "Replaces the system clipboard contents with the given string.",
           "parameters": [
@@ -19485,7 +19543,7 @@
         },
         {
           "name": "getClipboardText",
-          "fullPath": "lurek.system.getClipboardText",
+          "fullPath": "lurek.runtime.getClipboardText",
           "signature": "()",
           "description": "Returns the current contents of the system clipboard.",
           "parameters": [],
@@ -19496,7 +19554,7 @@
         },
         {
           "name": "setDebugOverlay",
-          "fullPath": "lurek.system.setDebugOverlay",
+          "fullPath": "lurek.runtime.setDebugOverlay",
           "signature": "(enabled)",
           "description": "Shows or hides the FPS/draw-call debug overlay.",
           "parameters": [
@@ -19514,7 +19572,7 @@
         },
         {
           "name": "getDebugOverlay",
-          "fullPath": "lurek.system.getDebugOverlay",
+          "fullPath": "lurek.runtime.getDebugOverlay",
           "signature": "()",
           "description": "Returns whether the debug overlay is currently visible.",
           "parameters": [],
@@ -19525,7 +19583,7 @@
         },
         {
           "name": "setLogLevel",
-          "fullPath": "lurek.system.setLogLevel",
+          "fullPath": "lurek.runtime.setLogLevel",
           "signature": "(level)",
           "description": "Sets the minimum severity level for runtime log messages.",
           "parameters": [
@@ -19543,7 +19601,7 @@
         },
         {
           "name": "getLogLevel",
-          "fullPath": "lurek.system.getLogLevel",
+          "fullPath": "lurek.runtime.getLogLevel",
           "signature": "()",
           "description": "Returns the name of the current minimum log level for runtime messages.",
           "parameters": [],
@@ -19554,7 +19612,7 @@
         },
         {
           "name": "log",
-          "fullPath": "lurek.system.log",
+          "fullPath": "lurek.runtime.log",
           "signature": "(level, message)",
           "description": "Emit a log message from Lua at the specified level.",
           "parameters": [
@@ -19578,7 +19636,7 @@
         },
         {
           "name": "getLastError",
-          "fullPath": "lurek.system.getLastError",
+          "fullPath": "lurek.runtime.getLastError",
           "signature": "()",
           "description": "Returns the last unhandled error message, or nil.",
           "parameters": [],
@@ -19589,7 +19647,7 @@
         },
         {
           "name": "errorSnapshot",
-          "fullPath": "lurek.system.errorSnapshot",
+          "fullPath": "lurek.runtime.errorSnapshot",
           "signature": "(msg)",
           "description": "Serialises an engine error message to a compact JSON string.",
           "parameters": [
@@ -19607,7 +19665,7 @@
         },
         {
           "name": "getArch",
-          "fullPath": "lurek.system.getArch",
+          "fullPath": "lurek.runtime.getArch",
           "signature": "()",
           "description": "Returns the CPU architecture string for the current machine.",
           "parameters": [],
@@ -19618,18 +19676,18 @@
         },
         {
           "name": "getEnv",
-          "fullPath": "lurek.system.getEnv",
+          "fullPath": "lurek.runtime.getEnv",
           "signature": "(name)",
           "description": "Returns the value of an environment variable, or nil if not set.",
           "parameters": [],
-          "returns": "nil",
-          "returnType": "nil",
+          "returns": "string?",
+          "returnType": "string?",
           "isMethod": false,
           "objectType": null
         },
         {
           "name": "getArgs",
-          "fullPath": "lurek.system.getArgs",
+          "fullPath": "lurek.runtime.getArgs",
           "signature": "()",
           "description": "Returns the command-line arguments as a table.",
           "parameters": [],
@@ -19640,7 +19698,7 @@
         },
         {
           "name": "parseArgs",
-          "fullPath": "lurek.system.parseArgs",
+          "fullPath": "lurek.runtime.parseArgs",
           "signature": "([args])",
           "description": "Parses a command-line argument string and returns a structured key/value table.",
           "parameters": [
@@ -19658,7 +19716,7 @@
         },
         {
           "name": "runBatch",
-          "fullPath": "lurek.system.runBatch",
+          "fullPath": "lurek.runtime.runBatch",
           "signature": "(tasks, [opts])",
           "description": "Runs a list of shell commands in parallel and returns immediately without blocking.",
           "parameters": [
@@ -19682,7 +19740,7 @@
         },
         {
           "name": "getBatchResults",
-          "fullPath": "lurek.system.getBatchResults",
+          "fullPath": "lurek.runtime.getBatchResults",
           "signature": "(results)",
           "description": "Returns the output table from the most recently completed runBatch call.",
           "parameters": [

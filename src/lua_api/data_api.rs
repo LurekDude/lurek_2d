@@ -420,8 +420,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|_, raw_data: LuaString| Ok(data::crc32(raw_data.as_bytes())))?,
     )?;
 
+    /// Instantiates a raw byte data container object.
     tbl.set(
-        /// Instantiates a raw byte data container object.
         "newByteData",
         lua.create_function(|lua, value: LuaValue| {
             let bd = match value {
