@@ -1,6 +1,6 @@
 # conf.toml Templates
 
-Reference for the `conf.toml` file used in `content/demos/<name>/conf.toml`.
+Reference for the `conf.toml` file used in `content/games/<name>/conf.toml`.
 
 ## Standard (800×600) — Use for Most Demos
 

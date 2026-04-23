@@ -1,4 +1,4 @@
----
+﻿---
 name: agent-md
 description: "Load this skill when creating or maintaining merged module reference specs in docs/specs/<module>.md. It owns the required section structure, sync contract, and scaffold+validate workflow after the retirement of src/<module>/AGENT.md. Skip it for writing production Rust code, tests, or Lua scripts."
 ---
@@ -12,7 +12,7 @@ description: "Load this skill when creating or maintaining merged module referen
 
 - Creating a new `docs/specs/<module>.md` for a new engine module
 - Updating a module reference after changing source files, public types, public functions, or Lua bindings
-- Running `tools/audit/validate_agent_md.py` to validate the merged module reference format
+- Running `tools/validate/cag_validate.py` to validate the merged module reference format
 - Running `tools/docs/gen_module_specs.py` to regenerate the collected sections from source
 - Reviewing whether a module reference still matches its Rust source and Lua wrapper
 
@@ -36,7 +36,7 @@ Every engine module now uses one canonical documentation file:
 ### Owns
 - Required section structure for `docs/specs/<module>.md`
 - `tools/docs/gen_module_specs.py` generation workflow
-- `tools/audit/validate_agent_md.py` validation workflow
+- `tools/validate/cag_validate.py` validation workflow
 - Sync contract between module specs, Rust source, docstrings, and `src/lua_api/<module>_api.rs`
 
 ### Purpose
@@ -44,7 +44,7 @@ The merged spec is the canonical module reference an agent reads before working 
 
 Scripts may scaffold and refresh the source-derived sections, but the Summary and Notes remain manual prose. The goal is a reference that stays accurate enough for automated checks while still carrying module-specific design context that only a human or focused agent can write well.
 
-Validate with: `python tools/audit/validate_agent_md.py --module <name>`
+Validate with: `python tools/validate/cag_validate.py --module <name>`
 Regenerate with: `python tools/docs/gen_module_specs.py --module <name>`
 
 ### Required Format (`docs/specs/<module>.md`)

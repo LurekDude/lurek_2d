@@ -1,6 +1,6 @@
 ---
 name: demo-creation
-description: "Load this skill when creating one or more new demo projects in content/demos/. Use when: scaffolding a demo from a genre or feature description; generating conf.lua + main.lua + README.md + screen.png; registering a new demo in content/demos/README.md; using content/library/ modules alongside lurek.* API; creating batches of demos from a list of genres or specific needs. Skip it for content/examples/ single-file scripts (use examples-management skill), test writing, or engine Rust code."
+description: "Load this skill when creating one or more new demo projects in content/games/. Use when: scaffolding a demo from a genre or feature description; generating conf.lua + main.lua + README.md + screen.png; registering a new demo in content/games/README.md; using library/ modules alongside lurek.* API; creating batches of demos from a list of genres or specific needs. Skip it for content/examples/ single-file scripts (use examples-management skill), test writing, or engine Rust code."
 ---
 # demo-creation
 
@@ -10,29 +10,29 @@ description: "Load this skill when creating one or more new demo projects in con
 
 ## When To Load
 
-- Generating a new `content/demos/<name>/` project from scratch
+- Generating a new `content/games/<name>/` project from scratch
 - Scaffolding multiple demos in one pass (batch creation)
-- A demo uses `content/library/` modules alongside `lurek.*`
+- A demo uses `library/` modules alongside `lurek.*`
 - You need the full 4-file bundle: `conf.toml`, `main.lua`, `README.md`, `screen.png`
-- Registering a newly created demo in `content/demos/README.md`
+- Registering a newly created demo in `content/games/README.md`
 
 ## When To Skip
 
 - `content/examples/` single-file scripts → use `examples-management` skill
 - Engine Rust changes needed by a demo → use `rust-coding` + `lua-rust-bridge` skills
 - Physics simulation internals → use `lua-scripting` skill alongside this one
-- Stubs and incomplete `content/library/` modules (check [library-integration](./references/library-integration.md) before picking a module)
+- Stubs and incomplete `library/` modules (check [library-integration](./references/library-integration.md) before picking a module)
 
 ## Domain Knowledge
 
 ### Owns
-- `content/demos/<name>/` folder scaffold and 4-file bundle
+- `content/games/<name>/` folder scaffold and 4-file bundle
 - `conf.toml` resolution variants and module flag conventions
 - `main.lua` canonical section order and mandatory invariants
 - `README.md` 5-section template and accuracy rules
 - `screen.png` generation via `tools/demos/gen_demo_screenshots.py`
-- `content/demos/README.md` table entry and detail block registration
-- `content/library/` module integration patterns (`dialog`, `item`, `inventory`)
+- `content/games/README.md` table entry and detail block registration
+- `library/` module integration patterns (`dialog`, `item`, `inventory`)
 - Genre-to-API mapping guidance
 - Batch demo creation workflow
 
@@ -41,14 +41,14 @@ Every demo **must** produce exactly these four artifacts (no more, no fewer unle
 
 | File | Required | Notes |
 |------|----------|-------|
-| `content/demos/<name>/conf.toml` | Yes | Window config, title, resolution, modules |
-| `content/demos/<name>/main.lua` | Yes | Game entry point — canonical structure below |
-| `content/demos/<name>/README.md` | Yes | 5-section doc, see template |
-| `content/demos/<name>/screen.png` | Yes | Auto-generated via screenshot tool |
+| `content/games/<name>/conf.toml` | Yes | Window config, title, resolution, modules |
+| `content/games/<name>/main.lua` | Yes | Game entry point — canonical structure below |
+| `content/games/<name>/README.md` | Yes | 5-section doc, see template |
+| `content/games/<name>/screen.png` | Yes | Auto-generated via screenshot tool |
 
 Optional additions:
-- `content/demos/<name>/assets/` — sprites, sounds, tilemaps (commit only what the demo runs)
-- `content/demos/<name>/save/` — auto-created at runtime by smoke tests; never scaffold this manually
+- `content/games/<name>/assets/` — sprites, sounds, tilemaps (commit only what the demo runs)
+- `content/games/<name>/save/` — auto-created at runtime by smoke tests; never scaffold this manually
 
 ---
 
@@ -57,7 +57,7 @@ Optional additions:
 
 - Format: `lowercase_underscore` (e.g., `tower_defense`, `bullet_hell`)
 - No spaces, no hyphens, no version numbers
-- Must not duplicate an existing `content/demos/` folder — check with `Get-ChildItem content/demos/`
+- Must not duplicate an existing `content/games/` folder — check with `Get-ChildItem content/games/`
 
 ### Step 2 — Write `conf.toml`
 
@@ -101,8 +101,8 @@ Add module flags only when the demo actually needs them:
 - [snippets/step-5-write-readme-md.md](snippets/step-5-write-readme-md.md) — Step 5 — Write `README.md`
 - [snippets/notes.txt](snippets/notes.txt) — Notes
 - [snippets/notes-2.ps1](snippets/notes-2.ps1) — Notes
-- [snippets/step-7-register-in-content-demos.md](snippets/step-7-register-in-content-demos.md) — Step 7 — Register in `content/demos/README.md`
-- [snippets/step-7-register-in-content-demos-2.md](snippets/step-7-register-in-content-demos-2.md) — Step 7 — Register in `content/demos/README.md`
+- [snippets/step-7-register-in-content-demos.md](snippets/step-7-register-in-content-demos.md) — Step 7 — Register in `content/games/README.md`
+- [snippets/step-7-register-in-content-demos-2.md](snippets/step-7-register-in-content-demos-2.md) — Step 7 — Register in `content/games/README.md`
 - [snippets/extended-notes.md](snippets/extended-notes.md) — extended notes (overflow)
 
 ## References

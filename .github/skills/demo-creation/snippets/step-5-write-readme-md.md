@@ -11,4 +11,4 @@
 ## How to Run
 
 ```bash
-cargo run -- content/demos/<name>
+cargo run -- content/games/<name>

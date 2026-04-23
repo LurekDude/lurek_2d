@@ -1,6 +1,6 @@
 ---
 name: examples-management
-description: "Load this skill when adding, modifying, or reviewing content in the content/examples/ or content/demos/ directories: game example scripts, demo folder structure, conf.lua, or README files. Use for ensuring examples are self-contained, well-commented, and demonstrate one API concept. Skip it for engine Rust code, tests, documentation under docs/, or CAG work."
+description: "Load this skill when adding, modifying, or reviewing content in the content/examples/ or content/games/ directories: game example scripts, demo folder structure, conf.lua, or README files. Use for ensuring examples are self-contained, well-commented, and demonstrate one API concept. Skip it for engine Rust code, tests, documentation under docs/, or CAG work."
 ---
 # examples-management
 
@@ -10,9 +10,9 @@ description: "Load this skill when adding, modifying, or reviewing content in th
 
 ## When To Load
 
-- Adding a new Lua example to `content/examples/` or demo to `content/demos/`
+- Adding a new Lua example to `content/examples/` or demo to `content/games/`
 - Reviewing an existing example for correctness or code quality
-- Understanding the difference between `content/examples/` and `content/demos/`
+- Understanding the difference between `content/examples/` and `content/games/`
 - Writing conf.toml for a demo
 - Linking an example to the API documentation pipeline
 - Setting up an example to work as a smoke test
@@ -24,20 +24,20 @@ description: "Load this skill when adding, modifying, or reviewing content in th
 ## Domain Knowledge
 
 ### Owns
-- `content/examples/` vs `content/demos/` structure and naming rules
+- `content/examples/` vs `content/games/` structure and naming rules
 - Example file self-contained requirement and comment style
 - Demo folder layout (conf.lua, main.lua, assets, README)
 - Examples ↔ API documentation pipeline integration
 - Smoke test support pattern (`--smoke` flag + `lurek.event.quit()`)
-- `content/examples/README.md` and `content/demos/README.md` maintenance
+- `content/examples/README.md` and `content/games/README.md` maintenance
 
 ### Two-Folder Model
 | Folder | Purpose | Scope | Format |
 |--------|---------|-------|--------|
 | `content/examples/` | Minimal single-file API demonstrations | One `.lua` file per API area | ~30–100 lines, no conf.lua |
-| `content/demos/` | Larger showcase games/feature demos | Full game directory (conf.toml + main.lua + assets) | 100–500+ lines, multiple files |
+| `content/games/` | Larger showcase games/feature demos | Full game directory (conf.toml + main.lua + assets) | 100–500+ lines, multiple files |
 
-**Rule**: An `content/examples/` file shows one API namespace in the simplest possible way. A `content/demos/` folder is a small, complete game or feature showcase.
+**Rule**: An `content/examples/` file shows one API namespace in the simplest possible way. A `content/games/` folder is a small, complete game or feature showcase.
 
 ### content/examples/ File Structure
 > See [snippets/content-examples-file-structure.txt](snippets/content-examples-file-structure.txt) for the example.
@@ -52,7 +52,7 @@ description: "Load this skill when adding, modifying, or reviewing content in th
 - No `conf.toml` (uses default window settings)
 - Self-contained: no external assets unless they are embedded in the engine
 
-### content/demos/ Folder Structure
+### content/games/ Folder Structure
 > See [snippets/content-demos-folder-structure.txt](snippets/content-demos-folder-structure.txt) for the example.
 
 **conf.toml template:**
@@ -87,8 +87,8 @@ understand what game problem this solves?" If NO, rewrite it as a scenario.
 
 - [snippets/content-examples-file-structure.txt](snippets/content-examples-file-structure.txt) — content/examples/ File Structure
 - [examples/content-examples-file-structure-2.lua](examples/content-examples-file-structure-2.lua) — content/examples/ File Structure
-- [snippets/content-demos-folder-structure.txt](snippets/content-demos-folder-structure.txt) — content/demos/ Folder Structure
-- [examples/content-demos-folder-structure-2.lua](examples/content-demos-folder-structure-2.lua) — content/demos/ Folder Structure
+- [snippets/content-demos-folder-structure.txt](snippets/content-demos-folder-structure.txt) — content/games/ Folder Structure
+- [examples/content-demos-folder-structure-2.lua](examples/content-demos-folder-structure-2.lua) — content/games/ Folder Structure
 - [examples/the-scenario-pattern-always-write-this.lua](examples/the-scenario-pattern-always-write-this.lua) — The scenario pattern — ALWAYS write this way
 - [examples/forbidden-patterns-never-write-these.lua](examples/forbidden-patterns-never-write-these.lua) — FORBIDDEN patterns — never write these
 - [snippets/examples-and-api-documentation.ps1](snippets/examples-and-api-documentation.ps1) — Examples and API Documentation

@@ -54,7 +54,7 @@ The user specifies targets as module names, group shortcuts, or `all`:
 | `platform-services` | `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect` |
 | `feature-systems` | `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` |
 | `edge` | `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin` |
-| `lunasome` | Lua libraries in `content/library/` — different audit checks apply |
+| `lunasome` | Lua libraries in `library/` — different audit checks apply |
 | `all` | All `src/` modules |
 
 All modules should be assigned to one of the five groups. Check `docs/architecture/engine-architecture.md` for the canonical group assignment.

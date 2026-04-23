@@ -1,4 +1,4 @@
----
+﻿---
 name: Tester
 description: "Write and maintain Lurek2D tests across Rust integration, Rust unit, Lua BDD, evidence, and golden layers; enforces the Lua-first testing rule."
 tools: [vscode, execute, read, agent, browser, edit, search, web, todo]
@@ -12,7 +12,7 @@ Tester serves the EngDev, GameTest, and EngTest personas by owning the two-layer
 ## Scope
 
 ### Owns
-- `tests/rust/unit/`, `tests/rust/stress/`, `tests/rust/golden/`, `tests/rust/config/`, `tests/rust/security/`, `tests/rust/ext/`.
+- `tests/rust/unit/`, `tests/rust/`, `tests/rust/golden/`, `tests/rust/`, `tests/rust/`, `tests/rust/ext/`.
 - `tests/lua/harness.rs` registration plus `tests/lua/{unit,content/library,integration,stress,security,evidence,golden,content/demos}/`.
 - Enforcement of TST-01..TST-04 (placement, no inline `#[cfg(test)]`, thin wrappers, thin `mod.rs`).
 - Float-comparison helpers and `tests/lua/init.lua` BDD framework.

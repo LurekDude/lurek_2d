@@ -2,6 +2,28 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.22] - 2026-04-25
+
+### fix(cag): repair all 176 broken markdown links in `.github/` CAG layer
+
+- **`.github/skills/*/snippets/extended-notes.md`** — fixed companion-file relative paths: changed
+  `snippets/foo` → `foo` and `examples/foo` → `../examples/foo` and `templates/foo` →
+  `../templates/foo` in 17 extended-notes files; changed `./references/library-integration.md` →
+  `../references/library-integration.md` in `demo-creation`.
+- **Companion stub files created** — added 133 stub companion files under `.github/skills/*/examples/`,
+  `.github/skills/*/snippets/`, and `.github/skills/*/templates/` so all references resolve.
+- **`content/games/README.md`** — created stub README listing genre sub-directories and `lurek2d` run syntax.
+- **`.github/skills/lua-scripting/SKILL.md`** — updated demo links from non-existent `hello_world/`,
+  `physics_demo/`, `sprites/` paths to real games: `action/platformer`, `action/brick_breaker`, `action/bullet_hell`.
+- **`.github/skills/examples-management/snippets/extended-notes.md`** — fixed 9 aliased example file names
+  (`entity.lua→ecs.lua`, `fx.lua→effect.lua`, `localization.lua→i18n.lua`, `modding.lua→mods.lua`,
+  `pathfinding.lua→pathfind.lua`, `graphics.lua→render.lua`, `savegame.lua→save.lua`,
+  `runtime_platform.lua→window.lua`, `gui.lua→ui.lua`).
+- **Various SKILL.md and agent.md files** — updated stale `src/`, `tests/`, `tools/`, `docs/` paths
+  (e.g. `docs/reports/→logs/reports/`, `tools/audit/validate_agent_md.py→tools/validate/cag_validate.py`).
+- **Result**: `python tools/audit/cag_link_check.py --strict` — 0 broken links (was 176). `python
+  tools/validate/cag_validate.py` — 0 errors, 0 warnings.
+
 ## [0.20.21] - 2026-04-25
 
 ### fix(tooling): repair Lua API catalog, namespace map, BOM, and evidence markers

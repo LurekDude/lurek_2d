@@ -1,4 +1,4 @@
----
+﻿---
 name: lua-scripting
 description: "Load this skill when writing or reviewing Lua game scripts for Lurek2D. It owns lurek.* API usage patterns, Lua idioms, game script structure, and example code conventions. Skip it for Rust engine code or API design."
 ---
@@ -30,10 +30,10 @@ description: "Load this skill when writing or reviewing Lua game scripts for Lur
 - Example game organization (directory structure, main.lua)
 
 ### Live Repository Contracts
-- `content/demos/hello_world/main.lua` — minimal game example
-- `content/demos/physics_demo/main.lua` — physics usage example
-- `content/demos/sprites/main.lua` — sprite and texture example
-- `docs/lua-api.md` — API reference for script authors
+- `content/games/action/platformer/main.lua` — minimal game example
+- `content/games/action/brick_breaker/main.lua` — physics usage example
+- `content/games/action/bullet_hell/main.lua` — sprite and texture example
+- `docs/api/lurek.md` — API reference for script authors
 
 ### Decision Rules
 - **Entry point**: Every game has a `main.lua` in its directory
@@ -42,7 +42,7 @@ description: "Load this skill when writing or reviewing Lua game scripts for Lur
 - **Local variables**: Use `local` for all variables — avoid globals except lurek callbacks
 - **Table patterns**: Use tables for game objects: `local player = {x = 100, y = 200, speed = 150}`
 - **Delta time**: Always multiply movement by `dt` for frame-rate independence
-- **Directory layout**: Each game in its own directory: `content/demos/hello_world/main.lua`
+- **Directory layout**: Each game in its own directory: `content/games/action/platformer/main.lua`
 - **No require()**: Lurek2D doesn't support module loading yet — single-file scripts
 - **Comments**: Use `--` for single-line comments, document non-obvious game logic
 

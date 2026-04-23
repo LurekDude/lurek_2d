@@ -24,7 +24,7 @@ Full release readiness check for Lurek2D. Use before tagging a release or mergin
 7. 0 CRITICAL issues, ≤ 3 HIGH issues
 8. Window must open and display without panic
 9. Close manually; verify no stderr errors
-10. `docs/lua-api.md` — every `lurek.*` function in the code has an entry
+10. `docs/api/lurek.md` — every `lurek.*` function in the code has an entry
 11. `README.md` — version badge and feature list current
 12. 0 known vulnerabilities in dependencies
 

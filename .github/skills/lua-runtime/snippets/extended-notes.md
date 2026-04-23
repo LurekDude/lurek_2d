@@ -1,4 +1,4 @@
-> See [examples/gc-pressure-reduction-applies-to-both.lua](examples/gc-pressure-reduction-applies-to-both.lua) for the example.
+﻿> See [../examples/gc-pressure-reduction-applies-to-both.lua](../examples/gc-pressure-reduction-applies-to-both.lua) for the example.
 
 ---
 
@@ -14,14 +14,14 @@
 
 ### Upvalue limit workaround
 
-> See [examples/upvalue-limit-workaround.lua](examples/upvalue-limit-workaround.lua) for the example.
+> See [../examples/upvalue-limit-workaround.lua](../examples/upvalue-limit-workaround.lua) for the example.
 
 ---
 
 ### LuaJIT FFI
 LuaJIT's `ffi` library allows calling C functions directly from Lua without a Rust binding:
 
-> See [examples/luajit-ffi.lua](examples/luajit-ffi.lua) for the example.
+> See [../examples/luajit-ffi.lua](../examples/luajit-ffi.lua) for the example.
 
 **Rules for Lurek2D:**
 - FFI is only available with the `lua-jit` feature
@@ -34,19 +34,19 @@ LuaJIT's `ffi` library allows calling C functions directly from Lua without a Ru
 ### Performance Patterns
 ### Local caching (critical for hot loops)
 
-> See [examples/local-caching-critical-for-hot-loops.lua](examples/local-caching-critical-for-hot-loops.lua) for the example.
+> See [../examples/local-caching-critical-for-hot-loops.lua](../examples/local-caching-critical-for-hot-loops.lua) for the example.
 
 ### Avoid metatables on hot paths
 
 LuaJIT can JIT-compile table indexing but struggles with `__index` metamethods on every access:
 
-> See [examples/avoid-metatables-on-hot-paths.lua](examples/avoid-metatables-on-hot-paths.lua) for the example.
+> See [../examples/avoid-metatables-on-hot-paths.lua](../examples/avoid-metatables-on-hot-paths.lua) for the example.
 
 ### String interning
 
 LuaJIT interns all strings (one copy per unique string). Do NOT mutate strings in hot loops:
 
-> See [examples/string-interning.lua](examples/string-interning.lua) for the example.
+> See [../examples/string-interning.lua](../examples/string-interning.lua) for the example.
 
 ---
 

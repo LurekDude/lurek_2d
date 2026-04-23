@@ -1,4 +1,4 @@
-| Complexity | Lines | Examples |
+﻿| Complexity | Lines | Examples |
 |------------|-------|---------|
 | Minimal | 50–100 | `hello_world` |
 | Simple | 100–160 | `sprites`, `physics_demo` |
@@ -9,10 +9,10 @@ Never exceed 400 lines — if logic grows larger, extract helpers or split into 
 
 ### Step 4 — Library Modules
 
-When the prompt requests `content/library/` modules, see [library-integration](./references/library-integration.md) for full patterns. Quick reference:
+When the prompt requests `library/` modules, see [library-integration](../references/library-integration.md) for full patterns. Quick reference:
 
 **Import pattern** (always at top of file, after header comment):
-> See [examples/step-4-library-modules.lua](examples/step-4-library-modules.lua) for the example.
+> See [../examples/step-4-library-modules.lua](../examples/step-4-library-modules.lua) for the example.
 
 **Only use modules with ✅ Full status** (stub modules are unusable):
 
@@ -25,11 +25,11 @@ When the prompt requests `content/library/` modules, see [library-integration](.
 | `library.battle`, `.stats`, `.economy`, `.crafting`, `.cardgame`, `.combat`, `.quest` | 🔧 Stub | Do NOT use — causes runtime errors |
 
 Call library functions at the top of `lurek.load()` before any `lurek.*` drawing setup:
-> See [examples/step-4-library-modules-2.lua](examples/step-4-library-modules-2.lua) for the example.
+> See [../examples/step-4-library-modules-2.lua](../examples/step-4-library-modules-2.lua) for the example.
 
 ### Step 5 — Write `README.md`
 
-> See [snippets/step-5-write-readme-md.md](snippets/step-5-write-readme-md.md) for the example.
+> See [step-5-write-readme-md.md](step-5-write-readme-md.md) for the example.
 
 ### Controls
 | Key | Action |
@@ -39,20 +39,20 @@ Call library functions at the top of `lurek.load()` before any `lurek.*` drawing
 
 ### Notes
 - <Optional: 2–4 bullets on non-obvious design choices or limitations>
-> See [snippets/notes.txt](snippets/notes.txt) for the example.
+> See [notes.txt](notes.txt) for the example.
 
 Requirements: the release binary must exist (`cargo build --release` or use `--rebuild` flag).
 
 If the binary is fresh:
-> See [snippets/notes-2.ps1](snippets/notes-2.ps1) for the example.
+> See [notes-2.ps1](notes-2.ps1) for the example.
 
-### Step 7 — Register in `content/demos/README.md`
+### Step 7 — Register in `content/games/README.md`
 
 Append to the `## Demo Index` table:
-> See [snippets/step-7-register-in-content-demos.md](snippets/step-7-register-in-content-demos.md) for the example.
+> See [step-7-register-in-content-demos.md](step-7-register-in-content-demos.md) for the example.
 
 Then append a detail block at the end of the per-demo sections:
-> See [snippets/step-7-register-in-content-demos-2.md](snippets/step-7-register-in-content-demos-2.md) for the example.
+> See [step-7-register-in-content-demos-2.md](step-7-register-in-content-demos-2.md) for the example.
 
 ---
 ```
@@ -69,7 +69,7 @@ When generating N > 1 demos from a list of genres:
    ```powershell
    python tools/demos/gen_demo_screenshots.py --demo <n1> --demo <n2> ... --overwrite --frames 3
    ```
-5. Register all demos in `content/demos/README.md` in one edit (alphabetical order)
+5. Register all demos in `content/games/README.md` in one edit (alphabetical order)
 
 ---
 
@@ -87,6 +87,6 @@ Before marking a demo complete:
 - [ ] `main.lua` — no `print()` statements; debug output via `lurek.log.debug()`
 - [ ] `README.md` — 4 required sections present; `What It Demonstrates` matches actual code
 - [ ] `screen.png` — generated and present (non-zero file size)
-- [ ] `content/demos/README.md` — table entry added; detail block added
-- [ ] `cargo run -- content/demos/<name>` — runs without errors or unhandled exceptions
+- [ ] `content/games/README.md` — table entry added; detail block added
+- [ ] `cargo run -- content/games/<name>` — runs without errors or unhandled exceptions
 - [ ] `cargo check` — no type errors introduced

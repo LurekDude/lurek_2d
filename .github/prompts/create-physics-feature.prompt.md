@@ -21,7 +21,7 @@ Add a new physics feature: body type, collision shape, force type, or constraint
 4. Add Lua binding in `src/lua_api/physics_api.rs`
 5. Write physics tests with float tolerance assertions
 6. Run `cargo test` and `cargo clippy`
-7. Consult the actual `lurek.*` API surface via [docs/lua-api.md](docs/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
+7. Consult the actual `lurek.*` API surface via [docs/api/lurek.md](docs/api/lurek.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 
 ## Success Criteria
 

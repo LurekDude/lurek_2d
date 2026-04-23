@@ -1,10 +1,10 @@
-- Use `wgpu::TextureFormat::Rgba8Unorm` for data textures (no gamma correction)
+﻿- Use `wgpu::TextureFormat::Rgba8Unorm` for data textures (no gamma correction)
 - `GpuRenderer::flush_pending_removals()` processes the deferred destruction queue at frame start
 
 ### Canvas (Render-to-Texture)
-> See [examples/canvas-render-to-texture.lua](examples/canvas-render-to-texture.lua) for the example.
+> See [../examples/canvas-render-to-texture.lua](../examples/canvas-render-to-texture.lua) for the example.
 
-> See [snippets/canvas-render-to-texture-2.txt](snippets/canvas-render-to-texture-2.txt) for the example.
+> See [canvas-render-to-texture-2.txt](canvas-render-to-texture-2.txt) for the example.
 
 ### Blend Modes
 Five pre-built wgpu pipelines, cached at startup:
@@ -18,7 +18,7 @@ Five pre-built wgpu pipelines, cached at startup:
 | `screen` | `SCREEN_PIPELINE` | Screen blending, lightening |
 
 ### Transform Stack
-> See [snippets/transform-stack.txt](snippets/transform-stack.txt) for the example.
+> See [transform-stack.txt](transform-stack.txt) for the example.
 
 Transforms apply to all subsequent draw calls until `PopTransform`.
 

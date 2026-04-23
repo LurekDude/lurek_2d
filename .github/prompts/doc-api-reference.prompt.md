@@ -17,7 +17,7 @@ Write or update API reference documentation for lurek.* functions. Use when new 
 1. Load [skill: documentation](.github/skills/documentation/SKILL.md), [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md) before changing any files.
 2. Load skill `documentation/SKILL.md`
 3. For each function to document:
-4. Open `docs/lua-api.md`
+4. Open `docs/api/lurek.md`
 5. Find the correct sub-section (e.g., `## lurek.render`)
 6. Write the entry following this format:
 7. `param` — type, range or valid values
@@ -27,7 +27,7 @@ Write or update API reference documentation for lurek.* functions. Use when new 
 
 ## Success Criteria
 
-- [ ] Updated `docs/lua-api.md` with accurate, complete entries for all specified functions
+- [ ] Updated `docs/api/lurek.md` with accurate, complete entries for all specified functions
 - [ ] No entries for functions that don't exist in `src/lua_api/`
 
 ## Anti-patterns

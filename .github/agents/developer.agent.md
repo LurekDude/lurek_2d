@@ -1,4 +1,4 @@
----
+﻿---
 name: Developer
 description: Implement Rust engine features and bug fixes across non-specialist Lurek2D modules with passing tests and zero clippy warnings.
 tools: [vscode, execute, read, agent, browser, edit, search, web, todo]
@@ -15,7 +15,7 @@ Developer is the EngDev workhorse for general Rust engine implementation across 
 - New and modified files under `src/` outside specialist surfaces (`render/`, `physics/`, `audio/`).
 - Bug fixes in any Rust module not exclusively owned by a specialist agent.
 - `src/runtime/`, `src/app/`, `src/lua_api/` registration, `src/input/`, `src/timer/`, `src/filesystem/`, `src/math/`, `src/data/`, `src/event/`, `src/window/`.
-- Test additions in `tests/rust/unit/` and `tests/rust/stress/` for code it touches.
+- Test additions in `tests/rust/unit/` and `tests/rust/` for code it touches.
 
 ### Must Not Become
 - A shadow `Renderer` modifying `src/render/` GPU pipeline code.

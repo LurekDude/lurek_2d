@@ -33,7 +33,7 @@ Design a new lurek.* Lua API surface. Use when adding a new function or module t
 - [ ] Finalized function signature with parameter types and defaults
 - [ ] Lua usage example (3–10 lines)
 - [ ] Description of required Rust changes (what `RenderCommand` variant or state field)
-- [ ] Updated `docs/lua-api.md` entry
+- [ ] Updated `docs/api/lurek.md` entry
 
 ## Anti-patterns
 

@@ -1,4 +1,4 @@
-The overlay shows per-frame draw call count — the primary signal for render performance.
+﻿The overlay shows per-frame draw call count — the primary signal for render performance.
 
 ---
 
@@ -6,12 +6,12 @@ The overlay shows per-frame draw call count — the primary signal for render pe
 | Hot Path | Location | Bottleneck |
 |----------|----------|------------|
 | RenderCommand processing | `src/render/gpu_renderer.rs` | Draw call count, state changes |
-| Sprite batch flush | `src/render/sprite_batch.rs` | Vertex buffer upload size |
+| Sprite batch flush | `src/render/draw_layer.rs` | Vertex buffer upload size |
 | Physics world step | `src/physics/world.rs` | Body + collider count |
 | Lua `lurek.update()` | `src/app/app.rs` | Lua computation + GC |
 | Particle system update | `src/particle/mod.rs` | Active particle count |
 | Font glyph rasterization | `src/render/font.rs` | First-time cache miss only |
-| Texture decompression | `src/render/texture.rs` | Load time, not per-frame |
+| Texture decompression | `src/image/mod.rs` | Load time, not per-frame |
 
 ---
 
@@ -22,7 +22,7 @@ Draw call count is the primary render budget variable on integrated GPUs.
 
 ### SpriteBatch (most important)
 
-> See [examples/spritebatch-most-important.lua](examples/spritebatch-most-important.lua) for the example.
+> See [../examples/spritebatch-most-important.lua](../examples/spritebatch-most-important.lua) for the example.
 
 ### Texture atlas
 
@@ -35,11 +35,11 @@ The LuaJIT GC runs incrementally. Excessive allocation causes visible micro-stal
 
 **Detect GC pressure:**
 
-> See [examples/lua-gc-pressure-reduction.lua](examples/lua-gc-pressure-reduction.lua) for the example.
+> See [../examples/lua-gc-pressure-reduction.lua](../examples/lua-gc-pressure-reduction.lua) for the example.
 
 **Patterns:**
 
-> See [examples/lua-gc-pressure-reduction-2.lua](examples/lua-gc-pressure-reduction-2.lua) for the example.
+> See [../examples/lua-gc-pressure-reduction-2.lua](../examples/lua-gc-pressure-reduction-2.lua) for the example.
 
 ---
 

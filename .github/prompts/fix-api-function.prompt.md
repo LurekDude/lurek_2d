@@ -20,9 +20,9 @@ Fix a broken `lurek.*` API function.
 3. Read the underlying engine code
 4. Identify the discrepancy
 5. Fix the binding or engine code
-6. Update `docs/lua-api.md` if signature changed
+6. Update `docs/api/lurek.md` if signature changed
 7. Verify with test
-8. Consult the actual `lurek.*` API surface via [docs/lua-api.md](docs/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
+8. Consult the actual `lurek.*` API surface via [docs/api/lurek.md](docs/api/lurek.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 
 ## Success Criteria
 

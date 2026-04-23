@@ -1,14 +1,14 @@
-> See [snippets/3-section-separators.txt](snippets/3-section-separators.txt) for the example.
+﻿> See [3-section-separators.txt](3-section-separators.txt) for the example.
 
 Standard labels: `LuaFoo UserData`, `Register`.
 
 ### 4. UserData Struct
 
-> See [examples/4-userdata-struct.rs](examples/4-userdata-struct.rs) for the example.
+> See [../examples/4-userdata-struct.rs](../examples/4-userdata-struct.rs) for the example.
 
 ### 5. `impl LuaUserData` Block
 
-> See [examples/5-impl-luauserdata-block.rs](examples/5-impl-luauserdata-block.rs) for the example.
+> See [../examples/5-impl-luauserdata-block.rs](../examples/5-impl-luauserdata-block.rs) for the example.
 
 #### `add_method` vs `add_method_mut`
 
@@ -24,11 +24,11 @@ Standard labels: `LuaFoo UserData`, `Register`.
 
 When a method accepts a Lua function to call later, store it in the registry:
 
-> See [examples/callback-storage-pattern-luaregistrykey.rs](examples/callback-storage-pattern-luaregistrykey.rs) for the example.
+> See [../examples/callback-storage-pattern-luaregistrykey.rs](../examples/callback-storage-pattern-luaregistrykey.rs) for the example.
 
 To call the callback later (single domain call per closure — call a domain method that accepts a `LuaFunction`):
 
-> See [examples/callback-storage-pattern-luaregistrykey-2.rs](examples/callback-storage-pattern-luaregistrykey-2.rs) for the example.
+> See [../examples/callback-storage-pattern-luaregistrykey-2.rs](../examples/callback-storage-pattern-luaregistrykey-2.rs) for the example.
 
 **Exception to the one-domain-call rule**: An `if let Some(key) = &this.callback_key` guard
 around a single domain call is acceptable — the guard is infrastructure, not business logic.
@@ -38,22 +38,22 @@ Clean up: `lua.remove_registry_value(key)?` in a `cancel`/`destroy` method.
 
 #### Method section header (8-space indent)
 
-> See [examples/method-section-header-8-space-indent.rs](examples/method-section-header-8-space-indent.rs) for the example.
+> See [../examples/method-section-header-8-space-indent.rs](../examples/method-section-header-8-space-indent.rs) for the example.
 
 #### Docstring
 
-> See [examples/docstring.rs](examples/docstring.rs) for the example.
+> See [../examples/docstring.rs](../examples/docstring.rs) for the example.
 
 - `@param` before `@return`. Always.
 - No blank line between last docstring line and `methods.add_method(`.
 - Docstring above the call site, never inside the closure.
 - Multi-line form: docstring is ABOVE `methods.add_method(`:
 
-> See [examples/docstring-2.rs](examples/docstring-2.rs) for the example.
+> See [../examples/docstring-2.rs](../examples/docstring-2.rs) for the example.
 
 ### 6. Register Section
 
-> See [examples/6-register-section.rs](examples/6-register-section.rs) for the example.
+> See [../examples/6-register-section.rs](../examples/6-register-section.rs) for the example.
 
 - Signature is FIXED: `(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`
 - Table variable is ALWAYS named `tbl`.
@@ -63,7 +63,7 @@ Clean up: `lua.remove_registry_value(key)?` in a `cancel`/`destroy` method.
 
 Standard pattern with state:
 
-> See [examples/7-function-entry-pattern-4-space.rs](examples/7-function-entry-pattern-4-space.rs) for the example.
+> See [../examples/7-function-entry-pattern-4-space.rs](../examples/7-function-entry-pattern-4-space.rs) for the example.
 
 - `let s = state.clone();` comes AFTER docstring, BEFORE `tbl.set(`.
 - Section header at 4-space indent.
@@ -73,11 +73,11 @@ Standard pattern with state:
 ### Docstring Contract
 ### @param syntax
 
-> See [examples/param-syntax.rs](examples/param-syntax.rs) for the example.
+> See [../examples/param-syntax.rs](../examples/param-syntax.rs) for the example.
 
 ### @return syntax
 
-> See [examples/return-syntax.rs](examples/return-syntax.rs) for the example.
+> See [../examples/return-syntax.rs](../examples/return-syntax.rs) for the example.
 
 - `nil` for functions that return nothing.
 - Must be the last docstring line before the code.
@@ -138,10 +138,10 @@ A lua_api file is a **BRIDGE ONLY**. Every closure body contains exactly **one d
 When you find business logic in a closure, move it to the domain like this:
 
 **Before (anti-pattern):**
-> See [examples/business-logic-migration-pattern.rs](examples/business-logic-migration-pattern.rs) for the example.
+> See [../examples/business-logic-migration-pattern.rs](../examples/business-logic-migration-pattern.rs) for the example.
 
 **After (correct):**
-> See [examples/business-logic-migration-pattern-2.rs](examples/business-logic-migration-pattern-2.rs) for the example.
+> See [../examples/business-logic-migration-pattern-2.rs](../examples/business-logic-migration-pattern-2.rs) for the example.
 
 Add `pub fn tick(&mut self, dt: f32)` to the `Clock` struct in `src/timer/clock.rs`.
 
@@ -160,7 +160,7 @@ If the domain module lacks a needed method, **add `pub fn` to domain first, then
 ---
 
 ### Validation
-> See [snippets/validation.ps1](snippets/validation.ps1) for the example.
+> See [validation.ps1](validation.ps1) for the example.
 
 Exit code `0` = pass. Exit code `1` = errors.
 

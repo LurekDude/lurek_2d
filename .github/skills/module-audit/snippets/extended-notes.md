@@ -1,12 +1,12 @@
-> See [snippets/s-01-lib-rs-registration.txt](snippets/s-01-lib-rs-registration.txt) for the example.
+﻿> See [s-01-lib-rs-registration.txt](s-01-lib-rs-registration.txt) for the example.
 
 ### S-02: mod.rs Simplicity
 
-> See [snippets/s-02-mod-rs-simplicity.txt](snippets/s-02-mod-rs-simplicity.txt) for the example.
+> See [s-02-mod-rs-simplicity.txt](s-02-mod-rs-simplicity.txt) for the example.
 
 ### S-03: File Size Limits
 
-> See [snippets/s-03-file-size-limits.txt](snippets/s-03-file-size-limits.txt) for the example.
+> See [s-03-file-size-limits.txt](s-03-file-size-limits.txt) for the example.
 
 ### S-04–S-06: Structural Checks
 
@@ -14,19 +14,19 @@ Run manually by reviewing file names, checking if pure-Lua alternative exists, a
 
 ### D-01–D-05: Docstring Checks
 
-> See [snippets/d-01-d-05-docstring-checks.txt](snippets/d-01-d-05-docstring-checks.txt) for the example.
+> See [d-01-d-05-docstring-checks.txt](d-01-d-05-docstring-checks.txt) for the example.
 
 ### T-01–T-07: Test Coverage
 
-> See [snippets/t-01-t-07-test-coverage.txt](snippets/t-01-t-07-test-coverage.txt) for the example.
+> See [t-01-t-07-test-coverage.txt](t-01-t-07-test-coverage.txt) for the example.
 
 ### R-01–R-05: Architecture Compliance
 
-> See [snippets/r-01-r-05-architecture-compliance.txt](snippets/r-01-r-05-architecture-compliance.txt) for the example.
+> See [r-01-r-05-architecture-compliance.txt](r-01-r-05-architecture-compliance.txt) for the example.
 
 ### Q-01–Q-06: Code Quality
 
-> See [snippets/q-01-q-06-code-quality.txt](snippets/q-01-q-06-code-quality.txt) for the example.
+> See [q-01-q-06-code-quality.txt](q-01-q-06-code-quality.txt) for the example.
 
 ### Python Validation Tool
 The audit runner automates checks across 12 phases using a single-pass file analyzer
@@ -34,14 +34,14 @@ The audit runner automates checks across 12 phases using a single-pass file anal
 per-module Markdown report to `logs/quality/<module>.md`** — nothing large ever
 goes to stdout, so the VS Code pipe never blocks.
 
-> See [snippets/python-validation-tool.ps1](snippets/python-validation-tool.ps1) for the example.
+> See [python-validation-tool.ps1](python-validation-tool.ps1) for the example.
 
 Exit code: 0 = all PASS, 1 = any FAIL, 2 = argument error.
 Run time: ~0.12 s per module, under 5 s for all 46 modules.
 
 ### What every report contains (`logs/quality/<module>.md`)
 
-> See [snippets/what-every-report-contains-docs-quality.txt](snippets/what-every-report-contains-docs-quality.txt) for the example.
+> See [what-every-report-contains-docs-quality.txt](what-every-report-contains-docs-quality.txt) for the example.
 
 Automated checks: S-01..S-04, A-01..A-07, A-04b, SP-01..SP-06, D-01..D-09,
 B-01..B-06, R-01..R-03, T-01..T-05, W-01..W-02, W-04..W-05, Q-01, Q-03..Q-04,
@@ -52,7 +52,7 @@ When an agent needs to fix module quality issues, follow this loop:
 
 ### Step 1 — Generate reports
 
-> See [snippets/step-1-generate-reports.ps1](snippets/step-1-generate-reports.ps1) for the example.
+> See [step-1-generate-reports.ps1](step-1-generate-reports.ps1) for the example.
 
 ### Step 2 — Read the report
 
@@ -115,20 +115,20 @@ Add `// ── funcName ──────────────────�
 
 ### Step 4 — Re-run and verify
 
-> See [snippets/step-4-re-run-and-verify.ps1](snippets/step-4-re-run-and-verify.ps1) for the example.
+> See [step-4-re-run-and-verify.ps1](step-4-re-run-and-verify.ps1) for the example.
 
 ### Batch fix strategy
 
 For multiple modules, read all reports first to identify patterns, then fix the
 most common error type across all modules before re-running batch mode:
 
-> See [snippets/batch-fix-strategy.ps1](snippets/batch-fix-strategy.ps1) for the example.
+> See [batch-fix-strategy.ps1](batch-fix-strategy.ps1) for the example.
 
 ### Report Template
 The `--docs-quality` flag writes a Markdown report to `logs/quality/<module>.md`.
 The `stdout` report format (without `--docs-quality`) shows:
 
-> See [snippets/report-template.txt](snippets/report-template.txt) for the example.
+> See [report-template.txt](report-template.txt) for the example.
 
 ### Batch Mode
 When auditing multiple modules with `--all`, the tool:
@@ -136,7 +136,7 @@ When auditing multiple modules with `--all`, the tool:
 2. Writes `logs/quality/<module>.md` for each module (if `--docs-quality` flag set)
 3. Prints a batch summary to stdout:
 
-> See [snippets/batch-mode.txt](snippets/batch-mode.txt) for the example.
+> See [batch-mode.txt](batch-mode.txt) for the example.
 
 Use `Get-ChildItem logs/quality/` to verify all reports were written.
 

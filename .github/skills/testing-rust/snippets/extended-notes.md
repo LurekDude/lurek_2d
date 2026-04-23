@@ -1,4 +1,4 @@
-**Float rule:** `assert!((actual - expected).abs() < 1e-5)` — NEVER `assert_eq!` on `f32`/`f64`.
+﻿**Float rule:** `assert!((actual - expected).abs() < 1e-5)` — NEVER `assert_eq!` on `f32`/`f64`.
 
 **Boundary conditions required:**
 - Zero values
@@ -14,23 +14,23 @@
 
 **Unit test** — tests one `lurek.*` module in isolation:
 
-> See [examples/3-1-create-the-lua-file.lua](examples/3-1-create-the-lua-file.lua) for the example.
+> See [../examples/3-1-create-the-lua-file.lua](../examples/3-1-create-the-lua-file.lua) for the example.
 
 **Integration test** — crosses two modules (`tests/lua/integration/test_<a>_<b>.lua`):
-> See [examples/3-1-create-the-lua-file-2.lua](examples/3-1-create-the-lua-file-2.lua) for the example.
+> See [../examples/3-1-create-the-lua-file-2.lua](../examples/3-1-create-the-lua-file-2.lua) for the example.
 
 **Stress test** (`tests/lua/stress/test_<name>_stress.lua`):
-> See [examples/3-1-create-the-lua-file-3.lua](examples/3-1-create-the-lua-file-3.lua) for the example.
+> See [../examples/3-1-create-the-lua-file-3.lua](../examples/3-1-create-the-lua-file-3.lua) for the example.
 
 **Validation test** (`tests/lua/validation/test_<name>.lua`):
-> See [examples/3-1-create-the-lua-file-4.lua](examples/3-1-create-the-lua-file-4.lua) for the example.
+> See [../examples/3-1-create-the-lua-file-4.lua](../examples/3-1-create-the-lua-file-4.lua) for the example.
 
 ### 3.2 Harness Registration
 
 Lua test files are **not** auto-discovered in this repository. After creating a new `.lua` file, add the matching `#[test]` entry to `tests/lua/harness.rs`.
 
 Required pattern:
-> See [examples/3-2-harness-registration.rs](examples/3-2-harness-registration.rs) for the example.
+> See [../examples/3-2-harness-registration.rs](../examples/3-2-harness-registration.rs) for the example.
 
 ---
 
@@ -38,7 +38,7 @@ Required pattern:
 The framework is provided by `tests/lua/init.lua` and loaded automatically. Do not require/import it.
 
 ### Test structure
-> See [examples/test-structure.lua](examples/test-structure.lua) for the example.
+> See [../examples/test-structure.lua](../examples/test-structure.lua) for the example.
 
 - `describe(name, fn)` — defines a test suite; errors in setup are caught and reported
 - `it(name, fn)` — defines one test case; failure is recorded but execution continues
@@ -85,7 +85,7 @@ The framework is provided by `tests/lua/init.lua` and loaded automatically. Do n
 
 ### Performance and Golden helpers
 
-> See [examples/performance-and-golden-helpers.lua](examples/performance-and-golden-helpers.lua) for the example.
+> See [../examples/performance-and-golden-helpers.lua](../examples/performance-and-golden-helpers.lua) for the example.
 
 ---
 
@@ -110,7 +110,7 @@ The framework is provided by `tests/lua/init.lua` and loaded automatically. Do n
 ### 6. Test VM Helpers (Rust Side)
 Both helpers are defined in `tests/lua/harness.rs` and reused across all Lua-dispatching test suites.
 
-> See [examples/6-test-vm-helpers-rust-side.rs](examples/6-test-vm-helpers-rust-side.rs) for the example.
+> See [../examples/6-test-vm-helpers-rust-side.rs](../examples/6-test-vm-helpers-rust-side.rs) for the example.
 
 For Rust-only integration tests that need a Lua VM call a variant from the appropriate test file's own helpers (e.g., `make_audio_vm()` in `audio_tests.rs`).
 
@@ -118,13 +118,13 @@ For Rust-only integration tests that need a Lua VM call a variant from the appro
 
 ### 7. Coverage and Quality Tools
 ### Running quality gates
-> See [snippets/running-quality-gates.ps1](snippets/running-quality-gates.ps1) for the example.
+> See [running-quality-gates.ps1](running-quality-gates.ps1) for the example.
 
 ### Analytics tools
-> See [snippets/analytics-tools.ps1](snippets/analytics-tools.ps1) for the example.
+> See [analytics-tools.ps1](analytics-tools.ps1) for the example.
 
 ### Adding missing docs
-> See [snippets/adding-missing-docs.ps1](snippets/adding-missing-docs.ps1) for the example.
+> See [adding-missing-docs.ps1](adding-missing-docs.ps1) for the example.
 
 ### What "covered" means
 - **Rust module covered**: `tests/<module>_tests.rs` exists AND has ≥1 `#[test]` for every `pub fn`
@@ -149,18 +149,18 @@ Categories now focus on renderer/internal artifacts, for example `image/` and `r
 3. Run once to confirm match: `cargo test --test golden_tests`
 
 **To update a baseline** (when intentional output change):
-> See [snippets/rust-golden-tests-byte-level.ps1](snippets/rust-golden-tests-byte-level.ps1) for the example.
+> See [rust-golden-tests-byte-level.ps1](rust-golden-tests-byte-level.ps1) for the example.
 
 ### Lua golden tests (compare-only files)
 
-Lua golden tests compare an evidence file against a committed sample under `tests/lua/golden/samples/`. They do **not** create content inline.
+Lua golden tests compare an evidence file against a committed sample under `tests/lua/golden/`. They do **not** create content inline.
 
-> See [examples/lua-golden-tests-compare-only-files.lua](examples/lua-golden-tests-compare-only-files.lua) for the example.
+> See [../examples/lua-golden-tests-compare-only-files.lua](../examples/lua-golden-tests-compare-only-files.lua) for the example.
 
 **Rules for Lua golden tests:**
 - Golden files compare only; they must not call `lurek.*`, `savePNG`, `saveWAV`, or write files.
 - The evidence artifact must already exist from an evidence test.
-- Samples live in `tests/lua/golden/samples/<module>/` or `tests/lua/golden/samples/migrated_rust/`.
+- Samples live in `tests/lua/golden/<module>/` or `tests/lua/golden/`.
 - All Lua golden test files live in `tests/lua/golden/test_<module>_golden.lua`.
 - Use `expect_golden_text_match()` or `expect_golden_file_match()` from `tests/lua/init.lua`.
 
@@ -171,7 +171,7 @@ Lua test files declare which API functions they verify using `-- @covers` marker
 
 ### Syntax
 
-> See [examples/syntax.lua](examples/syntax.lua) for the example.
+> See [../examples/syntax.lua](../examples/syntax.lua) for the example.
 
 **Placement rules:**
 - One `-- @covers` line per API function
@@ -184,10 +184,10 @@ Lua test files declare which API functions they verify using `-- @covers` marker
 
 Name every `describe()` block after the exact API function it tests. The scanner extracts these as secondary coverage Evidence:
 
-> See [examples/syntax-2.lua](examples/syntax-2.lua) for the example.
+> See [../examples/syntax-2.lua](../examples/syntax-2.lua) for the example.
 
 **Running the scanner:**
-> See [snippets/syntax-3.ps1](snippets/syntax-3.ps1) for the example.
+> See [syntax-3.ps1](syntax-3.ps1) for the example.
 
 ---
 
@@ -198,19 +198,19 @@ Some API functions can only be proven correct through observable side effects. E
 
 Query engine state after API calls. Works in the headless test VM without GPU or audio.
 
-> See [examples/tier-1-headless-state-readback-preferred.lua](examples/tier-1-headless-state-readback-preferred.lua) for the example.
+> See [../examples/tier-1-headless-state-readback-preferred.lua](../examples/tier-1-headless-state-readback-preferred.lua) for the example.
 
 ### Tier 2 — Canvas Pixel Readback (headless GPU simulation)
 
 Draw to a Canvas and read pixels back. Proves rendering functions produce output.
 
-> See [examples/tier-2-canvas-pixel-readback-headless.lua](examples/tier-2-canvas-pixel-readback-headless.lua) for the example.
+> See [../examples/tier-2-canvas-pixel-readback-headless.lua](../examples/tier-2-canvas-pixel-readback-headless.lua) for the example.
 
 ### Tier 3 — Runtime Smoke Tests (GPU required)
 
 Full rendering pipeline with screenshot. Lives in `tests/rust/ext/` only — not callable from headless Lua tests.
 
-> See [examples/tier-3-runtime-smoke-tests-gpu.rs](examples/tier-3-runtime-smoke-tests-gpu.rs) for the example.
+> See [../examples/tier-3-runtime-smoke-tests-gpu.rs](../examples/tier-3-runtime-smoke-tests-gpu.rs) for the example.
 
 ### Evidence Tags in Test Files
 
@@ -227,7 +227,7 @@ Full rendering pipeline with screenshot. Lives in `tests/rust/ext/` only — not
 Every `it()` block in an `evidence/` file **MUST** satisfy all of the following:
 
 1. **Produce at least one artifact.** Call `expect_evidence_created(path)` after writing the file. An `it()` that only calls `pending()` is a **contract violation** — the harness will count the test as failed.
-2. **Use `evidence_output_dir("module")` for all paths.** Never hard-code `tests/output/module/`. Always call `ensure_evidence_dir("module")` in `before_each`.
+2. **Use `evidence_output_dir("module")` for all paths.** Never hard-code `tests/output/`. Always call `ensure_evidence_dir("module")` in `before_each`.
 3. **GPU-limited operations use `xit()` + a text artifact.** If an operation requires a live GPU context (canvas rendering, texture readback), mark the GPU rendering test as `xit()` (with `-- @evidence skip` and a comment explaining why). Still provide at least one headless test in the same file that writes a text/JSON artifact (e.g. API surface manifest via `io.open`).
 4. **Placeholder evidence files are banned.** A file whose only content is `pending(...)` has no artifacts and must be replaced with a real implementation before merge. This applies to every `evidence/` layer file for every module.
 
@@ -268,7 +268,7 @@ When writing Lua tests, annotate which API functions are covered using `-- @cove
 
 ### Syntax
 
-> See [examples/syntax-4.lua](examples/syntax-4.lua) for the example.
+> See [../examples/syntax-4.lua](../examples/syntax-4.lua) for the example.
 
 ### Rules
 
@@ -281,7 +281,7 @@ When writing Lua tests, annotate which API functions are covered using `-- @cove
 
 ### Coverage Scanner
 
-> See [snippets/coverage-scanner.ps1](snippets/coverage-scanner.ps1) for the example.
+> See [coverage-scanner.ps1](coverage-scanner.ps1) for the example.
 
 ---
 
@@ -290,16 +290,16 @@ Some API functions cannot be verified by return values alone. Use these patterns
 
 ### Canvas Pixel Readback (Headless)
 
-> See [examples/canvas-pixel-readback-headless.lua](examples/canvas-pixel-readback-headless.lua) for the example.
+> See [../examples/canvas-pixel-readback-headless.lua](../examples/canvas-pixel-readback-headless.lua) for the example.
 
 ### File Evidence
 
-> See [examples/file-evidence.lua](examples/file-evidence.lua) for the example.
+> See [../examples/file-evidence.lua](../examples/file-evidence.lua) for the example.
 
 ### Runtime Smoke Tests (GPU Required)
 
 For tests requiring actual GPU rendering, use `tests/rust/ext/` with the smoke test infrastructure:
-> See [examples/runtime-smoke-tests-gpu-required.rs](examples/runtime-smoke-tests-gpu-required.rs) for the example.
+> See [../examples/runtime-smoke-tests-gpu-required.rs](../examples/runtime-smoke-tests-gpu-required.rs) for the example.
 
 ---
 
@@ -308,7 +308,7 @@ For tests requiring actual GPU rendering, use `tests/rust/ext/` with the smoke t
 
 Write golden tests in `tests/lua/golden/` for deterministic operations:
 
-> See [examples/lua-golden-tests.lua](examples/lua-golden-tests.lua) for the example.
+> See [../examples/lua-golden-tests.lua](../examples/lua-golden-tests.lua) for the example.
 
 ### Key Rules
 
@@ -323,7 +323,7 @@ Write golden tests in `tests/lua/golden/` for deterministic operations:
 
 All stress tests should print `[PERF]` lines for parseable performance data:
 
-> See [examples/stress-test-output-format.lua](examples/stress-test-output-format.lua) for the example.
+> See [../examples/stress-test-output-format.lua](../examples/stress-test-output-format.lua) for the example.
 
 ---
 
@@ -332,11 +332,11 @@ Name every `describe()` block that targets a specific API function after that fu
 
 ### Recognized Patterns
 
-> See [examples/recognized-patterns.lua](examples/recognized-patterns.lua) for the example.
+> See [../examples/recognized-patterns.lua](../examples/recognized-patterns.lua) for the example.
 
 ### Example: Well-Named Describe Blocks
 
-> See [examples/example-well-named-describe-blocks.lua](examples/example-well-named-describe-blocks.lua) for the example.
+> See [../examples/example-well-named-describe-blocks.lua](../examples/example-well-named-describe-blocks.lua) for the example.
 
 ### Coverage Score Per Method (0–4)
 
@@ -393,7 +393,7 @@ Evidence test files (`tests/lua/evidence/`) prove that side-effect-producing API
 - Each evidence test writes to `tests/lua/evidence/output/<module>/` and the directory must exist before the test runs (create it at the top of the file or in a setup block).- **MUST use the module's `lurek.*` API** — The output content MUST be produced by calling the `lurek.*` module under test. An evidence test that draws shapes manually using only `setPixel` / `fill` / `drawRect` without exercising any meaningful domain module API is **invalid** and must be rewritten or deleted.
 - **Litmus test (read before writing any evidence test):** "If the module's Lua API was removed, would the output PNG/file look different?" If NO — the test is invalid. It only tests `newImageData`, not the module.
 - **Four mandatory steps:** (1) CREATE — instantiate the module object via `lurek.*` API; (2) CONFIGURE — call API methods to set module state; (3) EXECUTE — run the module to produce output (update loop, findPath, etc.); (4) DUMP — save what the module produced to a file. Steps 1–3 must touch the module being evidenced.
-> See [examples/evidence-tests-file-output-required.lua](examples/evidence-tests-file-output-required.lua) for the example.
+> See [../examples/evidence-tests-file-output-required.lua](../examples/evidence-tests-file-output-required.lua) for the example.
 
 ### Golden Tests — Compare Only
 
@@ -404,17 +404,17 @@ Golden test files (`tests/lua/golden/`) verify that deterministic evidence outpu
 - **Never call `lurek.*` module API to produce new output** in a golden test — that belongs in the evidence test.
 - **Never write new files** in a golden test — evidence tests do the writing; golden tests only compare.
 - Every `it()` block in a golden test must call a comparison helper (`expect_files_equal`, `expect_png_near`, `expect_text_equal`, etc.) and nothing else.
-- Reference sample files live in `tests/lua/golden/samples/<module>/` — committed once, never changed except to intentionally update a baseline.
+- Reference sample files live in `tests/lua/golden/<module>/` — committed once, never changed except to intentionally update a baseline.
 - **If a golden test contains content-creation code, move it** to the corresponding evidence test immediately.
 
 Golden tests fail when output diverges from the baseline. They do NOT produce output themselves.
 
-> See [examples/golden-tests-compare-only.lua](examples/golden-tests-compare-only.lua) for the example.
+> See [../examples/golden-tests-compare-only.lua](../examples/golden-tests-compare-only.lua) for the example.
 
 ### `@covers` Markers — Required
 
 Every Lua test file must declare its coverage at the top of the file using `-- @covers` markers:
 
-> See [examples/covers-markers-required.lua](examples/covers-markers-required.lua) for the example.
+> See [../examples/covers-markers-required.lua](../examples/covers-markers-required.lua) for the example.
 
 These markers are consumed by `tools/audit/lua_api_test_coverage.py` and are mandatory for accurate coverage reporting.

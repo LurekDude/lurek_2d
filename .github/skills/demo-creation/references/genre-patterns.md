@@ -65,7 +65,7 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 
 ### Dialog / Visual Novel
 - Always use `library.dialog` — **do not reimplement** the sequencer
-- Dialog assets (portraits, backgrounds) go in `content/demos/<name>/assets/`
+- Dialog assets (portraits, backgrounds) go in `content/games/<name>/assets/`
 - Text rendering uses `lurek.render.print()` inside a letterbox at bottom 25% of screen
 - Keyboard `space`/`enter` advance; `up`/`down` select choice
 
@@ -96,7 +96,7 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 
 For the full API surface run:
 ```powershell
-cat docs/lua-api.md
+cat docs/api/lurek.md
 ```
 
-Or check `docs/lua-api.md` (regenerate with `python tools/gen_all_docs.py` if stale).
+Or check `docs/api/lurek.md` (regenerate with `python tools/gen_all_docs.py` if stale).

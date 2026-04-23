@@ -1,22 +1,22 @@
-| `item_picked` | item, location | Loot spawn placement |
+﻿| `item_picked` | item, location | Loot spawn placement |
 | `shop_purchase` | item, gold_spent | Economy balance |
 | `ability_used` | ability, context | Ability utility |
 | `boss_attempt` | boss, attempt_num | Boss difficulty calibration |
 
 ### Record for performance analysis
 
-> See [examples/record-for-performance-analysis.lua](examples/record-for-performance-analysis.lua) for the example.
+> See [../examples/record-for-performance-analysis.lua](../examples/record-for-performance-analysis.lua) for the example.
 
 ---
 
 ### Offline Analysis Workflow
 ### Death heatmap (Python)
 
-> See [examples/death-heatmap-python.py](examples/death-heatmap-python.py) for the example.
+> See [../examples/death-heatmap-python.py](../examples/death-heatmap-python.py) for the example.
 
 ### Level completion funnel (PowerShell)
 
-> See [snippets/level-completion-funnel-powershell.ps1](snippets/level-completion-funnel-powershell.ps1) for the example.
+> See [level-completion-funnel-powershell.ps1](level-completion-funnel-powershell.ps1) for the example.
 
 ---
 

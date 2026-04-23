@@ -1,6 +1,6 @@
 # Library Module Integration
 
-How to use `content/library/` Lunasome modules inside `content/demos/`.
+How to use `library/` Lunasome modules inside `content/games/`.
 
 ---
 
@@ -30,10 +30,10 @@ Place `require()` calls at the **top of `main.lua`**, immediately after the head
 and before any other code:
 
 ```lua
--- content/demos/loot_rpg_demo/main.lua
+-- content/games/loot_rpg_demo/main.lua
 -- Loot RPG Demo — item drops, inventory management, stat display
 -- Controls: Arrow keys to move, Space to pick up
--- Run with: cargo run -- content/demos/loot_rpg_demo
+-- Run with: cargo run -- content/games/loot_rpg_demo
 
 local item      = require("library.item")
 local inventory = require("library.inventory")
@@ -44,7 +44,7 @@ local drops  = {}
 ```
 
 Engine search paths are configured so `require("library.X")` resolves to
-`content/library/X.lua` relative to the engine binary or game directory.
+`library/X.lua` relative to the engine binary or game directory.
 
 ---
 
@@ -214,7 +214,7 @@ end
 
 ## Adding a New `require` Path to `README.md`
 
-When a demo uses a library module, the `content/demos/README.md` key APIs column should list it:
+When a demo uses a library module, the `content/games/README.md` key APIs column should list it:
 ```markdown
 | [loot_rpg_demo](#loot_rpg_demo) | Item drops and inventory system | `item`, `inventory`, `graphics` |
 ```

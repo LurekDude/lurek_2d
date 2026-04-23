@@ -1,11 +1,11 @@
 ---
-description: "Create one or more new Lurek2D demo projects in content/demos/. Generates conf.toml, main.lua, README.md, and screen.png for each demo. U..."
+description: "Create one or more new Lurek2D demo projects in content/games/. Generates conf.toml, main.lua, README.md, and screen.png for each demo. U..."
 ---
 # Create Demo
 
 ## Goal
 
-Create one or more new Lurek2D demo projects in content/demos/. Generates conf.toml, main.lua, README.md, and screen.png for each demo. U... The prompt finishes when every Success Criteria item below is checked.
+Create one or more new Lurek2D demo projects in content/games/. Generates conf.toml, main.lua, README.md, and screen.png for each demo. U... The prompt finishes when every Success Criteria item below is checked.
 
 ## Inputs
 
@@ -20,16 +20,16 @@ Create one or more new Lurek2D demo projects in content/demos/. Generates conf.t
 3. Load any skill listed in `loads_skills` of this prompt's frontmatter.
 4. Execute the work as the `Developer` agent.
 5. Run the relevant quality gates from the [skill: quality-pipeline](.github/skills/quality-pipeline/SKILL.md) before declaring done.
-6. Consult the actual `lurek.*` API surface via [docs/lua-api.md](docs/lua-api.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
+6. Consult the actual `lurek.*` API surface via [docs/api/lurek.md](docs/api/lurek.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
 
 ## Success Criteria
 
-- [ ] `cargo run -- content/demos/<name>` runs without errors
+- [ ] `cargo run -- content/games/<name>` runs without errors
 - [ ] All 4 callbacks are defined in `main.lua`
 - [ ] `escape` quits via `lurek.event.quit()`
 - [ ] No undeclared globals, no bare `print()` calls
 - [ ] `screen.png` exists and is non-empty
-- [ ] `content/demos/README.md` table row and detail block both added
+- [ ] `content/games/README.md` table row and detail block both added
 - [ ] Only ✅ Full library modules are required (if any)
 - [ ] `cargo check` passes with no new errors
 

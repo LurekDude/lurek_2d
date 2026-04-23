@@ -1,4 +1,4 @@
-| `lurek.physics` | ❌ | Physics world is main-thread only |
+﻿| `lurek.physics` | ❌ | Physics world is main-thread only |
 | `lurek.input` | ❌ | Input state is main-thread only |
 | `lurek.data` | ✅ Full | Compression, hashing, encoding |
 | `lurek.image` | ✅ Full | CPU-side pixel data only |
@@ -9,20 +9,20 @@
 ### Error Handling in Workers
 Errors in the worker VM do **not** propagate to the main thread automatically. Wrap worker code in `pcall` and send errors back via channel:
 
-> See [examples/error-handling-in-workers.lua](examples/error-handling-in-workers.lua) for the example.
+> See [../examples/error-handling-in-workers.lua](../examples/error-handling-in-workers.lua) for the example.
 
-> See [examples/error-handling-in-workers-2.lua](examples/error-handling-in-workers-2.lua) for the example.
+> See [../examples/error-handling-in-workers-2.lua](../examples/error-handling-in-workers-2.lua) for the example.
 
 ---
 
 ### Patterns
 ### Work Queue
 
-> See [examples/work-queue.lua](examples/work-queue.lua) for the example.
+> See [../examples/work-queue.lua](../examples/work-queue.lua) for the example.
 
 ### Background Save
 
-> See [examples/background-save.lua](examples/background-save.lua) for the example.
+> See [../examples/background-save.lua](../examples/background-save.lua) for the example.
 
 ---
 

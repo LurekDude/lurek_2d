@@ -1,20 +1,20 @@
-### Conditional verbose mode
+﻿### Conditional verbose mode
 
-> See [examples/conditional-verbose-mode.lua](examples/conditional-verbose-mode.lua) for the example.
+> See [../examples/conditional-verbose-mode.lua](../examples/conditional-verbose-mode.lua) for the example.
 
 ---
 
 ### Log to File (Rust Side)
 `env_logger` writes to stderr by default. To capture to a file during development:
 
-> See [snippets/log-to-file-rust-side.ps1](snippets/log-to-file-rust-side.ps1) for the example.
+> See [log-to-file-rust-side.ps1](log-to-file-rust-side.ps1) for the example.
 
 For production log files, consider adding a `WriteLogger` via the `fern` or `simplelog` crate alongside `env_logger` � but do not add new logging crates to Lurek2D's `Cargo.toml` without a design decision.
 
 ---
 
 ### During Tests
-> See [snippets/during-tests.ps1](snippets/during-tests.ps1) for the example.
+> See [during-tests.ps1](during-tests.ps1) for the example.
 
 Note: `env_logger` writes to stderr. `--nocapture` shows both stdout and stderr in `cargo test`.
 

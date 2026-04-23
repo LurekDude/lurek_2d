@@ -1,4 +1,4 @@
-- **Do NOT use `separator`** — use 8–16 px positional gap between siblings instead.
+﻿- **Do NOT use `separator`** — use 8–16 px positional gap between siblings instead.
 - **Nest `panel` → siblings** for grouped sections, not a flat list of all widgets at root.
 
 ---
@@ -47,7 +47,7 @@
 ### TOML Layout Format
 ### File skeleton
 
-> See [templates/file-skeleton.toml](templates/file-skeleton.toml) for the example.
+> See [../templates/file-skeleton.toml](../templates/file-skeleton.toml) for the example.
 
 ### Naming rules
 - `id` uses `snake_case` throughout.
@@ -60,14 +60,14 @@
 - Do **not** prefix IDs with the screen name — they are already scoped by the file.
 
 ### Field ordering convention (per widget block)
-> See [templates/field-ordering-convention-per-widget-block.toml](templates/field-ordering-convention-per-widget-block.toml) for the example.
+> See [../templates/field-ordering-convention-per-widget-block.toml](../templates/field-ordering-convention-per-widget-block.toml) for the example.
 
 ---
 
 ### Layout Hierarchy — Godot-Inspired Patterns
 Lurek2D layouts follow the same mental model as Godot's **Control → Container → Control** tree:
 
-> See [snippets/layout-hierarchy-godot-inspired-patterns.txt](snippets/layout-hierarchy-godot-inspired-patterns.txt) for the example.
+> See [layout-hierarchy-godot-inspired-patterns.txt](layout-hierarchy-godot-inspired-patterns.txt) for the example.
 
 **Rules:**
 1. **Never put content widgets directly on root** — always wrap in a named sub-panel.
@@ -131,11 +131,11 @@ This is the canonical Lurek2D hybrid pattern:
 
 ### Step 1 — Layout TOML (structure only)
 
-> See [templates/step-1-layout-toml-structure-only.toml](templates/step-1-layout-toml-structure-only.toml) for the example.
+> See [../templates/step-1-layout-toml-structure-only.toml](../templates/step-1-layout-toml-structure-only.toml) for the example.
 
 ### Step 2 — Lua script (behaviour only)
 
-> See [examples/step-2-lua-script-behaviour-only.lua](examples/step-2-lua-script-behaviour-only.lua) for the example.
+> See [../examples/step-2-lua-script-behaviour-only.lua](../examples/step-2-lua-script-behaviour-only.lua) for the example.
 
 ### API surface (what `lurek.ui` needs to expose)
 

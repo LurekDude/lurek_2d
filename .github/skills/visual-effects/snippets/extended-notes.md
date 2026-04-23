@@ -1,9 +1,9 @@
----
+﻿---
 
 ### CPU-Side Image Filters (Offline / Load-Time)
 For effects that only need to run once (level load, asset generation):
 
-> See [examples/cpu-side-image-filters-offline-load.lua](examples/cpu-side-image-filters-offline-load.lua) for the example.
+> See [../examples/cpu-side-image-filters-offline-load.lua](../examples/cpu-side-image-filters-offline-load.lua) for the example.
 
 ---
 
@@ -20,4 +20,4 @@ Full-screen shader passes are expensive on integrated GPUs. Target: **≤ 2ms to
 
 **Rule**: Halve the canvas resolution for effects that don't need pixel-level precision (bloom, blur). Draw final composite at full resolution:
 
-> See [examples/performance-budget.lua](examples/performance-budget.lua) for the example.
+> See [../examples/performance-budget.lua](../examples/performance-budget.lua) for the example.

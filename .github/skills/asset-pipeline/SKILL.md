@@ -1,4 +1,4 @@
----
+﻿---
 name: asset-pipeline
 description: "Load this skill when working on Lurek2D asset loading: textures, audio files, Lua scripts, or filesystem sandboxing. It owns the GameFS, image loading, and asset caching patterns. Skip it for rendering or audio playback."
 ---
@@ -32,7 +32,7 @@ description: "Load this skill when working on Lurek2D asset loading: textures, a
 
 ### Live Repository Contracts
 - `src/filesystem/vfs.rs` — `GameFS` struct, sandboxed file operations
-- `src/render/texture.rs` — image loading, pixel buffer conversion
+- `src/image/mod.rs` — image loading, pixel buffer conversion
 - `src/audio/source.rs` — audio file loading
 
 ### Decision Rules

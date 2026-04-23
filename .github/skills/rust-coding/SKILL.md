@@ -60,7 +60,7 @@ Lurek2D source is organized in five responsibility groups — no cycles, ever:
 | Platform Services | `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect` | Foundations + Core Runtime |
 | Feature Systems | `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` | Below groups; same-group OK when acyclic |
 | Edge/Integration | `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin` | All groups — nothing below imports these |
-| Lunasome | `content/library/` (pure Lua) | Public `lurek.*` API only |
+| Lunasome | `library/` (pure Lua) | Public `lurek.*` API only |
 
 **Forbidden import patterns:**
 > See [examples/module-group-system.rs](examples/module-group-system.rs) for the example.

@@ -1,4 +1,4 @@
----
+﻿---
 name: quality-pipeline
 description: "Load this skill when running quality checks, interpreting audit/coverage results, or remediating issues found by Lurek2D's Python analysis tools. Covers the full audit→diagnose→fix→verify cycle: which tools to run, what their output means, which agent or fixer script handles each issue type, and how to compose tools into a quality sweep. Skip it for implementing features, writing game scripts, or CAG file editing."
 ---
@@ -49,7 +49,7 @@ This orchestrates all doc generators under `tools/docs/`. Always run this before
 |---|---|---|
 | `tools/validate/cag_validate.py` | `.github/` CAG files | After any `.github/` edit |
 | `tools/validate/validate_lua_api.py` | `src/lua_api/*.rs` contract compliance | After any lua_api edit |
-| `tools/validate/validate_game.py` | Game/demo directory structure | After any `content/demos/` or `content/examples/` edit |
+| `tools/validate/validate_game.py` | Game/demo directory structure | After any `content/games/` or `content/examples/` edit |
 | `tools/validate/validate_module_coverage.py` | Every `src/` module has a `docs/specs/*.md` | After creating/renaming modules |
 | `tools/validate/check_callbacks.py` | Callback doc generation integrity | After editing callback docs |
 
@@ -68,7 +68,7 @@ This orchestrates all doc generators under `tools/docs/`. Always run this before
 | `tools/audit/example_coverage.py` | Content/examples vs Lua API coverage | stdout |
 | `tools/audit/integration_coverage.py` | Integration test module-pair matrix | stdout |
 | `tools/audit/audit_module.py` | 12-phase per-module quality audit | `logs/quality/<module>.md` |
-| `tools/audit/validate_agent_md.py` | AGENT.md structural validation | stdout |
+| `tools/validate/cag_validate.py` | AGENT.md structural validation | stdout |
 | `tools/audit/count_gaps.py` | Missing-doc items per `lurek.*` module | stdout |
 
 ### 4. Fixers — automated remediation

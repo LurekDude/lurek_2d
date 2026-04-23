@@ -47,7 +47,7 @@ These three rules are **absolute** — violations are commit-blocking errors, no
 - [ ] Rust unit tests in `tests/rust/unit/<module>_tests.rs` only — never in `src/` files
 - [ ] Expanded docstrings on all public items; `python tools/docs/collect_docs.py --report-missing` exits 0
 - [ ] Updated `docs/specs/<module>.md`; no spec MDs inside `src/`
-- [ ] Regenerated `docs/lua-api.md` via `python tools/gen_all_docs.py` — command exits 0 with no error lines
+- [ ] Regenerated `docs/api/lurek.md` via `python tools/gen_all_docs.py` — command exits 0 with no error lines
 - [ ] `content/examples/<module>.lua` demonstrating the new API
 - [ ] `docs/CHANGELOG.md` entry; `Cargo.toml` version bumped if MINOR/MAJOR
 - [ ] `cargo check --tests` exits 0 before declaring done — run this as the final code gate

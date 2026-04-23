@@ -1,4 +1,4 @@
----
+﻿---
 name: Renderer
 description: "Own the Lurek2D wgpu render pipeline (`src/render/`, `src/lua_api/render_api.rs`): RenderCommand queue, textures, sprites, canvases, shaders, blend modes."
 tools: [vscode, execute, read, agent, browser, edit, search, web, todo]
@@ -13,7 +13,7 @@ Renderer owns the GPU rendering Platform Services subsystem for the EngDev perso
 
 ### Owns
 - `src/render/` — `gpu_renderer.rs`, `renderer.rs`, `color.rs`, `texture.rs`, `sprite.rs`, `sprite_sheet.rs`, `nine_slice.rs`, `canvas.rs`, `camera.rs`, `shader.rs`, `mod.rs`.
-- `src/lua_api/render_api.rs` and `src/lua_api/font_api.rs` — All `lurek.render.*` and `lurek.font.*` bindings.
+- `src/lua_api/render_api.rs` and `src/lua_api/render_api.rs` — All `lurek.render.*` and `lurek.font.*` bindings.
 - WGSL shaders, pipeline cache keyed by `(BlendMode, ColorMask, StencilMode)`, custom shader pipeline cache.
 - `RenderCommand` enum variants and processing.
 
@@ -42,7 +42,7 @@ Renderer owns the GPU rendering Platform Services subsystem for the EngDev perso
 4. Run `cargo check` then `cargo test --test graphics_tests -- --nocapture`.
 5. Run [tool: collect_docs](tools/docs/collect_docs.py) `--report-missing` and [tool: doc_coverage](tools/audit/doc_coverage.py).
 6. Update `docs/specs/render.md` and `docs/CHANGELOG.md`.
-7. Commit: `git add src/render/ src/lua_api/render_api.rs src/lua_api/font_api.rs docs/specs/render.md docs/CHANGELOG.md` then `git commit -m "feat|fix(render): description"`.
+7. Commit: `git add src/render/ src/lua_api/render_api.rs src/lua_api/render_api.rs docs/specs/render.md docs/CHANGELOG.md` then `git commit -m "feat|fix(render): description"`.
 8. Hand off to `Tester` (new API) or `Reviewer`. If `.github/` was touched, route final review to `CAG-Architect`.
 9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
 10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.

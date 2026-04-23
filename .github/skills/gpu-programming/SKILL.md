@@ -1,4 +1,4 @@
----
+﻿---
 name: gpu-programming
 description: "Load this skill when working with the Lurek2D GPU rendering pipeline: wgpu device/surface setup, RenderCommand queue, render passes, texture management, custom WGSL shaders, blend modes, canvas render-to-texture, or transform stacks. Also covers profiling GPU frame time and diagnosing wgpu validation errors. Skip it for font rasterization details, Lua API design, or physics."
 ---
@@ -51,7 +51,7 @@ Lurek2D targets **wgpu 22**. No raw OpenGL path exists. All rendering goes throu
 1. Add variant to `RenderCommand` enum in `src/render/renderer.rs`
 2. Add execution arm in `src/render/gpu_renderer.rs` (match arm)
 3. Add Lua push function in `src/lua_api/render_api.rs`
-4. Add Lua BDD test in `tests/lua/unit/test_render.lua`
+4. Add Lua BDD test in `tests/lua/unit/test_render_unit.lua`
 
 ### Shader Authoring (WGSL)
 ### Built-In Shaders

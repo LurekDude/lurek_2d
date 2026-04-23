@@ -1,11 +1,11 @@
-> See [templates/feature-flags-lua-backend.toml](templates/feature-flags-lua-backend.toml) for the example.
+﻿> See [../templates/feature-flags-lua-backend.toml](../templates/feature-flags-lua-backend.toml) for the example.
 
 **Rule**: Ship with `lua-jit`. Use `lua54` only in CI environments where LuaJIT is unavailable or when explicitly testing Lua 5.4 compatibility.
 
 ---
 
 ### Development Loop Commands
-> See [snippets/development-loop-commands.ps1](snippets/development-loop-commands.ps1) for the example.
+> See [development-loop-commands.ps1](development-loop-commands.ps1) for the example.
 
 **Rule**: Use `cargo check` during implementation. Never run `cargo build` just to validate types — it compiles everything including link step.
 
@@ -14,30 +14,30 @@
 ### Distribution Packaging
 ### Windows — ZIP + Folder
 
-> See [snippets/windows-zip-folder.ps1](snippets/windows-zip-folder.ps1) for the example.
+> See [windows-zip-folder.ps1](windows-zip-folder.ps1) for the example.
 
 Output: `dist/lurek2d-windows-x86_64/lurek2d.exe` + demos + `dist/lurek2d-windows-x86_64.zip`
 
 ### Linux / macOS — TAR.GZ
 
-> See [snippets/linux-macos-tar-gz.sh](snippets/linux-macos-tar-gz.sh) for the example.
+> See [linux-macos-tar-gz.sh](linux-macos-tar-gz.sh) for the example.
 
 Output: `dist/lurek2d-<os>-<arch>/` + `.tar.gz`
 
 ### Windows Installer (NSIS)
 
-> See [snippets/windows-installer-nsis.ps1](snippets/windows-installer-nsis.ps1) for the example.
+> See [windows-installer-nsis.ps1](windows-installer-nsis.ps1) for the example.
 
 Output: `dist/lurek2d-<version>-setup.exe`
 
 ---
 
 ### Local Install / Uninstall
-> See [snippets/local-install-uninstall.ps1](snippets/local-install-uninstall.ps1) for the example.
+> See [local-install-uninstall.ps1](local-install-uninstall.ps1) for the example.
 
-> See [snippets/local-install-uninstall-2.sh](snippets/local-install-uninstall-2.sh) for the example.
+> See [local-install-uninstall-2.sh](local-install-uninstall-2.sh) for the example.
 
-After install: `lurek content/demos/hello_world` works from any directory.
+After install: `lurek content/games/hello_world` works from any directory.
 
 ---
 
@@ -49,8 +49,8 @@ These tasks are in `.vscode/tasks.json` (Ctrl+Shift+B or Terminal → Run Task):
 | `Build: Debug` | `cargo build` |
 | `Build: Release` | `cargo build --release` |
 | `Build: Check (fast)` | `cargo check` |
-| `Run Debug: Pick Example` | `cargo run -- content/demos/<pick>` |
-| `Run Release: Pick Example` | `cargo run --release -- content/demos/<pick>` |
+| `Run Debug: Pick Example` | `cargo run -- content/games/<pick>` |
+| `Run Release: Pick Example` | `cargo run --release -- content/games/<pick>` |
 | `Dist: Package Windows` | `tools/dist/dist.ps1` |
 | `Dist: Package Windows (skip build)` | `tools/dist/dist.ps1 -SkipBuild` |
 | `Dist: NSIS Installer (Windows)` | `makensis tools/dist/installer.nsi` |

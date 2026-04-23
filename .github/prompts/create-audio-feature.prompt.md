@@ -33,7 +33,7 @@ Add a new audio feature to the Lurek2D engine. Use when implementing new audio A
 - [ ] Updated `src/audio/mixer.rs` with new method
 - [ ] Updated `src/lua_api/audio_api.rs` with new Lua binding
 - [ ] New test in `tests/rust/unit/audio_tests.rs`
-- [ ] Updated `docs/lua-api.md`
+- [ ] Updated `docs/api/lurek.md`
 - [ ] Verified: `cargo build` clean, `cargo test` passes
 
 ## Anti-patterns

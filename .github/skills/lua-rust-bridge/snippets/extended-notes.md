@@ -1,11 +1,11 @@
-- The reason must follow the colon on the same line (cannot be blank).
+﻿- The reason must follow the colon on the same line (cannot be blank).
 
 **Acceptable uses:**
 - The eval/run IS the feature (e.g., `debugbridge_api.rs`: the REPL eval endpoint exists specifically to execute arbitrary Lua code at developer request).
 - Accessing the Lua `debug` library internals that have no Rust equivalent (e.g., `devtools_api.rs`: `debug.getinfo` stack introspection).
 
 **Unacceptable uses:**
-- Embedding game logic as Lua strings in a binding file — move it to a Lua library under `content/library/` or a domain helper.
+- Embedding game logic as Lua strings in a binding file — move it to a Lua library under `library/` or a domain helper.
 - Avoiding a proper Rust implementation for convenience.
 
 **Current justified uses in the codebase:**
@@ -50,6 +50,6 @@ Before implementing the Lua bridge, verify the domain module provides:
 2. Return from the Lua callback
 3. The engine processes draw commands after `lurek.draw()` returns and renders the frame
 
-> See [examples/rendering-boundary-rule.rs](examples/rendering-boundary-rule.rs) for the example.
+> See [../examples/rendering-boundary-rule.rs](../examples/rendering-boundary-rule.rs) for the example.
 
 Any API that invokes GPU operations (wgpu render pass, texture upload, shader bind) must be called from the engine side, not from inside a `create_function` closure.

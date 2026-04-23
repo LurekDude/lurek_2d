@@ -25,7 +25,7 @@
     python tools/docs/gen_lib_docs.py --check
 
 Outputs:
-- `docs/reports/library-docs.md` — single aggregate file mirroring `docs/lua-api.md` style
+- `docs/api/library.md` — single aggregate file mirroring `docs/api/lurek.md` style
 - `docs/reports/libs/<name>.md` — one per library
 
 Never hand-edit either output. Fix the docstring in `init.lua` and regenerate.

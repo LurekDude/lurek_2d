@@ -1,4 +1,4 @@
-# `<module>` — Agent Reference
+﻿# `<module>` — Agent Reference
 
 | Property | Value |
 |----------|-------|
@@ -23,7 +23,7 @@ agent decide whether to enter this module or a different one.
 
 ## Full Specification
 
-→ [`docs/specs/<module>.md`](../../docs/specs/<module>.md)
+→ `docs/specs/<module>.md`
 
 _Update both this file and `docs/specs/<module>.md` whenever source files,
 public types, or Lua bindings change._

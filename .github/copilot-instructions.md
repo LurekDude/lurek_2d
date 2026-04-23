@@ -21,7 +21,7 @@ Verbatim from `docs/architecture/philosophy.md`. Do not propose changes without 
 - **TST-02** Inline `#[cfg(test)]` blocks in `src/**/*.rs` are banned; Rust unit tests live in `tests/rust/unit/<module>_tests.rs`.
 - **TST-03** `src/lua_api/<module>_api.rs` holds only `impl LuaUserData`, registration, and conversions — business logic lives in `src/<module>/`.
 - **TST-04** Every `mod.rs` holds only `pub mod`, `pub use`, attributes, and doc comments — definitions live in sibling files.
-- **TST-05** Demo/game tests: headless Lua static-analysis tests live in `tests/lua/content/demos/test_<name>.lua` (one file per demo); binary screenshot tests live in `tests/demo_smoke_tests.rs` (`#[ignore]`). Never put demo tests in `tests/lua/unit/`.
+- **TST-05** Demo/game tests: headless Lua static-analysis tests live in `tests/lua/content/games/test_<name>.lua` (one file per demo); binary screenshot tests live in `tests/demo_smoke_tests.rs` (`#[ignore]`). Never put demo tests in `tests/lua/unit/`.
 - **TST-06** Every Lua test layer has exactly **one file per module** (`test_<module>_<layer>.lua`). Applies to `unit/`, `evidence/`, `golden/`, `stress/`, `security/`, `config/`. No per-sub-feature splits — merge into the single module file.
 
 ## Cross-Artifact Sync
@@ -36,7 +36,7 @@ When you change one of these, you MUST update the others in the same commit.
 | New module created                           | New `docs/specs/<module>.md` · `docs/specs/README.md`                    |
 | `library/<name>/init.lua` changed            | `library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/api/library.md` via `tools/docs/gen_lib_docs.py` |
 | Onboarding flow changes (build steps, tutorial, quality gates) | `docs/handbook.md` · `CONTRIBUTING.md` if needed |
-| New game demo added to `content/games/`      | `tests/lua/content/demos/test_<name>.lua` · `tests/demo_smoke_tests.rs` (`#[ignore]`) · `tests/lua/harness.rs` (add `lua_demo_<name>`) |
+| New game demo added to `content/games/`      | `tests/lua/content/games/test_<name>.lua` · `tests/demo_smoke_tests.rs` (`#[ignore]`) · `tests/lua/harness.rs` (add `lua_demo_<name>`) |
 | Any change                                   | `docs/CHANGELOG.md`                                                      |
 
 Regenerate API references with `python tools/gen_all_docs.py` after any Rust or Lua API change.

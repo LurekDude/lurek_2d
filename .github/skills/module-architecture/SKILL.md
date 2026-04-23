@@ -41,7 +41,7 @@ description: "Load this skill when designing module boundaries, dependency direc
   - **Platform Services**: `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect` — OS-facing backends
   - **Feature Systems**: `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` — game-domain services; same-group imports allowed when acyclic
   - **Edge/Integration**: `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin` — composition root; nothing below imports these
-  - `content/library/` → Lunasome, pure Lua; when a new gameplay-domain helper can live there, prefer that over a new Rust module
+  - `library/` → Lunasome, pure Lua; when a new gameplay-domain helper can live there, prefer that over a new Rust module
 - **No upward imports**: lower groups must not import higher groups. Feature Systems allows same-group imports only when the dependency graph remains acyclic
 - **One responsibility**: Each module owns one subsystem — no shared kitchen-sink modules
 - **Thin `mod.rs` rule (TST-04)**: Every `mod.rs` contains ONLY `pub mod X;` declarations, `pub use X::*;` re-exports, module-level attributes (`#![...]`), and doc comments. Function / struct / enum / trait / `impl` definitions MUST live in sibling files such as `src/<module>/facade.rs`, `src/<module>/register.rs`, or topic-named files. Reinforces Zen Rule 7 ("split by reason to change"). Full text: [philosophy.md § Testing Constraints](../../../docs/architecture/philosophy.md#testing-constraints). Enforcement: `thin_modrs_audit.py` scheduled to land in `tools/audit/` during session `testing-cleanup-20260420` P3.

@@ -1,4 +1,4 @@
-| Missing `docs/specs/*.md` | `validate_module_coverage.py` | — | `Doc-Writer` |
+﻿| Missing `docs/specs/*.md` | `validate_module_coverage.py` | — | `Doc-Writer` |
 | Missing test coverage | `test_coverage.py`, `lua_api_test_coverage.py` | — | `Tester` |
 | Lua test structure violation | `lua_test_structure_audit.py` | `lua_test_structure_audit.py --fix` for safe cases | `Tester` |
 | Evidence/golden contract violation | `lua_evidence_golden_contract_audit.py` | `lua_evidence_golden_contract_audit.py --fix` for missing markers | `Tester` |
@@ -13,19 +13,19 @@
 ### Quality Sweep Recipes
 ### Quick check (before any commit)
 
-> See [snippets/quick-check-before-any-commit.ps1](snippets/quick-check-before-any-commit.ps1) for the example.
+> See [quick-check-before-any-commit.ps1](quick-check-before-any-commit.ps1) for the example.
 
 ### Standard pre-commit sweep
 
-> See [snippets/standard-pre-commit-sweep.ps1](snippets/standard-pre-commit-sweep.ps1) for the example.
+> See [standard-pre-commit-sweep.ps1](standard-pre-commit-sweep.ps1) for the example.
 
 ### Single module deep audit
 
-> See [snippets/single-module-deep-audit.ps1](snippets/single-module-deep-audit.ps1) for the example.
+> See [single-module-deep-audit.ps1](single-module-deep-audit.ps1) for the example.
 
 ### Full project quality sweep
 
-> See [snippets/full-project-quality-sweep.ps1](snippets/full-project-quality-sweep.ps1) for the example.
+> See [full-project-quality-sweep.ps1](full-project-quality-sweep.ps1) for the example.
 
 ### Remediation loop
 
