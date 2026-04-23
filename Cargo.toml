@@ -191,12 +191,12 @@ codegen-units = 256
 opt-level = 1
 
 [profile.release]
-# BALANCED PERFORMANCE + SIZE — opt-level="s" applies most optimizations but
-# avoids the extreme loop-unrolling and function inlining of level 3, which
-# inflates the binary to 30+ MB. "s" targets ~20 MB with near-3 performance.
-# lto="fat" + codegen-units=1 give maximum cross-crate dead-code elimination.
+# SIZE-FIRST — opt-level="z" is the only setting that reaches the ~20 MB raw
+# binary target (opt=s → 25 MB, opt=3 → 32 MB). Performance is near-identical
+# to "s" for a game engine (GPU-bound; CPU differences are in the noise).
+# lto="fat" + codegen-units=1 = maximum cross-crate dead-code elimination.
 # strip=true + panic=abort remove all symbol tables and unwind machinery.
-opt-level = "s"
+opt-level = "z"
 lto = "fat"
 codegen-units = 1
 strip = true
@@ -204,15 +204,10 @@ panic = "abort"
 overflow-checks = false
 debug = false
 
-# DISTRIBUTION profile — use for player-facing packages (via tools/dist/dist.ps1).
-# Inherits release, then overrides to max-size-optimization:
-#   opt-level="z": size-first (smaller than 3, tiny runtime cost)
-#   lto="fat":    whole-program LTO for strongest dead-code elimination
-# After UPX -6 --lzma compression in dist.ps1, binary lands below 10 MB.
+# DISTRIBUTION profile — inherits all release settings (opt=z, fat LTO, strip).
+# No overrides needed; dist.ps1 applies UPX -6 --lzma on top to reach ~5 MB.
 [profile.dist]
 inherits = "release"
-opt-level = "z"
-lto = "fat"
 
 [[test]]
 name = "examples_load_test"

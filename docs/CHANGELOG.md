@@ -4,13 +4,13 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.16] - 2026-04-23
 
-### fix(build): correct release profile opt-level to hit ~20 MB target
+### fix(build): release opt-level s → z to hit 20 MB target; simplify dist profile
 
-- `[profile.release]` `opt-level` changed from `3` → `"s"`: level 3 inlines aggressively and produced a 32 MB binary; "s" applies all meaningful optimizations while avoiding code-bloating transformations, targeting ~20 MB.
-- `lto` changed from `true` (thin) → `"fat"`: full whole-program link-time optimization for stronger dead-code elimination across all crates.
-- `launch.json` comment updated to reflect `opt-level="s"`.
+- `[profile.release]` `opt-level` changed from `"s"` → `"z"`: "s" produced 25 MB; "z" produces ~20 MB (same as confirmed by dist pre-UPX). Performance difference for a GPU-bound game engine is negligible.
+- `[profile.dist]` simplified: now inherits release without overrides — release already uses opt=z + fat LTO, so dist just adds UPX compression in dist.ps1 → ~5 MB.
+- `launch.json` comment updated accordingly.
 
-**Target sizes:** debug ~55 MB (don't care), release ~20 MB (in progress), dist 5 MB (UPX — already achieved).
+**Final binary sizes:** debug ~55 MB (don't care), release ~20 MB ✅, dist 5 MB ✅ (UPX).
 
 ## [0.20.15] - 2026-04-23
 
