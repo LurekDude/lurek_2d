@@ -8233,17 +8233,21 @@ function register13(context, _apiData) {
 // src/providers/requireGraph.ts
 var vscode17 = __toESM(require("vscode"));
 var path9 = __toESM(require("path"));
-function parseRequires(document) {
+function positionFromOffset(text, offset) {
+  const before = text.substring(0, offset);
+  const lines = before.split("\n");
+  return new vscode17.Position(lines.length - 1, lines[lines.length - 1].length);
+}
+function parseRequires(text) {
   const requires = [];
-  const text = document.getText();
   const regex = /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g;
   let match;
   while ((match = regex.exec(text)) !== null) {
     const moduleName = match[1];
     const startOffset = match.index;
     const endOffset = match.index + match[0].length;
-    const startPos = document.positionAt(startOffset);
-    const endPos = document.positionAt(endOffset);
+    const startPos = positionFromOffset(text, startOffset);
+    const endPos = positionFromOffset(text, endOffset);
     requires.push({
       moduleName,
       range: new vscode17.Range(startPos, endPos)
@@ -8303,15 +8307,27 @@ function register14(context) {
   const diagCollection = vscode17.languages.createDiagnosticCollection("lurek.requireGraph");
   context.subscriptions.push(diagCollection);
   const nodeCache = /* @__PURE__ */ new Map();
+  let buildDebounceTimer;
+  function scheduleBuildGraph() {
+    if (buildDebounceTimer) clearTimeout(buildDebounceTimer);
+    buildDebounceTimer = setTimeout(() => {
+      buildDebounceTimer = void 0;
+      buildGraph();
+    }, 500);
+  }
   async function buildGraph() {
     const workspaceFolder = vscode17.workspace.workspaceFolders?.[0]?.uri;
     if (!workspaceFolder) return;
     nodeCache.clear();
-    const luaFiles = await vscode17.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
+    const luaFiles = await vscode17.workspace.findFiles(
+      "**/*.lua",
+      "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}"
+    );
     for (const fileUri of luaFiles) {
       try {
-        const doc = await vscode17.workspace.openTextDocument(fileUri);
-        const requires = parseRequires(doc);
+        const bytes = await vscode17.workspace.fs.readFile(fileUri);
+        const text = new TextDecoder().decode(bytes);
+        const requires = parseRequires(text);
         for (const req of requires) {
           req.resolvedUri = resolveModule(req.moduleName, workspaceFolder);
         }
@@ -8407,11 +8423,11 @@ function register14(context) {
   context.subscriptions.push(
     vscode17.workspace.onDidSaveTextDocument((doc) => {
       if (doc.languageId === "lua") {
-        buildGraph();
+        scheduleBuildGraph();
       }
     }),
-    vscode17.workspace.onDidCreateFiles(() => buildGraph()),
-    vscode17.workspace.onDidDeleteFiles(() => buildGraph())
+    vscode17.workspace.onDidCreateFiles(() => scheduleBuildGraph()),
+    vscode17.workspace.onDidDeleteFiles(() => scheduleBuildGraph())
   );
 }
 
@@ -8450,7 +8466,7 @@ var SymbolIndex = class {
       this.fileSymbols.clear();
       const luaFiles = await vscode18.workspace.findFiles(
         "**/*.lua",
-        "{**/node_modules/**,ideas/**,work/**,.github/**}"
+        "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}"
       );
       for (const fileUri of luaFiles) {
         try {

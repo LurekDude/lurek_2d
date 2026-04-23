@@ -2,6 +2,25 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.26] - 2026-04-23
+
+### fix(ext): stop extension scanning entire repo and generating 855 warnings
+
+- **Root cause**: `providers/requireGraph.ts` `buildGraph()` called
+  `vscode.workspace.openTextDocument()` for every `.lua` file on activation. Each call fired
+  `onDidOpenTextDocument` in `diagnostics.ts`, which ran all 13 diagnostic rules on every file
+  across the whole workspace — including `tests/lua/`, `library/`, `save/`, etc. — flooding the
+  Problems panel with ~855 warnings and making the status bar flicker rapidly.
+- **`providers/requireGraph.ts`**: Replaced `openTextDocument()` with
+  `vscode.workspace.fs.readFile()` + `TextDecoder` so require-parsing reads raw bytes without
+  touching the VS Code document model. Added manual `positionFromOffset()` helper for computing
+  positions from raw text offsets. Added 500 ms debounce (`scheduleBuildGraph()`) to the
+  `onDidSaveTextDocument`, `onDidCreateFiles`, and `onDidDeleteFiles` handlers. Extended the
+  `findFiles` exclusion glob to also skip `**/build/**,**/save/**,**/assets/**,**/logs/**`.
+- **`services/symbolIndex.ts`**: Extended the `findFiles` exclusion glob in `buildIndex()` to
+  also skip `**/build/**,**/save/**,**/assets/**,**/logs/**`.
+- Extension rebuilt and reinstalled (`dist/extension.js` — 1007.1 KB).
+
 ## [0.20.25] - 2026-04-23
 
 ### feat(ext): replace all hardcoded IntelliSense data with gen_extension_api.py → lurek-api.json pipeline

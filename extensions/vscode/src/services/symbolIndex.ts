@@ -52,12 +52,12 @@ export class SymbolIndex {
       this.symbols.clear();
       this.fileSymbols.clear();
 
-      // Exclude folders that are not game/library code.
-      // ideas/ and work/ are scratch folders; .github/ has skill example snippets;
-      // opening these via openTextDocument triggers diagnostics on every rebuild.
+      // Exclude folders that are not game/library code:
+      // scratch folders (ideas/, work/), CAG snippets (.github/),
+      // build artefacts (build/, save/, assets/, logs/).
       const luaFiles = await vscode.workspace.findFiles(
         "**/*.lua",
-        "{**/node_modules/**,ideas/**,work/**,.github/**}",
+        "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}",
       );
 
       for (const fileUri of luaFiles) {

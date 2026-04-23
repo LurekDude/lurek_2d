@@ -22,11 +22,20 @@ interface FileNode {
 // ── Graph builder ─────────────────────────────────────────
 
 /**
- * Parse a Lua file for require() calls.
+ * Compute a vscode.Position from a raw text offset.
  */
-function parseRequires(document: vscode.TextDocument): RequireInfo[] {
+function positionFromOffset(text: string, offset: number): vscode.Position {
+  const before = text.substring(0, offset);
+  const lines = before.split("\n");
+  return new vscode.Position(lines.length - 1, lines[lines.length - 1].length);
+}
+
+/**
+ * Parse raw Lua text for require() calls.
+ * Does NOT need an open TextDocument — works on raw bytes read via fs.readFile.
+ */
+function parseRequires(text: string): RequireInfo[] {
   const requires: RequireInfo[] = [];
-  const text = document.getText();
   const regex = /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g;
   let match: RegExpExecArray | null;
 
@@ -34,8 +43,8 @@ function parseRequires(document: vscode.TextDocument): RequireInfo[] {
     const moduleName = match[1];
     const startOffset = match.index;
     const endOffset = match.index + match[0].length;
-    const startPos = document.positionAt(startOffset);
-    const endPos = document.positionAt(endOffset);
+    const startPos = positionFromOffset(text, startOffset);
+    const endPos = positionFromOffset(text, endOffset);
     requires.push({
       moduleName,
       range: new vscode.Range(startPos, endPos),
@@ -128,18 +137,36 @@ export function register(context: vscode.ExtensionContext): void {
   // File node cache
   const nodeCache = new Map<string, FileNode>();
 
+  let buildDebounceTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function scheduleBuildGraph(): void {
+    if (buildDebounceTimer) clearTimeout(buildDebounceTimer);
+    buildDebounceTimer = setTimeout(() => {
+      buildDebounceTimer = undefined;
+      buildGraph();
+    }, 500);
+  }
+
   async function buildGraph(): Promise<void> {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri;
     if (!workspaceFolder) return;
 
     nodeCache.clear();
 
-    const luaFiles = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
+    // Only scan game/example/library Lua — exclude tests, build artefacts,
+    // scratch folders, and binary/log directories.
+    const luaFiles = await vscode.workspace.findFiles(
+      "**/*.lua",
+      "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}",
+    );
 
     for (const fileUri of luaFiles) {
       try {
-        const doc = await vscode.workspace.openTextDocument(fileUri);
-        const requires = parseRequires(doc);
+        // Use fs.readFile — NOT openTextDocument — to avoid triggering
+        // onDidOpenTextDocument and cascading diagnostics on every rebuild.
+        const bytes = await vscode.workspace.fs.readFile(fileUri);
+        const text = new TextDecoder().decode(bytes);
+        const requires = parseRequires(text);
 
         // Resolve each require
         for (const req of requires) {
@@ -148,7 +175,7 @@ export function register(context: vscode.ExtensionContext): void {
 
         nodeCache.set(fileUri.toString(), { uri: fileUri, requires });
       } catch {
-        // Skip files that can't be opened
+        // Skip files that can't be read
       }
     }
 
@@ -259,14 +286,15 @@ export function register(context: vscode.ExtensionContext): void {
   // Build graph on activation
   buildGraph();
 
-  // Rebuild on file save
+  // Rebuild on file save (debounced — a save can trigger many rapid rebuilds
+  // if files are being auto-saved or if several files are saved at once).
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument((doc) => {
       if (doc.languageId === "lua") {
-        buildGraph();
+        scheduleBuildGraph();
       }
     }),
-    vscode.workspace.onDidCreateFiles(() => buildGraph()),
-    vscode.workspace.onDidDeleteFiles(() => buildGraph())
+    vscode.workspace.onDidCreateFiles(() => scheduleBuildGraph()),
+    vscode.workspace.onDidDeleteFiles(() => scheduleBuildGraph()),
   );
 }
