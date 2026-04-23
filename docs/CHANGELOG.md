@@ -4,6 +4,12 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.10] - 2026-04-23
 
+### chore(cag): end-of-session sweep — fix E003 and W005 regressions in copilot-instructions.md
+
+- **fix(cag): trim copilot-instructions.md to 8181 bytes (cap 8192)** — Shortened TST-06 rule (removed verbose inline examples), shortened the New game demo sync row, shortened the Onboarding row, and removed a redundant "never overwrite" clause from the Sessions directive.
+- **fix(cag): update stale Cross-Artifact Sync paths** — `docs/lua-api.md` → `docs/api/lurek.md`; `docs/reports/library-docs.md` → `docs/api/library.md` (paths moved when library docs were regenerated this session).
+- `python tools/validate/cag_validate.py --baseline` → 0 errors, 0 warnings, 0 regressions.
+
 ### chore(library): docstring coverage, @covers markers, and audit tool fixes
 
 - **fix(tools): `library_coverage.py` — fix API% always 0.0%** — `_api_md_names` was using `###` header regexes that never matched the actual `docs/api/library.md` code-fence format. Replaced with regexes that extract `library.<name>.<fn>(` and `ClassName:<method>(` patterns from code blocks.

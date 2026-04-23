@@ -22,7 +22,7 @@ Verbatim from `docs/architecture/philosophy.md`. Do not propose changes without 
 - **TST-03** `src/lua_api/<module>_api.rs` holds only `impl LuaUserData`, registration, and conversions — business logic lives in `src/<module>/`.
 - **TST-04** Every `mod.rs` holds only `pub mod`, `pub use`, attributes, and doc comments — definitions live in sibling files.
 - **TST-05** Demo/game tests: headless Lua static-analysis tests live in `tests/lua/content/demos/test_<name>.lua` (one file per demo); binary screenshot tests live in `tests/demo_smoke_tests.rs` (`#[ignore]`). Never put demo tests in `tests/lua/unit/`.
-- **TST-06** Every Lua test layer has exactly **one file per module** (`test_<module>_<layer>.lua` — e.g. `test_audio_unit.lua`, `test_audio_evidence.lua`). This rule applies to `unit/`, `evidence/`, `golden/`, `stress/`, `security/`, and `config/`. No split per-sub-feature files (e.g. `test_effect_overlay.lua` alongside `test_effect.lua`). Merge into the single module file.
+- **TST-06** Every Lua test layer has exactly **one file per module** (`test_<module>_<layer>.lua`). Applies to `unit/`, `evidence/`, `golden/`, `stress/`, `security/`, `config/`. No per-sub-feature splits — merge into the single module file.
 
 ## Cross-Artifact Sync
 
@@ -31,15 +31,15 @@ When you change one of these, you MUST update the others in the same commit.
 | Changed                                      | Also update                                                              |
 |----------------------------------------------|--------------------------------------------------------------------------|
 | `src/<module>/*.rs`                          | `docs/specs/<module>.md`                                                 |
-| `src/lua_api/<module>_api.rs`                | `docs/specs/<module>.md` · `docs/lua-api.md`                             |
+| `src/lua_api/<module>_api.rs`                | `docs/specs/<module>.md` · `docs/api/lurek.md`                           |
 | `lurek.*` API added / renamed / removed      | `content/examples/<module>.lua` · affected `content/games/` · dependent `library/` modules |
 | New module created                           | New `docs/specs/<module>.md` · `docs/specs/README.md`                    |
-| `library/<name>/init.lua` changed            | `library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/reports/library-docs.md` via `tools/docs/gen_lib_docs.py` |
-| Contributor onboarding flow changes (build steps, first-game tutorial, quality gates) | `docs/handbook.md` (relevant section) · `CONTRIBUTING.md` if needed |
-| New game demo added to `content/games/`      | `tests/lua/content/demos/test_<name>.lua` (new static-analysis test) · `tests/demo_smoke_tests.rs` (new `#[ignore]` screenshot test) · `tests/lua/harness.rs` (add `lua_demo_<name>` entry) |
+| `library/<name>/init.lua` changed            | `library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/api/library.md` via `tools/docs/gen_lib_docs.py` |
+| Onboarding flow changes (build steps, tutorial, quality gates) | `docs/handbook.md` · `CONTRIBUTING.md` if needed |
+| New game demo added to `content/games/`      | `tests/lua/content/demos/test_<name>.lua` · `tests/demo_smoke_tests.rs` (`#[ignore]`) · `tests/lua/harness.rs` (add `lua_demo_<name>`) |
 | Any change                                   | `docs/CHANGELOG.md`                                                      |
 
-Regenerate API references with `python tools/gen_all_docs.py` whenever Rust or Lua API surface changes.
+Regenerate API references with `python tools/gen_all_docs.py` after any Rust or Lua API change.
 
 ## Discovery Directives
 
@@ -50,7 +50,7 @@ This system prompt is a discovery index, not a manual. Find specialised context 
 - **Prompts** live in `.github/prompts/<verb>-<noun>.prompt.md`. Each is a parameterised user-selected entrypoint; the `expected_agent` frontmatter names the runner.
 - **Tools** are catalogued in [`tools/README.md`](../tools/README.md) — the authoritative registry with complete script reference, dependency map, and usage guide. Each subfolder has its own `README.md` with per-script tables.
 - **Module specs** live in `docs/specs/<module>.md` — load directly when you need the canonical reference for a Rust module, its Lua bindings, types, and functions.
-- **Sessions** must create `work/<session-name>/` with subfolders `scripts/`, `handovers/`, `reports/`, `data/`, `examples/`, `other/`, `temp/`, `logs/`. Append one JSONL entry per phase to `logs/agent_log.jsonl`; never overwrite. Move to `work/archive/` when done.
+- **Sessions** must create `work/<session-name>/` with subfolders `scripts/`, `handovers/`, `reports/`, `data/`, `examples/`, `other/`, `temp/`, `logs/`. Append one JSONL entry per phase to `logs/agent_log.jsonl`. Move to `work/archive/` when done.
 - **API namespace** is `lurek.*` exclusively — never bare globals or external prefixes. The Thin Wrapper Rule binds: `src/lua_api/<module>_api.rs` owns ALL `impl LuaUserData` and `mlua` imports; domain modules under `src/<module>/` stay pure-Rust.
 - **Lua-first testing rule (TST-01)**: behaviour observable through `lurek.*` MUST be tested in Lua under `tests/lua/`. Rust unit tests under `tests/rust/unit/` are reserved for non-Lua-reachable internals. Full text: [philosophy.md § Testing Constraints](../docs/architecture/philosophy.md#testing-constraints).
 
