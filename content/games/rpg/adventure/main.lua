@@ -25,7 +25,6 @@ local INV_Y           = SCREEN_H - 60
 -- Room palettes
 ------------------------------------------------------------------------
 local PALETTES = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     bedroom  = { bg = {0.12, 0.10, 0.18}, wall = {0.22, 0.18, 0.30}, floor = {0.16, 0.12, 0.22}, accent = {0.55, 0.35, 0.20} },
     hallway  = { bg = {0.08, 0.08, 0.12}, wall = {0.18, 0.16, 0.20}, floor = {0.12, 0.10, 0.14}, accent = {0.40, 0.40, 0.50} },
     kitchen  = { bg = {0.15, 0.12, 0.08}, wall = {0.28, 0.22, 0.15}, floor = {0.20, 0.16, 0.10}, accent = {0.70, 0.50, 0.20} },

@@ -213,6 +213,10 @@ name = "examples_load_test"
 path = "tests/examples_load_test.rs"
 
 [[test]]
+name = "games_load_test"
+path = "tests/games_load_test.rs"
+
+[[test]]
 name = "golden_tests"
 path = "tests/rust/golden/harness.rs"
 

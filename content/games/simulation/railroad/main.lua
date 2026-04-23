@@ -17,7 +17,6 @@ local GOOD_WOOD = 2
 local GOOD_IRON = 3
 local GOOD_NAMES = { "Coal", "Wood", "Iron" }
 local GOOD_COLORS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { 0.45, 0.28, 0.12 }, -- coal brown
     { 0.2, 0.6, 0.2 },   -- wood green
     { 0.6, 0.6, 0.65 },  -- iron gray

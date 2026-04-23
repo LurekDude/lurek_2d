@@ -25,7 +25,6 @@ local T_BERRY = 4
 local T_WALL  = 5
 
 local TILE_COLORS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     [T_GRASS] = {0.30, 0.65, 0.20},
     [T_STONE] = {0.55, 0.55, 0.50},
     [T_TREE]  = {0.15, 0.45, 0.12},

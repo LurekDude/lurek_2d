@@ -203,7 +203,7 @@ function lurek.init()
     reveal_around(player.gx, player.gy)
 end
 
-local function _ready_setup() end)
+local function _ready_setup() end
 
 ------------------------------------------------------------------------
 -- lurek.process

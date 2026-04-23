@@ -42,7 +42,6 @@ local ball = { x = 0, y = 0, vx = 0, vy = 0, active = false }
 
 -- Flippers
 local flippers = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     left = {
         px = TABLE_X + 160, py = TABLE_Y + TABLE_H - 50,
         angle = FLIPPER_REST_ANGLE, target_angle = FLIPPER_REST_ANGLE,

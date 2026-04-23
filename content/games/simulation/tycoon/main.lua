@@ -23,7 +23,6 @@ local mode_upgrade  = false
 
 -- ── Business definitions ────────────────────────────────────────────────
 local businesses = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { name = "Lemonade Stand", key = "1", cost = 10,    revenue = 1,    cycle = 1,  owned = true,  level = 1, progress = 0, has_manager = false, upgraded = false, ready = false, slide_y = 0 },
     { name = "Pizza Shop",     key = "2", cost = 100,   revenue = 10,   cycle = 3,  owned = false, level = 0, progress = 0, has_manager = false, upgraded = false, ready = false, slide_y = 0 },
     { name = "Car Wash",       key = "3", cost = 500,   revenue = 50,   cycle = 6,  owned = false, level = 0, progress = 0, has_manager = false, upgraded = false, ready = false, slide_y = 0 },

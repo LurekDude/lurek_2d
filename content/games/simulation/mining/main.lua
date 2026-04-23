@@ -20,7 +20,6 @@ local T_BEDROCK = 6
 local T_LADDER  = 7
 
 local TILE_COLORS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     [T_EMPTY]   = {0.12, 0.08, 0.06},
     [T_DIRT]    = {0.55, 0.35, 0.15},
     [T_STONE]   = {0.50, 0.50, 0.52},

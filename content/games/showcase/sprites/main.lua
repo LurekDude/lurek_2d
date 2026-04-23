@@ -36,7 +36,6 @@ local score = 0
 local sprite_scale = 2
 local tint_index = 1
 local tint_modes = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { name = "Normal", r = 1.0, g = 1.0, b = 1.0 },
     { name = "Red",    r = 1.0, g = 0.4, b = 0.4 },
     { name = "Blue",   r = 0.4, g = 0.4, b = 1.0 },

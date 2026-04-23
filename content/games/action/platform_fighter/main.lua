@@ -42,7 +42,6 @@ local BLINK_RATE     = 0.1
 
 -- Platforms: {x, y, w, h}
 local PLATFORMS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { x = 150, y = 450, w = 500, h = 20 },   -- main ground
     { x = 80,  y = 330, w = 140, h = 14 },    -- left floating
     { x = 580, y = 330, w = 140, h = 14 },    -- right floating

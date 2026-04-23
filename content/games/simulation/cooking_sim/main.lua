@@ -13,7 +13,6 @@ local state = STATES.TITLE
 
 local STATION_NAMES = { "Prep Station", "Stove", "Oven", "Serving Counter" }
 local STATION_COLORS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { 0.3, 0.6, 0.3 },
     { 0.7, 0.3, 0.2 },
     { 0.6, 0.4, 0.1 },

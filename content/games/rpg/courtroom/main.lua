@@ -237,7 +237,7 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.15, 0.1, 0.08)
 end
 
-local function _ready_setup() end)
+local function _ready_setup() end
 
 function lurek.process(dt)
     local fps = lurek.timer.getFPS()

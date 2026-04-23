@@ -35,7 +35,6 @@ local REP_LOSS         = 0.03
 local CATEGORIES = { "Weapons", "Armor", "Potions" }
 
 local ITEMS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { id = 1, name = "Iron Sword",   cat = "Weapons", cost = 30,  stat = "dmg 10", color = {0.7,0.7,0.8} },
     { id = 2, name = "Steel Sword",  cat = "Weapons", cost = 80,  stat = "dmg 18", color = {0.8,0.8,0.9} },
     { id = 3, name = "Magic Staff",  cat = "Weapons", cost = 120, stat = "dmg 25", color = {0.6,0.4,0.9} },

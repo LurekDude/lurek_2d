@@ -35,7 +35,6 @@ local title_alpha = 0
 -- Easing definitions
 -- ============================================================
 local easing_names = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     "linear",    "inQuad",     "outQuad",    "inOutQuad",
     "inCubic",   "outCubic",   "inOutCubic", "inSine",
     "outSine",   "inOutSine",  "inExpo",     "outExpo",

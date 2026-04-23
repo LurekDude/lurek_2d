@@ -26,7 +26,6 @@ local title_alpha = 0
 -- ============================================================
 local preset_index = 1
 local preset_names = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     "Fire", "Water Splash", "Smoke", "Magic Sparkle",
     "Explosion", "Snow", "Fireflies", "Confetti",
 }

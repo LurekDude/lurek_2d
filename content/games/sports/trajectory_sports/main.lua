@@ -30,7 +30,6 @@ local medals = { "", "", "", "" }
 local sport_names = { "ARCHERY", "BASKETBALL", "BOWLING", "DARTS" }
 
 -- ── Input bindings ────────────────────────────────────────────────
-local _cam = lurek.camera.new()  -- injected by fix_games.py
 lurek.input.bind("power",      "space")
 lurek.input.bind("aim_up",     "w")
 lurek.input.bind("aim_down",   "s")

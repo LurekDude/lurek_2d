@@ -56,7 +56,6 @@ local state = STATE.TITLE
 
 -- ── Perk definitions ──────────────────────────────────────────────────────
 local PERK_DEFS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { id = "dmg",    label = "+25% Attack Damage",  desc = "All attacks deal 25% more damage" },
     { id = "speed",  label = "+20% Move Speed",     desc = "Move 20% faster"                  },
     { id = "heal",   label = "+2 HP Heal",          desc = "Restore 2 hit points"             },

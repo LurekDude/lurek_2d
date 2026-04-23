@@ -49,7 +49,6 @@ local wind = { dx = 0, dy = 0, strength = 0 }
 
 local function randomize_wind()
     local angle = math.random() * math.pi * 2
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     wind.strength = math.random() * 30 + 5
     wind.dx = math.cos(angle) * wind.strength
     wind.dy = math.sin(angle) * wind.strength

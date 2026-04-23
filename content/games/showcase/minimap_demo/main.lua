@@ -56,7 +56,6 @@ local tweens        = {}
 -- ── Helpers ────────────────────────────────────────────────────────────
 
 local function clamp(v, lo, hi)
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     if v < lo then return lo end
     if v > hi then return hi end
     return v

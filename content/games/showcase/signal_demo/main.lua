@@ -36,7 +36,6 @@ local BONUS_SCORE    = 50
 
 -- Colors per signal type
 local SIG_COLORS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     player_hit    = { 0.95, 0.25, 0.20 },
     score_up      = { 0.20, 0.90, 0.40 },
     level_up      = { 0.30, 0.50, 1.00 },

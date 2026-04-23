@@ -484,7 +484,7 @@ function lurek.init()
     reset_game()
 end
 
-local function _ready_setup() end)
+local function _ready_setup() end
 
 -- ── lurek.process ─────────────────────────────────────────────
 function lurek.process(dt)

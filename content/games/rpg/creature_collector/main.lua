@@ -50,7 +50,6 @@ local state = STATE_TITLE
 local TYPE_ADV = { fire = "grass", grass = "water", water = "fire" }
 
 local function type_multiplier(atk_type, def_type)
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     if TYPE_ADV[atk_type] == def_type then return 1.5 end
     if TYPE_ADV[def_type] == atk_type then return 0.67 end
     return 1.0

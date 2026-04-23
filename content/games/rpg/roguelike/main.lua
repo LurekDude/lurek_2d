@@ -47,7 +47,6 @@ local function clamp(v, lo, hi) return math.max(lo, math.min(hi, v)) end
 local function distance(x1, y1, x2, y2)
     local dx = x1 - x2
     local dy = y1 - y2
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     return math.sqrt(dx * dx + dy * dy)
 end
 

@@ -55,7 +55,6 @@ local game_state = STATE.TITLE
 
 -- ── Game state ────────────────────────────────────────────────────────────
 local player = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     x = 0, y = 0, r = PLAYER_R,
     crouching = false, hidden = false, hide_spot = nil,
     keys_collected = 0, alive = true,

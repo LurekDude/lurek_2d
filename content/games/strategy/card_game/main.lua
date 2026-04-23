@@ -43,7 +43,6 @@ local title_timer = 0
 -- Card definitions
 -- ---------------------------------------------------------------------------
 local CARD_DEFS = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { name = "Soldier",  type = "creature", cost = 1, atk = 2, hp = 1,  color = {0.6,0.6,0.7}, taunt = false, revive = false },
     { name = "Wolf",     type = "creature", cost = 2, atk = 3, hp = 2,  color = {0.5,0.4,0.3}, taunt = false, revive = false },
     { name = "Knight",   type = "creature", cost = 3, atk = 3, hp = 4,  color = {0.7,0.7,0.8}, taunt = false, revive = false },

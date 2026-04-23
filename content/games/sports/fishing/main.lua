@@ -1,3 +1,18 @@
+-- Constants (grouped into C to stay within LuaJIT 60-upvalue limit)
+local C = {
+  SCREEN_W=800, SCREEN_H=600, WATER_Y=300, SHORE_X=80,
+  ROD_TIP_X=110, ROD_TIP_Y=240,
+  MAX_CAST_DIST=400, HOOK_WINDOW=1.5,
+  TENSION_SNAP=0.80, TENSION_SNAP_TIME=2.0, TENSION_SAFE=0.20,
+  REEL_SPEED=60, FISH_PULL_SPEED=30, FISH_BURST_CALM=3.0, FISH_BURST_PULL=1.0,
+  LAND_DIST=20, DAY_CYCLE=120, WIN_COUNT=10,
+  BITE_MIN=3.0, BITE_MAX=10.0, RAIN_BITE_MULT=0.5,
+}
+local STATES = {
+  TITLE="TITLE", FISHING="FISHING", CATCHING="CATCHING",
+  BUCKET="BUCKET_VIEW", GAMEOVER="GAME_OVER",
+}
+
 --[[
 
   Fishing — Lurek2D
@@ -7,35 +22,7 @@
   five fish species, bait selection, day/night cycle, and weather.
 ]]
 
--- Constants
-local SCREEN_W = 800
-local SCREEN_H = 600
-local WATER_Y = 300
-local SHORE_X = 80
-local ROD_TIP_X = SHORE_X + 30
-local ROD_TIP_Y = WATER_Y - 60
-local MAX_CAST_DIST = 400
-local HOOK_WINDOW = 1.5
-local TENSION_SNAP = 0.80
-local TENSION_SNAP_TIME = 2.0
-local TENSION_SAFE = 0.20
-local REEL_SPEED = 60
-local FISH_PULL_SPEED = 30
-local FISH_BURST_CALM = 3.0
-local FISH_BURST_PULL = 1.0
-local LAND_DIST = 20
-local DAY_CYCLE = 120
-local WIN_COUNT = 10
-local BITE_MIN = 3.0
-local BITE_MAX = 10.0
-local RAIN_BITE_MULT = 0.5
 
--- States
-local STATE_TITLE = "TITLE"
-local STATE_FISHING = "FISHING"
-local STATE_CATCHING = "CATCHING"
-local STATE_BUCKET = "BUCKET_VIEW"
-local STATE_GAMEOVER = "GAME_OVER"
 
 -- Fish definitions
 local FISH_TYPES = {
@@ -54,12 +41,12 @@ local BAITS = {
 }
 
 -- Game state
-local state = STATE_TITLE
+local state = STATES.TITLE
 local power = 0
 local charging = false
 local cast_x = 0
-local bobber_y = WATER_Y
-local bobber_base_y = WATER_Y
+local bobber_y = C.WATER_Y
+local bobber_base_y = C.WATER_Y
 local bite_timer = 0
 local bite_active = false
 local hook_timer = 0
@@ -105,7 +92,7 @@ local function pick_fish()
   local total = 0
   local night_mult = is_night and 2.0 or 1.0
   local bait = BAITS[bait_index]
-  local deep_cast = cast_x > SHORE_X + MAX_CAST_DIST * 0.7
+  local deep_cast = cast_x > C.SHORE_X + C.MAX_CAST_DIST * 0.7
 
   for i, f in ipairs(FISH_TYPES) do
     local w = f.rarity
@@ -164,8 +151,8 @@ local function reset_cast()
   power = 0
   charging = false
   cast_x = 0
-  bobber_y = WATER_Y
-  bobber_base_y = WATER_Y
+  bobber_y = C.WATER_Y
+  bobber_base_y = C.WATER_Y
   bite_timer = 0
   bite_active = false
   hook_timer = 0
@@ -181,7 +168,7 @@ local function reset_cast()
 end
 
 local function start_game()
-  state = STATE_FISHING
+  state = STATES.FISHING
   bucket = {}
   total_points = 0
   day_timer = 0
@@ -257,7 +244,7 @@ function lurek.process(delta)
   if raining then
     for _ = 1, 3 do
       table.insert(rain_particles, {
-        x = math.random() * SCREEN_W,
+        x = math.random() * C.SCREEN_W,
         y = -10,
         vy = 300 + math.random() * 100,
         life = 2.0,
@@ -268,11 +255,11 @@ function lurek.process(delta)
     local p = rain_particles[i]
     p.y = p.y + p.vy * dt
     p.life = p.life - dt
-    if p.life <= 0 or p.y > SCREEN_H then table.remove(rain_particles, i) end
+    if p.life <= 0 or p.y > C.SCREEN_H then table.remove(rain_particles, i) end
   end
 
   -- TITLE
-  if state == STATE_TITLE then
+  if state == STATES.TITLE then
     if lurek.input.keyboard.isDown("cast_reel") then
       start_game()
     end
@@ -280,17 +267,17 @@ function lurek.process(delta)
   end
 
   -- GAME OVER
-  if state == STATE_GAMEOVER then
+  if state == STATES.GAMEOVER then
     if lurek.input.keyboard.isDown("cast_reel") then
-      state = STATE_TITLE
+      state = STATES.TITLE
     end
     return
   end
 
   -- BUCKET VIEW
-  if state == STATE_BUCKET then
+  if state == STATES.BUCKET then
     if lurek.input.keyboard.isDown("cast_reel") then
-      state = STATE_FISHING
+      state = STATES.FISHING
       reset_cast()
     end
     return
@@ -298,8 +285,8 @@ function lurek.process(delta)
 
   -- Day/night cycle
   day_timer = day_timer + dt
-  local cycle_pos = day_timer % DAY_CYCLE
-  is_night = cycle_pos > DAY_CYCLE * 0.5
+  local cycle_pos = day_timer % C.DAY_CYCLE
+  is_night = cycle_pos > C.DAY_CYCLE * 0.5
 
   -- Weather
   rain_timer = rain_timer - dt
@@ -316,7 +303,7 @@ function lurek.process(delta)
   if lurek.input.keyboard.isDown("bait3") then bait_index = 3; show_message("Bait: Deep Bait", 1.5) end
 
   -- FISHING state
-  if state == STATE_FISHING then
+  if state == STATES.FISHING then
     if cast_x == 0 then
       -- Charging
       if lurek.input.isActionDown("cast_reel") then
@@ -325,16 +312,16 @@ function lurek.process(delta)
       elseif charging then
         -- Release cast
         charging = false
-        local dist = (power / 100) * MAX_CAST_DIST
-        cast_x = SHORE_X + dist
-        bobber_y = WATER_Y
-        bobber_base_y = WATER_Y
-        local bite_delay = BITE_MIN + math.random() * (BITE_MAX - BITE_MIN)
-        if raining then bite_delay = bite_delay * RAIN_BITE_MULT end
+        local dist = (power / 100) * C.MAX_CAST_DIST
+        cast_x = C.SHORE_X + dist
+        bobber_y = C.WATER_Y
+        bobber_base_y = C.WATER_Y
+        local bite_delay = C.BITE_MIN + math.random() * (C.BITE_MAX - C.BITE_MIN)
+        if raining then bite_delay = bite_delay * C.RAIN_BITE_MULT end
         bite_timer = bite_delay
         bite_active = false
-        spawn_splash(cast_x, WATER_Y, 8)
-        spawn_ripple(cast_x, WATER_Y)
+        spawn_splash(cast_x, C.WATER_Y, 8)
+        spawn_ripple(cast_x, C.WATER_Y)
         show_message("Waiting for a bite...", 2)
         power = 0
       end
@@ -347,12 +334,12 @@ function lurek.process(delta)
 
         if bite_timer <= 0 then
           bite_active = true
-          hook_timer = HOOK_WINDOW
+          hook_timer = C.HOOK_WINDOW
           hooked_fish = pick_fish()
           -- Bobber dip
           bobber_dip_tween = { from = bobber_y, to = bobber_y + 15, t = 0, dur = 0.3 }
           show_message("BITE! Press SPACE!", 1.5)
-          spawn_ripple(cast_x, WATER_Y)
+          spawn_ripple(cast_x, C.WATER_Y)
         end
       else
         -- Bite window
@@ -369,14 +356,14 @@ function lurek.process(delta)
 
         if lurek.input.keyboard.isDown("cast_reel") then
           -- Hooked!
-          state = STATE_CATCHING
+          state = STATES.CATCHING
           fish_x = cast_x
           tension = 0.40
           tension_high_timer = 0
           fish_fight_timer = 0
           fish_bursting = false
           show_message("Hooked " .. hooked_fish.name .. "! Reel with SPACE!", 2)
-          spawn_splash(cast_x, WATER_Y, 5)
+          spawn_splash(cast_x, C.WATER_Y, 5)
         elseif hook_timer <= 0 then
           show_message("Too slow! Fish escaped.", 2)
           reset_cast()
@@ -391,13 +378,13 @@ function lurek.process(delta)
   end
 
   -- CATCHING state
-  if state == STATE_CATCHING then
+  if state == STATES.CATCHING then
     local fight = hooked_fish.fight
 
     -- Fish fight bursts
     fish_fight_timer = fish_fight_timer + dt
-    local cycle_t = fish_fight_timer % (FISH_BURST_CALM + FISH_BURST_PULL)
-    fish_bursting = cycle_t > FISH_BURST_CALM
+    local cycle_t = fish_fight_timer % (C.FISH_BURST_CALM + C.FISH_BURST_PULL)
+    fish_bursting = cycle_t > C.FISH_BURST_CALM
 
     -- Tension dynamics
     if fish_bursting then
@@ -408,27 +395,27 @@ function lurek.process(delta)
 
     if lurek.input.isActionDown("cast_reel") then
       -- Reeling in
-      fish_x = fish_x - REEL_SPEED * dt
+      fish_x = fish_x - C.REEL_SPEED * dt
       tension = tension + 0.15 * dt
-      spawn_ripple(fish_x, WATER_Y)
+      spawn_ripple(fish_x, C.WATER_Y)
     else
       -- Fish pulls away
       if fish_bursting then
-        fish_x = fish_x + FISH_PULL_SPEED * fight * dt
+        fish_x = fish_x + C.FISH_PULL_SPEED * fight * dt
       end
       tension = tension - 0.08 * dt
     end
 
     tension = clamp(tension, 0, 1.0)
-    fish_x = clamp(fish_x, SHORE_X, SCREEN_W - 20)
+    fish_x = clamp(fish_x, C.SHORE_X, C.SCREEN_W - 20)
 
     -- Snap check
-    if tension > TENSION_SNAP then
+    if tension > C.TENSION_SNAP then
       tension_high_timer = tension_high_timer + dt
-      if tension_high_timer >= TENSION_SNAP_TIME then
+      if tension_high_timer >= C.TENSION_SNAP_TIME then
         show_message("LINE SNAPPED! " .. hooked_fish.name .. " escaped!", 2.5)
-        spawn_splash(fish_x, WATER_Y, 10)
-        state = STATE_FISHING
+        spawn_splash(fish_x, C.WATER_Y, 10)
+        state = STATES.FISHING
         reset_cast()
         return
       end
@@ -437,25 +424,25 @@ function lurek.process(delta)
     end
 
     -- Land check
-    if fish_x <= SHORE_X + LAND_DIST then
+    if fish_x <= C.SHORE_X + C.LAND_DIST then
       -- Caught!
       table.insert(bucket, { name = hooked_fish.name, points = hooked_fish.points, color = hooked_fish.color })
       total_points = total_points + hooked_fish.points
-      spawn_sparkle(SHORE_X + 20, WATER_Y - 30, 15)
-      spawn_splash(SHORE_X, WATER_Y, 6)
+      spawn_sparkle(C.SHORE_X + 20, C.WATER_Y - 30, 15)
+      spawn_splash(C.SHORE_X, C.WATER_Y, 6)
       show_message("Caught " .. hooked_fish.name .. "! +" .. hooked_fish.points .. "pts", 2.5)
 
       -- Win check
       if hooked_fish.name == "Golden Fish" then
         game_won = true
         win_reason = "You caught the legendary Golden Fish!"
-        state = STATE_GAMEOVER
-      elseif #bucket >= WIN_COUNT then
+        state = STATES.GAMEOVER
+      elseif #bucket >= C.WIN_COUNT then
         game_won = true
         win_reason = "You filled the bucket with " .. #bucket .. " fish!"
-        state = STATE_GAMEOVER
+        state = STATES.GAMEOVER
       else
-        state = STATE_FISHING
+        state = STATES.FISHING
         reset_cast()
       end
     end
@@ -471,39 +458,39 @@ function lurek.draw()
   -- Water
   local water_r, water_g, water_b = 0.1, 0.2, 0.5
   if is_night then water_r, water_g, water_b = 0.03, 0.06, 0.15 end
-  lurek.render.rectangle(0, WATER_Y, SCREEN_W, SCREEN_H - WATER_Y, water_r, water_g, water_b, 0.85)
+  lurek.render.rectangle(0, C.WATER_Y, C.SCREEN_W, C.SCREEN_H - C.WATER_Y, water_r, water_g, water_b, 0.85)
 
   -- Water surface line
-  lurek.render.rectangle(0, WATER_Y - 2, SCREEN_W, 4, 0.3, 0.5, 0.8, 0.6)
+  lurek.render.rectangle(0, C.WATER_Y - 2, C.SCREEN_W, 4, 0.3, 0.5, 0.8, 0.6)
 
   -- Shore
-  lurek.render.rectangle(0, WATER_Y - 10, SHORE_X + 10, SCREEN_H - WATER_Y + 10, 0.45, 0.35, 0.2, 1.0)
+  lurek.render.rectangle(0, C.WATER_Y - 10, C.SHORE_X + 10, C.SCREEN_H - C.WATER_Y + 10, 0.45, 0.35, 0.2, 1.0)
   -- Grass
-  lurek.render.rectangle(0, WATER_Y - 15, SHORE_X + 15, 8, 0.2, 0.6, 0.2, 1.0)
+  lurek.render.rectangle(0, C.WATER_Y - 15, C.SHORE_X + 15, 8, 0.2, 0.6, 0.2, 1.0)
 
   -- Fisher (stick figure)
   -- Body
-  lurek.render.rectangle(SHORE_X - 5, WATER_Y - 55, 6, 30, 0.3, 0.2, 0.1, 1.0)
+  lurek.render.rectangle(C.SHORE_X - 5, C.WATER_Y - 55, 6, 30, 0.3, 0.2, 0.1, 1.0)
   -- Head
-  lurek.render.circle(SHORE_X - 2, WATER_Y - 62, 8, 0.9, 0.75, 0.6, 1.0)
+  lurek.render.circle(C.SHORE_X - 2, C.WATER_Y - 62, 8, 0.9, 0.75, 0.6, 1.0)
   -- Legs
-  lurek.render.rectangle(SHORE_X - 8, WATER_Y - 25, 5, 20, 0.2, 0.15, 0.1, 1.0)
-  lurek.render.rectangle(SHORE_X, WATER_Y - 25, 5, 20, 0.2, 0.15, 0.1, 1.0)
+  lurek.render.rectangle(C.SHORE_X - 8, C.WATER_Y - 25, 5, 20, 0.2, 0.15, 0.1, 1.0)
+  lurek.render.rectangle(C.SHORE_X, C.WATER_Y - 25, 5, 20, 0.2, 0.15, 0.1, 1.0)
   -- Rod
-  lurek.render.line(SHORE_X, WATER_Y - 50, ROD_TIP_X, ROD_TIP_Y, 0.5, 0.35, 0.1, 1.0)
+  lurek.render.line(C.SHORE_X, C.WATER_Y - 50, C.ROD_TIP_X, C.ROD_TIP_Y, 0.5, 0.35, 0.1, 1.0)
 
   -- Fishing line + bobber
   if cast_x > 0 then
-    lurek.render.line(ROD_TIP_X, ROD_TIP_Y, cast_x, bobber_y, 0.8, 0.8, 0.8, 0.6)
+    lurek.render.line(C.ROD_TIP_X, C.ROD_TIP_Y, cast_x, bobber_y, 0.8, 0.8, 0.8, 0.6)
     -- Bobber
     lurek.render.circle(cast_x, bobber_y, 5, 1.0, 0.2, 0.1, 1.0)
     lurek.render.circle(cast_x, bobber_y - 4, 3, 1.0, 1.0, 1.0, 1.0)
   end
 
   -- Fish under water (visible when hooked in CATCHING)
-  if state == STATE_CATCHING and hooked_fish then
+  if state == STATES.CATCHING and hooked_fish then
     local fc = hooked_fish.color
-    local fy = WATER_Y + 30 + math.sin(day_timer * 5) * 8
+    local fy = C.WATER_Y + 30 + math.sin(day_timer * 5) * 8
     -- Fish body
     lurek.render.circle(fish_x, fy, 10, fc[1], fc[2], fc[3], 0.8)
     -- Tail
@@ -513,7 +500,7 @@ function lurek.draw()
   end
 
   -- Bite indicator
-  if state == STATE_FISHING and bite_active then
+  if state == STATES.FISHING and bite_active then
     lurek.render.print("!", cast_x - 3, bobber_y - 25, 1.0, 0.9, 0.0, 1.0)
   end
 
@@ -543,8 +530,8 @@ function lurek.draw()
   -- Night/day indicator stars
   if is_night then
     for i = 1, 12 do
-      local sx = (i * 67 + 13) % SCREEN_W
-      local sy = (i * 43 + 7) % (WATER_Y - 30)
+      local sx = (i * 67 + 13) % C.SCREEN_W
+      local sy = (i * 43 + 7) % (C.WATER_Y - 30)
       local flicker = 0.5 + 0.5 * math.sin(day_timer * 2 + i)
       lurek.render.circle(sx, sy, 1.5, 1.0, 1.0, 0.8, flicker)
     end
@@ -553,10 +540,10 @@ end
 
 function lurek.draw_ui()
   local fps = lurek.timer.getFPS()
-  lurek.render.print("FPS: " .. fps, SCREEN_W - 80, 10, 1, 1, 1, 0.5)
+  lurek.render.print("FPS: " .. fps, C.SCREEN_W - 80, 10, 1, 1, 1, 0.5)
 
   -- TITLE
-  if state == STATE_TITLE then
+  if state == STATES.TITLE then
     lurek.render.rectangle(150, 150, 500, 250, 0.0, 0.1, 0.3, 0.85)
     lurek.render.print("FISHING", 300, 200, 1.0, 1.0, 1.0, 1.0)
     lurek.render.print("PATIENCE REWARDED", 275, 250, 0.7, 0.85, 1.0, 0.9)
@@ -565,7 +552,7 @@ function lurek.draw_ui()
   end
 
   -- GAME OVER
-  if state == STATE_GAMEOVER then
+  if state == STATES.GAMEOVER then
     lurek.render.rectangle(100, 120, 600, 350, 0.0, 0.05, 0.15, 0.9)
     if game_won then
       lurek.render.print("YOU WIN!", 320, 150, 1.0, 0.9, 0.2, 1.0)
@@ -591,10 +578,10 @@ function lurek.draw_ui()
   end
 
   -- BUCKET VIEW
-  if state == STATE_BUCKET then
+  if state == STATES.BUCKET then
     lurek.render.rectangle(150, 80, 500, 440, 0.1, 0.08, 0.2, 0.9)
     lurek.render.print("BUCKET", 340, 100, 1.0, 1.0, 1.0, 1.0)
-    lurek.render.print("Fish: " .. #bucket .. "/" .. WIN_COUNT .. "  Points: " .. total_points, 250, 135, 0.8, 0.8, 0.8, 1.0)
+    lurek.render.print("Fish: " .. #bucket .. "/" .. C.WIN_COUNT .. "  Points: " .. total_points, 250, 135, 0.8, 0.8, 0.8, 1.0)
     local y_off = 170
     for i, f in ipairs(bucket) do
       lurek.render.print(i .. ". " .. f.name .. "  +" .. f.points, 200, y_off, f.color[1], f.color[2], f.color[3], 0.9)
@@ -612,37 +599,37 @@ function lurek.draw_ui()
   -- Bait indicator
   lurek.render.print("Bait: " .. BAITS[bait_index].name, 10, 10, 1, 1, 1, 0.8)
   -- Bucket count
-  lurek.render.print("Bucket: " .. #bucket .. "/" .. WIN_COUNT, 10, 30, 1, 1, 1, 0.8)
+  lurek.render.print("Bucket: " .. #bucket .. "/" .. C.WIN_COUNT, 10, 30, 1, 1, 1, 0.8)
   -- Points
   lurek.render.print("Points: " .. total_points, 10, 50, 1, 1, 0.5, 0.8)
   -- Day/night
   local dn = is_night and "Night" or "Day"
-  lurek.render.print(dn, SCREEN_W - 60, 30, 0.8, 0.8, 0.4, 0.7)
+  lurek.render.print(dn, C.SCREEN_W - 60, 30, 0.8, 0.8, 0.4, 0.7)
   -- Weather
   if raining then
-    lurek.render.print("Rain", SCREEN_W - 60, 50, 0.5, 0.6, 0.9, 0.7)
+    lurek.render.print("Rain", C.SCREEN_W - 60, 50, 0.5, 0.6, 0.9, 0.7)
   end
 
   -- Power bar (while charging)
   if charging then
-    lurek.render.rectangle(SCREEN_W / 2 - 100, SCREEN_H - 50, 200, 20, 0.2, 0.2, 0.2, 0.7)
+    lurek.render.rectangle(C.SCREEN_W / 2 - 100, C.SCREEN_H - 50, 200, 20, 0.2, 0.2, 0.2, 0.7)
     local pw = (power / 100) * 196
     local pr = power / 100
-    lurek.render.rectangle(SCREEN_W / 2 - 98, SCREEN_H - 48, pw, 16, pr, 1.0 - pr * 0.5, 0.1, 0.9)
-    lurek.render.print("POWER", SCREEN_W / 2 - 22, SCREEN_H - 48, 1, 1, 1, 0.9)
+    lurek.render.rectangle(C.SCREEN_W / 2 - 98, C.SCREEN_H - 48, pw, 16, pr, 1.0 - pr * 0.5, 0.1, 0.9)
+    lurek.render.print("POWER", C.SCREEN_W / 2 - 22, C.SCREEN_H - 48, 1, 1, 1, 0.9)
   end
 
   -- Tension bar (while catching)
-  if state == STATE_CATCHING then
-    local bar_x = SCREEN_W / 2 - 100
-    local bar_y = SCREEN_H - 60
+  if state == STATES.CATCHING then
+    local bar_x = C.SCREEN_W / 2 - 100
+    local bar_y = C.SCREEN_H - 60
     lurek.render.rectangle(bar_x, bar_y, 200, 24, 0.15, 0.15, 0.15, 0.8)
     local tw = tension * 196
     local tr = tension
     local tg = 1.0 - tension
     lurek.render.rectangle(bar_x + 2, bar_y + 2, tw, 20, tr, tg, 0.1, 0.9)
     -- Snap danger zone
-    lurek.render.rectangle(bar_x + 2 + TENSION_SNAP * 196, bar_y + 2, (1.0 - TENSION_SNAP) * 196, 20, 1.0, 0.0, 0.0, 0.2)
+    lurek.render.rectangle(bar_x + 2 + C.TENSION_SNAP * 196, bar_y + 2, (1.0 - C.TENSION_SNAP) * 196, 20, 1.0, 0.0, 0.0, 0.2)
     lurek.render.print("TENSION", bar_x + 70, bar_y + 3, 1, 1, 1, 0.9)
 
     -- Fish name
@@ -651,16 +638,16 @@ function lurek.draw_ui()
     end
 
     -- Warning
-    if tension > TENSION_SNAP then
+    if tension > C.TENSION_SNAP then
       local blink = math.sin(day_timer * 10) > 0
       if blink then
-        lurek.render.print("!! LINE STRAIN !!", SCREEN_W / 2 - 60, bar_y - 40, 1.0, 0.2, 0.1, 1.0)
+        lurek.render.print("!! LINE STRAIN !!", C.SCREEN_W / 2 - 60, bar_y - 40, 1.0, 0.2, 0.1, 1.0)
       end
     end
   end
 
   -- Message
   if message ~= "" then
-    lurek.render.print(message, SCREEN_W / 2 - #message * 3.5, SCREEN_H / 2 - 80, 1.0, 1.0, 0.6, 0.9)
+    lurek.render.print(message, C.SCREEN_W / 2 - #message * 3.5, C.SCREEN_H / 2 - 80, 1.0, 1.0, 0.6, 0.9)
   end
 end

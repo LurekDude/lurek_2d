@@ -1,5 +1,4 @@
 --[[
-local _cam = lurek.camera.new()  -- injected by fix_games.py
   Physics Demo — Lurek2D
   Category: simulation
 

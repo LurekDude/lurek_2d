@@ -435,7 +435,7 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.03, 0.03, 0.08)
 end
 
-local function _ready_setup() end)
+local function _ready_setup() end
 
 function lurek.process(delta)
     dt = delta

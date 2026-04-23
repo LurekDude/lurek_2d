@@ -24,7 +24,6 @@ local STATE_GAME_OVER = "GAME_OVER"
 
 -- ── Ship map rooms (center x, y, w, h, name) ──────────────────────────────
 local rooms = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     { x = 200, y = 150, w = 160, h = 120, name = "Bridge" },
     { x = 500, y = 150, w = 140, h = 120, name = "Shields" },
     { x = 100, y = 350, w = 140, h = 120, name = "Engine" },

@@ -36,7 +36,6 @@ local state = STATE_TITLE
 local title_timer = 0
 
 local scene_names = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     [STATE_SCENE_1] = "Menu",
     [STATE_SCENE_2] = "Simulation",
     [STATE_SCENE_3] = "Paused",
@@ -299,7 +298,7 @@ end
 -- ============================================================
 -- process_physics(dt) — callback index 3
 -- ============================================================
-lurek.process_physics(function(dt)
+function lurek.process_physics(dt)
     if not is_pipe_active(3) then return end
 
     local t0 = lurek.timer.getTime()
@@ -344,7 +343,7 @@ end
 -- ============================================================
 -- process_late(dt) — callback index 4
 -- ============================================================
-lurek.process_late(function(dt)
+function lurek.process_late(dt)
     if not is_pipe_active(4) then return end
 
     local t0 = lurek.timer.getTime()

@@ -27,7 +27,6 @@ local STATE_SCREEN_7 = "SCREEN_7"
 local STATE_SCREEN_8 = "SCREEN_8"
 
 local SCREEN_STATES = {
-local _cam = lurek.camera.new()  -- injected by fix_games.py
     STATE_SCREEN_1, STATE_SCREEN_2, STATE_SCREEN_3, STATE_SCREEN_4,
     STATE_SCREEN_5, STATE_SCREEN_6, STATE_SCREEN_7, STATE_SCREEN_8,
 }
