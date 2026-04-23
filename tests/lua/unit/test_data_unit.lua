@@ -355,6 +355,7 @@ describe("data.hash", function()
   end)
 end)
 
+
 -- â”€â”€ newByteData â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 -- @description Verifies ByteData creation from sizes and strings, byte mutation and retrieval, and cloning behavior.
