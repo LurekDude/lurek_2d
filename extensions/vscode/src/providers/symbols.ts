@@ -173,12 +173,17 @@ export function register(
       const lowerQuery = query.toLowerCase();
       const results: vscode.SymbolInformation[] = [];
 
-      const files = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 100);
+      const files = await vscode.workspace.findFiles(
+        "**/*.lua",
+        "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}",
+        100,
+      );
 
       for (const fileUri of files) {
         try {
-          const doc = await vscode.workspace.openTextDocument(fileUri);
-          const info = analyzer.analyze(doc.getText());
+          const bytes = await vscode.workspace.fs.readFile(fileUri);
+          const text = new TextDecoder().decode(bytes);
+          const info = analyzer.analyze(text);
 
           for (const sym of info.symbols) {
             if (sym.kind === "parameter") continue;

@@ -5,6 +5,13 @@ import { LuaDocumentAnalyzer } from "../services/luaParser.js";
 const LUA_SELECTOR: vscode.DocumentSelector = { scheme: "file", language: "lua" };
 const analyzer = new LuaDocumentAnalyzer();
 
+/** Compute a vscode.Position from a raw text offset (replaces doc.positionAt). */
+function positionFromOffset(text: string, offset: number): vscode.Position {
+  const before = text.substring(0, offset);
+  const lines = before.split("\n");
+  return new vscode.Position(lines.length - 1, lines[lines.length - 1].length);
+}
+
 // ── Provider registration ────────────────────────────────────
 
 export function register(
@@ -28,12 +35,16 @@ export function register(
       const locations: vscode.Location[] = [];
 
       // Search across all .lua files in workspace
-      const files = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 500);
+      const files = await vscode.workspace.findFiles(
+        "**/*.lua",
+        "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}",
+        500,
+      );
 
       for (const fileUri of files) {
         try {
-          const doc = await vscode.workspace.openTextDocument(fileUri);
-          const text = doc.getText();
+          const bytes = await vscode.workspace.fs.readFile(fileUri);
+          const text = new TextDecoder().decode(bytes);
 
           // Use analyzer for precise token-based search
           const refs = analyzer.findReferencesInDocument(text, searchTerm);
@@ -51,7 +62,7 @@ export function register(
             const pattern = new RegExp(escaped, "g");
             let match: RegExpExecArray | null;
             while ((match = pattern.exec(text)) !== null) {
-              const pos = doc.positionAt(match.index);
+              const pos = positionFromOffset(text, match.index);
               // Avoid duplicates
               const isDuplicate = locations.some(
                 loc => loc.uri.fsPath === fileUri.fsPath &&
@@ -64,7 +75,7 @@ export function register(
             }
           }
         } catch {
-          // Skip files that can't be opened
+          // Skip files that can't be read
         }
       }
 

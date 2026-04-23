@@ -56,7 +56,16 @@ export function register(context: vscode.ExtensionContext, apiData: ApiDataServi
     };
 
     context.subscriptions.push(
-        vscode.workspace.onDidOpenTextDocument(diagnose),
+        // NOTE: Do NOT use onDidOpenTextDocument here.
+        // Many internal providers (symbols, references, requireGraph) open documents
+        // programmatically via openTextDocument() — that fires onDidOpenTextDocument for
+        // every file they scan, causing diagnostics to run on 200+ files per query.
+        // Instead, only run diagnostics on documents visible in the editor.
+        vscode.window.onDidChangeVisibleTextEditors((editors) => {
+            for (const editor of editors) {
+                diagnose(editor.document);
+            }
+        }),
         vscode.workspace.onDidSaveTextDocument(diagnose),
         vscode.workspace.onDidChangeTextDocument((e) => debouncedDiagnose(e.document)),
         vscode.workspace.onDidCloseTextDocument((doc) => {
@@ -70,9 +79,9 @@ export function register(context: vscode.ExtensionContext, apiData: ApiDataServi
         }),
     );
 
-    // Diagnose already-open documents
-    for (const doc of vscode.workspace.textDocuments) {
-        diagnose(doc);
+    // Diagnose documents already visible in editors on activation
+    for (const editor of vscode.window.visibleTextEditors) {
+        diagnose(editor.document);
     }
 }
 

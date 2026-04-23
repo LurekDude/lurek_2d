@@ -5742,6 +5742,11 @@ function register4(context, apiData2) {
 var vscode8 = __toESM(require("vscode"));
 var LUA_SELECTOR5 = { scheme: "file", language: "lua" };
 var analyzer5 = new LuaDocumentAnalyzer();
+function positionFromOffset(text, offset) {
+  const before = text.substring(0, offset);
+  const lines = before.split("\n");
+  return new vscode8.Position(lines.length - 1, lines[lines.length - 1].length);
+}
 function register5(context, apiData2) {
   const provider = vscode8.languages.registerReferenceProvider(LUA_SELECTOR5, {
     async provideReferences(document, position, _refContext) {
@@ -5751,11 +5756,15 @@ function register5(context, apiData2) {
       if (!word || word.length < 2) return [];
       const searchTerm = word.includes(".") ? word : word;
       const locations = [];
-      const files = await vscode8.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 500);
+      const files = await vscode8.workspace.findFiles(
+        "**/*.lua",
+        "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}",
+        500
+      );
       for (const fileUri of files) {
         try {
-          const doc = await vscode8.workspace.openTextDocument(fileUri);
-          const text = doc.getText();
+          const bytes = await vscode8.workspace.fs.readFile(fileUri);
+          const text = new TextDecoder().decode(bytes);
           const refs = analyzer5.findReferencesInDocument(text, searchTerm);
           for (const ref of refs) {
             locations.push(new vscode8.Location(
@@ -5768,7 +5777,7 @@ function register5(context, apiData2) {
             const pattern = new RegExp(escaped, "g");
             let match;
             while ((match = pattern.exec(text)) !== null) {
-              const pos = doc.positionAt(match.index);
+              const pos = positionFromOffset(text, match.index);
               const isDuplicate = locations.some(
                 (loc) => loc.uri.fsPath === fileUri.fsPath && loc.range.start.line === pos.line && loc.range.start.character === pos.character
               );
@@ -5918,11 +5927,16 @@ function register6(context, apiData2) {
       if (query.length < 2) return [];
       const lowerQuery = query.toLowerCase();
       const results = [];
-      const files = await vscode9.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 100);
+      const files = await vscode9.workspace.findFiles(
+        "**/*.lua",
+        "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}",
+        100
+      );
       for (const fileUri of files) {
         try {
-          const doc = await vscode9.workspace.openTextDocument(fileUri);
-          const info = analyzer6.analyze(doc.getText());
+          const bytes = await vscode9.workspace.fs.readFile(fileUri);
+          const text = new TextDecoder().decode(bytes);
+          const info = analyzer6.analyze(text);
           for (const sym of info.symbols) {
             if (sym.kind === "parameter") continue;
             if (!sym.name.toLowerCase().includes(lowerQuery)) continue;
@@ -6042,7 +6056,16 @@ function register7(context, apiData2) {
     }, 300));
   };
   context.subscriptions.push(
-    vscode10.workspace.onDidOpenTextDocument(diagnose),
+    // NOTE: Do NOT use onDidOpenTextDocument here.
+    // Many internal providers (symbols, references, requireGraph) open documents
+    // programmatically via openTextDocument() — that fires onDidOpenTextDocument for
+    // every file they scan, causing diagnostics to run on 200+ files per query.
+    // Instead, only run diagnostics on documents visible in the editor.
+    vscode10.window.onDidChangeVisibleTextEditors((editors) => {
+      for (const editor of editors) {
+        diagnose(editor.document);
+      }
+    }),
     vscode10.workspace.onDidSaveTextDocument(diagnose),
     vscode10.workspace.onDidChangeTextDocument((e) => debouncedDiagnose(e.document)),
     vscode10.workspace.onDidCloseTextDocument((doc) => {
@@ -6055,8 +6078,8 @@ function register7(context, apiData2) {
       }
     })
   );
-  for (const doc of vscode10.workspace.textDocuments) {
-    diagnose(doc);
+  for (const editor of vscode10.window.visibleTextEditors) {
+    diagnose(editor.document);
   }
 }
 function checkDeprecated(text, apiData2) {
@@ -8233,7 +8256,7 @@ function register13(context, _apiData) {
 // src/providers/requireGraph.ts
 var vscode17 = __toESM(require("vscode"));
 var path9 = __toESM(require("path"));
-function positionFromOffset(text, offset) {
+function positionFromOffset2(text, offset) {
   const before = text.substring(0, offset);
   const lines = before.split("\n");
   return new vscode17.Position(lines.length - 1, lines[lines.length - 1].length);
@@ -8246,8 +8269,8 @@ function parseRequires(text) {
     const moduleName = match[1];
     const startOffset = match.index;
     const endOffset = match.index + match[0].length;
-    const startPos = positionFromOffset(text, startOffset);
-    const endPos = positionFromOffset(text, endOffset);
+    const startPos = positionFromOffset2(text, startOffset);
+    const endPos = positionFromOffset2(text, endOffset);
     requires.push({
       moduleName,
       range: new vscode17.Range(startPos, endPos)
