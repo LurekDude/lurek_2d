@@ -28,27 +28,12 @@ These appear as `// (undocumented)` in `docs/api/rust.md`.
 
 ---
 
-## 3. Lua Docstring Issues (5 items)
+## 3. Lua Docstring Issues (0 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/api/lurek.md` and IntelliSense.
 
-### `camera`
-
-- `function` **`lurek.camera.newCamera`** — *(no description)*
-
-### `dataframe`
-
-- `method` **`DataFrame:pivot`** — *"Create a pivot table."* (too short)
-
-### `render`
-
-- `method` **`Shape:arc`** — *"Queues an arc command."* (too short)
-- `method` **`Shape:circle`** — *"Queues a circle command."* (too short)
-
-### `tilemap`
-
-- `method` **`TileMap:setLayerVisible`** — *"Sets layer visibility."* (too short)
+*All Lua API items have adequate descriptions.*
 
 ---
 

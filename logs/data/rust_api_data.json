@@ -1,20 +1,20 @@
 {
   "meta": {
-    "generated": "2026-04-22T22:26:17.437199+00:00",
+    "generated": "2026-04-23T22:15:48.426764+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "0.20.0",
     "stats": {
-      "rust_items": 1873,
-      "rust_modules": 451,
+      "rust_items": 1882,
+      "rust_modules": 452,
       "rust_tests": 1,
-      "lua_tests": 245
+      "lua_tests": 256
     }
   },
   "rust_api": {
     "summary": {
-      "total_items": 1873,
-      "documented": 1862,
-      "modules": 451
+      "total_items": 1882,
+      "documented": 1871,
+      "modules": 452
     },
     "modules": {
       "ai::agent": {
@@ -1165,6 +1165,20 @@
             "description": "Parameter-driven finite-state machine for animation control.  Owns an [`Animation`] controller. On each [`update`](Self::update) call the machine advances the animation by `dt` seconds, then checks registered transitions to see if the current state should change.  # Fields - `states` — `HashMap<String, AnimStateConfig>`. - `transitions` — `Vec<AnimTransition>`. - `current` — `String`. Active state name. - `params` — `HashMap<String, AnimParamValue>`. - `animation` — [`Animation`].",
             "file": "src/animation/state_machine.rs",
             "line": 126
+          },
+          {
+            "name": "compare_nums",
+            "kind": "fn",
+            "description": "Applies a comparison operator to two `f32` values.",
+            "file": "src/animation/state_machine.rs",
+            "line": 363
+          },
+          {
+            "name": "parse_condition",
+            "kind": "fn",
+            "description": "Parses a condition string such as `\"speed > 0.1\"` or `\"jumping == true\"`.  Multi-character operators (`>=`, `<=`, `!=`) are tried before single-character ones.  # Parameters - `s` — `&str`. Condition expression.  # Returns `Result<TransitionCondition, String>`.",
+            "file": "src/animation/state_machine.rs",
+            "line": 383
           }
         ]
       },
@@ -1225,7 +1239,7 @@
             "kind": "struct",
             "description": "Entry point for the Lurek2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.  # Fields - `config` â€” `Config`. - `conf_error` â€” `Option<String>`.",
             "file": "src/app/app.rs",
-            "line": 2570
+            "line": 2592
           }
         ]
       },
@@ -2957,7 +2971,7 @@
         ]
       },
       "dataframe": {
-        "module_doc": "In-memory column-major tabular data with query, analytics, and SQL.  Provides `DataFrame` for named-column data tables and `Database` for multi-table catalogs. Used by the `lurek.dataframe` Lua module.",
+        "module_doc": "In-memory column-major tabular data with query, analytics, and SQL.  Provides `DataFrame` for named-column data tables and `Database` for multi-table catalogs. Used by the `lurek.dataframe` Lua module. `VecFrame` adds a typed-column vectorized layer for bulk numeric transforms.",
         "source_file": "src/dataframe/mod.rs",
         "items": [
           {
@@ -2965,28 +2979,35 @@
             "kind": "mod",
             "description": "Column-major DataFrame and Database types.",
             "file": "src/dataframe/mod.rs",
-            "line": 7
+            "line": 8
           },
           {
             "name": "query",
             "kind": "mod",
             "description": "Filter, sort, group-by, and aggregate query engine.",
             "file": "src/dataframe/mod.rs",
-            "line": 9
+            "line": 10
           },
           {
             "name": "serial",
             "kind": "mod",
             "description": "CSV and JSON serialization/deserialization for DataFrames.",
             "file": "src/dataframe/mod.rs",
-            "line": 11
+            "line": 12
           },
           {
             "name": "sql",
             "kind": "mod",
             "description": "SQL query parser and executor for in-memory databases.",
             "file": "src/dataframe/mod.rs",
-            "line": 13
+            "line": 14
+          },
+          {
+            "name": "vectorized",
+            "kind": "mod",
+            "description": "Typed columnar storage and vectorized bulk operations.",
+            "file": "src/dataframe/mod.rs",
+            "line": 16
           }
         ]
       },
@@ -3039,6 +3060,54 @@
             "description": "Execute a SQL query on a Database (supports FROM and JOIN).  # Parameters - `db` — `&Database`. - `sql` — `&str`.  # Returns `Result<DataFrame, String>`.",
             "file": "src/dataframe/sql.rs",
             "line": 685
+          }
+        ]
+      },
+      "dataframe::vectorized": {
+        "module_doc": "Vectorized columnar storage and bulk operations for DataFrames.  `VecFrame` stores each column as a typed flat buffer (`Vec<f64>`, `Vec<i64>`, `Vec<bool>`, or `Vec<String>`) with a separate validity bitmap (null mask). This layout lets the Rust compiler auto-vectorize (SIMD) numeric loops and lets `rayon` parallelize multi-column bulk operations without per-cell enum dispatch, which the `CellValue`-based `DataFrame` cannot do.  # When to use VecFrame vs DataFrame - Use `DataFrame` for mixed-type tables, SQL queries, CSV I/O, and join/pivot. - Convert to `VecFrame` when you need bulk numeric transforms (add scalar to   every row, column-wise reduce, multi-column parallel sweep, etc.).  # Null handling Nulls are stored in a `Vec<bool>` validity mask (`true` = valid, `false` = null). When `validity` is `None` the column has no nulls (common fast path). All numeric reductions skip null rows.",
+        "source_file": "src/dataframe/vectorized.rs",
+        "items": [
+          {
+            "name": "ColumnStore",
+            "kind": "enum",
+            "description": "Typed flat-buffer column with an optional null/validity bitmap.  Each variant stores all values as a dense `Vec<T>`, keeping memory contiguous for SIMD-friendly iteration.  The `validity` field, if present, has the same length as `data`; a `false` entry marks a null.",
+            "file": "src/dataframe/vectorized.rs",
+            "line": 33
+          },
+          {
+            "name": "ScalarOp",
+            "kind": "enum",
+            "description": "Scalar arithmetic operation applied element-wise to an entire column.  All ops operate on Float64 columns; other column types return an error.",
+            "file": "src/dataframe/vectorized.rs",
+            "line": 223
+          },
+          {
+            "name": "BinaryOp",
+            "kind": "enum",
+            "description": "Element-wise binary operation between two Float64 columns.",
+            "file": "src/dataframe/vectorized.rs",
+            "line": 270
+          },
+          {
+            "name": "ReduceOp",
+            "kind": "enum",
+            "description": "Column-level reduction operations.",
+            "file": "src/dataframe/vectorized.rs",
+            "line": 308
+          },
+          {
+            "name": "CmpOp",
+            "kind": "enum",
+            "description": "Comparison operator used in `VecFrame::filter_mask`.",
+            "file": "src/dataframe/vectorized.rs",
+            "line": 349
+          },
+          {
+            "name": "VecFrame",
+            "kind": "struct",
+            "description": "Typed-column vectorized DataFrame.  Each column is a [`ColumnStore`] — a dense typed `Vec` with an optional null bitmap.  This layout enables: - Auto-vectorization (SIMD) by the compiler for `f64` / `i64` arithmetic. - Parallel multi-column operations via `rayon`.  Conversion helpers `VecFrame::from_dataframe` and `VecFrame::to_dataframe` bridge between the flexible `CellValue`-based API and this fast numeric layer.",
+            "file": "src/dataframe/vectorized.rs",
+            "line": 397
           }
         ]
       },
@@ -10602,7 +10671,7 @@
         ]
       },
       "render": {
-        "module_doc": "GPU rendering layer backed by wgpu 22.  Implements a deferred `RenderCommand` queue: Lua callbacks push draw commands into `SharedState::pending_commands` during `lurek.render()` / `lurek.render_ui()`; after all callbacks return, [`gpu_renderer::GpuRenderer::render_frame()`] processes the queue, batches compatible draw calls, and presents the swapchain surface. No GPU work is done inside a Lua closure.  ## Subsystem inventory - [`renderer`] — `RenderCommand` enum, draw enums, and texture data types - [`gpu_renderer`] — [`GpuRenderer`]: wgpu device, queue, surface, resource pools - [`canvas`] — [`Canvas`]: off-screen render-to-texture for post-processing - [`font`] — [`Font`]: fontdue glyph rasterization and GPU atlas management - [`shader`] — [`Shader`]: user-supplied WGSL with uniform variable table - [`shape`] — compound vector shape builder for batched drawing - [`mesh`] — custom vertex geometry with per-vertex position, UV, and color - [`postfx_pipeline`] — ping-pong texture passes for multi-pass post-processing - [`draw_layer`] — Z-ordered draw layer for painter's-algorithm sorting - [`decal_surface`] — persistent surface for accumulated decal stamps - [`image_effect`] — per-image shader-effect pass descriptor  All public items are documented. Lua bridge: `src/lua_api/render_api.rs` (registered as `lurek.renders.*`).",
+        "module_doc": "GPU rendering layer backed by wgpu 22.  Implements a deferred `RenderCommand` queue: Lua callbacks push draw commands into `SharedState::pending_commands` during `lurek.draw()` / `lurek.draw_ui()`; after all callbacks return, [`gpu_renderer::GpuRenderer::render_frame()`] processes the queue, batches compatible draw calls, and presents the swapchain surface. No GPU work is done inside a Lua closure.  ## Subsystem inventory - [`renderer`] — `RenderCommand` enum, draw enums, and texture data types - [`gpu_renderer`] — [`GpuRenderer`]: wgpu device, queue, surface, resource pools - [`canvas`] — [`Canvas`]: off-screen render-to-texture for post-processing - [`font`] — [`Font`]: fontdue glyph rasterization and GPU atlas management - [`shader`] — [`Shader`]: user-supplied WGSL with uniform variable table - [`shape`] — compound vector shape builder for batched drawing - [`mesh`] — custom vertex geometry with per-vertex position, UV, and color - [`postfx_pipeline`] — ping-pong texture passes for multi-pass post-processing - [`draw_layer`] — Z-ordered draw layer for painter's-algorithm sorting - [`decal_surface`] — persistent surface for accumulated decal stamps - [`image_effect`] — per-image shader-effect pass descriptor  All public items are documented. Lua bridge: `src/lua_api/render_api.rs` (registered as `lurek.renders.*`).",
         "source_file": "src/render/mod.rs",
         "items": [
           {
@@ -15988,10 +16057,45 @@
         "kind": "lua"
       },
       {
+        "file": "tests/lua/evidence/test_bezier_evidence.lua",
+        "module": "test_bezier_evidence",
+        "name": "test_bezier_evidence",
+        "description": "Evidence tests: bezier module",
+        "kind": "lua"
+      },
+      {
         "file": "tests/lua/evidence/test_camera_evidence.lua",
         "module": "test_camera_evidence",
         "name": "test_camera_evidence",
         "description": "test_evidence_camera.lua",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_canvas_evidence.lua",
+        "module": "test_canvas_evidence",
+        "name": "test_canvas_evidence",
+        "description": "Canvas is GPU-backed; GPU rendering ops are xit in headless mode.",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_cellular_sand_evidence.lua",
+        "module": "test_cellular_sand_evidence",
+        "name": "test_cellular_sand_evidence",
+        "description": "Evidence tests: cellular_sand module",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_charts_evidence.lua",
+        "module": "test_charts_evidence",
+        "name": "test_charts_evidence",
+        "description": "Evidence tests: charts module",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_easing_evidence.lua",
+        "module": "test_easing_evidence",
+        "name": "test_easing_evidence",
+        "description": "Evidence tests: easing module",
         "kind": "lua"
       },
       {
@@ -16002,6 +16106,13 @@
         "kind": "lua"
       },
       {
+        "file": "tests/lua/evidence/test_geometry_evidence.lua",
+        "module": "test_geometry_evidence",
+        "name": "test_geometry_evidence",
+        "description": "Evidence tests: geometry module",
+        "kind": "lua"
+      },
+      {
         "file": "tests/lua/evidence/test_graph_evidence.lua",
         "module": "test_graph_evidence",
         "name": "test_graph_evidence",
@@ -16009,10 +16120,31 @@
         "kind": "lua"
       },
       {
+        "file": "tests/lua/evidence/test_gui_evidence.lua",
+        "module": "test_gui_evidence",
+        "name": "test_gui_evidence",
+        "description": "Produces PNG artifacts from lurek.ui layout rendering.",
+        "kind": "lua"
+      },
+      {
         "file": "tests/lua/evidence/test_image_evidence.lua",
         "module": "test_image_evidence",
         "name": "test_image_evidence",
         "description": "Placeholder evidence suite for migrated image-adjacent artifacts.",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_imagedata_evidence.lua",
+        "module": "test_imagedata_evidence",
+        "name": "test_imagedata_evidence",
+        "description": "Evidence tests: imagedata module",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_layers_evidence.lua",
+        "module": "test_layers_evidence",
+        "name": "test_layers_evidence",
+        "description": "Evidence tests: layers module",
         "kind": "lua"
       },
       {
@@ -16026,7 +16158,7 @@
         "file": "tests/lua/evidence/test_math_evidence.lua",
         "module": "test_math_evidence",
         "name": "test_math_evidence",
-        "description": "Placeholder evidence suite for migrated math artifacts.",
+        "description": "Evidence suite for math module core operations.",
         "kind": "lua"
       },
       {
@@ -16034,6 +16166,13 @@
         "module": "test_minimap_evidence",
         "name": "test_minimap_evidence",
         "description": "test_evidence_minimap.lua",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_noise_evidence.lua",
+        "module": "test_noise_evidence",
+        "name": "test_noise_evidence",
+        "description": "Evidence tests: noise module",
         "kind": "lua"
       },
       {
@@ -16047,14 +16186,14 @@
         "file": "tests/lua/evidence/test_pathfind_evidence.lua",
         "module": "test_pathfind_evidence",
         "name": "test_pathfind_evidence",
-        "description": "Placeholder evidence suite for migrated pathfinding artifacts.",
+        "description": "Evidence suite: pathfind module",
         "kind": "lua"
       },
       {
         "file": "tests/lua/evidence/test_physics_evidence.lua",
         "module": "test_physics_evidence",
         "name": "test_physics_evidence",
-        "description": "Evidence test: physics simulation -    body positions after stepping",
+        "description": "Produces: physics_sim.png showing colored dots at body positions",
         "kind": "lua"
       },
       {
@@ -16075,14 +16214,21 @@
         "file": "tests/lua/evidence/test_render_evidence.lua",
         "module": "test_render_evidence",
         "name": "test_render_evidence",
-        "description": "test_render_evidence.lua",
+        "description": "Canonical file. Merged from multiple sources.",
         "kind": "lua"
       },
       {
         "file": "tests/lua/evidence/test_scene_evidence.lua",
         "module": "test_scene_evidence",
         "name": "test_scene_evidence",
-        "description": "test_evidence_scene.lua",
+        "description": "Evidence test: lurek.scene DepthSorter API",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_shapes_evidence.lua",
+        "module": "test_shapes_evidence",
+        "name": "test_shapes_evidence",
+        "description": "Evidence tests: shapes module",
         "kind": "lua"
       },
       {
@@ -16859,7 +17005,7 @@
         "file": "tests/lua/library/test_library_patterns.lua",
         "module": "test_library_patterns",
         "name": "test_library_patterns",
-        "description": "newScheduler",
+        "description": "",
         "kind": "lua"
       },
       {
@@ -17132,7 +17278,7 @@
         "file": "tests/lua/unit/test_ai_unit.lua",
         "module": "test_ai_unit",
         "name": "test_ai_unit",
-        "description": "Lurek2D AI API Tests",
+        "description": "=========================================================================",
         "kind": "lua"
       },
       {
@@ -17174,14 +17320,14 @@
         "file": "tests/lua/unit/test_collision_unit.lua",
         "module": "test_collision_unit",
         "name": "test_collision_unit",
-        "description": "test_collision_unit.lua\\nrequire(\\\"lunasome.testing\\\")\\ndescribe(\\\"collision\\\", function()\\n    it(\"lurek.collision.testAABB works\", function()\\n        -- @tests lurek.collision.testAABB\\n        -- TODO: add assertion for lurek.collision.testAABB\\n    end)\\n    it(\"lurek.collision.testCircles works\", function()\\n        -- @tests lurek.collision.testCircles\\n        -- TODO: add assertion for lurek.collision.testCircles\\n    end)\\n    it(\"lurek.collision.testPoint works\", function()\\n        -- @tests lurek.collision.testPoint\\n        -- TODO: add assertion for lurek.collision.testPoint\\n    end)\\n    it(\"lurek.collision.testCircleAABB works\", function()\\n        -- @tests lurek.collision.testCircleAABB\\n        -- TODO: add assertion for lurek.collision.testCircleAABB\\n    end)\\nend)\\n",
+        "description": "test_collision_unit.lua",
         "kind": "lua"
       },
       {
         "file": "tests/lua/unit/test_compute_unit.lua",
         "module": "test_compute_unit",
         "name": "test_compute_unit",
-        "description": "Lurek2D Compute Array Tests",
+        "description": "Tests for lurek.compute dense N-dimensional array API",
         "kind": "lua"
       },
       {
@@ -17202,7 +17348,7 @@
         "file": "tests/lua/unit/test_dataframe_unit.lua",
         "module": "test_dataframe_unit",
         "name": "test_dataframe_unit",
-        "description": "Lurek2D DataFrame Tests",
+        "description": "Tests for lurek.dataframe tabular data API",
         "kind": "lua"
       },
       {
@@ -17363,7 +17509,7 @@
         "file": "tests/lua/unit/test_network_unit.lua",
         "module": "test_network_unit",
         "name": "test_network_unit",
-        "description": "tests/lua/unit/test_network.lua",
+        "description": "BDD tests for lurek.network (high-level UDP API via ENet).",
         "kind": "lua"
       },
       {
@@ -17426,7 +17572,7 @@
         "file": "tests/lua/unit/test_render_unit.lua",
         "module": "test_render_unit",
         "name": "test_render_unit",
-        "description": "Lurek2D Graphics API Tests (headless â€” tests lurek.render API existence and behaviour)",
+        "description": "@description Verifies the graphics namespace is exposed on lurek as a table.",
         "kind": "lua"
       },
       {
@@ -17489,7 +17635,7 @@
         "file": "tests/lua/unit/test_terminal_unit.lua",
         "module": "test_terminal_unit",
         "name": "test_terminal_unit",
-        "description": "tests/lua/unit/test_terminal.lua",
+        "description": "BDD tests for the lurek.terminal.* API, covering terminal widgets, layout helpers, input-driven interactions, and headless terminal state updates.",
         "kind": "lua"
       },
       {

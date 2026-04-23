@@ -32,8 +32,8 @@ import sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-RUST_INPUT = WORKSPACE_ROOT / "logs" / "rust_api_data.json"
-LUA_INPUT = WORKSPACE_ROOT / "logs" / "lua_api_data.json"
+RUST_INPUT = WORKSPACE_ROOT / "logs" / "data" / "rust_api_data.json"
+LUA_INPUT = WORKSPACE_ROOT / "logs" / "data" / "lua_api_data.json"
 OUTPUT_FILE = WORKSPACE_ROOT / "logs" / "reports" / "coverage_gaps.md"
 
 # Rust modules that are deliberately not exposed to Lua (engine internals, CLI, etc.)

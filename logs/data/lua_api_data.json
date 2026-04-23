@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-04-23T22:09:06.538550+00:00",
+    "generated": "2026-04-23T22:15:22.463253+00:00",
     "generator": "tools/gen_lua_api_data.py",
     "version": "0.20.0",
     "stats": {
