@@ -28,7 +28,7 @@ export function register(
       const locations: vscode.Location[] = [];
 
       // Search across all .lua files in workspace
-      const files = await vscode.workspace.findFiles("**/*.lua", "**/node_modules/**", 500);
+      const files = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 500);
 
       for (const fileUri of files) {
         try {

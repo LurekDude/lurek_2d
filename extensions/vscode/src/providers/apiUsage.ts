@@ -13,7 +13,7 @@ interface ApiUsage {
 }
 
 async function scanApiUsage(): Promise<ApiUsage[]> {
-  const luaFiles = await vscode.workspace.findFiles("**/*.lua", "**/node_modules/**");
+  const luaFiles = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
   const usage = new Map<string, ApiUsage>();
 
   for (const uri of luaFiles) {

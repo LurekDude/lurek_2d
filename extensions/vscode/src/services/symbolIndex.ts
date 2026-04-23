@@ -52,14 +52,24 @@ export class SymbolIndex {
       this.symbols.clear();
       this.fileSymbols.clear();
 
-      const luaFiles = await vscode.workspace.findFiles("**/*.lua", "**/node_modules/**");
+      // Exclude folders that are not game/library code.
+      // ideas/ and work/ are scratch folders; .github/ has skill example snippets;
+      // opening these via openTextDocument triggers diagnostics on every rebuild.
+      const luaFiles = await vscode.workspace.findFiles(
+        "**/*.lua",
+        "{**/node_modules/**,ideas/**,work/**,.github/**}",
+      );
 
       for (const fileUri of luaFiles) {
         try {
-          const doc = await vscode.workspace.openTextDocument(fileUri);
-          this.indexDocument(doc);
+          // Read raw bytes — do NOT use openTextDocument here.
+          // openTextDocument fires onDidOpenTextDocument → diagnose() for every
+          // file, which causes the warning count to flicker on every index rebuild.
+          const bytes = await vscode.workspace.fs.readFile(fileUri);
+          const text = new TextDecoder().decode(bytes);
+          this.indexText(fileUri, text);
         } catch {
-          // Skip files that can't be opened
+          // Skip files that can't be read
         }
       }
     } finally {
@@ -143,13 +153,18 @@ export class SymbolIndex {
 
   // ── Internal ────────────────────────────────────────────
 
-  private indexDocument(doc: vscode.TextDocument): void {
-    const key = doc.uri.toString();
+  /** Compute a vscode.Position from a raw text offset (line/col from newlines). */
+  private positionFromOffset(text: string, offset: number): vscode.Position {
+    const before = text.substring(0, offset);
+    const lines = before.split("\n");
+    return new vscode.Position(lines.length - 1, lines[lines.length - 1].length);
+  }
 
-    // Remove old entries for this file
-    this.removeFile(doc.uri);
+  /** Index a file from raw text, without requiring an open TextDocument. */
+  private indexText(uri: vscode.Uri, text: string): void {
+    const key = uri.toString();
+    this.removeFile(uri);
 
-    const text = doc.getText();
     const fileSyms: SymbolInfo[] = [];
 
     for (const pat of PATTERNS) {
@@ -158,8 +173,8 @@ export class SymbolIndex {
 
       while ((match = pat.regex.exec(text)) !== null) {
         const name = match[pat.group];
-        const startPos = doc.positionAt(match.index);
-        const endPos = doc.positionAt(match.index + match[0].length);
+        const startPos = this.positionFromOffset(text, match.index);
+        const endPos = this.positionFromOffset(text, match.index + match[0].length);
 
         // Extract container name for methods (Class:method → Class)
         let containerName: string | undefined;
@@ -172,7 +187,7 @@ export class SymbolIndex {
         const sym: SymbolInfo = {
           name,
           kind: pat.kind,
-          uri: doc.uri,
+          uri,
           range: new vscode.Range(startPos, endPos),
           containerName,
         };
@@ -187,6 +202,11 @@ export class SymbolIndex {
     }
 
     this.fileSymbols.set(key, fileSyms);
+  }
+
+  /** Index an already-open TextDocument (used for per-file updates). */
+  private indexDocument(doc: vscode.TextDocument): void {
+    this.indexText(doc.uri, doc.getText());
   }
 }
 

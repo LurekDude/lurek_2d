@@ -210,8 +210,8 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
   },
   // ── I1 additions ────────────────────────────────────────────
   {
-    // lurek.graphics.printf 5th arg: alignment
-    pattern: /lurek\.graphics\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']$/,
+    // lurek.render.printf 5th arg: alignment
+    pattern: /lurek\.render\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']$/,
     values: [
       { label: "left", detail: "Left-aligned text" },
       { label: "center", detail: "Center-aligned text" },
@@ -220,8 +220,8 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    // lurek.graphics.setStencilTest mode
-    pattern: /lurek\.graphics\.(?:setStencilTest|stencil)\s*\([^)]*["']$/,
+    // lurek.render.setStencilTest mode
+    pattern: /lurek\.render\.(?:setStencilTest|stencil)\s*\([^)]*["']$/,
     values: [
       { label: "greater", detail: "Draw where stencil > value" },
       { label: "greaterequal", detail: "Draw where stencil >= value" },
@@ -269,8 +269,8 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    // lurek.graphics.setArcType / arc type
-    pattern: /lurek\.graphics\.arc\s*\(\s*["']$/,
+    // lurek.render.setArcType / arc type
+    pattern: /lurek\.render\.arc\s*\(\s*["']$/,
     values: [
       { label: "pie", detail: "Pie-slice arc" },
       { label: "open", detail: "Open arc (lines to centre not drawn)" },
@@ -299,15 +299,16 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
 // ── Constructor → object type mapping ────────────────────────
 
 const CONSTRUCTOR_RETURN_TYPES: Record<string, string> = {
-  "lurek.graphics.newImage": "Image",
-  "lurek.graphics.newCanvas": "Canvas",
-  "lurek.graphics.newFont": "Font",
-  "lurek.graphics.newShader": "Shader",
-  "lurek.graphics.newQuad": "Quad",
-  "lurek.graphics.newMesh": "Mesh",
-  "lurek.graphics.newSpriteBatch": "SpriteBatch",
-  "lurek.graphics.newParticleSystem": "ParticleSystem",
-  "lurek.graphics.newImageData": "ImageData",
+  // lurek.render.* is the current API namespace
+  "lurek.render.newImage": "Image",
+  "lurek.render.newCanvas": "Canvas",
+  "lurek.render.newFont": "Font",
+  "lurek.render.newShader": "Shader",
+  "lurek.render.newQuad": "Quad",
+  "lurek.render.newMesh": "Mesh",
+  "lurek.render.newSpriteBatch": "SpriteBatch",
+  "lurek.render.newParticleSystem": "ParticleSystem",
+  "lurek.render.newImageData": "ImageData",
   "lurek.audio.newSource": "Source",
   "lurek.physics.newWorld": "World",
   "lurek.physics.newBody": "Body",
@@ -691,7 +692,7 @@ export function register(
         const items: vscode.CompletionItem[] = [];
 
         try {
-          const luaFiles = await vscode.workspace.findFiles("**/*.lua", "**/node_modules/**", 200);
+          const luaFiles = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 200);
           const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
 
           for (const fileUri of luaFiles) {

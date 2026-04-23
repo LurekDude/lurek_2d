@@ -134,7 +134,7 @@ export function register(context: vscode.ExtensionContext): void {
 
     nodeCache.clear();
 
-    const luaFiles = await vscode.workspace.findFiles("**/*.lua", "**/node_modules/**");
+    const luaFiles = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
 
     for (const fileUri of luaFiles) {
       try {

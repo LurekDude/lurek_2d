@@ -118,8 +118,9 @@ function checkColorRange(text: string): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
     const lines = text.split('\n');
 
+    // lurek.render.* is the current API namespace (lurek.graphics.* was the old name)
     const colorFuncPattern =
-        /lurek\.graphics\.(?:setColor|setBackgroundColor|clear)\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/g;
+        /lurek\.render\.(?:setColor|setBackgroundColor|clear)\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/g;
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -192,7 +193,7 @@ function checkAssetNotFound(
 
     const lines = text.split('\n');
     const assetFuncPattern =
-        /lurek\.(?:graphics\.newImage|audio\.newSource|filesystem\.read)\s*\(\s*["']([^"']+)["']/g;
+        /lurek\.(?:render\.newImage|audio\.newSource|fs\.read)\s*\(\s*["']([^"']+)["']/g;
 
     const docDir = path.dirname(document.uri.fsPath);
     const wsRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
@@ -286,8 +287,11 @@ function checkMissingCallback(
     const diagnostics: vscode.Diagnostic[] = [];
     const fileName = path.basename(document.uri.fsPath);
 
-    // Only for files named main.lua
+    // Only for files named main.lua that live inside content/games/
+    // (not ideas/, work/, .github/ skill examples, or other root main.lua files)
     if (fileName !== 'main.lua') return diagnostics;
+    const filePath = document.uri.fsPath.replace(/\\/g, '/');
+    if (!filePath.includes('/content/games/')) return diagnostics;
 
     const hasUpdate = info.callbacks.some(cb => cb.name === 'update')
         || /lurek\.update\s*=\s*function/.test(text);
@@ -315,27 +319,28 @@ function checkMissingCallback(
 // Known enum sets per function/param pattern
 const ENUM_RULES: { pattern: RegExp; valid: string[]; label: string }[] = [
     {
-        pattern: /lurek\.graphics\.(?:rectangle|circle|arc|polygon|ellipse)\s*\(\s*["']([^"']+)["']/g,
+        // lurek.render.* is the current draw API namespace
+        pattern: /lurek\.render\.(?:rectangle|circle|arc|polygon|ellipse)\s*\(\s*["']([^"']+)["']/g,
         valid: ['fill', 'line'],
         label: 'draw mode',
     },
     {
-        pattern: /lurek\.graphics\.setBlendMode\s*\(\s*["']([^"']+)["']/g,
+        pattern: /lurek\.render\.setBlendMode\s*\(\s*["']([^"']+)["']/g,
         valid: ['alpha', 'add', 'subtract', 'multiply', 'replace', 'screen', 'darken', 'lighten', 'none'],
         label: 'blend mode',
     },
     {
-        pattern: /lurek\.graphics\.setLineStyle\s*\(\s*["']([^"']+)["']/g,
+        pattern: /lurek\.render\.setLineStyle\s*\(\s*["']([^"']+)["']/g,
         valid: ['smooth', 'rough'],
         label: 'line style',
     },
     {
-        pattern: /lurek\.graphics\.setFilter\s*\([^,]*,\s*["']([^"']+)["']/g,
+        pattern: /lurek\.render\.setFilter\s*\([^,]*,\s*["']([^"']+)["']/g,
         valid: ['linear', 'nearest'],
         label: 'texture filter',
     },
     {
-        pattern: /lurek\.graphics\.setFilter\s*\(\s*["']([^"']+)["']/g,
+        pattern: /lurek\.render\.setFilter\s*\(\s*["']([^"']+)["']/g,
         valid: ['linear', 'nearest'],
         label: 'texture filter',
     },
@@ -350,7 +355,7 @@ const ENUM_RULES: { pattern: RegExp; valid: string[]; label: string }[] = [
         label: 'body type',
     },
     {
-        pattern: /lurek\.graphics\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']([^"']+)["']/g,
+        pattern: /lurek\.render\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']([^"']+)["']/g,
         valid: ['left', 'center', 'right', 'justify'],
         label: 'text alignment',
     },
@@ -505,7 +510,7 @@ function checkPerFrameAllocation(
 ): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
     const lines = text.split('\n');
-    const allocPattern = /lurek\.(?:graphics\.(?:newImage|newFont|newCanvas|newShader|newSpriteBatch|newMesh)|audio\.(?:newSource)|image\.load)\s*\(/g;
+    const allocPattern = /lurek\.(?:render\.(?:newImage|newFont|newCanvas|newShader)|audio\.(?:newSource)|image\.load)\s*\(/g;
     const frameCallbacks = ['update', 'draw', 'render', 'render_ui', 'process', 'process_late', 'process_physics'];
 
     for (let i = 0; i < lines.length; i++) {

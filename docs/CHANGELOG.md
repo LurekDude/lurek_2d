@@ -2,7 +2,25 @@
 
 All notable changes to Lurek2D are recorded here.
 
-## [0.20.23] - 2026-04-26
+## [0.20.24] - 2026-04-23
+
+### fix(ext): stop warning-count flicker and fix stale lurek.graphics.* patterns
+
+- **`symbolIndex.ts`**: `buildIndex()` now reads files via `vscode.workspace.fs.readFile()`
+  instead of `openTextDocument()`. This stops the `onDidOpenTextDocument` cascade that caused
+  diagnostics to fire on every Lua file every time the index rebuilt, causing warning counts
+  to flicker continuously.
+- **All `findFiles` calls** (7 files) updated with `{**/node_modules/**,ideas/**,work/**,.github/**}`
+  exclusion so `ideas/`, `work/`, and `.github/skills/*/examples/` Lua files are never scanned.
+- **`diagnostics.ts`**: Updated `checkColorRange`, `checkAssetNotFound`, `ENUM_RULES`, and
+  `checkPerFrameAllocation` — all used `lurek.graphics.*` (old API) which generated false warnings
+  on every game file after the API migration; updated to `lurek.render.*`.
+  `checkMissingCallback` now only fires for files under `content/games/` (was any `main.lua`).
+- **`completion.ts`**: `STRING_CONTEXT_RULES` and `CONSTRUCTOR_RETURN_TYPES` updated from
+  `lurek.graphics.*` → `lurek.render.*` for correct autocomplete suggestions.
+- Rebuilt and reinstalled extension to `~/.vscode/extensions/lurek2d.lurek2d-toolkit-0.9.0/`.
+
+## [0.20.23] - 2026-04-23
 
 ### fix(games): repair Lua API errors across all 124 game scripts
 

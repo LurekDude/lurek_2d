@@ -173,7 +173,7 @@ export function register(
       const lowerQuery = query.toLowerCase();
       const results: vscode.SymbolInformation[] = [];
 
-      const files = await vscode.workspace.findFiles("**/*.lua", "**/node_modules/**", 100);
+      const files = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 100);
 
       for (const fileUri of files) {
         try {

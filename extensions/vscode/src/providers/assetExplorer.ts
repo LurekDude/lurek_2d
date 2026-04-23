@@ -311,7 +311,7 @@ export async function findMissingAssets(): Promise<void> {
     return;
   }
 
-  const luaFiles = await vscode.workspace.findFiles("**/*.lua", "**/node_modules/**");
+  const luaFiles = await vscode.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
   const assetPattern = /lurek\.(?:graphics\.newImage|audio\.newSource)\s*\(\s*["']([^"']+)["']/g;
   const missing: { file: string; line: number; asset: string }[] = [];
 
