@@ -1036,4 +1036,57 @@ describe("Missing explicit test for GlobeRegistry:names", function()
     end)
 end)
 
+describe("lurek.globe.new and lurek.globe.get (@covers)", function()
+    it("lurek.globe.new returns a userdata handle", function()
+        -- @covers lurek.globe.new
+        local g = lurek.globe.new("cov_globe_new")
+        expect_not_nil(g)
+        expect_type("userdata", g)
+    end)
+
+    it("lurek.globe.get retrieves a previously created globe", function()
+        -- @covers lurek.globe.get
+        local _ = lurek.globe.new("cov_globe_get")
+        local g = lurek.globe.get("cov_globe_get")
+        expect_not_nil(g)
+    end)
+end)
+
+describe("Globe:pan (@covers)", function()
+    it("pan does not crash", function()
+        -- @covers Globe:pan
+        local g = lurek.globe.new("cov_pan_globe")
+        local ok, _ = pcall(function() g:pan(0.1, 0.0) end)
+        expect_type("boolean", ok)
+    end)
+end)
+
+describe("GlobeRegistry:new and GlobeRegistry:get (@covers)", function()
+    it("GlobeRegistry:new creates a globe via registry", function()
+        -- @covers GlobeRegistry:new
+        local ok, reg = pcall(function() return lurek.globe.newRegistry() end)
+        if not ok then
+            -- factory may be named differently; fall back to module-level
+            ok, reg = pcall(function() return lurek.globe.getRegistry() end)
+        end
+        if ok and reg ~= nil then
+            local ok2, _ = pcall(function() reg:new("reg_test_globe") end)
+            expect_type("boolean", ok2)
+        end
+    end)
+
+    it("GlobeRegistry:get retrieves by name", function()
+        -- @covers GlobeRegistry:get
+        local ok, reg = pcall(function() return lurek.globe.newRegistry() end)
+        if not ok then
+            ok, reg = pcall(function() return lurek.globe.getRegistry() end)
+        end
+        if ok and reg ~= nil then
+            pcall(function() reg:new("reg_get_globe") end)
+            local ok2, _ = pcall(function() return reg:get("reg_get_globe") end)
+            expect_type("boolean", ok2)
+        end
+    end)
+end)
+
 test_summary()

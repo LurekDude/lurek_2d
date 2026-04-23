@@ -71,4 +71,12 @@ describe("Missing explicit test for lurek.engine.isDebug", function()
     end)
 end)
 
+describe("lurek.engine.fps (@covers)", function()
+    it("fps returns a number", function()
+        -- @covers lurek.engine.fps
+        local v = lurek.engine.fps()
+        expect_type("number", v)
+    end)
+end)
+
 test_summary()

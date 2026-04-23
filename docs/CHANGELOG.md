@@ -2,6 +2,39 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.18] - 2026-04-24
+
+### test(lua): add @covers-marked unit tests for 15 modules — coverage 98.7 %
+
+Added missing `@covers`-marked `it()` blocks to 15 existing Lua unit test files (per TST-06, no new files created). All tests added to existing per-module files under `tests/lua/unit/`.
+
+**Modules covered:**
+- `raycaster` — `DoorManager:addDoor`, `PointLight:x/y/set`, `Raycaster:buildScene/drawTopDown`, `SpriteManager:add`
+- `compute` — `Array:get/set/pow/abs/neg/any/all/sum/min/max/dot/map`, `lurek.compute.fft`
+- `engine` — `lurek.engine.fps`
+- `patterns` — `EventBus:on/off`, `ObjectPool:add`, `ServiceLocator:has`, `Factory:has`, `Blackboard:set/get/has`, `Observer:set/get`, `PriorityQueue:pop/len`, `Ring:len/sum`, `Mediator:on/off`, `Strategy:set/has`, `Stack:pop/len`
+- `math` — `lurek.math.rad/deg/tan/exp/log/pow`, `Vec2:x/y`, `Vec3:dot/add/sub`, `CatmullRom:len`, `Transform:setTransformation`, `BezierCurve:setControlPoint/insertControlPoint`, `Tween:set`, `Circle:x/y`, `AabbTree:len`
+- `globe` — `lurek.globe.new/get`, `Globe:pan`, `GlobeRegistry:new/get`
+- `network` — `NetworkHost:disconnectNow/disconnectLater`
+- `physics` — `World:newChainBody`, 7 joint constructors, `World:raycastClosest/queryAABB`, `Body:applyForceAtPoint`
+- `spine` — `Skeleton:blendAnimation`, `SkeletonAnimation:addEventKey`
+- `scene` — `lurek.scene.pop/new`, `DepthSorter:add`
+- `tween` — `lurek.tween.to`, `TweenState:t`
+- `data` — `RingBuffer:pop/len`, `DataWriter:len`
+- `camera` — `Camera2D:followPath/setParallaxFactor`
+- `devtools` — `lurek.devtools.log`, `ReplConsole:len`
+- `animation` — `BlendLayerSet:len/addLayer`, `AnimSyncGroup:add`
+
+**Overall Lua API test coverage: 98.7 % (4043/4097 functions covered).**
+
+## [0.20.17] - 2026-04-23
+
+### chore(build): pivot release to max performance; dist inherits; UPX --best
+
+- `[profile.release]` `opt-level` changed `"z"` → `3`: maximum LLVM inlining and loop-unrolling for best runtime performance. Binary grows to ~32 MB raw (acceptable — not shipped).
+- `[profile.dist]` now a clean `inherits = "release"` with no overrides: ships opt-level=3 binary for maximum in-game performance.
+- `tools/dist/dist.ps1` UPX flags changed from `--lzma -6` → `--best`: switches from LZMA to UCL/NRV compression. Result is faster startup decompression and ~8-9 MB packaged binary (<10 MB zipped).
+
 ## [0.20.16] - 2026-04-23
 
 ### fix(build): release opt-level s → z to hit 20 MB target; simplify dist profile

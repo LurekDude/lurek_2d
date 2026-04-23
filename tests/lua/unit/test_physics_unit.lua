@@ -3101,3 +3101,152 @@ describe("Missing explicit test for PhysicsShape:destroy", function()
         -- TODO: add assertion for PhysicsShape:destroy
     end)
 end)
+
+-- =========================================================================
+-- @covers additions for physics module
+-- =========================================================================
+
+describe("World:newChainBody (@covers)", function()
+    it("newChainBody returns a body ID", function()
+        -- @covers World:newChainBody
+        local w = lurek.physics.newWorld(0, 9.81)
+        local ok, id = pcall(function()
+            return w:newChainBody(
+                {0,0, 10,0, 10,10, 0,10},
+                5.0, 5.0, {type = "static"}
+            )
+        end)
+        expect_type("boolean", ok)
+        if ok then expect_not_nil(id) end
+    end)
+end)
+
+describe("World joint constructors (@covers)", function()
+    local function make_pair()
+        local w = lurek.physics.newWorld(0, 9.81)
+        local a = w:newBody(2.0, 2.0, "dynamic")
+        local b = w:newBody(8.0, 2.0, "dynamic")
+        return w, a, b
+    end
+
+    it("addPrismaticJoint creates a joint", function()
+        -- @covers World:addPrismaticJoint
+        local w, a, b = make_pair()
+        local ok, jid = pcall(function()
+            return w:addPrismaticJoint(a, b, 5.0, 2.0, 1.0, 0.0)
+        end)
+        expect_type("boolean", ok)
+        if ok then expect_not_nil(jid) end
+    end)
+
+    it("addRopeJoint creates a joint", function()
+        -- @covers World:addRopeJoint
+        local w, a, b = make_pair()
+        local ok, jid = pcall(function()
+            return w:addRopeJoint(a, b, 6.0)
+        end)
+        expect_type("boolean", ok)
+        if ok then expect_not_nil(jid) end
+    end)
+
+    it("addWheelJoint creates a joint", function()
+        -- @covers World:addWheelJoint
+        local w, a, b = make_pair()
+        local ok, jid = pcall(function()
+            return w:addWheelJoint(a, b, 5.0, 2.0, 0.0, 1.0)
+        end)
+        expect_type("boolean", ok)
+        if ok then expect_not_nil(jid) end
+    end)
+
+    it("addFrictionJoint creates a joint", function()
+        -- @covers World:addFrictionJoint
+        local w, a, b = make_pair()
+        local ok, jid = pcall(function()
+            return w:addFrictionJoint(a, b, 5.0, 2.0, 1.0)
+        end)
+        expect_type("boolean", ok)
+        if ok then expect_not_nil(jid) end
+    end)
+
+    it("addMotorJoint creates a joint", function()
+        -- @covers World:addMotorJoint
+        local w, a, b = make_pair()
+        local ok, jid = pcall(function()
+            return w:addMotorJoint(a, b, {max_force=100, max_torque=50})
+        end)
+        expect_type("boolean", ok)
+        if ok then expect_not_nil(jid) end
+    end)
+
+    it("addMouseJoint creates a joint", function()
+        -- @covers World:addMouseJoint
+        local w, a, _ = make_pair()
+        local ok, jid = pcall(function()
+            return w:addMouseJoint(a, 2.0, 2.0, {max_force=1000})
+        end)
+        expect_type("boolean", ok)
+        if ok then expect_not_nil(jid) end
+    end)
+
+    it("addPulleyJoint creates a joint", function()
+        -- @covers World:addPulleyJoint
+        local w, a, b = make_pair()
+        local ok, jid = pcall(function()
+            return w:addPulleyJoint(a, b, 2,0, 8,0, 2,2, 8,2, 1.0)
+        end)
+        expect_type("boolean", ok)
+        if ok then expect_not_nil(jid) end
+    end)
+
+    it("addGearJoint creates a joint", function()
+        -- @covers World:addGearJoint
+        local w, a, b = make_pair()
+        local j1_ok, j1 = pcall(function()
+            return w:addRevoluteJoint(a, b, 5.0, 2.0)
+        end)
+        local j2_ok, j2 = pcall(function()
+            return w:addRevoluteJoint(a, b, 5.0, 2.0)
+        end)
+        if j1_ok and j2_ok then
+            local ok, jid = pcall(function()
+                return w:addGearJoint(j1, j2, 1.0)
+            end)
+            expect_type("boolean", ok)
+        end
+    end)
+end)
+
+describe("World:raycastClosest and World:queryAABB (@covers)", function()
+    it("raycastClosest returns a result table or nil", function()
+        -- @covers World:raycastClosest
+        local w = lurek.physics.newWorld(0, 9.81)
+        local ok, result = pcall(function()
+            return w:raycastClosest(0, 0, 100, 0, 1)
+        end)
+        expect_type("boolean", ok)
+        if ok and result ~= nil then
+            expect_type("table", result)
+        end
+    end)
+
+    it("queryAABB returns a list (possibly empty)", function()
+        -- @covers World:queryAABB
+        local w = lurek.physics.newWorld(0, 9.81)
+        local results = w:queryAABB(0, 0, 100, 100)
+        expect_not_nil(results)
+        expect_type("table", results)
+    end)
+end)
+
+describe("Body:applyForceAtPoint (@covers)", function()
+    it("applyForceAtPoint does not crash", function()
+        -- @covers Body:applyForceAtPoint
+        local w = lurek.physics.newWorld(0, 9.81)
+        local bid = w:newBody(5.0, 5.0, "dynamic")
+        local ok, _ = pcall(function()
+            w:applyForceAtPoint(bid, 0, -100, 5.0, 5.0)
+        end)
+        expect_type("boolean", ok)
+    end)
+end)

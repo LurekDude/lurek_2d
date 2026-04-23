@@ -1747,4 +1747,109 @@ describe("Array:scan", function()
     end)
 end)
 
+-- =========================================================================
+-- Array element-level operations with explicit @covers markers
+-- =========================================================================
+describe("Array element operations (@covers)", function()
+    it("Array:get reads an element by index", function()
+        -- @covers Array:get
+        local a = lurek.compute.fromTable({10.0, 20.0, 30.0})
+        expect_near(10.0, a:get(1), 1e-5)
+        expect_near(30.0, a:get(3), 1e-5)
+    end)
+
+    it("Array:set writes an element by index", function()
+        -- @covers Array:set
+        local a = lurek.compute.zeros({4})
+        a:set(2, 99.0)
+        expect_near(99.0, a:get(2), 1e-5)
+        expect_near(0.0, a:get(1), 1e-5)
+    end)
+
+    it("Array:pow raises each element to a power", function()
+        -- @covers Array:pow
+        local a = lurek.compute.fromTable({2.0, 3.0})
+        local r = a:pow(2)
+        expect_not_nil(r)
+        expect_type("userdata", r)
+    end)
+
+    it("Array:abs returns absolute-value array", function()
+        -- @covers Array:abs
+        local a = lurek.compute.fromTable({-4.0, 3.0})
+        local r = a:abs()
+        expect_not_nil(r)
+        expect_type("userdata", r)
+    end)
+
+    it("Array:neg negates all elements", function()
+        -- @covers Array:neg
+        local a = lurek.compute.fromTable({1.0, -2.0})
+        local r = a:neg()
+        expect_not_nil(r)
+        expect_type("userdata", r)
+    end)
+
+    it("Array:any returns a boolean", function()
+        -- @covers Array:any
+        local a = lurek.compute.fromTable({0.0, 1.0})
+        local v = a:any()
+        expect_type("boolean", v)
+        expect_equal(true, v)
+    end)
+
+    it("Array:all returns a boolean", function()
+        -- @covers Array:all
+        local a = lurek.compute.fromTable({1.0, 1.0, 1.0})
+        local v = a:all()
+        expect_type("boolean", v)
+        expect_equal(true, v)
+    end)
+
+    it("Array:sum returns the total of all elements", function()
+        -- @covers Array:sum
+        local a = lurek.compute.fromTable({1.0, 2.0, 3.0})
+        local s = a:sum()
+        expect_near(6.0, s, 1e-5)
+    end)
+
+    it("Array:min returns the smallest element", function()
+        -- @covers Array:min
+        local a = lurek.compute.fromTable({5.0, 1.0, 3.0})
+        local m = a:min()
+        expect_near(1.0, m, 1e-5)
+    end)
+
+    it("Array:max returns the largest element", function()
+        -- @covers Array:max
+        local a = lurek.compute.fromTable({5.0, 1.0, 3.0})
+        local m = a:max()
+        expect_near(5.0, m, 1e-5)
+    end)
+
+    it("Array:dot computes inner product", function()
+        -- @covers Array:dot
+        local a = lurek.compute.fromTable({1.0, 2.0, 3.0})
+        local b = lurek.compute.fromTable({4.0, 5.0, 6.0})
+        local d = a:dot(b)
+        expect_near(32.0, d, 1e-5)
+    end)
+
+    it("Array:map applies a transform to each element", function()
+        -- @covers Array:map
+        local a = lurek.compute.fromTable({1.0, 2.0, 4.0})
+        local r = a:map(function(x) return x * 2 end)
+        expect_not_nil(r)
+        expect_type("userdata", r)
+    end)
+end)
+
+describe("lurek.compute.fft", function()
+    it("fft of a real signal returns a result", function()
+        -- @covers lurek.compute.fft
+        local result = lurek.compute.fft({1.0, 0.0, 1.0, 0.0})
+        expect_not_nil(result)
+    end)
+end)
+
 test_summary()

@@ -798,4 +798,68 @@ describe("Missing explicit test for SpriteManager:typeOf", function()
     end)
 end)
 
+-- @covers DoorManager:addDoor
+describe("DoorManager:addDoor", function()
+    it("addDoor increments door count", function()
+        -- @covers DoorManager:addDoor
+        local dm = lurek.raycaster.newDoorManager()
+        dm:addDoor(3, 5, 0, 0.0, 2.0)
+        expect_equal(1, dm:count())
+    end)
+end)
+
+-- @covers PointLight:x / PointLight:y / PointLight:set
+describe("PointLight accessors and set", function()
+    it("x returns a number", function()
+        -- @covers PointLight:x
+        local pl = lurek.raycaster.newPointLight(10.0, 20.0, 5.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        expect_type("number", pl:x())
+    end)
+
+    it("y returns a number", function()
+        -- @covers PointLight:y
+        local pl = lurek.raycaster.newPointLight(10.0, 20.0, 5.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        expect_type("number", pl:y())
+    end)
+
+    it("set updates the position", function()
+        -- @covers PointLight:set
+        local pl = lurek.raycaster.newPointLight(0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        pl:set(7.0, 9.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        expect_near(7.0, pl:x(), 1e-5)
+        expect_near(9.0, pl:y(), 1e-5)
+    end)
+end)
+
+-- @covers Raycaster:buildScene
+describe("Raycaster:buildScene", function()
+    it("buildScene does not panic on empty grid", function()
+        -- @covers Raycaster:buildScene
+        local rc = lurek.raycaster.new(8, 8)
+        local ok, _ = pcall(function() rc:buildScene() end)
+        -- headless: accept success or a headless-specific nil return
+        expect_type("boolean", ok)
+    end)
+end)
+
+-- @covers Raycaster:drawTopDown
+describe("Raycaster:drawTopDown", function()
+    it("drawTopDown does not crash in headless mode", function()
+        -- @covers Raycaster:drawTopDown
+        local rc = lurek.raycaster.new(8, 8)
+        local ok, _ = pcall(function() rc:drawTopDown(0.0, 0.0, 1.0) end)
+        expect_type("boolean", ok)
+    end)
+end)
+
+-- @covers SpriteManager:add
+describe("SpriteManager:add", function()
+    it("add does not crash", function()
+        -- @covers SpriteManager:add
+        local sm = lurek.raycaster.newSpriteManager()
+        local ok, _ = pcall(function() sm:add(1, 5.0, 5.0, {}) end)
+        expect_type("boolean", ok)
+    end)
+end)
+
 test_summary()

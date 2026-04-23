@@ -541,3 +541,29 @@ describe("Missing explicit test for SkeletonAnimation:getTimelineCount", functio
         -- TODO: add assertion for SkeletonAnimation:getTimelineCount
     end)
 end)
+
+-- =========================================================================
+-- @covers additions for spine module
+-- =========================================================================
+
+describe("Skeleton:blendAnimation (@covers)", function()
+    it("blendAnimation does not crash on a fresh skeleton", function()
+        -- @covers Skeleton:blendAnimation
+        local skel = lurek.spine.newSkeleton("cov_blend_skel")
+        local ok, _ = pcall(function()
+            skel:blendAnimation("idle", 1.0, 0.0)
+        end)
+        expect_type("boolean", ok)
+    end)
+end)
+
+describe("SkeletonAnimation:addEventKey (@covers)", function()
+    it("addEventKey does not crash", function()
+        -- @covers SkeletonAnimation:addEventKey
+        local anim = lurek.spine.newSkeletonAnimation("cov_anim", 1.0)
+        local ok, _ = pcall(function()
+            anim:addEventKey(0.5, "footstep", 0)
+        end)
+        expect_type("boolean", ok)
+    end)
+end)

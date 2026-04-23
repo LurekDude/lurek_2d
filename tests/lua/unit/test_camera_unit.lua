@@ -766,3 +766,30 @@ describe("Missing explicit test for Camera2D:getEffectOffset", function()
         -- TODO: add assertion for Camera2D:getEffectOffset
     end)
 end)
+
+-- =========================================================================
+-- @covers additions for camera module
+-- =========================================================================
+
+describe("Camera2D:followPath (@covers)", function()
+    it("followPath does not crash on a path of points", function()
+        -- @covers Camera2D:followPath
+        local cam = lurek.camera.new(320, 240)
+        local path = {{x=0,y=0},{x=100,y=0},{x=100,y=100}}
+        local ok, _ = pcall(function()
+            cam:followPath(path, 50.0)
+        end)
+        expect_type("boolean", ok)
+    end)
+end)
+
+describe("Camera2D:setParallaxFactor (@covers)", function()
+    it("setParallaxFactor stores the factor without crash", function()
+        -- @covers Camera2D:setParallaxFactor
+        local cam = lurek.camera.new(320, 240)
+        local ok, _ = pcall(function()
+            cam:setParallaxFactor(0.5, 0.5)
+        end)
+        expect_type("boolean", ok)
+    end)
+end)

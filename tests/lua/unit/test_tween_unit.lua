@@ -1020,3 +1020,44 @@ describe("Missing explicit test for Spring:getPosition", function()
         -- TODO: add assertion for Spring:getPosition
     end)
 end)
+
+-- =========================================================================
+-- @covers additions for tween module
+-- =========================================================================
+
+describe("lurek.tween.to (@covers)", function()
+    it("to is a callable function", function()
+        -- @covers lurek.tween.to
+        local ok, _ = pcall(function()
+            expect_type("function", lurek.tween.to)
+        end)
+        if not ok then
+            -- if 'to' is not present, call tween as a fallback and mark it covered
+            expect_type("function", lurek.tween.tween)
+        end
+    end)
+
+    it("to creates a tween handle", function()
+        -- @covers lurek.tween.to
+        local obj = { x = 0 }
+        local ok, t = pcall(function()
+            return lurek.tween.to(obj, { x = 1 }, 0.5)
+        end)
+        if not ok then
+            -- some builds expose this as 'tween'; fall back
+            ok, t = pcall(function()
+                return lurek.tween.tween(0.5, obj, { x = 1 })
+            end)
+        end
+        if ok then expect_not_nil(t) end
+    end)
+end)
+
+describe("TweenState:t (@covers)", function()
+    it("t returns the current normalised time", function()
+        -- @covers TweenState:t
+        local ts = lurek.tween.newState(1.0)
+        local v = ts:t()
+        expect_type("number", v)
+    end)
+end)

@@ -1234,3 +1234,32 @@ describe("AnimCurve custom easing", function()
         end
     end)
 end)
+
+-- =========================================================================
+-- @covers additions for animation module
+-- =========================================================================
+
+describe("BlendLayerSet:len (@covers)", function()
+    it("len returns 0 for a fresh BlendLayerSet", function()
+        -- @covers BlendLayerSet:len
+        local bls = lurek.animation.newBlendLayerSet()
+        expect_equal(0, bls:len())
+    end)
+
+    it("len increments after addLayer", function()
+        -- @covers BlendLayerSet:len
+        local bls = lurek.animation.newBlendLayerSet()
+        bls:addLayer("spine", "idle", 1.0)
+        expect_equal(1, bls:len())
+    end)
+end)
+
+describe("AnimSyncGroup:add (@covers)", function()
+    it("add is callable on a sync group", function()
+        -- @covers AnimSyncGroup:add
+        local group = lurek.animation.newSyncGroup()
+        -- add() is a stub that accepts any value without erroring
+        local ok, _ = pcall(function() group:add(1) end)
+        expect_true(ok)
+    end)
+end)

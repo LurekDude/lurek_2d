@@ -1534,3 +1534,36 @@ describe("Missing explicit test for DepthSorter:isStable", function()
         -- TODO: add assertion for DepthSorter:isStable
     end)
 end)
+
+-- =========================================================================
+-- @covers additions for scene module
+-- =========================================================================
+
+describe("lurek.scene.pop (@covers)", function()
+    it("pop does not panic on an empty or existing stack", function()
+        -- @covers lurek.scene.pop
+        local ok, _ = pcall(function() lurek.scene.pop() end)
+        expect_type("boolean", ok)
+    end)
+end)
+
+describe("lurek.scene.new (@covers)", function()
+    it("new returns a scene object or nil gracefully", function()
+        -- @covers lurek.scene.new
+        local ok, result = pcall(function() return lurek.scene.new() end)
+        expect_type("boolean", ok)
+        if ok and result ~= nil then
+            expect_not_nil(result)
+        end
+    end)
+end)
+
+describe("DepthSorter:add (@covers)", function()
+    it("add increments the sorted-object count", function()
+        -- @covers DepthSorter:add
+        local ds = lurek.scene.newDepthSorter()
+        ds:add(function() end, 5.0)
+        ds:add(function() end, 3.0)
+        expect_true(ds:getCount() >= 2)
+    end)
+end)

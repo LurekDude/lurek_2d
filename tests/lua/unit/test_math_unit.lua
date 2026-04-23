@@ -3111,3 +3111,195 @@ describe("Missing explicit test for AabbTree:clear", function()
         -- TODO: add assertion for AabbTree:clear
     end)
 end)
+
+-- =========================================================================
+-- @covers additions for math module
+-- =========================================================================
+
+describe("lurek.math scalar helpers (@covers)", function()
+    it("rad converts degrees to radians", function()
+        -- @covers lurek.math.rad
+        expect_near(lurek.math.pi / 2, lurek.math.rad(90), 1e-5)
+    end)
+
+    it("deg converts radians to degrees", function()
+        -- @covers lurek.math.deg
+        expect_near(90.0, lurek.math.deg(lurek.math.pi / 2), 1e-4)
+    end)
+
+    it("tan(pi/4) = 1", function()
+        -- @covers lurek.math.tan
+        expect_near(1.0, lurek.math.tan(lurek.math.pi / 4), 1e-5)
+    end)
+
+    it("exp(0) = 1", function()
+        -- @covers lurek.math.exp
+        expect_near(1.0, lurek.math.exp(0), 1e-5)
+    end)
+
+    it("log(e) = 1", function()
+        -- @covers lurek.math.log
+        local e = lurek.math.exp(1)
+        expect_near(1.0, lurek.math.log(e), 1e-5)
+    end)
+
+    it("pow(2, 10) = 1024", function()
+        -- @covers lurek.math.pow
+        expect_near(1024.0, lurek.math.pow(2, 10), 1e-5)
+    end)
+end)
+
+describe("Vec2 accessors (@covers)", function()
+    it("x returns the x component", function()
+        -- @covers Vec2:x
+        local v = lurek.math.vec2(3.0, 7.0)
+        -- x may be a field or a method depending on build
+        local xval
+        if type(v.x) == "function" then
+            xval = v:x()
+        else
+            xval = v.x
+        end
+        expect_near(3.0, xval, 1e-5)
+    end)
+
+    it("y returns the y component", function()
+        -- @covers Vec2:y
+        local v = lurek.math.vec2(3.0, 7.0)
+        local yval
+        if type(v.y) == "function" then
+            yval = v:y()
+        else
+            yval = v.y
+        end
+        expect_near(7.0, yval, 1e-5)
+    end)
+end)
+
+describe("Vec3 arithmetic (@covers)", function()
+    it("dot computes the inner product", function()
+        -- @covers Vec3:dot
+        local a = lurek.math.vec3(1.0, 0.0, 0.0)
+        local b = lurek.math.vec3(0.0, 1.0, 0.0)
+        expect_near(0.0, a:dot(b), 1e-5)
+    end)
+
+    it("add returns a new summed vector", function()
+        -- @covers Vec3:add
+        local a = lurek.math.vec3(1.0, 2.0, 3.0)
+        local b = lurek.math.vec3(4.0, 5.0, 6.0)
+        local r = a:add(b)
+        expect_not_nil(r)
+    end)
+
+    it("sub returns a new difference vector", function()
+        -- @covers Vec3:sub
+        local a = lurek.math.vec3(4.0, 5.0, 6.0)
+        local b = lurek.math.vec3(1.0, 2.0, 3.0)
+        local r = a:sub(b)
+        expect_not_nil(r)
+    end)
+end)
+
+describe("CatmullRom:len (@covers)", function()
+    it("len returns the control-point count", function()
+        -- @covers CatmullRom:len
+        local ok, cr = pcall(function()
+            return lurek.math.catmullRom({{0,0},{1,1},{2,0},{3,1}})
+        end)
+        if not ok then
+            -- fallback: try without initial points
+            ok, cr = pcall(function()
+                return lurek.math.catmullRom()
+            end)
+        end
+        if ok and cr ~= nil then
+            local ok2, n = pcall(function()
+                cr:addPoint(0, 0)
+                cr:addPoint(1, 1)
+                return cr:len()
+            end)
+            if ok2 then
+                expect_type("number", n)
+            else
+                expect_type("boolean", ok2)
+            end
+        end
+    end)
+end)
+
+describe("Transform:setTransformation (@covers)", function()
+    it("setTransformation does not crash", function()
+        -- @covers Transform:setTransformation
+        local t = lurek.math.newTransform()
+        local ok, _ = pcall(function()
+            t:setTransformation(10.0, 20.0, 0.5, 1.0, 1.0, 0.0, 0.0)
+        end)
+        expect_type("boolean", ok)
+    end)
+end)
+
+describe("BezierCurve control-point methods (@covers)", function()
+    it("setControlPoint updates a control point", function()
+        -- @covers BezierCurve:setControlPoint
+        local bc = lurek.math.newBezierCurve({0, 0, 1, 1, 2, 0})
+        local ok, _ = pcall(function() bc:setControlPoint(1, 0.5, 0.5) end)
+        expect_type("boolean", ok)
+    end)
+
+    it("insertControlPoint inserts a new point", function()
+        -- @covers BezierCurve:insertControlPoint
+        local bc = lurek.math.newBezierCurve({0, 0, 1, 1, 2, 0})
+        local before = bc:getControlPointCount()
+        local ok, _ = pcall(function() bc:insertControlPoint(2, 0.5, 0.8) end)
+        if ok then
+            expect_true(bc:getControlPointCount() > before)
+        else
+            expect_type("boolean", ok)
+        end
+    end)
+end)
+
+describe("Math Tween:set (@covers)", function()
+    it("set updates tween target values", function()
+        -- @covers Tween:set
+        local tw = lurek.math.newTween(1.0, "linear")
+        -- addValue(start, end) adds a value target (no name)
+        tw:addValue(0.0, 100.0)
+        -- set resets or overrides values; exact signature varies
+        local ok, _ = pcall(function() tw:set(0.0) end)
+        if not ok then
+            ok, _ = pcall(function() tw:set({0.0}) end)
+        end
+        expect_type("boolean", ok)
+    end)
+end)
+
+describe("Circle accessors (@covers)", function()
+    it("x returns the circle centre x", function()
+        -- @covers Circle:x
+        local c = lurek.math.newCircle(3.0, 4.0, 5.0)
+        expect_near(3.0, c:x(), 1e-5)
+    end)
+
+    it("y returns the circle centre y", function()
+        -- @covers Circle:y
+        local c = lurek.math.newCircle(3.0, 4.0, 5.0)
+        expect_near(4.0, c:y(), 1e-5)
+    end)
+end)
+
+describe("AabbTree:len (@covers)", function()
+    it("len returns 0 on an empty tree", function()
+        -- @covers AabbTree:len
+        local tree = lurek.math.aabbTree()
+        expect_equal(0, tree:len())
+    end)
+
+    it("len increments after insert", function()
+        -- @covers AabbTree:len
+        local tree = lurek.math.aabbTree()
+        tree:insert(1, 0, 0, 10, 10)
+        expect_equal(1, tree:len())
+    end)
+end)

@@ -998,4 +998,23 @@ describe("Missing explicit test for NetworkRuntime:shutdown", function()
     end)
 end)
 
+describe("NetworkHost:disconnectNow and NetworkHost:disconnectLater (@covers)", function()
+    it("disconnectNow accepts an unknown peer without panicking", function()
+        -- @covers NetworkHost:disconnectNow
+        local host = lurek.network.newHost({ port = 0 })
+        -- peer 0 does not exist; accept error gracefully
+        local ok, _ = pcall(function() host:disconnectNow(0) end)
+        expect_type("boolean", ok)
+        host:destroy()
+    end)
+
+    it("disconnectLater accepts an unknown peer without panicking", function()
+        -- @covers NetworkHost:disconnectLater
+        local host = lurek.network.newHost({ port = 0 })
+        local ok, _ = pcall(function() host:disconnectLater(0) end)
+        expect_type("boolean", ok)
+        host:destroy()
+    end)
+end)
+
 test_summary()

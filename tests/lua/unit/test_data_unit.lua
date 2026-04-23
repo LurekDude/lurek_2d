@@ -1323,3 +1323,40 @@ describe("Missing explicit test for mlua:clone", function()
         -- TODO: add assertion for mlua:clone
     end)
 end)
+
+-- =========================================================================
+-- @covers additions for data module
+-- =========================================================================
+
+describe("RingBuffer:pop and RingBuffer:len (@covers)", function()
+    it("pop returns the oldest pushed value", function()
+        -- @covers RingBuffer:pop
+        local rb = lurek.data.newRingBuffer(8)
+        rb:push(42)
+        rb:push(99)
+        local v = rb:pop()
+        expect_not_nil(v)
+        expect_equal(42, v)
+    end)
+
+    it("len returns the current item count", function()
+        -- @covers RingBuffer:len
+        local rb = lurek.data.newRingBuffer(8)
+        rb:push(1)
+        rb:push(2)
+        rb:push(3)
+        expect_equal(3, rb:len())
+    end)
+end)
+
+describe("DataWriter:len (@covers)", function()
+    it("len returns the number of bytes written", function()
+        -- @covers DataWriter:len
+        local w = lurek.data.newWriter()
+        w:writeU8(0x41)
+        w:writeU8(0x42)
+        local n = w:len()
+        expect_type("number", n)
+        expect_true(n >= 2)
+    end)
+end)
