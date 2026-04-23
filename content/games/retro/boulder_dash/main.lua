@@ -230,12 +230,12 @@ function lurek.process(dt)
             state = PLAYING
         end
         if lurek.input.wasActionPressed("quit") then
-            lurek.event.emit("quit")
+            lurek.event.push("quit")
         end
 
     elseif state == PLAYING then
         if lurek.input.wasActionPressed("quit") then
-            lurek.event.emit("quit")
+            lurek.event.push("quit")
         end
 
         -- Level flash tween
@@ -379,7 +379,7 @@ function lurek.process(dt)
             state = TITLE
         end
         if lurek.input.wasActionPressed("quit") then
-            lurek.event.emit("quit")
+            lurek.event.push("quit")
         end
     end
 end

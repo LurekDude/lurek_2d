@@ -43,6 +43,7 @@ local title_timer = 0
 -- Card definitions
 -- ---------------------------------------------------------------------------
 local CARD_DEFS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { name = "Soldier",  type = "creature", cost = 1, atk = 2, hp = 1,  color = {0.6,0.6,0.7}, taunt = false, revive = false },
     { name = "Wolf",     type = "creature", cost = 2, atk = 3, hp = 2,  color = {0.5,0.4,0.3}, taunt = false, revive = false },
     { name = "Knight",   type = "creature", cost = 3, atk = 3, hp = 4,  color = {0.7,0.7,0.8}, taunt = false, revive = false },
@@ -517,7 +518,7 @@ end
 function lurek.init()
     lurek.window.setTitle("Card Game — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.05, 0.1)
-    lurek.timer.setTargetFPS(60)
+    -- [removed: lurek.timer.setTargetFPS has no equivalent]
     lurek.input.bind("select", "mouse1")
     lurek.input.bind("end_turn", "space")
     lurek.input.bind("quit", "escape")
@@ -553,7 +554,7 @@ function lurek.process(dt)
             start_player_turn()
         end
         if lurek.input.keyboard.isDown("quit") then
-            lurek.event.signal("quit")
+            lurek.event.push("quit")
         end
         return
     end
@@ -566,7 +567,7 @@ function lurek.process(dt)
             title_timer = 0
         end
         if lurek.input.keyboard.isDown("quit") then
-            lurek.event.signal("quit")
+            lurek.event.push("quit")
         end
         return
     end
@@ -611,7 +612,7 @@ function lurek.process(dt)
 
     -- Quit
     if lurek.input.keyboard.isDown("quit") then
-        lurek.event.signal("quit")
+        lurek.event.push("quit")
         return
     end
 
@@ -716,7 +717,7 @@ end
 function lurek.draw()
     if state == STATE_TITLE or state == STATE_GAME_OVER then return end
 
-    local cam = lurek.camera.getPosition()
+    local cam = _cam:getPosition()
     local ox, oy = shake_x, shake_y
 
     -- Battlefield divider line

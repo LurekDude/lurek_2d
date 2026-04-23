@@ -104,7 +104,7 @@ end
 local function dist2(ax,ay,bx,by) return (ax-bx)^2+(ay-by)^2 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
-function lurek.load()
+function lurek.init()
     lurek.window.setTitle("Star Voyage — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.08)
 
@@ -264,7 +264,7 @@ function lurek.draw()
 end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if key == "escape" then lurek.event.quit() end
     if state == STATE.SPACE then
         if key == "space" and active_planet then

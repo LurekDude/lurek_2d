@@ -471,14 +471,14 @@ function lurek.process(delta)
   update_particles(train_particles, delta)
   update_particles(transfer_particles, delta)
 
-  if lurek.input.pressed("quit") then
+  if lurek.input.wasActionPressed("quit") then
     lurek.event.quit()
     return
   end
 
   -- TITLE
   if state == STATE_TITLE then
-    if lurek.input.pressed("confirm") then
+    if lurek.input.wasActionPressed("confirm") then
       state = STATE_OFFICE
     end
     return
@@ -486,13 +486,13 @@ function lurek.process(delta)
 
   -- OFFICE
   if state == STATE_OFFICE then
-    if lurek.input.pressed("roster") then
+    if lurek.input.wasActionPressed("roster") then
       state = STATE_ROSTER
-    elseif lurek.input.pressed("train") and not training_done then
+    elseif lurek.input.wasActionPressed("train") and not training_done then
       state = STATE_TRAINING
-    elseif lurek.input.pressed("buy") then
+    elseif lurek.input.wasActionPressed("buy") then
       state = STATE_TRANSFER
-    elseif lurek.input.pressed("next_match") then
+    elseif lurek.input.wasActionPressed("next_match") then
       if week > SEASON_WEEKS then
         local pos = get_my_position()
         if pos <= 3 then
@@ -511,10 +511,10 @@ function lurek.process(delta)
 
   -- ROSTER
   if state == STATE_ROSTER then
-    if lurek.input.pressed("roster") or lurek.input.pressed("confirm") then
+    if lurek.input.wasActionPressed("roster") or lurek.input.wasActionPressed("confirm") then
       state = STATE_OFFICE
     end
-    if lurek.input.pressed("select") then
+    if lurek.input.wasActionPressed("select") then
       local mx, my = lurek.input.mouse.getPosition()
       for i, p in ipairs(roster) do
         local py = 80 + (i - 1) * 30
@@ -571,28 +571,28 @@ function lurek.process(delta)
 
   -- TRAINING
   if state == STATE_TRAINING then
-    if lurek.input.pressed("opt_o") then
+    if lurek.input.wasActionPressed("opt_o") then
       for _, p in ipairs(roster) do
         if p.pos == "FWD" then p.skill = clamp(p.skill + 2, 0, 99) end
       end
       training_done = true
       spawn_train_particles(SCREEN_W / 2, SCREEN_H / 2, 25)
       state = STATE_OFFICE
-    elseif lurek.input.pressed("opt_d") then
+    elseif lurek.input.wasActionPressed("opt_d") then
       for _, p in ipairs(roster) do
         if p.pos == "DEF" or p.pos == "GK" then p.skill = clamp(p.skill + 2, 0, 99) end
       end
       training_done = true
       spawn_train_particles(SCREEN_W / 2, SCREEN_H / 2, 25)
       state = STATE_OFFICE
-    elseif lurek.input.pressed("opt_f") then
+    elseif lurek.input.wasActionPressed("opt_f") then
       for _, p in ipairs(roster) do
         p.stamina = clamp(p.stamina + 5, 0, 100)
       end
       training_done = true
       spawn_train_particles(SCREEN_W / 2, SCREEN_H / 2, 25)
       state = STATE_OFFICE
-    elseif lurek.input.pressed("opt_m") then
+    elseif lurek.input.wasActionPressed("opt_m") then
       for _, p in ipairs(roster) do
         p.morale = clamp(p.morale + 10, 0, 100)
         add_tween(p, "morale", p.morale - 10, p.morale, 0.6)
@@ -600,7 +600,7 @@ function lurek.process(delta)
       training_done = true
       spawn_train_particles(SCREEN_W / 2, SCREEN_H / 2, 25)
       state = STATE_OFFICE
-    elseif lurek.input.pressed("confirm") or lurek.input.pressed("train") then
+    elseif lurek.input.wasActionPressed("confirm") or lurek.input.wasActionPressed("train") then
       state = STATE_OFFICE
     end
     return
@@ -610,7 +610,7 @@ function lurek.process(delta)
   if state == STATE_TRANSFER then
     for idx = 1, 3 do
       local key = "opt_" .. idx
-      if lurek.input.pressed(key) and market[idx] then
+      if lurek.input.wasActionPressed(key) and market[idx] then
         local p = market[idx]
         if budget >= p.price and #roster < 24 then
           budget = budget - p.price
@@ -620,7 +620,7 @@ function lurek.process(delta)
         end
       end
     end
-    if lurek.input.pressed("confirm") or lurek.input.pressed("buy") then
+    if lurek.input.wasActionPressed("confirm") or lurek.input.wasActionPressed("buy") then
       state = STATE_OFFICE
     end
     return
@@ -628,7 +628,7 @@ function lurek.process(delta)
 
   -- SEASON END
   if state == STATE_SEASON_END then
-    if lurek.input.pressed("confirm") then
+    if lurek.input.wasActionPressed("confirm") then
       -- reset for new season
       state = STATE_TITLE
       week = 1
@@ -653,16 +653,16 @@ function lurek.draw()
   if state == STATE_MATCH then
     -- draw pitch
     lurek.render.setColor(0.15, 0.55, 0.15, 1)
-    lurek.render.rectangleangle("fill", 50, 100, 700, 400)
+    lurek.render.rectangle("fill", "fill", 50, 100, 700, 400)
     -- pitch lines
     lurek.render.setColor(1, 1, 1, 0.4)
-    lurek.render.rectangleangle("line", 50, 100, 700, 400)
+    lurek.render.rectangle("fill", "line", 50, 100, 700, 400)
     lurek.render.line(400, 100, 400, 500)
     lurek.render.circle("line", 400, 300, 60)
     -- goals
     lurek.render.setColor(1, 1, 1, 0.7)
-    lurek.render.rectangleangle("line", 50, 240, 40, 120)
-    lurek.render.rectangleangle("line", 710, 240, 40, 120)
+    lurek.render.rectangle("fill", "line", 50, 240, 40, 120)
+    lurek.render.rectangle("fill", "line", 710, 240, 40, 120)
 
     -- animated "players" as dots
     local time = match_timer
@@ -690,9 +690,9 @@ function lurek.draw()
   -- training particles (on field background)
   if state == STATE_TRAINING then
     lurek.render.setColor(0.12, 0.4, 0.12, 1)
-    lurek.render.rectangleangle("fill", 100, 200, 600, 250)
+    lurek.render.rectangle("fill", "fill", 100, 200, 600, 250)
     lurek.render.setColor(1, 1, 1, 0.3)
-    lurek.render.rectangleangle("line", 100, 200, 600, 250)
+    lurek.render.rectangle("fill", "line", 100, 200, 600, 250)
   end
 
   for _, p in ipairs(train_particles) do
@@ -764,7 +764,7 @@ function lurek.draw_ui()
       local is_me = (t.name == TEAM_NAMES[my_team_index])
       if is_me then
         lurek.render.setColor(0.2, 0.4, 0.2, 0.5)
-        lurek.render.rectangleangle("fill", 18, y - 2, 550, 20)
+        lurek.render.rectangle("fill", "fill", 18, y - 2, 550, 20)
       end
       if i <= 3 then
         lurek.render.setColor(0.3, 1, 0.5, 1)
@@ -809,7 +809,7 @@ function lurek.draw_ui()
       -- highlight starters
       if p.starter then
         lurek.render.setColor(0.15, 0.3, 0.15, 0.5)
-        lurek.render.rectangleangle("fill", 38, y - 2, 720, 26)
+        lurek.render.rectangle("fill", "fill", 38, y - 2, 720, 26)
       end
 
       if p.injured > 0 then
@@ -830,7 +830,7 @@ function lurek.draw_ui()
       local bar_h = 10
       local fill = p.morale / 100
       lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
-      lurek.render.rectangleangle("fill", bar_x, y + 4, bar_w, bar_h)
+      lurek.render.rectangle("fill", "fill", bar_x, y + 4, bar_w, bar_h)
       if p.morale > 70 then
         lurek.render.setColor(0.2, 0.8, 0.3, 0.8)
       elseif p.morale > 40 then
@@ -838,7 +838,7 @@ function lurek.draw_ui()
       else
         lurek.render.setColor(0.8, 0.2, 0.2, 0.8)
       end
-      lurek.render.rectangleangle("fill", bar_x, y + 4, bar_w * fill, bar_h)
+      lurek.render.rectangle("fill", "fill", bar_x, y + 4, bar_w * fill, bar_h)
 
       local c = POS_COLORS[p.pos] or {1, 1, 1}
       if p.injured > 0 then
@@ -863,7 +863,7 @@ function lurek.draw_ui()
   if state == STATE_MATCH then
     -- scoreboard
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.rectangleangle("fill", 200, 20, 400, 70)
+    lurek.render.rectangle("fill", "fill", 200, 20, 400, 70)
     lurek.render.setColor(0.3, 0.6, 1, 1)
     lurek.render.print(TEAM_NAMES[my_team_index], 220, 30)
     lurek.render.setColor(1, 0.3, 0.3, 1)
@@ -876,13 +876,13 @@ function lurek.draw_ui()
     -- match time bar
     local progress = clamp(match_timer / MATCH_DURATION, 0, 1)
     lurek.render.setColor(0.3, 0.3, 0.3, 0.6)
-    lurek.render.rectangleangle("fill", 200, 95, 400, 8)
+    lurek.render.rectangle("fill", "fill", 200, 95, 400, 8)
     lurek.render.setColor(0.4, 0.9, 0.4, 0.9)
-    lurek.render.rectangleangle("fill", 200, 95, 400 * progress, 8)
+    lurek.render.rectangle("fill", "fill", 200, 95, 400 * progress, 8)
 
     -- event feed
     lurek.render.setColor(0, 0, 0, 0.6)
-    lurek.render.rectangleangle("fill", 50, 520, 700, 70)
+    lurek.render.rectangle("fill", "fill", 50, 520, 700, 70)
     for i = math.max(1, match_event_index - 2), match_event_index do
       if match_events[i] then
         local ey = 525 + (i - math.max(1, match_event_index - 2)) * 20
@@ -980,7 +980,7 @@ function lurek.draw_ui()
       local is_me = (t.name == TEAM_NAMES[my_team_index])
       if is_me then
         lurek.render.setColor(0.2, 0.4, 0.2, 0.6)
-        lurek.render.rectangleangle("fill", 78, y - 2, 500, 22)
+        lurek.render.rectangle("fill", "fill", 78, y - 2, 500, 22)
       end
       if i <= 3 then
         lurek.render.setColor(0.3, 1, 0.5, 1)

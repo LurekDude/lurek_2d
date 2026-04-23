@@ -185,7 +185,7 @@ local function award_point(winner)
             state = ST.MATCH_END
 
             if ace_particles then
-                lurek.particle.emit(ace_particles, CENTER_X, NET_Y, 40)
+                ace_particles:emit(CENTER_X, NET_Y, 40)
             end
             return
         end
@@ -264,29 +264,29 @@ function lurek.init()
     lurek.input.bind("quit", "escape")
 
     -- Particles
-    dust_particles = lurek.particle.newSystem(50)
-    lurek.particle.setLifetime(dust_particles, 0.2, 0.5)
-    lurek.particle.setSpeed(dust_particles, 20, 80)
-    lurek.particle.setColors(dust_particles, 0.8, 0.7, 0.5, 1.0, 0.8, 0.7, 0.5, 0.0)
-    lurek.particle.setSizes(dust_particles, 3, 1)
+    dust_particles = lurek.particle.newSystem({maxParticles=50})
+    dust_particles:setParticleLifetime(0.2, 0.5)
+    dust_particles:setSpeed(20, 80)
+    dust_particles:setColors(0.8, 0.7, 0.5, 1.0, 0.8, 0.7, 0.5, 0.0)
+    dust_particles:setSizes(3, 1)
 
-    ace_particles = lurek.particle.newSystem(80)
-    lurek.particle.setLifetime(ace_particles, 0.3, 0.8)
-    lurek.particle.setSpeed(ace_particles, 50, 200)
-    lurek.particle.setColors(ace_particles, 1.0, 1.0, 0.0, 1.0, 1.0, 0.5, 0.0, 0.0)
-    lurek.particle.setSizes(ace_particles, 5, 1)
-    lurek.particle.setSpread(ace_particles, math.pi * 2)
+    ace_particles = lurek.particle.newSystem({maxParticles=80})
+    ace_particles:setParticleLifetime(0.3, 0.8)
+    ace_particles:setSpeed(50, 200)
+    ace_particles:setColors(1.0, 1.0, 0.0, 1.0, 1.0, 0.5, 0.0, 0.0)
+    ace_particles:setSizes(5, 1)
+    ace_particles:setSpread(math.pi * 2)
 
-    net_particles = lurek.particle.newSystem(30)
-    lurek.particle.setLifetime(net_particles, 0.1, 0.3)
-    lurek.particle.setSpeed(net_particles, 10, 40)
-    lurek.particle.setColors(net_particles, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0)
-    lurek.particle.setSizes(net_particles, 2, 1)
+    net_particles = lurek.particle.newSystem({maxParticles=30})
+    net_particles:setParticleLifetime(0.1, 0.3)
+    net_particles:setSpeed(10, 40)
+    net_particles:setColors(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0)
+    net_particles:setSizes(2, 1)
 end
 
 -- ── Process ───────────────────────────────────────────────────────
 function lurek.process(dt)
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -294,9 +294,9 @@ function lurek.process(dt)
     title_timer = title_timer + dt
 
     -- Update particles
-    lurek.particle.update(dust_particles, dt)
-    lurek.particle.update(ace_particles, dt)
-    lurek.particle.update(net_particles, dt)
+    dust_particles:update(dt)
+    ace_particles:update(dt)
+    net_particles:update(dt)
 
     -- Score popup fade
     if score_popup.alpha > 0 then
@@ -306,7 +306,7 @@ function lurek.process(dt)
 
     -- ── TITLE ─────────────────────────────────────────────────────
     if state == ST.TITLE then
-        if lurek.input.pressed("hit") then
+        if lurek.input.wasActionPressed("hit") then
             pts = { 0, 0 }
             games = { { 0, 0 }, { 0, 0 }, { 0, 0 } }
             sets_won = { 0, 0 }
@@ -339,29 +339,29 @@ function lurek.process(dt)
 
     -- ── Player movement ───────────────────────────────────────────
     local spd = 250 * dt
-    if lurek.input.down("move_up") then
+    if lurek.input.isDown("move_up") then
         player.y = clamp(player.y - spd, NET_Y + 10, COURT_B - 10)
     end
-    if lurek.input.down("move_down") then
+    if lurek.input.isDown("move_down") then
         player.y = clamp(player.y + spd, NET_Y + 10, COURT_B - 10)
     end
-    if lurek.input.down("move_left") then
+    if lurek.input.isDown("move_left") then
         player.x = clamp(player.x - spd, COURT_L + 10, COURT_R - 10)
         aim_dir = -1
     end
-    if lurek.input.down("move_right") then
+    if lurek.input.isDown("move_right") then
         player.x = clamp(player.x + spd, COURT_L + 10, COURT_R - 10)
         aim_dir = 1
     end
     -- Spin modifier
-    if lurek.input.down("move_up") then spin_type = 1 end   -- topspin
-    if lurek.input.down("move_down") then spin_type = -1 end -- slice
+    if lurek.input.isDown("move_up") then spin_type = 1 end   -- topspin
+    if lurek.input.isDown("move_down") then spin_type = -1 end -- slice
 
     -- ── SERVING ───────────────────────────────────────────────────
     if state == ST.SERVING then
         if server == 1 then
             -- Player serves
-            if serve_phase == 0 and lurek.input.pressed("hit") then
+            if serve_phase == 0 and lurek.input.wasActionPressed("hit") then
                 serve_phase = 1
                 ball_height = 0
                 ball.x = player.x
@@ -370,7 +370,7 @@ function lurek.process(dt)
                 ball_height = ball_height + dt * 80
                 ball.y = player.y - 15 - math.sin(ball_height / SERVE_TOSS_H * math.pi) * SERVE_TOSS_H
 
-                if lurek.input.pressed("hit") then
+                if lurek.input.wasActionPressed("hit") then
                     serve_phase = 2
                     ball.active = true
                     ball_height = 0
@@ -381,7 +381,7 @@ function lurek.process(dt)
                     ball.bounced = false
                     last_hitter = 1
                     state = ST.PLAYING
-                    lurek.particle.emit(dust_particles, ball.x, ball.y, 8)
+                    dust_particles:emit(ball.x, ball.y, 8)
                 end
 
                 if ball_height > math.pi then
@@ -404,7 +404,7 @@ function lurek.process(dt)
                 ball.bounced = false
                 last_hitter = 2
                 state = ST.PLAYING
-                lurek.particle.emit(dust_particles, ball.x, ball.y, 8)
+                dust_particles:emit(ball.x, ball.y, 8)
             end
         end
         return
@@ -436,7 +436,7 @@ function lurek.process(dt)
             local spd_total = math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy)
             if spd_total < 100 then
                 -- Net fault
-                lurek.particle.emit(net_particles, ball.x, NET_Y, 15)
+                net_particles:emit(ball.x, NET_Y, 15)
                 ball.active = false
                 award_point((last_hitter == 1) and 2 or 1)
                 return
@@ -482,7 +482,7 @@ function lurek.process(dt)
             -- Ball in opponent half, first bounce
             if ball.y <= COURT_T + 5 then
                 ball.bounced = true
-                lurek.particle.emit(dust_particles, ball.x, ball.y, 5)
+                dust_particles:emit(ball.x, ball.y, 5)
 
                 -- Service box check for serves
                 if serve_phase == 2 and last_hitter == 1 then
@@ -507,7 +507,7 @@ function lurek.process(dt)
         if ball.vy > 0 and ball.y > NET_Y and not ball.bounced then
             if ball.y >= COURT_B - 5 then
                 ball.bounced = true
-                lurek.particle.emit(dust_particles, ball.x, ball.y, 5)
+                dust_particles:emit(ball.x, ball.y, 5)
 
                 if serve_phase == 2 and last_hitter == 2 then
                     if not is_in_service_box(ball.x, ball.y, false) then
@@ -545,11 +545,11 @@ function lurek.process(dt)
         if last_hitter == 2 and ball.vy > 0 then
             local d = dist(player.x, player.y, ball.x, ball.y)
             if d < HIT_RANGE then
-                if lurek.input.pressed("hit") then
+                if lurek.input.wasActionPressed("hit") then
                     charging = true
                     charge_power = 0
                 end
-                if lurek.input.released("hit") and charging then
+                if lurek.input.wasActionReleased("hit") and charging then
                     charging = false
                     local pwr = clamp(charge_power, 0, 1)
                     local speed = lerp(MIN_SPEED, MAX_SPEED, pwr)
@@ -562,7 +562,7 @@ function lurek.process(dt)
                     rally_count = rally_count + 1
                     aim_dir = 0
                     spin_type = 0
-                    lurek.particle.emit(dust_particles, ball.x, ball.y, 6)
+                    dust_particles:emit(ball.x, ball.y, 6)
 
                     if rally_count >= 10 then
                         score_popup = { text = "Rally: " .. rally_count, alpha = 1.0, y = H / 2 - 40 }
@@ -604,7 +604,7 @@ function lurek.process(dt)
                     serve_phase = 0
                     rally_count = rally_count + 1
                     ai_react_timer = 0
-                    lurek.particle.emit(dust_particles, ball.x, ball.y, 6)
+                    dust_particles:emit(ball.x, ball.y, 6)
                 end
             end
         else
@@ -649,7 +649,7 @@ function lurek.draw()
     -- Ball trail
     for _, t in ipairs(ball_trail) do
         local a = t.t / 0.3
-        lurek.render.circleFill(t.x, t.y, BALL_R * 0.6, 1, 1, 0.7, a * 0.3)
+        lurek.render.circle("fill", t.x, t.y, BALL_R * 0.6, 1, 1, 0.7, a * 0.3)
     end
 
     -- Player (blue)
@@ -668,9 +668,9 @@ function lurek.draw()
     if ball.active or state == ST.SERVING then
         local br = BALL_R
         -- Shadow
-        lurek.render.circleFill(ball.x + 2, ball.y + 2, br, 0, 0, 0, 0.3)
+        lurek.render.circle("fill", ball.x + 2, ball.y + 2, br, 0, 0, 0, 0.3)
         -- Ball
-        lurek.render.circleFill(ball.x, ball.y, br, 1.0, 1.0, 1.0, 1.0)
+        lurek.render.circle("fill", ball.x, ball.y, br, 1.0, 1.0, 1.0, 1.0)
     end
 
     -- Charge indicator
@@ -681,9 +681,9 @@ function lurek.draw()
     end
 
     -- Particles
-    lurek.particle.draw(dust_particles)
-    lurek.particle.draw(ace_particles)
-    lurek.particle.draw(net_particles)
+    lurek.render.draw(dust_particles)
+    lurek.render.draw(ace_particles)
+    lurek.render.draw(net_particles)
 end
 
 -- ── Render UI (screen-space: score, messages) ─────────────────────

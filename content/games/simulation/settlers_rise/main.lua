@@ -157,7 +157,7 @@ local function gen_map(seed)
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
-function lurek.load()
+function lurek.init()
     lurek.window.setTitle("Settlers Rise — Lurek2D")
     lurek.render.setBackgroundColor(0.25, 0.45, 0.2)
 
@@ -168,7 +168,7 @@ function lurek.load()
     tilemap[hq_row][hq_col] = 3
 
     -- Build pathfinding grid (walkable = not water)
-    pf_grid = lurek.pathfind.newGrid(MAP_COLS, MAP_ROWS, function(c, r)
+    pf_grid = lurek.pathfind.newNavGrid(MAP_COLS, MAP_ROWS, function(c, r)
         local t = tile_at(c, r)
         return t ~= 4
     end)
@@ -313,7 +313,7 @@ function lurek.mousepressed(x, y, button)
 end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if key == "escape" then lurek.event.quit() end
     if key == "tab" then
         build_index = (build_index % #BUILD_ORDER) + 1

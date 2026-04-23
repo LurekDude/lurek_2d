@@ -55,6 +55,7 @@ local game_state = STATE.TITLE
 
 -- ── Game state ────────────────────────────────────────────────────────────
 local player = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     x = 0, y = 0, r = PLAYER_R,
     crouching = false, hidden = false, hide_spot = nil,
     keys_collected = 0, alive = true,
@@ -308,7 +309,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Stealth — Lurek2D")
-    lurek.window.setBackgroundColor(0.05, 0.08, 0.05)
+    lurek.render.setBackgroundColor(0.05, 0.08, 0.05)
 
     -- Input actions
     lurek.input.bind("up",       {"w", "up"})
@@ -320,21 +321,21 @@ function lurek.init()
     lurek.input.bind("quit",     {"escape"})
 
     -- Particle systems
-    noise_ps = lurek.particle.new({
+    noise_ps = lurek.particle.newSystem({
         maxParticles = 30, lifetime = 0.6,
         speed = 50, spread = 6.28,
         sizeStart = 6, sizeEnd = 12,
         colorStart = {0.8, 0.8, 0.6, 0.4},
         colorEnd   = {0.8, 0.8, 0.6, 0.0},
     })
-    alert_ps = lurek.particle.new({
+    alert_ps = lurek.particle.newSystem({
         maxParticles = 20, lifetime = 0.4,
         speed = 80, spread = 6.28,
         sizeStart = 4, sizeEnd = 2,
         colorStart = {1.0, 0.3, 0.1, 1.0},
         colorEnd   = {1.0, 0.1, 0.0, 0.0},
     })
-    sparkle_ps = lurek.particle.new({
+    sparkle_ps = lurek.particle.newSystem({
         maxParticles = 15, lifetime = 0.5,
         speed = 60, spread = 6.28,
         sizeStart = 3, sizeEnd = 1,
@@ -358,7 +359,7 @@ function lurek.process(dt)
     -- Title screen
     if game_state == STATE.TITLE then
         title_blink = title_blink + dt
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             current_level = 1
             load_level(1)
         end
@@ -367,7 +368,7 @@ function lurek.process(dt)
 
     -- Game over / level complete — press Enter to restart/continue
     if game_state == STATE.GAME_OVER or game_state == STATE.LEVEL_COMPLETE then
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             if game_state == STATE.LEVEL_COMPLETE then
                 current_level = current_level + 1
                 if current_level > #LEVELS then
@@ -597,7 +598,7 @@ function lurek.process(dt)
     susp_bar.value = max_susp
 
     -- Camera
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 
     -- FPS in title
     local fps = lurek.timer.getFPS()
@@ -679,7 +680,7 @@ function lurek.draw()
         for i = 0, segments - 1 do
             local a1 = start_a + i * step
             local a2 = start_a + (i + 1) * step
-            lurek.render.drawTriangle(
+            lurek.render.triangle(
                 g.x, g.y,
                 g.x + math.cos(a1) * cone_r, g.y + math.sin(a1) * cone_r,
                 g.x + math.cos(a2) * cone_r, g.y + math.sin(a2) * cone_r

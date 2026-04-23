@@ -26,6 +26,7 @@ local title_alpha = 0
 -- ============================================================
 local preset_index = 1
 local preset_names = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     "Fire", "Water Splash", "Smoke", "Magic Sparkle",
     "Explosion", "Snow", "Fireflies", "Confetti",
 }
@@ -174,7 +175,7 @@ local function apply_preset(idx)
     if not cfg then return end
 
     if psys then psys:stop(); psys:reset() end
-    psys = lurek.particle.newSystem(MAX_PARTICLES)
+    psys = lurek.particle.newSystem({maxParticles=MAX_PARTICLES})
 
     psys:setEmissionRate(continuous and cfg.rate or 0)
     psys:setParticleLifetime(cfg.lifetime[1], cfg.lifetime[2])
@@ -280,7 +281,7 @@ lurek.input.bind("quit", "escape")
 function lurek.init()
     lurek.window.setTitle("Particles Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 local function _ready_setup()
@@ -303,7 +304,7 @@ function lurek.process(dt)
     time_acc = time_acc + dt
 
     -- Quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -314,13 +315,13 @@ function lurek.process(dt)
         title_alpha = clamp(title_timer / 0.8, 0, 1)
 
         for i = 1, NUM_PRESETS do
-            if lurek.input.pressed("preset_" .. i) then
+            if lurek.input.wasActionPressed("preset_" .. i) then
                 state = STATE_RUNNING
                 switch_preset(i)
                 return
             end
         end
-        if lurek.input.pressed("burst") then
+        if lurek.input.wasActionPressed("burst") then
             state = STATE_RUNNING
             switch_preset(1)
             return
@@ -331,13 +332,13 @@ function lurek.process(dt)
     -- ── Running state ──────────────────────────────────────
     -- Preset switching
     for i = 1, NUM_PRESETS do
-        if lurek.input.pressed("preset_" .. i) then
+        if lurek.input.wasActionPressed("preset_" .. i) then
             switch_preset(i)
         end
     end
 
     -- Toggle continuous
-    if lurek.input.pressed("toggle_continuous") then
+    if lurek.input.wasActionPressed("toggle_continuous") then
         continuous = not continuous
         if psys then
             local cfg = preset_configs[preset_index]
@@ -346,7 +347,7 @@ function lurek.process(dt)
     end
 
     -- Toggle gravity
-    if lurek.input.pressed("toggle_gravity") then
+    if lurek.input.wasActionPressed("toggle_gravity") then
         gravity_on = not gravity_on
         if psys then
             local cfg = preset_configs[preset_index]
@@ -359,17 +360,17 @@ function lurek.process(dt)
     end
 
     -- Toggle rainbow
-    if lurek.input.pressed("toggle_rainbow") then
+    if lurek.input.wasActionPressed("toggle_rainbow") then
         rainbow_mode = not rainbow_mode
     end
 
     -- Toggle wind
-    if lurek.input.pressed("toggle_wind") then
+    if lurek.input.wasActionPressed("toggle_wind") then
         wind_on = not wind_on
     end
 
     -- Burst
-    if lurek.input.pressed("burst") then
+    if lurek.input.wasActionPressed("burst") then
         if psys then
             psys:emit(BURST_COUNT)
             total_emitted = total_emitted + BURST_COUNT

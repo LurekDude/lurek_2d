@@ -494,20 +494,20 @@ function lurek.draw()
 
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.3, 0.35, 0.25)
-        lurek.render.drawRectangle("fill", 0, 0, ARENA_W, ARENA_H)
+        lurek.render.rectangle("fill", 0, 0, ARENA_W, ARENA_H)
         return
     end
 
     -- Arena ground
     lurek.render.setColor(0.15, 0.18, 0.12)
-    lurek.render.drawRectangle("fill", 0, 0, ARENA_W, ARENA_H)
+    lurek.render.rectangle("fill", 0, 0, ARENA_W, ARENA_H)
 
     -- Arena border
     lurek.render.setColor(0.08, 0.1, 0.06)
-    lurek.render.drawRectangle("fill", -50, -50, ARENA_W + 100, 50)
-    lurek.render.drawRectangle("fill", -50, ARENA_H, ARENA_W + 100, 50)
-    lurek.render.drawRectangle("fill", -50, 0, 50, ARENA_H)
-    lurek.render.drawRectangle("fill", ARENA_W, 0, 50, ARENA_H)
+    lurek.render.rectangle("fill", -50, -50, ARENA_W + 100, 50)
+    lurek.render.rectangle("fill", -50, ARENA_H, ARENA_W + 100, 50)
+    lurek.render.rectangle("fill", -50, 0, 50, ARENA_H)
+    lurek.render.rectangle("fill", ARENA_W, 0, 50, ARENA_H)
 
     -- Ground detail — subtle grid
     lurek.render.setColor(0.13, 0.16, 0.1, 0.3)
@@ -522,9 +522,9 @@ function lurek.draw()
     for _, g in ipairs(xp_gems) do
         lurek.render.setColor(0.2, 0.9, 0.3)
         local s = XP_GEM_SIZE
-        lurek.render.drawPolygon("fill", g.x, g.y - s, g.x + s, g.y, g.x, g.y + s, g.x - s, g.y)
+        lurek.render.polygon("fill", g.x, g.y - s, g.x + s, g.y, g.x, g.y + s, g.x - s, g.y)
         lurek.render.setColor(0.5, 1, 0.6)
-        lurek.render.drawPolygon("fill", g.x, g.y - s * 0.5, g.x + s * 0.5, g.y, g.x, g.y + s * 0.5, g.x - s * 0.5, g.y)
+        lurek.render.polygon("fill", g.x, g.y - s * 0.5, g.x + s * 0.5, g.y, g.x, g.y + s * 0.5, g.x - s * 0.5, g.y)
     end
 
     -- Enemies
@@ -534,44 +534,44 @@ function lurek.draw()
         local flash_g = math.min(1, c[2] + e.flash * 0.5)
         local flash_b = math.min(1, c[3] + e.flash * 0.5)
         lurek.render.setColor(flash_r, flash_g, flash_b)
-        lurek.render.drawCircle("fill", e.x, e.y, ENEMY_SIZE[e.etype])
+        lurek.render.circle("fill", e.x, e.y, ENEMY_SIZE[e.etype])
 
         -- Inner detail
         lurek.render.setColor(c[1] * 0.6, c[2] * 0.6, c[3] * 0.6)
-        lurek.render.drawCircle("fill", e.x, e.y, ENEMY_SIZE[e.etype] * 0.5)
+        lurek.render.circle("fill", e.x, e.y, ENEMY_SIZE[e.etype] * 0.5)
 
         -- Exploder warning ring
         if e.etype == ENEMY_EXPLODER then
             lurek.render.setColor(0.2, 0.9, 0.4, 0.3)
-            lurek.render.drawCircle("line", e.x, e.y, ENEMY_SIZE[e.etype] + 3)
+            lurek.render.circle("line", e.x, e.y, ENEMY_SIZE[e.etype] + 3)
         end
     end
 
     -- Projectiles (orbiting)
     for _, p in ipairs(projectiles) do
         lurek.render.setColor(1, 0.9, 0.4)
-        lurek.render.drawCircle("fill", p.x, p.y, PROJ_RADIUS)
+        lurek.render.circle("fill", p.x, p.y, PROJ_RADIUS)
         lurek.render.setColor(1, 1, 0.8)
-        lurek.render.drawCircle("fill", p.x, p.y, PROJ_RADIUS * 0.5)
+        lurek.render.circle("fill", p.x, p.y, PROJ_RADIUS * 0.5)
     end
 
     -- Orbit ring (subtle)
     lurek.render.setColor(1, 0.9, 0.4, 0.15)
-    lurek.render.drawCircle("line", player.x, player.y, proj_orbit_r)
+    lurek.render.circle("line", player.x, player.y, proj_orbit_r)
 
     -- Player
     local pa = (invuln_timer > 0 and math.floor(invuln_timer * 10) % 2 == 0) and 0.4 or 1.0
     lurek.render.setColor(0.3, 0.7, 1.0, pa)
-    lurek.render.drawCircle("fill", player.x, player.y, PLAYER_RADIUS)
+    lurek.render.circle("fill", player.x, player.y, PLAYER_RADIUS)
     -- Direction indicator
     lurek.render.setColor(0.6, 0.9, 1.0, pa)
-    lurek.render.drawCircle("fill",
+    lurek.render.circle("fill",
         player.x + player.dir_x * PLAYER_RADIUS * 0.7,
         player.y + player.dir_y * PLAYER_RADIUS * 0.7,
         PLAYER_RADIUS * 0.35)
     -- Player outline
     lurek.render.setColor(0.2, 0.5, 0.8, pa)
-    lurek.render.drawCircle("line", player.x, player.y, PLAYER_RADIUS)
+    lurek.render.circle("line", player.x, player.y, PLAYER_RADIUS)
 
     -- Particles
     death_burst:draw()
@@ -581,7 +581,7 @@ function lurek.draw()
     -- Damage flash overlay
     if damage_flash > 0 then
         lurek.render.setColor(1, 0.2, 0.1, damage_flash)
-        lurek.render.drawRectangle("fill",
+        lurek.render.rectangle("fill",
             player.x - SCREEN_W / 2, player.y - SCREEN_H / 2,
             SCREEN_W, SCREEN_H)
     end
@@ -609,7 +609,7 @@ function lurek.draw_ui()
     -- ── GAME OVER ─────────────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.drawRectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
         lurek.render.setColor(1, 0.3, 0.3)
         lurek.render.print("GAME OVER", SCREEN_W / 2 - 80, 150, 32)
         lurek.render.setColor(0.9, 0.9, 0.9)
@@ -627,7 +627,7 @@ function lurek.draw_ui()
     -- ── LEVEL UP overlay ──────────────────────────────────────────────
     if current_state == STATE.LEVEL_UP then
         lurek.render.setColor(0, 0, 0, 0.65)
-        lurek.render.drawRectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
         lurek.render.setColor(1, 1, 0.3)
         lurek.render.print("LEVEL UP!", SCREEN_W / 2 - 70, 120, 28)
         lurek.render.setColor(0.9, 0.9, 0.9)
@@ -638,9 +638,9 @@ function lurek.draw_ui()
             local by = 210 + (i - 1) * 80
             -- Card background
             lurek.render.setColor(0.15, 0.2, 0.15, 0.9)
-            lurek.render.drawRectangle("fill", bx, by, 320, 65)
+            lurek.render.rectangle("fill", bx, by, 320, 65)
             lurek.render.setColor(0.4, 0.8, 0.4)
-            lurek.render.drawRectangle("line", bx, by, 320, 65)
+            lurek.render.rectangle("line", bx, by, 320, 65)
             -- Number
             lurek.render.setColor(1, 0.9, 0.3)
             lurek.render.print(tostring(i), bx + 10, by + 12, 28)
@@ -661,22 +661,22 @@ function lurek.draw_ui()
     local bar_x = 10
     local bar_y = 10
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.drawRectangle("fill", bar_x, bar_y, bar_w, bar_h)
+    lurek.render.rectangle("fill", bar_x, bar_y, bar_w, bar_h)
     local hp_frac = hp / PLAYER_MAX_HP
     local hp_color_r = 1 - hp_frac
     local hp_color_g = hp_frac
     lurek.render.setColor(hp_color_r, hp_color_g, 0.1, 0.9)
-    lurek.render.drawRectangle("fill", bar_x, bar_y, bar_w * hp_frac, bar_h)
+    lurek.render.rectangle("fill", bar_x, bar_y, bar_w * hp_frac, bar_h)
     lurek.render.setColor(1, 1, 1)
     lurek.render.print(string.format("HP %d/%d", hp, PLAYER_MAX_HP), bar_x + 4, bar_y + 1, 12)
 
     -- XP bar
     local xp_y = bar_y + bar_h + 4
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.drawRectangle("fill", bar_x, xp_y, bar_w, 10)
+    lurek.render.rectangle("fill", bar_x, xp_y, bar_w, 10)
     local xp_frac = xp / xp_to_next
     lurek.render.setColor(0.3, 0.8, 1.0, 0.9)
-    lurek.render.drawRectangle("fill", bar_x, xp_y, bar_w * xp_frac, 10)
+    lurek.render.rectangle("fill", bar_x, xp_y, bar_w * xp_frac, 10)
     lurek.render.setColor(1, 1, 1)
     lurek.render.print(string.format("XP %d/%d", xp, xp_to_next), bar_x + 4, xp_y - 1, 10)
 

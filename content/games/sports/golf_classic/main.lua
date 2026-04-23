@@ -49,6 +49,7 @@ local wind = { dx = 0, dy = 0, strength = 0 }
 
 local function randomize_wind()
     local angle = math.random() * math.pi * 2
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     wind.strength = math.random() * 30 + 5
     wind.dx = math.cos(angle) * wind.strength
     wind.dy = math.sin(angle) * wind.strength
@@ -285,12 +286,12 @@ lurek.input.bind("quit", "escape")
 
 function lurek.init()
     lurek.window.setTitle("Golf Classic — Lurek2D")
-    lurek.window.setBackgroundColor(0.2, 0.5, 0.2)
+    lurek.render.setBackgroundColor(0.2, 0.5, 0.2)
     make_holes()
 end
 
 local function _ready_setup()
-    lurek.camera.init(W, H)
+    _cam:setPosition(W, H)
 end
 
 function lurek.process(dt)

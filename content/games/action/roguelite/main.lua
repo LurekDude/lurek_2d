@@ -56,6 +56,7 @@ local state = STATE.TITLE
 
 -- ── Perk definitions ──────────────────────────────────────────────────────
 local PERK_DEFS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { id = "dmg",    label = "+25% Attack Damage",  desc = "All attacks deal 25% more damage" },
     { id = "speed",  label = "+20% Move Speed",     desc = "Move 20% faster"                  },
     { id = "heal",   label = "+2 HP Heal",          desc = "Restore 2 hit points"             },
@@ -238,7 +239,7 @@ end
 
 local function open_door()
     door_open = true
-    if door_pulse_tw then lurek.tween.cancel(door_pulse_tw) end
+    if door_pulse_tw then door_pulse_tw:cancel() end
     door_pulse.alpha = 0
     door_pulse_tw = lurek.tween.to(door_pulse, 0.6, { alpha = 1 }, { loop = -1, yoyo = true })
 end
@@ -246,7 +247,7 @@ end
 local function enter_perk_select()
     perk_choices = random_perk_choices()
     perk_glow.alpha = 0
-    if perk_glow_tw then lurek.tween.cancel(perk_glow_tw) end
+    if perk_glow_tw then perk_glow_tw:cancel() end
     perk_glow_tw = lurek.tween.to(perk_glow, 0.5, { alpha = 1 }, { loop = -1, yoyo = true })
     state = STATE.PERK_SELECT
 end
@@ -284,11 +285,11 @@ local function damage_player(amount)
     player.iframes = IFRAMES_DUR
     player.flash = 0.3
 
-    if dmg_flash_tw then lurek.tween.cancel(dmg_flash_tw) end
+    if dmg_flash_tw then dmg_flash_tw:cancel() end
     dmg_flash_tw = lurek.tween.to(player, 0.3, { flash = 0 })
 
     if death_burst then
-        lurek.particle.emit(death_burst, player.x, player.y, 8)
+        death_burst:emit(player.x, player.y, 8)
     end
 
     if player.hp <= 0 then
@@ -304,7 +305,7 @@ local function damage_enemy(e, amount)
         kills_total = kills_total + 1
         score = score + 100
         if death_burst then
-            lurek.particle.emit(death_burst, e.x, e.y, 15)
+            death_burst:emit(e.x, e.y, 15)
         end
         return true -- dead
     end
@@ -324,7 +325,7 @@ local function do_melee()
         range = MELEE_RANGE, timer = 0.15,
     }
     if slash_sparks then
-        lurek.particle.emit(slash_sparks, player.x + player.facing_x * 20, player.y + player.facing_y * 20, 6)
+        slash_sparks:emit(player.x + player.facing_x * 20, player.y + player.facing_y * 20, 6)
     end
 
     -- hit enemies in arc
@@ -516,7 +517,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Roguelite — Lurek2D")
-    lurek.window.setBackgroundColor(0.08, 0.06, 0.04)
+    lurek.render.setBackgroundColor(0.08, 0.06, 0.04)
 
     lurek.input.bind("up",     {"w", "up"})
     lurek.input.bind("down",   {"s", "down"})
@@ -538,7 +539,7 @@ end
 --  lurek.ready — create particles & tweens after GPU init
 -- ══════════════════════════════════════════════════════════════════════════
 local function _ready_setup()
-    death_burst = lurek.particle.new({
+    death_burst = lurek.particle.newSystem({
         maxParticles = 60,
         emitRate     = 0,
         lifetime     = { 0.3, 0.6 },
@@ -548,7 +549,7 @@ local function _ready_setup()
         sizes        = { 4, 1 },
     })
 
-    slash_sparks = lurek.particle.new({
+    slash_sparks = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.1, 0.25 },
@@ -558,7 +559,7 @@ local function _ready_setup()
         sizes        = { 3, 1 },
     })
 
-    dash_trail = lurek.particle.new({
+    dash_trail = lurek.particle.newSystem({
         maxParticles = 40,
         emitRate     = 0,
         lifetime     = { 0.15, 0.3 },
@@ -568,7 +569,7 @@ local function _ready_setup()
         sizes        = { 6, 2 },
     })
 
-    proj_sparks = lurek.particle.new({
+    proj_sparks = lurek.particle.newSystem({
         maxParticles = 30,
         emitRate     = 0,
         lifetime     = { 0.1, 0.2 },
@@ -578,19 +579,19 @@ local function _ready_setup()
         sizes        = { 3, 1 },
     })
 
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 -- ══════════════════════════════════════════════════════════════════════════
 --  lurek.process — game logic each frame
 -- ══════════════════════════════════════════════════════════════════════════
 function lurek.process(dt)
-    if lurek.input.pressed("quit") then lurek.event.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- ── Title ─────────────────────────────────────────────────────────
     if state == STATE.TITLE then
         title_blink = title_blink + dt
-        if lurek.input.pressed("attack") or lurek.input.pressed("perk1") then
+        if lurek.input.wasActionPressed("attack") or lurek.input.wasActionPressed("perk1") then
             reset_game()
         end
         return
@@ -598,7 +599,7 @@ function lurek.process(dt)
 
     -- ── Game Over ─────────────────────────────────────────────────────
     if state == STATE.GAME_OVER then
-        if lurek.input.pressed("restart") then
+        if lurek.input.wasActionPressed("restart") then
             state = STATE.TITLE
         end
         return
@@ -607,9 +608,9 @@ function lurek.process(dt)
     -- ── Perk Select ───────────────────────────────────────────────────
     if state == STATE.PERK_SELECT then
         for i = 1, 3 do
-            if lurek.input.pressed("perk" .. i) and perk_choices[i] then
+            if lurek.input.wasActionPressed("perk" .. i) and perk_choices[i] then
                 apply_perk(perk_choices[i])
-                if perk_glow_tw then lurek.tween.cancel(perk_glow_tw) end
+                if perk_glow_tw then perk_glow_tw:cancel() end
                 start_room()
             end
         end
@@ -629,15 +630,15 @@ function lurek.process(dt)
         player.x = player.x + player.dash_dx * dt
         player.y = player.y + player.dash_dy * dt
         if dash_trail then
-            lurek.particle.emit(dash_trail, player.x, player.y, 3)
+            dash_trail:emit(player.x, player.y, 3)
         end
         if player.dash_timer <= 0 then player.dashing = false end
     else
         local mx, my = 0, 0
-        if lurek.input.held("left")  then mx = mx - 1 end
-        if lurek.input.held("right") then mx = mx + 1 end
-        if lurek.input.held("up")    then my = my - 1 end
-        if lurek.input.held("down")  then my = my + 1 end
+        if lurek.input.isDown("left")  then mx = mx - 1 end
+        if lurek.input.isDown("right") then mx = mx + 1 end
+        if lurek.input.isDown("up")    then my = my - 1 end
+        if lurek.input.isDown("down")  then my = my + 1 end
         if mx ~= 0 or my ~= 0 then
             local nx, ny = normalize(mx, my)
             player.facing_x = nx
@@ -652,9 +653,9 @@ function lurek.process(dt)
     player.y = clamp(player.y, ARENA_Y + PLAYER_RADIUS, ARENA_Y + ARENA_H - PLAYER_RADIUS)
 
     -- Attacks
-    if lurek.input.pressed("attack") then do_melee() end
-    if lurek.input.pressed("ranged") then do_ranged() end
-    if lurek.input.pressed("dash")   then do_dash() end
+    if lurek.input.wasActionPressed("attack") then do_melee() end
+    if lurek.input.wasActionPressed("ranged") then do_ranged() end
+    if lurek.input.wasActionPressed("dash")   then do_dash() end
 
     -- Update player projectiles
     for i = #projectiles, 1, -1 do
@@ -685,7 +686,7 @@ function lurek.process(dt)
         end
 
         if hit then
-            if proj_sparks then lurek.particle.emit(proj_sparks, p.x, p.y, 8) end
+            if proj_sparks then proj_sparks:emit(p.x, p.y, 8) end
             table.remove(projectiles, i)
         elseif p.traveled > RANGED_MAX_DIST or not point_in_arena(p.x, p.y) then
             table.remove(projectiles, i)
@@ -727,7 +728,7 @@ function lurek.process(dt)
             local door_cx = ARENA_X + ARENA_W / 2
             local door_cy = ARENA_Y
             if dist(player.x, player.y, door_cx, door_cy + DOOR_H / 2) < 40 then
-                if door_pulse_tw then lurek.tween.cancel(door_pulse_tw) end
+                if door_pulse_tw then door_pulse_tw:cancel() end
                 enter_perk_select()
             end
         end
@@ -744,17 +745,17 @@ function lurek.process(dt)
             local door_cx = ARENA_X + ARENA_W / 2
             local door_cy = ARENA_Y
             if dist(player.x, player.y, door_cx, door_cy + DOOR_H / 2) < 40 then
-                if door_pulse_tw then lurek.tween.cancel(door_pulse_tw) end
+                if door_pulse_tw then door_pulse_tw:cancel() end
                 enter_perk_select()
             end
         end
     end
 
     -- Update particles
-    if death_burst  then lurek.particle.update(death_burst, dt) end
-    if slash_sparks then lurek.particle.update(slash_sparks, dt) end
-    if dash_trail   then lurek.particle.update(dash_trail, dt) end
-    if proj_sparks  then lurek.particle.update(proj_sparks, dt) end
+    if death_burst  then death_burst:update(dt) end
+    if slash_sparks then slash_sparks:update(dt) end
+    if dash_trail   then dash_trail:update(dt) end
+    if proj_sparks  then proj_sparks:update(dt) end
 end
 
 -- ══════════════════════════════════════════════════════════════════════════
@@ -883,10 +884,10 @@ function lurek.draw()
     end
 
     -- ── Particles ─────────────────────────────────────────────────────
-    if death_burst  then lurek.particle.draw(death_burst) end
-    if slash_sparks then lurek.particle.draw(slash_sparks) end
-    if dash_trail   then lurek.particle.draw(dash_trail) end
-    if proj_sparks  then lurek.particle.draw(proj_sparks) end
+    if death_burst  then lurek.render.draw(death_burst) end
+    if slash_sparks then lurek.render.draw(slash_sparks) end
+    if dash_trail   then lurek.render.draw(dash_trail) end
+    if proj_sparks  then lurek.render.draw(proj_sparks) end
 end
 
 -- ══════════════════════════════════════════════════════════════════════════

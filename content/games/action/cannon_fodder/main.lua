@@ -92,7 +92,7 @@ local function spawn_explosion(x, y)
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
-function lurek.load()
+function lurek.init()
     lurek.window.setTitle("Cannon Fodder — Lurek2D")
     lurek.render.setBackgroundColor(0.18, 0.32, 0.12)
 
@@ -338,6 +338,6 @@ function lurek.mousepressed(x, y, button)
 end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if key == "escape" then lurek.event.quit() end
 end

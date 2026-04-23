@@ -489,7 +489,7 @@ function lurek.draw()
     lurek.render.setColor(0.4, 0.3, 0.2, 1)
     lurek.render.rectangle("fill", SCREEN_W / 2 - 15, SCREEN_H - 35, 30, 15)
     lurek.render.setColor(0.5, 0.4, 0.25, 1)
-    lurek.render.drawCircle("fill", SCREEN_W / 2, SCREEN_H - 35, 10)
+    lurek.render.circle("fill", SCREEN_W / 2, SCREEN_H - 35, 10)
 
     -- Targets
     for i = 1, #targets do
@@ -520,10 +520,10 @@ function lurek.draw()
         local b = balls[i]
         local col = b.radius > BALL_RADIUS and COL_BALL_BIG or COL_BALL
         lurek.render.setColor(col[1], col[2], col[3], 1)
-        lurek.render.drawCircle("fill", b.x, b.y, b.radius)
+        lurek.render.circle("fill", b.x, b.y, b.radius)
         -- Bright core
         lurek.render.setColor(1, 1, 0.9, 0.7)
-        lurek.render.drawCircle("fill", b.x, b.y, b.radius * 0.4)
+        lurek.render.circle("fill", b.x, b.y, b.radius * 0.4)
     end
 
     -- Score popups
@@ -542,7 +542,7 @@ function lurek.draw()
 
     -- Crosshair
     lurek.render.setColor(COL_CROSSHAIR[1], COL_CROSSHAIR[2], COL_CROSSHAIR[3], 0.9)
-    lurek.render.drawCircle("line", crosshair_x, crosshair_y, 12)
+    lurek.render.circle("line", crosshair_x, crosshair_y, 12)
     lurek.render.line(crosshair_x - 16, crosshair_y, crosshair_x - 6, crosshair_y)
     lurek.render.line(crosshair_x + 6, crosshair_y, crosshair_x + 16, crosshair_y)
     lurek.render.line(crosshair_x, crosshair_y - 16, crosshair_x, crosshair_y - 6)

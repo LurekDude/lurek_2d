@@ -120,7 +120,7 @@ local function count_alive(t)
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
-function lurek.load()
+function lurek.init()
     lurek.window.setTitle("Worms Artillery — Lurek2D")
     lurek.render.setBackgroundColor(0.35, 0.6, 0.85)
 
@@ -135,7 +135,7 @@ function lurek.load()
     spawn_teams()
 
     -- Particle system for explosions
-    sparks = lurek.particle.newSystem(120)
+    sparks = lurek.particle.newSystem({maxParticles=120})
     sparks:setEmissionRate(0)
     sparks:setParticleLifetime(0.3, 0.8)
     sparks:setSpeed(100, 280)
@@ -307,7 +307,7 @@ function lurek.draw()
 end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if key == "escape" then lurek.event.quit() end
     if key == "r" and state == STATE.OVER then
         -- restart

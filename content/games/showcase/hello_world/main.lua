@@ -335,16 +335,16 @@ function lurek.draw()
 
     -- ── Bouncing circle ───────────────────────────────────────
     lurek.render.setColor(0.3, 0.85, 1.0, 0.9)
-    lurek.render.drawCircle("fill", ball.x, ball.y, ball.r)
+    lurek.render.circle("fill", ball.x, ball.y, ball.r)
     lurek.render.setColor(1, 1, 1, 0.3)
-    lurek.render.drawCircle("line", ball.x, ball.y, ball.r + 2)
+    lurek.render.circle("line", ball.x, ball.y, ball.r + 2)
 
     -- ── Mouse follower ────────────────────────────────────────
     local fpulse = 0.6 + 0.4 * math.sin(time * 5)
     lurek.render.setColor(1.0, 0.8, 0.2, fpulse)
-    lurek.render.drawCircle("fill", follower.x, follower.y, 10)
+    lurek.render.circle("fill", follower.x, follower.y, 10)
     lurek.render.setColor(1, 1, 1, 0.5)
-    lurek.render.drawCircle("line", follower.x, follower.y, 14)
+    lurek.render.circle("line", follower.x, follower.y, 14)
 
     -- ── Spawned shapes ────────────────────────────────────────
     for i = 1, #shapes do
@@ -358,7 +358,7 @@ function lurek.draw()
             lurek.render.rectangle("fill", s.x - hw, s.y - hw, s.size * sc, s.size * sc)
 
         elseif s.kind == "circle" then
-            lurek.render.drawCircle("fill", s.x, s.y, s.size * sc / 2)
+            lurek.render.circle("fill", s.x, s.y, s.size * sc / 2)
 
         elseif s.kind == "line" then
             local len = s.size * sc

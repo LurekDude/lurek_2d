@@ -129,7 +129,7 @@ end
 
 -- ── Input: direction changes via keypressed callback ──────────────────────
 -- Using keypressed avoids frame-skip issues with buffered direction input.
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if state ~= STATE.PLAYING then return end
 
     -- Map raw key to direction, preventing 180-degree reversal

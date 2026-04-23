@@ -305,7 +305,7 @@ function lurek.process(dt)
         local mx, my = lurek.input.mouse.getPosition()
         add_event("mouse_move", { x = mx, y = my })
 
-        if lurek.input.isMousePressed(1) then
+        if lurek.input.isDown(1) then
             add_event("mouse_click", { x = mx, y = my, button = 1 })
             place_rect(mx, my)
         end
@@ -391,7 +391,7 @@ function lurek.process(dt)
         end
 
         -- Canvas drawing in idle mode
-        if lurek.input.isMousePressed(1) then
+        if lurek.input.isDown(1) then
             local mx, my = lurek.input.mouse.getPosition()
             if my > CANVAS_Y and my < CANVAS_Y + CANVAS_H then
                 place_rect(mx, my)
@@ -414,14 +414,14 @@ function lurek.draw()
 
     -- Canvas border
     lurek.render.setColor(0.25, 0.25, 0.35, 1)
-    lurek.render.rectangleOutline(0, CANVAS_Y, SCREEN_W, CANVAS_H)
+    lurek.render.rectangle("line", 0, CANVAS_Y, SCREEN_W, CANVAS_H)
 
     -- Drawn rectangles
     for _, r in ipairs(canvas_rects) do
         lurek.render.setColor(r.r, r.g, r.b, 0.9)
         lurek.render.rectangle(r.x, r.y, RECT_SIZE, RECT_SIZE)
         lurek.render.setColor(r.r * 0.6, r.g * 0.6, r.b * 0.6, 1)
-        lurek.render.rectangleOutline(r.x, r.y, RECT_SIZE, RECT_SIZE)
+        lurek.render.rectangle("line", r.x, r.y, RECT_SIZE, RECT_SIZE)
     end
 
     -- Particles (world-space ones)
@@ -437,7 +437,7 @@ function lurek.draw()
         lurek.render.setColor(0.2, 1, 0.5, 0.7)
         lurek.render.circle(ghost_x, ghost_y, GHOST_RADIUS)
         lurek.render.setColor(0.1, 0.8, 0.4, 1)
-        lurek.render.circleOutline(ghost_x, ghost_y, GHOST_RADIUS + 2)
+        lurek.render.circle("line", ghost_x, ghost_y, GHOST_RADIUS + 2)
     end
 end
 
@@ -527,7 +527,7 @@ function lurek.draw_ui()
     lurek.render.setColor(0.15, 0.15, 0.2, 1)
     lurek.render.rectangle(TIMELINE_X, TIMELINE_Y, TIMELINE_W, TIMELINE_H)
     lurek.render.setColor(0.3, 0.3, 0.4, 1)
-    lurek.render.rectangleOutline(TIMELINE_X, TIMELINE_Y, TIMELINE_W, TIMELINE_H)
+    lurek.render.rectangle("line", TIMELINE_X, TIMELINE_Y, TIMELINE_W, TIMELINE_H)
 
     -- Event markers on timeline
     if record_duration > 0 then

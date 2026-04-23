@@ -235,7 +235,7 @@ function lurek.init()
     camera:setPosition(0, 0)
 
     -- Note placement sparkle
-    ps_sparkle = lurek.particle.new()
+    ps_sparkle = lurek.particle.newSystem({maxParticles=500})
     ps_sparkle:setEmissionRate(0)
     ps_sparkle:setParticleLifetime(0.3, 0.6)
     ps_sparkle:setSpeed(30, 80)
@@ -244,7 +244,7 @@ function lurek.init()
     ps_sparkle:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 
     -- Beat pulse
-    ps_beat = lurek.particle.new()
+    ps_beat = lurek.particle.newSystem({maxParticles=500})
     ps_beat:setEmissionRate(0)
     ps_beat:setParticleLifetime(0.2, 0.5)
     ps_beat:setSpeed(10, 50)
@@ -253,7 +253,7 @@ function lurek.init()
     ps_beat:setColors(1, 0.95, 0.4, 1, 1, 0.95, 0.4, 0)
 
     -- Cursor glow
-    ps_cursor = lurek.particle.new()
+    ps_cursor = lurek.particle.newSystem({maxParticles=500})
     ps_cursor:setEmissionRate(40)
     ps_cursor:setParticleLifetime(0.15, 0.35)
     ps_cursor:setSpeed(5, 25)
@@ -348,7 +348,7 @@ function lurek.process(dt)
     end
 
     -- Mouse click → toggle note
-    if lurek.input.isMousePressed(1) then
+    if lurek.input.isDown(1) then
         local mx, my = lurek.input.mouse.getPosition()
         local col, row = pixel_to_grid(mx, my)
         if col and row then

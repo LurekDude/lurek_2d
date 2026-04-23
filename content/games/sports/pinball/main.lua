@@ -42,6 +42,7 @@ local ball = { x = 0, y = 0, vx = 0, vy = 0, active = false }
 
 -- Flippers
 local flippers = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     left = {
         px = TABLE_X + 160, py = TABLE_Y + TABLE_H - 50,
         angle = FLIPPER_REST_ANGLE, target_angle = FLIPPER_REST_ANGLE,
@@ -187,12 +188,12 @@ lurek.input.bind("quit", "escape")
 
 function lurek.init()
     lurek.window.setTitle("Pinball — Lurek2D")
-    lurek.window.setBackgroundColor(0.02, 0.02, 0.05)
+    lurek.render.setBackgroundColor(0.02, 0.02, 0.05)
     reset_targets()
 end
 
 local function _ready_setup()
-    lurek.camera.init(W, H)
+    _cam:setPosition(W, H)
 end
 
 function lurek.process(dt)

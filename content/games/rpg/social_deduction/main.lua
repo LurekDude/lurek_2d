@@ -24,6 +24,7 @@ local STATE_GAME_OVER = "GAME_OVER"
 
 -- ── Ship map rooms (center x, y, w, h, name) ──────────────────────────────
 local rooms = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { x = 200, y = 150, w = 160, h = 120, name = "Bridge" },
     { x = 500, y = 150, w = 140, h = 120, name = "Shields" },
     { x = 100, y = 350, w = 140, h = 120, name = "Engine" },
@@ -127,7 +128,7 @@ local function spawn_particles(x, y, r, g, b, count)
     for _ = 1, count do
         local angle = math.random() * math.pi * 2
         local speed = 30 + math.random() * 60
-        lurek.particle.emit(x, y, math.cos(angle) * speed, math.sin(angle) * speed, r, g, b, 1.0, 0.6 + math.random() * 0.4)
+        x:emit(y, math.cos(angle) * speed, math.sin(angle) * speed, r, g, b, 1.0, 0.6 + math.random() * 0.4)
     end
 end
 
@@ -440,14 +441,14 @@ function lurek.process(delta)
     dt = delta
     frame_count = frame_count + 1
 
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     -- ── Title ──────────────────────────────────────────────────────────
     if state == STATE_TITLE then
-        if lurek.input.pressed("interact") then
+        if lurek.input.wasActionPressed("interact") then
             init_game()
             state = STATE_TASK_PHASE
             if is_player_traitor then
@@ -471,10 +472,10 @@ function lurek.process(delta)
 
         -- player movement
         local mx, my = 0, 0
-        if lurek.input.down("up")    then my = my - 1 end
-        if lurek.input.down("down")  then my = my + 1 end
-        if lurek.input.down("left")  then mx = mx - 1 end
-        if lurek.input.down("right") then mx = mx + 1 end
+        if lurek.input.isDown("up")    then my = my - 1 end
+        if lurek.input.isDown("down")  then my = my + 1 end
+        if lurek.input.isDown("left")  then mx = mx - 1 end
+        if lurek.input.isDown("right") then mx = mx + 1 end
         if mx ~= 0 or my ~= 0 then
             local len = math.sqrt(mx * mx + my * my)
             p.x = clamp(p.x + (mx / len) * PLAYER_SPEED * dt, 20, 750)
@@ -482,10 +483,10 @@ function lurek.process(delta)
         end
 
         -- camera follow
-        lurek.camera.setPosition(p.x - SCREEN_W / 2, p.y - SCREEN_H / 2)
+        _cam:setPosition(p.x - SCREEN_W / 2, p.y - SCREEN_H / 2)
 
         -- task interaction
-        if lurek.input.down("interact") then
+        if lurek.input.isDown("interact") then
             if is_player_traitor then
                 -- traitor: eliminate nearby player
                 for j = 2, PLAYER_COUNT do
@@ -551,7 +552,7 @@ function lurek.process(delta)
         end
 
         -- call meeting
-        if lurek.input.pressed("meeting") then
+        if lurek.input.wasActionPressed("meeting") then
             start_meeting(1)
             return
         end
@@ -581,7 +582,7 @@ function lurek.process(delta)
     if state == STATE_VOTING then
         if not votes[1] then
             for v = 1, 6 do
-                if lurek.input.pressed("vote" .. v) then
+                if lurek.input.wasActionPressed("vote" .. v) then
                     if players[v].alive and v ~= 1 then
                         votes[1] = v
                         -- animate then tally
@@ -605,7 +606,7 @@ function lurek.process(delta)
 
     -- ── Game over ──────────────────────────────────────────────────────
     if state == STATE_GAME_OVER then
-        if lurek.input.pressed("interact") then
+        if lurek.input.wasActionPressed("interact") then
             state = STATE_TITLE
             title_alpha = 1.0
         end

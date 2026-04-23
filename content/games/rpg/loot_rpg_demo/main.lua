@@ -341,9 +341,9 @@ function lurek.process(dt)
         end
     end
 
-    if lurek.input.isKeyDown("up") then
+    if lurek.input.isDown("up") then
         scrollOffset = math.max(0, scrollOffset - 1)
-    elseif lurek.input.isKeyDown("down") then
+    elseif lurek.input.isDown("down") then
         scrollOffset = scrollOffset + 1
     end
 end

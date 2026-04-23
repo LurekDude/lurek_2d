@@ -247,7 +247,7 @@ end
 
 local function exit_test_scene()
     lurek.tween.to(tw_test_fade, 0.3, { alpha = 0.0 })
-    lurek.timer.after(0.35, function() current_state = STATE_BROWSER end)
+    lurek.timer.afterReal(0.35, function() current_state = STATE_BROWSER end)
 end
 
 -- ---------------------------------------------------------------------------
@@ -272,9 +272,9 @@ function lurek.init()
     camera:setPosition(0, 0)
 
     -- Mod activation particle system
-    ps_activate = lurek.particle.new()
+    ps_activate = lurek.particle.newSystem({maxParticles=500})
     ps_activate:setEmissionRate(0)
-    ps_activate:setLifetime(0.4, 0.8)
+    ps_activate:setParticleLifetime(0.4, 0.8)
     ps_activate:setSpeed(60, 140)
     ps_activate:setSpread(math.pi * 2)
     ps_activate:setColors(
@@ -284,9 +284,9 @@ function lurek.init()
     ps_activate:setSizes(4, 1)
 
     -- Coin collect particle system
-    ps_coin = lurek.particle.new()
+    ps_coin = lurek.particle.newSystem({maxParticles=500})
     ps_coin:setEmissionRate(0)
-    ps_coin:setLifetime(0.3, 0.6)
+    ps_coin:setParticleLifetime(0.3, 0.6)
     ps_coin:setSpeed(40, 100)
     ps_coin:setSpread(math.pi * 2)
     ps_coin:setColors(
@@ -305,7 +305,7 @@ function lurek.process(dt)
     -- Title auto-advance
     if current_state == STATE_TITLE then
         title_timer = title_timer + dt
-        if title_timer >= title_hold or lurek.input.pressed("toggle") then
+        if title_timer >= title_hold or lurek.input.wasActionPressed("toggle") then
             current_state = STATE_BROWSER
             lurek.tween.to(tw_preview, 0.3, { alpha = 1.0 })
         end
@@ -326,19 +326,19 @@ function lurek.process(dt)
     -- BROWSER state input
     -- -----------------------------------------------------------------------
     if current_state == STATE_BROWSER then
-        if lurek.input.pressed("nav_up") then
+        if lurek.input.wasActionPressed("nav_up") then
             selected_index = selected_index - 1
             if selected_index < 1 then selected_index = #MODS end
             tw_preview.alpha = 0.0
             lurek.tween.to(tw_preview, 0.25, { alpha = 1.0 })
         end
-        if lurek.input.pressed("nav_down") then
+        if lurek.input.wasActionPressed("nav_down") then
             selected_index = selected_index + 1
             if selected_index > #MODS then selected_index = 1 end
             tw_preview.alpha = 0.0
             lurek.tween.to(tw_preview, 0.25, { alpha = 1.0 })
         end
-        if lurek.input.pressed("toggle") then
+        if lurek.input.wasActionPressed("toggle") then
             local mod = MODS[selected_index]
             mod.enabled = not mod.enabled
             -- Activation flash
@@ -346,10 +346,10 @@ function lurek.process(dt)
             ps_activate:setPosition(LIST_X + 180, flash_y)
             ps_activate:emit(25)
         end
-        if lurek.input.pressed("test") then
+        if lurek.input.wasActionPressed("test") then
             enter_test_scene()
         end
-        if lurek.input.pressed("export") then
+        if lurek.input.wasActionPressed("export") then
             local lines = { "=== Mod Config ===" }
             local order = 1
             for i, m in ipairs(MODS) do
@@ -369,21 +369,21 @@ function lurek.process(dt)
     -- -----------------------------------------------------------------------
     if current_state == STATE_TEST then
         -- Allow toggling mods during test
-        if lurek.input.pressed("nav_up") then
+        if lurek.input.wasActionPressed("nav_up") then
             selected_index = selected_index - 1
             if selected_index < 1 then selected_index = #MODS end
         end
-        if lurek.input.pressed("nav_down") then
+        if lurek.input.wasActionPressed("nav_down") then
             selected_index = selected_index + 1
             if selected_index > #MODS then selected_index = 1 end
         end
-        if lurek.input.pressed("toggle") then
+        if lurek.input.wasActionPressed("toggle") then
             local mod = MODS[selected_index]
             mod.enabled = not mod.enabled
             ps_activate:setPosition(player.x, player.y)
             ps_activate:emit(20)
         end
-        if lurek.input.pressed("test") then
+        if lurek.input.wasActionPressed("test") then
             exit_test_scene()
             return
         end
@@ -391,8 +391,8 @@ function lurek.process(dt)
         -- Player movement
         local spd = get_player_speed()
         player.vx, player.vy = 0, 0
-        if lurek.input.down("nav_up")   then player.vy = -spd end
-        if lurek.input.down("nav_down") then player.vy =  spd end
+        if lurek.input.isDown("nav_up")   then player.vy = -spd end
+        if lurek.input.isDown("nav_down") then player.vy =  spd end
         if lurek.input.isActionDown("left")   then player.vx = -spd end
         if lurek.input.isActionDown("right")  then player.vx =  spd end
         player.x = clamp(player.x + player.vx * dt, PLAYER_SIZE, SCREEN_W - PLAYER_SIZE)
@@ -456,7 +456,7 @@ function lurek.process(dt)
     end
 
     -- Quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
     end
 end

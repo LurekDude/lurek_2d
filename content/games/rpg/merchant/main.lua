@@ -35,6 +35,7 @@ local REP_LOSS         = 0.03
 local CATEGORIES = { "Weapons", "Armor", "Potions" }
 
 local ITEMS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { id = 1, name = "Iron Sword",   cat = "Weapons", cost = 30,  stat = "dmg 10", color = {0.7,0.7,0.8} },
     { id = 2, name = "Steel Sword",  cat = "Weapons", cost = 80,  stat = "dmg 18", color = {0.8,0.8,0.9} },
     { id = 3, name = "Magic Staff",  cat = "Weapons", cost = 120, stat = "dmg 25", color = {0.6,0.4,0.9} },
@@ -309,7 +310,7 @@ end
 function lurek.init()
     lurek.window.setTitle("Merchant — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.12, 0.08)
-    lurek.timer.setTargetFPS(60)
+    -- [removed: lurek.timer.setTargetFPS has no equivalent]
     reset_game()
 end
 
@@ -324,7 +325,7 @@ function lurek.process(dt)
             current_state = STATE.TRADING
         end
         if lurek.input.keyboard.isDown("escape") then
-            lurek.event.signal("quit")
+            lurek.event.push("quit")
         end
         return
     end
@@ -336,7 +337,7 @@ function lurek.process(dt)
             current_state = STATE.TITLE
         end
         if lurek.input.keyboard.isDown("escape") then
-            lurek.event.signal("quit")
+            lurek.event.push("quit")
         end
         return
     end
@@ -419,7 +420,7 @@ function lurek.process(dt)
 
         -- Quit
         if lurek.input.keyboard.isDown("escape") then
-            lurek.event.signal("quit")
+            lurek.event.push("quit")
         end
     end
 
@@ -437,7 +438,7 @@ function lurek.draw()
         return
     end
 
-    local cam = lurek.camera.getPosition()
+    local cam = _cam:getPosition()
 
     -- Shop floor
     lurek.render.rectangle(0, 450, SCREEN_W, 150, 0.25, 0.18, 0.12, 1)

@@ -209,11 +209,11 @@ local function get_position()
 end
 
 local function update_car_physics(car_dt)
-    local accel_input = lurek.input.is_action_pressed("accelerate")
-    local brake_input = lurek.input.is_action_pressed("brake")
-    local steer_l = lurek.input.is_action_pressed("steer_left")
-    local steer_r = lurek.input.is_action_pressed("steer_right")
-    local boost_input = lurek.input.is_action_just_pressed("boost")
+    local accel_input = lurek.input.wasActionPressed("accelerate")
+    local brake_input = lurek.input.wasActionPressed("brake")
+    local steer_l = lurek.input.wasActionPressed("steer_left")
+    local steer_r = lurek.input.wasActionPressed("steer_right")
+    local boost_input = lurek.input.wasActionPressed("boost")
 
     -- Boost activation
     if boost_input and player.boost_fuel > 0 and not player.boost_active then
@@ -449,7 +449,7 @@ local function draw_road_segment(ax, ay, bx, by)
     local len = math.sqrt(dx * dx + dy * dy)
     if len == 0 then return end
     local nx, ny = -dy / len * ROAD_WIDTH, dx / len * ROAD_WIDTH
-    lurek.render.quad(
+    lurek.render.drawq(
         ax + nx, ay + ny, bx + nx, by + ny,
         bx - nx, by - ny, ax - nx, ay - ny,
         0.35, 0.35, 0.35, 1
@@ -461,10 +461,10 @@ local function draw_car(x, y, angle, w, h, r, g, b)
     lurek.render.translate(x, y)
     lurek.render.rotate(angle)
     lurek.render.setColor(r, g, b, 1)
-    lurek.render.rect("fill", -w / 2, -h / 2, w, h)
+    lurek.render.rectangle("fill", -w / 2, -h / 2, w, h)
     -- Windshield
     lurek.render.setColor(0.6, 0.8, 1, 0.8)
-    lurek.render.rect("fill", w * 0.1, -h * 0.3, w * 0.25, h * 0.6)
+    lurek.render.rectangle("fill", w * 0.1, -h * 0.3, w * 0.25, h * 0.6)
     lurek.render.pop()
 end
 
@@ -494,22 +494,22 @@ end
 function lurek.process(delta)
     dt = delta
 
-    if lurek.input.is_action_just_pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     if state == "TITLE" then
-        if lurek.input.is_action_just_pressed("accelerate") then
+        if lurek.input.wasActionPressed("accelerate") then
             state = "TRACK_SELECT"
         end
 
     elseif state == "TRACK_SELECT" then
-        if lurek.input.is_key_just_pressed("1") then
+        if lurek.input.wasActionPressed("1") then
             track_index = 1; start_race()
-        elseif lurek.input.is_key_just_pressed("2") then
+        elseif lurek.input.wasActionPressed("2") then
             track_index = 2; start_race()
-        elseif lurek.input.is_key_just_pressed("3") then
+        elseif lurek.input.wasActionPressed("3") then
             track_index = 3; start_race()
         end
 
@@ -531,7 +531,7 @@ function lurek.process(delta)
         camera_y = lerp(camera_y, player.y - SCREEN_H / 2, 5 * dt)
 
     elseif state == "RESULTS" then
-        if lurek.input.is_action_just_pressed("accelerate") then
+        if lurek.input.wasActionPressed("accelerate") then
             state = "TRACK_SELECT"
         end
     end
@@ -550,7 +550,7 @@ function lurek.draw()
 
         -- Draw grass background
         lurek.render.setColor(0.2, 0.45, 0.15, 1)
-        lurek.render.rect("fill", -200, -200, SCREEN_W * 2 + 400, SCREEN_H * 2 + 400)
+        lurek.render.rectangle("fill", -200, -200, SCREEN_W * 2 + 400, SCREEN_H * 2 + 400)
 
         -- Draw road segments
         for i = 1, n do
@@ -560,7 +560,7 @@ function lurek.draw()
 
         -- Draw start/finish line
         lurek.render.setColor(1, 1, 1, 0.8)
-        lurek.render.rect("fill", wp[1].x - 4, wp[1].y - ROAD_WIDTH, 8, ROAD_WIDTH * 2)
+        lurek.render.rectangle("fill", wp[1].x - 4, wp[1].y - ROAD_WIDTH, 8, ROAD_WIDTH * 2)
 
         -- Draw tire marks
         for _, mark in ipairs(tire_marks) do
@@ -572,7 +572,7 @@ function lurek.draw()
         for _, pad in ipairs(boost_pads) do
             if pad.active then
                 lurek.render.setColor(1, 0.9, 0.1, 0.9)
-                lurek.render.rect("fill", pad.x - BOOST_PAD_SIZE / 2, pad.y - BOOST_PAD_SIZE / 2, BOOST_PAD_SIZE, BOOST_PAD_SIZE)
+                lurek.render.rectangle("fill", pad.x - BOOST_PAD_SIZE / 2, pad.y - BOOST_PAD_SIZE / 2, BOOST_PAD_SIZE, BOOST_PAD_SIZE)
             end
         end
 

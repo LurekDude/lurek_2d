@@ -472,10 +472,10 @@ function lurek.process(dt)
 
     -- Camera pan
     local moved = false
-    if lurek.input.isActionHeld("move_up")    then cam_y = cam_y - CAM_SPEED * dt; moved = true end
-    if lurek.input.isActionHeld("move_down")  then cam_y = cam_y + CAM_SPEED * dt; moved = true end
-    if lurek.input.isActionHeld("move_left")  then cam_x = cam_x - CAM_SPEED * dt; moved = true end
-    if lurek.input.isActionHeld("move_right") then cam_x = cam_x + CAM_SPEED * dt; moved = true end
+    if lurek.input.isActionDown("move_up")    then cam_y = cam_y - CAM_SPEED * dt; moved = true end
+    if lurek.input.isActionDown("move_down")  then cam_y = cam_y + CAM_SPEED * dt; moved = true end
+    if lurek.input.isActionDown("move_left")  then cam_x = cam_x - CAM_SPEED * dt; moved = true end
+    if lurek.input.isActionDown("move_right") then cam_x = cam_x + CAM_SPEED * dt; moved = true end
     cam_x = clamp(cam_x, 0, WORLD_W - SCREEN_W)
     cam_y = clamp(cam_y, 0, WORLD_H - SCREEN_H)
 

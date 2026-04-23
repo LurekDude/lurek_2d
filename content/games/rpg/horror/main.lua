@@ -41,6 +41,7 @@ local TILE_EXIT    = 3
 -- Map (20x15)
 ------------------------------------------------------------------------
 local MAP = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     {0,1,1,1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0},
     {0,1,0,1,0,1,0,0,1,0,1,0,0,0,1,0,1,0,1,0},
@@ -254,21 +255,21 @@ function lurek.init()
     lurek.input.bind("quit",      {"escape"})
 
     -- Particle systems
-    dust_ps = lurek.particle.new({
+    dust_ps = lurek.particle.newSystem({
         maxParticles = 30, lifetime = 1.2,
         speed = 15, spread = 6.28,
         sizeStart = 2, sizeEnd = 1,
         colorStart = {0.9, 0.85, 0.6, 0.4},
         colorEnd   = {0.7, 0.65, 0.4, 0.0},
     })
-    flash_ps = lurek.particle.new({
+    flash_ps = lurek.particle.newSystem({
         maxParticles = 20, lifetime = 0.3,
         speed = 120, spread = 6.28,
         sizeStart = 8, sizeEnd = 2,
         colorStart = {1.0, 1.0, 1.0, 0.9},
         colorEnd   = {1.0, 0.9, 0.7, 0.0},
     })
-    glow_ps = lurek.particle.new({
+    glow_ps = lurek.particle.newSystem({
         maxParticles = 15, lifetime = 0.8,
         speed = 25, spread = 6.28,
         sizeStart = 5, sizeEnd = 2,
@@ -572,7 +573,7 @@ function lurek.process(dt)
     -- Camera + title
     local sx = shake_amount > 0 and (math.random() - 0.5) * shake_amount * 2 or 0
     local sy = shake_amount > 0 and (math.random() - 0.5) * shake_amount * 2 or 0
-    lurek.camera.setPosition(
+    _cam:setPosition(
         player.x - SCREEN_W / 2 + sx + distort_offset.x,
         player.y - SCREEN_H / 2 + sy + distort_offset.y
     )
@@ -663,7 +664,7 @@ function lurek.draw()
                 lurek.render.rectangle(tx, ty, TILE_SIZE, TILE_SIZE)
                 -- Wall edge highlight
                 lurek.render.setColor(0.18 * brightness, 0.15 * brightness, 0.22 * brightness, 1)
-                lurek.render.rectangleLines(tx, ty, TILE_SIZE, TILE_SIZE, 1)
+                lurek.render.rectangle("line", tx, ty, TILE_SIZE, TILE_SIZE, 1)
             elseif tile == TILE_FLOOR then
                 lurek.render.setColor(0.22 * brightness, 0.20 * brightness, 0.18 * brightness, 1)
                 lurek.render.rectangle(tx, ty, TILE_SIZE, TILE_SIZE)
@@ -673,7 +674,7 @@ function lurek.draw()
                 lurek.render.rectangle(tx, ty, TILE_SIZE, TILE_SIZE)
                 -- Recharge icon
                 lurek.render.setColor(0.2, 0.8 * pulse, 0.3, brightness * 0.6)
-                lurek.render.rectangleLines(tx + 8, ty + 8, TILE_SIZE - 16, TILE_SIZE - 16, 2)
+                lurek.render.rectangle("line", tx + 8, ty + 8, TILE_SIZE - 16, TILE_SIZE - 16, 2)
             elseif tile == TILE_EXIT then
                 local pulse = 0.5 + 0.5 * math.sin(title_time * 2)
                 lurek.render.setColor(0.35 * brightness * pulse, 0.12 * brightness, 0.12 * brightness, 1)
@@ -862,7 +863,7 @@ function lurek.draw_ui()
         lurek.render.setColor(0, 0, 0, 0.85)
         lurek.render.rectangle(60, 100, SCREEN_W - 120, 300)
         lurek.render.setColor(0.6, 0.5, 0.3, 1)
-        lurek.render.rectangleLines(60, 100, SCREEN_W - 120, 300, 2)
+        lurek.render.rectangle("line", 60, 100, SCREEN_W - 120, 300, 2)
 
         lurek.render.setColor(0.95, 0.9, 0.7, 1)
         lurek.render.print(current_note.title, 90, 130, 18)

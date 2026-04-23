@@ -490,7 +490,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Patterns Demo — Lurek2D")
-    lurek.window.setBackgroundColor(0.08, 0.06, 0.1)
+    lurek.render.setBackgroundColor(0.08, 0.06, 0.1)
 end
 
 local function _ready_setup()
@@ -511,45 +511,45 @@ function lurek.process(dt)
     if state == STATE_TITLE then
         title_timer = title_timer + dt
         for i, ps in ipairs(pattern_order) do
-            if lurek.input.pressed("pattern_" .. i) then switch_pattern(ps) end
+            if lurek.input.wasActionPressed("pattern_" .. i) then switch_pattern(ps) end
         end
-        if lurek.input.pressed("quit") then lurek.event.quit() end
+        if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
         return
     end
 
     -- Global pattern switching
     for i, ps in ipairs(pattern_order) do
-        if lurek.input.pressed("pattern_" .. i) then switch_pattern(ps) end
+        if lurek.input.wasActionPressed("pattern_" .. i) then switch_pattern(ps) end
     end
-    if lurek.input.pressed("quit") then lurek.event.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Tab slide tween
     tab_slide_x = lerp(tab_slide_x, tab_slide_target, dt * 10)
 
     -- Pattern-specific update
     if state == STATE_P1 then
-        if lurek.input.pressed("action_a") then bus_fire("player_hit") end
-        if lurek.input.pressed("action_b") then bus_fire("score_up") end
-        if lurek.input.pressed("action_c") then bus_fire("level_up") end
+        if lurek.input.wasActionPressed("action_a") then bus_fire("player_hit") end
+        if lurek.input.wasActionPressed("action_b") then bus_fire("score_up") end
+        if lurek.input.wasActionPressed("action_c") then bus_fire("level_up") end
 
     elseif state == STATE_P2 then
-        if lurek.input.pressed("spawn") then pool_spawn() end
-        if lurek.input.pressed("release") then pool_release() end
+        if lurek.input.wasActionPressed("spawn") then pool_spawn() end
+        if lurek.input.wasActionPressed("release") then pool_release() end
         pool_update(dt)
 
     elseif state == STATE_P3 then
-        if lurek.input.pressed("move_up") then cmd_execute(0, -CMD_STEP) end
-        if lurek.input.pressed("move_down") then cmd_execute(0, CMD_STEP) end
-        if lurek.input.pressed("move_left") then cmd_execute(-CMD_STEP, 0) end
-        if lurek.input.pressed("move_right") then cmd_execute(CMD_STEP, 0) end
-        if lurek.input.pressed("undo") then cmd_undo() end
-        if lurek.input.pressed("redo") then cmd_redo_action() end
+        if lurek.input.wasActionPressed("move_up") then cmd_execute(0, -CMD_STEP) end
+        if lurek.input.wasActionPressed("move_down") then cmd_execute(0, CMD_STEP) end
+        if lurek.input.wasActionPressed("move_left") then cmd_execute(-CMD_STEP, 0) end
+        if lurek.input.wasActionPressed("move_right") then cmd_execute(CMD_STEP, 0) end
+        if lurek.input.wasActionPressed("undo") then cmd_undo() end
+        if lurek.input.wasActionPressed("redo") then cmd_redo_action() end
 
     elseif state == STATE_P4 then
-        if lurek.input.pressed("service") then svc_query() end
+        if lurek.input.wasActionPressed("service") then svc_query() end
 
     elseif state == STATE_P5 then
-        if lurek.input.pressed("factory") then factory_create() end
+        if lurek.input.wasActionPressed("factory") then factory_create() end
         for _, e in ipairs(factory_entities) do
             e.scale = lerp(e.scale, 1.0, dt * 8)
         end
@@ -557,7 +557,7 @@ function lurek.process(dt)
     elseif state == STATE_P6 then
         fsm.timer = fsm.timer + dt
         if fsm.timer >= FSM_DURATIONS[fsm.state] then fsm_transition() end
-        if lurek.input.pressed("spawn") then fsm_transition() end
+        if lurek.input.wasActionPressed("spawn") then fsm_transition() end
         local c = FSM_COLORS[fsm.state]
         fsm_blend.r = lerp(fsm_blend.r, c[1], dt * 5)
         fsm_blend.g = lerp(fsm_blend.g, c[2], dt * 5)

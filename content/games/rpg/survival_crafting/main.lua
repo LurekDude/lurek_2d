@@ -25,6 +25,7 @@ local T_BERRY = 4
 local T_WALL  = 5
 
 local TILE_COLORS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     [T_GRASS] = {0.30, 0.65, 0.20},
     [T_STONE] = {0.55, 0.55, 0.50},
     [T_TREE]  = {0.15, 0.45, 0.12},
@@ -239,7 +240,7 @@ function lurek.init()
 end
 
 local function _ready_setup()
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 -- ============================================================================
@@ -283,7 +284,7 @@ function lurek.process(dt)
             state = STATE_PLAYING
         end
         -- Crafting choices via number keys
-        if lurek.input.isKeyJustPressed("1") then
+        if lurek.input.wasActionPressed("1") then
             if inventory.wood >= 2 and inventory.stone >= 3 then
                 inventory.wood = inventory.wood - 2
                 inventory.stone = inventory.stone - 3
@@ -293,7 +294,7 @@ function lurek.process(dt)
                 spawn_particles(wx, wy, 12, 1.0, 0.9, 0.2, 0.6, 50)
             end
         end
-        if lurek.input.isKeyJustPressed("2") then
+        if lurek.input.wasActionPressed("2") then
             if inventory.wood >= 4 then
                 inventory.wood = inventory.wood - 4
                 inventory.wall = inventory.wall + 1
@@ -468,7 +469,7 @@ function lurek.process(dt)
     local target_cy = (player.gy - 1) * TILE + TILE / 2 - SCREEN_H / 2
     camera_x = camera_x + (target_cx - camera_x) * math.min(1, dt * 6)
     camera_y = camera_y + (target_cy - camera_y) * math.min(1, dt * 6)
-    lurek.camera.setPosition(camera_x, camera_y)
+    _cam:setPosition(camera_x, camera_y)
 end
 
 -- ============================================================================

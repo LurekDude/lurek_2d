@@ -192,36 +192,36 @@ end
 -- Init particles
 -- ---------------------------------------------------------------------------
 local function init_particles()
-    ps_dust = lurek.particle.new()
+    ps_dust = lurek.particle.newSystem({maxParticles=500})
     ps_dust:setEmissionRate(0)
-    ps_dust:setLifetime(0.4, 0.8)
+    ps_dust:setParticleLifetime(0.4, 0.8)
     ps_dust:setSpeed(20, 60)
     ps_dust:setDirection(math.pi * 0.5)
     ps_dust:setSpread(math.pi * 0.6)
     ps_dust:setColor(0.6, 0.5, 0.4, 0.7, 0.6, 0.5, 0.4, 0)
     ps_dust:setSize(2, 5)
 
-    ps_impact = lurek.particle.new()
+    ps_impact = lurek.particle.newSystem({maxParticles=500})
     ps_impact:setEmissionRate(0)
-    ps_impact:setLifetime(0.3, 0.6)
+    ps_impact:setParticleLifetime(0.3, 0.6)
     ps_impact:setSpeed(40, 100)
     ps_impact:setDirection(math.pi * 1.5)
     ps_impact:setSpread(math.pi)
     ps_impact:setColor(0.7, 0.6, 0.4, 1, 0.7, 0.6, 0.4, 0)
     ps_impact:setSize(3, 7)
 
-    ps_trail = lurek.particle.new()
+    ps_trail = lurek.particle.newSystem({maxParticles=500})
     ps_trail:setEmissionRate(0)
-    ps_trail:setLifetime(0.2, 0.5)
+    ps_trail:setParticleLifetime(0.2, 0.5)
     ps_trail:setSpeed(10, 30)
     ps_trail:setDirection(math.pi)
     ps_trail:setSpread(0.3)
     ps_trail:setColor(0.9, 0.85, 0.7, 0.6, 0.9, 0.85, 0.7, 0)
     ps_trail:setSize(2, 4)
 
-    ps_confetti = lurek.particle.new()
+    ps_confetti = lurek.particle.newSystem({maxParticles=500})
     ps_confetti:setEmissionRate(0)
-    ps_confetti:setLifetime(1.0, 2.5)
+    ps_confetti:setParticleLifetime(1.0, 2.5)
     ps_confetti:setSpeed(50, 150)
     ps_confetti:setDirection(math.pi * 1.5)
     ps_confetti:setSpread(math.pi * 0.8)
@@ -747,7 +747,7 @@ end
 function lurek.process(dt)
     -- Quit
     if lurek.input.keyboard.isDown("quit") then
-        lurek.event.signal("quit")
+        lurek.event.push("quit")
         return
     end
 
@@ -937,10 +937,10 @@ function lurek.draw()
 
     -- Particles
     lurek.render.setColor(1, 1, 1)
-    lurek.particle.draw(ps_dust)
-    lurek.particle.draw(ps_impact)
-    lurek.particle.draw(ps_trail)
-    lurek.particle.draw(ps_confetti)
+    lurek.render.draw(ps_dust)
+    lurek.render.draw(ps_impact)
+    lurek.render.draw(ps_trail)
+    lurek.render.draw(ps_confetti)
 
     if camera then camera:detach() end
 end

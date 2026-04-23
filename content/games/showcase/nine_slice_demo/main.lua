@@ -255,7 +255,7 @@ end
 -- ── Callbacks ──────────────────────────────────────────────────────────
 
 function lurek.init()
-    SCREEN_W, SCREEN_H = lurek.window.getSize()
+    SCREEN_W, SCREEN_H = lurek.window.getDimensions()
     lurek.render.setBackgroundColor(0.1, 0.08, 0.12)
     math.randomseed(os.time())
 end

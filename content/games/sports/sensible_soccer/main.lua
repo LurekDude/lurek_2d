@@ -98,7 +98,7 @@ local function find_nearest_player(team)
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
-function lurek.load()
+function lurek.init()
     lurek.window.setTitle("Sensible Soccer — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.48, 0.18)
     lurek.input.bind("left",  "a,left")
@@ -313,7 +313,7 @@ function lurek.draw()
 end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if key == "escape" then lurek.event.quit() end
     if (key == "space" or key == "return") and state == STATE.PLAY then
         -- Shoot: kick ball in player's facing direction + aftertouch

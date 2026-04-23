@@ -42,6 +42,7 @@ local BLINK_RATE     = 0.1
 
 -- Platforms: {x, y, w, h}
 local PLATFORMS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { x = 150, y = 450, w = 500, h = 20 },   -- main ground
     { x = 80,  y = 330, w = 140, h = 14 },    -- left floating
     { x = 580, y = 330, w = 140, h = 14 },    -- right floating
@@ -171,7 +172,7 @@ local function collide_platforms(f, dt)
                 f.jumps_left = MAX_JUMPS
                 -- Landing dust
                 if not was_grounded and land_dust_ps then
-                    lurek.particle.emit(land_dust_ps, f.x + FIGHTER_W * 0.5, plat.y, 5)
+                    land_dust_ps:emit(f.x + FIGHTER_W * 0.5, plat.y, 5)
                 end
                 break
             end
@@ -241,7 +242,7 @@ local function check_melee_hit(attacker, defender)
         if hit_burst_ps then
             local hx = (attacker.x + defender.x) * 0.5 + FIGHTER_W * 0.5
             local hy = (attacker.y + defender.y) * 0.5 + FIGHTER_H * 0.5
-            lurek.particle.emit(hit_burst_ps, hx, hy, 12)
+            hit_burst_ps:emit(hx, hy, 12)
         end
     end
 end
@@ -270,7 +271,7 @@ local function check_projectile_hits()
                         lurek.tween.to(0.4, function(t) dmg_flash_p2 = 1.0 - t end)
                     end
                     if hit_burst_ps then
-                        lurek.particle.emit(hit_burst_ps, proj.x, proj.y, 10)
+                        hit_burst_ps:emit(proj.x, proj.y, 10)
                     end
                     table.insert(to_remove, i)
                     break
@@ -290,7 +291,7 @@ local function check_blast_zones(f)
     if cx < BLAST_LEFT or cx > BLAST_RIGHT or cy < BLAST_TOP or cy > BLAST_BOTTOM then
         -- KO explosion
         if ko_explode_ps then
-            lurek.particle.emit(ko_explode_ps, clamp(f.x, 0, SCREEN_W), clamp(f.y, 0, SCREEN_H), 30)
+            ko_explode_ps:emit(clamp(f.x, 0, SCREEN_W), clamp(f.y, 0, SCREEN_H), 30)
         end
         f.stocks = f.stocks - 1
         if f.stocks > 0 then
@@ -377,23 +378,23 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.15, 0.2, 0.35)
 
     -- Input actions — P1
-    lurek.input.action("p1_left",    {"a"})
-    lurek.input.action("p1_right",   {"d"})
-    lurek.input.action("p1_jump",    {"w"})
-    lurek.input.action("p1_attack",  {"f"})
-    lurek.input.action("p1_special", {"g"})
+    lurek.input.isActionDown("p1_left",    {"a"})
+    lurek.input.isActionDown("p1_right",   {"d"})
+    lurek.input.isActionDown("p1_jump",    {"w"})
+    lurek.input.isActionDown("p1_attack",  {"f"})
+    lurek.input.isActionDown("p1_special", {"g"})
     -- Input actions — P2
-    lurek.input.action("p2_left",    {"left"})
-    lurek.input.action("p2_right",   {"right"})
-    lurek.input.action("p2_jump",    {"up"})
-    lurek.input.action("p2_attack",  {"k"})
-    lurek.input.action("p2_special", {"l"})
+    lurek.input.isActionDown("p2_left",    {"left"})
+    lurek.input.isActionDown("p2_right",   {"right"})
+    lurek.input.isActionDown("p2_jump",    {"up"})
+    lurek.input.isActionDown("p2_attack",  {"k"})
+    lurek.input.isActionDown("p2_special", {"l"})
     -- Global
-    lurek.input.action("quit",  {"escape"})
-    lurek.input.action("start", {"return"})
+    lurek.input.isActionDown("quit",  {"escape"})
+    lurek.input.isActionDown("start", {"return"})
 
     -- Particle systems
-    hit_burst_ps = lurek.particle.new({
+    hit_burst_ps = lurek.particle.newSystem({
         max        = 60,
         lifetime   = {0.15, 0.35},
         speed      = {100, 300},
@@ -401,7 +402,7 @@ function lurek.init()
         colors     = {{1,1,0.3,1},{1,0.5,0,0}},
         sizes      = {4, 1},
     })
-    ko_explode_ps = lurek.particle.new({
+    ko_explode_ps = lurek.particle.newSystem({
         max        = 80,
         lifetime   = {0.3, 0.8},
         speed      = {80, 250},
@@ -409,7 +410,7 @@ function lurek.init()
         colors     = {{1,0.8,0.2,1},{1,0.2,0,0}},
         sizes      = {8, 2},
     })
-    land_dust_ps = lurek.particle.new({
+    land_dust_ps = lurek.particle.newSystem({
         max        = 30,
         lifetime   = {0.1, 0.3},
         speed      = {20, 60},
@@ -417,7 +418,7 @@ function lurek.init()
         colors     = {{0.7,0.65,0.5,0.7},{0.5,0.5,0.4,0}},
         sizes      = {3, 1},
     })
-    proj_trail_ps = lurek.particle.new({
+    proj_trail_ps = lurek.particle.newSystem({
         max        = 100,
         lifetime   = {0.1, 0.25},
         speed      = {5, 20},
@@ -429,25 +430,25 @@ end
 
 -- ── lurek.ready ──────────────────────────────────────────────────────────
 local function _ready_setup()
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 -- ── lurek.process ────────────────────────────────────────────────────────
 function lurek.process(dt)
     -- Quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     -- FPS in title
-    local fps = lurek.timer.fps()
+    local fps = lurek.timer.getFPS()
     lurek.window.setTitle("Platform Fighter — Lurek2D | FPS: " .. fps)
 
     -- ── TITLE state ──────────────────────────────────────────────────
     if game_state == STATES.TITLE then
         title_blink = title_blink + dt
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             init_match()
         end
         return
@@ -456,18 +457,18 @@ function lurek.process(dt)
     -- ── FIGHTING state ───────────────────────────────────────────────
     if game_state == STATES.FIGHTING then
         -- P1 input
-        local p1_left  = lurek.input.down("p1_left")
-        local p1_right = lurek.input.down("p1_right")
-        local p1_jump  = lurek.input.pressed("p1_jump")
-        local p1_atk   = lurek.input.pressed("p1_attack")
-        local p1_spc   = lurek.input.pressed("p1_special")
+        local p1_left  = lurek.input.isDown("p1_left")
+        local p1_right = lurek.input.isDown("p1_right")
+        local p1_jump  = lurek.input.wasActionPressed("p1_jump")
+        local p1_atk   = lurek.input.wasActionPressed("p1_attack")
+        local p1_spc   = lurek.input.wasActionPressed("p1_special")
 
         -- P2 input
-        local p2_left  = lurek.input.down("p2_left")
-        local p2_right = lurek.input.down("p2_right")
-        local p2_jump  = lurek.input.pressed("p2_jump")
-        local p2_atk   = lurek.input.pressed("p2_attack")
-        local p2_spc   = lurek.input.pressed("p2_special")
+        local p2_left  = lurek.input.isDown("p2_left")
+        local p2_right = lurek.input.isDown("p2_right")
+        local p2_jump  = lurek.input.wasActionPressed("p2_jump")
+        local p2_atk   = lurek.input.wasActionPressed("p2_attack")
+        local p2_spc   = lurek.input.wasActionPressed("p2_special")
 
         update_fighter(p1, dt, p1_left, p1_right, p1_jump, p1_atk, p1_spc)
         update_fighter(p2, dt, p2_left, p2_right, p2_jump, p2_atk, p2_spc)
@@ -480,7 +481,7 @@ function lurek.process(dt)
             proj.life = proj.life - dt
             -- Trail particles
             if proj_trail_ps then
-                lurek.particle.emit(proj_trail_ps, proj.x + PROJECTILE_SIZE * 0.5,
+                proj_trail_ps:emit(proj.x + PROJECTILE_SIZE * 0.5,
                                      proj.y + PROJECTILE_SIZE * 0.5, 1)
             end
             if proj.life <= 0 or proj.x < BLAST_LEFT or proj.x > BLAST_RIGHT then
@@ -519,7 +520,7 @@ function lurek.process(dt)
 
     -- ── MATCH_OVER state ─────────────────────────────────────────────
     if game_state == STATES.MATCH_OVER then
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             game_state = STATES.TITLE
         end
     end

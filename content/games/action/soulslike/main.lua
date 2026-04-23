@@ -1,3 +1,4 @@
+local _cam = lurek.camera.new()  -- injected by fix_games.py
 ﻿-- ============================================================================
 --  Soulslike — Precision boss fight with stamina, dodges, and 3-phase AI
 -- ----------------------------------------------------------------------------
@@ -148,7 +149,7 @@ local function update_boss_phase()
         boss.phase   = 3
         boss.enraged = true
         boss.flash   = 0.6
-        if enrage_ps then lurek.particle.emit(enrage_ps, boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.5, 30) end
+        if enrage_ps then enrage_ps:emit(boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.5, 30) end
     elseif ratio <= 0.66 and boss.phase < 2 then
         boss.phase = 2
         boss.flash = 0.4
@@ -174,9 +175,9 @@ local function player_try_hit_boss()
         lurek.tween.to(boss, 0.3, { hp_disp = boss.hp })
         player.hit_cd = player.atk_data.dur
         hitlag = HITLAG_DUR
-        lurek.camera.shake(3, 0.1)
+        _cam:shake(3, 0.1)
         if hit_ps then
-            lurek.particle.emit(hit_ps, boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.3, 10)
+            hit_ps:emit(boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.3, 10)
         end
         update_boss_phase()
         if boss.hp <= 0 then
@@ -239,12 +240,12 @@ local function boss_deal_damage(dmg)
         player.hp = math.max(0, player.hp - reduced)
         player.stamina = math.max(0, player.stamina - BLOCK_COST_PER_HIT)
         if block_ps then
-            lurek.particle.emit(block_ps, player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.3, 8)
+            block_ps:emit(player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.3, 8)
         end
-        lurek.camera.shake(2, 0.08)
+        _cam:shake(2, 0.08)
     else
         player.hp = math.max(0, player.hp - dmg)
-        lurek.camera.shake(4, 0.12)
+        _cam:shake(4, 0.12)
         hitlag = HITLAG_DUR
     end
     lurek.tween.to(player, 0.3, { hp_disp = player.hp })
@@ -252,7 +253,7 @@ local function boss_deal_damage(dmg)
         game_state  = STATE.PLAYER_DIED
         death_timer = 0
         death_alpha = 0
-        if death_ps then lurek.particle.emit(death_ps, player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.5, 25) end
+        if death_ps then death_ps:emit(player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.5, 25) end
     end
 end
 
@@ -298,7 +299,7 @@ local function update_player(dt)
         player.x = player.x + player.dodge_dir * (DODGE.dist / DODGE.dur) * dt
         player.x = arena_clamp_x(player.x, PLAYER_W)
         if dodge_ps and player.dodge_timer < DODGE.dur * 0.5 then
-            lurek.particle.emit(dodge_ps, player.x + PLAYER_W * 0.5, player.y + PLAYER_H, 3)
+            dodge_ps:emit(player.x + PLAYER_W * 0.5, player.y + PLAYER_H, 3)
         end
         return
     end
@@ -456,15 +457,15 @@ function lurek.init()
     lurek.input.bind("quit",        {"escape"})
 
     -- Particle systems
-    hit_ps    = lurek.particle.new({ maxParticles = 30, lifetime = 0.25,
+    hit_ps    = lurek.particle.newSystem({ maxParticles = 30, lifetime = 0.25,
         speed = 200, spread = math.pi, colors = {{1,0.9,0.6,1},{1,0.5,0.1,0}} })
-    dodge_ps  = lurek.particle.new({ maxParticles = 15, lifetime = 0.2,
+    dodge_ps  = lurek.particle.newSystem({ maxParticles = 15, lifetime = 0.2,
         speed = 60, spread = math.pi * 0.5, colors = {{0.7,0.7,0.6,0.8},{0.5,0.5,0.4,0}} })
-    block_ps  = lurek.particle.new({ maxParticles = 20, lifetime = 0.2,
+    block_ps  = lurek.particle.newSystem({ maxParticles = 20, lifetime = 0.2,
         speed = 150, spread = math.pi * 0.8, colors = {{0.4,0.6,1,1},{0.2,0.3,0.8,0}} })
-    enrage_ps = lurek.particle.new({ maxParticles = 40, lifetime = 0.5,
+    enrage_ps = lurek.particle.newSystem({ maxParticles = 40, lifetime = 0.5,
         speed = 120, spread = math.pi, colors = {{1,0.2,0,1},{1,0.6,0,0}} })
-    death_ps  = lurek.particle.new({ maxParticles = 50, lifetime = 0.8,
+    death_ps  = lurek.particle.newSystem({ maxParticles = 50, lifetime = 0.8,
         speed = 80, spread = math.pi, colors = {{0.8,0.1,0.1,1},{0.3,0,0,0}} })
 end
 
@@ -542,8 +543,7 @@ function lurek.process(dt)
     -- Enrage fire particles
     if boss.enraged and math.random() < 0.3 then
         if enrage_ps then
-            lurek.particle.emit(enrage_ps,
-                boss.x + math.random() * BOSS_W,
+            enrage_ps:emit(boss.x + math.random() * BOSS_W,
                 boss.y + math.random() * BOSS_H, 2)
         end
     end

@@ -47,6 +47,7 @@ local function clamp(v, lo, hi) return math.max(lo, math.min(hi, v)) end
 local function distance(x1, y1, x2, y2)
     local dx = x1 - x2
     local dy = y1 - y2
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     return math.sqrt(dx * dx + dy * dy)
 end
 
@@ -518,7 +519,7 @@ function lurek.draw()
     -- Camera offset to center player
     local cam_x = player.x * TILE_SIZE - 400 + TILE_SIZE / 2
     local cam_y = player.y * TILE_SIZE - 300 + TILE_SIZE / 2
-    lurek.camera.setPosition(-cam_x, -cam_y)
+    _cam:setPosition(-cam_x, -cam_y)
 
     -- Draw map
     for y = 0, MAP_H - 1 do

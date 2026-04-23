@@ -1,4 +1,5 @@
 --[[
+local _cam = lurek.camera.new()  -- injected by fix_games.py
   Physics Demo — Lurek2D
   Category: simulation
 
@@ -403,7 +404,7 @@ function lurek.init()
 end
 
 local function _ready_setup()
-  lurek.camera.reset()
+  _cam:reset()
 end
 
 -- ───────────────────────── process ───────────────────────────
@@ -417,7 +418,7 @@ function lurek.process(dt)
 
   -- mouse release
   if dragging then
-    if not lurek.input.isMouseDown(1) then
+    if not lurek.input.isDown(1) then
       local o = objects[dragging]
       if o and not o.pinned then
         o.vx = throw_vx
@@ -506,13 +507,13 @@ function lurek.draw()
   for _, ramp in ipairs(ramps) do
     lurek.render.setColor(0.5, 0.4, 0.2, 0.9)
     if ramp.dir == "right" then
-      lurek.render.drawTriangleFill(
+      lurek.render.polygon("fill", 
         ramp.x, ramp.y + ramp.h,
         ramp.x + ramp.w, ramp.y + ramp.h,
         ramp.x + ramp.w, ramp.y
       )
     else
-      lurek.render.drawTriangleFill(
+      lurek.render.polygon("fill", 
         ramp.x, ramp.y,
         ramp.x, ramp.y + ramp.h,
         ramp.x + ramp.w, ramp.y + ramp.h
@@ -526,12 +527,12 @@ function lurek.draw()
     lurek.render.setColor(o.r, o.g, o.b, a)
 
     if o.shape == "circle" then
-      lurek.render.circleFill(o.x, o.y, o.radius)
+      lurek.render.circle("fill", o.x, o.y, o.radius)
     elseif o.shape == "rect" then
       lurek.render.rectangle(o.x - o.w * 0.5, o.y - o.h * 0.5, o.w, o.h)
     elseif o.shape == "triangle" then
       local s = o.size
-      lurek.render.drawTriangleFill(
+      lurek.render.polygon("fill", 
         o.x, o.y - s * 0.5,
         o.x - s * 0.5, o.y + s * 0.5,
         o.x + s * 0.5, o.y + s * 0.5
@@ -548,7 +549,7 @@ function lurek.draw()
   -- particles
   for _, p in ipairs(particles) do
     lurek.render.setColor(p.r, p.g, p.b, p.a)
-    lurek.render.circleFill(p.x, p.y, p.size)
+    lurek.render.circle("fill", p.x, p.y, p.size)
   end
 end
 

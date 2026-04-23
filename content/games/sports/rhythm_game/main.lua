@@ -201,7 +201,7 @@ local function process_hit(lane)
             life = clamp(life + PERFECT_HEAL, 0, LIFE_MAX)
             hit_flash[lane] = 0.4
             if hit_particles then
-                lurek.particle.emit(hit_particles, lane_center_x(lane), HIT_ZONE_Y, 20)
+                hit_particles:emit(lane_center_x(lane), HIT_ZONE_Y, 20)
             end
         else
             -- Good
@@ -220,13 +220,13 @@ local function process_hit(lane)
 
         -- Combo milestone particles
         if combo > 0 and combo % 10 == 0 and combo_particles then
-            lurek.particle.emit(combo_particles, W / 2, H / 2, 40)
+            combo_particles:emit(W / 2, H / 2, 40)
         end
 
         -- Tweens
         if lurek.tween then
-            score_tween = lurek.tween.new(0.3, { val = display_score }, { val = score }, "outQuad")
-            life_tween = lurek.tween.new(0.3, { val = display_life }, { val = life }, "outQuad")
+            score_tween = lurek.tween.tween(0.3, { val = display_score }, { val = score }, "outQuad")
+            life_tween = lurek.tween.tween(0.3, { val = display_life }, { val = life }, "outQuad")
         end
         hit_zone_pulse = 1.0
     else
@@ -235,7 +235,7 @@ local function process_hit(lane)
         combo = 0
         life = clamp(life - MISS_PENALTY, 0, LIFE_MAX)
         if lurek.tween then
-            life_tween = lurek.tween.new(0.3, { val = display_life }, { val = life }, "outQuad")
+            life_tween = lurek.tween.tween(0.3, { val = display_life }, { val = life }, "outQuad")
         end
     end
 end
@@ -263,19 +263,19 @@ function lurek.init()
 
     -- Particles: hit burst
     if lurek.particle then
-        hit_particles = lurek.particle.new()
-        lurek.particle.setColors(hit_particles, { { 1, 0.85, 0.2, 1 }, { 1, 0.5, 0.1, 0 } })
-        lurek.particle.setSpeed(hit_particles, 80, 200)
-        lurek.particle.setLifetime(hit_particles, 0.3, 0.6)
-        lurek.particle.setSize(hit_particles, 4, 1)
-        lurek.particle.setSpread(hit_particles, math.pi * 2)
+        hit_particles = lurek.particle.newSystem({maxParticles=500})
+        hit_particles:setColors({ { 1, 0.85, 0.2, 1 }, { 1, 0.5, 0.1, 0 } })
+        hit_particles:setSpeed(80, 200)
+        hit_particles:setParticleLifetime(0.3, 0.6)
+        hit_particles:setSize(4, 1)
+        hit_particles:setSpread(math.pi * 2)
 
-        combo_particles = lurek.particle.new()
-        lurek.particle.setColors(combo_particles, { { 1, 1, 1, 1 }, { 0.5, 0.8, 1, 0 } })
-        lurek.particle.setSpeed(combo_particles, 100, 300)
-        lurek.particle.setLifetime(combo_particles, 0.5, 1.0)
-        lurek.particle.setSize(combo_particles, 6, 2)
-        lurek.particle.setSpread(combo_particles, math.pi * 2)
+        combo_particles = lurek.particle.newSystem({maxParticles=500})
+        combo_particles:setColors({ { 1, 1, 1, 1 }, { 0.5, 0.8, 1, 0 } })
+        combo_particles:setSpeed(100, 300)
+        combo_particles:setParticleLifetime(0.5, 1.0)
+        combo_particles:setSize(6, 2)
+        combo_particles:setSpread(math.pi * 2)
     end
 end
 
@@ -288,7 +288,7 @@ function lurek.process(dt)
     title_timer = title_timer + dt
 
     -- Quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         if current_state == STATE_PLAYING then
             current_state = STATE_RESULTS
             result_grade = calc_grade()
@@ -297,7 +297,7 @@ function lurek.process(dt)
         elseif current_state == STATE_RESULTS then
             current_state = STATE_SONG_SELECT
         else
-            lurek.event.signal("quit")
+            lurek.event.push("quit")
         end
         return
     end
@@ -306,7 +306,7 @@ function lurek.process(dt)
     -- TITLE
     -- -----------------------------------------------------------------------
     if current_state == STATE_TITLE then
-        if lurek.input.pressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             current_state = STATE_SONG_SELECT
         end
         return
@@ -316,15 +316,15 @@ function lurek.process(dt)
     -- SONG SELECT
     -- -----------------------------------------------------------------------
     if current_state == STATE_SONG_SELECT then
-        if lurek.input.pressed("nav_up") then
+        if lurek.input.wasActionPressed("nav_up") then
             selected_song = selected_song - 1
             if selected_song < 1 then selected_song = #SONGS end
         end
-        if lurek.input.pressed("nav_down") then
+        if lurek.input.wasActionPressed("nav_down") then
             selected_song = selected_song + 1
             if selected_song > #SONGS then selected_song = 1 end
         end
-        if lurek.input.pressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             start_song(selected_song)
         end
         return
@@ -334,7 +334,7 @@ function lurek.process(dt)
     -- RESULTS
     -- -----------------------------------------------------------------------
     if current_state == STATE_RESULTS then
-        if lurek.input.pressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             current_state = STATE_SONG_SELECT
         end
         return
@@ -348,7 +348,7 @@ function lurek.process(dt)
     -- Update lane input state
     for i = 1, LANE_COUNT do
         local was_held = lane_held[i]
-        lane_held[i] = lurek.input.down(LANE_KEYS[i])
+        lane_held[i] = lurek.input.isDown(LANE_KEYS[i])
         lane_just_pressed[i] = lane_held[i] and not was_held
     end
 
@@ -404,7 +404,7 @@ function lurek.process(dt)
             combo = 0
             life = clamp(life - MISS_PENALTY, 0, LIFE_MAX)
             if lurek.tween then
-                life_tween = lurek.tween.new(0.3, { val = display_life }, { val = life }, "outQuad")
+                life_tween = lurek.tween.tween(0.3, { val = display_life }, { val = life }, "outQuad")
             end
         end
 
@@ -449,8 +449,8 @@ function lurek.process(dt)
     end
 
     -- Update particles
-    if hit_particles then lurek.particle.update(hit_particles, dt) end
-    if combo_particles then lurek.particle.update(combo_particles, dt) end
+    if hit_particles then hit_particles:update(dt) end
+    if combo_particles then combo_particles:update(dt) end
 
     -- Life check
     if life <= 0 then
@@ -554,8 +554,8 @@ function lurek.draw()
     end
 
     -- Draw particles
-    if hit_particles then lurek.particle.draw(hit_particles) end
-    if combo_particles then lurek.particle.draw(combo_particles) end
+    if hit_particles then lurek.render.draw(hit_particles) end
+    if combo_particles then lurek.render.draw(combo_particles) end
 end
 
 -- ---------------------------------------------------------------------------

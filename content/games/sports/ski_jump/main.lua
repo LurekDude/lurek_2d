@@ -165,7 +165,7 @@ lurek.input.bind("quit", "escape")
 
 function lurek.init()
     lurek.window.setTitle("Ski Jump — Lurek2D")
-    lurek.window.setBackgroundColor(0.7, 0.8, 0.95)
+    lurek.render.setBackgroundColor(0.7, 0.8, 0.95)
     compute_ramp()
     math.randomseed(os.time())
 end
@@ -389,7 +389,7 @@ function lurek.draw()
     lurek.render.setColor(0.75, 0.8, 0.88, 1)
     for i = 0, 8 do
         local mx = i * 180 + ox * 0.3
-        lurek.render.drawTriangle(mx, 350 + oy * 0.3, mx + 90, 180 + oy * 0.3, mx + 180, 350 + oy * 0.3)
+        lurek.render.triangle(mx, 350 + oy * 0.3, mx + 90, 180 + oy * 0.3, mx + 180, 350 + oy * 0.3)
     end
 
     -- snow ground
@@ -431,7 +431,13 @@ function lurek.draw()
         -- tumble: rotating rectangle
         local angle = tumble_timer * 600
         lurek.render.setColor(0.9, 0.2, 0.2, 1)
-        lurek.render.rectangleRotated(sx - 8, sy - 18, 16, 36, angle)
+        -- [fix] rectangleRotated -> push/rotate/pop equivalent
+        local _rx, _ry, _rw, _rh = sx - 8, sy - 18, 16, 36
+        lurek.render.push()
+        lurek.render.translate(_rx + _rw * 0.5, _ry + _rh * 0.5)
+        lurek.render.rotate(math.rad(angle))
+        lurek.render.rectangle("fill", -_rw * 0.5, -_rh * 0.5, _rw, _rh)
+        lurek.render.pop()
     elseif wobble_timer > 0 then
         local wobble = math.sin(wobble_timer * 30) * 4
         lurek.render.setColor(0.15, 0.2, 0.6, 1)
@@ -467,8 +473,8 @@ function lurek.draw()
     for i = 0, 6 do
         local tx = ramp_end_x + 100 + i * 120 + ox
         local ty = landing_slope_y + oy
-        lurek.render.drawTriangle(tx, ty - 40, tx - 15, ty, tx + 15, ty)
-        lurek.render.drawTriangle(tx, ty - 60, tx - 10, ty - 25, tx + 10, ty - 25)
+        lurek.render.triangle(tx, ty - 40, tx - 15, ty, tx + 15, ty)
+        lurek.render.triangle(tx, ty - 60, tx - 10, ty - 25, tx + 10, ty - 25)
     end
 end
 

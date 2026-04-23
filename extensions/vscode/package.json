@@ -418,6 +418,11 @@
       {
         "command": "lurek.jam.checklist",
         "title": "Open Submission Checklist"
+      },
+      {
+        "command": "lurek2d.scanAllGames",
+        "title": "Scan All Games for Errors",
+        "category": "Lurek2D"
       }
     ],
     "keybindings": [

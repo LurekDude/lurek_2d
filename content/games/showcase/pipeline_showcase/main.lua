@@ -36,6 +36,7 @@ local state = STATE_TITLE
 local title_timer = 0
 
 local scene_names = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     [STATE_SCENE_1] = "Menu",
     [STATE_SCENE_2] = "Simulation",
     [STATE_SCENE_3] = "Paused",
@@ -205,7 +206,7 @@ end
 function lurek.init()
     lurek.render.setBackgroundColor(0.06, 0.06, 0.08)
     lurek.window.setTitle("Pipeline Showcase — Lurek2D")
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 
     lurek.input.bind("1", "scene_1")
     lurek.input.bind("2", "scene_2")

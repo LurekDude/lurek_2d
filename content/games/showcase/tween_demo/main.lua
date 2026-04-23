@@ -35,6 +35,7 @@ local title_alpha = 0
 -- Easing definitions
 -- ============================================================
 local easing_names = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     "linear",    "inQuad",     "outQuad",    "inOutQuad",
     "inCubic",   "outCubic",   "inOutCubic", "inSine",
     "outSine",   "inOutSine",  "inExpo",     "outExpo",
@@ -189,7 +190,7 @@ lurek.input.bind("quit",         "escape")
 function lurek.init()
     lurek.window.setTitle("Tween Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.06, 0.1)
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 -- ============================================================
@@ -197,7 +198,7 @@ end
 -- ============================================================
 local function _ready_setup()
     -- Burst particles: animation cycle complete
-    psys_burst = lurek.particle.newSystem(MAX_PARTICLES)
+    psys_burst = lurek.particle.newSystem({maxParticles=MAX_PARTICLES})
     psys_burst:setEmissionRate(0)
     psys_burst:setParticleLifetime(0.3, 0.8)
     psys_burst:setSpeed(60, 150)
@@ -214,7 +215,7 @@ local function _ready_setup()
     psys_burst:start()
 
     -- Flash particles: property switch
-    psys_flash = lurek.particle.newSystem(MAX_PARTICLES)
+    psys_flash = lurek.particle.newSystem({maxParticles=MAX_PARTICLES})
     psys_flash:setEmissionRate(0)
     psys_flash:setParticleLifetime(0.2, 0.5)
     psys_flash:setSpeed(80, 200)
@@ -245,7 +246,7 @@ function lurek.process(dt)
     end
 
     -- Quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -255,7 +256,7 @@ function lurek.process(dt)
         title_timer = title_timer + dt
         title_alpha = clamp(title_timer / 0.8, 0, 1)
 
-        if lurek.input.pressed("pause") or lurek.input.pressed("select_down") then
+        if lurek.input.wasActionPressed("pause") or lurek.input.wasActionPressed("select_down") then
             state = STATE_RUNNING
             create_tweens()
             return
@@ -265,12 +266,12 @@ function lurek.process(dt)
 
     -- ── Running state ──────────────────────────────────────
     -- Speed control
-    if lurek.input.pressed("speed_half")   then speed_mult = 0.5 end
-    if lurek.input.pressed("speed_normal") then speed_mult = 1.0 end
-    if lurek.input.pressed("speed_double") then speed_mult = 2.0 end
+    if lurek.input.wasActionPressed("speed_half")   then speed_mult = 0.5 end
+    if lurek.input.wasActionPressed("speed_normal") then speed_mult = 1.0 end
+    if lurek.input.wasActionPressed("speed_double") then speed_mult = 2.0 end
 
     -- Pause / Resume
-    if lurek.input.pressed("pause") then
+    if lurek.input.wasActionPressed("pause") then
         paused = not paused
         for i = 1, NUM_EASINGS do
             if tweens[i] then
@@ -281,11 +282,11 @@ function lurek.process(dt)
 
     -- Manual scrub (while paused)
     if paused then
-        if lurek.input.pressed("step_forward") then
+        if lurek.input.wasActionPressed("step_forward") then
             lurek.tween.update(0.05)
             elapsed = elapsed + 0.05
         end
-        if lurek.input.pressed("step_back") then
+        if lurek.input.wasActionPressed("step_back") then
             local target_elapsed = math.max(0, elapsed - 0.05)
             create_tweens()
             if target_elapsed > 0 then
@@ -300,17 +301,17 @@ function lurek.process(dt)
     end
 
     -- Selection
-    if lurek.input.pressed("select_up") then
+    if lurek.input.wasActionPressed("select_up") then
         selected = selected - 1
         if selected < 1 then selected = NUM_EASINGS end
     end
-    if lurek.input.pressed("select_down") then
+    if lurek.input.wasActionPressed("select_down") then
         selected = selected + 1
         if selected > NUM_EASINGS then selected = 1 end
     end
 
     -- Property switch
-    if lurek.input.pressed("switch_prop") then
+    if lurek.input.wasActionPressed("switch_prop") then
         current_prop = current_prop + 1
         if current_prop > PROP_COLOR then current_prop = PROP_POSITION end
         create_tweens()
@@ -532,7 +533,7 @@ function lurek.draw_ui()
         local progress = clamp(elapsed / TWEEN_DURATION, 0, 1)
         local v = sel_func(progress)
         lurek.render.setColor(1.0, 1.0, 1.0, 1.0)
-        lurek.render.circleFill(gx + progress * gw, gy + gh - v * gh, 5)
+        lurek.render.circle("fill", gx + progress * gw, gy + gh - v * gh, 5)
 
         -- Crosshair lines at progress point
         lurek.render.setColor(1.0, 1.0, 1.0, 0.2)

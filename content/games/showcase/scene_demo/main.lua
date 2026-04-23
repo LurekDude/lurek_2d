@@ -190,7 +190,7 @@ scenes.title = {
             local s = star_field[i]
             local a = 0.4 + 0.6 * math.sin(title_time * 2 + i)
             lurek.render.setColor(1, 1, 1, a * s.s)
-            lurek.render.drawCircle("fill", s.x, s.y, 1 + s.s)
+            lurek.render.circle("fill", s.x, s.y, 1 + s.s)
         end
     end,
     render_ui = function()
@@ -466,9 +466,9 @@ scenes.gameplay = {
             if c.alive then
                 local pulse = 0.8 + 0.2 * math.sin(c.t)
                 lurek.render.setColor(COL_COIN[1], COL_COIN[2], COL_COIN[3], pulse)
-                lurek.render.drawCircle("fill", c.x, c.y, COIN_RADIUS)
+                lurek.render.circle("fill", c.x, c.y, COIN_RADIUS)
                 lurek.render.setColor(1, 1, 0.9, 0.5)
-                lurek.render.drawCircle("fill", c.x, c.y, COIN_RADIUS * 0.4)
+                lurek.render.circle("fill", c.x, c.y, COIN_RADIUS * 0.4)
             end
         end
 
@@ -632,7 +632,7 @@ function lurek.init()
     camera = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Coin collect sparkle
-    ps_coin = lurek.particle.newSystem(100)
+    ps_coin = lurek.particle.newSystem({maxParticles=100})
     ps_coin:setEmissionRate(0)
     ps_coin:setParticleLifetime(0.2, 0.5)
     ps_coin:setSpeed(40, 120)
@@ -646,7 +646,7 @@ function lurek.init()
     )
 
     -- Transition particles
-    ps_transition = lurek.particle.newSystem(60)
+    ps_transition = lurek.particle.newSystem({maxParticles=60})
     ps_transition:setEmissionRate(0)
     ps_transition:setParticleLifetime(0.3, 0.6)
     ps_transition:setSpeed(20, 80)
@@ -660,7 +660,7 @@ function lurek.init()
     )
 
     -- Menu hover glow
-    ps_hover = lurek.particle.newSystem(40)
+    ps_hover = lurek.particle.newSystem({maxParticles=40})
     ps_hover:setEmissionRate(0)
     ps_hover:setParticleLifetime(0.3, 0.7)
     ps_hover:setSpeed(10, 40)

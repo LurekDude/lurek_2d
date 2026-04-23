@@ -168,7 +168,7 @@ end
 local function draw_atmo_motes()
     for _, m in ipairs(atmo_motes) do
         lurek.render.setColor(0.6, 0.5, 0.8, m.alpha)
-        lurek.render.drawCircle("fill", m.x, m.y, m.size)
+        lurek.render.circle("fill", m.x, m.y, m.size)
     end
 end
 
@@ -279,24 +279,24 @@ end
 local function update_player(dt)
     -- Horizontal movement
     player.vx = 0
-    if lurek.input.down("left") then
+    if lurek.input.isDown("left") then
         player.vx = -WALK_SPEED
         player.facing = -1
     end
-    if lurek.input.down("right") then
+    if lurek.input.isDown("right") then
         player.vx = WALK_SPEED
         player.facing = 1
     end
 
     -- Jump
-    if player.on_ground and lurek.input.pressed("jump") then
+    if player.on_ground and lurek.input.wasActionPressed("jump") then
         player.vy = JUMP_VEL
         player.on_ground = false
         spawn_particles(player.x, GROUND_Y, 0.4, 0.3, 0.5, 6, 0.5)
     end
 
     -- Attack
-    if lurek.input.pressed("attack") and player.attack_cd <= 0 then
+    if lurek.input.wasActionPressed("attack") and player.attack_cd <= 0 then
         player.attacking = true
         player.attack_timer = 0.15
         player.attack_cd = ATTACK_CD
@@ -485,12 +485,12 @@ local function draw_parallax()
     -- Moon
     local moon_x = 600 - scroll_x * 0.02
     lurek.render.setColor(0.9, 0.85, 0.7, 0.9)
-    lurek.render.drawCircle("fill", moon_x, 100, 50)
+    lurek.render.circle("fill", moon_x, 100, 50)
     -- Moon glow
     lurek.render.setColor(0.9, 0.85, 0.7, 0.15)
-    lurek.render.drawCircle("fill", moon_x, 100, 80)
+    lurek.render.circle("fill", moon_x, 100, 80)
     lurek.render.setColor(0.9, 0.85, 0.7, 0.06)
-    lurek.render.drawCircle("fill", moon_x, 100, 120)
+    lurek.render.circle("fill", moon_x, 100, 120)
 
     -- Layer 1: Far mountains
     local c1 = PARALLAX[2].color
@@ -499,9 +499,9 @@ local function draw_parallax()
     for ix = -1, 2 do
         local bx = ix * 400 - off1
         -- Mountain silhouettes
-        lurek.render.drawTriangle("fill",
+        lurek.render.triangle("fill",
             bx, 450, bx + 200, 280, bx + 400, 450)
-        lurek.render.drawTriangle("fill",
+        lurek.render.triangle("fill",
             bx + 150, 450, bx + 320, 310, bx + 500, 450)
     end
     lurek.render.rectangle("fill", 0, 450, SCREEN_W, 150)
@@ -515,8 +515,8 @@ local function draw_parallax()
         -- Tree trunk
         lurek.render.rectangle("fill", tx + 90, 400, 12, 80)
         -- Tree canopy
-        lurek.render.drawTriangle("fill", tx + 60, 420, tx + 96, 340, tx + 132, 420)
-        lurek.render.drawTriangle("fill", tx + 65, 390, tx + 96, 320, tx + 127, 390)
+        lurek.render.triangle("fill", tx + 60, 420, tx + 96, 340, tx + 132, 420)
+        lurek.render.triangle("fill", tx + 65, 390, tx + 96, 320, tx + 127, 390)
     end
     lurek.render.rectangle("fill", 0, 480, SCREEN_W, 120)
 
@@ -526,7 +526,7 @@ local function draw_parallax()
     lurek.render.setColor(c3[1], c3[2], c3[3], 1)
     for ix = -1, 4 do
         local hx = ix * 300 - off3
-        lurek.render.drawTriangle("fill", hx, 520, hx + 150, 440, hx + 300, 520)
+        lurek.render.triangle("fill", hx, 520, hx + 150, 440, hx + 300, 520)
     end
     lurek.render.rectangle("fill", 0, 500, SCREEN_W, 100)
 
@@ -615,9 +615,9 @@ local function draw_enemies()
             -- Wing shape
             lurek.render.setColor(er * 0.8, eg * 0.8, eb * 1.2, 1)
             local wing = math.sin(e.anim * 6) * 6
-            lurek.render.drawTriangle("fill",
+            lurek.render.triangle("fill",
                 e.x - 16, e.y - wing, e.x, e.y - e.h / 2, e.x - 4, e.y)
-            lurek.render.drawTriangle("fill",
+            lurek.render.triangle("fill",
                 e.x + 16, e.y - wing, e.x, e.y - e.h / 2, e.x + 4, e.y)
             -- Body
             lurek.render.setColor(er, eg, eb, 1)
@@ -629,11 +629,11 @@ local function draw_enemies()
         elseif e.kind == "spike" then
             -- Three spike triangles
             lurek.render.setColor(0.4, 0.2, 0.3, 1)
-            lurek.render.drawTriangle("fill",
+            lurek.render.triangle("fill",
                 e.x - 12, GROUND_Y, e.x - 4, GROUND_Y - 14, e.x + 4, GROUND_Y)
-            lurek.render.drawTriangle("fill",
+            lurek.render.triangle("fill",
                 e.x - 4, GROUND_Y, e.x + 4, GROUND_Y - 18, e.x + 12, GROUND_Y)
-            lurek.render.drawTriangle("fill",
+            lurek.render.triangle("fill",
                 e.x + 4, GROUND_Y, e.x + 12, GROUND_Y - 12, e.x + 20, GROUND_Y)
 
         elseif e.kind == "boss" then
@@ -642,9 +642,9 @@ local function draw_enemies()
             lurek.render.rectangle("fill", e.x - e.w / 2, e.y - e.h, e.w, e.h)
             -- Horns
             lurek.render.setColor(0.5, 0.2, 0.3, 1)
-            lurek.render.drawTriangle("fill",
+            lurek.render.triangle("fill",
                 e.x - 20, e.y - e.h, e.x - 28, e.y - e.h - 20, e.x - 12, e.y - e.h)
-            lurek.render.drawTriangle("fill",
+            lurek.render.triangle("fill",
                 e.x + 20, e.y - e.h, e.x + 28, e.y - e.h - 20, e.x + 12, e.y - e.h)
             -- Eyes
             lurek.render.setColor(1.0, 0.1, 0.0, 1)
@@ -665,13 +665,13 @@ end
 -- Update (process)
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     if current_state == STATE.TITLE then
-        if lurek.input.pressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             current_state = STATE.PLAYING
             reset_game()
         end
@@ -690,7 +690,7 @@ function lurek.process(dt)
     elseif current_state == STATE.GAME_OVER then
         update_particles(dt)
         update_atmo_motes(dt)
-        if lurek.input.pressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             current_state = STATE.PLAYING
             reset_game()
         end
@@ -729,16 +729,16 @@ function lurek.draw_ui()
     if current_state == STATE.TITLE then
         -- Title
         lurek.render.setColor(0.85, 0.7, 0.95, 1)
-        lurek.render.drawText("SHADOW OF THE BEAST", SCREEN_W / 2 - 150, 180, 32)
+        lurek.render.print("SHADOW OF THE BEAST", SCREEN_W / 2 - 150, 180, 32)
         lurek.render.setColor(0.6, 0.45, 0.7, 0.8)
-        lurek.render.drawText("A Lurek2D Tribute to Psygnosis", SCREEN_W / 2 - 140, 225, 16)
+        lurek.render.print("A Lurek2D Tribute to Psygnosis", SCREEN_W / 2 - 140, 225, 16)
         -- Controls
         lurek.render.setColor(0.5, 0.4, 0.6, 0.7)
-        lurek.render.drawText("A/D  Move   |   SPACE  Jump   |   F  Attack", SCREEN_W / 2 - 180, 340, 14)
+        lurek.render.print("A/D  Move   |   SPACE  Jump   |   F  Attack", SCREEN_W / 2 - 180, 340, 14)
         -- Prompt
         local pulse = 0.5 + 0.5 * math.abs(math.sin(lurek.timer.getTime() * 2.5))
         lurek.render.setColor(0.8, 0.6, 0.9, pulse)
-        lurek.render.drawText("Press ENTER to begin", SCREEN_W / 2 - 90, 420, 18)
+        lurek.render.print("Press ENTER to begin", SCREEN_W / 2 - 90, 420, 18)
 
     elseif current_state == STATE.PLAYING then
         -- HP icons
@@ -759,17 +759,17 @@ function lurek.draw_ui()
 
         -- Score
         lurek.render.setColor(0.8, 0.7, 0.9, 1)
-        lurek.render.drawText("SCORE: " .. score, SCREEN_W - 180, 12, 16)
+        lurek.render.print("SCORE: " .. score, SCREEN_W - 180, 12, 16)
 
         -- Distance
         lurek.render.setColor(0.6, 0.5, 0.7, 0.8)
-        lurek.render.drawText("DIST: " .. math.floor(distance), SCREEN_W - 180, 32, 14)
+        lurek.render.print("DIST: " .. math.floor(distance), SCREEN_W - 180, 32, 14)
 
         -- Boss warning
         if boss_active then
             local flash = math.abs(math.sin(lurek.timer.getTime() * 4))
             lurek.render.setColor(1.0, 0.2, 0.1, flash * 0.8)
-            lurek.render.drawText("!! BOSS !!", SCREEN_W / 2 - 40, 50, 20)
+            lurek.render.print("!! BOSS !!", SCREEN_W / 2 - 40, 50, 20)
         end
 
     elseif current_state == STATE.GAME_OVER then
@@ -778,14 +778,14 @@ function lurek.draw_ui()
         lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(0.9, 0.3, 0.3, 1)
-        lurek.render.drawText("GAME OVER", SCREEN_W / 2 - 80, 220, 32)
+        lurek.render.print("GAME OVER", SCREEN_W / 2 - 80, 220, 32)
 
         lurek.render.setColor(0.7, 0.5, 0.8, 1)
-        lurek.render.drawText("Score: " .. score, SCREEN_W / 2 - 50, 280, 20)
-        lurek.render.drawText("Distance: " .. math.floor(distance), SCREEN_W / 2 - 70, 310, 16)
+        lurek.render.print("Score: " .. score, SCREEN_W / 2 - 50, 280, 20)
+        lurek.render.print("Distance: " .. math.floor(distance), SCREEN_W / 2 - 70, 310, 16)
 
         local pulse = 0.5 + 0.5 * math.abs(math.sin(lurek.timer.getTime() * 2.5))
         lurek.render.setColor(0.6, 0.5, 0.7, pulse)
-        lurek.render.drawText("Press ENTER to try again", SCREEN_W / 2 - 110, 380, 18)
+        lurek.render.print("Press ENTER to try again", SCREEN_W / 2 - 110, 380, 18)
     end
 end

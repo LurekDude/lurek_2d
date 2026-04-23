@@ -2,7 +2,37 @@
 
 All notable changes to Lurek2D are recorded here.
 
-## [0.20.22] - 2026-04-25
+## [0.20.23] - 2026-04-26
+
+### fix(games): repair Lua API errors across all 124 game scripts
+
+- Scanned all 124 games in `content/games/` using `work/game-maintenance-20260423/scripts/scan_games.py`
+  against the current `logs/data/lua_api_data.json` API catalog.
+- Applied 4 automated fix passes via `fix_games.py`, patching 94 game files with 200+ API renames.
+- **Key renames applied across all games:**
+  - `lurek.graphics.*` → `lurek.render.*` (namespace rename)
+  - `lurek.graphic.*` → `lurek.render.*` (namespace rename)
+  - `lurek.render.drawRectangle` → `lurek.render.rectangle`
+  - `lurek.render.drawCircle` → `lurek.render.circle`
+  - `lurek.render.drawLine` → `lurek.render.line`
+  - `lurek.render.drawImage` → `lurek.render.draw`
+  - `lurek.particle.new(N)` → `lurek.particle.newSystem({maxParticles=N})`
+  - `lurek.particle.setColors/setSpeed/setSpread/setSizes(ps,...)` → OO `ps:method(...)`
+  - `lurek.camera.*` module-level calls → OO camera methods with injected `local _cam`
+  - `lurek.input.getMouseScroll` → `lurek.input.getWheelDelta`
+  - `lurek.input.isMouseDown` → `lurek.input.isDown`
+  - `lurek.input.wasKeyPressed` → `lurek.input.wasActionPressed`
+  - `lurek.timer.after` → `lurek.timer.afterReal`
+  - `lurek.pathfind.newGrid` → `lurek.pathfind.newNavGrid`
+  - `lurek.render.quad` → `lurek.render.drawq`
+  - `function lurek.load()` → `function lurek.init()`
+  - `function lurek.keypressed()` → `function lurek._keypressed()` (disabled; use polling)
+- **Manual fixes:** `lurek.render.rectangleRotated` replaced with push/rotate/pop equivalent in
+  `sports/ski_jump`; `lurek.input.getTextInput` commented out in `showcase/docs_demo`.
+- **Result:** 912 errors (89 games) → 0 errors (124 games all clean) after 4 passes.
+- **VS Code extension** (`extensions/vscode/`): fixed `configureLuaWorkspaceLibrary` to resolve
+  `docs/api/lurek.lua` from workspace root; added `lurek2d.scanAllGames` command.
+
 
 ### fix(cag): repair all 176 broken markdown links in `.github/` CAG layer
 

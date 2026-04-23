@@ -13,6 +13,7 @@ local state = STATES.TITLE
 
 local STATION_NAMES = { "Prep Station", "Stove", "Oven", "Serving Counter" }
 local STATION_COLORS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { 0.3, 0.6, 0.3 },
     { 0.7, 0.3, 0.2 },
     { 0.6, 0.4, 0.1 },
@@ -169,7 +170,7 @@ lurek.input.bind("escape", "quit")
 function lurek.init()
     lurek.window.setTitle("Cooking Sim — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.1, 0.05)
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
     reset_inventory()
     fill_customer_queue()
 end
@@ -412,7 +413,7 @@ function lurek.draw()
         local alpha = (i == current_station) and 1.0 or 0.5
 
         lurek.render.rectangle(sx, STATION_Y, STATION_W, STATION_H, c[1], c[2], c[3], alpha)
-        lurek.render.rectangleLines(sx, STATION_Y, STATION_W, STATION_H, 1, 1, 1, alpha, 2)
+        lurek.render.rectangle("line", sx, STATION_Y, STATION_W, STATION_H, 1, 1, 1, alpha, 2)
         lurek.render.print(STATION_NAMES[i], sx + 8, STATION_Y + 8, 14, 1, 1, 1, alpha)
 
         -- Selection arrow

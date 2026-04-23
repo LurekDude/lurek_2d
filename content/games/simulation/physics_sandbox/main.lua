@@ -473,7 +473,7 @@ lurek.input.bind("confirm",    "return")
 
 function lurek.init()
     lurek.window.setTitle("Physics Sandbox — Lurek2D")
-    lurek.window.setBackgroundColor(0.06, 0.06, 0.08)
+    lurek.render.setBackgroundColor(0.06, 0.06, 0.08)
 end
 
 local function _ready_setup()
@@ -581,7 +581,7 @@ local function process_sandbox(dt)
             local h = y2 - y1
             if w > 4 and h > 4 then
                 local col = BUILD_COLORS[color_idx]
-                local is_static = lurek.input.isKeyDown("lshift") or lurek.input.isKeyDown("rshift")
+                local is_static = lurek.input.isDown("lshift") or lurek.input.isDown("rshift")
                 local mass = is_static and 0 or (w * h * 0.005)
                 local o = make_object(x1 + w * 0.5, y1 + h * 0.5, w, h, mass,
                                       col[1], col[2], col[3], is_static, 0.3)
@@ -691,7 +691,7 @@ local function render_sandbox()
     for _, o in ipairs(objects) do
         local alpha = o.is_static and 0.85 or 1.0
         if o.shape == "circle" then
-            lurek.render.circleFill(o.x, o.y, o.w * 0.5,
+            lurek.render.circle("fill", o.x, o.y, o.w * 0.5,
                 { r = o.r, g = o.g, b = o.b, a = alpha })
         else
             lurek.render.rectangle(o.x - o.w * 0.5, o.y - o.h * 0.5, o.w, o.h,

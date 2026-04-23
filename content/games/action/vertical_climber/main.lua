@@ -237,7 +237,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Vertical Climber — Lurek2D")
-    lurek.window.setBackgroundColor(0.6, 0.75, 0.9)
+    lurek.render.setBackgroundColor(0.6, 0.75, 0.9)
 
     -- Input actions
     lurek.input.bind("left",  {"a", "left"})
@@ -249,35 +249,35 @@ function lurek.init()
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Particle systems
-    dust_ps = lurek.particle.new({
+    dust_ps = lurek.particle.newSystem({
         maxParticles = 15, lifetime = 0.25,
         speed = 25, spread = 3.14,
         sizeStart = 3, sizeEnd = 1,
         colorStart = {0.7, 0.6, 0.4, 0.7},
         colorEnd   = {0.7, 0.6, 0.4, 0.0},
     })
-    crumble_ps = lurek.particle.new({
+    crumble_ps = lurek.particle.newSystem({
         maxParticles = 25, lifetime = 0.6,
         speed = 80, spread = 1.5,
         sizeStart = 4, sizeEnd = 2,
         colorStart = {0.55, 0.35, 0.15, 1.0},
         colorEnd   = {0.4,  0.25, 0.1,  0.0},
     })
-    spring_ps = lurek.particle.new({
+    spring_ps = lurek.particle.newSystem({
         maxParticles = 20, lifetime = 0.4,
         speed = 60, spread = 6.28,
         sizeStart = 3, sizeEnd = 1,
         colorStart = {1.0, 0.95, 0.2, 0.9},
         colorEnd   = {1.0, 0.85, 0.0, 0.0},
     })
-    enemy_ps = lurek.particle.new({
+    enemy_ps = lurek.particle.newSystem({
         maxParticles = 20, lifetime = 0.4,
         speed = 70, spread = 6.28,
         sizeStart = 4, sizeEnd = 1,
         colorStart = {1.0, 0.2, 0.1, 1.0},
         colorEnd   = {0.5, 0.0, 0.0, 0.0},
     })
-    bullet_ps = lurek.particle.new({
+    bullet_ps = lurek.particle.newSystem({
         maxParticles = 10, lifetime = 0.2,
         speed = 40, spread = 6.28,
         sizeStart = 2, sizeEnd = 1,
@@ -301,7 +301,7 @@ function lurek.process(dt)
 
     -- ── Title ─────────────────────────────────────────────────────────────
     if game_state == STATE.TITLE then
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             reset_game()
         end
         return
@@ -309,7 +309,7 @@ function lurek.process(dt)
 
     -- ── Game Over ─────────────────────────────────────────────────────────
     if game_state == STATE.GAME_OVER then
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             game_state = STATE.TITLE
         end
         return
@@ -497,7 +497,7 @@ function lurek.process(dt)
 
     -- Update sky color based on altitude
     local sr, sg, sb = sky_color()
-    lurek.window.setBackgroundColor(sr, sg, sb)
+    lurek.render.setBackgroundColor(sr, sg, sb)
 
     -- Update particles
     dust_ps:update(dt)

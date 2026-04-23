@@ -287,7 +287,7 @@ function lurek.process(dt)
         light_radius = clamp(light_radius + RADIUS_STEP, MIN_RADIUS, MAX_RADIUS)
         player_light:setRadius(light_radius)
     end
-    local scroll = lurek.input.getMouseScroll()
+    local scroll = lurek.input.getWheelDelta()
     if scroll ~= 0 then
         light_radius = clamp(light_radius + scroll * RADIUS_STEP, MIN_RADIUS, MAX_RADIUS)
         player_light:setRadius(light_radius)
@@ -354,7 +354,7 @@ function lurek.draw()
             lurek.render.setColor(pulse, pulse, pulse * 1.5, 0.4)
             local cx = 100 + (i - 1) * 90
             local cy = 300 + math.sin(time * 1.5 + i) * 60
-            lurek.render.drawCircle("fill", cx, cy, 30 + math.sin(time + i) * 10)
+            lurek.render.circle("fill", cx, cy, 30 + math.sin(time + i) * 10)
         end
         camera:detach()
         return
@@ -398,9 +398,9 @@ function lurek.draw()
     -- Draw player
     local pc = LIGHT_COLORS[color_index]
     lurek.render.setColor(pc[1], pc[2], pc[3], 1.0)
-    lurek.render.drawCircle("fill", player.x, player.y, 8)
+    lurek.render.circle("fill", player.x, player.y, 8)
     lurek.render.setColor(1.0, 1.0, 1.0, 0.5)
-    lurek.render.drawCircle("line", player.x, player.y, 10)
+    lurek.render.circle("line", player.x, player.y, 10)
 
     -- Spotlight direction indicator
     if spotlight_mode then

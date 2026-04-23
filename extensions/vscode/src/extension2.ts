@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import * as fs from "fs";
 import { startMcpServer } from "./mcp/server.js";
 
 // Services
@@ -657,6 +658,42 @@ window.addEventListener('resize',draw);
   });
   registerCommand(context, "lurek2d.getApiDoc", () => browseApi());
 
+  // ─── Scan All Games (bulk diagnostic) ────────────────────
+  registerCommand(context, "lurek2d.scanAllGames", async () => {
+    const wsRoot = getWorkspaceRoot();
+    if (!wsRoot) {
+      vscode.window.showErrorMessage("No workspace open.");
+      return;
+    }
+    const uris = await vscode.workspace.findFiles("content/games/**/main.lua", "**/node_modules/**");
+    if (uris.length === 0) {
+      vscode.window.showInformationMessage("No game main.lua files found.");
+      return;
+    }
+
+    await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: `Scanning ${uris.length} games…`, cancellable: false },
+      async (progress) => {
+        let done = 0;
+        for (const uri of uris) {
+          try {
+            const doc = await vscode.workspace.openTextDocument(uri);
+            // Opening the document triggers the diagnostics provider automatically.
+            await vscode.window.showTextDocument(doc, { preview: true, preserveFocus: true });
+          } catch {
+            // skip unreadable files
+          }
+          done++;
+          progress.report({ increment: (100 / uris.length), message: `${done}/${uris.length}` });
+        }
+      }
+    );
+
+    // Show Problems panel
+    await vscode.commands.executeCommand("workbench.action.problems.focus");
+    vscode.window.showInformationMessage(`Scanned ${uris.length} games. Check the Problems panel for errors.`);
+  });
+
   // ─── MCP Server ──────────────────────────────────────────
   const workspaceRoot = getWorkspaceRoot();
   if (workspaceRoot) {
@@ -712,13 +749,23 @@ function getWorkspaceRoot(): string | undefined {
  * type definitions and sets the Lua runtime version to match lurek.luaVersion.
  */
 function configureLuaWorkspaceLibrary(context: vscode.ExtensionContext): void {
-  const annotationsDir = path.join(context.extensionPath, "data");
+  // Prefer the workspace's own docs/api/ folder (always up-to-date),
+  // fallback to the bundled data/ folder inside the extension.
+  const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const wsDocsApi = wsRoot ? path.join(wsRoot, "docs", "api") : undefined;
+  const bundledData = path.join(context.extensionPath, "data");
+  const annotationsDir = (wsDocsApi && fs.existsSync(path.join(wsDocsApi, "lurek.lua")))
+    ? wsDocsApi
+    : bundledData;
+
   const luaConfig = vscode.workspace.getConfiguration("Lua");
 
-  // Add the annotations data/ folder to Lua.workspace.library
+  // Add the annotations folder to Lua.workspace.library
   const currentLibrary: string[] = luaConfig.get<string[]>("workspace.library") ?? [];
   if (!currentLibrary.includes(annotationsDir)) {
-    const updated = [...currentLibrary, annotationsDir];
+    // Remove any old bundledData entry so we don't accumulate stale entries
+    const filtered = currentLibrary.filter((p) => !p.includes("lurek2d-toolkit"));
+    const updated = [...filtered, annotationsDir];
     luaConfig
       .update("workspace.library", updated, vscode.ConfigurationTarget.Global)
       .then(undefined, () => {/* ignore if not installed */});

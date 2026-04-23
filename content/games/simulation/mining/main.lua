@@ -20,6 +20,7 @@ local T_BEDROCK = 6
 local T_LADDER  = 7
 
 local TILE_COLORS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     [T_EMPTY]   = {0.12, 0.08, 0.06},
     [T_DIRT]    = {0.55, 0.35, 0.15},
     [T_STONE]   = {0.50, 0.50, 0.52},
@@ -281,7 +282,7 @@ function lurek.process(dt)
     fps = lurek.timer.getFPS()
 
     if state == "TITLE" then
-        if lurek.input.wasPressed("confirm") then
+        if lurek.input.wasActionPressed("confirm") then
             state = "MINING"
             generate_mine()
             player = { cx=10, cy=0, hp=100, gold=0, items=0 }
@@ -292,41 +293,41 @@ function lurek.process(dt)
             gold_display = 0
             cavein_timer = 0
         end
-        if lurek.input.wasPressed("quit") then lurek.event.quit() end
+        if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
         return
     end
 
     if state == "GAME_OVER" or state == "VICTORY" then
-        if lurek.input.wasPressed("confirm") then state = "TITLE" end
-        if lurek.input.wasPressed("quit") then lurek.event.quit() end
+        if lurek.input.wasActionPressed("confirm") then state = "TITLE" end
+        if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
         return
     end
 
     if state == "SHOP" then
-        if lurek.input.wasPressed("nav_up") then
+        if lurek.input.wasActionPressed("nav_up") then
             shop_sel = shop_sel - 1
             if shop_sel < 1 then shop_sel = #shop_items end
         end
-        if lurek.input.wasPressed("nav_down") then
+        if lurek.input.wasActionPressed("nav_down") then
             shop_sel = shop_sel + 1
             if shop_sel > #shop_items then shop_sel = 1 end
         end
-        if lurek.input.wasPressed("confirm") then buy_item() end
-        if lurek.input.wasPressed("quit") then state = "MINING" end
+        if lurek.input.wasActionPressed("confirm") then buy_item() end
+        if lurek.input.wasActionPressed("quit") then state = "MINING" end
         return
     end
 
     -- MINING state
-    if lurek.input.wasPressed("quit") then lurek.event.quit() end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Movement
-    if lurek.input.wasPressed("move_up")    then try_move(0, -1) end
-    if lurek.input.wasPressed("move_down")  then try_move(0,  1) end
-    if lurek.input.wasPressed("move_left")  then try_move(-1, 0) end
-    if lurek.input.wasPressed("move_right") then try_move(1,  0) end
+    if lurek.input.wasActionPressed("move_up")    then try_move(0, -1) end
+    if lurek.input.wasActionPressed("move_down")  then try_move(0,  1) end
+    if lurek.input.wasActionPressed("move_left")  then try_move(-1, 0) end
+    if lurek.input.wasActionPressed("move_right") then try_move(1,  0) end
 
     -- Dig: mine the tile the player is facing (below first, then sides)
-    if lurek.input.wasPressed("dig") and not dig.active then
+    if lurek.input.wasActionPressed("dig") and not dig.active then
         -- Try dig down first, then left, then right
         if is_solid(player.cx, player.cy + 1) then
             start_dig(player.cx, player.cy + 1)
@@ -351,10 +352,10 @@ function lurek.process(dt)
     end
 
     -- Ladder
-    if lurek.input.wasPressed("ladder") then place_ladder() end
+    if lurek.input.wasActionPressed("ladder") then place_ladder() end
 
     -- Shop access (at surface)
-    if player.cy == 0 and lurek.input.wasPressed("shop") then
+    if player.cy == 0 and lurek.input.wasActionPressed("shop") then
         return_to_surface()
         state = "SHOP"
         return
@@ -401,7 +402,7 @@ end
 function lurek.draw()
     if state ~= "MINING" then return end
 
-    lurek.camera.set(0, -cam_y)
+    _cam:setPosition(0, -cam_y)
     local lr = light_radius()
 
     -- Draw mine tiles
@@ -475,7 +476,7 @@ function lurek.draw()
         lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 
-    lurek.camera.reset()
+    _cam:reset()
 end
 
 -- ── Render UI ───────────────────────────────────────────────────

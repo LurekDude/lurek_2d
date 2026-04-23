@@ -22,6 +22,7 @@ local gold_per_second = 0
 
 -- ── Auto-clicker definitions ────────────────────────────────────────────
 local producers = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { name = "Cursor",  key = "c", base_cost = 15,     rate = 0.1,   owned = 0 },
     { name = "Worker",  key = "w", base_cost = 100,    rate = 1,     owned = 0 },
     { name = "Factory", key = "f", base_cost = 1000,   rate = 10,    owned = 0 },
@@ -199,7 +200,7 @@ end
 function lurek.init()
     lurek.window.setTitle("Idle Game — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.06, 0.1)
-    lurek.camera.init(W, H)
+    _cam:setPosition(W, H)
 
     lurek.input.bind("click",        "space")
     lurek.input.bind("cursor_buy",   "c")

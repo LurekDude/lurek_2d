@@ -280,10 +280,10 @@ function lurek.process(dt)
 
     -- read input
     input_dx, input_dy = 0, 0
-    if lurek.input.isKeyDown("w") then input_dy = -1 end
-    if lurek.input.isKeyDown("s") then input_dy =  1 end
-    if lurek.input.isKeyDown("a") then input_dx = -1 end
-    if lurek.input.isKeyDown("d") then input_dx =  1 end
+    if lurek.input.isDown("w") then input_dy = -1 end
+    if lurek.input.isDown("s") then input_dy =  1 end
+    if lurek.input.isDown("a") then input_dx = -1 end
+    if lurek.input.isDown("d") then input_dx =  1 end
     local idx_len = math.sqrt(input_dx * input_dx + input_dy * input_dy)
     if idx_len > 0 then
         input_dx = input_dx / idx_len
@@ -461,9 +461,9 @@ function lurek.draw()
     -- halfway line
     lurek.render.line(PITCH_X, CENTER_Y, PITCH_X + PITCH_W, CENTER_Y)
     -- center circle
-    lurek.render.drawCircle("line", CENTER_X, CENTER_Y, 50)
+    lurek.render.circle("line", CENTER_X, CENTER_Y, 50)
     -- center spot
-    lurek.render.drawCircle("fill", CENTER_X, CENTER_Y, 3)
+    lurek.render.circle("fill", CENTER_X, CENTER_Y, 3)
 
     -- penalty boxes
     local pbox_w = 200
@@ -482,7 +482,7 @@ function lurek.draw()
         local p = particles[i]
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a * 0.8)
-        lurek.render.drawCircle("fill", p.x, p.y, 2)
+        lurek.render.circle("fill", p.x, p.y, 2)
     end
 
     -- draw players
@@ -490,26 +490,26 @@ function lurek.draw()
         local p = players_green[i]
         if i == controlled_idx and state == STATE.PLAYING then
             lurek.render.setColor(1, 1, 0, 0.5)
-            lurek.render.drawCircle("line", p.x, p.y, PLAYER_RADIUS + 3)
+            lurek.render.circle("line", p.x, p.y, PLAYER_RADIUS + 3)
         end
         lurek.render.setColor(0.2, 0.8, 0.2, 1)
-        lurek.render.drawCircle("fill", p.x, p.y, PLAYER_RADIUS)
+        lurek.render.circle("fill", p.x, p.y, PLAYER_RADIUS)
         lurek.render.setColor(1, 1, 1, 0.8)
-        lurek.render.drawCircle("line", p.x, p.y, PLAYER_RADIUS)
+        lurek.render.circle("line", p.x, p.y, PLAYER_RADIUS)
     end
     for i = 1, 5 do
         local p = players_red[i]
         lurek.render.setColor(0.9, 0.2, 0.2, 1)
-        lurek.render.drawCircle("fill", p.x, p.y, PLAYER_RADIUS)
+        lurek.render.circle("fill", p.x, p.y, PLAYER_RADIUS)
         lurek.render.setColor(1, 1, 1, 0.8)
-        lurek.render.drawCircle("line", p.x, p.y, PLAYER_RADIUS)
+        lurek.render.circle("line", p.x, p.y, PLAYER_RADIUS)
     end
 
     -- ball
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.drawCircle("fill", ball.x, ball.y, BALL_RADIUS)
+    lurek.render.circle("fill", ball.x, ball.y, BALL_RADIUS)
     lurek.render.setColor(0, 0, 0, 0.5)
-    lurek.render.drawCircle("line", ball.x, ball.y, BALL_RADIUS)
+    lurek.render.circle("line", ball.x, ball.y, BALL_RADIUS)
 end
 
 -- ── UI ────────────────────────────────────────────────────────
@@ -592,7 +592,7 @@ function lurek.draw_ui()
 end
 
 -- ── keypressed ────────────────────────────────────────────────
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if key == "escape" then lurek.event.quit() end
 
     if state == STATE.TITLE then

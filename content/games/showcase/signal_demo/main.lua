@@ -36,6 +36,7 @@ local BONUS_SCORE    = 50
 
 -- Colors per signal type
 local SIG_COLORS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     player_hit    = { 0.95, 0.25, 0.20 },
     score_up      = { 0.20, 0.90, 0.40 },
     level_up      = { 0.30, 0.50, 1.00 },
@@ -360,7 +361,7 @@ lurek.input.bind("quit",  "escape")
 function lurek.init()
     lurek.window.setTitle("Signal Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.06, 0.10)
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 local function _ready_setup()

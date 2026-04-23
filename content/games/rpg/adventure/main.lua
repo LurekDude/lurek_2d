@@ -25,6 +25,7 @@ local INV_Y           = SCREEN_H - 60
 -- Room palettes
 ------------------------------------------------------------------------
 local PALETTES = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     bedroom  = { bg = {0.12, 0.10, 0.18}, wall = {0.22, 0.18, 0.30}, floor = {0.16, 0.12, 0.22}, accent = {0.55, 0.35, 0.20} },
     hallway  = { bg = {0.08, 0.08, 0.12}, wall = {0.18, 0.16, 0.20}, floor = {0.12, 0.10, 0.14}, accent = {0.40, 0.40, 0.50} },
     kitchen  = { bg = {0.15, 0.12, 0.08}, wall = {0.28, 0.22, 0.15}, floor = {0.20, 0.16, 0.10}, accent = {0.70, 0.50, 0.20} },
@@ -318,21 +319,21 @@ function lurek.init()
     lurek.input.bind("quit",      {"escape"})
 
     -- Particle systems
-    sparkle_ps = lurek.particle.new({
+    sparkle_ps = lurek.particle.newSystem({
         maxParticles = 25, lifetime = 0.6,
         speed = 40, spread = 6.28,
         sizeStart = 4, sizeEnd = 1,
         colorStart = {1.0, 0.95, 0.5, 1.0},
         colorEnd   = {1.0, 0.80, 0.2, 0.0},
     })
-    burst_ps = lurek.particle.new({
+    burst_ps = lurek.particle.newSystem({
         maxParticles = 35, lifetime = 0.5,
         speed = 90, spread = 6.28,
         sizeStart = 6, sizeEnd = 2,
         colorStart = {1.0, 0.7, 0.2, 1.0},
         colorEnd   = {0.8, 0.3, 0.1, 0.0},
     })
-    dust_ps = lurek.particle.new({
+    dust_ps = lurek.particle.newSystem({
         maxParticles = 20, lifetime = 0.8,
         speed = 30, spread = 3.14,
         sizeStart = 5, sizeEnd = 8,
@@ -490,7 +491,7 @@ function lurek.process(dt)
     lurek.tween.update(dt)
 
     -- Camera + window
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
     local pal = get_palette()
     lurek.render.setBackgroundColor(pal.bg[1], pal.bg[2], pal.bg[3])
     local fps = lurek.timer.getFPS()
@@ -534,7 +535,7 @@ local function draw_hotspot(hs, idx)
     if is_sel then
         local pulse = 0.7 + 0.3 * math.sin(title_blink * 4)
         lurek.render.setColor(1, 1, 0.6, pulse)
-        lurek.render.rectangleLines(hs.x - 2, hs.y - 2, hs.w + 4, hs.h + 4, 2)
+        lurek.render.rectangle("line", hs.x - 2, hs.y - 2, hs.w + 4, hs.h + 4, 2)
     end
 
     -- Label
@@ -617,8 +618,8 @@ function lurek.draw()
 
         -- Decorative border
         lurek.render.setColor(0.6, 0.45, 0.15, 0.6)
-        lurek.render.rectangleLines(40, 40, SCREEN_W - 80, SCREEN_H - 80, 3)
-        lurek.render.rectangleLines(50, 50, SCREEN_W - 100, SCREEN_H - 100, 1)
+        lurek.render.rectangle("line", 40, 40, SCREEN_W - 80, SCREEN_H - 80, 3)
+        lurek.render.rectangle("line", 50, 50, SCREEN_W - 100, SCREEN_H - 100, 1)
 
         -- Title
         lurek.render.setColor(0.95, 0.85, 0.3, 1)
@@ -727,7 +728,7 @@ function lurek.draw_ui()
 
         if i == inv_selected then
             lurek.render.setColor(0.8, 0.7, 0.2, 0.8)
-            lurek.render.rectangleLines(sx - 2, sy - 2, INV_SLOT_W + 4, INV_SLOT_H - 14, 2)
+            lurek.render.rectangle("line", sx - 2, sy - 2, INV_SLOT_W + 4, INV_SLOT_H - 14, 2)
         end
 
         -- Item background
@@ -753,7 +754,7 @@ function lurek.draw_ui()
         lurek.render.rectangle(40, SCREEN_H / 2 - 50, SCREEN_W - 80, 100)
         -- Border
         lurek.render.setColor(0.6, 0.5, 0.2, 1)
-        lurek.render.rectangleLines(40, SCREEN_H / 2 - 50, SCREEN_W - 80, 100, 2)
+        lurek.render.rectangle("line", 40, SCREEN_H / 2 - 50, SCREEN_W - 80, 100, 2)
         -- Text (typewriter)
         lurek.render.setColor(0.95, 0.9, 0.8, 1)
         lurek.render.print(dialog.shown, 60, SCREEN_H / 2 - 30, 14)
@@ -775,7 +776,7 @@ function lurek.draw_ui()
         lurek.render.setColor(0.08, 0.06, 0.12, 0.95)
         lurek.render.rectangle(100, 100, SCREEN_W - 200, SCREEN_H - 260)
         lurek.render.setColor(0.6, 0.5, 0.2, 1)
-        lurek.render.rectangleLines(100, 100, SCREEN_W - 200, SCREEN_H - 260, 2)
+        lurek.render.rectangle("line", 100, 100, SCREEN_W - 200, SCREEN_H - 260, 2)
 
         lurek.render.setColor(0.95, 0.85, 0.4, 1)
         lurek.render.print("INVENTORY", 320, 115, 20)
@@ -789,7 +790,7 @@ function lurek.draw_ui()
 
             if i == inv_selected then
                 lurek.render.setColor(0.8, 0.7, 0.2, 0.9)
-                lurek.render.rectangleLines(ix - 4, iy - 4, 140, 50, 2)
+                lurek.render.rectangle("line", ix - 4, iy - 4, 140, 50, 2)
             end
 
             lurek.render.setColor(0.15, 0.12, 0.08, 0.9)

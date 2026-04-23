@@ -107,9 +107,9 @@ local function draw_base_scene(time)
     -- Central pulsing circle (bright — bloom test target)
     local pulse = 0.7 + 0.3 * math.sin(time * 3)
     lurek.render.setColor(1.0, 0.95, 0.8, pulse)
-    lurek.render.drawCircle("fill", cx, cy, 40 + 10 * math.sin(time * 2))
+    lurek.render.circle("fill", cx, cy, 40 + 10 * math.sin(time * 2))
     lurek.render.setColor(1, 1, 1, 0.6)
-    lurek.render.drawCircle("line", cx, cy, 55)
+    lurek.render.circle("line", cx, cy, 55)
 
     -- Grid of small dots (pixelation test target)
     for gx = 20, SCREEN_W - 20, 40 do
@@ -117,7 +117,7 @@ local function draw_base_scene(time)
             local d = math.sqrt((gx - cx) ^ 2 + (gy - cy) ^ 2)
             local a = clamp(1.0 - d / 350, 0.05, 0.5)
             lurek.render.setColor(0.6, 0.7, 0.9, a)
-            lurek.render.drawCircle("fill", gx, gy, 2)
+            lurek.render.circle("fill", gx, gy, 2)
         end
     end
 
@@ -150,7 +150,7 @@ local function apply_bloom(intensity, time)
     for r = 1, 5 do
         local rad = 50 + r * 18
         lurek.render.setColor(1.0, 0.95, 0.8, glow / r)
-        lurek.render.drawCircle("fill", cx, cy, rad)
+        lurek.render.circle("fill", cx, cy, rad)
     end
     -- Bloom halos on the rotating squares
     local colors = {
@@ -163,7 +163,7 @@ local function apply_bloom(intensity, time)
         local sx = cx + math.cos(angle) * dist
         local sy = cy + math.sin(angle) * dist
         lurek.render.setColor(c[1], c[2], c[3], 0.05 * intensity)
-        lurek.render.drawCircle("fill", sx, sy, 35)
+        lurek.render.circle("fill", sx, sy, 35)
     end
 end
 
@@ -227,10 +227,10 @@ local function apply_vignette(intensity)
     -- Corner darkening (extra)
     local corner = 100 * intensity
     lurek.render.setColor(0, 0, 0, 0.15 * intensity)
-    lurek.render.drawCircle("fill", 0, 0, corner)
-    lurek.render.drawCircle("fill", SCREEN_W, 0, corner)
-    lurek.render.drawCircle("fill", 0, SCREEN_H, corner)
-    lurek.render.drawCircle("fill", SCREEN_W, SCREEN_H, corner)
+    lurek.render.circle("fill", 0, 0, corner)
+    lurek.render.circle("fill", SCREEN_W, 0, corner)
+    lurek.render.circle("fill", 0, SCREEN_H, corner)
+    lurek.render.circle("fill", SCREEN_W, SCREEN_H, corner)
 end
 
 local function apply_chromatic(intensity, time)
@@ -580,7 +580,7 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
         end
-        lurek.render.drawCircle("fill", panel_x + 12, ey + 6, 4)
+        lurek.render.circle("fill", panel_x + 12, ey + 6, 4)
 
         -- Key label
         lurek.render.setColor(0.9, 0.8, 0.3, e.enabled and 1 or 0.4)

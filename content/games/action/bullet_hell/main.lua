@@ -381,7 +381,7 @@ end
 -- Process
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -405,7 +405,7 @@ function lurek.process(dt)
     -- TITLE
     -- -----------------------------------------------------------------------
     if current_state == STATE.TITLE then
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             reset_game()
             current_state = STATE.PLAYING
         end
@@ -416,7 +416,7 @@ function lurek.process(dt)
     -- GAME OVER
     -- -----------------------------------------------------------------------
     if current_state == STATE.GAME_OVER then
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             reset_game()
             current_state = STATE.PLAYING
         end
@@ -426,14 +426,14 @@ function lurek.process(dt)
     -- -----------------------------------------------------------------------
     -- PLAYING
     -- -----------------------------------------------------------------------
-    local focused = lurek.input.down("focus")
+    local focused = lurek.input.isDown("focus")
     local speed = focused and FOCUS_SPEED or PLAYER_SPEED
 
     -- Player movement
-    if lurek.input.down("left")  then player.x = player.x - speed * dt end
-    if lurek.input.down("right") then player.x = player.x + speed * dt end
-    if lurek.input.down("up")    then player.y = player.y - speed * dt end
-    if lurek.input.down("down")  then player.y = player.y + speed * dt end
+    if lurek.input.isDown("left")  then player.x = player.x - speed * dt end
+    if lurek.input.isDown("right") then player.x = player.x + speed * dt end
+    if lurek.input.isDown("up")    then player.y = player.y - speed * dt end
+    if lurek.input.isDown("down")  then player.y = player.y + speed * dt end
     player.x = clamp(player.x, PLAYER_SIZE, SCREEN_W - PLAYER_SIZE)
     player.y = clamp(player.y, PLAYER_SIZE, SCREEN_H - PLAYER_SIZE)
 
@@ -442,14 +442,14 @@ function lurek.process(dt)
 
     -- Auto-fire
     fire_timer = fire_timer + dt
-    if lurek.input.down("fire") and fire_timer >= FIRE_RATE then
+    if lurek.input.isDown("fire") and fire_timer >= FIRE_RATE then
         fire_timer = 0
         table.insert(player_bullets, { x = player.x - 4, y = player.y - PLAYER_SIZE })
         table.insert(player_bullets, { x = player.x + 2,  y = player.y - PLAYER_SIZE })
     end
 
     -- Bomb
-    if lurek.input.pressed("bomb") then
+    if lurek.input.wasActionPressed("bomb") then
         activate_bomb()
     end
 
@@ -684,7 +684,7 @@ function lurek.draw()
                 6, PLAYER_SIZE / 2)
 
             -- Hitbox dot (always visible when focused, pulsing otherwise)
-            local focused = lurek.input.down("focus")
+            local focused = lurek.input.isDown("focus")
             if focused then
                 lurek.render.setColor(1, 1, 1, 1)
                 lurek.render.circle("fill", player.x, player.y, HITBOX_RADIUS + 1)

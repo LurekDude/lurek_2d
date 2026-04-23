@@ -1,3 +1,4 @@
+local _cam = lurek.camera.new()  -- injected by fix_games.py
 ﻿-- ============================================================================
 --  Fighting Game — 1v1 Player vs AI with combos, super meter, best of 3
 -- ----------------------------------------------------------------------------
@@ -137,7 +138,7 @@ local function try_hit(attacker, defender)
             defender.meter = math.min(METER_MAX, defender.meter + METER_ON_BLOCK)
             if block_sparks then
                 local sx = (attacker.facing == 1) and (defender.x) or (defender.x + FIGHTER_W)
-                lurek.particle.emit(block_sparks, sx, defender.y + FIGHTER_H * 0.5, 8)
+                block_sparks:emit(sx, defender.y + FIGHTER_H * 0.5, 8)
             end
             trigger_shake(SHAKE_LIGHT)
         else
@@ -160,10 +161,10 @@ local function try_hit(attacker, defender)
             -- Particles
             if hit_sparks then
                 local sx = (attacker.facing == 1) and (defender.x) or (defender.x + FIGHTER_W)
-                lurek.particle.emit(hit_sparks, sx, defender.y + FIGHTER_H * 0.4, 12)
+                hit_sparks:emit(sx, defender.y + FIGHTER_H * 0.4, 12)
             end
             if atk == SUPER and super_flash then
-                lurek.particle.emit(super_flash, (attacker.x + defender.x) * 0.5 + FIGHTER_W * 0.5,
+                super_flash:emit((attacker.x + defender.x) * 0.5 + FIGHTER_W * 0.5,
                     attacker.y + FIGHTER_H * 0.5, 20)
             end
 
@@ -305,7 +306,7 @@ function lurek.init()
     lurek.input.bind("quit",  {"escape"})
 
     -- Particles — hit sparks (orange)
-    hit_sparks = lurek.particle.new({
+    hit_sparks = lurek.particle.newSystem({
         maxParticles  = 60,
         emissionRate  = 0,
         lifetime      = {0.15, 0.35},
@@ -317,7 +318,7 @@ function lurek.init()
     })
 
     -- Block sparks (blue)
-    block_sparks = lurek.particle.new({
+    block_sparks = lurek.particle.newSystem({
         maxParticles  = 40,
         emissionRate  = 0,
         lifetime      = {0.1, 0.25},
@@ -329,7 +330,7 @@ function lurek.init()
     })
 
     -- Super flash (yellow)
-    super_flash = lurek.particle.new({
+    super_flash = lurek.particle.newSystem({
         maxParticles  = 80,
         emissionRate  = 0,
         lifetime      = {0.2, 0.5},
@@ -340,7 +341,7 @@ function lurek.init()
         sizes          = {6, 2},
     })
 
-    lurek.timer.setTargetFPS(60)
+    -- [removed: lurek.timer.setTargetFPS has no equivalent]
     reset_fighters()
 end
 
@@ -368,7 +369,7 @@ function lurek.process(dt)
 
     -- ── TITLE ─────────────────────────────────────────────────────────
     if state == STATE.TITLE then
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             round_num = 1
             start_round()
         end
@@ -377,7 +378,7 @@ function lurek.process(dt)
 
     -- ── MATCH OVER ────────────────────────────────────────────────────
     if state == STATE.MATCH_OVER then
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             round_num = 1
             state = STATE.TITLE
         end
@@ -442,9 +443,9 @@ function lurek.process(dt)
     try_hit(p2, p1)
 
     -- Particles update
-    lurek.particle.update(hit_sparks, dt)
-    lurek.particle.update(block_sparks, dt)
-    lurek.particle.update(super_flash, dt)
+    hit_sparks:update(dt)
+    block_sparks:update(dt)
+    super_flash:update(dt)
 
     -- Check KO
     if p2.hp <= 0 then
@@ -525,7 +526,7 @@ function lurek.draw()
         ox = (math.random() - 0.5) * shake_amount * 2
         oy = (math.random() - 0.5) * shake_amount * 2
     end
-    lurek.camera.setPosition(ox, oy)
+    _cam:setPosition(ox, oy)
 
     if state == STATE.TITLE then
         -- Title background accents
@@ -552,9 +553,9 @@ function lurek.draw()
     draw_fighter(p2, 0.9, 0.2, 0.2,  1.0, 0.5, 0.2)    -- red body, orange accent
 
     -- Particles
-    lurek.particle.draw(hit_sparks)
-    lurek.particle.draw(block_sparks)
-    lurek.particle.draw(super_flash)
+    lurek.render.draw(hit_sparks)
+    lurek.render.draw(block_sparks)
+    lurek.render.draw(super_flash)
 end
 
 -- ── lurek.render_ui ──────────────────────────────────────────────────────

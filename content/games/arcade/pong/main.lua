@@ -302,7 +302,7 @@ end
 
 -- ── Input events ─────────────────────────────────────────────────────────
 
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if key == "escape" then
         lurek.event.quit()
     end

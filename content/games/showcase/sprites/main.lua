@@ -36,6 +36,7 @@ local score = 0
 local sprite_scale = 2
 local tint_index = 1
 local tint_modes = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { name = "Normal", r = 1.0, g = 1.0, b = 1.0 },
     { name = "Red",    r = 1.0, g = 0.4, b = 0.4 },
     { name = "Blue",   r = 0.4, g = 0.4, b = 1.0 },
@@ -294,7 +295,7 @@ function lurek.init()
         lurek.tween.to(ct, 0.3 + i * 0.05, { y = 4 }, "inOutSine", bounce)
     end
 
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 -- ============================================================
@@ -318,7 +319,7 @@ function lurek.process(dt)
     end
 
     -- Quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -339,7 +340,7 @@ function lurek.process(dt)
     if state == STATE_TITLE then
         title_timer = title_timer + dt
         title_alpha = math.min(1.0, title_timer * 1.5)
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             state = STATE_PLAYING
         end
         return
@@ -443,20 +444,20 @@ function lurek.process(dt)
     end
 
     -- Scale controls
-    if lurek.input.pressed("scale_up") then
+    if lurek.input.wasActionPressed("scale_up") then
         sprite_scale = math.min(MAX_SCALE, sprite_scale + 1)
     end
-    if lurek.input.pressed("scale_down") then
+    if lurek.input.wasActionPressed("scale_down") then
         sprite_scale = math.max(MIN_SCALE, sprite_scale - 1)
     end
 
     -- Tint cycle
-    if lurek.input.pressed("tint") then
+    if lurek.input.wasActionPressed("tint") then
         tint_index = (tint_index % #tint_modes) + 1
     end
 
     -- Trail toggle
-    if lurek.input.pressed("trail") then
+    if lurek.input.wasActionPressed("trail") then
         trail_on = not trail_on
         if not trail_on then trail_positions = {} end
     end

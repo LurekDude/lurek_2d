@@ -282,17 +282,17 @@ local function update_player(dt)
 
     -- Horizontal movement
     player.vx = 0
-    if lurek.input.down("left") then
+    if lurek.input.isDown("left") then
         player.vx = -WALK_SPEED
         player.facing = -1
     end
-    if lurek.input.down("right") then
+    if lurek.input.isDown("right") then
         player.vx = WALK_SPEED
         player.facing = 1
     end
 
     -- Jump
-    if player.on_ground and lurek.input.pressed("jump") then
+    if player.on_ground and lurek.input.wasActionPressed("jump") then
         player.vy = JUMP_VEL
         player.on_ground = false
     end
@@ -379,7 +379,7 @@ local function fire_super()
 end
 
 local function update_gun(dt)
-    if lurek.input.pressed("fire") then
+    if lurek.input.wasActionPressed("fire") then
         charging = true
         charge_timer = 0
     end
@@ -388,7 +388,7 @@ local function update_gun(dt)
         charge_timer = charge_timer + dt
     end
 
-    if lurek.input.released("fire") and charging then
+    if lurek.input.wasActionReleased("fire") and charging then
         charging = false
         if charge_timer >= CHARGE_SUPER then
             fire_super()
@@ -626,7 +626,7 @@ end
 -- Process
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -636,7 +636,7 @@ function lurek.process(dt)
 
     -- ── TITLE ──────────────────────────────────────────────────
     if current_state == STATE.TITLE then
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             current_state = STATE.INTRO
             intro_timer = 0
             intro_line = 1
@@ -647,7 +647,7 @@ function lurek.process(dt)
     -- ── INTRO ──────────────────────────────────────────────────
     if current_state == STATE.INTRO then
         intro_timer = intro_timer + dt
-        if lurek.input.pressed("start") or intro_timer > #intro_lines * 1.2 + 2 then
+        if lurek.input.wasActionPressed("start") or intro_timer > #intro_lines * 1.2 + 2 then
             current_state = STATE.PLAYING
             load_scene(1)
         end
@@ -666,7 +666,7 @@ function lurek.process(dt)
 
     -- ── GAME OVER ──────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             lives = 3
             current_state = STATE.PLAYING
             load_scene(1)

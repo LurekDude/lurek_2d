@@ -28,6 +28,7 @@ local dt    = 0
 -- ── Ingredients ─────────────────────────────────────────────────────────────
 
 local ingredients = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { name = "Sunpetal",    fire = 2, water = 0, earth = 1, air = 0, cost = 8,  color = {1.0, 0.8, 0.2} },
     { name = "Moonmoss",    fire = 0, water = 2, earth = 0, air = 1, cost = 8,  color = {0.5, 0.7, 1.0} },
     { name = "Ironite",     fire = 1, water = 0, earth = 2, air = 0, cost = 10, color = {0.6, 0.5, 0.4} },
@@ -201,7 +202,7 @@ end
 function lurek.init()
     lurek.window.setTitle("Alchemy Lab — Lurek2D")
     lurek.render.setBackgroundColor(0.12, 0.08, 0.06)
-    lurek.camera.reset()
+    _cam:reset()
 end
 
 local function _ready_setup()

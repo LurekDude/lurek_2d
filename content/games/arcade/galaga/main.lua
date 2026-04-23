@@ -523,7 +523,7 @@ end
 -- Process
 -- ---------------------------------------------------------------------------
 function lurek.process(dt)
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -536,7 +536,7 @@ function lurek.process(dt)
     -- TITLE
     -- -----------------------------------------------------------------------
     if current_state == STATE.TITLE then
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             reset_game()
             current_state = STATE.PLAYING
         end
@@ -547,7 +547,7 @@ function lurek.process(dt)
     -- GAME OVER
     -- -----------------------------------------------------------------------
     if current_state == STATE.GAME_OVER then
-        if lurek.input.pressed("restart") or lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("restart") or lurek.input.wasActionPressed("start") then
             reset_game()
             current_state = STATE.PLAYING
         end
@@ -564,16 +564,16 @@ function lurek.process(dt)
     end
 
     -- Player movement
-    if lurek.input.down("left") then
+    if lurek.input.isDown("left") then
         player.x = player.x - PLAYER_SPEED * dt
     end
-    if lurek.input.down("right") then
+    if lurek.input.isDown("right") then
         player.x = player.x + PLAYER_SPEED * dt
     end
     player.x = clamp(player.x, 0, SCREEN_W - PLAYER_W)
 
     -- Player fire
-    if lurek.input.pressed("fire") and #player_bullets < MAX_PLAYER_BULLETS then
+    if lurek.input.wasActionPressed("fire") and #player_bullets < MAX_PLAYER_BULLETS then
         -- Single or dual fire
         local cx = player.x + PLAYER_W / 2
         if dual_fire then

@@ -417,17 +417,17 @@ function lurek.process(dt)
     dt = dt * speed_mult
 
     if state == "TITLE" then
-        if lurek.input.pressed("select") then
+        if lurek.input.wasActionPressed("select") then
             state = "PLAYING"
         end
-        if lurek.input.pressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.quit()
         end
         return
     end
 
     if state == "VICTORY" or state == "GAME_OVER" then
-        if lurek.input.pressed("select") then
+        if lurek.input.wasActionPressed("select") then
             -- Restart
             state = "PLAYING"
             resources = {wood = 30, stone = 15, food = 20}
@@ -442,7 +442,7 @@ function lurek.process(dt)
             generate_map()
             init_colonists()
         end
-        if lurek.input.pressed("quit") then
+        if lurek.input.wasActionPressed("quit") then
             lurek.event.quit()
         end
         return
@@ -471,26 +471,26 @@ function lurek.process(dt)
     end
 
     -- Input: speed
-    if lurek.input.pressed("speed_1") then speed_mult = 1; show_message("Speed: 1x") end
-    if lurek.input.pressed("speed_2") then speed_mult = 2; show_message("Speed: 2x") end
-    if lurek.input.pressed("speed_3") then speed_mult = 4; show_message("Speed: 4x") end
+    if lurek.input.wasActionPressed("speed_1") then speed_mult = 1; show_message("Speed: 1x") end
+    if lurek.input.wasActionPressed("speed_2") then speed_mult = 2; show_message("Speed: 2x") end
+    if lurek.input.wasActionPressed("speed_3") then speed_mult = 4; show_message("Speed: 4x") end
 
     -- Input: build mode
-    if lurek.input.pressed("build_house")    then build_mode = B_HOUSE;    show_message("Click to place House (10 wood)") end
-    if lurek.input.pressed("build_farm")     then build_mode = B_FARM;     show_message("Click to place Farm (5 wood)") end
-    if lurek.input.pressed("build_mine")     then build_mode = B_MINE;     show_message("Click to place Mine (5w+5s)") end
-    if lurek.input.pressed("build_barracks") then build_mode = B_BARRACKS; show_message("Click to place Barracks (15w+10s)") end
+    if lurek.input.wasActionPressed("build_house")    then build_mode = B_HOUSE;    show_message("Click to place House (10 wood)") end
+    if lurek.input.wasActionPressed("build_farm")     then build_mode = B_FARM;     show_message("Click to place Farm (5 wood)") end
+    if lurek.input.wasActionPressed("build_mine")     then build_mode = B_MINE;     show_message("Click to place Mine (5w+5s)") end
+    if lurek.input.wasActionPressed("build_barracks") then build_mode = B_BARRACKS; show_message("Click to place Barracks (15w+10s)") end
 
     -- Input: assign job
     if selected_colonist and colonists[selected_colonist] then
-        if lurek.input.pressed("assign_builder") then colonists[selected_colonist].job = J_BUILDER; show_message("Assigned Builder") end
-        if lurek.input.pressed("assign_farmer")  then colonists[selected_colonist].job = J_FARMER;  show_message("Assigned Farmer") end
-        if lurek.input.pressed("assign_miner")   then colonists[selected_colonist].job = J_MINER;   show_message("Assigned Miner") end
-        if lurek.input.pressed("assign_guard")   then colonists[selected_colonist].job = J_GUARD;    show_message("Assigned Guard") end
+        if lurek.input.wasActionPressed("assign_builder") then colonists[selected_colonist].job = J_BUILDER; show_message("Assigned Builder") end
+        if lurek.input.wasActionPressed("assign_farmer")  then colonists[selected_colonist].job = J_FARMER;  show_message("Assigned Farmer") end
+        if lurek.input.wasActionPressed("assign_miner")   then colonists[selected_colonist].job = J_MINER;   show_message("Assigned Miner") end
+        if lurek.input.wasActionPressed("assign_guard")   then colonists[selected_colonist].job = J_GUARD;    show_message("Assigned Guard") end
     end
 
     -- Input: click
-    if lurek.input.pressed("select") then
+    if lurek.input.wasActionPressed("select") then
         local mx, my = lurek.input.mouse.getPosition()
         if build_mode then
             try_place_building(mx, my, build_mode)
@@ -502,7 +502,7 @@ function lurek.process(dt)
     end
 
     -- Input: quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
     end
 

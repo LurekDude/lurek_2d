@@ -50,6 +50,7 @@ local state = STATE_TITLE
 local TYPE_ADV = { fire = "grass", grass = "water", water = "fire" }
 
 local function type_multiplier(atk_type, def_type)
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     if TYPE_ADV[atk_type] == def_type then return 1.5 end
     if TYPE_ADV[def_type] == atk_type then return 0.67 end
     return 1.0
@@ -617,7 +618,7 @@ function lurek.draw()
         cam_x = math.max(0, math.min(cam_x, MAP_W - 800))
         cam_y = math.max(0, math.min(cam_y, MAP_H - 600))
 
-        lurek.camera.set(-cam_x + shake_x, -cam_y + shake_y)
+        _cam:setPosition(-cam_x + shake_x, -cam_y + shake_y)
 
         -- draw tiles
         for r = 1, ROWS do
@@ -652,7 +653,7 @@ function lurek.draw()
         lurek.render.rectangle(px, py, TILE - 8, TILE - 8, 0.2, 0.4, 1.0)
         lurek.render.rectangle(px + 2, py + 2, TILE - 12, TILE - 12, 0.3, 0.5, 1.0)
 
-        lurek.camera.reset()
+        _cam:reset()
     end
 
     -- battle scene background

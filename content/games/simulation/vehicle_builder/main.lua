@@ -247,7 +247,7 @@ lurek.input.bind("quit",    "escape")
 
 function lurek.init()
     lurek.window.setTitle("Vehicle Builder — Lurek2D")
-    lurek.window.setBackgroundColor(0.1, 0.1, 0.12)
+    lurek.render.setBackgroundColor(0.1, 0.1, 0.12)
     clear_grid()
 end
 
@@ -713,7 +713,7 @@ function lurek.draw_ui()
         lurek.render.rectangle(0, 0, SCREEN_W, 28)
 
         lurek.render.setColor(0.9, 0.9, 0.9, 1)
-        lurek.render.print(string.format("FPS: %d", lurek.timer.getFps()), 10, 6, 14)
+        lurek.render.print(string.format("FPS: %d", lurek.timer.getFPS()), 10, 6, 14)
 
         -- Budget
         local budget_color = total_cost <= BUDGET and { 0.3, 1, 0.3 } or { 1, 0.3, 0.3 }
@@ -771,7 +771,7 @@ function lurek.draw_ui()
         lurek.render.rectangle(0, 0, SCREEN_W, 28)
 
         lurek.render.setColor(0.9, 0.9, 0.9, 1)
-        lurek.render.print(string.format("FPS: %d", lurek.timer.getFps()), 10, 6, 14)
+        lurek.render.print(string.format("FPS: %d", lurek.timer.getFPS()), 10, 6, 14)
         lurek.render.print(string.format("Distance: %d", math.floor(test.distance)), 120, 6, 14)
         lurek.render.print(string.format("Track %d/%d", track_index, #TRACKS), 320, 6, 14)
 

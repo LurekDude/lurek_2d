@@ -103,7 +103,7 @@ local function facing_tile()
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
-function lurek.load()
+function lurek.init()
     lurek.window.setTitle("Dungeon Eye — Lurek2D")
     lurek.render.setBackgroundColor(0.03, 0.02, 0.06)
 
@@ -384,7 +384,7 @@ function lurek.draw()
 end
 
 -- ── Keypressed ────────────────────────────────────────────────────────────
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if key == "escape" then
         if show_inv then
             show_inv = false

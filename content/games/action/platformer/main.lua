@@ -225,7 +225,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Platformer — Lurek2D")
-    lurek.window.setBackgroundColor(0.3, 0.5, 0.8)
+    lurek.render.setBackgroundColor(0.3, 0.5, 0.8)
 
     -- Input actions
     lurek.input.bind("left",  {"a", "left"})
@@ -234,28 +234,28 @@ function lurek.init()
     lurek.input.bind("quit",  {"escape"})
 
     -- Particle systems
-    dust_ps = lurek.particle.new({
+    dust_ps = lurek.particle.newSystem({
         maxParticles = 20, lifetime = 0.3,
         speed = 30, spread = 3.14,
         sizeStart = 3, sizeEnd = 1,
         colorStart = {0.7, 0.6, 0.4, 0.8},
         colorEnd   = {0.7, 0.6, 0.4, 0.0},
     })
-    coin_ps = lurek.particle.new({
+    coin_ps = lurek.particle.newSystem({
         maxParticles = 15, lifetime = 0.4,
         speed = 60, spread = 6.28,
         sizeStart = 3, sizeEnd = 1,
         colorStart = {1.0, 0.9, 0.2, 1.0},
         colorEnd   = {1.0, 0.9, 0.2, 0.0},
     })
-    stomp_ps = lurek.particle.new({
+    stomp_ps = lurek.particle.newSystem({
         maxParticles = 12, lifetime = 0.35,
         speed = 50, spread = 3.14,
         sizeStart = 4, sizeEnd = 1,
         colorStart = {0.9, 0.3, 0.1, 0.9},
         colorEnd   = {0.5, 0.1, 0.0, 0.0},
     })
-    death_ps = lurek.particle.new({
+    death_ps = lurek.particle.newSystem({
         maxParticles = 30, lifetime = 0.5,
         speed = 100, spread = 6.28,
         sizeStart = 4, sizeEnd = 2,
@@ -279,7 +279,7 @@ function lurek.process(dt)
 
     -- ── Title ─────────────────────────────────────────────────────────────
     if game_state == STATE.TITLE then
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             game_state = STATE.PLAYING
             score = 0
             lives = 3
@@ -291,7 +291,7 @@ function lurek.process(dt)
 
     -- ── Level complete ────────────────────────────────────────────────────
     if game_state == STATE.LEVEL_COMPLETE then
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             game_state = STATE.PLAYING
         end
         return
@@ -299,7 +299,7 @@ function lurek.process(dt)
 
     -- ── Game over ─────────────────────────────────────────────────────────
     if game_state == STATE.GAME_OVER then
-        if lurek.input.isKeyJustPressed("return") then
+        if lurek.input.wasActionPressed("return") then
             game_state = STATE.TITLE
         end
         return

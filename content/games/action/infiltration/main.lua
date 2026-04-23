@@ -237,7 +237,7 @@ end
 -- â”€â”€ lurek.init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function lurek.init()
     lurek.window.setTitle("Infiltration â€” Lurek2D")
-    lurek.window.setBackgroundColor(0.02, 0.02, 0.04)
+    lurek.render.setBackgroundColor(0.02, 0.02, 0.04)
 
     lurek.input.bind("up",      {"w", "up"})
     lurek.input.bind("down",    {"s", "down"})
@@ -254,7 +254,7 @@ function lurek.init()
     lurek.input.bind("quit",    {"escape"})
 
     -- Particle emitters
-    emp_particles = lurek.particle.new({
+    emp_particles = lurek.particle.newSystem({
         max       = 60,
         lifetime  = {0.4, 0.8},
         speed     = {80, 160},
@@ -263,7 +263,7 @@ function lurek.init()
         sizes     = {4, 1},
     })
 
-    hack_particles = lurek.particle.new({
+    hack_particles = lurek.particle.newSystem({
         max       = 40,
         lifetime  = {0.2, 0.5},
         speed     = {40, 100},

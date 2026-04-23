@@ -355,7 +355,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Entity Showcase — Lurek2D")
-    lurek.window.setBackgroundColor(0.06, 0.08, 0.1)
+    lurek.render.setBackgroundColor(0.06, 0.08, 0.1)
 end
 
 local function _ready_setup()
@@ -375,24 +375,24 @@ function lurek.process(dt)
     -- Title
     if state == STATE_TITLE then
         title_timer = title_timer + dt
-        if lurek.input.pressed("chapter_1") then switch_chapter(STATE_CH1) end
-        if lurek.input.pressed("chapter_2") then switch_chapter(STATE_CH2) end
-        if lurek.input.pressed("chapter_3") then switch_chapter(STATE_CH3) end
-        if lurek.input.pressed("chapter_4") then switch_chapter(STATE_CH4) end
-        if lurek.input.pressed("chapter_5") then switch_chapter(STATE_CH5) end
-        if lurek.input.pressed("chapter_6") then switch_chapter(STATE_CH6) end
-        if lurek.input.pressed("quit") then lurek.event.quit() end
+        if lurek.input.wasActionPressed("chapter_1") then switch_chapter(STATE_CH1) end
+        if lurek.input.wasActionPressed("chapter_2") then switch_chapter(STATE_CH2) end
+        if lurek.input.wasActionPressed("chapter_3") then switch_chapter(STATE_CH3) end
+        if lurek.input.wasActionPressed("chapter_4") then switch_chapter(STATE_CH4) end
+        if lurek.input.wasActionPressed("chapter_5") then switch_chapter(STATE_CH5) end
+        if lurek.input.wasActionPressed("chapter_6") then switch_chapter(STATE_CH6) end
+        if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
         return
     end
 
     -- Chapter switching (always available)
-    if lurek.input.pressed("chapter_1") then switch_chapter(STATE_CH1) end
-    if lurek.input.pressed("chapter_2") then switch_chapter(STATE_CH2) end
-    if lurek.input.pressed("chapter_3") then switch_chapter(STATE_CH3) end
-    if lurek.input.pressed("chapter_4") then switch_chapter(STATE_CH4) end
-    if lurek.input.pressed("chapter_5") then switch_chapter(STATE_CH5) end
-    if lurek.input.pressed("chapter_6") then switch_chapter(STATE_CH6) end
-    if lurek.input.pressed("quit") then lurek.event.quit() end
+    if lurek.input.wasActionPressed("chapter_1") then switch_chapter(STATE_CH1) end
+    if lurek.input.wasActionPressed("chapter_2") then switch_chapter(STATE_CH2) end
+    if lurek.input.wasActionPressed("chapter_3") then switch_chapter(STATE_CH3) end
+    if lurek.input.wasActionPressed("chapter_4") then switch_chapter(STATE_CH4) end
+    if lurek.input.wasActionPressed("chapter_5") then switch_chapter(STATE_CH5) end
+    if lurek.input.wasActionPressed("chapter_6") then switch_chapter(STATE_CH6) end
+    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
     -- Panel tween
     panel_offset = lerp(panel_offset, panel_offset_target, dt * PANEL_SLIDE_SPEED)
@@ -406,7 +406,7 @@ function lurek.process(dt)
     end
 
     -- Entity selection via mouse click
-    if lurek.input.pressed("select") then
+    if lurek.input.wasActionPressed("select") then
         local mx, my = lurek.input.mouse.getPosition()
         local best_id = nil
         local best_dist = ENTITY_RADIUS + 4
@@ -427,12 +427,12 @@ function lurek.process(dt)
 
     -- Chapter-specific logic
     if state == STATE_CH1 then
-        if lurek.input.pressed("spawn") then
+        if lurek.input.wasActionPressed("spawn") then
             local e = new_entity({ color = true })
             spawn_particles(e.x, e.y, e.r, e.g, e.b, SPAWN_BURST_COUNT, 35)
             log_event(string.format("Spawned entity #%d", e.id), 0.3, 1, 0.3)
         end
-        if lurek.input.pressed("destroy") then
+        if lurek.input.wasActionPressed("destroy") then
             if selected_id and entities[selected_id] then
                 local e = entities[selected_id]
                 spawn_particles(e.x, e.y, 1, 0.3, 0.3, DESTROY_POOF_COUNT, 30)
@@ -452,24 +452,24 @@ function lurek.process(dt)
     elseif state == STATE_CH2 then
         if selected_id and entities[selected_id] then
             local e = entities[selected_id]
-            if lurek.input.pressed("toggle_position") then
+            if lurek.input.wasActionPressed("toggle_position") then
                 e.has_position = not e.has_position
                 component_counts.position = component_counts.position + (e.has_position and 1 or -1)
                 log_event(string.format("#%d Position %s", e.id, e.has_position and "ON" or "OFF"), 0.4, 0.8, 1)
             end
-            if lurek.input.pressed("toggle_velocity") then
+            if lurek.input.wasActionPressed("toggle_velocity") then
                 e.has_velocity = not e.has_velocity
                 component_counts.velocity = component_counts.velocity + (e.has_velocity and 1 or -1)
                 if e.has_velocity then e.vx = -30 + math.random() * 60; e.vy = -30 + math.random() * 60 end
                 log_event(string.format("#%d Velocity %s", e.id, e.has_velocity and "ON" or "OFF"), 0.4, 1, 0.6)
             end
-            if lurek.input.pressed("toggle_health") then
+            if lurek.input.wasActionPressed("toggle_health") then
                 e.has_health = not e.has_health
                 component_counts.health = component_counts.health + (e.has_health and 1 or -1)
                 if e.has_health then e.health = 100 end
                 log_event(string.format("#%d Health %s", e.id, e.has_health and "ON" or "OFF"), 1, 0.5, 0.5)
             end
-            if lurek.input.pressed("toggle_color") then
+            if lurek.input.wasActionPressed("toggle_color") then
                 e.has_color = not e.has_color
                 component_counts.color = component_counts.color + (e.has_color and 1 or -1)
                 if e.has_color then e.r = 0.3 + math.random() * 0.7; e.g = 0.3 + math.random() * 0.7; e.b = 0.3 + math.random() * 0.7 end
@@ -479,7 +479,7 @@ function lurek.process(dt)
         system_movement(dt)
 
     elseif state == STATE_CH3 then
-        if lurek.input.pressed("spawn") then
+        if lurek.input.wasActionPressed("spawn") then
             local e = new_entity({ velocity = true, health = true, color = true, health_val = 60 + math.random() * 40 })
             spawn_particles(e.x, e.y, e.r, e.g, e.b, SPAWN_BURST_COUNT, 35)
         end
@@ -487,7 +487,7 @@ function lurek.process(dt)
         system_health(dt)
 
     elseif state == STATE_CH4 then
-        if lurek.input.pressed("spawn") then
+        if lurek.input.wasActionPressed("spawn") then
             local use_vel = math.random() > 0.4
             local use_hp = math.random() > 0.4
             new_entity({ velocity = use_vel, health = use_hp, color = true })
@@ -495,7 +495,7 @@ function lurek.process(dt)
         system_movement(dt)
 
     elseif state == STATE_CH5 then
-        if lurek.input.pressed("spawn") then
+        if lurek.input.wasActionPressed("spawn") then
             local e = new_entity({ velocity = true, health = true, color = true, health_val = 80 })
             spawn_particles(e.x, e.y, e.r, e.g, e.b, SPAWN_BURST_COUNT, 35)
             log_event(string.format("SPAWN: Entity #%d created", e.id), 0.3, 1, 0.4)
@@ -505,7 +505,7 @@ function lurek.process(dt)
         system_health(dt)
 
     elseif state == STATE_CH6 then
-        if lurek.input.pressed("spawn") then
+        if lurek.input.wasActionPressed("spawn") then
             for i = 1, MAX_ENTITIES_STRESS do
                 new_entity({
                     velocity = true, color = true, health = true,
@@ -515,7 +515,7 @@ function lurek.process(dt)
                 })
             end
         end
-        if lurek.input.pressed("destroy") then
+        if lurek.input.wasActionPressed("destroy") then
             clear_entities()
         end
         system_movement(dt)

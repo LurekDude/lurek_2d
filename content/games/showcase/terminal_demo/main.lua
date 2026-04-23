@@ -94,13 +94,13 @@ local function grid_y(row) return (row - 1) * CELL_H end
 local function draw_char(ch, col, row, color, alpha)
     local c = color or COL_GREEN
     lurek.render.setColor(c[1], c[2], c[3], alpha or 1)
-    lurek.render.drawText(ch, grid_x(col), grid_y(row))
+    lurek.render.print(ch, grid_x(col), grid_y(row))
 end
 
 local function draw_string(str, col, row, color, alpha)
     local c = color or COL_GREEN
     lurek.render.setColor(c[1], c[2], c[3], alpha or 1)
-    lurek.render.drawText(str, grid_x(col), grid_y(row))
+    lurek.render.print(str, grid_x(col), grid_y(row))
 end
 
 local function draw_box(c1, r1, c2, r2, color)
@@ -330,7 +330,7 @@ function lurek.textinput(text)
     end
 end
 
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     -- Title → start
     if current_state == STATE_TITLE then
         if key ~= "escape" then current_state = STATE_PAGE_1 end
@@ -601,5 +601,5 @@ function lurek.draw_ui()
 
     -- ── HUD ───────────────────────────────────────────────────
     lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.4)
-    lurek.render.drawText(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 18)
+    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 18)
 end

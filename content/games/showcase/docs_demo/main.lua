@@ -414,7 +414,7 @@ function lurek.process(dt)
             current_state = STATE.BROWSING
         end
         -- Text input via character callback
-        local ch = lurek.input.getTextInput()
+        local ch = nil -- TODO: getTextInput removed; wire up text input via lurek.event
         if ch and #ch > 0 then
             search_query = search_query .. ch
             do_search(search_query)
@@ -739,7 +739,7 @@ function lurek.draw_ui()
 end
 
 -- ── Keyboard text input for search ─────────────────────────────────────────
-function lurek.keypressed(key)
+function lurek._keypressed(key)
     if current_state == STATE.SEARCH then
         if key == "backspace" and #search_query > 0 then
             search_query = search_query:sub(1, -2)

@@ -56,6 +56,7 @@ local tweens        = {}
 -- ── Helpers ────────────────────────────────────────────────────────────
 
 local function clamp(v, lo, hi)
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     if v < lo then return lo end
     if v > hi then return hi end
     return v
@@ -260,7 +261,7 @@ lurek.input.bind("quit",       "escape")
 -- ── Callbacks ──────────────────────────────────────────────────────────
 
 function lurek.init()
-    screen_w, screen_h = lurek.window.getSize()
+    screen_w, screen_h = lurek.window.getDimensions()
     lurek.render.setBackgroundColor(0.1, 0.15, 0.1)
     generate_world()
     generate_pois()
@@ -337,7 +338,7 @@ function lurek.process(dt)
     local cam_y = player_draw_y - screen_h / 2 + PLAYER_SIZE / 2
     cam_x = clamp(cam_x, 0, WORLD_PX_W - screen_w)
     cam_y = clamp(cam_y, 0, WORLD_PX_H - screen_h)
-    lurek.camera.setPosition(cam_x, cam_y)
+    _cam:setPosition(cam_x, cam_y)
 
     update_visibility()
 
@@ -397,7 +398,7 @@ function lurek.draw()
         return
     end
 
-    local cam_x, cam_y = lurek.camera.getPosition()
+    local cam_x, cam_y = _cam:getPosition()
 
     -- calculate visible tile range
     local start_tx = math.floor(cam_x / TILE_SIZE)
@@ -523,7 +524,7 @@ function lurek.draw_ui()
         end
 
         -- viewport rectangle
-        local cam_x, cam_y = lurek.camera.getPosition()
+        local cam_x, cam_y = _cam:getPosition()
         local vx = mx + (cam_x / TILE_SIZE) * scale
         local vy = my + (cam_y / TILE_SIZE) * scale
         local vw = (screen_w / TILE_SIZE) * scale

@@ -331,7 +331,7 @@ local function update_enemies(dt)
             e.hp = e.hp - 2
             if e.hp <= 0 then
                 if death_particles then
-                    lurek.particle.emit(death_particles, e.x + e.w / 2, e.y + e.h / 2, 8)
+                    death_particles:emit(e.x + e.w / 2, e.y + e.h / 2, 8)
                 end
                 table.remove(enemies, i)
             end
@@ -373,7 +373,7 @@ local function try_break_dash_gates()
                 if room[row][col] == 3 and player.has_dash then
                     room[row][col] = 0
                     if death_particles then
-                        lurek.particle.emit(death_particles, (col - 0.5) * TILE, (row - 0.5) * TILE, 6)
+                        death_particles:emit((col - 0.5) * TILE, (row - 0.5) * TILE, 6)
                     end
                 end
             end
@@ -394,28 +394,28 @@ function lurek.init()
     lurek.input.bind("quit",  { "escape" })
 
     -- Particle systems
-    death_particles = lurek.particle.new({
+    death_particles = lurek.particle.newSystem({
         maxParticles = 30, emitRate = 0,
         lifetime = { 0.3, 0.6 },
         speed = { 30, 80 },
         colors = { { 1, 0.4, 0.2, 1 }, { 1, 0.8, 0.1, 0 } },
         sizes = { 3, 0 },
     })
-    dash_particles = lurek.particle.new({
+    dash_particles = lurek.particle.newSystem({
         maxParticles = 20, emitRate = 0,
         lifetime = { 0.1, 0.25 },
         speed = { 5, 15 },
         colors = { { 0.3, 0.8, 1, 0.8 }, { 0.1, 0.3, 1, 0 } },
         sizes = { 4, 1 },
     })
-    land_particles = lurek.particle.new({
+    land_particles = lurek.particle.newSystem({
         maxParticles = 10, emitRate = 0,
         lifetime = { 0.15, 0.3 },
         speed = { 20, 50 },
         colors = { { 0.6, 0.5, 0.4, 0.7 }, { 0.4, 0.3, 0.2, 0 } },
         sizes = { 2, 0 },
     })
-    pickup_particles = lurek.particle.new({
+    pickup_particles = lurek.particle.newSystem({
         maxParticles = 20, emitRate = 0,
         lifetime = { 0.3, 0.7 },
         speed = { 20, 60 },
@@ -473,7 +473,7 @@ function lurek.process(dt)
         player.vx = player.dash_dir * DASH_SPEED
         player.vy = 0
         if dash_particles then
-            lurek.particle.emit(dash_particles, player.x + PLAYER_W / 2, player.y + PLAYER_H / 2, 1)
+            dash_particles:emit(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2, 1)
         end
         if player.dash_timer <= 0 then
             player.dashing = false
@@ -549,7 +549,7 @@ function lurek.process(dt)
             player.on_ground = true
             player.jumps_left = player.has_double and 2 or 1
             if was_in_air and land_particles then
-                lurek.particle.emit(land_particles, player.x + PLAYER_W / 2, player.y + PLAYER_H, 4)
+                land_particles:emit(player.x + PLAYER_W / 2, player.y + PLAYER_H, 4)
             end
         end
         player.vy = 0
@@ -603,7 +603,7 @@ function lurek.process(dt)
                 if it.type == "dash" then player.has_dash = true end
                 if it.type == "double" then player.has_double = true; player.jumps_left = 2 end
                 if pickup_particles then
-                    lurek.particle.emit(pickup_particles, it.x, it.y, 15)
+                    pickup_particles:emit(it.x, it.y, 15)
                 end
             end
         end
@@ -616,7 +616,7 @@ function lurek.process(dt)
                 hp.collected = true
                 player.hp = math.min(player.hp + 1, MAX_HP)
                 if pickup_particles then
-                    lurek.particle.emit(pickup_particles, hp.x, hp.y, 8)
+                    pickup_particles:emit(hp.x, hp.y, 8)
                 end
             end
         end
@@ -626,10 +626,10 @@ function lurek.process(dt)
     update_enemies(dt)
 
     -- Update particles
-    if death_particles  then lurek.particle.update(death_particles, dt)  end
-    if dash_particles   then lurek.particle.update(dash_particles, dt)   end
-    if land_particles   then lurek.particle.update(land_particles, dt)   end
-    if pickup_particles then lurek.particle.update(pickup_particles, dt) end
+    if death_particles  then death_particles:update(dt)  end
+    if dash_particles   then dash_particles:update(dt)   end
+    if land_particles   then land_particles:update(dt)   end
+    if pickup_particles then pickup_particles:update(dt) end
 end
 
 -- ── Tile colors ───────────────────────────────────────────────────────────
@@ -672,7 +672,7 @@ function lurek.draw()
                     local c = TILE_COLORS[t]
                     if c then
                         lurek.render.setColor(c[1], c[2], c[3], 1)
-                        lurek.render.fillRect((col - 1) * TILE, (row - 1) * TILE, TILE, TILE)
+                        lurek.render.rectangle((col - 1) * TILE, (row - 1) * TILE, TILE, TILE)
                     end
                 end
             end
@@ -684,7 +684,7 @@ function lurek.draw()
         if not hp.collected and hp.rx == room_x and hp.ry == room_y then
             local pulse = 0.6 + 0.4 * math.sin(lurek.timer.getTime() * 4)
             lurek.render.setColor(0.2, 1, 0.3, pulse)
-            lurek.render.fillCircle(hp.x, hp.y, 4)
+            lurek.render.circle(hp.x, hp.y, 4)
         end
     end
 
@@ -697,9 +697,9 @@ function lurek.draw()
             else
                 lurek.render.setColor(1, 1, 0.3, pulse)
             end
-            lurek.render.fillCircle(it.x, it.y, 6)
+            lurek.render.circle(it.x, it.y, 6)
             lurek.render.setColor(1, 1, 1, pulse * 0.5)
-            lurek.render.fillCircle(it.x, it.y, 3)
+            lurek.render.circle(it.x, it.y, 3)
         end
     end
 
@@ -707,22 +707,22 @@ function lurek.draw()
     for _, e in ipairs(enemies) do
         if e.type == "walker" then
             lurek.render.setColor(0.9, 0.2, 0.2, 1)
-            lurek.render.fillRect(e.x, e.y, e.w, e.h)
+            lurek.render.rectangle(e.x, e.y, e.w, e.h)
         elseif e.type == "flyer" then
             lurek.render.setColor(1, 0.5, 0.1, 1)
-            lurek.render.fillCircle(e.x + e.w / 2, e.y + e.h / 2, e.w / 2)
+            lurek.render.circle(e.x + e.w / 2, e.y + e.h / 2, e.w / 2)
         elseif e.type == "turret" then
             lurek.render.setColor(0.8, 0.2, 0.6, 1)
-            lurek.render.fillRect(e.x, e.y, e.w, e.h)
+            lurek.render.rectangle(e.x, e.y, e.w, e.h)
             lurek.render.setColor(1, 0.3, 0.3, 1)
-            lurek.render.fillCircle(e.x + e.w / 2, e.y + e.h / 2, 3)
+            lurek.render.circle(e.x + e.w / 2, e.y + e.h / 2, 3)
         end
     end
 
     -- Draw projectiles
     lurek.render.setColor(1, 0.3, 0.3, 0.9)
     for _, p in ipairs(projectiles) do
-        lurek.render.fillCircle(p.x, p.y, p.r)
+        lurek.render.circle(p.x, p.y, p.r)
     end
 
     -- Draw player
@@ -736,29 +736,29 @@ function lurek.draw()
         else
             lurek.render.setColor(0.3, 0.5, 1, 1)
         end
-        lurek.render.fillRect(player.x, player.y, PLAYER_W, PLAYER_H)
+        lurek.render.rectangle(player.x, player.y, PLAYER_W, PLAYER_H)
         -- Eyes
         lurek.render.setColor(1, 1, 1, 1)
         local eye_x = player.facing == 1 and (player.x + 10) or (player.x + 4)
-        lurek.render.fillRect(eye_x, player.y + 6, 3, 3)
+        lurek.render.rectangle(eye_x, player.y + 6, 3, 3)
     end
 
     -- Particles (in world space)
-    if death_particles  then lurek.particle.draw(death_particles)  end
-    if dash_particles   then lurek.particle.draw(dash_particles)   end
-    if land_particles   then lurek.particle.draw(land_particles)   end
-    if pickup_particles then lurek.particle.draw(pickup_particles) end
+    if death_particles  then lurek.render.draw(death_particles)  end
+    if dash_particles   then lurek.render.draw(dash_particles)   end
+    if land_particles   then lurek.render.draw(land_particles)   end
+    if pickup_particles then lurek.render.draw(pickup_particles) end
 
     -- Transition fade overlay
     if fade_alpha > 0 then
         lurek.render.setColor(0, 0, 0, fade_alpha)
-        lurek.render.fillRect(0, 0, LOGICAL_W, LOGICAL_H)
+        lurek.render.rectangle(0, 0, LOGICAL_W, LOGICAL_H)
     end
 
     -- Damage flash overlay
     if damage_flash > 0 then
         lurek.render.setColor(1, 0, 0, damage_flash * 0.4)
-        lurek.render.fillRect(0, 0, LOGICAL_W, LOGICAL_H)
+        lurek.render.rectangle(0, 0, LOGICAL_W, LOGICAL_H)
     end
 
     lurek.render.pop()
@@ -770,20 +770,20 @@ function lurek.draw_ui()
 
     -- HP bar
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.fillRect(8, 8, MAX_HP * 22 + 4, 18)
+    lurek.render.rectangle(8, 8, MAX_HP * 22 + 4, 18)
     for i = 1, MAX_HP do
         if i <= player.hp then
             lurek.render.setColor(0.2, 0.9, 0.3, 1)
         else
             lurek.render.setColor(0.3, 0.1, 0.1, 1)
         end
-        lurek.render.fillRect(10 + (i - 1) * 22, 10, 18, 14)
+        lurek.render.rectangle(10 + (i - 1) * 22, 10, 18, 14)
     end
 
     -- Ability icons
     local ax = SCREEN_W - 90
     lurek.render.setColor(0.15, 0.15, 0.2, 0.8)
-    lurek.render.fillRect(ax - 4, 6, 88, 22)
+    lurek.render.rectangle(ax - 4, 6, 88, 22)
     -- Dash
     if player.has_dash then
         lurek.render.setColor(0.3, 0.8, 1, 1)
@@ -804,7 +804,7 @@ function lurek.draw_ui()
     local mm_y = SCREEN_H - 70
     local mm_cell = 16
     lurek.render.setColor(0.1, 0.1, 0.15, 0.8)
-    lurek.render.fillRect(mm_x - 4, mm_y - 4, 3 * mm_cell + 8, 3 * mm_cell + 8)
+    lurek.render.rectangle(mm_x - 4, mm_y - 4, 3 * mm_cell + 8, 3 * mm_cell + 8)
 
     for ry = 0, 2 do
         for rx = 0, 2 do
@@ -819,7 +819,7 @@ function lurek.draw_ui()
                 else
                     lurek.render.setColor(0.15, 0.15, 0.2, 0.6)
                 end
-                lurek.render.fillRect(cx + 1, cy + 1, mm_cell - 2, mm_cell - 2)
+                lurek.render.rectangle(cx + 1, cy + 1, mm_cell - 2, mm_cell - 2)
             end
         end
     end

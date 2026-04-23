@@ -154,7 +154,7 @@ local function spawn_particle(x, y, r, g, b, count, speed, life)
     local e = particle.newEmitter(x, y)
     e:setColors(r, g, b, 1.0)
     e:setSpeed(speed or 60)
-    e:setLifetime(life or 0.5)
+    e:setParticleLifetime(life or 0.5)
     e:setSizes(3, 1)
     e:emit(count or 8)
     emitters[#emitters + 1] = { em = e, timer = (life or 0.5) + 0.2 }
@@ -475,39 +475,39 @@ end
 function lurek.draw()
     if state == STATE_TITLE then
         -- Title screen
-        lurek.render.drawText("PARADROID", 240, 160, 48, 0.3, 0.8, 1.0)
-        lurek.render.drawText("Lurek2D Remake", 290, 220, 18, 0.5, 0.5, 0.6)
+        lurek.render.print("PARADROID", 240, 160, 48, 0.3, 0.8, 1.0)
+        lurek.render.print("Lurek2D Remake", 290, 220, 18, 0.5, 0.5, 0.6)
 
         -- Animated droid number
         local display_num = math.floor(title_blink * 5) % 999
         local num_str = string.format("%03d", display_num)
-        lurek.render.drawCircle(400, 340, 40, 0.2, 0.6, 0.8, 1.0)
-        lurek.render.drawCircleLines(400, 340, 42, 0.4, 0.8, 1.0, 1.0)
-        lurek.render.drawText(num_str, 376, 328, 24, 1, 1, 1)
+        lurek.render.circle(400, 340, 40, 0.2, 0.6, 0.8, 1.0)
+        lurek.render.circle("line", 400, 340, 42, 0.4, 0.8, 1.0, 1.0)
+        lurek.render.print(num_str, 376, 328, 24, 1, 1, 1)
 
         if math.floor(title_blink * 2) % 2 == 0 then
-            lurek.render.drawText("PRESS SPACE TO START", 270, 440, 20, 0.8, 0.8, 0.8)
+            lurek.render.print("PRESS SPACE TO START", 270, 440, 20, 0.8, 0.8, 0.8)
         end
 
-        lurek.render.drawText("Arrow keys: Move | Space: Fire | E: Transfer", 175, 500, 14, 0.4, 0.4, 0.5)
+        lurek.render.print("Arrow keys: Move | Space: Fire | E: Transfer", 175, 500, 14, 0.4, 0.4, 0.5)
         return
     end
 
     if state == STATE_GAME_OVER then
-        lurek.render.drawText("GAME OVER", 260, 220, 48, 1, 0.3, 0.2)
-        lurek.render.drawText("Score: " .. score, 330, 290, 24, 0.8, 0.8, 0.8)
-        lurek.render.drawText("Level: " .. level, 345, 330, 20, 0.6, 0.6, 0.6)
+        lurek.render.print("GAME OVER", 260, 220, 48, 1, 0.3, 0.2)
+        lurek.render.print("Score: " .. score, 330, 290, 24, 0.8, 0.8, 0.8)
+        lurek.render.print("Level: " .. level, 345, 330, 20, 0.6, 0.6, 0.6)
         if math.floor(title_blink * 2) % 2 == 0 then
-            lurek.render.drawText("PRESS SPACE", 320, 420, 20, 0.7, 0.7, 0.7)
+            lurek.render.print("PRESS SPACE", 320, 420, 20, 0.7, 0.7, 0.7)
         end
         return
     end
 
     if state == STATE_LEVEL_CLEAR then
-        lurek.render.drawText("LEVEL " .. level .. " CLEAR", 240, 240, 40, 0.3, 1, 0.4)
-        lurek.render.drawText("Score: " .. score, 330, 310, 24, 0.8, 0.8, 0.8)
+        lurek.render.print("LEVEL " .. level .. " CLEAR", 240, 240, 40, 0.3, 1, 0.4)
+        lurek.render.print("Score: " .. score, 330, 310, 24, 0.8, 0.8, 0.8)
         if math.floor(title_blink * 2) % 2 == 0 then
-            lurek.render.drawText("PRESS SPACE FOR NEXT LEVEL", 225, 400, 18, 0.7, 0.7, 0.7)
+            lurek.render.print("PRESS SPACE FOR NEXT LEVEL", 225, 400, 18, 0.7, 0.7, 0.7)
         end
         return
     end
@@ -524,10 +524,10 @@ function lurek.draw()
                 local wy = PLAY_Y + r * CELL
                 if room_walls[r][c] then
                     lurek.render.rectangle(wx, wy, CELL, CELL, 0.15, 0.15, 0.2, 1)
-                    lurek.render.drawRectLines(wx, wy, CELL, CELL, 0.2, 0.2, 0.28, 1)
+                    lurek.render.rectangle("line", wx, wy, CELL, CELL, 0.2, 0.2, 0.28, 1)
                 else
                     -- Floor tile lines
-                    lurek.render.drawRectLines(wx, wy, CELL, CELL, 0.06, 0.06, 0.1, 0.3)
+                    lurek.render.rectangle("line", wx, wy, CELL, CELL, 0.06, 0.06, 0.1, 0.3)
                 end
             end
         end
@@ -536,9 +536,9 @@ function lurek.draw()
     -- Draw bullets
     for _, b in ipairs(bullets) do
         if b.owner == "player" then
-            lurek.render.drawCircle(b.x, b.y, 3, 0.5, 0.9, 1.0, 1)
+            lurek.render.circle(b.x, b.y, 3, 0.5, 0.9, 1.0, 1)
         else
-            lurek.render.drawCircle(b.x, b.y, 3, 1.0, 0.4, 0.2, 1)
+            lurek.render.circle(b.x, b.y, 3, 1.0, 0.4, 0.2, 1)
         end
     end
 
@@ -546,9 +546,9 @@ function lurek.draw()
     for _, e in ipairs(enemies) do
         if e.alive then
             local c = e.color
-            lurek.render.drawCircle(e.x, e.y, 14, c[1], c[2], c[3], 1)
-            lurek.render.drawCircleLines(e.x, e.y, 15, c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 1)
-            lurek.render.drawText(e.num, e.x - 12, e.y - 6, 12, 1, 1, 1)
+            lurek.render.circle(e.x, e.y, 14, c[1], c[2], c[3], 1)
+            lurek.render.circle("line", e.x, e.y, 15, c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 1)
+            lurek.render.print(e.num, e.x - 12, e.y - 6, 12, 1, 1, 1)
             -- HP bar
             local hp_frac = e.hp / e.max_hp
             lurek.render.rectangle(e.x - 12, e.y - 22, 24, 3, 0.3, 0.1, 0.1, 1)
@@ -559,14 +559,14 @@ function lurek.draw()
     -- Draw player
     local ps = get_droid_stats(player.droid_class)
     local pc = ps.color
-    lurek.render.drawCircle(player.x, player.y, 14, pc[1], pc[2], pc[3], 1)
-    lurek.render.drawCircleLines(player.x, player.y, 16, 1, 1, 1, 0.8)
-    lurek.render.drawText(player.droid_num, player.x - 12, player.y - 6, 12, 1, 1, 1)
+    lurek.render.circle(player.x, player.y, 14, pc[1], pc[2], pc[3], 1)
+    lurek.render.circle("line", player.x, player.y, 16, 1, 1, 1, 0.8)
+    lurek.render.print(player.droid_num, player.x - 12, player.y - 6, 12, 1, 1, 1)
 
     -- Direction indicator
     local dv = DIR_VEC[player.dir]
     if dv then
-        lurek.render.drawCircle(player.x + dv.dx * 18, player.y + dv.dy * 18, 3, 1, 1, 1, 0.7)
+        lurek.render.circle(player.x + dv.dx * 18, player.y + dv.dy * 18, 3, 1, 1, 1, 0.7)
     end
 
     -- Particles
@@ -579,8 +579,8 @@ function lurek.draw()
         -- Dim background
         lurek.render.rectangle(0, 0, 800, 600, 0, 0, 0, 0.6)
 
-        lurek.render.drawText("TRANSFER SEQUENCE", 250, 100, 28, 0.4, 0.8, 1.0)
-        lurek.render.drawText("Mash WASD to boost!", 280, 140, 16, 0.6, 0.6, 0.7)
+        lurek.render.print("TRANSFER SEQUENCE", 250, 100, 28, 0.4, 0.8, 1.0)
+        lurek.render.print("Mash WASD to boost!", 280, 140, 16, 0.6, 0.6, 0.7)
 
         -- Player bar
         local bar_w = 300
@@ -589,17 +589,17 @@ function lurek.draw()
         local p_frac = math.min(transfer.player_bar / TRANSFER_BAR_MAX, 1.0)
         local e_frac = math.min(transfer.enemy_bar / TRANSFER_BAR_MAX, 1.0)
 
-        lurek.render.drawText("YOU [" .. player.droid_num .. "]", bar_x, 200, 16, 0.3, 0.8, 1.0)
+        lurek.render.print("YOU [" .. player.droid_num .. "]", bar_x, 200, 16, 0.3, 0.8, 1.0)
         lurek.render.rectangle(bar_x, 220, bar_w, bar_h, 0.1, 0.1, 0.15, 1)
         lurek.render.rectangle(bar_x, 220, bar_w * p_frac, bar_h, 0.3, 0.7, 1.0, 1)
-        lurek.render.drawRectLines(bar_x, 220, bar_w, bar_h, 0.4, 0.8, 1.0, 1)
+        lurek.render.rectangle("line", bar_x, 220, bar_w, bar_h, 0.4, 0.8, 1.0, 1)
 
         local te = transfer.target
         local tc = te.color
-        lurek.render.drawText("ENEMY [" .. te.num .. "]", bar_x, 280, 16, tc[1], tc[2], tc[3])
+        lurek.render.print("ENEMY [" .. te.num .. "]", bar_x, 280, 16, tc[1], tc[2], tc[3])
         lurek.render.rectangle(bar_x, 300, bar_w, bar_h, 0.1, 0.1, 0.15, 1)
         lurek.render.rectangle(bar_x, 300, bar_w * e_frac, bar_h, tc[1], tc[2], tc[3], 1)
-        lurek.render.drawRectLines(bar_x, 300, bar_w, bar_h, tc[1]*0.7, tc[2]*0.7, tc[3]*0.7, 1)
+        lurek.render.rectangle("line", bar_x, 300, bar_w, bar_h, tc[1]*0.7, tc[2]*0.7, tc[3]*0.7, 1)
 
         -- Timer bar
         local time_frac = math.min(transfer.timer / transfer.duration, 1.0)
@@ -608,9 +608,9 @@ function lurek.draw()
 
         -- Result text
         if transfer.result == "WIN" then
-            lurek.render.drawText("TRANSFER COMPLETE!", 260, 410, 24, 0.3, 1.0, 0.4)
+            lurek.render.print("TRANSFER COMPLETE!", 260, 410, 24, 0.3, 1.0, 0.4)
         elseif transfer.result == "LOSE" then
-            lurek.render.drawText("TRANSFER FAILED!", 270, 410, 24, 1.0, 0.3, 0.2)
+            lurek.render.print("TRANSFER FAILED!", 270, 410, 24, 1.0, 0.3, 0.2)
         end
     end
 end
@@ -622,13 +622,13 @@ function lurek.draw_ui()
     local ps = get_droid_stats(player.droid_class)
     local pc = ps.color
     lurek.render.rectangle(4, 4, 120, 28, 0.05, 0.05, 0.1, 0.9)
-    lurek.render.drawText("DROID " .. player.droid_num, 12, 8, 18, pc[1], pc[2], pc[3])
+    lurek.render.print("DROID " .. player.droid_num, 12, 8, 18, pc[1], pc[2], pc[3])
 
     -- HP
     lurek.render.rectangle(4, 36, 120, 14, 0.1, 0.05, 0.05, 0.9)
     local hp_frac = player.hp / player.max_hp
     lurek.render.rectangle(4, 36, 120 * hp_frac, 14, 0.2, 0.8, 0.3, 1)
-    lurek.render.drawText("HP", 8, 37, 11, 1, 1, 1)
+    lurek.render.print("HP", 8, 37, 11, 1, 1, 1)
 
     -- Energy bar
     lurek.render.rectangle(4, 54, 120, 14, 0.05, 0.05, 0.1, 0.9)
@@ -636,17 +636,17 @@ function lurek.draw_ui()
     local er, eg, eb = 0.3, 0.6, 1.0
     if en_frac < 0.25 then er, eg, eb = 1.0, 0.3, 0.1 end
     lurek.render.rectangle(4, 54, 120 * en_frac, 14, er, eg, eb, 1)
-    lurek.render.drawText("NRG", 8, 55, 11, 1, 1, 1)
+    lurek.render.print("NRG", 8, 55, 11, 1, 1, 1)
 
     -- Score and Level
     lurek.render.rectangle(660, 4, 136, 28, 0.05, 0.05, 0.1, 0.9)
-    lurek.render.drawText("SCORE " .. score, 668, 8, 16, 0.8, 0.8, 0.8)
+    lurek.render.print("SCORE " .. score, 668, 8, 16, 0.8, 0.8, 0.8)
 
     lurek.render.rectangle(660, 36, 136, 18, 0.05, 0.05, 0.1, 0.9)
-    lurek.render.drawText("LEVEL " .. level, 668, 38, 14, 0.6, 0.6, 0.7)
+    lurek.render.print("LEVEL " .. level, 668, 38, 14, 0.6, 0.6, 0.7)
 
     -- FPS
     if dt > 0 then
-        lurek.render.drawText(string.format("FPS %d", math.floor(1 / dt + 0.5)), 4, 580, 12, 0.3, 0.3, 0.4)
+        lurek.render.print(string.format("FPS %d", math.floor(1 / dt + 0.5)), 4, 580, 12, 0.3, 0.3, 0.4)
     end
 end

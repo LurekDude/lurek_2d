@@ -245,7 +245,7 @@ function lurek.process(dt)
 
     -- Quit
     if lurek.input.keyboard.isDown(actions.quit) then
-        lurek.event.signal("quit")
+        lurek.event.push("quit")
         return
     end
 

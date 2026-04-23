@@ -256,7 +256,7 @@ function lurek.process(dt)
         local word = typing.current
         for i = 1, #word do
             local ch = word:sub(i, i):lower()
-            if lurek.input.isKeyJustPressed(ch) then
+            if lurek.input.wasActionPressed(ch) then
                 typing.typed[1] = typing.typed[1] .. word:sub(i, i)
                 if typing.typed[1] == word then
                     typing.winner  = 1
@@ -270,7 +270,7 @@ function lurek.process(dt)
 
     if state == "math" and not math_game.done then
         for _, d in ipairs({"0","1","2","3","4","5","6","7","8","9"}) do
-            if lurek.input.isKeyJustPressed(d) then
+            if lurek.input.wasActionPressed(d) then
                 math_game.p1buf = math_game.p1buf .. d
                 local n = tonumber(math_game.p1buf)
                 if n and n == math_game.answer then

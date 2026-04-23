@@ -278,21 +278,21 @@ function lurek.process(dt)
     -- Title screen
     if current_state == STATE.TITLE then
         title_timer = title_timer + dt
-        if lurek.input.pressed("start") then
+        if lurek.input.wasActionPressed("start") then
             current_state = STATE.RUNNING
         end
         return
     end
 
     -- Quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     -- Weather toggles (1-7)
     for i = 1, #WEATHER do
-        if lurek.input.pressed(WEATHER[i].key) then
+        if lurek.input.wasActionPressed(WEATHER[i].key) then
             WEATHER[i].active = not WEATHER[i].active
             if WEATHER[i].active then
                 weather_ps[i]:start()
@@ -303,34 +303,34 @@ function lurek.process(dt)
     end
 
     -- Time of day cycle
-    if lurek.input.pressed("time_cycle") then
+    if lurek.input.wasActionPressed("time_cycle") then
         local next_tod = (current_tod % 4) + 1
         transition_tod(next_tod)
     end
 
     -- Fog toggle
-    if lurek.input.pressed("fog_toggle") then
+    if lurek.input.wasActionPressed("fog_toggle") then
         fog_active = not fog_active
         if fog_active then fog_ps:start() else fog_ps:stop() end
     end
 
     -- Vignette toggle
-    if lurek.input.pressed("vignette_toggle") then
+    if lurek.input.wasActionPressed("vignette_toggle") then
         vignette_active = not vignette_active
     end
 
     -- Intensity +/-
-    if lurek.input.pressed("intensity_up") then
+    if lurek.input.wasActionPressed("intensity_up") then
         local target = clamp(intensity.val + INTENSITY_STEP, INTENSITY_MIN, INTENSITY_MAX)
         lurek.tween.to(intensity, 0.2, { val = target }, "outQuad")
     end
-    if lurek.input.pressed("intensity_down") then
+    if lurek.input.wasActionPressed("intensity_down") then
         local target = clamp(intensity.val - INTENSITY_STEP, INTENSITY_MIN, INTENSITY_MAX)
         lurek.tween.to(intensity, 0.2, { val = target }, "outQuad")
     end
 
     -- Clear all
-    if lurek.input.pressed("clear_all") then
+    if lurek.input.wasActionPressed("clear_all") then
         clear_all()
     end
 

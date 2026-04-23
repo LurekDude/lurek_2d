@@ -27,6 +27,7 @@ local STATE_SCREEN_7 = "SCREEN_7"
 local STATE_SCREEN_8 = "SCREEN_8"
 
 local SCREEN_STATES = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     STATE_SCREEN_1, STATE_SCREEN_2, STATE_SCREEN_3, STATE_SCREEN_4,
     STATE_SCREEN_5, STATE_SCREEN_6, STATE_SCREEN_7, STATE_SCREEN_8,
 }
@@ -249,7 +250,7 @@ end
 function lurek.init()
     lurek.window.setTitle("Light Showcase — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.05)
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 local function _ready_setup()
@@ -272,7 +273,7 @@ function lurek.process(dt)
     time_acc = time_acc + dt
 
     -- Quit
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
@@ -281,12 +282,12 @@ function lurek.process(dt)
     if state == STATE_TITLE then
         title_timer = title_timer + dt
         for i = 1, NUM_SCREENS do
-            if lurek.input.pressed("screen_" .. i) then
+            if lurek.input.wasActionPressed("screen_" .. i) then
                 switch_screen(i)
                 return
             end
         end
-        if lurek.input.pressed("nav_right") then
+        if lurek.input.wasActionPressed("nav_right") then
             switch_screen(1)
             return
         end
@@ -295,15 +296,15 @@ function lurek.process(dt)
 
     -- Screen switching
     for i = 1, NUM_SCREENS do
-        if lurek.input.pressed("screen_" .. i) then
+        if lurek.input.wasActionPressed("screen_" .. i) then
             switch_screen(i)
             return
         end
     end
-    if lurek.input.pressed("nav_left") then
+    if lurek.input.wasActionPressed("nav_left") then
         switch_screen(screen_index - 1 >= 1 and screen_index - 1 or NUM_SCREENS)
     end
-    if lurek.input.pressed("nav_right") then
+    if lurek.input.wasActionPressed("nav_right") then
         switch_screen(screen_index + 1 <= NUM_SCREENS and screen_index + 1 or 1)
     end
 
@@ -326,13 +327,13 @@ function lurek.process(dt)
         update_flickers(dt)
 
     elseif state == STATE_SCREEN_6 then
-        if lurek.input.pressed("toggle_red") then
+        if lurek.input.wasActionPressed("toggle_red") then
             group_enabled[1] = not group_enabled[1]
         end
-        if lurek.input.pressed("toggle_blue") then
+        if lurek.input.wasActionPressed("toggle_blue") then
             group_enabled[2] = not group_enabled[2]
         end
-        if lurek.input.pressed("toggle_green") then
+        if lurek.input.wasActionPressed("toggle_green") then
             group_enabled[3] = not group_enabled[3]
         end
     end
@@ -369,11 +370,11 @@ function lurek.draw()
                 local a = 0.08 * ring
                 local rr = radius * ring * 0.35
                 lurek.render.setColor(c[1], c[2], c[3], a)
-                lurek.render.circleFill(lx, ly, rr)
+                lurek.render.circle("fill", lx, ly, rr)
             end
             -- Core
             lurek.render.setColor(c[1], c[2], c[3], 0.9)
-            lurek.render.circleFill(lx, ly, 8)
+            lurek.render.circle("fill", lx, ly, 8)
         end
         -- Center marker
         lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
@@ -399,11 +400,11 @@ function lurek.draw()
                 local y2 = cy + math.sin(a2) * reach
                 local fade = 0.12 - 0.06 * (math.abs(s - steps / 2) / (steps / 2))
                 lurek.render.setColor(c[1], c[2], c[3], fade)
-                lurek.render.drawTriangleFill(cx, cy, x1, y1, x2, y2)
+                lurek.render.polygon("fill", cx, cy, x1, y1, x2, y2)
             end
             -- Source dot
             lurek.render.setColor(c[1], c[2], c[3], 0.9)
-            lurek.render.circleFill(cx, cy, 6)
+            lurek.render.circle("fill", cx, cy, 6)
         end
 
     elseif state == STATE_SCREEN_3 then
@@ -421,7 +422,7 @@ function lurek.draw()
         if sky_t > 0.3 then
             -- Sun
             lurek.render.setColor(1.0, 0.9, 0.4, sky_t)
-            lurek.render.circleFill(sun_x, sun_y, 30)
+            lurek.render.circle("fill", sun_x, sun_y, 30)
             -- Sun rays
             for r = 1, 8 do
                 local ra = r * math.pi / 4 + time_acc * 0.3
@@ -435,7 +436,7 @@ function lurek.draw()
         else
             -- Moon
             lurek.render.setColor(0.7, 0.75, 0.9, 0.7)
-            lurek.render.circleFill(sun_x, sun_y, 22)
+            lurek.render.circle("fill", sun_x, sun_y, 22)
         end
 
         -- Ground shadow line
@@ -446,7 +447,7 @@ function lurek.draw()
         -- Scene objects (trees/buildings silhouette)
         lurek.render.setColor(0.08, 0.12, 0.08, 1.0)
         lurek.render.rectangle(ox + 150, SCREEN_H - 180, 30, 80)
-        lurek.render.drawTriangleFill(ox + 115, SCREEN_H - 180, ox + 195, SCREEN_H - 180, ox + 165, SCREEN_H - 260)
+        lurek.render.polygon("fill", ox + 115, SCREEN_H - 180, ox + 195, SCREEN_H - 180, ox + 165, SCREEN_H - 260)
         lurek.render.rectangle(ox + 500, SCREEN_H - 200, 60, 100)
         lurek.render.rectangle(ox + 490, SCREEN_H - 220, 80, 20)
 
@@ -464,11 +465,11 @@ function lurek.draw()
                 local a = val * 0.06 * ring
                 local rr = radius * ring * 0.3
                 lurek.render.setColor(pat.color[1], pat.color[2], pat.color[3], a)
-                lurek.render.circleFill(cx, cy, rr)
+                lurek.render.circle("fill", cx, cy, rr)
             end
             -- Core
             lurek.render.setColor(pat.color[1], pat.color[2], pat.color[3], val)
-            lurek.render.circleFill(cx, cy, 10 + val * 5)
+            lurek.render.circle("fill", cx, cy, 10 + val * 5)
         end
 
     elseif state == STATE_SCREEN_5 then
@@ -492,11 +493,11 @@ function lurek.draw()
                 local intensity = 1.0 / (1.0 + (d * 3) ^ falloff)
                 local rr = d * max_r
                 lurek.render.setColor(0.9, 0.85, 0.6, intensity * 0.3)
-                lurek.render.circleFill(cx, cy, rr)
+                lurek.render.circle("fill", cx, cy, rr)
             end
             -- Core
             lurek.render.setColor(1.0, 0.95, 0.7, 0.9)
-            lurek.render.circleFill(cx, cy, 8)
+            lurek.render.circle("fill", cx, cy, 8)
         end
 
     elseif state == STATE_SCREEN_6 then
@@ -517,11 +518,11 @@ function lurek.draw()
                 local a = alpha * 0.05 * ring
                 local rr = 30 * ring
                 lurek.render.setColor(c[1], c[2], c[3], a)
-                lurek.render.circleFill(gx, gy, rr)
+                lurek.render.circle("fill", gx, gy, rr)
             end
             -- Core
             lurek.render.setColor(c[1], c[2], c[3], alpha * 0.9)
-            lurek.render.circleFill(gx, gy, 12)
+            lurek.render.circle("fill", gx, gy, 12)
             -- Disabled cross
             if not enabled then
                 lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
@@ -545,10 +546,10 @@ function lurek.draw()
 
             -- Light source
             lurek.render.setColor(1.0, 0.9, 0.6, 0.8)
-            lurek.render.circleFill(cx, cy - 60, 10)
+            lurek.render.circle("fill", cx, cy - 60, 10)
             for ring = 4, 1, -1 do
                 lurek.render.setColor(1.0, 0.9, 0.6, 0.06 * ring)
-                lurek.render.circleFill(cx, cy - 60, 20 * ring)
+                lurek.render.circle("fill", cx, cy - 60, 20 * ring)
             end
 
             -- Occluder block
@@ -597,9 +598,9 @@ function lurek.draw()
                     local a = 0.1 * ring
                     local rr = 20 * ring
                     lurek.render.setColor(c1[1], c1[2], c1[3], a)
-                    lurek.render.circleFill(cx - offset, cy, rr)
+                    lurek.render.circle("fill", cx - offset, cy, rr)
                     lurek.render.setColor(c2[1], c2[2], c2[3], a)
-                    lurek.render.circleFill(cx + offset, cy, rr)
+                    lurek.render.circle("fill", cx + offset, cy, rr)
                 end
             elseif p == 2 then
                 -- Multiply: darker where lights overlap
@@ -607,26 +608,26 @@ function lurek.draw()
                     local a = 0.08 * ring
                     local rr = 20 * ring
                     lurek.render.setColor(c1[1] * 0.5, c1[2] * 0.5, c1[3] * 0.5, a)
-                    lurek.render.circleFill(cx - offset, cy, rr)
+                    lurek.render.circle("fill", cx - offset, cy, rr)
                     lurek.render.setColor(c2[1] * 0.5, c2[2] * 0.5, c2[3] * 0.5, a)
-                    lurek.render.circleFill(cx + offset, cy, rr)
+                    lurek.render.circle("fill", cx + offset, cy, rr)
                 end
                 -- Dark overlap zone
                 lurek.render.setColor(0.05, 0.02, 0.08, 0.4)
-                lurek.render.circleFill(cx, cy, 40)
+                lurek.render.circle("fill", cx, cy, 40)
             else
                 -- Screen: bright, washed-out overlap
                 for ring = 5, 1, -1 do
                     local a = 0.12 * ring
                     local rr = 20 * ring
                     lurek.render.setColor(c1[1], c1[2], c1[3], a)
-                    lurek.render.circleFill(cx - offset, cy, rr)
+                    lurek.render.circle("fill", cx - offset, cy, rr)
                     lurek.render.setColor(c2[1], c2[2], c2[3], a)
-                    lurek.render.circleFill(cx + offset, cy, rr)
+                    lurek.render.circle("fill", cx + offset, cy, rr)
                 end
                 -- Bright overlap
                 lurek.render.setColor(0.85, 0.7, 0.95, 0.35)
-                lurek.render.circleFill(cx, cy, 45)
+                lurek.render.circle("fill", cx, cy, 45)
             end
         end
     end
@@ -634,7 +635,7 @@ function lurek.draw()
     -- Draw particles (world-space)
     for _, p in ipairs(particles) do
         lurek.render.setColor(p.r, p.g, p.b, p.a)
-        lurek.render.circleFill(p.x + ox, p.y, p.size)
+        lurek.render.circle("fill", p.x + ox, p.y, p.size)
     end
 end
 

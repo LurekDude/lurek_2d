@@ -489,10 +489,10 @@ function lurek.process(dt)
 
     -- Player movement
     local dx, dy = 0, 0
-    if lurek.input.isKeyDown("w") or lurek.input.isKeyDown("up")    then dy = -1 end
-    if lurek.input.isKeyDown("s") or lurek.input.isKeyDown("down")  then dy =  1 end
-    if lurek.input.isKeyDown("a") or lurek.input.isKeyDown("left")  then dx = -1 end
-    if lurek.input.isKeyDown("d") or lurek.input.isKeyDown("right") then dx =  1 end
+    if lurek.input.isDown("w") or lurek.input.isDown("up")    then dy = -1 end
+    if lurek.input.isDown("s") or lurek.input.isDown("down")  then dy =  1 end
+    if lurek.input.isDown("a") or lurek.input.isDown("left")  then dx = -1 end
+    if lurek.input.isDown("d") or lurek.input.isDown("right") then dx =  1 end
     if dx ~= 0 and dy ~= 0 then
         local inv = 1 / math.sqrt(2)
         dx, dy = dx * inv, dy * inv
@@ -507,7 +507,7 @@ function lurek.process(dt)
 
     -- Shoot
     fire_timer = math.max(0, fire_timer - dt)
-    if lurek.input.isKeyDown("space") and fire_timer <= 0 then
+    if lurek.input.isDown("space") and fire_timer <= 0 then
         fire_timer = FIRE_COOLDOWN
         table.insert(player_bullets, { x = player.x + PLAYER_W / 2 - BULLET_W / 2, y = player.y - BULLET_H })
     end

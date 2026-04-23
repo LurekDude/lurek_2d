@@ -17,6 +17,7 @@ local GOOD_WOOD = 2
 local GOOD_IRON = 3
 local GOOD_NAMES = { "Coal", "Wood", "Iron" }
 local GOOD_COLORS = {
+local _cam = lurek.camera.new()  -- injected by fix_games.py
     { 0.45, 0.28, 0.12 }, -- coal brown
     { 0.2, 0.6, 0.2 },   -- wood green
     { 0.6, 0.6, 0.65 },  -- iron gray
@@ -385,18 +386,18 @@ function lurek.init()
 end
 
 local function _ready_setup()
-    lurek.camera.setPosition(0, 0)
+    _cam:setPosition(0, 0)
 end
 
 function lurek.process(dt)
-    if lurek.input.pressed("quit") then
+    if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
         return
     end
 
     if state == STATE_TITLE then
         title_blink = title_blink + dt
-        if lurek.input.pressed("place") then
+        if lurek.input.wasActionPressed("place") then
             state = STATE_PLAYING
         end
         return
@@ -408,14 +409,14 @@ function lurek.process(dt)
     end
 
     -- Speed controls
-    if lurek.input.pressed("speed1") then game_speed = 1 end
-    if lurek.input.pressed("speed2") then game_speed = 2 end
-    if lurek.input.pressed("speed3") then game_speed = 3 end
+    if lurek.input.wasActionPressed("speed1") then game_speed = 1 end
+    if lurek.input.wasActionPressed("speed2") then game_speed = 2 end
+    if lurek.input.wasActionPressed("speed3") then game_speed = 3 end
 
     -- Mode switches
-    if lurek.input.pressed("station_mode") then mode = "station" end
-    if lurek.input.pressed("signal_mode") then mode = "signal" end
-    if lurek.input.pressed("buy_train") then
+    if lurek.input.wasActionPressed("station_mode") then mode = "station" end
+    if lurek.input.wasActionPressed("signal_mode") then mode = "signal" end
+    if lurek.input.wasActionPressed("buy_train") then
         -- pick first station
         if #stations >= 2 and #trains < MAX_TRAINS and gold >= 100 then
             mode = "track"
@@ -436,10 +437,10 @@ function lurek.process(dt)
     end
 
     -- Click handling
-    if lurek.input.pressed("place") and not route_pick then
+    if lurek.input.wasActionPressed("place") and not route_pick then
         local mx, my = lurek.input.mouse.getPosition()
         handle_click(mx, my)
-    elseif lurek.input.pressed("place") and route_pick then
+    elseif lurek.input.wasActionPressed("place") and route_pick then
         local mx, my = lurek.input.mouse.getPosition()
         handle_click(mx, my)
     end

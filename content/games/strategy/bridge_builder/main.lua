@@ -468,7 +468,7 @@ function lurek.process(dt)
     if state == STATE.LEVEL_SELECT then
         for i = 1, #LEVELS do
             local key = tostring(i)
-            if lurek.input.wasKeyPressed(key) and i <= levels_unlocked then
+            if lurek.input.wasActionPressed(key) and i <= levels_unlocked then
                 start_level(i)
                 return
             end
@@ -636,27 +636,27 @@ function lurek.draw()
     if state ~= STATE.TITLE and state ~= STATE.LEVEL_SELECT then
         -- Distant hills
         lurek.render.setColor(0.35, 0.55, 0.35, 0.4)
-        lurek.render.fillRect(0, cliff_y - 80, SCREEN_W, 80)
+        lurek.render.rectangle(0, cliff_y - 80, SCREEN_W, 80)
 
         -- Left cliff
         lurek.render.setColor(0.35, 0.28, 0.22)
-        lurek.render.fillRect(0, cliff_y, cliff_left_x, SCREEN_H - cliff_y)
+        lurek.render.rectangle(0, cliff_y, cliff_left_x, SCREEN_H - cliff_y)
         -- Cliff top grass
         lurek.render.setColor(0.3, 0.6, 0.2)
-        lurek.render.fillRect(0, cliff_y - 6, cliff_left_x, 8)
+        lurek.render.rectangle(0, cliff_y - 6, cliff_left_x, 8)
 
         -- Right cliff
         lurek.render.setColor(0.35, 0.28, 0.22)
-        lurek.render.fillRect(cliff_right_x, cliff_y, SCREEN_W - cliff_right_x, SCREEN_H - cliff_y)
+        lurek.render.rectangle(cliff_right_x, cliff_y, SCREEN_W - cliff_right_x, SCREEN_H - cliff_y)
         lurek.render.setColor(0.3, 0.6, 0.2)
-        lurek.render.fillRect(cliff_right_x, cliff_y - 6, SCREEN_W - cliff_right_x, 8)
+        lurek.render.rectangle(cliff_right_x, cliff_y - 6, SCREEN_W - cliff_right_x, 8)
 
         -- River
         lurek.render.setColor(0.15, 0.35, 0.7, 0.85)
-        lurek.render.fillRect(cliff_left_x, river_y, cliff_right_x - cliff_left_x, river_h)
+        lurek.render.rectangle(cliff_left_x, river_y, cliff_right_x - cliff_left_x, river_h)
         -- River surface shimmer
         lurek.render.setColor(0.3, 0.5, 0.9, 0.3)
-        lurek.render.fillRect(cliff_left_x, river_y, cliff_right_x - cliff_left_x, 3)
+        lurek.render.rectangle(cliff_left_x, river_y, cliff_right_x - cliff_left_x, 3)
 
         -- ── Beams ─────────────────────────────────────────────────────
         for _, b in ipairs(beams) do
@@ -687,7 +687,7 @@ function lurek.draw()
             else
                 lurek.render.setColor(0.9, 0.9, 0.9)
             end
-            lurek.render.fillCircle(n.x, n.y, NODE_RADIUS)
+            lurek.render.circle(n.x, n.y, NODE_RADIUS)
             -- Dark outline
             lurek.render.setColor(0.2, 0.2, 0.2)
             lurek.render.circle(n.x, n.y, NODE_RADIUS)
@@ -701,14 +701,14 @@ function lurek.draw()
             else
                 lurek.render.setColor(0.3, 0.5, 0.7)  -- car: blue
             end
-            lurek.render.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h)
+            lurek.render.rectangle(vehicle.x, vehicle.y, vehicle.w, vehicle.h)
             -- Wheels
             lurek.render.setColor(0.15, 0.15, 0.15)
-            lurek.render.fillCircle(vehicle.x + 6,            vehicle.y + vehicle.h, 4)
-            lurek.render.fillCircle(vehicle.x + vehicle.w - 6, vehicle.y + vehicle.h, 4)
+            lurek.render.circle(vehicle.x + 6,            vehicle.y + vehicle.h, 4)
+            lurek.render.circle(vehicle.x + vehicle.w - 6, vehicle.y + vehicle.h, 4)
             -- Window
             lurek.render.setColor(0.6, 0.8, 1.0, 0.7)
-            lurek.render.fillRect(vehicle.x + vehicle.w * 0.55, vehicle.y + 2, vehicle.w * 0.3, vehicle.h * 0.45)
+            lurek.render.rectangle(vehicle.x + vehicle.w * 0.55, vehicle.y + 2, vehicle.w * 0.3, vehicle.h * 0.45)
         end
     end
 
@@ -726,7 +726,7 @@ function lurek.draw_ui()
     -- ── TITLE ─────────────────────────────────────────────────────────
     if state == STATE.TITLE then
         lurek.render.setColor(0.2, 0.15, 0.1)
-        lurek.render.fillRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1.0, 0.85, 0.3)
         lurek.render.print("BRIDGE BUILDER", SCREEN_W / 2 - 150, 140, 4)
@@ -751,7 +751,7 @@ function lurek.draw_ui()
     -- ── LEVEL SELECT ──────────────────────────────────────────────────
     if state == STATE.LEVEL_SELECT then
         lurek.render.setColor(0.15, 0.12, 0.1)
-        lurek.render.fillRect(0, 0, SCREEN_W, SCREEN_H)
+        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1.0, 0.85, 0.3)
         lurek.render.print("SELECT LEVEL", SCREEN_W / 2 - 100, 40, 3)
@@ -779,7 +779,7 @@ function lurek.draw_ui()
 
     -- Top bar background
     lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
-    lurek.render.fillRect(0, 0, SCREEN_W, 36)
+    lurek.render.rectangle(0, 0, SCREEN_W, 36)
 
     -- Level name
     lurek.render.setColor(1.0, 0.85, 0.3)
@@ -804,7 +804,7 @@ function lurek.draw_ui()
     if state == STATE.BUILDING then
         local tool_y = SCREEN_H - 50
         lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
-        lurek.render.fillRect(0, tool_y - 5, SCREEN_W, 55)
+        lurek.render.rectangle(0, tool_y - 5, SCREEN_W, 55)
 
         local tools = { "road", "steel", "cable" }
         for idx, t in ipairs(tools) do
@@ -812,10 +812,10 @@ function lurek.draw_ui()
             local bt = BEAM_TYPES[t]
             if beam_type == t and not delete_mode then
                 lurek.render.setColor(1.0, 1.0, 0.3)
-                lurek.render.rect(tx - 4, tool_y - 2, 160, 38)
+                lurek.render.rectangle(tx - 4, tool_y - 2, 160, 38)
             end
             lurek.render.setColor(bt.r, bt.g, bt.b)
-            lurek.render.fillRect(tx, tool_y + 10, 40, bt.thick * 2)
+            lurek.render.rectangle(tx, tool_y + 10, 40, bt.thick * 2)
             lurek.render.setColor(0.9, 0.9, 0.9)
             lurek.render.print(string.format("%s (%s) %dg", bt.label, string.upper(string.sub(t, 1, 1)), bt.cost), tx + 50, tool_y + 5, 1.2)
         end
@@ -837,10 +837,10 @@ function lurek.draw_ui()
         local bar_x = SCREEN_W / 2 - bar_w / 2
         local bar_y = SCREEN_H - 24
         lurek.render.setColor(0.2, 0.2, 0.2, 0.6)
-        lurek.render.fillRect(bar_x, bar_y, bar_w, 12)
+        lurek.render.rectangle(bar_x, bar_y, bar_w, 12)
         local prog = clamp(vehicle.progress, 0, 1)
         lurek.render.setColor(0.3, 0.8, 0.4)
-        lurek.render.fillRect(bar_x, bar_y, bar_w * prog, 12)
+        lurek.render.rectangle(bar_x, bar_y, bar_w * prog, 12)
         lurek.render.setColor(1, 1, 1)
         lurek.render.print("TESTING...", bar_x + bar_w / 2 - 30, bar_y - 16, 1.2)
     end
@@ -848,7 +848,7 @@ function lurek.draw_ui()
     -- ── SUCCESS overlay ───────────────────────────────────────────────
     if state == STATE.SUCCESS then
         lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
-        lurek.render.fillRect(0, SCREEN_H / 2 - 80, SCREEN_W, 160)
+        lurek.render.rectangle(0, SCREEN_H / 2 - 80, SCREEN_W, 160)
 
         lurek.render.setColor(0.3, 1.0, 0.4)
         lurek.render.print("SUCCESS!", SCREEN_W / 2 - 70, SCREEN_H / 2 - 60, 3.5)
@@ -866,7 +866,7 @@ function lurek.draw_ui()
     -- ── FAIL overlay ──────────────────────────────────────────────────
     if state == STATE.FAIL then
         lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
-        lurek.render.fillRect(0, SCREEN_H / 2 - 60, SCREEN_W, 120)
+        lurek.render.rectangle(0, SCREEN_H / 2 - 60, SCREEN_W, 120)
 
         lurek.render.setColor(1.0, 0.3, 0.2)
         lurek.render.print("BRIDGE FAILED!", SCREEN_W / 2 - 110, SCREEN_H / 2 - 45, 3.5)

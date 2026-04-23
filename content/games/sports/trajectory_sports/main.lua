@@ -30,6 +30,7 @@ local medals = { "", "", "", "" }
 local sport_names = { "ARCHERY", "BASKETBALL", "BOWLING", "DARTS" }
 
 -- ── Input bindings ────────────────────────────────────────────────
+local _cam = lurek.camera.new()  -- injected by fix_games.py
 lurek.input.bind("power",      "space")
 lurek.input.bind("aim_up",     "w")
 lurek.input.bind("aim_down",   "s")
@@ -630,11 +631,11 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Trajectory Sports — Lurek2D")
-    lurek.window.setBackgroundColor(0.1, 0.1, 0.15)
+    lurek.render.setBackgroundColor(0.1, 0.1, 0.15)
 end
 
 local function _ready_setup()
-    lurek.camera.init(W, H)
+    _cam:setPosition(W, H)
 end
 
 function lurek.process(dt)
