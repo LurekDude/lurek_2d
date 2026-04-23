@@ -655,3 +655,147 @@ do  -- DataFrame:groupByObj
     lurek.log.debug("groupByObj returned: " .. tostring(grouped), "dataframe")
   end
 end
+
+-- ── VecFrame: vectorized columnar operations ──────────────────────────────
+--
+-- VecFrame stores each column as a typed flat buffer (float64/int64/bool/text)
+-- with an optional null-validity bitmap.  Operations run over the entire column
+-- at once — no per-cell Lua dispatch — allowing the Rust compiler to apply
+-- SIMD vectorization and rayon parallelism.
+--
+-- Workflow: DataFrame → toVec() → fast bulk ops → toDataFrame() (or fromVec)
+
+--@api-stub: lurek.dataframe.toVec
+-- Converts a DataFrame to a VecFrame for fast bulk column operations.
+-- The conversion infers each column's type from its cell values.
+do  -- lurek.dataframe.toVec
+  local df = lurek.dataframe.fromCSV("hp,mp\n100,50\n200,80\n150,60\n")
+  local vf = lurek.dataframe.toVec(df)
+  lurek.log.info("VecFrame: " .. vf:nrows() .. " rows, " .. vf:ncols() .. " cols")
+end
+
+--@api-stub: lurek.dataframe.fromVec
+-- Converts a VecFrame back to a DataFrame.
+do  -- lurek.dataframe.fromVec
+  local df = lurek.dataframe.fromCSV("hp,mp\n100,50\n200,80\n")
+  local vf = lurek.dataframe.toVec(df)
+  vf:colMul("hp", 0.5)          -- halve all HP values at once
+  local df2 = lurek.dataframe.fromVec(vf)
+  lurek.log.info("first HP after halving: " .. tostring(df2:get(0, "hp")))
+end
+
+--@api-stub: VecFrame:colAdd
+-- Add a scalar to every element of a Float64 column.
+-- All rows are processed in a single vectorized Rust loop.
+do  -- VecFrame:colAdd
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("score\n10\n20\n30\n"))
+  vf:colAdd("score", 5)    -- score becomes 15, 25, 35
+  local df = vf:toDataFrame()
+  lurek.log.info("score[0] = " .. tostring(df:get(0, "score")))
+end
+
+--@api-stub: VecFrame:colMul
+-- Multiply every element of a Float64 column by a scalar.
+do  -- VecFrame:colMul
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("dmg\n10\n15\n20\n"))
+  vf:colMul("dmg", 1.5)    -- apply 1.5x damage multiplier to all rows
+end
+
+--@api-stub: VecFrame:colClamp
+-- Clamp every element of a Float64 column to [min, max].
+-- Useful for enforcing stat caps (e.g. HP cannot exceed 100).
+do  -- VecFrame:colClamp
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n-5\n50\n150\n"))
+  vf:colClamp("hp", 0, 100)   -- HP in [0, 100]
+  local df = vf:toDataFrame()
+  lurek.log.info("hp[2] clamped to " .. tostring(df:get(2, "hp")))  -- 100
+end
+
+--@api-stub: VecFrame:colAbs
+-- Replace every element with its absolute value.
+do  -- VecFrame:colAbs
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("delta\n-3\n4\n-1\n"))
+  vf:colAbs("delta")
+end
+
+--@api-stub: VecFrame:colSqrt
+-- Apply square root to every element of a Float64 column.
+do  -- VecFrame:colSqrt
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("dist_sq\n9\n16\n25\n"))
+  vf:colSqrt("dist_sq")   -- dist_sq becomes 3, 4, 5
+end
+
+--@api-stub: VecFrame:colOp
+-- Element-wise binary operation between two Float64 columns.
+-- op: "add" | "sub" | "mul" | "div" | "min" | "max"
+do  -- VecFrame:colOp
+  local df = lurek.dataframe.fromCSV("atk,def\n30,10\n40,15\n20,5\n")
+  local vf = lurek.dataframe.toVec(df)
+  vf:colOp("net_dmg", "atk", "sub", "def")   -- net_dmg = atk - def per row
+  local df2 = vf:toDataFrame()
+  lurek.log.info("net_dmg[0] = " .. tostring(df2:get(0, "net_dmg")))  -- 20
+end
+
+--@api-stub: VecFrame:reduce
+-- Reduce an entire numeric column to a single scalar.
+-- op: "sum" | "mean" | "min" | "max" | "std" | "var" | "count"
+do  -- VecFrame:reduce
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("score\n10\n20\n30\n"))
+  local total = vf:reduce("score", "sum")
+  local avg   = vf:reduce("score", "mean")
+  lurek.log.info("sum=" .. total .. " mean=" .. avg)
+end
+
+--@api-stub: VecFrame:filterMask
+-- Build a boolean row mask: mask[i] = (col[i] op val).
+-- op: "<" | "<=" | ">" | ">=" | "==" | "!="
+do  -- VecFrame:filterMask
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n10\n50\n90\n"))
+  local mask = vf:filterMask("hp", ">=", 50)  -- {false, true, true}
+  lurek.log.info("rows with hp >= 50: " .. tostring(mask[2]) .. ", " .. tostring(mask[3]))
+end
+
+--@api-stub: VecFrame:applyMask
+-- Return a new VecFrame with only the rows where mask[i] is true.
+do  -- VecFrame:applyMask
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n10\n50\n90\n"))
+  local mask = vf:filterMask("hp", ">=", 50)
+  local alive = vf:applyMask(mask)   -- 2 rows
+  lurek.log.info("alive rows: " .. alive:nrows())  -- 2
+end
+
+--@api-stub: VecFrame:colType
+-- Return the dtype name of a column: "float64" | "int64" | "bool" | "text".
+do  -- VecFrame:colType
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n10\n20\n"))
+  lurek.log.info("hp dtype: " .. vf:colType("hp"))  -- "float64"
+end
+
+--@api-stub: VecFrame:parReduce
+-- Reduce multiple columns in parallel using rayon, returning {col → value}.
+-- Useful for computing per-stat totals across large enemy tables in one call.
+do  -- VecFrame:parReduce
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp,mp,atk\n10,5,8\n20,10,12\n"))
+  local sums = vf:parReduce({"hp", "mp", "atk"}, "sum")
+  for col, s in pairs(sums) do
+    lurek.log.info(col .. " sum = " .. tostring(s))
+  end
+end
+
+--@api-stub: VecFrame:parScalarOp
+-- Apply a scalar op in parallel to multiple Float64 columns.
+do  -- VecFrame:parScalarOp
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp,mp\n100,50\n200,80\n"))
+  vf:parScalarOp({"hp", "mp"}, "mul", 0.5)   -- halve all stats at once
+  local df2 = vf:toDataFrame()
+  lurek.log.info("hp[0]=" .. df2:get(0,"hp") .. " mp[0]=" .. df2:get(0,"mp"))
+end
+
+--@api-stub: VecFrame:toDataFrame
+-- Convert a VecFrame back to a DataFrame (same as lurek.dataframe.fromVec).
+do  -- VecFrame:toDataFrame
+  local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("v\n1\n2\n3\n"))
+  vf:colAdd("v", 10)
+  local df2 = vf:toDataFrame()
+  lurek.log.info("v[0] = " .. tostring(df2:get(0, "v")))  -- 11
+end

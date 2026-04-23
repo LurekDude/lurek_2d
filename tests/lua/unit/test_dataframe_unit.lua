@@ -2040,6 +2040,392 @@ describe("Missing explicit test for DataFrame:sample", function()
     end)
 end)
 
+-- =========================================================================
+-- Vectorized VecFrame API (lurek.dataframe.toVec / fromVec)
+-- =========================================================================
+
+-- @tests lurek.dataframe.toVec
+-- @tests lurek.dataframe.fromVec
+describe("lurek.dataframe vectorized factory functions", function()
+    it("toVec is a function", function()
+        -- @tests lurek.dataframe.toVec
+        expect_type("function", lurek.dataframe.toVec)
+    end)
+
+    it("fromVec is a function", function()
+        -- @tests lurek.dataframe.fromVec
+        expect_type("function", lurek.dataframe.fromVec)
+    end)
+
+    it("toVec returns a VecFrame userdata", function()
+        -- @tests lurek.dataframe.toVec
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n")
+        local vf = lurek.dataframe.toVec(df)
+        assert(vf ~= nil, "toVec returned nil")
+        assert(type(vf) == "userdata", "expected userdata")
+    end)
+
+    it("fromVec converts VecFrame back to DataFrame", function()
+        -- @tests lurek.dataframe.fromVec
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n")
+        local vf = lurek.dataframe.toVec(df)
+        local df2 = lurek.dataframe.fromVec(vf)
+        assert(df2 ~= nil, "fromVec returned nil")
+    end)
+end)
+
+-- @tests VecFrame:nrows
+-- @tests VecFrame:ncols
+-- @tests VecFrame:columns
+describe("VecFrame shape queries", function()
+    local function make_vf()
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n30,15\n")
+        return lurek.dataframe.toVec(df)
+    end
+
+    it("nrows returns correct row count", function()
+        -- @tests VecFrame:nrows
+        local vf = make_vf()
+        assert(vf:nrows() == 3, "expected nrows=3, got " .. tostring(vf:nrows()))
+    end)
+
+    it("ncols returns correct column count", function()
+        -- @tests VecFrame:ncols
+        local vf = make_vf()
+        assert(vf:ncols() == 2, "expected ncols=2, got " .. tostring(vf:ncols()))
+    end)
+
+    it("columns returns table of column names", function()
+        -- @tests VecFrame:columns
+        local vf = make_vf()
+        local cols = vf:columns()
+        assert(type(cols) == "table", "expected table")
+        assert(cols[1] == "hp", "expected cols[1]='hp', got " .. tostring(cols[1]))
+        assert(cols[2] == "mp", "expected cols[2]='mp', got " .. tostring(cols[2]))
+    end)
+end)
+
+-- @tests VecFrame:colType
+-- @tests VecFrame:colCast
+describe("VecFrame type inspection and casting", function()
+    local function make_vf()
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n")
+        return lurek.dataframe.toVec(df)
+    end
+
+    it("colType returns float64 for numeric column", function()
+        -- @tests VecFrame:colType
+        local vf = make_vf()
+        assert(vf:colType("hp") == "float64", "expected float64, got " .. tostring(vf:colType("hp")))
+    end)
+
+    it("colType returns nil for nonexistent column", function()
+        -- @tests VecFrame:colType
+        local vf = make_vf()
+        assert(vf:colType("NOPE") == nil, "expected nil for missing column")
+    end)
+
+    it("colCast float64 to int64 changes type", function()
+        -- @tests VecFrame:colCast
+        local vf = make_vf()
+        vf:colCast("hp", "int64")
+        assert(vf:colType("hp") == "int64", "expected int64 after cast")
+    end)
+end)
+
+-- @tests VecFrame:colAdd
+-- @tests VecFrame:colSub
+-- @tests VecFrame:colMul
+-- @tests VecFrame:colDiv
+-- @tests VecFrame:colAbs
+-- @tests VecFrame:colSqrt
+-- @tests VecFrame:colFloor
+-- @tests VecFrame:colCeil
+-- @tests VecFrame:colNeg
+-- @tests VecFrame:colClamp
+describe("VecFrame scalar column operations", function()
+    local function make_vf()
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n30,15\n")
+        return lurek.dataframe.toVec(df)
+    end
+
+    local function first(vf, col)
+        local df2 = vf:toDataFrame()
+        return df2:get(0, col)
+    end
+
+    it("colAdd adds scalar to every row", function()
+        -- @tests VecFrame:colAdd
+        local vf = make_vf()
+        vf:colAdd("hp", 5)
+        local df2 = lurek.dataframe.fromVec(vf)
+        local v = df2:get(0, "hp")
+        assert(v ~= nil, "colAdd: got nil")
+        assert(math.abs(v - 15) < 0.0001, "expected 15, got " .. tostring(v))
+    end)
+
+    it("colSub subtracts scalar from every row", function()
+        -- @tests VecFrame:colSub
+        local vf = make_vf()
+        vf:colSub("hp", 5)
+        local df2 = lurek.dataframe.fromVec(vf)
+        local v = df2:get(0, "hp")
+        assert(math.abs(v - 5) < 0.0001, "expected 5, got " .. tostring(v))
+    end)
+
+    it("colMul multiplies every row by scalar", function()
+        -- @tests VecFrame:colMul
+        local vf = make_vf()
+        vf:colMul("hp", 3)
+        local df2 = lurek.dataframe.fromVec(vf)
+        local v = df2:get(0, "hp")
+        assert(math.abs(v - 30) < 0.0001, "expected 30, got " .. tostring(v))
+    end)
+
+    it("colDiv divides every row by scalar", function()
+        -- @tests VecFrame:colDiv
+        local vf = make_vf()
+        vf:colDiv("hp", 2)
+        local df2 = lurek.dataframe.fromVec(vf)
+        local v = df2:get(0, "hp")
+        assert(math.abs(v - 5) < 0.0001, "expected 5, got " .. tostring(v))
+    end)
+
+    it("colAbs makes all values non-negative", function()
+        -- @tests VecFrame:colAbs
+        local df = lurek.dataframe.fromCSV("v\n-3\n4\n-1.5\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colAbs("v")
+        local df2 = lurek.dataframe.fromVec(vf)
+        local v = df2:get(0, "v")
+        assert(v ~= nil and v >= 0, "expected non-negative, got " .. tostring(v))
+    end)
+
+    it("colSqrt takes sqrt of every row", function()
+        -- @tests VecFrame:colSqrt
+        local df = lurek.dataframe.fromCSV("v\n9\n4\n1\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colSqrt("v")
+        local df2 = lurek.dataframe.fromVec(vf)
+        local v = df2:get(0, "v")
+        assert(math.abs(v - 3) < 0.0001, "expected 3, got " .. tostring(v))
+    end)
+
+    it("colFloor floors every element", function()
+        -- @tests VecFrame:colFloor
+        local df = lurek.dataframe.fromCSV("v\n1.9\n2.5\n3.1\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colFloor("v")
+        local df2 = lurek.dataframe.fromVec(vf)
+        assert(math.abs(df2:get(0, "v") - 1) < 0.0001, "expected 1")
+    end)
+
+    it("colCeil ceils every element", function()
+        -- @tests VecFrame:colCeil
+        local df = lurek.dataframe.fromCSV("v\n1.1\n2.5\n3.9\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colCeil("v")
+        local df2 = lurek.dataframe.fromVec(vf)
+        assert(math.abs(df2:get(0, "v") - 2) < 0.0001, "expected 2")
+    end)
+
+    it("colNeg negates every element", function()
+        -- @tests VecFrame:colNeg
+        local df = lurek.dataframe.fromCSV("v\n5\n10\n15\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colNeg("v")
+        local df2 = lurek.dataframe.fromVec(vf)
+        assert(math.abs(df2:get(0, "v") - (-5)) < 0.0001, "expected -5")
+    end)
+
+    it("colClamp clamps values to [min, max]", function()
+        -- @tests VecFrame:colClamp
+        local vf = make_vf()
+        vf:colClamp("hp", 15, 25)
+        local df2 = lurek.dataframe.fromVec(vf)
+        -- row 0 was 10 → clamped to 15
+        local v0 = df2:get(0, "hp")
+        assert(math.abs(v0 - 15) < 0.0001, "expected 15 (clamped), got " .. tostring(v0))
+        -- row 1 was 20 → stays 20
+        local v1 = df2:get(1, "hp")
+        assert(math.abs(v1 - 20) < 0.0001, "expected 20, got " .. tostring(v1))
+        -- row 2 was 30 → clamped to 25
+        local v2 = df2:get(2, "hp")
+        assert(math.abs(v2 - 25) < 0.0001, "expected 25 (clamped), got " .. tostring(v2))
+    end)
+end)
+
+-- @tests VecFrame:colOp
+describe("VecFrame binary column operations", function()
+    it("colOp add computes element-wise sum", function()
+        -- @tests VecFrame:colOp
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n30,15\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colOp("total", "hp", "add", "mp")
+        local df2 = lurek.dataframe.fromVec(vf)
+        local v = df2:get(0, "total")
+        assert(v ~= nil and math.abs(v - 15) < 0.0001, "expected 15, got " .. tostring(v))
+    end)
+
+    it("colOp mul computes element-wise product", function()
+        -- @tests VecFrame:colOp
+        local df = lurek.dataframe.fromCSV("a,b\n3,4\n5,6\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colOp("product", "a", "mul", "b")
+        local df2 = lurek.dataframe.fromVec(vf)
+        local v = df2:get(0, "product")
+        assert(v ~= nil and math.abs(v - 12) < 0.0001, "expected 12, got " .. tostring(v))
+    end)
+
+    it("colOp min picks element-wise minimum", function()
+        -- @tests VecFrame:colOp
+        local df = lurek.dataframe.fromCSV("a,b\n3,7\n8,2\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colOp("m", "a", "min", "b")
+        local df2 = lurek.dataframe.fromVec(vf)
+        assert(math.abs(df2:get(0, "m") - 3) < 0.0001, "expected 3")
+        assert(math.abs(df2:get(1, "m") - 2) < 0.0001, "expected 2")
+    end)
+end)
+
+-- @tests VecFrame:reduce
+describe("VecFrame reductions", function()
+    local function make_vf()
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n30,15\n")
+        return lurek.dataframe.toVec(df)
+    end
+
+    it("reduce sum returns correct total", function()
+        -- @tests VecFrame:reduce
+        local vf = make_vf()
+        local s = vf:reduce("hp", "sum")
+        assert(s ~= nil and math.abs(s - 60) < 0.0001, "expected 60, got " .. tostring(s))
+    end)
+
+    it("reduce mean returns correct average", function()
+        -- @tests VecFrame:reduce
+        local vf = make_vf()
+        local m = vf:reduce("hp", "mean")
+        assert(m ~= nil and math.abs(m - 20) < 0.0001, "expected 20, got " .. tostring(m))
+    end)
+
+    it("reduce min returns minimum value", function()
+        -- @tests VecFrame:reduce
+        local vf = make_vf()
+        assert(vf:reduce("hp", "min") == 10, "expected 10")
+    end)
+
+    it("reduce max returns maximum value", function()
+        -- @tests VecFrame:reduce
+        local vf = make_vf()
+        assert(vf:reduce("hp", "max") == 30, "expected 30")
+    end)
+
+    it("reduce count returns row count", function()
+        -- @tests VecFrame:reduce
+        local vf = make_vf()
+        assert(vf:reduce("hp", "count") == 3, "expected 3")
+    end)
+
+    it("reduce std is near 0 for constant column", function()
+        -- @tests VecFrame:reduce
+        local df = lurek.dataframe.fromCSV("v\n5\n5\n5\n")
+        local vf = lurek.dataframe.toVec(df)
+        local s = vf:reduce("v", "std")
+        assert(s ~= nil and math.abs(s) < 0.0001, "expected ~0, got " .. tostring(s))
+    end)
+end)
+
+-- @tests VecFrame:filterMask
+-- @tests VecFrame:applyMask
+describe("VecFrame filter and mask", function()
+    local function make_vf()
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n30,15\n")
+        return lurek.dataframe.toVec(df)
+    end
+
+    it("filterMask > returns correct boolean array", function()
+        -- @tests VecFrame:filterMask
+        local vf = make_vf()
+        local mask = vf:filterMask("hp", ">", 15)
+        assert(type(mask) == "table", "expected table")
+        assert(mask[1] == false, "row 0 (hp=10) should be false")
+        assert(mask[2] == true,  "row 1 (hp=20) should be true")
+        assert(mask[3] == true,  "row 2 (hp=30) should be true")
+    end)
+
+    it("filterMask <= returns correct boolean array", function()
+        -- @tests VecFrame:filterMask
+        local vf = make_vf()
+        local mask = vf:filterMask("hp", "<=", 20)
+        assert(mask[1] == true, "row 0 (hp=10) should be true")
+        assert(mask[2] == true, "row 1 (hp=20) should be true")
+        assert(mask[3] == false, "row 2 (hp=30) should be false")
+    end)
+
+    it("applyMask returns filtered VecFrame with correct row count", function()
+        -- @tests VecFrame:applyMask
+        local vf = make_vf()
+        local mask = vf:filterMask("hp", ">", 15)
+        local filtered = vf:applyMask(mask)
+        assert(filtered:nrows() == 2, "expected 2 rows, got " .. tostring(filtered:nrows()))
+    end)
+
+    it("applyMask combined reduce gives correct sum", function()
+        -- @tests VecFrame:applyMask
+        local vf = make_vf()
+        local mask = vf:filterMask("hp", ">=", 20)
+        local filtered = vf:applyMask(mask)
+        local s = filtered:reduce("hp", "sum")
+        assert(math.abs(s - 50) < 0.0001, "expected 50, got " .. tostring(s))
+    end)
+end)
+
+-- @tests VecFrame:parReduce
+-- @tests VecFrame:parScalarOp
+describe("VecFrame parallel operations", function()
+    local function make_vf()
+        local df = lurek.dataframe.fromCSV("hp,mp\n10,5\n20,10\n30,15\n")
+        return lurek.dataframe.toVec(df)
+    end
+
+    it("parReduce sum across multiple columns", function()
+        -- @tests VecFrame:parReduce
+        local vf = make_vf()
+        local result = vf:parReduce({"hp", "mp"}, "sum")
+        assert(type(result) == "table", "expected table")
+        assert(math.abs(result["hp"] - 60) < 0.0001, "expected hp sum=60, got " .. tostring(result["hp"]))
+        assert(math.abs(result["mp"] - 30) < 0.0001, "expected mp sum=30, got " .. tostring(result["mp"]))
+    end)
+
+    it("parScalarOp mul across multiple columns", function()
+        -- @tests VecFrame:parScalarOp
+        local vf = make_vf()
+        vf:parScalarOp({"hp", "mp"}, "mul", 2)
+        local df2 = lurek.dataframe.fromVec(vf)
+        local hp0 = df2:get(0, "hp")
+        local mp0 = df2:get(0, "mp")
+        assert(math.abs(hp0 - 20) < 0.0001, "expected hp=20, got " .. tostring(hp0))
+        assert(math.abs(mp0 - 10) < 0.0001, "expected mp=10, got " .. tostring(mp0))
+    end)
+end)
+
+-- @tests VecFrame:toDataFrame
+describe("VecFrame conversion roundtrip", function()
+    it("toVec → ops → toDataFrame preserves modified values", function()
+        -- @tests VecFrame:toDataFrame
+        local df = lurek.dataframe.fromCSV("hp,mp\n100,50\n200,100\n")
+        local vf = lurek.dataframe.toVec(df)
+        vf:colMul("hp", 0.5)
+        vf:colAdd("mp", 10)
+        local df2 = vf:toDataFrame()
+        local hp0 = df2:get(0, "hp")
+        local mp0 = df2:get(0, "mp")
+        assert(math.abs(hp0 - 50) < 0.0001, "expected hp=50, got " .. tostring(hp0))
+        assert(math.abs(mp0 - 60) < 0.0001, "expected mp=60, got " .. tostring(mp0))
+    end)
+end)
+
 describe("Missing explicit test for DataFrame:describe", function()
     it("DataFrame:describe works", function()
         -- @tests DataFrame:describe

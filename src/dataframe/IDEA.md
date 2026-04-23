@@ -54,6 +54,17 @@ Provide a zero-dependency, in-memory column-major tabular data engine for Lurek2
 - [ ] Add `DataFrame::from_rows()` constructor for row-major input (common Lua pattern).
 - [ ] Add streaming iterator API for large tables to avoid full materialisation.
 
+## TODO(vectorized) ✅ DONE
+
+- [x] Implement `VecFrame` typed-column vectorized processing layer (`src/dataframe/vectorized.rs`).
+  - Typed flat-buffer columns (`Float64`/`Int64`/`Bool`/`Text`) with validity bitmaps.
+  - Scalar ops (add/sub/mul/div/abs/sqrt/floor/ceil/neg/clamp) over entire columns.
+  - Binary column ops (add/sub/mul/div/min/max between two columns).
+  - Reductions (sum/mean/min/max/std/var/count) with null-skip.
+  - Filter mask + `apply_mask` for vectorized row filtering.
+  - `par_reduce` and `par_scalar_op` for rayon-parallel multi-column processing.
+  - GPU path intentionally deferred — would require crossing into `src/compute/`.
+
 ## TODO(plugin)
 
 - [ ] Consider a `TIER-2-PLUGIN` extraction so games that don't use tabular data pay no compile-time cost.

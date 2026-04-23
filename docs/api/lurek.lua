@@ -3820,6 +3820,102 @@ local GroupedFrame = {}
 ---@return DataFrame
 function GroupedFrame:aggregate(col_name, func) end
 
+--- Thin Lua wrapper around a [`VecFrame`]: typed-column vectorized DataFrame.
+---@class VecFrame
+local VecFrame = {}
+
+--- Return a new VecFrame containing only the rows where mask[i] is true.
+---@param mask_tbl any
+---@return VecFrame
+function VecFrame:applyMask(mask_tbl) end
+
+--- Apply absolute value to every element of a Float64 column.
+---@param col any
+function VecFrame:colAbs(col) end
+
+--- Add a scalar to every element of a Float64 column.
+---@param col any
+---@param val any
+function VecFrame:colAdd(col, val) end
+
+--- Cast a column to a new dtype: "float64", "int64", or "text".
+---@param col any
+---@param dtype any
+function VecFrame:colCast(col, dtype) end
+
+--- Apply ceiling to every element of a Float64 column.
+---@param col any
+function VecFrame:colCeil(col) end
+
+--- Divide every element of a Float64 column by a scalar.
+---@param col any
+---@param val any
+function VecFrame:colDiv(col, val) end
+
+--- Apply floor to every element of a Float64 column.
+---@param col any
+function VecFrame:colFloor(col) end
+
+--- Multiply every element of a Float64 column by a scalar.
+---@param col any
+---@param val any
+function VecFrame:colMul(col, val) end
+
+--- Negate every element of a Float64 column.
+---@param col any
+function VecFrame:colNeg(col) end
+
+--- Apply square root to every element of a Float64 column.
+---@param col any
+function VecFrame:colSqrt(col) end
+
+--- Subtract a scalar from every element of a Float64 column.
+---@param col any
+---@param val any
+function VecFrame:colSub(col, val) end
+
+--- Return the dtype name of a column: "float64", "int64", "bool", or "text".
+---@param col any
+---@return string|nil
+function VecFrame:colType(col) end
+
+--- Return a table of column names.
+---@return table
+function VecFrame:columns() end
+
+--- Return the number of columns.
+---@return integer
+function VecFrame:ncols() end
+
+--- Return the number of rows.
+---@return integer
+function VecFrame:nrows() end
+
+--- Reduce multiple columns in parallel, returning {col → value} table.
+---@param cols_tbl any
+---@param op any
+---@return table
+function VecFrame:parReduce(cols_tbl, op) end
+
+--- Reduce an entire numeric column to a single value.
+---@param col any
+---@param op any
+---@return number|nil
+function VecFrame:reduce(col, op) end
+
+--- Convert this VecFrame back to a DataFrame.
+---@return DataFrame
+function VecFrame:toDataFrame() end
+
+--- Returns the type name of this object.
+---@return string
+function VecFrame:type() end
+
+--- Returns true if this object is of the given type.
+---@param name any
+---@return boolean
+function VecFrame:typeOf(name) end
+
 --- Deserializes a binary LVDF string into a DataFrame.
 ---@param s any
 ---@return DataFrame
@@ -3840,6 +3936,11 @@ function lurek.dataframe.fromJSON(s) end
 ---@return DataFrame
 function lurek.dataframe.fromTable(rows) end
 
+--- Converts a VecFrame back to a DataFrame.
+---@param vf any
+---@return DataFrame
+function lurek.dataframe.fromVec(vf) end
+
 --- Creates a new empty DataFrame.
 ---@return DataFrame
 function lurek.dataframe.newDataFrame() end
@@ -3854,6 +3955,11 @@ function lurek.dataframe.newDatabase() end
 ---@param seed? any (optional)
 ---@return DataFrame
 function lurek.dataframe.random(defs_tbl, n, seed) end
+
+--- Converts a DataFrame to a VecFrame for vectorized column operations.
+---@param df any
+---@return VecFrame
+function lurek.dataframe.toVec(df) end
 
 ---@class lurek.debugbridge
 lurek.debugbridge = {}

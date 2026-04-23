@@ -430,3 +430,233 @@ mod sql_tests {
         assert_eq!(result.nrows(), 2);
     }
 }
+
+// ── vectorized ────────────────────────────────────────────────────────────
+
+mod vectorized_tests {
+    use lurek2d::dataframe::vectorized::{BinaryOp, CmpOp, ReduceOp, ScalarOp, VecFrame};
+    use lurek2d::dataframe::frame::{CellValue, ColRef, DataFrame};
+    use lurek2d::dataframe::serial::from_csv;
+
+    fn numeric_vf() -> VecFrame {
+        let df = from_csv("hp,mp\n10.0,5.0\n20.0,10.0\n30.0,15.0\n").unwrap();
+        VecFrame::from_dataframe(&df)
+    }
+
+    #[test]
+    fn from_dataframe_preserves_shape() {
+        let vf = numeric_vf();
+        assert_eq!(vf.nrows(), 3);
+        assert_eq!(vf.ncols(), 2);
+        assert!(vf.col_type("hp").is_some());
+        assert_eq!(vf.col_type("hp"), Some("float64"));
+    }
+
+    #[test]
+    fn to_dataframe_roundtrip() {
+        let df = from_csv("a,b\n1.0,2.0\n3.0,4.0\n").unwrap();
+        let vf = VecFrame::from_dataframe(&df);
+        let df2 = vf.to_dataframe();
+        assert_eq!(df2.nrows(), 2);
+        assert_eq!(df2.ncols(), 2);
+    }
+
+    fn get(df: &DataFrame, row: usize, col: &str) -> Option<f64> {
+        df.get_value(row, ColRef::Name(col.into())).ok()?.as_number()
+    }
+
+    #[test]
+    fn col_scalar_add_modifies_all_rows() {
+        let mut vf = numeric_vf();
+        vf.col_scalar_op("hp", ScalarOp::Add, 5.0).unwrap();
+        let df = vf.to_dataframe();
+        assert_eq!(get(&df, 0, "hp"), Some(15.0));
+        assert_eq!(get(&df, 1, "hp"), Some(25.0));
+        assert_eq!(get(&df, 2, "hp"), Some(35.0));
+    }
+
+    #[test]
+    fn col_scalar_mul_modifies_all_rows() {
+        let mut vf = numeric_vf();
+        vf.col_scalar_op("hp", ScalarOp::Mul, 2.0).unwrap();
+        let df = vf.to_dataframe();
+        assert_eq!(get(&df, 0, "hp"), Some(20.0));
+    }
+
+    #[test]
+    fn col_scalar_div_by_zero_returns_error() {
+        let mut vf = numeric_vf();
+        assert!(vf.col_scalar_op("hp", ScalarOp::Div, 0.0).is_err());
+    }
+
+    #[test]
+    fn col_scalar_abs() {
+        let df = from_csv("v\n-3.0\n4.0\n-1.5\n").unwrap();
+        let mut vf = VecFrame::from_dataframe(&df);
+        vf.col_scalar_op("v", ScalarOp::Abs, 0.0).unwrap();
+        let out = vf.to_dataframe();
+        assert_eq!(get(&out, 0, "v"), Some(3.0));
+    }
+
+    #[test]
+    fn col_scalar_sqrt() {
+        let df = from_csv("v\n9.0\n4.0\n1.0\n").unwrap();
+        let mut vf = VecFrame::from_dataframe(&df);
+        vf.col_scalar_op("v", ScalarOp::Sqrt, 0.0).unwrap();
+        let out = vf.to_dataframe();
+        assert_eq!(get(&out, 0, "v"), Some(3.0));
+    }
+
+    #[test]
+    fn col_clamp() {
+        let mut vf = numeric_vf();
+        vf.col_clamp("hp", 15.0, 25.0).unwrap();
+        let df = vf.to_dataframe();
+        assert_eq!(get(&df, 0, "hp"), Some(15.0));
+        assert_eq!(get(&df, 1, "hp"), Some(20.0));
+        assert_eq!(get(&df, 2, "hp"), Some(25.0));
+    }
+
+    #[test]
+    fn col_binary_op_add() {
+        let mut vf = numeric_vf();
+        vf.col_binary_op("total", "hp", BinaryOp::Add, "mp").unwrap();
+        let df = vf.to_dataframe();
+        assert_eq!(get(&df, 0, "total"), Some(15.0));
+        assert_eq!(get(&df, 1, "total"), Some(30.0));
+    }
+
+    #[test]
+    fn col_binary_op_mul() {
+        let mut vf = numeric_vf();
+        vf.col_binary_op("product", "hp", BinaryOp::Mul, "mp").unwrap();
+        let df = vf.to_dataframe();
+        assert_eq!(get(&df, 0, "product"), Some(50.0));
+    }
+
+    #[test]
+    fn reduce_sum() {
+        let vf = numeric_vf();
+        let sum = vf.col_reduce("hp", ReduceOp::Sum).unwrap();
+        assert_eq!(sum, Some(60.0));
+    }
+
+    #[test]
+    fn reduce_mean() {
+        let vf = numeric_vf();
+        let mean = vf.col_reduce("hp", ReduceOp::Mean).unwrap();
+        assert_eq!(mean, Some(20.0));
+    }
+
+    #[test]
+    fn reduce_min_max() {
+        let vf = numeric_vf();
+        assert_eq!(vf.col_reduce("hp", ReduceOp::Min).unwrap(), Some(10.0));
+        assert_eq!(vf.col_reduce("hp", ReduceOp::Max).unwrap(), Some(30.0));
+    }
+
+    #[test]
+    fn reduce_count() {
+        let vf = numeric_vf();
+        let count = vf.col_reduce("hp", ReduceOp::Count).unwrap();
+        assert_eq!(count, Some(3.0));
+    }
+
+    #[test]
+    fn reduce_std_zero_for_constant_column() {
+        let df = from_csv("v\n5.0\n5.0\n5.0\n").unwrap();
+        let vf = VecFrame::from_dataframe(&df);
+        let std = vf.col_reduce("v", ReduceOp::Std).unwrap().unwrap();
+        assert!(std < 1e-9);
+    }
+
+    #[test]
+    fn filter_mask_greater_than() {
+        let vf = numeric_vf();
+        let mask = vf.filter_mask("hp", CmpOp::Gt, 15.0).unwrap();
+        assert_eq!(mask, vec![false, true, true]);
+    }
+
+    #[test]
+    fn filter_mask_less_than_or_equal() {
+        let vf = numeric_vf();
+        let mask = vf.filter_mask("hp", CmpOp::Le, 20.0).unwrap();
+        assert_eq!(mask, vec![true, true, false]);
+    }
+
+    #[test]
+    fn apply_mask_filters_rows() {
+        let vf = numeric_vf();
+        let mask = vf.filter_mask("hp", CmpOp::Gt, 15.0).unwrap();
+        let filtered = vf.apply_mask(&mask).unwrap();
+        assert_eq!(filtered.nrows(), 2);
+    }
+
+    #[test]
+    fn col_cast_float64_to_int64() {
+        let mut vf = numeric_vf();
+        vf.col_cast("hp", "int64").unwrap();
+        assert_eq!(vf.col_type("hp"), Some("int64"));
+    }
+
+    #[test]
+    fn col_cast_int64_to_float64() {
+        let mut vf = numeric_vf();
+        vf.col_cast("hp", "int64").unwrap();
+        vf.col_cast("hp", "float64").unwrap();
+        assert_eq!(vf.col_type("hp"), Some("float64"));
+    }
+
+    #[test]
+    fn par_reduce_multiple_cols() {
+        let vf = numeric_vf();
+        let results = vf.par_reduce(&["hp", "mp"], ReduceOp::Sum);
+        assert_eq!(results.get("hp").copied().flatten(), Some(60.0));
+        assert_eq!(results.get("mp").copied().flatten(), Some(30.0));
+    }
+
+    #[test]
+    fn par_scalar_op_multiple_cols() {
+        let mut vf = numeric_vf();
+        vf.par_scalar_op(&["hp", "mp"], ScalarOp::Mul, 2.0).unwrap();
+        let df = vf.to_dataframe();
+        assert_eq!(get(&df, 0, "hp"), Some(20.0));
+        assert_eq!(get(&df, 0, "mp"), Some(10.0));
+    }
+
+    #[test]
+    fn from_dataframe_handles_nil_as_null() {
+        let df = DataFrame::from_raw(
+            vec!["v".to_string()],
+            vec![vec![
+                CellValue::Number(1.0),
+                CellValue::Nil,
+                CellValue::Number(3.0),
+            ]],
+        );
+        let vf = VecFrame::from_dataframe(&df);
+        // Count should be 2, not 3
+        let count = vf.col_reduce("v", ReduceOp::Count).unwrap();
+        assert_eq!(count, Some(2.0));
+    }
+
+    #[test]
+    fn apply_mask_wrong_length_returns_error() {
+        let vf = numeric_vf();
+        let bad_mask = vec![true, false]; // too short
+        assert!(vf.apply_mask(&bad_mask).is_err());
+    }
+
+    #[test]
+    fn reduce_on_nonexistent_col_returns_error() {
+        let vf = numeric_vf();
+        assert!(vf.col_reduce("NOPE", ReduceOp::Sum).is_err());
+    }
+
+    #[test]
+    fn scalar_op_on_text_col_returns_error() {
+        let df = from_csv("name\nAlice\nBob\n").unwrap();
+        let mut vf = VecFrame::from_dataframe(&df);
+        assert!(vf.col_scalar_op("name", ScalarOp::Add, 1.0).is_err());
+    }
+}

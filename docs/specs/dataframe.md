@@ -11,24 +11,46 @@
 
 ## Summary
 
-The `dataframe` module provides Lurek2D's in-memory column-major tabular data system, exposed to Lua scripts as `lurek.dataframe.*`. It is a Foundations tier module designed for analytical workloads: game data tables, leaderboard processing, CSV imports, and lightweight SQL-style queries without an external database.
+The `dataframe` module is Lurek2D's in-memory column-major tabular data system — a Foundations tier module for analytical workloads: game data tables, leaderboard processing, CSV imports, configurable save-game summaries, and lightweight SQL-style queries without an external database. It has no Lurek2D engine dependencies and can run in any headless test context.
 
-The core type is `DataFrame`, a column-major table where each column is a named `Vec<CellValue>`. `CellValue` is a tagged union of Null, Bool, Integer (i64), Float (f64), and Text (String). `ColRef` provides a borrowing window into a single column for iteration without copying. The `Database` type groups multiple named `DataFrame` tables into a catalog that can be queried across tables with JOIN-like operations.
+**Core model.** `DataFrame` is the primary type: a column-major table where each column is a named `Vec<CellValue>`. `CellValue` is a tagged union of Null, Bool, Integer (i64), Float (f64), and Text (String). Rows are accessed by 0-based index; columns by name or by `ColRef` (name or 1-based Lua-style index). Core CRUD: `add_column(name, default)`, `remove_column(ref)`, `rename_column(old, new)`, `get_column(ref)`, `add_row(pairs)`, `remove_row(i)`, `get_cell(row, col)`, `set_cell(row, col, value)`. Meta queries: `nrows()`, `ncols()`, `columns()`, `count()`.
 
-The `query` submodule provides a filter/sort/group-by/aggregate pipeline: `filter(predicate)` returns a row-index mask; `sort_by(col, asc)` produces a sorted copy; `group_by(cols)` returns groups of row indices; `aggregate(col, op)` computes sum, mean, min, max, count. The `sql` submodule parses and executes a small SQL subset (SELECT, WHERE, ORDER BY, GROUP BY, LIMIT, basic JOINs) directly against in-memory `Database` catalogs.
+**Database.** `Database` groups multiple named `DataFrame` tables into a catalog for multi-table query workflows. `add_table(name, frame)`, `remove_table(name)`, `get_table(name)`, `list_tables()`.
 
-The `serial` submodule handles CSV round-trip (parse headers + typed cells, emit with configurable delimiter/quote) and JSON round-trip (array-of-objects to `DataFrame` and back). This makes it straightforward to load a `.csv` asset into a `DataFrame`, run queries, and write results back to CSV.
+**Query pipeline.** `query.rs` provides a comprehensive analytical pipeline operating on `DataFrame` instances:
+- *Filtering*: `filter(predicate)` returns a row-index mask; `where_col_eq(col, value)`, `where_col_gt`, `where_col_lt` for typed comparisons.
+- *Sorting*: `sort_by(col, asc)` returns a sorted copy; `sort_by_multi(cols, dirs)` for multi-key sort.
+- *Projection*: `select_cols(names)` returns a new frame with only the specified columns; `drop_cols(names)` removes them.
+- *Slicing*: `head(n)`, `tail(n)`, `slice(start, end)` return subsets.
+- *Set operations*: `concat(other)` appends rows; `union_cols(other)` adds columns from another frame.
+- *Group-by / aggregate*: `group_by(cols)` returns groups of row indices; `aggregate(col, AggFn)` computes sum, mean, min, max, count, std_dev over grouped or full columns. `pivot(row_col, col_col, val_col, agg)` builds a pivot table.
+- *Sampling*: `sample(n, seed)` returns a random row subset (seeded for repeatability).
+- *Null handling*: `drop_nulls(col)`, `fill_nulls(col, value)`, `count_nulls(col)`.
+- *Statistics*: `describe(col)` returns min, max, mean, std_dev, count for numeric columns.
+- *Type-casting*: `cast_column(col, target_type)` converts a column in-place.
+- *Join*: `join(other, left_col, right_col, join_type)` for INNER, LEFT, RIGHT joins.
 
-Additional column-operation methods have been added to `DataFrame`, expanding the analytical surface available to Lua scripts through `lurek.dataframe.*`. These additions cover extended numeric transformations, type-casting helpers, and per-column derived statistics, making in-game data analysis workflows more expressive without requiring callers to drop to the lower-level `compute` array layer.
+**SQL engine.** `sql.rs` is a hand-written SQL tokenizer, parser, expression evaluator, and execution engine supporting a useful subset of standard SQL: SELECT (column list or `*`), FROM (single table or two-table JOIN with ON clause), WHERE (comparison operators, AND/OR, IS NULL, LIKE), ORDER BY (ASC/DESC), GROUP BY, aggregate functions (SUM, COUNT, AVG, MIN, MAX), and LIMIT. Queries run against `Database` catalogs via `execute(db, sql_string) → Result<DataFrame>`.
 
-**Scope boundary**: Foundations tier. No Lurek2D module imports. Lua bridge in `src/lua_api/dataframe_api.rs`.
+**Serialisation.** `serial.rs` handles round-trip I/O for multiple formats:
+- *CSV*: `from_csv(text, delimiter, has_header)` with auto-typed cell parsing; `to_csv(delimiter, include_header)`.
+- *JSON*: `from_json_array(json_string)` (array-of-objects); `to_json_array()`.
+- *LVDF*: Lurek2D's own lightweight binary format for fast DataFrame persistence.
+- *Table string*: `to_table_string(max_rows)` for debug display.
+
+**Vectorized layer (VecFrame).** `vectorized.rs` provides `VecFrame`, a Polars-inspired typed-column store where each column is a dense flat buffer (`Vec<f64>`, `Vec<i64>`, `Vec<bool>`, or `Vec<String>`) plus an optional validity bitmap for null rows.  Operations run over entire columns at once — no per-cell enum dispatch — so the Rust compiler can auto-vectorize numeric loops with SIMD instructions and `rayon` can parallelize multi-column sweeps.  Key operations: scalar ops (`add`/`sub`/`mul`/`div`/`abs`/`sqrt`/`floor`/`ceil`/`neg`/`clamp`) applied in-place to a whole column; binary column ops (`add`/`sub`/`mul`/`div`/`min`/`max`) between two columns producing a third; reductions (`sum`/`mean`/`min`/`max`/`std`/`var`/`count`) that skip null rows; comparison filter masks and `apply_mask` for row filtering; `col_cast` for type conversion; and `par_reduce`/`par_scalar_op` for rayon-parallel multi-column work.  `VecFrame::from_dataframe` converts a `DataFrame` into `VecFrame` by type-inferring each column; `VecFrame::to_dataframe` converts back.  A GPU path is intentionally deferred — would require crossing into `src/compute/`.
+
+**Lua surface.** `lurek.dataframe.new()` creates an empty `DataFrame`. `lurek.dataframe.fromCSV(text)`, `fromJSON(text)`. The `DataFrame` userdata exposes the full column/row CRUD, all query methods, and serialisation methods. `lurek.dataframe.newDatabase()` creates a `Database`. `Database:execute(sql)` runs SQL directly from Lua.  `lurek.dataframe.toVec(df)` converts a `DataFrame` to a `VecFrame`; `lurek.dataframe.fromVec(vf)` converts back.  `VecFrame` exposes: `colAdd`/`colSub`/`colMul`/`colDiv`/`colAbs`/`colSqrt`/`colFloor`/`colCeil`/`colNeg`/`colClamp`, `colOp`, `reduce`, `filterMask`, `applyMask`, `colType`, `colCast`, `nrows`, `ncols`, `columns`, `parReduce`, `parScalarOp`, `toDataFrame`.
+
+**Scope boundary.** Foundations tier. No Lurek2D module imports. Lua bridge in `src/lua_api/dataframe_api.rs`.
 
 ## Files
 
 - `frame.rs`: Defines `CellValue`, `ColRef`, `DataFrame`, and `Database`, including column and row CRUD plus deterministic random test-data generation.
-- `mod.rs`: Declares the dataframe submodules and re-exports the main table and database types.
+- `mod.rs`: Declares the dataframe submodules and re-exports the main table and database types, plus `VecFrame` and its op enums.
 - `query.rs`: Implements most table-manipulation behavior such as filtering, sorting, slicing, projection, grouping, joins, sampling, nil handling, and numeric summary statistics.
 - `serial.rs`: Handles DataFrame serialization and parsing for CSV, JSON, LVDF binary, and printable string-table output.
+- `vectorized.rs`: Provides `VecFrame` (typed flat-buffer columns), `ColumnStore`, and the scalar/binary/reduce/cmp op enums for bulk vectorized processing.
 - `sql.rs`: Implements the hand-written SQL tokenizer, parser, expression evaluator, and execution engine for single-table and multi-table queries.
 
 ## Types

@@ -2,6 +2,20 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.9] - 2026-04-23
+
+### feat(dataframe): vectorized columnar processing — VecFrame
+
+- **feat(dataframe): `VecFrame` typed-column vectorized DataFrame** — New `src/dataframe/vectorized.rs` implements `VecFrame`, a Polars-inspired columnar store where each column is a typed flat buffer (`Vec<f64>`, `Vec<i64>`, `Vec<bool>`, `Vec<String>`) plus an optional validity bitmap. Operations run over entire columns at once rather than per-cell, enabling compiler SIMD auto-vectorization and `rayon`-based parallel multi-column processing.
+- **feat(dataframe): `ColumnStore`, `ScalarOp`, `BinaryOp`, `ReduceOp`, `CmpOp` enums** — Full set of column-level operation types: scalar ops (add/sub/mul/div/abs/sqrt/floor/ceil/neg/clamp), binary column ops (add/sub/mul/div/min/max between two columns), reductions (sum/mean/min/max/std/var/count), and comparison operators for filter masks.
+- **feat(dataframe/lua): `lurek.dataframe.toVec(df)` / `fromVec(vf)`** — Convert between `DataFrame` and `VecFrame` from Lua. VecFrame methods: `colAdd/Sub/Mul/Div/Abs/Sqrt/Floor/Ceil/Neg/Clamp`, `colOp`, `reduce`, `filterMask`, `applyMask`, `colType`, `colCast`, `nrows`, `ncols`, `columns`, `parReduce`, `parScalarOp`, `toDataFrame`.
+- **feat(dataframe): parallel ops via rayon** — `VecFrame::par_reduce` and `VecFrame::par_scalar_op` process multiple columns concurrently using the existing rayon thread pool.
+- **test(dataframe): 22 Rust unit tests in `tests/rust/unit/dataframe_tests.rs`** — Covers all scalar ops, binary ops, reductions, filter/mask, type casting, null handling, parallel ops, and error paths.
+- **test(dataframe): Lua tests in `tests/lua/unit/test_dataframe_unit.lua`** — Full VecFrame coverage: factory functions, shape queries, scalar ops, binary ops, reductions, filter/mask, parallel ops, and roundtrip conversion.
+- **docs(dataframe): `docs/specs/dataframe.md`** — Added VecFrame subsection.
+- **chore(dataframe): `src/dataframe/IDEA.md`** — Marked vectorized processing as ✅ DONE.
+- **chore(dataframe): `content/examples/dataframe.lua`** — Added VecFrame usage example section.
+
 ## [0.20.8] - 2026-04-23
 
 ### docs(api): Lunasome library API docs, spec regeneration

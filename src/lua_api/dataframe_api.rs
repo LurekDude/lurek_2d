@@ -12,6 +12,7 @@ use std::rc::Rc;
 use crate::dataframe::frame::{AggFn, CellValue, ColRef, DataFrame, Database};
 use crate::dataframe::serial;
 use crate::dataframe::sql;
+use crate::dataframe::vectorized::{BinaryOp, CmpOp, ReduceOp, ScalarOp, VecFrame};
 
 // -------------------------------------------------------------------------------
 // Helpers
@@ -1042,7 +1043,7 @@ impl LuaUserData for LuaDataFrame {
         /// @return DataFrame
         methods.add_method("withEval", |lua, this, (col_name, expr): (String, String)| {
             let result = this.inner.borrow().with_eval(&col_name, &expr)
-                .map_err(|e| LuaError::RuntimeError(e))?;
+                .map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaDataFrame::new(result))
         });
 
@@ -1307,6 +1308,313 @@ impl LuaUserData for LuaDatabase {
     }
 }
 
+// ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ──
+// LuaVecFrame
+// ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ──
+
+/// Thin Lua wrapper around a [`VecFrame`]: typed-column vectorized DataFrame.
+#[derive(Clone)]
+pub struct LuaVecFrame {
+    inner: Rc<RefCell<VecFrame>>,
+}
+
+impl LuaVecFrame {
+    /// Create from a [`VecFrame`].
+    pub fn new(vf: VecFrame) -> Self {
+        Self {
+            inner: Rc::new(RefCell::new(vf)),
+        }
+    }
+}
+
+impl LuaUserData for LuaVecFrame {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── Scalar column operations ─────────────────────────────────────
+
+        /// Add a scalar to every element of a Float64 column.
+        /// @param col : string
+        /// @param val : number
+        methods.add_method_mut("colAdd", |_, this, (col, val): (String, f64)| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Add, val)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Subtract a scalar from every element of a Float64 column.
+        /// @param col : string
+        /// @param val : number
+        methods.add_method_mut("colSub", |_, this, (col, val): (String, f64)| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Sub, val)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Multiply every element of a Float64 column by a scalar.
+        /// @param col : string
+        /// @param val : number
+        methods.add_method_mut("colMul", |_, this, (col, val): (String, f64)| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Mul, val)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Divide every element of a Float64 column by a scalar.
+        /// @param col : string
+        /// @param val : number
+        methods.add_method_mut("colDiv", |_, this, (col, val): (String, f64)| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Div, val)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Apply absolute value to every element of a Float64 column.
+        /// @param col : string
+        methods.add_method_mut("colAbs", |_, this, col: String| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Abs, 0.0)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Apply square root to every element of a Float64 column.
+        /// @param col : string
+        methods.add_method_mut("colSqrt", |_, this, col: String| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Sqrt, 0.0)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Apply floor to every element of a Float64 column.
+        /// @param col : string
+        methods.add_method_mut("colFloor", |_, this, col: String| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Floor, 0.0)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Apply ceiling to every element of a Float64 column.
+        /// @param col : string
+        methods.add_method_mut("colCeil", |_, this, col: String| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Ceil, 0.0)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Negate every element of a Float64 column.
+        /// @param col : string
+        methods.add_method_mut("colNeg", |_, this, col: String| {
+            this.inner
+                .borrow_mut()
+                .col_scalar_op(&col, ScalarOp::Neg, 0.0)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        /// Clamp every element of a Float64 column to [min, max].
+        /// @param col : string
+        /// @param min_val : number
+        /// @param max_val : number
+        methods.add_method_mut(
+            "colClamp",
+            |_, this, (col, min_val, max_val): (String, f64, f64)| {
+                this.inner
+                    .borrow_mut()
+                    .col_clamp(&col, min_val, max_val)
+                    .map_err(LuaError::RuntimeError)
+            },
+        );
+
+        // ── Binary column operations ─────────────────────────────────────
+
+        /// Compute out[i] = left[i] op right[i] for every row.
+        /// op is one of: "add", "sub", "mul", "div", "min", "max".
+        /// @param out_col : string
+        /// @param left_col : string
+        /// @param op : string
+        /// @param right_col : string
+        methods.add_method_mut(
+            "colOp",
+            |_, this, (out_col, left_col, op, right_col): (String, String, String, String)| {
+                let bop = BinaryOp::parse(&op).map_err(LuaError::RuntimeError)?;
+                this.inner
+                    .borrow_mut()
+                    .col_binary_op(&out_col, &left_col, bop, &right_col)
+                    .map_err(LuaError::RuntimeError)
+            },
+        );
+
+        // ── Reductions ───────────────────────────────────────────────────
+
+        /// Reduce an entire numeric column to a single value.
+        /// op is one of: "sum", "mean", "min", "max", "std", "var", "count".
+        /// @param col : string
+        /// @param op : string
+        /// @return number|nil
+        methods.add_method("reduce", |_, this, (col, op): (String, String)| {
+            let rop = ReduceOp::parse(&op).map_err(LuaError::RuntimeError)?;
+            this.inner
+                .borrow()
+                .col_reduce(&col, rop)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        // ── Filter / mask ────────────────────────────────────────────────
+
+        /// Build a boolean row mask: mask[i] = col[i] cmp_op val.
+        /// cmp_op is one of: "<", "<=", ">", ">=", "==", "!=".
+        /// @param col : string
+        /// @param cmp_op : string
+        /// @param val : number
+        /// @return table  -- array of booleans
+        methods.add_method(
+            "filterMask",
+            |lua, this, (col, cmp_op, val): (String, String, f64)| {
+                let op = CmpOp::parse(&cmp_op).map_err(LuaError::RuntimeError)?;
+                let mask = this
+                    .inner
+                    .borrow()
+                    .filter_mask(&col, op, val)
+                    .map_err(LuaError::RuntimeError)?;
+                let tbl = lua.create_table()?;
+                for (i, b) in mask.iter().enumerate() {
+                    tbl.set(i + 1, *b)?;
+                }
+                Ok(tbl)
+            },
+        );
+
+        /// Return a new VecFrame containing only the rows where mask[i] is true.
+        /// @param mask : table  -- array of booleans (from filterMask)
+        /// @return VecFrame
+        methods.add_method("applyMask", |_, this, mask_tbl: LuaTable| {
+            let len = mask_tbl.len()? as usize;
+            let mut mask = Vec::with_capacity(len);
+            for i in 1..=len {
+                let b: bool = mask_tbl.get(i)?;
+                mask.push(b);
+            }
+            let vf = this
+                .inner
+                .borrow()
+                .apply_mask(&mask)
+                .map_err(LuaError::RuntimeError)?;
+            Ok(LuaVecFrame::new(vf))
+        });
+
+        // ── Type / cast ──────────────────────────────────────────────────
+
+        /// Return the dtype name of a column: "float64", "int64", "bool", or "text".
+        /// @param col : string
+        /// @return string|nil
+        methods.add_method("colType", |_, this, col: String| {
+            Ok(this.inner.borrow().col_type(&col).map(|s| s.to_string()))
+        });
+
+        /// Cast a column to a new dtype: "float64", "int64", or "text".
+        /// @param col : string
+        /// @param dtype : string
+        methods.add_method_mut("colCast", |_, this, (col, dtype): (String, String)| {
+            this.inner
+                .borrow_mut()
+                .col_cast(&col, &dtype)
+                .map_err(LuaError::RuntimeError)
+        });
+
+        // ── Shape ────────────────────────────────────────────────────────
+
+        /// Return the number of rows.
+        /// @return integer
+        methods.add_method("nrows", |_, this, ()| Ok(this.inner.borrow().nrows()));
+
+        /// Return the number of columns.
+        /// @return integer
+        methods.add_method("ncols", |_, this, ()| Ok(this.inner.borrow().ncols()));
+
+        /// Return a table of column names.
+        /// @return table
+        methods.add_method("columns", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (i, name) in this.inner.borrow().columns().iter().enumerate() {
+                tbl.set(i + 1, name.clone())?;
+            }
+            Ok(tbl)
+        });
+
+        // ── Parallel operations ──────────────────────────────────────────
+
+        /// Reduce multiple columns in parallel, returning {col → value} table.
+        /// op is one of: "sum", "mean", "min", "max", "std", "var", "count".
+        /// @param cols : table  -- array of column name strings
+        /// @param op : string
+        /// @return table
+        methods.add_method("parReduce", |lua, this, (cols_tbl, op): (LuaTable, String)| {
+            let rop = ReduceOp::parse(&op).map_err(LuaError::RuntimeError)?;
+            let len = cols_tbl.len()? as usize;
+            let cols: Vec<String> = (1..=len)
+                .map(|i| { let s: String = cols_tbl.get(i)?; LuaResult::Ok(s) })
+                .collect::<LuaResult<_>>()?;
+            let col_refs: Vec<&str> = cols.iter().map(|s| s.as_str()).collect();
+            let results = this.inner.borrow().par_reduce(&col_refs, rop);
+            let out = lua.create_table()?;
+            for (k, v) in results {
+                match v {
+                    Some(n) => out.set(k, n)?,
+                    None => out.set(k, LuaValue::Nil)?,
+                }
+            }
+            Ok(out)
+        });
+
+        /// Apply a scalar op in parallel to multiple Float64 columns.
+        /// op is one of: "add", "sub", "mul", "div", "abs", "sqrt", "floor", "ceil", "neg".
+        /// @param cols : table  -- array of column name strings
+        /// @param op : string
+        /// @param val : number
+        methods.add_method_mut(
+            "parScalarOp",
+            |_, this, (cols_tbl, op, val): (LuaTable, String, f64)| {
+                let sop = ScalarOp::parse(&op).map_err(LuaError::RuntimeError)?;
+                let len = cols_tbl.len()? as usize;
+                let cols: Vec<String> = (1..=len)
+                    .map(|i| { let s: String = cols_tbl.get(i)?; LuaResult::Ok(s) })
+                    .collect::<LuaResult<_>>()?;
+                let col_refs: Vec<&str> = cols.iter().map(|s| s.as_str()).collect();
+                this.inner
+                    .borrow_mut()
+                    .par_scalar_op(&col_refs, sop, val)
+                    .map_err(LuaError::RuntimeError)
+            },
+        );
+
+        // ── Conversion ───────────────────────────────────────────────────
+
+        /// Convert this VecFrame back to a DataFrame.
+        /// @return DataFrame
+        methods.add_method("toDataFrame", |_, this, ()| {
+            Ok(LuaDataFrame::new(this.inner.borrow().to_dataframe()))
+        });
+
+        // ── Type helpers ─────────────────────────────────────────────────
+
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("VecFrame"));
+
+        /// Returns true if this object is of the given type.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "VecFrame" || name == "Object")
+        });
+    }
+}
+
 // -------------------------------------------------------------------------------
 // Register
 // -------------------------------------------------------------------------------
@@ -1422,6 +1730,32 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 defs.push((name, hint));
             }
             Ok(LuaDataFrame::new(DataFrame::random(&defs, n, seed)))
+        })?,
+    )?;
+
+    // -- toVec --
+    /// Converts a DataFrame to a VecFrame for vectorized column operations.
+    /// @param df : DataFrame
+    /// @return VecFrame
+    tbl.set(
+        "toVec",
+        lua.create_function(|_, df: LuaAnyUserData| {
+            let lua_df = df.borrow::<LuaDataFrame>()?;
+            let vf = VecFrame::from_dataframe(&lua_df.inner.borrow());
+            Ok(LuaVecFrame::new(vf))
+        })?,
+    )?;
+
+    // -- fromVec --
+    /// Converts a VecFrame back to a DataFrame.
+    /// @param vf : VecFrame
+    /// @return DataFrame
+    tbl.set(
+        "fromVec",
+        lua.create_function(|_, vf: LuaAnyUserData| {
+            let lua_vf = vf.borrow::<LuaVecFrame>()?;
+            let df = lua_vf.inner.borrow().to_dataframe();
+            Ok(LuaDataFrame::new(df))
         })?,
     )?;
 
