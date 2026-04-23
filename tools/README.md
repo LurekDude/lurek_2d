@@ -66,6 +66,7 @@ and `tools/audit/` in the correct dependency order. Produces:
 | ---------------------- | ------------------ | ------------------------------ | ----------------------- |
 | `gen_rust_api_data.py` | `src/**/*.rs`      | `logs/data/rust_api_data.json` | `--output`              |
 | `gen_lua_api_data.py`  | `src/lua_api/*.rs` | `logs/data/lua_api_data.json`  | `--output`, `--verbose` |
+| `gen_extension_api.py` | `lua_api_data.json` | `extensions/vscode/data/lurek-api.json` | `--input`, `--output`, `--verbose` |
 
 **Reference generators** â€” produce human-readable docs from JSON:
 

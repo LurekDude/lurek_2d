@@ -510,13 +510,13 @@ __export(perfDashboard_exports, {
 });
 function openPerfDashboard(context) {
   if (_panel) {
-    _panel.reveal(vscode26.ViewColumn.Two);
+    _panel.reveal(vscode25.ViewColumn.Two);
     return;
   }
-  _panel = vscode26.window.createWebviewPanel(
+  _panel = vscode25.window.createWebviewPanel(
     "lurek.perfDashboard",
     "Lurek2D Performance",
-    vscode26.ViewColumn.Two,
+    vscode25.ViewColumn.Two,
     { enableScripts: true, retainContextWhenHidden: true }
   );
   _panel.webview.html = buildHtml();
@@ -654,11 +654,11 @@ window.addEventListener('resize', updateUI);
 </html>`
   );
 }
-var vscode26, _panel, _history, MAX_HISTORY;
+var vscode25, _panel, _history, MAX_HISTORY;
 var init_perfDashboard = __esm({
   "src/providers/perfDashboard.ts"() {
     "use strict";
-    vscode26 = __toESM(require("vscode"));
+    vscode25 = __toESM(require("vscode"));
     _history = [];
     MAX_HISTORY = 300;
   }
@@ -669,11 +669,11 @@ var debugBridge_exports = {};
 __export(debugBridge_exports, {
   DebugBridge: () => DebugBridge
 });
-var vscode45, net, DEFAULT_PORT, CONNECT_TIMEOUT, REQUEST_TIMEOUT, DebugBridge;
+var vscode44, net, DEFAULT_PORT, CONNECT_TIMEOUT, REQUEST_TIMEOUT, DebugBridge;
 var init_debugBridge = __esm({
   "src/services/debugBridge.ts"() {
     "use strict";
-    vscode45 = __toESM(require("vscode"));
+    vscode44 = __toESM(require("vscode"));
     net = __toESM(require("net"));
     DEFAULT_PORT = 19740;
     CONNECT_TIMEOUT = 5e3;
@@ -688,7 +688,7 @@ var init_debugBridge = __esm({
       statsItem = null;
       statsInterval = null;
       constructor() {
-        this.outputChannel = vscode45.window.createOutputChannel("Lurek2D Debug");
+        this.outputChannel = vscode44.window.createOutputChannel("Lurek2D Debug");
       }
       /** Whether the bridge is currently connected. */
       get isConnected() {
@@ -700,7 +700,7 @@ var init_debugBridge = __esm({
           this.outputChannel.appendLine("[debug] Already connected.");
           return true;
         }
-        const targetPort = port ?? vscode45.workspace.getConfiguration("lurek.debugBridge").get("port", DEFAULT_PORT);
+        const targetPort = port ?? vscode44.workspace.getConfiguration("lurek.debugBridge").get("port", DEFAULT_PORT);
         return new Promise((resolve5) => {
           const socket = new net.Socket();
           const timeout = setTimeout(() => {
@@ -789,9 +789,9 @@ var init_debugBridge = __esm({
       }
       /** Hot-reload: send updated Lua file content to engine. */
       async hotReload(uri) {
-        const doc = await vscode45.workspace.openTextDocument(uri);
+        const doc = await vscode44.workspace.openTextDocument(uri);
         const content = doc.getText();
-        const relativePath = vscode45.workspace.asRelativePath(uri, false);
+        const relativePath = vscode44.workspace.asRelativePath(uri, false);
         const resp = await this.sendRequest("hotReload", {
           file: relativePath,
           content
@@ -839,7 +839,7 @@ var init_debugBridge = __esm({
       getStatusInfo() {
         return {
           connected: this.connected,
-          port: vscode45.workspace.getConfiguration("lurek.debugBridge").get("port", DEFAULT_PORT)
+          port: vscode44.workspace.getConfiguration("lurek.debugBridge").get("port", DEFAULT_PORT)
         };
       }
       /** Show a persistent status bar item with live engine stats. */
@@ -847,7 +847,7 @@ var init_debugBridge = __esm({
         if (this.statsItem) {
           return;
         }
-        this.statsItem = vscode45.window.createStatusBarItem(vscode45.StatusBarAlignment.Right, 50);
+        this.statsItem = vscode44.window.createStatusBarItem(vscode44.StatusBarAlignment.Right, 50);
         this.statsItem.text = "$(pulse) FPS: --";
         this.statsItem.tooltip = "Lurek2D Engine Stats";
         this.statsItem.show();
@@ -2342,7 +2342,7 @@ __export(extension2_exports, {
   deactivate: () => deactivate
 });
 module.exports = __toCommonJS(extension2_exports);
-var vscode51 = __toESM(require("vscode"));
+var vscode50 = __toESM(require("vscode"));
 var path22 = __toESM(require("path"));
 var fs19 = __toESM(require("fs"));
 
@@ -2485,12 +2485,12 @@ function getToolDefinitions2(workspaceRoot) {
 }
 if (require.main === module) {
   const args = process.argv.slice(2);
-  let workspace35 = process.cwd();
+  let workspace34 = process.cwd();
   const wsIndex = args.indexOf("--workspace");
   if (wsIndex !== -1 && args[wsIndex + 1]) {
-    workspace35 = args[wsIndex + 1];
+    workspace34 = args[wsIndex + 1];
   }
-  runStdioServer(workspace35);
+  runStdioServer(workspace34);
 }
 
 // src/services/lurekProcess.ts
@@ -2624,48 +2624,8 @@ var StatusBarService = class {
 };
 
 // src/services/apiData.ts
-var vscode3 = __toESM(require("vscode"));
 var fs4 = __toESM(require("fs"));
 var path4 = __toESM(require("path"));
-var BUILTIN_ENUMS = {
-  DrawMode: { values: ["fill", "line"], descriptions: /* @__PURE__ */ new Map([["fill", "Filled shape"], ["line", "Outlined shape"]]) },
-  BodyType: { values: ["static", "dynamic", "kinematic"], descriptions: /* @__PURE__ */ new Map([["static", "Does not move"], ["dynamic", "Full physics simulation"], ["kinematic", "Moves via velocity only"]]) },
-  SourceType: { values: ["static", "stream"], descriptions: /* @__PURE__ */ new Map([["static", "Fully loaded into memory"], ["stream", "Streamed from disk"]]) },
-  BlendMode: { values: ["alpha", "add", "subtract", "multiply", "premultiplied", "replace", "screen"], descriptions: /* @__PURE__ */ new Map() },
-  FilterMode: { values: ["nearest", "linear"], descriptions: /* @__PURE__ */ new Map([["nearest", "Pixelated (sharp)"], ["linear", "Smooth (blurred)"]]) },
-  WrapMode: { values: ["clamp", "clampzero", "repeat", "mirroredrepeat"], descriptions: /* @__PURE__ */ new Map() },
-  ShapeType: { values: ["circle", "rectangle", "polygon", "edge", "chain"], descriptions: /* @__PURE__ */ new Map() },
-  JointType: { values: ["distance", "revolute", "prismatic", "pulley", "gear", "weld", "friction", "motor"], descriptions: /* @__PURE__ */ new Map() },
-  AlignMode: { values: ["left", "center", "right", "justify"], descriptions: /* @__PURE__ */ new Map() },
-  ArcType: { values: ["pie", "open", "closed"], descriptions: /* @__PURE__ */ new Map() },
-  CompareMode: { values: ["equal", "notequal", "less", "lequal", "gequal", "greater", "always", "never"], descriptions: /* @__PURE__ */ new Map() },
-  LineJoin: { values: ["miter", "bevel", "none"], descriptions: /* @__PURE__ */ new Map() },
-  LineCap: { values: ["butt", "round", "square"], descriptions: /* @__PURE__ */ new Map() },
-  EasingFunction: { values: ["linear", "quad", "cubic", "quart", "quint", "sine", "expo", "circ", "back", "bounce", "elastic"], descriptions: /* @__PURE__ */ new Map() }
-};
-var CALLBACK_DEFS = [
-  { name: "load", signature: "lurek.load()", description: "Called once after the script is loaded.", params: [] },
-  { name: "update", signature: "lurek.update(dt)", description: "Called every frame; `dt` is elapsed seconds.", params: [{ name: "dt", type: "number", description: "Delta time in seconds", optional: false }] },
-  { name: "draw", signature: "lurek.draw()", description: "Called every frame for rendering.", params: [] },
-  { name: "keypressed", signature: "lurek.keypressed(key)", description: "Called when a keyboard key is pressed.", params: [{ name: "key", type: "string", description: "Key name", optional: false }] },
-  { name: "keyreleased", signature: "lurek.keyreleased(key)", description: "Called when a keyboard key is released.", params: [{ name: "key", type: "string", description: "Key name", optional: false }] },
-  { name: "textinput", signature: "lurek.textinput(text)", description: "Called on text input.", params: [{ name: "text", type: "string", description: "Input character(s)", optional: false }] },
-  { name: "mousepressed", signature: "lurek.mousepressed(x, y, button)", description: "Called when a mouse button is pressed.", params: [{ name: "x", type: "number", description: "Mouse X", optional: false }, { name: "y", type: "number", description: "Mouse Y", optional: false }, { name: "button", type: "number", description: "Button index", optional: false }] },
-  { name: "mousereleased", signature: "lurek.mousereleased(x, y, button)", description: "Called when a mouse button is released.", params: [{ name: "x", type: "number", description: "Mouse X", optional: false }, { name: "y", type: "number", description: "Mouse Y", optional: false }, { name: "button", type: "number", description: "Button index", optional: false }] },
-  { name: "wheelmoved", signature: "lurek.wheelmoved(x, y)", description: "Called on mouse wheel movement.", params: [{ name: "x", type: "number", description: "Horizontal scroll", optional: false }, { name: "y", type: "number", description: "Vertical scroll", optional: false }] },
-  { name: "gamepadpressed", signature: "lurek.gamepadpressed(id, button)", description: "Called on gamepad button press.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "button", type: "string", description: "Button name", optional: false }] },
-  { name: "gamepadreleased", signature: "lurek.gamepadreleased(id, button)", description: "Called on gamepad button release.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "button", type: "string", description: "Button name", optional: false }] },
-  { name: "gamepadaxis", signature: "lurek.gamepadaxis(id, axis, value)", description: "Called on gamepad axis change.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "axis", type: "string", description: "Axis name", optional: false }, { name: "value", type: "number", description: "Axis value", optional: false }] },
-  { name: "joystickadded", signature: "lurek.joystickadded(id)", description: "Called when a gamepad is connected.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }] },
-  { name: "joystickremoved", signature: "lurek.joystickremoved(id)", description: "Called when a gamepad is disconnected.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }] },
-  { name: "touchpressed", signature: "lurek.touchpressed(id, x, y, dx, dy, pressure)", description: "Called on touch start.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
-  { name: "touchmoved", signature: "lurek.touchmoved(id, x, y, dx, dy, pressure)", description: "Called on touch move.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
-  { name: "touchreleased", signature: "lurek.touchreleased(id, x, y, dx, dy, pressure)", description: "Called on touch end.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
-  { name: "focus", signature: "lurek.focus(has_focus)", description: "Called when window gains or loses focus.", params: [{ name: "has_focus", type: "boolean", description: "Whether window has focus", optional: false }] },
-  { name: "visible", signature: "lurek.visible(is_visible)", description: "Called when window visibility changes.", params: [{ name: "is_visible", type: "boolean", description: "Whether window is visible", optional: false }] },
-  { name: "resize", signature: "lurek.resize(w, h)", description: "Called when the window is resized.", params: [{ name: "w", type: "number", description: "New width", optional: false }, { name: "h", type: "number", description: "New height", optional: false }] },
-  { name: "quit", signature: "lurek.quit()", description: "Called when the window is closed.", params: [] }
-];
 var LUA_STDLIB = {
   string: {
     common: [
@@ -2845,88 +2805,35 @@ var ApiDataService = class {
   enums = /* @__PURE__ */ new Map();
   methodsByObjectType = /* @__PURE__ */ new Map();
   callbackList = [];
+  keyNames = [];
+  gamepadButtons = [];
+  gamepadAxes = [];
   loaded = false;
-  /** Load API data from available sources. */
+  /**
+   * Load API data from `data/lurek-api.json` bundled with the extension.
+   * That file is generated by: python tools/docs/gen_extension_api.py
+   * Re-run whenever the Lurek API changes, then rebuild the extension.
+   */
   async load(extensionPath) {
     if (this.loaded) return;
-    const wsRoot = vscode3.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (wsRoot) {
-      const luaCatsCandidates = [
-        path4.join(wsRoot, "docs", "api", "lurek.lua"),
-        path4.join(wsRoot, "docs", "lurek.lua")
-      ];
-      for (const luaCatsPath of luaCatsCandidates) {
-        if (!fs4.existsSync(luaCatsPath)) {
-          continue;
-        }
-        try {
-          const raw = fs4.readFileSync(luaCatsPath, "utf-8");
-          this.loadFromLurekLua(raw);
-          this.initEnums();
-          this.initCallbacks();
-          this.loaded = true;
-          return;
-        } catch {
-        }
-      }
-      const jsonPath = path4.join(wsRoot, "docs", "reports", "api_data.json");
-      if (fs4.existsSync(jsonPath)) {
-        try {
-          const raw = fs4.readFileSync(jsonPath, "utf-8");
-          this.loadFromJson(JSON.parse(raw));
-          this.initEnums();
-          this.initCallbacks();
-          this.loaded = true;
-          return;
-        } catch {
-        }
-      }
-    }
-    const bundledJson = path4.join(extensionPath, "data", "api-data.json");
+    const bundledJson = path4.join(extensionPath, "data", "lurek-api.json");
     if (fs4.existsSync(bundledJson)) {
       try {
         const raw = fs4.readFileSync(bundledJson, "utf-8");
         this.loadFromJson(JSON.parse(raw));
-        this.initEnums();
-        this.initCallbacks();
-        this.loaded = true;
-        return;
       } catch {
       }
     }
-    if (wsRoot) {
-      const mdCandidates = [
-        path4.join(wsRoot, "docs", "api", "lurek.md"),
-        path4.join(wsRoot, "docs", "lua-api.md")
-      ];
-      for (const mdPath of mdCandidates) {
-        if (!fs4.existsSync(mdPath)) {
-          continue;
-        }
-        try {
-          const md = fs4.readFileSync(mdPath, "utf-8");
-          this.loadFromLuaApiMd(md);
-          this.initEnums();
-          this.initCallbacks();
-          this.loaded = true;
-          return;
-        } catch {
-        }
-      }
-    }
-    this.loadFallback();
-    this.initEnums();
-    this.initCallbacks();
     this.loaded = true;
   }
-  // ── Module access ──────────────────────────────────────────
+  // â”€â”€ Module access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   getModuleNames() {
     return Array.from(this.modules.keys());
   }
   getModule(name) {
     return this.modules.get(name);
   }
-  // ── Function access ────────────────────────────────────────
+  // â”€â”€ Function access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   getFunctions(moduleName) {
     return this.modules.get(moduleName)?.functions ?? [];
   }
@@ -2946,7 +2853,7 @@ var ApiDataService = class {
     }
     return results;
   }
-  // ── Method access ──────────────────────────────────────────
+  // â”€â”€ Method access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   getMethods(objectType) {
     return this.methodsByObjectType.get(objectType) ?? [];
   }
@@ -2954,18 +2861,27 @@ var ApiDataService = class {
     const methods = this.methodsByObjectType.get(objectType);
     return methods?.find((m) => m.name === methodName);
   }
-  // ── Enum access ────────────────────────────────────────────
+  // â”€â”€ Enum access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   getEnumValues(enumName) {
     return this.enums.get(enumName)?.values ?? [];
   }
   getEnum(name) {
     return this.enums.get(name);
   }
-  // ── Callbacks ──────────────────────────────────────────────
+  // â”€â”€ Callbacks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   getCallbacks() {
     return this.callbackList;
   }
-  // ── Lua stdlib ─────────────────────────────────────────────
+  getKeyNames() {
+    return this.keyNames;
+  }
+  getGamepadButtons() {
+    return this.gamepadButtons;
+  }
+  getGamepadAxes() {
+    return this.gamepadAxes;
+  }
+  // â”€â”€ Lua stdlib â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   getLuaStdlib(version) {
     const result = [];
     for (const [tableName, data] of Object.entries(LUA_STDLIB)) {
@@ -2985,7 +2901,7 @@ var ApiDataService = class {
     }
     return result;
   }
-  // ── Stats ──────────────────────────────────────────────────
+  // â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   getStats() {
     let functions = 0;
     let methods = 0;
@@ -2997,7 +2913,7 @@ var ApiDataService = class {
     }
     return { modules: this.modules.size, functions, methods, documented };
   }
-  // ── JSON loader ────────────────────────────────────────────
+  // â”€â”€ JSON loader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   loadFromJson(data) {
     if (!data || typeof data !== "object") return;
     const obj = data;
@@ -3037,6 +2953,32 @@ var ApiDataService = class {
         this.modules.set(modName, mod);
       }
     }
+    const rawEnums = obj.enums;
+    if (rawEnums && typeof rawEnums === "object" && !Array.isArray(rawEnums)) {
+      for (const [name, values] of Object.entries(rawEnums)) {
+        if (Array.isArray(values)) {
+          this.enums.set(name, { name, values, descriptions: /* @__PURE__ */ new Map() });
+        }
+      }
+    }
+    const rawCallbacks = Array.isArray(obj.callbacks) ? obj.callbacks : [];
+    this.callbackList = rawCallbacks.map((cb) => ({
+      module: "",
+      name: String(cb.name ?? ""),
+      fullPath: `lurek.${cb.name ?? ""}`,
+      signature: String(cb.signature ?? ""),
+      description: String(cb.description ?? ""),
+      parameters: Array.isArray(cb.parameters) ? cb.parameters.map((p) => ({
+        name: String(p.name ?? ""),
+        type: String(p.type ?? "any"),
+        description: String(p.description ?? ""),
+        optional: Boolean(p.optional)
+      })) : [],
+      isMethod: false
+    }));
+    this.keyNames = Array.isArray(obj.keyNames) ? obj.keyNames : [];
+    this.gamepadButtons = Array.isArray(obj.gamepadButtons) ? obj.gamepadButtons : [];
+    this.gamepadAxes = Array.isArray(obj.gamepadAxes) ? obj.gamepadAxes : [];
   }
   rawToApiFunction(modName, raw) {
     const name = String(raw.name ?? "");
@@ -3064,247 +3006,6 @@ var ApiDataService = class {
       sourceFile: raw.sourceFile != null ? String(raw.sourceFile) : void 0
     };
   }
-  // ── Markdown loader ────────────────────────────────────────
-  loadFromMarkdown(md) {
-    const lines = md.split("\n");
-    let currentModule = null;
-    let currentFunc = null;
-    let currentObjectType = null;
-    let inParams = false;
-    let inMethodsSection = false;
-    const flushFunc = () => {
-      if (!currentFunc || !currentModule || !currentFunc.name) {
-        currentFunc = null;
-        inParams = false;
-        return;
-      }
-      let desc = (currentFunc.description ?? "").trim();
-      desc = desc.replace(/\s*Lurek2D [\w]+ API function\.\s*/g, " ").trim();
-      const fn = {
-        module: currentModule.name,
-        name: currentFunc.name,
-        fullPath: currentFunc.fullPath ?? `lurek.${currentModule.name}.${currentFunc.name}`,
-        signature: currentFunc.signature ?? "",
-        description: desc,
-        parameters: currentFunc.parameters ?? [],
-        returns: currentFunc.returns,
-        returnType: currentFunc.returnType ?? inferReturnType(currentFunc.returns),
-        since: currentFunc.since,
-        deprecated: currentFunc.deprecated,
-        isMethod: currentFunc.isMethod ?? false,
-        objectType: currentFunc.objectType,
-        sourceFile: currentFunc.sourceFile
-      };
-      if (!fn.signature) {
-        const pStr = fn.parameters.map((p) => p.optional ? `[${p.name}]` : p.name).join(", ");
-        fn.signature = fn.isMethod ? `${fn.objectType ?? "obj"}:${fn.name}(${pStr})` : `${fn.fullPath}(${pStr})`;
-      }
-      if (fn.isMethod) {
-        currentModule.methods.push(fn);
-        this.indexMethod(fn);
-      } else {
-        currentModule.functions.push(fn);
-      }
-      this.allFunctions.set(fn.fullPath, fn);
-      currentFunc = null;
-      inParams = false;
-    };
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const modMatch = line.match(/^## (?:lurek\.)?(\w+)/);
-      if (modMatch && !line.startsWith("## Contents") && !line.startsWith("## Callbacks")) {
-        flushFunc();
-        if (currentModule) {
-          currentModule.totalEntries = currentModule.functions.length + currentModule.methods.length;
-          currentModule.documentedEntries = [...currentModule.functions, ...currentModule.methods].filter((f) => f.description.length > 0).length;
-          this.modules.set(currentModule.name, currentModule);
-        }
-        const modName = modMatch[1].toLowerCase().replace(/-/g, "_");
-        currentModule = {
-          name: modName,
-          fullPath: `lurek.${modName}`,
-          description: "",
-          functions: [],
-          methods: [],
-          totalEntries: 0,
-          documentedEntries: 0
-        };
-        currentObjectType = null;
-        inMethodsSection = false;
-        const nextLine = i + 1 < lines.length ? lines[i + 1] : "";
-        if (nextLine && !nextLine.startsWith("#") && !nextLine.startsWith("*") && nextLine.trim().length > 0) {
-          currentModule.description = nextLine.trim();
-        }
-        const countLine = lines[i + 1] ?? lines[i + 2] ?? "";
-        const countMatch = countLine.match(/\*(\d+)\s+entries?\s*\|\s*(\d+)\s+documented\*/);
-        if (countMatch) {
-          currentModule.totalEntries = parseInt(countMatch[1], 10);
-          currentModule.documentedEntries = parseInt(countMatch[2], 10);
-        }
-        continue;
-      }
-      const sectionMatch = line.match(/^### (?:(\w+)\s+)?Methods$/);
-      if (sectionMatch && currentModule) {
-        flushFunc();
-        inMethodsSection = true;
-        currentObjectType = sectionMatch[1] ?? null;
-        continue;
-      }
-      if (line.match(/^### Functions$/)) {
-        flushFunc();
-        inMethodsSection = false;
-        currentObjectType = null;
-        continue;
-      }
-      const funcMatch = line.match(
-        /^#{3,4}\s+`?lurek\.(\w+)\.(\w+)(?:\(([^)]*)\))?`?/
-      );
-      if (funcMatch && currentModule) {
-        flushFunc();
-        const [, , funcName, argStr] = funcMatch;
-        const paramNames = argStr ? argStr.split(",").map((s) => s.trim().replace(/[\[\]]/g, "")).filter(Boolean) : [];
-        currentFunc = {
-          name: funcName,
-          fullPath: `lurek.${currentModule.name}.${funcName}`,
-          signature: `lurek.${currentModule.name}.${funcName}(${argStr ?? ""})`,
-          description: "",
-          parameters: paramNames.map((n) => ({
-            name: n,
-            type: "any",
-            description: "",
-            optional: n.startsWith("[") || argStr?.includes(`[${n}]`) || false
-          })),
-          isMethod: false
-        };
-        continue;
-      }
-      const methMatch = line.match(/^#{3,4}\s+`?(\w+):(\w+)(?:\(([^)]*)\))?`?\s*$/);
-      if (methMatch && currentModule) {
-        flushFunc();
-        const [, objType, methName, argStr] = methMatch;
-        const paramNames = argStr ? argStr.split(",").map((s) => s.trim().replace(/[\[\]]/g, "")).filter(Boolean) : [];
-        currentObjectType = objType;
-        currentFunc = {
-          name: methName,
-          fullPath: `lurek.${currentModule.name}.${objType}:${methName}`,
-          signature: `${objType}:${methName}(${argStr ?? ""})`,
-          description: "",
-          parameters: paramNames.map((n) => ({
-            name: n,
-            type: "any",
-            description: "",
-            optional: false
-          })),
-          isMethod: true,
-          objectType: objType
-        };
-        continue;
-      }
-      if (!currentFunc) continue;
-      if (/^\*\*Parameters:?\*\*/i.test(line)) {
-        const inlineMatch = line.match(/^\*\*Parameters:?\*\*\s+`([^`]+)`(?:,\s*`([^`]+)`)*$/);
-        if (inlineMatch) {
-          const inlineParams = line.match(/`(\w+)`/g);
-          if (inlineParams) {
-            const existing = new Set((currentFunc.parameters ?? []).map((p) => p.name));
-            for (const raw of inlineParams) {
-              const pName = raw.replace(/`/g, "");
-              if (!existing.has(pName)) {
-                currentFunc.parameters = currentFunc.parameters ?? [];
-                currentFunc.parameters.push({
-                  name: pName,
-                  type: "any",
-                  description: "",
-                  optional: false
-                });
-              }
-            }
-          }
-        } else {
-          inParams = true;
-        }
-        continue;
-      }
-      if (inParams && line.match(/^- `[^`]+`/)) {
-        const twoDash = line.match(/^- `([^`]+)`(?:,\s*`([^`]+)`)?\s*—\s*([^—]+?)\s*—\s*(.+)/);
-        if (twoDash) {
-          const [, pName, pName2, pType, pDesc] = twoDash;
-          this.upsertParam(currentFunc, pName, pType.trim(), pDesc.trim());
-          if (pName2) {
-            this.upsertParam(currentFunc, pName2, pType.trim(), pDesc.trim());
-          }
-          continue;
-        }
-        const oneDash = line.match(/^- `([^`]+)`(?:,\s*`([^`]+)`)?\s*—\s*(.*)/);
-        if (oneDash) {
-          const [, pName, pName2, rest] = oneDash;
-          const typeMatch = rest.match(/^`(\w+)`[:\s]\s*(.*)/);
-          if (typeMatch) {
-            this.upsertParam(currentFunc, pName, typeMatch[1], typeMatch[2].trim());
-          } else {
-            const inferredType = inferTypeFromDesc(rest);
-            this.upsertParam(currentFunc, pName, inferredType, rest.trim());
-          }
-          if (pName2) {
-            this.upsertParam(currentFunc, pName2, "any", "");
-          }
-          continue;
-        }
-        const bareParam = line.match(/^- `(\w+)`\s*$/);
-        if (bareParam) {
-          this.upsertParam(currentFunc, bareParam[1], "any", "");
-          continue;
-        }
-        continue;
-      }
-      if (inParams && !line.startsWith("-") && line.trim() !== "") {
-        inParams = false;
-      }
-      const retMatch = line.match(/^\*\*Returns:?\*\*\s*(.*)/i);
-      if (retMatch) {
-        const retText = retMatch[1].trim();
-        currentFunc.returns = retText;
-        currentFunc.returnType = inferReturnType(retText);
-        continue;
-      }
-      const srcMatch = line.match(/^\*Source:\s*\[([^\]]+)\]/);
-      if (srcMatch) {
-        currentFunc.sourceFile = srcMatch[1];
-        continue;
-      }
-      if (!inParams && line.trim().length > 0 && !line.startsWith("#") && !line.startsWith("*Source:") && !line.startsWith("---") && !line.startsWith("*") && !line.match(/^Lua API:/)) {
-        const desc = currentFunc.description ?? "";
-        currentFunc.description = desc ? `${desc} ${line.trim()}` : line.trim();
-      }
-    }
-    flushFunc();
-    if (currentModule) {
-      currentModule.totalEntries = currentModule.functions.length + currentModule.methods.length;
-      currentModule.documentedEntries = [...currentModule.functions, ...currentModule.methods].filter((f) => f.description.length > 0).length;
-      this.modules.set(currentModule.name, currentModule);
-    }
-  }
-  upsertParam(func, name, type, description) {
-    func.parameters = func.parameters ?? [];
-    const existing = func.parameters.find((p) => p.name === name);
-    if (existing) {
-      if (type !== "any") existing.type = type;
-      if (description) existing.description = description;
-    } else {
-      const isOptional = description.toLowerCase().startsWith("optional") || description.includes("(default") || name.startsWith("[");
-      const cleanName = name.replace(/[\[\]]/g, "");
-      let defaultVal;
-      const defMatch = description.match(/\(default[:\s]+([^)]+)\)/i);
-      if (defMatch) defaultVal = defMatch[1].trim();
-      func.parameters.push({
-        name: cleanName,
-        type,
-        description,
-        optional: isOptional,
-        default: defaultVal
-      });
-    }
-  }
   indexMethod(fn) {
     const objType = fn.objectType;
     if (!objType) return;
@@ -3315,25 +3016,7 @@ var ApiDataService = class {
     }
     list.push(fn);
   }
-  // ── Enum initialization ────────────────────────────────────
-  initEnums() {
-    for (const [name, data] of Object.entries(BUILTIN_ENUMS)) {
-      this.enums.set(name, { name, values: data.values, descriptions: data.descriptions });
-    }
-  }
-  // ── Callback initialization ────────────────────────────────
-  initCallbacks() {
-    this.callbackList = CALLBACK_DEFS.map((cb) => ({
-      module: "",
-      name: cb.name,
-      fullPath: `lurek.${cb.name}`,
-      signature: cb.signature,
-      description: cb.description,
-      parameters: cb.params,
-      isMethod: false
-    }));
-  }
-  // ── Stdlib helper ──────────────────────────────────────────
+  // â”€â”€ Stdlib helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   stdlibToApiFunction(tableName, entry) {
     return {
       module: tableName,
@@ -3347,486 +3030,13 @@ var ApiDataService = class {
       isMethod: false
     };
   }
-  // ── docs/api/lurek.lua loader ─────────────────────────────────────────
-  // Parses the LuaCATS-style full API reference used as the workspace source of
-  // truth. This format includes richer @param and @return annotations than the
-  // compact lua-api.md reference.
-  loadFromLurekLua(luaSource) {
-    const lines = luaSource.split("\n");
-    let currentModule = null;
-    let pendingDescription = [];
-    let pendingParams = [];
-    let pendingReturns = [];
-    const finishModule = () => {
-      if (!currentModule) {
-        return;
-      }
-      currentModule.totalEntries = currentModule.functions.length + currentModule.methods.length;
-      currentModule.documentedEntries = [
-        ...currentModule.functions,
-        ...currentModule.methods
-      ].filter((fn) => fn.description.length > 0).length;
-      this.modules.set(currentModule.name, currentModule);
-    };
-    const clearPending = () => {
-      pendingDescription = [];
-      pendingParams = [];
-      pendingReturns = [];
-    };
-    const ensureModule = (moduleName) => {
-      if (currentModule && currentModule.name === moduleName) {
-        return currentModule;
-      }
-      finishModule();
-      currentModule = {
-        name: moduleName,
-        fullPath: `lurek.${moduleName}`,
-        description: pendingDescription.join(" ").trim(),
-        functions: [],
-        methods: [],
-        totalEntries: 0,
-        documentedEntries: 0
-      };
-      clearPending();
-      return currentModule;
-    };
-    for (const rawLine of lines) {
-      const line = rawLine.trim();
-      if (line.length === 0) {
-        continue;
-      }
-      const descMatch = line.match(/^---(?!@)(.*)$/);
-      if (descMatch) {
-        const desc = descMatch[1].trim();
-        if (desc) {
-          pendingDescription.push(desc);
-        }
-        continue;
-      }
-      const paramMatch = line.match(/^---@param\s+(\w+)\s+(\S+)(?:\s+(.*))?$/);
-      if (paramMatch) {
-        const [, name, rawType, rawDesc] = paramMatch;
-        pendingParams.push({
-          name,
-          type: rawType.replace(/\?$/, ""),
-          description: rawDesc?.trim() ?? "",
-          optional: rawType.includes("?") || /optional/i.test(rawDesc ?? "")
-        });
-        continue;
-      }
-      const returnMatch = line.match(/^---@return\s+(.+)$/);
-      if (returnMatch) {
-        pendingReturns.push(returnMatch[1].trim());
-        continue;
-      }
-      const moduleMatch = line.match(/^---@class\s+lurek\.([A-Za-z0-9_]+)\s*$/);
-      if (moduleMatch) {
-        finishModule();
-        currentModule = {
-          name: moduleMatch[1],
-          fullPath: `lurek.${moduleMatch[1]}`,
-          description: pendingDescription.join(" ").trim(),
-          functions: [],
-          methods: [],
-          totalEntries: 0,
-          documentedEntries: 0
-        };
-        clearPending();
-        continue;
-      }
-      if (/^---@class\s+[A-Za-z_][A-Za-z0-9_]*(?:\s*:\s*[A-Za-z_][A-Za-z0-9_]*)?\s*$/.test(line)) {
-        clearPending();
-        continue;
-      }
-      const functionMatch = line.match(/^function\s+lurek\.([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\(([^)]*)\)\s*end$/);
-      if (functionMatch) {
-        const [, moduleName, functionName, argStr] = functionMatch;
-        const module2 = ensureModule(moduleName);
-        const returns = pendingReturns.length > 0 ? pendingReturns.join(", ") : void 0;
-        const parameters = this.mergeSignatureParams(argStr, pendingParams);
-        const fn = {
-          module: module2.name,
-          name: functionName,
-          fullPath: `lurek.${module2.name}.${functionName}`,
-          signature: `lurek.${module2.name}.${functionName}(${argStr.trim()})`,
-          description: pendingDescription.join(" ").trim(),
-          parameters,
-          returns,
-          returnType: inferReturnType(returns),
-          isMethod: false
-        };
-        module2.functions.push(fn);
-        this.allFunctions.set(fn.fullPath, fn);
-        clearPending();
-        continue;
-      }
-      const methodMatch = line.match(/^function\s+([A-Za-z_][A-Za-z0-9_]*)[:.]([A-Za-z0-9_]+)\(([^)]*)\)\s*end$/);
-      if (methodMatch && currentModule) {
-        const [, objectType, methodName, argStr] = methodMatch;
-        const returns = pendingReturns.length > 0 ? pendingReturns.join(", ") : void 0;
-        const parameters = this.mergeSignatureParams(argStr, pendingParams);
-        const fn = {
-          module: currentModule.name,
-          name: methodName,
-          fullPath: `lurek.${currentModule.name}.${objectType}:${methodName}`,
-          signature: `${objectType}:${methodName}(${argStr.trim()})`,
-          description: pendingDescription.join(" ").trim(),
-          parameters,
-          returns,
-          returnType: inferReturnType(returns),
-          isMethod: true,
-          objectType
-        };
-        currentModule.methods.push(fn);
-        this.indexMethod(fn);
-        this.allFunctions.set(fn.fullPath, fn);
-        clearPending();
-        continue;
-      }
-      clearPending();
-    }
-    finishModule();
-  }
-  // ── lua-api.md loader ─────────────────────────────────────────────────────
-  // Parses the compact one-liner format used in docs/api/lurek.md:
-  //   lurek.MODULE.FUNCNAME( params )[ -> returnType]  -- description
-  //   ObjType:methodName( params )[ -> returnType]  -- description
-  loadFromLuaApiMd(md) {
-    const lines = md.split("\n");
-    let currentModule = null;
-    let inCodeBlock = false;
-    const finishModule = () => {
-      if (!currentModule) return;
-      currentModule.totalEntries = currentModule.functions.length + currentModule.methods.length;
-      currentModule.documentedEntries = [
-        ...currentModule.functions,
-        ...currentModule.methods
-      ].filter((f) => f.description.length > 0).length;
-      this.modules.set(currentModule.name, currentModule);
-    };
-    for (const line of lines) {
-      const modMatch = line.match(/^## [`']?lurek\.([\w]+)[`']?/);
-      if (modMatch) {
-        finishModule();
-        const modName = modMatch[1];
-        currentModule = {
-          name: modName,
-          fullPath: `lurek.${modName}`,
-          description: "",
-          functions: [],
-          methods: [],
-          totalEntries: 0,
-          documentedEntries: 0
-        };
-        inCodeBlock = false;
-        continue;
-      }
-      if (currentModule && line.startsWith(">") && !currentModule.description) {
-        const desc = line.replace(/^>\s*`[^`]*`\s*—\s*/, "").trim();
-        if (desc) currentModule.description = desc;
-        continue;
-      }
-      if (line.startsWith("```")) {
-        inCodeBlock = !inCodeBlock;
-        continue;
-      }
-      if (!inCodeBlock || !currentModule) continue;
-      {
-        const m = line.match(/^function lurek\.(\w+)\(\s*(.*?)\s*\)\s*--\s*(.*)/);
-        if (m) {
-          continue;
-        }
-      }
-      {
-        const m = line.match(/^lurek\.(\w+)\.(\w+)\(\s*(.*?)\s*\)(?:\s*->\s*([^-]+?))?\s*--\s*(.*)/);
-        if (m) {
-          const [, , funcName, paramStr, retRaw, description] = m;
-          const returnType = retRaw?.trim() || void 0;
-          const parameters = this.parseParamStr(paramStr);
-          const fn = {
-            module: currentModule.name,
-            name: funcName,
-            fullPath: `lurek.${currentModule.name}.${funcName}`,
-            signature: `lurek.${currentModule.name}.${funcName}(${paramStr})`,
-            description: description.trim(),
-            parameters,
-            returns: returnType,
-            returnType,
-            isMethod: false
-          };
-          currentModule.functions.push(fn);
-          this.allFunctions.set(fn.fullPath, fn);
-          continue;
-        }
-      }
-      {
-        const m = line.match(/^([A-Z]\w*):([\w]+)\(\s*(.*?)\s*\)(?:\s*->\s*([^-]+?))?\s*--\s*(.*)/);
-        if (m) {
-          const [, objType, methName, paramStr, retRaw, description] = m;
-          const returnType = retRaw?.trim() || void 0;
-          const parameters = this.parseParamStr(paramStr);
-          const fn = {
-            module: currentModule.name,
-            name: methName,
-            fullPath: `lurek.${currentModule.name}.${objType}:${methName}`,
-            signature: `${objType}:${methName}(${paramStr})`,
-            description: description.trim(),
-            parameters,
-            returns: returnType,
-            returnType,
-            isMethod: true,
-            objectType: objType
-          };
-          currentModule.methods.push(fn);
-          this.indexMethod(fn);
-          this.allFunctions.set(fn.fullPath, fn);
-          continue;
-        }
-      }
-    }
-    finishModule();
-  }
-  // ── Param string parser ────────────────────────────────────────────────────
-  // Parses "name : type, name2 : type2?" style param strings from lua-api.md
-  parseParamStr(paramStr) {
-    if (!paramStr.trim()) return [];
-    return paramStr.split(",").map((p) => {
-      p = p.trim();
-      const optional = p.endsWith("?") || p.includes("?");
-      const colonIdx = p.indexOf(":");
-      if (colonIdx >= 0) {
-        const name2 = p.slice(0, colonIdx).trim().replace(/[?\[\]]/g, "");
-        const type = p.slice(colonIdx + 1).trim().replace(/\?$/, "").trim();
-        return { name: name2 || "_", type: type || "any", description: "", optional };
-      }
-      const name = p.replace(/[?\[\]]/g, "").trim();
-      return { name: name || "_", type: "any", description: "", optional };
-    });
-  }
-  mergeSignatureParams(argStr, annotatedParams) {
-    const params = annotatedParams.map((param) => ({ ...param }));
-    const existingNames = new Set(params.map((param) => param.name));
-    const signatureNames = argStr.split(",").map((part) => part.trim()).filter(Boolean);
-    for (const name of signatureNames) {
-      if (!existingNames.has(name)) {
-        params.push({
-          name,
-          type: "any",
-          description: "",
-          optional: false
-        });
-      }
-    }
-    return params;
-  }
-  // ── Fallback data ──────────────────────────────────────────
-  loadFallback() {
-    const mods = [
-      [
-        "render",
-        "Drawing and rendering functions",
-        [
-          ["draw", "Draws a drawable object at the specified position", ["drawable", "x", "y", "r", "sx", "sy", "ox", "oy"]],
-          ["rectangle", "Draws a rectangle", ["mode", "x", "y", "width", "height"]],
-          ["circle", "Draws a circle", ["mode", "x", "y", "radius"]],
-          ["line", "Draws a line between points", ["x1", "y1", "x2", "y2"]],
-          ["setColor", "Sets the active drawing color (0-1 range)", ["r", "g", "b", "a"]],
-          ["setBackgroundColor", "Sets the background color", ["r", "g", "b"]],
-          ["newImage", "Loads an image from file", ["path"]],
-          ["newCanvas", "Creates an off-screen canvas", ["width", "height"]],
-          ["newFont", "Loads a font from file", ["path", "size"]],
-          ["newShader", "Creates a shader from source", ["code"]],
-          ["print", "Draws text at position", ["text", "x", "y"]],
-          ["push", "Pushes the current transform onto the stack", []],
-          ["pop", "Pops the current transform from the stack", []],
-          ["translate", "Translates the coordinate system", ["dx", "dy"]],
-          ["rotate", "Rotates the coordinate system", ["angle"]],
-          ["scale", "Scales the coordinate system", ["sx", "sy"]],
-          ["clear", "Clears the screen with current background color", ["r", "g", "b"]],
-          ["getWidth", "Returns the window width in pixels", []],
-          ["getHeight", "Returns the window height in pixels", []],
-          ["arc", "Draws an arc", ["mode", "x", "y", "radius", "angle1", "angle2"]],
-          ["polygon", "Draws a polygon", ["mode", "...vertices"]],
-          ["ellipse", "Draws an ellipse", ["mode", "x", "y", "rx", "ry"]],
-          ["points", "Draws points at positions", ["...coords"]],
-          ["setLineWidth", "Sets the line width", ["width"]],
-          ["getLineWidth", "Returns the current line width", []],
-          ["setFont", "Sets the active font", ["font"]],
-          ["origin", "Resets the transform to identity", []]
-        ]
-      ],
-      [
-        "audio",
-        "Audio playback and management",
-        [
-          ["newSource", "Creates a new audio source from file", ["path", "type"]],
-          ["play", "Plays an audio source", ["source"]],
-          ["stop", "Stops an audio source", ["source"]],
-          ["pause", "Pauses an audio source", ["source"]],
-          ["setVolume", "Sets the master volume (0-1)", ["volume"]],
-          ["getVolume", "Returns the master volume", []]
-        ]
-      ],
-      [
-        "physics",
-        "2D physics simulation with rapier2d",
-        [
-          ["newWorld", "Creates a new physics world", ["gx", "gy"]],
-          ["newBody", "Creates a new rigid body", ["world", "x", "y", "type"]],
-          ["newRectangleShape", "Attaches a rectangle collider", ["body", "w", "h"]],
-          ["newCircleShape", "Attaches a circle collider", ["body", "radius"]],
-          ["newEdgeShape", "Attaches an edge collider", ["body", "x1", "y1", "x2", "y2"]],
-          ["newPolygonShape", "Attaches a polygon collider", ["body", "...vertices"]]
-        ]
-      ],
-      [
-        "input",
-        "Keyboard, mouse, and gamepad input",
-        [
-          ["isDown", "Checks if a keyboard key is currently pressed", ["key"]],
-          ["isUp", "Checks if a keyboard key is not pressed", ["key"]],
-          ["getMousePosition", "Returns mouse x, y coordinates", []],
-          ["getMouseX", "Returns the mouse X position", []],
-          ["getMouseY", "Returns the mouse Y position", []],
-          ["isMouseDown", "Checks if a mouse button is pressed", ["button"]],
-          ["getGamepadAxis", "Returns gamepad axis value", ["id", "axis"]],
-          ["isGamepadDown", "Checks if gamepad button is pressed", ["id", "button"]]
-        ]
-      ],
-      [
-        "timer",
-        "Timing and frame management",
-        [
-          ["getTime", "Returns total elapsed time in seconds", []],
-          ["getDelta", "Returns delta time for current frame", []],
-          ["getFPS", "Returns current frames per second", []],
-          ["sleep", "Pauses execution for duration", ["seconds"]],
-          ["average", "Returns average frame time", []]
-        ]
-      ],
-      [
-        "window",
-        "Window management and display",
-        [
-          ["setTitle", "Sets the window title", ["title"]],
-          ["getTitle", "Returns the window title", []],
-          ["setMode", "Sets the window dimensions", ["width", "height", "flags"]],
-          ["getWidth", "Returns the window width", []],
-          ["getHeight", "Returns the window height", []],
-          ["setFullscreen", "Toggles fullscreen mode", ["fullscreen"]],
-          ["isFullscreen", "Returns whether window is fullscreen", []],
-          ["setIcon", "Sets the window icon", ["imagedata"]],
-          ["close", "Closes the window", []],
-          ["minimize", "Minimizes the window", []],
-          ["maximize", "Maximizes the window", []],
-          ["restore", "Restores the window from minimize/maximize", []]
-        ]
-      ],
-      [
-        "math",
-        "Mathematical utility functions",
-        [
-          ["random", "Returns a random number", ["min", "max"]],
-          ["noise", "Generates Perlin noise value", ["x", "y", "z"]],
-          ["lerp", "Linearly interpolates between two values", ["a", "b", "t"]],
-          ["clamp", "Clamps a value between min and max", ["x", "min", "max"]],
-          ["distance", "Returns distance between two points", ["x1", "y1", "x2", "y2"]],
-          ["angle", "Returns angle between two points", ["x1", "y1", "x2", "y2"]],
-          ["normalize", "Normalizes a vector", ["x", "y"]]
-        ]
-      ],
-      [
-        "filesystem",
-        "Sandboxed file I/O",
-        [
-          ["read", "Reads a file as a string", ["path"]],
-          ["write", "Writes a string to a file", ["path", "data"]],
-          ["exists", "Checks if a file exists", ["path"]],
-          ["getDirectoryItems", "Lists items in a directory", ["path"]],
-          ["createDirectory", "Creates a directory", ["path"]],
-          ["remove", "Removes a file", ["path"]],
-          ["isFile", "Checks if path is a file", ["path"]],
-          ["isDirectory", "Checks if path is a directory", ["path"]]
-        ]
-      ],
-      [
-        "system",
-        "System information and utilities",
-        [
-          ["getOS", "Returns the operating system name", []],
-          ["getClipboardText", "Returns clipboard text content", []],
-          ["setClipboardText", "Sets clipboard text content", ["text"]],
-          ["quit", "Quits the application", []],
-          ["openURL", "Opens a URL in the default browser", ["url"]]
-        ]
-      ]
-    ];
-    for (const [modName, modDesc, funcs] of mods) {
-      const mod = {
-        name: modName,
-        fullPath: `lurek.${modName}`,
-        description: modDesc,
-        functions: [],
-        methods: [],
-        totalEntries: 0,
-        documentedEntries: 0
-      };
-      for (const [name, desc, params] of funcs) {
-        const fn = {
-          module: modName,
-          name,
-          fullPath: `lurek.${modName}.${name}`,
-          signature: `lurek.${modName}.${name}(${params.join(", ")})`,
-          description: desc,
-          parameters: params.map((p) => ({
-            name: p,
-            type: "any",
-            description: "",
-            optional: false
-          })),
-          isMethod: false
-        };
-        mod.functions.push(fn);
-        this.allFunctions.set(fn.fullPath, fn);
-      }
-      mod.totalEntries = mod.functions.length;
-      mod.documentedEntries = mod.functions.filter((f) => f.description.length > 0).length;
-      this.modules.set(modName, mod);
-    }
-  }
 };
-function inferReturnType(returns) {
-  if (!returns) return void 0;
-  const lower = returns.toLowerCase();
-  if (lower === "nil" || lower === "none") return "nil";
-  if (lower.startsWith("number") || lower.startsWith("`number`")) return "number";
-  if (lower.startsWith("string") || lower.startsWith("`string`")) return "string";
-  if (lower.startsWith("boolean") || lower.startsWith("`boolean`")) return "boolean";
-  if (lower.startsWith("table") || lower.startsWith("`table`")) return "table";
-  if (lower.startsWith("integer") || lower.startsWith("`integer`")) return "number";
-  if (lower.startsWith("function") || lower.startsWith("`function`")) return "function";
-  if (lower.includes(",")) return "multiple";
-  return returns;
-}
-function inferTypeFromDesc(desc) {
-  const lower = desc.toLowerCase();
-  if (lower.includes("boolean")) return "boolean";
-  if (lower.includes("string") || lower.includes("name")) return "string";
-  if (lower.includes("pixel") || lower.includes("coordinate") || lower.includes("number") || lower.includes("angle") || lower.includes("radius") || lower.includes("width") || lower.includes("height") || lower.includes("scale") || lower.includes("factor") || lower.includes("offset") || lower.includes("index") || lower.includes("integer")) {
-    return "number";
-  }
-  if (lower.includes("table")) return "table";
-  if (lower.includes("function") || lower.includes("callback")) return "function";
-  if (lower.includes("draw mode") || lower.includes("'fill'") || lower.includes("'line'")) return "DrawMode";
-  if (lower.includes("blend mode")) return "BlendMode";
-  return "any";
-}
 
 // src/providers/sidebar.ts
-var vscode4 = __toESM(require("vscode"));
+var vscode3 = __toESM(require("vscode"));
 var fs5 = __toESM(require("fs"));
 var path5 = __toESM(require("path"));
-var SidebarItem = class extends vscode4.TreeItem {
+var SidebarItem = class extends vscode3.TreeItem {
   constructor(label, collapsibleState, commandId, icon, statusDescription) {
     super(label, collapsibleState);
     this.label = label;
@@ -3841,7 +3051,7 @@ var SidebarItem = class extends vscode4.TreeItem {
       };
     }
     if (icon) {
-      this.iconPath = new vscode4.ThemeIcon(icon);
+      this.iconPath = new vscode3.ThemeIcon(icon);
     }
     if (statusDescription) {
       this.description = statusDescription;
@@ -3849,7 +3059,7 @@ var SidebarItem = class extends vscode4.TreeItem {
   }
 };
 var ProjectToolsProvider = class {
-  _onDidChangeTreeData = new vscode4.EventEmitter();
+  _onDidChangeTreeData = new vscode3.EventEmitter();
   onDidChangeTreeData = this._onDidChangeTreeData.event;
   refresh() {
     this._onDidChangeTreeData.fire(void 0);
@@ -3862,25 +3072,25 @@ var ProjectToolsProvider = class {
       return [
         new SidebarItem(
           "Project Health",
-          vscode4.TreeItemCollapsibleState.Expanded,
+          vscode3.TreeItemCollapsibleState.Expanded,
           void 0,
           "heart"
         ),
         new SidebarItem(
           "Create",
-          vscode4.TreeItemCollapsibleState.Expanded,
+          vscode3.TreeItemCollapsibleState.Expanded,
           void 0,
           "new-folder"
         ),
         new SidebarItem(
           "Package",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "package"
         ),
         new SidebarItem(
           "Libraries",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "library"
         )
@@ -3893,13 +3103,13 @@ var ProjectToolsProvider = class {
         return [
           new SidebarItem(
             "New Project from Template",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.scaffold.project",
             "file-add"
           ),
           new SidebarItem(
             "New File from Template",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.scaffold.file",
             "new-file"
           )
@@ -3908,19 +3118,19 @@ var ProjectToolsProvider = class {
         return [
           new SidebarItem(
             "Package .zip",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.package.zip",
             "file-zip"
           ),
           new SidebarItem(
             "Package for Windows",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.package.windows",
             "desktop-download"
           ),
           new SidebarItem(
             "Package for Linux",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.package.linux",
             "terminal-linux"
           )
@@ -3929,19 +3139,19 @@ var ProjectToolsProvider = class {
         return [
           new SidebarItem(
             "Browse Pattern Library",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.library.browse",
             "search"
           ),
           new SidebarItem(
             "Insert Code Snippet",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.library.insertSnippet",
             "code"
           ),
           new SidebarItem(
             "Save Selection as Pattern",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.library.newPattern",
             "save"
           )
@@ -3952,17 +3162,17 @@ var ProjectToolsProvider = class {
   }
   /** Scans the workspace for key project files and returns health indicators. */
   getProjectHealthItems() {
-    const wsRoot = vscode4.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const wsRoot = vscode3.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!wsRoot) {
       return [
-        new SidebarItem("No workspace open", vscode4.TreeItemCollapsibleState.None, void 0, "warning")
+        new SidebarItem("No workspace open", vscode3.TreeItemCollapsibleState.None, void 0, "warning")
       ];
     }
     const items = [];
     const hasMainLua = fs5.existsSync(path5.join(wsRoot, "main.lua"));
     items.push(new SidebarItem(
       "main.lua",
-      vscode4.TreeItemCollapsibleState.None,
+      vscode3.TreeItemCollapsibleState.None,
       hasMainLua ? void 0 : "lurek.scaffold.file",
       hasMainLua ? "pass" : "error",
       hasMainLua ? "found" : "missing"
@@ -3970,7 +3180,7 @@ var ProjectToolsProvider = class {
     const hasConfLua = fs5.existsSync(path5.join(wsRoot, "conf.lua"));
     items.push(new SidebarItem(
       "conf.lua",
-      vscode4.TreeItemCollapsibleState.None,
+      vscode3.TreeItemCollapsibleState.None,
       void 0,
       hasConfLua ? "pass" : "warning",
       hasConfLua ? "found" : "optional"
@@ -3996,7 +3206,7 @@ var ProjectToolsProvider = class {
     }
     items.push(new SidebarItem(
       "Lua files",
-      vscode4.TreeItemCollapsibleState.None,
+      vscode3.TreeItemCollapsibleState.None,
       void 0,
       "file-code",
       `${luaFileCount}`
@@ -4004,7 +3214,7 @@ var ProjectToolsProvider = class {
     const hasTests = fs5.existsSync(path5.join(wsRoot, "tests")) || fs5.existsSync(path5.join(wsRoot, "test")) || fs5.existsSync(path5.join(wsRoot, "tests.lua"));
     items.push(new SidebarItem(
       "Tests",
-      vscode4.TreeItemCollapsibleState.None,
+      vscode3.TreeItemCollapsibleState.None,
       void 0,
       hasTests ? "pass" : "warning",
       hasTests ? "detected" : "none found"
@@ -4013,7 +3223,7 @@ var ProjectToolsProvider = class {
   }
 };
 var DevToolsProvider = class {
-  _onDidChangeTreeData = new vscode4.EventEmitter();
+  _onDidChangeTreeData = new vscode3.EventEmitter();
   onDidChangeTreeData = this._onDidChangeTreeData.event;
   _gameStatus = "stopped";
   _lastTestResult;
@@ -4038,49 +3248,49 @@ var DevToolsProvider = class {
       return [
         new SidebarItem(
           "Run",
-          vscode4.TreeItemCollapsibleState.Expanded,
+          vscode3.TreeItemCollapsibleState.Expanded,
           void 0,
           "play"
         ),
         new SidebarItem(
           "Testing",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "beaker"
         ),
         new SidebarItem(
           "Editors",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "window"
         ),
         new SidebarItem(
           "Debug",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "bug"
         ),
         new SidebarItem(
           "Reference",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "book"
         ),
         new SidebarItem(
           "Assets",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "file-media"
         ),
         new SidebarItem(
           "Dependencies",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "list-tree"
         ),
         new SidebarItem(
           "Performance",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "dashboard"
         )
@@ -4091,32 +3301,32 @@ var DevToolsProvider = class {
         return [
           new SidebarItem(
             "Game Status",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             void 0,
             this._gameStatus === "running" ? "debug-start" : this._gameStatus === "crashed" ? "error" : "debug-stop",
             this._gameStatus
           ),
           new SidebarItem(
             "Run Game",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.runGame",
             "play"
           ),
           new SidebarItem(
             "Stop Game",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.stopGame",
             "debug-stop"
           ),
           new SidebarItem(
             "Run with Arguments",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.runWithArgs",
             "terminal"
           ),
           new SidebarItem(
             "Run Example",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.runExample",
             "file-code"
           )
@@ -4126,7 +3336,7 @@ var DevToolsProvider = class {
           ...this._lastTestResult ? [
             new SidebarItem(
               "Last Result",
-              vscode4.TreeItemCollapsibleState.None,
+              vscode3.TreeItemCollapsibleState.None,
               void 0,
               this._lastTestResult.includes("fail") ? "error" : "pass",
               this._lastTestResult
@@ -4134,31 +3344,31 @@ var DevToolsProvider = class {
           ] : [],
           new SidebarItem(
             "Open Test Runner",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.editor.testRunner",
             "beaker"
           ),
           new SidebarItem(
             "Run All Tests",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.test.all",
             "testing-run-all-icon"
           ),
           new SidebarItem(
             "Run Lua Tests",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.test.lua.all",
             "test-view-icon"
           ),
           new SidebarItem(
             "Run Golden Tests",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.test.lua.golden",
             "file-media"
           ),
           new SidebarItem(
             "Generate Tests for File",
-            vscode4.TreeItemCollapsibleState.None,
+            vscode3.TreeItemCollapsibleState.None,
             "lurek.test.generateForFile",
             "wand"
           )
@@ -4166,80 +3376,80 @@ var DevToolsProvider = class {
       case "Editors":
         return [
           // ── Level / World ─────────────────────────────────────
-          new SidebarItem("Tile Map Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.tileMap", "symbol-misc"),
-          new SidebarItem("Tileset Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.tileset", "layers"),
-          new SidebarItem("Tilemap Script Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.tilemapScript", "code"),
-          new SidebarItem("World Map Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.worldMap", "map"),
-          new SidebarItem("Procedural Map Generator", vscode4.TreeItemCollapsibleState.None, "lurek.editor.procMap", "globe"),
+          new SidebarItem("Tile Map Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.tileMap", "symbol-misc"),
+          new SidebarItem("Tileset Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.tileset", "layers"),
+          new SidebarItem("Tilemap Script Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.tilemapScript", "code"),
+          new SidebarItem("World Map Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.worldMap", "map"),
+          new SidebarItem("Procedural Map Generator", vscode3.TreeItemCollapsibleState.None, "lurek.editor.procMap", "globe"),
           // ── Art / Visual ──────────────────────────────────────
-          new SidebarItem("Pixel Art Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.pixelArt", "paintcan"),
-          new SidebarItem("Sprite Animation Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.spriteAnim", "play-circle"),
-          new SidebarItem("Shader Preview", vscode4.TreeItemCollapsibleState.None, "lurek.editor.shaderPreview", "wand"),
-          new SidebarItem("Color Palette", vscode4.TreeItemCollapsibleState.None, "lurek.editor.colorPalette", "symbol-color"),
-          new SidebarItem("Font Preview", vscode4.TreeItemCollapsibleState.None, "lurek.editor.fontPreview", "text-size"),
+          new SidebarItem("Pixel Art Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.pixelArt", "paintcan"),
+          new SidebarItem("Sprite Animation Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.spriteAnim", "play-circle"),
+          new SidebarItem("Shader Preview", vscode3.TreeItemCollapsibleState.None, "lurek.editor.shaderPreview", "wand"),
+          new SidebarItem("Color Palette", vscode3.TreeItemCollapsibleState.None, "lurek.editor.colorPalette", "symbol-color"),
+          new SidebarItem("Font Preview", vscode3.TreeItemCollapsibleState.None, "lurek.editor.fontPreview", "text-size"),
           // ── Game Design ───────────────────────────────────────
-          new SidebarItem("Scene Flow Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.sceneFlow", "type-hierarchy"),
-          new SidebarItem("Entity Designer", vscode4.TreeItemCollapsibleState.None, "lurek.editor.entity", "symbol-class"),
-          new SidebarItem("Dialog Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.dialog", "comment-discussion"),
-          new SidebarItem("Quest Tree Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.questTree", "git-merge"),
-          new SidebarItem("GUI Widget Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.guiWidget", "symbol-interface"),
-          new SidebarItem("Timeline / Cutscene", vscode4.TreeItemCollapsibleState.None, "lurek.editor.timeline", "history"),
-          new SidebarItem("Input Mapper", vscode4.TreeItemCollapsibleState.None, "lurek.editor.inputMapper", "keyboard"),
-          new SidebarItem("Localization Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.localization", "book"),
+          new SidebarItem("Scene Flow Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.sceneFlow", "type-hierarchy"),
+          new SidebarItem("Entity Designer", vscode3.TreeItemCollapsibleState.None, "lurek.editor.entity", "symbol-class"),
+          new SidebarItem("Dialog Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.dialog", "comment-discussion"),
+          new SidebarItem("Quest Tree Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.questTree", "git-merge"),
+          new SidebarItem("GUI Widget Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.guiWidget", "symbol-interface"),
+          new SidebarItem("Timeline / Cutscene", vscode3.TreeItemCollapsibleState.None, "lurek.editor.timeline", "history"),
+          new SidebarItem("Input Mapper", vscode3.TreeItemCollapsibleState.None, "lurek.editor.inputMapper", "keyboard"),
+          new SidebarItem("Localization Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.localization", "book"),
           // ── Simulation ────────────────────────────────────────
-          new SidebarItem("Particle Designer", vscode4.TreeItemCollapsibleState.None, "lurek.editor.particle", "sparkle"),
-          new SidebarItem("Physics Materials", vscode4.TreeItemCollapsibleState.None, "lurek.editor.physicsMaterials", "settings-gear"),
-          new SidebarItem("AI Behavior Tree", vscode4.TreeItemCollapsibleState.None, "lurek.editor.aiBehavior", "hubot"),
-          new SidebarItem("Voxel Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.voxel", "layers"),
+          new SidebarItem("Particle Designer", vscode3.TreeItemCollapsibleState.None, "lurek.editor.particle", "sparkle"),
+          new SidebarItem("Physics Materials", vscode3.TreeItemCollapsibleState.None, "lurek.editor.physicsMaterials", "settings-gear"),
+          new SidebarItem("AI Behavior Tree", vscode3.TreeItemCollapsibleState.None, "lurek.editor.aiBehavior", "hubot"),
+          new SidebarItem("Voxel Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.voxel", "layers"),
           // ── Audio / FX ───────────────────────────────────────
-          new SidebarItem("Audio Mixer", vscode4.TreeItemCollapsibleState.None, "lurek.editor.audioMixer", "unmute"),
-          new SidebarItem("Sound DSP Panel", vscode4.TreeItemCollapsibleState.None, "lurek.editor.soundDsp", "radio-tower"),
-          new SidebarItem("PostFX & Overlay Designer", vscode4.TreeItemCollapsibleState.None, "lurek.editor.postfxOverlay", "color-mode"),
+          new SidebarItem("Audio Mixer", vscode3.TreeItemCollapsibleState.None, "lurek.editor.audioMixer", "unmute"),
+          new SidebarItem("Sound DSP Panel", vscode3.TreeItemCollapsibleState.None, "lurek.editor.soundDsp", "radio-tower"),
+          new SidebarItem("PostFX & Overlay Designer", vscode3.TreeItemCollapsibleState.None, "lurek.editor.postfxOverlay", "color-mode"),
           // ── Data ──────────────────────────────────────────────
-          new SidebarItem("Database Browser", vscode4.TreeItemCollapsibleState.None, "lurek.editor.database", "database"),
-          new SidebarItem("Graph Editor", vscode4.TreeItemCollapsibleState.None, "lurek.editor.graph", "graph")
+          new SidebarItem("Database Browser", vscode3.TreeItemCollapsibleState.None, "lurek.editor.database", "database"),
+          new SidebarItem("Graph Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.graph", "graph")
         ];
       case "Debug":
         return [
-          new SidebarItem("Debug Run + Connect", vscode4.TreeItemCollapsibleState.None, "lurek.debug.runAndConnect", "debug-start"),
-          new SidebarItem("Connect", vscode4.TreeItemCollapsibleState.None, "lurek.debug.connect", "plug"),
-          new SidebarItem("Disconnect", vscode4.TreeItemCollapsibleState.None, "lurek.debug.disconnect", "debug-disconnect"),
-          new SidebarItem("Evaluate Lua", vscode4.TreeItemCollapsibleState.None, "lurek.debug.evaluate", "terminal"),
-          new SidebarItem("Watchers Panel", vscode4.TreeItemCollapsibleState.None, "lurek.debug.openWatchers", "eye"),
-          new SidebarItem("Variable Inspector", vscode4.TreeItemCollapsibleState.None, "lurek.debug.openInspector", "symbol-variable"),
-          new SidebarItem("Call Stack", vscode4.TreeItemCollapsibleState.None, "lurek.debug.openCallStack", "list-tree"),
-          new SidebarItem("Performance", vscode4.TreeItemCollapsibleState.None, "lurek.debug.performance", "dashboard"),
-          new SidebarItem("Screenshot", vscode4.TreeItemCollapsibleState.None, "lurek.debug.screenshot", "device-camera"),
-          new SidebarItem("Status", vscode4.TreeItemCollapsibleState.None, "lurek.debug.status", "info")
+          new SidebarItem("Debug Run + Connect", vscode3.TreeItemCollapsibleState.None, "lurek.debug.runAndConnect", "debug-start"),
+          new SidebarItem("Connect", vscode3.TreeItemCollapsibleState.None, "lurek.debug.connect", "plug"),
+          new SidebarItem("Disconnect", vscode3.TreeItemCollapsibleState.None, "lurek.debug.disconnect", "debug-disconnect"),
+          new SidebarItem("Evaluate Lua", vscode3.TreeItemCollapsibleState.None, "lurek.debug.evaluate", "terminal"),
+          new SidebarItem("Watchers Panel", vscode3.TreeItemCollapsibleState.None, "lurek.debug.openWatchers", "eye"),
+          new SidebarItem("Variable Inspector", vscode3.TreeItemCollapsibleState.None, "lurek.debug.openInspector", "symbol-variable"),
+          new SidebarItem("Call Stack", vscode3.TreeItemCollapsibleState.None, "lurek.debug.openCallStack", "list-tree"),
+          new SidebarItem("Performance", vscode3.TreeItemCollapsibleState.None, "lurek.debug.performance", "dashboard"),
+          new SidebarItem("Screenshot", vscode3.TreeItemCollapsibleState.None, "lurek.debug.screenshot", "device-camera"),
+          new SidebarItem("Status", vscode3.TreeItemCollapsibleState.None, "lurek.debug.status", "info")
         ];
       case "Reference":
         return [
-          new SidebarItem("Browse API", vscode4.TreeItemCollapsibleState.None, "lurek.browseApi", "search"),
-          new SidebarItem("Open API Docs", vscode4.TreeItemCollapsibleState.None, "lurek.openApiDocs", "book"),
-          new SidebarItem("Open Wiki", vscode4.TreeItemCollapsibleState.None, "lurek.openWiki", "globe"),
-          new SidebarItem("Dependency Graph", vscode4.TreeItemCollapsibleState.None, "lurek.depGraph", "graph"),
-          new SidebarItem("Dependency List", vscode4.TreeItemCollapsibleState.None, "lurek.depList", "list-tree"),
-          new SidebarItem("API Coverage", vscode4.TreeItemCollapsibleState.None, "lurek.apiCoverage", "graph-line")
+          new SidebarItem("Browse API", vscode3.TreeItemCollapsibleState.None, "lurek.browseApi", "search"),
+          new SidebarItem("Open API Docs", vscode3.TreeItemCollapsibleState.None, "lurek.openApiDocs", "book"),
+          new SidebarItem("Open Wiki", vscode3.TreeItemCollapsibleState.None, "lurek.openWiki", "globe"),
+          new SidebarItem("Dependency Graph", vscode3.TreeItemCollapsibleState.None, "lurek.depGraph", "graph"),
+          new SidebarItem("Dependency List", vscode3.TreeItemCollapsibleState.None, "lurek.depList", "list-tree"),
+          new SidebarItem("API Coverage", vscode3.TreeItemCollapsibleState.None, "lurek.apiCoverage", "graph-line")
         ];
       case "Assets":
         return [
-          new SidebarItem("Refresh Assets", vscode4.TreeItemCollapsibleState.None, "lurek.assets.refresh", "refresh"),
-          new SidebarItem("Open Asset Explorer", vscode4.TreeItemCollapsibleState.None, "lurek.assets.openPanel", "file-media"),
-          new SidebarItem("Find Missing Assets", vscode4.TreeItemCollapsibleState.None, "lurek.assets.findMissing", "warning")
+          new SidebarItem("Refresh Assets", vscode3.TreeItemCollapsibleState.None, "lurek.assets.refresh", "refresh"),
+          new SidebarItem("Open Asset Explorer", vscode3.TreeItemCollapsibleState.None, "lurek.assets.openPanel", "file-media"),
+          new SidebarItem("Find Missing Assets", vscode3.TreeItemCollapsibleState.None, "lurek.assets.findMissing", "warning")
         ];
       case "Dependencies":
         return [
-          new SidebarItem("Show Module Graph", vscode4.TreeItemCollapsibleState.None, "lurek.deps.showGraph", "type-hierarchy"),
-          new SidebarItem("Find Circular Deps", vscode4.TreeItemCollapsibleState.None, "lurek.deps.findCircular", "warning"),
-          new SidebarItem("Show Orphan Modules", vscode4.TreeItemCollapsibleState.None, "lurek.deps.findOrphans", "question")
+          new SidebarItem("Show Module Graph", vscode3.TreeItemCollapsibleState.None, "lurek.deps.showGraph", "type-hierarchy"),
+          new SidebarItem("Find Circular Deps", vscode3.TreeItemCollapsibleState.None, "lurek.deps.findCircular", "warning"),
+          new SidebarItem("Show Orphan Modules", vscode3.TreeItemCollapsibleState.None, "lurek.deps.findOrphans", "question")
         ];
       case "Performance":
         return [
-          new SidebarItem("Open Performance Dashboard", vscode4.TreeItemCollapsibleState.None, "lurek.perf.openDashboard", "dashboard"),
-          new SidebarItem("System Monitor", vscode4.TreeItemCollapsibleState.None, "lurek.runtime.openMonitor", "pulse"),
-          new SidebarItem("API Usage Report", vscode4.TreeItemCollapsibleState.None, "lurek.api.usageReport", "graph"),
-          new SidebarItem("Open Hot Reload History", vscode4.TreeItemCollapsibleState.None, "lurek.perf.openHotReload", "history"),
-          new SidebarItem("Clear History", vscode4.TreeItemCollapsibleState.None, "lurek.perf.clearHistory", "clear-all")
+          new SidebarItem("Open Performance Dashboard", vscode3.TreeItemCollapsibleState.None, "lurek.perf.openDashboard", "dashboard"),
+          new SidebarItem("System Monitor", vscode3.TreeItemCollapsibleState.None, "lurek.runtime.openMonitor", "pulse"),
+          new SidebarItem("API Usage Report", vscode3.TreeItemCollapsibleState.None, "lurek.api.usageReport", "graph"),
+          new SidebarItem("Open Hot Reload History", vscode3.TreeItemCollapsibleState.None, "lurek.perf.openHotReload", "history"),
+          new SidebarItem("Clear History", vscode3.TreeItemCollapsibleState.None, "lurek.perf.clearHistory", "clear-all")
         ];
       default:
         return [];
@@ -4247,7 +3457,7 @@ var DevToolsProvider = class {
   }
 };
 var AiToolsProvider = class {
-  _onDidChangeTreeData = new vscode4.EventEmitter();
+  _onDidChangeTreeData = new vscode3.EventEmitter();
   onDidChangeTreeData = this._onDidChangeTreeData.event;
   refresh() {
     this._onDidChangeTreeData.fire(void 0);
@@ -4260,19 +3470,19 @@ var AiToolsProvider = class {
       return [
         new SidebarItem(
           "CAG (AI Config)",
-          vscode4.TreeItemCollapsibleState.Expanded,
+          vscode3.TreeItemCollapsibleState.Expanded,
           void 0,
           "hubot"
         ),
         new SidebarItem(
           "MCP Server",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "server"
         ),
         new SidebarItem(
           "Game Jam",
-          vscode4.TreeItemCollapsibleState.Collapsed,
+          vscode3.TreeItemCollapsibleState.Collapsed,
           void 0,
           "flame"
         )
@@ -4281,24 +3491,24 @@ var AiToolsProvider = class {
     switch (element.label) {
       case "CAG (AI Config)":
         return [
-          new SidebarItem("Install AI Config", vscode4.TreeItemCollapsibleState.None, "lurek.cag.install", "cloud-download"),
-          new SidebarItem("Select Agent", vscode4.TreeItemCollapsibleState.None, "lurek.cag.selectAgent", "person"),
-          new SidebarItem("Select Skill", vscode4.TreeItemCollapsibleState.None, "lurek.cag.selectSkill", "mortar-board"),
-          new SidebarItem("Select Prompt", vscode4.TreeItemCollapsibleState.None, "lurek.cag.selectPrompt", "comment"),
-          new SidebarItem("Update CAG Files", vscode4.TreeItemCollapsibleState.None, "lurek.cag.update", "sync")
+          new SidebarItem("Install AI Config", vscode3.TreeItemCollapsibleState.None, "lurek.cag.install", "cloud-download"),
+          new SidebarItem("Select Agent", vscode3.TreeItemCollapsibleState.None, "lurek.cag.selectAgent", "person"),
+          new SidebarItem("Select Skill", vscode3.TreeItemCollapsibleState.None, "lurek.cag.selectSkill", "mortar-board"),
+          new SidebarItem("Select Prompt", vscode3.TreeItemCollapsibleState.None, "lurek.cag.selectPrompt", "comment"),
+          new SidebarItem("Update CAG Files", vscode3.TreeItemCollapsibleState.None, "lurek.cag.update", "sync")
         ];
       case "MCP Server":
         return [
-          new SidebarItem("Install MCP Server", vscode4.TreeItemCollapsibleState.None, "lurek.mcp.install", "cloud-download"),
-          new SidebarItem("MCP Status", vscode4.TreeItemCollapsibleState.None, "lurek.mcp.status", "info")
+          new SidebarItem("Install MCP Server", vscode3.TreeItemCollapsibleState.None, "lurek.mcp.install", "cloud-download"),
+          new SidebarItem("MCP Status", vscode3.TreeItemCollapsibleState.None, "lurek.mcp.status", "info")
         ];
       case "Game Jam":
         return [
-          new SidebarItem("Game Jam Quick Start", vscode4.TreeItemCollapsibleState.None, "lurek.gameJam.quickStart", "rocket"),
-          new SidebarItem("Add Game Module", vscode4.TreeItemCollapsibleState.None, "lurek.gameJam.addModule", "add"),
-          new SidebarItem("Game Jam Timer", vscode4.TreeItemCollapsibleState.None, "lurek.gameJam.timer", "watch"),
-          new SidebarItem("Quick Build", vscode4.TreeItemCollapsibleState.None, "lurek.jam.quickBuild", "zap"),
-          new SidebarItem("Submission Checklist", vscode4.TreeItemCollapsibleState.None, "lurek.jam.checklist", "checklist")
+          new SidebarItem("Game Jam Quick Start", vscode3.TreeItemCollapsibleState.None, "lurek.gameJam.quickStart", "rocket"),
+          new SidebarItem("Add Game Module", vscode3.TreeItemCollapsibleState.None, "lurek.gameJam.addModule", "add"),
+          new SidebarItem("Game Jam Timer", vscode3.TreeItemCollapsibleState.None, "lurek.gameJam.timer", "watch"),
+          new SidebarItem("Quick Build", vscode3.TreeItemCollapsibleState.None, "lurek.jam.quickBuild", "zap"),
+          new SidebarItem("Submission Checklist", vscode3.TreeItemCollapsibleState.None, "lurek.jam.checklist", "checklist")
         ];
       default:
         return [];
@@ -4307,7 +3517,7 @@ var AiToolsProvider = class {
 };
 
 // src/providers/completion.ts
-var vscode5 = __toESM(require("vscode"));
+var vscode4 = __toESM(require("vscode"));
 
 // src/services/luaParser.ts
 var LUA_KEYWORDS = /* @__PURE__ */ new Set([
@@ -5109,31 +4319,31 @@ function getCachedAnalysis(document) {
   return info;
 }
 var LUA_BUILTINS = [
-  { label: "print", kind: vscode5.CompletionItemKind.Function, detail: "print(...)", doc: "Receives any number of arguments and prints their values to stdout.", snippet: "print(${1:value})" },
-  { label: "require", kind: vscode5.CompletionItemKind.Function, detail: "require(modname)", doc: "Loads the given module, returns the value stored in `package.loaded[modname]`.", snippet: 'require("${1:module}")' },
-  { label: "type", kind: vscode5.CompletionItemKind.Function, detail: "type(v) \u2192 string", doc: "Returns the type of its argument as a string.", snippet: "type(${1:value})" },
-  { label: "tostring", kind: vscode5.CompletionItemKind.Function, detail: "tostring(v) \u2192 string", doc: "Converts any value to a string in a reasonable format.", snippet: "tostring(${1:value})" },
-  { label: "tonumber", kind: vscode5.CompletionItemKind.Function, detail: "tonumber(e [, base]) \u2192 number|nil", doc: "Tries to convert its argument to a number.", snippet: "tonumber(${1:value})" },
-  { label: "pairs", kind: vscode5.CompletionItemKind.Function, detail: "pairs(t) \u2192 iterator", doc: "Returns an iterator function for all key-value pairs in table t.", snippet: "pairs(${1:table})" },
-  { label: "ipairs", kind: vscode5.CompletionItemKind.Function, detail: "ipairs(t) \u2192 iterator", doc: "Returns an iterator function for the integer keys 1, 2, ... in table t.", snippet: "ipairs(${1:table})" },
-  { label: "next", kind: vscode5.CompletionItemKind.Function, detail: "next(table [, index]) \u2192 key, value", doc: "Returns the next key-value pair after index in the table.", snippet: "next(${1:table})" },
-  { label: "select", kind: vscode5.CompletionItemKind.Function, detail: "select(index, ...)", doc: 'Returns all arguments after argument number index, or the total number with "#".', snippet: "select(${1:index})" },
-  { label: "unpack", kind: vscode5.CompletionItemKind.Function, detail: "unpack(list [, i [, j]])", doc: "Returns the elements from the given list.", snippet: "unpack(${1:list})" },
-  { label: "setmetatable", kind: vscode5.CompletionItemKind.Function, detail: "setmetatable(table, metatable) \u2192 table", doc: "Sets the metatable for the given table.", snippet: "setmetatable(${1:table}, ${2:metatable})" },
-  { label: "getmetatable", kind: vscode5.CompletionItemKind.Function, detail: "getmetatable(object) \u2192 table|nil", doc: "Returns the metatable of the given object, if it has one.", snippet: "getmetatable(${1:object})" },
-  { label: "rawset", kind: vscode5.CompletionItemKind.Function, detail: "rawset(table, index, value) \u2192 table", doc: "Sets the value of table[index] without invoking metamethods.", snippet: "rawset(${1:table}, ${2:index}, ${3:value})" },
-  { label: "rawget", kind: vscode5.CompletionItemKind.Function, detail: "rawget(table, index) \u2192 value", doc: "Gets the value of table[index] without invoking metamethods.", snippet: "rawget(${1:table}, ${2:index})" },
-  { label: "rawequal", kind: vscode5.CompletionItemKind.Function, detail: "rawequal(v1, v2) \u2192 boolean", doc: "Checks equality without invoking __eq metamethod.", snippet: "rawequal(${1:v1}, ${2:v2})" },
-  { label: "rawlen", kind: vscode5.CompletionItemKind.Function, detail: "rawlen(v) \u2192 number", doc: "Returns the length without invoking __len metamethod.", snippet: "rawlen(${1:v})" },
-  { label: "error", kind: vscode5.CompletionItemKind.Function, detail: "error(message [, level])", doc: "Terminates the last protected function called and returns message as the error object.", snippet: "error(${1:message})" },
-  { label: "pcall", kind: vscode5.CompletionItemKind.Function, detail: "pcall(f, ...) \u2192 ok, result...", doc: "Calls function f in protected mode. Returns status and results.", snippet: "pcall(${1:func})" },
-  { label: "xpcall", kind: vscode5.CompletionItemKind.Function, detail: "xpcall(f, msgh, ...) \u2192 ok, result...", doc: "Calls function f in protected mode with message handler msgh.", snippet: "xpcall(${1:func}, ${2:handler})" },
-  { label: "assert", kind: vscode5.CompletionItemKind.Function, detail: "assert(v [, message])", doc: "Calls error if the value of v is false or nil.", snippet: "assert(${1:value})" },
-  { label: "dofile", kind: vscode5.CompletionItemKind.Function, detail: "dofile(filename)", doc: "Opens the named file and executes its contents as a Lua chunk.", snippet: 'dofile("${1:filename}")' },
-  { label: "loadfile", kind: vscode5.CompletionItemKind.Function, detail: "loadfile(filename) \u2192 function|nil, err", doc: "Loads a chunk from a file without executing it.", snippet: 'loadfile("${1:filename}")' },
-  { label: "load", kind: vscode5.CompletionItemKind.Function, detail: "load(chunk [, chunkname]) \u2192 function|nil, err", doc: "Loads a chunk from a string or function.", snippet: "load(${1:chunk})" },
-  { label: "loadstring", kind: vscode5.CompletionItemKind.Function, detail: "loadstring(s) \u2192 function|nil, err", doc: "Loads a chunk from a string (LuaJIT/Lua 5.1 compat).", snippet: "loadstring(${1:code})" },
-  { label: "collectgarbage", kind: vscode5.CompletionItemKind.Function, detail: "collectgarbage(opt [, arg])", doc: "Interface to the garbage collector.", snippet: 'collectgarbage("${1:collect}")' }
+  { label: "print", kind: vscode4.CompletionItemKind.Function, detail: "print(...)", doc: "Receives any number of arguments and prints their values to stdout.", snippet: "print(${1:value})" },
+  { label: "require", kind: vscode4.CompletionItemKind.Function, detail: "require(modname)", doc: "Loads the given module, returns the value stored in `package.loaded[modname]`.", snippet: 'require("${1:module}")' },
+  { label: "type", kind: vscode4.CompletionItemKind.Function, detail: "type(v) \u2192 string", doc: "Returns the type of its argument as a string.", snippet: "type(${1:value})" },
+  { label: "tostring", kind: vscode4.CompletionItemKind.Function, detail: "tostring(v) \u2192 string", doc: "Converts any value to a string in a reasonable format.", snippet: "tostring(${1:value})" },
+  { label: "tonumber", kind: vscode4.CompletionItemKind.Function, detail: "tonumber(e [, base]) \u2192 number|nil", doc: "Tries to convert its argument to a number.", snippet: "tonumber(${1:value})" },
+  { label: "pairs", kind: vscode4.CompletionItemKind.Function, detail: "pairs(t) \u2192 iterator", doc: "Returns an iterator function for all key-value pairs in table t.", snippet: "pairs(${1:table})" },
+  { label: "ipairs", kind: vscode4.CompletionItemKind.Function, detail: "ipairs(t) \u2192 iterator", doc: "Returns an iterator function for the integer keys 1, 2, ... in table t.", snippet: "ipairs(${1:table})" },
+  { label: "next", kind: vscode4.CompletionItemKind.Function, detail: "next(table [, index]) \u2192 key, value", doc: "Returns the next key-value pair after index in the table.", snippet: "next(${1:table})" },
+  { label: "select", kind: vscode4.CompletionItemKind.Function, detail: "select(index, ...)", doc: 'Returns all arguments after argument number index, or the total number with "#".', snippet: "select(${1:index})" },
+  { label: "unpack", kind: vscode4.CompletionItemKind.Function, detail: "unpack(list [, i [, j]])", doc: "Returns the elements from the given list.", snippet: "unpack(${1:list})" },
+  { label: "setmetatable", kind: vscode4.CompletionItemKind.Function, detail: "setmetatable(table, metatable) \u2192 table", doc: "Sets the metatable for the given table.", snippet: "setmetatable(${1:table}, ${2:metatable})" },
+  { label: "getmetatable", kind: vscode4.CompletionItemKind.Function, detail: "getmetatable(object) \u2192 table|nil", doc: "Returns the metatable of the given object, if it has one.", snippet: "getmetatable(${1:object})" },
+  { label: "rawset", kind: vscode4.CompletionItemKind.Function, detail: "rawset(table, index, value) \u2192 table", doc: "Sets the value of table[index] without invoking metamethods.", snippet: "rawset(${1:table}, ${2:index}, ${3:value})" },
+  { label: "rawget", kind: vscode4.CompletionItemKind.Function, detail: "rawget(table, index) \u2192 value", doc: "Gets the value of table[index] without invoking metamethods.", snippet: "rawget(${1:table}, ${2:index})" },
+  { label: "rawequal", kind: vscode4.CompletionItemKind.Function, detail: "rawequal(v1, v2) \u2192 boolean", doc: "Checks equality without invoking __eq metamethod.", snippet: "rawequal(${1:v1}, ${2:v2})" },
+  { label: "rawlen", kind: vscode4.CompletionItemKind.Function, detail: "rawlen(v) \u2192 number", doc: "Returns the length without invoking __len metamethod.", snippet: "rawlen(${1:v})" },
+  { label: "error", kind: vscode4.CompletionItemKind.Function, detail: "error(message [, level])", doc: "Terminates the last protected function called and returns message as the error object.", snippet: "error(${1:message})" },
+  { label: "pcall", kind: vscode4.CompletionItemKind.Function, detail: "pcall(f, ...) \u2192 ok, result...", doc: "Calls function f in protected mode. Returns status and results.", snippet: "pcall(${1:func})" },
+  { label: "xpcall", kind: vscode4.CompletionItemKind.Function, detail: "xpcall(f, msgh, ...) \u2192 ok, result...", doc: "Calls function f in protected mode with message handler msgh.", snippet: "xpcall(${1:func}, ${2:handler})" },
+  { label: "assert", kind: vscode4.CompletionItemKind.Function, detail: "assert(v [, message])", doc: "Calls error if the value of v is false or nil.", snippet: "assert(${1:value})" },
+  { label: "dofile", kind: vscode4.CompletionItemKind.Function, detail: "dofile(filename)", doc: "Opens the named file and executes its contents as a Lua chunk.", snippet: 'dofile("${1:filename}")' },
+  { label: "loadfile", kind: vscode4.CompletionItemKind.Function, detail: "loadfile(filename) \u2192 function|nil, err", doc: "Loads a chunk from a file without executing it.", snippet: 'loadfile("${1:filename}")' },
+  { label: "load", kind: vscode4.CompletionItemKind.Function, detail: "load(chunk [, chunkname]) \u2192 function|nil, err", doc: "Loads a chunk from a string or function.", snippet: "load(${1:chunk})" },
+  { label: "loadstring", kind: vscode4.CompletionItemKind.Function, detail: "loadstring(s) \u2192 function|nil, err", doc: "Loads a chunk from a string (LuaJIT/Lua 5.1 compat).", snippet: "loadstring(${1:code})" },
+  { label: "collectgarbage", kind: vscode4.CompletionItemKind.Function, detail: "collectgarbage(opt [, arg])", doc: "Interface to the garbage collector.", snippet: 'collectgarbage("${1:collect}")' }
 ];
 var LUA_STDLIB_MODULES = [
   { label: "string", detail: "String manipulation library" },
@@ -5483,7 +4693,7 @@ var FREQUENT_FUNCTIONS = /* @__PURE__ */ new Set([
   "exists"
 ]);
 function buildFunctionDoc(fn) {
-  const md = new vscode5.MarkdownString();
+  const md = new vscode4.MarkdownString();
   md.appendCodeblock(fn.signature, "lua");
   if (fn.description) md.appendMarkdown("\n" + fn.description + "\n");
   if (fn.parameters.length > 0) {
@@ -5552,7 +4762,7 @@ function inferObjectType(document, position, objName, apiData2) {
   return void 0;
 }
 function register(context, apiData2) {
-  const mainProvider = vscode5.languages.registerCompletionItemProvider(
+  const mainProvider = vscode4.languages.registerCompletionItemProvider(
     LUA_SELECTOR,
     {
       provideCompletionItems(document, position) {
@@ -5571,16 +4781,16 @@ function register(context, apiData2) {
           const funcs = apiData2.getFunctions(modName);
           if (funcs.length === 0) return void 0;
           return funcs.filter((fn) => !partial || fn.name.toLowerCase().startsWith(partial)).sort((a, b) => sortPriority(a).localeCompare(sortPriority(b))).map((fn, idx) => {
-            const item = new vscode5.CompletionItem(
+            const item = new vscode4.CompletionItem(
               fn.name,
-              fn.isMethod ? vscode5.CompletionItemKind.Method : vscode5.CompletionItemKind.Function
+              fn.isMethod ? vscode4.CompletionItemKind.Method : vscode4.CompletionItemKind.Function
             );
             item.detail = fn.signature;
             item.documentation = buildFunctionDoc(fn);
-            item.insertText = new vscode5.SnippetString(buildSnippet(fn));
+            item.insertText = new vscode4.SnippetString(buildSnippet(fn));
             item.sortText = String(idx).padStart(4, "0");
             if (fn.deprecated) {
-              item.tags = [vscode5.CompletionItemTag.Deprecated];
+              item.tags = [vscode4.CompletionItemTag.Deprecated];
             }
             return item;
           });
@@ -5592,19 +4802,19 @@ function register(context, apiData2) {
           for (const modName of apiData2.getModuleNames()) {
             if (partial && !modName.toLowerCase().startsWith(partial)) continue;
             const mod = apiData2.getModule(modName);
-            const item = new vscode5.CompletionItem(modName, vscode5.CompletionItemKind.Module);
+            const item = new vscode4.CompletionItem(modName, vscode4.CompletionItemKind.Module);
             item.detail = `lurek.${modName}`;
             if (mod?.description) {
-              item.documentation = new vscode5.MarkdownString(mod.description);
+              item.documentation = new vscode4.MarkdownString(mod.description);
             }
             item.sortText = "0" + modName;
             items.push(item);
           }
           for (const cb of apiData2.getCallbacks()) {
             if (partial && !cb.name.toLowerCase().startsWith(partial)) continue;
-            const item = new vscode5.CompletionItem(cb.name, vscode5.CompletionItemKind.Event);
+            const item = new vscode4.CompletionItem(cb.name, vscode4.CompletionItemKind.Event);
             item.detail = cb.signature;
-            item.documentation = new vscode5.MarkdownString(cb.description);
+            item.documentation = new vscode4.MarkdownString(cb.description);
             item.sortText = "1" + cb.name;
             items.push(item);
           }
@@ -5619,14 +4829,14 @@ function register(context, apiData2) {
           if (libFuncs.length === 0) return void 0;
           return libFuncs.filter((fn) => !partial || fn.name.toLowerCase().startsWith(partial)).map((fn) => {
             const isConst = fn.parameters.length === 0 && !fn.signature.includes("(");
-            const item = new vscode5.CompletionItem(
+            const item = new vscode4.CompletionItem(
               fn.name,
-              isConst ? vscode5.CompletionItemKind.Constant : vscode5.CompletionItemKind.Function
+              isConst ? vscode4.CompletionItemKind.Constant : vscode4.CompletionItemKind.Function
             );
             item.detail = fn.signature;
             item.documentation = buildFunctionDoc(fn);
             if (!isConst) {
-              item.insertText = new vscode5.SnippetString(buildStdlibSnippet(fn));
+              item.insertText = new vscode4.SnippetString(buildStdlibSnippet(fn));
             }
             return item;
           });
@@ -5640,11 +4850,11 @@ function register(context, apiData2) {
           if (objectType) {
             for (const m of apiData2.getMethods(objectType)) {
               if (partial && !m.name.toLowerCase().startsWith(partial)) continue;
-              const item = new vscode5.CompletionItem(m.name, vscode5.CompletionItemKind.Method);
+              const item = new vscode4.CompletionItem(m.name, vscode4.CompletionItemKind.Method);
               item.detail = m.signature;
               item.documentation = buildFunctionDoc(m);
-              item.insertText = new vscode5.SnippetString(buildSnippet(m));
-              if (m.deprecated) item.tags = [vscode5.CompletionItemTag.Deprecated];
+              item.insertText = new vscode4.SnippetString(buildSnippet(m));
+              if (m.deprecated) item.tags = [vscode4.CompletionItemTag.Deprecated];
               items.push(item);
             }
           }
@@ -5658,10 +4868,10 @@ function register(context, apiData2) {
                 if (partial && !method.name.toLowerCase().startsWith(partial)) continue;
                 if (seenNames.has(method.name)) continue;
                 seenNames.add(method.name);
-                const item = new vscode5.CompletionItem(method.name, vscode5.CompletionItemKind.Method);
+                const item = new vscode4.CompletionItem(method.name, vscode4.CompletionItemKind.Method);
                 item.detail = `${cls.name}:${method.name}(${(method.parameters ?? []).join(", ")})`;
                 if (method.description) {
-                  item.documentation = new vscode5.MarkdownString(method.description);
+                  item.documentation = new vscode4.MarkdownString(method.description);
                 }
                 items.push(item);
               }
@@ -5673,20 +4883,20 @@ function register(context, apiData2) {
         if (/(?:^|[\s=(,{;])[\w]*$/.test(before) && !before.match(/\.\w*$/) && !before.match(/:\w*$/)) {
           const items = [];
           for (const g of LUA_BUILTINS) {
-            const item = new vscode5.CompletionItem(g.label, g.kind);
+            const item = new vscode4.CompletionItem(g.label, g.kind);
             item.detail = g.detail;
-            item.documentation = new vscode5.MarkdownString(g.doc);
-            if (g.snippet) item.insertText = new vscode5.SnippetString(g.snippet);
+            item.documentation = new vscode4.MarkdownString(g.doc);
+            if (g.snippet) item.insertText = new vscode4.SnippetString(g.snippet);
             item.sortText = "2" + g.label;
             items.push(item);
           }
           for (const mod of LUA_STDLIB_MODULES) {
-            const item = new vscode5.CompletionItem(mod.label, vscode5.CompletionItemKind.Module);
+            const item = new vscode4.CompletionItem(mod.label, vscode4.CompletionItemKind.Module);
             item.detail = mod.detail;
             item.sortText = "3" + mod.label;
             items.push(item);
           }
-          const lurekItem = new vscode5.CompletionItem("lurek", vscode5.CompletionItemKind.Module);
+          const lurekItem = new vscode4.CompletionItem("lurek", vscode4.CompletionItemKind.Module);
           lurekItem.detail = "Lurek2D engine API";
           lurekItem.sortText = "1lurek";
           items.push(lurekItem);
@@ -5697,11 +4907,11 @@ function register(context, apiData2) {
             for (const sym of locals) {
               if (seen.has(sym.name)) continue;
               seen.add(sym.name);
-              const kind = sym.kind === "function" ? vscode5.CompletionItemKind.Function : vscode5.CompletionItemKind.Variable;
-              const item = new vscode5.CompletionItem(sym.name, kind);
+              const kind = sym.kind === "function" ? vscode4.CompletionItemKind.Function : vscode4.CompletionItemKind.Variable;
+              const item = new vscode4.CompletionItem(sym.name, kind);
               item.detail = sym.kind === "function" ? `local function ${sym.name}(${(sym.parameters ?? []).join(", ")})` : sym.kind === "parameter" ? "parameter" : `local ${sym.name}`;
               if (sym.description) {
-                item.documentation = new vscode5.MarkdownString(sym.description);
+                item.documentation = new vscode4.MarkdownString(sym.description);
               }
               item.sortText = "0" + sym.name;
               items.push(item);
@@ -5710,8 +4920,8 @@ function register(context, apiData2) {
               if (sym.isLocal || sym.kind === "parameter") continue;
               if (seen.has(sym.name)) continue;
               seen.add(sym.name);
-              const kind = sym.kind === "function" || sym.kind === "method" ? vscode5.CompletionItemKind.Function : vscode5.CompletionItemKind.Variable;
-              const item = new vscode5.CompletionItem(sym.name, kind);
+              const kind = sym.kind === "function" || sym.kind === "method" ? vscode4.CompletionItemKind.Function : vscode4.CompletionItemKind.Variable;
+              const item = new vscode4.CompletionItem(sym.name, kind);
               item.detail = sym.kind === "function" ? `function ${sym.name}(${(sym.parameters ?? []).join(", ")})` : sym.name;
               item.sortText = "1" + sym.name;
               items.push(item);
@@ -5726,7 +4936,7 @@ function register(context, apiData2) {
     ".",
     ":"
   );
-  const stringProvider = vscode5.languages.registerCompletionItemProvider(
+  const stringProvider = vscode4.languages.registerCompletionItemProvider(
     LUA_SELECTOR,
     {
       provideCompletionItems(document, position) {
@@ -5734,7 +4944,7 @@ function register(context, apiData2) {
         for (const rule of STRING_CONTEXT_RULES) {
           if (rule.pattern.test(before)) {
             return rule.values.map((v) => {
-              const item = new vscode5.CompletionItem(v.label, vscode5.CompletionItemKind.EnumMember);
+              const item = new vscode4.CompletionItem(v.label, vscode4.CompletionItemKind.EnumMember);
               if (v.detail) item.detail = v.detail;
               item.insertText = v.label;
               return item;
@@ -5747,7 +4957,7 @@ function register(context, apiData2) {
     "'",
     '"'
   );
-  const requireProvider = vscode5.languages.registerCompletionItemProvider(
+  const requireProvider = vscode4.languages.registerCompletionItemProvider(
     LUA_SELECTOR,
     {
       async provideCompletionItems(document, position) {
@@ -5757,15 +4967,15 @@ function register(context, apiData2) {
         const partial = requireMatch[1];
         const items = [];
         try {
-          const luaFiles = await vscode5.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 200);
-          const wsRoot = vscode5.workspace.workspaceFolders?.[0]?.uri.fsPath;
+          const luaFiles = await vscode4.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 200);
+          const wsRoot = vscode4.workspace.workspaceFolders?.[0]?.uri.fsPath;
           for (const fileUri of luaFiles) {
             if (fileUri.fsPath === document.uri.fsPath) continue;
             let relativePath = "";
             if (wsRoot && fileUri.fsPath.startsWith(wsRoot)) {
               relativePath = fileUri.fsPath.substring(wsRoot.length + 1);
             } else {
-              relativePath = vscode5.workspace.asRelativePath(fileUri);
+              relativePath = vscode4.workspace.asRelativePath(fileUri);
             }
             let modulePath = relativePath.replace(/\\/g, "/");
             if (modulePath.endsWith("/init.lua")) {
@@ -5775,7 +4985,7 @@ function register(context, apiData2) {
             }
             const dotPath = modulePath.replace(/\//g, ".");
             if (partial && !dotPath.toLowerCase().startsWith(partial.toLowerCase())) continue;
-            const item = new vscode5.CompletionItem(dotPath, vscode5.CompletionItemKind.File);
+            const item = new vscode4.CompletionItem(dotPath, vscode4.CompletionItemKind.File);
             item.detail = relativePath;
             item.insertText = dotPath;
             items.push(item);
@@ -5792,7 +5002,7 @@ function register(context, apiData2) {
 }
 
 // src/providers/hover.ts
-var vscode6 = __toESM(require("vscode"));
+var vscode5 = __toESM(require("vscode"));
 var LUA_SELECTOR2 = { scheme: "file", language: "lua" };
 var analyzer2 = new LuaDocumentAnalyzer();
 var analysisCache2 = /* @__PURE__ */ new Map();
@@ -5941,7 +5151,7 @@ function renderEasingChart(name, fn) {
   return lines.join("\n");
 }
 function buildRichHover(fn) {
-  const md = new vscode6.MarkdownString();
+  const md = new vscode5.MarkdownString();
   md.appendCodeblock(fn.signature, "lua");
   if (fn.description) md.appendMarkdown("\n" + fn.description + "\n");
   if (fn.parameters.length > 0) {
@@ -5972,13 +5182,13 @@ function buildRichHover(fn) {
   return md;
 }
 function register2(context, apiData2) {
-  const apiHover = vscode6.languages.registerHoverProvider(LUA_SELECTOR2, {
+  const apiHover = vscode5.languages.registerHoverProvider(LUA_SELECTOR2, {
     provideHover(document, position) {
       const funcRange = document.getWordRangeAtPosition(position, /lurek\.\w+\.\w+/);
       if (funcRange) {
         const word = document.getText(funcRange);
         const fn = apiData2.getFunction(word);
-        if (fn) return new vscode6.Hover(buildRichHover(fn), funcRange);
+        if (fn) return new vscode5.Hover(buildRichHover(fn), funcRange);
       }
       const cbRange = document.getWordRangeAtPosition(position, /lurek\.\w+/);
       if (cbRange) {
@@ -5986,7 +5196,7 @@ function register2(context, apiData2) {
         if (!word.includes(".", 5)) {
           for (const cb of apiData2.getCallbacks()) {
             if (cb.fullPath === word) {
-              const md = new vscode6.MarkdownString();
+              const md = new vscode5.MarkdownString();
               md.appendCodeblock(cb.signature, "lua");
               md.appendMarkdown("\n" + cb.description + "\n");
               if (cb.parameters.length > 0) {
@@ -5998,21 +5208,21 @@ function register2(context, apiData2) {
               }
               md.appendMarkdown("\n*Engine callback \u2014 called automatically by Lurek2D*");
               md.isTrusted = true;
-              return new vscode6.Hover(md, cbRange);
+              return new vscode5.Hover(md, cbRange);
             }
           }
         }
         const modName = word.replace("lurek.", "");
         const mod = apiData2.getModule(modName);
         if (mod) {
-          const md = new vscode6.MarkdownString();
+          const md = new vscode5.MarkdownString();
           md.appendMarkdown(`**lurek.${mod.name}**
 
 `);
           if (mod.description) md.appendMarkdown(mod.description + "\n\n");
           md.appendMarkdown(`*${mod.functions.length} functions, ${mod.methods.length} methods*`);
           md.isTrusted = true;
-          return new vscode6.Hover(md, cbRange);
+          return new vscode5.Hover(md, cbRange);
         }
       }
       const stdlibRange = document.getWordRangeAtPosition(position, /\b(?:string|table|math|os|io|coroutine|debug|package|utf8|bit|jit|ffi)\.\w+/);
@@ -6020,7 +5230,7 @@ function register2(context, apiData2) {
         const word = document.getText(stdlibRange);
         const stdlib = apiData2.getLuaStdlib("luajit");
         const match = stdlib.find((fn) => fn.fullPath === word);
-        if (match) return new vscode6.Hover(buildRichHover(match), stdlibRange);
+        if (match) return new vscode5.Hover(buildRichHover(match), stdlibRange);
       }
       const wordRange = document.getWordRangeAtPosition(position, /\w+/);
       if (wordRange) {
@@ -6033,7 +5243,7 @@ function register2(context, apiData2) {
           for (const sym of info.symbols) {
             if (sym.name === word && sym.line <= position.line) {
               if (sym.kind === "parameter") continue;
-              const md = new vscode6.MarkdownString();
+              const md = new vscode5.MarkdownString();
               if (sym.kind === "function") {
                 const params = (sym.parameters ?? []).join(", ");
                 const prefix = sym.isLocal ? "local " : "";
@@ -6051,26 +5261,26 @@ function register2(context, apiData2) {
 *Defined at line ${sym.line + 1}*`);
               if (sym.scope) md.appendMarkdown(` \xB7 scope: \`${sym.scope}\``);
               md.isTrusted = true;
-              return new vscode6.Hover(md, wordRange);
+              return new vscode5.Hover(md, wordRange);
             }
           }
         } catch {
         }
         const keywordDoc = LUA_KEYWORD_DOCS[word];
         if (keywordDoc) {
-          const md = new vscode6.MarkdownString();
+          const md = new vscode5.MarkdownString();
           md.appendMarkdown(`**\`${word}\`** \u2014 Lua keyword
 
 `);
           md.appendMarkdown(keywordDoc);
           md.isTrusted = true;
-          return new vscode6.Hover(md, wordRange);
+          return new vscode5.Hover(md, wordRange);
         }
       }
       return void 0;
     }
   });
-  const easingHover = vscode6.languages.registerHoverProvider(LUA_SELECTOR2, {
+  const easingHover = vscode5.languages.registerHoverProvider(LUA_SELECTOR2, {
     provideHover(document, position) {
       const line = document.lineAt(position).text;
       const charIdx = position.character;
@@ -6096,7 +5306,7 @@ function register2(context, apiData2) {
       const easing = EASING_FUNCTIONS[stringContent];
       if (!easing) return void 0;
       const chart = renderEasingChart(stringContent, easing.fn);
-      const md = new vscode6.MarkdownString();
+      const md = new vscode5.MarkdownString();
       md.appendMarkdown(`**Easing: \`${stringContent}\`**
 
 `);
@@ -6105,20 +5315,20 @@ function register2(context, apiData2) {
 ${easing.desc}
 `);
       md.isTrusted = true;
-      const range = new vscode6.Range(position.line, stringStart, position.line, stringEnd);
-      return new vscode6.Hover(md, range);
+      const range = new vscode5.Range(position.line, stringStart, position.line, stringEnd);
+      return new vscode5.Hover(md, range);
     }
   });
-  const mathConstHover = vscode6.languages.registerHoverProvider(LUA_SELECTOR2, {
+  const mathConstHover = vscode5.languages.registerHoverProvider(LUA_SELECTOR2, {
     provideHover(document, position) {
       const range = document.getWordRangeAtPosition(position, /math\.\w+/);
       if (!range) return void 0;
       const word = document.getText(range);
       const doc = MATH_CONSTANT_DOCS[word];
       if (!doc) return void 0;
-      const md = new vscode6.MarkdownString(doc);
+      const md = new vscode5.MarkdownString(doc);
       md.isTrusted = true;
-      return new vscode6.Hover(md, range);
+      return new vscode5.Hover(md, range);
     }
   });
   const CALLBACK_PARAM_DOCS = {
@@ -6204,7 +5414,7 @@ ${easing.desc}
       pressure: { type: "number", desc: "Pressure at release." }
     }
   };
-  const callbackParamHover = vscode6.languages.registerHoverProvider(LUA_SELECTOR2, {
+  const callbackParamHover = vscode5.languages.registerHoverProvider(LUA_SELECTOR2, {
     provideHover(document, position) {
       const wordRange = document.getWordRangeAtPosition(position, /\w+/);
       if (!wordRange) return void 0;
@@ -6232,17 +5442,17 @@ ${easing.desc}
       const paramDocs = CALLBACK_PARAM_DOCS[callbackName];
       if (!paramDocs?.[word]) return void 0;
       const { type, desc } = paramDocs[word];
-      const md = new vscode6.MarkdownString();
+      const md = new vscode5.MarkdownString();
       md.appendCodeblock(`(parameter) ${word}: ${type}`, "typescript");
       md.appendMarkdown(`
 ${desc}
 
 *Parameter of \`lurek.${callbackName}\`*`);
       md.isTrusted = true;
-      return new vscode6.Hover(md, wordRange);
+      return new vscode5.Hover(md, wordRange);
     }
   });
-  const physicsGravityHover = vscode6.languages.registerHoverProvider(LUA_SELECTOR2, {
+  const physicsGravityHover = vscode5.languages.registerHoverProvider(LUA_SELECTOR2, {
     provideHover(document, position) {
       const line = document.lineAt(position).text;
       if (!/lurek\.physics\.newWorld/.test(line)) return void 0;
@@ -6255,7 +5465,7 @@ ${desc}
       const commaCount = (before.match(/,/g) ?? []).length;
       if (commaCount !== 1) return void 0;
       const earthPx = Math.round(980);
-      const md = new vscode6.MarkdownString(
+      const md = new vscode5.MarkdownString(
         `**Gravity Y = ${num} px/s\xB2**
 
 Earth gravity (at 1px = 1cm) \u2248 **${earthPx} px/s\xB2**
@@ -6263,31 +5473,31 @@ Earth gravity (at 1px = 1cm) \u2248 **${earthPx} px/s\xB2**
 Current value is **${(num / earthPx * 100).toFixed(0)}%** of Earth gravity.`
       );
       md.isTrusted = true;
-      return new vscode6.Hover(md, wordRange);
+      return new vscode5.Hover(md, wordRange);
     }
   });
   context.subscriptions.push(apiHover, easingHover, mathConstHover, callbackParamHover, physicsGravityHover);
 }
 
 // src/providers/signature.ts
-var vscode7 = __toESM(require("vscode"));
+var vscode6 = __toESM(require("vscode"));
 var LUA_SELECTOR3 = { scheme: "file", language: "lua" };
 var analyzer3 = new LuaDocumentAnalyzer();
 function buildSignatureInfo(fn) {
-  const sig = new vscode7.SignatureInformation(fn.signature);
-  sig.documentation = new vscode7.MarkdownString(fn.description);
+  const sig = new vscode6.SignatureInformation(fn.signature);
+  sig.documentation = new vscode6.MarkdownString(fn.description);
   sig.parameters = fn.parameters.map((p) => {
-    const paramDoc = new vscode7.MarkdownString();
+    const paramDoc = new vscode6.MarkdownString();
     const opt = p.optional ? " *(optional)*" : "";
     const def = p.default ? ` \u2014 default: \`${p.default}\`` : "";
     paramDoc.appendMarkdown(`*${p.type}*${opt}${def}`);
     if (p.description) paramDoc.appendMarkdown(` \u2014 ${p.description}`);
-    return new vscode7.ParameterInformation(p.name, paramDoc);
+    return new vscode6.ParameterInformation(p.name, paramDoc);
   });
   return sig;
 }
 function register3(context, apiData2) {
-  const provider = vscode7.languages.registerSignatureHelpProvider(
+  const provider = vscode6.languages.registerSignatureHelpProvider(
     LUA_SELECTOR3,
     {
       provideSignatureHelp(document, position) {
@@ -6313,7 +5523,7 @@ function register3(context, apiData2) {
         }
         if (!fn || fn.parameters.length === 0) return void 0;
         const sig = buildSignatureInfo(fn);
-        const help = new vscode7.SignatureHelp();
+        const help = new vscode6.SignatureHelp();
         help.signatures = [sig];
         help.activeSignature = 0;
         help.activeParameter = Math.min(paramIndex, fn.parameters.length - 1);
@@ -6327,7 +5537,7 @@ function register3(context, apiData2) {
 }
 
 // src/providers/definition.ts
-var vscode8 = __toESM(require("vscode"));
+var vscode7 = __toESM(require("vscode"));
 var path6 = __toESM(require("path"));
 var LUA_SELECTOR4 = { scheme: "file", language: "lua" };
 var analyzer4 = new LuaDocumentAnalyzer();
@@ -6429,24 +5639,24 @@ async function resolveRequire(document, requirePath) {
   const candidates = [fsPath + ".lua", fsPath + "/init.lua"];
   const docDir = path6.dirname(document.uri.fsPath);
   for (const candidate of candidates) {
-    const relUri = vscode8.Uri.file(path6.resolve(docDir, candidate));
+    const relUri = vscode7.Uri.file(path6.resolve(docDir, candidate));
     try {
-      await vscode8.workspace.fs.stat(relUri);
-      return new vscode8.Location(relUri, new vscode8.Position(0, 0));
+      await vscode7.workspace.fs.stat(relUri);
+      return new vscode7.Location(relUri, new vscode7.Position(0, 0));
     } catch {
     }
-    const wsRoot = vscode8.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const wsRoot = vscode7.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (wsRoot) {
-      const absUri = vscode8.Uri.file(path6.resolve(wsRoot, candidate));
+      const absUri = vscode7.Uri.file(path6.resolve(wsRoot, candidate));
       try {
-        await vscode8.workspace.fs.stat(absUri);
-        return new vscode8.Location(absUri, new vscode8.Position(0, 0));
+        await vscode7.workspace.fs.stat(absUri);
+        return new vscode7.Location(absUri, new vscode7.Position(0, 0));
       } catch {
       }
     }
-    const files = await vscode8.workspace.findFiles(`**/${candidate}`, "**/node_modules/**", 1);
+    const files = await vscode7.workspace.findFiles(`**/${candidate}`, "**/node_modules/**", 1);
     if (files.length > 0) {
-      return new vscode8.Location(files[0], new vscode8.Position(0, 0));
+      return new vscode7.Location(files[0], new vscode7.Position(0, 0));
     }
   }
   return void 0;
@@ -6464,9 +5674,9 @@ function findLocalDefinition(document, word, cursorLine) {
       }
     }
     if (best) {
-      return new vscode8.Location(
+      return new vscode7.Location(
         document.uri,
-        new vscode8.Position(best.line, best.column)
+        new vscode7.Position(best.line, best.column)
       );
     }
   } catch {
@@ -6484,7 +5694,7 @@ function findLocalDefinition(document, word, cursorLine) {
     const match = pattern.exec(text);
     if (match) {
       const pos = document.positionAt(match.index);
-      return new vscode8.Location(document.uri, pos);
+      return new vscode7.Location(document.uri, pos);
     }
   }
   return void 0;
@@ -6492,9 +5702,9 @@ function findLocalDefinition(document, word, cursorLine) {
 function register4(context, apiData2) {
   const docProvider = new LurekApiDocumentProvider(apiData2);
   context.subscriptions.push(
-    vscode8.workspace.registerTextDocumentContentProvider(LUREK_API_SCHEME, docProvider)
+    vscode7.workspace.registerTextDocumentContentProvider(LUREK_API_SCHEME, docProvider)
   );
-  const provider = vscode8.languages.registerDefinitionProvider(LUA_SELECTOR4, {
+  const provider = vscode7.languages.registerDefinitionProvider(LUA_SELECTOR4, {
     async provideDefinition(document, position) {
       const lineText = document.lineAt(position).text;
       const requireMatch = lineText.match(/require\s*\(\s*["']([^"']+)["']\s*\)/);
@@ -6511,8 +5721,8 @@ function register4(context, apiData2) {
         const fullPath = document.getText(lurekRange);
         const fn = apiData2.getFunction(fullPath);
         if (fn) {
-          const uri = vscode8.Uri.parse(`${LUREK_API_SCHEME}:/${fullPath}`);
-          return new vscode8.Location(uri, new vscode8.Position(0, 0));
+          const uri = vscode7.Uri.parse(`${LUREK_API_SCHEME}:/${fullPath}`);
+          return new vscode7.Location(uri, new vscode7.Position(0, 0));
         }
       }
       const wordRange = document.getWordRangeAtPosition(position, /\w+/);
@@ -6529,11 +5739,11 @@ function register4(context, apiData2) {
 }
 
 // src/providers/references.ts
-var vscode9 = __toESM(require("vscode"));
+var vscode8 = __toESM(require("vscode"));
 var LUA_SELECTOR5 = { scheme: "file", language: "lua" };
 var analyzer5 = new LuaDocumentAnalyzer();
 function register5(context, apiData2) {
-  const provider = vscode9.languages.registerReferenceProvider(LUA_SELECTOR5, {
+  const provider = vscode8.languages.registerReferenceProvider(LUA_SELECTOR5, {
     async provideReferences(document, position, _refContext) {
       const wordRange = document.getWordRangeAtPosition(position, /[\w.]+/);
       if (!wordRange) return [];
@@ -6541,16 +5751,16 @@ function register5(context, apiData2) {
       if (!word || word.length < 2) return [];
       const searchTerm = word.includes(".") ? word : word;
       const locations = [];
-      const files = await vscode9.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 500);
+      const files = await vscode8.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 500);
       for (const fileUri of files) {
         try {
-          const doc = await vscode9.workspace.openTextDocument(fileUri);
+          const doc = await vscode8.workspace.openTextDocument(fileUri);
           const text = doc.getText();
           const refs = analyzer5.findReferencesInDocument(text, searchTerm);
           for (const ref of refs) {
-            locations.push(new vscode9.Location(
+            locations.push(new vscode8.Location(
               fileUri,
-              new vscode9.Position(ref.line, ref.column)
+              new vscode8.Position(ref.line, ref.column)
             ));
           }
           if (searchTerm.includes(".")) {
@@ -6563,7 +5773,7 @@ function register5(context, apiData2) {
                 (loc) => loc.uri.fsPath === fileUri.fsPath && loc.range.start.line === pos.line && loc.range.start.character === pos.character
               );
               if (!isDuplicate) {
-                locations.push(new vscode9.Location(fileUri, pos));
+                locations.push(new vscode8.Location(fileUri, pos));
               }
             }
           }
@@ -6577,7 +5787,7 @@ function register5(context, apiData2) {
 }
 
 // src/providers/symbols.ts
-var vscode10 = __toESM(require("vscode"));
+var vscode9 = __toESM(require("vscode"));
 var LUA_SELECTOR6 = { scheme: "file", language: "lua" };
 var analyzer6 = new LuaDocumentAnalyzer();
 var LUREK_CALLBACKS2 = /* @__PURE__ */ new Set([
@@ -6623,13 +5833,13 @@ function getBlockRange(lines, startLine) {
     depth += openers - closers - untils;
     if (openers > 0) started = true;
     if (started && depth <= 0) {
-      return new vscode10.Range(startLine, 0, i, lines[i].length);
+      return new vscode9.Range(startLine, 0, i, lines[i].length);
     }
   }
-  return new vscode10.Range(startLine, 0, startLine, lines[startLine]?.length ?? 0);
+  return new vscode9.Range(startLine, 0, startLine, lines[startLine]?.length ?? 0);
 }
 function register6(context, apiData2) {
-  const docSymbolProvider = vscode10.languages.registerDocumentSymbolProvider(
+  const docSymbolProvider = vscode9.languages.registerDocumentSymbolProvider(
     LUA_SELECTOR6,
     {
       provideDocumentSymbols(document) {
@@ -6641,11 +5851,11 @@ function register6(context, apiData2) {
           const tableSymbols = /* @__PURE__ */ new Map();
           for (const req of info.requires) {
             const lineLen = lines[req.line]?.length ?? 0;
-            const range = new vscode10.Range(req.line, 0, req.line, lineLen);
-            symbols.push(new vscode10.DocumentSymbol(
+            const range = new vscode9.Range(req.line, 0, req.line, lineLen);
+            symbols.push(new vscode9.DocumentSymbol(
               req.localName,
               `require("${req.modulePath}")`,
-              vscode10.SymbolKind.Module,
+              vscode9.SymbolKind.Module,
               range,
               range
             ));
@@ -6653,34 +5863,34 @@ function register6(context, apiData2) {
           for (const sym of info.symbols) {
             if (sym.kind === "parameter") continue;
             const lineLen = lines[sym.line]?.length ?? 0;
-            const selRange = new vscode10.Range(sym.line, sym.column, sym.line, sym.column + sym.name.length);
+            const selRange = new vscode9.Range(sym.line, sym.column, sym.line, sym.column + sym.name.length);
             if (sym.kind === "function") {
-              const range = sym.endLine !== void 0 ? new vscode10.Range(sym.line, 0, sym.endLine, lines[sym.endLine]?.length ?? 0) : getBlockRange(lines, sym.line);
+              const range = sym.endLine !== void 0 ? new vscode9.Range(sym.line, 0, sym.endLine, lines[sym.endLine]?.length ?? 0) : getBlockRange(lines, sym.line);
               const isCallback = info.callbacks.some((cb) => cb.name === sym.name && cb.line === sym.line);
-              const kind = isCallback ? vscode10.SymbolKind.Event : vscode10.SymbolKind.Function;
+              const kind = isCallback ? vscode9.SymbolKind.Event : vscode9.SymbolKind.Function;
               const detail = isCallback ? "callback" : sym.isLocal ? "local function" : "function";
               const displayName = isCallback ? `lurek.${sym.name}` : sym.name;
-              const docSym = new vscode10.DocumentSymbol(displayName, detail, kind, range, selRange);
+              const docSym = new vscode9.DocumentSymbol(displayName, detail, kind, range, selRange);
               if (sym.scope && tableSymbols.has(sym.scope)) {
                 tableSymbols.get(sym.scope).children.push(docSym);
               } else {
                 symbols.push(docSym);
               }
             } else if (sym.kind === "method") {
-              const range = sym.endLine !== void 0 ? new vscode10.Range(sym.line, 0, sym.endLine, lines[sym.endLine]?.length ?? 0) : getBlockRange(lines, sym.line);
+              const range = sym.endLine !== void 0 ? new vscode9.Range(sym.line, 0, sym.endLine, lines[sym.endLine]?.length ?? 0) : getBlockRange(lines, sym.line);
               const displayName = sym.type ? `${sym.type}:${sym.name}` : sym.name;
-              const docSym = new vscode10.DocumentSymbol(displayName, "method", vscode10.SymbolKind.Method, range, selRange);
+              const docSym = new vscode9.DocumentSymbol(displayName, "method", vscode9.SymbolKind.Method, range, selRange);
               if (sym.type && tableSymbols.has(sym.type)) {
                 tableSymbols.get(sym.type).children.push(docSym);
               } else {
                 symbols.push(docSym);
               }
             } else if (sym.kind === "table") {
-              const range = new vscode10.Range(sym.line, 0, sym.line, lineLen);
-              const docSym = new vscode10.DocumentSymbol(
+              const range = new vscode9.Range(sym.line, 0, sym.line, lineLen);
+              const docSym = new vscode9.DocumentSymbol(
                 sym.name,
                 "table",
-                vscode10.SymbolKind.Object,
+                vscode9.SymbolKind.Object,
                 range,
                 selRange
               );
@@ -6688,11 +5898,11 @@ function register6(context, apiData2) {
               symbols.push(docSym);
             } else if (sym.kind === "local" || sym.kind === "global") {
               const isConstant = /^[A-Z_][A-Z0-9_]*$/.test(sym.name);
-              const range = new vscode10.Range(sym.line, 0, sym.line, lineLen);
-              const kind = isConstant ? vscode10.SymbolKind.Constant : vscode10.SymbolKind.Variable;
+              const range = new vscode9.Range(sym.line, 0, sym.line, lineLen);
+              const kind = isConstant ? vscode9.SymbolKind.Constant : vscode9.SymbolKind.Variable;
               const detail = sym.isLocal ? "local" : "global";
               if (!sym.isLocal || isConstant || !sym.scope) {
-                symbols.push(new vscode10.DocumentSymbol(sym.name, detail, kind, range, selRange));
+                symbols.push(new vscode9.DocumentSymbol(sym.name, detail, kind, range, selRange));
               }
             }
           }
@@ -6703,25 +5913,25 @@ function register6(context, apiData2) {
       }
     }
   );
-  const wsSymbolProvider = vscode10.languages.registerWorkspaceSymbolProvider({
+  const wsSymbolProvider = vscode9.languages.registerWorkspaceSymbolProvider({
     async provideWorkspaceSymbols(query) {
       if (query.length < 2) return [];
       const lowerQuery = query.toLowerCase();
       const results = [];
-      const files = await vscode10.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 100);
+      const files = await vscode9.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}", 100);
       for (const fileUri of files) {
         try {
-          const doc = await vscode10.workspace.openTextDocument(fileUri);
+          const doc = await vscode9.workspace.openTextDocument(fileUri);
           const info = analyzer6.analyze(doc.getText());
           for (const sym of info.symbols) {
             if (sym.kind === "parameter") continue;
             if (!sym.name.toLowerCase().includes(lowerQuery)) continue;
-            const kind = sym.kind === "function" || sym.kind === "method" ? vscode10.SymbolKind.Function : sym.kind === "table" ? vscode10.SymbolKind.Object : vscode10.SymbolKind.Variable;
-            const location = new vscode10.Location(
+            const kind = sym.kind === "function" || sym.kind === "method" ? vscode9.SymbolKind.Function : sym.kind === "table" ? vscode9.SymbolKind.Object : vscode9.SymbolKind.Variable;
+            const location = new vscode9.Location(
               fileUri,
-              new vscode10.Position(sym.line, sym.column)
+              new vscode9.Position(sym.line, sym.column)
             );
-            results.push(new vscode10.SymbolInformation(
+            results.push(new vscode9.SymbolInformation(
               sym.name,
               kind,
               sym.scope ?? "",
@@ -6744,43 +5954,43 @@ function fallbackDocumentSymbols(lines) {
     if (cbMatch) {
       const name = cbMatch[1];
       const range = getBlockRange(lines, i);
-      const selRange = new vscode10.Range(i, 0, i, line.length);
+      const selRange = new vscode9.Range(i, 0, i, line.length);
       const shortName = name.replace("lurek.", "");
-      const kind = LUREK_CALLBACKS2.has(shortName) ? vscode10.SymbolKind.Event : vscode10.SymbolKind.Function;
-      symbols.push(new vscode10.DocumentSymbol(name, "callback", kind, range, selRange));
+      const kind = LUREK_CALLBACKS2.has(shortName) ? vscode9.SymbolKind.Event : vscode9.SymbolKind.Function;
+      symbols.push(new vscode9.DocumentSymbol(name, "callback", kind, range, selRange));
       continue;
     }
     const globalFuncMatch = line.match(/^\s*function\s+(\w[\w.:]*)\s*\(/);
     if (globalFuncMatch) {
       const name = globalFuncMatch[1];
       const range = getBlockRange(lines, i);
-      const selRange = new vscode10.Range(i, 0, i, line.length);
-      symbols.push(new vscode10.DocumentSymbol(name, "function", vscode10.SymbolKind.Function, range, selRange));
+      const selRange = new vscode9.Range(i, 0, i, line.length);
+      symbols.push(new vscode9.DocumentSymbol(name, "function", vscode9.SymbolKind.Function, range, selRange));
       continue;
     }
     const localFuncMatch = line.match(/^\s*local\s+function\s+(\w+)\s*\(/);
     if (localFuncMatch) {
       const name = localFuncMatch[1];
       const range = getBlockRange(lines, i);
-      const selRange = new vscode10.Range(i, 0, i, line.length);
-      symbols.push(new vscode10.DocumentSymbol(name, "local function", vscode10.SymbolKind.Function, range, selRange));
+      const selRange = new vscode9.Range(i, 0, i, line.length);
+      symbols.push(new vscode9.DocumentSymbol(name, "local function", vscode9.SymbolKind.Function, range, selRange));
       continue;
     }
     const assignFuncMatch = line.match(/^\s*local\s+(\w+)\s*=\s*function\s*\(/);
     if (assignFuncMatch) {
       const name = assignFuncMatch[1];
       const range = getBlockRange(lines, i);
-      const selRange = new vscode10.Range(i, 0, i, line.length);
-      symbols.push(new vscode10.DocumentSymbol(name, "local function", vscode10.SymbolKind.Function, range, selRange));
+      const selRange = new vscode9.Range(i, 0, i, line.length);
+      symbols.push(new vscode9.DocumentSymbol(name, "local function", vscode9.SymbolKind.Function, range, selRange));
       continue;
     }
     const requireMatch = line.match(/^\s*local\s+(\w+)\s*=\s*require\s*\(\s*["']([^"']+)["']\s*\)/);
     if (requireMatch) {
-      const range = new vscode10.Range(i, 0, i, line.length);
-      symbols.push(new vscode10.DocumentSymbol(
+      const range = new vscode9.Range(i, 0, i, line.length);
+      symbols.push(new vscode9.DocumentSymbol(
         requireMatch[1],
         `require("${requireMatch[2]}")`,
-        vscode10.SymbolKind.Module,
+        vscode9.SymbolKind.Module,
         range,
         range
       ));
@@ -6791,12 +6001,12 @@ function fallbackDocumentSymbols(lines) {
 }
 
 // src/providers/diagnostics.ts
-var vscode11 = __toESM(require("vscode"));
+var vscode10 = __toESM(require("vscode"));
 var fs6 = __toESM(require("fs"));
 var path7 = __toESM(require("path"));
 var analyzer7 = new LuaDocumentAnalyzer();
 function register7(context, apiData2) {
-  const collection = vscode11.languages.createDiagnosticCollection("lurek");
+  const collection = vscode10.languages.createDiagnosticCollection("lurek");
   context.subscriptions.push(collection);
   const debounceTimers = /* @__PURE__ */ new Map();
   const diagnose = (document) => {
@@ -6832,10 +6042,10 @@ function register7(context, apiData2) {
     }, 300));
   };
   context.subscriptions.push(
-    vscode11.workspace.onDidOpenTextDocument(diagnose),
-    vscode11.workspace.onDidSaveTextDocument(diagnose),
-    vscode11.workspace.onDidChangeTextDocument((e) => debouncedDiagnose(e.document)),
-    vscode11.workspace.onDidCloseTextDocument((doc) => {
+    vscode10.workspace.onDidOpenTextDocument(diagnose),
+    vscode10.workspace.onDidSaveTextDocument(diagnose),
+    vscode10.workspace.onDidChangeTextDocument((e) => debouncedDiagnose(e.document)),
+    vscode10.workspace.onDidCloseTextDocument((doc) => {
       collection.delete(doc.uri);
       const key = doc.uri.toString();
       const timer = debounceTimers.get(key);
@@ -6845,7 +6055,7 @@ function register7(context, apiData2) {
       }
     })
   );
-  for (const doc of vscode11.workspace.textDocuments) {
+  for (const doc of vscode10.workspace.textDocuments) {
     diagnose(doc);
   }
 }
@@ -6862,15 +6072,15 @@ function checkDeprecated(text, apiData2) {
       if (line.trimStart().startsWith("--")) continue;
       let match;
       while ((match = regex.exec(line)) !== null) {
-        const range = new vscode11.Range(i, match.index, i, match.index + fn.fullPath.length);
-        const diag = new vscode11.Diagnostic(
+        const range = new vscode10.Range(i, match.index, i, match.index + fn.fullPath.length);
+        const diag = new vscode10.Diagnostic(
           range,
           `${fn.fullPath} is deprecated. ${fn.deprecated}`,
-          vscode11.DiagnosticSeverity.Warning
+          vscode10.DiagnosticSeverity.Warning
         );
         diag.code = "lurek.deprecated";
         diag.source = "Lurek2D Toolkit";
-        diag.tags = [vscode11.DiagnosticTag.Deprecated];
+        diag.tags = [vscode10.DiagnosticTag.Deprecated];
         diagnostics.push(diag);
       }
     }
@@ -6891,11 +6101,11 @@ function checkColorRange(text) {
       const hasLargeValue = vals.some((v) => v > 1);
       if (!hasLargeValue) continue;
       const converted = vals.slice(0, 3).map((v) => (v / 255).toFixed(2));
-      const range = new vscode11.Range(i, match.index, i, match.index + match[0].length);
-      const diag = new vscode11.Diagnostic(
+      const range = new vscode10.Range(i, match.index, i, match.index + match[0].length);
+      const diag = new vscode10.Diagnostic(
         range,
         `Color values should be in 0-1 range. Did you mean ${converted.join(", ")}?`,
-        vscode11.DiagnosticSeverity.Warning
+        vscode10.DiagnosticSeverity.Warning
       );
       diag.code = "lurek.colorRange";
       diag.source = "Lurek2D Toolkit";
@@ -6913,26 +6123,26 @@ function checkUnusedRequire(text, info) {
       const lines = text.split("\n");
       const lineIdx = req.line;
       const lineText = lines[lineIdx] ?? "";
-      const range = new vscode11.Range(lineIdx, 0, lineIdx, lineText.length);
-      const diag = new vscode11.Diagnostic(
+      const range = new vscode10.Range(lineIdx, 0, lineIdx, lineText.length);
+      const diag = new vscode10.Diagnostic(
         range,
         `Required module '${varName}' is never used`,
-        vscode11.DiagnosticSeverity.Hint
+        vscode10.DiagnosticSeverity.Hint
       );
       diag.code = "lurek.unusedRequire";
       diag.source = "Lurek2D Toolkit";
-      diag.tags = [vscode11.DiagnosticTag.Unnecessary];
+      diag.tags = [vscode10.DiagnosticTag.Unnecessary];
       diagnostics.push(diag);
     }
   }
   return diagnostics;
 }
 function checkAssetNotFound(text, document, diagnostics) {
-  if (!vscode11.workspace.workspaceFolders?.length) return;
+  if (!vscode10.workspace.workspaceFolders?.length) return;
   const lines = text.split("\n");
   const assetFuncPattern = /lurek\.(?:render\.newImage|audio\.newSource|fs\.read)\s*\(\s*["']([^"']+)["']/g;
   const docDir = path7.dirname(document.uri.fsPath);
-  const wsRoot = vscode11.workspace.workspaceFolders[0].uri.fsPath;
+  const wsRoot = vscode10.workspace.workspaceFolders[0].uri.fsPath;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (line.trimStart().startsWith("--")) continue;
@@ -6953,11 +6163,11 @@ function checkAssetNotFound(text, document, diagnostics) {
       });
       if (!exists) {
         const strStart = line.indexOf(assetPath, match.index);
-        const range = new vscode11.Range(i, strStart, i, strStart + assetPath.length);
-        const diag = new vscode11.Diagnostic(
+        const range = new vscode10.Range(i, strStart, i, strStart + assetPath.length);
+        const diag = new vscode10.Diagnostic(
           range,
           `Asset file '${assetPath}' not found in workspace`,
-          vscode11.DiagnosticSeverity.Warning
+          vscode10.DiagnosticSeverity.Warning
         );
         diag.code = "lurek.assetNotFound";
         diag.source = "Lurek2D Toolkit";
@@ -6980,11 +6190,11 @@ function checkThreadRandom(text, info) {
       if (!scope) continue;
       const scopeLines = lines.slice(scope.startLine, scope.endLine + 1).join("\n");
       if (!scopeLines.includes("lurek.thread")) continue;
-      const range = new vscode11.Range(i, match.index, i, match.index + "math.random".length);
-      const diag = new vscode11.Diagnostic(
+      const range = new vscode10.Range(i, match.index, i, match.index + "math.random".length);
+      const diag = new vscode10.Diagnostic(
         range,
         "math.random in threads may produce identical sequences. Consider seeding with thread ID.",
-        vscode11.DiagnosticSeverity.Information
+        vscode10.DiagnosticSeverity.Information
       );
       diag.code = "lurek.threadRandom";
       diag.source = "Lurek2D Toolkit";
@@ -7003,11 +6213,11 @@ function checkMissingCallback(text, document, info) {
   const hasDraw = info.callbacks.some((cb) => cb.name === "draw") || /lurek\.draw\s*=\s*function/.test(text);
   if (!hasUpdate && !hasDraw) {
     const lines = text.split("\n");
-    const range = new vscode11.Range(0, 0, 0, lines[0]?.length ?? 0);
-    const diag = new vscode11.Diagnostic(
+    const range = new vscode10.Range(0, 0, 0, lines[0]?.length ?? 0);
+    const diag = new vscode10.Diagnostic(
       range,
       "main.lua should define lurek.update(dt) and/or lurek.draw()",
-      vscode11.DiagnosticSeverity.Information
+      vscode10.DiagnosticSeverity.Information
     );
     diag.code = "lurek.missingCallback";
     diag.source = "Lurek2D Toolkit";
@@ -7086,9 +6296,9 @@ function checkWrongEnumValue(text, _apiData) {
         if (rule.valid.includes(value)) continue;
         const suggestion = fuzzyMatch(value, rule.valid);
         const valueStart = line.indexOf(`"${value}"`, m.index) !== -1 ? line.indexOf(`"${value}"`, m.index) + 1 : line.indexOf(`'${value}'`, m.index) + 1;
-        const range = new vscode11.Range(i, valueStart, i, valueStart + value.length);
+        const range = new vscode10.Range(i, valueStart, i, valueStart + value.length);
         const msg = suggestion ? `Unknown ${rule.label} "${value}". Did you mean "${suggestion}"? Valid: ${rule.valid.join(", ")}` : `Unknown ${rule.label} "${value}". Valid values: ${rule.valid.join(", ")}`;
-        const diag = new vscode11.Diagnostic(range, msg, vscode11.DiagnosticSeverity.Warning);
+        const diag = new vscode10.Diagnostic(range, msg, vscode10.DiagnosticSeverity.Warning);
         diag.code = "lurek.wrongEnumValue";
         diag.source = "Lurek2D Toolkit";
         diagnostics.push(diag);
@@ -7117,11 +6327,11 @@ function checkUnknownLurekFunc(text, apiData2) {
       const methodFn = apiData2.getFunctions(modName).find((f) => f.name === funcName);
       if (methodFn) continue;
       const col = m.index + `lurek.${modName}.`.length;
-      const range = new vscode11.Range(i, col, i, col + funcName.length);
-      const diag = new vscode11.Diagnostic(
+      const range = new vscode10.Range(i, col, i, col + funcName.length);
+      const diag = new vscode10.Diagnostic(
         range,
         `"${funcName}" is not a known function in lurek.${modName}`,
-        vscode11.DiagnosticSeverity.Warning
+        vscode10.DiagnosticSeverity.Warning
       );
       diag.code = "lurek.unknownFunction";
       diag.source = "Lurek2D Toolkit";
@@ -7176,11 +6386,11 @@ function checkConfLua(text, document, diagnostics) {
       if (!validKeys) continue;
       if (validKeys.includes(key)) continue;
       const col = m.index + `t.${section}.`.length;
-      const range = new vscode11.Range(i, col, i, col + key.length);
-      const diag = new vscode11.Diagnostic(
+      const range = new vscode10.Range(i, col, i, col + key.length);
+      const diag = new vscode10.Diagnostic(
         range,
         `"${key}" is not a recognised conf.lua key in t.${section}. Valid: ${validKeys.join(", ")}`,
-        vscode11.DiagnosticSeverity.Warning
+        vscode10.DiagnosticSeverity.Warning
       );
       diag.code = "lurek.confKey";
       diag.source = "Lurek2D Toolkit";
@@ -7207,11 +6417,11 @@ function checkPerFrameAllocation(text, info) {
       });
       if (!isPerFrame) continue;
       const funcName = m[0].replace(/\s*\($/, "");
-      const range = new vscode11.Range(i, m.index, i, m.index + funcName.length);
-      const diag = new vscode11.Diagnostic(
+      const range = new vscode10.Range(i, m.index, i, m.index + funcName.length);
+      const diag = new vscode10.Diagnostic(
         range,
         `${funcName} called inside a per-frame callback. This allocates every frame \u2014 move to lurek.init() or lurek.ready().`,
-        vscode11.DiagnosticSeverity.Warning
+        vscode10.DiagnosticSeverity.Warning
       );
       diag.code = "lurek.perFrameAlloc";
       diag.source = "Lurek2D Toolkit";
@@ -7230,11 +6440,11 @@ function checkMissingTestSummary(text, document) {
   if (!hasTestSummary) {
     const lines = text.split("\n");
     const lastLine = lines.length - 1;
-    const range = new vscode11.Range(lastLine, 0, lastLine, lines[lastLine]?.length ?? 0);
-    const diag = new vscode11.Diagnostic(
+    const range = new vscode10.Range(lastLine, 0, lastLine, lines[lastLine]?.length ?? 0);
+    const diag = new vscode10.Diagnostic(
       range,
       "Lua test file is missing test_summary() call at the end. Required by the Lurek2D test harness.",
-      vscode11.DiagnosticSeverity.Warning
+      vscode10.DiagnosticSeverity.Warning
     );
     diag.code = "lurek.missingTestSummary";
     diag.source = "Lurek2D Toolkit";
@@ -7264,11 +6474,11 @@ function checkEntityNilAccess(text) {
         const accessPattern = new RegExp(`\\b${varName}\\s*[:.:]\\s*\\w+`);
         if (accessPattern.test(checkLine) && !hasGuard) {
           const col = checkLine.indexOf(varName);
-          const range = new vscode11.Range(j, col, j, col + varName.length);
-          const diag = new vscode11.Diagnostic(
+          const range = new vscode10.Range(j, col, j, col + varName.length);
+          const diag = new vscode10.Diagnostic(
             range,
             `'${varName}' from lurek.ecs.find() may be nil. Consider adding: if ${varName} then`,
-            vscode11.DiagnosticSeverity.Information
+            vscode10.DiagnosticSeverity.Information
           );
           diag.code = "lurek.entityNilAccess";
           diag.source = "Lurek2D Toolkit";
@@ -7295,11 +6505,11 @@ function checkMethodColonDot(text) {
       if (varName === "lurek") continue;
       const col = m.index;
       const endCol = col + `${varName}.${methodName}`.length;
-      const range = new vscode11.Range(i, col, i, endCol);
-      const diag = new vscode11.Diagnostic(
+      const range = new vscode10.Range(i, col, i, endCol);
+      const diag = new vscode10.Diagnostic(
         range,
         `Consider using colon syntax: ${varName}:${methodName}(...) instead of ${varName}.${methodName}(${varName}, ...)`,
-        vscode11.DiagnosticSeverity.Information
+        vscode10.DiagnosticSeverity.Information
       );
       diag.code = "lurek.colonSyntax";
       diag.source = "Lurek2D Toolkit";
@@ -7310,11 +6520,11 @@ function checkMethodColonDot(text) {
 }
 
 // src/providers/color.ts
-var vscode12 = __toESM(require("vscode"));
+var vscode11 = __toESM(require("vscode"));
 var LUA_SELECTOR7 = { scheme: "file", language: "lua" };
 var COLOR_FUNCTIONS = ["setColor", "setBackgroundColor", "clear", "newColor"];
 function register8(context, apiData2) {
-  const provider = vscode12.languages.registerColorProvider(LUA_SELECTOR7, {
+  const provider = vscode11.languages.registerColorProvider(LUA_SELECTOR7, {
     provideDocumentColors(document) {
       try {
         return detectColors(document);
@@ -7354,8 +6564,8 @@ function detectColors(document) {
     const argsLen = argsEnd - argsStart;
     const startPos = document.positionAt(argsOffset);
     const endPos = document.positionAt(argsOffset + argsLen);
-    const range = new vscode12.Range(startPos, endPos);
-    colors.push(new vscode12.ColorInformation(range, new vscode12.Color(r, g, b, a)));
+    const range = new vscode11.Range(startPos, endPos);
+    colors.push(new vscode11.ColorInformation(range, new vscode11.Color(r, g, b, a)));
   }
   return colors;
 }
@@ -7365,19 +6575,19 @@ function createPresentations(color, colorContext) {
   const b = formatComponent(color.blue);
   const a = formatComponent(color.alpha);
   const presentations = [];
-  const withAlpha = new vscode12.ColorPresentation(`${r}, ${g}, ${b}, ${a}`);
-  withAlpha.textEdit = new vscode12.TextEdit(colorContext.range, `${r}, ${g}, ${b}, ${a}`);
+  const withAlpha = new vscode11.ColorPresentation(`${r}, ${g}, ${b}, ${a}`);
+  withAlpha.textEdit = new vscode11.TextEdit(colorContext.range, `${r}, ${g}, ${b}, ${a}`);
   presentations.push(withAlpha);
   if (Math.abs(color.alpha - 1) < 5e-3) {
-    const noAlpha = new vscode12.ColorPresentation(`${r}, ${g}, ${b}`);
-    noAlpha.textEdit = new vscode12.TextEdit(colorContext.range, `${r}, ${g}, ${b}`);
+    const noAlpha = new vscode11.ColorPresentation(`${r}, ${g}, ${b}`);
+    noAlpha.textEdit = new vscode11.TextEdit(colorContext.range, `${r}, ${g}, ${b}`);
     presentations.push(noAlpha);
   }
   const hexR = Math.round(color.red * 255).toString(16).padStart(2, "0");
   const hexG = Math.round(color.green * 255).toString(16).padStart(2, "0");
   const hexB = Math.round(color.blue * 255).toString(16).padStart(2, "0");
-  const hexPresentation = new vscode12.ColorPresentation(`${r}, ${g}, ${b} --[[ #${hexR}${hexG}${hexB} ]]`);
-  hexPresentation.textEdit = new vscode12.TextEdit(
+  const hexPresentation = new vscode11.ColorPresentation(`${r}, ${g}, ${b} --[[ #${hexR}${hexG}${hexB} ]]`);
+  hexPresentation.textEdit = new vscode11.TextEdit(
     colorContext.range,
     `${r}, ${g}, ${b} --[[ #${hexR}${hexG}${hexB} ]]`
   );
@@ -7389,7 +6599,7 @@ function formatComponent(value) {
 }
 
 // src/providers/assetPath.ts
-var vscode13 = __toESM(require("vscode"));
+var vscode12 = __toESM(require("vscode"));
 var path8 = __toESM(require("path"));
 var LUA_SELECTOR8 = { scheme: "file", language: "lua" };
 var analyzer8 = new LuaDocumentAnalyzer();
@@ -7402,7 +6612,7 @@ var ASSET_FUNC_EXTENSIONS = {
 };
 var LUA_EXTENSIONS = [".lua"];
 function register9(context, apiData2) {
-  const provider = vscode13.languages.registerCompletionItemProvider(
+  const provider = vscode12.languages.registerCompletionItemProvider(
     LUA_SELECTOR8,
     {
       async provideCompletionItems(document, position) {
@@ -7435,11 +6645,11 @@ async function getAssetCompletions(document, position) {
   } else {
     return void 0;
   }
-  const workspaceRoot = vscode13.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const workspaceRoot = vscode12.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!workspaceRoot) return void 0;
   const searchDir = partialPath.includes("/") ? path8.dirname(partialPath) : "";
   const globPattern = searchDir ? `${searchDir}/**/*` : "**/*";
-  const files = await vscode13.workspace.findFiles(globPattern, "**/node_modules/**", 200);
+  const files = await vscode12.workspace.findFiles(globPattern, "**/node_modules/**", 200);
   const items = [];
   const seenDirs = /* @__PURE__ */ new Set();
   for (const file of files) {
@@ -7448,7 +6658,7 @@ async function getAssetCompletions(document, position) {
     const relativePath = path8.relative(workspaceRoot, file.fsPath).replace(/\\/g, "/");
     if (funcPath === "require") {
       const requirePath = relativePath.replace(/\.lua$/, "").replace(/\//g, ".");
-      const item2 = new vscode13.CompletionItem(requirePath, vscode13.CompletionItemKind.Module);
+      const item2 = new vscode12.CompletionItem(requirePath, vscode12.CompletionItemKind.Module);
       item2.detail = "Lua module";
       item2.insertText = requirePath;
       const depth2 = requirePath.split(".").length;
@@ -7460,12 +6670,12 @@ async function getAssetCompletions(document, position) {
     if (dir !== "." && !seenDirs.has(dir)) {
       seenDirs.add(dir);
       if (!partialPath || dir.startsWith(partialPath.split("/")[0])) {
-        const dirItem = new vscode13.CompletionItem(dir + "/", vscode13.CompletionItemKind.Folder);
+        const dirItem = new vscode12.CompletionItem(dir + "/", vscode12.CompletionItemKind.Folder);
         dirItem.sortText = "0" + dir;
         items.push(dirItem);
       }
     }
-    const item = new vscode13.CompletionItem(relativePath, vscode13.CompletionItemKind.File);
+    const item = new vscode12.CompletionItem(relativePath, vscode12.CompletionItemKind.File);
     item.detail = ext.toUpperCase().substring(1) + " file";
     item.insertText = relativePath;
     const depth = relativePath.split("/").length;
@@ -7476,14 +6686,14 @@ async function getAssetCompletions(document, position) {
 }
 
 // src/providers/inlayHints.ts
-var vscode14 = __toESM(require("vscode"));
+var vscode13 = __toESM(require("vscode"));
 var LUA_SELECTOR9 = { scheme: "file", language: "lua" };
 var analyzer9 = new LuaDocumentAnalyzer();
 function register10(context, apiData2) {
-  const provider = vscode14.languages.registerInlayHintsProvider(LUA_SELECTOR9, {
+  const provider = vscode13.languages.registerInlayHintsProvider(LUA_SELECTOR9, {
     provideInlayHints(document, range) {
       try {
-        const config = vscode14.workspace.getConfiguration("lurek");
+        const config = vscode13.workspace.getConfiguration("lurek");
         if (config.get("inlayHints.enabled") === false) return [];
         return getInlayHints(document, range, apiData2);
       } catch {
@@ -7528,10 +6738,10 @@ function getInlayHints(document, range, apiData2) {
         continue;
       }
       const pos = document.positionAt(argOffset + leadingSpaces);
-      const hint = new vscode14.InlayHint(
+      const hint = new vscode13.InlayHint(
         pos,
         `${param.name}:`,
-        vscode14.InlayHintKind.Parameter
+        vscode13.InlayHintKind.Parameter
       );
       hint.paddingRight = true;
       hints.push(hint);
@@ -7607,11 +6817,11 @@ function shouldSkipHint(arg, paramName) {
 }
 
 // src/providers/codeActions.ts
-var vscode15 = __toESM(require("vscode"));
+var vscode14 = __toESM(require("vscode"));
 var LUA_SELECTOR10 = { scheme: "file", language: "lua" };
 var analyzer10 = new LuaDocumentAnalyzer();
 function register11(context, apiData2) {
-  const provider = vscode15.languages.registerCodeActionsProvider(
+  const provider = vscode14.languages.registerCodeActionsProvider(
     LUA_SELECTOR10,
     {
       provideCodeActions(document, range, actionContext) {
@@ -7624,8 +6834,8 @@ function register11(context, apiData2) {
     },
     {
       providedCodeActionKinds: [
-        vscode15.CodeActionKind.QuickFix,
-        vscode15.CodeActionKind.RefactorExtract
+        vscode14.CodeActionKind.QuickFix,
+        vscode14.CodeActionKind.RefactorExtract
       ]
     }
   );
@@ -7679,13 +6889,13 @@ function getCodeActions(document, range, actionContext) {
   return actions;
 }
 function createRemoveUnusedRequire(document, diag) {
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     "Remove unused require",
-    vscode15.CodeActionKind.QuickFix
+    vscode14.CodeActionKind.QuickFix
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   const line = diag.range.start.line;
-  const deleteRange = new vscode15.Range(line, 0, line + 1, 0);
+  const deleteRange = new vscode14.Range(line, 0, line + 1, 0);
   action.edit.delete(document.uri, deleteRange);
   action.diagnostics = [diag];
   action.isPreferred = true;
@@ -7704,11 +6914,11 @@ function createGenerateCallbacks(document, diag) {
     missing.push("draw");
   }
   if (missing.length === 0) return [];
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     "Generate Lurek2D callbacks",
-    vscode15.CodeActionKind.QuickFix
+    vscode14.CodeActionKind.QuickFix
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   const stubs = [];
   if (missing.includes("load")) {
     stubs.push("function lurek.load()\n    -- Initialize game\nend");
@@ -7742,22 +6952,22 @@ function createConvertColorRange(document, diag) {
   } else {
     replacement = `${func}(${r}, ${g}, ${b})`;
   }
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     "Convert to 0-1 color range",
-    vscode15.CodeActionKind.QuickFix
+    vscode14.CodeActionKind.QuickFix
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   action.edit.replace(document.uri, diag.range, replacement);
   action.diagnostics = [diag];
   action.isPreferred = true;
   return [action];
 }
 function createExtractFunction(document, range) {
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     "Extract to local function",
-    vscode15.CodeActionKind.RefactorExtract
+    vscode14.CodeActionKind.RefactorExtract
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   const selectedText = document.getText(range);
   const indent = document.lineAt(range.start.line).text.match(/^(\s*)/)?.[1] ?? "";
   const funcName = "extracted_function";
@@ -7767,16 +6977,16 @@ ${indent}    ${bodyLines.join("\n")}
 ${indent}end
 
 `;
-  action.edit.insert(document.uri, new vscode15.Position(range.start.line, 0), funcDef);
+  action.edit.insert(document.uri, new vscode14.Position(range.start.line, 0), funcDef);
   action.edit.replace(document.uri, range, `${funcName}()`);
   return action;
 }
 function createConvertToLocal(document, line, match) {
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     "Convert to local variable",
-    vscode15.CodeActionKind.QuickFix
+    vscode14.CodeActionKind.QuickFix
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   const lineRange = document.lineAt(line).range;
   const newText = `${match[1]}local ${match[2]} = ${match[3]}`;
   action.edit.replace(document.uri, lineRange, newText);
@@ -7785,11 +6995,11 @@ function createConvertToLocal(document, line, match) {
 function createWrapRequirePcall(document, line) {
   const lineText = document.lineAt(line).text;
   const indent = lineText.match(/^(\s*)/)?.[1] ?? "";
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     "Wrap require in pcall",
-    vscode15.CodeActionKind.QuickFix
+    vscode14.CodeActionKind.QuickFix
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   const match = lineText.match(/^(\s*)local\s+(\w+)\s*=\s*require\s*\(\s*["']([^"']+)["']\s*\)/);
   if (match) {
     const varName = match[2];
@@ -7817,9 +7027,9 @@ function createWrapRequirePcall(document, line) {
   return action;
 }
 function createExtractToFileModule(document, range) {
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     "Extract selection to new module file",
-    vscode15.CodeActionKind.RefactorExtract
+    vscode14.CodeActionKind.RefactorExtract
   );
   action.command = {
     command: "lurek.extractToModuleFile",
@@ -7829,11 +7039,11 @@ function createExtractToFileModule(document, range) {
   return action;
 }
 function createInlineVariable(document, line, match) {
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     `Inline variable '${match[2]}'`,
-    vscode15.CodeActionKind.RefactorInline
+    vscode14.CodeActionKind.RefactorInline
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   const indent = match[1];
   const rhs = match[3].trim();
   action.edit.replace(
@@ -7880,12 +7090,12 @@ ${indent}  end,`),
     `${indent}local _handler = ${mapName}[${stateVar}]`,
     `${indent}if _handler then _handler() end`
   ];
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     `Convert if/elseif chain to state-map (${mapName})`,
-    vscode15.CodeActionKind.RefactorRewrite
+    vscode14.CodeActionKind.RefactorRewrite
   );
-  action.edit = new vscode15.WorkspaceEdit();
-  const replaceRange = new vscode15.Range(
+  action.edit = new vscode14.WorkspaceEdit();
+  const replaceRange = new vscode14.Range(
     startLine,
     0,
     startLine + lines.length - 1,
@@ -7895,25 +7105,25 @@ ${indent}  end,`),
   return action;
 }
 function createAddTypeAnnotation(document, line, varName) {
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     `Add ---@type annotation for '${varName}'`,
-    vscode15.CodeActionKind.RefactorRewrite
+    vscode14.CodeActionKind.RefactorRewrite
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   const indent = (document.lineAt(line).text.match(/^(\s*)/) ?? ["", ""])[1];
-  const insertPos = new vscode15.Position(line, 0);
+  const insertPos = new vscode14.Position(line, 0);
   action.edit.insert(document.uri, insertPos, `${indent}---@type any
 `);
   return action;
 }
 function createGenerateTostring(document, line, className) {
-  const action = new vscode15.CodeAction(
+  const action = new vscode14.CodeAction(
     `Generate __tostring for ${className}`,
-    vscode15.CodeActionKind.QuickFix
+    vscode14.CodeActionKind.QuickFix
   );
-  action.edit = new vscode15.WorkspaceEdit();
+  action.edit = new vscode14.WorkspaceEdit();
   const indent = (document.lineAt(line).text.match(/^(\s*)/) ?? ["", ""])[1];
-  const insertPos = new vscode15.Position(line + 1, 0);
+  const insertPos = new vscode14.Position(line + 1, 0);
   action.edit.insert(
     document.uri,
     insertPos,
@@ -7927,7 +7137,7 @@ ${indent}end
 }
 
 // src/providers/luajitHints.ts
-var vscode16 = __toESM(require("vscode"));
+var vscode15 = __toESM(require("vscode"));
 var LUA_SELECTOR11 = {
   scheme: "file",
   language: "lua"
@@ -7973,56 +7183,56 @@ var PERF_RULES = [
     code: "lurek.perf.tableAllocHotPath",
     pattern: /\{\s*\}/,
     message: "Table allocation `{}` in hot path \u2014 consider pre-allocating or using an object pool.",
-    severity: vscode16.DiagnosticSeverity.Hint,
+    severity: vscode15.DiagnosticSeverity.Hint,
     hotPathOnly: true
   },
   {
     code: "lurek.perf.newInHotPath",
     pattern: /lurek\.\w+\.new\w*\s*\(/,
     message: "Resource creation (lurek.*.new*) in hot path \u2014 move to lurek.load() or cache the result.",
-    severity: vscode16.DiagnosticSeverity.Warning,
+    severity: vscode15.DiagnosticSeverity.Warning,
     hotPathOnly: true
   },
   {
     code: "lurek.perf.globalInLoop",
     pattern: /\bfor\b.+\bdo\b/,
     message: "Loop detected \u2014 ensure frequently accessed globals are cached as locals above the loop.",
-    severity: vscode16.DiagnosticSeverity.Hint,
+    severity: vscode15.DiagnosticSeverity.Hint,
     hotPathOnly: false
   },
   {
     code: "lurek.perf.stringConcatLoop",
     pattern: /\.\.\s*["']/,
     message: "String concatenation in loop \u2014 consider table.insert + table.concat for better performance.",
-    severity: vscode16.DiagnosticSeverity.Hint,
+    severity: vscode15.DiagnosticSeverity.Hint,
     hotPathOnly: true
   },
   {
     code: "lurek.perf.pcallHotPath",
     pattern: /\bpcall\s*\(/,
     message: "pcall in hot path adds overhead \u2014 consider error handling outside the frame loop.",
-    severity: vscode16.DiagnosticSeverity.Hint,
+    severity: vscode15.DiagnosticSeverity.Hint,
     hotPathOnly: true
   },
   {
     code: "lurek.perf.mathFloor",
     pattern: /math\.floor\s*\(/,
     message: "Consider bit.tobit() or x%1 for faster integer conversion in LuaJIT.",
-    severity: vscode16.DiagnosticSeverity.Hint,
+    severity: vscode15.DiagnosticSeverity.Hint,
     hotPathOnly: true
   },
   {
     code: "lurek.perf.mathRandom",
     pattern: /math\.random\s*\(/,
     message: "Use lurek.math.random() for deterministic, seedable RNG consistent across platforms.",
-    severity: vscode16.DiagnosticSeverity.Information,
+    severity: vscode15.DiagnosticSeverity.Information,
     hotPathOnly: false
   },
   {
     code: "lurek.perf.unpackInLoop",
     pattern: /\bunpack\s*\(/,
     message: "unpack() in hot path creates temporary values \u2014 prefer indexed access for known structures.",
-    severity: vscode16.DiagnosticSeverity.Hint,
+    severity: vscode15.DiagnosticSeverity.Hint,
     hotPathOnly: true
   }
 ];
@@ -8088,7 +7298,7 @@ function findHotPathLines(text) {
 }
 function register12(context, _apiData) {
   const disposables = [];
-  const completionProvider = vscode16.languages.registerCompletionItemProvider(
+  const completionProvider = vscode15.languages.registerCompletionItemProvider(
     LUA_SELECTOR11,
     {
       provideCompletionItems(document, position) {
@@ -8098,9 +7308,9 @@ function register12(context, _apiData) {
         if (bitMatch) {
           const partial = bitMatch[1].toLowerCase();
           return BIT_FUNCTIONS.filter((f) => !partial || f.name.toLowerCase().startsWith(partial)).map((f) => {
-            const item = new vscode16.CompletionItem(f.name, vscode16.CompletionItemKind.Function);
+            const item = new vscode15.CompletionItem(f.name, vscode15.CompletionItemKind.Function);
             item.detail = f.sig;
-            item.documentation = new vscode16.MarkdownString(
+            item.documentation = new vscode15.MarkdownString(
               `**LuaJIT bit library**
 
 ${f.desc}`
@@ -8112,10 +7322,10 @@ ${f.desc}`
         if (jitMatch) {
           const partial = jitMatch[1].toLowerCase();
           return JIT_FUNCTIONS.filter((f) => !partial || f.name.toLowerCase().startsWith(partial)).map((f) => {
-            const kind = f.sig.includes("(") ? vscode16.CompletionItemKind.Function : vscode16.CompletionItemKind.Property;
-            const item = new vscode16.CompletionItem(f.name, kind);
+            const kind = f.sig.includes("(") ? vscode15.CompletionItemKind.Function : vscode15.CompletionItemKind.Property;
+            const item = new vscode15.CompletionItem(f.name, kind);
             item.detail = f.sig;
-            item.documentation = new vscode16.MarkdownString(
+            item.documentation = new vscode15.MarkdownString(
               `**LuaJIT jit library**
 
 ${f.desc}`
@@ -8127,9 +7337,9 @@ ${f.desc}`
         if (ffiMatch) {
           const partial = ffiMatch[1].toLowerCase();
           return FFI_FUNCTIONS.filter((f) => !partial || f.name.toLowerCase().startsWith(partial)).map((f) => {
-            const item = new vscode16.CompletionItem(f.name, vscode16.CompletionItemKind.Function);
+            const item = new vscode15.CompletionItem(f.name, vscode15.CompletionItemKind.Function);
             item.detail = f.sig;
-            item.documentation = new vscode16.MarkdownString(
+            item.documentation = new vscode15.MarkdownString(
               `**LuaJIT FFI library**
 
 ${f.desc}`
@@ -8143,7 +7353,7 @@ ${f.desc}`
     "."
   );
   disposables.push(completionProvider);
-  const hoverProvider = vscode16.languages.registerHoverProvider(LUA_SELECTOR11, {
+  const hoverProvider = vscode15.languages.registerHoverProvider(LUA_SELECTOR11, {
     provideHover(document, position) {
       const allLibs = [
         [/bit\.\w+/, "LuaJIT bit library", BIT_FUNCTIONS],
@@ -8157,7 +7367,7 @@ ${f.desc}`
         const funcName = word.split(".")[1];
         const fn = funcs.find((f) => f.name === funcName);
         if (!fn) continue;
-        const md = new vscode16.MarkdownString();
+        const md = new vscode15.MarkdownString();
         md.appendCodeblock(fn.sig, "lua");
         md.appendMarkdown(`
 **${libName}**
@@ -8165,15 +7375,15 @@ ${f.desc}`
 ${fn.desc}
 `);
         md.isTrusted = true;
-        return new vscode16.Hover(md, range);
+        return new vscode15.Hover(md, range);
       }
       return void 0;
     }
   });
   disposables.push(hoverProvider);
-  const diagCollection = vscode16.languages.createDiagnosticCollection("lurek.luajit");
+  const diagCollection = vscode15.languages.createDiagnosticCollection("lurek.luajit");
   disposables.push(diagCollection);
-  const compatCollection = vscode16.languages.createDiagnosticCollection("lurek.compat");
+  const compatCollection = vscode15.languages.createDiagnosticCollection("lurek.compat");
   disposables.push(compatCollection);
   function analyzePerfHints(document) {
     if (document.languageId !== "lua") return;
@@ -8190,8 +7400,8 @@ ${fn.desc}
         if (match) {
           const startCol = match.index;
           const endCol = match.index + match[0].length;
-          const range = new vscode16.Range(i, startCol, i, endCol);
-          const diag = new vscode16.Diagnostic(range, rule.message, rule.severity);
+          const range = new vscode15.Range(i, startCol, i, endCol);
+          const diag = new vscode15.Diagnostic(range, rule.message, rule.severity);
           diag.code = rule.code;
           diag.source = "Lurek2D LuaJIT";
           diagnostics.push(diag);
@@ -8214,9 +7424,9 @@ ${fn.desc}
         if (match) {
           const startCol = match.index;
           const endCol = match.index + match[0].length;
-          const range = new vscode16.Range(i, startCol, i, endCol);
-          const sev = rule.code === "lurek.compat.intDivOp" ? vscode16.DiagnosticSeverity.Hint : vscode16.DiagnosticSeverity.Warning;
-          const diag = new vscode16.Diagnostic(range, rule.message, sev);
+          const range = new vscode15.Range(i, startCol, i, endCol);
+          const sev = rule.code === "lurek.compat.intDivOp" ? vscode15.DiagnosticSeverity.Hint : vscode15.DiagnosticSeverity.Warning;
+          const diag = new vscode15.Diagnostic(range, rule.message, sev);
           diag.code = rule.code;
           diag.source = "Lurek2D Compat";
           diagnostics.push(diag);
@@ -8225,22 +7435,22 @@ ${fn.desc}
     }
     compatCollection.set(document.uri, diagnostics);
   }
-  if (vscode16.window.activeTextEditor) {
-    analyzePerfHints(vscode16.window.activeTextEditor.document);
-    analyzeCompatWarnings(vscode16.window.activeTextEditor.document);
+  if (vscode15.window.activeTextEditor) {
+    analyzePerfHints(vscode15.window.activeTextEditor.document);
+    analyzeCompatWarnings(vscode15.window.activeTextEditor.document);
   }
   disposables.push(
-    vscode16.window.onDidChangeActiveTextEditor((editor) => {
+    vscode15.window.onDidChangeActiveTextEditor((editor) => {
       if (editor) {
         analyzePerfHints(editor.document);
         analyzeCompatWarnings(editor.document);
       }
     }),
-    vscode16.workspace.onDidChangeTextDocument((e) => {
+    vscode15.workspace.onDidChangeTextDocument((e) => {
       analyzePerfHints(e.document);
       analyzeCompatWarnings(e.document);
     }),
-    vscode16.workspace.onDidCloseTextDocument((doc) => {
+    vscode15.workspace.onDidCloseTextDocument((doc) => {
       diagCollection.delete(doc.uri);
       compatCollection.delete(doc.uri);
     })
@@ -8249,7 +7459,7 @@ ${fn.desc}
 }
 
 // src/providers/typeInference.ts
-var vscode17 = __toESM(require("vscode"));
+var vscode16 = __toESM(require("vscode"));
 var LUA_SELECTOR12 = {
   scheme: "file",
   language: "lua"
@@ -8840,7 +8050,7 @@ function getMethodsForVar(varName, position, varTypes, classes) {
   return void 0;
 }
 function register13(context, _apiData) {
-  const colonProvider = vscode17.languages.registerCompletionItemProvider(
+  const colonProvider = vscode16.languages.registerCompletionItemProvider(
     LUA_SELECTOR12,
     {
       provideCompletionItems(document, position) {
@@ -8854,12 +8064,12 @@ function register13(context, _apiData) {
         const methods = getMethodsForVar(varName, position, varTypes, classes);
         if (!methods) return void 0;
         return methods.filter((m) => !partial || m.name.toLowerCase().startsWith(partial)).map((m) => {
-          const item = new vscode17.CompletionItem(
+          const item = new vscode16.CompletionItem(
             m.name,
-            vscode17.CompletionItemKind.Method
+            vscode16.CompletionItemKind.Method
           );
           item.detail = m.sig;
-          item.documentation = new vscode17.MarkdownString(m.desc);
+          item.documentation = new vscode16.MarkdownString(m.desc);
           item.sortText = `0${m.name}`;
           return item;
         });
@@ -8867,7 +8077,7 @@ function register13(context, _apiData) {
     },
     ":"
   );
-  const dotProvider = vscode17.languages.registerCompletionItemProvider(
+  const dotProvider = vscode16.languages.registerCompletionItemProvider(
     LUA_SELECTOR12,
     {
       provideCompletionItems(document, position) {
@@ -8890,12 +8100,12 @@ function register13(context, _apiData) {
               const funcName = key.substring(prefix.length);
               if (!partial || funcName.toLowerCase().startsWith(partial)) {
                 const typeInfo = FACTORY_TYPES[key];
-                const item = new vscode17.CompletionItem(
+                const item = new vscode16.CompletionItem(
                   funcName,
-                  vscode17.CompletionItemKind.Function
+                  vscode16.CompletionItemKind.Function
                 );
                 item.detail = `\u2192 ${typeInfo.typeName}`;
-                item.documentation = new vscode17.MarkdownString(
+                item.documentation = new vscode16.MarkdownString(
                   `Factory from \`${key}\``
                 );
                 item.sortText = `0${funcName}`;
@@ -8917,24 +8127,24 @@ function register13(context, _apiData) {
             if (typeInfo.fields) {
               for (const f of typeInfo.fields) {
                 if (partial && !f.name.toLowerCase().startsWith(partial)) continue;
-                const item = new vscode17.CompletionItem(
+                const item = new vscode16.CompletionItem(
                   f.name,
-                  vscode17.CompletionItemKind.Field
+                  vscode16.CompletionItemKind.Field
                 );
                 item.detail = f.type;
-                item.documentation = new vscode17.MarkdownString(f.desc);
+                item.documentation = new vscode16.MarkdownString(f.desc);
                 item.sortText = `0a${f.name}`;
                 items.push(item);
               }
             }
             for (const m of typeInfo.methods) {
               if (partial && !m.name.toLowerCase().startsWith(partial)) continue;
-              const item = new vscode17.CompletionItem(
+              const item = new vscode16.CompletionItem(
                 m.name,
-                vscode17.CompletionItemKind.Method
+                vscode16.CompletionItemKind.Method
               );
               item.detail = m.sig;
-              item.documentation = new vscode17.MarkdownString(m.desc);
+              item.documentation = new vscode16.MarkdownString(m.desc);
               item.sortText = `0b${m.name}`;
               items.push(item);
             }
@@ -8948,12 +8158,12 @@ function register13(context, _apiData) {
             if (instance && cls.methods.length > 0) {
               for (const m of cls.methods) {
                 if (partial && !m.name.toLowerCase().startsWith(partial)) continue;
-                const item = new vscode17.CompletionItem(
+                const item = new vscode16.CompletionItem(
                   m.name,
-                  vscode17.CompletionItemKind.Method
+                  vscode16.CompletionItemKind.Method
                 );
                 item.detail = m.sig;
-                item.documentation = new vscode17.MarkdownString(m.desc);
+                item.documentation = new vscode16.MarkdownString(m.desc);
                 item.sortText = `0${m.name}`;
                 items.push(item);
               }
@@ -8966,7 +8176,7 @@ function register13(context, _apiData) {
     },
     "."
   );
-  const hoverProvider = vscode17.languages.registerHoverProvider(LUA_SELECTOR12, {
+  const hoverProvider = vscode16.languages.registerHoverProvider(LUA_SELECTOR12, {
     provideHover(document, position) {
       const wordRange = document.getWordRangeAtPosition(position, /\w+/);
       if (!wordRange) return void 0;
@@ -8976,15 +8186,15 @@ function register13(context, _apiData) {
         (a) => a.varName === word && a.line < position.line
       );
       if (alias) {
-        const md = new vscode17.MarkdownString();
+        const md = new vscode16.MarkdownString();
         md.appendCodeblock(`${word}: module (${alias.modulePath})`, "lua");
         md.appendMarkdown(`Alias for \`${alias.modulePath}\``);
-        return new vscode17.Hover(md, wordRange);
+        return new vscode16.Hover(md, wordRange);
       }
       const result = getTypeInfoForVar(word, position, varTypes, classes);
       if (result) {
         const { typeInfo, factoryCall } = result;
-        const md = new vscode17.MarkdownString();
+        const md = new vscode16.MarkdownString();
         md.appendCodeblock(`${word}: ${typeInfo.typeName}`, "lua");
         md.appendMarkdown(`Created by \`${factoryCall}()\`
 
@@ -8999,19 +8209,19 @@ function register13(context, _apiData) {
         md.appendMarkdown(
           `**Methods:** ${typeInfo.methods.map((m) => `\`${m.name}\``).join(", ")}`
         );
-        return new vscode17.Hover(md, wordRange);
+        return new vscode16.Hover(md, wordRange);
       }
       for (const cls of classes) {
         const instance = cls.instances.find(
           (inst) => inst.varName === word && inst.line < position.line
         );
         if (instance && cls.methods.length > 0) {
-          const md = new vscode17.MarkdownString();
+          const md = new vscode16.MarkdownString();
           md.appendCodeblock(`${word}: ${cls.name}`, "lua");
           md.appendMarkdown(
             `**Methods:** ${cls.methods.map((m) => `\`${m.name}\``).join(", ")}`
           );
-          return new vscode17.Hover(md, wordRange);
+          return new vscode16.Hover(md, wordRange);
         }
       }
       return void 0;
@@ -9021,7 +8231,7 @@ function register13(context, _apiData) {
 }
 
 // src/providers/requireGraph.ts
-var vscode18 = __toESM(require("vscode"));
+var vscode17 = __toESM(require("vscode"));
 var path9 = __toESM(require("path"));
 function parseRequires(document) {
   const requires = [];
@@ -9036,7 +8246,7 @@ function parseRequires(document) {
     const endPos = document.positionAt(endOffset);
     requires.push({
       moduleName,
-      range: new vscode18.Range(startPos, endPos)
+      range: new vscode17.Range(startPos, endPos)
     });
   }
   return requires;
@@ -9048,7 +8258,7 @@ function resolveModule(moduleName, workspaceFolder) {
     `${relativePath}/init.lua`
   ];
   for (const candidate of candidates) {
-    const uri = vscode18.Uri.joinPath(workspaceFolder, candidate);
+    const uri = vscode17.Uri.joinPath(workspaceFolder, candidate);
     return uri;
   }
   return void 0;
@@ -9090,17 +8300,17 @@ function detectCycles(graph) {
   return cycles;
 }
 function register14(context) {
-  const diagCollection = vscode18.languages.createDiagnosticCollection("lurek.requireGraph");
+  const diagCollection = vscode17.languages.createDiagnosticCollection("lurek.requireGraph");
   context.subscriptions.push(diagCollection);
   const nodeCache = /* @__PURE__ */ new Map();
   async function buildGraph() {
-    const workspaceFolder = vscode18.workspace.workspaceFolders?.[0]?.uri;
+    const workspaceFolder = vscode17.workspace.workspaceFolders?.[0]?.uri;
     if (!workspaceFolder) return;
     nodeCache.clear();
-    const luaFiles = await vscode18.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
+    const luaFiles = await vscode17.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
     for (const fileUri of luaFiles) {
       try {
-        const doc = await vscode18.workspace.openTextDocument(fileUri);
+        const doc = await vscode17.workspace.openTextDocument(fileUri);
         const requires = parseRequires(doc);
         for (const req of requires) {
           req.resolvedUri = resolveModule(req.moduleName, workspaceFolder);
@@ -9149,10 +8359,10 @@ function register14(context) {
           const modulePath2 = req.moduleName.replace(/\./g, "/");
           const targetUri2 = uriByModule.get(modulePath2);
           if (!targetUri2) {
-            const diag = new vscode18.Diagnostic(
+            const diag = new vscode17.Diagnostic(
               req.range,
               `Cannot resolve module "${req.moduleName}" \u2014 file not found in workspace.`,
-              vscode18.DiagnosticSeverity.Warning
+              vscode17.DiagnosticSeverity.Warning
             );
             diag.code = "lurek.requireMissing";
             diag.source = "Lurek2D Require Graph";
@@ -9169,10 +8379,10 @@ function register14(context) {
                 if (!n) return "?";
                 return path9.basename(n.uri.fsPath, ".lua");
               });
-              const diag = new vscode18.Diagnostic(
+              const diag = new vscode17.Diagnostic(
                 req.range,
                 `Circular dependency detected: ${cycleNames.join(" \u2192 ")}`,
-                vscode18.DiagnosticSeverity.Warning
+                vscode17.DiagnosticSeverity.Warning
               );
               diag.code = "lurek.requireCycle";
               diag.source = "Lurek2D Require Graph";
@@ -9195,37 +8405,37 @@ function register14(context) {
   }
   buildGraph();
   context.subscriptions.push(
-    vscode18.workspace.onDidSaveTextDocument((doc) => {
+    vscode17.workspace.onDidSaveTextDocument((doc) => {
       if (doc.languageId === "lua") {
         buildGraph();
       }
     }),
-    vscode18.workspace.onDidCreateFiles(() => buildGraph()),
-    vscode18.workspace.onDidDeleteFiles(() => buildGraph())
+    vscode17.workspace.onDidCreateFiles(() => buildGraph()),
+    vscode17.workspace.onDidDeleteFiles(() => buildGraph())
   );
 }
 
 // src/services/symbolIndex.ts
-var vscode19 = __toESM(require("vscode"));
+var vscode18 = __toESM(require("vscode"));
 var PATTERNS = [
   // function moduleName.funcName(...)
-  { regex: /\bfunction\s+(\w+\.\w+)\s*\(/g, kind: vscode19.SymbolKind.Function, group: 1 },
+  { regex: /\bfunction\s+(\w+\.\w+)\s*\(/g, kind: vscode18.SymbolKind.Function, group: 1 },
   // function funcName(...)
-  { regex: /\bfunction\s+(\w+)\s*\(/g, kind: vscode19.SymbolKind.Function, group: 1 },
+  { regex: /\bfunction\s+(\w+)\s*\(/g, kind: vscode18.SymbolKind.Function, group: 1 },
   // local function funcName(...)
-  { regex: /\blocal\s+function\s+(\w+)\s*\(/g, kind: vscode19.SymbolKind.Function, group: 1 },
+  { regex: /\blocal\s+function\s+(\w+)\s*\(/g, kind: vscode18.SymbolKind.Function, group: 1 },
   // function Class:method(...)
-  { regex: /\bfunction\s+(\w+:\w+)\s*\(/g, kind: vscode19.SymbolKind.Method, group: 1 },
+  { regex: /\bfunction\s+(\w+:\w+)\s*\(/g, kind: vscode18.SymbolKind.Method, group: 1 },
   // ModuleName = {} (table/class)
-  { regex: /^(\w+)\s*=\s*\{\s*\}/gm, kind: vscode19.SymbolKind.Class, group: 1 },
+  { regex: /^(\w+)\s*=\s*\{\s*\}/gm, kind: vscode18.SymbolKind.Class, group: 1 },
   // local ModuleName = {} (table/class)
-  { regex: /\blocal\s+(\w+)\s*=\s*\{\s*\}/g, kind: vscode19.SymbolKind.Class, group: 1 },
+  { regex: /\blocal\s+(\w+)\s*=\s*\{\s*\}/g, kind: vscode18.SymbolKind.Class, group: 1 },
   // CONSTANT = value (all-caps)
-  { regex: /^([A-Z][A-Z_0-9]+)\s*=/gm, kind: vscode19.SymbolKind.Constant, group: 1 },
+  { regex: /^([A-Z][A-Z_0-9]+)\s*=/gm, kind: vscode18.SymbolKind.Constant, group: 1 },
   // lurek.callback assignment: lurek.load = function ...
-  { regex: /\b(lurek\.\w+)\s*=\s*function/g, kind: vscode19.SymbolKind.Function, group: 1 },
+  { regex: /\b(lurek\.\w+)\s*=\s*function/g, kind: vscode18.SymbolKind.Function, group: 1 },
   // function lurek.callback(...)
-  { regex: /\bfunction\s+(lurek\.\w+)\s*\(/g, kind: vscode19.SymbolKind.Function, group: 1 }
+  { regex: /\bfunction\s+(lurek\.\w+)\s*\(/g, kind: vscode18.SymbolKind.Function, group: 1 }
 ];
 var SymbolIndex = class {
   symbols = /* @__PURE__ */ new Map();
@@ -9238,13 +8448,13 @@ var SymbolIndex = class {
     try {
       this.symbols.clear();
       this.fileSymbols.clear();
-      const luaFiles = await vscode19.workspace.findFiles(
+      const luaFiles = await vscode18.workspace.findFiles(
         "**/*.lua",
         "{**/node_modules/**,ideas/**,work/**,.github/**}"
       );
       for (const fileUri of luaFiles) {
         try {
-          const bytes = await vscode19.workspace.fs.readFile(fileUri);
+          const bytes = await vscode18.workspace.fs.readFile(fileUri);
           const text = new TextDecoder().decode(bytes);
           this.indexText(fileUri, text);
         } catch {
@@ -9257,7 +8467,7 @@ var SymbolIndex = class {
   /** Update index for a single file. */
   async updateFile(uri) {
     try {
-      const doc = await vscode19.workspace.openTextDocument(uri);
+      const doc = await vscode18.workspace.openTextDocument(uri);
       this.indexDocument(doc);
     } catch {
       this.removeFile(uri);
@@ -9284,7 +8494,7 @@ var SymbolIndex = class {
   findDefinition(name) {
     const syms = this.symbols.get(name);
     if (!syms || syms.length === 0) return void 0;
-    return syms.find((s) => s.kind === vscode19.SymbolKind.Function) || syms.find((s) => s.kind === vscode19.SymbolKind.Method) || syms[0];
+    return syms.find((s) => s.kind === vscode18.SymbolKind.Function) || syms.find((s) => s.kind === vscode18.SymbolKind.Method) || syms[0];
   }
   /** Find all references/definitions of a symbol. */
   findReferences(name) {
@@ -9298,11 +8508,11 @@ var SymbolIndex = class {
       if (!lower || name.toLowerCase().includes(lower)) {
         for (const sym of syms) {
           results.push(
-            new vscode19.SymbolInformation(
+            new vscode18.SymbolInformation(
               sym.name,
               sym.kind,
               sym.containerName || "",
-              new vscode19.Location(sym.uri, sym.range)
+              new vscode18.Location(sym.uri, sym.range)
             )
           );
         }
@@ -9319,7 +8529,7 @@ var SymbolIndex = class {
   positionFromOffset(text, offset) {
     const before = text.substring(0, offset);
     const lines = before.split("\n");
-    return new vscode19.Position(lines.length - 1, lines[lines.length - 1].length);
+    return new vscode18.Position(lines.length - 1, lines[lines.length - 1].length);
   }
   /** Index a file from raw text, without requiring an open TextDocument. */
   indexText(uri, text) {
@@ -9343,7 +8553,7 @@ var SymbolIndex = class {
           name,
           kind: pat.kind,
           uri,
-          range: new vscode19.Range(startPos, endPos),
+          range: new vscode18.Range(startPos, endPos),
           containerName
         };
         fileSyms.push(sym);
@@ -9363,17 +8573,17 @@ function register15(context) {
   const index = new SymbolIndex();
   index.buildIndex();
   context.subscriptions.push(
-    vscode19.workspace.onDidSaveTextDocument((doc) => {
+    vscode18.workspace.onDidSaveTextDocument((doc) => {
       if (doc.languageId === "lua") {
         index.updateFile(doc.uri);
       }
     }),
-    vscode19.workspace.onDidDeleteFiles((e) => {
+    vscode18.workspace.onDidDeleteFiles((e) => {
       for (const uri of e.files) {
         index.removeFile(uri);
       }
     }),
-    vscode19.workspace.onDidCreateFiles((e) => {
+    vscode18.workspace.onDidCreateFiles((e) => {
       for (const uri of e.files) {
         if (uri.fsPath.endsWith(".lua")) {
           index.updateFile(uri);
@@ -9381,7 +8591,7 @@ function register15(context) {
       }
     })
   );
-  const wsProvider = vscode19.languages.registerWorkspaceSymbolProvider({
+  const wsProvider = vscode18.languages.registerWorkspaceSymbolProvider({
     provideWorkspaceSymbols(query) {
       return index.getWorkspaceSymbols(query);
     }
@@ -9391,7 +8601,7 @@ function register15(context) {
 }
 
 // src/providers/formatting.ts
-var vscode20 = __toESM(require("vscode"));
+var vscode19 = __toESM(require("vscode"));
 var LUA_SELECTOR13 = { scheme: "file", language: "lua" };
 var BLOCK_OPENERS = /\b(function|if|for|while|do|repeat)\b/;
 var BLOCK_CLOSERS = /^\s*(end|else|elseif|until)\b/;
@@ -9415,12 +8625,12 @@ function register16(context, _apiData) {
     }
   };
   context.subscriptions.push(
-    vscode20.languages.registerDocumentFormattingEditProvider(LUA_SELECTOR13, provider),
-    vscode20.languages.registerDocumentRangeFormattingEditProvider(LUA_SELECTOR13, provider)
+    vscode19.languages.registerDocumentFormattingEditProvider(LUA_SELECTOR13, provider),
+    vscode19.languages.registerDocumentRangeFormattingEditProvider(LUA_SELECTOR13, provider)
   );
 }
 function formatDocument(document, options) {
-  const fullRange = new vscode20.Range(0, 0, document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length);
+  const fullRange = new vscode19.Range(0, 0, document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length);
   return formatRange(document, fullRange, options);
 }
 function formatRange(document, range, options) {
@@ -9432,8 +8642,8 @@ function formatRange(document, range, options) {
   if (newText === lines.join("\n")) {
     return [];
   }
-  const fullRange = new vscode20.Range(0, 0, document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length);
-  return [vscode20.TextEdit.replace(fullRange, newText)];
+  const fullRange = new vscode19.Range(0, 0, document.lineCount - 1, document.lineAt(document.lineCount - 1).text.length);
+  return [vscode19.TextEdit.replace(fullRange, newText)];
 }
 function formatLines(lines, indentStr) {
   const result = [];
@@ -9619,12 +8829,12 @@ function makeIndent(indentStr, level) {
 }
 
 // src/providers/folding.ts
-var vscode21 = __toESM(require("vscode"));
+var vscode20 = __toESM(require("vscode"));
 var LUA_SELECTOR14 = { scheme: "file", language: "lua" };
 var analyzer11 = new LuaDocumentAnalyzer();
 function register17(context, _apiData) {
   context.subscriptions.push(
-    vscode21.languages.registerFoldingRangeProvider(LUA_SELECTOR14, {
+    vscode20.languages.registerFoldingRangeProvider(LUA_SELECTOR14, {
       provideFoldingRanges(document) {
         try {
           return computeFoldingRanges(document);
@@ -9654,22 +8864,22 @@ function computeFoldingRanges(document) {
         case "for":
         case "while":
         case "do":
-          stack.push({ keyword: tok.value, line: tok.line, kind: vscode21.FoldingRangeKind.Region });
+          stack.push({ keyword: tok.value, line: tok.line, kind: vscode20.FoldingRangeKind.Region });
           break;
         case "repeat":
-          stack.push({ keyword: "repeat", line: tok.line, kind: vscode21.FoldingRangeKind.Region });
+          stack.push({ keyword: "repeat", line: tok.line, kind: vscode20.FoldingRangeKind.Region });
           break;
         case "end": {
           const entry = popMatching(stack, ["function", "if", "for", "while", "do"]);
           if (entry && tok.line > entry.line) {
-            ranges.push(new vscode21.FoldingRange(entry.line, tok.line, entry.kind));
+            ranges.push(new vscode20.FoldingRange(entry.line, tok.line, entry.kind));
           }
           break;
         }
         case "until": {
           const entry = popMatching(stack, ["repeat"]);
           if (entry && tok.line > entry.line) {
-            ranges.push(new vscode21.FoldingRange(entry.line, tok.line, entry.kind));
+            ranges.push(new vscode20.FoldingRange(entry.line, tok.line, entry.kind));
           }
           break;
         }
@@ -9681,7 +8891,7 @@ function computeFoldingRanges(document) {
       } else if (tok.value === "}") {
         const openLine = braceStack.pop();
         if (openLine !== void 0 && tok.line > openLine) {
-          ranges.push(new vscode21.FoldingRange(openLine, tok.line, vscode21.FoldingRangeKind.Region));
+          ranges.push(new vscode20.FoldingRange(openLine, tok.line, vscode20.FoldingRangeKind.Region));
         }
       }
     }
@@ -9693,13 +8903,13 @@ function addTokenFolds(tokens, ranges) {
     if (tok.type === 4 /* Comment */ && tok.value.startsWith("--[")) {
       const nlCount = countNewlines2(tok.value);
       if (nlCount > 0) {
-        ranges.push(new vscode21.FoldingRange(tok.line, tok.line + nlCount, vscode21.FoldingRangeKind.Comment));
+        ranges.push(new vscode20.FoldingRange(tok.line, tok.line + nlCount, vscode20.FoldingRangeKind.Comment));
       }
     }
     if (tok.type === 2 /* String */ && tok.value.startsWith("[")) {
       const nlCount = countNewlines2(tok.value);
       if (nlCount > 0) {
-        ranges.push(new vscode21.FoldingRange(tok.line, tok.line + nlCount, vscode21.FoldingRangeKind.Region));
+        ranges.push(new vscode20.FoldingRange(tok.line, tok.line + nlCount, vscode20.FoldingRangeKind.Region));
       }
     }
   }
@@ -9715,7 +8925,7 @@ function addLineFolds(document, ranges) {
     } else if (/^--\s*endregion\b/i.test(line)) {
       const start = regionStack.pop();
       if (start !== void 0 && i > start) {
-        ranges.push(new vscode21.FoldingRange(start, i, vscode21.FoldingRangeKind.Region));
+        ranges.push(new vscode20.FoldingRange(start, i, vscode20.FoldingRangeKind.Region));
       }
     }
     if (/^---/.test(line) && !line.startsWith("---[")) {
@@ -9731,7 +8941,7 @@ function addLineFolds(document, ranges) {
 }
 function flushDocCommentRun(start, end, ranges) {
   if (start !== void 0 && end > start) {
-    ranges.push(new vscode21.FoldingRange(start, end, vscode21.FoldingRangeKind.Comment));
+    ranges.push(new vscode20.FoldingRange(start, end, vscode20.FoldingRangeKind.Comment));
   }
 }
 function popMatching(stack, keywords) {
@@ -9751,7 +8961,7 @@ function countNewlines2(text) {
 }
 
 // src/providers/rename.ts
-var vscode22 = __toESM(require("vscode"));
+var vscode21 = __toESM(require("vscode"));
 var LUA_SELECTOR15 = { scheme: "file", language: "lua" };
 var analyzer12 = new LuaDocumentAnalyzer();
 var LUA_KEYWORDS2 = /* @__PURE__ */ new Set([
@@ -9780,7 +8990,7 @@ var LUA_KEYWORDS2 = /* @__PURE__ */ new Set([
 ]);
 function register18(context, apiData2) {
   context.subscriptions.push(
-    vscode22.languages.registerRenameProvider(LUA_SELECTOR15, {
+    vscode21.languages.registerRenameProvider(LUA_SELECTOR15, {
       prepareRename(document, position) {
         try {
           return doPrepareRename(document, position, apiData2);
@@ -9846,7 +9056,7 @@ function doRename(document, position, newName, apiData2) {
     }
   }
   const tokens = analyzer12.tokenize(text);
-  const edit = new vscode22.WorkspaceEdit();
+  const edit = new vscode21.WorkspaceEdit();
   for (const tok of tokens) {
     if (tok.type !== 1 /* Identifier */) continue;
     if (tok.value !== symbolName) continue;
@@ -9857,7 +9067,7 @@ function doRename(document, position, newName, apiData2) {
     const before = tok.column > 0 ? lineText[tok.column - 1] : "";
     const after = tok.column + tok.length < lineText.length ? lineText[tok.column + tok.length] : "";
     if (isIdentChar(before) || isIdentChar(after)) continue;
-    const range = new vscode22.Range(tok.line, tok.column, tok.line, tok.column + tok.length);
+    const range = new vscode21.Range(tok.line, tok.column, tok.line, tok.column + tok.length);
     edit.replace(document.uri, range, newName);
   }
   return edit;
@@ -9885,7 +9095,7 @@ function isIdentChar(ch) {
 }
 
 // src/providers/semanticTokens.ts
-var vscode23 = __toESM(require("vscode"));
+var vscode22 = __toESM(require("vscode"));
 var LUA_SELECTOR16 = { scheme: "file", language: "lua" };
 var analyzer13 = new LuaDocumentAnalyzer();
 var tokenTypes = [
@@ -9938,7 +9148,7 @@ var tokenModifiers = [
   "defaultLibrary"
   // 6
 ];
-var legend = new vscode23.SemanticTokensLegend(tokenTypes, tokenModifiers);
+var legend = new vscode22.SemanticTokensLegend(tokenTypes, tokenModifiers);
 var LUREK_CALLBACKS3 = /* @__PURE__ */ new Set([
   "load",
   "update",
@@ -9965,12 +9175,12 @@ var LUREK_CALLBACKS3 = /* @__PURE__ */ new Set([
 var cache = /* @__PURE__ */ new Map();
 function register19(context, apiData2) {
   context.subscriptions.push(
-    vscode23.languages.registerDocumentSemanticTokensProvider(LUA_SELECTOR16, {
+    vscode22.languages.registerDocumentSemanticTokensProvider(LUA_SELECTOR16, {
       provideDocumentSemanticTokens(document) {
         try {
           return computeSemanticTokens(document, apiData2);
         } catch {
-          return new vscode23.SemanticTokensBuilder(legend).build();
+          return new vscode22.SemanticTokensBuilder(legend).build();
         }
       }
     }, legend)
@@ -9985,7 +9195,7 @@ function computeSemanticTokens(document, apiData2) {
   const text = document.getText();
   const tokens = analyzer13.tokenize(text);
   const info = analyzer13.analyze(text);
-  const builder = new vscode23.SemanticTokensBuilder(legend);
+  const builder = new vscode22.SemanticTokensBuilder(legend);
   const paramNames = new Set(info.symbols.filter((s) => s.kind === "parameter").map((s) => s.name));
   const localNames = new Set(info.symbols.filter((s) => s.kind === "local").map((s) => s.name));
   const localFuncNames = new Set(info.symbols.filter((s) => s.kind === "function" && s.isLocal).map((s) => s.name));
@@ -10208,7 +9418,7 @@ function getIdentifierChain(tokens, idx) {
 }
 
 // src/providers/luacatsProvider.ts
-var vscode24 = __toESM(require("vscode"));
+var vscode23 = __toESM(require("vscode"));
 var LUA_SELECTOR17 = { scheme: "file", language: "lua" };
 var docRegistries = /* @__PURE__ */ new Map();
 function parseDocument(document) {
@@ -10342,7 +9552,7 @@ function resolveClassForWord(document, word, registry) {
   return void 0;
 }
 function register20(context, _apiData) {
-  const hoverProvider = vscode24.languages.registerHoverProvider(LUA_SELECTOR17, {
+  const hoverProvider = vscode23.languages.registerHoverProvider(LUA_SELECTOR17, {
     provideHover(document, position) {
       const registry = parseDocument(document);
       const fullRange = document.getWordRangeAtPosition(position, /\w+[.:]\w+/);
@@ -10354,7 +9564,7 @@ function register20(context, _apiData) {
         if (cls2) {
           const field = cls2.fields.find((f) => f.name === member);
           if (field) {
-            const md2 = new vscode24.MarkdownString();
+            const md2 = new vscode23.MarkdownString();
             md2.appendCodeblock(`${cls2.name}.${field.name}: ${field.type}`, "lua");
             if (field.description) md2.appendMarkdown(`
 ${field.description}
@@ -10362,11 +9572,11 @@ ${field.description}
             md2.appendMarkdown(`
 *Defined in class \`${cls2.name}\`*`);
             md2.isTrusted = true;
-            return new vscode24.Hover(md2, fullRange);
+            return new vscode23.Hover(md2, fullRange);
           }
           const method = cls2.methods.find((m) => m.name === member);
           if (method) {
-            const md2 = new vscode24.MarkdownString();
+            const md2 = new vscode23.MarkdownString();
             md2.appendCodeblock(`${cls2.name}:${method.name}(${method.params})${method.returns ? ` \u2192 ${method.returns}` : ""}`, "lua");
             if (method.description) md2.appendMarkdown(`
 ${method.description}
@@ -10374,7 +9584,7 @@ ${method.description}
             md2.appendMarkdown(`
 *Method of class \`${cls2.name}\`*`);
             md2.isTrusted = true;
-            return new vscode24.Hover(md2, fullRange);
+            return new vscode23.Hover(md2, fullRange);
           }
         }
       }
@@ -10383,7 +9593,7 @@ ${method.description}
       const word = document.getText(wordRange);
       const cls = registry.classes.get(word);
       if (!cls) return void 0;
-      const md = new vscode24.MarkdownString();
+      const md = new vscode23.MarkdownString();
       md.appendCodeblock(`class ${cls.name}${cls.parent ? ` : ${cls.parent}` : ""}`, "lua");
       if (cls.fields.length > 0) {
         md.appendMarkdown("\n**Fields:**\n\n");
@@ -10400,10 +9610,10 @@ ${method.description}
         }
       }
       md.isTrusted = true;
-      return new vscode24.Hover(md, wordRange);
+      return new vscode23.Hover(md, wordRange);
     }
   });
-  const completionProvider = vscode24.languages.registerCompletionItemProvider(
+  const completionProvider = vscode23.languages.registerCompletionItemProvider(
     LUA_SELECTOR17,
     {
       provideCompletionItems(document, position) {
@@ -10418,17 +9628,17 @@ ${method.description}
         const items = [];
         if (!isColon) {
           for (const field of cls.fields) {
-            const item = new vscode24.CompletionItem(field.name, vscode24.CompletionItemKind.Field);
+            const item = new vscode23.CompletionItem(field.name, vscode23.CompletionItemKind.Field);
             item.detail = `${field.type} \u2014 ${cls.name}`;
             item.documentation = field.description;
             items.push(item);
           }
         }
         for (const method of cls.methods) {
-          const item = new vscode24.CompletionItem(method.name, vscode24.CompletionItemKind.Method);
+          const item = new vscode23.CompletionItem(method.name, vscode23.CompletionItemKind.Method);
           item.detail = `${cls.name}:${method.name}(${method.params})${method.returns ? ` \u2192 ${method.returns}` : ""}`;
           item.documentation = method.description;
-          item.insertText = new vscode24.SnippetString(
+          item.insertText = new vscode23.SnippetString(
             method.params ? `${method.name}(\${1})` : `${method.name}()`
           );
           items.push(item);
@@ -10439,7 +9649,7 @@ ${method.description}
     ".",
     ":"
   );
-  const changeListener = vscode24.workspace.onDidChangeTextDocument((e) => {
+  const changeListener = vscode23.workspace.onDidChangeTextDocument((e) => {
     if (e.document.languageId === "lua") {
       docRegistries.delete(e.document.uri.toString());
     }
@@ -10448,10 +9658,10 @@ ${method.description}
 }
 
 // src/providers/assetExplorer.ts
-var vscode25 = __toESM(require("vscode"));
+var vscode24 = __toESM(require("vscode"));
 var path10 = __toESM(require("path"));
 var fs7 = __toESM(require("fs"));
-var AssetItem = class _AssetItem extends vscode25.TreeItem {
+var AssetItem = class _AssetItem extends vscode24.TreeItem {
   constructor(label, collapsibleState, resourceUri, assetType, sizeBytes) {
     super(label, collapsibleState);
     this.label = label;
@@ -10463,7 +9673,7 @@ var AssetItem = class _AssetItem extends vscode25.TreeItem {
       this.resourceUri = resourceUri;
       this.tooltip = resourceUri.fsPath;
     }
-    this.iconPath = assetType ? new vscode25.ThemeIcon(_AssetItem.iconFor(assetType)) : void 0;
+    this.iconPath = assetType ? new vscode24.ThemeIcon(_AssetItem.iconFor(assetType)) : void 0;
     if (sizeBytes !== void 0) {
       this.description = _AssetItem.formatSize(sizeBytes);
     }
@@ -10509,7 +9719,7 @@ function classifyFile(ext) {
   return void 0;
 }
 var AssetExplorerProvider = class {
-  _onDidChangeTreeData = new vscode25.EventEmitter();
+  _onDidChangeTreeData = new vscode24.EventEmitter();
   onDidChangeTreeData = this._onDidChangeTreeData.event;
   categories = [];
   _missingAssets = [];
@@ -10532,7 +9742,7 @@ var AssetExplorerProvider = class {
   }
   /** Find the game project root — the folder containing main.lua closest to workspace root. */
   _findGameRoot() {
-    const folders = vscode25.workspace.workspaceFolders;
+    const folders = vscode24.workspace.workspaceFolders;
     if (!folders?.length) return void 0;
     const wsRoot = folders[0].uri.fsPath;
     if (fs7.existsSync(path10.join(wsRoot, "main.lua"))) {
@@ -10610,7 +9820,7 @@ var AssetExplorerProvider = class {
         folder.files.push({
           name: entry.name,
           relPath,
-          uri: vscode25.Uri.file(fullPath),
+          uri: vscode24.Uri.file(fullPath),
           size,
           type: kind
         });
@@ -10626,7 +9836,7 @@ var AssetExplorerProvider = class {
       return this.categories.filter((cat) => cat.totalCount > 0).map((cat) => {
         const item = new AssetItem(
           `${cat.label} (${cat.totalCount})`,
-          vscode25.TreeItemCollapsibleState.Collapsed,
+          vscode24.TreeItemCollapsibleState.Collapsed,
           void 0,
           "folder",
           void 0
@@ -10656,7 +9866,7 @@ var AssetExplorerProvider = class {
       const fileCount = this._countFiles(child);
       const item = new AssetItem(
         `${name} (${fileCount})`,
-        vscode25.TreeItemCollapsibleState.Collapsed,
+        vscode24.TreeItemCollapsibleState.Collapsed,
         void 0,
         "folder",
         void 0
@@ -10669,7 +9879,7 @@ var AssetExplorerProvider = class {
     for (const file of sortedFiles) {
       const item = new AssetItem(
         file.name,
-        vscode25.TreeItemCollapsibleState.None,
+        vscode24.TreeItemCollapsibleState.None,
         file.uri,
         file.type,
         file.size
@@ -10688,12 +9898,12 @@ var AssetExplorerProvider = class {
   }
 };
 async function findMissingAssets() {
-  const wsRoot = vscode25.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const wsRoot = vscode24.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!wsRoot) {
-    vscode25.window.showWarningMessage("No workspace folder open.");
+    vscode24.window.showWarningMessage("No workspace folder open.");
     return;
   }
-  const luaFiles = await vscode25.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
+  const luaFiles = await vscode24.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
   const assetPattern = /lurek\.(?:graphics\.newImage|audio\.newSource)\s*\(\s*["']([^"']+)["']/g;
   const missing = [];
   for (const uri of luaFiles) {
@@ -10713,25 +9923,25 @@ async function findMissingAssets() {
         const abs = path10.resolve(path10.dirname(uri.fsPath), assetPath);
         const abs2 = path10.resolve(wsRoot, assetPath);
         if (!fs7.existsSync(abs) && !fs7.existsSync(abs2)) {
-          missing.push({ file: vscode25.workspace.asRelativePath(uri), line: i + 1, asset: assetPath });
+          missing.push({ file: vscode24.workspace.asRelativePath(uri), line: i + 1, asset: assetPath });
         }
       }
     }
   }
   if (missing.length === 0) {
-    vscode25.window.showInformationMessage("No missing assets found.");
+    vscode24.window.showInformationMessage("No missing assets found.");
     return;
   }
   const report = missing.map((m) => `${m.file}:${m.line}  \u2192  ${m.asset}`).join("\n");
-  const doc = await vscode25.workspace.openTextDocument({ content: `Missing assets:
+  const doc = await vscode24.workspace.openTextDocument({ content: `Missing assets:
 
 ${report}`, language: "plaintext" });
-  vscode25.window.showTextDocument(doc);
+  vscode24.window.showTextDocument(doc);
 }
 function insertAssetPath(item) {
-  const editor = vscode25.window.activeTextEditor;
+  const editor = vscode24.window.activeTextEditor;
   if (!editor || !item.resourceUri) return;
-  const wsRoot = vscode25.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
+  const wsRoot = vscode24.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
   let rel = item.resourceUri.fsPath;
   if (wsRoot && rel.startsWith(wsRoot)) rel = rel.substring(wsRoot.length + 1);
   rel = rel.replace(/\\/g, "/");
@@ -10742,7 +9952,7 @@ function insertAssetPath(item) {
 init_perfDashboard();
 
 // src/providers/codeLens.ts
-var vscode27 = __toESM(require("vscode"));
+var vscode26 = __toESM(require("vscode"));
 var LUA_SELECTOR18 = { scheme: "file", language: "lua" };
 var LUREK_CALLBACKS4 = /* @__PURE__ */ new Set([
   "load",
@@ -10767,7 +9977,7 @@ var LUREK_CALLBACKS4 = /* @__PURE__ */ new Set([
   "touchreleased"
 ]);
 var LuaCodeLensProvider = class {
-  _onDidChange = new vscode27.EventEmitter();
+  _onDidChange = new vscode26.EventEmitter();
   onDidChangeCodeLenses = this._onDidChange.event;
   provideCodeLenses(document) {
     const lenses = [];
@@ -10786,11 +9996,11 @@ var LuaCodeLensProvider = class {
       if (!m) continue;
       const funcName = m[1] ?? m[2];
       if (!funcName) continue;
-      const range = new vscode27.Range(i, 0, i, 0);
+      const range = new vscode26.Range(i, 0, i, 0);
       const lurekCallbackMatch = funcName.match(/^lurek\.(\w+)$/);
       const cbName = lurekCallbackMatch?.[1];
       if (cbName && LUREK_CALLBACKS4.has(cbName)) {
-        lenses.push(new vscode27.CodeLens(range, {
+        lenses.push(new vscode26.CodeLens(range, {
           title: `\u26A1 lurek.${cbName} callback`,
           command: "lurek.browseApi",
           arguments: [`lurek.${cbName}`],
@@ -10799,15 +10009,15 @@ var LuaCodeLensProvider = class {
       } else {
         const refCount = countRefs(funcName.split(".").pop() ?? funcName);
         const refLabel = refCount === 1 ? "1 reference" : `${refCount} references`;
-        lenses.push(new vscode27.CodeLens(range, {
+        lenses.push(new vscode26.CodeLens(range, {
           title: refCount === 0 ? "\u26A0 unused" : refLabel,
           command: "lurek.codelens.findRefs",
-          arguments: [document.uri, new vscode27.Position(i, line.indexOf(funcName)), funcName],
+          arguments: [document.uri, new vscode26.Position(i, line.indexOf(funcName)), funcName],
           tooltip: refCount === 0 ? `"${funcName}" is never called` : `Find all references to "${funcName}"`
         }));
       }
       if (/^test_|_test\b/.test(funcName)) {
-        lenses.push(new vscode27.CodeLens(range, {
+        lenses.push(new vscode26.CodeLens(range, {
           title: "\u25B6 Run test",
           command: "lurek.test.runSingleLua",
           arguments: [document.uri, funcName],
@@ -10822,8 +10032,8 @@ var LuaCodeLensProvider = class {
   }
 };
 function buildVariableInspector(context) {
-  const barItem = vscode27.window.createStatusBarItem(
-    vscode27.StatusBarAlignment.Right,
+  const barItem = vscode26.window.createStatusBarItem(
+    vscode26.StatusBarAlignment.Right,
     95
   );
   barItem.name = "Lurek2D Variable Type";
@@ -10869,7 +10079,7 @@ function buildVariableInspector(context) {
     return void 0;
   }
   context.subscriptions.push(
-    vscode27.window.onDidChangeTextEditorSelection((e) => {
+    vscode26.window.onDidChangeTextEditorSelection((e) => {
       const editor = e.textEditor;
       if (editor.document.languageId !== "lua") {
         barItem.hide();
@@ -10899,28 +10109,28 @@ function buildVariableInspector(context) {
 function register21(context, _apiData) {
   const provider = new LuaCodeLensProvider();
   context.subscriptions.push(
-    vscode27.languages.registerCodeLensProvider(LUA_SELECTOR18, provider)
+    vscode26.languages.registerCodeLensProvider(LUA_SELECTOR18, provider)
   );
   context.subscriptions.push(
-    vscode27.workspace.onDidChangeTextDocument((e) => {
+    vscode26.workspace.onDidChangeTextDocument((e) => {
       if (e.document.languageId === "lua") provider.refresh();
     })
   );
   context.subscriptions.push(
-    vscode27.commands.registerCommand(
+    vscode26.commands.registerCommand(
       "lurek.codelens.findRefs",
       async (_uri, pos) => {
-        await vscode27.commands.executeCommand("editor.action.referenceSearch.trigger", pos);
+        await vscode26.commands.executeCommand("editor.action.referenceSearch.trigger", pos);
       }
     )
   );
   buildVariableInspector(context);
   context.subscriptions.push(
-    vscode27.commands.registerCommand("lurek.codeLens.toggle", () => {
-      const cfg = vscode27.workspace.getConfiguration("lurek");
+    vscode26.commands.registerCommand("lurek.codeLens.toggle", () => {
+      const cfg = vscode26.workspace.getConfiguration("lurek");
       const current = cfg.get("codeLens.enabled", true);
-      cfg.update("codeLens.enabled", !current, vscode27.ConfigurationTarget.Global);
-      vscode27.window.showInformationMessage(
+      cfg.update("codeLens.enabled", !current, vscode26.ConfigurationTarget.Global);
+      vscode26.window.showInformationMessage(
         `Lurek2D Code Lens ${!current ? "enabled" : "disabled"}`
       );
     })
@@ -10928,7 +10138,7 @@ function register21(context, _apiData) {
 }
 
 // src/providers/debugWatchers.ts
-var vscode28 = __toESM(require("vscode"));
+var vscode27 = __toESM(require("vscode"));
 var _panel2;
 var _watches = [];
 var _nextId = 1;
@@ -10987,13 +10197,13 @@ async function refreshAll() {
 }
 function openWatchersPanel(context) {
   if (_panel2) {
-    _panel2.reveal(vscode28.ViewColumn.Two);
+    _panel2.reveal(vscode27.ViewColumn.Two);
     return;
   }
-  _panel2 = vscode28.window.createWebviewPanel(
+  _panel2 = vscode27.window.createWebviewPanel(
     "lurek.debugWatchers",
     "Lurek2D Watchers",
-    vscode28.ViewColumn.Two,
+    vscode27.ViewColumn.Two,
     { enableScripts: true, retainContextWhenHidden: true }
   );
   _panel2.webview.html = buildHtml2();
@@ -11205,7 +10415,7 @@ function addWatchFromEditor(editor) {
 }
 
 // src/providers/systemMonitor.ts
-var vscode29 = __toESM(require("vscode"));
+var vscode28 = __toESM(require("vscode"));
 var import_child_process = require("child_process");
 var import_util = require("util");
 var execFileAsync = (0, import_util.promisify)(import_child_process.execFile);
@@ -11322,13 +10532,13 @@ function stopPolling() {
 }
 function openSystemMonitor(context) {
   if (_panel3) {
-    _panel3.reveal(vscode29.ViewColumn.Two);
+    _panel3.reveal(vscode28.ViewColumn.Two);
     return;
   }
-  _panel3 = vscode29.window.createWebviewPanel(
+  _panel3 = vscode28.window.createWebviewPanel(
     "lurek.systemMonitor",
     "Lurek2D System Monitor",
-    vscode29.ViewColumn.Two,
+    vscode28.ViewColumn.Two,
     { enableScripts: true, retainContextWhenHidden: true }
   );
   _panel3.webview.html = buildHtml3();
@@ -11536,11 +10746,11 @@ window.addEventListener('message', (e) => {
 }
 
 // src/providers/apiUsage.ts
-var vscode30 = __toESM(require("vscode"));
+var vscode29 = __toESM(require("vscode"));
 var fs8 = __toESM(require("fs"));
 var path11 = __toESM(require("path"));
 async function scanApiUsage() {
-  const luaFiles = await vscode30.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
+  const luaFiles = await vscode29.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
   const usage = /* @__PURE__ */ new Map();
   for (const uri of luaFiles) {
     let text;
@@ -11549,7 +10759,7 @@ async function scanApiUsage() {
     } catch {
       continue;
     }
-    const relFile = vscode30.workspace.asRelativePath(uri);
+    const relFile = vscode29.workspace.asRelativePath(uri);
     const lines = text.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -11575,14 +10785,14 @@ async function scanApiUsage() {
 var _panel4;
 async function openApiUsageReport(context) {
   if (_panel4) {
-    _panel4.reveal(vscode30.ViewColumn.Two);
+    _panel4.reveal(vscode29.ViewColumn.Two);
     await refreshPanel();
     return;
   }
-  _panel4 = vscode30.window.createWebviewPanel(
+  _panel4 = vscode29.window.createWebviewPanel(
     "lurek.apiUsage",
     "Lurek2D API Usage",
-    vscode30.ViewColumn.Two,
+    vscode29.ViewColumn.Two,
     { enableScripts: true, retainContextWhenHidden: true }
   );
   _panel4.onDidDispose(() => {
@@ -11591,12 +10801,12 @@ async function openApiUsageReport(context) {
   _panel4.webview.onDidReceiveMessage(async (msg) => {
     if (msg.type === "refresh") await refreshPanel();
     if (msg.type === "open") {
-      const uri = vscode30.Uri.file(path11.join(
-        vscode30.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "",
+      const uri = vscode29.Uri.file(path11.join(
+        vscode29.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "",
         msg.file
       ));
-      await vscode30.window.showTextDocument(uri, {
-        selection: new vscode30.Range(msg.line - 1, 0, msg.line - 1, 0)
+      await vscode29.window.showTextDocument(uri, {
+        selection: new vscode29.Range(msg.line - 1, 0, msg.line - 1, 0)
       });
     }
   }, null, context.subscriptions);
@@ -11701,9 +10911,9 @@ function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 async function quickInsertLurekApi(apiData2) {
-  const editor = vscode30.window.activeTextEditor;
+  const editor = vscode29.window.activeTextEditor;
   if (!editor) {
-    vscode30.window.showWarningMessage("Open a Lua file first.");
+    vscode29.window.showWarningMessage("Open a Lua file first.");
     return;
   }
   const funcs = apiData2.getAllFunctions();
@@ -11712,7 +10922,7 @@ async function quickInsertLurekApi(apiData2) {
     description: f.description ?? "",
     detail: f.parameters?.map((p) => `${p.name}: ${p.type}`).join(", ")
   }));
-  const picked = await vscode30.window.showQuickPick(items, {
+  const picked = await vscode29.window.showQuickPick(items, {
     placeHolder: "Search lurek.* function to insert\u2026",
     matchOnDescription: true,
     matchOnDetail: true
@@ -11726,38 +10936,38 @@ async function quickInsertLurekApi(apiData2) {
     snippet += args;
   }
   snippet += ")$0";
-  editor.insertSnippet(new vscode30.SnippetString(snippet));
+  editor.insertSnippet(new vscode29.SnippetString(snippet));
 }
 
 // src/commands/run.ts
-var vscode31 = __toESM(require("vscode"));
+var vscode30 = __toESM(require("vscode"));
 var path12 = __toESM(require("path"));
 var fs9 = __toESM(require("fs"));
 async function runGame(lurekProcess2) {
   const root = getWorkspaceRoot2();
   if (!root) {
-    vscode31.window.showErrorMessage("No workspace folder open.");
+    vscode30.window.showErrorMessage("No workspace folder open.");
     return;
   }
-  const srcDir = vscode31.workspace.getConfiguration("lurek").get("srcDir", "");
+  const srcDir = vscode30.workspace.getConfiguration("lurek").get("srcDir", "");
   const gameDir = srcDir ? path12.join(root, srcDir) : root;
   try {
     await lurekProcess2.run(gameDir);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    vscode31.window.showErrorMessage(`Failed to run Lurek2D: ${msg}`);
+    vscode30.window.showErrorMessage(`Failed to run Lurek2D: ${msg}`);
   }
 }
 function stopGame(lurekProcess2) {
   if (!lurekProcess2.isRunning()) {
-    vscode31.window.showInformationMessage("No Lurek2D game is running.");
+    vscode30.window.showInformationMessage("No Lurek2D game is running.");
     return;
   }
   lurekProcess2.stop();
-  vscode31.window.showInformationMessage("Lurek2D game stopped.");
+  vscode30.window.showInformationMessage("Lurek2D game stopped.");
 }
 async function runWithArgs(lurekProcess2) {
-  const args = await vscode31.window.showInputBox({
+  const args = await vscode30.window.showInputBox({
     prompt: "Enter arguments for Lurek2D",
     placeHolder: "e.g. --debug --fps-cap 60"
   });
@@ -11766,35 +10976,35 @@ async function runWithArgs(lurekProcess2) {
   }
   const root = getWorkspaceRoot2();
   if (!root) {
-    vscode31.window.showErrorMessage("No workspace folder open.");
+    vscode30.window.showErrorMessage("No workspace folder open.");
     return;
   }
-  const srcDir = vscode31.workspace.getConfiguration("lurek").get("srcDir", "");
+  const srcDir = vscode30.workspace.getConfiguration("lurek").get("srcDir", "");
   const gameDir = srcDir ? path12.join(root, srcDir) : root;
   try {
     await lurekProcess2.run(gameDir, args.split(/\s+/).filter(Boolean));
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    vscode31.window.showErrorMessage(`Failed to run Lurek2D: ${msg}`);
+    vscode30.window.showErrorMessage(`Failed to run Lurek2D: ${msg}`);
   }
 }
 async function runExample(lurekProcess2) {
   const root = getWorkspaceRoot2();
   if (!root) {
-    vscode31.window.showErrorMessage("No workspace folder open.");
+    vscode30.window.showErrorMessage("No workspace folder open.");
     return;
   }
   const examplesDir = path12.join(root, "content", "games", "showcase");
   if (!fs9.existsSync(examplesDir)) {
-    vscode31.window.showWarningMessage("No content/games/showcase/ directory found.");
+    vscode30.window.showWarningMessage("No content/games/showcase/ directory found.");
     return;
   }
   const examples = fs9.readdirSync(examplesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
   if (examples.length === 0) {
-    vscode31.window.showWarningMessage("No examples found.");
+    vscode30.window.showWarningMessage("No examples found.");
     return;
   }
-  const selected = await vscode31.window.showQuickPick(examples, {
+  const selected = await vscode30.window.showQuickPick(examples, {
     placeHolder: "Select a demo to run"
   });
   if (!selected) {
@@ -11804,15 +11014,15 @@ async function runExample(lurekProcess2) {
     await lurekProcess2.run(path12.join(examplesDir, selected));
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    vscode31.window.showErrorMessage(`Failed to run example: ${msg}`);
+    vscode30.window.showErrorMessage(`Failed to run example: ${msg}`);
   }
 }
 function getWorkspaceRoot2() {
-  return vscode31.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  return vscode30.workspace.workspaceFolders?.[0]?.uri.fsPath;
 }
 
 // src/commands/scaffold.ts
-var vscode32 = __toESM(require("vscode"));
+var vscode31 = __toESM(require("vscode"));
 var path13 = __toESM(require("path"));
 var fs10 = __toESM(require("fs"));
 var PROJECT_TEMPLATES = [
@@ -12059,13 +11269,13 @@ async function scaffoldProject() {
     label: t.label,
     description: t.description
   }));
-  const picked = await vscode32.window.showQuickPick(items, {
+  const picked = await vscode31.window.showQuickPick(items, {
     placeHolder: "Select a project template"
   });
   if (!picked) {
     return;
   }
-  const folder = await vscode32.window.showOpenDialog({
+  const folder = await vscode31.window.showOpenDialog({
     canSelectFolders: true,
     canSelectFiles: false,
     canSelectMany: false,
@@ -12085,23 +11295,23 @@ async function scaffoldProject() {
       fs10.writeFileSync(filePath, content, "utf-8");
     }
   }
-  const uri = vscode32.Uri.file(projectDir);
-  await vscode32.commands.executeCommand("vscode.openFolder", uri);
+  const uri = vscode31.Uri.file(projectDir);
+  await vscode31.commands.executeCommand("vscode.openFolder", uri);
 }
 async function scaffoldFile() {
   const templateNames = Object.keys(FILE_TEMPLATES);
-  const picked = await vscode32.window.showQuickPick(templateNames, {
+  const picked = await vscode31.window.showQuickPick(templateNames, {
     placeHolder: "Select a file template"
   });
   if (!picked) {
     return;
   }
-  const root = vscode32.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = vscode31.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
-    vscode32.window.showErrorMessage("No workspace folder open.");
+    vscode31.window.showErrorMessage("No workspace folder open.");
     return;
   }
-  const filename = await vscode32.window.showInputBox({
+  const filename = await vscode31.window.showInputBox({
     prompt: "Enter file name",
     value: picked
   });
@@ -12110,16 +11320,16 @@ async function scaffoldFile() {
   }
   const filePath = path13.join(root, filename);
   if (fs10.existsSync(filePath)) {
-    vscode32.window.showWarningMessage(`File already exists: ${filename}`);
+    vscode31.window.showWarningMessage(`File already exists: ${filename}`);
     return;
   }
   fs10.writeFileSync(filePath, FILE_TEMPLATES[picked], "utf-8");
-  const doc = await vscode32.workspace.openTextDocument(filePath);
-  await vscode32.window.showTextDocument(doc);
+  const doc = await vscode31.workspace.openTextDocument(filePath);
+  await vscode31.window.showTextDocument(doc);
 }
 
 // src/commands/test.ts
-var vscode33 = __toESM(require("vscode"));
+var vscode32 = __toESM(require("vscode"));
 init_parallelCargo();
 function testAll() {
   const terminal = getOrCreateTerminal("Lurek2D Tests");
@@ -12142,15 +11352,15 @@ function testLuaGolden() {
   terminal.sendText(buildTestTargetCommand("golden_tests"));
 }
 function getOrCreateTerminal(name) {
-  const existing = vscode33.window.terminals.find((t) => t.name === name);
+  const existing = vscode32.window.terminals.find((t) => t.name === name);
   if (existing) {
     return existing;
   }
-  return vscode33.window.createTerminal(name);
+  return vscode32.window.createTerminal(name);
 }
 
 // src/commands/packaging.ts
-var vscode34 = __toESM(require("vscode"));
+var vscode33 = __toESM(require("vscode"));
 function packageZip() {
   const terminal = getOrCreateTerminal2("Lurek2D Package");
   terminal.show();
@@ -12171,18 +11381,18 @@ function packageLinux() {
   terminal.sendText("bash tools/dist.sh");
 }
 function getOrCreateTerminal2(name) {
-  const existing = vscode34.window.terminals.find((t) => t.name === name);
+  const existing = vscode33.window.terminals.find((t) => t.name === name);
   if (existing) {
     return existing;
   }
-  return vscode34.window.createTerminal(name);
+  return vscode33.window.createTerminal(name);
 }
 
 // src/commands/editors.ts
-var vscode41 = __toESM(require("vscode"));
+var vscode40 = __toESM(require("vscode"));
 
 // src/editors/shared.ts
-var vscode35 = __toESM(require("vscode"));
+var vscode34 = __toESM(require("vscode"));
 function getNonce() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
@@ -12273,10 +11483,10 @@ var WebviewEditor = class {
   constructor(context, viewType, title, data = {}) {
     this.context = context;
     this.data = data;
-    this.panel = vscode35.window.createWebviewPanel(
+    this.panel = vscode34.window.createWebviewPanel(
       viewType,
       title,
-      vscode35.ViewColumn.One,
+      vscode34.ViewColumn.One,
       { enableScripts: true, retainContextWhenHidden: true }
     );
     this.panel.webview.onDidReceiveMessage(
@@ -12295,16 +11505,16 @@ var WebviewEditor = class {
   isDirty = false;
   disposables = [];
   async exportFile(content, defaultName, filterLabel, ext) {
-    const uri = await vscode35.window.showSaveDialog({
-      defaultUri: vscode35.Uri.file(defaultName),
+    const uri = await vscode34.window.showSaveDialog({
+      defaultUri: vscode34.Uri.file(defaultName),
       filters: { [filterLabel]: [ext] }
     });
     if (uri) {
-      await vscode35.workspace.fs.writeFile(
+      await vscode34.workspace.fs.writeFile(
         uri,
         Buffer.from(content, "utf-8")
       );
-      vscode35.window.showInformationMessage(`Exported to ${uri.fsPath}`);
+      vscode34.window.showInformationMessage(`Exported to ${uri.fsPath}`);
     }
   }
   async exportLua(content, defaultName) {
@@ -13995,7 +13205,7 @@ var DialogEditor = class _DialogEditor extends WebviewEditor {
 };
 
 // src/editors/databaseEditor.ts
-var vscode36 = __toESM(require("vscode"));
+var vscode35 = __toESM(require("vscode"));
 var DatabaseEditor = class _DatabaseEditor extends WebviewEditor {
   static open(context) {
     return new _DatabaseEditor(context);
@@ -14017,11 +13227,11 @@ var DatabaseEditor = class _DatabaseEditor extends WebviewEditor {
     }
   }
   async importCsv() {
-    const uri = await vscode36.window.showOpenDialog({
+    const uri = await vscode35.window.showOpenDialog({
       filters: { "CSV Files": ["csv"], "TOML Files": ["toml"] }
     });
     if (uri && uri[0]) {
-      const data = await vscode36.workspace.fs.readFile(uri[0]);
+      const data = await vscode35.workspace.fs.readFile(uri[0]);
       const text = new globalThis.TextDecoder().decode(data);
       this.panel.webview.postMessage({ type: "csvData", content: text, name: uri[0].fsPath });
     }
@@ -16072,7 +15282,7 @@ var VoxelEditor = class _VoxelEditor extends WebviewEditor {
 };
 
 // src/editors/testRunnerEditor.ts
-var vscode37 = __toESM(require("vscode"));
+var vscode36 = __toESM(require("vscode"));
 var path14 = __toESM(require("path"));
 var fs11 = __toESM(require("fs"));
 init_parallelCargo();
@@ -16141,7 +15351,7 @@ var TestRunnerEditor = class _TestRunnerEditor extends WebviewEditor {
         this.runParallelTestCommand(buildTestTargetCommand("golden_tests"), "golden");
         break;
       case "stop":
-        vscode37.window.showInformationMessage("Use the terminal to cancel the running test.");
+        vscode36.window.showInformationMessage("Use the terminal to cancel the running test.");
         break;
     }
   }
@@ -16151,7 +15361,7 @@ var TestRunnerEditor = class _TestRunnerEditor extends WebviewEditor {
   }
   /** Scan tests/ directory for *_tests.rs and extract test function names. */
   discoverTestSuites() {
-    const ws = vscode37.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const ws = vscode36.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!ws) return this.fallbackSuites();
     const testsDir = path14.join(ws, "tests");
     if (!fs11.existsSync(testsDir)) return this.fallbackSuites();
@@ -16205,8 +15415,8 @@ var TestRunnerEditor = class _TestRunnerEditor extends WebviewEditor {
     this.runParallelTestCommand(command, suite);
   }
   runParallelTestCommand(command, label) {
-    const existing = vscode37.window.terminals.find((t) => t.name === "Lurek2D Tests");
-    const terminal = existing ?? vscode37.window.createTerminal("Lurek2D Tests");
+    const existing = vscode36.window.terminals.find((t) => t.name === "Lurek2D Tests");
+    const terminal = existing ?? vscode36.window.createTerminal("Lurek2D Tests");
     terminal.show();
     terminal.sendText(command);
     this.panel.webview.postMessage({ type: "testStarted", filter: label, command });
@@ -16357,7 +15567,7 @@ Select a suite and click "Run Selected Suite", or click \u25B6 next to any suite
 };
 
 // src/editors/apiReferenceEditor.ts
-var vscode38 = __toESM(require("vscode"));
+var vscode37 = __toESM(require("vscode"));
 init_apiDocs();
 var ApiReferenceEditor = class _ApiReferenceEditor extends WebviewEditor {
   static open(context) {
@@ -16369,7 +15579,7 @@ var ApiReferenceEditor = class _ApiReferenceEditor extends WebviewEditor {
   }
   async loadApiData() {
     try {
-      const workspaceFolders = vscode38.workspace.workspaceFolders;
+      const workspaceFolders = vscode37.workspace.workspaceFolders;
       if (!workspaceFolders) {
         return;
       }
@@ -16377,7 +15587,7 @@ var ApiReferenceEditor = class _ApiReferenceEditor extends WebviewEditor {
       if (!apiPath) {
         return;
       }
-      const data = await vscode38.workspace.fs.readFile(vscode38.Uri.file(apiPath));
+      const data = await vscode37.workspace.fs.readFile(vscode37.Uri.file(apiPath));
       const text = new globalThis.TextDecoder().decode(data);
       this.panel.webview.postMessage({ type: "apiData", content: text });
     } catch {
@@ -16595,7 +15805,7 @@ var ApiReferenceEditor = class _ApiReferenceEditor extends WebviewEditor {
 };
 
 // src/editors/postfxOverlayEditor.ts
-var vscode39 = __toESM(require("vscode"));
+var vscode38 = __toESM(require("vscode"));
 var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
   static open(context) {
     return new _PostFxOverlayEditor(context);
@@ -16605,15 +15815,15 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
   }
   handleMessage(msg) {
     if (msg.type === "copyCode") {
-      vscode39.env.clipboard.writeText(msg.code);
-      vscode39.window.showInformationMessage("PostFX code copied to clipboard.");
+      vscode38.env.clipboard.writeText(msg.code);
+      vscode38.window.showInformationMessage("PostFX code copied to clipboard.");
     }
     if (msg.type === "insertCode") {
-      const editor = vscode39.window.activeTextEditor;
+      const editor = vscode38.window.activeTextEditor;
       if (editor) {
-        editor.insertSnippet(new vscode39.SnippetString(msg.code));
+        editor.insertSnippet(new vscode38.SnippetString(msg.code));
       } else {
-        vscode39.window.showWarningMessage("Open a Lua file to insert code.");
+        vscode38.window.showWarningMessage("Open a Lua file to insert code.");
       }
     }
   }
@@ -17016,7 +16226,7 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
 };
 
 // src/editors/soundDspEditor.ts
-var vscode40 = __toESM(require("vscode"));
+var vscode39 = __toESM(require("vscode"));
 var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
   static open(context) {
     return new _SoundDspEditor(context);
@@ -17026,15 +16236,15 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
   }
   handleMessage(msg) {
     if (msg.type === "copyCode") {
-      vscode40.env.clipboard.writeText(msg.code);
-      vscode40.window.showInformationMessage("Sound DSP code copied to clipboard.");
+      vscode39.env.clipboard.writeText(msg.code);
+      vscode39.window.showInformationMessage("Sound DSP code copied to clipboard.");
     }
     if (msg.type === "insertCode") {
-      const editor = vscode40.window.activeTextEditor;
+      const editor = vscode39.window.activeTextEditor;
       if (editor) {
-        editor.insertSnippet(new vscode40.SnippetString(msg.code));
+        editor.insertSnippet(new vscode39.SnippetString(msg.code));
       } else {
-        vscode40.window.showWarningMessage("Open a Lua file to insert code.");
+        vscode39.window.showWarningMessage("Open a Lua file to insert code.");
       }
     }
   }
@@ -20985,7 +20195,7 @@ var EDITORS = [
 ];
 function registerEditorCommands(context) {
   return EDITORS.map(
-    (entry) => vscode41.commands.registerCommand(
+    (entry) => vscode40.commands.registerCommand(
       `lurek.editor.${entry.id}`,
       () => entry.open(context)
     )
@@ -20993,19 +20203,19 @@ function registerEditorCommands(context) {
 }
 
 // src/commands/reference.ts
-var vscode42 = __toESM(require("vscode"));
+var vscode41 = __toESM(require("vscode"));
 var path15 = __toESM(require("path"));
 var fs12 = __toESM(require("fs"));
 init_apiDocs();
 async function browseApi() {
-  const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
-    vscode42.window.showErrorMessage("No workspace folder open.");
+    vscode41.window.showErrorMessage("No workspace folder open.");
     return;
   }
   const apiPath = resolveWorkspaceApiDocPath(root);
   if (!apiPath || !fs12.existsSync(apiPath)) {
-    vscode42.window.showWarningMessage(
+    vscode41.window.showWarningMessage(
       "API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md."
     );
     return;
@@ -21013,10 +20223,10 @@ async function browseApi() {
   const content = fs12.readFileSync(apiPath, "utf-8");
   const entries = listApiEntries(content, apiPath);
   if (entries.length === 0) {
-    vscode42.window.showInformationMessage("No API entries found.");
+    vscode41.window.showInformationMessage("No API entries found.");
     return;
   }
-  const picked = await vscode42.window.showQuickPick(entries.map((entry) => ({
+  const picked = await vscode41.window.showQuickPick(entries.map((entry) => ({
     label: entry.label,
     description: entry.kind,
     line: entry.line
@@ -21025,42 +20235,42 @@ async function browseApi() {
     matchOnDescription: true
   });
   if (picked) {
-    const doc = await vscode42.workspace.openTextDocument(apiPath);
-    const editor = await vscode42.window.showTextDocument(doc);
+    const doc = await vscode41.workspace.openTextDocument(apiPath);
+    const editor = await vscode41.window.showTextDocument(doc);
     const lineIndex = typeof picked.line === "number" ? picked.line : findApiSymbolLine(content, apiPath, picked.label);
     if (lineIndex >= 0) {
-      const pos = new vscode42.Position(lineIndex, 0);
-      editor.selection = new vscode42.Selection(pos, pos);
-      editor.revealRange(new vscode42.Range(pos, pos));
+      const pos = new vscode41.Position(lineIndex, 0);
+      editor.selection = new vscode41.Selection(pos, pos);
+      editor.revealRange(new vscode41.Range(pos, pos));
     }
   }
 }
 async function openApiDocs() {
-  const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
-    vscode42.window.showErrorMessage("No workspace folder open.");
+    vscode41.window.showErrorMessage("No workspace folder open.");
     return;
   }
   const apiPath = resolveWorkspaceApiDocPath(root);
   if (!apiPath || !fs12.existsSync(apiPath)) {
-    vscode42.window.showWarningMessage(
+    vscode41.window.showWarningMessage(
       "API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md."
     );
     return;
   }
-  const doc = await vscode42.workspace.openTextDocument(apiPath);
-  await vscode42.window.showTextDocument(doc);
+  const doc = await vscode41.workspace.openTextDocument(apiPath);
+  await vscode41.window.showTextDocument(doc);
 }
 async function openWiki() {
-  const editor = vscode42.window.activeTextEditor;
+  const editor = vscode41.window.activeTextEditor;
   const wordRange = editor?.document.getWordRangeAtPosition(
     editor.selection.active,
     /lurek\.[a-zA-Z0-9_.]+/
   );
   const symbol = wordRange ? editor.document.getText(wordRange) : void 0;
-  const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
-    vscode42.window.showErrorMessage("No workspace folder open.");
+    vscode41.window.showErrorMessage("No workspace folder open.");
     return;
   }
   const docPath = resolveWorkspaceApiDocPath(root) ?? null;
@@ -21068,28 +20278,28 @@ async function openWiki() {
     const content = fs12.readFileSync(docPath, "utf-8");
     if (symbol) {
       const lineIndex = findApiSymbolLine(content, docPath, symbol);
-      const doc = await vscode42.workspace.openTextDocument(docPath);
-      const editorDoc = await vscode42.window.showTextDocument(doc);
-      const pos = new vscode42.Position(Math.max(0, lineIndex), 0);
-      editorDoc.selection = new vscode42.Selection(pos, pos);
-      editorDoc.revealRange(new vscode42.Range(pos, pos), vscode42.TextEditorRevealType.InCenter);
+      const doc = await vscode41.workspace.openTextDocument(docPath);
+      const editorDoc = await vscode41.window.showTextDocument(doc);
+      const pos = new vscode41.Position(Math.max(0, lineIndex), 0);
+      editorDoc.selection = new vscode41.Selection(pos, pos);
+      editorDoc.revealRange(new vscode41.Range(pos, pos), vscode41.TextEditorRevealType.InCenter);
       if (lineIndex < 0) {
-        vscode42.window.showInformationMessage(`"${symbol}" not found in API docs \u2014 showing full reference.`);
+        vscode41.window.showInformationMessage(`"${symbol}" not found in API docs \u2014 showing full reference.`);
       }
     } else {
-      const doc = await vscode42.workspace.openTextDocument(docPath);
-      await vscode42.window.showTextDocument(doc);
+      const doc = await vscode41.workspace.openTextDocument(docPath);
+      await vscode41.window.showTextDocument(doc);
     }
   } else {
     await browseApi();
   }
 }
 function depGraph(context) {
-  const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  const panel = vscode42.window.createWebviewPanel(
+  const root = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const panel = vscode41.window.createWebviewPanel(
     "lurek.depGraph",
     "Lurek2D Module Dependency Graph",
-    vscode42.ViewColumn.One,
+    vscode41.ViewColumn.One,
     { enableScripts: true, retainContextWhenHidden: true }
   );
   const nodes = [];
@@ -21401,7 +20611,7 @@ draw();
 </html>`;
 }
 function depList() {
-  const terminal = vscode42.window.createTerminal("Lurek2D Deps");
+  const terminal = vscode41.window.createTerminal("Lurek2D Deps");
   terminal.show();
   terminal.sendText("cargo tree --depth 1");
 }
@@ -21415,13 +20625,13 @@ function getNonce2() {
 }
 
 // src/commands/cag.ts
-var vscode43 = __toESM(require("vscode"));
+var vscode42 = __toESM(require("vscode"));
 var path16 = __toESM(require("path"));
 var fs13 = __toESM(require("fs"));
 async function installCag() {
-  const root = vscode43.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
-    vscode43.window.showErrorMessage("No workspace folder open.");
+    vscode42.window.showErrorMessage("No workspace folder open.");
     return;
   }
   let engineGithub = null;
@@ -21435,12 +20645,12 @@ async function installCag() {
     dir = path16.dirname(dir);
   }
   if (!engineGithub) {
-    vscode43.window.showErrorMessage("Could not locate engine .github/ folder. Make sure the extension is run from the lurek2d repository root.");
+    vscode42.window.showErrorMessage("Could not locate engine .github/ folder. Make sure the extension is run from the lurek2d repository root.");
     return;
   }
   const targetDir = path16.join(root, ".github");
   if (fs13.existsSync(targetDir)) {
-    const overwrite = await vscode43.window.showWarningMessage(
+    const overwrite = await vscode42.window.showWarningMessage(
       ".github/ directory already exists in your workspace. Overwrite all CAG files?",
       "Yes \u2014 Overwrite",
       "Cancel"
@@ -21464,80 +20674,80 @@ async function installCag() {
   }
   try {
     copyDir(engineGithub, targetDir);
-    vscode43.window.showInformationMessage(`\u2705 CAG installed: ${copied} file(s) copied to .github/`);
+    vscode42.window.showInformationMessage(`\u2705 CAG installed: ${copied} file(s) copied to .github/`);
   } catch (err) {
-    vscode43.window.showErrorMessage(`CAG install failed: ${err}`);
+    vscode42.window.showErrorMessage(`CAG install failed: ${err}`);
   }
 }
 async function selectAgent() {
   const agents = await listCagFiles("agents", "*.agent.md");
   if (agents.length === 0) {
-    vscode43.window.showWarningMessage("No agent definitions found.");
+    vscode42.window.showWarningMessage("No agent definitions found.");
     return;
   }
-  const picked = await vscode43.window.showQuickPick(agents, {
+  const picked = await vscode42.window.showQuickPick(agents, {
     placeHolder: "Select an agent"
   });
   if (picked) {
-    const root = vscode43.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (root) {
       const filePath = path16.join(root, ".github", "agents", picked);
       if (fs13.existsSync(filePath)) {
-        const doc = await vscode43.workspace.openTextDocument(filePath);
-        await vscode43.window.showTextDocument(doc);
+        const doc = await vscode42.workspace.openTextDocument(filePath);
+        await vscode42.window.showTextDocument(doc);
       }
     }
   }
 }
 async function selectSkill() {
-  const root = vscode43.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
-    vscode43.window.showErrorMessage("No workspace folder open.");
+    vscode42.window.showErrorMessage("No workspace folder open.");
     return;
   }
   const skillsDir = path16.join(root, ".github", "skills");
   if (!fs13.existsSync(skillsDir)) {
-    vscode43.window.showWarningMessage("No skills directory found.");
+    vscode42.window.showWarningMessage("No skills directory found.");
     return;
   }
   const skills = fs13.readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
   if (skills.length === 0) {
-    vscode43.window.showWarningMessage("No skills found.");
+    vscode42.window.showWarningMessage("No skills found.");
     return;
   }
-  const picked = await vscode43.window.showQuickPick(skills, {
+  const picked = await vscode42.window.showQuickPick(skills, {
     placeHolder: "Select a skill"
   });
   if (picked) {
     const skillFile = path16.join(skillsDir, picked, "SKILL.md");
     if (fs13.existsSync(skillFile)) {
-      const doc = await vscode43.workspace.openTextDocument(skillFile);
-      await vscode43.window.showTextDocument(doc);
+      const doc = await vscode42.workspace.openTextDocument(skillFile);
+      await vscode42.window.showTextDocument(doc);
     }
   }
 }
 async function selectPrompt() {
   const prompts = await listCagFiles("prompts", "*.prompt.md");
   if (prompts.length === 0) {
-    vscode43.window.showWarningMessage("No prompts found.");
+    vscode42.window.showWarningMessage("No prompts found.");
     return;
   }
-  const picked = await vscode43.window.showQuickPick(prompts, {
+  const picked = await vscode42.window.showQuickPick(prompts, {
     placeHolder: "Select a prompt"
   });
   if (picked) {
-    const root = vscode43.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (root) {
       const filePath = path16.join(root, ".github", "prompts", picked);
       if (fs13.existsSync(filePath)) {
-        const doc = await vscode43.workspace.openTextDocument(filePath);
-        await vscode43.window.showTextDocument(doc);
+        const doc = await vscode42.workspace.openTextDocument(filePath);
+        await vscode42.window.showTextDocument(doc);
       }
     }
   }
 }
 async function listCagFiles(subdir, _pattern) {
-  const root = vscode43.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = vscode42.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) {
     return [];
   }
@@ -21553,7 +20763,7 @@ async function listCagFiles(subdir, _pattern) {
 }
 
 // src/commands/testGenerator.ts
-var vscode44 = __toESM(require("vscode"));
+var vscode43 = __toESM(require("vscode"));
 var path17 = __toESM(require("path"));
 var fs14 = __toESM(require("fs"));
 function detectLurekCalls(text) {
@@ -21728,27 +20938,27 @@ function getGameRoot(filePath) {
     }
     dir = parent;
   }
-  return vscode44.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  return vscode43.workspace.workspaceFolders?.[0]?.uri.fsPath;
 }
 function registerTestCommands(context) {
   context.subscriptions.push(
-    vscode44.commands.registerCommand("lurek.test.generateForFile", async () => {
-      const editor = vscode44.window.activeTextEditor;
+    vscode43.commands.registerCommand("lurek.test.generateForFile", async () => {
+      const editor = vscode43.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "lua") {
-        vscode44.window.showWarningMessage("Open a Lua file first.");
+        vscode43.window.showWarningMessage("Open a Lua file first.");
         return;
       }
       const doc = editor.document;
       const text = doc.getText();
       const calls = detectLurekCalls(text);
       if (calls.length === 0) {
-        vscode44.window.showInformationMessage("No lurek.* API calls detected in this file.");
+        vscode43.window.showInformationMessage("No lurek.* API calls detected in this file.");
         return;
       }
       const sourceFileName = path17.basename(doc.fileName);
       const gameRoot = getGameRoot(doc.fileName);
       if (!gameRoot) {
-        vscode44.window.showErrorMessage("Could not determine game root directory.");
+        vscode43.window.showErrorMessage("Could not determine game root directory.");
         return;
       }
       const testsDir = path17.join(gameRoot, "tests");
@@ -21759,18 +20969,18 @@ function registerTestCommands(context) {
       const testFilePath = path17.join(testsDir, testFileName);
       const content = generateTestContent(sourceFileName, calls);
       fs14.writeFileSync(testFilePath, content, "utf-8");
-      const testDoc = await vscode44.workspace.openTextDocument(testFilePath);
-      await vscode44.window.showTextDocument(testDoc);
-      vscode44.window.showInformationMessage(
+      const testDoc = await vscode43.workspace.openTextDocument(testFilePath);
+      await vscode43.window.showTextDocument(testDoc);
+      vscode43.window.showInformationMessage(
         `Generated test file: tests/${testFileName} (${calls.length} API calls detected)`
       );
     })
   );
   context.subscriptions.push(
-    vscode44.commands.registerCommand("lurek.test.generateForFunction", async () => {
-      const editor = vscode44.window.activeTextEditor;
+    vscode43.commands.registerCommand("lurek.test.generateForFunction", async () => {
+      const editor = vscode43.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "lua") {
-        vscode44.window.showWarningMessage("Open a Lua file first.");
+        vscode43.window.showWarningMessage("Open a Lua file first.");
         return;
       }
       const doc = editor.document;
@@ -21779,13 +20989,13 @@ function registerTestCommands(context) {
       const fns = detectFunctions(text);
       const target = fns.find((f) => cursorLine >= f.line && cursorLine <= f.endLine);
       if (!target) {
-        vscode44.window.showWarningMessage("No function found at cursor position.");
+        vscode43.window.showWarningMessage("No function found at cursor position.");
         return;
       }
       const sourceFileName = path17.basename(doc.fileName);
       const gameRoot = getGameRoot(doc.fileName);
       if (!gameRoot) {
-        vscode44.window.showErrorMessage("Could not determine game root directory.");
+        vscode43.window.showErrorMessage("Could not determine game root directory.");
         return;
       }
       const testsDir = path17.join(gameRoot, "tests");
@@ -21797,27 +21007,27 @@ function registerTestCommands(context) {
       const testFilePath = path17.join(testsDir, testFileName);
       const content = generateFunctionTestContent(sourceFileName, target.name, target.body);
       fs14.writeFileSync(testFilePath, content, "utf-8");
-      const testDoc = await vscode44.workspace.openTextDocument(testFilePath);
-      await vscode44.window.showTextDocument(testDoc);
-      vscode44.window.showInformationMessage(
+      const testDoc = await vscode43.workspace.openTextDocument(testFilePath);
+      await vscode43.window.showTextDocument(testDoc);
+      vscode43.window.showInformationMessage(
         `Generated test file: tests/${testFileName} for ${target.name}()`
       );
     })
   );
   context.subscriptions.push(
-    vscode44.commands.registerCommand("lurek.test.runCurrent", async () => {
-      const editor = vscode44.window.activeTextEditor;
+    vscode43.commands.registerCommand("lurek.test.runCurrent", async () => {
+      const editor = vscode43.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "lua") {
-        vscode44.window.showWarningMessage("Open a Lua test file first.");
+        vscode43.window.showWarningMessage("Open a Lua test file first.");
         return;
       }
       const filePath = editor.document.fileName;
       const gameRoot = getGameRoot(filePath);
       if (!gameRoot) {
-        vscode44.window.showErrorMessage("Could not determine game root directory.");
+        vscode43.window.showErrorMessage("Could not determine game root directory.");
         return;
       }
-      const lurekPath = vscode44.workspace.getConfiguration("lurek").get("enginePath", "lurek2d");
+      const lurekPath = vscode43.workspace.getConfiguration("lurek").get("enginePath", "lurek2d");
       const terminal = getOrCreateTerminal3("Lurek2D Tests");
       terminal.show();
       const relPath = path17.relative(gameRoot, filePath).replace(/\\/g, "/");
@@ -21825,28 +21035,28 @@ function registerTestCommands(context) {
     })
   );
   context.subscriptions.push(
-    vscode44.commands.registerCommand("lurek.test.runAll", async () => {
-      const editor = vscode44.window.activeTextEditor;
-      const gameRoot = editor ? getGameRoot(editor.document.fileName) : vscode44.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    vscode43.commands.registerCommand("lurek.test.runAll", async () => {
+      const editor = vscode43.window.activeTextEditor;
+      const gameRoot = editor ? getGameRoot(editor.document.fileName) : vscode43.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (!gameRoot) {
-        vscode44.window.showErrorMessage("No game project found.");
+        vscode43.window.showErrorMessage("No game project found.");
         return;
       }
       const testsDir = path17.join(gameRoot, "tests");
       if (!fs14.existsSync(testsDir)) {
-        vscode44.window.showWarningMessage("No tests/ directory found in the game project.");
+        vscode43.window.showWarningMessage("No tests/ directory found in the game project.");
         return;
       }
       const testFiles = fs14.readdirSync(testsDir).filter((f) => f.endsWith(".lua"));
       if (testFiles.length === 0) {
-        vscode44.window.showWarningMessage("No Lua test files found in tests/.");
+        vscode43.window.showWarningMessage("No Lua test files found in tests/.");
         return;
       }
-      const outputChannel = vscode44.window.createOutputChannel("Lurek2D Test Results");
+      const outputChannel = vscode43.window.createOutputChannel("Lurek2D Test Results");
       outputChannel.show();
       outputChannel.appendLine(`Running ${testFiles.length} test file(s)...`);
       outputChannel.appendLine("\u2500".repeat(50));
-      const lurekPath = vscode44.workspace.getConfiguration("lurek").get("enginePath", "lurek2d");
+      const lurekPath = vscode43.workspace.getConfiguration("lurek").get("enginePath", "lurek2d");
       const terminal = getOrCreateTerminal3("Lurek2D Tests");
       terminal.show();
       for (const testFile of testFiles) {
@@ -21859,11 +21069,11 @@ Running: ${testFile}`);
     })
   );
   context.subscriptions.push(
-    vscode44.commands.registerCommand("lurek.test.coverage", async () => {
-      const editor = vscode44.window.activeTextEditor;
-      const gameRoot = editor ? getGameRoot(editor.document.fileName) : vscode44.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    vscode43.commands.registerCommand("lurek.test.coverage", async () => {
+      const editor = vscode43.window.activeTextEditor;
+      const gameRoot = editor ? getGameRoot(editor.document.fileName) : vscode43.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (!gameRoot) {
-        vscode44.window.showErrorMessage("No game project found.");
+        vscode43.window.showErrorMessage("No game project found.");
         return;
       }
       const luaFiles = findLuaFiles(gameRoot);
@@ -21881,7 +21091,7 @@ Running: ${testFile}`);
           }
         }
       }
-      const outputChannel = vscode44.window.createOutputChannel("Lurek2D API Coverage");
+      const outputChannel = vscode43.window.createOutputChannel("Lurek2D API Coverage");
       outputChannel.show();
       outputChannel.appendLine("Lurek2D API Coverage Report");
       outputChannel.appendLine("\u2550".repeat(50));
@@ -21922,11 +21132,11 @@ function findLuaFiles(dir, results = []) {
   return results;
 }
 function getOrCreateTerminal3(name) {
-  const existing = vscode44.window.terminals.find((t) => t.name === name);
+  const existing = vscode43.window.terminals.find((t) => t.name === name);
   if (existing) {
     return existing;
   }
-  return vscode44.window.createTerminal(name);
+  return vscode43.window.createTerminal(name);
 }
 
 // src/extension2.ts
@@ -21934,18 +21144,18 @@ init_debugBridge();
 init_parallelCargo();
 
 // src/commands/debugBridge.ts
-var vscode46 = __toESM(require("vscode"));
+var vscode45 = __toESM(require("vscode"));
 function registerDebugBridgeCommands(context, bridge) {
   context.subscriptions.push(
-    vscode46.commands.registerCommand("lurek.debug.connect", async () => {
+    vscode45.commands.registerCommand("lurek.debug.connect", async () => {
       if (bridge.isConnected) {
-        vscode46.window.showInformationMessage("Already connected to Lurek2D engine.");
+        vscode45.window.showInformationMessage("Already connected to Lurek2D engine.");
         return;
       }
-      const portStr = await vscode46.window.showInputBox({
+      const portStr = await vscode45.window.showInputBox({
         prompt: "Debug bridge port",
         value: String(
-          vscode46.workspace.getConfiguration("lurek.debugBridge").get("port", 19740)
+          vscode45.workspace.getConfiguration("lurek.debugBridge").get("port", 19740)
         ),
         validateInput: (v) => {
           const n = Number(v);
@@ -21961,29 +21171,29 @@ function registerDebugBridgeCommands(context, bridge) {
       bridge.showOutput();
       const ok = await bridge.connect(Number(portStr));
       if (ok) {
-        vscode46.window.showInformationMessage("Connected to Lurek2D engine.");
-        vscode46.commands.executeCommand("setContext", "lurek.debugConnected", true);
+        vscode45.window.showInformationMessage("Connected to Lurek2D engine.");
+        vscode45.commands.executeCommand("setContext", "lurek.debugConnected", true);
       } else {
-        vscode46.window.showErrorMessage(
+        vscode45.window.showErrorMessage(
           "Failed to connect. Is the engine running with debug bridge enabled?"
         );
       }
     })
   );
   context.subscriptions.push(
-    vscode46.commands.registerCommand("lurek.debug.disconnect", () => {
+    vscode45.commands.registerCommand("lurek.debug.disconnect", () => {
       bridge.disconnect();
-      vscode46.commands.executeCommand("setContext", "lurek.debugConnected", false);
-      vscode46.window.showInformationMessage("Disconnected from Lurek2D engine.");
+      vscode45.commands.executeCommand("setContext", "lurek.debugConnected", false);
+      vscode45.window.showInformationMessage("Disconnected from Lurek2D engine.");
     })
   );
   context.subscriptions.push(
-    vscode46.commands.registerCommand("lurek.debug.evaluate", async () => {
+    vscode45.commands.registerCommand("lurek.debug.evaluate", async () => {
       if (!bridge.isConnected) {
-        vscode46.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
+        vscode45.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
         return;
       }
-      const expression = await vscode46.window.showInputBox({
+      const expression = await vscode45.window.showInputBox({
         prompt: "Lua expression to evaluate",
         placeHolder: 'e.g. print("hello") or player.x'
       });
@@ -21993,21 +21203,21 @@ function registerDebugBridgeCommands(context, bridge) {
       try {
         const result = await bridge.evaluate(expression);
         bridge.showOutput();
-        vscode46.window.showInformationMessage(`Result: ${result}`);
+        vscode45.window.showInformationMessage(`Result: ${result}`);
       } catch (err) {
-        vscode46.window.showErrorMessage(`Evaluation failed: ${err instanceof Error ? err.message : String(err)}`);
+        vscode45.window.showErrorMessage(`Evaluation failed: ${err instanceof Error ? err.message : String(err)}`);
       }
     })
   );
   context.subscriptions.push(
-    vscode46.commands.registerCommand("lurek.debug.hotReload", async () => {
+    vscode45.commands.registerCommand("lurek.debug.hotReload", async () => {
       if (!bridge.isConnected) {
-        vscode46.window.showErrorMessage("Not connected to Lurek2D engine.");
+        vscode45.window.showErrorMessage("Not connected to Lurek2D engine.");
         return;
       }
-      const editor = vscode46.window.activeTextEditor;
+      const editor = vscode45.window.activeTextEditor;
       if (!editor || editor.document.languageId !== "lua") {
-        vscode46.window.showWarningMessage("Open a Lua file to hot-reload.");
+        vscode45.window.showWarningMessage("Open a Lua file to hot-reload.");
         return;
       }
       if (editor.document.isDirty) {
@@ -22016,36 +21226,36 @@ function registerDebugBridgeCommands(context, bridge) {
       try {
         const ok = await bridge.hotReload(editor.document.uri);
         if (ok) {
-          vscode46.window.showInformationMessage(
-            `Hot-reloaded: ${vscode46.workspace.asRelativePath(editor.document.uri)}`
+          vscode45.window.showInformationMessage(
+            `Hot-reloaded: ${vscode45.workspace.asRelativePath(editor.document.uri)}`
           );
         } else {
-          vscode46.window.showErrorMessage("Hot-reload failed. Check debug output for details.");
+          vscode45.window.showErrorMessage("Hot-reload failed. Check debug output for details.");
         }
       } catch (err) {
-        vscode46.window.showErrorMessage(`Hot-reload error: ${err instanceof Error ? err.message : String(err)}`);
+        vscode45.window.showErrorMessage(`Hot-reload error: ${err instanceof Error ? err.message : String(err)}`);
       }
     })
   );
   context.subscriptions.push(
-    vscode46.commands.registerCommand("lurek.debug.showStats", async () => {
+    vscode45.commands.registerCommand("lurek.debug.showStats", async () => {
       if (!bridge.isConnected) {
-        vscode46.window.showErrorMessage("Not connected to Lurek2D engine.");
+        vscode45.window.showErrorMessage("Not connected to Lurek2D engine.");
         return;
       }
       bridge.startStatsPolling();
-      vscode46.window.showInformationMessage("Engine stats enabled in status bar.");
+      vscode45.window.showInformationMessage("Engine stats enabled in status bar.");
     })
   );
   context.subscriptions.push(
-    vscode46.commands.registerCommand("lurek.debug.inspect", async () => {
+    vscode45.commands.registerCommand("lurek.debug.inspect", async () => {
       if (!bridge.isConnected) {
-        vscode46.window.showErrorMessage("Not connected to Lurek2D engine.");
+        vscode45.window.showErrorMessage("Not connected to Lurek2D engine.");
         return;
       }
-      const editor = vscode46.window.activeTextEditor;
+      const editor = vscode45.window.activeTextEditor;
       if (!editor) {
-        vscode46.window.showWarningMessage("No active editor.");
+        vscode45.window.showWarningMessage("No active editor.");
         return;
       }
       const selection = editor.selection;
@@ -22055,7 +21265,7 @@ function registerDebugBridgeCommands(context, bridge) {
       } else {
         const wordRange = editor.document.getWordRangeAtPosition(selection.active, /[\w.:\[\]]+/);
         if (!wordRange) {
-          vscode46.window.showWarningMessage("No variable found at cursor.");
+          vscode45.window.showWarningMessage("No variable found at cursor.");
           return;
         }
         expression = editor.document.getText(wordRange);
@@ -22063,9 +21273,9 @@ function registerDebugBridgeCommands(context, bridge) {
       try {
         const result = await bridge.evaluate(`return tostring(${expression})`);
         const typeResult = await bridge.evaluate(`return type(${expression})`);
-        vscode46.window.showInformationMessage(`${expression} = ${result} (${typeResult})`);
+        vscode45.window.showInformationMessage(`${expression} = ${result} (${typeResult})`);
       } catch (err) {
-        vscode46.window.showErrorMessage(
+        vscode45.window.showErrorMessage(
           `Failed to inspect '${expression}': ${err instanceof Error ? err.message : String(err)}`
         );
       }
@@ -22074,7 +21284,7 @@ function registerDebugBridgeCommands(context, bridge) {
 }
 
 // src/commands/gameJam.ts
-var vscode47 = __toESM(require("vscode"));
+var vscode46 = __toESM(require("vscode"));
 var path18 = __toESM(require("path"));
 var fs15 = __toESM(require("fs"));
 var TEMPLATES = [
@@ -22616,7 +21826,7 @@ var jamEndTime;
 function startJamTimer(minutes) {
   stopJamTimer();
   jamEndTime = Date.now() + minutes * 6e4;
-  jamTimerItem = vscode47.window.createStatusBarItem(vscode47.StatusBarAlignment.Right, 200);
+  jamTimerItem = vscode46.window.createStatusBarItem(vscode46.StatusBarAlignment.Right, 200);
   jamTimerItem.show();
   const totalMs = minutes * 6e4;
   let notified50 = false;
@@ -22629,8 +21839,8 @@ function startJamTimer(minutes) {
     const remaining = jamEndTime - Date.now();
     if (remaining <= 0) {
       jamTimerItem.text = "$(bell) TIME'S UP!";
-      jamTimerItem.backgroundColor = new vscode47.ThemeColor("statusBarItem.errorBackground");
-      vscode47.window.showWarningMessage("Game Jam Timer: Time's up!");
+      jamTimerItem.backgroundColor = new vscode46.ThemeColor("statusBarItem.errorBackground");
+      vscode46.window.showWarningMessage("Game Jam Timer: Time's up!");
       stopJamTimer();
       return;
     }
@@ -22640,15 +21850,15 @@ function startJamTimer(minutes) {
     jamTimerItem.text = `$(clock) ${mins}:${String(secs).padStart(2, "0")} remaining`;
     if (pct <= 0.1 && !notified10) {
       notified10 = true;
-      jamTimerItem.backgroundColor = new vscode47.ThemeColor("statusBarItem.errorBackground");
-      vscode47.window.showWarningMessage("Game Jam Timer: 10% time remaining!");
+      jamTimerItem.backgroundColor = new vscode46.ThemeColor("statusBarItem.errorBackground");
+      vscode46.window.showWarningMessage("Game Jam Timer: 10% time remaining!");
     } else if (pct <= 0.25 && !notified25) {
       notified25 = true;
-      jamTimerItem.backgroundColor = new vscode47.ThemeColor("statusBarItem.warningBackground");
-      vscode47.window.showWarningMessage("Game Jam Timer: 25% time remaining!");
+      jamTimerItem.backgroundColor = new vscode46.ThemeColor("statusBarItem.warningBackground");
+      vscode46.window.showWarningMessage("Game Jam Timer: 25% time remaining!");
     } else if (pct <= 0.5 && !notified50) {
       notified50 = true;
-      vscode47.window.showInformationMessage("Game Jam Timer: 50% time remaining.");
+      vscode46.window.showInformationMessage("Game Jam Timer: 50% time remaining.");
     }
   };
   update();
@@ -22667,15 +21877,15 @@ function stopJamTimer() {
 }
 function registerGameJamCommands(context) {
   context.subscriptions.push(
-    vscode47.commands.registerCommand("lurek.gameJam.quickStart", async () => {
-      const picked = await vscode47.window.showQuickPick(
+    vscode46.commands.registerCommand("lurek.gameJam.quickStart", async () => {
+      const picked = await vscode46.window.showQuickPick(
         TEMPLATES.map((t) => ({ label: t.label, description: t.description, template: t })),
         { placeHolder: "Choose a game template" }
       );
       if (!picked) {
         return;
       }
-      const name = await vscode47.window.showInputBox({
+      const name = await vscode46.window.showInputBox({
         prompt: "Project name",
         placeHolder: "my-game",
         validateInput: (v) => {
@@ -22691,7 +21901,7 @@ function registerGameJamCommands(context) {
       if (!name) {
         return;
       }
-      const parentUri = await vscode47.window.showOpenDialog({
+      const parentUri = await vscode46.window.showOpenDialog({
         canSelectFolders: true,
         canSelectFiles: false,
         canSelectMany: false,
@@ -22702,7 +21912,7 @@ function registerGameJamCommands(context) {
       }
       const projectDir = path18.join(parentUri[0].fsPath, name);
       if (fs15.existsSync(projectDir)) {
-        vscode47.window.showErrorMessage(`Folder already exists: ${projectDir}`);
+        vscode46.window.showErrorMessage(`Folder already exists: ${projectDir}`);
         return;
       }
       const template = picked.template;
@@ -22716,23 +21926,23 @@ function registerGameJamCommands(context) {
         "# Assets\n\nPlace your game assets (images, sounds, fonts) in this folder.\n",
         "utf-8"
       );
-      const uri = vscode47.Uri.file(projectDir);
-      await vscode47.commands.executeCommand("vscode.openFolder", uri);
-      vscode47.window.showInformationMessage(`Created "${name}" with ${template.label} template!`);
+      const uri = vscode46.Uri.file(projectDir);
+      await vscode46.commands.executeCommand("vscode.openFolder", uri);
+      vscode46.window.showInformationMessage(`Created "${name}" with ${template.label} template!`);
     })
   );
   context.subscriptions.push(
-    vscode47.commands.registerCommand("lurek.gameJam.addModule", async () => {
-      const picked = await vscode47.window.showQuickPick(
+    vscode46.commands.registerCommand("lurek.gameJam.addModule", async () => {
+      const picked = await vscode46.window.showQuickPick(
         MODULES.map((m) => ({ label: m.label, description: m.description, module: m })),
         { placeHolder: "Choose a module to add" }
       );
       if (!picked) {
         return;
       }
-      const workspaceRoot = vscode47.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const workspaceRoot = vscode46.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (!workspaceRoot) {
-        vscode47.window.showErrorMessage("No workspace folder open.");
+        vscode46.window.showErrorMessage("No workspace folder open.");
         return;
       }
       const mod = picked.module;
@@ -22742,7 +21952,7 @@ function registerGameJamCommands(context) {
       }
       const destFile = path18.join(libsDir, mod.patternFile);
       if (fs15.existsSync(destFile)) {
-        const overwrite = await vscode47.window.showWarningMessage(
+        const overwrite = await vscode46.window.showWarningMessage(
           `libs/${mod.patternFile} already exists. Overwrite?`,
           "Yes",
           "No"
@@ -22753,7 +21963,7 @@ function registerGameJamCommands(context) {
       }
       const patternPath = path18.join(context.extensionPath, "data", "patterns", mod.patternFile);
       if (!fs15.existsSync(patternPath)) {
-        vscode47.window.showErrorMessage(`Pattern file not found: ${mod.patternFile}`);
+        vscode46.window.showErrorMessage(`Pattern file not found: ${mod.patternFile}`);
         return;
       }
       fs15.copyFileSync(patternPath, destFile);
@@ -22772,12 +21982,12 @@ function registerGameJamCommands(context) {
           fs15.writeFileSync(mainLuaPath, lines.join("\n"), "utf-8");
         }
       }
-      vscode47.window.showInformationMessage(`Added ${mod.label} module to libs/${mod.patternFile}`);
+      vscode46.window.showInformationMessage(`Added ${mod.label} module to libs/${mod.patternFile}`);
     })
   );
   context.subscriptions.push(
-    vscode47.commands.registerCommand("lurek.gameJam.timer", async () => {
-      const picked = await vscode47.window.showQuickPick(
+    vscode46.commands.registerCommand("lurek.gameJam.timer", async () => {
+      const picked = await vscode46.window.showQuickPick(
         [
           { label: "30 minutes", minutes: 30 },
           { label: "1 hour", minutes: 60 },
@@ -22792,12 +22002,12 @@ function registerGameJamCommands(context) {
       }
       if (picked.minutes === 0) {
         stopJamTimer();
-        vscode47.window.showInformationMessage("Game Jam Timer stopped.");
+        vscode46.window.showInformationMessage("Game Jam Timer stopped.");
         return;
       }
       let minutes = picked.minutes;
       if (minutes < 0) {
-        const custom = await vscode47.window.showInputBox({
+        const custom = await vscode46.window.showInputBox({
           prompt: "Duration in minutes",
           placeHolder: "90",
           validateInput: (v) => {
@@ -22814,14 +22024,14 @@ function registerGameJamCommands(context) {
         minutes = Number(custom);
       }
       startJamTimer(minutes);
-      vscode47.window.showInformationMessage(`Game Jam Timer started: ${minutes} minutes.`);
+      vscode46.window.showInformationMessage(`Game Jam Timer started: ${minutes} minutes.`);
     })
   );
   context.subscriptions.push({ dispose: stopJamTimer });
 }
 
 // src/commands/library.ts
-var vscode48 = __toESM(require("vscode"));
+var vscode47 = __toESM(require("vscode"));
 var path19 = __toESM(require("path"));
 var fs16 = __toESM(require("fs"));
 var SNIPPETS = [
@@ -23542,13 +22752,13 @@ function listPatternFiles(extensionPath) {
 }
 function registerLibraryCommands(context) {
   context.subscriptions.push(
-    vscode48.commands.registerCommand("lurek.library.browse", async () => {
+    vscode47.commands.registerCommand("lurek.library.browse", async () => {
       const patterns = listPatternFiles(context.extensionPath);
       if (patterns.length === 0) {
-        vscode48.window.showInformationMessage("No patterns found in data/patterns/.");
+        vscode47.window.showInformationMessage("No patterns found in data/patterns/.");
         return;
       }
-      const picked = await vscode48.window.showQuickPick(
+      const picked = await vscode47.window.showQuickPick(
         patterns.map((p) => ({
           label: p.name,
           description: `data/patterns/${p.name}.lua`,
@@ -23559,7 +22769,7 @@ function registerLibraryCommands(context) {
       if (!picked) {
         return;
       }
-      const action = await vscode48.window.showQuickPick(
+      const action = await vscode47.window.showQuickPick(
         [
           { label: "Preview", description: "Open the pattern file in a new tab" },
           { label: "Copy to project", description: "Copy to libs/ folder in your project" }
@@ -23570,12 +22780,12 @@ function registerLibraryCommands(context) {
         return;
       }
       if (action.label === "Preview") {
-        const doc = await vscode48.workspace.openTextDocument(picked.fullPath);
-        await vscode48.window.showTextDocument(doc, { preview: true });
+        const doc = await vscode47.workspace.openTextDocument(picked.fullPath);
+        await vscode47.window.showTextDocument(doc, { preview: true });
       } else {
-        const workspaceRoot = vscode48.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        const workspaceRoot = vscode47.workspace.workspaceFolders?.[0]?.uri.fsPath;
         if (!workspaceRoot) {
-          vscode48.window.showErrorMessage("No workspace folder open.");
+          vscode47.window.showErrorMessage("No workspace folder open.");
           return;
         }
         const libsDir = path19.join(workspaceRoot, "libs");
@@ -23584,7 +22794,7 @@ function registerLibraryCommands(context) {
         }
         const dest = path19.join(libsDir, `${picked.label}.lua`);
         if (fs16.existsSync(dest)) {
-          const overwrite = await vscode48.window.showWarningMessage(
+          const overwrite = await vscode47.window.showWarningMessage(
             `libs/${picked.label}.lua already exists. Overwrite?`,
             "Yes",
             "No"
@@ -23594,14 +22804,14 @@ function registerLibraryCommands(context) {
           }
         }
         fs16.copyFileSync(picked.fullPath, dest);
-        vscode48.window.showInformationMessage(`Copied ${picked.label} to libs/${picked.label}.lua`);
+        vscode47.window.showInformationMessage(`Copied ${picked.label} to libs/${picked.label}.lua`);
       }
     })
   );
   context.subscriptions.push(
-    vscode48.commands.registerCommand("lurek.library.insertSnippet", async () => {
+    vscode47.commands.registerCommand("lurek.library.insertSnippet", async () => {
       const categories = getCategories();
-      const catPick = await vscode48.window.showQuickPick(
+      const catPick = await vscode47.window.showQuickPick(
         categories.map((c) => ({ label: c })),
         { placeHolder: "Choose snippet category" }
       );
@@ -23609,20 +22819,20 @@ function registerLibraryCommands(context) {
         return;
       }
       const snippetsInCat = SNIPPETS.filter((s) => s.category === catPick.label);
-      const snippetPick = await vscode48.window.showQuickPick(
+      const snippetPick = await vscode47.window.showQuickPick(
         snippetsInCat.map((s) => ({ label: s.label, snippet: s })),
         { placeHolder: `${catPick.label} snippets` }
       );
       if (!snippetPick) {
         return;
       }
-      const editor = vscode48.window.activeTextEditor;
+      const editor = vscode47.window.activeTextEditor;
       if (!editor) {
-        const doc = await vscode48.workspace.openTextDocument({
+        const doc = await vscode47.workspace.openTextDocument({
           language: "lua",
           content: snippetPick.snippet.code + "\n"
         });
-        await vscode48.window.showTextDocument(doc);
+        await vscode47.window.showTextDocument(doc);
         return;
       }
       await editor.edit((editBuilder) => {
@@ -23631,14 +22841,14 @@ function registerLibraryCommands(context) {
     })
   );
   context.subscriptions.push(
-    vscode48.commands.registerCommand("lurek.library.newPattern", async () => {
-      const editor = vscode48.window.activeTextEditor;
+    vscode47.commands.registerCommand("lurek.library.newPattern", async () => {
+      const editor = vscode47.window.activeTextEditor;
       if (!editor || editor.selection.isEmpty) {
-        vscode48.window.showWarningMessage("Select some Lua code first to create a pattern from it.");
+        vscode47.window.showWarningMessage("Select some Lua code first to create a pattern from it.");
         return;
       }
       const selectedText = editor.document.getText(editor.selection);
-      const name = await vscode48.window.showInputBox({
+      const name = await vscode47.window.showInputBox({
         prompt: "Pattern name",
         placeHolder: "my-pattern",
         validateInput: (v) => {
@@ -23654,11 +22864,11 @@ function registerLibraryCommands(context) {
       if (!name) {
         return;
       }
-      const category = await vscode48.window.showInputBox({
+      const category = await vscode47.window.showInputBox({
         prompt: "Category",
         placeHolder: "e.g. gameplay, ui, utility"
       });
-      const description = await vscode48.window.showInputBox({
+      const description = await vscode47.window.showInputBox({
         prompt: "Brief description",
         placeHolder: "What does this pattern do?"
       });
@@ -23676,7 +22886,7 @@ function registerLibraryCommands(context) {
       }
       const destFile = path19.join(patternsDir, `${name}.lua`);
       if (fs16.existsSync(destFile)) {
-        const overwrite = await vscode48.window.showWarningMessage(
+        const overwrite = await vscode47.window.showWarningMessage(
           `Pattern "${name}" already exists. Overwrite?`,
           "Yes",
           "No"
@@ -23686,13 +22896,13 @@ function registerLibraryCommands(context) {
         }
       }
       fs16.writeFileSync(destFile, header + selectedText + "\n", "utf-8");
-      vscode48.window.showInformationMessage(`Pattern "${name}" saved to data/patterns/${name}.lua`);
+      vscode47.window.showInformationMessage(`Pattern "${name}" saved to data/patterns/${name}.lua`);
     })
   );
 }
 
 // src/commands/gameDevCag.ts
-var vscode49 = __toESM(require("vscode"));
+var vscode48 = __toESM(require("vscode"));
 var path20 = __toESM(require("path"));
 var fs17 = __toESM(require("fs"));
 var CAG_COMPONENTS = [
@@ -23719,7 +22929,7 @@ function getGameDevCagRoot(context) {
   return path20.join(context.extensionPath, "cag", "game-dev");
 }
 function getWorkspaceRoot3() {
-  return vscode49.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  return vscode48.workspace.workspaceFolders?.[0]?.uri.fsPath;
 }
 function copyDirRecursive(src, dest) {
   if (!fs17.existsSync(dest)) {
@@ -23752,15 +22962,15 @@ function countFiles(dir) {
 async function deployCag(context) {
   const root = getWorkspaceRoot3();
   if (!root) {
-    vscode49.window.showErrorMessage("No workspace folder open.");
+    vscode48.window.showErrorMessage("No workspace folder open.");
     return;
   }
   const cagRoot = getGameDevCagRoot(context);
   if (!fs17.existsSync(cagRoot)) {
-    vscode49.window.showErrorMessage("Game Dev CAG files not found in extension bundle.");
+    vscode48.window.showErrorMessage("Game Dev CAG files not found in extension bundle.");
     return;
   }
-  const picks = await vscode49.window.showQuickPick(
+  const picks = await vscode48.window.showQuickPick(
     CAG_COMPONENTS.map((c) => ({
       label: c.label,
       description: c.description,
@@ -23787,23 +22997,23 @@ async function deployCag(context) {
     copyDirRecursive(srcDir, destDir);
     totalFiles += countFiles(srcDir);
   }
-  vscode49.window.showInformationMessage(
+  vscode48.window.showInformationMessage(
     `Deployed ${totalFiles} file(s) to .github/ (${picks.map((p) => p.label).join(", ")})`
   );
 }
 async function scaffoldFromTemplate(context) {
   const root = getWorkspaceRoot3();
   if (!root) {
-    vscode49.window.showErrorMessage("No workspace folder open.");
+    vscode48.window.showErrorMessage("No workspace folder open.");
     return;
   }
   const cagRoot = getGameDevCagRoot(context);
   const templatesRoot = path20.join(cagRoot, "templates");
   if (!fs17.existsSync(templatesRoot)) {
-    vscode49.window.showErrorMessage("Game Dev templates not found in extension bundle.");
+    vscode48.window.showErrorMessage("Game Dev templates not found in extension bundle.");
     return;
   }
-  const pick = await vscode49.window.showQuickPick(
+  const pick = await vscode48.window.showQuickPick(
     TEMPLATES2.map((t) => ({ label: t.label, description: t.description, dir: t.dir })),
     { placeHolder: "Select a game template", title: "Scaffold Project from Template" }
   );
@@ -23812,12 +23022,12 @@ async function scaffoldFromTemplate(context) {
   }
   const srcDir = path20.join(templatesRoot, pick.dir);
   if (!fs17.existsSync(srcDir)) {
-    vscode49.window.showErrorMessage(`Template "${pick.label}" not found.`);
+    vscode48.window.showErrorMessage(`Template "${pick.label}" not found.`);
     return;
   }
   const mainLua = path20.join(root, "main.lua");
   if (fs17.existsSync(mainLua)) {
-    const overwrite = await vscode49.window.showWarningMessage(
+    const overwrite = await vscode48.window.showWarningMessage(
       "main.lua already exists in workspace. Overwrite project files?",
       "Yes",
       "No"
@@ -23828,29 +23038,29 @@ async function scaffoldFromTemplate(context) {
   }
   copyDirRecursive(srcDir, root);
   const fileCount = countFiles(srcDir);
-  vscode49.window.showInformationMessage(
+  vscode48.window.showInformationMessage(
     `Scaffolded "${pick.label}" template (${fileCount} files)`
   );
   const newMain = path20.join(root, "main.lua");
   if (fs17.existsSync(newMain)) {
-    const doc = await vscode49.workspace.openTextDocument(newMain);
-    await vscode49.window.showTextDocument(doc);
+    const doc = await vscode48.workspace.openTextDocument(newMain);
+    await vscode48.window.showTextDocument(doc);
   }
 }
 async function updateCag(context) {
   const root = getWorkspaceRoot3();
   if (!root) {
-    vscode49.window.showErrorMessage("No workspace folder open.");
+    vscode48.window.showErrorMessage("No workspace folder open.");
     return;
   }
   const targetGithub = path20.join(root, ".github");
   if (!fs17.existsSync(targetGithub)) {
-    vscode49.window.showInformationMessage(
+    vscode48.window.showInformationMessage(
       "No .github/ folder found. Use 'Deploy Game Dev AI Layer' first."
     );
     return;
   }
-  const confirm = await vscode49.window.showWarningMessage(
+  const confirm = await vscode48.window.showWarningMessage(
     "This will overwrite existing CAG files in .github/ with the latest from the extension. Continue?",
     "Yes",
     "No"
@@ -23869,20 +23079,20 @@ async function updateCag(context) {
     copyDirRecursive(srcDir, destDir);
     totalFiles += countFiles(srcDir);
   }
-  vscode49.window.showInformationMessage(
+  vscode48.window.showInformationMessage(
     `Updated ${totalFiles} CAG file(s) in .github/`
   );
 }
 function registerGameDevCagCommands(context) {
   context.subscriptions.push(
-    vscode49.commands.registerCommand("lurek.cag.deploy", () => deployCag(context)),
-    vscode49.commands.registerCommand("lurek.cag.scaffold", () => scaffoldFromTemplate(context)),
-    vscode49.commands.registerCommand("lurek.cag.updateGameDev", () => updateCag(context))
+    vscode48.commands.registerCommand("lurek.cag.deploy", () => deployCag(context)),
+    vscode48.commands.registerCommand("lurek.cag.scaffold", () => scaffoldFromTemplate(context)),
+    vscode48.commands.registerCommand("lurek.cag.updateGameDev", () => updateCag(context))
   );
 }
 
 // src/debug/luaDebugAdapter.ts
-var vscode50 = __toESM(require("vscode"));
+var vscode49 = __toESM(require("vscode"));
 
 // src/debug/luaDebugSession.ts
 var import_debugadapter = __toESM(require_main());
@@ -24608,7 +23818,7 @@ ${message}`;
 // src/debug/luaDebugAdapter.ts
 var LuaDebugAdapterFactory = class {
   createDebugAdapterDescriptor(_session, _executable) {
-    return new vscode50.DebugAdapterInlineImplementation(new LuaDebugSession());
+    return new vscode49.DebugAdapterInlineImplementation(new LuaDebugSession());
   }
 };
 var LuaDebugConfigurationProvider = class {
@@ -24623,8 +23833,8 @@ var LuaDebugConfigurationProvider = class {
       config.name = "Lurek2D: Debug Game";
     }
     if (!config.program) {
-      const wsRoot = folder?.uri.fsPath ?? vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      const activeFile = vscode50.window.activeTextEditor?.document.uri.fsPath;
+      const wsRoot = folder?.uri.fsPath ?? vscode49.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const activeFile = vscode49.window.activeTextEditor?.document.uri.fsPath;
       if (activeFile) {
         const activeDir = require("path").dirname(activeFile);
         const mainLua = require("path").join(activeDir, "main.lua");
@@ -24638,7 +23848,7 @@ var LuaDebugConfigurationProvider = class {
       }
     }
     if (!config.luaVersion) {
-      config.luaVersion = vscode50.workspace.getConfiguration("lurek").get("luaVersion", "luajit");
+      config.luaVersion = vscode49.workspace.getConfiguration("lurek").get("luaVersion", "luajit");
     }
     if (config.stopOnEntry === void 0) {
       config.stopOnEntry = false;
@@ -24647,7 +23857,7 @@ var LuaDebugConfigurationProvider = class {
       config.debugPort = 8172;
     }
     if (!config.enginePath) {
-      const wsRoot = folder?.uri.fsPath ?? vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const wsRoot = folder?.uri.fsPath ?? vscode49.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (wsRoot) {
         const buildDebug = require("path").join(wsRoot, "build", "debug", process.platform === "win32" ? "lurek2d.exe" : "lurek2d");
         const buildRelease = require("path").join(wsRoot, "build", "release", process.platform === "win32" ? "lurek2d.exe" : "lurek2d");
@@ -24696,8 +23906,8 @@ function register22(context) {
   const factory = new LuaDebugAdapterFactory();
   const configProvider = new LuaDebugConfigurationProvider();
   context.subscriptions.push(
-    vscode50.debug.registerDebugAdapterDescriptorFactory("lurek", factory),
-    vscode50.debug.registerDebugConfigurationProvider("lurek", configProvider)
+    vscode49.debug.registerDebugAdapterDescriptorFactory("lurek", factory),
+    vscode49.debug.registerDebugConfigurationProvider("lurek", configProvider)
   );
 }
 
@@ -24727,9 +23937,9 @@ function activate(context) {
   const devTools = new DevToolsProvider();
   const aiTools = new AiToolsProvider();
   context.subscriptions.push(
-    vscode51.window.registerTreeDataProvider("lurek.projectTools", projectTools),
-    vscode51.window.registerTreeDataProvider("lurek.devTools", devTools),
-    vscode51.window.registerTreeDataProvider("lurek.aiCopilot", aiTools)
+    vscode50.window.registerTreeDataProvider("lurek.projectTools", projectTools),
+    vscode50.window.registerTreeDataProvider("lurek.devTools", devTools),
+    vscode50.window.registerTreeDataProvider("lurek.aiCopilot", aiTools)
   );
   register(context, apiData);
   register2(context, apiData);
@@ -24753,7 +23963,7 @@ function activate(context) {
   register19(context, apiData);
   const assetExplorer = new AssetExplorerProvider();
   context.subscriptions.push(
-    vscode51.window.registerTreeDataProvider("lurek.assetExplorer", assetExplorer)
+    vscode50.window.registerTreeDataProvider("lurek.assetExplorer", assetExplorer)
   );
   registerCommand(context, "lurek.runGame", () => runGame(lurekProcess));
   registerCommand(context, "lurek.stopGame", () => stopGame(lurekProcess));
@@ -24814,21 +24024,21 @@ function activate(context) {
       const uri = args[0];
       const range = args[1];
       if (!uri || !range) return;
-      const moduleName = await vscode51.window.showInputBox({
+      const moduleName = await vscode50.window.showInputBox({
         prompt: "New module file name (without .lua)",
         placeHolder: "my_module",
         validateInput: (v) => /^[a-z_][a-z0-9_]*$/i.test(v) ? null : "Use letters, digits, underscores"
       });
       if (!moduleName) return;
-      const doc = await vscode51.workspace.openTextDocument(uri);
+      const doc = await vscode50.workspace.openTextDocument(uri);
       const selectedText = doc.getText(range);
       const folder = uri.fsPath.replace(/[/\\][^/\\]+$/, "");
-      const newUri = vscode51.Uri.file(`${folder}/${moduleName}.lua`);
-      const we = new vscode51.WorkspaceEdit();
+      const newUri = vscode50.Uri.file(`${folder}/${moduleName}.lua`);
+      const we = new vscode50.WorkspaceEdit();
       we.createFile(newUri, { ignoreIfExists: true });
       we.insert(
         newUri,
-        new vscode51.Position(0, 0),
+        new vscode50.Position(0, 0),
         `-- ${moduleName}.lua
 local M = {}
 
@@ -24838,8 +24048,8 @@ return M
 `
       );
       we.replace(uri, range, `require("${moduleName}")`);
-      await vscode51.workspace.applyEdit(we);
-      await vscode51.window.showTextDocument(newUri);
+      await vscode50.workspace.applyEdit(we);
+      await vscode50.window.showTextDocument(newUri);
     }
   );
   registerCommand(context, "lurek.package.zip", () => packageZip());
@@ -24848,7 +24058,7 @@ return M
   context.subscriptions.push(...registerEditorCommands(context));
   registerCommand(context, "lurek.assets.refresh", () => assetExplorer.refresh());
   registerCommand(context, "lurek.assets.openPanel", () => {
-    vscode51.window.showInformationMessage("Asset Explorer is in the sidebar under Lurek2D.");
+    vscode50.window.showInformationMessage("Asset Explorer is in the sidebar under Lurek2D.");
   });
   registerCommand(context, "lurek.assets.findMissing", () => findMissingAssets());
   registerCommand(context, "lurek.assets.insertPath", (item) => {
@@ -24860,19 +24070,19 @@ return M
     clearHistory2();
   });
   registerCommand(context, "lurek.perf.openHotReload", () => {
-    const panel = vscode51.window.createWebviewPanel(
+    const panel = vscode50.window.createWebviewPanel(
       "lurek.hotReload",
       "Hot-Reload History",
-      vscode51.ViewColumn.Two,
+      vscode50.ViewColumn.Two,
       { enableScripts: true, retainContextWhenHidden: true }
     );
     const events = [];
-    const wsRoot = vscode51.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
-    const watcher = vscode51.workspace.createFileSystemWatcher(
-      new vscode51.RelativePattern(wsRoot, "**/*.lua")
+    const wsRoot = vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
+    const watcher = vscode50.workspace.createFileSystemWatcher(
+      new vscode50.RelativePattern(wsRoot, "**/*.lua")
     );
     const push = (file, status) => {
-      events.unshift({ time: (/* @__PURE__ */ new Date()).toLocaleTimeString(), file: vscode51.workspace.asRelativePath(file), status });
+      events.unshift({ time: (/* @__PURE__ */ new Date()).toLocaleTimeString(), file: vscode50.workspace.asRelativePath(file), status });
       if (events.length > 200) events.pop();
       panel.webview.postMessage({ type: "events", events });
     };
@@ -24884,12 +24094,12 @@ return M
   });
   registerCommand(context, "lurek.deps.showGraph", () => depGraph(context));
   registerCommand(context, "lurek.deps.findCircular", async () => {
-    const wsRoot = vscode51.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const wsRoot = vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!wsRoot) {
-      vscode51.window.showErrorMessage("No workspace folder open.");
+      vscode50.window.showErrorMessage("No workspace folder open.");
       return;
     }
-    const out = vscode51.window.createOutputChannel("Lurek2D Circular Deps");
+    const out = vscode50.window.createOutputChannel("Lurek2D Circular Deps");
     out.show(true);
     out.appendLine("\u{1F50D} Scanning for circular dependencies...");
     const nodeFsModule = require("fs");
@@ -24948,12 +24158,12 @@ return M
     out.appendLine("\nDone.");
   });
   registerCommand(context, "lurek.deps.findOrphans", async () => {
-    const wsRoot = vscode51.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const wsRoot = vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!wsRoot) {
-      vscode51.window.showErrorMessage("No workspace folder open.");
+      vscode50.window.showErrorMessage("No workspace folder open.");
       return;
     }
-    const out = vscode51.window.createOutputChannel("Lurek2D Orphan Modules");
+    const out = vscode50.window.createOutputChannel("Lurek2D Orphan Modules");
     out.show(true);
     out.appendLine("\u{1F50D} Scanning for orphan modules...");
     const nodeFsModule = require("fs");
@@ -24986,10 +24196,10 @@ return M
   register21(context, apiData);
   registerCommand(context, "lurek.debug.openWatchers", () => openWatchersPanel(context));
   registerCommand(context, "lurek.debug.openInspector", () => {
-    const panel = vscode51.window.createWebviewPanel(
+    const panel = vscode50.window.createWebviewPanel(
       "lurekVariableInspector",
       "Lurek2D Variable Inspector",
-      vscode51.ViewColumn.Two,
+      vscode50.ViewColumn.Two,
       { enableScripts: true, retainContextWhenHidden: true }
     );
     const getHtml = (entries) => `<!DOCTYPE html><html><head>
@@ -25051,10 +24261,10 @@ return M
     }, void 0, context.subscriptions);
   });
   registerCommand(context, "lurek.debug.openCallStack", () => {
-    vscode51.window.showInformationMessage("Call stack available when connected to the Lua debug bridge.");
+    vscode50.window.showInformationMessage("Call stack available when connected to the Lua debug bridge.");
   });
   registerCommand(context, "lurek.debug.addWatch", () => {
-    const editor = vscode51.window.activeTextEditor;
+    const editor = vscode50.window.activeTextEditor;
     if (editor) addWatchFromEditor(editor);
   });
   registerCommand(context, "lurek.runtime.openMonitor", () => openSystemMonitor(context));
@@ -25081,7 +24291,7 @@ return M
   registerCommand(context, "lurek.depGraph", () => depGraph(context));
   registerCommand(context, "lurek.depList", () => depList());
   registerCommand(context, "lurek.apiCoverage", () => {
-    const terminal = vscode51.window.createTerminal("Lurek2D API Coverage");
+    const terminal = vscode50.window.createTerminal("Lurek2D API Coverage");
     terminal.show();
     terminal.sendText("python tools/integration_coverage.py");
   });
@@ -25092,24 +24302,24 @@ return M
     await new Promise((res) => setTimeout(res, 1500));
     const ok = await debugBridge.connect();
     if (ok) {
-      vscode51.commands.executeCommand("setContext", "lurek.debugConnected", true);
+      vscode50.commands.executeCommand("setContext", "lurek.debugConnected", true);
       debugBridge.startStatsPolling();
-      vscode51.window.showInformationMessage("Lurek2D started and debug bridge connected.");
+      vscode50.window.showInformationMessage("Lurek2D started and debug bridge connected.");
     } else {
-      vscode51.window.showWarningMessage(
+      vscode50.window.showWarningMessage(
         "Game launched but debug bridge could not connect. Is debug bridge enabled in conf.lua?"
       );
     }
   });
   registerCommand(context, "lurek.debug.performance", () => {
     if (!debugBridge.isConnected) {
-      vscode51.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
+      vscode50.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
       return;
     }
-    const panel = vscode51.window.createWebviewPanel(
+    const panel = vscode50.window.createWebviewPanel(
       "lurek.debugPerf",
       "Lurek2D Live Performance",
-      vscode51.ViewColumn.Two,
+      vscode50.ViewColumn.Two,
       { enableScripts: true, retainContextWhenHidden: true }
     );
     panel.webview.html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
@@ -25155,40 +24365,40 @@ window.addEventListener('resize',draw);
   });
   registerCommand(context, "lurek.debug.screenshot", async () => {
     if (!debugBridge.isConnected) {
-      vscode51.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
+      vscode50.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
       return;
     }
     try {
       const b64 = await debugBridge.takeScreenshot();
       if (!b64) {
-        vscode51.window.showWarningMessage("Engine did not return screenshot data.");
+        vscode50.window.showWarningMessage("Engine did not return screenshot data.");
         return;
       }
       const buf = Buffer.from(b64, "base64");
-      const wsFolder = vscode51.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const wsFolder = vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (!wsFolder) {
-        vscode51.window.showErrorMessage("No workspace folder.");
+        vscode50.window.showErrorMessage("No workspace folder.");
         return;
       }
       const ts = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
       const outPath = require("path").join(wsFolder, `screenshot-${ts}.png`);
       require("fs").writeFileSync(outPath, buf);
-      const uri = vscode51.Uri.file(outPath);
-      await vscode51.commands.executeCommand("vscode.open", uri);
-      vscode51.window.showInformationMessage(`Screenshot saved: screenshot-${ts}.png`);
+      const uri = vscode50.Uri.file(outPath);
+      await vscode50.commands.executeCommand("vscode.open", uri);
+      vscode50.window.showInformationMessage(`Screenshot saved: screenshot-${ts}.png`);
     } catch (err) {
-      vscode51.window.showErrorMessage(`Screenshot failed: ${err instanceof Error ? err.message : String(err)}`);
+      vscode50.window.showErrorMessage(`Screenshot failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   });
   registerCommand(context, "lurek.debug.callStack", async () => {
     if (!debugBridge.isConnected) {
-      vscode51.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
+      vscode50.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
       return;
     }
     try {
       const frames = await debugBridge.getCallStack();
       if (frames.length === 0) {
-        vscode51.window.showInformationMessage("Call stack is empty (game may not be paused).");
+        vscode50.window.showInformationMessage("Call stack is empty (game may not be paused).");
         return;
       }
       const items = frames.map((f) => ({
@@ -25198,46 +24408,46 @@ window.addEventListener('resize',draw);
         source: f.source,
         line: f.line
       }));
-      const picked = await vscode51.window.showQuickPick(items, {
+      const picked = await vscode50.window.showQuickPick(items, {
         title: "Lua Call Stack",
         placeHolder: "Select a frame to navigate to"
       });
       if (picked?.source && picked.source !== "?" && picked.source !== "[C]") {
         const relPath = picked.source.startsWith("@") ? picked.source.slice(1) : picked.source;
-        const wsFolder = vscode51.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        const wsFolder = vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath;
         if (wsFolder) {
           const filePath = require("path").join(wsFolder, relPath);
           if (require("fs").existsSync(filePath)) {
-            const doc = await vscode51.workspace.openTextDocument(filePath);
-            await vscode51.window.showTextDocument(doc, {
-              selection: new vscode51.Range(picked.line - 1, 0, picked.line - 1, 0)
+            const doc = await vscode50.workspace.openTextDocument(filePath);
+            await vscode50.window.showTextDocument(doc, {
+              selection: new vscode50.Range(picked.line - 1, 0, picked.line - 1, 0)
             });
           }
         }
       }
     } catch (err) {
-      vscode51.window.showErrorMessage(`Call stack failed: ${err instanceof Error ? err.message : String(err)}`);
+      vscode50.window.showErrorMessage(`Call stack failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   });
   registerCommand(context, "lurek.debug.status", async () => {
     const info = debugBridge.getStatusInfo();
     if (!info.connected) {
-      const choice = await vscode51.window.showInformationMessage(
+      const choice = await vscode50.window.showInformationMessage(
         `Lurek2D debug bridge: NOT connected (port ${info.port})`,
         "Connect Now",
         "Dismiss"
       );
       if (choice === "Connect Now") {
-        vscode51.commands.executeCommand("lurek.debug.connect");
+        vscode50.commands.executeCommand("lurek.debug.connect");
       }
     } else {
       try {
         const stats = await debugBridge.getStats();
-        vscode51.window.showInformationMessage(
+        vscode50.window.showInformationMessage(
           `Lurek2D connected on port ${info.port} \xB7 FPS: ${stats.fps} \xB7 Draw calls: ${stats.drawCalls} \xB7 Memory: ${(stats.memory / 1024 / 1024).toFixed(1)} MB`
         );
       } catch {
-        vscode51.window.showInformationMessage(`Lurek2D debug bridge connected on port ${info.port}.`);
+        vscode50.window.showInformationMessage(`Lurek2D debug bridge connected on port ${info.port}.`);
       }
     }
   });
@@ -25246,28 +24456,28 @@ window.addEventListener('resize',draw);
   registerCommand(context, "lurek.cag.selectSkill", () => selectSkill());
   registerCommand(context, "lurek.cag.selectPrompt", () => selectPrompt());
   registerCommand(context, "lurek.cag.update", () => {
-    vscode51.window.showInformationMessage(
+    vscode50.window.showInformationMessage(
       "CAG update is not yet implemented."
     );
   });
   registerCommand(context, "lurek.mcp.install", () => {
-    vscode51.window.showInformationMessage(
+    vscode50.window.showInformationMessage(
       "MCP server installation is not yet implemented."
     );
   });
   registerCommand(context, "lurek.mcp.status", () => {
-    vscode51.window.showInformationMessage(
+    vscode50.window.showInformationMessage(
       mcpProcess ? "MCP server is running." : "MCP server is not running."
     );
   });
   registerGameJamCommands(context);
   registerCommand(context, "lurek.jam.quickBuild", () => {
-    const terminal = vscode51.window.createTerminal("Lurek2D Quick Build");
+    const terminal = vscode50.window.createTerminal("Lurek2D Quick Build");
     terminal.show();
     terminal.sendText(buildBuildCommand("release"));
   });
   registerCommand(context, "lurek.jam.checklist", () => {
-    vscode51.window.showInformationMessage(
+    vscode50.window.showInformationMessage(
       "Submission Checklist is not yet implemented."
     );
   });
@@ -25276,7 +24486,7 @@ window.addEventListener('resize',draw);
   registerCommand(context, "lurek2d.runExample", () => runExample(lurekProcess));
   registerCommand(context, "lurek2d.listExamples", () => runExample(lurekProcess));
   registerCommand(context, "lurek2d.checkBuild", () => {
-    const terminal = vscode51.window.createTerminal("Lurek2D Build Check");
+    const terminal = vscode50.window.createTerminal("Lurek2D Build Check");
     terminal.show();
     terminal.sendText(buildCheckCommand());
   });
@@ -25284,22 +24494,22 @@ window.addEventListener('resize',draw);
   registerCommand(context, "lurek2d.scanAllGames", async () => {
     const wsRoot = getWorkspaceRoot4();
     if (!wsRoot) {
-      vscode51.window.showErrorMessage("No workspace open.");
+      vscode50.window.showErrorMessage("No workspace open.");
       return;
     }
-    const uris = await vscode51.workspace.findFiles("content/games/**/main.lua", "**/node_modules/**");
+    const uris = await vscode50.workspace.findFiles("content/games/**/main.lua", "**/node_modules/**");
     if (uris.length === 0) {
-      vscode51.window.showInformationMessage("No game main.lua files found.");
+      vscode50.window.showInformationMessage("No game main.lua files found.");
       return;
     }
-    await vscode51.window.withProgress(
-      { location: vscode51.ProgressLocation.Notification, title: `Scanning ${uris.length} games\u2026`, cancellable: false },
+    await vscode50.window.withProgress(
+      { location: vscode50.ProgressLocation.Notification, title: `Scanning ${uris.length} games\u2026`, cancellable: false },
       async (progress) => {
         let done = 0;
         for (const uri of uris) {
           try {
-            const doc = await vscode51.workspace.openTextDocument(uri);
-            await vscode51.window.showTextDocument(doc, { preview: true, preserveFocus: true });
+            const doc = await vscode50.workspace.openTextDocument(uri);
+            await vscode50.window.showTextDocument(doc, { preview: true, preserveFocus: true });
           } catch {
           }
           done++;
@@ -25307,8 +24517,8 @@ window.addEventListener('resize',draw);
         }
       }
     );
-    await vscode51.commands.executeCommand("workbench.action.problems.focus");
-    vscode51.window.showInformationMessage(`Scanned ${uris.length} games. Check the Problems panel for errors.`);
+    await vscode50.commands.executeCommand("workbench.action.problems.focus");
+    vscode50.window.showInformationMessage(`Scanned ${uris.length} games. Check the Problems panel for errors.`);
   });
   const workspaceRoot = getWorkspaceRoot4();
   if (workspaceRoot) {
@@ -25316,7 +24526,7 @@ window.addEventListener('resize',draw);
   }
   configureLuaWorkspaceLibrary(context);
   context.subscriptions.push(
-    vscode51.workspace.onDidChangeConfiguration((e) => {
+    vscode50.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("lurek.luaVersion")) {
         apiData.load(context.extensionPath).catch((err) => {
           console.error("Failed to reload Lurek2D API data:", err);
@@ -25325,7 +24535,7 @@ window.addEventListener('resize',draw);
       }
     })
   );
-  vscode51.commands.executeCommand("setContext", "lurek.gameRunning", false);
+  vscode50.commands.executeCommand("setContext", "lurek.gameRunning", false);
 }
 function deactivate() {
   if (mcpProcess) {
@@ -25335,28 +24545,28 @@ function deactivate() {
 }
 function registerCommand(context, id, handler) {
   context.subscriptions.push(
-    vscode51.commands.registerCommand(id, handler)
+    vscode50.commands.registerCommand(id, handler)
   );
 }
 function getWorkspaceRoot4() {
-  return vscode51.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  return vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath;
 }
 function configureLuaWorkspaceLibrary(context) {
-  const wsRoot = vscode51.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const wsRoot = vscode50.workspace.workspaceFolders?.[0]?.uri.fsPath;
   const wsDocsApi = wsRoot ? path22.join(wsRoot, "docs", "api") : void 0;
   const bundledData = path22.join(context.extensionPath, "data");
   const annotationsDir = wsDocsApi && fs19.existsSync(path22.join(wsDocsApi, "lurek.lua")) ? wsDocsApi : bundledData;
-  const luaConfig = vscode51.workspace.getConfiguration("Lua");
+  const luaConfig = vscode50.workspace.getConfiguration("Lua");
   const currentLibrary = luaConfig.get("workspace.library") ?? [];
   if (!currentLibrary.includes(annotationsDir)) {
     const filtered = currentLibrary.filter((p) => !p.includes("lurek2d-toolkit"));
     const updated = [...filtered, annotationsDir];
-    luaConfig.update("workspace.library", updated, vscode51.ConfigurationTarget.Global).then(void 0, () => {
+    luaConfig.update("workspace.library", updated, vscode50.ConfigurationTarget.Global).then(void 0, () => {
     });
   }
-  const lurekVersion = vscode51.workspace.getConfiguration("lurek").get("luaVersion", "luajit");
+  const lurekVersion = vscode50.workspace.getConfiguration("lurek").get("luaVersion", "luajit");
   const runtimeVersion = lurekVersion === "lua54" ? "Lua 5.4" : "LuaJIT";
-  luaConfig.update("runtime.version", runtimeVersion, vscode51.ConfigurationTarget.Global).then(void 0, () => {
+  luaConfig.update("runtime.version", runtimeVersion, vscode50.ConfigurationTarget.Global).then(void 0, () => {
   });
 }
 // Annotate the CommonJS export names for ESM import in node:

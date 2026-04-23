@@ -4,7 +4,8 @@
 Steps:
     1.  gen_rust_api_data.py         -> logs/data/rust_api_data.json           (Rust master JSON)
     2.  gen_lua_api_data.py          -> logs/data/lua_api_data.json            (Lua master JSON)
-    3.  gen_luadoc.py                -> docs/api/lurek.lua                (LuaCATS stubs)
+    3.  gen_extension_api.py         -> extensions/vscode/data/lurek-api.json  (VS Code extension API)
+    4.  gen_luadoc.py                -> docs/api/lurek.lua                (LuaCATS stubs)
     4.  gen_docs_lua.py              -> docs/api/lurek.md                 (Lua API reference)
     5.  gen_docs_rust.py             -> docs/api/rust.md                  (Rust API reference)
     6.  gen_wiki_api.py              -> wiki/API-Reference.md        (game-dev cheatsheet)
@@ -35,6 +36,7 @@ if hasattr(sys.stdout, "reconfigure"):
 SCRIPTS = [
     ("docs/gen_rust_api_data.py", "Rust JSON (logs/data/rust_api_data.json)"),
     ("docs/gen_lua_api_data.py",  "Lua JSON (logs/data/lua_api_data.json)"),
+    ("docs/gen_extension_api.py", "VS Code extension API (extensions/vscode/data/lurek-api.json)"),
     ("docs/gen_luadoc.py",        "LuaCATS Stubs (docs/api/lurek.lua)"),
     ("docs/gen_docs_lua.py",      "Lua API reference (docs/api/lurek.md)"),
     ("docs/gen_docs_rust.py",     "Rust API reference (docs/api/rust.md)"),
