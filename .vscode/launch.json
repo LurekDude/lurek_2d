@@ -15,7 +15,8 @@
     // ─────────────────────────────────────────────────────────────────────────
     "configurations": [
         // ─── 🐛 DEBUG ─────────────────────────────────────────────────────────
-        // Full DWARF symbols, opt-level 1, debug logging, [DEBUG] in window title.
+        // [profile.dev]: opt-level=0, full DWARF debug symbols (debug=2), no optimizations.
+        // Fastest possible compile. Binary is large and slow to run — use for debugging only.
         {
             "type": "lldb",
             "request": "launch",
@@ -31,7 +32,8 @@
             "console": "integratedTerminal"
         },
         // ─── 🚀 RELEASE ───────────────────────────────────────────────────────
-        // opt-level 3 + LTO, stripped symbols, error-only logging, smallest exe.
+        // [profile.release]: opt-level=3, LTO, stripped symbols, panic=abort.
+        // Balanced performance + size. Raw binary ~20 MB. Use dist.ps1 to ship.
         {
             "type": "lldb",
             "request": "launch",
@@ -47,8 +49,7 @@
             "console": "integratedTerminal"
         },
         // ─── ⚡ RUN DEBUG (from source) ───────────────────────────────────────
-        // Uses CodeLLDB cargo integration — compiles incrementally then runs.
-        // No separate build step needed.
+        // Builds with [profile.dev] (opt-level=0, full DWARF) then launches.
         {
             "type": "lldb",
             "request": "launch",
@@ -60,7 +61,7 @@
             "cwd": "${workspaceFolder}"
         },
         // ─── ⚡ RUN RELEASE (from source) ────────────────────────────────────
-        // Uses CodeLLDB cargo integration — release build, compiles then runs.
+        // Builds with [profile.release] (opt-level=3, LTO, stripped) then launches.
         {
             "type": "lldb",
             "request": "launch",

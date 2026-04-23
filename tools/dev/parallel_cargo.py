@@ -247,6 +247,8 @@ def build_mode_command(target: str, jobs: int, verbose: bool) -> list[str]:
     command = ["cargo", "build"]
     if target == "release":
         command.append("--release")
+    elif target == "dist":
+        command.extend(["--profile", "dist"])
     add_verbose_flag(command, verbose)
     add_jobs_flag(command, jobs)
     return command
@@ -263,6 +265,8 @@ def run_command(target: str, jobs: int, verbose: bool, run_args: Sequence[str]) 
     command = ["cargo", "run", "--bin", "lurek2d"]
     if target == "release":
         command.append("--release")
+    elif target == "dist":
+        command.extend(["--profile", "dist"])
     add_verbose_flag(command, verbose)
     add_jobs_flag(command, jobs)
     if run_args:
@@ -526,7 +530,7 @@ def parse_args() -> argparse.Namespace:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     build_parser = subparsers.add_parser("build", help="Build the workspace in debug or release mode.")
-    build_parser.add_argument("profile", choices=["debug", "release"])
+    build_parser.add_argument("profile", choices=["debug", "release", "dist"])
     add_common_flags(build_parser)
     build_parser.set_defaults(handler=run_build)
 
@@ -535,7 +539,7 @@ def parse_args() -> argparse.Namespace:
     check_parser.set_defaults(handler=run_check)
 
     run_parser = subparsers.add_parser("run", help="Run the workspace via cargo run.")
-    run_parser.add_argument("profile", choices=["debug", "release"])
+    run_parser.add_argument("profile", choices=["debug", "release", "dist"])
     add_common_flags(run_parser)
     run_parser.add_argument("run_args", nargs="*", help="Arguments forwarded after cargo run --.")
     run_parser.set_defaults(handler=run_run)

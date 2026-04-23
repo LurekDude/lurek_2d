@@ -2,6 +2,25 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.14] - 2026-04-23
+
+### chore(build): overhaul all three build profiles and dist pipeline
+
+- **fix(profile.dev)**: `debug = "line-tables-only"` → `debug = 2` — full DWARF symbols for variable values, types, and step-into debugging. Added `codegen-units = 256` for maximum parallel compilation.
+- **fix(profile.release)**: `opt-level = "z"` → `opt-level = 3` — balanced performance + size. LTO, strip, panic=abort retained. Raw binary ~20 MB; faster runtime than z.
+- **fix(profile.dist)**: Now explicitly overrides `opt-level = "z"` and `lto = "fat"` from release instead of inheriting unchanged settings. dist.ps1 applies UPX -6 --lzma → binary lands ~5 MB, ZIP ~6.6 MB.
+- **feat(dist.ps1)**: Changed build command from `parallel_cargo.py build release` → `parallel_cargo.py build dist`. Binary source updated to `build/dist/lurek2d.exe`.
+- **feat(parallel_cargo.py)**: Added `dist` as a valid profile choice for `build` and `run` subcommands (`cargo build --profile dist` / `cargo run --profile dist`).
+- **feat(tasks.json)**: Added `Build: Dist` task ([profile.dist]). Updated detail strings for `Build: Debug` and `Build: Release` to accurately reflect active profile settings.
+- **fix(launch.json)**: Updated comments to accurately describe `[profile.dev]` (opt-level=0, full DWARF, fastest compile) and `[profile.release]` (opt-level=3, LTO, balanced perf/size).
+
+**Three-profile summary:**
+| Profile | Command | Output | Use for |
+|---|---|---|---|
+| `debug` | `build debug` / F5 | `build/debug/` ~55 MB | Development, debugging |
+| `release` | `build release` | `build/release/` ~20 MB | Performance testing |
+| `dist` | `dist.ps1` | `dist/` ~5 MB (UPX) | Shipping to players |
+
 ## [0.20.13] - 2026-04-24
 
 ### chore(build): optimise debug/release profiles and dist pipeline

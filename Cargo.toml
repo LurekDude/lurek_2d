@@ -175,25 +175,27 @@ name = "lurek2d"
 path = "src/lib.rs"
 
 [profile.dev]
-# opt-level 0 = fastest possible compilation for rapid iteration.
-# incremental disabled: repeated debug rebuilds of lua_tests caused unstable
-# Windows MSVC link failures with incremental + /DEBUG:FASTLINK.
-# line-tables-only keeps file/line backtraces without heavy DWARF metadata.
+# FASTEST COMPILE — all settings tuned for minimum wall-clock build time.
+# opt-level = 0: no compiler optimizations; code is slow to run but fast to compile.
+# incremental = false: Windows MSVC link stability (lua_tests link crashes).
+# debug = 2: full DWARF — variable values, type info, step-into; best debugger UX.
+# codegen-units = 256: maximum parallel code generation units = fastest compile.
 opt-level = 0
 incremental = false
-debug = "line-tables-only"
-# Use the toolchain default split debug behavior for stability.
+debug = 2
+codegen-units = 256
 
-# Compile dependencies at opt-level 1 — avoids pathologically slow dep builds
-# (proc-macros, wgpu internals) while still being faster than opt-level 3.
+# Compile dependencies at opt-level 1 — avoids slow dep compiles (proc-macros,
+# wgpu internals) while keeping game code debuggable at opt-level 0 above.
 [profile.dev.package."*"]
 opt-level = 1
 
 [profile.release]
-# Size + throughput: opt-level=z minimises binary size while LTO/codegen-units=1 maximises
-# dead-code elimination. strip+panic=abort remove unwinder and debug info.
-# overflow checks disabled for speed — the debug build catches those first.
-opt-level = "z"
+# BALANCED PERFORMANCE + SIZE — tuned for maximum runtime speed while keeping
+# the binary reasonably small. LTO + codegen-units=1 maximize dead-code removal.
+# strip + panic=abort drop all unneeded symbols and unwind tables.
+# Raw binary ~20 MB; use `cargo build --profile dist` (or dist.ps1) to ship.
+opt-level = 3
 lto = true
 codegen-units = 1
 strip = true
@@ -201,13 +203,15 @@ panic = "abort"
 overflow-checks = false
 debug = false
 
-# Size-optimised distribution profile: cargo build --profile dist
-# Inherits all release settings (opt-level=z, fat LTO, strip, panic=abort).
-# Explicitly re-states key settings for clarity; no weaker overrides.
+# DISTRIBUTION profile — use for player-facing packages (via tools/dist/dist.ps1).
+# Inherits release, then overrides to max-size-optimization:
+#   opt-level="z": size-first (smaller than 3, tiny runtime cost)
+#   lto="fat":    whole-program LTO for strongest dead-code elimination
+# After UPX -6 --lzma compression in dist.ps1, binary lands below 10 MB.
 [profile.dist]
 inherits = "release"
-# opt-level, lto, codegen-units, strip, panic all inherited from release.
-# Nothing overridden — release is already maximum size optimisation.
+opt-level = "z"
+lto = "fat"
 
 [[test]]
 name = "examples_load_test"

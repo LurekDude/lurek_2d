@@ -45,8 +45,8 @@ $Version = "0.20.0"
 $ArchName = "lurek2d-windows-x86_64"
 $PackageDir = Join-Path $OutDir $ArchName
 $ZipPath = Join-Path $OutDir "$ArchName.zip"
-# Release binary lives in build/release/
-$BinarySource = Join-Path $WorkspaceRoot 'build\release\lurek2d.exe'
+# Release binary lives in build/dist/ (cargo build --profile dist)
+$BinarySource = Join-Path $WorkspaceRoot 'build\dist\lurek2d.exe'
 
 # -- Helpers -------------------------------------------------------------------
 function Write-Step([string]$Msg) { Write-Host "[dist] $Msg" -ForegroundColor Cyan }
@@ -75,8 +75,8 @@ if (-not $SkipBuild) {
     Write-Step "Building Lurek2D (dist -- size-optimised) -- this may take several minutes ..."
     Push-Location $WorkspaceRoot
     try {
-        python tools/dev/parallel_cargo.py build release 2>&1 | ForEach-Object { Write-Host "    $_" }
-        if ($LASTEXITCODE -ne 0) { Write-Fail "parallel_cargo.py build release failed." }
+        python tools/dev/parallel_cargo.py build dist 2>&1 | ForEach-Object { Write-Host "    $_" }
+        if ($LASTEXITCODE -ne 0) { Write-Fail "parallel_cargo.py build dist failed." }
     }
     finally { Pop-Location }
     Write-OK "Build succeeded."

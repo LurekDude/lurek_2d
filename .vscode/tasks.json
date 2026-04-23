@@ -4,7 +4,7 @@
         // ─── 🔨 BUILD ─────────────────────────────────────────────────────────
         {
             "label": "Build: Debug",
-            "detail": "🔨 Compile the Lurek2D engine in debug mode through tools/dev/parallel_cargo.py using the detected logical CPU count. Default build task (Ctrl+Shift+B).",
+            "detail": "� [profile.dev] opt-level=0, full DWARF debug symbols, 256 codegen units. Fastest compile. Use for active development and debugging.",
             "type": "shell",
             "command": "python tools/dev/parallel_cargo.py build debug",
             "group": {
@@ -17,7 +17,7 @@
         },
         {
             "label": "Build: Release",
-            "detail": "🔨 Compile the Lurek2D engine in release mode through tools/dev/parallel_cargo.py with the detected logical CPU count. Use this for distribution builds and performance measurement.",
+            "detail": "� [profile.release] opt-level=3, LTO, stripped, panic=abort. Balanced performance + size (~20 MB raw). Use for performance testing.",
             "type": "shell",
             "command": "python tools/dev/parallel_cargo.py build release",
             "group": "build",
@@ -26,7 +26,16 @@
             ]
         },
         {
-            "label": "Build: Check (fast)",
+            "label": "Build: Dist",
+            "detail": "📦 [profile.dist] opt-level=z, fat LTO, stripped — max size reduction. Run 'Dist: Package Windows' to apply UPX and assemble the distributable ZIP.",
+            "type": "shell",
+            "command": "python tools/dev/parallel_cargo.py build dist",
+            "group": "build",
+            "problemMatcher": [
+                "$rustc"
+            ]
+        },
+        {
             "detail": "⚡ Type-check and resolve the crate through tools/dev/parallel_cargo.py without producing a binary — much faster than a full build.",
             "type": "shell",
             "command": "python tools/dev/parallel_cargo.py check",
