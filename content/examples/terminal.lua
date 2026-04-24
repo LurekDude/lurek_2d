@@ -818,8 +818,7 @@ end
 -- Sets the foreground text or icon colour for a terminal widget.
 -- Use ANSI-style RGB values in [0,1] to theme individual widgets.
 do  -- Widget:setColor
-  local btn = lurek.terminal.newButton()
-  btn:setText("OK")
-  btn:setColor(0.2, 0.9, 0.3)
+  local lbl = lurek.terminal.newLabel(1, 1, "OK")
+  lbl:setColor(0.2, 0.9, 0.3)
   lurek.log.info("widget colour set", "terminal")
 end

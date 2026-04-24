@@ -261,9 +261,9 @@ end
 -- Registers a migration function for upgrading save data from an older schema version.
 -- Migrations run in version order on load; use to add/rename/remove fields safely.
 do  -- SaveManager:addMigration
-  local sm = lurek.save.newSaveManager("game.sav")
+  local sm = lurek.save.newSaveManager()
   sm:setSchemaVersion(2)
-  sm:addMigration(1, 2, function(data)
+  sm:addMigration(1, function(data)
     data.score = data.score or 0
     return data
   end)
@@ -274,9 +274,9 @@ end
 -- Enables automatic saving after every markDirty() call, with an optional cooldown.
 -- cooldown_secs prevents thrashing; 0 saves immediately on every dirty event.
 do  -- SaveManager:enableAutoSave
-  local sm = lurek.save.newSaveManager("game.sav")
+  local sm = lurek.save.newSaveManager()
   sm:register("state", function() return {score=0} end, function(d) end)
-  sm:enableAutoSave(5.0)
+  sm:enableAutoSave(5.0, "slot1")
   lurek.log.info("auto-save enabled", "save")
 end
 
@@ -284,7 +284,7 @@ end
 -- Returns true if a save file exists for the given slot name.
 -- Use before loading to provide appropriate UI (New Game vs Continue).
 do  -- SaveManager:exists
-  local sm = lurek.save.newSaveManager("game.sav")
+  local sm = lurek.save.newSaveManager()
   local present = sm:exists("slot1")
   lurek.log.info("slot1 exists: " .. tostring(present), "save")
 end
@@ -293,7 +293,7 @@ end
 -- Registers a named serializable component with collect and restore callbacks.
 -- collect() returns the data table; restore(data) applies it to the game state.
 do  -- SaveManager:register
-  local sm = lurek.save.newSaveManager("game.sav")
+  local sm = lurek.save.newSaveManager()
   sm:register("player_state",
     function() return {x=200, y=300, hp=100} end,
     function(d) lurek.log.info("restored hp=" .. d.hp, "save") end

@@ -54,7 +54,7 @@ end
 -- Wire to a "back to map" button so nested menus collapse in one call.
 do  -- lurek.scene.popTo
   if lurek.scene.hasRegistered("world_map") and lurek.scene.depth() > 1 then
-    lurek.scene.popTo("world_map", "slide", 0.3)
+    lurek.scene.popTo("world_map")
   end
 end
 

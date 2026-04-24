@@ -8434,7 +8434,7 @@ function lurek.image.newCompressedData(filename) end
 --- Creates a new blank ImageData or loads one from a file.
 ---@param args any
 ---@return ImageData
-function lurek.image.newImageData(args) end
+function lurek.image.newImageData(width, height, opts) end
 
 --- Creates a new empty LayeredImage canvas with no layers.
 ---@param width any
@@ -13062,9 +13062,10 @@ function EventBus:clear(event) end
 function EventBus:clearAll() end
 
 --- Dispatches an event, calling all registered listeners in priority order.
----@param args any
+---@param event any
+---@param ... any
 ---@return nil
-function EventBus:emit(args) end
+function EventBus:emit(event, ...) end
 
 --- Returns all event names that have at least one listener.
 ---@return table
@@ -13102,9 +13103,10 @@ function Factory:alias(alias, canonical) end
 function Factory:clearAll() end
 
 --- Creates an instance of the named type by invoking its constructor.
----@param args any
+---@param name any
+---@param ... any
 ---@return table|userdata
-function Factory:create(args) end
+function Factory:create(name, ...) end
 
 --- Returns a table of all registered type names.
 ---@return table
@@ -13248,9 +13250,10 @@ function Mediator:on(channel, callback) end
 function Mediator:removeChannel(channel) end
 
 --- Dispatches a message to all handlers on a channel.
----@param args any
+---@param channel any
+---@param ... any
 ---@return nil
-function Mediator:send(args) end
+function Mediator:send(channel, ...) end
 
 --- Lua wrapper for the ObjectPool pattern.
 ---@class ObjectPool
@@ -13649,9 +13652,9 @@ local Strategy = {}
 function Strategy:clear() end
 
 --- Calls the currently active strategy function with the given arguments.
----@param args any
+---@param ... any
 ---@return table|nil
-function Strategy:execute(args) end
+function Strategy:execute(...) end
 
 --- Returns the name of the active strategy, or nil.
 ---@return string?
@@ -14239,8 +14242,9 @@ function World:addDistanceJoint(a, b, ax1, ay1, ax2, ay2, len) end
 --- Adds an extra fixture (collider) to a body.
 ---@param bodyId integer
 ---@param shapeType string
+---@param opts? table (optional)
 ---@return integer
-function World:addFixture(bodyId, shapeType) end
+function World:addFixture(bodyId, shapeType, opts) end
 
 --- Creates a friction joint that resists relative motion.
 ---@param a any
@@ -14263,9 +14267,10 @@ function World:addGearJoint(a, b, ax, ay) end
 --- Creates a motor joint that drives body_b toward body_a.
 ---@param a any
 ---@param b any
----@param factor any
+---@param maxForce? any (optional)
+---@param maxTorque? any (optional)
 ---@return integer
-function World:addMotorJoint(a, b, factor) end
+function World:addMotorJoint(a, b, maxForce, maxTorque) end
 
 --- Creates a mouse joint connecting a body to a target point.
 ---@param body_id any
@@ -14290,8 +14295,13 @@ function World:addPrismaticJoint(a, b, ax, ay, axis_x, axis_y) end
 ---@param b any
 ---@param ax any
 ---@param ay any
+---@param bx? any (optional)
+---@param by? any (optional)
+---@param lengthA? any (optional)
+---@param lengthB? any (optional)
+---@param ratio? any (optional)
 ---@return integer
-function World:addPulleyJoint(a, b, ax, ay) end
+function World:addPulleyJoint(a, b, ax, ay, bx, by, lengthA, lengthB, ratio) end
 
 --- Creates a revolute (pin) joint between two bodies.
 ---@param a any
@@ -14317,8 +14327,10 @@ function World:addRopeJoint(a, b, ax1, ay1, ax2, ay2, max) end
 ---@param b any
 ---@param ax any
 ---@param ay any
+---@param frequency? any (optional)
+---@param damping? any (optional)
 ---@return integer
-function World:addWeldJoint(a, b, ax, ay) end
+function World:addWeldJoint(a, b, ax, ay, frequency, damping) end
 
 --- Creates a wheel joint (prismatic + rotation).
 ---@param a any
@@ -14327,8 +14339,10 @@ function World:addWeldJoint(a, b, ax, ay) end
 ---@param ay any
 ---@param axis_x any
 ---@param axis_y any
+---@param frequency? any (optional)
+---@param damping? any (optional)
 ---@return integer
-function World:addWheelJoint(a, b, ax, ay, axis_x, axis_y) end
+function World:addWheelJoint(a, b, ax, ay, axis_x, axis_y, frequency, damping) end
 
 --- Creates a rectangular gravity/damping zone and returns a LuaZone handle.
 ---@param x any
@@ -14371,11 +14385,11 @@ function World:destroyBody(id) end
 function World:destroyJoint(jid) end
 
 --- Draws physics objects for debugging
----@param target ImageData
----@param r number
----@param g number
----@param b number
----@param a number
+---@param target? ImageData (optional)
+---@param r? number (optional)
+---@param g? number (optional)
+---@param b? number (optional)
+---@param a? number (optional)
 ---@return nil
 function World:drawDebug(target, r, g, b, a) end
 
@@ -14481,7 +14495,7 @@ function World:getMeter() end
 function World:getSolverIterations() end
 
 --- Returns zone enter/leave events produced by the most recent step.
----@return nil
+---@return table
 function World:getZoneEvents() end
 
 --- Returns true if a body is currently sleeping (inactive).
@@ -14834,13 +14848,13 @@ function lurek.physics.newCellular(width, height) end
 
 --- Creates a chain shape userdata from flat variadic vertex pairs.
 ---@param closed any
----@param coords any
----@return Shape
-function lurek.physics.newChainShape(closed, coords) end
+---@param ... any
+---@return PhysicsShape
+function lurek.physics.newChainShape(closed, ...) end
 
 --- Creates a circle shape userdata.
 ---@param r any
----@return Shape
+---@return PhysicsShape
 function lurek.physics.newCircleShape(r) end
 
 --- Creates an edge (line segment) shape userdata.
@@ -14848,17 +14862,18 @@ function lurek.physics.newCircleShape(r) end
 ---@param y1 any
 ---@param x2 any
 ---@param y2 any
----@return Shape
+---@return PhysicsShape
 function lurek.physics.newEdgeShape(x1, y1, x2, y2) end
 
 --- Creates a convex polygon shape userdata from flat variadic vertex pairs.
----@return Shape
-function lurek.physics.newPolygonShape() end
+---@param ... any
+---@return PhysicsShape
+function lurek.physics.newPolygonShape(...) end
 
 --- Creates a rectangle shape userdata.
 ---@param w any
 ---@param h any
----@return Shape
+---@return PhysicsShape
 function lurek.physics.newRectangleShape(w, h) end
 
 --- Creates a destructible terrain grid.
@@ -14882,6 +14897,210 @@ function lurek.physics.newWorld(gx, gy) end
 ---@param vy any
 ---@return nil
 function lurek.physics.setBodyVelocity(world_ud, body_ud, vx, vy) end
+
+--- CELL_SAND constant for cellular automaton grid.
+lurek.physics.CELL_SAND = 1
+--- CELL_WATER constant for cellular automaton grid.
+lurek.physics.CELL_WATER = 2
+--- CELL_AIR constant for cellular automaton grid.
+lurek.physics.CELL_AIR = 0
+--- CELL_ROCK constant for cellular automaton grid.
+lurek.physics.CELL_ROCK = 3
+--- CELL_FIRE constant for cellular automaton grid.
+lurek.physics.CELL_FIRE = 4
+
+--- Falling-sand cellular automaton grid.
+---@class LuaCellular
+local LuaCellular = {}
+
+--- Sets a single cell to the given type constant.
+---@param x any
+---@param y any
+---@param cell_type any
+function LuaCellular:setCell(x, y, cell_type) end
+
+--- Gets a single cell type.
+---@param x any
+---@param y any
+---@return integer
+function LuaCellular:getCell(x, y) end
+
+--- Returns count of cells with the given type.
+---@param cell_type any
+---@return integer
+function LuaCellular:countCells(cell_type) end
+
+--- Returns a list of cell positions with the given type.
+---@param cell_type any
+---@return table
+function LuaCellular:findCells(cell_type) end
+
+--- Steps the cellular automaton by one frame.
+function LuaCellular:step() end
+
+--- Steps the cellular automaton by n frames.
+---@param n any
+function LuaCellular:stepN(n) end
+
+--- Fills a rectangular region.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param cell_type any
+function LuaCellular:fillRect(x, y, w, h, cell_type) end
+
+--- Fills a circular region.
+---@param cx any
+---@param cy any
+---@param radius any
+---@param cell_type any
+function LuaCellular:fillCircle(cx, cy, radius, cell_type) end
+
+--- Converts the grid to an ImageData.
+---@return ImageData
+function LuaCellular:toImageData() end
+
+--- Converts a region to an ImageData.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return ImageData
+function LuaCellular:toImageDataRegion(x, y, w, h) end
+
+--- Serializes the grid to a byte string.
+---@return string
+function LuaCellular:toBytes() end
+
+--- Loads the grid from a byte string.
+---@param data any
+---@return boolean
+function LuaCellular:loadFromBytes(data) end
+
+--- Destructible terrain grid.
+---@class LuaTerrain
+local LuaTerrain = {}
+
+--- Sets a single terrain cell to solid or empty.
+---@param x any
+---@param y any
+---@param solid any
+function LuaTerrain:setCell(x, y, solid) end
+
+--- Gets a single terrain cell.
+---@param x any
+---@param y any
+---@return boolean
+function LuaTerrain:getCell(x, y) end
+
+--- Fills all cells.
+---@param solid any
+function LuaTerrain:fillAll(solid) end
+
+--- Fills a circle in the terrain.
+---@param cx any
+---@param cy any
+---@param radius any
+---@param solid any
+function LuaTerrain:fillCircle(cx, cy, radius, solid) end
+
+--- Fills a rectangle in the terrain.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param solid any
+function LuaTerrain:fillRect(x, y, w, h, solid) end
+
+--- Flushes terrain changes to the physics world.
+function LuaTerrain:flush() end
+
+--- Returns whether the terrain has pending changes.
+---@return boolean
+function LuaTerrain:isDirty() end
+
+--- Collapses unsupported columns.
+---@return integer
+function LuaTerrain:collapseColumns() end
+
+--- Returns positions of all solid cells.
+---@return table
+function LuaTerrain:solidPositions() end
+
+--- Serializes the terrain to a byte string.
+---@return string
+function LuaTerrain:toBytes() end
+
+--- Loads terrain from a byte string.
+---@param data any
+function LuaTerrain:loadFromBytes(data) end
+
+--- Converts terrain to an ImageData.
+---@return ImageData
+function LuaTerrain:toImageData() end
+
+--- Spawns debris bodies for destroyed terrain cells.
+---@param world any
+---@return table
+function LuaTerrain:spawnDebris(world) end
+
+--- Physics gravity/damping zone.
+---@class LuaZone
+local LuaZone = {}
+
+--- Returns the zone's integer ID.
+---@return integer
+function LuaZone:getId() end
+
+--- Enables or disables the zone.
+---@param enabled any
+function LuaZone:setEnabled(enabled) end
+
+--- Sets the zone priority.
+---@param priority any
+function LuaZone:setPriority(priority) end
+
+--- Sets the layer bitmask for the zone.
+---@param mask any
+function LuaZone:setLayerMask(mask) end
+
+--- Replaces the zone boundary with a circle.
+---@param cx any
+---@param cy any
+---@param radius any
+function LuaZone:setCircle(cx, cy, radius) end
+
+--- Sets directional gravity inside the zone.
+---@param gx any
+---@param gy any
+function LuaZone:setGravityDirectional(gx, gy) end
+
+--- Suppresses gravity inside the zone.
+function LuaZone:setGravityZero() end
+
+--- Sets linear damping override for bodies inside the zone.
+---@param damping any
+function LuaZone:setLinearDampingOverride(damping) end
+
+--- Sets angular damping override for bodies inside the zone.
+---@param damping any
+function LuaZone:setAngularDampingOverride(damping) end
+
+--- Sets a point gravity source at (cx,cy) with given strength.
+---@param cx any
+---@param cy any
+---@param strength any
+function LuaZone:setGravityPoint(cx, cy, strength) end
+
+--- Sets a repulsor gravity source at (cx,cy) with given strength.
+---@param cx any
+---@param cy any
+---@param strength any
+function LuaZone:setGravityRepulsor(cx, cy, strength) end
+
+--- Removes the zone from the world.
+function LuaZone:destroy() end
 
 --- Sets whether the body is allowed to sleep.
 ---@param world_ud any
@@ -15867,7 +16086,7 @@ function Canvas:type() end
 
 --- Returns the type name of this object.
 ---@return string
-function Canvas:typeOf() end
+function Canvas:typeOf(name) end
 
 --- Lua-side z-ordered draw queue. Callbacks are sorted by z and called on `flush()`.
 ---@class DrawLayer
@@ -15887,9 +16106,10 @@ function DrawLayer:getCount() end
 
 --- Queues a draw callback at the given z-order.
 ---@param z any
----@param f any
+---@param cmd any
+---@param ... any
 ---@return nil
-function DrawLayer:queue(z, f) end
+function DrawLayer:queue(z, cmd, ...) end
 
 --- Returns the string type identifier of this draw layer (e.g. `'sprite'`).
 ---@return string
@@ -15946,7 +16166,7 @@ function Font:type() end
 
 --- Returns the type name of this object.
 ---@return string
-function Font:typeOf() end
+function Font:typeOf(name) end
 
 --- Lua-side handle to a loaded GPU texture stored in the engine's texture pool.
 ---@class Image
@@ -15973,8 +16193,9 @@ function Image:release() end
 function Image:type() end
 
 --- Returns the type name of this object.
----@return string
-function Image:typeOf() end
+---@param name? string (optional)
+---@return boolean|string
+function Image:typeOf(name) end
 
 --- Lua-side handle to a loaded texture stored in SharedState.
 ---@class ImageData
@@ -16062,7 +16283,7 @@ function Mesh:type() end
 
 --- Returns the type name of this object.
 ---@return string
-function Mesh:typeOf() end
+function Mesh:typeOf(name) end
 
 --- Lua-side 9-slice descriptor.
 ---@class NineSlice
@@ -16119,7 +16340,7 @@ function Quad:type() end
 
 --- Returns the type name of this object.
 ---@return string
-function Quad:typeOf() end
+function Quad:typeOf(name) end
 
 --- Lua-side handle to a compiled shader stored in SharedState.
 ---@class Shader
@@ -16146,7 +16367,7 @@ function Shader:type() end
 
 --- Returns the type name of this object.
 ---@return string
-function Shader:typeOf() end
+function Shader:typeOf(name) end
 
 --- Lua-side handle to a [`CompoundShape`] stored in [`SharedState::shapes`].
 ---@class Shape
@@ -16214,8 +16435,9 @@ function Shape:line(x1, y1, x2, y2) end
 function Shape:polygon(mode, coords) end
 
 --- Queues a polyline command from variadic (x, y) coordinate pairs.
+---@param ... any
 ---@return nil
-function Shape:polyline() end
+function Shape:polyline(...) end
 
 --- Queues a rectangle command.
 ---@param mode any
@@ -16277,8 +16499,13 @@ local SpriteBatch = {}
 --- Adds a sprite entry to this batch.
 ---@param x number
 ---@param y number
+---@param r? number (optional)
+---@param sx? number (optional)
+---@param sy? number (optional)
+---@param ox? number (optional)
+---@param oy? number (optional)
 ---@return integer?
-function SpriteBatch:add(x, y) end
+function SpriteBatch:add(x, y, r, sx, sy, ox, oy) end
 
 --- Removes all sprites from this batch.
 ---@return nil
@@ -16302,7 +16529,7 @@ function SpriteBatch:type() end
 
 --- Returns the type name of this object.
 ---@return string
-function SpriteBatch:typeOf() end
+function SpriteBatch:typeOf(name) end
 
 --- Applies an affine transform matrix.
 ---@param mat any
@@ -16342,7 +16569,8 @@ function lurek.render.circle(mode, x, y, radius) end
 ---@param r? any (optional)
 ---@param g? any (optional)
 ---@param b? any (optional)
-function lurek.render.clear(r, g, b) end
+---@param a? any (optional)
+function lurek.render.clear(r, g, b, a) end
 
 --- Resets the stencil mode to the default (keep / always / 0).
 ---@return nil
@@ -16353,9 +16581,16 @@ function lurek.render.clearStencil() end
 function lurek.render.currentLayer() end
 
 --- Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
----@param args any
+---@param drawable any
+---@param x? number (optional)
+---@param y? number (optional)
+---@param r? number (optional)
+---@param sx? number (optional)
+---@param sy? number (optional)
+---@param ox? number (optional)
+---@param oy? number (optional)
 ---@return table|nil
-function lurek.render.draw(args) end
+function lurek.render.draw(drawable, x, y, r, sx, sy, ox, oy) end
 
 --- Queues a beveled border rectangle with inner fill.
 ---@param x number
@@ -16452,18 +16687,11 @@ function lurek.render.drawHexTile(cx, cy, size, orientation, mode) end
 --- Queues a three-face isometric cube tile at screen position (sx, sy).
 ---@param sx number
 ---@param sy number
----@param halfW number
----@param halfH number
----@param opts? table? (optional)
-function lurek.render.drawIsoCubeTile(sx, sy, halfW, halfH, opts) end
-
---- Queues a three-face isometric cube tile at screen position (sx, sy).
----@param sx any
----@param sy any
----@param half_w any
----@param half_h any
----@param opts? any (optional)
-function lurek.render.drawIsoCubeTile(sx, sy, half_w, half_h, opts) end
+---@param size number
+---@param top_color? any (optional)
+---@param left_color? any (optional)
+---@param right_color? any (optional)
+function lurek.render.drawIsoCubeTile(sx, sy, size, top_color, left_color, right_color) end
 
 --- Queues a 9-slice draw call inside lurek.draw / lurek.draw_ui.
 ---@param slice any
@@ -16605,8 +16833,9 @@ function lurek.render.getFontHeight(ud) end
 function lurek.render.getFontLineHeight(ud) end
 
 --- Returns a table of available built-in font pixel heights.
+---@param path? string (optional)
 ---@return table
-function lurek.render.getFontSizes() end
+function lurek.render.getFontSizes(path) end
 
 --- Returns the pixel width of text in the given font.
 ---@param ud any
@@ -16678,7 +16907,8 @@ function lurek.render.isWireframe() end
 ---@param y1 number
 ---@param x2 number
 ---@param y2 number
-function lurek.render.line(x1, y1, x2, y2) end
+---@param ... number
+function lurek.render.line(x1, y1, x2, y2, ...) end
 
 --- Creates an off-screen render canvas.
 ---@param width any
@@ -16691,9 +16921,10 @@ function lurek.render.newCanvas(width, height) end
 function lurek.render.newDrawLayer() end
 
 --- Loads a bitmap font PNG from a file, or selects a built-in size by pixel height.
----@param args any
+---@param path any
+---@param size? any (optional)
 ---@return Font
-function lurek.render.newFont(args) end
+function lurek.render.newFont(path, size) end
 
 --- Loads an image from a file path or creates one from ImageData.
 ---@param arg any
@@ -16750,8 +16981,8 @@ function lurek.render.newSpriteBatch(ud, max) end
 function lurek.render.origin() end
 
 --- Draws a batch of individual points at the specified world-space coordinates.
----@param args any
-function lurek.render.points(args) end
+---@param ... any
+function lurek.render.points(...) end
 
 --- Draws a polygon from a list of vertices.
 ---@param mode string
@@ -16859,8 +17090,11 @@ function lurek.render.setCanvas(ud) end
 function lurek.render.setColor(r, g, b, a) end
 
 --- Sets which RGBA channels are written. Reset with no args.
----@param args any
-function lurek.render.setColorMask(args) end
+---@param r? any (optional)
+---@param g? any (optional)
+---@param b? any (optional)
+---@param a? any (optional)
+function lurek.render.setColorMask(r, g, b, a) end
 
 --- Sets the default texture filter mode.
 ---@param min any
@@ -16909,8 +17143,11 @@ function lurek.render.setLineWidth(w) end
 function lurek.render.setPointSize(size) end
 
 --- Restricts drawing to a rectangle, or clears scissor if no args.
----@param args any
-function lurek.render.setScissor(args) end
+---@param x? any (optional)
+---@param y? any (optional)
+---@param w? any (optional)
+---@param h? any (optional)
+function lurek.render.setScissor(x, y, w, h) end
 
 --- Sets the active shader, or clears it.
 ---@param ud? any (optional)
@@ -17432,23 +17669,31 @@ function Skeleton:addAnimation(anim_ud) end
 
 --- Adds a root bone with optional local transform and returns its index.
 ---@param name any
----@param opts? any (optional)
+---@param x? any (optional)
+---@param y? any (optional)
+---@param angle? any (optional)
+---@param length? any (optional)
 ---@return integer
-function Skeleton:addBone(name, opts) end
+function Skeleton:addBone(name, x, y, angle, length) end
 
 --- Adds a child bone attached to a parent and returns its index.
 ---@param name any
 ---@param parent_idx any
----@param opts? any (optional)
+---@param x? any (optional)
+---@param y? any (optional)
+---@param angle? any (optional)
+---@param length? any (optional)
 ---@return integer
-function Skeleton:addChildBone(name, parent_idx, opts) end
+function Skeleton:addChildBone(name, parent_idx, x, y, angle, length) end
 
 --- Adds a two-bone IK constraint and returns its index.
 ---@param name any
----@param chain_tbl any
----@param bend_positive? any (optional)
+---@param end_bone any
+---@param root_bone any
+---@param chain_len? any (optional)
+---@param weight? any (optional)
 ---@return integer
-function Skeleton:addIKConstraint(name, chain_tbl, bend_positive) end
+function Skeleton:addIKConstraint(name, end_bone, root_bone, chain_len, weight) end
 
 --- Registers a new empty skin by name.
 ---@param name any
@@ -17904,9 +18149,19 @@ function Terminal:render(x, y) end
 function Terminal:resetCellSize() end
 
 --- Sets a cell at 1-based coordinates with character FG and BG colours.
----@param args any
+---@param col integer
+---@param row integer
+---@param char string
+---@param fg_r number
+---@param fg_g number
+---@param fg_b number
+---@param fg_a number
+---@param bg_r? number (optional)
+---@param bg_g? number (optional)
+---@param bg_b? number (optional)
+---@param bg_a? number (optional)
 ---@return nil
-function Terminal:set(args) end
+function Terminal:set(col, row, char, fg_r, fg_g, fg_b, fg_a, bg_r?, bg_g?, bg_b?, bg_a?) end
 
 --- Sets a per-terminal cell pixel size override, bypassing the font-derived size.
 ---@param w any
@@ -18029,7 +18284,7 @@ function Widget:removeItem(index) end
 ---@param b any
 ---@param a? any (optional)
 ---@return nil
-function Widget:setColor(r, g, b, a) end
+function Widget:setColor(r, g, b, a?) end
 
 --- Sets whether the widget accepts input.
 ---@param enabled any
@@ -18155,10 +18410,10 @@ function lurek.terminal.newBorder(col, row, width, height) end
 ---@param col integer
 ---@param row integer
 ---@param width integer
----@param height? integer? (optional)
----@param text? string? (optional)
+---@param height? integer (optional)
+---@param text? string (optional)
 ---@return Widget
-function lurek.terminal.newButton(col, row, width, height, text) end
+function lurek.terminal.newButton(col, row, width, height?, text?) end
 
 --- Creates a new label widget at 1-based coordinates.
 ---@param col any
@@ -19879,9 +20134,9 @@ function lurek.tween.to(target, fields, duration, easing) end
 ---@param duration number
 ---@param target table
 ---@param fields table
----@param easing string
+---@param easing? string (optional)
 ---@return Tween
-function lurek.tween.tween(duration, target, fields, easing) end
+function lurek.tween.tween(duration, target, fields, easing?) end
 
 --- Advances all active tweens, sequences, and parallels by `dt` seconds.
 ---@param dt any

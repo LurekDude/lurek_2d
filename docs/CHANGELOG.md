@@ -2,6 +2,99 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.36] - 2026-04-25
+
+### fix(docs, examples): fix Lua linter errors in save, scene, terminal, tween, tilemap examples
+
+- **`docs/api/lurek.lua`**: corrected 4 stub signatures:
+  - `lurek.tween.tween(duration, target, fields, easing?)` — made `easing` optional (Rust: `Option<String>`).
+  - `Terminal:set(col, row, char, fg_r, fg_g, fg_b, fg_a, bg_r?, bg_g?, bg_b?, bg_a?)` — replaced incorrect
+    single-table `(args)` param with proper positional params.
+  - `lurek.terminal.newButton(col, row, width, height?, text?)` — made `height` and `text` optional
+    (Rust: `Option<usize>`, `Option<String>`).
+  - `Widget:setColor(r, g, b, a?)` — made `a` optional.
+- **`content/examples/save.lua`**: corrected API usage — `lurek.save.newSaveManager()` takes no args
+  (removed filename arg); `SaveManager:addMigration(from_ver, func)` takes 2 args (removed extra `to_ver`).
+- **`content/examples/scene.lua`**: `lurek.scene.popTo(name)` takes 1 arg; removed extra `transition`
+  and `duration` args.
+- **`content/examples/terminal.lua`**: `lurek.terminal.newButton(col, row, width, height?, text?)` requires
+  3 args; fixed call from `newButton()` → `newButton(1, 1, 8)`.
+- **`content/examples/tilemap.lua`**: corrected 9 call patterns that used wrong arg shapes vs Rust API:
+  - `newTileSet("tileset.png", 16, 16)` → `newTileSet(1, 64, 8, 16, 16)` (25 occurrences).
+  - `newTileMap(ts, 16, 16)` → `newTileMap(16, 16)` (removed bogus TileSet first arg).
+  - `newChunkMap(ts, 16, 16, 16)` → `newChunkMap(16)` (Rust: chunk_size only).
+  - `tm:fill(1, 1, 32, 32, 1)` / `tm:fill(1, 5, 5, 8, 8, 1)` → `tm:fill(1, 1)` (Rust: layer, gid).
+  - `newIsoMap(16, 16, 32, 16)` → `newIsoMap(16, 16, 32, 16, 8)` (added required `levelHeight`).
+  - `newLargeMapRenderer(128, 128, 16, 16)` → `newLargeMapRenderer(16, 16)` (Rust: tile_w, tile_h).
+  - `ts:setAnimation(5, {5,6,7,8}, 0.5)` → correct `{tileid, duration}` frame table form.
+  - `mb:setSide(3, 3, "north", 5)` → `mb:setSide("north", 1, 5)` (Rust: edge_str, segment, sideId).
+  - `newAutoTileSheet("autotile.png", 16, 16)` → `newAutoTileSheet(16, 16, "blob47")` (Rust: tileW, tileH, layout).
+  - `newMapGen({...})` → `newMapGroup` + `newMapGen(grp, preset, segmentSize)` pattern.
+  - Fixed `player_x`/`player_y` undefined-global by adding local declarations.
+
+## [0.20.35] - 2026-04-25
+
+### fix(docs, examples): fix Lua linter errors in content/examples/ and lurek.lua stubs
+
+- **`docs/api/lurek.lua`**: corrected 22 stub signatures that used `(args)` single-table
+  conventions instead of positional/variadic params:
+  - `EventBus:emit(event, ...)`, `Factory:create(name, ...)`, `Mediator:send(channel, ...)`,
+    `Strategy:execute(...)`, `World:addFixture(bodyId, shapeType, opts?)`,
+    `World:addMotorJoint(a, b, maxForce?, maxTorque?)`,
+    `World:addPulleyJoint(a, b, ax, ay, bx?, by?, lengthA?, lengthB?, ratio?)`,
+    `World:addWeldJoint(a, b, ax, ay, frequency?, damping?)`,
+    `World:addWheelJoint(a, b, ax, ay, axis_x, axis_y, frequency?, damping?)`,
+    `World:drawDebug(target?, r?, g?, b?, a?)`, `lurek.physics.newChainShape(closed, ...)`,
+    `lurek.physics.newPolygonShape(...)`, `Shape:polyline(...)`,
+    `SpriteBatch:add(x, y, r?, sx?, sy?, ox?, oy?)`,
+    `lurek.render.clear(r?, g?, b?, a?)`, `lurek.render.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)`,
+    `lurek.render.getFontSizes(path?)`, `lurek.render.line(x1, y1, x2, y2, ...)`,
+    `lurek.render.newFont(path, size?)`, `lurek.render.points(...)`,
+    `lurek.render.setColorMask(r?, g?, b?, a?)`, `lurek.render.setScissor(x?, y?, w?, h?)`.
+  - Fixed `drawIsoCubeTile` to 6 params (removed duplicate definition).
+  - Fixed `DrawLayer:queue` to variadic `(z, cmd, ...)`.
+  - Fixed `lurek.image.newImageData` signature to `(width, height, opts?)`.
+  - Fixed `World:getZoneEvents()` return type `nil` → `table`.
+  - Fixed `typeOf(name)` signature for `Image`, `Font`, `Canvas`, `Mesh`, `Quad`, `Shader`,
+    `SpriteBatch` (was `typeOf()` with no params).
+  - Changed all `lurek.physics.new*Shape` return types from `Shape` to `PhysicsShape`.
+  - Added `LuaCellular`, `LuaTerrain`, `LuaZone` class stubs with full method tables.
+  - Added `CELL_SAND`, `CELL_WATER`, `CELL_AIR`, `CELL_ROCK`, `CELL_FIRE` constants.
+  - Added `LuaZone:setAngularDampingOverride`, `setGravityPoint`, `setGravityRepulsor`.
+  - Added `LuaTerrain:getCell`, `isDirty`, `collapseColumns`, `solidPositions`, `toBytes`,
+    `toImageData`, `spawnDebris`, `fillRect`.
+  - Added `LuaCellular:getCell`, `fillRect`, `fillCircle`, `toImageData`, `toImageDataRegion`,
+    `toBytes`, `loadFromBytes`.
+  - Corrected `Skeleton:addBone`, `addChildBone`, `addIKConstraint` to positional params.
+- **`content/examples/patterns.lua`**: added nil guard on `log` from `lurek.services.get`;
+  fixed `lurek.input.keyboard.isDown` → `lurek.input.isDown`; added nil guard on scheduler `top`.
+- **`content/examples/physics.lua`**: replaced 3× `lurek.input.isKeyPressed` → `lurek.input.isDown`;
+  added nil guard on `data.kind`; fixed `world = nil` and `shape = nil` type coercion.
+- **`content/examples/render.lua`**: added nil guard on `m:getVertex(1)` result;
+  fixed `lurek.time.now()` → `lurek.time.getTime()`.
+
+## [0.20.34] - 2026-04-25
+
+
+### fix(content): fix Lua linter errors across retro/ and showcase/ game files
+
+- **`content/games/retro/another_world/main.lua`**: annotated `cam` as `Camera2D?`; added
+  `if not cam then return end` guard in `lurek.draw()`; added `if cam then cam:detach() end`
+  guard; removed no-op `lurek.tween.to({ duration = 0.4 })` call with missing required args.
+- **`content/games/retro/cannon_fodder/main.lua`**: replaced 7 `lurek.input.isActionDown(action, {keys})`
+  calls in `lurek.init()` with `lurek.input.bind(action, {keys})`; added 9th param `i` to
+  `rect()` helper and applied `setColor` in the string-mode branch.
+- **`content/games/retro/paradroid/main.lua`**: added `lurek.input.bind(...)` calls for all 9
+  actions in `lurek.init()`; replaced all `input.isKeyDown` with `input.isActionDown`, all
+  `input.isKeyPressed` with `input.wasActionPressed`; fixed `particle.newEmitter(x,y)` →
+  `particle.newSystem(); e:setPosition(x,y)`; fixed `e:setColors(r,g,b,a)` → `e:setColors({{r,g,b,a}})`;
+  added 9th param `i` to `rect()` helper with color in string-mode branch; added
+  `if not transfer.target then return end` nil guard in `update_transfer()`; added
+  `if not te then return end` nil guard in draw.
+- **`content/games/action/infiltration/main.lua`**: fixed stray `gfx` → `_gfx` in `lurek.draw_ui()`.
+- **`content/games/showcase/tween_demo/main.lua`**: removed undefined `_cam:setPosition(0, 0)`;
+  fixed `psys_burst:setColors` and `psys_flash:setColors` flat varargs → table-of-tables.
+
 ## [0.20.33] - 2026-04-25
 
 ### refactor(vscode-ext): remove sumneko.lua overlapping providers from VS Code extension
