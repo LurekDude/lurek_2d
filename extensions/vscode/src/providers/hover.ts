@@ -1,31 +1,19 @@
 import * as vscode from "vscode";
 import { ApiDataService, ApiFunction } from "../services/apiData.js";
-import { LuaDocumentAnalyzer, LuaDocumentInfo } from "../services/luaParser.js";
+// LuaDocumentAnalyzer removed — local-symbol hover is now handled by sumneko.lua
 
 const LUA_SELECTOR: vscode.DocumentSelector = { scheme: "file", language: "lua" };
-const analyzer = new LuaDocumentAnalyzer();
 
-// ── Document analysis cache ──────────────────────────────────
+// ── NOTE: The following are intentionally NOT provided here because sumneko.lua
+// (Lua Language Server) already covers them with higher-quality analysis:
+//   • Lua keyword hover (if, while, function, …)
+//   • Lua stdlib function hover (string.*, table.*, math.*, …)
+//   • Local/upvalue symbol hover with type inference
+//   • math.pi / math.huge constant hover
+// This extension only provides hover for lurek.* API surface and engine callbacks.
 
-interface CachedAnalysis {
-  version: number;
-  info: LuaDocumentInfo;
-}
-
-const analysisCache = new Map<string, CachedAnalysis>();
-
-function getCachedAnalysis(document: vscode.TextDocument): LuaDocumentInfo {
-  const key = document.uri.toString();
-  const cached = analysisCache.get(key);
-  if (cached && cached.version === document.version) return cached.info;
-  const info = analyzer.analyze(document.getText());
-  analysisCache.set(key, { version: document.version, info });
-  return info;
-}
-
-// ── Lua keyword documentation ────────────────────────────────
-
-const LUA_KEYWORD_DOCS: Record<string, string> = {
+// PLACEHOLDER — kept to avoid reformatting the diff below
+const _REMOVED_LUA_KEYWORD_DOCS = {  // sumneko handles keyword docs
   function: "Declares a function. Functions are first-class values in Lua.\n```lua\nfunction name(args) body end\nlocal f = function(args) body end\n```",
   local: "Declares a local variable or function. Local scope is limited to the enclosing block.\n```lua\nlocal x = 10\nlocal function helper() end\n```",
   if: "Conditional statement. Evaluates condition and executes the `then` block if truthy.\n```lua\nif condition then\n  -- body\nelseif other then\n  -- body\nelse\n  -- body\nend\n```",
@@ -47,19 +35,11 @@ const LUA_KEYWORD_DOCS: Record<string, string> = {
   not: "Logical NOT operator. Returns `true` if argument is falsy, `false` otherwise.",
   nil: "The absence of a value. Variables are `nil` before assignment. `nil` is falsy.",
   true: "Boolean true value.",
-  false: "Boolean false value. Along with `nil`, the only falsy values in Lua.",
+  false: "(removed — handled by sumneko.lua)",
 };
 
 // ── Easing function charts ───────────────────────────────────
-
-// ── Math constant hover docs ─────────────────────────────────
-
-const MATH_CONSTANT_DOCS: Record<string, string> = {
-  "math.pi":    "**`math.pi`** = `3.141592653589793` (π)\n\nRatio of a circle's circumference to its diameter.\n\n*Tip: `lurek.math.pi` is also available as a constant.*",
-  "math.huge":  "**`math.huge`** = `+∞` (positive infinity overflow sentinel)\n\nUsed as a sentinel for unbounded ranges, e.g. `math.min(math.huge, x)` always returns `x`.",
-  "math.maxinteger": "**`math.maxinteger`** = `2^63 - 1` (max 64-bit signed integer, Lua 5.3+/LuaJIT)",
-  "math.mininteger": "**`math.mininteger`** = `-2^63` (min 64-bit signed integer, Lua 5.3+/LuaJIT)",
-};
+// (MATH_CONSTANT_DOCS removed — sumneko.lua covers math.pi / math.huge hover)
 
 type EasingFn = (t: number) => number;
 
@@ -230,63 +210,8 @@ export function register(
         }
       }
 
-      // ── B: Lua standard library functions ──
-      const stdlibRange = document.getWordRangeAtPosition(position, /\b(?:string|table|math|os|io|coroutine|debug|package|utf8|bit|jit|ffi)\.\w+/);
-      if (stdlibRange) {
-        const word = document.getText(stdlibRange);
-        const stdlib = apiData.getLuaStdlib("luajit");
-        const match = stdlib.find(fn => fn.fullPath === word);
-        if (match) return new vscode.Hover(buildRichHover(match), stdlibRange);
-      }
-
-      // ── C: Local symbols from document analysis ──
-      const wordRange = document.getWordRangeAtPosition(position, /\w+/);
-      if (wordRange) {
-        const word = document.getText(wordRange);
-
-        // Skip if part of a lurek.* or stdlib expression
-        const lineText = document.lineAt(position).text;
-        const charBefore = wordRange.start.character > 0 ? lineText[wordRange.start.character - 1] : "";
-        if (charBefore === ".") return undefined;
-
-        try {
-          const info = getCachedAnalysis(document);
-          for (const sym of info.symbols) {
-            if (sym.name === word && sym.line <= position.line) {
-              if (sym.kind === "parameter") continue;
-              const md = new vscode.MarkdownString();
-              if (sym.kind === "function") {
-                const params = (sym.parameters ?? []).join(", ");
-                const prefix = sym.isLocal ? "local " : "";
-                md.appendCodeblock(`${prefix}function ${sym.name}(${params})`, "lua");
-              } else if (sym.kind === "method") {
-                const params = (sym.parameters ?? []).join(", ");
-                md.appendCodeblock(`function ${sym.type ?? "obj"}:${sym.name}(${params})`, "lua");
-              } else if (sym.kind === "table") {
-                md.appendCodeblock(`local ${sym.name} = {}`, "lua");
-              } else {
-                md.appendCodeblock(`local ${sym.name}`, "lua");
-              }
-              if (sym.description) md.appendMarkdown("\n" + sym.description + "\n");
-              md.appendMarkdown(`\n*Defined at line ${sym.line + 1}*`);
-              if (sym.scope) md.appendMarkdown(` · scope: \`${sym.scope}\``);
-              md.isTrusted = true;
-              return new vscode.Hover(md, wordRange);
-            }
-          }
-        } catch { /* skip */ }
-
-        // ── F: Lua keyword hover ──
-        const keywordDoc = LUA_KEYWORD_DOCS[word];
-        if (keywordDoc) {
-          const md = new vscode.MarkdownString();
-          md.appendMarkdown(`**\`${word}\`** — Lua keyword\n\n`);
-          md.appendMarkdown(keywordDoc);
-          md.isTrusted = true;
-          return new vscode.Hover(md, wordRange);
-        }
-      }
-
+      // Sections B (stdlib), C (local symbols), F (keywords) removed —
+      // sumneko.lua provides higher-quality hover for all of these.
       return undefined;
     },
   });
@@ -338,23 +263,7 @@ export function register(
     },
   });
 
-  // ── F: Math constant hover (math.pi, math.huge, etc.) ────────
-
-  const mathConstHover = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
-    provideHover(
-      document: vscode.TextDocument,
-      position: vscode.Position,
-    ): vscode.Hover | undefined {
-      const range = document.getWordRangeAtPosition(position, /math\.\w+/);
-      if (!range) return undefined;
-      const word = document.getText(range);
-      const doc = MATH_CONSTANT_DOCS[word];
-      if (!doc) return undefined;
-      const md = new vscode.MarkdownString(doc);
-      md.isTrusted = true;
-      return new vscode.Hover(md, range);
-    },
-  });
+  // mathConstHover removed — sumneko.lua covers math.pi / math.huge / math.maxinteger
 
   // ── I4: Callback parameter hover ─────────────────────────────
 
@@ -443,6 +352,15 @@ export function register(
     },
   };
 
+  // Build combined set of all known callback parameter names for fast rejection.
+  // apiData.getCallbacks() is the primary source; CALLBACK_PARAM_DOCS provides legacy fallback.
+  const _allCallbackParamNames = new Set<string>(
+    Object.values(CALLBACK_PARAM_DOCS).flatMap(p => Object.keys(p)),
+  );
+  for (const cb of apiData.getCallbacks()) {
+    for (const p of cb.parameters) _allCallbackParamNames.add(p.name);
+  }
+
   const callbackParamHover = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
     provideHover(
       document: vscode.TextDocument,
@@ -451,9 +369,7 @@ export function register(
       const wordRange = document.getWordRangeAtPosition(position, /\w+/);
       if (!wordRange) return undefined;
       const word = document.getText(wordRange);
-      if (!(word in Object.values(CALLBACK_PARAM_DOCS).reduce((acc, p) => ({ ...acc, ...p }), {}))) {
-        return undefined;
-      }
+      if (!_allCallbackParamNames.has(word)) return undefined;
 
       // Walk backwards from current line to find the enclosing lurek callback
       const lines = document.getText().split("\n");
@@ -472,6 +388,22 @@ export function register(
       }
 
       if (!callbackName) return undefined;
+
+      // Primary: apiData callbacks (live JSON data)
+      const apiCb = apiData.getCallbacks().find(c => c.name === callbackName);
+      if (apiCb) {
+        const apiParam = apiCb.parameters.find(p => p.name === word);
+        if (apiParam) {
+          const md = new vscode.MarkdownString();
+          md.appendCodeblock(`(parameter) ${word}: ${apiParam.type}`, "typescript");
+          if (apiParam.description) md.appendMarkdown(`\n${apiParam.description}\n`);
+          md.appendMarkdown(`\n*Parameter of \`lurek.${callbackName}\`*`);
+          md.isTrusted = true;
+          return new vscode.Hover(md, wordRange);
+        }
+      }
+
+      // Fallback: legacy rich descriptions
       const paramDocs = CALLBACK_PARAM_DOCS[callbackName];
       if (!paramDocs?.[word]) return undefined;
 
@@ -517,5 +449,6 @@ export function register(
     },
   });
 
-  context.subscriptions.push(apiHover, easingHover, mathConstHover, callbackParamHover, physicsGravityHover);
+  context.subscriptions.push(apiHover, easingHover, callbackParamHover, physicsGravityHover);
+  // mathConstHover not registered — sumneko.lua handles math.pi / math.huge
 }

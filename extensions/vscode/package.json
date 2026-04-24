@@ -661,18 +661,6 @@
         }
       }
     },
-    "languages": [
-      {
-        "id": "lua",
-        "aliases": [
-          "Lua"
-        ],
-        "extensions": [
-          ".lua"
-        ],
-        "configuration": "./data/language-configuration.json"
-      }
-    ],
     "debuggers": [
       {
         "type": "lurek",

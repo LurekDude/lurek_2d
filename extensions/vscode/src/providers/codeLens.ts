@@ -1,17 +1,14 @@
 import * as vscode from "vscode";
+import { ApiDataService } from "../services/apiData.js";
 
 const LUA_SELECTOR: vscode.DocumentSelector = { scheme: "file", language: "lua" };
 
-// ── Lurek2D callback names (always shown) ───────────────────────
-
-const LUREK_CALLBACKS = new Set([
-  "load", "update", "draw", "keypressed", "keyreleased", "textinput",
-  "mousepressed", "mousereleased", "wheelmoved", "resize", "focus", "visible",
-  "gamepadpressed", "gamepadreleased", "gamepadaxis", "joystickadded",
-  "joystickremoved", "touchpressed", "touchmoved", "touchreleased",
-]);
-
-// ── CodeLens: function reference counts + run targets ────────
+// ── CodeLens: lurek.* engine callbacks + test run targets ────
+// Reference counts and "unused" labels are intentionally omitted here —
+// sumneko.lua (Lua Language Server) already provides accurate cross-file
+// reference tracking and unused-symbol diagnostics. Duplicating them causes
+// conflicting annotations (e.g. "3 references" vs "⚠ unused" for the same
+// engine callback that is invoked by the runtime, not by Lua call sites).
 
 class LuaCodeLensProvider implements vscode.CodeLensProvider {
   private readonly _onDidChange = new vscode.EventEmitter<void>();
@@ -22,50 +19,28 @@ class LuaCodeLensProvider implements vscode.CodeLensProvider {
     const text = document.getText();
     const lines = text.split("\n");
 
-    // Collect all function definitions
+    // Match only top-level function definitions
     const funcDef = /^(?:local\s+function\s+(\w+)|function\s+([\w.:]+))/;
-
-    // Count how many times each identifier appears in the whole document
-    function countRefs(name: string): number {
-      // Simple word-boundary count, skip the definition itself
-      const plain = name.replace(/[.]/g, "\\.");
-      const re = new RegExp(`\\b${plain}\\b`, "g");
-      const all = text.match(re) ?? [];
-      return Math.max(0, all.length - 1); // subtract 1 for the definition
-    }
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const m = funcDef.exec(line.trimStart());
       if (!m) continue;
 
-      const funcName = m[1] ?? m[2]; // local function X or function X.Y.Z
+      const funcName = m[1] ?? m[2];
       if (!funcName) continue;
       const range = new vscode.Range(i, 0, i, 0);
 
-      // Check if this is a lurek.callback
+      // lurek.X engine callbacks → show callback icon + API docs link
       const lurekCallbackMatch = funcName.match(/^lurek\.(\w+)$/);
       const cbName = lurekCallbackMatch?.[1];
 
-      if (cbName && LUREK_CALLBACKS.has(cbName)) {
-        // Lurek2D callback: show documentation link
+      if (cbName && _lurekCallbacks.has(cbName)) {
         lenses.push(new vscode.CodeLens(range, {
           title: `⚡ lurek.${cbName} callback`,
           command: "lurek.browseApi",
           arguments: [`lurek.${cbName}`],
           tooltip: `Open API documentation for lurek.${cbName}`,
-        }));
-      } else {
-        // Regular function: show reference count
-        const refCount = countRefs(funcName.split(".").pop() ?? funcName);
-        const refLabel = refCount === 1 ? "1 reference" : `${refCount} references`;
-        lenses.push(new vscode.CodeLens(range, {
-          title: refCount === 0 ? "⚠ unused" : refLabel,
-          command: "lurek.codelens.findRefs",
-          arguments: [document.uri, new vscode.Position(i, line.indexOf(funcName)), funcName],
-          tooltip: refCount === 0
-            ? `"${funcName}" is never called`
-            : `Find all references to "${funcName}"`,
         }));
       }
 
@@ -167,7 +142,10 @@ function buildVariableInspector(context: vscode.ExtensionContext): void {
 
 // ── Registration ──────────────────────────────────────────────
 
-export function register(context: vscode.ExtensionContext, _apiData: unknown): void {
+let _lurekCallbacks: Set<string> = new Set();
+
+export function register(context: vscode.ExtensionContext, apiData: ApiDataService): void {
+  _lurekCallbacks = apiData.getCallbackNameSet();
   const provider = new LuaCodeLensProvider();
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider(LUA_SELECTOR, provider),
@@ -180,15 +158,8 @@ export function register(context: vscode.ExtensionContext, _apiData: unknown): v
     }),
   );
 
-  // Command: find references from CodeLens click
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "lurek.codelens.findRefs",
-      async (_uri: vscode.Uri, pos: vscode.Position) => {
-        await vscode.commands.executeCommand("editor.action.referenceSearch.trigger", pos);
-      },
-    ),
-  );
+  // Command: find references delegated to sumneko.lua via built-in VS Code command
+  // (no longer registered as a code lens action — sumneko handles this)
 
   // Variable type inspector in status bar
   buildVariableInspector(context);

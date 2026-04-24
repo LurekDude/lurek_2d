@@ -1,29 +1,10 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import { ApiDataService } from "../services/apiData.js";
-import { LuaDocumentAnalyzer, LuaDocumentInfo } from "../services/luaParser.js";
+// LuaDocumentAnalyzer removed — local-symbol Go-to-Definition is handled by sumneko.lua
 
 const LUA_SELECTOR: vscode.DocumentSelector = { scheme: "file", language: "lua" };
-const analyzer = new LuaDocumentAnalyzer();
 const LUREK_API_SCHEME = "lurek-api";
-
-// ── Document analysis cache ──────────────────────────────────
-
-interface CachedAnalysis {
-  version: number;
-  info: LuaDocumentInfo;
-}
-
-const analysisCache = new Map<string, CachedAnalysis>();
-
-function getCachedAnalysis(document: vscode.TextDocument): LuaDocumentInfo {
-  const key = document.uri.toString();
-  const cached = analysisCache.get(key);
-  if (cached && cached.version === document.version) return cached.info;
-  const info = analyzer.analyze(document.getText());
-  analysisCache.set(key, { version: document.version, info });
-  return info;
-}
 
 // ── Virtual document provider for lurek.* API definitions ─────
 
@@ -159,54 +140,11 @@ async function resolveRequire(
   return undefined;
 }
 
-// ── Local definition finder ──────────────────────────────────
-
-function findLocalDefinition(document: vscode.TextDocument, word: string, cursorLine: number): vscode.Location | undefined {
-  try {
-    const info = getCachedAnalysis(document);
-
-    // Find the best matching symbol (declared before or at cursor line)
-    let best: import("../services/luaParser.js").LuaSymbol | undefined;
-    for (const sym of info.symbols) {
-      if (sym.name !== word) continue;
-      if (sym.kind === "parameter") continue;
-      if (sym.line > cursorLine) continue;
-      if (!best || sym.line > best.line) {
-        best = sym;
-      }
-    }
-
-    if (best) {
-      return new vscode.Location(
-        document.uri,
-        new vscode.Position(best.line, best.column),
-      );
-    }
-  } catch { /* fallback to regex */ }
-
-  // Regex fallback for simple patterns
-  const text = document.getText();
-  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const patterns = [
-    new RegExp(`\\blocal\\s+function\\s+${escaped}\\s*\\(`),
-    new RegExp(`^function\\s+${escaped}\\s*\\(`, "m"),
-    new RegExp(`\\blocal\\s+${escaped}\\s*=\\s*function\\s*\\(`),
-    new RegExp(`\\blocal\\s+${escaped}\\s*=`),
-    new RegExp(`^${escaped}\\s*=\\s*\\{`, "m"),
-  ];
-
-  for (const pattern of patterns) {
-    const match = pattern.exec(text);
-    if (match) {
-      const pos = document.positionAt(match.index);
-      return new vscode.Location(document.uri, pos);
-    }
-  }
-
-  return undefined;
-}
-
 // ── Provider registration ────────────────────────────────────
+// NOTE: Local and global symbol definition is handled by sumneko.lua.
+// This provider only covers:
+//   1. lurek.module.func → virtual API document
+//   2. require("module.path") → real file navigation (project-relative paths)─
 
 export function register(
   context: vscode.ExtensionContext,
@@ -254,11 +192,8 @@ export function register(
 
       // Skip lurek.* prefix situations
       const beforeWord = lineText.substring(0, wordRange.start.character);
-      if (beforeWord.endsWith("lurek.") || beforeWord.match(/lurek\.\w+\.$/)) {
-        return undefined;
-      }
-
-      return findLocalDefinition(document, word, position.line);
+      // Local/global symbol navigation delegated to sumneko.lua
+      return undefined;
     },
   });
 

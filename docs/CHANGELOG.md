@@ -2,6 +2,26 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.33] - 2026-04-25
+
+### refactor(vscode-ext): remove sumneko.lua overlapping providers from VS Code extension
+
+- **`src/extension2.ts`**: removed registration of `referencesProvider`, `symbolsProvider`,
+  `registerFormatting`, `registerFolding`, `registerRename`, `registerSemanticTokens` —
+  all are fully covered by sumneko.lua (Lua Language Server).
+- **`src/providers/codeLens.ts`**: removed generic reference-count and "⚠ unused" code lenses
+  that conflicted with sumneko.lua annotations for engine callbacks. Kept only
+  `⚡ lurek.X callback` label and `▶ Run test` label which are Lurek2D-unique.
+- **`src/providers/hover.ts`**: removed `LUA_KEYWORD_DOCS`, `MATH_CONSTANT_DOCS`, stdlib hover,
+  local-symbol hover, keyword hover, and `mathConstHover` provider — all duplicated sumneko.lua.
+  Kept `lurek.*` API hover, easing-chart hover, callback-param hover, physics-gravity hover.
+- **`src/providers/definition.ts`**: removed `findLocalDefinition()` and local/global symbol
+  lookup — delegated to sumneko.lua. Kept virtual `lurek-api` document provider and
+  `require()` path resolution (Lurek2D content layout).
+- **`package.json`**: removed top-level `"languages"` contribution that re-registered the
+  `lua` language with `language-configuration.json`, conflicting with sumneko.lua.
+  The `"debuggers"[0].languages` scope is preserved (Lurek2D debugger adapter).
+
 ## [0.20.32] - 2026-04-25
 
 ### fix(lua-api): fix API stubs and game call signatures across action/ and sports/ games

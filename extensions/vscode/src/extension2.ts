@@ -20,8 +20,8 @@ import * as completionProvider from "./providers/completion.js";
 import * as hoverProvider from "./providers/hover.js";
 import * as signatureProvider from "./providers/signature.js";
 import * as definitionProvider from "./providers/definition.js";
-import * as referencesProvider from "./providers/references.js";
-import * as symbolsProvider from "./providers/symbols.js";
+// referencesProvider removed — sumneko.lua handles cross-file references
+// symbolsProvider removed — sumneko.lua handles document outline
 import * as diagnosticsProvider from "./providers/diagnostics.js";
 import * as colorProvider from "./providers/color.js";
 import * as assetPathProvider from "./providers/assetPath.js";
@@ -35,13 +35,13 @@ import * as requireGraphProvider from "./providers/requireGraph.js";
 import * as symbolIndexService from "./services/symbolIndex.js";
 
 // Phase 3 providers
-import { register as registerFormatting } from "./providers/formatting.js";
-import { register as registerFolding } from "./providers/folding.js";
-import { register as registerRename } from "./providers/rename.js";
-import { register as registerSemanticTokens } from "./providers/semanticTokens.js";
+// registerFormatting removed — sumneko.lua/stylua handles Lua formatting
+// registerFolding removed — sumneko.lua handles folding ranges
+// registerRename removed — sumneko.lua handles symbol rename
+// registerSemanticTokens removed — sumneko.lua handles semantic highlighting
 
 // New providers (Phase 4+)
-import * as luacatsProvider from "./providers/luacatsProvider.js";
+// NOTE: luacatsProvider (@class/@field) is now handled by sumneko.lua — not registered.
 import { AssetExplorerProvider, findMissingAssets, insertAssetPath, AssetItem } from "./providers/assetExplorer.js";
 import { openPerfDashboard } from "./providers/perfDashboard.js";
 import * as codeLensProvider from "./providers/codeLens.js";
@@ -138,8 +138,8 @@ export function activate(context: vscode.ExtensionContext): void {
   hoverProvider.register(context, apiData);
   signatureProvider.register(context, apiData);
   definitionProvider.register(context, apiData);
-  referencesProvider.register(context, apiData);
-  symbolsProvider.register(context, apiData);
+  // references — handled by sumneko.lua
+  // symbols (outline) — handled by sumneko.lua
   diagnosticsProvider.register(context, apiData);
   colorProvider.register(context, apiData);
   assetPathProvider.register(context, apiData);
@@ -151,14 +151,8 @@ export function activate(context: vscode.ExtensionContext): void {
   typeInferenceProvider.register(context, apiData);
   requireGraphProvider.register(context);
   symbolIndexService.register(context);
-  // LuaCATS @class/@field annotation hover and completion
-  luacatsProvider.register(context, apiData);
-
-  // Phase 3: Formatting, folding, rename, semantic tokens
-  registerFormatting(context, apiData);
-  registerFolding(context, apiData);
-  registerRename(context, apiData);
-  registerSemanticTokens(context, apiData);
+  // NOTE: @class/@field completions/hover/formatting/folding/rename/semanticTokens
+  // are all provided by sumneko.lua — not registered here to avoid conflicts
 
   // ─── Asset Explorer Tree View ────────────────────────────
   const assetExplorer = new AssetExplorerProvider();
