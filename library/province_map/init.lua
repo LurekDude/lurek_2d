@@ -1,4 +1,4 @@
-﻿--- @module library.province_map
+﻿-- @module library.province_map
 --- @status full
 --- Pure-Lua province-map data model: provinces, adjacency edges,
 --- definitions, borders, event bus, map modes, positions, routing, and

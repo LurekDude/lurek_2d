@@ -338,6 +338,8 @@ impl DataFrame {
     }
 
     /// Add a row from name-value pairs. Missing columns receive `Nil`.
+    /// New column names that do not yet exist are auto-created with `Nil`
+    /// backfilled for all previous rows.
     ///
     /// # Parameters
     /// - `values` — `&[(String, CellValue)]`.
@@ -347,6 +349,13 @@ impl DataFrame {
     /// Returns the 0-based row index of the new row.
     pub fn add_row(&mut self, values: &[(String, CellValue)]) -> usize {
         let row_idx = self.nrows();
+        // Auto-create any columns that appear in this row but don't yet exist
+        for (key, _) in values.iter() {
+            if !self.column_names.contains(key) {
+                self.column_names.push(key.clone());
+                self.data.push(vec![CellValue::Nil; row_idx]);
+            }
+        }
         // Build a lookup for provided values
         let lookup: HashMap<&str, &CellValue> =
             values.iter().map(|(k, v)| (k.as_str(), v)).collect();
@@ -617,7 +626,11 @@ impl DataFrame {
                 }
             }
         }
-        let n_rows = if self.data.is_empty() { 0 } else { self.data[0].len() };
+        let n_rows = if self.data.is_empty() {
+            0
+        } else {
+            self.data[0].len()
+        };
         let mut computed: Vec<CellValue> = Vec::with_capacity(n_rows);
         for row_idx in 0..n_rows {
             let val = eval_expr_row(&tokens, self, row_idx)?;
@@ -737,7 +750,11 @@ impl DataFrame {
             }
         }
 
-        log::debug!("dataframe: pivot_table → {} rows × {} cols", n_rows, n_out_cols);
+        log::debug!(
+            "dataframe: pivot_table → {} rows × {} cols",
+            n_rows,
+            n_out_cols
+        );
         Ok(DataFrame::from_raw(out_names, out_data))
     }
 
@@ -782,7 +799,9 @@ impl DataFrame {
             if nums.is_empty() {
                 new_col.push(CellValue::Nil);
             } else {
-                new_col.push(CellValue::Number(nums.iter().sum::<f64>() / nums.len() as f64));
+                new_col.push(CellValue::Number(
+                    nums.iter().sum::<f64>() / nums.len() as f64,
+                ));
             }
         }
         let mut out = self.clone_df();
@@ -842,9 +861,7 @@ impl DataFrame {
         }
         let mut out = self.clone_df();
         if out.column_names.contains(&result_col.to_string()) {
-            return Err(format!(
-                "rolling_sum: column '{result_col}' already exists"
-            ));
+            return Err(format!("rolling_sum: column '{result_col}' already exists"));
         }
         out.column_names.push(result_col.to_string());
         out.data.push(new_col);
@@ -888,11 +905,9 @@ impl DataFrame {
 
         // Sort by value according to the requested order.
         if order == "desc" {
-            indexed
-                .sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+            indexed.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
         } else {
-            indexed
-                .sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
+            indexed.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
         }
 
         // Assign dense ranks (tied values share the same rank, no gaps).
@@ -913,9 +928,7 @@ impl DataFrame {
 
         let mut out = self.clone_df();
         if out.column_names.contains(&result_col.to_string()) {
-            return Err(format!(
-                "rank_column: column '{result_col}' already exists"
-            ));
+            return Err(format!("rank_column: column '{result_col}' already exists"));
         }
         out.column_names.push(result_col.to_string());
         out.data.push(ranks);
@@ -943,22 +956,45 @@ fn tokenize_expr(expr: &str) -> Result<Vec<ExprToken>, String> {
     let mut chars = expr.chars().peekable();
     while let Some(&c) = chars.peek() {
         match c {
-            ' ' | '\t' => { chars.next(); }
-            '+' | '-' | '*' | '/' => { tokens.push(ExprToken::Op(c)); chars.next(); }
-            '(' => { tokens.push(ExprToken::LParen); chars.next(); }
-            ')' => { tokens.push(ExprToken::RParen); chars.next(); }
+            ' ' | '\t' => {
+                chars.next();
+            }
+            '+' | '-' | '*' | '/' => {
+                tokens.push(ExprToken::Op(c));
+                chars.next();
+            }
+            '(' => {
+                tokens.push(ExprToken::LParen);
+                chars.next();
+            }
+            ')' => {
+                tokens.push(ExprToken::RParen);
+                chars.next();
+            }
             '0'..='9' | '.' => {
                 let mut s = String::new();
                 while let Some(&d) = chars.peek() {
-                    if d.is_ascii_digit() || d == '.' { s.push(d); chars.next(); } else { break; }
+                    if d.is_ascii_digit() || d == '.' {
+                        s.push(d);
+                        chars.next();
+                    } else {
+                        break;
+                    }
                 }
-                let v: f64 = s.parse().map_err(|_| format!("with_eval: invalid number '{s}'"))?;
+                let v: f64 = s
+                    .parse()
+                    .map_err(|_| format!("with_eval: invalid number '{s}'"))?;
                 tokens.push(ExprToken::Num(v));
             }
             'a'..='z' | 'A'..='Z' | '_' => {
                 let mut s = String::new();
                 while let Some(&d) = chars.peek() {
-                    if d.is_alphanumeric() || d == '_' { s.push(d); chars.next(); } else { break; }
+                    if d.is_alphanumeric() || d == '_' {
+                        s.push(d);
+                        chars.next();
+                    } else {
+                        break;
+                    }
                 }
                 tokens.push(ExprToken::ColRef(s));
             }
@@ -978,13 +1014,20 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
     for tok in tokens {
         match tok {
             ExprToken::Num(v) => {
-                if !expect_value { return Err("with_eval: unexpected number".to_string()); }
+                if !expect_value {
+                    return Err("with_eval: unexpected number".to_string());
+                }
                 values.push(*v);
                 expect_value = false;
             }
             ExprToken::ColRef(name) => {
-                if !expect_value { return Err(format!("with_eval: unexpected column '{name}'")); }
-                let col_idx = df.column_names.iter().position(|c| c == name)
+                if !expect_value {
+                    return Err(format!("with_eval: unexpected column '{name}'"));
+                }
+                let col_idx = df
+                    .column_names
+                    .iter()
+                    .position(|c| c == name)
                     .ok_or_else(|| format!("with_eval: column '{name}' not found"))?;
                 let v = match df.data[col_idx].get(row_idx) {
                     Some(CellValue::Number(f)) => *f,
@@ -999,7 +1042,9 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
                     values.push(-1.0);
                     ops.push('*');
                 } else {
-                    if expect_value { return Err(format!("with_eval: unexpected operator '{op}'")); }
+                    if expect_value {
+                        return Err(format!("with_eval: unexpected operator '{op}'"));
+                    }
                     ops.push(*op);
                     expect_value = true;
                 }
@@ -1010,23 +1055,35 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
             }
         }
     }
-    if expect_value { return Err("with_eval: expression ends with operator".to_string()); }
+    if expect_value {
+        return Err("with_eval: expression ends with operator".to_string());
+    }
     // Apply * and / first.
     let mut i = 0;
     while i < ops.len() {
         if ops[i] == '*' || ops[i] == '/' {
-            let r = if ops[i] == '*' { values[i] * values[i + 1] }
-                    else if values[i + 1] == 0.0 { return Err("with_eval: division by zero".to_string()); }
-                    else { values[i] / values[i + 1] };
+            let r = if ops[i] == '*' {
+                values[i] * values[i + 1]
+            } else if values[i + 1] == 0.0 {
+                return Err("with_eval: division by zero".to_string());
+            } else {
+                values[i] / values[i + 1]
+            };
             values[i] = r;
             values.remove(i + 1);
             ops.remove(i);
-        } else { i += 1; }
+        } else {
+            i += 1;
+        }
     }
     // Apply + and -.
     let mut result = values[0];
     for (op, &v) in ops.iter().zip(values[1..].iter()) {
-        match op { '+' => result += v, '-' => result -= v, _ => {} }
+        match op {
+            '+' => result += v,
+            '-' => result -= v,
+            _ => {}
+        }
     }
     Ok(result)
 }

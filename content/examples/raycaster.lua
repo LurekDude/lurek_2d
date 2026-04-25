@@ -426,7 +426,7 @@ end
 -- Returns a sprite id; update position each frame with setPosition(id, x, y).
 do  -- SpriteManager:add
   local sm = lurek.raycaster.newSpriteManager()
-  local id = sm:add(3.5, 2.5, 1, 0)
+  local id = sm:add(3.5, 2.5, "crate", 1.0)
   lurek.log.info("sprite id: " .. id, "raycaster")
 end
 
@@ -435,8 +435,8 @@ end
 -- DoorManager.update() advances door animations each frame automatically.
 do  -- DoorManager:addDoor
   local dm = lurek.raycaster.newDoorManager()
-  local rc = lurek.raycaster.new(32, 32, 1)
-  local did = dm:addDoor(rc, 5, 7, 0)
+  local rc = lurek.raycaster.new(32, 32)
+  local did = dm:addDoor(5, 7, "horizontal", 1.0)
   lurek.log.info("door id: " .. did, "raycaster")
 end
 
@@ -444,7 +444,7 @@ end
 -- Precomputes a scene description from the current cell map for column-order rendering.
 -- Call after setCell() changes; subsequent castRays use the compiled scene.
 do  -- Raycaster:buildScene
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local params = { px = 8, py = 8, angle = 0, fov = math.pi/3, rays = 320,
                    max_dist = 16, screen_w = 320, screen_h = 240 }
   rc:buildScene(params, nil, nil, nil)
@@ -455,7 +455,7 @@ end
 -- Casts a single floor/ceiling row and returns depth and texture-coordinate tables.
 -- Call for each screen row between the horizon and the floor to build the floor plane.
 do  -- Raycaster:castFloorRow
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local uvs = rc:castFloorRow(8, 8, 1, 0, 0, 0.66, 240)
   lurek.log.info("floor row uv count: " .. (uvs and #uvs or 0), "raycaster")
 end
@@ -464,7 +464,7 @@ end
 -- Casts a single ray from origin in direction angle and returns the hit data.
 -- Returns distance, wallType, side, and texture coordinates for the hit cell.
 do  -- Raycaster:castRay
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local hit = rc:castRay(8, 8, 0, 16)
   lurek.log.info("ray dist: " .. (hit and hit.dist or -1), "raycaster")
 end
@@ -473,7 +473,7 @@ end
 -- Casts multiple rays from different positions and returns a results table.
 -- Useful for multi-camera setups or custom rendering passes.
 do  -- Raycaster:castRayMulti
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local results = rc:castRayMulti(8, 8, 0, 16)
   lurek.log.info("multi-ray results: " .. #results, "raycaster")
 end
@@ -482,7 +482,7 @@ end
 -- Casts a full fan of rays for the current camera view and returns the column buffer.
 -- Returns a table of per-column hit data; used by drawView() internally.
 do  -- Raycaster:castRays
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local cols = rc:castRays(8, 8, 0, math.pi/3, 320, 16)
   lurek.log.info("columns: " .. (cols and #cols or 0), "raycaster")
 end
@@ -491,7 +491,7 @@ end
 -- Casts rays and returns results in a flat array format for GPU upload.
 -- More cache-friendly than castRays for large column counts.
 do  -- Raycaster:castRaysFlat
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local flat = rc:castRaysFlat(8, 8, 0, math.pi/3, 320, 16)
   lurek.log.info("flat ray count: " .. (flat and #flat or 0), "raycaster")
 end
@@ -500,7 +500,7 @@ end
 -- Renders a top-down camera FOV arc onto an ImageData for a minimap overlay.
 -- fov and range control the visible arc; useful for guard-vision debugging.
 do  -- Raycaster:drawCameraSweep
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local img = rc:drawCameraSweep(8, 8, math.pi/3, 16, 6, 64, 48)
   lurek.log.info("camera sweep drawn", "raycaster")
 end
@@ -509,7 +509,7 @@ end
 -- Renders the per-column depth buffer as a greyscale gradient into an ImageData.
 -- Useful for debugging occlusion and rendering artefacts.
 do  -- Raycaster:drawDepthMap
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local img = rc:drawDepthMap(8, 8, 0, math.pi/3, 320, 320, 240, 16)
   lurek.log.info("depth map drawn", "raycaster")
 end
@@ -518,7 +518,7 @@ end
 -- Draws a filled line-of-sight polygon onto a top-down ImageData.
 -- Shows visible area from a guard's perspective for minimap or debugging.
 do  -- Raycaster:drawLineOfSight
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local img = rc:drawLineOfSight(4, 4, 12, 12, 8)
   lurek.log.info("LOS drawn", "raycaster")
 end
@@ -527,7 +527,7 @@ end
 -- Renders the map grid and optionally objects as a 2D top-down view.
 -- Use for minimaps, editor overlays, or debugging spatial relationships.
 do  -- Raycaster:drawTopDown
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local img = rc:drawTopDown(8, 8, 0, 8)
   lurek.log.info("top-down drawn", "raycaster")
 end
@@ -536,7 +536,7 @@ end
 -- Renders the full pseudo-3D first-person view from the camera position and angle.
 -- Writes column-by-column into an ImageData; call once per frame in lurek.render().
 do  -- Raycaster:drawView
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local img = rc:drawView(8, 8, 0, math.pi/3, 320, 240, 16)
   lurek.log.info("view rendered", "raycaster")
 end
@@ -545,7 +545,7 @@ end
 -- Returns true if there is unobstructed sight between two map-space positions.
 -- Uses DDA; blocked cells with non-zero wall values break the line.
 do  -- Raycaster:lineOfSight
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   local los = rc:lineOfSight(4, 4, 12, 12)
   lurek.log.info("LOS result: " .. tostring(los), "raycaster")
 end
@@ -554,16 +554,16 @@ end
 -- Projects a world-space sprite into screen-space column/height data.
 -- Returns screen_x, screen_y, height, and a visibility mask for the sprite.
 do  -- Raycaster:projectSprite
-  local rc = lurek.raycaster.new(16, 16, 1)
-  local sx, sy, h = rc:projectSprite(8, 4, 4, 0, math.pi/3, 320, 240)
-  lurek.log.info("projected: " .. (sx or -1), "raycaster")
+  local rc = lurek.raycaster.new(16, 16)
+  local sp = rc:projectSprite(8, 4, 4, 0, math.pi/3, 320, 240)
+  lurek.log.info("projected: " .. (sp and sp.screen_x or -1), "raycaster")
 end
 
 --@api-stub: Raycaster:setCell
 -- Sets the wall type of a single cell in the map grid.
 -- type=0 means empty (walkable); non-zero values index the texture atlas.
 do  -- Raycaster:setCell
-  local rc = lurek.raycaster.new(16, 16, 1)
+  local rc = lurek.raycaster.new(16, 16)
   rc:setCell(4, 4, 2)
   lurek.log.info("cell 4,4 = 2", "raycaster")
 end
@@ -573,8 +573,8 @@ end
 -- Call after castRays() each frame; returns sorted projection data table.
 do  -- SpriteManager:sortAndProject
   local sm = lurek.raycaster.newSpriteManager()
-  sm:add(3.5, 2.5, 1, 0)
-  local projs = sm:sortAndProject(8, 8, 0, math.pi/3, 320, 240)
+  sm:add(3.5, 2.5, "crate", 1.0)
+  local projs = sm:sortAndProject(8, 8, 0)
   lurek.log.info("projected sprites: " .. #projs, "raycaster")
 end
 

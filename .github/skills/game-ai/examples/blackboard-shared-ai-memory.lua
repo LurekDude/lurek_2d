@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 -- Global blackboard on the world — all agents can read these
 world:blackboard():set("playerX", player.x)
 world:blackboard():set("playerY", player.y)

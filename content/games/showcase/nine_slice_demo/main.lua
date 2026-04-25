@@ -1,3 +1,50 @@
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 -- Nine Slice Demo — Lurek2D
 -- Category: showcase
 -- Visual demonstration of 9-slice (9-patch) UI panel scaling techniques
@@ -149,49 +196,49 @@ local function draw_nine_slice(x, y, w, h, style)
 
     -- center fill
     lurek.render.setColor(fl[1], fl[2], fl[3], 1)
-    lurek.render.rectangle(x + sl, y + sl, w - sl * 2, h - sl * 2)
+    rect(x + sl, y + sl, w - sl * 2, h - sl * 2)
 
     -- edges (stretch)
     lurek.render.setColor(br[1], br[2], br[3], 1)
     -- top edge
-    lurek.render.rectangle(x + sl, y, w - sl * 2, thk)
-    lurek.render.rectangle(x + sl, y + thk, w - sl * 2, sl - thk)
+    rect(x + sl, y, w - sl * 2, thk)
+    rect(x + sl, y + thk, w - sl * 2, sl - thk)
     -- bottom edge
-    lurek.render.rectangle(x + sl, y + h - sl, w - sl * 2, sl - thk)
-    lurek.render.rectangle(x + sl, y + h - thk, w - sl * 2, thk)
+    rect(x + sl, y + h - sl, w - sl * 2, sl - thk)
+    rect(x + sl, y + h - thk, w - sl * 2, thk)
     -- left edge
-    lurek.render.rectangle(x, y + sl, thk, h - sl * 2)
-    lurek.render.rectangle(x + thk, y + sl, sl - thk, h - sl * 2)
+    rect(x, y + sl, thk, h - sl * 2)
+    rect(x + thk, y + sl, sl - thk, h - sl * 2)
     -- right edge
-    lurek.render.rectangle(x + w - sl, y + sl, sl - thk, h - sl * 2)
-    lurek.render.rectangle(x + w - thk, y + sl, thk, h - sl * 2)
+    rect(x + w - sl, y + sl, sl - thk, h - sl * 2)
+    rect(x + w - thk, y + sl, thk, h - sl * 2)
 
     -- edge fill (between border and center)
     lurek.render.setColor(fl[1] + 0.05, fl[2] + 0.05, fl[3] + 0.05, 1)
-    lurek.render.rectangle(x + thk, y + thk, sl - thk, sl - thk)        -- inner TL
-    lurek.render.rectangle(x + w - sl, y + thk, sl - thk, sl - thk)     -- inner TR
-    lurek.render.rectangle(x + thk, y + h - sl, sl - thk, sl - thk)     -- inner BL
-    lurek.render.rectangle(x + w - sl, y + h - sl, sl - thk, sl - thk)  -- inner BR
+    rect(x + thk, y + thk, sl - thk, sl - thk)        -- inner TL
+    rect(x + w - sl, y + thk, sl - thk, sl - thk)     -- inner TR
+    rect(x + thk, y + h - sl, sl - thk, sl - thk)     -- inner BL
+    rect(x + w - sl, y + h - sl, sl - thk, sl - thk)  -- inner BR
 
     -- corners (fixed size)
     lurek.render.setColor(cr[1], cr[2], cr[3], 1)
-    lurek.render.rectangle(x, y, sl, thk)                              -- TL top
-    lurek.render.rectangle(x, y, thk, sl)                              -- TL left
-    lurek.render.rectangle(x + w - sl, y, sl, thk)                     -- TR top
-    lurek.render.rectangle(x + w - thk, y, thk, sl)                    -- TR right
-    lurek.render.rectangle(x, y + h - thk, sl, thk)                    -- BL bottom
-    lurek.render.rectangle(x, y + h - sl, thk, sl)                     -- BL left
-    lurek.render.rectangle(x + w - sl, y + h - thk, sl, thk)           -- BR bottom
-    lurek.render.rectangle(x + w - thk, y + h - sl, thk, sl)           -- BR right
+    rect(x, y, sl, thk)                              -- TL top
+    rect(x, y, thk, sl)                              -- TL left
+    rect(x + w - sl, y, sl, thk)                     -- TR top
+    rect(x + w - thk, y, thk, sl)                    -- TR right
+    rect(x, y + h - thk, sl, thk)                    -- BL bottom
+    rect(x, y + h - sl, thk, sl)                     -- BL left
+    rect(x + w - sl, y + h - thk, sl, thk)           -- BR bottom
+    rect(x + w - thk, y + h - sl, thk, sl)           -- BR right
 
     -- double-border style: inner line
     if style == 4 then
         local off = thk + 2
         lurek.render.setColor(br[1] * 0.6, br[2] * 0.6, br[3] * 0.6, 0.7)
-        lurek.render.rectangle(x + off, y + off, w - off * 2, 1)
-        lurek.render.rectangle(x + off, y + h - off - 1, w - off * 2, 1)
-        lurek.render.rectangle(x + off, y + off, 1, h - off * 2)
-        lurek.render.rectangle(x + w - off - 1, y + off, 1, h - off * 2)
+        rect(x + off, y + off, w - off * 2, 1)
+        rect(x + off, y + h - off - 1, w - off * 2, 1)
+        rect(x + off, y + off, 1, h - off * 2)
+        rect(x + w - off - 1, y + off, 1, h - off * 2)
     end
 end
 
@@ -200,34 +247,34 @@ local function draw_grid_overlay(x, y, w, h)
     local sl = SLICE
     lurek.render.setColor(1, 1, 0, 0.4)
     -- vertical lines at slice boundaries
-    lurek.render.rectangle(x + sl, y, 1, h)
-    lurek.render.rectangle(x + w - sl, y, 1, h)
+    rect(x + sl, y, 1, h)
+    rect(x + w - sl, y, 1, h)
     -- horizontal lines at slice boundaries
-    lurek.render.rectangle(x, y + sl, w, 1)
-    lurek.render.rectangle(x, y + h - sl, w, 1)
+    rect(x, y + sl, w, 1)
+    rect(x, y + h - sl, w, 1)
     -- label zones
     lurek.render.setColor(1, 1, 0, 0.6)
-    lurek.render.print("C", x + 3, y + 2, 9)                               -- corner TL
-    lurek.render.print("C", x + w - sl + 3, y + 2, 9)                      -- corner TR
-    lurek.render.print("C", x + 3, y + h - sl + 2, 9)                      -- corner BL
-    lurek.render.print("C", x + w - sl + 3, y + h - sl + 2, 9)             -- corner BR
-    lurek.render.print("H", x + w * 0.5 - 4, y + 2, 9)                     -- edge top
-    lurek.render.print("H", x + w * 0.5 - 4, y + h - sl + 2, 9)            -- edge bottom
-    lurek.render.print("V", x + 3, y + h * 0.5 - 5, 9)                     -- edge left
-    lurek.render.print("V", x + w - sl + 3, y + h * 0.5 - 5, 9)            -- edge right
-    lurek.render.print("FILL", x + w * 0.5 - 12, y + h * 0.5 - 5, 9)       -- center
+    text_("C", x + 3, y + 2, 9)                               -- corner TL
+    text_("C", x + w - sl + 3, y + 2, 9)                      -- corner TR
+    text_("C", x + 3, y + h - sl + 2, 9)                      -- corner BL
+    text_("C", x + w - sl + 3, y + h - sl + 2, 9)             -- corner BR
+    text_("H", x + w * 0.5 - 4, y + 2, 9)                     -- edge top
+    text_("H", x + w * 0.5 - 4, y + h - sl + 2, 9)            -- edge bottom
+    text_("V", x + 3, y + h * 0.5 - 5, 9)                     -- edge left
+    text_("V", x + w - sl + 3, y + h * 0.5 - 5, 9)            -- edge right
+    text_("FILL", x + w * 0.5 - 12, y + h * 0.5 - 5, 9)       -- center
 end
 
 -- draw a naively stretched panel for comparison
 local function draw_stretched(x, y, w, h, style)
     local s = STYLES[style]
     lurek.render.setColor(s.fill[1], s.fill[2], s.fill[3], 1)
-    lurek.render.rectangle(x, y, w, h)
+    rect(x, y, w, h)
     lurek.render.setColor(s.border[1], s.border[2], s.border[3], 1)
-    lurek.render.rectangle(x, y, w, s.thick)
-    lurek.render.rectangle(x, y + h - s.thick, w, s.thick)
-    lurek.render.rectangle(x, y, s.thick, h)
-    lurek.render.rectangle(x + w - s.thick, y, s.thick, h)
+    rect(x, y, w, s.thick)
+    rect(x, y + h - s.thick, w, s.thick)
+    rect(x, y, s.thick, h)
+    rect(x + w - s.thick, y, s.thick, h)
 end
 
 -- ── Input bindings ─────────────────────────────────────────────────────
@@ -327,13 +374,13 @@ function lurek.draw_ui()
     -- ── TITLE state ────────────────────────────────────────────────────
     if state == "TITLE" then
         lurek.render.setColor(1, 1, 1, title_alpha)
-        lurek.render.print("NINE SLICE DEMO", SCREEN_W * 0.5 - 120, SCREEN_H * 0.5 - 70, 28)
+        text_("NINE SLICE DEMO", SCREEN_W * 0.5 - 120, SCREEN_H * 0.5 - 70, 28)
 
         lurek.render.setColor(0.7, 0.6, 0.9, title_alpha * 0.9)
-        lurek.render.print("SCALABLE UI PANELS", SCREEN_W * 0.5 - 100, SCREEN_H * 0.5 - 30, 18)
+        text_("SCALABLE UI PANELS", SCREEN_W * 0.5 - 100, SCREEN_H * 0.5 - 30, 18)
 
         lurek.render.setColor(0.5, 0.5, 0.6, title_prompt_alpha * 0.8)
-        lurek.render.print("Press any arrow key to begin", SCREEN_W * 0.5 - 110, SCREEN_H * 0.5 + 20, 14)
+        text_("Press any arrow key to begin", SCREEN_W * 0.5 - 110, SCREEN_H * 0.5 + 20, 14)
         return
     end
 
@@ -349,19 +396,19 @@ function lurek.draw_ui()
 
         -- stretched version
         lurek.render.setColor(0.6, 0.6, 0.6, 0.8)
-        lurek.render.print("Stretched (naive)", sx + pw * 0.5 - 55, sy - 22, 13)
+        text_("Stretched (naive)", sx + pw * 0.5 - 55, sy - 22, 13)
         draw_stretched(sx, sy, pw, ph, current_style)
 
         -- 9-slice version
         local nx = sx + pw + gap
         lurek.render.setColor(0.6, 0.6, 0.6, 0.8)
-        lurek.render.print("9-Slice (correct)", nx + pw * 0.5 - 55, sy - 22, 13)
+        text_("9-Slice (correct)", nx + pw * 0.5 - 55, sy - 22, 13)
         draw_nine_slice(nx, sy, pw, ph, current_style)
         if show_grid then draw_grid_overlay(nx, sy, pw, ph) end
 
         -- hint
         lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-        lurek.render.print("Press C to return to editing", SCREEN_W * 0.5 - 100, sy + ph + 20, 12)
+        text_("Press C to return to editing", SCREEN_W * 0.5 - 100, sy + ph + 20, 12)
     else
         -- ── EDITING state ──────────────────────────────────────────────
         -- center panel
@@ -392,13 +439,13 @@ function lurek.draw_ui()
             end
             if line ~= "" then lines[#lines + 1] = line end
             for li, l in ipairs(lines) do
-                lurek.render.print(l, px + text_margin, py + text_margin + (li - 1) * 16, 12)
+                text_(l, px + text_margin, py + text_margin + (li - 1) * 16, 12)
             end
         end
 
         -- size label
         lurek.render.setColor(0.9, 0.9, 0.9, 0.8)
-        lurek.render.print(
+        text_(
             string.format("Width: %d  Height: %d", pw, ph),
             px + pw * 0.5 - 55, py + ph + 8, 12
         )
@@ -407,7 +454,7 @@ function lurek.draw_ui()
     -- ── Scale demo row (bottom) ────────────────────────────────────────
     local row_y = SCREEN_H - 85
     lurek.render.setColor(0.5, 0.5, 0.6, 0.6)
-    lurek.render.print("Scale comparison:", 10, row_y - 18, 11)
+    text_("Scale comparison:", 10, row_y - 18, 11)
 
     local rx = 10
     for _, sz in ipairs(SCALE_SIZES) do
@@ -418,7 +465,7 @@ function lurek.draw_ui()
         local dh = math.floor(sh * scale)
         draw_nine_slice(rx, row_y, dw, dh, current_style)
         lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
-        lurek.render.print(string.format("%dx%d", sw, sh), rx, row_y + dh + 2, 9)
+        text_(string.format("%dx%d", sw, sh), rx, row_y + dh + 2, 9)
         rx = rx + dw + 12
     end
 
@@ -426,12 +473,12 @@ function lurek.draw_ui()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.rectangle(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size)
+        rect(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size)
     end
 
     -- ── Style selector bar ─────────────────────────────────────────────
     lurek.render.setColor(0, 0, 0, 0.45)
-    lurek.render.rectangle(0, 0, SCREEN_W, 28)
+    rect(0, 0, SCREEN_W, 28)
     for i, s in ipairs(STYLES) do
         local bx = 10 + (i - 1) * 155
         if i == current_style then
@@ -439,12 +486,12 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.45, 0.45, 0.45, 0.7)
         end
-        lurek.render.print(string.format("[%d] %s", i, s.name), bx, 6, 12)
+        text_(string.format("[%d] %s", i, s.name), bx, 6, 12)
     end
 
     -- ── Controls hint ──────────────────────────────────────────────────
     lurek.render.setColor(0.4, 0.4, 0.45, 0.5)
-    lurek.render.print(
+    text_(
         "Arrows: resize | 1-5: style | G: grid | C: compare | ESC: quit",
         10, SCREEN_H - 16, 10
     )

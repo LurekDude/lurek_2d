@@ -1011,6 +1011,7 @@ describe("physics body data", function()
     local id = body:getId()
     w:setBodyData(id, { name = "ground", kind = "platform" })
     local d = w:getBodyData(id)
+    assert(d, "expected body data")
     expect_equal(d.name, "ground")
     expect_equal(d.kind, "platform")
   end)
@@ -1443,7 +1444,7 @@ describe("lurek.physics breakable joints", function()
     xit("setJointBreakForce stores the threshold", function()
         local b1 = lurek.physics.newBody(world, 0, 0, "dynamic")
         local b2 = lurek.physics.newBody(world, 50, 0, "dynamic")
-        local jid = lurek.physics.newJoint(world, b1, b2, "distance")
+        local jid = lurek.physics.newJoint(world, b1, b2, "distance") ---@diagnostic disable-line: undefined-field
         world:setJointBreakForce(jid, 100.0)
         expect_near(100.0, world:getJointBreakForce(jid), 1e-4)
     end)
@@ -1453,7 +1454,7 @@ describe("lurek.physics breakable joints", function()
     xit("getJointBreakForce returns nil when not set", function()
         local b1 = lurek.physics.newBody(world, 0, 0, "dynamic")
         local b2 = lurek.physics.newBody(world, 50, 0, "dynamic")
-        local jid = lurek.physics.newJoint(world, b1, b2, "distance")
+        local jid = lurek.physics.newJoint(world, b1, b2, "distance") ---@diagnostic disable-line: undefined-field
         expect_equal(nil, world:getJointBreakForce(jid))
     end)
 end)
@@ -2011,7 +2012,9 @@ describe("lurek.physics zone events", function()
         world:step(1/60)
         local events = world:getZoneEvents()
         expect_true(#events >= 1, "expected at least one zone event")
-        expect_equal("enter", events[1].kind)
+        ---@diagnostic disable-next-line: need-check-nil
+        local first_event = events[1] ---@type {kind: string, zone_id: integer, body_id: integer}
+        expect_equal("enter", first_event.kind)
     end)
 end)
 
@@ -3112,8 +3115,9 @@ describe("World:newChainBody (@covers)", function()
         local w = lurek.physics.newWorld(0, 9.81)
         local ok, id = pcall(function()
             return w:newChainBody(
+                5.0, 5.0,
                 {0,0, 10,0, 10,10, 0,10},
-                5.0, 5.0, {type = "static"}
+                false, "static"
             )
         end)
         expect_type("boolean", ok)
@@ -3124,8 +3128,8 @@ end)
 describe("World joint constructors (@covers)", function()
     local function make_pair()
         local w = lurek.physics.newWorld(0, 9.81)
-        local a = w:newBody(2.0, 2.0, "dynamic")
-        local b = w:newBody(8.0, 2.0, "dynamic")
+        local a = w:newBody(2.0, 2.0, "dynamic"):getId()
+        local b = w:newBody(8.0, 2.0, "dynamic"):getId()
         return w, a, b
     end
 
@@ -3143,7 +3147,7 @@ describe("World joint constructors (@covers)", function()
         -- @covers World:addRopeJoint
         local w, a, b = make_pair()
         local ok, jid = pcall(function()
-            return w:addRopeJoint(a, b, 6.0)
+            return w:addRopeJoint(a, b, 0.0, 0.0, 0.0, 0.0, 6.0)
         end)
         expect_type("boolean", ok)
         if ok then expect_not_nil(jid) end
@@ -3163,7 +3167,7 @@ describe("World joint constructors (@covers)", function()
         -- @covers World:addFrictionJoint
         local w, a, b = make_pair()
         local ok, jid = pcall(function()
-            return w:addFrictionJoint(a, b, 5.0, 2.0, 1.0)
+            return w:addFrictionJoint(a, b, 5.0, 2.0, 1.0, 1.0)
         end)
         expect_type("boolean", ok)
         if ok then expect_not_nil(jid) end
@@ -3173,7 +3177,7 @@ describe("World joint constructors (@covers)", function()
         -- @covers World:addMotorJoint
         local w, a, b = make_pair()
         local ok, jid = pcall(function()
-            return w:addMotorJoint(a, b, {max_force=100, max_torque=50})
+            return w:addMotorJoint(a, b, 0.5)
         end)
         expect_type("boolean", ok)
         if ok then expect_not_nil(jid) end
@@ -3183,7 +3187,7 @@ describe("World joint constructors (@covers)", function()
         -- @covers World:addMouseJoint
         local w, a, _ = make_pair()
         local ok, jid = pcall(function()
-            return w:addMouseJoint(a, 2.0, 2.0, {max_force=1000})
+            return w:addMouseJoint(a, 2.0, 2.0, 1000.0)
         end)
         expect_type("boolean", ok)
         if ok then expect_not_nil(jid) end
@@ -3193,7 +3197,7 @@ describe("World joint constructors (@covers)", function()
         -- @covers World:addPulleyJoint
         local w, a, b = make_pair()
         local ok, jid = pcall(function()
-            return w:addPulleyJoint(a, b, 2,0, 8,0, 2,2, 8,2, 1.0)
+            return w:addPulleyJoint(a, b, 5.0, 2.0)
         end)
         expect_type("boolean", ok)
         if ok then expect_not_nil(jid) end
@@ -3202,18 +3206,10 @@ describe("World joint constructors (@covers)", function()
     it("addGearJoint creates a joint", function()
         -- @covers World:addGearJoint
         local w, a, b = make_pair()
-        local j1_ok, j1 = pcall(function()
-            return w:addRevoluteJoint(a, b, 5.0, 2.0)
+        local ok, jid = pcall(function()
+            return w:addGearJoint(a, b, 5.0, 2.0)
         end)
-        local j2_ok, j2 = pcall(function()
-            return w:addRevoluteJoint(a, b, 5.0, 2.0)
-        end)
-        if j1_ok and j2_ok then
-            local ok, jid = pcall(function()
-                return w:addGearJoint(j1, j2, 1.0)
-            end)
-            expect_type("boolean", ok)
-        end
+        expect_type("boolean", ok)
     end)
 end)
 
@@ -3245,7 +3241,7 @@ describe("Body:applyForceAtPoint (@covers)", function()
         local w = lurek.physics.newWorld(0, 9.81)
         local bid = w:newBody(5.0, 5.0, "dynamic")
         local ok, _ = pcall(function()
-            w:applyForceAtPoint(bid, 0, -100, 5.0, 5.0)
+            bid:applyForceAtPoint(0, -100, 5.0, 5.0)
         end)
         expect_type("boolean", ok)
     end)

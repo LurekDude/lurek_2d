@@ -1,3 +1,6 @@
+local ch = lurek.thread.newChannel()
+local value = "payload"
+
 ch:push(value)        -- non-blocking send; value: nil|bool|number|string
 ch:pop()              -- non-blocking receive; returns nil if empty
 ch:demand()           -- BLOCKING receive; use in workers, NOT in lurek.update()

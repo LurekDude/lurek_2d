@@ -1,4 +1,4 @@
-﻿--- @module library.economy
+﻿-- @module library.economy
 --- @status full
 --- @description Pure-Lua resource economy system with named resources, overflow policies,
 --- flow/decay/interest simulation, conversion rules with modifiers, and a ResourceManager.
@@ -38,7 +38,16 @@ end
 local function _log(level, msg)
     if type(lurek) == "table" and type(lurek.log) == "table"
        and type(lurek.log[level]) == "function" then
-        lurek.log[level]("[economy] " .. msg)
+        local text = "[economy] " .. msg
+        if level == "debug" then
+            lurek.log.debug(text)
+        elseif level == "info" then
+            lurek.log.info(text)
+        elseif level == "warn" then
+            lurek.log.warn(text)
+        elseif level == "error" then
+            lurek.log.error(text)
+        end
     end
 end
 

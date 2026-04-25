@@ -9,7 +9,7 @@ function lurek.process(dt)
     Events.emit("game:update", dt)
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.1, 0.1, 0.15)
     Events.emit("game:draw")
 end

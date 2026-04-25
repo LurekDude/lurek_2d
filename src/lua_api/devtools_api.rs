@@ -82,12 +82,11 @@ fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers `lurek.devtools.*`.
-///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
-///
+// Registers `lurek.devtools.*`.
+//
+// @param lua &Lua
+// @param lurek &LuaTable
+// @param _state Rc<RefCell<SharedState>>
 
 // ---------------------------------------------------------------------------
 // LuaFileWatcher â€” standalone per-path file-change watcher userdata
@@ -110,7 +109,7 @@ impl LuaUserData for LuaFileWatcher {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- onChanged --
         /// Registers a callback invoked (with no arguments) when the watched path changes.
-        /// @param fn : function
+        /// @param fn function
         /// @return nil
         methods.add_method_mut("onChanged", |lua, this, func: LuaFunction| {
             let key = lua.create_registry_value(func)?;
@@ -163,8 +162,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€ Logger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Logs a message at the given level.
-    /// @param level : string
-    /// @param message : string
+    /// @param level string
+    /// @param message string
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -175,22 +174,50 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    for level_name in &["trace", "debug", "info", "warn", "error", "fatal"] {
-        let s = shared.clone();
-        let lvl = level_name.to_string();
-        /// Logs a message at a fixed level.
-        /// @param message : string
-        dt.set(
-            *level_name,
-            lua.create_function(move |_, message: String| {
-                s.borrow_mut().logger.push(&lvl, &message, "?", 0, None);
-                Ok(())
-            })?,
-        )?;
-    }
+    /// Logs a message at TRACE level.
+    /// @param message string
+    /// @return nil
+    let s = shared.clone();
+    dt.set("trace", lua.create_function(move |_, message: String| {
+        s.borrow_mut().logger.push("trace", &message, "?", 0, None); Ok(()) })?)?;
+
+    /// Logs a message at DEBUG level.
+    /// @param message string
+    /// @return nil
+    let s = shared.clone();
+    dt.set("debug", lua.create_function(move |_, message: String| {
+        s.borrow_mut().logger.push("debug", &message, "?", 0, None); Ok(()) })?)?;
+
+    /// Logs a message at INFO level.
+    /// @param message string
+    /// @return nil
+    let s = shared.clone();
+    dt.set("info", lua.create_function(move |_, message: String| {
+        s.borrow_mut().logger.push("info", &message, "?", 0, None); Ok(()) })?)?;
+
+    /// Logs a message at WARN level.
+    /// @param message string
+    /// @return nil
+    let s = shared.clone();
+    dt.set("warn", lua.create_function(move |_, message: String| {
+        s.borrow_mut().logger.push("warn", &message, "?", 0, None); Ok(()) })?)?;
+
+    /// Logs a message at ERROR level.
+    /// @param message string
+    /// @return nil
+    let s = shared.clone();
+    dt.set("error", lua.create_function(move |_, message: String| {
+        s.borrow_mut().logger.push("error", &message, "?", 0, None); Ok(()) })?)?;
+
+    /// Logs a message at FATAL level.
+    /// @param message string
+    /// @return nil
+    let s = shared.clone();
+    dt.set("fatal", lua.create_function(move |_, message: String| {
+        s.borrow_mut().logger.push("fatal", &message, "?", 0, None); Ok(()) })?)?;
 
     /// Sets the minimum log level.
-    /// @param level : string
+    /// @param level string
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -213,7 +240,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Enables or disables console log output.
-    /// @param enabled : boolean
+    /// @param enabled boolean
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -233,7 +260,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Sets the log file path (empty string disables file output).
-    /// @param path : string
+    /// @param path string
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -253,7 +280,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Returns recent log entries as an array of tables.
-    /// @param count : integer?
+    /// @param count integer?
     let s = shared.clone();
     /// @return table
     dt.set(
@@ -292,7 +319,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€ Profiler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Enables or disables the profiler.
-    /// @param enabled : boolean
+    /// @param enabled boolean
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -312,7 +339,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Opens a named profiling zone on the stack.
-    /// @param name : string
+    /// @param name string
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -355,7 +382,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Returns zone data table for a specific frame (0 or nil = most recent).
-    /// @param frame : integer?
+    /// @param frame integer?
     let s = shared.clone();
     /// @return table
     dt.set(
@@ -387,7 +414,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€ Frame Statistics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Records a frame-time sample (call each frame with delta time in seconds).
-    /// @param dt : number
+    /// @param dt number
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -435,7 +462,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Sets the frame-history buffer capacity (clamped 10-10000).
-    /// @param size : integer
+    /// @param size integer
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -457,7 +484,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€ File Watcher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Adds a file path to the watch list. Returns false if already watched.
-    /// @param path : string
+    /// @param path string
     let s = shared.clone();
     /// @return boolean
     dt.set(
@@ -473,7 +500,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Removes a file path from the watch list.
-    /// @param path : string
+    /// @param path string
     let s = shared.clone();
     /// @return boolean
     dt.set(
@@ -534,7 +561,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Sets the file watch poll interval in seconds.
-    /// @param interval : number
+    /// @param interval number
     let s = shared.clone();
     /// @return nil
     dt.set(
@@ -548,7 +575,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€ Lua Debug Bridge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Returns the Lua call stack as a table of frames.
-    /// @param max_depth : integer?
+    /// @param max_depth integer?
     /// @return table
     dt.set(
         "getCallStack",
@@ -578,7 +605,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Evaluates a Lua string and returns (success, results...).
-    /// @param code : string
+    /// @param code string
     /// @return boolean
     dt.set(
         "eval",
@@ -624,9 +651,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     /// Registers a named live watch. The getter function is called on demand to sample a value.
     /// Returns an integer id that can be passed to removeWatch.
-    /// @param name : string
-    /// @param getter : function
-    /// @param category : string?
+    /// @param name string
+    /// @param getter function
+    /// @param category string?
     let s = shared.clone();
     /// @return integer
     dt.set(
@@ -648,7 +675,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     /// Removes a watch by the id returned from exposeWatch. Returns true if removed.
-    /// @param id : integer
+    /// @param id integer
     let s = shared.clone();
     /// @return boolean
     dt.set(
@@ -821,7 +848,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// - `onChanged(fn)` â€” register a no-arg callback fired when the file changes
     /// - `check()` â†’ boolean â€” polls and fires callback if changed; returns `true` if changed
     /// - `cancel()` â€” removes the stored callback
-    /// @param path : string   file or directory path to watch
+    /// @param path string   file or directory path to watch
     /// @return FileWatcher
     dt.set(
         "newFileWatcher",
@@ -853,7 +880,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// local repl = lurek.devtools.newRepl(100)
     /// local result = repl:eval("1 + 1")
     /// ```
-    /// @param max_history : integer?
+    /// @param max_history integer?
     /// @return ReplConsole
     dt.set(
         "newRepl",
@@ -887,7 +914,7 @@ impl LuaUserData for LuaReplConsole {
         /// Statement blocks (e.g. `"x = 10"`) return `"(ok)"` on success.
         /// Any Lua error is caught and returned as an error string.
         ///
-        /// @param code : string
+        /// @param code string
         /// @return string
         methods.add_method_mut("eval", |lua, this, code: String| {
             Ok(this.inner.eval(&code, lua))

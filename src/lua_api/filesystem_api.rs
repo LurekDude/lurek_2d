@@ -56,7 +56,7 @@ impl LuaUserData for LuaFileHandle {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- read --
         /// Reads bytes from the file, returning them as a string.
-        /// @param count : integer?
+        /// @param count integer?
         /// @return string
         methods.add_method("read", |_, this, count: Option<usize>| {
             let bytes = this
@@ -79,7 +79,7 @@ impl LuaUserData for LuaFileHandle {
 
         // -- write --
         /// Writes a string to the file and returns the number of bytes written.
-        /// @param data : string
+        /// @param data string
         /// @return integer
         methods.add_method("write", |_, this, data: String| {
             this.inner
@@ -90,7 +90,7 @@ impl LuaUserData for LuaFileHandle {
 
         // -- seek --
         /// Seeks the file position to the given byte offset from the start.
-        /// @param pos : integer
+        /// @param pos integer
         /// @return integer
         methods.add_method("seek", |_, this, pos: u64| {
             this.inner
@@ -156,7 +156,7 @@ impl LuaUserData for LuaZipMount {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- readFile --
         /// Reads a file from the ZIP and returns it as a string of bytes.
-        /// @param virtual_path : string
+        /// @param virtual_path string
         /// @return string
         methods.add_method("readFile", |_, this, virtual_path: String| {
             let bytes = this
@@ -168,7 +168,7 @@ impl LuaUserData for LuaZipMount {
 
         // -- contains --
         /// Returns true if `virtual_path` exists inside this ZIP mount.
-        /// @param virtual_path : string
+        /// @param virtual_path string
         /// @return boolean
         methods.add_method("contains", |_, this, virtual_path: String| {
             Ok(this.inner.contains(&virtual_path))
@@ -196,9 +196,9 @@ impl LuaUserData for LuaZipMount {
 // -------------------------------------------------------------------------------
 /// Registers the `lurek.filesystem` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -207,8 +207,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     /// Mounts a ZIP archive at a virtual path prefix, making its contents readable
     /// via the returned `ZipMount` userdata.  Returns a `ZipMount` handle.
-    /// @param archive_path : string
-    /// @param prefix : string  (virtual mount point, e.g. "mods/extra")
+    /// @param archive_path string
+    /// @param prefix string  (virtual mount point, e.g. "mods/extra")
     /// @return ZipMount
     tbl.set(
         "mountZip",
@@ -224,7 +224,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     let wrc = watcher_rc.clone();
     /// Adds `path` to the polled file-watch list.
-    /// @param path : string
+    /// @param path string
     /// @return nil
     tbl.set(
         "watchPath",
@@ -236,7 +236,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     let wrc = watcher_rc.clone();
     /// Removes `path` from the polled file-watch list.  No-op if not watched.
-    /// @param path : string
+    /// @param path string
     /// @return nil
     tbl.set(
         "unwatchPath",
@@ -265,7 +265,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- read --
     /// Reads a text file and returns its contents as a string.
-    /// @param path : string
+    /// @param path string
     /// @return string
     let s = state.clone();
     tbl.set(
@@ -277,8 +277,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- write --
     /// Writes a string to a file in the save directory.
-    /// @param path : string
-    /// @param data : string
+    /// @param path string
+    /// @param data string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -293,7 +293,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- exists --
     /// Returns whether the given file or directory exists.
-    /// @param path : string
+    /// @param path string
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -303,8 +303,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- append --
     /// Opens the file in append mode and writes the given string at the end.
-    /// @param path : string
-    /// @param data : string
+    /// @param path string
+    /// @param data string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -319,8 +319,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- openFile --
     /// Opens a file and returns a readable/writable file handle.
-    /// @param path : string
-    /// @param mode : string
+    /// @param path string
+    /// @param mode string
     /// @return FileHandle
     let s = state.clone();
     tbl.set(
@@ -339,7 +339,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getDirectoryItems --
     /// Returns a table containing the names of every file and subdirectory in the given path.
-    /// @param path : string
+    /// @param path string
     /// @return table
     let s = state.clone();
     tbl.set(
@@ -354,7 +354,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isFile --
     /// Returns whether the given path is a regular file.
-    /// @param path : string
+    /// @param path string
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -364,7 +364,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isDirectory --
     /// Returns whether the given path is a directory.
-    /// @param path : string
+    /// @param path string
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -374,7 +374,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- createDirectory --
     /// Creates a directory and any missing parent directories in the save area.
-    /// @param path : string
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -389,7 +389,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- remove --
     /// Permanently deletes a file or empty directory from the save directory.
-    /// @param path : string
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -401,7 +401,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getInfo --
     /// Returns a table of metadata for a path, or nil if the path does not exist.
-    /// @param path : string
+    /// @param path string
     /// @return table?
     let s = state.clone();
     tbl.set(
@@ -474,7 +474,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setIdentity --
     /// Sets the identity string that names the game's sandboxed save-data directory.
-    /// @param name : string
+    /// @param name string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -487,7 +487,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- lines --
     /// Returns an iterator function over the lines of a text file.
-    /// @param path : string
+    /// @param path string
     /// @return function
     let s = state.clone();
     tbl.set(
@@ -506,7 +506,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- readAsync --
     /// Starts loading a file in the background and returns an opaque handle.
-    /// @param path : string
+    /// @param path string
     /// @return integer
     let s = state.clone();
     tbl.set(
@@ -520,7 +520,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- pollAsync --
     /// Polls an async load handle, returning status and optional data.
-    /// @param handle : integer
+    /// @param handle integer
     /// string, string?
     let s = state.clone();
     /// @return string|nil
@@ -531,8 +531,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- mount --
     /// Mounts a directory at a virtual path inside the game filesystem.
-    /// @param source : string
-    /// @param mountpoint : string
+    /// @param source string
+    /// @param mountpoint string
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -548,7 +548,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- unmount --
     /// Removes a virtual mount layer by mountpoint.
-    /// @param mountpoint : string
+    /// @param mountpoint string
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -558,7 +558,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- load --
     /// Loads and compiles a Lua file from the VFS, returning it as a callable function.
-    /// @param path : string
+    /// @param path string
     /// @return function
     let s = state.clone();
     tbl.set(
@@ -575,7 +575,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newFileData --
     /// Loads a file from the VFS into a FileData buffer.
-    /// @param path : string
+    /// @param path string
     /// @return FileData
     let s = state.clone();
     tbl.set(
@@ -597,8 +597,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     ///
     /// The source is resolved inside the game root; the destination must be inside `save/`.
     ///
-    /// @param src : string
-    /// @param dst : string
+    /// @param src string
+    /// @param dst string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -616,8 +616,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     ///
     /// Both source and destination must be inside `save/`.
     ///
-    /// @param src : string
-    /// @param dst : string
+    /// @param src string
+    /// @param dst string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -633,7 +633,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- removeDir --
     /// Recursively deletes a directory and all its contents within `save/`.
     ///
-    /// @param path : string
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -651,7 +651,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     ///
     /// Example: `lurek.filesystem.glob("save/*.json")`
     ///
-    /// @param pattern : string
+    /// @param pattern string
     /// table  array of matching relative paths
     let s = state.clone();
     /// @return table
@@ -672,7 +672,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     ///
     /// Paths are relative to the game root and use `/` separators.
     ///
-    /// @param path : string
+    /// @param path string
     /// @return table  array of relative file paths
     let s = state.clone();
     tbl.set(
@@ -701,7 +701,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     ///
     /// Raises a Lua error if the path is inaccessible or outside the sandbox.
     ///
-    /// @param path : string
+    /// @param path string
     /// @return table  { size: integer, isFile: boolean, isDir: boolean }
     let s = state.clone();
     tbl.set(
@@ -722,7 +722,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     ///
     /// The caller is responsible for deleting the file when done.
     ///
-    /// @param prefix : string?  Optional name prefix (default `"tmp"`).
+    /// @param prefix string?  Optional name prefix (default `"tmp"`).
     /// @return string  Relative path of the created temp file (e.g. `"save/tmp123.tmp"`).
     let s = state.clone();
     tbl.set(
@@ -740,7 +740,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Creates a directory (and any missing parents) relative to the game root.
     /// Unlike `createDirectory`, this is not restricted to `save/`.
     /// Mainly useful for evidence test output folders.
-    /// @param path : string
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -756,7 +756,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- toAbsolutePath --
     /// Resolves a path relative to the game root to an absolute OS path string.
     /// Useful when passing paths to Lua's `io.open`.
-    /// @param path : string
+    /// @param path string
     /// @return string
     let s = state.clone();
     tbl.set(

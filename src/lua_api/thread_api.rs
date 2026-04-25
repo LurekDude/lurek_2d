@@ -33,7 +33,7 @@ impl LuaUserData for LuaThreadHandle {
 
         // -- typeOf --
         /// Returns whether this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "Thread" || name == "Object")
@@ -41,7 +41,7 @@ impl LuaUserData for LuaThreadHandle {
 
         // -- start --
         /// Launches the background thread, passing optional arguments via varargs.
-        /// @param args : MultiValue
+        /// @param ... any
         /// @return nil
         methods.add_method("start", |_, this, args: LuaMultiValue| {
             let channel_args: Vec<_> = args
@@ -99,7 +99,7 @@ impl LuaUserData for LuaThreadPool {
 
         // -- typeOf --
         /// Returns whether this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ThreadPool" || name == "Object")
@@ -108,7 +108,7 @@ impl LuaUserData for LuaThreadPool {
         // -- submit --
         /// Submits a value to the pool's input channel for processing by a worker.
         /// Workers read from lurek.thread.getChannel("__pool_input").
-        /// @param value : any
+        /// @param value any
         /// @return nil
         methods.add_method("submit", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
@@ -181,7 +181,7 @@ impl LuaUserData for LuaPromise {
 
         // -- typeOf --
         /// Returns whether this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "Promise" || name == "Object")
@@ -219,9 +219,9 @@ impl LuaUserData for LuaPromise {
 
 /// Registers the `lurek.thread` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -230,7 +230,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newThread --
     /// Creates a new background thread from a Lua code string.
-    /// @param code : string
+    /// @param code string
     /// @return Thread
     let ch = named_channels.clone();
     tbl.set(
@@ -244,6 +244,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newChannel --
     /// Creates an unnamed thread-safe channel for inter-thread communication.
+    /// @param name? string
     /// @return Channel
     tbl.set(
         "newChannel",
@@ -256,7 +257,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- getChannel --
     /// Gets or creates a named global channel shared across threads.
-    /// @param name : string
+    /// @param name string
     /// @return Channel
     let ch = named_channels.clone();
     tbl.set(
@@ -275,8 +276,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a thread pool of N workers all running the same Lua code.
     /// Workers receive tasks via lurek.thread.getChannel("__pool_input") and
     /// send results via lurek.thread.getChannel("__pool_output").
-    /// @param size : integer
-    /// @param code : string
+    /// @param size integer
+    /// @param code string
     /// @return ThreadPool
     tbl.set(
         "newPool",
@@ -291,8 +292,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Starts a one-shot background computation and returns a Promise.
     /// The worker code should push its result via:
     ///   lurek.thread.getChannel("__promise_result"):push(value)
-    /// @param code : string
-    /// @param args : MultiValue
+    /// @param code string
+    /// @param args MultiValue
     /// @return Promise
     tbl.set(
         "async",
@@ -320,14 +321,14 @@ impl LuaUserData for LuaChannel {
         /// @return string
         methods.add_method("type", |_, _, ()| Ok("Channel".to_string()));
         /// Checks if the object is of the specified type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok("Channel" == name || ["Object"].contains(&name.as_str()))
         });
 
         /// Pushes a value to the channel.
-        /// @param value : any
+        /// @param value any
         /// @return integer
         methods.add_method("push", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
@@ -350,7 +351,7 @@ impl LuaUserData for LuaChannel {
         });
 
         /// Blocks until a value is available or the timeout expires, then removes and returns it.
-        /// @param timeout : number?
+        /// @param timeout number?
         /// @return string|number|boolean|table|nil
         methods.add_method("demand", |lua, this, timeout: Option<f64>| {
             match this.inner.demand(timeout) {
@@ -371,7 +372,7 @@ impl LuaUserData for LuaChannel {
         });
 
         /// Blocks until the channel has space, then adds the value.
-        /// @param value : any
+        /// @param value any
         /// @return nil
         methods.add_method("supply", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
@@ -381,7 +382,7 @@ impl LuaUserData for LuaChannel {
         // -- pushTable --
         /// Serializes a Lua table and pushes it to the channel.
         /// Supports nested tables with string/number/boolean/nil keys and values.
-        /// @param value : table
+        /// @param value table
         /// @return integer
         methods.add_method("pushTable", |_, this, value: LuaValue| {
             match &value {
@@ -408,7 +409,7 @@ impl LuaUserData for LuaChannel {
 
         // -- pushBytes --
         /// Pushes raw binary data (a Lua string treated as a byte array) to the channel.
-        /// @param data : string
+        /// @param data string
         /// @return integer
         methods.add_method("pushBytes", |_, this, data: LuaString| {
             let bytes = data.as_bytes().to_vec();

@@ -5,7 +5,13 @@ const LUA_SELECTOR: vscode.DocumentSelector = {
   scheme: "file",
   language: "lua",
 };
-
+// Modules injected at runtime by the test harness or sandboxed intentionally.
+// Never emit requireMissing for these.
+const KNOWN_RUNTIME_MODULES = new Set([
+  "tests/lua/init",   // injected by tests/lua/harness.rs
+  "tests.lua.init",   // dot-notation variant used by some library tests
+  "socket",           // LuaJIT socket — blocked in sandbox (security tests)
+]);
 // ── Require graph types ───────────────────────────────────
 
 interface RequireInfo {
@@ -36,10 +42,15 @@ function positionFromOffset(text: string, offset: number): vscode.Position {
  */
 function parseRequires(text: string): RequireInfo[] {
   const requires: RequireInfo[] = [];
+  // Strip comments before scanning so requires inside comments are not detected.
+  // Replace comment chars with spaces (same length) to preserve offsets for position mapping.
+  const stripped = text
+    .replace(/--\[\[[\s\S]*?\]\]/g, (m) => " ".repeat(m.length))  // block comments
+    .replace(/--[^\n]*/g, (m) => " ".repeat(m.length));             // single-line comments
   const regex = /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g;
   let match: RegExpExecArray | null;
 
-  while ((match = regex.exec(text)) !== null) {
+  while ((match = regex.exec(stripped)) !== null) {
     const moduleName = match[1];
     const startOffset = match.index;
     const endOffset = match.index + match[0].length;
@@ -157,7 +168,7 @@ export function register(context: vscode.ExtensionContext): void {
     // scratch folders, and binary/log directories.
     const luaFiles = await vscode.workspace.findFiles(
       "**/*.lua",
-      "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}",
+      "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**,**/cag/**}",
     );
 
     for (const fileUri of luaFiles) {
@@ -232,7 +243,14 @@ export function register(context: vscode.ExtensionContext): void {
         if (req.resolvedUri) {
           const modulePath = req.moduleName.replace(/\./g, "/");
           const targetUri = uriByModule.get(modulePath);
-          if (!targetUri) {
+          // Also check relative to the requiring file's directory for game-local modules
+          // (e.g. require("scenes.01_sprites") in content/games/shooter/main.lua).
+          const relPath = vscode.workspace.asRelativePath(node.uri.fsPath).replace(/\\/g, "/");
+          const relDir = relPath.includes("/") ? relPath.replace(/\/[^/]+$/, "") : "";
+          const localModulePath = relDir ? `${relDir}/${modulePath}` : modulePath;
+          const localTargetUri = uriByModule.get(localModulePath);
+
+          if (!targetUri && !localTargetUri && !KNOWN_RUNTIME_MODULES.has(req.moduleName)) {
             const diag = new vscode.Diagnostic(
               req.range,
               `Cannot resolve module "${req.moduleName}" — file not found in workspace.`,

@@ -75,7 +75,9 @@ do  -- lurek.engine.fps
   function lurek.init() font = lurek.render.newFont(14) end
   function lurek.draw_ui()
     local fps = lurek.engine.fps()
-    lurek.render.print(font, string.format("FPS: %.0f", fps), 8, 8, 1, 1, 0, 1)
+    lurek.render.setFont(font)
+    lurek.render.setColor(1, 1, 0, 1)
+    lurek.render.print(string.format("FPS: %.0f", fps), 8, 8)
   end
 end
 

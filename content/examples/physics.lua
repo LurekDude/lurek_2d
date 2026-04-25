@@ -8,7 +8,7 @@
 --
 -- Run: cargo run -- content/examples/physics.lua
 
--- ── lurek.physics.* functions ──
+-- â”€â”€ lurek.physics.* functions â”€â”€
 
 --@api-stub: lurek.physics.newWorld
 -- Creates a new physics world with the given gravity vector.
@@ -34,7 +34,7 @@ end
 do  -- lurek.physics.destroyWorld
   local world = lurek.physics.newWorld(0, 9.81)
   lurek.physics.destroyWorld(world)
-  world = nil
+  world = nil --[[@type any]]
 end
 
 --@api-stub: lurek.physics.newBody
@@ -48,7 +48,7 @@ end
 
 --@api-stub: lurek.physics.getBody
 -- Returns the position and velocity of a body (x, y, vx, vy).
--- Returns x, y, vx, vy in one call — handy for syncing a sprite to its body each frame.
+-- Returns x, y, vx, vy in one call â€” handy for syncing a sprite to its body each frame.
 do  -- lurek.physics.getBody
   local world = lurek.physics.newWorld(0, 9.81)
   local body = lurek.physics.newBody(world, 100, 200, "dynamic")
@@ -67,7 +67,7 @@ end
 
 --@api-stub: lurek.physics.isSleepingAllowed
 -- Returns whether the body is allowed to sleep.
--- Branch on this before applying ambient forces — woken bodies cost solver time.
+-- Branch on this before applying ambient forces â€” woken bodies cost solver time.
 do  -- lurek.physics.isSleepingAllowed
   local world = lurek.physics.newWorld(0, 9.81)
   local body = lurek.physics.newBody(world, 100, 200, "dynamic")
@@ -87,7 +87,7 @@ end
 
 --@api-stub: lurek.physics.newRectangleShape
 -- Creates a rectangle shape userdata.
--- Attach to a body via lurek.physics.attachShape — width and height are in world units.
+-- Attach to a body via lurek.physics.attachShape â€” width and height are in world units.
 do  -- lurek.physics.newRectangleShape
   local crate_shape = lurek.physics.newRectangleShape(64, 64)
   lurek.log.info("crate shape type=" .. crate_shape:getType(), "phys")
@@ -154,7 +154,7 @@ end
 do  -- lurek.physics.debugDraw
   lurek.physics.debugDraw(true)
   function lurek.process(dt)
-    if lurek.input.isKeyPressed("f3") then lurek.physics.debugDraw(false) end
+    if lurek.input.keyboard.isDown("f3") then lurek.physics.debugDraw(false) end
   end
 end
 
@@ -188,7 +188,7 @@ do  -- lurek.physics.newCellular
 end
 
 
--- ── World methods ──
+-- â”€â”€ World methods â”€â”€
 
 --@api-stub: World:step
 -- Advances the physics simulation by dt seconds, firing onBeginContact /.
@@ -212,7 +212,7 @@ end
 
 --@api-stub: World:getGravity
 -- Returns the gravity vector (gx, gy).
--- Read the current gravity vector — useful when toggling underwater / zero-g modes.
+-- Read the current gravity vector â€” useful when toggling underwater / zero-g modes.
 do  -- World:getGravity
   local world = lurek.physics.newWorld(0, 9.81)
   local gx, gy = world:getGravity()
@@ -225,7 +225,7 @@ end
 do  -- World:setGravity
   local world = lurek.physics.newWorld(0, 9.81)
   function lurek.process(dt)
-    if lurek.input.isKeyPressed("g") then world:setGravity(0, -9.81) end
+    if lurek.input.keyboard.isDown("g") then world:setGravity(0, -9.81) end
   end
 end
 
@@ -429,7 +429,7 @@ end
 
 --@api-stub: World:getEndContactEvents
 -- Returns end-contact events from the last step.
--- Use to detect when objects part — e.g. removing a temporary glue effect.
+-- Use to detect when objects part â€” e.g. removing a temporary glue effect.
 do  -- World:getEndContactEvents
   local world = lurek.physics.newWorld(0, 9.81)
   function lurek.process(dt)
@@ -442,7 +442,7 @@ end
 
 --@api-stub: World:getContacts
 -- Returns all contact pairs from the narrow phase.
--- Includes contact normals — use to push bodies apart manually or to spawn impact FX.
+-- Includes contact normals â€” use to push bodies apart manually or to spawn impact FX.
 do  -- World:getContacts
   local world = lurek.physics.newWorld(0, 9.81)
   for _, c in ipairs(world:getContacts()) do
@@ -473,7 +473,7 @@ end
 
 --@api-stub: World:getBodyType
 -- Returns the body type as a string.
--- Read before mutating mass or velocity — only dynamic bodies respond to those.
+-- Read before mutating mass or velocity â€” only dynamic bodies respond to those.
 do  -- World:getBodyType
   local world = lurek.physics.newWorld(0, 9.81)
   local body = world:newBody(100, 200, "dynamic")
@@ -526,7 +526,7 @@ do  -- World:getBodyData
   local body = world:newBody(100, 200, "dynamic")
   world:setBodyData(body:getId(), { kind = "enemy", hp = 30 })
   local data = world:getBodyData(body:getId())
-  lurek.log.debug("entity kind=" .. data.kind, "phys")
+  if data then lurek.log.debug("entity kind=" .. data.kind, "phys") end
 end
 
 --@api-stub: World:clearBodyData
@@ -578,7 +578,7 @@ end
 
 --@api-stub: World:setJointBreakForce
 -- Sets the relative-velocity threshold above which a joint breaks.
--- Use to model destructible vehicle joints — the engine destroys the joint when exceeded.
+-- Use to model destructible vehicle joints â€” the engine destroys the joint when exceeded.
 do  -- World:setJointBreakForce
   local world = lurek.physics.newWorld(0, 9.81)
   local b1 = world:newBody(0, 0, "static")
@@ -612,7 +612,7 @@ end
 
 --@api-stub: World:wakeUpBody
 -- Forcibly wakes up a sleeping body.
--- Wake before applying impulses or forces — sleeping bodies ignore them.
+-- Wake before applying impulses or forces â€” sleeping bodies ignore them.
 do  -- World:wakeUpBody
   local world = lurek.physics.newWorld(0, 9.81)
   local body = world:newBody(100, 200, "dynamic")
@@ -682,7 +682,7 @@ do  -- World:getZoneEvents
 end
 
 
--- ── Zone methods ──
+-- â”€â”€ Zone methods â”€â”€
 
 --@api-stub: Zone:getId
 -- Returns the zone's integer ID.
@@ -704,7 +704,7 @@ end
 
 --@api-stub: Zone:setPriority
 -- Sets the zone priority; higher values win over lower when zones overlap.
--- Higher priority wins when zones overlap — use to layer a wind tunnel above ambient water.
+-- Higher priority wins when zones overlap â€” use to layer a wind tunnel above ambient water.
 do  -- Zone:setPriority
   local world = lurek.physics.newWorld(0, 9.81)
   local wind = world:addZone(0, 0, 200, 200)
@@ -722,7 +722,7 @@ end
 
 --@api-stub: Zone:setCircle
 -- Replaces the zone boundary with a circle.
--- Switch from rectangle to circular boundary — useful for blast radii or planet wells.
+-- Switch from rectangle to circular boundary â€” useful for blast radii or planet wells.
 do  -- Zone:setCircle
   local world = lurek.physics.newWorld(0, 9.81)
   local well = world:addZone(0, 0, 1, 1)
@@ -766,7 +766,7 @@ do  -- Zone:destroy
 end
 
 
--- ── Terrain methods ──
+-- â”€â”€ Terrain methods â”€â”€
 
 --@api-stub: Terrain:setCell
 -- Sets a single terrain cell to solid or empty.
@@ -780,7 +780,7 @@ end
 
 --@api-stub: Terrain:getCell
 -- Returns whether a cell is solid.
--- Probe before placing a structure — fail early when target cells are not solid.
+-- Probe before placing a structure â€” fail early when target cells are not solid.
 do  -- Terrain:getCell
   local world = lurek.physics.newWorld(0, 9.81)
   local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
@@ -808,7 +808,7 @@ end
 
 --@api-stub: Terrain:isDirty
 -- Returns `true` when at least one chunk needs flushing.
--- Skip flush() when nothing changed this frame — saves chunk rebuild work.
+-- Skip flush() when nothing changed this frame â€” saves chunk rebuild work.
 do  -- Terrain:isDirty
   local world = lurek.physics.newWorld(0, 9.81)
   local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
@@ -859,11 +859,11 @@ do  -- Terrain:loadFromBytes
 end
 
 
--- ── Cellular methods ──
+-- â”€â”€ Cellular methods â”€â”€
 
 --@api-stub: Cellular:setCell
 -- Sets the material of a cell.
--- Use to spawn material (sand, water) at a specific cell — typically from a player tool.
+-- Use to spawn material (sand, water) at a specific cell â€” typically from a player tool.
 do  -- Cellular:setCell
   local sand = lurek.physics.newCellular(128, 64)
   sand:setCell(64, 0, lurek.physics.CELL_SAND)
@@ -872,7 +872,7 @@ end
 
 --@api-stub: Cellular:getCell
 -- Returns the material at `(cx, cy)` as an integer constant.
--- Probe before placing a barrier — only act when the source cell is empty.
+-- Probe before placing a barrier â€” only act when the source cell is empty.
 do  -- Cellular:getCell
   local sand = lurek.physics.newCellular(128, 64)
   if sand:getCell(10, 10) == lurek.physics.CELL_AIR then
@@ -882,7 +882,7 @@ end
 
 --@api-stub: Cellular:step
 -- Advances the simulation by one tick.
--- Drive the simulation each frame from lurek.process — sand falls, water spreads.
+-- Drive the simulation each frame from lurek.process â€” sand falls, water spreads.
 do  -- Cellular:step
   local sand = lurek.physics.newCellular(128, 64)
   function lurek.process(dt)
@@ -946,7 +946,7 @@ do  -- Cellular:loadFromBytes
 end
 
 
--- ── Body methods ──
+-- â”€â”€ Body methods â”€â”€
 
 --@api-stub: Body:getId
 -- Returns the body's integer ID.
@@ -1065,7 +1065,7 @@ end
 
 --@api-stub: Body:setMass
 -- Sets the body mass; affects how forces and impulses change velocity.
--- Override the mass derived from shape density — use for game-feel tuning.
+-- Override the mass derived from shape density â€” use for game-feel tuning.
 do  -- Body:setMass
   local world = lurek.physics.newWorld(0, 9.81)
   local heavy = world:newBody(100, 200, "dynamic")
@@ -1074,7 +1074,7 @@ end
 
 --@api-stub: Body:getType
 -- Returns the body type as a string.
--- Branch on the type before applying impulses — only dynamic bodies respond.
+-- Branch on the type before applying impulses â€” only dynamic bodies respond.
 do  -- Body:getType
   local world = lurek.physics.newWorld(0, 9.81)
   local body = world:newBody(100, 200, "dynamic")
@@ -1110,7 +1110,7 @@ end
 
 --@api-stub: Body:getFriction
 -- Returns the body friction coefficient.
--- Compare to a target value before mutating — avoid wakes on bodies already at the right value.
+-- Compare to a target value before mutating â€” avoid wakes on bodies already at the right value.
 do  -- Body:getFriction
   local world = lurek.physics.newWorld(0, 9.81)
   local crate = world:newBody(100, 200, "dynamic")
@@ -1119,7 +1119,7 @@ end
 
 --@api-stub: Body:setFriction
 -- Sets the body friction coefficient.
--- Use 0.0 for ice, 0.7 for wood, 1.0+ for rubber — tune for the surface material.
+-- Use 0.0 for ice, 0.7 for wood, 1.0+ for rubber â€” tune for the surface material.
 do  -- Body:setFriction
   local world = lurek.physics.newWorld(0, 9.81)
   local ice = world:newBody(100, 200, "dynamic")
@@ -1164,7 +1164,7 @@ end
 
 --@api-stub: Body:getMask
 -- Returns the collision mask bitmask.
--- Read to debug collision filtering — body sees layers in the mask, ignores others.
+-- Read to debug collision filtering â€” body sees layers in the mask, ignores others.
 do  -- Body:getMask
   local world = lurek.physics.newWorld(0, 9.81)
   local body = world:newBody(100, 200, "dynamic")
@@ -1187,7 +1187,7 @@ do  -- Body:applyImpulse
   local world = lurek.physics.newWorld(0, 9.81)
   local player = world:newBody(100, 200, "dynamic")
   function lurek.process(dt)
-    if lurek.input.isKeyPressed("space") then player:applyImpulse(0, -300) end
+    if lurek.input.keyboard.isDown("space") then player:applyImpulse(0, -300) end
   end
 end
 
@@ -1204,7 +1204,7 @@ end
 
 --@api-stub: Body:applyTorque
 -- Applies a torque (rotational force).
--- Use to spin up a wheel or give a thrown object a tumble — accumulates over the step.
+-- Use to spin up a wheel or give a thrown object a tumble â€” accumulates over the step.
 do  -- Body:applyTorque
   local world = lurek.physics.newWorld(0, 9.81)
   local wheel = world:newBody(100, 200, "dynamic")
@@ -1267,7 +1267,7 @@ end
 
 --@api-stub: Body:setLinearDamping
 -- Sets the linear damping coefficient.
--- Use 0 for vacuum, 0.5 for air, 5+ for water — simulates fluid drag without a zone.
+-- Use 0 for vacuum, 0.5 for air, 5+ for water â€” simulates fluid drag without a zone.
 do  -- Body:setLinearDamping
   local world = lurek.physics.newWorld(0, 9.81)
   local fish = world:newBody(100, 200, "dynamic")
@@ -1276,7 +1276,7 @@ end
 
 --@api-stub: Body:getAngularDamping
 -- Returns the angular damping coefficient.
--- Read to debug bodies that keep spinning forever — usually damping=0 is the cause.
+-- Read to debug bodies that keep spinning forever â€” usually damping=0 is the cause.
 do  -- Body:getAngularDamping
   local world = lurek.physics.newWorld(0, 9.81)
   local top = world:newBody(100, 200, "dynamic")
@@ -1312,7 +1312,7 @@ end
 
 --@api-stub: Body:isSleepingAllowed
 -- Returns whether the body can sleep.
--- Read before disabling — gameplay-critical bodies should never sleep.
+-- Read before disabling â€” gameplay-critical bodies should never sleep.
 do  -- Body:isSleepingAllowed
   local world = lurek.physics.newWorld(0, 9.81)
   local body = world:newBody(100, 200, "dynamic")
@@ -1339,7 +1339,7 @@ end
 
 --@api-stub: Body:isSleeping
 -- Returns true if this body is currently sleeping (inactive).
--- Use to gate per-frame work (AI, sound) on inactive bodies — saves frame budget.
+-- Use to gate per-frame work (AI, sound) on inactive bodies â€” saves frame budget.
 do  -- Body:isSleeping
   local world = lurek.physics.newWorld(0, 9.81)
   local body = world:newBody(100, 200, "dynamic")
@@ -1366,7 +1366,7 @@ do  -- Body:sleep
 end
 
 
--- ── PhysicsShape methods ──
+-- â”€â”€ PhysicsShape methods â”€â”€
 
 --@api-stub: PhysicsShape:getType
 -- Returns the shape type string: "circle", "rectangle", "polygon", "edge", or "chain".
@@ -1397,7 +1397,7 @@ end
 
 --@api-stub: PhysicsShape:setDensity
 -- Sets the density for this shape (used when attaching to a body).
--- Set BEFORE attachShape — once attached, density does not retro-actively re-derive mass.
+-- Set BEFORE attachShape â€” once attached, density does not retro-actively re-derive mass.
 do  -- PhysicsShape:setDensity
   local shape = lurek.physics.newRectangleShape(32, 32)
   shape:setDensity(2.0)
@@ -1421,7 +1421,7 @@ end
 
 --@api-stub: PhysicsShape:setSensor
 -- Sets whether this shape is a sensor (non-colliding trigger).
--- Use for trigger volumes (pickup zones, kill planes) — fires events but does not block.
+-- Use for trigger volumes (pickup zones, kill planes) â€” fires events but does not block.
 do  -- PhysicsShape:setSensor
   local trigger = lurek.physics.newRectangleShape(64, 64)
   trigger:setSensor(true)
@@ -1433,7 +1433,7 @@ end
 do  -- PhysicsShape:destroy
   local shape = lurek.physics.newRectangleShape(32, 32)
   shape:destroy()
-  shape = nil
+  shape = nil --[[@type any]]
 end
 
 --@api-stub: lurek.physics.testAABB
@@ -1480,10 +1480,10 @@ end
 -- Creates a distance joint keeping two bodies at a fixed separation.
 -- damping and frequency control spring-like oscillation; 0 damping = rigid rod.
 do  -- World:addDistanceJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 100, "dynamic")
   local b = world:newBody(200, 100, "dynamic")
-  local jid = world:addDistanceJoint(a:getId(), b:getId(), 100, 0.9, 5.0)
+  local jid = world:addDistanceJoint(a:getId(), b:getId(), 100, 100, 200, 100, 100)
   lurek.log.info("distance joint: " .. jid, "physics")
 end
 
@@ -1491,7 +1491,7 @@ end
 -- Attaches a shape fixture to an existing body with friction and restitution.
 -- Multiple fixtures give a body a composite collision shape.
 do  -- World:addFixture
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newBody(200, 200, "dynamic")
   local fid = world:addFixture(b:getId(), "circle", {radius=16, friction=0.4, restitution=0.3})
   lurek.log.info("fixture id: " .. fid, "physics")
@@ -1501,10 +1501,10 @@ end
 -- Creates a friction joint that resists relative linear and angular motion.
 -- maxForce and maxTorque cap the damping; use for ice-skating or surface drag.
 do  -- World:addFrictionJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 100, "dynamic")
   local b = world:newBody(100, 100, "static")
-  local jid = world:addFrictionJoint(a:getId(), b:getId(), 50, 10)
+  local jid = world:addFrictionJoint(a:getId(), b:getId(), 100, 100, 50, 10)
   lurek.log.info("friction joint: " .. jid, "physics")
 end
 
@@ -1512,13 +1512,13 @@ end
 -- Links two revolute or prismatic joints so their motion stays coupled by a ratio.
 -- Simulates gear trains; both joints must already exist in the same world.
 do  -- World:addGearJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 200, "dynamic")
   local b = world:newBody(200, 200, "dynamic")
   local c = world:newBody(150, 200, "static")
   local j1 = world:addRevoluteJoint(c:getId(), a:getId(), 100, 200)
   local j2 = world:addRevoluteJoint(c:getId(), b:getId(), 200, 200)
-  local jid = world:addGearJoint(j1, j2, 2.0)
+  local jid = world:addGearJoint(a:getId(), b:getId(), 150, 200)
   lurek.log.info("gear joint: " .. jid, "physics")
 end
 
@@ -1526,10 +1526,10 @@ end
 -- Creates a motor joint that drives one body to match the position/angle of another.
 -- maxForce and maxTorque control how aggressively the motor corrects offset.
 do  -- World:addMotorJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 100, "dynamic")
   local b = world:newBody(200, 200, "dynamic")
-  local jid = world:addMotorJoint(a:getId(), b:getId(), 100, 50)
+  local jid = world:addMotorJoint(a:getId(), b:getId(), 0.3)
   lurek.log.info("motor joint: " .. jid, "physics")
 end
 
@@ -1537,7 +1537,7 @@ end
 -- Creates a spring-like joint from a body to a moving screen position (drag-and-drop).
 -- maxForce prevents the joint from exploding when the target moves quickly.
 do  -- World:addMouseJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newBody(200, 200, "dynamic")
   local jid = world:addMouseJoint(b:getId(), 200, 200, 1000)
   lurek.log.info("mouse joint: " .. jid, "physics")
@@ -1547,10 +1547,10 @@ end
 -- Creates a prismatic joint allowing translation along one axis only.
 -- Use for sliding doors, pistons, or elevator platforms.
 do  -- World:addPrismaticJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 300, "static")
   local b = world:newBody(100, 200, "dynamic")
-  local jid = world:addPrismaticJoint(a:getId(), b:getId(), 0, -1)
+  local jid = world:addPrismaticJoint(a:getId(), b:getId(), 100, 300, 0, -1)
   lurek.log.info("prismatic joint: " .. jid, "physics")
 end
 
@@ -1558,10 +1558,10 @@ end
 -- Creates a pulley joint constraining two bodies through a fixed rope length.
 -- lengthA + lengthB == total rope; a ratio != 1 simulates a block-and-tackle.
 do  -- World:addPulleyJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 200, "dynamic")
   local b = world:newBody(300, 200, "dynamic")
-  local jid = world:addPulleyJoint(a:getId(), b:getId(), 100, 100, 300, 100, 100, 100, 1.0)
+  local jid = world:addPulleyJoint(a:getId(), b:getId(), 100, 100)
   lurek.log.info("pulley joint: " .. jid, "physics")
 end
 
@@ -1569,7 +1569,7 @@ end
 -- Creates a revolute (hinge) joint at a world-space anchor point.
 -- Bodies can rotate freely about the anchor; add limits to constrain the angle.
 do  -- World:addRevoluteJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local door = world:newBody(200, 200, "dynamic")
   local wall  = world:newBody(200, 200, "static")
   local jid = world:addRevoluteJoint(wall:getId(), door:getId(), 200, 200)
@@ -1580,10 +1580,10 @@ end
 -- Creates a rope joint that prevents two bodies from exceeding a max distance.
 -- Slack means bodies can be closer; maxLength is the hard upper limit.
 do  -- World:addRopeJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 100, "dynamic")
   local b = world:newBody(100, 200, "dynamic")
-  local jid = world:addRopeJoint(a:getId(), b:getId(), 120)
+  local jid = world:addRopeJoint(a:getId(), b:getId(), 100, 100, 100, 200, 120)
   lurek.log.info("rope joint: " .. jid, "physics")
 end
 
@@ -1591,10 +1591,10 @@ end
 -- Welds two bodies together at their current relative positions.
 -- frequency and damping add slight spring flexibility to prevent solver jitter.
 do  -- World:addWeldJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(150, 200, "dynamic")
   local b = world:newBody(170, 200, "dynamic")
-  local jid = world:addWeldJoint(a:getId(), b:getId(), 160, 200, 10, 0.7)
+  local jid = world:addWeldJoint(a:getId(), b:getId(), 160, 200)
   lurek.log.info("weld joint: " .. jid, "physics")
 end
 
@@ -1602,10 +1602,10 @@ end
 -- Creates a wheel joint for vehicle suspension: translation + rotation + motor.
 -- Adjust frequency and damping to tune suspension stiffness and bounce.
 do  -- World:addWheelJoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local chassis = world:newBody(200, 200, "dynamic")
   local wheel   = world:newBody(200, 240, "dynamic")
-  local jid = world:addWheelJoint(chassis:getId(), wheel:getId(), 200, 240, 0, -1, 5.0, 0.7)
+  local jid = world:addWheelJoint(chassis:getId(), wheel:getId(), 200, 240, 0, -1)
   lurek.log.info("wheel joint: " .. jid, "physics")
 end
 
@@ -1613,7 +1613,7 @@ end
 -- Applies a force at an off-centre world-space point, generating torque.
 -- Use for realistic drag, thrust, or projectile impact forces.
 do  -- Body:applyForceAtPoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newBody(200, 200, "dynamic")
   b:applyForceAtPoint(100, 0, 220, 200)
   lurek.log.info("force at point applied", "physics")
@@ -1621,12 +1621,13 @@ end
 
 --@api-stub: World:drawDebug
 -- Renders physics shapes, joints, and AABBs using the engine's debug draw API.
--- Call inside lurek.render() to overlay the physics debug visualisation.
+-- Call inside lurek.draw() to overlay the physics debug visualisation.
 do  -- World:drawDebug
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   world:newBody(200, 200, "static")
-  function lurek.render()
-    world:drawDebug()
+  local debug_img = lurek.image.newImageData(400, 400)
+  function lurek.draw()
+    world:drawDebug(debug_img)
   end
   lurek.log.info("drawDebug hooked", "physics")
 end
@@ -1635,9 +1636,10 @@ end
 -- Fills a circular region of the destructible terrain with a given cell value.
 -- Used to create craters; value=0 makes cells empty (air), 1=solid.
 do  -- Terrain:fillCircle
-  local terrain = lurek.physics.newTerrain(64, 64, 8)
-  terrain:fillAll(1)
-  terrain:fillCircle(32, 32, 10, 0)
+  local _world = lurek.physics.newWorld(0, 9.81)
+  local terrain = lurek.physics.newTerrain(64, 64, 8, _world)
+  terrain:fillAll(true)
+  terrain:fillCircle(32, 32, 10, false)
   terrain:flush()
   lurek.log.info("terrain crater dug", "physics")
 end
@@ -1655,8 +1657,9 @@ end
 -- Fills a rectangular region of the destructible terrain with the given cell value.
 -- value=1 places solid material; value=0 removes it.
 do  -- Terrain:fillRect
-  local terrain = lurek.physics.newTerrain(64, 64, 8)
-  terrain:fillRect(10, 10, 40, 40, 1)
+  local _world = lurek.physics.newWorld(0, 9.81)
+  local terrain = lurek.physics.newTerrain(64, 64, 8, _world)
+  terrain:fillRect(10, 10, 40, 40, true)
   terrain:flush()
   lurek.log.info("terrain rect filled", "physics")
 end
@@ -1674,9 +1677,9 @@ end
 -- Creates a chain-shape body from a sequence of vertices.
 -- Chain shapes are one-sided and ideal for long terrain contours or platforms.
 do  -- World:newChainBody
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local verts = {0,400, 200,380, 400,400, 600,390, 800,400}
-  local b = world:newChainBody(verts, "static")
+  local b = world:newChainBody(0, 0, verts, false, "static")
   lurek.log.info("chain body: " .. b:getId(), "physics")
 end
 
@@ -1684,7 +1687,7 @@ end
 -- Creates a circle-shaped body at (x, y) with the given radius and type.
 -- Faster and more stable than polygon approximations for round objects.
 do  -- World:newCircleBody
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newCircleBody(300, 200, 20, "dynamic")
   lurek.log.info("circle body: " .. b:getId(), "physics")
 end
@@ -1693,8 +1696,8 @@ end
 -- Creates a single one-sided edge between two points as a static body.
 -- Use for thin walls, platforms, or invisible boundaries.
 do  -- World:newEdgeBody
-  local world = lurek.physics.newWorld()
-  local b = world:newEdgeBody(0, 400, 800, 400, "static")
+  local world = lurek.physics.newWorld(0, 9.81)
+  local b = world:newEdgeBody(0, 0, 0, 400, 800, 400, "static")
   lurek.log.info("edge body: " .. b:getId(), "physics")
 end
 
@@ -1702,7 +1705,7 @@ end
 -- Creates a convex polygon body from a vertex table (max 8 vertices).
 -- Vertices must be in counter-clockwise order; Box2D auto-computes the centroid.
 do  -- World:newPolygonBody
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local verts = {-20,-10, 20,-10, 20,10, -20,10}
   local b = world:newPolygonBody(300, 200, verts, "dynamic")
   lurek.log.info("polygon body: " .. b:getId(), "physics")
@@ -1712,7 +1715,7 @@ end
 -- Returns all body IDs whose fixtures overlap the given axis-aligned bounding box.
 -- Use for cheap broad-phase spatial queries before narrow-phase shape tests.
 do  -- World:queryAABB
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   world:newCircleBody(100, 100, 20, "static")
   local hits = world:queryAABB(80, 80, 130, 130)
   lurek.log.info("AABB hits: " .. #hits, "physics")
@@ -1722,7 +1725,7 @@ end
 -- Fires a ray and returns the first hit body id, normal, and fraction.
 -- Returns nil if no body is hit; fraction is in [0,1] along the ray.
 do  -- World:raycast
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   world:newCircleBody(200, 200, 30, "static")
   local id, nx, ny, frac = world:raycast(0, 200, 400, 200)
   lurek.log.info("raycast hit: " .. tostring(id), "physics")
@@ -1732,10 +1735,10 @@ end
 -- Returns all bodies hit by a ray as a table of {id, normal, fraction} records.
 -- Sorted by fraction (nearest first); useful for piercing shots.
 do  -- World:raycastAll
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   world:newCircleBody(100, 200, 20, "static")
   world:newCircleBody(300, 200, 20, "static")
-  local hits = world:raycastAll(0, 200, 400, 200)
+  local hits = world:raycastAll(0, 200, 1, 0, 400)
   lurek.log.info("all hits: " .. #hits, "physics")
 end
 
@@ -1743,9 +1746,9 @@ end
 -- Returns only the closest body hit by a ray as {id, normal, fraction}.
 -- Faster than raycastAll when only the nearest obstacle matters.
 do  -- World:raycastClosest
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   world:newCircleBody(150, 200, 20, "static")
-  local hit = world:raycastClosest(0, 200, 400, 200)
+  local hit = world:raycastClosest(0, 200, 1, 0, 400)
   lurek.log.info("closest hit: " .. tostring(hit and hit.id), "physics")
 end
 
@@ -1753,7 +1756,7 @@ end
 -- Sets an angular damping coefficient applied to all bodies inside this zone.
 -- Override is only active while the body remains within the zone boundary.
 do  -- Zone:setAngularDampingOverride
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local z = world:addZone(100, 100, 300, 300)
   z:setAngularDampingOverride(5.0)
   lurek.log.info("zone angular damping set", "physics")
@@ -1763,7 +1766,7 @@ end
 -- Attaches arbitrary Lua data to a body for retrieval in collision callbacks.
 -- Common use: store the entity id or component table that owns the body.
 do  -- World:setBodyData
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newBody(200, 200, "dynamic")
   world:setBodyData(b:getId(), {entityId=42, type="player"})
   lurek.log.info("body data set", "physics")
@@ -1773,7 +1776,7 @@ end
 -- Marks a body as a one-way platform: only collides from one direction.
 -- Pass the allowed normal direction (0,-1 = top surface; 0,1 = bottom).
 do  -- World:setBodyOneWay
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local platform = world:newBody(400, 300, "static")
   world:setBodyOneWay(platform:getId(), 0, -1)
   lurek.log.info("one-way platform set", "physics")
@@ -1783,10 +1786,10 @@ end
 -- Sets the friction coefficient on an existing fixture by its id.
 -- Values in [0,1]; 0=ice, 1=rubber; default is 0.5.
 do  -- World:setFixtureFriction
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newBody(200, 200, "dynamic")
   local fid = world:addFixture(b:getId(), "box", {width=32,height=32})
-  world:setFixtureFriction(fid, 0.1)
+  world:setFixtureFriction(b:getId(), fid, 0.1)
   lurek.log.info("fixture friction set", "physics")
 end
 
@@ -1794,10 +1797,10 @@ end
 -- Sets the restitution (bounciness) on an existing fixture.
 -- 0 = completely inelastic; 1 = perfectly elastic bounce.
 do  -- World:setFixtureRestitution
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newBody(200, 200, "dynamic")
   local fid = world:addFixture(b:getId(), "circle", {radius=16})
-  world:setFixtureRestitution(fid, 0.8)
+  world:setFixtureRestitution(b:getId(), fid, 0.8)
   lurek.log.info("restitution set", "physics")
 end
 
@@ -1805,10 +1808,10 @@ end
 -- Marks a fixture as a sensor so it receives collision events but exerts no force.
 -- Sensors detect overlaps without preventing movement; ideal for trigger zones.
 do  -- World:setFixtureSensor
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newBody(200, 200, "static")
   local fid = world:addFixture(b:getId(), "circle", {radius=40})
-  world:setFixtureSensor(fid, true)
+  world:setFixtureSensor(b:getId(), fid, true)
   lurek.log.info("sensor fixture set", "physics")
 end
 
@@ -1816,7 +1819,7 @@ end
 -- Sets gravity in the zone to pull bodies toward a point attractor.
 -- strength > 0 pulls inward (planet gravity); < 0 pushes outward (explosion).
 do  -- Zone:setGravityPoint
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local z = world:addZone(0, 0, 800, 600)
   z:setGravityPoint(400, 300, 500)
   lurek.log.info("gravity point set", "physics")
@@ -1826,7 +1829,7 @@ end
 -- Sets gravity in the zone to push bodies away from a repulsor point.
 -- strength controls force magnitude; useful for explosive force zones.
 do  -- Zone:setGravityRepulsor
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local z = world:addZone(200, 200, 600, 400)
   z:setGravityRepulsor(400, 300, 300)
   lurek.log.info("gravity repulsor set", "physics")
@@ -1836,7 +1839,7 @@ end
 -- Sets the angular or linear limits for an existing constrained joint.
 -- For revolute joints: min/max are angles in radians; for prismatic: metres.
 do  -- World:setJointLimits
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 200, "static")
   local b = world:newBody(100, 100, "dynamic")
   local jid = world:addRevoluteJoint(a:getId(), b:getId(), 100, 200)
@@ -1848,7 +1851,7 @@ end
 -- Enables or disables the angular/linear limits on an existing joint.
 -- Toggle without removing the joint to implement retractable constraints.
 do  -- World:setJointLimitsEnabled
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local a = world:newBody(100, 200, "static")
   local b = world:newBody(100, 100, "dynamic")
   local jid = world:addRevoluteJoint(a:getId(), b:getId(), 100, 200)
@@ -1860,7 +1863,7 @@ end
 -- Sets the motor speed for a revolute or prismatic joint motor.
 -- Positive and negative values drive in opposite directions.
 do  -- World:setJointMotorSpeed
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local axle = world:newBody(200, 200, "static")
   local wheel = world:newBody(200, 240, "dynamic")
   local jid = world:addRevoluteJoint(axle:getId(), wheel:getId(), 200, 220)
@@ -1872,7 +1875,7 @@ end
 -- Updates the target world position for an existing mouse joint each frame.
 -- Call inside lurek.process(dt) with the current mouse world coordinates.
 do  -- World:setMouseJointTarget
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   local b = world:newBody(300, 200, "dynamic")
   local jid = world:addMouseJoint(b:getId(), 300, 200, 2000)
   world:setMouseJointTarget(jid, 350, 250)
@@ -1883,12 +1886,13 @@ end
 -- Spawns dynamic debris bodies for cells removed from the terrain.
 -- Returns a table of new body ids; debris bodies settle under gravity.
 do  -- Terrain:spawnDebris
-  local world = lurek.physics.newWorld()
-  local terrain = lurek.physics.newTerrain(32, 32, 8)
-  terrain:fillAll(1)
-  terrain:fillCircle(16, 16, 6, 0)
+  local world = lurek.physics.newWorld(0, 9.81)
+  local terrain = lurek.physics.newTerrain(32, 32, 8, world)
+  terrain:fillAll(true)
+  terrain:fillCircle(16, 16, 6, false)
   terrain:flush()
-  local debris = terrain:spawnDebris(world)
+  local positions = terrain:solidPositions()
+  local debris = terrain:spawnDebris(positions, 1.0, 0.5)
   lurek.log.info("debris count: " .. #debris, "physics")
 end
 
@@ -1896,7 +1900,7 @@ end
 -- Advances the physics world by a fixed timestep with an optional substep count.
 -- Use instead of step() for deterministic simulations requiring fixed-rate updates.
 do  -- World:stepFixed
-  local world = lurek.physics.newWorld()
+  local world = lurek.physics.newWorld(0, 9.81)
   world:stepFixed(1/60, 6, 2)
   lurek.log.info("fixed step done", "physics")
 end
@@ -1905,12 +1909,13 @@ end
 -- Converts the terrain cell grid to an ImageData for rendering or saving.
 -- Solid cells are opaque white; empty cells are transparent black.
 do  -- Terrain:toImageData
-  local terrain = lurek.physics.newTerrain(32, 32, 8)
-  terrain:fillAll(1)
-  terrain:fillCircle(16, 16, 8, 0)
+  local _w = lurek.physics.newWorld(0, 9.81)
+  local terrain = lurek.physics.newTerrain(32, 32, 8, _w)
+  terrain:fillAll(true)
+  terrain:fillCircle(16, 16, 8, false)
   terrain:flush()
-  local img = terrain:toImageData()
-  lurek.log.info("terrain image: " .. img:getWidth() .. "x" .. img:getHeight(), "physics")
+  local bytes = terrain:toImageData(255, 255, 255, 0, 0, 0)
+  lurek.log.info("terrain image: " .. #bytes .. " bytes", "physics")
 end
 
 --@api-stub: Cellular:toImageDataRegion
@@ -1920,5 +1925,5 @@ do  -- Cellular:toImageDataRegion
   local ca = lurek.physics.newCellular(64, 64)
   ca:fillRect(0, 0, 63, 63, 1)
   local img = ca:toImageDataRegion(10, 10, 40, 40)
-  lurek.log.info("region img: " .. img:getWidth() .. "x" .. img:getHeight(), "physics")
+  lurek.log.info("region img: " .. #img .. " bytes", "physics")
 end

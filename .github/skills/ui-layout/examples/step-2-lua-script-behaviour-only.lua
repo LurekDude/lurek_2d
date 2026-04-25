@@ -1,17 +1,24 @@
--- Load the layout and show it
-local hud = lurek.ui.load_layout("content/layouts/games/combat_hud.toml")
-lurek.ui.show(hud)
+-- Behaviour-only sketch: wire the widget handles returned by your layout loader,
+-- then use the current widget setters/callbacks directly.
+local game = { score = 120, end_player_turn = function() end }
+local player = { hp = 75, max_hp = 100, has_ranged_weapon = true }
 
--- Attach callbacks by widget id
-lurek.ui.on(hud, "end_turn_btn", "click", function()
+local hud = {} ---@type any
+local end_turn_btn = {} ---@type any
+local volume_slider = {} ---@type any
+local score_label = {} ---@type any
+local hp_bar = {} ---@type any
+local ammo_badge = {} ---@type any
+
+hud:setVisible(true)
+end_turn_btn:setOnClick(function()
     game.end_player_turn()
 end)
 
-lurek.ui.on(hud, "volume_slider", "change", function(value)
-    lurek.audio.set_master_volume(value)
+volume_slider:setOnChange(function(value)
+    lurek.audio.setMasterVolume(value)
 end)
 
--- Update widget text / values at runtime
-lurek.ui.set_text(hud, "score_label",  tostring(game.score))
-lurek.ui.set_value(hud, "hp_bar",      player.hp / player.max_hp)
-lurek.ui.set_visible(hud, "ammo_badge", player.has_ranged_weapon)
+score_label:setText(tostring(game.score))
+hp_bar:setValue(player.hp / player.max_hp)
+ammo_badge:setVisible(player.has_ranged_weapon)

@@ -259,8 +259,61 @@ lurek.input.bind("quit",       "escape")
 
 -- ── Callbacks ──────────────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+local _cam = nil ---@type any
+
 function lurek.init()
-    screen_w, screen_h = lurek.window.getDimensions()
+    _cam = lurek.camera.new()
+    local window_w, window_h = lurek.window.getDimensions()
+    if window_w ~= nil and window_h ~= nil then
+        screen_w, screen_h = window_w, window_h
+    end
     lurek.render.setBackgroundColor(0.1, 0.15, 0.1)
     generate_world()
     generate_pois()
@@ -417,7 +470,7 @@ function lurek.draw()
             if gx >= 1 and gx <= WORLD_H and gy >= 1 and gy <= WORLD_W then
                 local r, g, b = tile_color(tiles[gx][gy])
                 lurek.render.setColor(r, g, b, 1)
-                lurek.render.rectangle(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                rect(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE)
             end
         end
     end
@@ -432,10 +485,10 @@ function lurek.draw()
                 local wy = (pty - 1) * TILE_SIZE + TILE_SIZE * 0.5
                 -- draw star as diamond
                 lurek.render.setColor(1.0, 0.9, 0.1, 1)
-                lurek.render.rectangle(wx - 4, wy - 4, 8, 8)
+                rect(wx - 4, wy - 4, 8, 8)
                 lurek.render.setColor(1.0, 1.0, 0.5, 0.6)
-                lurek.render.rectangle(wx - 6, wy - 2, 12, 4)
-                lurek.render.rectangle(wx - 2, wy - 6, 4, 12)
+                rect(wx - 6, wy - 2, 12, 4)
+                rect(wx - 2, wy - 6, 4, 12)
             end
         end
     end
@@ -444,18 +497,18 @@ function lurek.draw()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.rectangle(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size)
+        rect(p.x - p.size * 0.5, p.y - p.size * 0.5, p.size, p.size)
     end
 
     -- draw player
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.rectangle(player_draw_x, player_draw_y, PLAYER_SIZE, PLAYER_SIZE)
+    rect(player_draw_x, player_draw_y, PLAYER_SIZE, PLAYER_SIZE)
     -- player outline
     lurek.render.setColor(0.2, 0.2, 0.2, 1)
-    lurek.render.rectangle(player_draw_x - 1, player_draw_y - 1, PLAYER_SIZE + 2, 1)
-    lurek.render.rectangle(player_draw_x - 1, player_draw_y + PLAYER_SIZE, PLAYER_SIZE + 2, 1)
-    lurek.render.rectangle(player_draw_x - 1, player_draw_y, 1, PLAYER_SIZE)
-    lurek.render.rectangle(player_draw_x + PLAYER_SIZE, player_draw_y, 1, PLAYER_SIZE)
+    rect(player_draw_x - 1, player_draw_y - 1, PLAYER_SIZE + 2, 1)
+    rect(player_draw_x - 1, player_draw_y + PLAYER_SIZE, PLAYER_SIZE + 2, 1)
+    rect(player_draw_x - 1, player_draw_y, 1, PLAYER_SIZE)
+    rect(player_draw_x + PLAYER_SIZE, player_draw_y, 1, PLAYER_SIZE)
 end
 
 -- ── Render UI: minimap, fog, stats, title ──────────────────────────────
@@ -464,13 +517,13 @@ function lurek.draw_ui()
     if state == "TITLE" then
         -- title screen
         lurek.render.setColor(1, 1, 1, title_alpha)
-        lurek.render.print("MINIMAP DEMO", screen_w / 2 - 100, screen_h / 2 - 60, 32)
+        text_("MINIMAP DEMO", screen_w / 2 - 100, screen_h / 2 - 60, 32)
 
         lurek.render.setColor(0.7, 0.9, 0.7, title_prompt_alpha)
-        lurek.render.print("EXPLORE THE WORLD", screen_w / 2 - 90, screen_h / 2, 18)
+        text_("EXPLORE THE WORLD", screen_w / 2 - 90, screen_h / 2, 18)
 
         lurek.render.setColor(0.5, 0.5, 0.5, title_prompt_alpha * 0.7)
-        lurek.render.print("Press WASD to begin", screen_w / 2 - 80, screen_h / 2 + 40, 14)
+        text_("Press WASD to begin", screen_w / 2 - 80, screen_h / 2 + 40, 14)
         return
     end
 
@@ -484,7 +537,7 @@ function lurek.draw_ui()
 
         -- minimap background
         lurek.render.setColor(0, 0, 0, 0.75)
-        lurek.render.rectangle(mx - 2, my - 2, mm + 4, mm + 4)
+        rect(mx - 2, my - 2, mm + 4, mm + 4)
 
         -- draw tiles on minimap
         for ty = 1, WORLD_H do
@@ -496,14 +549,14 @@ function lurek.draw_ui()
                 if visible[ty][tx] then
                     local r, g, b = tile_color(tiles[ty][tx])
                     lurek.render.setColor(r, g, b, 1)
-                    lurek.render.rectangle(px, py, sz, sz)
+                    rect(px, py, sz, sz)
                 elseif explored[ty][tx] then
                     local r, g, b = tile_color(tiles[ty][tx])
                     lurek.render.setColor(r * 0.4, g * 0.4, b * 0.4, 0.8)
-                    lurek.render.rectangle(px, py, sz, sz)
+                    rect(px, py, sz, sz)
                 else
                     lurek.render.setColor(0.05, 0.05, 0.05, 0.9)
-                    lurek.render.rectangle(px, py, sz, sz)
+                    rect(px, py, sz, sz)
                 end
             end
         end
@@ -518,7 +571,7 @@ function lurek.draw_ui()
                 else
                     lurek.render.setColor(1.0, 0.9, 0.1, 1)
                 end
-                lurek.render.rectangle(px - 1, py - 1, 3, 3)
+                rect(px - 1, py - 1, 3, 3)
             end
         end
 
@@ -530,27 +583,27 @@ function lurek.draw_ui()
         local vh = (screen_h / TILE_SIZE) * scale
         lurek.render.setColor(1, 1, 1, 0.8)
         -- top
-        lurek.render.rectangle(vx, vy, vw, 1)
+        rect(vx, vy, vw, 1)
         -- bottom
-        lurek.render.rectangle(vx, vy + vh, vw, 1)
+        rect(vx, vy + vh, vw, 1)
         -- left
-        lurek.render.rectangle(vx, vy, 1, vh)
+        rect(vx, vy, 1, vh)
         -- right
-        lurek.render.rectangle(vx + vw, vy, 1, vh)
+        rect(vx + vw, vy, 1, vh)
 
         -- player dot on minimap (blinking)
         local blink_alpha = 0.5 + 0.5 * math.sin(player_blink)
         local ppx = mx + (player_x / TILE_SIZE) * scale
         local ppy = my + (player_y / TILE_SIZE) * scale
         lurek.render.setColor(1, 1, 1, blink_alpha)
-        lurek.render.rectangle(ppx - 2, ppy - 2, 4, 4)
+        rect(ppx - 2, ppy - 2, 4, 4)
 
         -- minimap border
         lurek.render.setColor(0.6, 0.7, 0.6, 0.5)
-        lurek.render.rectangle(mx - 2, my - 2, mm + 4, 1)
-        lurek.render.rectangle(mx - 2, my + mm + 1, mm + 4, 1)
-        lurek.render.rectangle(mx - 2, my - 2, 1, mm + 4)
-        lurek.render.rectangle(mx + mm + 1, my - 2, 1, mm + 4)
+        rect(mx - 2, my - 2, mm + 4, 1)
+        rect(mx - 2, my + mm + 1, mm + 4, 1)
+        rect(mx - 2, my - 2, 1, mm + 4)
+        rect(mx + mm + 1, my - 2, 1, mm + 4)
     end
 
     -- ── Stats overlay ──────────────────────────────────────────────────
@@ -559,18 +612,18 @@ function lurek.draw_ui()
     local pty = math.floor(player_y / TILE_SIZE) + 1
 
     lurek.render.setColor(0, 0, 0, 0.5)
-    lurek.render.rectangle(5, screen_h - 70, 280, 65)
+    rect(5, screen_h - 70, 280, 65)
 
     lurek.render.setColor(0.9, 0.95, 0.9, 1)
-    lurek.render.print(
+    text_(
         string.format("Explored: %d / %d (%.1f%%)", exp, WORLD_W * WORLD_H, exp / (WORLD_W * WORLD_H) * 100),
         10, screen_h - 65, 13
     )
-    lurek.render.print(
+    text_(
         string.format("Discoveries: %d / %d", discovered, NUM_POIS),
         10, screen_h - 45, 13
     )
-    lurek.render.print(
+    text_(
         string.format("Position: (%d, %d)  |  Minimap: %dpx  [M] toggle  [+/-] zoom",
             ptx, pty, math.floor(minimap_size)),
         10, screen_h - 25, 11
@@ -579,7 +632,7 @@ function lurek.draw_ui()
     -- ── Discovery popup ────────────────────────────────────────────────
     if discovery_popup_alpha > 0.01 then
         lurek.render.setColor(1.0, 0.9, 0.2, discovery_popup_alpha)
-        lurek.render.print(discovery_popup_text, screen_w / 2 - 60, screen_h / 2 - 30, 22)
+        text_(discovery_popup_text, screen_w / 2 - 60, screen_h / 2 - 30, 22)
     end
 
     -- ── Controls hint (first 5 seconds) ────────────────────────────────
@@ -588,7 +641,7 @@ function lurek.draw_ui()
         local hint_a = clamp(1 - (t - 5) / 3, 0, 1)
         if hint_a > 0 then
             lurek.render.setColor(0.7, 0.7, 0.7, hint_a * 0.6)
-            lurek.render.print("WASD: move | M: minimap | +/-: zoom | ESC: quit", 10, 10, 12)
+            text_("WASD: move | M: minimap | +/-: zoom | ESC: quit", 10, 10, 12)
         end
     end
 end

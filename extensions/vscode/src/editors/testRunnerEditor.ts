@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
-import { WebviewEditor, getNonce, wrapHtml } from "./shared.js";
+import { WebviewEditor, getNonce, wrapHtml, ICONS, iconButton, panelSection, fieldInline, toolbarSep, toolbarSpacer } from "./shared.js";
 import {
   buildLuaTestsCommand,
   buildTestAllCommand,
@@ -129,43 +129,79 @@ export class TestRunnerEditor extends WebviewEditor {
     const nonce = getNonce();
     return wrapHtml(nonce, "Test Runner", `
       .editor-layout {
-        display: grid; grid-template-columns: 280px 1fr;
+        display: grid; grid-template-columns: 260px 1fr;
         grid-template-rows: auto 1fr auto; height: 100vh;
       }
-      .toolbar { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-      .tree-panel { grid-row: 2; overflow-y: auto; border-right: 1px solid var(--border); }
-      .output-panel { grid-row: 2; padding: 8px; overflow-y: auto; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 12px; white-space: pre-wrap; background: #1a1a1a; color: #ccc; }
+      .toolbar { grid-column: 1 / -1; }
       .status-bar { grid-column: 1 / -1; }
-      .test-item { display: flex; align-items: center; gap: 6px; padding: 3px 8px 3px 24px; cursor: pointer; font-size: 12px; border-radius: 2px; }
-      .test-item:hover { background: var(--surface-2); }
-      .test-item.sel { background: var(--selection); }
-      .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+      .tree-panel { grid-row: 2; overflow-y: auto; border-right: 1px solid var(--border); background: var(--surface); }
+      .output-panel { grid-row: 2; padding: 8px; overflow-y: auto; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 12px; white-space: pre-wrap; background: var(--bg); color: #ccc; }
+
+      .suite-row {
+        display: flex; align-items: center; justify-content: space-between;
+        font-weight: 600; font-size: 11px; padding: 5px 8px;
+        border-bottom: 1px solid var(--border); color: var(--text-dim); cursor: pointer;
+      }
+      .suite-row:hover { background: var(--hover); }
+      .suite-row.sel { background: var(--selection); }
+      .suite-run-btn {
+        font-size: 10px; padding: 1px 6px; border-radius: 9px; cursor: pointer;
+        background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+      }
+      .suite-run-btn:hover { background: var(--accent); color: var(--bg); }
+
+      .test-item {
+        display: flex; align-items: center; gap: 6px; padding: 3px 8px 3px 24px;
+        cursor: pointer; font-size: 11px; border-radius: var(--radius);
+      }
+      .test-item:hover { background: var(--hover); }
+      .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
       .dot.pass { background: #4caf50; } .dot.fail { background: #f44336; }
-      .dot.pending { background: #555; } .dot.running { background: #ff9800; animation: pulse 1s infinite; }
-      @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-      .suite-row { display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 12px; padding: 5px 8px; border-bottom: 1px solid var(--border); color: var(--text-dim); cursor: pointer; }
-      .suite-row:hover { background: var(--surface-2); }
-      .suite-run-btn { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: #0e518c; color: #fff; border: none; cursor: pointer; }
-      .suite-run-btn:hover { background: #1177bb; }
-      .badge { font-size: 10px; padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
-      .badge.pass { background: #1e4a1e; color: #4caf50; } .badge.fail { background: #4a1e1e; color: #f44336; }
-      #discovering { padding: 12px; font-size: 12px; opacity: 0.6; }
+      .dot.pending { background: #585b70; } .dot.running { background: #ff9800; animation: pulse 1s infinite; }
+      @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+      .result-badge {
+        font-size: 9px; padding: 1px 5px; border-radius: 9px; margin-left: 4px; font-weight: 600;
+      }
+      .result-badge.pass { background: rgba(76,175,80,0.15); color: #4caf50; }
+      .result-badge.fail { background: rgba(244,67,54,0.15); color: #f44336; }
+      #discovering { padding: 12px; font-size: 11px; color: var(--text-dim); }
     `, `
       <div class="editor-layout">
+        <!-- Toolbar -->
         <div class="toolbar">
-          <button id="btnRunAll">&#9654; Run All</button>
-          <button id="btnRunLua">Run Lua Tests</button>
-          <button id="btnRunGolden">Run Golden Tests</button>
-          <button id="btnRunSelected">Run Selected Suite</button>
-          <div class="sep"></div>
-          <label style="font-size:12px">Filter:</label>
-          <input id="filter" placeholder="function name..." style="width:130px">
-          <div class="sep"></div>
-          <span id="statusSummary" style="font-size:12px;color:var(--text-dim)">Discovering…</span>
+          <div class="group">
+            <button id="btnRunAll">${ICONS.play} Run All</button>
+            <button id="btnRunLua">Run Lua</button>
+            <button id="btnRunGolden">Run Golden</button>
+            <button id="btnRunSelected">Run Selected</button>
+          </div>
+          ${toolbarSep()}
+          <div class="group">
+            <input id="filter" placeholder="Filter tests…" style="width:130px">
+          </div>
+          ${toolbarSpacer()}
+          <span id="statusSummary" style="font-size:11px;color:var(--text-dim)">Discovering…</span>
         </div>
-        <div class="panel tree-panel" id="treePanel"><div id="discovering">⟳ Scanning tests/ directory…</div></div>
-        <div class="output-panel" id="output">Tests run in the "Lurek2D Tests" terminal.\n\nSelect a suite and click "Run Selected Suite", or click ▶ next to any suite name.</div>
-        <div class="status-bar"><span id="statusBar">Ready</span></div>
+
+        <!-- Tree Panel -->
+        <div class="tree-panel" id="treePanel"><div id="discovering">Scanning tests/ directory…</div></div>
+
+        <!-- Output Panel -->
+        <div class="output-panel" id="output">Tests run in the "Lurek2D Tests" terminal.\n\nSelect a suite and click "Run Selected", or click ▶ next to any suite name.</div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+          <span id="statusSuites" class="badge">0 suites</span>
+          <div class="sep"></div>
+          <span id="statusTests">0 tests</span>
+          <div class="sep"></div>
+          <span id="statusPass" style="color:#4caf50">0 pass</span>
+          <div class="sep"></div>
+          <span id="statusFail" style="color:#f44336">0 fail</span>
+          <div class="spacer"></div>
+          <span id="statusState">Ready</span>
+        </div>
       </div>
     `, `
       let TEST_SUITES = [];
@@ -183,6 +219,7 @@ export class TestRunnerEditor extends WebviewEditor {
         }
         if (data.type === 'testStarted') {
           document.getElementById('statusSummary').textContent = 'Running: ' + data.filter;
+          document.getElementById('statusState').textContent = 'Running…';
           document.getElementById('output').textContent = '$ ' + data.command + '\\n\\nSee "Lurek2D Tests" terminal for live output.';
         }
       });
@@ -207,10 +244,10 @@ export class TestRunnerEditor extends WebviewEditor {
           const failCount = suiteResults.filter(r => r === 'fail').length;
 
           const row = document.createElement('div');
-          row.className = 'suite-row';
+          row.className = 'suite-row' + (selectedSuite === suite.name ? ' sel' : '');
           let badges = '';
-          if (passCount) badges += '<span class="badge pass">' + passCount + '✓</span>';
-          if (failCount) badges += '<span class="badge fail">' + failCount + '✗</span>';
+          if (passCount) badges += '<span class="result-badge pass">' + passCount + ' ✓</span>';
+          if (failCount) badges += '<span class="result-badge fail">' + failCount + ' ✗</span>';
           row.innerHTML = '<span>' + suite.name + badges + '</span>' +
             '<button class="suite-run-btn" data-suite="' + suite.name + '">▶</button>';
           row.querySelector('.suite-run-btn').addEventListener('click', (ev) => {
@@ -218,8 +255,9 @@ export class TestRunnerEditor extends WebviewEditor {
             const s = ev.target.dataset.suite;
             selectedSuite = s;
             vscode.postMessage({ type: 'runSuite', suite: s });
+            renderTree();
           });
-          row.addEventListener('click', () => { selectedSuite = suite.name; highlightSuite(suite.name); });
+          row.addEventListener('click', () => { selectedSuite = suite.name; renderTree(); });
           panel.appendChild(row);
 
           for (const t of filteredTests) {
@@ -229,7 +267,7 @@ export class TestRunnerEditor extends WebviewEditor {
             const status = results[key] || 'pending';
             item.innerHTML = '<span class="dot ' + status + '"></span><span>' + t + '</span>';
             item.addEventListener('click', () => {
-              document.getElementById('output').textContent = 'Suite: ' + suite.name + '\\nTest: ' + t + '\\nStatus: ' + status + '\\n\\nRun the suite to get real results.';
+              document.getElementById('output').textContent = 'Suite: ' + suite.name + '\\nTest: ' + t + '\\nStatus: ' + status + '\\n\\nRun the suite to see actual results.';
             });
             panel.appendChild(item);
           }
@@ -237,20 +275,15 @@ export class TestRunnerEditor extends WebviewEditor {
         updateStatusBar();
       }
 
-      function highlightSuite(name) {
-        document.querySelectorAll('.suite-row').forEach(r => r.style.background = '');
-        const rows = document.querySelectorAll('.suite-row');
-        rows.forEach(r => { if (r.querySelector('span')?.textContent?.startsWith(name)) r.style.background = 'var(--selection)'; });
-      }
-
       function updateStatusBar() {
         const all = Object.values(results);
         const pass = all.filter(r => r === 'pass').length;
         const fail = all.filter(r => r === 'fail').length;
-        const pending = all.filter(r => r === 'pending').length;
         const total = TEST_SUITES.reduce((s, sr) => s + sr.tests.length, 0);
-        document.getElementById('statusBar').textContent =
-          TEST_SUITES.length + ' suites · ' + total + ' tests · ' + pass + ' pass · ' + fail + ' fail · ' + pending + ' pending';
+        document.getElementById('statusSuites').textContent = TEST_SUITES.length + ' suites';
+        document.getElementById('statusTests').textContent = total + ' tests';
+        document.getElementById('statusPass').textContent = pass + ' pass';
+        document.getElementById('statusFail').textContent = fail + ' fail';
       }
 
       document.getElementById('btnRunAll').addEventListener('click', () => vscode.postMessage({ type: 'runAll' }));

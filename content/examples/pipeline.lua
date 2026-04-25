@@ -369,7 +369,7 @@ do  -- Pipeline:validate
   local s = lurek.pipeline.newStep("orphan"); s:dependsOn("missing"); pl:addStep(s)
   local ok, errs = pl:validate()
   if not ok then
-    for _, e in ipairs(errs) do lurek.log.error(e, "pipeline") end
+    for _, e in ipairs(errs or {}) do lurek.log.error(e, "pipeline") end
   end
 end
 
@@ -381,7 +381,7 @@ do  -- Pipeline:getExecutionOrder
   pl:addStep(lurek.pipeline.newStep("a"))
   local order, err = pl:getExecutionOrder()
   if err then lurek.log.error(err, "pipeline")
-  else lurek.log.info("first step: " .. order[1], "pipeline") end
+  else lurek.log.info("first step: " .. ((order and order[1]) or "?"), "pipeline") end
 end
 
 --@api-stub: Pipeline:getParallelGroups
@@ -614,8 +614,10 @@ end
 do  -- Pipeline:addConditional
   local pipe = lurek.pipeline.newPipeline("build")
   pipe:addConditional(
-    function(ctx) return ctx.debugBuild == true end,
-    lurek.pipeline.newStep("embed_symbols", function(ctx) end)
+    "embed_symbols",
+    {},
+    function(ctx) end,
+    function(ctx) return ctx.debugBuild == true end
   )
   lurek.log.info("conditional step added", "pipeline")
 end
@@ -627,6 +629,6 @@ do  -- Pipeline:addSubPipeline
   local parent = lurek.pipeline.newPipeline("full_build")
   local tests  = lurek.pipeline.newPipeline("test_suite")
   tests:addStep(lurek.pipeline.newStep("unit_tests", function() end))
-  parent:addSubPipeline(tests)
+  parent:addSubPipeline(tests, "tests", {})
   lurek.log.info("sub-pipeline embedded", "pipeline")
 end

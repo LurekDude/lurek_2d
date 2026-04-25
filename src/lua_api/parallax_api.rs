@@ -120,7 +120,7 @@ impl LuaUserData for LuaParallaxLayer {
         /// Advances the autonomous scroll accumulator by `dt` seconds.
         ///
         /// Call once per frame in `lurek.process` before drawing.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method("update", |_, this, dt: f32| {
             this.layer.borrow_mut().update(dt);
@@ -132,8 +132,8 @@ impl LuaUserData for LuaParallaxLayer {
         ///
         /// Must be called inside a `lurek.render` or `lurek.render_ui` callback.
         /// Sets the draw color and blend mode to this layer's settings.
-        /// @param cam_x : number
-        /// @param cam_y : number
+        /// @param cam_x number
+        /// @param cam_y number
         /// @return nil
         methods.add_method("render", |_, this, (cam_x, cam_y): (f32, f32)| {
             let layer = this.layer.borrow();
@@ -176,8 +176,8 @@ impl LuaUserData for LuaParallaxLayer {
         ///
         /// `0` = fully fixed (sky); `1` = moves with camera (no parallax);
         /// `0.3` = slow far-background layer.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("setScrollFactor", |_, this, (x, y): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
@@ -195,8 +195,8 @@ impl LuaUserData for LuaParallaxLayer {
 
         // â”€â”€ setOffset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets the static world-pixel position bias added on top of camera scroll.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("setOffset", |_, this, (x, y): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
@@ -216,8 +216,8 @@ impl LuaUserData for LuaParallaxLayer {
         /// Sets the autonomous scroll velocity in world-pixels per second.
         ///
         /// Positive X scrolls right; positive Y scrolls down.
-        /// @param vx : number
-        /// @param vy : number
+        /// @param vx number
+        /// @param vy number
         /// @return nil
         methods.add_method("setAutoscroll", |_, this, (vx, vy): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
@@ -235,8 +235,8 @@ impl LuaUserData for LuaParallaxLayer {
 
         // â”€â”€ setRepeat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets whether the layer tiles on the X and Y axes.
-        /// @param repeat_x : boolean
-        /// @param repeat_y : boolean
+        /// @param repeat_x boolean
+        /// @param repeat_y boolean
         /// @return nil
         methods.add_method("setRepeat", |_, this, (rx, ry): (bool, bool)| {
             let mut l = this.layer.borrow_mut();
@@ -249,8 +249,8 @@ impl LuaUserData for LuaParallaxLayer {
         /// Sets the texture display scale factor on each axis.
         ///
         /// Values > 1 zoom in (larger tiles); values < 1 zoom out (more tiles).
-        /// @param sx : number
-        /// @param sy : number
+        /// @param sx number
+        /// @param sy number
         /// @return nil
         methods.add_method("setScale", |_, this, (sx, sy): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
@@ -260,7 +260,7 @@ impl LuaUserData for LuaParallaxLayer {
 
         // â”€â”€ setZ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets the draw-order depth. Lower values render first (further back).
-        /// @param z : integer
+        /// @param z integer
         /// @return nil
         methods.add_method("setZ", |_, this, z: i32| {
             this.layer.borrow_mut().z = z;
@@ -274,7 +274,7 @@ impl LuaUserData for LuaParallaxLayer {
 
         // â”€â”€ setOpacity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets the layer-wide opacity override in `[0.0, 1.0]`.
-        /// @param a : number
+        /// @param a number
         /// @return nil
         methods.add_method("setOpacity", |_, this, a: f32| {
             this.layer.borrow_mut().opacity = a.clamp(0.0, 1.0);
@@ -290,10 +290,10 @@ impl LuaUserData for LuaParallaxLayer {
         /// Sets the multiplicative RGBA tint applied to all pixels of this layer.
         ///
         /// All components in `[0.0, 1.0]`. Default: `(1, 1, 1, 1)` (white â€” no tint).
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param a number
         /// @return nil
         methods.add_method("setTint", |_, this, (r, g, b, a): (f32, f32, f32, f32)| {
             this.layer.borrow_mut().tint = [r, g, b, a];
@@ -314,7 +314,7 @@ impl LuaUserData for LuaParallaxLayer {
         /// Valid modes: `"normal"` (default), `"additive"`, `"multiply"`, `"replace"`, `"screen"`.
         /// The legacy aliases `"alpha"` and `"add"` are also accepted.
         /// Returns an error for unrecognised mode strings.
-        /// @param mode : string
+        /// @param mode string
         /// @return nil
         methods.add_method("setBlendMode", |_, this, mode: String| {
             this.layer.borrow_mut().blend_mode = blend_from_str(&mode)?;
@@ -330,7 +330,7 @@ impl LuaUserData for LuaParallaxLayer {
 
         // â”€â”€ setVisible â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Shows or hides this layer.
-        /// @param visible : boolean
+        /// @param visible boolean
         /// @return nil
         methods.add_method("setVisible", |_, this, v: bool| {
             this.layer.borrow_mut().visible = v;
@@ -347,10 +347,10 @@ impl LuaUserData for LuaParallaxLayer {
         ///
         /// Prevents the layer from scrolling outside `[min_x, max_x]` Ă— `[min_y, max_y]`.
         /// Useful for non-repeating layers that have a fixed world size.
-        /// @param min_x : number
-        /// @param min_y : number
-        /// @param max_x : number
-        /// @param max_y : number
+        /// @param min_x number
+        /// @param min_y number
+        /// @param max_x number
+        /// @param max_y number
         /// @return nil
         methods.add_method(
             "setClamp",
@@ -376,7 +376,7 @@ impl LuaUserData for LuaParallaxLayer {
         ///
         /// When `true`, the layer tiles in both X and Y regardless of the
         /// per-axis `setRepeat` flags set on this layer.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method("setTiling", |_, this, enabled: bool| {
             this.layer.borrow_mut().set_tiling(enabled);
@@ -393,8 +393,8 @@ impl LuaUserData for LuaParallaxLayer {
         // â”€â”€ setTileSize â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets explicit tile dimensions in logical pixels, overriding the default
         /// scaled-texture size.  Values â‰¤ 0 reset to the default texture-based size.
-        /// @param w : number
-        /// @param h : number
+        /// @param w number
+        /// @param h number
         /// @return nil
         methods.add_method("setTileSize", |_, this, (w, h): (f32, f32)| {
             this.layer.borrow_mut().set_tile_size(w, h);
@@ -406,7 +406,7 @@ impl LuaUserData for LuaParallaxLayer {
         ///
         /// Lower values render first (further back).  Works alongside `setZ` for
         /// cases where integer ordering is insufficient.
-        /// @param z : number
+        /// @param z number
         /// @return nil
         methods.add_method("setDepth", |_, this, z: f32| {
             this.layer.borrow_mut().set_depth(z);
@@ -468,7 +468,7 @@ impl LuaUserData for LuaParallaxSet {
         /// The layer is added by shared reference: mutating the original variable
         /// after adding is reflected in the set.  The set is re-sorted by `z` on
         /// every add.
-        /// @param layer : LuaParallaxLayer
+        /// @param layer LuaParallaxLayer
         /// @return nil
         methods.add_method_mut("addLayer", |_, this, layer: LuaAnyUserData| {
             let lu_layer = layer.borrow::<LuaParallaxLayer>()?.clone();
@@ -481,7 +481,7 @@ impl LuaUserData for LuaParallaxSet {
         /// Removes the layer at the given 1-based index.
         ///
         /// Returns `true` if a layer was removed, `false` if the index was out of range.
-        /// @param index : integer
+        /// @param index integer
         /// @return boolean
         methods.add_method_mut("removeLayerAt", |_, this, index: usize| {
             if index >= 1 && index <= this.layers.len() {
@@ -509,7 +509,7 @@ impl LuaUserData for LuaParallaxSet {
 
         // â”€â”€ setVisible â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Shows or hides all layers in this set.
-        /// @param visible : boolean
+        /// @param visible boolean
         /// @return nil
         methods.add_method_mut("setVisible", |_, this, v: bool| {
             this.visible = v;
@@ -525,7 +525,7 @@ impl LuaUserData for LuaParallaxSet {
         /// Advances the autoscroll accumulator of every layer by `dt` seconds.
         ///
         /// Call once per frame in `lurek.process`.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("update", |_, this, dt: f32| {
             for l in &this.layers {
@@ -538,8 +538,8 @@ impl LuaUserData for LuaParallaxSet {
         /// Draws all visible layers in ascending `z` order using an explicit camera position.
         ///
         /// Must be called inside a `lurek.render` or `lurek.render_ui` callback.
-        /// @param cam_x : number
-        /// @param cam_y : number
+        /// @param cam_x number
+        /// @param cam_y number
         /// @return nil
         methods.add_method("render", |_, this, (cam_x, cam_y): (f32, f32)| {
             if !this.visible {
@@ -579,7 +579,7 @@ impl LuaUserData for LuaParallaxSet {
 
         // â”€â”€ setName â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets the name of this set.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method_mut("setName", |_, this, name: String| {
             this.name = name;
@@ -594,9 +594,9 @@ impl LuaUserData for LuaParallaxSet {
 
 /// Registers the `lurek.parallax` sub-table on the given `lurek` global.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 ///
 /// Registers `lurek.parallax` onto the given global table.
@@ -613,7 +613,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// `tint_r`, `tint_g`, `tint_b`, `tint_a`, `blend_mode`, `visible`,
     /// `scale_x`, `scale_y`.
     ///
-    /// @param opts : table
+    /// @param opts table
     /// @return LuaParallaxLayer
     let s = state.clone();
     parallax.set(
@@ -707,7 +707,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     ///
     /// A set groups multiple layers for scene-level management: update all and
     /// draw all in one call.
-    /// @param name : string
+    /// @param name string
     /// @return LuaParallaxSet
     let s = state.clone();
     parallax.set(

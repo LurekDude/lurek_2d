@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- FORBIDDEN: function-name scenario (teaches what, not why or when)
 -- lurek.timer.after
 -- Schedules a callback.
@@ -8,4 +9,4 @@ local sig2 = lurek.event.newSignal()
 print("type: " .. sig2:type())   -- sig2 exists only to demonstrate :type()
 
 -- FORBIDDEN: nil / zero args for meaningful parameters
-lurek.physics.newBody(nil, 0, 0)
+-- lurek.physics.newBody(nil, 0, 0)

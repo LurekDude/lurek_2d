@@ -280,6 +280,53 @@ local function bind_inputs()
 end
 
 -- ── Initialization ─────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Docs Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.06, 0.10)
@@ -479,13 +526,13 @@ function lurek.draw()
     if current_state == STATE.TITLE then
         -- Title text
         set_color(COL.header, title_alpha)
-        lurek.render.print("DOCS BROWSER", SCREEN_W * 0.5 - 100, SCREEN_H * 0.30)
+        text_("DOCS BROWSER", SCREEN_W * 0.5 - 100, SCREEN_H * 0.30)
         set_color(COL.param, title_alpha * 0.8)
-        lurek.render.print("EXPLORE THE API", SCREEN_W * 0.5 - 90, SCREEN_H * 0.30 + 36)
+        text_("EXPLORE THE API", SCREEN_W * 0.5 - 90, SCREEN_H * 0.30 + 36)
         set_color(COL.muted, title_alpha * 0.5)
-        lurek.render.print("Press ENTER to begin", SCREEN_W * 0.5 - 95, SCREEN_H * 0.60)
+        text_("Press ENTER to begin", SCREEN_W * 0.5 - 95, SCREEN_H * 0.60)
         set_color(COL.desc, title_alpha * 0.4)
-        lurek.render.print(string.format("%d namespaces  |  %d functions", #namespaces, total_funcs),
+        text_(string.format("%d namespaces  |  %d functions", #namespaces, total_funcs),
             SCREEN_W * 0.5 - 110, SCREEN_H * 0.68)
     end
 
@@ -504,20 +551,20 @@ function lurek.draw_ui()
 
     -- ── Header ─────────────────────────────────────────────────
     set_color(COL.sidebar_bg)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, HEADER_H)
+    rect("fill", 0, 0, SCREEN_W, HEADER_H)
     set_color(COL.header)
-    lurek.render.print("lurek.* API Reference", 12, 14)
+    text_("lurek.* API Reference", 12, 14)
     set_color(COL.muted)
-    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, 14)
+    text_(string.format("FPS: %d", fps), SCREEN_W - 80, 14)
 
     -- State indicator
     local state_label = ({ "TITLE", "BROWSING", "SEARCH", "BOOKMARKS", "HISTORY" })[current_state]
     set_color(COL.param, 0.6)
-    lurek.render.print(state_label, SCREEN_W * 0.5 - 30, 14)
+    text_(state_label, SCREEN_W * 0.5 - 30, 14)
 
     -- ── Sidebar ────────────────────────────────────────────────
     set_color(COL.sidebar_bg)
-    lurek.render.rectangle("fill", 0, HEADER_H, SIDEBAR_W, SCREEN_H - HEADER_H - FOOTER_H)
+    rect("fill", 0, HEADER_H, SIDEBAR_W, SCREEN_H - HEADER_H - FOOTER_H)
 
     for i, ns in ipairs(namespaces) do
         local y = HEADER_H + 8 + (i - 1) * ITEM_H - sidebar_scroll_y
@@ -526,7 +573,7 @@ function lurek.draw_ui()
             -- Selection highlight
             if i == selected_ns and current_state == STATE.BROWSING then
                 set_color(COL.sidebar_sel)
-                lurek.render.rectangle("fill", 4, y - 2, SIDEBAR_W - 8, ITEM_H)
+                rect("fill", 4, y - 2, SIDEBAR_W - 8, ITEM_H)
             end
 
             -- Namespace name
@@ -535,17 +582,17 @@ function lurek.draw_ui()
             else
                 set_color(COL.sidebar_text)
             end
-            lurek.render.print(string.format("lurek.%s", ns.name), 12, y + 2)
+            text_(string.format("lurek.%s", ns.name), 12, y + 2)
 
             -- Function count badge
             set_color(COL.muted, 0.6)
-            lurek.render.print(string.format("(%d)", #ns.funcs), SIDEBAR_W - 36, y + 2)
+            text_(string.format("(%d)", #ns.funcs), SIDEBAR_W - 36, y + 2)
         end
     end
 
     -- Sidebar divider
     set_color(COL.muted, 0.3)
-    lurek.render.line(SIDEBAR_W, HEADER_H, SIDEBAR_W, SCREEN_H - FOOTER_H)
+    ln(SIDEBAR_W, HEADER_H, SIDEBAR_W, SCREEN_H - FOOTER_H)
 
     -- ── Main panel ─────────────────────────────────────────────
     if current_state == STATE.BROWSING then
@@ -555,7 +602,7 @@ function lurek.draw_ui()
 
         -- Namespace title
         set_color(COL.func_name)
-        lurek.render.print(string.format("lurek.%s", ns.name), px, py)
+        text_(string.format("lurek.%s", ns.name), px, py)
         py = py + 30
 
         -- Functions for current page
@@ -568,43 +615,43 @@ function lurek.draw_ui()
             -- Selection background
             if is_sel then
                 set_color(COL.sidebar_sel, 0.5)
-                lurek.render.rectangle("fill", px - 4, py - 2, PANEL_W - 8, 60)
+                rect("fill", px - 4, py - 2, PANEL_W - 8, 60)
             end
 
             -- Bookmark indicator
             if is_bm then
                 set_color(COL.bookmark)
-                lurek.render.print("*", px - 12, py)
+                text_("*", px - 12, py)
             end
 
             -- Function signature: name(params) → ret
             set_color(COL.func_name)
-            lurek.render.print(fn.name, px, py)
+            text_(fn.name, px, py)
             local name_w = #fn.name * 8
             set_color(COL.white, 0.7)
-            lurek.render.print("(", px + name_w, py)
+            text_("(", px + name_w, py)
             set_color(COL.param)
-            lurek.render.print(fn.params, px + name_w + 8, py)
+            text_(fn.params, px + name_w + 8, py)
             local params_w = #fn.params * 8
             set_color(COL.white, 0.7)
-            lurek.render.print(")", px + name_w + 8 + params_w, py)
+            text_(")", px + name_w + 8 + params_w, py)
 
             -- Return type
             if fn.ret ~= "" then
                 set_color(COL.muted, 0.5)
-                lurek.render.print(" -> ", px + name_w + 16 + params_w, py)
+                text_(" -> ", px + name_w + 16 + params_w, py)
                 set_color(COL.ret_type)
-                lurek.render.print(fn.ret, px + name_w + 48 + params_w, py)
+                text_(fn.ret, px + name_w + 48 + params_w, py)
             end
 
             -- Description
             py = py + 18
             if fn.desc ~= "" then
                 set_color(COL.desc)
-                lurek.render.print(fn.desc, px + 8, py)
+                text_(fn.desc, px + 8, py)
             else
                 set_color(COL.muted, 0.4)
-                lurek.render.print("(no description)", px + 8, py)
+                text_("(no description)", px + 8, py)
             end
 
             py = py + 28
@@ -614,7 +661,7 @@ function lurek.draw_ui()
         local pages = total_pages(selected_ns)
         if pages > 1 then
             set_color(COL.muted)
-            lurek.render.print(string.format("Page %d/%d  (Left/Right)", current_page, pages),
+            text_(string.format("Page %d/%d  (Left/Right)", current_page, pages),
                 px, SCREEN_H - FOOTER_H - 28)
         end
     end
@@ -622,21 +669,21 @@ function lurek.draw_ui()
     -- ── Search overlay ─────────────────────────────────────────
     if current_state == STATE.SEARCH then
         set_color(COL.search_bg, 0.95)
-        lurek.render.rectangle("fill", PANEL_X - 5, HEADER_H, PANEL_W + 10, SCREEN_H - HEADER_H - FOOTER_H)
+        rect("fill", PANEL_X - 5, HEADER_H, PANEL_W + 10, SCREEN_H - HEADER_H - FOOTER_H)
 
         set_color(COL.header)
-        lurek.render.print("SEARCH", PANEL_X + 10, HEADER_H + 10)
+        text_("SEARCH", PANEL_X + 10, HEADER_H + 10)
 
         -- Search input box
         set_color(COL.bar_bg)
-        lurek.render.rectangle("fill", PANEL_X + 10, HEADER_H + 34, PANEL_W - 20, 24)
+        rect("fill", PANEL_X + 10, HEADER_H + 34, PANEL_W - 20, 24)
         set_color(COL.white)
-        lurek.render.print("> " .. search_query .. "_", PANEL_X + 14, HEADER_H + 38)
+        text_("> " .. search_query .. "_", PANEL_X + 14, HEADER_H + 38)
 
         -- Results
         local ry = HEADER_H + 70
         set_color(COL.muted)
-        lurek.render.print(string.format("%d results", #search_results), PANEL_X + 10, ry)
+        text_(string.format("%d results", #search_results), PANEL_X + 10, ry)
         ry = ry + 24
 
         local shown = math.min(#search_results, 8)
@@ -646,96 +693,96 @@ function lurek.draw_ui()
             local fn = ns.funcs[r.func_idx]
 
             set_color(COL.muted, 0.5)
-            lurek.render.print(string.format("lurek.%s.", ns.name), PANEL_X + 14, ry)
+            text_(string.format("lurek.%s.", ns.name), PANEL_X + 14, ry)
             set_color(COL.func_name)
             local prefix_w = (#ns.name + 7) * 8
-            lurek.render.print(fn.name, PANEL_X + 14 + prefix_w, ry)
+            text_(fn.name, PANEL_X + 14 + prefix_w, ry)
 
             ry = ry + 22
         end
 
         set_color(COL.muted, 0.4)
-        lurek.render.print("Up=backspace | Enter=go | Esc=cancel", PANEL_X + 10, SCREEN_H - FOOTER_H - 28)
+        text_("Up=backspace | Enter=go | Esc=cancel", PANEL_X + 10, SCREEN_H - FOOTER_H - 28)
     end
 
     -- ── Bookmarks overlay ──────────────────────────────────────
     if current_state == STATE.BOOKMARKS then
         set_color(COL.search_bg, 0.95)
-        lurek.render.rectangle("fill", PANEL_X - 5, HEADER_H, PANEL_W + 10, SCREEN_H - HEADER_H - FOOTER_H)
+        rect("fill", PANEL_X - 5, HEADER_H, PANEL_W + 10, SCREEN_H - HEADER_H - FOOTER_H)
 
         set_color(COL.bookmark)
-        lurek.render.print("BOOKMARKS", PANEL_X + 10, HEADER_H + 10)
+        text_("BOOKMARKS", PANEL_X + 10, HEADER_H + 10)
 
         if #bookmarks == 0 then
             set_color(COL.muted)
-            lurek.render.print("No bookmarks yet. Press B to bookmark.", PANEL_X + 10, HEADER_H + 40)
+            text_("No bookmarks yet. Press B to bookmark.", PANEL_X + 10, HEADER_H + 40)
         else
             local by = HEADER_H + 40
             for i, bm in ipairs(bookmarks) do
                 local ns = namespaces[bm[1]]
                 local fn = ns.funcs[bm[2]]
                 set_color(COL.bookmark, 0.8)
-                lurek.render.print(string.format("%d. lurek.%s.%s", i, ns.name, fn.name), PANEL_X + 14, by)
+                text_(string.format("%d. lurek.%s.%s", i, ns.name, fn.name), PANEL_X + 14, by)
                 by = by + 22
             end
         end
 
         set_color(COL.muted, 0.4)
-        lurek.render.print("Enter=go | Esc=back", PANEL_X + 10, SCREEN_H - FOOTER_H - 28)
+        text_("Enter=go | Esc=back", PANEL_X + 10, SCREEN_H - FOOTER_H - 28)
     end
 
     -- ── History overlay ────────────────────────────────────────
     if current_state == STATE.HISTORY then
         set_color(COL.search_bg, 0.95)
-        lurek.render.rectangle("fill", PANEL_X - 5, HEADER_H, PANEL_W + 10, SCREEN_H - HEADER_H - FOOTER_H)
+        rect("fill", PANEL_X - 5, HEADER_H, PANEL_W + 10, SCREEN_H - HEADER_H - FOOTER_H)
 
         set_color(COL.history)
-        lurek.render.print("HISTORY (last 10)", PANEL_X + 10, HEADER_H + 10)
+        text_("HISTORY (last 10)", PANEL_X + 10, HEADER_H + 10)
 
         if #history == 0 then
             set_color(COL.muted)
-            lurek.render.print("No history yet. Press Enter on a function.", PANEL_X + 10, HEADER_H + 40)
+            text_("No history yet. Press Enter on a function.", PANEL_X + 10, HEADER_H + 40)
         else
             local hy = HEADER_H + 40
             for i, h in ipairs(history) do
                 local ns = namespaces[h[1]]
                 local fn = ns.funcs[h[2]]
                 set_color(COL.history, 0.7)
-                lurek.render.print(string.format("%d. lurek.%s.%s", i, ns.name, fn.name), PANEL_X + 14, hy)
+                text_(string.format("%d. lurek.%s.%s", i, ns.name, fn.name), PANEL_X + 14, hy)
                 hy = hy + 22
             end
         end
 
         set_color(COL.muted, 0.4)
-        lurek.render.print("Enter=go | Esc=back", PANEL_X + 10, SCREEN_H - FOOTER_H - 28)
+        text_("Enter=go | Esc=back", PANEL_X + 10, SCREEN_H - FOOTER_H - 28)
     end
 
     -- ── Footer — coverage bar ──────────────────────────────────
     set_color(COL.sidebar_bg)
-    lurek.render.rectangle("fill", 0, SCREEN_H - FOOTER_H, SCREEN_W, FOOTER_H)
+    rect("fill", 0, SCREEN_H - FOOTER_H, SCREEN_W, FOOTER_H)
 
     -- Coverage text
     local pct = math.floor((documented_funcs / total_funcs) * 100 + 0.5)
     set_color(COL.white, 0.8)
-    lurek.render.print(string.format("%d/%d functions documented (%d%%)", documented_funcs, total_funcs, pct),
+    text_(string.format("%d/%d functions documented (%d%%)", documented_funcs, total_funcs, pct),
         12, SCREEN_H - FOOTER_H + 8)
 
     -- Coverage bar
     local bar_x, bar_w = 320, 200
     local bar_y, bar_h = SCREEN_H - FOOTER_H + 8, 14
     set_color(COL.bar_bg)
-    lurek.render.rectangle("fill", bar_x, bar_y, bar_w, bar_h)
+    rect("fill", bar_x, bar_y, bar_w, bar_h)
     local fill_w = bar_w * (documented_funcs / total_funcs) * coverage_bar
     if pct >= 80 then
         set_color(COL.bar_fill)
     else
         set_color(COL.bar_partial)
     end
-    lurek.render.rectangle("fill", bar_x, bar_y, fill_w, bar_h)
+    rect("fill", bar_x, bar_y, fill_w, bar_h)
 
     -- Controls hint
     set_color(COL.muted, 0.5)
-    lurek.render.print("/=search  B=mark  H=hist  Tab=marks", SCREEN_W - 280, SCREEN_H - FOOTER_H + 8)
+    text_("/=search  B=mark  H=hist  Tab=marks", SCREEN_W - 280, SCREEN_H - FOOTER_H + 8)
 end
 
 -- ── Keyboard text input for search ─────────────────────────────────────────

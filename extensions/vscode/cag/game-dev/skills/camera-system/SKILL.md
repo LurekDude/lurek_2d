@@ -64,7 +64,7 @@ function apply_shake(dt)
     return ox, oy
 end
 
-function lurek.render()
+function lurek.draw()
     local ox, oy = apply_shake(dt_global)
     lurek.render.push()
     lurek.render.translate(-cam.x + ox, -cam.y + oy)

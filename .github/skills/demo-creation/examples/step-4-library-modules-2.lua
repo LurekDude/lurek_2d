@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 function lurek.init()
     -- library init first
     item.clearTypes()

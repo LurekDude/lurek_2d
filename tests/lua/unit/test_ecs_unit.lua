@@ -423,7 +423,7 @@ describe("World.getBitmapTagBit", function()
     -- @description Confirms getBitmapTagBit returns a number after the collidable tag has been defined with an explicit bit.
     it("getBitmapTagBit returns a number for a defined tag", function()
         local world = lurek.ecs.newUniverse()
-        world:defineTag("collidable", 1)
+        world:defineTag("collidable")
         local bit = world:getBitmapTagBit("collidable")
         expect_type("number", bit)
     end)

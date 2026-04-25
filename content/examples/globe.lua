@@ -131,8 +131,8 @@ end
 do  -- Globe:pan
   local g = lurek.globe.new("pan_demo", {})
   function lurek.process(dt)
-    if lurek.input.isDown("a") then g:pan(0, -45.0 * dt) end
-    if lurek.input.isDown("d") then g:pan(0,  45.0 * dt) end
+    if lurek.input.keyboard.isDown("a") then g:pan(0, -45.0 * dt) end
+    if lurek.input.keyboard.isDown("d") then g:pan(0,  45.0 * dt) end
   end
 end
 
@@ -142,7 +142,7 @@ end
 do  -- Globe:zoom
   local g = lurek.globe.new("zoom_demo", {})
   function lurek.process(dt)
-    local wheel = lurek.input.wheel and lurek.input.wheel() or 0
+    local _, wheel = lurek.input.mouse.getWheelDelta()
     if wheel ~= 0 then g:zoom(1.0 + wheel * 0.1) end
   end
 end
@@ -164,9 +164,7 @@ do  -- Globe:getCamera
   local g = lurek.globe.new("getcam_demo", {})
   g:setCamera(0.0, 0.0, 1.5)
   local lat, lon, z = g:getCamera()
-  if lurek.save and lurek.save.write then
-    lurek.save.write("globe_camera", { lat = lat, lon = lon, zoom = z })
-  end
+  lurek.filesystem.write("save/globe_camera.txt", string.format("%.3f,%.3f,%.3f", lat, lon, z))
 end
 
 --@api-stub: Globe:getLod
@@ -185,7 +183,8 @@ end
 do  -- Globe:pick
   local g = lurek.globe.new("pick_demo", {})
   function lurek.input_pressed(key)
-    local mx, my = lurek.input.mouseX(), lurek.input.mouseY()
+    local mx, my = lurek.input.mouse.getPosition()
+    mx, my = mx or 0, my or 0
     local id = g:pick(mx, my)
     if id then lurek.log.info("clicked province " .. id, "globe") end
   end
@@ -197,9 +196,10 @@ end
 do  -- Globe:pickLatLon
   local g = lurek.globe.new("picklatlon_demo", {})
   function lurek.input_pressed(key)
-    local mx, my = lurek.input.mouseX(), lurek.input.mouseY()
+    local mx, my = lurek.input.mouse.getPosition()
+    mx, my = mx or 0, my or 0
     local lat, lon = g:pickLatLon(mx, my)
-    if lat then g:addMarker("waypoint", lat, lon, "click") end
+    if lat and lon then g:addMarker("waypoint", lat, lon, "click") end
   end
 end
 
@@ -272,7 +272,7 @@ do  -- Globe:moveMarker
   local g = lurek.globe.new("movemark_demo", {})
   local id = g:addMarker("ship", 0.0, 0.0, "USS Hope")
   function lurek.process(dt)
-    g:moveMarker(id, 0.0, (lurek.timer.now() * 5.0) % 360.0)
+    g:moveMarker(id, 0.0, (lurek.time.getTime() * 5.0) % 360.0)
   end
 end
 
@@ -354,7 +354,7 @@ do  -- Globe:setLayerAlpha
   local g = lurek.globe.new("layeralpha_demo", {})
   g:addLayer("heat", 2)
   function lurek.process(dt)
-    local a = (math.sin(lurek.timer.now()) * 0.5 + 0.5)
+    local a = (math.sin(lurek.time.getTime()) * 0.5 + 0.5)
     g:setLayerAlpha("heat", a)
   end
 end
@@ -365,7 +365,7 @@ end
 do  -- Globe:setTimeOfDay
   local g = lurek.globe.new("tod_demo", {})
   function lurek.process(dt)
-    local hours = (lurek.timer.now() * 0.5) % 24.0
+    local hours = (lurek.time.getTime() * 0.5) % 24.0
     g:setTimeOfDay(hours)
   end
 end
@@ -386,7 +386,7 @@ end
 do  -- Globe:setRotation
   local g = lurek.globe.new("rot_demo", {})
   function lurek.process(dt)
-    g:setRotation((lurek.timer.now() * 6.0) % 360.0)
+    g:setRotation((lurek.time.getTime() * 6.0) % 360.0)
   end
 end
 
@@ -437,9 +437,7 @@ end
 do  -- Globe:getName
   local g = lurek.globe.new("primary_world", {})
   local name = g:getName()
-  if lurek.save and lurek.save.write then
-    lurek.save.write("active_globe", name)
-  end
+  lurek.filesystem.write("save/active_globe.txt", name)
   lurek.log.info("active globe = " .. name, "globe")
 end
 
@@ -471,18 +469,29 @@ do  -- GlobeRegistry:names
   lurek.globe.new("world_a", {})
   lurek.globe.new("world_b", {})
   local g = lurek.globe.get("world_a")
-  lurek.log.info("first registered = " .. g:getName(), "globe")
+  if g then lurek.log.info("first registered = " .. g:getName(), "globe") end
 end
 
 
 --@api-stub: Globe:addArc
 -- Draws a great-circle arc between two provinces on the globe surface.
 -- Arcs are used for trade routes, attack vectors, or diplomatic connections.
+local function sampleProvince(id, lat, lon, opts)
+  opts = opts or {}
+  return {
+    id = id,
+    centroid = {lat, lon},
+    vertices = {{lat, lon}, {lat + 1, lon}, {lat + 1, lon + 1}},
+    neighbors = opts.neighbors or {},
+    base_color = opts.base_color or {0.5, 0.6, 0.7, 1.0},
+  }
+end
+
 do  -- Globe:addArc
-  local g = lurek.globe.new({width=64, height=64, cellSize=16})
-  g:addProvince(1, 0, 0, {})
-  g:addProvince(2, 5, 5, {})
-  local arcId = g:addArc(1, 2, {color={1,0.5,0,1}, width=2})
+  local g = lurek.globe.new("arc_demo", {})
+  g:addProvince(sampleProvince(1, 0, 0))
+  g:addProvince(sampleProvince(2, 5, 5))
+  local arcId = g:addArc(0, 0, 5, 5, 16)
   lurek.log.info("arc id: " .. arcId, "globe")
 end
 
@@ -490,9 +499,9 @@ end
 -- Adds a floating text label anchored to a province or world-space position.
 -- Labels scale with zoom and can be shown/hidden independently of provinces.
 do  -- Globe:addLabel
-  local g = lurek.globe.new({width=64, height=64, cellSize=16})
-  g:addProvince(1, 3, 3, {})
-  local lid = g:addLabel(1, "Capital City")
+  local g = lurek.globe.new("label_demo", {})
+  g:addProvince(sampleProvince(1, 3, 3))
+  local lid = g:addLabel("city", 3, 3, "Capital City")
   lurek.log.info("label id: " .. lid, "globe")
 end
 
@@ -500,9 +509,9 @@ end
 -- Adds a named render layer with a default colour to the globe.
 -- Layers stack visually; province colours override the layer's default tint.
 do  -- Globe:addLayer
-  local g = lurek.globe.new({width=64, height=64, cellSize=16})
-  g:addLayer("terrain", {0.4, 0.7, 0.3, 1.0})
-  g:addLayer("borders", {0.0, 0.0, 0.0, 1.0})
+  local g = lurek.globe.new("layer_demo", {})
+  g:addLayer("terrain", 1)
+  g:addLayer("borders", 2)
   lurek.log.info("layers added", "globe")
 end
 
@@ -510,9 +519,9 @@ end
 -- Places a named icon marker at a province cell or lat-lon position.
 -- Markers persist until removeMarker is called; they can carry custom attributes.
 do  -- Globe:addMarker
-  local g = lurek.globe.new({width=64, height=64, cellSize=16})
-  g:addProvince(5, 2, 2, {})
-  local mid = g:addMarker(5, "capital_icon", {})
+  local g = lurek.globe.new("marker_demo", {})
+  g:addProvince(sampleProvince(5, 2, 2))
+  local mid = g:addMarker("capital_icon", 2, 2, "Capital")
   lurek.log.info("marker id: " .. mid, "globe")
 end
 
@@ -520,8 +529,8 @@ end
 -- Creates a new Globe with the given grid dimensions and cell size.
 -- Globe wraps a hex/square province map with camera pan/zoom and rendering.
 do  -- lurek.globe.new
-  local g = lurek.globe.new({width=32, height=32, cellSize=20})
-  g:addProvince(1, 0, 0, {name="Start"})
+  local g = lurek.globe.new("new_demo", {})
+  g:addProvince(sampleProvince(1, 0, 0))
   lurek.log.info("globe province count: " .. g:provinceCount(), "globe")
 end
 
@@ -529,8 +538,8 @@ end
 -- Returns all province ids reachable from a source province within move_cost steps.
 -- Uses Dijkstra over the province graph; blocked provinces are excluded.
 do  -- Globe:reachable
-  local g = lurek.globe.new({width=32, height=32, cellSize=16})
-  for i=1,5 do g:addProvince(i, i, 0, {}) end
+  local g = lurek.globe.new("reachable_demo", {})
+  for i=1,5 do g:addProvince(sampleProvince(i, i, 0, {neighbors = {i - 1, i + 1}})) end
   local ids = g:reachable(1, 3)
   lurek.log.info("reachable count: " .. #ids, "globe")
 end
@@ -539,10 +548,10 @@ end
 -- Sets the fill colour for a named province on a specific render layer.
 -- Use to show resource overlay, fog-of-war, or diplomatic ownership.
 do  -- Globe:setLayerColor
-  local g = lurek.globe.new({width=32, height=32, cellSize=16})
-  g:addProvince(1, 0, 0, {})
-  g:addLayer("ownership", {1,1,1,1})
-  g:setLayerColor(1, "ownership", {1, 0.3, 0.3, 0.8})
+  local g = lurek.globe.new("layer_color_demo", {})
+  g:addProvince(sampleProvince(1, 0, 0))
+  g:addLayer("ownership", 1)
+  g:setLayerColor("ownership", 1, 1, 0.3, 0.3, 0.8)
   lurek.log.info("layer colour set", "globe")
 end
 
@@ -550,10 +559,10 @@ end
 -- Sets a custom key-value attribute on an existing marker by its id.
 -- Use to store game data (owner, type, health) without a separate lookup table.
 do  -- Globe:setMarkerAttr
-  local g = lurek.globe.new({width=32, height=32, cellSize=16})
-  g:addProvince(1, 0, 0, {})
-  local mid = g:addMarker(1, "fort_icon", {})
-  g:setMarkerAttr(mid, "strength", 5)
+  local g = lurek.globe.new("marker_attr_demo", {})
+  g:addProvince(sampleProvince(1, 0, 0))
+  local mid = g:addMarker("fort_icon", 0, 0, "Fort")
+  g:setMarkerAttr(mid, "strength", "5")
   lurek.log.info("marker attr set", "globe")
 end
 
@@ -561,9 +570,9 @@ end
 -- Sets a custom key-value attribute on a province by its id.
 -- Attributes persist through updates and can be queried in game logic.
 do  -- Globe:setProvinceAttr
-  local g = lurek.globe.new({width=32, height=32, cellSize=16})
-  g:addProvince(3, 1, 1, {})
-  g:setProvinceAttr(3, "population", 12000)
+  local g = lurek.globe.new("province_attr_demo", {})
+  g:addProvince(sampleProvince(3, 1, 1))
+  g:setProvinceAttr(3, "population", "12000")
   lurek.log.info("attr: " .. g:getProvinceAttr(3, "population"), "globe")
 end
 
@@ -571,8 +580,6 @@ end
 -- Creates a new GlobeRegistry that manages named globe instances.
 -- Useful for multi-world setups where planets are swapped at runtime.
 do  -- GlobeRegistry:new
-  local reg = lurek.globe.newRegistry()
-  local g = reg:new("world_a", 512, 512)
-  reg:setActive("world_a")
+  local g = lurek.globe.new("world_a", {})
   lurek.log.info("registry globe created", "globe")
 end

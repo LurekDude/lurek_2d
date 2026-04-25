@@ -68,6 +68,7 @@ local death_timer  = 0
 local death_alpha  = 0
 local victory_timer = 0
 local title_blink  = 0
+local _cam         = nil ---@type Camera2D?
 
 -- ── Helpers ───────────────────────────────────────────────────────────────
 local function clamp(v, lo, hi) return math.max(lo, math.min(hi, v)) end
@@ -171,10 +172,11 @@ local function player_try_hit_boss()
     local hb_x = player.facing == 1 and (player.x + PLAYER_W) or (player.x - 40)
     if aabb(hb_x, player.y, 40, PLAYER_H, boss.x, boss.y, BOSS_W, BOSS_H) then
         boss.hp = math.max(0, boss.hp - atk.dmg)
-        lurek.tween.to(boss, 0.3, { hp_disp = boss.hp })
+        lurek.tween.to(boss, { hp_disp = boss.hp }, 0.3)
         player.hit_cd = player.atk_data.dur
         hitlag = HITLAG_DUR
-        _cam:shake(3, 0.1)
+        local cam = _cam
+        if cam ~= nil then cam:shake(3, 0.1) end
         if hit_ps then
             hit_ps:emit(boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.3, 10)
         end
@@ -241,13 +243,15 @@ local function boss_deal_damage(dmg)
         if block_ps then
             block_ps:emit(player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.3, 8)
         end
-        _cam:shake(2, 0.08)
+        local cam = _cam
+        if cam ~= nil then cam:shake(2, 0.08) end
     else
         player.hp = math.max(0, player.hp - dmg)
-        _cam:shake(4, 0.12)
+        local cam = _cam
+        if cam ~= nil then cam:shake(4, 0.12) end
         hitlag = HITLAG_DUR
     end
-    lurek.tween.to(player, 0.3, { hp_disp = player.hp })
+    lurek.tween.to(player, { hp_disp = player.hp }, 0.3)
     if player.hp <= 0 then
         game_state  = STATE.PLAYER_DIED
         death_timer = 0
@@ -339,7 +343,7 @@ local function update_player(dt)
     if not player.blocking and player.atk_timer <= 0 then
         player.stamina = math.min(PLAYER_MAX_STAM, player.stamina + STAM_REGEN * dt)
     end
-    lurek.tween.to(player, 0.15, { stam_disp = player.stamina })
+    lurek.tween.to(player, { stam_disp = player.stamina }, 0.15)
 
     -- Exhaustion trigger
     if player.stamina <= 0 then
@@ -438,9 +442,57 @@ local function update_projectiles(dt)
 end
 
 -- ── Callbacks ─────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Soulslike — Lurek2D")
     lurek.render.setBackgroundColor(0.04, 0.03, 0.06)
+    _cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Input actions
     lurek.input.bind("left",        {"a", "left"})
@@ -531,7 +583,7 @@ function lurek.process(dt)
             player.estus     = player.estus - 1
             player.heal_timer = ESTUS_LOCK_DUR
             player.hp        = math.min(PLAYER_MAX_HP, player.hp + ESTUS_HEAL)
-            lurek.tween.to(player, 0.4, { hp_disp = player.hp })
+            lurek.tween.to(player, { hp_disp = player.hp }, 0.4)
         end
     end
 
@@ -553,34 +605,34 @@ function lurek.draw()
     if game_state == STATE.TITLE then
         -- Title screen
         local cx = SCREEN_W * 0.5
-        lurek.render.print("SOULSLIKE", cx - 90, 180, 40, {0.8, 0.15, 0.1, 1})
-        lurek.render.print("PREPARE TO DIE", cx - 100, 240, 20, {0.6, 0.1, 0.1, 1})
+        text_("SOULSLIKE", cx - 90, 180, 40, {0.8, 0.15, 0.1, 1})
+        text_("PREPARE TO DIE", cx - 100, 240, 20, {0.6, 0.1, 0.1, 1})
         local a = math.abs(math.sin(title_blink * 2))
-        lurek.render.print("PRESS ENTER", cx - 70, 360, 16, {0.9, 0.85, 0.7, a})
+        text_("PRESS ENTER", cx - 70, 360, 16, {0.9, 0.85, 0.7, a})
         return
     end
 
     -- Arena background — stone
     lurek.render.setColor(0.18, 0.16, 0.14, 1)
-    lurek.render.rectangle("fill", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
+    rect("fill", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
     -- Arena border
     lurek.render.setColor(0.35, 0.30, 0.25, 1)
-    lurek.render.rectangle("line", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
+    rect("line", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
     -- Decorative inner border
     lurek.render.setColor(0.28, 0.24, 0.20, 1)
-    lurek.render.rectangle("line", ARENA_X + 4, ARENA_Y + 4, ARENA_W - 8, ARENA_H - 8)
+    rect("line", ARENA_X + 4, ARENA_Y + 4, ARENA_W - 8, ARENA_H - 8)
 
     -- Ground slam AoE indicator
     if boss.slam_show > 0 then
         local sa = boss.slam_show * 0.6
         lurek.render.setColor(1, 0.3, 0.1, sa)
-        lurek.render.circle("fill", boss.slam_x, boss.slam_y, BOSS_SLAM.radius)
+        circ("fill", boss.slam_x, boss.slam_y, BOSS_SLAM.radius)
     end
 
     -- Projectiles
     for _, p in ipairs(projectiles) do
         lurek.render.setColor(1, 0.3, 0.8, 0.9)
-        lurek.render.circle("fill", p.x, p.y, 4)
+        circ("fill", p.x, p.y, 4)
     end
 
     -- Boss
@@ -594,18 +646,18 @@ function lurek.draw()
         br = math.min(1, br + 0.15 + math.sin(lurek.timer.getTime() * 8) * 0.08)
     end
     lurek.render.setColor(br, bg, bb, 1)
-    lurek.render.rectangle("fill", boss.x, boss.y, BOSS_W, BOSS_H)
+    rect("fill", boss.x, boss.y, BOSS_W, BOSS_H)
     -- Glowing eyes
     local ey = boss.y + 8
     local ex1 = boss.facing == -1 and boss.x + 8 or boss.x + BOSS_W - 14
     lurek.render.setColor(1, 0.3, 0.1, 0.9)
-    lurek.render.rectangle("fill", ex1, ey, 3, 3)
-    lurek.render.rectangle("fill", ex1 + 6, ey, 3, 3)
+    rect("fill", ex1, ey, 3, 3)
+    rect("fill", ex1 + 6, ey, 3, 3)
     -- Boss windup telegraph
     if boss.windup > 0 then
         local wa = math.abs(math.sin(boss.windup * 20))
         lurek.render.setColor(1, 1, 0.5, wa * 0.5)
-        lurek.render.rectangle("line", boss.x - 3, boss.y - 3, BOSS_W + 6, BOSS_H + 6)
+        rect("line", boss.x - 3, boss.y - 3, BOSS_W + 6, BOSS_H + 6)
     end
 
     -- Player
@@ -620,24 +672,24 @@ function lurek.draw()
     else
         lurek.render.setColor(0.25, 0.35, 0.8, pa)
     end
-    lurek.render.rectangle("fill", player.x, player.y, PLAYER_W, PLAYER_H)
+    rect("fill", player.x, player.y, PLAYER_W, PLAYER_H)
     -- Player attack indicator
     if player.atk_timer > 0 and player.atk_data then
         local ax = player.facing == 1 and (player.x + PLAYER_W) or (player.x - 30)
         lurek.render.setColor(1, 1, 0.8, 0.5)
-        lurek.render.rectangle("fill", ax, player.y + 4, 30, PLAYER_H - 8)
+        rect("fill", ax, player.y + 4, 30, PLAYER_H - 8)
     end
     -- Block shield
     if player.blocking then
         local sx = player.facing == 1 and (player.x + PLAYER_W + 2) or (player.x - 6)
         lurek.render.setColor(0.4, 0.7, 1, 0.6)
-        lurek.render.rectangle("fill", sx, player.y + 2, 4, PLAYER_H - 4)
+        rect("fill", sx, player.y + 2, 4, PLAYER_H - 4)
     end
 
     -- Death fade
     if game_state == STATE.PLAYER_DIED then
         lurek.render.setColor(0, 0, 0, death_alpha * 0.7)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
     end
 end
 
@@ -649,23 +701,23 @@ function lurek.draw_ui()
     local php = SCREEN_W * 0.05
     local bar_w = 160
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.rectangle("fill", php, 16, bar_w, 14)
+    rect("fill", php, 16, bar_w, 14)
     local hp_frac = (player.hp_disp or player.hp) / PLAYER_MAX_HP
     lurek.render.setColor(0.8, 0.15, 0.1, 1)
-    lurek.render.rectangle("fill", php, 16, bar_w * hp_frac, 14)
+    rect("fill", php, 16, bar_w * hp_frac, 14)
     lurek.render.setColor(1, 1, 1, 0.9)
-    lurek.render.print("HP", php + 2, 17, 11, {1,1,1,0.9})
+    text_("HP", php + 2, 17, 11, {1,1,1,0.9})
 
     -- Player stamina bar
     lurek.render.setColor(0.15, 0.15, 0.15, 0.8)
-    lurek.render.rectangle("fill", php, 34, bar_w, 10)
+    rect("fill", php, 34, bar_w, 10)
     local st_frac = (player.stam_disp or player.stamina) / PLAYER_MAX_STAM
     local st_r, st_g = 0.1, 0.7
     if player.exhausted > 0 then st_r, st_g = 0.6, 0.3 end
     lurek.render.setColor(st_r, st_g, 0.15, 1)
-    lurek.render.rectangle("fill", php, 34, bar_w * st_frac, 10)
+    rect("fill", php, 34, bar_w * st_frac, 10)
     lurek.render.setColor(1, 1, 1, 0.7)
-    lurek.render.print("STA", php + 2, 34, 9, {1,1,1,0.7})
+    text_("STA", php + 2, 34, 9, {1,1,1,0.7})
 
     -- Estus charges
     for i = 1, ESTUS_MAX do
@@ -676,39 +728,39 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.3, 0.2, 0.1, 0.5)
         end
-        lurek.render.rectangle("fill", ex, ey, 12, 16)
+        rect("fill", ex, ey, 12, 16)
     end
 
     -- Exhausted warning
     if player.exhausted > 0 then
         local wa = math.abs(math.sin(player.exhausted * 10))
-        lurek.render.print("EXHAUSTED", php, 70, 12, {1, 0.3, 0.1, wa})
+        text_("EXHAUSTED", php, 70, 12, {1, 0.3, 0.1, wa})
     end
 
     -- Boss HP bar (top right)
     local bhp_x = SCREEN_W - 220
     local bhp_w = 200
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.rectangle("fill", bhp_x, 16, bhp_w, 18)
+    rect("fill", bhp_x, 16, bhp_w, 18)
     local boss_frac = (boss.hp_disp or boss.hp) / BOSS_MAX_HP
     local bossR = boss.enraged and 0.9 or 0.6
     lurek.render.setColor(bossR, 0.08, 0.12, 1)
-    lurek.render.rectangle("fill", bhp_x, 16, bhp_w * boss_frac, 18)
+    rect("fill", bhp_x, 16, bhp_w * boss_frac, 18)
     -- Phase markers
     lurek.render.setColor(1, 1, 1, 0.3)
-    lurek.render.rectangle("fill", bhp_x + bhp_w * 0.66, 16, 1, 18)
-    lurek.render.rectangle("fill", bhp_x + bhp_w * 0.33, 16, 1, 18)
+    rect("fill", bhp_x + bhp_w * 0.66, 16, 1, 18)
+    rect("fill", bhp_x + bhp_w * 0.33, 16, 1, 18)
     -- Phase label
-    lurek.render.print("BOSS  P" .. boss.phase, bhp_x + 4, 18, 12, {1,1,1,0.9})
+    text_("BOSS  P" .. boss.phase, bhp_x + 4, 18, 12, {1,1,1,0.9})
 
     -- Death overlay
     if game_state == STATE.PLAYER_DIED then
         if death_timer > 1.0 then
             local ta = math.min(1, (death_timer - 1.0) / 0.8)
-            lurek.render.print("YOU DIED", SCREEN_W * 0.5 - 80, SCREEN_H * 0.4, 36, {0.7, 0.1, 0.05, ta})
+            text_("YOU DIED", SCREEN_W * 0.5 - 80, SCREEN_H * 0.4, 36, {0.7, 0.1, 0.05, ta})
             if death_timer > 2.5 then
                 local ra = math.abs(math.sin(death_timer * 2))
-                lurek.render.print("Press ENTER to retry", SCREEN_W * 0.5 - 90, SCREEN_H * 0.55, 14, {0.8, 0.7, 0.6, ra})
+                text_("Press ENTER to retry", SCREEN_W * 0.5 - 90, SCREEN_H * 0.55, 14, {0.8, 0.7, 0.6, ra})
             end
         end
     end
@@ -716,13 +768,13 @@ function lurek.draw_ui()
     -- Victory overlay
     if game_state == STATE.VICTORY then
         local va = math.min(1, victory_timer / 1.0)
-        lurek.render.print("VICTORY", SCREEN_W * 0.5 - 70, SCREEN_H * 0.4, 36, {1, 0.85, 0.2, va})
+        text_("VICTORY", SCREEN_W * 0.5 - 70, SCREEN_H * 0.4, 36, {1, 0.85, 0.2, va})
         if victory_timer > 1.5 then
-            lurek.render.print("HEIR OF FIRE DESTROYED", SCREEN_W * 0.5 - 110, SCREEN_H * 0.5, 16, {0.9, 0.8, 0.6, va})
+            text_("HEIR OF FIRE DESTROYED", SCREEN_W * 0.5 - 110, SCREEN_H * 0.5, 16, {0.9, 0.8, 0.6, va})
         end
         if victory_timer > 3.0 then
             local ra = math.abs(math.sin(victory_timer * 2))
-            lurek.render.print("Press ENTER", SCREEN_W * 0.5 - 55, SCREEN_H * 0.6, 14, {0.8, 0.7, 0.6, ra})
+            text_("Press ENTER", SCREEN_W * 0.5 - 55, SCREEN_H * 0.6, 14, {0.8, 0.7, 0.6, ra})
         end
     end
 end

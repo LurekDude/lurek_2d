@@ -70,6 +70,7 @@ local signal_bus = {}
 local subscriber_registry = {}  -- { signal_name = { {name, fn, color}, ... } }
 local stats = { fired = 0, chain_reactions = 0, subscribers = 0 }
 local event_log = {}
+local game_time = 0
 
 local function signal_subscribe(signal_name, sub_name, fn, color)
     if not subscriber_registry[signal_name] then
@@ -115,13 +116,13 @@ end
 -- ---------------------------------------------------------------------------
 -- Game state
 -- ---------------------------------------------------------------------------
+local _cam = nil ---@type any
 local health          = MAX_HEALTH
 local health_display  = MAX_HEALTH
 local score           = 0
 local score_display   = 0
 local combo           = 0
 local level           = 1
-local game_time       = 0
 local game_speed      = 1.0
 local title_timer     = 0
 local title_alpha     = 0
@@ -357,7 +358,55 @@ lurek.input.bind("quit",  "escape")
 -- Init
 -- ---------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
+    _cam = lurek.camera.new()
     lurek.window.setTitle("Signal Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.06, 0.10)
     _cam:setPosition(0, 0)
@@ -484,41 +533,41 @@ function lurek.draw()
     if current_state == STATE.TITLE then
         -- Title screen
         local a = title_alpha
-        lurek.render.print("SIGNAL DEMO", 180, 180, 40, 0.9 * a, 0.85 * a, 0.3 * a, a)
-        lurek.render.print("PUB-SUB EVENTS", 210, 240, 22, 0.6 * a, 0.6 * a, 0.7 * a, a * 0.8)
-        lurek.render.print("Press any signal key to begin...", 180, 320, 14,
+        text_("SIGNAL DEMO", 180, 180, 40, 0.9 * a, 0.85 * a, 0.3 * a, a)
+        text_("PUB-SUB EVENTS", 210, 240, 22, 0.6 * a, 0.6 * a, 0.7 * a, a * 0.8)
+        text_("Press any signal key to begin...", 180, 320, 14,
             0.5 * a, 0.5 * a, 0.5 * a, a * 0.5)
         return
     end
 
     -- Game area background
-    lurek.render.rectangle(10, 60, GAME_AREA_W - 20, 360, 0.08, 0.08, 0.12, 0.5)
+    rect(10, 60, GAME_AREA_W - 20, 360, 0.08, 0.08, 0.12, 0.5)
 
     -- Health bar
     local bar_w = 200
     local bar_h = 20
     local bar_x = 30
     local bar_y = 80
-    lurek.render.rectangle(bar_x, bar_y, bar_w, bar_h, 0.2, 0.05, 0.05, 0.8)
+    rect(bar_x, bar_y, bar_w, bar_h, 0.2, 0.05, 0.05, 0.8)
     local fill = clamp(health_display / MAX_HEALTH, 0, 1)
     local hr = lerp(0.9, 0.2, fill)
     local hg = lerp(0.15, 0.8, fill)
-    lurek.render.rectangle(bar_x, bar_y, bar_w * fill, bar_h, hr, hg, 0.15, 0.9)
-    lurek.render.print("HP: " .. health .. "/" .. MAX_HEALTH, bar_x + 4, bar_y + 3, 13,
+    rect(bar_x, bar_y, bar_w * fill, bar_h, hr, hg, 0.15, 0.9)
+    text_("HP: " .. health .. "/" .. MAX_HEALTH, bar_x + 4, bar_y + 3, 13,
         1, 1, 1, 0.9)
 
     -- Score display
-    lurek.render.print("Score: " .. math.floor(score_display), 30, 115, 18,
+    text_("Score: " .. math.floor(score_display), 30, 115, 18,
         0.2, 0.95, 0.4, 0.9)
 
     -- Combo display
     local combo_a = combo > 0 and 1.0 or 0.4
-    lurek.render.print("Combo: " .. combo .. "/" .. COMBO_THRESHOLD, 30, 145, 15,
+    text_("Combo: " .. combo .. "/" .. COMBO_THRESHOLD, 30, 145, 15,
         1.0, 0.85, 0.1, combo_a)
 
     -- Level / Speed
-    lurek.render.print("Level: " .. level, 30, 172, 14, 0.4, 0.6, 1.0, 0.8)
-    lurek.render.print(string.format("Speed: %.0f%%", game_speed * 100), 150, 172, 14,
+    text_("Level: " .. level, 30, 172, 14, 0.4, 0.6, 1.0, 0.8)
+    text_(string.format("Speed: %.0f%%", game_speed * 100), 150, 172, 14,
         0.5, 0.5, 0.6, 0.7)
 
     -- Signal key hints
@@ -530,14 +579,14 @@ function lurek.draw()
         { key = "[F]", sig = "combo_reached", col = SIG_COLORS.combo_reached },
     }
     for _, h in ipairs(hints) do
-        lurek.render.print(h.key .. " " .. h.sig, 30, hint_y, 13,
+        text_(h.key .. " " .. h.sig, 30, hint_y, 13,
             h.col[1], h.col[2], h.col[3], 0.8)
         hint_y = hint_y + 20
     end
 
     -- Manual particles
     for _, p in ipairs(particles) do
-        lurek.render.rectangle(
+        rect(
             p.x - p.size / 2, p.y - p.size / 2,
             p.size, p.size,
             p.r, p.g, p.b, p.a
@@ -546,7 +595,7 @@ function lurek.draw()
 
     -- Floating texts
     for _, ft in ipairs(floating_texts) do
-        lurek.render.print(ft.text, ft.x, ft.y, 16,
+        text_(ft.text, ft.x, ft.y, 16,
             ft.r, ft.g, ft.b, ft.a)
     end
 
@@ -558,22 +607,22 @@ function lurek.draw()
 
     -- Screen flash overlay
     if screen_flash.a > 0.01 then
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H,
+        rect(0, 0, SCREEN_W, SCREEN_H,
             screen_flash.r, screen_flash.g, screen_flash.b, screen_flash.a)
     end
 
     -- Game Over overlay
     if current_state == STATE.GAME_OVER then
         local oa = clamp(death_timer / 0.8, 0, 0.7)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.05, 0.02, 0.02, oa)
+        rect(0, 0, SCREEN_W, SCREEN_H, 0.05, 0.02, 0.02, oa)
         local ta = clamp(death_timer / 1.0, 0, 1)
-        lurek.render.print("GAME OVER", 240, 200, 42, 0.9, 0.12, 0.1, ta)
-        lurek.render.print("Final Score: " .. score, 270, 260, 22, 1, 1, 1, ta * 0.9)
-        lurek.render.print("Signals fired: " .. stats.fired, 270, 295, 15,
+        text_("GAME OVER", 240, 200, 42, 0.9, 0.12, 0.1, ta)
+        text_("Final Score: " .. score, 270, 260, 22, 1, 1, 1, ta * 0.9)
+        text_("Signals fired: " .. stats.fired, 270, 295, 15,
             0.7, 0.7, 0.7, ta * 0.7)
-        lurek.render.print("Chain reactions: " .. stats.chain_reactions, 270, 315, 15,
+        text_("Chain reactions: " .. stats.chain_reactions, 270, 315, 15,
             0.7, 0.7, 0.7, ta * 0.7)
-        lurek.render.print("Level reached: " .. level, 270, 335, 15,
+        text_("Level reached: " .. level, 270, 335, 15,
             0.7, 0.7, 0.7, ta * 0.7)
     end
 end
@@ -585,13 +634,13 @@ function lurek.draw_ui()
     if current_state == STATE.TITLE then return end
 
     local fps = lurek.timer.getFPS and lurek.timer.getFPS() or 0
-    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, 8, 12,
+    text_(string.format("FPS: %d", fps), SCREEN_W - 80, 8, 12,
         0.5, 0.5, 0.5, 0.6)
 
     -- ── Right panel: subscriber list ──
-    lurek.render.rectangle(RIGHT_PANEL_X, 50, RIGHT_PANEL_W, LOG_PANEL_Y - 60,
+    rect(RIGHT_PANEL_X, 50, RIGHT_PANEL_W, LOG_PANEL_Y - 60,
         0.10, 0.10, 0.14, 0.7)
-    lurek.render.print("SUBSCRIBERS", RIGHT_PANEL_X + 8, 55, 14,
+    text_("SUBSCRIBERS", RIGHT_PANEL_X + 8, 55, 14,
         0.8, 0.8, 0.9, 0.9)
 
     local sy = 78
@@ -601,8 +650,8 @@ function lurek.draw_ui()
         local sc = SIG_COLORS[sig_name] or { 0.6, 0.6, 0.6 }
 
         -- Signal header
-        lurek.render.rectangle(RIGHT_PANEL_X + 8, sy + 2, 8, 8, sc[1], sc[2], sc[3], 0.9)
-        lurek.render.print(sig_name, RIGHT_PANEL_X + 22, sy, 12,
+        rect(RIGHT_PANEL_X + 8, sy + 2, 8, 8, sc[1], sc[2], sc[3], 0.9)
+        text_(sig_name, RIGHT_PANEL_X + 22, sy, 12,
             sc[1], sc[2], sc[3], 0.85)
         sy = sy + 16
 
@@ -612,9 +661,9 @@ function lurek.draw_ui()
             local dot_r = lerp(sub.color[1] * 0.5, sub.color[1], sub.flash)
             local dot_g = lerp(sub.color[2] * 0.5, sub.color[2], sub.flash)
             local dot_b = lerp(sub.color[3] * 0.5, sub.color[3], sub.flash)
-            lurek.render.rectangle(RIGHT_PANEL_X + 18, sy + 3, 5, 5,
+            rect(RIGHT_PANEL_X + 18, sy + 3, 5, 5,
                 dot_r, dot_g, dot_b, dot_a)
-            lurek.render.print(sub.name, RIGHT_PANEL_X + 28, sy, 11,
+            text_(sub.name, RIGHT_PANEL_X + 28, sy, 11,
                 0.6, 0.6, 0.65, 0.5 + sub.flash * 0.5)
             sy = sy + 14
         end
@@ -622,9 +671,9 @@ function lurek.draw_ui()
     end
 
     -- ── Bottom panel: event log ──
-    lurek.render.rectangle(10, LOG_PANEL_Y, SCREEN_W - 20, LOG_PANEL_H,
+    rect(10, LOG_PANEL_Y, SCREEN_W - 20, LOG_PANEL_H,
         0.10, 0.10, 0.14, 0.7)
-    lurek.render.print("EVENT LOG", 20, LOG_PANEL_Y + 5, 13,
+    text_("EVENT LOG", 20, LOG_PANEL_Y + 5, 13,
         0.8, 0.8, 0.9, 0.9)
 
     local ly = LOG_PANEL_Y + 24
@@ -633,8 +682,8 @@ function lurek.draw_ui()
         local ec = SIG_COLORS[ev.signal] or { 0.6, 0.6, 0.6 }
         local chain_tag = ev.chain and " [CHAIN]" or ""
         local age = clamp(1 - (i - 1) / LOG_MAX, 0.3, 1.0)
-        lurek.render.rectangle(20, ly + 2, 6, 6, ec[1], ec[2], ec[3], age)
-        lurek.render.print(
+        rect(20, ly + 2, 6, 6, ec[1], ec[2], ec[3], age)
+        text_(
             format_time(ev.time) .. "  " .. ev.signal .. chain_tag,
             32, ly, 11,
             ec[1] * 0.8, ec[2] * 0.8, ec[3] * 0.8, age * 0.85
@@ -643,8 +692,8 @@ function lurek.draw_ui()
     end
 
     -- ── Stats bar ──
-    lurek.render.rectangle(10, 30, SCREEN_W - 20, 22, 0.08, 0.08, 0.12, 0.6)
-    lurek.render.print(
+    rect(10, 30, SCREEN_W - 20, 22, 0.08, 0.08, 0.12, 0.6)
+    text_(
         string.format("Signals: %d  |  Subscribers: %d  |  Chains: %d  |  Time: %s",
             stats.fired, stats.subscribers, stats.chain_reactions, format_time(game_time)),
         20, 34, 13, 0.7, 0.7, 0.75, 0.85

@@ -22,7 +22,7 @@ Create a new self-contained Lua example game in content/examples/. Use when demo
 5. `local` variables for all state
 6. `function lurek.init()` — initialization
 7. `function lurek.process(dt)` — frame logic
-8. `function lurek.render()` — rendering only
+8. `function lurek.draw()` — rendering only
 9. Optionally: `lurek.keypressed`, `lurek.input.mousepressed` callbacks
 10. Check all API calls against `docs/api/lurek.md`:
 11. Colors: `[0.0, 1.0]` float range

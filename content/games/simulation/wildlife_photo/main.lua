@@ -376,6 +376,53 @@ end
 -- Init
 -- ---------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Wildlife Photo — Lurek2D")
     lurek.render.setBackgroundColor(bg_r, bg_g, bg_b)
@@ -560,12 +607,12 @@ function lurek.draw()
     camera:attach()
 
     -- Sky gradient band
-    lurek.render.rectangle(0, 0, WORLD_W, SKY_MAX_Y, {
+    rect(0, 0, WORLD_W, SKY_MAX_Y, {
         color = { bg_r * 0.8, bg_g * 0.9, bg_b * 1.1, 0.3 },
     })
 
     -- Ground
-    lurek.render.rectangle(0, SKY_MAX_Y, WORLD_W, WATER_Y - SKY_MAX_Y, {
+    rect(0, SKY_MAX_Y, WORLD_W, WATER_Y - SKY_MAX_Y, {
         color = { 0.25, 0.50, 0.18, 1 },
     })
 
@@ -574,27 +621,27 @@ function lurek.draw()
         local tx = 80 + i * 150
         local ty = SKY_MAX_Y - 10
         -- Trunk
-        lurek.render.rectangle(tx - 4, ty, 8, 40, { color = { 0.35, 0.22, 0.10, 1 } })
+        rect(tx - 4, ty, 8, 40, { color = { 0.35, 0.22, 0.10, 1 } })
         -- Canopy
-        lurek.render.circle(tx, ty, 20, { color = { 0.18, 0.45, 0.12, 1 } })
+        circ(tx, ty, 20, { color = { 0.18, 0.45, 0.12, 1 } })
     end
 
     -- Bushes
     for i = 0, 20 do
         local bx = 40 + i * 110
         local by = math.random(200, 440)
-        lurek.render.circle(bx, by, 10, { color = { 0.22, 0.48, 0.15, 0.7 } })
+        circ(bx, by, 10, { color = { 0.22, 0.48, 0.15, 0.7 } })
     end
 
     -- Water zone
-    lurek.render.rectangle(0, WATER_Y, WORLD_W, WORLD_H - WATER_Y, {
+    rect(0, WATER_Y, WORLD_W, WORLD_H - WATER_Y, {
         color = { 0.10, 0.30, 0.60, 0.8 },
     })
     -- Water ripples
     for i = 0, 8 do
         local rx = 100 + i * 280
         local ry = WATER_Y + 20 + math.sin(tod_timer + i) * 8
-        lurek.render.rectangle(rx, ry, 40, 2, { color = { 0.3, 0.5, 0.8, 0.4 } })
+        rect(rx, ry, 40, 2, { color = { 0.3, 0.5, 0.8, 0.4 } })
     end
 
     -- Draw animals
@@ -602,17 +649,17 @@ function lurek.draw()
         if a.visible then
             local def = ANIMAL_DEFS[a.def_index]
             if def.shape == "circle" then
-                lurek.render.circle(a.x + def.w * 0.5, a.y + def.h * 0.5, def.w * 0.5, {
+                circ(a.x + def.w * 0.5, a.y + def.h * 0.5, def.w * 0.5, {
                     color = def.color,
                 })
             else
-                lurek.render.rectangle(a.x, a.y, def.w, def.h, {
+                rect(a.x, a.y, def.w, def.h, {
                     color = def.color,
                 })
             end
             -- Feeding indicator (small sparkle)
             if a.feeding then
-                lurek.render.circle(a.x + def.w * 0.5, a.y - 6, 3, {
+                circ(a.x + def.w * 0.5, a.y - 6, 3, {
                     color = { 1, 0.9, 0.3, 0.7 + math.sin(tod_timer * 8) * 0.3 },
                 })
             end
@@ -626,15 +673,15 @@ function lurek.draw()
 
     -- Night overlay
     if tod_phase == TOD_NIGHT then
-        lurek.render.rectangle(cam_x, cam_y, SCREEN_W, SCREEN_H, {
+        rect(cam_x, cam_y, SCREEN_W, SCREEN_H, {
             color = { 0.02, 0.02, 0.10, 0.35 },
         })
     elseif tod_phase == TOD_DUSK then
-        lurek.render.rectangle(cam_x, cam_y, SCREEN_W, SCREEN_H, {
+        rect(cam_x, cam_y, SCREEN_W, SCREEN_H, {
             color = { 0.4, 0.15, 0.05, 0.12 },
         })
     elseif tod_phase == TOD_DAWN then
-        lurek.render.rectangle(cam_x, cam_y, SCREEN_W, SCREEN_H, {
+        rect(cam_x, cam_y, SCREEN_W, SCREEN_H, {
             color = { 0.5, 0.3, 0.15, 0.08 },
         })
     end
@@ -650,61 +697,61 @@ function lurek.draw_ui()
 
     -- ─── TITLE ───
     if current_state == STATES.TITLE then
-        lurek.render.rectangle(0, 0, W, H, { color = { 0.05, 0.12, 0.08, 1 } })
-        lurek.render.print("WILDLIFE PHOTO", 200, 180, { size = 42, color = { 0.85, 0.95, 0.70, 1 } })
-        lurek.render.print("CAPTURE THE WILD", 250, 240, { size = 20, color = { 0.55, 0.75, 0.45, 1 } })
-        lurek.render.print("Press SPACE to begin", 290, 340, { size = 16, color = { 0.5, 0.5, 0.5, 1 } })
-        lurek.render.print("WASD pan  |  SPACE photo  |  Q/E zoom  |  TAB album", 135, 400, { size = 12, color = { 0.4, 0.4, 0.4, 1 } })
+        rect(0, 0, W, H, { color = { 0.05, 0.12, 0.08, 1 } })
+        text_("WILDLIFE PHOTO", 200, 180, { size = 42, color = { 0.85, 0.95, 0.70, 1 } })
+        text_("CAPTURE THE WILD", 250, 240, { size = 20, color = { 0.55, 0.75, 0.45, 1 } })
+        text_("Press SPACE to begin", 290, 340, { size = 16, color = { 0.5, 0.5, 0.5, 1 } })
+        text_("WASD pan  |  SPACE photo  |  Q/E zoom  |  TAB album", 135, 400, { size = 12, color = { 0.4, 0.4, 0.4, 1 } })
         return
     end
 
     -- ─── COMPLETE ───
     if current_state == STATES.COMPLETE then
-        lurek.render.rectangle(0, 0, W, H, { color = { 0.02, 0.08, 0.04, 0.9 } })
-        lurek.render.print("JOURNAL COMPLETE!", 200, 160, { size = 40, color = { 1, 0.9, 0.3, 1 } })
+        rect(0, 0, W, H, { color = { 0.02, 0.08, 0.04, 0.9 } })
+        text_("JOURNAL COMPLETE!", 200, 160, { size = 40, color = { 1, 0.9, 0.3, 1 } })
         local total = 0
         for _, p in ipairs(photos) do total = total + p.score end
-        lurek.render.print(string.format("Total Score: %d  |  Photos: %d", total, #photos), 200, 230, { size = 18, color = { 0.85, 0.85, 0.85, 1 } })
-        lurek.render.print("All 8 species photographed!", 230, 270, { size = 16, color = { 0.6, 0.9, 0.5, 1 } })
-        lurek.render.print("Press SPACE to play again", 270, 360, { size = 16, color = { 0.5, 0.5, 0.5, 1 } })
+        text_(string.format("Total Score: %d  |  Photos: %d", total, #photos), 200, 230, { size = 18, color = { 0.85, 0.85, 0.85, 1 } })
+        text_("All 8 species photographed!", 230, 270, { size = 16, color = { 0.6, 0.9, 0.5, 1 } })
+        text_("Press SPACE to play again", 270, 360, { size = 16, color = { 0.5, 0.5, 0.5, 1 } })
         return
     end
 
     -- ─── ALBUM ───
     if current_state == STATES.ALBUM then
-        lurek.render.rectangle(0, 0, W, H, { color = { 0, 0, 0, 0.8 } })
-        lurek.render.print("PHOTO ALBUM", 300, 30, { size = 28, color = { 0.9, 0.85, 0.6, 1 } })
+        rect(0, 0, W, H, { color = { 0, 0, 0, 0.8 } })
+        text_("PHOTO ALBUM", 300, 30, { size = 28, color = { 0.9, 0.85, 0.6, 1 } })
 
         if #photos == 0 then
-            lurek.render.print("No photos yet. Get out there!", 250, 280, { size = 16, color = { 0.5, 0.5, 0.5, 1 } })
+            text_("No photos yet. Get out there!", 250, 280, { size = 16, color = { 0.5, 0.5, 0.5, 1 } })
         else
             local y = 70
-            lurek.render.print("  #   Species       Score   Zoom           Time", 80, y, { size = 13, color = { 0.6, 0.6, 0.6, 1 } })
+            text_("  #   Species       Score   Zoom           Time", 80, y, { size = 13, color = { 0.6, 0.6, 0.6, 1 } })
             y = y + 25
             local max_show = math.min(#photos, 16)
             for i = 1, max_show do
                 local p = photos[i]
                 local line = string.format(" %2d   %-12s  %3d     %-14s %s", i, p.species, p.score, p.zoom, p.tod)
-                lurek.render.print(line, 80, y, { size = 13, color = { 0.8, 0.8, 0.8, 1 } })
+                text_(line, 80, y, { size = 13, color = { 0.8, 0.8, 0.8, 1 } })
                 y = y + 20
             end
             if #photos > 16 then
-                lurek.render.print(string.format("  ... and %d more", #photos - 16), 80, y, { size = 13, color = { 0.5, 0.5, 0.5, 1 } })
+                text_(string.format("  ... and %d more", #photos - 16), 80, y, { size = 13, color = { 0.5, 0.5, 0.5, 1 } })
             end
         end
 
         -- Journal section
-        lurek.render.print("SPECIES JOURNAL", 300, 440, { size = 18, color = { 0.8, 0.9, 0.6, 1 } })
+        text_("SPECIES JOURNAL", 300, 440, { size = 18, color = { 0.8, 0.9, 0.6, 1 } })
         local jx = 100
         for _, def in ipairs(ANIMAL_DEFS) do
             local found = journal[def.name]
             local col = found and { 0.5, 0.9, 0.4, 1 } or { 0.3, 0.3, 0.3, 1 }
             local mark = found and "[x]" or "[ ]"
-            lurek.render.print(mark .. " " .. def.name, jx, 470, { size = 12, color = col })
+            text_(mark .. " " .. def.name, jx, 470, { size = 12, color = col })
             jx = jx + 80
         end
 
-        lurek.render.print("Press TAB or ESC to close", 290, 550, { size = 12, color = { 0.4, 0.4, 0.4, 1 } })
+        text_("Press TAB or ESC to close", 290, 550, { size = 12, color = { 0.4, 0.4, 0.4, 1 } })
         return
     end
 
@@ -713,69 +760,69 @@ function lurek.draw_ui()
     -- Viewfinder rectangle (screen center)
     local vf_sx = (W - VIEWFINDER_W) * 0.5
     local vf_sy = (H - VIEWFINDER_H) * 0.5
-    lurek.render.rectangle(vf_sx, vf_sy, VIEWFINDER_W, VIEWFINDER_H, {
+    rect(vf_sx, vf_sy, VIEWFINDER_W, VIEWFINDER_H, {
         color = { 1, 1, 1, 0.5 }, mode = "line",
     })
     -- Crosshair
     local cx, cy = W * 0.5, H * 0.5
-    lurek.render.rectangle(cx - 8, cy, 16, 1, { color = { 1, 1, 1, 0.3 } })
-    lurek.render.rectangle(cx, cy - 8, 1, 16, { color = { 1, 1, 1, 0.3 } })
+    rect(cx - 8, cy, 16, 1, { color = { 1, 1, 1, 0.3 } })
+    rect(cx, cy - 8, 1, 16, { color = { 1, 1, 1, 0.3 } })
 
     -- Corner brackets
     local bk = 12
-    lurek.render.rectangle(vf_sx, vf_sy, bk, 2, { color = { 1, 1, 1, 0.7 } })
-    lurek.render.rectangle(vf_sx, vf_sy, 2, bk, { color = { 1, 1, 1, 0.7 } })
-    lurek.render.rectangle(vf_sx + VIEWFINDER_W - bk, vf_sy, bk, 2, { color = { 1, 1, 1, 0.7 } })
-    lurek.render.rectangle(vf_sx + VIEWFINDER_W - 2, vf_sy, 2, bk, { color = { 1, 1, 1, 0.7 } })
-    lurek.render.rectangle(vf_sx, vf_sy + VIEWFINDER_H - 2, bk, 2, { color = { 1, 1, 1, 0.7 } })
-    lurek.render.rectangle(vf_sx, vf_sy + VIEWFINDER_H - bk, 2, bk, { color = { 1, 1, 1, 0.7 } })
-    lurek.render.rectangle(vf_sx + VIEWFINDER_W - bk, vf_sy + VIEWFINDER_H - 2, bk, 2, { color = { 1, 1, 1, 0.7 } })
-    lurek.render.rectangle(vf_sx + VIEWFINDER_W - 2, vf_sy + VIEWFINDER_H - bk, 2, bk, { color = { 1, 1, 1, 0.7 } })
+    rect(vf_sx, vf_sy, bk, 2, { color = { 1, 1, 1, 0.7 } })
+    rect(vf_sx, vf_sy, 2, bk, { color = { 1, 1, 1, 0.7 } })
+    rect(vf_sx + VIEWFINDER_W - bk, vf_sy, bk, 2, { color = { 1, 1, 1, 0.7 } })
+    rect(vf_sx + VIEWFINDER_W - 2, vf_sy, 2, bk, { color = { 1, 1, 1, 0.7 } })
+    rect(vf_sx, vf_sy + VIEWFINDER_H - 2, bk, 2, { color = { 1, 1, 1, 0.7 } })
+    rect(vf_sx, vf_sy + VIEWFINDER_H - bk, 2, bk, { color = { 1, 1, 1, 0.7 } })
+    rect(vf_sx + VIEWFINDER_W - bk, vf_sy + VIEWFINDER_H - 2, bk, 2, { color = { 1, 1, 1, 0.7 } })
+    rect(vf_sx + VIEWFINDER_W - 2, vf_sy + VIEWFINDER_H - bk, 2, bk, { color = { 1, 1, 1, 0.7 } })
 
     -- Top HUD bar
-    lurek.render.rectangle(0, 0, W, 26, { color = { 0, 0, 0, 0.7 } })
+    rect(0, 0, W, 26, { color = { 0, 0, 0, 0.7 } })
 
     -- Film counter
-    lurek.render.print(string.format("Film: %d/%d", film_remaining, MAX_FILM), 10, 5, {
+    text_(string.format("Film: %d/%d", film_remaining, MAX_FILM), 10, 5, {
         size = 14, color = film_remaining > 3 and { 0.8, 0.8, 0.8, 1 } or { 1, 0.4, 0.3, 1 },
     })
 
     -- Zoom
-    lurek.render.print(ZOOM_NAMES[zoom_index], 140, 5, { size = 14, color = { 0.7, 0.85, 1, 1 } })
+    text_(ZOOM_NAMES[zoom_index], 140, 5, { size = 14, color = { 0.7, 0.85, 1, 1 } })
 
     -- Time of day
-    lurek.render.print(TOD_NAMES[tod_phase], 310, 5, { size = 14, color = { 0.9, 0.8, 0.5, 1 } })
+    text_(TOD_NAMES[tod_phase], 310, 5, { size = 14, color = { 0.9, 0.8, 0.5, 1 } })
 
     -- Score total
     local total_score = 0
     for _, p in ipairs(photos) do total_score = total_score + p.score end
-    lurek.render.print(string.format("Score: %d", total_score), 420, 5, { size = 14, color = { 1, 0.9, 0.3, 1 } })
+    text_(string.format("Score: %d", total_score), 420, 5, { size = 14, color = { 1, 0.9, 0.3, 1 } })
 
     -- Journal progress
     local species_count = 0
     for _ in pairs(journal) do species_count = species_count + 1 end
-    lurek.render.print(string.format("Journal: %d/8", species_count), 560, 5, { size = 14, color = { 0.5, 0.9, 0.5, 1 } })
+    text_(string.format("Journal: %d/8", species_count), 560, 5, { size = 14, color = { 0.5, 0.9, 0.5, 1 } })
 
     -- FPS
     local fps = lurek.timer.getFPS()
-    lurek.render.print(string.format("FPS: %d", fps), W - 70, 5, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
+    text_(string.format("FPS: %d", fps), W - 70, 5, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
 
     -- Patience indicator
     if patience_timer >= PATIENCE_THRESHOLD then
         local pulse = 0.5 + math.sin(tod_timer * 4) * 0.3
-        lurek.render.print("Patience...", W * 0.5 - 30, H - 50, { size = 14, color = { 0.5, 0.9, 0.5, pulse } })
+        text_("Patience...", W * 0.5 - 30, H - 50, { size = 14, color = { 0.5, 0.9, 0.5, pulse } })
     end
 
     -- Film empty notice
     if film_remaining <= 0 then
-        lurek.render.print("FILM EMPTY — press SPACE for new roll", W * 0.5 - 120, H - 30, {
+        text_("FILM EMPTY — press SPACE for new roll", W * 0.5 - 120, H - 30, {
             size = 14, color = { 1, 0.5, 0.3, 1 },
         })
     end
 
     -- Score popup
     if score_popup.alpha > 0.01 then
-        lurek.render.print(score_popup.text, W * 0.5 - 60, score_popup.y, {
+        text_(score_popup.text, W * 0.5 - 60, score_popup.y, {
             size = 22, color = { 1, 0.95, 0.5, score_popup.alpha },
         })
     end

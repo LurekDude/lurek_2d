@@ -109,7 +109,7 @@ function lurek.process(dt)
     end
 end
 
-function lurek.render()
+function lurek.draw()
     local s = current_scene()
     if s and s.draw then s.draw() end
     draw_transition()

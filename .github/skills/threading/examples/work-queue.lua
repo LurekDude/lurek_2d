@@ -1,6 +1,10 @@
 local queue   = lurek.thread.newChannel()
 local results = lurek.thread.newChannel()
 
+local function applyResult(result)
+    lurek.log.info("worker result: " .. tostring(result), "thread")
+end
+
 local worker  = lurek.thread.newThread([[
     local q, r = ...
     while true do

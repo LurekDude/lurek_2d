@@ -12,7 +12,7 @@ local GRAVITY = 400
 
 -- Shapes placed by player
 local placed   = {}
-local ball     = nil
+local ball     = nil ---@type any
 local goal     = { x = 680, y = 520, r = 20 }
 local state    = "place"   -- place | simulating | win | fail
 local level    = 1
@@ -153,9 +153,56 @@ lurek.input.bind("quit",         "escape")
 
 -- ── Init ──────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Physics Puzzle — Lurek2D")
-    lurek.render.setBackgroundColor(0.05, 0.08, 0.12, 1.0)
+    lurek.render.setBackgroundColor(0.05, 0.08, 0.12)
     math.randomseed(os.time())
 
     ball_trail = lurek.particle.newSystem({
@@ -206,7 +253,7 @@ function lurek.process(dt)
 
     if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
 
-    local mx, my = lurek.input.mouse.getPosition()
+    local mx, my = lurek.input.getPosition()
     preview.x = mx
     preview.y = my
 
@@ -268,32 +315,32 @@ function lurek.draw()
 
     -- Walls
     for _, w in ipairs(WALLS) do
-        lurek.render.rectangle(w.x, w.y, w.w, w.h, { color = {0.4,0.4,0.4,1} })
+        rect(w.x, w.y, w.w, w.h, { color = {0.4,0.4,0.4,1} })
     end
 
     -- Goal
-    lurek.render.circle(goal.x, goal.y, goal.r, { color = {0.2,0.8,0.3,0.8}, segments = 16 })
-    lurek.render.print("GOAL", goal.x - 16, goal.y - 8, { color = {1,1,1,1}, size = 11 })
+    circ(goal.x, goal.y, goal.r, { color = {0.2,0.8,0.3,0.8}, segments = 16 })
+    text_("GOAL", goal.x - 16, goal.y - 8, { color = {1,1,1,1}, size = 11 })
 
     -- Ball spawn indicator
     local sp = lv.spawns[1]
-    lurek.render.circle(sp.x, sp.y, 16, { color = {0.4,0.4,0.9,0.4}, segments = 12 })
+    circ(sp.x, sp.y, 16, { color = {0.4,0.4,0.9,0.4}, segments = 12 })
 
     -- Placed shapes
     for _, sh in ipairs(placed) do
-        lurek.render.rectangle(sh.x, sh.y, sh.w, sh.h, { color = {0.6,0.5,0.3,1} })
+        rect(sh.x, sh.y, sh.w, sh.h, { color = {0.6,0.5,0.3,1} })
     end
 
     -- Preview (build mode)
     if state == "place" then
         local sh = SHAPES[preview.type]
         local px, py = preview.x - (sh.w or 60)/2, preview.y - (sh.h or 10)/2
-        lurek.render.rectangle(px, py, sh.w, sh.h, { color = {0.8,0.8,0.4,0.5} })
+        rect(px, py, sh.w, sh.h, { color = {0.8,0.8,0.4,0.5} })
     end
 
     -- Ball
     if ball then
-        lurek.render.circle(ball.x, ball.y, ball.r, { color = {0.3,0.6,1.0,1}, segments = 12 })
+        circ(ball.x, ball.y, ball.r, { color = {0.3,0.6,1.0,1}, segments = 12 })
     end
 
     if ball_trail    then ball_trail:draw()    end
@@ -304,18 +351,18 @@ end
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.draw_ui()
     local lv = LEVELS[level]
-    lurek.render.print("Level " .. level .. ": " .. lv.title, 14, 10, { color = {1,0.9,0.3,1}, size = 15 })
-    lurek.render.print("Budget: " .. #placed .. "/" .. lv.budgets, 400, 10, { color = {0.7,0.9,1.0,1}, size = 15 })
-    lurek.render.print("Score: " .. score, 580, 10, { color = {1,1,1,1}, size = 15 })
+    text_("Level " .. level .. ": " .. lv.title, 14, 10, { color = {1,0.9,0.3,1}, size = 15 })
+    text_("Budget: " .. #placed .. "/" .. lv.budgets, 400, 10, { color = {0.7,0.9,1.0,1}, size = 15 })
+    text_("Score: " .. score, 580, 10, { color = {1,1,1,1}, size = 15 })
 
     if state == "place" then
         local sh = SHAPES[SHAPE_ORDER[shape_idx]]
-        lurek.render.print("Shape: " .. sh.label .. "  Angle: " .. preview.angle .. "°", 14, H - 38, { color = {0.7,0.7,1.0,1}, size = 13 })
-        lurek.render.print("LMB=place  E/Q=rotate  Tab=shape  Space=launch  R=reset", 14, H - 20, { color = {0.4,0.4,0.4,1}, size = 11 })
+        text_("Shape: " .. sh.label .. "  Angle: " .. preview.angle .. "°", 14, H - 38, { color = {0.7,0.7,1.0,1}, size = 13 })
+        text_("LMB=place  E/Q=rotate  Tab=shape  Space=launch  R=reset", 14, H - 20, { color = {0.4,0.4,0.4,1}, size = 11 })
     elseif state == "win" then
-        lurek.render.print("GOAL REACHED! +pts", 270, 250, { color = {0.2,1.0,0.3,1}, size = 32 })
-        lurek.render.print("N=next level  R=retry", 290, 310, { color = {0.6,0.6,0.6,1}, size = 16 })
+        text_("GOAL REACHED! +pts", 270, 250, { color = {0.2,1.0,0.3,1}, size = 32 })
+        text_("N=next level  R=retry", 290, 310, { color = {0.6,0.6,0.6,1}, size = 16 })
     elseif state == "fail" then
-        lurek.render.print("BALL LOST — R to retry", 240, 260, { color = {0.9,0.3,0.3,1}, size = 26 })
+        text_("BALL LOST — R to retry", 240, 260, { color = {0.9,0.3,0.3,1}, size = 26 })
     end
 end

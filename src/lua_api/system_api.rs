@@ -41,7 +41,7 @@ pub fn get_memory_size() -> u64 {
 /// Returns `true` if the command was spawned, `false` if the scheme was
 /// rejected or the spawn failed.
 ///
-/// @param url : &str
+/// @param url &str
 /// @return bool
 pub fn open_url(url: &str) -> bool {
     let url_lower = url.to_lowercase();
@@ -137,9 +137,9 @@ pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
 
 /// Registers `lurek.platform.*` platform query functions into the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let system = lua.create_table()?;
@@ -193,7 +193,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // lurek.platform.openURL(url) -> bool
     /// Opens a URL in the system's default browser.
-    /// @param url : string
+    /// @param url string
     /// @return boolean
     system.set(
         "openURL",
@@ -261,7 +261,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // lurek.platform.getMessage(id) -> string
     /// Resolves a stable runtime message ID such as 'L001' to its human-readable text.
-    /// @param id : string
+    /// @param id string
     /// @return string
     system.set(
         "getMessage",
@@ -270,7 +270,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // lurek.platform.hasMessage(id) -> boolean
     /// Returns true when the runtime message catalog contains the given stable message ID.
-    /// @param id : string
+    /// @param id string
     /// @return boolean
     system.set(
         "hasMessage",
@@ -287,7 +287,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // lurek.platform.setClipboardText(text) Ă”Ă‡Ă¶ writes text to the system clipboard.
     /// Replaces the system clipboard contents with the given string.
-    /// @param text : string
+    /// @param text string
     system.set(
         "setClipboardText",
         lua.create_function(|_, text: String| {
@@ -331,7 +331,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // lurek.platform.setDebugOverlay(enabled)
     /// Shows or hides the FPS/draw-call debug overlay.
     let s = state.clone();
-    /// @param enabled : boolean
+    /// @param enabled boolean
     system.set(
         "setDebugOverlay",
         lua.create_function(move |_, enabled: bool| {
@@ -356,7 +356,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the minimum severity level for runtime log messages.
     /// - `level` Ă”Ă‡Ă¶ One of 'debug', 'info', 'warn', or 'error'.
     // lurek.platform.setLogLevel(level)
-    /// @param level : string
+    /// @param level string
     system.set(
         "setLogLevel",
         lua.create_function(|_, level: String| {
@@ -377,8 +377,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     #[allow(unused_doc_comments)]
     /// Emit a log message from Lua at the specified level.
     // lurek.platform.log(level, message)
-    /// @param level : string
-    /// @param message : string
+    /// @param level string
+    /// @param message string
     system.set(
         "log",
         lua.create_function(|_, (level, message): (String, String)| {
@@ -431,7 +431,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Pass the error string from a Lua `pcall` catch block. Returns a JSON
     /// object with `message`, `code`, `category`, and `hint` fields.
     ///
-    /// @param err : string  Error message (e.g. the second return of `pcall`).
+    /// @param err string  Error message (e.g. the second return of `pcall`).
     /// @return string  JSON: `{"message":"...","code":"...","category":"...","hint":"..."}`.
     system.set(
         "errorSnapshot",
@@ -480,7 +480,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // lurek.platform.parseArgs([argTable]) -> { flags={}, options={}, positional={} }
     /// Parses a command-line argument string and returns a structured key/value table.
-    /// @param args : table?
+    /// @param args table?
     /// @return table
     /// - `args` Ă”Ă‡Ă¶ Argument string or table (e.g. '--flag=value --bool').
     /// Table mapping flag names to their values or true for boolean flags.
@@ -548,8 +548,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // lurek.platform.runBatch(tasks [, opts]) -> results table
     /// Runs a list of shell commands in parallel and returns immediately without blocking.
-    /// @param tasks : table
-    /// @param opts : table?
+    /// @param tasks table
+    /// @param opts table?
     /// @return table
     /// - `commands` Ă”Ă‡Ă¶ Table of command strings to execute concurrently.
     /// A batch handle ID used to retrieve results with getBatchResults.
@@ -602,7 +602,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // lurek.platform.getBatchResults(results) -> passed, failed, skipped
     /// Returns the output table from the most recently completed runBatch call.
-    /// @param results : table
+    /// @param results table
     /// @return integer, integer, integer
     /// - `handle` Ă”Ă‡Ă¶ Batch handle returned by runBatch.
     /// Table mapping each command to its stdout string, or nil if not yet done.

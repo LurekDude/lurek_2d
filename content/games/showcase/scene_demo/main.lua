@@ -1,4 +1,51 @@
-﻿-- ============================================================================
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+-- ============================================================================
 -- Scene Demo — Lurek2D
 -- ============================================================================
 -- Category : showcase
@@ -190,7 +237,7 @@ scenes.title = {
             local s = star_field[i]
             local a = 0.4 + 0.6 * math.sin(title_time * 2 + i)
             lurek.render.setColor(1, 1, 1, a * s.s)
-            lurek.render.circle("fill", s.x, s.y, 1 + s.s)
+            circ("fill", s.x, s.y, 1 + s.s)
         end
     end,
     render_ui = function()
@@ -198,18 +245,18 @@ scenes.title = {
         local scale = 1.0 + 0.05 * math.sin(title_time * 3)
         local size = math.floor(36 * scale)
         lurek.render.setColor(COL_TITLE[1], COL_TITLE[2], COL_TITLE[3], 1)
-        lurek.render.print("SCENE DEMO", SCREEN_W / 2 - 110, 180, size)
+        text_("SCENE DEMO", SCREEN_W / 2 - 110, 180, size)
 
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-        lurek.render.print("A scene management showcase", SCREEN_W / 2 - 120, 240, 16)
+        text_("A scene management showcase", SCREEN_W / 2 - 120, 240, 16)
 
         -- Blinking prompt
         local blink = 0.5 + 0.5 * math.sin(title_time * 4)
         lurek.render.setColor(1, 1, 1, blink)
-        lurek.render.print("Press Enter", SCREEN_W / 2 - 50, 400, 18)
+        text_("Press Enter", SCREEN_W / 2 - 50, 400, 18)
 
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.6)
-        lurek.render.print("T: transition type   D: debug", SCREEN_W / 2 - 120, 550, 12)
+        text_("T: transition type   D: debug", SCREEN_W / 2 - 120, 550, 12)
     end,
 }
 
@@ -257,12 +304,12 @@ scenes.menu = {
     render = function()
         -- Decorative side bars
         lurek.render.setColor(0.15, 0.12, 0.25, 0.4)
-        lurek.render.rectangle("fill", 0, 0, 60, SCREEN_H)
-        lurek.render.rectangle("fill", SCREEN_W - 60, 0, 60, SCREEN_H)
+        rect("fill", 0, 0, 60, SCREEN_H)
+        rect("fill", SCREEN_W - 60, 0, 60, SCREEN_H)
     end,
     render_ui = function()
         lurek.render.setColor(COL_TITLE[1], COL_TITLE[2], COL_TITLE[3], 1)
-        lurek.render.print("MAIN MENU", SCREEN_W / 2 - 75, 120, 28)
+        text_("MAIN MENU", SCREEN_W / 2 - 75, 120, 28)
 
         for i, item in ipairs(menu_items) do
             local y = 250 + (i - 1) * 60
@@ -270,10 +317,10 @@ scenes.menu = {
             local sz = math.floor(20 * s)
             if i == menu_index then
                 lurek.render.setColor(COL_HIGHLIGHT[1], COL_HIGHLIGHT[2], COL_HIGHLIGHT[3], 1)
-                lurek.render.print("> " .. item, SCREEN_W / 2 - 60, y, sz)
+                text_("> " .. item, SCREEN_W / 2 - 60, y, sz)
             else
                 lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-                lurek.render.print("  " .. item, SCREEN_W / 2 - 60, y, 20)
+                text_("  " .. item, SCREEN_W / 2 - 60, y, 20)
             end
         end
 
@@ -329,7 +376,7 @@ scenes.settings = {
     render = function() end,
     render_ui = function()
         lurek.render.setColor(COL_TITLE[1], COL_TITLE[2], COL_TITLE[3], 1)
-        lurek.render.print("SETTINGS", SCREEN_W / 2 - 60, 120, 28)
+        text_("SETTINGS", SCREEN_W / 2 - 60, 120, 28)
 
         local labels = {
             "Difficulty: " .. tostring(settings.difficulty) .. "  (A/D)",
@@ -340,10 +387,10 @@ scenes.settings = {
             local y = 230 + (i - 1) * 50
             if i == settings_index then
                 lurek.render.setColor(COL_HIGHLIGHT[1], COL_HIGHLIGHT[2], COL_HIGHLIGHT[3], 1)
-                lurek.render.print("> " .. label, SCREEN_W / 2 - 120, y, 20)
+                text_("> " .. label, SCREEN_W / 2 - 120, y, 20)
             else
                 lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-                lurek.render.print("  " .. label, SCREEN_W / 2 - 120, y, 18)
+                text_("  " .. label, SCREEN_W / 2 - 120, y, 18)
             end
         end
 
@@ -355,16 +402,16 @@ scenes.settings = {
             else
                 lurek.render.setColor(0.25, 0.25, 0.25, 1)
             end
-            lurek.render.rectangle("fill", bar_x + (d - 1) * 22, bar_y, 18, 14)
+            rect("fill", bar_x + (d - 1) * 22, bar_y, 18, 14)
         end
 
         -- Volume bar
         local vol_w = 120
         local vol_fill = vol_w * (settings.volume / 100)
         lurek.render.setColor(0.25, 0.25, 0.25, 1)
-        lurek.render.rectangle("fill", bar_x, bar_y + 50, vol_w, 12)
+        rect("fill", bar_x, bar_y + 50, vol_w, 12)
         lurek.render.setColor(COL_HIGHLIGHT[1], COL_HIGHLIGHT[2], COL_HIGHLIGHT[3], 1)
-        lurek.render.rectangle("fill", bar_x, bar_y + 50, vol_fill, 12)
+        rect("fill", bar_x, bar_y + 50, vol_fill, 12)
     end,
 }
 
@@ -454,10 +501,10 @@ scenes.gameplay = {
         -- Ground grid
         lurek.render.setColor(0.1, 0.18, 0.12, 0.3)
         for gx = 0, SCREEN_W, 40 do
-            lurek.render.line(gx, 0, gx, SCREEN_H)
+            ln(gx, 0, gx, SCREEN_H)
         end
         for gy = 0, SCREEN_H, 40 do
-            lurek.render.line(0, gy, SCREEN_W, gy)
+            ln(0, gy, SCREEN_W, gy)
         end
 
         -- Coins
@@ -466,19 +513,19 @@ scenes.gameplay = {
             if c.alive then
                 local pulse = 0.8 + 0.2 * math.sin(c.t)
                 lurek.render.setColor(COL_COIN[1], COL_COIN[2], COL_COIN[3], pulse)
-                lurek.render.circle("fill", c.x, c.y, COIN_RADIUS)
+                circ("fill", c.x, c.y, COIN_RADIUS)
                 lurek.render.setColor(1, 1, 0.9, 0.5)
-                lurek.render.circle("fill", c.x, c.y, COIN_RADIUS * 0.4)
+                circ("fill", c.x, c.y, COIN_RADIUS * 0.4)
             end
         end
 
         -- Player
         lurek.render.setColor(COL_PLAYER[1], COL_PLAYER[2], COL_PLAYER[3], 1)
-        lurek.render.rectangle("fill",
+        rect("fill",
             player.x - PLAYER_SIZE / 2, player.y - PLAYER_SIZE / 2,
             PLAYER_SIZE, PLAYER_SIZE)
         lurek.render.setColor(0.5, 0.85, 1.0, 0.6)
-        lurek.render.rectangle("line",
+        rect("line",
             player.x - PLAYER_SIZE / 2 - 2, player.y - PLAYER_SIZE / 2 - 2,
             PLAYER_SIZE + 4, PLAYER_SIZE + 4)
 
@@ -493,20 +540,20 @@ scenes.gameplay = {
             local p = score_popups[i]
             local a = clamp(p.life / p.max_life, 0, 1)
             lurek.render.setColor(COL_COIN[1], COL_COIN[2], COL_COIN[3], a)
-            lurek.render.print(p.text, p.x - 12, p.y, 16)
+            text_(p.text, p.x - 12, p.y, 16)
         end
 
         camera:detach()
     end,
     render_ui = function()
         lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-        lurek.render.print("Score: " .. tostring(game_score), 16, 12, 20)
+        text_("Score: " .. tostring(game_score), 16, 12, 20)
 
         local alive_count = 0
         for i = 1, #coins do if coins[i].alive then alive_count = alive_count + 1 end end
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-        lurek.render.print("Coins left: " .. tostring(alive_count), 16, 38, 14)
-        lurek.render.print("Difficulty: " .. tostring(settings.difficulty), SCREEN_W - 140, 12, 14)
+        text_("Coins left: " .. tostring(alive_count), 16, 38, 14)
+        text_("Difficulty: " .. tostring(settings.difficulty), SCREEN_W - 140, 12, 14)
     end,
 }
 
@@ -529,15 +576,15 @@ scenes.gameover = {
     render = function() end,
     render_ui = function()
         lurek.render.setColor(COL_TITLE[1], COL_TITLE[2], COL_TITLE[3], 1)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 80, 180, 32)
+        text_("GAME OVER", SCREEN_W / 2 - 80, 180, 32)
 
         lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-        lurek.render.print("Final Score: " .. tostring(game_score), SCREEN_W / 2 - 80, 260, 22)
-        lurek.render.print("Difficulty: " .. tostring(settings.difficulty), SCREEN_W / 2 - 80, 295, 16)
+        text_("Final Score: " .. tostring(game_score), SCREEN_W / 2 - 80, 260, 22)
+        text_("Difficulty: " .. tostring(settings.difficulty), SCREEN_W / 2 - 80, 295, 16)
 
         local blink = 0.5 + 0.5 * math.sin(gameover_time * 4)
         lurek.render.setColor(1, 1, 1, blink)
-        lurek.render.print("Press Enter to Restart", SCREEN_W / 2 - 100, 380, 18)
+        text_("Press Enter to Restart", SCREEN_W / 2 - 100, 380, 18)
     end,
 }
 
@@ -547,12 +594,12 @@ local function draw_transition(progress)
 
     if transition_type == TRANS_FADE then
         lurek.render.setColor(0, 0, 0, progress)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
     elseif transition_type == TRANS_SLIDE then
         local offset = progress * SCREEN_W
         lurek.render.setColor(0.05, 0.05, 0.08, 1)
-        lurek.render.rectangle("fill", -SCREEN_W + offset, 0, SCREEN_W, SCREEN_H)
+        rect("fill", -SCREEN_W + offset, 0, SCREEN_W, SCREEN_H)
 
     elseif transition_type == TRANS_DISSOLVE then
         local cell_w = SCREEN_W / dissolve_cols
@@ -562,7 +609,7 @@ local function draw_transition(progress)
         lurek.render.setColor(0, 0, 0, 1)
         for i = 1, reveal do
             local g = dissolve_grid[i]
-            lurek.render.rectangle("fill", g.c * cell_w, g.r * cell_h, cell_w + 1, cell_h + 1)
+            rect("fill", g.c * cell_w, g.r * cell_h, cell_w + 1, cell_h + 1)
         end
     end
 
@@ -580,38 +627,39 @@ local function draw_debug()
 
     -- Background
     lurek.render.setColor(COL_DEBUG_BG[1], COL_DEBUG_BG[2], COL_DEBUG_BG[3], 0.75)
-    lurek.render.rectangle("fill", SCREEN_W - 260, 0, 260, 160 + #scene_history * 16)
+    rect("fill", SCREEN_W - 260, 0, 260, 160 + #scene_history * 16)
 
     local x, y = SCREEN_W - 250, 8
     lurek.render.setColor(COL_HIGHLIGHT[1], COL_HIGHLIGHT[2], COL_HIGHLIGHT[3], 1)
-    lurek.render.print("DEBUG", x, y, 14)
+    text_("DEBUG", x, y, 14)
 
     y = y + 20
     lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-    lurek.render.print("Scene: " .. tostring(current_scene), x, y, 12)
+    text_("Scene: " .. tostring(current_scene), x, y, 12)
     y = y + 16
-    lurek.render.print("Previous: " .. tostring(previous_scene), x, y, 12)
+    text_("Previous: " .. tostring(previous_scene), x, y, 12)
     y = y + 16
-    lurek.render.print("Transition: " .. TRANS_NAMES[transition_type], x, y, 12)
+    text_("Transition: " .. TRANS_NAMES[transition_type], x, y, 12)
     y = y + 16
-    lurek.render.print("FPS: " .. tostring(fps), x, y, 12)
+    text_("FPS: " .. tostring(fps), x, y, 12)
     y = y + 16
-    lurek.render.print("Difficulty: " .. tostring(settings.difficulty), x, y, 12)
+    text_("Difficulty: " .. tostring(settings.difficulty), x, y, 12)
     y = y + 16
-    lurek.render.print("Volume: " .. tostring(math.floor(settings.volume)) .. "%", x, y, 12)
+    text_("Volume: " .. tostring(math.floor(settings.volume)) .. "%", x, y, 12)
 
     y = y + 22
     lurek.render.setColor(COL_HIGHLIGHT[1], COL_HIGHLIGHT[2], COL_HIGHLIGHT[3], 1)
-    lurek.render.print("History:", x, y, 12)
+    text_("History:", x, y, 12)
     y = y + 16
     lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
     for i = 1, #scene_history do
-        lurek.render.print(scene_history[i], x, y, 11)
+        text_(scene_history[i], x, y, 11)
         y = y + 16
     end
 end
 
 -- ── init ──────────────────────────────────────────────────────
+
 function lurek.init()
     lurek.window.setTitle("Scene Demo — Lurek2D")
     lurek.render.setBackgroundColor(COL_BG_TITLE[1], COL_BG_TITLE[2], COL_BG_TITLE[3])
@@ -759,7 +807,7 @@ function lurek.draw_ui()
 
     -- Transition type indicator (bottom-left)
     lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.7)
-    lurek.render.print("Trans: " .. TRANS_NAMES[transition_type] .. " (T)", 12, SCREEN_H - 22, 12)
+    text_("Trans: " .. TRANS_NAMES[transition_type] .. " (T)", 12, SCREEN_H - 22, 12)
 
     -- Debug panel
     draw_debug()

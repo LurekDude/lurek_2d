@@ -6,54 +6,10 @@ const LUA_SELECTOR: vscode.DocumentSelector = {
   language: "lua",
 };
 
-// ── LuaJIT bit.* library ──────────────────────────────────
+// NOTE: bit.*, jit.*, ffi.* completions and hover are now handled by sumneko.lua
+// in LuaJIT mode. Only lurek-specific diagnostics remain below.
 
-interface BuiltinFunc {
-  name: string;
-  sig: string;
-  desc: string;
-}
-
-const BIT_FUNCTIONS: BuiltinFunc[] = [
-  { name: "band", sig: "bit.band(a, b)", desc: "Bitwise AND" },
-  { name: "bor", sig: "bit.bor(a, b)", desc: "Bitwise OR" },
-  { name: "bxor", sig: "bit.bxor(a, b)", desc: "Bitwise XOR" },
-  { name: "bnot", sig: "bit.bnot(a)", desc: "Bitwise NOT" },
-  { name: "lshift", sig: "bit.lshift(a, n)", desc: "Left shift" },
-  { name: "rshift", sig: "bit.rshift(a, n)", desc: "Logical right shift" },
-  { name: "arshift", sig: "bit.arshift(a, n)", desc: "Arithmetic right shift" },
-  { name: "tobit", sig: "bit.tobit(n)", desc: "Normalize to int32" },
-  { name: "tohex", sig: "bit.tohex(n, [len])", desc: "Format as hex string" },
-  { name: "rol", sig: "bit.rol(a, n)", desc: "Rotate left" },
-  { name: "ror", sig: "bit.ror(a, n)", desc: "Rotate right" },
-  { name: "bswap", sig: "bit.bswap(n)", desc: "Byte-swap a 32-bit integer" },
-];
-
-const JIT_FUNCTIONS: BuiltinFunc[] = [
-  { name: "on", sig: "jit.on([func])", desc: "Enable JIT for function or globally" },
-  { name: "off", sig: "jit.off([func])", desc: "Disable JIT (useful for debugging)" },
-  { name: "flush", sig: "jit.flush([func])", desc: "Flush JIT cache" },
-  { name: "status", sig: "jit.status()", desc: "Returns JIT engine status" },
-  { name: "version", sig: "jit.version", desc: "LuaJIT version string" },
-  { name: "version_num", sig: "jit.version_num", desc: "LuaJIT version number" },
-  { name: "os", sig: "jit.os", desc: "Target OS name" },
-  { name: "arch", sig: "jit.arch", desc: "Target architecture name" },
-];
-
-const FFI_FUNCTIONS: BuiltinFunc[] = [
-  { name: "cdef", sig: "ffi.cdef(def)", desc: "Add C declarations" },
-  { name: "new", sig: "ffi.new(ct, [init...])", desc: "Create cdata object" },
-  { name: "cast", sig: "ffi.cast(ct, init)", desc: "Cast to ctype" },
-  { name: "typeof", sig: "ffi.typeof(ct)", desc: "Create ctype object" },
-  { name: "sizeof", sig: "ffi.sizeof(ct, [nelem])", desc: "Size of ctype in bytes" },
-  { name: "string", sig: "ffi.string(ptr, [len])", desc: "Create Lua string from pointer" },
-  { name: "copy", sig: "ffi.copy(dst, src, len)", desc: "Copy memory" },
-  { name: "fill", sig: "ffi.fill(dst, len, [c])", desc: "Fill memory" },
-  { name: "istype", sig: "ffi.istype(ct, obj)", desc: "Check cdata type" },
-  { name: "load", sig: "ffi.load(name, [global])", desc: "Load dynamic library" },
-];
-
-// ── Performance hint diagnostics ──────────────────────────
+// ── Performance hint diagnostics ─────────────────────────
 
 interface PerfRule {
   code: string;
@@ -111,7 +67,7 @@ const PERF_RULES: PerfRule[] = [
     pattern: /math\.random\s*\(/,
     message: "Use lurek.math.random() for deterministic, seedable RNG consistent across platforms.",
     severity: vscode.DiagnosticSeverity.Information,
-    hotPathOnly: false,
+    hotPathOnly: true,
   },
   {
     code: "lurek.perf.unpackInLoop",
@@ -173,7 +129,7 @@ const COMPAT_RULES: CompatRule[] = [
   },
   {
     code: "lurek.compat.warnLevel",
-    pattern: /\bwarn\s*\(/,
+    pattern: /(?<!\.)(?<!\w)\bwarn\s*\(/,
     message: "`warn()` is a Lua 5.4-only function and is not available in LuaJIT. Use `print()` or `lurek.log.warn()` instead.",
   },
 ];
@@ -214,114 +170,14 @@ function findHotPathLines(text: string): Set<number> {
 }
 
 /**
- * Registers LuaJIT-specific IntelliSense providers.
+ * Registers LuaJIT-specific performance and compat diagnostics.
+ * NOTE: bit.*, jit.*, ffi.* completions/hover are now handled by sumneko.lua.
  */
 export function register(
   context: vscode.ExtensionContext,
   _apiData: ApiDataService
 ): void {
   const disposables: vscode.Disposable[] = [];
-
-  // ── Completion: bit.*, jit.*, ffi.* ─────────────────────
-
-  const completionProvider = vscode.languages.registerCompletionItemProvider(
-    LUA_SELECTOR,
-    {
-      provideCompletionItems(
-        document: vscode.TextDocument,
-        position: vscode.Position
-      ): vscode.CompletionItem[] | undefined {
-        const lineText = document.lineAt(position).text;
-        const before = lineText.substring(0, position.character);
-
-        const bitMatch = before.match(/\bbit\.(\w*)$/);
-        if (bitMatch) {
-          const partial = bitMatch[1].toLowerCase();
-          return BIT_FUNCTIONS
-            .filter((f) => !partial || f.name.toLowerCase().startsWith(partial))
-            .map((f) => {
-              const item = new vscode.CompletionItem(f.name, vscode.CompletionItemKind.Function);
-              item.detail = f.sig;
-              item.documentation = new vscode.MarkdownString(
-                `**LuaJIT bit library**\n\n${f.desc}`
-              );
-              return item;
-            });
-        }
-
-        const jitMatch = before.match(/\bjit\.(\w*)$/);
-        if (jitMatch) {
-          const partial = jitMatch[1].toLowerCase();
-          return JIT_FUNCTIONS
-            .filter((f) => !partial || f.name.toLowerCase().startsWith(partial))
-            .map((f) => {
-              const kind = f.sig.includes("(")
-                ? vscode.CompletionItemKind.Function
-                : vscode.CompletionItemKind.Property;
-              const item = new vscode.CompletionItem(f.name, kind);
-              item.detail = f.sig;
-              item.documentation = new vscode.MarkdownString(
-                `**LuaJIT jit library**\n\n${f.desc}`
-              );
-              return item;
-            });
-        }
-
-        const ffiMatch = before.match(/\bffi\.(\w*)$/);
-        if (ffiMatch) {
-          const partial = ffiMatch[1].toLowerCase();
-          return FFI_FUNCTIONS
-            .filter((f) => !partial || f.name.toLowerCase().startsWith(partial))
-            .map((f) => {
-              const item = new vscode.CompletionItem(f.name, vscode.CompletionItemKind.Function);
-              item.detail = f.sig;
-              item.documentation = new vscode.MarkdownString(
-                `**LuaJIT FFI library**\n\n${f.desc}`
-              );
-              return item;
-            });
-        }
-
-        return undefined;
-      },
-    },
-    "."
-  );
-  disposables.push(completionProvider);
-
-  // ── Hover: bit.*, jit.*, ffi.* ──────────────────────────
-
-  const hoverProvider = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
-    provideHover(
-      document: vscode.TextDocument,
-      position: vscode.Position
-    ): vscode.Hover | undefined {
-      const allLibs: [RegExp, string, BuiltinFunc[]][] = [
-        [/bit\.\w+/, "LuaJIT bit library", BIT_FUNCTIONS],
-        [/jit\.\w+/, "LuaJIT jit library", JIT_FUNCTIONS],
-        [/ffi\.\w+/, "LuaJIT FFI library", FFI_FUNCTIONS],
-      ];
-
-      for (const [pattern, libName, funcs] of allLibs) {
-        const range = document.getWordRangeAtPosition(position, pattern);
-        if (!range) continue;
-
-        const word = document.getText(range);
-        const funcName = word.split(".")[1];
-        const fn = funcs.find((f) => f.name === funcName);
-        if (!fn) continue;
-
-        const md = new vscode.MarkdownString();
-        md.appendCodeblock(fn.sig, "lua");
-        md.appendMarkdown(`\n**${libName}**\n\n${fn.desc}\n`);
-        md.isTrusted = true;
-        return new vscode.Hover(md, range);
-      }
-
-      return undefined;
-    },
-  });
-  disposables.push(hoverProvider);
 
   // ── Performance hint diagnostics ────────────────────────
 

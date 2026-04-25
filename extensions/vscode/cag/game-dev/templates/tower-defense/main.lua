@@ -95,7 +95,7 @@ function lurek.process(dt)
     end
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.1, 0.15, 0.1)
 
     -- Draw path

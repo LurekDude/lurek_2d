@@ -1,4 +1,51 @@
-﻿-- ============================================================================
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+-- ============================================================================
 -- Frogger — Lurek2D
 -- ============================================================================
 -- Category : arcade
@@ -156,7 +203,7 @@ local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        rect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -189,7 +236,7 @@ end
 local function draw_score_pops()
     for _, sp in ipairs(score_pops) do
         lurek.render.setColor(1, 1, 0, sp.alpha)
-        lurek.render.print(sp.text, sp.x, sp.y, 1)
+        text_(sp.text, sp.x, sp.y, 1)
     end
 end
 
@@ -328,6 +375,7 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Frogger — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.06)
@@ -569,28 +617,28 @@ function lurek.draw()
 
     -- ── Water band (rows 0-5) ─────────────────────────────────
     lurek.render.setColor(0.05, 0.15, 0.45, 1)
-    lurek.render.rectangle("fill", 0, row_y(HOME_ROW), SCREEN_W, TILE * 6)
+    rect("fill", 0, row_y(HOME_ROW), SCREEN_W, TILE * 6)
 
     -- ── Road band (rows 7-11) ─────────────────────────────────
     lurek.render.setColor(0.18, 0.18, 0.2, 1)
-    lurek.render.rectangle("fill", 0, row_y(ROAD_TOP), SCREEN_W, TILE * 5)
+    rect("fill", 0, row_y(ROAD_TOP), SCREEN_W, TILE * 5)
 
     -- Road lane dividers
     lurek.render.setColor(0.5, 0.5, 0.2, 0.5)
     for r = ROAD_TOP, ROAD_BOT - 1 do
         local ly = row_y(r) + TILE
         for dx = 0, SCREEN_W, 40 do
-            lurek.render.rectangle("fill", dx, ly - 1, 20, 2)
+            rect("fill", dx, ly - 1, 20, 2)
         end
     end
 
     -- ── Safe zones ────────────────────────────────────────────
     -- Start zone (row 12)
     lurek.render.setColor(0.1, 0.35, 0.1, 1)
-    lurek.render.rectangle("fill", 0, row_y(START_ROW), SCREEN_W, TILE)
+    rect("fill", 0, row_y(START_ROW), SCREEN_W, TILE)
     -- Middle safe zone (row 6)
     lurek.render.setColor(0.1, 0.35, 0.1, 1)
-    lurek.render.rectangle("fill", 0, row_y(MID_SAFE), SCREEN_W, TILE)
+    rect("fill", 0, row_y(MID_SAFE), SCREEN_W, TILE)
 
     -- ── Home slots ────────────────────────────────────────────
     for idx, h in ipairs(HOME_SLOTS) do
@@ -599,10 +647,10 @@ function lurek.draw()
         else
             lurek.render.setColor(0.03, 0.06, 0.15, 1)
         end
-        lurek.render.rectangle("fill", h.x, row_y(HOME_ROW) + 4, TILE, TILE - 8)
+        rect("fill", h.x, row_y(HOME_ROW) + 4, TILE, TILE - 8)
         -- Slot outline
         lurek.render.setColor(0.3, 0.3, 0.4, 1)
-        lurek.render.rectangle("line", h.x, row_y(HOME_ROW) + 4, TILE, TILE - 8)
+        rect("line", h.x, row_y(HOME_ROW) + 4, TILE, TILE - 8)
     end
 
     -- Bonus fly
@@ -610,10 +658,10 @@ function lurek.draw()
         local h = HOME_SLOTS[fly.slot]
         if h and not h.filled then
             lurek.render.setColor(1, 0.9, 0.1, 0.9)
-            lurek.render.circle("fill", h.x + TILE / 2, row_y(HOME_ROW) + TILE / 2, 6)
+            circ("fill", h.x + TILE / 2, row_y(HOME_ROW) + TILE / 2, 6)
             lurek.render.setColor(0.6, 0.4, 0, 1)
-            lurek.render.circle("fill", h.x + TILE / 2 - 5, row_y(HOME_ROW) + TILE / 2 - 2, 2)
-            lurek.render.circle("fill", h.x + TILE / 2 + 5, row_y(HOME_ROW) + TILE / 2 - 2, 2)
+            circ("fill", h.x + TILE / 2 - 5, row_y(HOME_ROW) + TILE / 2 - 2, 2)
+            circ("fill", h.x + TILE / 2 + 5, row_y(HOME_ROW) + TILE / 2 - 2, 2)
         end
     end
 
@@ -623,25 +671,25 @@ function lurek.draw()
         for _, obj in ipairs(lane.objects) do
             if def.kind == "car" then
                 lurek.render.setColor(0.9, 0.2, 0.2, 1)
-                lurek.render.rectangle("fill", obj.x, obj.y, obj.w, TILE - 8)
+                rect("fill", obj.x, obj.y, obj.w, TILE - 8)
                 -- Windshield
                 lurek.render.setColor(0.5, 0.8, 1, 0.7)
                 local wx = (def.dir == 1) and (obj.x + obj.w - 10) or (obj.x + 2)
-                lurek.render.rectangle("fill", wx, obj.y + 4, 8, TILE - 16)
+                rect("fill", wx, obj.y + 4, 8, TILE - 16)
             elseif def.kind == "truck" then
                 lurek.render.setColor(0.85, 0.65, 0.1, 1)
-                lurek.render.rectangle("fill", obj.x, obj.y, obj.w, TILE - 8)
+                rect("fill", obj.x, obj.y, obj.w, TILE - 8)
                 -- Cab
                 lurek.render.setColor(0.7, 0.5, 0.05, 1)
                 local cx = (def.dir == 1) and (obj.x + obj.w - 16) or obj.x
-                lurek.render.rectangle("fill", cx, obj.y + 2, 16, TILE - 12)
+                rect("fill", cx, obj.y + 2, 16, TILE - 12)
             elseif def.kind == "log" then
                 lurek.render.setColor(0.45, 0.28, 0.1, 1)
-                lurek.render.rectangle("fill", obj.x, obj.y, obj.w, TILE - 8)
+                rect("fill", obj.x, obj.y, obj.w, TILE - 8)
                 -- Wood grain lines
                 lurek.render.setColor(0.35, 0.2, 0.05, 0.5)
-                lurek.render.rectangle("fill", obj.x + 6, obj.y + 8, obj.w - 12, 2)
-                lurek.render.rectangle("fill", obj.x + 10, obj.y + TILE - 16, obj.w - 20, 2)
+                rect("fill", obj.x + 6, obj.y + 8, obj.w - 12, 2)
+                rect("fill", obj.x + 10, obj.y + TILE - 16, obj.w - 20, 2)
             elseif def.kind == "turtle" then
                 local tt = turtle_timers[li]
                 if tt then
@@ -655,7 +703,7 @@ function lurek.draw()
                             local tw = (TILE - 8) / 2
                             local shells = math.floor(obj.w / (tw + 6))
                             for s = 0, shells - 1 do
-                                lurek.render.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 2)
+                                circ("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 2)
                             end
                         end
                     else
@@ -663,12 +711,12 @@ function lurek.draw()
                         local tw = (TILE - 8) / 2
                         local shells = math.floor(obj.w / (tw + 6))
                         for s = 0, shells - 1 do
-                            lurek.render.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 2)
+                            circ("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 2)
                         end
                         -- Shell detail
                         lurek.render.setColor(0.05, 0.3, 0.1, 0.6)
                         for s = 0, shells - 1 do
-                            lurek.render.circle("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 4)
+                            circ("fill", obj.x + tw / 2 + s * (tw + 6) + 3, obj.y + (TILE - 8) / 2, tw / 4)
                         end
                     end
                 end
@@ -682,19 +730,19 @@ function lurek.draw()
 
         -- Body
         lurek.render.setColor(0.15, 0.75, 0.15, 1)
-        lurek.render.rectangle("fill", fx, fy, FROG_SIZE, FROG_SIZE)
+        rect("fill", fx, fy, FROG_SIZE, FROG_SIZE)
 
         -- Lighter belly
         lurek.render.setColor(0.3, 0.9, 0.3, 1)
-        lurek.render.rectangle("fill", fx + 6, fy + 8, FROG_SIZE - 12, FROG_SIZE - 12)
+        rect("fill", fx + 6, fy + 8, FROG_SIZE - 12, FROG_SIZE - 12)
 
         -- Eyes (white + black pupil)
         lurek.render.setColor(1, 1, 1, 1)
-        lurek.render.circle("fill", fx + 6, fy + 4, 4)
-        lurek.render.circle("fill", fx + FROG_SIZE - 6, fy + 4, 4)
+        circ("fill", fx + 6, fy + 4, 4)
+        circ("fill", fx + FROG_SIZE - 6, fy + 4, 4)
         lurek.render.setColor(0, 0, 0, 1)
-        lurek.render.circle("fill", fx + 6, fy + 4, 2)
-        lurek.render.circle("fill", fx + FROG_SIZE - 6, fy + 4, 2)
+        circ("fill", fx + 6, fy + 4, 2)
+        circ("fill", fx + FROG_SIZE - 6, fy + 4, 2)
     end
 
     -- ── Particles ─────────────────────────────────────────────
@@ -711,11 +759,11 @@ function lurek.draw_ui()
     -- ── TITLE SCREEN ──────────────────────────────────────────
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.05, 0.15, 0.45, 1)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         -- Title
         lurek.render.setColor(0.1, 0.9, 0.1, 1)
-        lurek.render.print("F R O G G E R", SCREEN_W / 2 - 100, 100, 2)
+        text_("F R O G G E R", SCREEN_W / 2 - 100, 100, 2)
 
         -- ASCII frog art
         lurek.render.setColor(0.2, 0.8, 0.2, 1)
@@ -727,26 +775,26 @@ function lurek.draw_ui()
             "    ~~~~    ",
         }
         for i, line in ipairs(frog_art) do
-            lurek.render.print(line, SCREEN_W / 2 - 72, 180 + i * 22, 1.4)
+            text_(line, SCREEN_W / 2 - 72, 180 + i * 22, 1.4)
         end
 
         -- Instructions
         lurek.render.setColor(1, 1, 1, 0.9)
-        lurek.render.print("Guide the frog across roads and rivers!", SCREEN_W / 2 - 160, 350, 1)
-        lurek.render.print("Ride logs and turtles — don't fall in!", SCREEN_W / 2 - 155, 375, 1)
-        lurek.render.print("Fill all 5 home slots to win!", SCREEN_W / 2 - 120, 400, 1)
+        text_("Guide the frog across roads and rivers!", SCREEN_W / 2 - 160, 350, 1)
+        text_("Ride logs and turtles — don't fall in!", SCREEN_W / 2 - 155, 375, 1)
+        text_("Fill all 5 home slots to win!", SCREEN_W / 2 - 120, 400, 1)
 
         -- Blink "PRESS ENTER"
         local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 0, 1)
-            lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 70, 470, 1.5)
+            text_("PRESS ENTER", SCREEN_W / 2 - 70, 470, 1.5)
         end
 
         -- High score
         if high_score > 0 then
             lurek.render.setColor(0.8, 0.8, 0.2, 1)
-            lurek.render.print("HIGH SCORE: " .. high_score, SCREEN_W / 2 - 70, 530, 1)
+            text_("HIGH SCORE: " .. high_score, SCREEN_W / 2 - 70, 530, 1)
         end
         return
     end
@@ -754,24 +802,24 @@ function lurek.draw_ui()
     -- ── GAME OVER ─────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1, 0.2, 0.2, 1)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 90, 200, 2.5)
+        text_("GAME OVER", SCREEN_W / 2 - 90, 200, 2.5)
 
         lurek.render.setColor(1, 1, 1, 1)
-        lurek.render.print("SCORE: " .. score, SCREEN_W / 2 - 60, 280, 1.5)
-        lurek.render.print("LEVEL: " .. level, SCREEN_W / 2 - 50, 320, 1.2)
+        text_("SCORE: " .. score, SCREEN_W / 2 - 60, 280, 1.5)
+        text_("LEVEL: " .. level, SCREEN_W / 2 - 50, 320, 1.2)
 
         if score >= high_score and score > 0 then
             lurek.render.setColor(1, 1, 0, 1)
-            lurek.render.print("NEW HIGH SCORE!", SCREEN_W / 2 - 80, 360, 1.2)
+            text_("NEW HIGH SCORE!", SCREEN_W / 2 - 80, 360, 1.2)
         end
 
         local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 1, 0.9)
-            lurek.render.print("PRESS ENTER TO RETRY", SCREEN_W / 2 - 110, 430, 1.2)
+            text_("PRESS ENTER TO RETRY", SCREEN_W / 2 - 110, 430, 1.2)
         end
         return
     end
@@ -779,18 +827,18 @@ function lurek.draw_ui()
     -- ── PLAYING HUD ───────────────────────────────────────────
     -- Score
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("SCORE: " .. score, 10, 6, 1)
+    text_("SCORE: " .. score, 10, 6, 1)
 
     -- Level
-    lurek.render.print("LVL " .. level, SCREEN_W / 2 - 25, 6, 1)
+    text_("LVL " .. level, SCREEN_W / 2 - 25, 6, 1)
 
     -- Lives (draw small frogs)
     for i = 1, lives do
         lurek.render.setColor(0.15, 0.75, 0.15, 1)
-        lurek.render.rectangle("fill", SCREEN_W - 30 * i, 6, 16, 16)
+        rect("fill", SCREEN_W - 30 * i, 6, 16, 16)
         lurek.render.setColor(1, 1, 1, 1)
-        lurek.render.circle("fill", SCREEN_W - 30 * i + 4, 9, 2)
-        lurek.render.circle("fill", SCREEN_W - 30 * i + 12, 9, 2)
+        circ("fill", SCREEN_W - 30 * i + 4, 9, 2)
+        circ("fill", SCREEN_W - 30 * i + 12, 9, 2)
     end
 
     -- Timer bar (bottom)
@@ -799,19 +847,19 @@ function lurek.draw_ui()
     local bar_y = SCREEN_H - 22
     -- Background
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.rectangle("fill", bar_x, bar_y, TIMER_BAR_W, TIMER_BAR_H)
+    rect("fill", bar_x, bar_y, TIMER_BAR_W, TIMER_BAR_H)
     -- Fill (green → yellow → red)
     local tr = (timer_pct < 0.5) and 1.0 or (1.0 - (timer_pct - 0.5) * 2)
     local tg = (timer_pct > 0.5) and 1.0 or (timer_pct * 2)
     lurek.render.setColor(tr, tg, 0.1, 1)
-    lurek.render.rectangle("fill", bar_x + 1, bar_y + 1, (TIMER_BAR_W - 2) * timer_pct, TIMER_BAR_H - 2)
+    rect("fill", bar_x + 1, bar_y + 1, (TIMER_BAR_W - 2) * timer_pct, TIMER_BAR_H - 2)
     -- Label
     lurek.render.setColor(1, 1, 1, 0.8)
-    lurek.render.print("TIME", bar_x - 40, bar_y, 1)
+    text_("TIME", bar_x - 40, bar_y, 1)
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 0.8)
+    text_("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 0.8)
 end
 
 -- ---------------------------------------------------------------------------

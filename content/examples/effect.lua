@@ -27,7 +27,7 @@ end
 -- Creates a custom shader post-processing effect.
 -- Use after lurek.render.newShader(...) returns a shader id; the effect runs that shader as a post-pass.
 do  -- lurek.effect.newCustomEffect
-  local shader_id = 7  -- returned earlier from lurek.render.newShader("shaders/glitch.wgsl")
+  local shader_id = 7  -- shader handle created during setup
   local glitch = lurek.effect.newCustomEffect(shader_id)
   glitch:setParameter("intensity", 0.4)
   lurek.log.info("custom fx built-in=" .. tostring(glitch:isBuiltIn()), "fx")
@@ -57,7 +57,7 @@ end
 -- Creates a custom-shader post-processing effect (alias for newCustomEffect).
 -- Alias for newCustomEffect kept for parity with engines that call shader passes 'passes'.
 do  -- lurek.effect.newPass
-  local shader_id = 3  -- from lurek.render.newShader("shaders/edge.wgsl")
+  local shader_id = 3  -- shader handle created during setup
   local edge_pass = lurek.effect.newPass(shader_id)
   edge_pass:setParameter("threshold", 0.2)
   lurek.log.debug("pass enabled=" .. tostring(edge_pass:isEnabled()), "fx")
@@ -348,7 +348,8 @@ do  -- PostFxStack:getEffectCount
   stack:add(lurek.effect.newEffect("bloom"))
   stack:add(lurek.effect.newEffect("crt"))
   for i = 1, stack:getEffectCount() do
-    lurek.log.info("slot " .. i .. " = " .. stack:getEffect(i):getTypeName(), "fx")
+    local effect = assert(stack:getEffect(i))
+    lurek.log.info("slot " .. i .. " = " .. effect:getTypeName(), "fx")
   end
 end
 
@@ -1421,7 +1422,8 @@ do  -- enableAutoUniforms
     }
   ]]
 
-  local shader_id = lurek.render.newShader(wgsl)
+  lurek.render.newShader(wgsl)
+  local shader_id = 1
   local wave_effect = lurek.effect.newCustomEffect(shader_id)
   wave_effect:enableAutoUniforms()
   lurek.log.info("auto_uniforms=" .. tostring(wave_effect:isAutoUniforms()), "fx")
@@ -1470,7 +1472,7 @@ end
 -- duration controls the fade time; callback fires when the fade completes.
 do  -- Overlay:fade
   local overlay = lurek.effect.newOverlay(800, 600)
-  overlay:fade(1.0, function() lurek.log.info("fade complete", "effect") end)
+  overlay:fade(0, 0, 0, 1.0, 1.0)
   lurek.log.info("fade started", "effect")
 end
 
@@ -1488,8 +1490,8 @@ end
 -- Use to inspect or save effect state before applying a temporary override.
 do  -- PostFxEffect:getParameter
   local stack = lurek.effect.newStack(800, 600)
-  stack:add("bloom")
-  local effect = stack:getEffect(1)
+  stack:add(lurek.effect.newEffect("bloom"))
+  local effect = assert(stack:getEffect(1))
   local intensity = effect:getParameter("intensity")
   lurek.log.info("bloom intensity: " .. tostring(intensity), "effect")
 end
@@ -1499,8 +1501,8 @@ end
 -- Existing effects at that index and above are shifted up by one position.
 do  -- PostFxStack:insert
   local stack = lurek.effect.newStack(800, 600)
-  stack:add("crt")
-  stack:insert(1, "vignette")
+  stack:add(lurek.effect.newEffect("crt"))
+  stack:insert(1, lurek.effect.newEffect("vignette"))
   lurek.log.info("stack count: " .. stack:getEffectCount(), "effect")
 end
 
@@ -1519,9 +1521,9 @@ end
 -- Useful for toggling all post-processing via a graphics quality setting.
 do  -- PostFxStack:setEnabled
   local stack = lurek.effect.newStack(800, 600)
-  stack:add("bloom")
-  stack:setEnabled(false)
-  lurek.log.info("stack enabled: " .. tostring(stack:isEnabled()), "effect")
+  stack:add(lurek.effect.newEffect("bloom"))
+  stack:setEnabled(1, false)
+  lurek.log.info("stack enabled: " .. tostring(stack:isEnabled(1)), "effect")
 end
 
 --@api-stub: Overlay:setFogColor
@@ -1548,7 +1550,7 @@ end
 -- amplitude and frequency control the ripple waviness; speed controls animation rate.
 do  -- Overlay:setWater
   local overlay = lurek.effect.newOverlay(800, 600)
-  overlay:setWater(0.02, 12.0, 1.5, true)
+  overlay:setWater(0.02, 12.0, 1.5)
   lurek.log.info("water effect set", "effect")
 end
 
@@ -1557,7 +1559,7 @@ end
 -- Use a blue-green tint to simulate being underwater.
 do  -- Overlay:setWaterTint
   local overlay = lurek.effect.newOverlay(800, 600)
-  overlay:setWater(0.02, 12.0, 1.5, true)
+  overlay:setWater(0.02, 12.0, 1.5)
   overlay:setWaterTint(0.2, 0.6, 0.8, 0.5)
   lurek.log.info("water tint set", "effect")
 end
@@ -1567,7 +1569,7 @@ end
 -- direction: "in" fades to transparent, "out" fades to the target colour.
 do  -- Overlay:triggerFade
   local overlay = lurek.effect.newOverlay(800, 600)
-  overlay:triggerFade("out", 1.5, 0, 0, 0)
+  overlay:triggerFade(0, 0, 0, 1.0, 1.5)
   lurek.log.info("fade out triggered", "effect")
 end
 

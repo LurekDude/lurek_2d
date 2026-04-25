@@ -14,7 +14,7 @@ function lurek.process(dt)
     bullets:update(dt)
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.05, 0.05, 0.1)
     player:draw()
     bullets:draw()

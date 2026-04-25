@@ -1,6 +1,6 @@
 --- BDD tests for library.patterns
 
-require("tests.lua.init")
+require("tests/lua/init")
 
 describe("library: patterns", function()
     pending("patterns library tests pending")

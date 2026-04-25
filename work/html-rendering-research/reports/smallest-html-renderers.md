@@ -8,7 +8,7 @@
    * **Footprint:** Extremely lightweight (usually < 2-3 MB compiled).
    * **Integration:** C++ library with existing Rust bindings (e.g., `rmlui-rs`). Uses a custom, game-optimized subset of HTML/CSS.
    * **Logic:** Lua integration is a first-class citizen in the core C++ library, making it highly suitable for Lua-heavy game engines.
-   * **Renderer:** Requires implementing a custom render interface (draw vertices, indices, textures), which maps perfectly and efficiently to `wgpu`. 
+   * **Renderer:** Requires implementing a custom render interface (draw vertices, indices, textures), which maps perfectly and efficiently to `wgpu`.
 
 2. **Sciter** [2]
    * **Footprint:** Very small for a full engine. The precompiled dynamic library (`sciter.dll`/`libsciter.so`) is typically ~5-8 MB.
@@ -37,7 +37,7 @@
 - [5] Ultralight Official Website: https://ultralig.ht/
 
 ## Confidence
-**HIGH.** The binary sizes and architectural trade-offs of these libraries are well-documented in their respective repositories and game development ecosystems. 
+**HIGH.** The binary sizes and architectural trade-offs of these libraries are well-documented in their respective repositories and game development ecosystems.
 
 ## Unanswered Gaps
 - Which specific subset of CSS is required by the game? (RmlUi only supports a targeted, game-centric subset of CSS, missing some modern web features).

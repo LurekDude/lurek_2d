@@ -143,7 +143,7 @@ end
 -- Button names are "left", "right", and "middle"; pass several to detect chord clicks (e.g. left+right for camera pan).
 do  -- lurek.input.isDown
   function lurek.process(dt)
-    if lurek.input.mouse.isDown("left") then
+    if lurek.input.mouse.isDown(1) then
       lurek.log.debug("left mouse held: dragging selection", "input")
     end
   end
@@ -354,7 +354,7 @@ end
 -- Button names match SDL2 controller buttons: "a", "b", "x", "y", "start", "back", "leftshoulder", etc.
 do  -- lurek.input.isDown
   function lurek.process(dt)
-    if lurek.input.gamepad.isDown(0, "a") then
+    if lurek.input.gamepad.isDown(0, 0) then
       lurek.log.debug("player 1 pressed A: jump", "input")
     end
   end
@@ -365,7 +365,7 @@ end
 -- Apply a small dead-zone (e.g. abs(v) < 0.15 → 0) so resting sticks do not drift the player.
 do  -- lurek.input.getAxis
   function lurek.process(dt)
-    local lx = lurek.input.gamepad.getAxis(0, "leftx")
+    local lx = lurek.input.gamepad.getAxis(0, 0)
     if math.abs(lx) > 0.15 then
       lurek.log.debug("player 1 left stick X = " .. lx, "input")
     end

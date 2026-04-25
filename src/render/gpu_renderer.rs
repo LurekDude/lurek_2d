@@ -1312,7 +1312,6 @@ impl GpuRenderer {
     /// Returns `Err(wgpu::SurfaceError)` on transient errors; the caller should reconfigure on
     /// `SurfaceError::Lost`. When `capture_screenshot` is `true`, a successful frame may also
     /// return `Ok(Some((width, height, rgba_pixels)))` containing the presented screen image.
-
     /// Returns `true` when the AABB of a primitive is within the visible viewport after the
     /// full model→camera transform is applied.
     ///

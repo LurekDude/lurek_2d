@@ -86,7 +86,7 @@ end
 -- Builds a NavGrid from a TileMap layer, treating specified GIDs as blocked (unwalkable).
 -- Pass the GIDs of solid tiles so the resulting NavGrid mirrors collision exactly without manual setCost loops.
 do  -- lurek.pathfind.newNavGridFromTileMap
-  local tm = lurek.tilemap.newTileMap(40, 25, 32, 32)
+  local tm = lurek.tilemap.newTileMap(40, 25, 32)
   tm:addLayer("walls", 40, 25)
   tm:setTile(1, 10, 5, 7)  -- place wall tile (gid=7) on layer 1
   local grid = lurek.pathfind.newNavGridFromTileMap(tm, 1, {7, 8, 9})
@@ -704,7 +704,7 @@ end
 do  -- FlowField:calculateMulti
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local ff = lurek.pathfind.newFlowField(grid)
-  ff:calculateMulti({{8,8},{24,24}})
+  ff:calculateMulti({{x=8,y=8},{x=24,y=24}})
   lurek.log.info("multi-target flow field done", "pathfind")
 end
 
@@ -713,7 +713,7 @@ end
 -- Used to measure movement cost or attack range on hex maps.
 do  -- HexGrid:distance
   local hg = lurek.pathfind.newHexGrid(16, 16)
-  local d = hg:distance(0, 0, 5, 3)
+  local d = hg:distance(1, 1, 6, 4)
   lurek.log.info("hex distance: " .. d, "pathfind")
 end
 
@@ -731,7 +731,7 @@ end
 -- Faster than looping over individual setBlocked calls for bulk terrain setup.
 do  -- NavGrid:fillRect
   local grid = lurek.pathfind.newNavGrid(64, 64)
-  grid:fillRect(10, 10, 20, 20, true)
+  grid:fillRect(10, 10, 20, 20, 1)
   lurek.log.info("rect filled", "pathfind")
 end
 
@@ -750,9 +750,9 @@ end
 -- Returns the path that gets closest within the cost budget.
 do  -- UnitPathfinder:findPartialPath
   local grid = lurek.pathfind.newNavGrid(32, 32)
-  grid:fillRect(15, 0, 15, 31, true)
+  grid:fillRect(15, 1, 15, 31, 0)
   local pf = lurek.pathfind.newPathfinder(grid)
-  local path = pf:findPartialPath(0, 16, 30, 16)
+  local path = pf:findPartialPath(1, 16, 30, 16, 200)
   lurek.log.info("partial path length: " .. #path, "pathfind")
 end
 
@@ -762,7 +762,7 @@ end
 do  -- UnitPathfinder:findPath
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
-  local path = pf:findPath(0, 0, 31, 31)
+  local path = pf:findPath(1, 1, 31, 31)
   lurek.log.info("path steps: " .. (path and #path or 0), "pathfind")
 end
 
@@ -771,7 +771,7 @@ end
 -- Returns a table of waypoint positions; smoother than NavGrid paths.
 do  -- PathGrid:findPath
   local pg = lurek.pathfind.newPathGrid(32, 32, 16)
-  local path = pg:findPath(0, 0, 31, 31)
+  local path = pg:findPath(1, 1, 31, 31)
   lurek.log.info("path grid path: " .. (path and #path or 0), "pathfind")
 end
 
@@ -780,7 +780,7 @@ end
 -- Returns a table of {q, r} axial coordinate pairs.
 do  -- HexGrid:findPath
   local hg = lurek.pathfind.newHexGrid(16, 16)
-  local path = hg:findPath(0, 0, 8, 4)
+  local path = hg:findPath(1, 1, 8, 4)
   lurek.log.info("hex path: " .. (path and #path or 0), "pathfind")
 end
 
@@ -789,7 +789,7 @@ end
 -- Much faster than A* for open maps; returns table of {x,y} positions.
 do  -- JpsGrid:findPath
   local jg = lurek.pathfind.newJpsGrid(64, 64)
-  local path = jg:findPath(0, 0, 63, 63)
+  local path = jg:findPath(1, 1, 63, 63)
   lurek.log.info("jps path: " .. (path and #path or 0), "pathfind")
 end
 
@@ -799,7 +799,7 @@ end
 do  -- UnitPathfinder:findPathBidirectional
   local grid = lurek.pathfind.newNavGrid(64, 64)
   local pf = lurek.pathfind.newPathfinder(grid)
-  local path = pf:findPathBidirectional(0, 0, 63, 63)
+  local path = pf:findPathBidirectional(1, 1, 63, 63)
   lurek.log.info("bidir path: " .. (path and #path or 0), "pathfind")
 end
 
@@ -809,7 +809,7 @@ end
 do  -- UnitPathfinder:findPathSmooth
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
-  local path = pf:findPathSmooth(0, 0, 31, 31)
+  local path = pf:findPathSmooth(1, 1, 31, 31)
   lurek.log.info("smooth path: " .. (path and #path or 0), "pathfind")
 end
 
@@ -818,7 +818,7 @@ end
 -- Produces direct line-of-sight segments where the terrain allows it.
 do  -- PathGrid:findPathSmoothed
   local pg = lurek.pathfind.newPathGrid(32, 32, 16)
-  local path = pg:findPathSmoothed(0, 0, 30, 30)
+  local path = pg:findPathSmoothed(1, 1, 30, 30)
   lurek.log.info("smoothed path: " .. (path and #path or 0), "pathfind")
 end
 
@@ -826,8 +826,8 @@ end
 -- Returns the target cell (x, y) this flow field was calculated toward.
 -- Use to verify which goal is active before re-computing on goal change.
 do  -- AiFlowField:getGoal
-  local grid = lurek.pathfind.newNavGrid(32, 32)
-  local pff = lurek.pathfind.newPathFlowField(grid)
+  local pg = lurek.pathfind.newPathGrid(32, 32, 16)
+  local pff = lurek.pathfind.newPathFlowField(pg)
   pff:setGoal(16, 16)
   local gx, gy = pff:getGoal()
   lurek.log.info("goal: " .. gx .. "," .. gy, "pathfind")
@@ -839,7 +839,7 @@ end
 do  -- UnitPathfinder:heuristicDistance
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
-  local h = pf:heuristicDistance(0, 0, 20, 15)
+  local h = pf:heuristicDistance(1, 1, 21, 16)
   lurek.log.info("heuristic: " .. h, "pathfind")
 end
 
@@ -849,7 +849,7 @@ end
 do  -- UnitPathfinder:isReachable
   local grid = lurek.pathfind.newNavGrid(16, 16)
   local pf = lurek.pathfind.newPathfinder(grid)
-  local ok = pf:isReachable(0, 0, 15, 15)
+  local ok = pf:isReachable(1, 1, 15, 15)
   lurek.log.info("reachable: " .. tostring(ok), "pathfind")
 end
 
@@ -868,7 +868,7 @@ end
 do  -- UnitPathfinder:lineOfSight
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
-  local los = pf:lineOfSight(0, 0, 15, 15)
+  local los = pf:lineOfSight(1, 1, 15, 15)
   lurek.log.info("los: " .. tostring(los), "pathfind")
 end
 
@@ -877,7 +877,7 @@ end
 -- Uses the hex supergrid LOS algorithm; blocked cells break the sight line.
 do  -- HexGrid:lineOfSight
   local hg = lurek.pathfind.newHexGrid(16, 16)
-  local los = hg:lineOfSight(0, 0, 8, 4)
+  local los = hg:lineOfSight(1, 1, 8, 4)
   lurek.log.info("hex los: " .. tostring(los), "pathfind")
 end
 
@@ -924,6 +924,6 @@ do  -- FlowField:steer
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local ff = lurek.pathfind.newFlowField(grid)
   ff:calculate(16, 16)
-  local vx, vy = ff:steer(8, 8)
+  local vx, vy = ff:steer(8, 8, 1.0, 1.0, 1.0)
   lurek.log.info("steer: " .. vx .. "," .. vy, "pathfind")
 end

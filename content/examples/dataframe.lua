@@ -520,7 +520,9 @@ do  -- Database:getTable
   local db = lurek.dataframe.newDatabase()
   db:addTable("players", lurek.dataframe.fromTable({{name = "Alice"}}))
   local players = db:getTable("players")
-  lurek.log.info("players rows: " .. players:nrows())
+  if players then
+    lurek.log.info("players rows: " .. players:nrows())
+  end
 end
 
 --@api-stub: Database:removeTable
@@ -633,7 +635,10 @@ end
 -- Apply a Lua aggregator function to a column within each group.
 -- fn(values_table) -> number  -- receives all column values for the group, returns one number.
 do  -- GroupedFrame:aggregate
-  local df = lurek.dataframe.newFrame({ damage = {12, 8, 20, 5}, class = {"warrior","mage","warrior","mage"} })
+  local df = lurek.dataframe.newDataFrame()
+  df:addColumn("damage", 0) ; df:addColumn("class", "")
+  df:addRow({damage=12, class="warrior"}) ; df:addRow({damage=8, class="mage"})
+  df:addRow({damage=20, class="warrior"}) ; df:addRow({damage=5, class="mage"})
   local grouped = df:groupBy("class")
   if grouped and grouped.aggregate then
     local result = grouped:aggregate("damage", function(vals)
@@ -649,7 +654,9 @@ end
 -- Group the frame by an object-type column (uses identity comparison).
 -- Returns a GroupedFrame; call :aggregate() on it to reduce per-group.
 do  -- DataFrame:groupByObj
-  local df = lurek.dataframe.newFrame({ score = {1,2,3}, key = {"a","b","a"} })
+  local df = lurek.dataframe.newDataFrame()
+  df:addColumn("score", 0) ; df:addColumn("key", "")
+  df:addRow({score=1, key="a"}) ; df:addRow({score=2, key="b"}) ; df:addRow({score=3, key="a"})
   if df.groupByObj then
     local grouped = df:groupByObj("key")
     lurek.log.debug("groupByObj returned: " .. tostring(grouped), "dataframe")
@@ -682,7 +689,7 @@ do  -- lurek.dataframe.fromVec
   local vf = lurek.dataframe.toVec(df)
   vf:colMul("hp", 0.5)          -- halve all HP values at once
   local df2 = lurek.dataframe.fromVec(vf)
-  lurek.log.info("first HP after halving: " .. tostring(df2:get(0, "hp")))
+  lurek.log.info("first HP after halving: " .. tostring(df2:getValue(1, "hp")))
 end
 
 --@api-stub: VecFrame:colAdd
@@ -692,7 +699,7 @@ do  -- VecFrame:colAdd
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("score\n10\n20\n30\n"))
   vf:colAdd("score", 5)    -- score becomes 15, 25, 35
   local df = vf:toDataFrame()
-  lurek.log.info("score[0] = " .. tostring(df:get(0, "score")))
+  lurek.log.info("score[0] = " .. tostring(df:getValue(1, "score")))
 end
 
 --@api-stub: VecFrame:colMul
@@ -710,7 +717,7 @@ do  -- VecFrame:colClamp
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n-5\n50\n150\n"))
   vf:colClamp("hp", 0, 100)   -- HP in [0, 100]
   local df = vf:toDataFrame()
-  lurek.log.info("hp[2] clamped to " .. tostring(df:get(2, "hp")))  -- 100
+  lurek.log.info("hp[2] clamped to " .. tostring(df:getValue(2, "hp")))  -- 100
 end
 
 --@api-stub: VecFrame:colAbs
@@ -720,7 +727,7 @@ do  -- VecFrame:colAbs
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("delta\n-3\n4\n-1\n"))
   vf:colAbs("delta")
   local df = vf:toDataFrame()
-  lurek.log.info("abs delta[0] = " .. tostring(df:get(0, "delta")))
+  lurek.log.info("abs delta[0] = " .. tostring(df:getValue(1, "delta")))
 end
 
 --@api-stub: VecFrame:colSqrt
@@ -730,7 +737,7 @@ do  -- VecFrame:colSqrt
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("dist_sq\n9\n16\n25\n"))
   vf:colSqrt("dist_sq")   -- dist_sq becomes 3, 4, 5
   local df = vf:toDataFrame()
-  lurek.log.info("dist[0] = " .. tostring(df:get(0, "dist_sq")))
+  lurek.log.info("dist[0] = " .. tostring(df:getValue(1, "dist_sq")))
 end
 
 --@api-stub: VecFrame:colOp
@@ -741,7 +748,7 @@ do  -- VecFrame:colOp
   local vf = lurek.dataframe.toVec(df)
   vf:colOp("net_dmg", "atk", "sub", "def")   -- net_dmg = atk - def per row
   local df2 = vf:toDataFrame()
-  lurek.log.info("net_dmg[0] = " .. tostring(df2:get(0, "net_dmg")))  -- 20
+  lurek.log.info("net_dmg[0] = " .. tostring(df2:getValue(1, "net_dmg")))  -- 20
 end
 
 --@api-stub: VecFrame:reduce
@@ -799,7 +806,7 @@ do  -- VecFrame:parScalarOp
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp,mp\n100,50\n200,80\n"))
   vf:parScalarOp({"hp", "mp"}, "mul", 0.5)   -- halve all stats at once
   local df2 = vf:toDataFrame()
-  lurek.log.info("hp[0]=" .. df2:get(0,"hp") .. " mp[0]=" .. df2:get(0,"mp"))
+  lurek.log.info("hp[0]=" .. df2:getValue(1,"hp") .. " mp[0]=" .. df2:getValue(1,"mp"))
 end
 
 --@api-stub: VecFrame:toDataFrame
@@ -809,7 +816,7 @@ do  -- VecFrame:toDataFrame
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("v\n1\n2\n3\n"))
   vf:colAdd("v", 10)
   local df2 = vf:toDataFrame()
-  lurek.log.info("v[0] = " .. tostring(df2:get(0, "v")))  -- 11
+  lurek.log.info("v[0] = " .. tostring(df2:getValue(1, "v")))  -- 11
 end
 
 --@api-stub: VecFrame:colSub
@@ -819,7 +826,7 @@ do  -- VecFrame:colSub
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("stamina\n100\n80\n60\n"))
   vf:colSub("stamina", 10)
   local df2 = vf:toDataFrame()
-  lurek.log.info("stamina[0] after drain = " .. tostring(df2:get(0, "stamina")))  -- 90
+  lurek.log.info("stamina[0] after drain = " .. tostring(df2:getValue(1, "stamina")))  -- 90
 end
 
 --@api-stub: VecFrame:colDiv
@@ -829,7 +836,7 @@ do  -- VecFrame:colDiv
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("score\n100\n200\n150\n"))
   vf:colDiv("score", 200)
   local df2 = vf:toDataFrame()
-  lurek.log.info("normalised score[1] = " .. tostring(df2:get(1, "score")))  -- 1.0
+  lurek.log.info("normalised score[1] = " .. tostring(df2:getValue(1, "score")))  -- 1.0
 end
 
 --@api-stub: VecFrame:colFloor
@@ -839,7 +846,7 @@ do  -- VecFrame:colFloor
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("x\n1.9\n2.1\n3.7\n"))
   vf:colFloor("x")
   local df2 = vf:toDataFrame()
-  lurek.log.info("floored x[2] = " .. tostring(df2:get(2, "x")))  -- 3
+  lurek.log.info("floored x[2] = " .. tostring(df2:getValue(2, "x")))  -- 3
 end
 
 --@api-stub: VecFrame:colCeil
@@ -849,7 +856,7 @@ do  -- VecFrame:colCeil
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("y\n1.1\n2.5\n3.0\n"))
   vf:colCeil("y")
   local df2 = vf:toDataFrame()
-  lurek.log.info("ceiled y[0] = " .. tostring(df2:get(0, "y")))  -- 2
+  lurek.log.info("ceiled y[0] = " .. tostring(df2:getValue(1, "y")))  -- 2
 end
 
 --@api-stub: VecFrame:colNeg
@@ -859,7 +866,7 @@ do  -- VecFrame:colNeg
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("vy\n3\n-2\n0\n"))
   vf:colNeg("vy")
   local df2 = vf:toDataFrame()
-  lurek.log.info("negated vy[0] = " .. tostring(df2:get(0, "vy")))  -- -3
+  lurek.log.info("negated vy[0] = " .. tostring(df2:getValue(1, "vy")))  -- -3
 end
 
 --@api-stub: VecFrame:colCast
@@ -870,7 +877,7 @@ do  -- VecFrame:colCast
   vf:colCast("level", "float64")
   lurek.log.info("level dtype after cast: " .. vf:colType("level"))  -- "float64"
   local df2 = vf:toDataFrame()
-  lurek.log.info("level[0] as float = " .. tostring(df2:get(0, "level")))
+  lurek.log.info("level[0] as float = " .. tostring(df2:getValue(1, "level")))
 end
 
 --@api-stub: VecFrame:nrows
@@ -952,7 +959,7 @@ do  -- DataFrame:apply
   local df = lurek.dataframe.newDataFrame()
   df:addRow({score=60})
   df:addRow({score=80})
-  df:apply("score", "grade", function(v) return v >= 70 and "pass" or "fail" end)
+  df:apply("score", function(v) return v >= 70 and "pass" or "fail" end)
   lurek.log.info("grade col added", "dataframe")
 end
 
@@ -975,7 +982,7 @@ do  -- DataFrame:filter
   local df = lurek.dataframe.newDataFrame()
   df:addRow({age=20, name="Alice"})
   df:addRow({age=35, name="Bob"})
-  local adults = df:filter(function(row) return row.age >= 21 end)
+  local adults = df:filter("age", ">=", 21)
   lurek.log.info("adults: " .. adults:nrows(), "dataframe")
 end
 
@@ -1009,7 +1016,7 @@ end
 do  -- DataFrame:normalizeCol
   local df = lurek.dataframe.newDataFrame()
   df:addRow({val=10}) ; df:addRow({val=50}) ; df:addRow({val=90})
-  df:normalizeCol("val")
+  df:normalizeCol("val", 0.0, 1.0, "val_norm")
   lurek.log.info("normalized col", "dataframe")
 end
 
@@ -1031,7 +1038,7 @@ do  -- VecFrame:parScalarOp
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromTable({
     x = {1.0, 2.0, 3.0}, y = {4.0, 5.0, 6.0}
   }))
-  local scaled = vf:parScalarOp("*", 2.0)
+  local scaled = vf:parScalarOp({"x", "y"}, "*", 2.0)
   lurek.log.info("par scalar done", "dataframe")
 end
 
@@ -1113,7 +1120,7 @@ end
 do  -- DataFrame:withCumsum
   local df = lurek.dataframe.newDataFrame()
   for i=1,4 do df:addRow({v=i}) end
-  local out = df:withCumsum("v")
+  local out = df:withCumsum("v", "v_cumsum")
   lurek.log.info("cumsum col added", "dataframe")
 end
 
@@ -1123,7 +1130,7 @@ end
 do  -- DataFrame:withPctChange
   local df = lurek.dataframe.newDataFrame()
   for _, v in ipairs({100,110,121,133}) do df:addRow({price=v}) end
-  local out = df:withPctChange("price")
+  local out = df:withPctChange("price", "price_pct")
   lurek.log.info("pct change col added", "dataframe")
 end
 
@@ -1133,7 +1140,7 @@ end
 do  -- DataFrame:withRank
   local df = lurek.dataframe.newDataFrame()
   df:addRow({pts=10}) ; df:addRow({pts=30}) ; df:addRow({pts=20})
-  local out = df:withRank("pts")
+  local out = df:withRank("pts", true, "pts_rank")
   lurek.log.info("rank col added", "dataframe")
 end
 
@@ -1143,7 +1150,7 @@ end
 do  -- DataFrame:withRollingMax
   local df = lurek.dataframe.newDataFrame()
   for _, v in ipairs({3,1,4,1,5,9,2,6}) do df:addRow({v=v}) end
-  local out = df:withRollingMax("v", 3)
+  local out = df:withRollingMax("v", 3, "v_rollmax")
   lurek.log.info("rolling max col added", "dataframe")
 end
 
@@ -1153,7 +1160,7 @@ end
 do  -- DataFrame:withRollingMean
   local df = lurek.dataframe.newDataFrame()
   for i=1,5 do df:addRow({temp=20+i}) end
-  local out = df:withRollingMean("temp", 3)
+  local out = df:withRollingMean("temp", 3, "temp_rollmean")
   lurek.log.info("rolling mean col added", "dataframe")
 end
 
@@ -1163,7 +1170,7 @@ end
 do  -- DataFrame:withRollingMin
   local df = lurek.dataframe.newDataFrame()
   for _, v in ipairs({5,3,8,2,7,1}) do df:addRow({v=v}) end
-  local out = df:withRollingMin("v", 3)
+  local out = df:withRollingMin("v", 3, "v_rollmin")
   lurek.log.info("rolling min col added", "dataframe")
 end
 
@@ -1173,7 +1180,7 @@ end
 do  -- DataFrame:withRollingSum
   local df = lurek.dataframe.newDataFrame()
   for i=1,5 do df:addRow({sales=i*10}) end
-  local out = df:withRollingSum("sales", 3)
+  local out = df:withRollingSum("sales", 3, "sales_rollsum")
   lurek.log.info("rolling sum col added", "dataframe")
 end
 
@@ -1183,6 +1190,6 @@ end
 do  -- DataFrame:zscoreCol
   local df = lurek.dataframe.newDataFrame()
   for i=1,6 do df:addRow({v=i*5}) end
-  df:zscoreCol("v")
+  df:zscoreCol("v", "v_zscore")
   lurek.log.info("zscore normalised", "dataframe")
 end

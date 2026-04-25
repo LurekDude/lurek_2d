@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- BAD: creates a new string object on every frame
 local key = "player_" .. tostring(id)   -- new allocation each frame
 

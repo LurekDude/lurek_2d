@@ -1,4 +1,4 @@
-﻿--- @module library.stats
+﻿-- @module library.stats
 --- @status full
 --- RPG character stat sheets with attributes, buffs, skills, perks, traits,
 --- XP/levelling, action points, morale, resistances, encumbrance and initiative.

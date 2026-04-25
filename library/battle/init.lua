@@ -1,4 +1,4 @@
-﻿--- @module library.battle
+﻿-- @module library.battle
 --- @status full
 --- Pure-Lua turn-based battle system with combatants, actions,
 --- status effects, initiative, damage types, and combat resolution.
@@ -36,7 +36,15 @@ end
 local function _log(level, msg)
     if type(lurek) == "table" and type(lurek.log) == "table"
        and type(lurek.log[level]) == "function" then
-        lurek.log[level](msg)
+        if level == "debug" then
+            lurek.log.debug(msg)
+        elseif level == "info" then
+            lurek.log.info(msg)
+        elseif level == "warn" then
+            lurek.log.warn(msg)
+        elseif level == "error" then
+            lurek.log.error(msg)
+        end
     end
 end
 

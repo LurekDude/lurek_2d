@@ -62,8 +62,8 @@ impl LuaUserData for LuaDepthSorter {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- add --
         /// Registers a draw callback at the given depth layer.
-        /// @param callback : function
-        /// @param depth : number
+        /// @param callback function
+        /// @param depth number
         /// @return nil
         methods.add_method("add", |lua, this, (callback, depth): (LuaFunction, f32)| {
             let key = lua.create_registry_value(callback)?;
@@ -76,7 +76,7 @@ impl LuaUserData for LuaDepthSorter {
 
         // -- addObject --
         /// Registers a table object with a draw method at the given depth.
-        /// @param obj : table
+        /// @param obj table
         /// @return nil
         methods.add_method("addObject", |lua, this, obj: LuaTable| {
             let depth: f32 = obj.get::<_, f32>("depth").unwrap_or(0.0);
@@ -132,7 +132,7 @@ impl LuaUserData for LuaDepthSorter {
 
         // -- setStable --
         /// Sets whether equal-depth entries preserve insertion order.
-        /// @param stable : boolean
+        /// @param stable boolean
         /// @return nil
         methods.add_method("setStable", |_, this, stable: bool| {
             this.inner.borrow_mut().set_stable(stable);
@@ -170,9 +170,9 @@ impl LuaUserData for LuaDepthSorter {
 
 /// Registers the `lurek.scene` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -190,11 +190,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- push --
     /// Pushes a scene table onto the stack with an optional transition and easing.
-    /// @param scene : table
-    /// @param transition : string?
-    /// @param duration : number?
-    /// @param easing : string?
-    /// @param params : table?
+    /// @param scene table
+    /// @param transition string?
+    /// @param duration number?
+    /// @param easing string?
+    /// @param params table?
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -244,9 +244,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- pop --
     /// Pops the top scene from the stack with an optional transition and easing.
-    /// @param transition : string?
-    /// @param duration : number?
-    /// @param easing : string?
+    /// @param transition string?
+    /// @param duration number?
+    /// @param easing string?
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -285,11 +285,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- switchTo --
     /// Replaces the top scene with a new one, calling leave and enter callbacks.
-    /// @param scene : table
-    /// @param transition : string?
-    /// @param duration : number?
-    /// @param easing : string?
-    /// @param params : table?
+    /// @param scene table
+    /// @param transition string?
+    /// @param duration number?
+    /// @param easing string?
+    /// @param params table?
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -359,7 +359,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- popTo --
     /// Pops scenes until the named scene is on top, calling leave on each removed.
-    /// @param name : string
+    /// @param name string
     /// @return boolean
     let st = state.clone();
     tbl.set(
@@ -390,7 +390,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- update --
     /// Updates the top scene and any active transition (legacy name; prefer `process`).
     /// Calls `scene:update(dt)` on the topmost scene only.
-    /// @param dt : number
+    /// @param dt number
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -412,7 +412,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- process --
     /// Calls `scene:ready(self)` once per scene on the first tick after enter,
     /// then `scene:process(dt)` on all active scenes (top-only unless overlays are present).
-    /// @param dt : number
+    /// @param dt number
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -437,7 +437,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- processPhysics --
     /// Calls `scene:process_physics(dt)` on all active scenes (fixed timestep).
     /// When overlays are present, all scenes in the stack receive the callback.
-    /// @param dt : number
+    /// @param dt number
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -457,7 +457,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- processLate --
     /// Calls `scene:process_late(dt)` on all active scenes (after process, before render).
     /// When overlays are present, all scenes in the stack receive the callback.
-    /// @param dt : number
+    /// @param dt number
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -609,8 +609,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- registerScene --
     /// Registers a scene table by name for later retrieval.
-    /// @param name : string
-    /// @param scene : table
+    /// @param name string
+    /// @param scene table
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -627,7 +627,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- getRegistered --
     /// Returns a registered scene table by name, or nil if not found.
-    /// @param name : string
+    /// @param name string
     /// @return table?
     let st = state.clone();
     tbl.set(
@@ -646,7 +646,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- hasRegistered --
     /// Returns true if a scene is registered under the given name.
-    /// @param name : string
+    /// @param name string
     /// @return boolean
     let st = state.clone();
     tbl.set(
@@ -656,7 +656,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- unregisterScene --
     /// Removes a scene from the registry by name.
-    /// @param name : string
+    /// @param name string
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -680,8 +680,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- setData --
     /// Stores a value in the inter-scene data store under the given key.
-    /// @param key : string
-    /// @param value : table
+    /// @param key string
+    /// @param value table
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -698,7 +698,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- getData --
     /// Returns a value from the inter-scene data store, or nil if not found.
-    /// @param key : string
+    /// @param key string
     /// @return table?
     let st = state.clone();
     tbl.set(
@@ -715,7 +715,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- hasData --
     /// Returns true if the given key exists in the data store.
-    /// @param key : string
+    /// @param key string
     /// @return boolean
     let st = state.clone();
     tbl.set(
@@ -725,7 +725,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- removeData --
     /// Removes a value from the inter-scene data store by key.
-    /// @param key : string
+    /// @param key string
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -759,7 +759,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // Implemented as a Rust closure using mlua set_metatable instead of setmetatable,
     // keeping no embedded Lua strings in the api file.
     /// Creates a scene instance directly from a methods table.
-    /// @param def : table?
+    /// @param def table?
     /// @return table
     tbl.set(
         "new",
@@ -777,7 +777,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // `lurek.scene.newScene(def)` â€” alias for `new`.
     /// Alias for `lurek.scene.new`. Creates a scene instance from a methods table.
-    /// @param def : table?
+    /// @param def table?
     /// @return table
     tbl.set(
         "newScene",
@@ -797,7 +797,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // The definition table is stored in the Lua registry so the returned constructor
     // closure can access it across multiple calls without holding a borrow.
     /// Creates a reusable scene class â€” returns a zero-argument constructor function.
-    /// @param def : table?
+    /// @param def table?
     /// @return function
     tbl.set(
         "define",
@@ -834,11 +834,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- pushOverlay --
     /// Pushes a scene as a non-pausing overlay over the current top scene.
     /// The background scene continues to receive process and render calls.
-    /// @param scene : table
-    /// @param transition : string?
-    /// @param duration : number?
-    /// @param easing : string?
-    /// @param params : table?
+    /// @param scene table
+    /// @param transition string?
+    /// @param duration number?
+    /// @param easing string?
+    /// @param params table?
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -926,8 +926,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Registers a loader function for a named scene. The loader is called
     /// once when `pushPreloaded` is first invoked for that name, allowing
     /// assets to be loaded before the scene is pushed.
-    /// @param name : string
-    /// @param loader : function
+    /// @param name string
+    /// @param loader function
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -942,7 +942,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- isPreloaded --
     /// Returns true if the named scene has been preloaded.
-    /// @param name : string
+    /// @param name string
     /// @return boolean
     let st = state.clone();
     tbl.set(
@@ -954,11 +954,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- pushPreloaded --
     /// Pushes a registered scene by name, running its loader if not yet preloaded.
-    /// @param name : string
-    /// @param transition : string?
-    /// @param duration : number?
-    /// @param easing : string?
-    /// @param params : table?
+    /// @param name string
+    /// @param transition string?
+    /// @param duration number?
+    /// @param easing string?
+    /// @param params table?
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -1102,7 +1102,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- deserializeScene --
     /// Restores scene data_refs from a snapshot produced by serializeScene().
     /// Only data keys are restored; the scene stack itself is not manipulated.
-    /// @param snapshot : table
+    /// @param snapshot table
     /// @return nil
     let st = state.clone();
     tbl.set(
@@ -1142,7 +1142,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // transitions.fade(duration?) â†’ {type="fade", duration=0.5}
     /// Returns a fade cross-dissolve transition config table.
     /// @return table|nil
-    /// @param duration : number?  â€” default 0.5
+    /// @param duration number?  â€” default 0.5
     /// table  â€” { type : string, duration : number }
     trans_tbl.set(
         "fade",
@@ -1157,8 +1157,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // transitions.slide(direction?, duration?) â†’ {type=direction, duration=0.4}
     /// Returns a directional slide transition config table.
     /// @return table|nil
-    /// @param direction : string?  â€” "left" | "right" | "up" | "down" (default "left")
-    /// @param duration  : number?  â€” default 0.4
+    /// @param direction string?  â€” "left" | "right" | "up" | "down" (default "left")
+    /// @param duration number?  â€” default 0.4
     /// table  â€” { type : string, duration : number }
     trans_tbl.set(
         "slide",
@@ -1176,7 +1176,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // transitions.wipe(duration?) â†’ {type="wipe", duration=0.5}
     /// Returns a wipe/curtain transition config table.
     /// @return table|nil
-    /// @param duration : number?  â€” default 0.5
+    /// @param duration number?  â€” default 0.5
     /// table  â€” { type : string, duration : number }
     trans_tbl.set(
         "wipe",
@@ -1191,7 +1191,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // transitions.iris(duration?) â†’ {type="iris", duration=0.6}
     /// Returns an iris in/out (circular reveal) transition config table.
     /// @return table|nil
-    /// @param duration : number?  â€” default 0.6
+    /// @param duration number?  â€” default 0.6
     /// table  â€” { type : string, duration : number }
     trans_tbl.set(
         "iris",

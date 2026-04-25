@@ -1270,7 +1270,7 @@ do  -- Graph:addEdge
   local g = lurek.graph.newGraph()
   local a = g:addNode("city_a")
   local b = g:addNode("city_b")
-  local e = g:addEdge("city_a", "city_b", {capacity=100, bidirectional=true})
+  local e = g:addEdge(a, b, "road")
   lurek.log.info("edges: " .. g:getEdgeCount(), "graph")
 end
 
@@ -1279,9 +1279,9 @@ end
 -- Use when you pre-build items outside the graph and inject them.
 do  -- Graph:addItem
   local g = lurek.graph.newGraph()
-  g:addNode("depot")
-  local item = g:createItem("wood", "depot")
-  g:addItem("depot", item)
+  local depot = g:addNode("depot")
+  local item = g:createItem("wood", -1)
+  g:addItem(item, depot)
   lurek.log.info("item count: " .. g:getItemCount(), "graph")
 end
 
@@ -1310,9 +1310,9 @@ end
 -- Returns a table of node names or nil if no path exists.
 do  -- Graph:astar
   local g = lurek.graph.newGraph()
-  g:addNode("A"); g:addNode("B"); g:addNode("C")
-  g:addEdge("A","B",{weight=1}); g:addEdge("B","C",{weight=1})
-  local path = g:astar("A","C")
+  local na = g:addNode("A") ; local nb = g:addNode("B") ; local nc = g:addNode("C")
+  g:addEdge(na, nb) ; g:addEdge(nb, nc)
+  local path = g:astar(na, nc)
   lurek.log.info("path length: " .. (path and #path or 0), "graph")
 end
 
@@ -1321,8 +1321,8 @@ end
 -- Returns a GraphItem handle; items are transported along edges by the graph solver.
 do  -- Graph:createItem
   local g = lurek.graph.newGraph()
-  g:addNode("factory")
-  local item = g:createItem("widget", "factory")
+  local factory = g:addNode("factory")
+  local item = g:createItem("widget", -1)
   lurek.log.info("item alive: " .. tostring(item:isAlive()), "graph")
 end
 
@@ -1331,9 +1331,9 @@ end
 -- Uses the edge weight attribute; returns nil if target is unreachable.
 do  -- Graph:findPath
   local g = lurek.graph.newGraph()
-  g:addNode("A"); g:addNode("B")
-  g:addEdge("A","B",{weight=2})
-  local p = g:findPath("A","B")
+  local na = g:addNode("A") ; local nb = g:addNode("B")
+  g:addEdge(na, nb)
+  local p = g:findPath(na, nb)
   lurek.log.info("found path: " .. (p and #p or 0) .. " nodes", "graph")
 end
 
@@ -1342,10 +1342,10 @@ end
 -- Some edges may restrict allowed item types; this variant respects those filters.
 do  -- Graph:findPathForItem
   local g = lurek.graph.newGraph()
-  g:addNode("source"); g:addNode("sink")
-  g:addEdge("source","sink",{capacity=100})
-  local item = g:createItem("ore","source")
-  local p = g:findPathForItem(item,"source","sink")
+  local ns = g:addNode("source") ; local nk = g:addNode("sink")
+  g:addEdge(ns, nk)
+  local item = g:createItem("ore", -1)
+  local p = g:findPathForItem(item, ns, nk)
   lurek.log.info("item path: " .. (p and #p or 0), "graph")
 end
 
@@ -1354,10 +1354,10 @@ end
 -- Returns math.huge if the target is not reachable from the source.
 do  -- Graph:getDistance
   local g = lurek.graph.newGraph()
-  g:addNode("X"); g:addNode("Y")
-  g:addEdge("X","Y",{weight=5})
-  local d = g:getDistance("X","Y")
-  lurek.log.info("distance X->Y: " .. d, "graph")
+  local nx = g:addNode("X") ; local ny = g:addNode("Y")
+  g:addEdge(nx, ny)
+  local d = g:getDistance(nx, ny)
+  lurek.log.info("distance X->Y: " .. tostring(d), "graph")
 end
 
 --@api-stub: Graph:getEdgeBetween
@@ -1365,10 +1365,10 @@ end
 -- Use to query or modify an edge without keeping a reference from addEdge.
 do  -- Graph:getEdgeBetween
   local g = lurek.graph.newGraph()
-  g:addNode("A"); g:addNode("B")
-  g:addEdge("A","B",{capacity=50})
-  local e = g:getEdgeBetween("A","B")
-  lurek.log.info("edge capacity: " .. e:getCapacity(), "graph")
+  local na = g:addNode("A") ; local nb = g:addNode("B")
+  g:addEdge(na, nb)
+  local e = g:getEdgeBetween(na, nb)
+  lurek.log.info("edge capacity: " .. tostring(e and e:getCapacity() or 0), "graph")
 end
 
 --@api-stub: Graph:getReachable
@@ -1376,32 +1376,32 @@ end
 -- Result is a table of node names; useful for range-of-movement or supply radius.
 do  -- Graph:getReachable
   local g = lurek.graph.newGraph()
-  for _, n in ipairs({"A","B","C"}) do g:addNode(n) end
-  g:addEdge("A","B",{weight=1}); g:addEdge("B","C",{weight=1})
-  local reachable = g:getReachable("A", 5)
-  lurek.log.info("reachable: " .. #reachable, "graph")
+  local na = g:addNode("A") ; local nb = g:addNode("B") ; local nc = g:addNode("C")
+  g:addEdge(na, nb) ; g:addEdge(nb, nc)
+  local reachable = g:getReachable(na, 5)
+  lurek.log.info("reachable: " .. (reachable and #reachable or 0), "graph")
 end
 
 --@api-stub: Graph:on
--- Registers a callback for a named graph event ("item_arrived", "edge_broken", etc.).
+-- Registers a callback for a named graph event ("itemEnter", "edgeLeave", etc.).
 -- Returns a listener id for later removal; multiple callbacks can share the same event.
 do  -- Graph:on
   local g = lurek.graph.newGraph()
-  g:on("item_arrived", function(item, node)
-    lurek.log.info("item arrived at " .. node, "graph")
+  g:on("itemEnter", function(item, node)
+    lurek.log.info("item arrived at " .. tostring(node), "graph")
   end)
   lurek.log.info("listener registered", "graph")
 end
 
 --@api-stub: Graph:sendItem
 -- Routes an item from its current node toward a destination, traversing edges each update.
--- Item moves by travel-time; subscribe to "item_arrived" to know when it lands.
+-- Item moves by travel-time; subscribe to "itemEnter" to know when it lands.
 do  -- Graph:sendItem
   local g = lurek.graph.newGraph()
-  g:addNode("A"); g:addNode("B")
-  g:addEdge("A","B",{travelTime=2.0,capacity=100})
-  local item = g:createItem("gold","A")
-  g:sendItem(item,"B")
+  local na = g:addNode("A") ; local nb = g:addNode("B")
+  local edge = g:addEdge(na, nb)
+  local item = g:createItem("gold", -1)
+  g:sendItem(item, edge)
   lurek.log.info("item dispatched", "graph")
 end
 
@@ -1411,6 +1411,6 @@ end
 do  -- Node:setConversion
   local g = lurek.graph.newGraph()
   local n = g:addNode("smelter")
-  n:setConversion("ore", 2, "ingot", 1)
+  n:setConversion("ore", "ingot", 2, 1)
   lurek.log.info("conversion set", "graph")
 end

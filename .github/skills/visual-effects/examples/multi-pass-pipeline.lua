@@ -1,4 +1,10 @@
 local sceneCanvas, blurH, blurV  -- three render targets
+local blurHShader, blurVShader
+local BLUR_H_WGSL = [[@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(1.0); }]]
+local BLUR_V_WGSL = [[@fragment fn fs_main() -> @location(0) vec4<f32> { return vec4<f32>(1.0); }]]
+
+local function drawScene()
+end
 
 function lurek.init()
     local w, h = lurek.window.getWidth(), lurek.window.getHeight()
@@ -9,7 +15,7 @@ function lurek.init()
     blurVShader = lurek.render.newShader(BLUR_V_WGSL)
 end
 
-function lurek.render()
+function lurek.draw()
     -- Pass 1: scene → sceneCanvas
     lurek.render.setCanvas(sceneCanvas) ; drawScene() ; lurek.render.setCanvas(nil)
 

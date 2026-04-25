@@ -702,6 +702,54 @@ def _returns_str(fn: dict) -> str:
     return ", ".join(types) if types else ""
 
 
+def _luacats_type(type_name: str) -> str:
+    """Normalize LDoc type text into LuaCATS-safe type syntax."""
+    t = (type_name or "any").strip()
+    t = re.sub(r"[,.;:]+$", "", t).strip()
+    if not t:
+        return "any"
+    aliases = {
+        "Any": "any",
+        "Arguments": "any",
+        "Function": "function",
+        "Table": "table",
+        "String": "string",
+        "Number": "number",
+        "Boolean": "boolean",
+    }
+    t = aliases.get(t, t)
+    if t.endswith("?"):
+        base = t[:-1].strip() or "any"
+        t = f"{base}|nil"
+    return t
+
+
+def _luacats_param_name(name: str) -> str:
+    """Return a LuaCATS-safe parameter name, or empty for field-style LDoc tags."""
+    name = (name or "").strip()
+    if not name:
+        return ""
+    if name == "...":
+        return name
+    if "." in name:
+        return ""
+    return re.sub(r"[^A-Za-z0-9_]", "", name)
+
+
+def _luacats_arg_names(args: str) -> set[str]:
+    names: set[str] = set()
+    for raw in (args or "").split(","):
+        name = raw.strip()
+        if not name:
+            continue
+        name = name.split("=", 1)[0].strip()
+        if name == "...":
+            names.add(name)
+        else:
+            names.add(re.sub(r"[^A-Za-z0-9_]", "", name))
+    return names
+
+
 def render_api_md(modules: dict) -> str:
     """Render docs/api/library.md in the same style as docs/api/lurek.md.
 
@@ -831,6 +879,30 @@ def render_luacats(modules: dict) -> str:
     out.append("library = {}")
     out.append("")
 
+    declared_classes: set[str] = set()
+    referenced_types: set[str] = set()
+    for _, info in modules.values():
+        for fn in info["functions"]:
+            raw_name = fn["name"]
+            if ":" in raw_name:
+                cls = raw_name.split(":", 1)[0]
+                if cls not in declared_classes:
+                    out.append(f"---@class {cls}")
+                    out.append(f"{cls} = {{}}")
+                    out.append("")
+                    declared_classes.add(cls)
+            for p in fn.get("params", []):
+                for token in re.findall(r"[A-Z][A-Za-z0-9_]*", _luacats_type(p.get("type", ""))):
+                    referenced_types.add(token)
+            for r in fn.get("returns", []):
+                for token in re.findall(r"[A-Z][A-Za-z0-9_]*", _luacats_type(r.get("type", ""))):
+                    referenced_types.add(token)
+
+    for type_name in sorted(referenced_types - declared_classes):
+        out.append(f"---@class {type_name}")
+        out.append(f"{type_name} = {{}}")
+        out.append("")
+
     for module_name in sorted(modules.keys()):
         _, info = modules[module_name]
         display = info["name"] or f"library.{module_name}"
@@ -838,40 +910,51 @@ def render_luacats(modules: dict) -> str:
         out.append(f"library.{module_name} = {{}}")
         out.append("")
 
-        # Track classes already declared
-        declared_classes: set[str] = set()
+        nested_tables: set[str] = set()
+        for fn in info["functions"]:
+            raw_name = fn["name"]
+            if ":" in raw_name:
+                continue
+            short_name = _strip_module_prefix(raw_name)
+            parts = short_name.split(".")
+            for depth in range(1, len(parts)):
+                nested_tables.add(".".join(parts[:depth]))
+
+        for nested in sorted(nested_tables, key=lambda value: (value.count("."), value)):
+            out.append(f"---@class {display}.{nested}")
+            out.append(f"{display}.{nested} = {{}}")
+            out.append("")
 
         for fn in info["functions"]:
-            short = _strip_module_prefix(fn["name"])
-            # If this is a method (e.g. Sequencer:update), declare the class first
-            if ":" in short:
-                cls = short.split(":")[0]
-                if cls not in declared_classes:
-                    out.append(f"---@class {cls}")
-                    out.append(f"local {cls} = {{}}")
-                    out.append("")
-                    declared_classes.add(cls)
+            raw_name = fn["name"]
+            arg_names = _luacats_arg_names(fn.get("args", ""))
 
             # Docstring
             if fn["desc"]:
                 first_line = fn["desc"].split("\n")[0]
                 out.append(f"--- {first_line}")
             for p in fn["params"]:
-                t = p["type"] if p["type"] else "any"
-                out.append(f"---@param {p['name']} {t}")
+                name = _luacats_param_name(p["name"])
+                if not name:
+                    continue
+                if arg_names and name != "..." and name not in arg_names:
+                    continue
+                t = _luacats_type(p["type"])
+                out.append(f"---@param {name} {t}")
             for r in fn["returns"]:
-                t = r["type"] if r["type"] else "any"
+                t = _luacats_type(r["type"] if r["type"] else "any")
                 out.append(f"---@return {t}")
             if not fn["returns"]:
                 out.append("---@return nil")
 
             # Function declaration
-            if ":" in short:
-                cls = short.split(":")[0]
-                method = short.split(":")[1]
+            if ":" in raw_name:
+                cls = raw_name.split(":", 1)[0]
+                method = raw_name.split(":", 1)[1]
                 args = fn["args"]
                 out.append(f"function {cls}:{method}({args}) end")
             else:
+                short = _strip_module_prefix(raw_name)
                 args = fn["args"]
                 out.append(f"function {display}.{short}({args}) end")
             out.append("")

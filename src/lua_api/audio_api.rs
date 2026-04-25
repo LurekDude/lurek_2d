@@ -175,7 +175,7 @@ impl LuaUserData for LuaSource {
 
         // -- setVolume --
         /// Sets playback volume (0.0 = silent, 1.0 = full).
-        /// @param vol : number
+        /// @param vol number
         /// @return nil
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
@@ -195,7 +195,7 @@ impl LuaUserData for LuaSource {
 
         // -- setPitch --
         /// Sets the pitch multiplier (1.0 = normal).
-        /// @param pitch : number
+        /// @param pitch number
         /// @return nil
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
@@ -215,7 +215,7 @@ impl LuaUserData for LuaSource {
 
         // -- setLooping --
         /// Enables or disables looping playback.
-        /// @param looping : boolean
+        /// @param looping boolean
         /// @return nil
         methods.add_method("setLooping", |_, this, looping: bool| {
             let mut st = this.state.borrow_mut();
@@ -262,7 +262,7 @@ impl LuaUserData for LuaSource {
 
         // -- setPan --
         /// Sets stereo panning (-1.0 left to 1.0 right).
-        /// @param pan : number
+        /// @param pan number
         /// @return nil
         methods.add_method("setPan", |_, this, pan: f32| {
             let mut st = this.state.borrow_mut();
@@ -326,7 +326,7 @@ impl LuaUserData for LuaSource {
 
         // -- seek --
         /// Seeks to a time position in seconds.
-        /// @param pos : number
+        /// @param pos number
         /// @return nil
         methods.add_method("seek", |_, this, pos: f32| {
             let mut st = this.state.borrow_mut();
@@ -338,7 +338,7 @@ impl LuaUserData for LuaSource {
 
         // -- setLowpass --
         /// Applies a low-pass filter at the given cutoff frequency.
-        /// @param cutoff_hz : integer
+        /// @param cutoff_hz integer
         /// @return nil
         methods.add_method("setLowpass", |_, this, cutoff_hz: u32| {
             let mut st = this.state.borrow_mut();
@@ -349,7 +349,7 @@ impl LuaUserData for LuaSource {
 
         // -- setHighpass --
         /// Applies a high-pass filter at the given cutoff frequency.
-        /// @param cutoff_hz : integer
+        /// @param cutoff_hz integer
         /// @return nil
         methods.add_method("setHighpass", |_, this, cutoff_hz: u32| {
             let mut st = this.state.borrow_mut();
@@ -388,7 +388,7 @@ impl LuaUserData for LuaSource {
 
         // -- fadeIn --
         /// Fades in from silence over the given duration in seconds.
-        /// @param dur : number
+        /// @param dur number
         /// @return nil
         methods.add_method("fadeIn", |_, this, dur: f32| {
             let mut st = this.state.borrow_mut();
@@ -441,7 +441,7 @@ impl LuaUserData for LuaBus {
 
         // -- setVolume --
         /// Sets the volume for all sources on this bus.
-        /// @param vol : number
+        /// @param vol number
         /// @return nil
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
@@ -461,7 +461,7 @@ impl LuaUserData for LuaBus {
 
         // -- setPitch --
         /// Sets the pitch multiplier for all sources on this bus.
-        /// @param pitch : number
+        /// @param pitch number
         /// @return nil
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
@@ -516,7 +516,7 @@ impl LuaUserData for LuaBus {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "Bus" || name == "Object")
@@ -529,8 +529,8 @@ impl LuaUserData for LuaBus {
         /// The `Mixer` will reduce the target bus to `duckVolume` while this bus
         /// is active.  Call `clearDuck` to stop ducking.
         ///
-        /// @param targetBusName : string   name of the bus to duck
-        /// @param duckVolume : number      target volume in \[0, 1\] (e.g. 0.2)
+        /// @param targetBusName string   name of the bus to duck
+        /// @param duckVolume number      target volume in \[0, 1\] (e.g. 0.2)
         /// @return nil
         methods.add_method(
             "setDuckTarget",
@@ -591,7 +591,7 @@ impl LuaUserData for LuaMidiPlayer {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- load --
         /// Loads a MIDI file from the given path.
-        /// @param path : string
+        /// @param path string
         /// @return boolean
         methods.add_method("load", |_, this, path: String| {
             let st = this.state.borrow();
@@ -601,7 +601,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- loadData --
         /// Loads MIDI data from a Lua string.
-        /// @param data : string
+        /// @param data string
         /// @return boolean
         methods.add_method("loadData", |_, this, data: mlua::String| {
             let bytes = data.as_bytes().to_vec();
@@ -624,7 +624,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setSoundFont --
         /// Loads a SoundFont file into this player (stub).
-        /// @param path : string
+        /// @param path string
         /// @return nil
         methods.add_method("setSoundFont", |_, _this, _path: String| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setSoundFont");
@@ -690,7 +690,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- seek --
         /// Seeks to a time position in seconds.
-        /// @param secs : number
+        /// @param secs number
         /// @return nil
         methods.add_method("seek", |_, this, secs: f64| {
             this.inner.borrow_mut().seek(secs);
@@ -711,7 +711,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setLooping --
         /// Enables or disables looping.
-        /// @param looping : boolean
+        /// @param looping boolean
         /// @return nil
         methods.add_method("setLooping", |_, this, looping: bool| {
             this.inner.borrow_mut().set_looping(looping);
@@ -727,7 +727,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setVolume --
         /// Sets MIDI playback volume.
-        /// @param vol : number
+        /// @param vol number
         /// @return nil
         methods.add_method("setVolume", |_, this, vol: f32| {
             this.inner.borrow_mut().set_volume(vol);
@@ -741,7 +741,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setBus --
         /// Routes MIDI output through a bus (or nil to clear).
-        /// @param bus_val : Bus
+        /// @param bus_val Bus
         /// @return nil
         methods.add_method("setBus", |_, this, bus_val: LuaValue| match &bus_val {
             LuaValue::UserData(ud) => {
@@ -773,7 +773,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setTempo --
         /// Sets playback tempo in BPM.
-        /// @param bpm : number
+        /// @param bpm number
         /// @return nil
         methods.add_method("setTempo", |_, this, bpm: f64| {
             let original = this.inner.borrow().original_tempo();
@@ -802,7 +802,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setTempoScale --
         /// Sets the tempo scale factor (1.0 = original speed).
-        /// @param scale : number
+        /// @param scale number
         /// @return nil
         methods.add_method("setTempoScale", |_, this, scale: f32| {
             this.inner.borrow_mut().set_tempo_scale(scale);
@@ -825,8 +825,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setChannelVolume --
         /// Sets volume for a MIDI channel (1-indexed).
-        /// @param ch : integer
-        /// @param vol : number
+        /// @param ch integer
+        /// @param vol number
         /// @return nil
         methods.add_method("setChannelVolume", |_, this, (ch, vol): (usize, f32)| {
             if (1..=16).contains(&ch) {
@@ -837,7 +837,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getChannelVolume --
         /// Returns the volume for a MIDI channel (1-indexed).
-        /// @param ch : integer
+        /// @param ch integer
         /// @return number
         methods.add_method("getChannelVolume", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
@@ -849,8 +849,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setChannelMuted --
         /// Mutes or unmutes a MIDI channel (1-indexed).
-        /// @param ch : integer
-        /// @param muted : boolean
+        /// @param ch integer
+        /// @param muted boolean
         /// @return nil
         methods.add_method("setChannelMuted", |_, this, (ch, muted): (usize, bool)| {
             if (1..=16).contains(&ch) {
@@ -861,7 +861,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- isChannelMuted --
         /// Returns true if a MIDI channel is muted (1-indexed).
-        /// @param ch : integer
+        /// @param ch integer
         /// @return boolean
         methods.add_method("isChannelMuted", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
@@ -873,8 +873,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setChannelInstrument --
         /// Sets the GM instrument for a MIDI channel (1-indexed).
-        /// @param ch : integer
-        /// @param inst : integer
+        /// @param ch integer
+        /// @param inst integer
         /// @return nil
         methods.add_method(
             "setChannelInstrument",
@@ -888,7 +888,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getChannelInstrument --
         /// Returns the GM instrument for a MIDI channel (1-indexed).
-        /// @param ch : integer
+        /// @param ch integer
         /// @return integer
         methods.add_method("getChannelInstrument", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
@@ -907,7 +907,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- soloChannel --
         /// Solos a MIDI channel (1-indexed).
-        /// @param ch : integer
+        /// @param ch integer
         /// @return nil
         methods.add_method("soloChannel", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
@@ -933,7 +933,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getTrackName --
         /// Returns the name of a MIDI track (1-indexed), or nil.
-        /// @param idx : integer
+        /// @param idx integer
         /// @return string
         methods.add_method("getTrackName", |_, this, idx: usize| {
             if idx >= 1 {
@@ -949,8 +949,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setTrackMuted --
         /// Mutes or unmutes a track (1-indexed).
-        /// @param idx : integer
-        /// @param muted : boolean
+        /// @param idx integer
+        /// @param muted boolean
         /// @return nil
         methods.add_method("setTrackMuted", |_, this, (idx, muted): (usize, bool)| {
             if idx >= 1 {
@@ -961,7 +961,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- isTrackMuted --
         /// Returns true if a track is muted (1-indexed).
-        /// @param idx : integer
+        /// @param idx integer
         /// @return boolean
         methods.add_method("isTrackMuted", |_, this, idx: usize| {
             if idx >= 1 {
@@ -980,7 +980,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setOnNoteOn --
         /// Registers a note-on callback (stub).
-        /// @param cb : function
+        /// @param cb function
         /// @return nil
         methods.add_method("setOnNoteOn", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOn");
@@ -989,7 +989,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setOnNoteOff --
         /// Registers a note-off callback (stub).
-        /// @param cb : function
+        /// @param cb function
         /// @return nil
         methods.add_method("setOnNoteOff", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOff");
@@ -998,7 +998,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setOnEnd --
         /// Registers a playback-end callback (stub).
-        /// @param cb : function
+        /// @param cb function
         /// @return nil
         methods.add_method("setOnEnd", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnEnd");
@@ -1014,7 +1014,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setSampleRate --
         /// Sets the PCM output sample rate in Hz (clamped 8000â€“192000).
-        /// @param rate : integer
+        /// @param rate integer
         /// @return nil
         methods.add_method_mut("setSampleRate", |_, this, rate: u32| {
             this.inner.borrow_mut().set_output_sample_rate(rate);
@@ -1030,7 +1030,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setChannels --
         /// Sets the PCM output channel count (clamped 1â€“2).
-        /// @param channels : integer
+        /// @param channels integer
         /// @return nil
         methods.add_method_mut("setChannels", |_, this, channels: u32| {
             this.inner.borrow_mut().set_output_channels(channels as u16);
@@ -1044,7 +1044,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "MidiPlayer" || name == "Object")
@@ -1095,7 +1095,7 @@ impl LuaUserData for LuaSoundPool {
 
         // -- setVolume --
         /// Sets the volume for all voices in this pool.
-        /// @param vol : number
+        /// @param vol number
         /// @return nil
         methods.add_method_mut("setVolume", |_, this, vol: f32| {
             this.pool.set_volume(vol);
@@ -1109,7 +1109,7 @@ impl LuaUserData for LuaSoundPool {
 
         // -- setBus --
         /// Routes all voices through the named bus.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method_mut("setBus", |_, this, name: String| {
             this.pool.set_bus(&name);
@@ -1146,7 +1146,7 @@ impl LuaUserData for LuaSoundPool {
 
         // -- typeOf --
         /// Returns true if the type name matches.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "SoundPool" || name == "Object")
@@ -1202,7 +1202,7 @@ impl LuaUserData for LuaDecoder {
 
         // -- seek --
         /// Seeks to a time offset in seconds.
-        /// @param offset : number
+        /// @param offset number
         /// @return nil
         methods.add_method_mut("seek", |_, this, offset: f64| {
             this.inner.seek(offset);
@@ -1240,17 +1240,17 @@ impl LuaUserData for LuaDecoder {
 
 /// Registers the `lurek.audio` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // â”€â”€ newSource â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Loads an audio file and returns a Source handle.
-    /// @param path : string
-    /// @param source_type : string
+    /// @param path string
+    /// @param source_type string
     /// @return Source
     let s = state.clone();
     tbl.set(
@@ -1287,8 +1287,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ play â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Plays a source, with optional bus routing via options table.
-    /// @param source : Source
-    /// @param options : table
+    /// @param source Source
+    /// @param options table
     /// @return integer
     let s = state.clone();
     tbl.set(
@@ -1315,7 +1315,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ stop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Stops playback and resets seek position.
-    /// @param source : Source
+    /// @param source Source
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1330,8 +1330,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setVolume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets source playback volume.
-    /// @param source : Source
-    /// @param vol : number
+    /// @param source Source
+    /// @param vol number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1346,7 +1346,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getVolume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the source volume.
-    /// @param source : Source
+    /// @param source Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -1360,7 +1360,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ pause â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Pauses playback at the current position.
-    /// @param source : Source
+    /// @param source Source
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1375,7 +1375,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ resume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Resumes playback from pause.
-    /// @param source : Source
+    /// @param source Source
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1390,8 +1390,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setPitch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets source pitch multiplier.
-    /// @param source : Source
-    /// @param pitch : number
+    /// @param source Source
+    /// @param pitch number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1406,7 +1406,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getPitch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the source pitch multiplier.
-    /// @param source : Source
+    /// @param source Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -1420,7 +1420,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ isPlaying â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns true if the source is playing.
-    /// @param source : Source
+    /// @param source Source
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -1434,7 +1434,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ isPaused â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns true if the source is paused.
-    /// @param source : Source
+    /// @param source Source
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -1448,7 +1448,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ isStopped â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns true if the source is stopped.
-    /// @param source : Source
+    /// @param source Source
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -1462,8 +1462,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setLooping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Enables or disables looping.
-    /// @param source : Source
-    /// @param looping : boolean
+    /// @param source Source
+    /// @param looping boolean
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1478,7 +1478,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ isLooping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns true if looping is enabled.
-    /// @param source : Source
+    /// @param source Source
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -1492,7 +1492,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ playLooping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Plays the source in a continuous loop.
-    /// @param source : Source
+    /// @param source Source
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1508,8 +1508,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setPan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets stereo panning (-1.0 left to 1.0 right).
-    /// @param source : Source
-    /// @param pan : number
+    /// @param source Source
+    /// @param pan number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1524,7 +1524,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getPan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the source stereo panning.
-    /// @param source : Source
+    /// @param source Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -1538,7 +1538,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setMasterVolume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the global master volume.
-    /// @param vol : number
+    /// @param vol number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1578,7 +1578,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getSourceType â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the type string ("static" or "stream") of a source.
-    /// @param source : Source
+    /// @param source Source
     /// @return string
     let s = state.clone();
     tbl.set(
@@ -1598,7 +1598,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ clone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates an independent copy of a source.
-    /// @param source : Source
+    /// @param source Source
     /// @return Source
     let s = state.clone();
     tbl.set(
@@ -1656,7 +1656,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ release â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Releases a source and frees its memory.
-    /// @param source : Source
+    /// @param source Source
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -1676,7 +1676,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newBus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a named audio bus for grouping sources.
-    /// @param name : string
+    /// @param name string
     /// @return Bus
     let s = state.clone();
     tbl.set(
@@ -1693,8 +1693,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setSourceBus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Assigns a source to a bus.
-    /// @param source : Source
-    /// @param bus : Bus
+    /// @param source Source
+    /// @param bus Bus
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1719,7 +1719,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getSourceBus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the bus a source is assigned to, or nil.
-    /// @param source : Source
+    /// @param source Source
     /// @return Bus
     let s = state.clone();
     tbl.set(
@@ -1744,7 +1744,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getDuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the total duration of a source in seconds.
-    /// @param source : Source
+    /// @param source Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -1758,7 +1758,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ tell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the current playback position in seconds.
-    /// @param source : Source
+    /// @param source Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -1772,8 +1772,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ seek â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Seeks to a time position in seconds.
-    /// @param source : Source
-    /// @param pos : number
+    /// @param source Source
+    /// @param pos number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1789,8 +1789,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setLowpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Applies a low-pass filter to a source.
-    /// @param source : Source
-    /// @param cutoff_hz : integer
+    /// @param source Source
+    /// @param cutoff_hz integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1805,8 +1805,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setHighpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Applies a high-pass filter to a source.
-    /// @param source : Source
-    /// @param cutoff_hz : integer
+    /// @param source Source
+    /// @param cutoff_hz integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1821,7 +1821,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getLowpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the low-pass filter cutoff of a source.
-    /// @param source : Source
+    /// @param source Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -1835,7 +1835,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getHighpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the high-pass filter cutoff of a source.
-    /// @param source : Source
+    /// @param source Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -1849,7 +1849,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ clearFilter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Removes any active filter from a source.
-    /// @param source : Source
+    /// @param source Source
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1864,8 +1864,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ fadeIn â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Fades a source in from silence over the given duration.
-    /// @param source : Source
-    /// @param dur : number
+    /// @param source Source
+    /// @param dur number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1880,7 +1880,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getFadeIn â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the fade-in duration of a source.
-    /// @param source : Source
+    /// @param source Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -1894,8 +1894,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setListener2D â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the 2D listener position for spatial audio.
-    /// @param x : number
-    /// @param y : number
+    /// @param x number
+    /// @param y number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1920,9 +1920,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setListener â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the 3D listener position.
-    /// @param x : number
-    /// @param y : number
-    /// @param z : number
+    /// @param x number
+    /// @param y number
+    /// @param z number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1949,10 +1949,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setPosition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the 3D position of a source.
-    /// @param source : Source
-    /// @param x : number
-    /// @param y : number
-    /// @param z : number
+    /// @param source Source
+    /// @param x number
+    /// @param y number
+    /// @param z number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1970,7 +1970,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getPosition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the 3D position of a source (x, y, z).
-    /// @param source : Source
+    /// @param source Source
     /// @return number, number, number
     let s = state.clone();
     tbl.set(
@@ -1984,10 +1984,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setVelocity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the velocity of a source for Doppler.
-    /// @param source : Source
-    /// @param x : number
-    /// @param y : number
-    /// @param z : number
+    /// @param source Source
+    /// @param x number
+    /// @param y number
+    /// @param z number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2005,7 +2005,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getVelocity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the velocity of a source (x, y, z).
-    /// @param source : Source
+    /// @param source Source
     /// @return number, number, number
     let s = state.clone();
     tbl.set(
@@ -2019,13 +2019,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setOrientation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the 6-component orientation of a source.
-    /// @param source : Source
-    /// @param fx : number
-    /// @param fy : number
-    /// @param fz : number
-    /// @param ux : number
-    /// @param uy : number
-    /// @param uz : number
+    /// @param source Source
+    /// @param fx number
+    /// @param fy number
+    /// @param fz number
+    /// @param ux number
+    /// @param uy number
+    /// @param uz number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2043,7 +2043,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getOrientation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the 6-component orientation of a source.
-    /// @param source : Source
+    /// @param source Source
     /// number, number, number, number, number, number
     let s = state.clone();
     /// @return table|nil
@@ -2058,7 +2058,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setDopplerScale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the global Doppler effect scale.
-    /// @param scale : number
+    /// @param scale number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2080,7 +2080,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setDistanceModel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the distance attenuation model.
-    /// @param model : string
+    /// @param model string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2106,7 +2106,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Game scripts call this to report the current amplitude of their audio
     /// output.  The stored value is retrievable via `getMeter`.
     ///
-    /// @param level : number   peak level in [0, 1]
+    /// @param level number   peak level in [0, 1]
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2129,7 +2129,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newMidiPlayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a MIDI player, optionally loading a file.
-    /// @param path : string
+    /// @param path string
     /// @return MidiPlayer
     let s = state.clone();
     tbl.set(
@@ -2153,7 +2153,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newSoundData â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a SoundData from a file or as a silent buffer.
-    /// @param args : string|integer
+    /// @param args string|integer
     /// @return SoundData
     let s = state.clone();
     tbl.set(
@@ -2170,7 +2170,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setMidiSoundFont â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the global SoundFont for MIDI synthesis.
-    /// @param path : string
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2214,8 +2214,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newDecoder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a streaming audio decoder.
-    /// @param source : string
-    /// @param buffersize : integer
+    /// @param source string
+    /// @param buffersize integer
     /// @return Decoder
     let s = state.clone();
     tbl.set(
@@ -2235,10 +2235,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newQueueableSource â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a queueable source for manual PCM buffering.
-    /// @param sample_rate : integer
-    /// @param bit_depth : integer
-    /// @param channels : integer
-    /// @param buffer_count : integer
+    /// @param sample_rate integer
+    /// @param bit_depth integer
+    /// @param channels integer
+    /// @param buffer_count? integer
     /// @return integer
     let s = state.clone();
     tbl.set(
@@ -2263,8 +2263,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ queueSource â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Pushes a SoundData buffer into a queueable source.
-    /// @param qsource_id : integer
-    /// @param sounddata : SoundData
+    /// @param qsource_id integer
+    /// @param sounddata SoundData
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2281,7 +2281,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getFreeBufferCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the free buffer slots in a queueable source.
-    /// @param qsource_id : integer
+    /// @param qsource_id integer
     /// @return integer
     let s = state.clone();
     tbl.set(
@@ -2294,7 +2294,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ playQueueable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Starts playback of a queueable source.
-    /// @param qsource_id : integer
+    /// @param qsource_id integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2308,7 +2308,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ stopQueueable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Stops a queueable source and drains its buffers.
-    /// @param qsource_id : integer
+    /// @param qsource_id integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2345,7 +2345,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setPlaybackDevice â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Selects an audio output device by name.
-    /// @param name : string
+    /// @param name string
     /// @return nil
     tbl.set(
         "setPlaybackDevice",
@@ -2357,8 +2357,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ create_bus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a bus by name (functional style).
-    /// @param name : string
-    /// @param parent_name : string
+    /// @param name string
+    /// @param parent_name string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2376,8 +2376,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ set_bus_volume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets a bus volume by name.
-    /// @param name : string
-    /// @param volume : number
+    /// @param name string
+    /// @param volume number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2396,9 +2396,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ add_effect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Adds a DSP effect to a bus.
-    /// @param bus_name : string
-    /// @param effect_type : string
-    /// @param params : table
+    /// @param bus_name string
+    /// @param effect_type string
+    /// @param params table
     /// @return integer
     let s = state.clone();
     tbl.set(
@@ -2428,8 +2428,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ remove_effect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Removes a DSP effect from a bus.
-    /// @param bus_name : string
-    /// @param effect_id : integer
+    /// @param bus_name string
+    /// @param effect_id integer
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -2452,10 +2452,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ set_effect_param â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets a parameter on a DSP effect.
-    /// @param bus_name : string
-    /// @param effect_id : integer
-    /// @param param_name : string
-    /// @param value : number
+    /// @param bus_name string
+    /// @param effect_id integer
+    /// @param param_name string
+    /// @param value number
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -2487,10 +2487,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newSineWave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Generate a mono sine-wave SoundData buffer.
-    /// @param freq : number
-    /// @param duration : number
-    /// @param sampleRate : number
-    /// @param amplitude : number
+    /// @param freq number
+    /// @param duration number
+    /// @param sampleRate number
+    /// @param amplitude number
     /// @return SoundData
     tbl.set(
         "newSineWave",
@@ -2503,10 +2503,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newSquareWave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Generate a mono square-wave SoundData buffer.
-    /// @param freq : number
-    /// @param duration : number
-    /// @param sampleRate : number
-    /// @param amplitude : number
+    /// @param freq number
+    /// @param duration number
+    /// @param sampleRate number
+    /// @param amplitude number
     /// @return SoundData
     tbl.set(
         "newSquareWave",
@@ -2524,10 +2524,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newSawtoothWave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Generate a mono sawtooth-wave SoundData buffer.
-    /// @param freq : number
-    /// @param duration : number
-    /// @param sampleRate : number
-    /// @param amplitude : number
+    /// @param freq number
+    /// @param duration number
+    /// @param sampleRate number
+    /// @param amplitude number
     /// @return SoundData
     tbl.set(
         "newSawtoothWave",
@@ -2545,10 +2545,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newTriangleWave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Generate a mono triangle-wave SoundData buffer.
-    /// @param freq : number
-    /// @param duration : number
-    /// @param sampleRate : number
-    /// @param amplitude : number
+    /// @param freq number
+    /// @param duration number
+    /// @param sampleRate number
+    /// @param amplitude number
     /// @return SoundData
     tbl.set(
         "newTriangleWave",
@@ -2566,10 +2566,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newWhiteNoise â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Generate a reproducible white-noise SoundData buffer.
-    /// @param duration : number
-    /// @param sampleRate : number
-    /// @param amplitude : number
-    /// @param seed : integer
+    /// @param duration number
+    /// @param sampleRate number
+    /// @param amplitude number
+    /// @param seed integer
     /// @return SoundData
     tbl.set(
         "newWhiteNoise",
@@ -2587,8 +2587,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ applyLowpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Applies a first-order IIR low-pass filter to a SoundData in-place.
-    /// @param sounddata : SoundData
-    /// @param cutoff_hz : number
+    /// @param sounddata SoundData
+    /// @param cutoff_hz number
     /// @return nil
     tbl.set(
         "applyLowpass",
@@ -2603,8 +2603,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ applyHighpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Applies a first-order IIR high-pass filter to a SoundData in-place.
-    /// @param sounddata : SoundData
-    /// @param cutoff_hz : number
+    /// @param sounddata SoundData
+    /// @param cutoff_hz number
     /// @return nil
     tbl.set(
         "applyHighpass",
@@ -2619,9 +2619,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ applyBandpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Applies a bandpass filter (high-pass then low-pass) to a SoundData in-place.
-    /// @param sounddata : SoundData
-    /// @param low_hz : number
-    /// @param high_hz : number
+    /// @param sounddata SoundData
+    /// @param low_hz number
+    /// @param high_hz number
     /// @return nil
     tbl.set(
         "applyBandpass",
@@ -2636,8 +2636,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ applyGain â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Scales every sample by gain (clamped to [-1, 1]).
-    /// @param sounddata : SoundData
-    /// @param gain : number
+    /// @param sounddata SoundData
+    /// @param gain number
     /// @return nil
     tbl.set(
         "applyGain",
@@ -2652,8 +2652,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ mixInto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Additively mixes another SoundData into the destination in-place.
-    /// @param dest : SoundData
-    /// @param src : SoundData
+    /// @param dest SoundData
+    /// @param src SoundData
     /// @return nil
     tbl.set(
         "mixInto",
@@ -2680,8 +2680,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ saveWAV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Saves a SoundData as a 16-bit PCM WAV file at the given path.
-    /// @param sounddata : SoundData
-    /// @param path : string
+    /// @param sounddata SoundData
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2701,8 +2701,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setStereoWidth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the stereo width multiplier for a source (1.0 = normal, 0.0 = mono).
-    /// @param src : AudioSource
-    /// @param width : number
+    /// @param src Source
+    /// @param width number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2721,7 +2721,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getStereoWidth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the current stereo width for a source.
-    /// @param src : AudioSource
+    /// @param src Source
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -2740,9 +2740,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ setRandomPitch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets a random pitch range applied each time the source is played.
-    /// @param src : AudioSource
-    /// @param min : number
-    /// @param max : number
+    /// @param src Source
+    /// @param min number
+    /// @param max number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2761,7 +2761,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ clearRandomPitch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Clears any random pitch range on a source, restoring fixed pitch.
-    /// @param src : AudioSource
+    /// @param src Source
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2778,9 +2778,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ crossfade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Crossfades from one source to another over a duration.
-    /// @param from : AudioSource
-    /// @param to : AudioSource
-    /// @param duration : number
+    /// @param from Source
+    /// @param to Source
+    /// @param duration number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2806,7 +2806,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getBusPeak â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the peak signal level of the named bus (stub: always 0.0).
-    /// @param bus_name : string
+    /// @param bus_name string
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -2821,7 +2821,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getBusRms â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the RMS signal level of the named bus (stub: always 0.0).
-    /// @param bus_name : string
+    /// @param bus_name string
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -2836,8 +2836,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ newPool â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a polyphonic sound pool for the given file with N simultaneous voices.
-    /// @param file_path : string
-    /// @param voice_count : integer
+    /// @param file_path string
+    /// @param voice_count integer
     /// @return SoundPool
     let s = state.clone();
     tbl.set(
@@ -2857,9 +2857,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ processOffline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Applies a DSP effect chain to a WAV file and writes output.
-    /// @param input_path : string
-    /// @param output_path : string
-    /// @param effects : table  -- list of {type, p1, p2, p3}
+    /// @param input_path string
+    /// @param output_path string
+    /// @param effects table  -- list of {type, p1, p2, p3}
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2913,9 +2913,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ normalizeFile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Normalizes a WAV file peak amplitude to target_level and writes output.
-    /// @param input_path : string
-    /// @param output_path : string
-    /// @param target_level : number
+    /// @param input_path string
+    /// @param output_path string
+    /// @param target_level number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2934,10 +2934,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ waveformToPng â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Renders the waveform of a WAV file to a PNG image.
-    /// @param input_wav : string
-    /// @param output_png : string
-    /// @param width : integer
-    /// @param height : integer
+    /// @param input_wav string
+    /// @param output_png string
+    /// @param width integer
+    /// @param height integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -2958,10 +2958,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ spectrogramToPng â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Renders a time-frequency spectrogram of a WAV file to a PNG image.
-    /// @param input_wav : string
-    /// @param output_png : string
-    /// @param width : integer
-    /// @param height : integer
+    /// @param input_wav string
+    /// @param output_png string
+    /// @param width integer
+    /// @param height integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -3013,7 +3013,7 @@ impl mlua::UserData for SoundData {
         methods.add_method("getBitDepth", |_, this, ()| Ok(this.bit_depth()));
         // â”€â”€ getSample â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Get a specific sample by index.
-        /// @param index : integer
+        /// @param index integer
         /// @return number
         methods.add_method("getSample", |_, this, index: usize| {
             this.get_sample(index).ok_or_else(|| {
@@ -3023,15 +3023,15 @@ impl mlua::UserData for SoundData {
 
         // â”€â”€ drawWaveform â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Draws the waveform onto an ImageData buffer.
-        /// @param target : ImageData
-        /// @param x : integer
-        /// @param y : integer
-        /// @param w : integer
-        /// @param h : integer
-        /// @param r : integer
-        /// @param g : integer
-        /// @param b : integer
-        /// @param a : integer
+        /// @param target ImageData
+        /// @param x integer
+        /// @param y integer
+        /// @param w integer
+        /// @param h integer
+        /// @param r integer
+        /// @param g integer
+        /// @param b integer
+        /// @param a integer
         /// @return nil
         methods.add_method(
             "drawWaveform",
@@ -3056,8 +3056,8 @@ impl mlua::UserData for SoundData {
 
         // â”€â”€ setSample â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Set a specific sample by index.
-        /// @param index : integer
-        /// @param value : number
+        /// @param index integer
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setSample", |_, this, (index, value): (usize, f32)| {
             if this.set_sample(index, value) {

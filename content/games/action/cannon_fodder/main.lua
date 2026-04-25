@@ -92,6 +92,53 @@ local function spawn_explosion(x, y)
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Cannon Fodder — Lurek2D")
     lurek.render.setBackgroundColor(0.18, 0.32, 0.12)
@@ -247,50 +294,50 @@ function lurek.draw()
             local t = tile_at(col, row)
             if t == 1 then
                 lurek.render.setColor(0.22, 0.38, 0.12)
-                lurek.render.rectangle("fill", (col-1)*TILE, (row-1)*TILE, TILE, TILE)
+                rect("fill", (col-1)*TILE, (row-1)*TILE, TILE, TILE)
                 lurek.render.setColor(0.15, 0.26, 0.08)
-                lurek.render.rectangle("line", (col-1)*TILE, (row-1)*TILE, TILE, TILE)
+                rect("line", (col-1)*TILE, (row-1)*TILE, TILE, TILE)
             end
         end
     end
 
     -- Squad target marker
     lurek.render.setColor(1, 1, 0, 0.4)
-    lurek.render.circle("line", squad_target.x, squad_target.y, 14)
+    circ("line", squad_target.x, squad_target.y, 14)
 
     -- Enemies
     for _, e in ipairs(enemies) do
         local r = e.alert and 0.95 or 0.6
         lurek.render.setColor(r, 0.15, 0.15)
-        lurek.render.circle("fill", e.x, e.y, ENEMY_R)
+        circ("fill", e.x, e.y, ENEMY_R)
         if e.alert then
             lurek.render.setColor(1, 0.4, 0)
-            lurek.render.print("!", e.x - 2, e.y - ENEMY_R - 14)
+            text_("!", e.x - 2, e.y - ENEMY_R - 14)
         end
         -- HP pips
         for pip = 1, e.hp do
             lurek.render.setColor(0.1, 0.9, 0.1)
-            lurek.render.rectangle("fill", e.x - 8 + (pip-1)*9, e.y - ENEMY_R - 8, 7, 4)
+            rect("fill", e.x - 8 + (pip-1)*9, e.y - ENEMY_R - 8, 7, 4)
         end
     end
 
     -- Soldiers
     for i, s in ipairs(soldiers) do
         lurek.render.setColor(0.2, 0.6, 0.95)
-        lurek.render.circle("fill", s.x, s.y, SOLDIER_R)
+        circ("fill", s.x, s.y, SOLDIER_R)
         lurek.render.setColor(1, 1, 1)
-        lurek.render.print(tostring(i), s.x - 3, s.y - 5)
+        text_(tostring(i), s.x - 3, s.y - 5)
         -- HP pips
         for pip = 1, s.hp do
             lurek.render.setColor(0.1, 0.9, 0.1)
-            lurek.render.rectangle("fill", s.x - 12 + (pip-1)*9, s.y - SOLDIER_R - 8, 7, 4)
+            rect("fill", s.x - 12 + (pip-1)*9, s.y - SOLDIER_R - 8, 7, 4)
         end
     end
 
     -- Bullets
     lurek.render.setColor(1, 1, 0.3)
     for _, b in ipairs(bullets) do
-        lurek.render.circle("fill", b.x, b.y, BULLET_R)
+        circ("fill", b.x, b.y, BULLET_R)
     end
 
     -- Explosions
@@ -299,31 +346,31 @@ function lurek.draw()
         local r2   = prog * 30
         local alpha = 1 - prog
         lurek.render.setColor(1, 0.5, 0.1, alpha)
-        lurek.render.circle("fill", ex.x, ex.y, r2)
+        circ("fill", ex.x, ex.y, r2)
         lurek.render.setColor(1, 1, 0, alpha * 0.6)
-        lurek.render.circle("line", ex.x, ex.y, r2)
+        circ("line", ex.x, ex.y, r2)
     end
 
     -- HUD
     lurek.render.setColor(0, 0, 0, 0.55)
-    lurek.render.rectangle("fill", 0, 0, W, 26)
+    rect("fill", 0, 0, W, 26)
     lurek.render.setColor(0.2, 0.6, 0.95)
-    lurek.render.print(string.format("Squad: %d   Enemies: %d   Score: %d", #soldiers, #enemies, score), 10, 5)
+    text_(string.format("Squad: %d   Enemies: %d   Score: %d", #soldiers, #enemies, score), 10, 5)
 
     if state == STATE.WIN then
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", W/2 - 140, H/2 - 30, 280, 60)
+        rect("fill", W/2 - 140, H/2 - 30, 280, 60)
         lurek.render.setColor(0.2, 1, 0.4)
-        lurek.render.print("MISSION COMPLETE!", W/2 - 90, H/2 - 10, 0, 1.4)
+        text_("MISSION COMPLETE!", W/2 - 90, H/2 - 10, 0, 1.4)
         lurek.render.setColor(1,1,1)
-        lurek.render.print(string.format("Score: %d  (Esc to quit)", score), W/2 - 90, H/2 + 16)
+        text_(string.format("Score: %d  (Esc to quit)", score), W/2 - 90, H/2 + 16)
     elseif state == STATE.LOSE then
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", W/2 - 120, H/2 - 30, 240, 60)
+        rect("fill", W/2 - 120, H/2 - 30, 240, 60)
         lurek.render.setColor(1, 0.2, 0.2)
-        lurek.render.print("SQUAD ELIMINATED", W/2 - 85, H/2 - 10, 0, 1.4)
+        text_("SQUAD ELIMINATED", W/2 - 85, H/2 - 10, 0, 1.4)
         lurek.render.setColor(1,1,1)
-        lurek.render.print("Esc to quit", W/2 - 40, H/2 + 16)
+        text_("Esc to quit", W/2 - 40, H/2 + 16)
     end
 end
 

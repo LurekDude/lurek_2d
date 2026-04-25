@@ -72,18 +72,6 @@ const LUA_STDLIB_MODULES: { label: string; detail: string }[] = [
   { label: "package", detail: "Package library" },
 ];
 
-// ── Key names for input functions ────────────────────────────
-
-const KEY_NAMES = [
-  "space", "return", "escape", "up", "down", "left", "right",
-  "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
-  "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-  "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-  "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
-  "lshift", "rshift", "lctrl", "rctrl", "lalt", "ralt",
-  "tab", "backspace", "delete", "insert", "home", "end", "pageup", "pagedown",
-];
-
 // ── String context completion rules ──────────────────────────
 
 interface StringContextRule {
@@ -91,14 +79,71 @@ interface StringContextRule {
   values: { label: string; detail?: string }[];
 }
 
-const STRING_CONTEXT_RULES: StringContextRule[] = [
+function buildStringContextRules(apiData: ApiDataService): StringContextRule[] {
+  function enumVals(
+    name: string,
+    fallback: { label: string; detail?: string }[],
+  ): { label: string; detail?: string }[] {
+    const vals = apiData.getEnumValues(name);
+    return vals.length > 0 ? vals.map(v => ({ label: v, detail: name })) : fallback;
+  }
+
+  const keyNames = apiData.getKeyNames();
+  const keyVals: { label: string; detail?: string }[] = keyNames.length > 0
+    ? keyNames.map(k => ({ label: k, detail: "Key name" }))
+    : [
+        "space", "return", "escape", "up", "down", "left", "right",
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+        "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+        "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12",
+        "lshift", "rshift", "lctrl", "rctrl", "lalt", "ralt",
+        "tab", "backspace", "delete", "insert", "home", "end", "pageup", "pagedown",
+      ].map(k => ({ label: k, detail: "Key name" }));
+
+  const axisVals: { label: string; detail?: string }[] = (() => {
+    const axes = apiData.getGamepadAxes();
+    return axes.length > 0 ? axes.map(a => ({ label: a, detail: "Gamepad axis" })) : [
+      { label: "leftx", detail: "Left stick X axis" },
+      { label: "lefty", detail: "Left stick Y axis" },
+      { label: "rightx", detail: "Right stick X axis" },
+      { label: "righty", detail: "Right stick Y axis" },
+      { label: "triggerleft", detail: "Left trigger" },
+      { label: "triggerright", detail: "Right trigger" },
+    ];
+  })();
+
+  const buttonVals: { label: string; detail?: string }[] = (() => {
+    const buttons = apiData.getGamepadButtons();
+    return buttons.length > 0 ? buttons.map(b => ({ label: b, detail: "Gamepad button" })) : [
+      { label: "a", detail: "A button (Cross on PS)" },
+      { label: "b", detail: "B button (Circle on PS)" },
+      { label: "x", detail: "X button (Square on PS)" },
+      { label: "y", detail: "Y button (Triangle on PS)" },
+      { label: "back", detail: "Back / Select" },
+      { label: "start", detail: "Start / Options" },
+      { label: "leftshoulder", detail: "Left bumper (LB/L1)" },
+      { label: "rightshoulder", detail: "Right bumper (RB/R1)" },
+      { label: "lefttrigger", detail: "Left trigger (LT/L2)" },
+      { label: "righttrigger", detail: "Right trigger (RT/R2)" },
+      { label: "leftstick", detail: "Left stick click (LS/L3)" },
+      { label: "rightstick", detail: "Right stick click (RS/R3)" },
+      { label: "dpup", detail: "D-pad up" },
+      { label: "dpdown", detail: "D-pad down" },
+      { label: "dpleft", detail: "D-pad left" },
+      { label: "dpright", detail: "D-pad right" },
+      { label: "guide", detail: "Guide / Home button" },
+    ];
+  })();
+
+  return [
   {
     pattern: /lurek\.input\.(?:isDown|isUp)\s*\(\s*["']$/,
-    values: KEY_NAMES.map(k => ({ label: k, detail: "Key name" })),
+    values: keyVals,
   },
   {
     pattern: /lurek\.graphics\.setBlendMode\s*\(\s*["']$/,
-    values: [
+    values: enumVals("BlendMode", [
       { label: "alpha", detail: "Standard alpha blending" },
       { label: "add", detail: "Additive blending" },
       { label: "subtract", detail: "Subtractive blending" },
@@ -108,80 +153,80 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
       { label: "screen", detail: "Screen blending" },
       { label: "darken", detail: "Darken blending" },
       { label: "lighten", detail: "Lighten blending" },
-    ],
+    ]),
   },
   {
     pattern: /lurek\.graphics\.setLineCap\s*\(\s*["']$/,
-    values: [
+    values: enumVals("LineCap", [
       { label: "none", detail: "No line cap" },
       { label: "butt", detail: "Flat cap (default)" },
       { label: "square", detail: "Square cap extends past endpoint" },
       { label: "round", detail: "Rounded cap" },
-    ],
+    ]),
   },
   {
     pattern: /lurek\.graphics\.setLineJoin\s*\(\s*["']$/,
-    values: [
+    values: enumVals("LineJoin", [
       { label: "miter", detail: "Sharp join (default)" },
       { label: "bevel", detail: "Flat corner join" },
       { label: "none", detail: "No join" },
-    ],
+    ]),
   },
   {
     pattern: /lurek\.physics\.newBody\s*\([^)]*,\s*["']$/,
-    values: [
+    values: enumVals("BodyType", [
       { label: "static", detail: "Immovable body" },
       { label: "dynamic", detail: "Fully simulated body" },
       { label: "kinematic", detail: "Moved by code, not forces" },
-    ],
+    ]),
   },
   {
     pattern: /lurek\.audio\.newSource\s*\([^)]*,\s*["']$/,
-    values: [
+    values: enumVals("SourceType", [
       { label: "static", detail: "Load entirely into memory" },
       { label: "stream", detail: "Stream from disk" },
-    ],
+    ]),
   },
   {
     pattern: /:setFilter\s*\(\s*["']$/,
-    values: [
+    values: enumVals("FilterMode", [
       { label: "nearest", detail: "Pixel-perfect (no filtering)" },
       { label: "linear", detail: "Smooth bilinear filtering" },
-    ],
+    ]),
   },
   {
     pattern: /:setWrap\s*\(\s*["']$/,
-    values: [
+    values: enumVals("WrapMode", [
       { label: "clamp", detail: "Clamp to edge" },
       { label: "clampzero", detail: "Clamp to transparent" },
       { label: "repeat", detail: "Tile texture" },
       { label: "mirroredrepeat", detail: "Tile with mirroring" },
-    ],
+    ]),
   },
   {
     pattern: /lurek\.graphics\.setDefaultFilter\s*\(\s*["']$/,
-    values: [
+    values: enumVals("FilterMode", [
       { label: "nearest", detail: "Pixel-perfect (no filtering)" },
       { label: "linear", detail: "Smooth bilinear filtering" },
-    ],
+    ]),
   },
   {
     pattern: /lurek\.graphics\.setLineStyle\s*\(\s*["']$/,
-    values: [
+    values: enumVals("LineStyle", [
       { label: "rough", detail: "Aliased line" },
       { label: "smooth", detail: "Anti-aliased line" },
-    ],
+    ]),
   },
   {
     pattern: /lurek\.graphics\.(?:rectangle|circle|polygon|ellipse|arc)\s*\(\s*["']$/,
-    values: [
+    values: enumVals("DrawMode", [
       { label: "fill", detail: "Filled shape" },
       { label: "line", detail: "Outlined shape" },
-    ],
+    ]),
   },
   {
     pattern: /(?:easing|ease|tween)\s*[=:]\s*["']$|lurek\.tween\.\w+\s*\([^)]*["']$/i,
-    values: [
+    values: enumVals("EasingFunction", [
       { label: "linear", detail: "Constant speed" },
       { label: "inQuad", detail: "Accelerating (quadratic)" },
       { label: "outQuad", detail: "Decelerating (quadratic)" },
@@ -206,23 +251,23 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
       { label: "outBounce", detail: "Bounce on end" },
       { label: "inElastic", detail: "Elastic spring start" },
       { label: "outElastic", detail: "Elastic spring end" },
-    ],
+    ]),
   },
   // ── I1 additions ────────────────────────────────────────────
   {
     // lurek.render.printf 5th arg: alignment
     pattern: /lurek\.render\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']$/,
-    values: [
+    values: enumVals("TextAlign", [
       { label: "left", detail: "Left-aligned text" },
       { label: "center", detail: "Center-aligned text" },
       { label: "right", detail: "Right-aligned text" },
       { label: "justify", detail: "Justified text" },
-    ],
+    ]),
   },
   {
     // lurek.render.setStencilTest mode
     pattern: /lurek\.render\.(?:setStencilTest|stencil)\s*\([^)]*["']$/,
-    values: [
+    values: enumVals("CompareMode", [
       { label: "greater", detail: "Draw where stencil > value" },
       { label: "greaterequal", detail: "Draw where stencil >= value" },
       { label: "less", detail: "Draw where stencil < value" },
@@ -231,56 +276,31 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
       { label: "notequal", detail: "Draw where stencil != value" },
       { label: "always", detail: "Always draw" },
       { label: "never", detail: "Never draw" },
-    ],
+    ]),
   },
   {
     // lurek.input.getAxis / isGamepadDown axis name
     pattern: /lurek\.input\.(?:getAxis|isGamepadAxis)\s*\([^)]*,\s*["']$/,
-    values: [
-      { label: "leftx", detail: "Left stick X axis" },
-      { label: "lefty", detail: "Left stick Y axis" },
-      { label: "rightx", detail: "Right stick X axis" },
-      { label: "righty", detail: "Right stick Y axis" },
-      { label: "triggerleft", detail: "Left trigger" },
-      { label: "triggerright", detail: "Right trigger" },
-    ],
+    values: axisVals,
   },
   {
     // Gamepad button names
     pattern: /lurek\.input\.(?:isGamepadDown|isGamepadUp|wasGamepadPressed)\s*\([^)]*,\s*["']$/,
-    values: [
-      { label: "a", detail: "A button (Cross on PS)" },
-      { label: "b", detail: "B button (Circle on PS)" },
-      { label: "x", detail: "X button (Square on PS)" },
-      { label: "y", detail: "Y button (Triangle on PS)" },
-      { label: "back", detail: "Back / Select" },
-      { label: "start", detail: "Start / Options" },
-      { label: "leftshoulder", detail: "Left bumper (LB/L1)" },
-      { label: "rightshoulder", detail: "Right bumper (RB/R1)" },
-      { label: "lefttrigger", detail: "Left trigger (LT/L2)" },
-      { label: "righttrigger", detail: "Right trigger (RT/R2)" },
-      { label: "leftstick", detail: "Left stick click (LS/L3)" },
-      { label: "rightstick", detail: "Right stick click (RS/R3)" },
-      { label: "dpup", detail: "D-pad up" },
-      { label: "dpdown", detail: "D-pad down" },
-      { label: "dpleft", detail: "D-pad left" },
-      { label: "dpright", detail: "D-pad right" },
-      { label: "guide", detail: "Guide / Home button" },
-    ],
+    values: buttonVals,
   },
   {
     // lurek.render.setArcType / arc type
     pattern: /lurek\.render\.arc\s*\(\s*["']$/,
-    values: [
+    values: enumVals("ArcType", [
       { label: "pie", detail: "Pie-slice arc" },
       { label: "open", detail: "Open arc (lines to centre not drawn)" },
       { label: "closed", detail: "Arc with closing chord" },
-    ],
+    ]),
   },
   {
     // lurek.audio setEffect type
     pattern: /lurek\.audio\.(?:setEffect|newEffect)\s*\([^)]*,\s*["']$/,
-    values: [
+    values: enumVals("EffectType", [
       { label: "reverb", detail: "Reverb / room effect" },
       { label: "delay", detail: "Echo delay" },
       { label: "chorus", detail: "Chorus doubling effect" },
@@ -292,39 +312,10 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
       { label: "bandpass", detail: "Band-pass filter" },
       { label: "lowpass", detail: "Low-pass filter" },
       { label: "highpass", detail: "High-pass filter" },
-    ],
+    ]),
   },
-];
-
-// ── Constructor → object type mapping ────────────────────────
-
-const CONSTRUCTOR_RETURN_TYPES: Record<string, string> = {
-  // lurek.render.* is the current API namespace
-  "lurek.render.newImage": "Image",
-  "lurek.render.newCanvas": "Canvas",
-  "lurek.render.newFont": "Font",
-  "lurek.render.newShader": "Shader",
-  "lurek.render.newQuad": "Quad",
-  "lurek.render.newMesh": "Mesh",
-  "lurek.render.newSpriteBatch": "SpriteBatch",
-  "lurek.render.newParticleSystem": "ParticleSystem",
-  "lurek.render.newImageData": "ImageData",
-  "lurek.audio.newSource": "Source",
-  "lurek.physics.newWorld": "World",
-  "lurek.physics.newBody": "Body",
-  "lurek.physics.newFixture": "Fixture",
-  "lurek.physics.newRectangleShape": "Shape",
-  "lurek.physics.newCircleShape": "Shape",
-  "lurek.physics.newPolygonShape": "Shape",
-  "lurek.physics.newEdgeShape": "Shape",
-  "lurek.physics.newChainShape": "Shape",
-  "lurek.physics.newDistanceJoint": "Joint",
-  "lurek.physics.newRevoluteJoint": "Joint",
-  "lurek.physics.newPrismaticJoint": "Joint",
-  "lurek.physics.newWeldJoint": "Joint",
-  "lurek.thread.newChannel": "Channel",
-  "lurek.thread.newThread": "Thread",
-};
+  ];
+}
 
 // ── Frequently used functions (sort boost) ───────────────────
 
@@ -389,6 +380,20 @@ function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/** Given a factory function full-path like "lurek.graph.newGraph", try to guess the return type
+ *  by stripping the "new" prefix: "newGraph" → "Graph". Returns the type name if it has methods,
+ *  otherwise undefined. */
+function inferTypeFromFunctionName(fnName: string, apiData: ApiDataService): string | undefined {
+  const baseName = fnName.replace(/^new/, ""); // e.g. "newGraph" → "Graph"
+  if (baseName && baseName !== fnName) {
+    if (apiData.getMethods(baseName).length > 0) return baseName;
+    // Also try capitalised variant
+    const cap = baseName.charAt(0).toUpperCase() + baseName.slice(1);
+    if (cap !== baseName && apiData.getMethods(cap).length > 0) return cap;
+  }
+  return undefined;
+}
+
 function inferObjectType(
   document: vscode.TextDocument,
   position: vscode.Position,
@@ -402,13 +407,19 @@ function inferObjectType(
     );
     if (assignMatch) {
       const constructorPath = assignMatch[1];
-      const objType = CONSTRUCTOR_RETURN_TYPES[constructorPath];
-      if (objType) return objType;
       const fn = apiData.getFunction(constructorPath);
+      // Primary: use explicit returnType from JSON
       if (fn?.returnType) {
         const methods = apiData.getMethods(fn.returnType);
         if (methods.length > 0) return fn.returnType;
       }
+      // Fallback: infer from factory function name (e.g. newGraph → Graph)
+      const shortName = constructorPath.split(".").pop() ?? "";
+      const inferred = inferTypeFromFunctionName(shortName, apiData);
+      if (inferred) return inferred;
+      // Also try via factory types map
+      const factoryType = apiData.getFactoryTypes().get(constructorPath);
+      if (factoryType && apiData.getMethods(factoryType).length > 0) return factoryType;
     }
   }
   // Check if the name itself is a known object type
@@ -524,6 +535,37 @@ export function register(
               }
               return item;
             });
+        }
+
+        // ── E': Dot method/field completions on typed objects (e.g. aaa.method) ──
+        const dotObjMatch = before.match(/\b(\w+)\.(\w*)$/);
+        if (dotObjMatch) {
+          const objName = dotObjMatch[1];
+          const partial = dotObjMatch[2].toLowerCase();
+          // Skip: already handled by earlier lurek.module and stdlib branches
+          if (objName !== "lurek" && ![
+            "string", "table", "math", "os", "io",
+            "coroutine", "debug", "package", "utf8", "bit", "jit", "ffi",
+          ].includes(objName)) {
+            const objectType = inferObjectType(document, position, objName, apiData);
+            if (objectType) {
+              const methods = apiData.getMethods(objectType);
+              const items: vscode.CompletionItem[] = [];
+              for (const m of methods) {
+                if (partial && !m.name.toLowerCase().startsWith(partial)) continue;
+                const item = new vscode.CompletionItem(
+                  m.name,
+                  m.isMethod ? vscode.CompletionItemKind.Method : vscode.CompletionItemKind.Field,
+                );
+                item.detail = m.signature;
+                item.documentation = buildFunctionDoc(m);
+                item.insertText = new vscode.SnippetString(buildSnippet(m));
+                if (m.deprecated) item.tags = [vscode.CompletionItemTag.Deprecated];
+                items.push(item);
+              }
+              if (items.length > 0) return items;
+            }
+          }
         }
 
         // ── F: Method completions after `:` ──
@@ -650,6 +692,8 @@ export function register(
 
   // ── G: String context completions (`, " triggers) ──
 
+  const stringContextRules = buildStringContextRules(apiData);
+
   const stringProvider = vscode.languages.registerCompletionItemProvider(
     LUA_SELECTOR,
     {
@@ -658,7 +702,7 @@ export function register(
         position: vscode.Position,
       ): vscode.CompletionItem[] | undefined {
         const before = document.lineAt(position).text.substring(0, position.character);
-        for (const rule of STRING_CONTEXT_RULES) {
+        for (const rule of stringContextRules) {
           if (rule.pattern.test(before)) {
             return rule.values.map(v => {
               const item = new vscode.CompletionItem(v.label, vscode.CompletionItemKind.EnumMember);

@@ -44,6 +44,8 @@ local title_blink = 0
 local victory_time = 0
 local particles = {}
 local tweens_list = {}
+---@type any
+local _cam = nil
 
 -- Town definitions: gx, gy, name, produces, wants
 local TOWN_DEFS = {
@@ -379,8 +381,56 @@ lurek.input.bind("speed2", "2")
 lurek.input.bind("speed3", "3")
 lurek.input.bind("quit", "escape")
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Railroad — Lurek2D")
+    _cam = lurek.camera.new()
     generate_map()
 end
 
@@ -420,7 +470,7 @@ function lurek.process(dt)
         if #stations >= 2 and #trains < MAX_TRAINS and gold >= 100 then
             mode = "track"
             -- find a station near mouse or use first available pair
-            local mx, my = lurek.input.mouse.getPosition()
+            local mx, my = lurek.input.getPosition()
             local gx = math.floor((mx - MAP_X) / TILE)
             local gy = math.floor((my - MAP_Y) / TILE)
             local nearest = nil
@@ -437,10 +487,10 @@ function lurek.process(dt)
 
     -- Click handling
     if lurek.input.wasActionPressed("place") and not route_pick then
-        local mx, my = lurek.input.mouse.getPosition()
+        local mx, my = lurek.input.getPosition()
         handle_click(mx, my)
     elseif lurek.input.wasActionPressed("place") and route_pick then
-        local mx, my = lurek.input.mouse.getPosition()
+        local mx, my = lurek.input.getPosition()
         handle_click(mx, my)
     end
 
@@ -516,36 +566,36 @@ function lurek.draw()
             local px, py = MAP_X + gx * TILE, MAP_Y + gy * TILE
             if t == T_GRASS then
                 lurek.render.setColor(0.25, 0.45, 0.2, 1)
-                lurek.render.rectangle(px, py, TILE, TILE)
+                rect(px, py, TILE, TILE)
                 -- grass texture hint
                 if (gx + gy) % 3 == 0 then
                     lurek.render.setColor(0.28, 0.50, 0.22, 1)
-                    lurek.render.rectangle(px + 4, py + 4, 4, 4)
+                    rect(px + 4, py + 4, 4, 4)
                 end
             elseif t == T_WATER then
                 lurek.render.setColor(0.15, 0.35, 0.65, 1)
-                lurek.render.rectangle(px, py, TILE, TILE)
+                rect(px, py, TILE, TILE)
                 lurek.render.setColor(0.2, 0.4, 0.7, 0.5)
-                lurek.render.rectangle(px + 8, py + 12, 16, 4)
+                rect(px + 8, py + 12, 16, 4)
             elseif t == T_MOUNTAIN then
                 lurek.render.setColor(0.45, 0.40, 0.35, 1)
-                lurek.render.rectangle(px, py, TILE, TILE)
+                rect(px, py, TILE, TILE)
                 lurek.render.setColor(0.55, 0.50, 0.45, 1)
-                lurek.render.rectangle(px + 8, py + 4, 16, 12)
+                rect(px + 8, py + 4, 16, 12)
                 lurek.render.setColor(0.7, 0.7, 0.7, 1)
-                lurek.render.rectangle(px + 12, py + 2, 8, 6)
+                rect(px + 12, py + 2, 8, 6)
             elseif t == T_TOWN then
                 lurek.render.setColor(0.55, 0.42, 0.3, 1)
-                lurek.render.rectangle(px, py, TILE, TILE)
+                rect(px, py, TILE, TILE)
                 -- building
                 lurek.render.setColor(0.7, 0.55, 0.4, 1)
-                lurek.render.rectangle(px + 6, py + 6, 20, 20)
+                rect(px + 6, py + 6, 20, 20)
                 lurek.render.setColor(0.85, 0.7, 0.5, 1)
-                lurek.render.rectangle(px + 10, py + 10, 12, 12)
+                rect(px + 10, py + 10, 12, 12)
             end
             -- grid line
             lurek.render.setColor(0, 0, 0, 0.1)
-            lurek.render.rectangle(px, py, TILE, TILE)
+            rect(px, py, TILE, TILE)
         end
     end
 
@@ -556,7 +606,7 @@ function lurek.draw()
         local a = tr.anim or 1
         -- rail bed
         lurek.render.setColor(0.35, 0.3, 0.25, a)
-        lurek.render.rectangle(px + 4, py + 4, TILE - 8, TILE - 8)
+        rect(px + 4, py + 4, TILE - 8, TILE - 8)
         -- rail lines based on neighbors
         local nb = track_neighbors(tr.gx, tr.gy)
         lurek.render.setColor(0.5, 0.5, 0.5, a)
@@ -566,23 +616,23 @@ function lurek.draw()
             local cx, cy = px + TILE / 2, py + TILE / 2
             if dx ~= 0 then
                 -- horizontal rail
-                lurek.render.rectangle(cx - 2, cy - 6, TILE / 2 * dx + 4, 3)
-                lurek.render.rectangle(cx - 2, cy + 3, TILE / 2 * dx + 4, 3)
+                rect(cx - 2, cy - 6, TILE / 2 * dx + 4, 3)
+                rect(cx - 2, cy + 3, TILE / 2 * dx + 4, 3)
             end
             if dy ~= 0 then
                 -- vertical rail
-                lurek.render.rectangle(cx - 6, cy - 2, 3, TILE / 2 * dy + 4)
-                lurek.render.rectangle(cx + 3, cy - 2, 3, TILE / 2 * dy + 4)
+                rect(cx - 6, cy - 2, 3, TILE / 2 * dy + 4)
+                rect(cx + 3, cy - 2, 3, TILE / 2 * dy + 4)
             end
         end
         if #nb == 0 then
             -- isolated track piece
-            lurek.render.rectangle(px + 8, py + TILE / 2 - 1, TILE - 16, 3)
+            rect(px + 8, py + TILE / 2 - 1, TILE - 16, 3)
         end
         -- crossties
         lurek.render.setColor(0.4, 0.3, 0.2, a)
-        lurek.render.rectangle(px + 6, py + 8, 3, TILE - 16)
-        lurek.render.rectangle(px + TILE - 9, py + 8, 3, TILE - 16)
+        rect(px + 6, py + 8, 3, TILE - 16)
+        rect(px + TILE - 9, py + 8, 3, TILE - 16)
     end
 
     -- Draw signals
@@ -591,10 +641,10 @@ function lurek.draw()
         local py = MAP_Y + sig.gy * TILE + 2
         -- pole
         lurek.render.setColor(0.3, 0.3, 0.3, 1)
-        lurek.render.rectangle(px - 1, py, 3, TILE - 4)
+        rect(px - 1, py, 3, TILE - 4)
         -- light
         lurek.render.setColor(0.1, 0.9, 0.1, 1)
-        lurek.render.rectangle(px - 3, py, 7, 7)
+        rect(px - 3, py, 7, 7)
     end
 
     -- Draw stations
@@ -602,14 +652,14 @@ function lurek.draw()
         local px = MAP_X + st.gx * TILE
         local py = MAP_Y + st.gy * TILE
         lurek.render.setColor(0.8, 0.7, 0.2, 1)
-        lurek.render.rectangle(px + 2, py + 2, TILE - 4, TILE - 4)
+        rect(px + 2, py + 2, TILE - 4, TILE - 4)
         lurek.render.setColor(0.9, 0.85, 0.4, 1)
-        lurek.render.rectangle(px + 6, py + 6, TILE - 12, TILE - 12)
+        rect(px + 6, py + 6, TILE - 12, TILE - 12)
         -- S marker
         lurek.render.setColor(0.2, 0.1, 0, 1)
-        lurek.render.rectangle(px + 12, py + 10, 8, 3)
-        lurek.render.rectangle(px + 12, py + 15, 8, 3)
-        lurek.render.rectangle(px + 12, py + 20, 8, 3)
+        rect(px + 12, py + 10, 8, 3)
+        rect(px + 12, py + 15, 8, 3)
+        rect(px + 12, py + 20, 8, 3)
     end
 
     -- Draw town names
@@ -617,13 +667,13 @@ function lurek.draw()
         local px = MAP_X + tw.gx * TILE + TILE / 2
         local py = MAP_Y + tw.gy * TILE - 12
         lurek.render.setColor(1, 1, 1, 0.9)
-        lurek.render.print(tw.name, px - 20, py)
+        text_(tw.name, px - 20, py)
         -- stock indicator
         if tw.stock > 0 then
             local gc = GOOD_COLORS[tw.produces]
             for i = 1, tw.stock do
                 lurek.render.setColor(gc[1], gc[2], gc[3], 1)
-                lurek.render.rectangle(
+                rect(
                     MAP_X + tw.gx * TILE + TILE + 2,
                     MAP_Y + tw.gy * TILE + (i - 1) * 6,
                     5, 4)
@@ -636,22 +686,22 @@ function lurek.draw()
         local c = tr.color
         -- body
         lurek.render.setColor(c[1], c[2], c[3], 1)
-        lurek.render.rectangle(tr.x - 8, tr.y - 5, 16, 10)
+        rect(tr.x - 8, tr.y - 5, 16, 10)
         -- cabin
         lurek.render.setColor(c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 1)
-        lurek.render.rectangle(tr.x - 5, tr.y - 7, 10, 3)
+        rect(tr.x - 5, tr.y - 7, 10, 3)
         -- cargo indicator
         if tr.carrying then
             local gc = GOOD_COLORS[tr.carrying]
             lurek.render.setColor(gc[1], gc[2], gc[3], 1)
-            lurek.render.rectangle(tr.x - 3, tr.y - 3, 6, 6)
+            rect(tr.x - 3, tr.y - 3, 6, 6)
         end
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
         lurek.render.setColor(p.r, p.g, p.b, p.a)
-        lurek.render.rectangle(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        rect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -662,55 +712,55 @@ function lurek.draw_ui()
     if state == STATE_TITLE then
         -- Title screen
         lurek.render.setColor(0.9, 0.8, 0.3, 1)
-        lurek.render.print("R A I L R O A D", 260, 180)
+        text_("R A I L R O A D", 260, 180)
         local blink_a = 0.5 + 0.5 * math.sin(title_blink * 3)
         lurek.render.setColor(0.8, 0.8, 0.8, blink_a)
-        lurek.render.print("BUILD YOUR NETWORK", 270, 240)
+        text_("BUILD YOUR NETWORK", 270, 240)
         lurek.render.setColor(0.6, 0.6, 0.6, 1)
-        lurek.render.print("Click to start", 320, 320)
+        text_("Click to start", 320, 320)
         lurek.render.setColor(0.4, 0.4, 0.4, 1)
-        lurek.render.print("S=Station  T=Train  G=Signal  1/2/3=Speed", 180, 400)
+        text_("S=Station  T=Train  G=Signal  1/2/3=Speed", 180, 400)
         return
     end
 
     if state == STATE_VICTORY then
         lurek.render.setColor(1, 0.85, 0.1, 1)
-        lurek.render.print("VICTORY!", 340, 200)
+        text_("VICTORY!", 340, 200)
         lurek.render.setColor(0.9, 0.9, 0.9, 1)
-        lurek.render.print("You connected all towns and earned 1000 gold!", 180, 260)
-        lurek.render.print("Revenue: " .. total_revenue .. "  Expense: " .. total_expense, 240, 310)
+        text_("You connected all towns and earned 1000 gold!", 180, 260)
+        text_("Revenue: " .. total_revenue .. "  Expense: " .. total_expense, 240, 310)
         lurek.render.setColor(0.6, 0.6, 0.6, 1)
-        lurek.render.print("Press Escape to quit", 300, 400)
+        text_("Press Escape to quit", 300, 400)
         return
     end
 
     -- HUD background
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.rectangle(0, GRID_H * TILE, 800, 600 - GRID_H * TILE)
+    rect(0, GRID_H * TILE, 800, 600 - GRID_H * TILE)
 
     local hud_y = GRID_H * TILE + 4
 
     -- Gold
     lurek.render.setColor(1, 0.85, 0.2, 1)
-    lurek.render.print("Gold: " .. gold, 10, hud_y)
+    text_("Gold: " .. gold, 10, hud_y)
 
     -- Revenue / Expense
     lurek.render.setColor(0.5, 0.9, 0.5, 1)
-    lurek.render.print("Rev: " .. total_revenue, 140, hud_y)
+    text_("Rev: " .. total_revenue, 140, hud_y)
     lurek.render.setColor(0.9, 0.5, 0.5, 1)
-    lurek.render.print("Exp: " .. total_expense, 250, hud_y)
+    text_("Exp: " .. total_expense, 250, hud_y)
 
     -- Trains
     lurek.render.setColor(0.7, 0.8, 1, 1)
-    lurek.render.print("Trains: " .. #trains .. "/" .. MAX_TRAINS, 360, hud_y)
+    text_("Trains: " .. #trains .. "/" .. MAX_TRAINS, 360, hud_y)
 
     -- Stations
     lurek.render.setColor(0.8, 0.7, 0.2, 1)
-    lurek.render.print("Stations: " .. #stations, 500, hud_y)
+    text_("Stations: " .. #stations, 500, hud_y)
 
     -- Speed
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("Speed: x" .. game_speed, 630, hud_y)
+    text_("Speed: x" .. game_speed, 630, hud_y)
 
     -- Mode indicator
     local mode_text = "Mode: TRACK (click)"
@@ -722,25 +772,25 @@ function lurek.draw_ui()
         mode_text = "Mode: SIGNAL (click track)"
     end
     lurek.render.setColor(1, 1, 0.6, 1)
-    lurek.render.print(mode_text, 10, hud_y + 18)
+    text_(mode_text, 10, hud_y + 18)
 
     -- Goal tracker
     local goal_pct = math.min(gold / 1000, 1) * 100
     lurek.render.setColor(0.6, 0.6, 0.6, 1)
-    lurek.render.print(string.format("Goal: %d/1000 gold (%.0f%%)", gold, goal_pct), 360, hud_y + 18)
+    text_(string.format("Goal: %d/1000 gold (%.0f%%)", gold, goal_pct), 360, hud_y + 18)
 
     -- FPS
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.5, 0.5, 0.5, 1)
-    lurek.render.print("FPS: " .. fps, 740, hud_y + 18)
+    text_("FPS: " .. fps, 740, hud_y + 18)
 
     -- Goods legend (bottom right)
     for i = 1, 3 do
         local gc = GOOD_COLORS[i]
         lurek.render.setColor(gc[1], gc[2], gc[3], 1)
-        lurek.render.rectangle(640, hud_y + 36 + (i - 1) * 14, 10, 10)
+        rect(640, hud_y + 36 + (i - 1) * 14, 10, 10)
         lurek.render.setColor(0.8, 0.8, 0.8, 1)
-        lurek.render.print(GOOD_NAMES[i], 655, hud_y + 35 + (i - 1) * 14)
+        text_(GOOD_NAMES[i], 655, hud_y + 35 + (i - 1) * 14)
     end
 
     -- Town info
@@ -748,7 +798,7 @@ function lurek.draw_ui()
         local prodName = GOOD_NAMES[tw.produces]
         local wantName = GOOD_NAMES[tw.wants]
         lurek.render.setColor(0.7, 0.7, 0.7, 1)
-        lurek.render.print(tw.name .. ": " .. prodName .. "→" .. wantName ..
+        text_(tw.name .. ": " .. prodName .. "→" .. wantName ..
             " [" .. tw.stock .. "]", 10, hud_y + 36 + (i - 1) * 14)
     end
 end

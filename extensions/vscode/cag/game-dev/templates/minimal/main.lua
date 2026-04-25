@@ -6,7 +6,7 @@ function lurek.process(dt)
     -- Game logic here
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.1, 0.1, 0.15)
     lurek.render.print("Hello, Lurek2D!", 320, 280)
 end

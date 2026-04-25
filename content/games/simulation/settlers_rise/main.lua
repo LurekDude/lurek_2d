@@ -129,7 +129,7 @@ local function gen_map(seed)
     for r = 1, MAP_ROWS do
         tilemap[r] = {}
         for c = 1, MAP_COLS do
-            local n  = (ng:noise(c * 0.18, r * 0.18) + 1) * 0.5
+            local n  = (ng:perlin2d(c * 0.18, r * 0.18) + 1) * 0.5
             local t
             if r == 1 or r == MAP_ROWS or c == 1 or c == MAP_COLS then
                 t = 4   -- water border
@@ -157,6 +157,53 @@ local function gen_map(seed)
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Settlers Rise — Lurek2D")
     lurek.render.setBackgroundColor(0.25, 0.45, 0.2)
@@ -168,10 +215,12 @@ function lurek.init()
     tilemap[hq_row][hq_col] = 3
 
     -- Build pathfinding grid (walkable = not water)
-    pf_grid = lurek.pathfind.newNavGrid(MAP_COLS, MAP_ROWS, function(c, r)
-        local t = tile_at(c, r)
-        return t ~= 4
-    end)
+    pf_grid = lurek.pathfind.newNavGrid(MAP_COLS, MAP_ROWS)
+    for r = 1, MAP_ROWS do
+        for c = 1, MAP_COLS do
+            pf_grid:setBlocked(c, r, tile_at(c, r) == 4)
+        end
+    end
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────
@@ -226,10 +275,10 @@ function lurek.draw()
             local t  = tilemap[r][c]
             local tc = TILE_COLORS[t] or TILE_COLORS[0]
             lurek.render.setColor(tc[1], tc[2], tc[3])
-            lurek.render.rectangle("fill", (c-1)*TILE, (r-1)*TILE, TILE, TILE)
+            rect("fill", (c-1)*TILE, (r-1)*TILE, TILE, TILE)
             -- subtle grid
             lurek.render.setColor(0, 0, 0, 0.08)
-            lurek.render.rectangle("line", (c-1)*TILE, (r-1)*TILE, TILE, TILE)
+            rect("line", (c-1)*TILE, (r-1)*TILE, TILE, TILE)
         end
     end
 
@@ -239,29 +288,29 @@ function lurek.draw()
         local by = (b.row-1)*TILE
         local bc = BUILD_COLORS[b.type] or {0.8,0.8,0.8}
         lurek.render.setColor(bc[1], bc[2], bc[3])
-        lurek.render.rectangle("fill", bx + 6, by + 6, TILE - 12, TILE - 12)
+        rect("fill", bx + 6, by + 6, TILE - 12, TILE - 12)
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.rectangle("line", bx + 6, by + 6, TILE - 12, TILE - 12)
+        rect("line", bx + 6, by + 6, TILE - 12, TILE - 12)
         -- Label
         lurek.render.setColor(0, 0, 0, 0.8)
         local short = b.type:sub(1, 2)
-        lurek.render.print(short, bx + 14, by + 16)
+        text_(short, bx + 14, by + 16)
         -- Produce progress bar
         if b.type ~= BTYPE.HQ then
             local pt  = PRODUCE_TIMES[b.type] or 1
             local prog = b.timer / pt
             lurek.render.setColor(0.1, 0.8, 0.3, 0.9)
-            lurek.render.rectangle("fill", bx + 4, by + TILE - 8, (TILE - 8) * prog, 5)
+            rect("fill", bx + 4, by + TILE - 8, (TILE - 8) * prog, 5)
         end
     end
 
     -- Settlers
     for _, s in ipairs(settlers) do
         lurek.render.setColor(0.95, 0.85, 0.55)
-        lurek.render.circle("fill", s.x, s.y, 5)
+        circ("fill", s.x, s.y, 5)
         lurek.render.setColor(0, 0, 0, 0.6)
         if s.carry then
-            lurek.render.print(s.carry:sub(1,2), s.x + 4, s.y - 10)
+            text_(s.carry:sub(1,2), s.x + 4, s.y - 10)
         end
     end
 
@@ -272,25 +321,25 @@ function lurek.draw()
     if hr <= MAP_ROWS and my < MAP_ROWS * TILE then
         local can = can_build(hc, hr) and not building_at(hc, hr)
         lurek.render.setColor(1, 1, 0, can and 0.35 or 0.15)
-        lurek.render.rectangle("fill", (hc-1)*TILE, (hr-1)*TILE, TILE, TILE)
+        rect("fill", (hc-1)*TILE, (hr-1)*TILE, TILE, TILE)
     end
 
     -- UI panel
     lurek.render.setColor(0.12, 0.12, 0.12, 0.88)
-    lurek.render.rectangle("fill", 0, H - UI_H, W, UI_H)
+    rect("fill", 0, H - UI_H, W, UI_H)
     lurek.render.setColor(0.9, 0.85, 0.55)
-    lurek.render.print(string.format("Wood:%d  Stone:%d  Food:%d  Logs:%d  Iron:%d",
+    text_(string.format("Wood:%d  Stone:%d  Food:%d  Logs:%d  Iron:%d",
         resources.wood, resources.stone, resources.food, resources.logs, resources.iron), 10, H - UI_H + 8)
     -- Selected build type
     local sel = BUILD_ORDER[build_index]
     local sc  = COSTS[sel]
     lurek.render.setColor(0.7, 0.9, 1)
-    lurek.render.print(string.format("[Tab] Build: %s  (cost: wood%d stone%d)  [LMB place]",
+    text_(string.format("[Tab] Build: %s  (cost: wood%d stone%d)  [LMB place]",
         sel, sc.wood, sc.stone), 10, H - UI_H + 30)
 
     -- Settler count badge
     lurek.render.setColor(0.2, 0.7, 0.4)
-    lurek.render.print("Settlers: " .. #settlers, W - 160, H - UI_H + 20)
+    text_("Settlers: " .. #settlers, W - 160, H - UI_H + 20)
 end
 
 -- ── Mousepressed ──────────────────────────────────────────────────────────

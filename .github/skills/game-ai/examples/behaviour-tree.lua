@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 local npc = world:newAgent("npc", x, y)
 local bt  = npc:useBt()
 

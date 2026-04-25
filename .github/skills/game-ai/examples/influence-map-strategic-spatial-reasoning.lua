@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 local imap = lurek.pathfind.newInfluenceMap(40, 30, 16)
 
 -- Add named layers

@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Usage in game scripts:
 local T = require("lib/telemetry")
 T.init()

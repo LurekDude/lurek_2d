@@ -15,7 +15,7 @@ function lurek.process(dt)
     dialog:update(dt)
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.08, 0.06, 0.12)
     -- Background area
     lurek.render.setColor(0.15, 0.1, 0.2, 1)

@@ -203,17 +203,65 @@ end
 -- Callbacks
 -- ============================================================================
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h, i)
+    if type(a) == "string" then
+        if type(f) == "number" then _gfx.setColor(f, g or 1, h or 1, i or 1) end
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Cannon Fodder — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.2, 0.05)
 
-    lurek.input.isActionDown("up",      {"w", "up"})
-    lurek.input.isActionDown("down",    {"s", "down"})
-    lurek.input.isActionDown("left",    {"a", "left"})
-    lurek.input.isActionDown("right",   {"d", "right"})
-    lurek.input.isActionDown("fire",    {"space"})
-    lurek.input.isActionDown("grenade", {"g"})
-    lurek.input.isActionDown("quit",    {"escape"})
+    lurek.input.bind("up",      {"w", "up"})
+    lurek.input.bind("down",    {"s", "down"})
+    lurek.input.bind("left",    {"a", "left"})
+    lurek.input.bind("right",   {"d", "right"})
+    lurek.input.bind("fire",    {"space"})
+    lurek.input.bind("grenade", {"g"})
+    lurek.input.bind("quit",    {"escape"})
 end
 
 local function _ready_setup()
@@ -570,34 +618,34 @@ function lurek.draw()
     -- Ground — dark jungle green gradient strips
     for row = 0, world_h, 40 do
         local shade = 0.12 + (row / world_h) * 0.06
-        lurek.render.rectangle("fill", ox, oy + row, world_w, 40, shade, shade + 0.08, 0.02)
+        rect("fill", ox, oy + row, world_w, 40, shade, shade + 0.08, 0.02)
     end
 
     -- Trees — trunk + canopy
     for _, tr in ipairs(trees) do
         local tx, ty = tr.x + ox, tr.y + oy
         -- Trunk
-        lurek.render.rectangle("fill", tx - 3, ty, 6, tr.radius * 0.7, 0.35, 0.22, 0.1)
+        rect("fill", tx - 3, ty, 6, tr.radius * 0.7, 0.35, 0.22, 0.1)
         -- Canopy
-        lurek.render.circle(tx, ty, tr.radius, 0.08, 0.3, 0.06)
-        lurek.render.circle(tx - 4, ty - 3, tr.radius * 0.7, 0.1, 0.35, 0.08)
+        circ(tx, ty, tr.radius, 0.08, 0.3, 0.06)
+        circ(tx - 4, ty - 3, tr.radius * 0.7, 0.1, 0.35, 0.08)
     end
 
     -- Flag
     if state == STATE.PLAYING or state == STATE.MISSION_COMPLETE then
         local fx, fy = flag.x + ox, flag.y + oy
         -- Pole
-        lurek.render.rectangle("fill", fx - 1, fy - 20, 3, 40, 0.7, 0.7, 0.7)
+        rect("fill", fx - 1, fy - 20, 3, 40, 0.7, 0.7, 0.7)
         -- Flag cloth
-        lurek.render.rectangle("fill", fx + 2, fy - 18, 16, 10, 0.9, 0.2, 0.1)
+        rect("fill", fx + 2, fy - 18, 16, 10, 0.9, 0.2, 0.1)
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
         if e.alive then
             local ex, ey = e.x + ox, e.y + oy
-            lurek.render.circle(ex, ey, e.radius, 0.8, 0.15, 0.1)
-            lurek.render.circle(ex, ey, e.radius - 2, 0.9, 0.25, 0.15)
+            circ(ex, ey, e.radius, 0.8, 0.15, 0.1)
+            circ(ex, ey, e.radius - 2, 0.9, 0.25, 0.15)
         end
     end
 
@@ -605,12 +653,12 @@ function lurek.draw()
     for idx, s in ipairs(soldiers) do
         if s.alive then
             local sx, sy = s.x + ox, s.y + oy
-            lurek.render.circle(sx, sy, s.radius, 0.15, 0.55, 0.15)
-            lurek.render.circle(sx, sy, s.radius - 2, 0.2, 0.65, 0.2)
+            circ(sx, sy, s.radius, 0.15, 0.55, 0.15)
+            circ(sx, sy, s.radius - 2, 0.2, 0.65, 0.2)
             -- Facing indicator
             local fdx = math.cos(facing_angle) * (s.radius + 3)
             local fdy = math.sin(facing_angle) * (s.radius + 3)
-            lurek.render.circle(sx + fdx, sy + fdy, 2, 0.9, 0.9, 0.3)
+            circ(sx + fdx, sy + fdy, 2, 0.9, 0.9, 0.3)
         end
     end
 
@@ -618,9 +666,9 @@ function lurek.draw()
     for _, b in ipairs(bullets) do
         local bx, by = b.x + ox, b.y + oy
         if b.friendly then
-            lurek.render.circle(bx, by, 2, 1.0, 0.9, 0.3)
+            circ(bx, by, 2, 1.0, 0.9, 0.3)
         else
-            lurek.render.circle(bx, by, 2, 1.0, 0.3, 0.2)
+            circ(bx, by, 2, 1.0, 0.3, 0.2)
         end
     end
 
@@ -628,10 +676,10 @@ function lurek.draw()
     for _, gr in ipairs(grenades) do
         local gx, gy = gr.x + ox, gr.y + oy - math.max(0, gr.arc_height)
         -- Shadow
-        lurek.render.circle(gr.x + ox, gr.y + oy, 3, 0.0, 0.0, 0.0)
+        circ(gr.x + ox, gr.y + oy, 3, 0.0, 0.0, 0.0)
         -- Grenade body
-        lurek.render.circle(gx, gy, 4, 0.3, 0.35, 0.1)
-        lurek.render.circle(gx, gy, 2, 0.5, 0.55, 0.2)
+        circ(gx, gy, 4, 0.3, 0.35, 0.1)
+        circ(gx, gy, 2, 0.5, 0.55, 0.2)
     end
 
     -- Particles
@@ -639,12 +687,12 @@ function lurek.draw()
         local px, py = p.x + ox, p.y + oy
         local alpha_factor = clamp(p.life / p.max_life, 0, 1)
         local sz = p.size * alpha_factor
-        lurek.render.circle(px, py, sz, p.r, p.g, p.b)
+        circ(px, py, sz, p.r, p.g, p.b)
     end
 
     -- Explosion flash overlay
     if flash_alpha > 0 then
-        lurek.render.rectangle("fill", 0, 0, 800, 600, 1.0, 0.9, 0.5, flash_alpha)
+        rect("fill", 0, 0, 800, 600, 1.0, 0.9, 0.5, flash_alpha)
     end
 end
 
@@ -654,43 +702,43 @@ end
 function lurek.draw_ui()
     if state == STATE.TITLE then
         -- Title screen
-        lurek.render.rectangle("fill", 0, 0, 800, 600, 0.05, 0.08, 0.02)
-        lurek.render.print("CANNON FODDER", 170, 180, 48, 0.9, 0.8, 0.2)
-        lurek.render.print("WAR HAS NEVER BEEN SO MUCH FUN", 180, 260, 18, 0.7, 0.7, 0.6)
+        rect("fill", 0, 0, 800, 600, 0.05, 0.08, 0.02)
+        text_("CANNON FODDER", 170, 180, 48, 0.9, 0.8, 0.2)
+        text_("WAR HAS NEVER BEEN SO MUCH FUN", 180, 260, 18, 0.7, 0.7, 0.6)
 
         -- Blinking prompt
         if math.floor(title_blink_timer * 2) % 2 == 0 then
-            lurek.render.print("Press SPACE to start", 280, 400, 20, 0.9, 0.9, 0.9)
+            text_("Press SPACE to start", 280, 400, 20, 0.9, 0.9, 0.9)
         end
 
-        lurek.render.print("WASD = Move   SPACE = Fire   G = Grenade", 180, 500, 14, 0.5, 0.5, 0.5)
+        text_("WASD = Move   SPACE = Fire   G = Grenade", 180, 500, 14, 0.5, 0.5, 0.5)
         return
     end
 
     if state == STATE.GAME_OVER then
-        lurek.render.rectangle("fill", 0, 0, 800, 600, 0.05, 0.02, 0.02, 0.85)
-        lurek.render.print("GAME OVER", 260, 220, 48, 0.9, 0.2, 0.15)
-        lurek.render.print("Final Score: " .. score, 300, 300, 24, 0.9, 0.9, 0.9)
+        rect("fill", 0, 0, 800, 600, 0.05, 0.02, 0.02, 0.85)
+        text_("GAME OVER", 260, 220, 48, 0.9, 0.2, 0.15)
+        text_("Final Score: " .. score, 300, 300, 24, 0.9, 0.9, 0.9)
         if math.floor(title_blink_timer * 2) % 2 == 0 then
-            lurek.render.print("Press SPACE", 330, 400, 20, 0.8, 0.8, 0.8)
+            text_("Press SPACE", 330, 400, 20, 0.8, 0.8, 0.8)
         end
         return
     end
 
     -- HUD background bar
-    lurek.render.rectangle("fill", 0, 0, 800, 32, 0.0, 0.0, 0.0, 0.6)
+    rect("fill", 0, 0, 800, 32, 0.0, 0.0, 0.0, 0.6)
 
     -- Score
-    lurek.render.print("SCORE: " .. score, 10, 6, 18, 0.9, 0.85, 0.3)
+    text_("SCORE: " .. score, 10, 6, 18, 0.9, 0.85, 0.3)
 
     -- Mission
-    lurek.render.print("MISSION " .. current_mission .. "/" .. #missions, 300, 6, 18, 0.9, 0.9, 0.9)
+    text_("MISSION " .. current_mission .. "/" .. #missions, 300, 6, 18, 0.9, 0.9, 0.9)
 
     -- Grenades
-    lurek.render.print("GRENADES: " .. grenade_count, 530, 6, 18, 0.6, 0.9, 0.4)
+    text_("GRENADES: " .. grenade_count, 530, 6, 18, 0.6, 0.9, 0.4)
 
     -- Enemies remaining
-    lurek.render.print("ENEMIES: " .. enemies_remaining, 680, 6, 14, 0.9, 0.4, 0.3)
+    text_("ENEMIES: " .. enemies_remaining, 680, 6, 14, 0.9, 0.4, 0.3)
 
     -- Soldiers alive indicator (bottom left)
     local alive = 0
@@ -701,21 +749,21 @@ function lurek.draw_ui()
         local sx = 20 + (i - 1) * 22
         local sy = 575
         if i <= alive then
-            lurek.render.circle(sx, sy, 7, 0.15, 0.6, 0.15)
+            circ(sx, sy, 7, 0.15, 0.6, 0.15)
         else
-            lurek.render.circle(sx, sy, 7, 0.3, 0.1, 0.1)
-            lurek.render.print("X", sx - 4, sy - 7, 14, 0.6, 0.2, 0.2)
+            circ(sx, sy, 7, 0.3, 0.1, 0.1)
+            text_("X", sx - 4, sy - 7, 14, 0.6, 0.2, 0.2)
         end
     end
 
     -- FPS
     local fps = lurek.timer.getFPS()
-    lurek.render.print("FPS: " .. fps, 730, 580, 12, 0.5, 0.5, 0.5)
+    text_("FPS: " .. fps, 730, 580, 12, 0.5, 0.5, 0.5)
 
     -- Mission complete banner
     if state == STATE.MISSION_COMPLETE then
-        lurek.render.rectangle("fill", 0, 230, 800, 80, 0.0, 0.0, 0.0, 0.75)
-        lurek.render.print("MISSION " .. current_mission .. " COMPLETE!", 220, 250, 32, 0.2, 0.9, 0.3)
-        lurek.render.print("+500 BONUS", 340, 290, 18, 0.9, 0.85, 0.3)
+        rect("fill", 0, 230, 800, 80, 0.0, 0.0, 0.0, 0.75)
+        text_("MISSION " .. current_mission .. " COMPLETE!", 220, 250, 32, 0.2, 0.9, 0.3)
+        text_("+500 BONUS", 340, 290, 18, 0.9, 0.85, 0.3)
     end
 end

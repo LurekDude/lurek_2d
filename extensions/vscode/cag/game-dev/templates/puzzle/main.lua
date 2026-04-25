@@ -12,7 +12,7 @@ function lurek.process(dt)
     -- Puzzle logic runs on input, not per-frame
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.12, 0.12, 0.18)
     grid:draw()
     lurek.render.setColor(1, 1, 1, 1)

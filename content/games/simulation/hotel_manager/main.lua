@@ -113,6 +113,53 @@ end
 local camera
 local fps = 0
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Hotel Manager — Lurek2D")
     lurek.render.setBackgroundColor(0.12, 0.1, 0.08)
@@ -398,7 +445,7 @@ function lurek.draw()
     -- Draw floor labels
     for r = 1, GRID_ROWS do
         local _, y = gridToScreen(r, 1)
-        lurek.render.print(tostring(r) .. "F", GRID_X - FLOOR_LABEL_W, y + ROOM_H / 2 - 6, FLOOR_LABEL_W, "right")
+        text_(tostring(r) .. "F", GRID_X - FLOOR_LABEL_W, y + ROOM_H / 2 - 6, FLOOR_LABEL_W, "right")
     end
 
     -- Draw elevator shaft
@@ -407,7 +454,7 @@ function lurek.draw()
         local _, botY = gridToScreen(1, 1)
         local shaftX = GRID_X - 14
         lurek.render.setColor(0.35, 0.35, 0.4, 0.7)
-        lurek.render.rectangle("fill", shaftX, topY, 8, botY - topY + ROOM_H)
+        rect("fill", shaftX, topY, 8, botY - topY + ROOM_H)
     end
 
     -- Draw grid and rooms
@@ -435,11 +482,11 @@ function lurek.draw()
                 end
 
                 lurek.render.setColor(dr, dg, db, 0.9)
-                lurek.render.rectangle("fill", x + 2, y + 2, ROOM_W - 4, ROOM_H - 4)
+                rect("fill", x + 2, y + 2, ROOM_W - 4, ROOM_H - 4)
 
                 -- Room label
                 lurek.render.setColor(1, 1, 1, 0.9)
-                lurek.render.print(roomLabel(room.type), x + 4, y + 4)
+                text_(roomLabel(room.type), x + 4, y + 4)
 
                 -- Occupant indicator
                 if room.occupant then
@@ -453,21 +500,21 @@ function lurek.draw()
                     else
                         lurek.render.setColor(0.9, 0.2, 0.2, 1)
                     end
-                    lurek.render.circle("fill", faceX, faceY, 6)
+                    circ("fill", faceX, faceY, 6)
                     lurek.render.setColor(0, 0, 0, 1)
-                    lurek.render.circle("fill", faceX - 2, faceY - 2, 1)
-                    lurek.render.circle("fill", faceX + 2, faceY - 2, 1)
+                    circ("fill", faceX - 2, faceY - 2, 1)
+                    circ("fill", faceX + 2, faceY - 2, 1)
                 end
 
                 -- Dirty indicator
                 if room.dirty >= DIRTY_THRESHOLD and (not room.cleanTimer or room.cleanTimer <= 0) then
                     lurek.render.setColor(0.6, 0.4, 0.1, 0.8)
-                    lurek.render.print("!", x + ROOM_W - 16, y + 4)
+                    text_("!", x + ROOM_W - 16, y + 4)
                 end
             else
                 -- Empty slot
                 lurek.render.setColor(0.2, 0.18, 0.16, 0.4)
-                lurek.render.rectangle("line", x + 2, y + 2, ROOM_W - 4, ROOM_H - 4)
+                rect("line", x + 2, y + 2, ROOM_W - 4, ROOM_H - 4)
             end
         end
     end
@@ -476,7 +523,7 @@ function lurek.draw()
     for _, p in ipairs(particles) do
         local alpha = math.max(p.life / p.maxLife, 0)
         lurek.render.setColor(p.r, p.g, p.b, alpha)
-        lurek.render.circle("fill", p.x, p.y, p.size * alpha)
+        circ("fill", p.x, p.y, p.size * alpha)
     end
 
     camera:detach()
@@ -488,32 +535,32 @@ end
 function lurek.draw_ui()
     if state == STATE_TITLE then
         lurek.render.setColor(0.85, 0.72, 0.2, 1)
-        lurek.render.print("HOTEL MANAGER", 220, 180, 360, "center", 0, 3, 3)
+        text_("HOTEL MANAGER", 220, 180, 360, "center", 0, 3, 3)
         lurek.render.setColor(0.7, 0.65, 0.5, 1)
-        lurek.render.print("BUILD YOUR EMPIRE", 220, 260, 360, "center", 0, 1.5, 1.5)
+        text_("BUILD YOUR EMPIRE", 220, 260, 360, "center", 0, 1.5, 1.5)
         lurek.render.setColor(1, 1, 1, 0.5 + 0.5 * math.sin(lurek.timer.getTime() * 3))
-        lurek.render.print("Click to Start", 280, 360, 240, "center")
+        text_("Click to Start", 280, 360, 240, "center")
         return
     end
 
     if state == STATE_VICTORY then
         lurek.render.setColor(0.85, 0.72, 0.2, 1)
-        lurek.render.print("5-STAR HOTEL!", 200, 180, 400, "center", 0, 3, 3)
+        text_("5-STAR HOTEL!", 200, 180, 400, "center", 0, 3, 3)
         lurek.render.setColor(1, 1, 1, 1)
-        lurek.render.print("Gold: " .. math.floor(gold), 280, 280, 240, "center", 0, 1.5, 1.5)
-        lurek.render.print("Total Guests: " .. totalGuests, 280, 320, 240, "center")
+        text_("Gold: " .. math.floor(gold), 280, 280, 240, "center", 0, 1.5, 1.5)
+        text_("Total Guests: " .. totalGuests, 280, 320, 240, "center")
         lurek.render.setColor(1, 1, 1, 0.5 + 0.5 * math.sin(lurek.timer.getTime() * 3))
-        lurek.render.print("Press ESC to exit", 280, 400, 240, "center")
+        text_("Press ESC to exit", 280, 400, 240, "center")
         return
     end
 
     -- HUD background
     lurek.render.setColor(0.08, 0.07, 0.06, 0.85)
-    lurek.render.rectangle("fill", 0, 0, 800, 28)
+    rect("fill", 0, 0, 800, 28)
 
     -- Gold
     lurek.render.setColor(0.95, 0.85, 0.2, 1)
-    lurek.render.print("Gold: " .. math.floor(displayGold), 10, 6)
+    text_("Gold: " .. math.floor(displayGold), 10, 6)
 
     -- Rating stars
     lurek.render.setColor(1, 0.9, 0.3, 1)
@@ -527,30 +574,30 @@ function lurek.draw_ui()
             starStr = starStr .. "."
         end
     end
-    lurek.render.print("Rating: " .. starStr .. " (" .. string.format("%.1f", rating) .. ")", 200, 6)
+    text_("Rating: " .. starStr .. " (" .. string.format("%.1f", rating) .. ")", 200, 6)
 
     -- Cleaners
     lurek.render.setColor(0.5, 0.8, 1, 1)
-    lurek.render.print("Cleaners: " .. cleaners, 460, 6)
+    text_("Cleaners: " .. cleaners, 460, 6)
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
-    lurek.render.print("FPS: " .. fps, 740, 6)
+    text_("FPS: " .. fps, 740, 6)
 
     -- Mode indicator
     if mode then
         lurek.render.setColor(1, 1, 1, 0.9)
         local modeText = "Mode: " .. mode
-        lurek.render.print(modeText, 10, 580)
+        text_(modeText, 10, 580)
     end
 
     -- Controls bar
     lurek.render.setColor(0.08, 0.07, 0.06, 0.85)
-    lurek.render.rectangle("fill", 0, 558, 800, 42)
+    rect("fill", 0, 558, 800, 42)
     lurek.render.setColor(0.6, 0.6, 0.55, 0.9)
-    lurek.render.print("[1]Std [2]Dlx [3]Suite  [C]Clean [U]Upgrade [H]Hire  [ESC]Quit", 10, 566)
+    text_("[1]Std [2]Dlx [3]Suite  [C]Clean [U]Upgrade [H]Hire  [ESC]Quit", 10, 566)
 
     -- Guests count
     lurek.render.setColor(0.7, 0.9, 0.7, 1)
-    lurek.render.print("Guests: " .. #guests .. "  Total: " .. totalGuests, 580, 6)
+    text_("Guests: " .. #guests .. "  Total: " .. totalGuests, 580, 6)
 end

@@ -88,7 +88,7 @@ local fuel   = 100
 local active_planet = nil
 
 -- Dialog sequencer
-local seq          = nil
+local seq          = nil ---@type any
 local dlg_line     = ""
 local dlg_speaker  = ""
 local dlg_choices  = {}
@@ -104,6 +104,53 @@ end
 local function dist2(ax,ay,bx,by) return (ax-bx)^2+(ay-by)^2 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Star Voyage — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.08)
@@ -185,7 +232,7 @@ function lurek.draw()
         local px = (s.wx - cam_x * (0.2 + s.layer * 0.15)) % W
         local py = (s.wy - cam_y * (0.2 + s.layer * 0.15)) % H
         lurek.render.setColor(s.br, s.br, s.br)
-        lurek.render.circle("fill", px, py, s.r)
+        circ("fill", px, py, s.r)
     end
 
     -- Planets
@@ -194,15 +241,15 @@ function lurek.draw()
         -- only draw if roughly on screen
         if sx > -80 and sx < W+80 and sy > -80 and sy < H+80 then
             lurek.render.setColor(p.color[1] * 0.4, p.color[2] * 0.4, p.color[3] * 0.4)
-            lurek.render.circle("fill", sx, sy, p.r + 6)    -- atmosphere glow
+            circ("fill", sx, sy, p.r + 6)    -- atmosphere glow
             lurek.render.setColor(p.color[1], p.color[2], p.color[3])
-            lurek.render.circle("fill", sx, sy, p.r)
+            circ("fill", sx, sy, p.r)
             if p.visited then
                 lurek.render.setColor(0.5, 1, 0.5, 0.7)
-                lurek.render.circle("line", sx, sy, p.r + 3)
+                circ("line", sx, sy, p.r + 3)
             end
             lurek.render.setColor(1, 1, 1, 0.9)
-            lurek.render.print(p.name, sx - 35, sy + p.r + 4)
+            text_(p.name, sx - 35, sy + p.r + 4)
         end
     end
 
@@ -221,44 +268,44 @@ function lurek.draw()
     -- Dock prompt
     if active_planet and state == STATE.SPACE then
         lurek.render.setColor(1, 1, 0, 0.9)
-        lurek.render.print("Press Space to dock at " .. active_planet.name, W/2 - 140, H - 44)
+        text_("Press Space to dock at " .. active_planet.name, W/2 - 140, H - 44)
     end
 
     -- HUD
     lurek.render.setColor(0, 0, 0, 0.55)
-    lurek.render.rectangle("fill", 0, 0, W, 26)
+    rect("fill", 0, 0, W, 26)
     lurek.render.setColor(0.4, 0.8, 1)
-    lurek.render.print(string.format("Fuel: %d%%   Pos: (%d,%d)", math.floor(fuel), math.floor(ship.x), math.floor(ship.y)), 10, 5)
+    text_(string.format("Fuel: %d%%   Pos: (%d,%d)", math.floor(fuel), math.floor(ship.x), math.floor(ship.y)), 10, 5)
     local visited = 0; for _, p in ipairs(planets) do if p.visited then visited = visited + 1 end end
-    lurek.render.print(string.format("Worlds visited: %d / %d", visited, #planets), W - 220, 5)
+    text_(string.format("Worlds visited: %d / %d", visited, #planets), W - 220, 5)
 
     -- Dialog overlay
     if state == STATE.DIALOG then
         lurek.render.setColor(0.04, 0.06, 0.18, 0.92)
-        lurek.render.rectangle("fill", 20, H - 160, W - 40, 148)
+        rect("fill", 20, H - 160, W - 40, 148)
         lurek.render.setColor(0.4, 0.7, 1)
-        lurek.render.rectangle("line", 20, H - 160, W - 40, 148)
+        rect("line", 20, H - 160, W - 40, 148)
         -- Portrait placeholder
         if active_planet then
             local pc = active_planet.color
             lurek.render.setColor(pc[1], pc[2], pc[3])
-            lurek.render.circle("fill", 58, H - 94, 30)
+            circ("fill", 58, H - 94, 30)
         end
         lurek.render.setColor(0.4, 0.7, 1)
-        lurek.render.print(dlg_speaker, 96, H - 152)
+        text_(dlg_speaker, 96, H - 152)
         lurek.render.setColor(0.9, 0.9, 1)
-        lurek.render.print(dlg_line, 96, H - 130, 0, 1, 1, 0, 0, 0, 0)
+        text_(dlg_line, 96, H - 130, { 0, 1, 1, 0 })
         -- Choices
         if #dlg_choices > 0 then
             for i, opt in ipairs(dlg_choices) do
                 lurek.render.setColor(1, 1, 0)
-                lurek.render.print(i .. ". " .. opt, 96, H - 130 + (i-1)*20 + 16)
+                text_(i .. ". " .. opt, 96, H - 130 + (i-1)*20 + 16)
             end
             lurek.render.setColor(0.5, 0.5, 0.5)
-            lurek.render.print("[1/2/3] choose", W - 180, H - 26)
+            text_("[1/2/3] choose", W - 180, H - 26)
         else
             lurek.render.setColor(0.5, 0.5, 0.5)
-            lurek.render.print("[Space] continue", W - 200, H - 26)
+            text_("[Space] continue", W - 200, H - 26)
         end
     end
 end

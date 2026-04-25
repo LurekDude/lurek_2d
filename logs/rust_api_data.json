@@ -1,12 +1,12 @@
 {
   "meta": {
-    "generated": "2026-04-23T18:13:31.415242+00:00",
+    "generated": "2026-04-25T07:41:41.463079+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "0.20.0",
     "stats": {
       "rust_items": 1882,
       "rust_modules": 452,
-      "rust_tests": 1,
+      "rust_tests": 2,
       "lua_tests": 256
     }
   },
@@ -15885,6 +15885,13 @@
         "name": "examples_load_all",
         "description": "",
         "line": 37
+      },
+      {
+        "file": "tests/games_load_test.rs",
+        "module": "games_load",
+        "name": "games_load_all",
+        "description": "",
+        "line": 60
       }
     ],
     "lua": [

@@ -1,6 +1,56 @@
 import * as vscode from "vscode";
 import { ApiDataService } from "../services/apiData.js";
 
+// Module-level ApiDataService reference — set once at extension activation.
+let _apiDataSingleton: ApiDataService | null = null;
+
+/** Called once in register() to wire up the live API data. */
+export function setApiData(data: ApiDataService): void {
+  _apiDataSingleton = data;
+}
+
+/** Look up the return type name for a factory function full path. */
+function getReturnTypeName(fullPath: string): string | undefined {
+  if (_apiDataSingleton) {
+    const typeName = _apiDataSingleton.getFactoryTypes().get(fullPath);
+    if (typeName) return typeName;
+  }
+  return FACTORY_TYPES[fullPath]?.typeName;
+}
+
+/** Build a TypeInfo for a type name using live API data, falling back to the hardcoded map.
+ *  Methods always come from the JSON; `fields` are supplemented from the legacy map. */
+function getTypeInfoByName(typeName: string): TypeInfo | undefined {
+  if (_apiDataSingleton) {
+    const methods = _apiDataSingleton.getMethods(typeName);
+    if (methods.length > 0) {
+      // Supplement with field definitions from legacy map (fields not yet sourced from JSON)
+      const legacyEntry = Object.values(FACTORY_TYPES).find(t => t.typeName === typeName);
+      return {
+        typeName,
+        methods: methods.map(fn => ({
+          name: fn.name,
+          sig: fn.signature,
+          desc: fn.description,
+        })),
+        ...(legacyEntry?.fields ? { fields: legacyEntry.fields } : {}),
+      };
+    }
+  }
+  return Object.values(FACTORY_TYPES).find(t => t.typeName === typeName);
+}
+
+/** All factory function full paths from API data, with hardcoded keys as fallback. */
+function getAllFactoryPaths(): string[] {
+  const paths = new Set<string>(Object.keys(FACTORY_TYPES));
+  if (_apiDataSingleton) {
+    for (const key of _apiDataSingleton.getFactoryTypes().keys()) {
+      paths.add(key);
+    }
+  }
+  return Array.from(paths);
+}
+
 const LUA_SELECTOR: vscode.DocumentSelector = {
   scheme: "file",
   language: "lua",
@@ -494,9 +544,9 @@ export function scanDocument(document: vscode.TextDocument): {
     );
     if (factoryMatch) {
       const [, varName, factoryCall] = factoryMatch;
-      const typeInfo = FACTORY_TYPES[factoryCall];
-      if (typeInfo) {
-        varTypes.push({ varName, typeName: typeInfo.typeName, factoryCall, line: i });
+      const returnTypeName = getReturnTypeName(factoryCall);
+      if (returnTypeName) {
+        varTypes.push({ varName, typeName: returnTypeName, factoryCall, line: i });
       }
     }
 
@@ -506,7 +556,7 @@ export function scanDocument(document: vscode.TextDocument): {
     );
     if (aliasMatch) {
       const [, varName, modulePath, moduleName] = aliasMatch;
-      if (LUREK_MODULES.includes(moduleName)) {
+      if ((_apiDataSingleton?.getModuleNames() ?? LUREK_MODULES).includes(moduleName)) {
         moduleAliases.push({ varName, modulePath, line: i });
       }
     }
@@ -622,9 +672,7 @@ export function getTypeInfoForVar(
     (v) => v.varName === varName && v.line < position.line
   );
   if (factoryVar) {
-    const typeInfo = Object.values(FACTORY_TYPES).find(
-      (t) => t.typeName === factoryVar.typeName
-    );
+    const typeInfo = getTypeInfoByName(factoryVar.typeName);
     if (typeInfo) return { typeInfo, factoryCall: factoryVar.factoryCall };
   }
   return undefined;
@@ -644,9 +692,7 @@ export function getMethodsForVar(
     (v) => v.varName === varName && v.line < position.line
   );
   if (factoryVar) {
-    const typeInfo = Object.values(FACTORY_TYPES).find(
-      (t) => t.typeName === factoryVar.typeName
-    );
+    const typeInfo = getTypeInfoByName(factoryVar.typeName);
     if (typeInfo) return typeInfo.methods;
   }
 
@@ -668,8 +714,9 @@ export function getMethodsForVar(
  */
 export function register(
   context: vscode.ExtensionContext,
-  _apiData: ApiDataService
+  apiData: ApiDataService
 ): void {
+  setApiData(apiData);
   // Colon provider — method completions (var:method)
   const colonProvider = vscode.languages.registerCompletionItemProvider(
     LUA_SELECTOR,
@@ -738,16 +785,17 @@ export function register(
         if (alias) {
           const prefix = alias.modulePath + ".";
           const items: vscode.CompletionItem[] = [];
-          for (const key of Object.keys(FACTORY_TYPES)) {
+          for (const key of getAllFactoryPaths()) {
             if (key.startsWith(prefix)) {
               const funcName = key.substring(prefix.length);
               if (!partial || funcName.toLowerCase().startsWith(partial)) {
-                const typeInfo = FACTORY_TYPES[key];
+                const typeName = getReturnTypeName(key);
+                if (!typeName) continue;
                 const item = new vscode.CompletionItem(
                   funcName,
                   vscode.CompletionItemKind.Function
                 );
-                item.detail = `→ ${typeInfo.typeName}`;
+                item.detail = `→ ${typeName}`;
                 item.documentation = new vscode.MarkdownString(
                   `Factory from \`${key}\``
                 );
@@ -766,9 +814,7 @@ export function register(
           (v) => v.varName === varName && v.line < position.line
         );
         if (factoryVar) {
-          const typeInfo = Object.values(FACTORY_TYPES).find(
-            (t) => t.typeName === factoryVar.typeName
-          );
+          const typeInfo = getTypeInfoByName(factoryVar.typeName);
           if (typeInfo) {
             // Add fields
             if (typeInfo.fields) {

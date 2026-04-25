@@ -52,12 +52,13 @@ local ambient_level = 0.1
 local light_radius = 200
 local spotlight_mode = false
 local torches_on = true
-local player_light = nil
+local player_light = nil ---@type any
 local torch_lights = {}
 local torch_particles = {}
-local glow_particles = nil
+local glow_particles = nil ---@type any
 local occluders = {}
-local camera = nil
+local camera = nil ---@type any
+local tween_api = lurek.tween ---@type any
 
 -- Wall definitions: { x, y, w, h }
 local WALLS = {
@@ -98,6 +99,53 @@ local function lerp(a, b, t) return a + (b - a) * t end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Light Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.04)
@@ -129,7 +177,7 @@ function lurek.init()
     lurek.light.setAmbient(0.1, 0.1, 0.1, 1.0)
 
     -- Player light
-    player_light = lurek.light.newLight()
+    player_light = lurek.light.newLight(player.x, player.y, light_radius)
     player_light:setLightType("point")
     player_light:setPosition(player.x, player.y)
     player_light:setRadius(light_radius)
@@ -140,14 +188,14 @@ function lurek.init()
 
     -- Create torches (orange flickering lights)
     for i, pos in ipairs(TORCH_POSITIONS) do
-        local t = lurek.light.newLight()
+        local t = lurek.light.newLight(pos[1], pos[2], 120)
         t:setLightType("point")
         t:setPosition(pos[1], pos[2])
         t:setRadius(120)
         t:setIntensity(0.85)
         t:setColor(1.0, 0.6, 0.2)
         t:setBlendMode("additive")
-        t:setFlicker(0.7, 1.0, 5.0)
+        t:setFlicker(5.0, 0.7)
         t:setFlickerEnabled(true)
         torch_lights[i] = t
 
@@ -176,8 +224,7 @@ function lurek.init()
 
     -- Create wall occluders
     for i, w in ipairs(WALLS) do
-        local occ = lurek.light.newOccluder()
-        occ:setVertices({
+        local occ = lurek.light.newOccluder({
             w[1],        w[2],
             w[1] + w[3], w[2],
             w[1] + w[3], w[2] + w[4],
@@ -274,7 +321,7 @@ function lurek.process(dt)
     if new_color and new_color ~= color_index then
         color_index = new_color
         local c = LIGHT_COLORS[color_index]
-        lurek.tween.to(color_tween, 0.4, { r = c[1], g = c[2], b = c[3] }, "inOutSine")
+        tween_api.to(color_tween, 0.4, { r = c[1], g = c[2], b = c[3] }, "inOutSine")
     end
     player_light:setColor(color_tween.r, color_tween.g, color_tween.b)
 
@@ -309,7 +356,7 @@ function lurek.process(dt)
     if lurek.input.wasActionPressed("ambient_tint") then
         ambient_tint_index = ambient_tint_index % #AMBIENT_TINTS + 1
         local tint = AMBIENT_TINTS[ambient_tint_index]
-        lurek.tween.to(ambient_tween, 0.6, {
+        tween_api.to(ambient_tween, 0.6, {
             r = ambient_level * tint[1],
             g = ambient_level * tint[2],
             b = ambient_level * tint[3],
@@ -328,7 +375,7 @@ function lurek.process(dt)
     end
     if ambient_changed then
         local tint = AMBIENT_TINTS[ambient_tint_index]
-        lurek.tween.to(ambient_tween, 0.3, {
+        tween_api.to(ambient_tween, 0.3, {
             r = ambient_level * tint[1],
             g = ambient_level * tint[2],
             b = ambient_level * tint[3],
@@ -354,7 +401,7 @@ function lurek.draw()
             lurek.render.setColor(pulse, pulse, pulse * 1.5, 0.4)
             local cx = 100 + (i - 1) * 90
             local cy = 300 + math.sin(time * 1.5 + i) * 60
-            lurek.render.circle("fill", cx, cy, 30 + math.sin(time + i) * 10)
+            circ("fill", cx, cy, 30 + math.sin(time + i) * 10)
         end
         camera:detach()
         return
@@ -365,27 +412,27 @@ function lurek.draw()
     -- Draw room floor (subtle grid pattern)
     lurek.render.setColor(0.06, 0.06, 0.08, 0.5)
     for gx = 0, SCREEN_W, 40 do
-        lurek.render.line(gx, 0, gx, SCREEN_H)
+        ln(gx, 0, gx, SCREEN_H)
     end
     for gy = 0, SCREEN_H, 40 do
-        lurek.render.line(0, gy, SCREEN_W, gy)
+        ln(0, gy, SCREEN_W, gy)
     end
 
     -- Draw walls
     for _, w in ipairs(WALLS) do
         lurek.render.setColor(0.25, 0.22, 0.18, 1.0)
-        lurek.render.rectangle("fill", w[1], w[2], w[3], w[4])
+        rect("fill", w[1], w[2], w[3], w[4])
         lurek.render.setColor(0.35, 0.30, 0.25, 1.0)
-        lurek.render.rectangle("line", w[1], w[2], w[3], w[4])
+        rect("line", w[1], w[2], w[3], w[4])
     end
 
     -- Draw torch markers (small orange squares at torch positions)
     if torches_on then
         for _, pos in ipairs(TORCH_POSITIONS) do
             lurek.render.setColor(0.6, 0.35, 0.1, 1.0)
-            lurek.render.rectangle("fill", pos[1] - 4, pos[2] - 4, 8, 8)
+            rect("fill", pos[1] - 4, pos[2] - 4, 8, 8)
             lurek.render.setColor(1.0, 0.7, 0.3, 0.8)
-            lurek.render.rectangle("line", pos[1] - 5, pos[2] - 5, 10, 10)
+            rect("line", pos[1] - 5, pos[2] - 5, 10, 10)
         end
 
         -- Draw torch flame particles
@@ -398,9 +445,9 @@ function lurek.draw()
     -- Draw player
     local pc = LIGHT_COLORS[color_index]
     lurek.render.setColor(pc[1], pc[2], pc[3], 1.0)
-    lurek.render.circle("fill", player.x, player.y, 8)
+    circ("fill", player.x, player.y, 8)
     lurek.render.setColor(1.0, 1.0, 1.0, 0.5)
-    lurek.render.circle("line", player.x, player.y, 10)
+    circ("line", player.x, player.y, 10)
 
     -- Spotlight direction indicator
     if spotlight_mode then
@@ -409,7 +456,7 @@ function lurek.draw()
         local ex = player.x + math.cos(angle) * 30
         local ey = player.y + math.sin(angle) * 30
         lurek.render.setColor(pc[1], pc[2], pc[3], 0.6)
-        lurek.render.line(player.x, player.y, ex, ey)
+        ln(player.x, player.y, ex, ey)
     end
 
     -- Player glow particles
@@ -429,20 +476,20 @@ function lurek.draw_ui()
     if current_state == STATE.TITLE then
         -- Title
         lurek.render.setColor(1.0, 0.85, 0.3, 1)
-        lurek.render.print("LIGHT DEMO", SCREEN_W / 2 - 90, SCREEN_H / 2 - 80, 32)
+        text_("LIGHT DEMO", SCREEN_W / 2 - 90, SCREEN_H / 2 - 80, 32)
 
         -- Subtitle
         lurek.render.setColor(0.7, 0.6, 0.4, 1)
-        lurek.render.print("ILLUMINATE THE DARKNESS", SCREEN_W / 2 - 130, SCREEN_H / 2 - 30, 20)
+        text_("ILLUMINATE THE DARKNESS", SCREEN_W / 2 - 130, SCREEN_H / 2 - 30, 20)
 
         -- Blink prompt
         local blink = 0.5 + 0.5 * math.sin(time * 4)
         lurek.render.setColor(1, 1, 1, blink)
-        lurek.render.print("Press Enter to Start", SCREEN_W / 2 - 90, SCREEN_H / 2 + 40, 16)
+        text_("Press Enter to Start", SCREEN_W / 2 - 90, SCREEN_H / 2 + 40, 16)
 
         -- Engine credit
         lurek.render.setColor(0.4, 0.4, 0.4, 0.5)
-        lurek.render.print("Lurek2D Engine Showcase", SCREEN_W / 2 - 80, SCREEN_H - 40, 12)
+        text_("Lurek2D Engine Showcase", SCREEN_W / 2 - 80, SCREEN_H - 40, 12)
         return
     end
 
@@ -450,44 +497,45 @@ function lurek.draw_ui()
 
     -- Stats panel (top-left)
     lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
-    lurek.render.rectangle("fill", 8, 8, 200, 110)
+    rect("fill", 8, 8, 200, 110)
 
     lurek.render.setColor(0.9, 0.85, 0.6, 1)
-    lurek.render.print("LIGHT DEMO", 14, 12, 16)
+    text_("LIGHT DEMO", 14, 12, 16)
 
     lurek.render.setColor(0.8, 0.8, 0.8, 0.9)
     local lc = LIGHT_COLORS[color_index]
     local mode_str = spotlight_mode and "Spotlight" or "Point"
     local total_lights = 1 + (torches_on and #torch_lights or 0)
 
-    lurek.render.print("Lights: " .. total_lights, 14, 32, 13)
-    lurek.render.print("Ambient: " .. string.format("%.2f", ambient_level), 14, 48, 13)
-    lurek.render.print("Radius: " .. light_radius .. "px", 14, 64, 13)
-    lurek.render.print("Mode: " .. mode_str, 14, 80, 13)
-    lurek.render.print(string.format("Pos: %d, %d", player.x, player.y), 14, 96, 13)
+    text_("Lights: " .. total_lights, 14, 32, 13)
+    text_("Ambient: " .. string.format("%.2f", ambient_level), 14, 48, 13)
+    text_("Radius: " .. light_radius .. "px", 14, 64, 13)
+    text_("Mode: " .. mode_str, 14, 80, 13)
+    text_(string.format("Pos: %d, %d", player.x, player.y), 14, 96, 13)
 
     -- Light color indicator
     lurek.render.setColor(lc[1], lc[2], lc[3], 1)
-    lurek.render.rectangle("fill", 170, 32, 12, 12)
+    rect("fill", 170, 32, 12, 12)
     lurek.render.setColor(1, 1, 1, 0.5)
-    lurek.render.rectangle("line", 170, 32, 12, 12)
+    rect("line", 170, 32, 12, 12)
 
     -- Ambient tint name
     local tint = AMBIENT_TINTS[ambient_tint_index]
     lurek.render.setColor(tint[1] * 0.8, tint[2] * 0.8, tint[3] * 0.8, 0.9)
-    lurek.render.print("Tint: " .. tint[4], 120, 48, 13)
+    text_("Tint: " .. tint[4], 120, 48, 13)
 
     -- Torch status
-    lurek.render.setColor(torches_on and {1.0, 0.7, 0.3, 1} or {0.4, 0.4, 0.4, 0.6})
-    lurek.render.print("Torches: " .. (torches_on and "ON" or "OFF"), 120, 64, 13)
+    local torch_color = torches_on and {1.0, 0.7, 0.3, 1} or {0.4, 0.4, 0.4, 0.6}
+    lurek.render.setColor(torch_color[1], torch_color[2], torch_color[3], torch_color[4])
+    text_("Torches: " .. (torches_on and "ON" or "OFF"), 120, 64, 13)
 
     -- Controls (bottom)
     lurek.render.setColor(0.0, 0.0, 0.0, 0.4)
-    lurek.render.rectangle("fill", 8, SCREEN_H - 58, SCREEN_W - 16, 50)
+    rect("fill", 8, SCREEN_H - 58, SCREEN_W - 16, 50)
 
     lurek.render.setColor(0.6, 0.6, 0.6, 0.7)
-    lurek.render.print("WASD: Move   1-4: Color   Q/E: Radius   Scroll: Radius   F: Spotlight", 14, SCREEN_H - 52, 12)
-    lurek.render.print("T: Torches   R: Ambient Tint   +/-: Ambient Level   Esc: Quit", 14, SCREEN_H - 36, 12)
+    text_("WASD: Move   1-4: Color   Q/E: Radius   Scroll: Radius   F: Spotlight", 14, SCREEN_H - 52, 12)
+    text_("T: Torches   R: Ambient Tint   +/-: Ambient Level   Esc: Quit", 14, SCREEN_H - 36, 12)
 
     -- Color legend (bottom right)
     local legend_x = SCREEN_W - 130
@@ -495,12 +543,12 @@ function lurek.draw_ui()
     for i, c in ipairs(LIGHT_COLORS) do
         local a = (i == color_index) and 1.0 or 0.4
         lurek.render.setColor(c[1], c[2], c[3], a)
-        lurek.render.rectangle("fill", legend_x + (i - 1) * 28, legend_y, 10, 10)
+        rect("fill", legend_x + (i - 1) * 28, legend_y, 10, 10)
         lurek.render.setColor(0.7, 0.7, 0.7, a)
-        lurek.render.print(tostring(i), legend_x + (i - 1) * 28 + 1, legend_y + 12, 10)
+        text_(tostring(i), legend_x + (i - 1) * 28 + 1, legend_y + 12, 10)
     end
 
     -- FPS (top-right)
     lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.render.print("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, 12, 12)
+    text_("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, 12, 12)
 end

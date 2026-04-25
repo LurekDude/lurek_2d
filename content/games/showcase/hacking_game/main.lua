@@ -467,6 +467,53 @@ end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Hacking Game — Lurek2D")
     lurek.render.setBackgroundColor(0, 0, 0)
@@ -635,7 +682,7 @@ function lurek.draw()
     -- CRT scanlines
     lurek.render.setColor(COL_SCANLINE[1], COL_SCANLINE[2], COL_SCANLINE[3], COL_SCANLINE[4])
     for y = 0, SCREEN_H, 3 do
-        lurek.render.line(0, y, SCREEN_W, y)
+        ln(0, y, SCREEN_W, y)
     end
 
     -- Title state: matrix rain
@@ -646,7 +693,7 @@ function lurek.draw()
                 if cy >= 0 and cy < SCREEN_H then
                     local brightness = 1.0 - (j / col.len) * 0.8
                     lurek.render.setColor(0, brightness, brightness * 0.3, 0.8)
-                    lurek.render.print(ch, col.x, cy)
+                    text_(ch, col.x, cy)
                 end
             end
         end
@@ -659,7 +706,7 @@ function lurek.draw()
 
     -- Slight CRT flicker overlay
     lurek.render.setColor(0, 0.02, 0, (1.0 - flicker_alpha) * 0.3)
-    lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+    rect(0, 0, SCREEN_W, SCREEN_H)
 
     camera:detach()
 end
@@ -673,12 +720,12 @@ function lurek.draw_ui()
     -- ── TITLE ─────────────────────────────────────────────────
     if current_state == STATE.TITLE then
         lurek.render.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 1)
-        lurek.render.print("H A C K I N G   G A M E", SCREEN_W / 2 - 110, SCREEN_H / 2 - 60)
+        text_("H A C K I N G   G A M E", SCREEN_W / 2 - 110, SCREEN_H / 2 - 60)
         lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 1)
-        lurek.render.print("[ Press any key to begin ]", SCREEN_W / 2 - 115, SCREEN_H / 2 + 10)
-        lurek.render.print("Lurek2D Showcase", SCREEN_W / 2 - 65, SCREEN_H / 2 + 50)
+        text_("[ Press any key to begin ]", SCREEN_W / 2 - 115, SCREEN_H / 2 + 10)
+        text_("Lurek2D Showcase", SCREEN_W / 2 - 65, SCREEN_H / 2 + 50)
         lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.5)
-        lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20)
+        text_(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20)
         return
     end
 
@@ -687,7 +734,7 @@ function lurek.draw_ui()
     for i, line in ipairs(terminal_lines) do
         local c = line.color or COL_GREEN
         lurek.render.setColor(c[1], c[2], c[3], flicker_alpha)
-        lurek.render.print(line.text, 10, start_y + (i - 1) * LINE_H)
+        text_(line.text, 10, start_y + (i - 1) * LINE_H)
     end
 
     -- ── INPUT LINE ────────────────────────────────────────────
@@ -696,19 +743,19 @@ function lurek.draw_ui()
         lurek.render.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 1)
         local display = PROMPT .. input_buffer
         if cursor_visible then display = display .. "█" end
-        lurek.render.print(display, 10, input_y)
+        text_(display, 10, input_y)
     end
 
     -- ── GAME OVER ─────────────────────────────────────────────
     if current_state == STATE.GAME_OVER then
         local gy = start_y + #terminal_lines * LINE_H + 30
         lurek.render.setColor(COL_RED[1], COL_RED[2], COL_RED[3], 1)
-        lurek.render.print("██ TRACED — GAME OVER ██", SCREEN_W / 2 - 105, gy)
+        text_("██ TRACED — GAME OVER ██", SCREEN_W / 2 - 105, gy)
         lurek.render.setColor(COL_YELLOW[1], COL_YELLOW[2], COL_YELLOW[3], 1)
-        lurek.render.print("Final score: " .. score, SCREEN_W / 2 - 55, gy + 25)
-        lurek.render.print("Files: " .. #downloaded_files, SCREEN_W / 2 - 35, gy + 45)
+        text_("Final score: " .. score, SCREEN_W / 2 - 55, gy + 25)
+        text_("Files: " .. #downloaded_files, SCREEN_W / 2 - 35, gy + 45)
         lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 1)
-        lurek.render.print("[ Press R to restart ]", SCREEN_W / 2 - 90, gy + 75)
+        text_("[ Press R to restart ]", SCREEN_W / 2 - 90, gy + 75)
     end
 
     -- ── HUD: Trace bar ────────────────────────────────────────
@@ -718,7 +765,7 @@ function lurek.draw_ui()
 
         -- Background
         lurek.render.setColor(0.15, 0.15, 0.15, 0.8)
-        lurek.render.rectangle(bar_x, bar_y, bar_w, bar_h)
+        rect(bar_x, bar_y, bar_w, bar_h)
 
         -- Fill (red when low, yellow when mid, green when high)
         local r, g
@@ -728,32 +775,32 @@ function lurek.draw_ui()
 
         local pulse = trace_bar_pulse.value
         lurek.render.setColor(r + pulse * 0.3, g * (1 - pulse * 0.3), 0, 0.9)
-        lurek.render.rectangle(bar_x, bar_y, bar_w * pct, bar_h)
+        rect(bar_x, bar_y, bar_w * pct, bar_h)
 
         -- Border
         lurek.render.setColor(COL_GREEN[1], COL_GREEN[2], COL_GREEN[3], 0.6)
-        lurek.render.rectangle(bar_x, bar_y, bar_w, 1)
-        lurek.render.rectangle(bar_x, bar_y + bar_h, bar_w, 1)
-        lurek.render.rectangle(bar_x, bar_y, 1, bar_h)
-        lurek.render.rectangle(bar_x + bar_w, bar_y, 1, bar_h)
+        rect(bar_x, bar_y, bar_w, 1)
+        rect(bar_x, bar_y + bar_h, bar_w, 1)
+        rect(bar_x, bar_y, 1, bar_h)
+        rect(bar_x + bar_w, bar_y, 1, bar_h)
 
         -- Label
         lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3], 1)
-        lurek.render.print(string.format("TRACE: %.0fs", trace_timer), bar_x, bar_y + bar_h + 3)
+        text_(string.format("TRACE: %.0fs", trace_timer), bar_x, bar_y + bar_h + 3)
     end
 
     -- ── HUD: Mission / Score / FPS ────────────────────────────
     lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.7)
-    lurek.render.print(string.format("Score: %d", score), 10, SCREEN_H - 20)
+    text_(string.format("Score: %d", score), 10, SCREEN_H - 20)
     if MISSIONS[current_mission] then
-        lurek.render.print("Mission " .. current_mission .. "/" .. #MISSIONS, 150, SCREEN_H - 20)
+        text_("Mission " .. current_mission .. "/" .. #MISSIONS, 150, SCREEN_H - 20)
     else
-        lurek.render.print("ALL MISSIONS COMPLETE", 150, SCREEN_H - 20)
+        text_("ALL MISSIONS COMPLETE", 150, SCREEN_H - 20)
     end
     if proxy_active then
         lurek.render.setColor(COL_CYAN[1], COL_CYAN[2], COL_CYAN[3], 0.7)
-        lurek.render.print("[PROXY]", 370, SCREEN_H - 20)
+        text_("[PROXY]", 370, SCREEN_H - 20)
     end
     lurek.render.setColor(COL_DIM_GREEN[1], COL_DIM_GREEN[2], COL_DIM_GREEN[3], 0.5)
-    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20)
+    text_(string.format("FPS: %d", fps), SCREEN_W - 80, SCREEN_H - 20)
 end

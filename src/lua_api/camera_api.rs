@@ -25,15 +25,17 @@ pub struct LuaCamera2D {
     /// Active smooth-zoom tween, if any.
     zoom_tween: RefCell<Option<ZoomTween>>,
     /// Per-layer parallax scale factors (`layer_name â†’ factor`).
-    parallax: RefCell<HashMap<String, f32>>,    /// Shared engine state for queuing render commands.
-    state: Rc<RefCell<SharedState>>,}
+    parallax: RefCell<HashMap<String, f32>>,
+    /// Shared engine state for queuing render commands.
+    state: Rc<RefCell<SharedState>>,
+}
 
 impl LuaUserData for LuaCamera2D {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- setPosition --
         /// Sets the camera's world-space position.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_position(x, y);
@@ -49,7 +51,7 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setZoom --
         /// Sets the uniform zoom factor (1.0 = natural size).
-        /// @param zoom : number
+        /// @param zoom number
         /// @return nil
         methods.add_method("setZoom", |_, this, zoom: f32| {
             this.inner.borrow_mut().set_zoom(zoom);
@@ -63,7 +65,7 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setRotation --
         /// Sets the rotation in radians.
-        /// @param r : number
+        /// @param r number
         /// @return nil
         methods.add_method("setRotation", |_, this, r: f32| {
             this.inner.borrow_mut().set_rotation(r);
@@ -79,10 +81,10 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setViewport --
         /// Sets the viewport rectangle in screen pixels.
-        /// @param x : number
-        /// @param y : number
-        /// @param w : number
-        /// @param h : number
+        /// @param x number
+        /// @param y number
+        /// @param w number
+        /// @param h number
         /// @return nil
         methods.add_method(
             "setViewport",
@@ -101,10 +103,10 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setBounds --
         /// Sets world-space bounds for camera clamping.
-        /// @param x : number
-        /// @param y : number
-        /// @param w : number
-        /// @param h : number
+        /// @param x number
+        /// @param y number
+        /// @param w number
+        /// @param h number
         /// @return nil
         methods.add_method(
             "setBounds",
@@ -124,8 +126,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setTarget --
         /// Sets the follow target position.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("setTarget", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_target(x, y);
@@ -142,7 +144,7 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setFollowSmooth --
         /// Sets the follow smooth interpolation speed (0.0 = instant snap).
-        /// @param speed : number
+        /// @param speed number
         /// @return nil
         methods.add_method("setFollowSmooth", |_, this, speed: f32| {
             this.inner.borrow_mut().set_follow_smooth(speed);
@@ -151,8 +153,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setDeadZone --
         /// Sets the dead zone half-extents for camera follow.
-        /// @param w : number
-        /// @param h : number
+        /// @param w number
+        /// @param h number
         /// @return nil
         methods.add_method("setDeadZone", |_, this, (w, h): (f32, f32)| {
             this.inner.borrow_mut().set_dead_zone(w, h);
@@ -161,7 +163,7 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setLookAhead --
         /// Sets the look-ahead multiplier for follow prediction.
-        /// @param mul : number
+        /// @param mul number
         /// @return nil
         methods.add_method("setLookAhead", |_, this, mul: f32| {
             this.inner.borrow_mut().set_look_ahead(mul);
@@ -170,8 +172,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- shake --
         /// Starts a screen-shake effect.
-        /// @param intensity : number
-        /// @param duration : number
+        /// @param intensity number
+        /// @param duration number
         /// @return nil
         methods.add_method("shake", |_, this, (intensity, duration): (f32, f32)| {
             this.inner.borrow_mut().shake(intensity, duration);
@@ -180,7 +182,7 @@ impl LuaUserData for LuaCamera2D {
 
         // -- update --
         /// Advances the camera simulation by dt seconds.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
@@ -189,8 +191,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- toWorld --
         /// Converts screen coordinates to world coordinates.
-        /// @param sx : number
-        /// @param sy : number
+        /// @param sx number
+        /// @param sy number
         /// @return number, number
         methods.add_method("toWorld", |_, this, (sx, sy): (f32, f32)| {
             Ok(this.inner.borrow().to_world_coords(sx, sy))
@@ -198,8 +200,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- toScreen --
         /// Converts world coordinates to screen coordinates.
-        /// @param wx : number
-        /// @param wy : number
+        /// @param wx number
+        /// @param wy number
         /// @return number, number
         methods.add_method("toScreen", |_, this, (wx, wy): (f32, f32)| {
             Ok(this.inner.borrow().to_screen_coords(wx, wy))
@@ -214,8 +216,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- lookAt --
         /// Instantly moves the camera to look at the given position.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("lookAt", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().look_at(x, y);
@@ -224,8 +226,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- move --
         /// Translates the camera by dx, dy in world space.
-        /// @param dx : number
-        /// @param dy : number
+        /// @param dx number
+        /// @param dy number
         /// @return nil
         methods.add_method("move", |_, this, (dx, dy): (f32, f32)| {
             this.inner.borrow_mut().move_by(dx, dy);
@@ -237,8 +239,8 @@ impl LuaUserData for LuaCamera2D {
         /// the given duration (seconds). The table must be a flat array of
         /// {x, y} pairs: `{{10,20},{50,80},{100,30}}`. Call `cam:updatePath(dt)`
         /// every frame to advance the animation.
-        /// @param points : table
-        /// @param duration : number
+        /// @param points table
+        /// @param duration number
         /// @return nil
         methods.add_method(
             "followPath",
@@ -267,7 +269,7 @@ impl LuaUserData for LuaCamera2D {
         /// Advances the path animation by `dt` seconds and applies the
         /// resulting position to the camera. Returns `true` while the path is
         /// still active, `false` once it has finished.
-        /// @param dt : number
+        /// @param dt number
         /// @return boolean
         methods.add_method("updatePath", |_, this, dt: f32| {
             let pos = this.path.borrow_mut().as_mut().and_then(|p| p.update(dt));
@@ -296,8 +298,8 @@ impl LuaUserData for LuaCamera2D {
         /// Smoothly tweens the camera zoom from its current level to
         /// `target_zoom` over `duration` seconds. Call `cam:updateZoom(dt)`
         /// every frame.
-        /// @param target_zoom : number
-        /// @param duration : number
+        /// @param target_zoom number
+        /// @param duration number
         /// @return nil
         methods.add_method("zoomTo", |_, this, (target_zoom, duration): (f32, f32)| {
             let current = this.inner.borrow().get_zoom();
@@ -316,7 +318,7 @@ impl LuaUserData for LuaCamera2D {
         // -- updateZoom --
         /// Advances the zoom tween by `dt` seconds and applies the resulting
         /// zoom level to the camera. Returns `true` while still tweening.
-        /// @param dt : number
+        /// @param dt number
         /// @return boolean
         methods.add_method("updateZoom", |_, this, dt: f32| {
             let zoom = this
@@ -336,8 +338,8 @@ impl LuaUserData for LuaCamera2D {
         /// Sets the parallax scroll factor for the named render layer.
         /// A factor of `1.0` (default) moves with the camera; lower values
         /// create a depth illusion.
-        /// @param layer : string
-        /// @param factor : number
+        /// @param layer string
+        /// @param factor number
         /// @return nil
         methods.add_method(
             "setParallaxFactor",
@@ -349,7 +351,7 @@ impl LuaUserData for LuaCamera2D {
 
         // -- getParallaxFactor --
         /// Returns the parallax factor for the named layer, or `1.0` if unset.
-        /// @param layer : string
+        /// @param layer string
         /// @return number
         methods.add_method("getParallaxFactor", |_, this, layer: String| {
             Ok(*this.parallax.borrow().get(&layer).unwrap_or(&1.0))
@@ -411,8 +413,8 @@ impl LuaUserData for LuaCamera2D {
         // -- zoomPulse --
         /// Triggers a momentary zoom-in that decays back via a sine envelope.
         /// Replaces any currently active pulse.
-        /// @param amplitude : number
-        /// @param duration : number
+        /// @param amplitude number
+        /// @param duration number
         /// @return nil
         methods.add_method("zoomPulse", |_, this, (amplitude, duration): (f32, f32)| {
             this.inner
@@ -424,10 +426,10 @@ impl LuaUserData for LuaCamera2D {
 
         // -- startSway --
         /// Starts a sinusoidal x/y offset oscillation (e.g., boat rocking).
-        /// @param amplitude_x : number
-        /// @param amplitude_y : number
-        /// @param frequency : number
-        /// @param decay : number?
+        /// @param amplitude_x number
+        /// @param amplitude_y number
+        /// @param frequency number
+        /// @param decay number?
         /// @return nil
         methods.add_method(
             "startSway",
@@ -458,8 +460,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- startBreathing --
         /// Starts a subtle periodic zoom oscillation for a "living camera" feel.
-        /// @param amplitude : number?
-        /// @param rate : number?
+        /// @param amplitude number?
+        /// @param rate number?
         /// @return nil
         methods.add_method(
             "startBreathing",
@@ -508,22 +510,24 @@ impl LuaUserData for LuaCamera2D {
 
 /// Registers the `lurek.camera` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- new --
     /// Creates a new Camera2D with the given viewport dimensions.
-    /// @param viewport_w : number
-    /// @param viewport_h : number
-    /// Camera2D
+    /// @param viewport_w number?  Viewport width in pixels (default 800).
+    /// @param viewport_h number?  Viewport height in pixels (default 600).
+    /// @return Camera2D
     let s = state.clone();
     tbl.set(
         "new",
-        lua.create_function(move |lua, (vw, vh): (f32, f32)| {
+        lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
+            let vw = vw.unwrap_or(800.0);
+            let vh = vh.unwrap_or(600.0);
             lua.create_userdata(LuaCamera2D {
                 inner: Rc::new(RefCell::new(Camera2D::new(vw, vh))),
                 path: RefCell::new(None),
@@ -539,8 +543,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     ///
     /// Both parameters default to 800 and 600 respectively when omitted.
     ///
-    /// @param viewport_w : number?  Viewport width in pixels (default 800).
-    /// @param viewport_h : number?  Viewport height in pixels (default 600).
+    /// @param viewport_w number?  Viewport width in pixels (default 800).
+    /// @param viewport_h number?  Viewport height in pixels (default 600).
     /// @return Camera2D
     let s = state.clone();
     tbl.set(

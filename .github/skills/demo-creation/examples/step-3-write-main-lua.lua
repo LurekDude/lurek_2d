@@ -23,7 +23,7 @@ function lurek.process(dt)
 end
 
 -- ── draw ──────────────────────────────────────────────────────
-function lurek.render()
+function lurek.draw()
     -- all rendering; HUD drawn last, unaffected by camera transforms
 end
 

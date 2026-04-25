@@ -10,6 +10,53 @@
 -- day/night cycle, hover highlight, and click-select with popup label.
 -- ============================================================================
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 -- Capture the render API namespace BEFORE defining function lurek.draw()
 -- (defining that callback overwrites lurek.render with the function itself).
 
@@ -385,7 +432,7 @@ function lurek.draw()
 
     -- ── HUD strip ─────────────────────────────────────────────────────────
     lurek.render.setColor(0.0, 0.0, 0.0, 0.65)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 32)
+    rect("fill", 0, 0, SCREEN_W, 32)
 
     local clat, clon, czoom = g:getCamera()
     local tod = g:getTimeOfDay()
@@ -398,31 +445,31 @@ function lurek.draw()
         tod_h, tod_m, g:provinceCount(), cmd_count)
 
     lurek.render.setColor(0.9, 0.9, 0.9)
-    lurek.render.print(hud_cam,  10, 8, 14)
+    text_(hud_cam,  10, 8, 14)
     lurek.render.setColor(0.7, 0.9, 1.0)
-    lurek.render.print(hud_time, SCREEN_W - 380, 8, 14)
+    text_(hud_time, SCREEN_W - 380, 8, 14)
 
     -- ── Province hover info ───────────────────────────────────────────────
     if hovered_id then
         local region = g:getProvinceAttr(hovered_id, "region") or "?"
         local hover_text = string.format("Province %d — %s", hovered_id, region)
         lurek.render.setColor(0.0, 0.0, 0.0, 0.55)
-        lurek.render.rectangle("fill", 0, SCREEN_H - 32, 400, 32)
+        rect("fill", 0, SCREEN_H - 32, 400, 32)
         lurek.render.setColor(1.0, 0.9, 0.5)
-        lurek.render.print(hover_text, 10, SCREEN_H - 24, 14)
+        text_(hover_text, 10, SCREEN_H - 24, 14)
     end
 
     -- ── Selected province popup ───────────────────────────────────────────
     if selected_id and hud_province ~= "" then
         local txt_w = 500
         lurek.render.setColor(0.0, 0.0, 0.0, 0.72)
-        lurek.render.rectangle("fill", SCREEN_W/2 - txt_w/2, SCREEN_H - 60, txt_w, 28)
+        rect("fill", SCREEN_W/2 - txt_w/2, SCREEN_H - 60, txt_w, 28)
         lurek.render.setColor(1.0, 0.85, 0.1)
-        lurek.render.print(hud_province, SCREEN_W/2 - txt_w/2 + 8, SCREEN_H - 54, 14)
+        text_(hud_province, SCREEN_W/2 - txt_w/2 + 8, SCREEN_H - 54, 14)
     end
 
     -- ── Controls reminder (bottom-right) ─────────────────────────────────
     lurek.render.setColor(0.5, 0.5, 0.5, 0.8)
-    lurek.render.print("Drag: pan   Wheel: zoom   Click: select   Esc: quit",
+    text_("Drag: pan   Wheel: zoom   Click: select   Esc: quit",
         SCREEN_W - 480, SCREEN_H - 20, 13)
 end

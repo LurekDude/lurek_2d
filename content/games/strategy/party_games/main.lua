@@ -126,9 +126,56 @@ lurek.input.bind("quit",    "escape")
 
 -- ── Init ──────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Party Games — Lurek2D")
-    lurek.render.setBackgroundColor(0.06, 0.04, 0.12, 1.0)
+    lurek.render.setBackgroundColor(0.06, 0.04, 0.12)
     math.randomseed(os.time())
 
     celebration_sys = lurek.particle.newSystem({
@@ -290,78 +337,78 @@ function lurek.draw()
     -- Flash overlay
     if flash_t > 0 and flash_col then
         local a = flash_t / 0.3 * flash_col[4]
-        lurek.render.rectangle(0, 0, W, H, { color = { flash_col[1], flash_col[2], flash_col[3], a } })
+        rect(0, 0, W, H, { color = { flash_col[1], flash_col[2], flash_col[3], a } })
     end
 end
 
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.draw_ui()
     if state == "menu" then
-        lurek.render.print("PARTY GAMES", 240, 180, { color = {1,0.8,0.2,1}, size = 48 })
-        lurek.render.print("Press SPACE to start", 268, 280, { color = {0.7,0.7,0.7,1}, size = 18 })
-        lurek.render.print("2 Players: P1=Z buzzer  P2=Shift buzzer", 180, 340, { color = {0.5,0.5,0.5,1}, size = 14 })
+        text_("PARTY GAMES", 240, 180, { color = {1,0.8,0.2,1}, size = 48 })
+        text_("Press SPACE to start", 268, 280, { color = {0.7,0.7,0.7,1}, size = 18 })
+        text_("2 Players: P1=Z buzzer  P2=Shift buzzer", 180, 340, { color = {0.5,0.5,0.5,1}, size = 14 })
         return
     end
 
     if state == "scoreboard" then
-        lurek.render.print("FINAL SCORES", 250, 140, { color = {1,0.9,0.2,1}, size = 36 })
-        lurek.render.print("P1: " .. scores[1] .. " pts", 260, 230, { color = {0.2,0.8,0.4,1}, size = 28 })
-        lurek.render.print("P2: " .. scores[2] .. " pts", 260, 280, { color = {0.3,0.5,1.0,1}, size = 28 })
+        text_("FINAL SCORES", 250, 140, { color = {1,0.9,0.2,1}, size = 36 })
+        text_("P1: " .. scores[1] .. " pts", 260, 230, { color = {0.2,0.8,0.4,1}, size = 28 })
+        text_("P2: " .. scores[2] .. " pts", 260, 280, { color = {0.3,0.5,1.0,1}, size = 28 })
         local winner = scores[1] > scores[2] and "Player 1 Wins!" or scores[2] > scores[1] and "Player 2 Wins!" or "It's a Tie!"
-        lurek.render.print(winner, 270, 360, { color = {1,1,1,1}, size = 26 })
+        text_(winner, 270, 360, { color = {1,1,1,1}, size = 26 })
         return
     end
 
     -- Header
-    lurek.render.print("Round " .. round .. "/" .. MAX_ROUNDS, 20, 14, { color = {0.7,0.7,0.8,1}, size = 14 })
-    lurek.render.print("P1: " .. scores[1], 300, 14, { color = {0.3,0.9,0.4,1}, size = 14 })
-    lurek.render.print("P2: " .. scores[2], 420, 14, { color = {0.3,0.5,1.0,1}, size = 14 })
+    text_("Round " .. round .. "/" .. MAX_ROUNDS, 20, 14, { color = {0.7,0.7,0.8,1}, size = 14 })
+    text_("P1: " .. scores[1], 300, 14, { color = {0.3,0.9,0.4,1}, size = 14 })
+    text_("P2: " .. scores[2], 420, 14, { color = {0.3,0.5,1.0,1}, size = 14 })
 
     if state == "reaction" then
-        lurek.render.print("REACTION GAME", 270, 80, { color = {1,0.7,0.2,1}, size = 24 })
+        text_("REACTION GAME", 270, 80, { color = {1,0.7,0.2,1}, size = 24 })
         if not reaction.signal then
-            lurek.render.print("Wait for the signal...", 250, 200, { color = {0.6,0.6,0.6,1}, size = 20 })
+            text_("Wait for the signal...", 250, 200, { color = {0.6,0.6,0.6,1}, size = 20 })
         else
-            lurek.render.rectangle(100, 180, 600, 120, { color = {0.1,0.8,0.2,0.9} })
-            lurek.render.print("NOW! P1=Z  P2=Shift", 240, 225, { color = {0,0,0,1}, size = 24 })
+            rect(100, 180, 600, 120, { color = {0.1,0.8,0.2,0.9} })
+            text_("NOW! P1=Z  P2=Shift", 240, 225, { color = {0,0,0,1}, size = 24 })
         end
         if reaction.done then
-            lurek.render.print("Player " .. reaction.winner .. " wins! (" .. string.format("%.3f", reaction.show_time) .. "s)", 180, 340, { color = {1,1,1,1}, size = 20 })
-            lurek.render.print("Space=continue", 320, 380, { color = {0.5,0.5,0.5,1}, size = 14 })
+            text_("Player " .. reaction.winner .. " wins! (" .. string.format("%.3f", reaction.show_time) .. "s)", 180, 340, { color = {1,1,1,1}, size = 20 })
+            text_("Space=continue", 320, 380, { color = {0.5,0.5,0.5,1}, size = 14 })
         end
 
     elseif state == "memory" then
-        lurek.render.print("MEMORY GAME", 280, 80, { color = {0.6,0.8,1.0,1}, size = 24 })
+        text_("MEMORY GAME", 280, 80, { color = {0.6,0.8,1.0,1}, size = 24 })
         if memory.stage == "show" and memory.idx <= #memory.seq then
             local num = memory.seq[memory.idx]
-            lurek.render.rectangle(350, 200, 80, 80, { color = {0.2,0.5,0.9,1} })
-            lurek.render.print(tostring(num), 376, 228, { color = {1,1,1,1}, size = 36 })
-            lurek.render.print("Watch the sequence!", 270, 320, { color = {0.7,0.7,0.7,1}, size = 16 })
+            rect(350, 200, 80, 80, { color = {0.2,0.5,0.9,1} })
+            text_(tostring(num), 376, 228, { color = {1,1,1,1}, size = 36 })
+            text_("Watch the sequence!", 270, 320, { color = {0.7,0.7,0.7,1}, size = 16 })
         elseif memory.stage == "input" then
-            lurek.render.print("Repeat the sequence! P1: keys 1-4", 200, 240, { color = {1,0.8,0.3,1}, size = 18 })
+            text_("Repeat the sequence! P1: keys 1-4", 200, 240, { color = {1,0.8,0.3,1}, size = 18 })
         end
         if memory.done then
-            lurek.render.print("Player " .. memory.winner .. " remembered it!", 220, 340, { color = {1,1,1,1}, size = 20 })
-            lurek.render.print("Space=continue", 320, 380, { color = {0.5,0.5,0.5,1}, size = 14 })
+            text_("Player " .. memory.winner .. " remembered it!", 220, 340, { color = {1,1,1,1}, size = 20 })
+            text_("Space=continue", 320, 380, { color = {0.5,0.5,0.5,1}, size = 14 })
         end
 
     elseif state == "typing" then
-        lurek.render.print("TYPING RACE", 290, 80, { color = {0.9,0.6,1.0,1}, size = 24 })
-        lurek.render.print("Type: " .. typing.current, 280, 200, { color = {1,1,1,1}, size = 28 })
-        lurek.render.print("P1: " .. typing.typed[1], 200, 280, { color = {0.3,0.9,0.4,1}, size = 22 })
+        text_("TYPING RACE", 290, 80, { color = {0.9,0.6,1.0,1}, size = 24 })
+        text_("Type: " .. typing.current, 280, 200, { color = {1,1,1,1}, size = 28 })
+        text_("P1: " .. typing.typed[1], 200, 280, { color = {0.3,0.9,0.4,1}, size = 22 })
         if typing.done then
-            lurek.render.print("Player " .. typing.winner .. " wins!", 290, 360, { color = {1,1,1,1}, size = 22 })
-            lurek.render.print("Space=continue", 320, 400, { color = {0.5,0.5,0.5,1}, size = 14 })
+            text_("Player " .. typing.winner .. " wins!", 290, 360, { color = {1,1,1,1}, size = 22 })
+            text_("Space=continue", 320, 400, { color = {0.5,0.5,0.5,1}, size = 14 })
         end
 
     elseif state == "math" then
-        lurek.render.print("MATH DUEL", 300, 80, { color = {1.0,0.8,0.3,1}, size = 28 })
-        lurek.render.print(math_game.q .. " = ?", 310, 200, { color = {1,1,1,1}, size = 32 })
-        lurek.render.print("P1 answer: " .. math_game.p1buf, 220, 300, { color = {0.3,0.9,0.4,1}, size = 20 })
-        lurek.render.print("Type digits to answer", 260, 360, { color = {0.5,0.5,0.5,1}, size = 14 })
+        text_("MATH DUEL", 300, 80, { color = {1.0,0.8,0.3,1}, size = 28 })
+        text_(math_game.q .. " = ?", 310, 200, { color = {1,1,1,1}, size = 32 })
+        text_("P1 answer: " .. math_game.p1buf, 220, 300, { color = {0.3,0.9,0.4,1}, size = 20 })
+        text_("Type digits to answer", 260, 360, { color = {0.5,0.5,0.5,1}, size = 14 })
         if math_game.done then
-            lurek.render.print("Player " .. math_game.winner .. " wins!", 290, 420, { color = {1,1,1,1}, size = 22 })
-            lurek.render.print("Space=continue", 320, 456, { color = {0.5,0.5,0.5,1}, size = 14 })
+            text_("Player " .. math_game.winner .. " wins!", 290, 420, { color = {1,1,1,1}, size = 22 })
+            text_("Space=continue", 320, 456, { color = {0.5,0.5,0.5,1}, size = 14 })
         end
     end
 end

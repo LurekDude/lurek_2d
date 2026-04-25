@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 local _frameTimes = {}
 
 function lurek.process(dt)

@@ -64,7 +64,7 @@ local function draw_nav_grid(grid, path, w, h, scale)
                 local v = math.floor(255 - (cost / 10) * 180)
                 r, g, b = v, v, v
             end
-            img:fillRect((x-1)*scale + 1, (y-1)*scale + 1, scale - 1, scale - 1, r, g, b, 255)
+            img:drawRect((x-1)*scale + 1, (y-1)*scale + 1, scale - 1, scale - 1, r, g, b, 255)
         end
     end
 
@@ -100,7 +100,7 @@ describe("Evidence: lurek.pathfind A* basic", function()
             end
         end
 
-        local pf   = lurek.pathfind.newUnitPathfinder(grid)
+        local pf   = lurek.pathfind.newPathfinder(grid)
         local path = pf:findPath(1, 1, 20, 15)
 
         local img = draw_nav_grid(grid, path, W, H, 10)
@@ -125,7 +125,7 @@ describe("Evidence: lurek.pathfind weighted terrain", function()
             grid:setCost(7, y, 9)
         end
 
-        local pf   = lurek.pathfind.newUnitPathfinder(grid)
+        local pf   = lurek.pathfind.newPathfinder(grid)
         local path = pf:findPath(1, 6, 12, 6)
 
         local img = draw_nav_grid(grid, path, W, H, 14)
@@ -148,7 +148,7 @@ describe("Evidence: lurek.pathfind FlowField", function()
         for y = 3, 12 do grid:setBlocked(8, y, true) end
         for x = 8, 16 do grid:setBlocked(x, 8, true) end
 
-        local ff = lurek.pathfind.newFlowField(grid, W, H)
+        local ff = lurek.pathfind.newFlowField(grid)
         ff:calculate(16, 16)
 
         local scale = 12
@@ -159,9 +159,9 @@ describe("Evidence: lurek.pathfind FlowField", function()
             for x = 1, W do
                 local blocked = grid:isBlocked(x, y)
                 if blocked then
-                    img:fillRect((x-1)*scale+1, (y-1)*scale+1, scale-2, scale-2, 20, 20, 60, 255)
+                    img:drawRect((x-1)*scale+1, (y-1)*scale+1, scale-2, scale-2, 20, 20, 60, 255)
                 else
-                    img:fillRect((x-1)*scale+1, (y-1)*scale+1, scale-2, scale-2, 80, 80, 100, 255)
+                    img:drawRect((x-1)*scale+1, (y-1)*scale+1, scale-2, scale-2, 80, 80, 100, 255)
                     local dx, dy = ff:getDirection(x, y)
                     if dx ~= 0 or dy ~= 0 then
                         local cx = (x-1)*scale + math.floor(scale / 2)

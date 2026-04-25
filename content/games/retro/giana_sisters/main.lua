@@ -211,6 +211,53 @@ end
 lurek.window.setTitle("Giana Sisters — Lurek2D")
 lurek.render.setBackgroundColor(0.1, 0.1, 0.3)
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
   load_level(1)
 end
@@ -515,8 +562,8 @@ function lurek.draw()
         if grid[row][col] == "1" then
           -- Solid block: brown/gray
           local shade = ((row + col) % 2 == 0) and 0.45 or 0.35
-          lurek.render.rectangle(tx, ty, TILE, TILE, shade, 0.28, 0.14, 1)
-          lurek.render.rectangle(tx + 2, ty + 2, TILE - 4, TILE - 4, shade + 0.1, 0.33, 0.18, 1)
+          rect(tx, ty, TILE, TILE, shade, 0.28, 0.14, 1)
+          rect(tx + 2, ty + 2, TILE - 4, TILE - 4, shade + 0.1, 0.33, 0.18, 1)
         end
       end
     end
@@ -525,9 +572,9 @@ function lurek.draw()
   -- Draw exit (green arch)
   local ex = exit_pos.x + ox
   local ey = exit_pos.y
-  lurek.render.rectangle(ex, ey, TILE, TILE, 0.1, 0.7, 0.2, 1)
-  lurek.render.rectangle(ex + 4, ey + 4, TILE - 8, TILE - 8, 0.2, 0.9, 0.3, 1)
-  lurek.render.rectangle(ex + 6, ey, TILE - 12, 6, 0.2, 0.9, 0.3, 1)
+  rect(ex, ey, TILE, TILE, 0.1, 0.7, 0.2, 1)
+  rect(ex + 4, ey + 4, TILE - 8, TILE - 8, 0.2, 0.9, 0.3, 1)
+  rect(ex + 6, ey, TILE - 12, 6, 0.2, 0.9, 0.3, 1)
 
   -- Draw gems (yellow diamonds)
   for _, gem in pairs(gems_map) do
@@ -536,8 +583,8 @@ function lurek.draw()
       local gy = gem.y + TILE / 2
       local s = 10
       -- Approximate diamond with small rotated square
-      lurek.render.rectangle(gx - s / 2, gy - s / 2, s, s, 1.0, 0.85, 0.1, 1)
-      lurek.render.rectangle(gx - s / 4, gy - s / 4, s / 2, s / 2, 1.0, 1.0, 0.5, 1)
+      rect(gx - s / 2, gy - s / 2, s, s, 1.0, 0.85, 0.1, 1)
+      rect(gx - s / 4, gy - s / 4, s / 2, s / 2, 1.0, 1.0, 0.5, 1)
     end
   end
 
@@ -547,13 +594,13 @@ function lurek.draw()
       local mx = mon.x + ox
       local my = mon.y
       -- Body
-      lurek.render.rectangle(mx + 2, my + 2, mon.w - 4, mon.h - 4, 0.9, 0.25, 0.1, 1)
-      lurek.render.rectangle(mx + 4, my + 4, mon.w - 8, mon.h - 8, 1.0, 0.4, 0.15, 1)
+      rect(mx + 2, my + 2, mon.w - 4, mon.h - 4, 0.9, 0.25, 0.1, 1)
+      rect(mx + 4, my + 4, mon.w - 8, mon.h - 8, 1.0, 0.4, 0.15, 1)
       -- Eyes
-      lurek.render.rectangle(mx + 6, my + 6, 5, 5, 1, 1, 1, 1)
-      lurek.render.rectangle(mx + 17, my + 6, 5, 5, 1, 1, 1, 1)
-      lurek.render.rectangle(mx + 7, my + 8, 3, 3, 0, 0, 0, 1)
-      lurek.render.rectangle(mx + 18, my + 8, 3, 3, 0, 0, 0, 1)
+      rect(mx + 6, my + 6, 5, 5, 1, 1, 1, 1)
+      rect(mx + 17, my + 6, 5, 5, 1, 1, 1, 1)
+      rect(mx + 7, my + 8, 3, 3, 0, 0, 0, 1)
+      rect(mx + 18, my + 8, 3, 3, 0, 0, 0, 1)
     end
   end
 
@@ -563,9 +610,9 @@ function lurek.draw()
       local sx = star.x + ox
       local sy = star.y
       local s = 12
-      lurek.render.rectangle(sx - s / 2, sy - 2, s, 4, 1, 1, 0.8, 1)
-      lurek.render.rectangle(sx - 2, sy - s / 2, 4, s, 1, 1, 0.8, 1)
-      lurek.render.rectangle(sx - 3, sy - 3, 6, 6, 1, 1, 1, 1)
+      rect(sx - s / 2, sy - 2, s, 4, 1, 1, 0.8, 1)
+      rect(sx - 2, sy - s / 2, 4, s, 1, 1, 0.8, 1)
+      rect(sx - 3, sy - 3, 6, 6, 1, 1, 1, 1)
     end
   end
 
@@ -578,15 +625,15 @@ function lurek.draw()
       -- Body
       local pr, pg, pb = 0.3, 0.5, 1.0
       if player.invincible then pr, pg, pb = 1.0, 0.8, 0.3 end
-      lurek.render.rectangle(px, py, player.w, player.h, pr, pg, pb, 1)
+      rect(px, py, player.w, player.h, pr, pg, pb, 1)
       -- Hair (pink top)
-      lurek.render.rectangle(px + 2, py, player.w - 4, 8, 1.0, 0.45, 0.6, 1)
+      rect(px + 2, py, player.w - 4, 8, 1.0, 0.45, 0.6, 1)
       -- Face
-      lurek.render.rectangle(px + 5, py + 10, 4, 4, 1, 1, 1, 1)
-      lurek.render.rectangle(px + 15, py + 10, 4, 4, 1, 1, 1, 1)
+      rect(px + 5, py + 10, 4, 4, 1, 1, 1, 1)
+      rect(px + 15, py + 10, 4, 4, 1, 1, 1, 1)
       -- Feet
-      lurek.render.rectangle(px + 2, py + player.h - 4, 8, 4, 0.2, 0.2, 0.6, 1)
-      lurek.render.rectangle(px + 14, py + player.h - 4, 8, 4, 0.2, 0.2, 0.6, 1)
+      rect(px + 2, py + player.h - 4, 8, 4, 0.2, 0.2, 0.6, 1)
+      rect(px + 14, py + player.h - 4, 8, 4, 0.2, 0.2, 0.6, 1)
     end
   end
 
@@ -594,12 +641,12 @@ function lurek.draw()
   for _, p in ipairs(particles) do
     local alpha = p.life / p.max_life
     local ps = 3 + alpha * 3
-    lurek.render.rectangle(p.x + ox - ps / 2, p.y - ps / 2, ps, ps, p.r, p.g, p.b, alpha)
+    rect(p.x + ox - ps / 2, p.y - ps / 2, ps, ps, p.r, p.g, p.b, alpha)
   end
 
   -- Level complete flash overlay
   if flash_alpha > 0 then
-    lurek.render.rectangle(0, 0, 800, 600, 1, 1, 1, flash_alpha * 0.5)
+    rect(0, 0, 800, 600, 1, 1, 1, flash_alpha * 0.5)
   end
 end
 
@@ -610,82 +657,82 @@ end
 function lurek.draw_ui()
   -- ---- TITLE SCREEN ----
   if state == TITLE then
-    lurek.render.rectangle(0, 0, 800, 600, 0.05, 0.05, 0.2, 1)
+    rect(0, 0, 800, 600, 0.05, 0.05, 0.2, 1)
     -- Title text background
-    lurek.render.rectangle(100, 150, 600, 60, 0.2, 0.1, 0.4, 0.8)
-    lurek.render.print("THE GREAT GIANA SISTERS", 160, 165, 28, 1.0, 0.85, 0.2, 1)
-    lurek.render.print("A Lurek2D Retro Tribute", 260, 210, 16, 0.7, 0.7, 0.7, 1)
+    rect(100, 150, 600, 60, 0.2, 0.1, 0.4, 0.8)
+    text_("THE GREAT GIANA SISTERS", 160, 165, 28, 1.0, 0.85, 0.2, 1)
+    text_("A Lurek2D Retro Tribute", 260, 210, 16, 0.7, 0.7, 0.7, 1)
 
     -- Controls
-    lurek.render.print("A/D or Arrows - Move", 280, 300, 16, 0.8, 0.8, 0.8, 1)
-    lurek.render.print("Space/W/Up - Jump", 290, 325, 16, 0.8, 0.8, 0.8, 1)
-    lurek.render.print("Stomp monsters from above!", 250, 365, 16, 1.0, 0.5, 0.3, 1)
+    text_("A/D or Arrows - Move", 280, 300, 16, 0.8, 0.8, 0.8, 1)
+    text_("Space/W/Up - Jump", 290, 325, 16, 0.8, 0.8, 0.8, 1)
+    text_("Stomp monsters from above!", 250, 365, 16, 1.0, 0.5, 0.3, 1)
 
     -- Blink prompt
     local blink = math.floor(lurek.timer.getTime() * 2) % 2 == 0
     if blink then
-      lurek.render.print("PRESS ENTER TO START", 270, 440, 22, 1, 1, 1, 1)
+      text_("PRESS ENTER TO START", 270, 440, 22, 1, 1, 1, 1)
     end
 
     -- Decorative gems
     for i = 0, 7 do
       local gx = 120 + i * 80
-      lurek.render.rectangle(gx, 500, 10, 10, 1.0, 0.85, 0.1, 0.6)
+      rect(gx, 500, 10, 10, 1.0, 0.85, 0.1, 0.6)
     end
     return
   end
 
   -- ---- GAME OVER ----
   if state == GAME_OVER then
-    lurek.render.rectangle(0, 0, 800, 600, 0.1, 0.0, 0.0, 0.85)
-    lurek.render.print("GAME OVER", 280, 200, 36, 1.0, 0.2, 0.2, 1)
-    lurek.render.print("Final Score: " .. score, 300, 280, 22, 1, 1, 1, 1)
-    lurek.render.print("Levels Cleared: " .. (current_level - 1) .. " / " .. #levels, 270, 320, 18, 0.8, 0.8, 0.8, 1)
+    rect(0, 0, 800, 600, 0.1, 0.0, 0.0, 0.85)
+    text_("GAME OVER", 280, 200, 36, 1.0, 0.2, 0.2, 1)
+    text_("Final Score: " .. score, 300, 280, 22, 1, 1, 1, 1)
+    text_("Levels Cleared: " .. (current_level - 1) .. " / " .. #levels, 270, 320, 18, 0.8, 0.8, 0.8, 1)
     local blink = math.floor(lurek.timer.getTime() * 2) % 2 == 0
     if blink then
-      lurek.render.print("PRESS ENTER", 320, 420, 22, 1, 1, 1, 1)
+      text_("PRESS ENTER", 320, 420, 22, 1, 1, 1, 1)
     end
     return
   end
 
   -- ---- LEVEL COMPLETE ----
   if state == LEVEL_COMPLETE then
-    lurek.render.rectangle(200, 200, 400, 120, 0.1, 0.3, 0.1, 0.9)
-    lurek.render.print("LEVEL " .. current_level .. " COMPLETE!", 270, 230, 26, 0.2, 1.0, 0.3, 1)
-    lurek.render.print("Score: " .. score, 330, 280, 20, 1, 1, 1, 1)
+    rect(200, 200, 400, 120, 0.1, 0.3, 0.1, 0.9)
+    text_("LEVEL " .. current_level .. " COMPLETE!", 270, 230, 26, 0.2, 1.0, 0.3, 1)
+    text_("Score: " .. score, 330, 280, 20, 1, 1, 1, 1)
   end
 
   -- ---- HUD ----
   -- Background bar
-  lurek.render.rectangle(0, 0, 800, 28, 0, 0, 0, 0.6)
+  rect(0, 0, 800, 28, 0, 0, 0, 0.6)
 
   -- Score
-  lurek.render.print("SCORE: " .. score, 10, 5, 18, 1, 1, 1, 1)
+  text_("SCORE: " .. score, 10, 5, 18, 1, 1, 1, 1)
 
   -- Gems with pulse effect
   local gem_scale = 1.0 + gem_pulse * 0.3
   local gem_text_size = math.floor(18 * gem_scale)
-  lurek.render.print("GEMS: " .. gem_count, 200, 5, gem_text_size, 1.0, 0.85, 0.1, 1)
+  text_("GEMS: " .. gem_count, 200, 5, gem_text_size, 1.0, 0.85, 0.1, 1)
 
   -- Level
-  lurek.render.print("LEVEL: " .. current_level .. "/" .. #levels, 400, 5, 18, 0.6, 0.8, 1.0, 1)
+  text_("LEVEL: " .. current_level .. "/" .. #levels, 400, 5, 18, 0.6, 0.8, 1.0, 1)
 
   -- Lives
-  lurek.render.print("LIVES: ", 580, 5, 18, 1, 1, 1, 1)
+  text_("LIVES: ", 580, 5, 18, 1, 1, 1, 1)
   for i = 1, lives do
-    lurek.render.rectangle(648 + (i - 1) * 22, 6, 16, 16, 1.0, 0.45, 0.6, 1)
+    rect(648 + (i - 1) * 22, 6, 16, 16, 1.0, 0.45, 0.6, 1)
   end
 
   -- FPS
   local fps = lurek.timer.getFPS()
-  lurek.render.print("FPS: " .. fps, 730, 5, 14, 0.5, 0.5, 0.5, 1)
+  text_("FPS: " .. fps, 730, 5, 14, 0.5, 0.5, 0.5, 1)
 
   -- Invincibility indicator
   if player.invincible then
     local remaining = math.ceil(player.inv_timer)
-    lurek.render.rectangle(300, 35, 200, 20, 0.2, 0.2, 0.0, 0.7)
+    rect(300, 35, 200, 20, 0.2, 0.2, 0.0, 0.7)
     local bar_w = (player.inv_timer / STAR_DURATION) * 196
-    lurek.render.rectangle(302, 37, bar_w, 16, 1.0, 0.9, 0.2, 0.9)
-    lurek.render.print("STAR POWER " .. remaining .. "s", 340, 38, 14, 1, 1, 1, 1)
+    rect(302, 37, bar_w, 16, 1.0, 0.9, 0.2, 0.9)
+    text_("STAR POWER " .. remaining .. "s", 340, 38, 14, 1, 1, 1, 1)
   end
 end

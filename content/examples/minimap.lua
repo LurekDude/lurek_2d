@@ -549,7 +549,7 @@ end
 -- Markers persist across frames; remove by id with removeMarker().
 do  -- Minimap:addMarker
   local mm = lurek.minimap.newMinimap(64, 64, 4)
-  local id = mm:addMarker(20, 30, "quest_marker", {1, 1, 0, 1})
+  local id = mm:addMarker(20, 30, "quest_marker", 1, 1, 0, 1)
   lurek.log.info("marker id: " .. id, "minimap")
 end
 
@@ -732,7 +732,7 @@ end
 -- Pass a table of {x,y} grid cell positions; cleared by clearPath().
 do  -- Minimap:showPath
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  local path = {{x=5,y=5},{x=10,y=10},{x=20,y=15}}
+  local path = {{5,5},{10,10},{20,15}}
   mm:showPath(path, {1, 0.5, 0, 1})
   lurek.log.info("path shown", "minimap")
 end

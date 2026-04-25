@@ -784,7 +784,6 @@ end
 -- duration in seconds; fires optional callback on completion.
 do  -- Light:transitionTo
   local lt = lurek.light.newLight(100, 100, 80)
-  lt:transitionTo({x=400, y=300, radius=200, r=1, g=0.5, b=0}, 2.0,
-    function() lurek.log.info("transition done", "light") end)
+  lt:transitionTo({x=400, y=300, radius=200, r=1, g=0.5, b=0}, 2.0)
   lurek.log.info("transition started", "light")
 end

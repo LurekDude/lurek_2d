@@ -23,7 +23,7 @@ impl LuaUserData for LuaSchema {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Validates a Lua table against the schema.
         /// Returns (ok: boolean, errors: {field, message}[]).
-        /// @param data : table
+        /// @param data table
         /// @return nil
         /// boolean, table
         methods.add_method("validate", |lua, this, data: LuaTable| {
@@ -55,7 +55,7 @@ impl LuaUserData for LuaSchema {
         });
 
         /// Returns true when the data passes all schema rules.
-        /// @param data : table
+        /// @param data table
         /// @return boolean
         methods.add_method("check", |_, this, data: LuaTable| {
             let mut fields: Vec<(String, &'static str, String)> = Vec::new();
@@ -76,7 +76,7 @@ impl LuaUserData for LuaSchema {
         });
 
         /// Validates data and throws a Lua error on failure with all error messages joined.
-        /// @param data : table
+        /// @param data table
         /// @return nil
         methods.add_method("assert", |_, this, data: LuaTable| {
             let mut fields: Vec<(String, &'static str, String)> = Vec::new();
@@ -276,7 +276,7 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns all entries, optionally filtered to a single module.
-        /// @param module : string?
+        /// @param module string?
         /// @return table
         methods.add_method("getEntries", |lua, this, module: Option<String>| {
             let tbl = lua.create_table()?;
@@ -291,7 +291,7 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns a single entry by qualified name, or nil.
-        /// @param qualified_name : string
+        /// @param qualified_name string
         /// @return nil
         /// DocEntry?
         methods.add_method("getEntry", |_, this, qualified_name: String| {
@@ -299,7 +299,7 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns the names of all entries with kind "type" in the given module.
-        /// @param module_name : string
+        /// @param module_name string
         /// @return table
         methods.add_method("getTypes", |lua, this, module_name: String| {
             let tbl = lua.create_table()?;
@@ -314,7 +314,7 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns entries that are methods of the given type qualified name.
-        /// @param qualified_name : string
+        /// @param qualified_name string
         /// @return table
         methods.add_method("getTypeMethods", |lua, this, qualified_name: String| {
             let tbl = lua.create_table()?;
@@ -332,7 +332,7 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns the number of entries, optionally scoped to a module.
-        /// @param module : string?
+        /// @param module string?
         /// @return integer
         methods.add_method("entryCount", |_, this, module: Option<String>| {
             Ok(match module.as_deref() {
@@ -342,7 +342,7 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns a new catalog that is the union of this and another catalog, with other overriding duplicates.
-        /// @param other : userdata
+        /// @param other userdata
         /// @return ApiCatalog
         methods.add_method("merge", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<ApiCatalog>()?;
@@ -361,7 +361,7 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns a new catalog containing only entries for which predicate returns true.
-        /// @param predicate : function
+        /// @param predicate function
         /// @return ApiCatalog
         methods.add_method("filter", |_lua, this, predicate: LuaFunction| {
             let mut filtered = Vec::new();
@@ -376,7 +376,7 @@ impl LuaUserData for ApiCatalog {
         });
 
         /// Returns a table of entries whose name, qualified name, or description contains query.
-        /// @param query : string
+        /// @param query string
         /// @return table
         methods.add_method("search", |lua, this, query: String| {
             let query_lower = query.to_lowercase();
@@ -590,7 +590,7 @@ impl LuaUserData for QualityReport {
         });
 
         /// Returns up to count entries with the lowest quality scores.
-        /// @param count : integer?
+        /// @param count integer?
         /// @return table
         methods.add_method("getWorst", |lua, this, count: Option<usize>| {
             let n = count.unwrap_or(10);
@@ -608,7 +608,7 @@ impl LuaUserData for QualityReport {
         });
 
         /// Returns up to count entries with the highest quality scores.
-        /// @param count : integer?
+        /// @param count integer?
         /// @return table
         methods.add_method("getBest", |lua, this, count: Option<usize>| {
             let n = count.unwrap_or(10);
@@ -626,7 +626,7 @@ impl LuaUserData for QualityReport {
         });
 
         /// Returns entries whose grade exactly matches the given letter grade.
-        /// @param grade : string
+        /// @param grade string
         /// @return table
         methods.add_method("getByGrade", |lua, this, grade: String| {
             let tbl = lua.create_table()?;
@@ -758,8 +758,8 @@ fn scan_table(
 
 /// Registers the `lurek.docs` namespace.
 ///
-/// @param lua : &Lua
-/// @param lurek_table : &LuaTable
+/// @param lua &Lua
+/// @param lurek_table &LuaTable
 ///
 pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
     let docs_tbl = lua.create_table()?;
@@ -769,7 +769,7 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- scan --------------------------------------------------------------
     /// Scan the lurek.* namespace to build an API catalog from live bindings.
-    /// @param opts : table?
+    /// @param opts table?
     /// @return ApiCatalog
     docs_tbl.set(
         "scan",
@@ -784,7 +784,7 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- scanModule --------------------------------------------------------
     /// Scan a single module's bindings.
-    /// @param module_name : string
+    /// @param module_name string
     /// @return ApiCatalog
     docs_tbl.set(
         "scanModule",
@@ -801,7 +801,7 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- loadToml ----------------------------------------------------------
     /// Load a TOML doc file into an ApiCatalog.
-    /// @param path : string
+    /// @param path string
     /// @return ApiCatalog
     docs_tbl.set(
         "loadToml",
@@ -835,7 +835,7 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- loadAll -----------------------------------------------------------
     /// Load all .toml files in a directory and merge into a single ApiCatalog.
-    /// @param directory : string
+    /// @param directory string
     /// @return ApiCatalog
     docs_tbl.set(
         "loadAll",
@@ -881,8 +881,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- describe ----------------------------------------------------------
     /// Inject or update a description for a named API entry.
-    /// @param qualified_name : string
-    /// @param description : string
+    /// @param qualified_name string
+    /// @param description string
     let s = state.clone();
     docs_tbl.set(
         "describe",
@@ -917,8 +917,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- setParamInfo ------------------------------------------------------
     /// Set the parameter metadata for a catalog entry.
-    /// @param qualified_name : string
-    /// @param params : table
+    /// @param qualified_name string
+    /// @param params table
     let s = state.clone();
     docs_tbl.set(
         "setParamInfo",
@@ -947,8 +947,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- setReturnInfo -----------------------------------------------------
     /// Set the return type metadata for a catalog entry.
-    /// @param qualified_name : string
-    /// @param returns : table
+    /// @param qualified_name string
+    /// @param returns table
     let s = state.clone();
     docs_tbl.set(
         "setReturnInfo",
@@ -995,7 +995,7 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- validate ----------------------------------------------------------
     /// Validate catalog completeness against the live lurek.* bindings.
-    /// @param catalog_ud : userdata?
+    /// @param catalog_ud userdata?
     /// @return ValidationReport
     docs_tbl.set(
         "validate",
@@ -1039,8 +1039,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- validateModule ----------------------------------------------------
     /// Validate a single module against the live lurek.<module>.* bindings.
-    /// @param module_name : string
-    /// @param catalog_ud : userdata?
+    /// @param module_name string
+    /// @param catalog_ud userdata?
     /// @return ValidationReport
     docs_tbl.set(
         "validateModule",
@@ -1092,8 +1092,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- checkStaleness ----------------------------------------------------
     /// Compare catalog entries against source files in a directory for staleness.
-    /// @param catalog_ud : userdata
-    /// @param source_dir : string
+    /// @param catalog_ud userdata
+    /// @param source_dir string
     /// @return table
     docs_tbl.set(
         "checkStaleness",
@@ -1126,7 +1126,7 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- quality -----------------------------------------------------------
     /// Calculate quality metrics for a catalog or the internal catalog.
-    /// @param catalog_ud : userdata?
+    /// @param catalog_ud userdata?
     /// @return table
     let s = state.clone();
     docs_tbl.set(
@@ -1142,8 +1142,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- qualityModule -----------------------------------------------------
     /// Calculate quality metrics for a single module.
-    /// @param module_name : string
-    /// @param catalog_ud : userdata?
+    /// @param module_name string
+    /// @param catalog_ud userdata?
     /// @return table
     let s = state.clone();
     docs_tbl.set(
@@ -1165,7 +1165,7 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- coverage ----------------------------------------------------------
     /// Return (documented_count, total_live_count) coverage tuple.
-    /// @param catalog_ud : userdata?
+    /// @param catalog_ud userdata?
     /// @return integer, integer
     docs_tbl.set(
         "coverage",
@@ -1185,8 +1185,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- coverageModule ----------------------------------------------------
     /// Return (documented_count, total_live_count) for a single module.
-    /// @param module_name : string
-    /// @param catalog_ud : userdata?
+    /// @param module_name string
+    /// @param catalog_ud userdata?
     /// @return integer, integer
     docs_tbl.set(
         "coverageModule",
@@ -1217,8 +1217,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportCompletions -------------------------------------------------
     /// Export VS Code IntelliSense completions JSON to a file.
-    /// @param catalog_ud : userdata
-    /// @param path : string
+    /// @param catalog_ud userdata
+    /// @param path string
     docs_tbl.set(
         "exportCompletions",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1229,8 +1229,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportHover -------------------------------------------------------
     /// Export VS Code hover JSON to a file.
-    /// @param catalog_ud : userdata
-    /// @param path : string
+    /// @param catalog_ud userdata
+    /// @param path string
     docs_tbl.set(
         "exportHover",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1241,8 +1241,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportSignatures --------------------------------------------------
     /// Export VS Code signature-help JSON to a file.
-    /// @param catalog_ud : userdata
-    /// @param path : string
+    /// @param catalog_ud userdata
+    /// @param path string
     docs_tbl.set(
         "exportSignatures",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1253,8 +1253,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportAll ---------------------------------------------------------
     /// Export completions.json, hover.json, and signatures.json to a directory.
-    /// @param catalog_ud : userdata
-    /// @param output_dir : string
+    /// @param catalog_ud userdata
+    /// @param output_dir string
     docs_tbl.set(
         "exportAll",
         lua.create_function(|_, (catalog_ud, output_dir): (LuaAnyUserData, String)| {
@@ -1265,8 +1265,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportMarkdown ----------------------------------------------------
     /// Export a Markdown API reference file.
-    /// @param catalog_ud : userdata
-    /// @param path : string
+    /// @param catalog_ud userdata
+    /// @param path string
     docs_tbl.set(
         "exportMarkdown",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1313,8 +1313,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportCheatsheet --------------------------------------------------
     /// Export a one-line-per-function plain-text cheatsheet.
-    /// @param catalog_ud : userdata
-    /// @param path : string
+    /// @param catalog_ud userdata
+    /// @param path string
     docs_tbl.set(
         "exportCheatsheet",
         lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
@@ -1360,8 +1360,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
     ///   description : string  (human-readable field doc)
     ///   strict      : boolean (on root table: reject undeclared fields, default false)
     ///
-    /// @param rules : table
-    /// @param name : string?
+    /// @param rules table
+    /// @param name string?
     /// @return userdata
     docs_tbl.set(
         "schema",
@@ -1407,7 +1407,7 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
     ///
     /// Returns a table: { [ns]: { name, type, arity? }[] }
     ///
-    /// @param ns : string?  (if provided, reflects only lurek.<ns>)
+    /// @param ns string?  (if provided, reflects only lurek.<ns>)
     /// @return table
     docs_tbl.set(
         "reflectLive",
@@ -1468,8 +1468,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
     ///
     /// Returns an array: { name, type, arity?, isVariadic? }[]
     ///
-    /// @param tbl : table
-    /// @param name : string?  (prefix for qualified names, optional)
+    /// @param tbl table
+    /// @param name string?  (prefix for qualified names, optional)
     /// @return table
     docs_tbl.set(
         "reflectTable",

@@ -1,4 +1,51 @@
-﻿-- ============================================================================
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+-- ============================================================================
 -- Terminal Demo — Lurek2D
 -- ============================================================================
 -- Category : showcase
@@ -77,7 +124,7 @@ local char_symbol   = 1
 local cursor_blink   = 0
 local cursor_visible = true
 local flash_timer    = 0    -- error flash
-local page_offset_x  = 0   -- tween slide
+local _slide         = { value = 0 }  -- tween slide
 local scroll_offset  = 0   -- lore scroll
 
 -- Particles & systems
@@ -94,13 +141,13 @@ local function grid_y(row) return (row - 1) * CELL_H end
 local function draw_char(ch, col, row, color, alpha)
     local c = color or COL_GREEN
     lurek.render.setColor(c[1], c[2], c[3], alpha or 1)
-    lurek.render.print(ch, grid_x(col), grid_y(row))
+    text_(ch, grid_x(col), grid_y(row))
 end
 
 local function draw_string(str, col, row, color, alpha)
     local c = color or COL_GREEN
     lurek.render.setColor(c[1], c[2], c[3], alpha or 1)
-    lurek.render.print(str, grid_x(col), grid_y(row))
+    text_(str, grid_x(col), grid_y(row))
 end
 
 local function draw_box(c1, r1, c2, r2, color)
@@ -169,7 +216,7 @@ end
 
 local function trigger_page_complete()
     if ps_complete then ps_complete:emit(25) end
-    lurek.tween.to({ target = { value = page_offset_x }, to = { value = 0 }, duration = 0.3 })
+    lurek.tween.to(_slide, { value = 0 }, 0.3)
 end
 
 -- ---------------------------------------------------------------------------
@@ -180,7 +227,7 @@ local PAGES = { STATE_PAGE_1, STATE_PAGE_2, STATE_PAGE_3, STATE_PAGE_4, STATE_PA
 local function go_next_page()
     for i, p in ipairs(PAGES) do
         if current_state == p and i < #PAGES then
-            page_offset_x = 30
+            _slide.value = 30
             current_state = PAGES[i + 1]
             trigger_page_complete()
             return true
@@ -192,9 +239,9 @@ end
 local function go_prev_page()
     for i, p in ipairs(PAGES) do
         if current_state == p and i > 1 then
-            page_offset_x = -30
+            _slide.value = -30
             current_state = PAGES[i - 1]
-            lurek.tween.to({ target = { value = page_offset_x }, to = { value = 0 }, duration = 0.3 })
+            lurek.tween.to(_slide, { value = 0 }, 0.3)
             return true
         end
     end
@@ -204,6 +251,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Terminal Demo — Lurek2D")
     lurek.render.setBackgroundColor(0, 0, 0)
@@ -386,14 +434,14 @@ function lurek.draw()
     -- CRT scanlines
     lurek.render.setColor(0, 0.12, 0.04, 0.2)
     for y = 0, SCREEN_H, 3 do
-        lurek.render.line(0, y, SCREEN_W, y)
+        ln(0, y, SCREEN_W, y)
     end
 
     -- Error flash overlay
     if flash_timer > 0 then
         local a = flash_timer / 0.3 * 0.15
         lurek.render.setColor(1, 0.1, 0, a)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
     end
 
     -- Particles
@@ -410,7 +458,7 @@ end
 function lurek.draw_ui()
     local fps  = lurek.timer.getFPS()
     local pnum = current_page_num()
-    local ox   = math.floor(page_offset_x)
+    local ox   = math.floor(_slide.value)
 
     -- ── TITLE SCREEN ──────────────────────────────────────────
     if current_state == STATE_TITLE then
@@ -601,5 +649,5 @@ function lurek.draw_ui()
 
     -- ── HUD ───────────────────────────────────────────────────
     lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.4)
-    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 18)
+    text_(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 18)
 end

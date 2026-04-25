@@ -444,6 +444,53 @@ lurek.input.bind("opt_4", "4")
 
 -- Init
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
   lurek.window.setTitle("Sports Manager — Lurek2D")
   lurek.render.setBackgroundColor(0.08, 0.12, 0.08)
@@ -653,16 +700,16 @@ function lurek.draw()
   if state == STATE_MATCH then
     -- draw pitch
     lurek.render.setColor(0.15, 0.55, 0.15, 1)
-    lurek.render.rectangle("fill", "fill", 50, 100, 700, 400)
+    rect("fill", "fill", 50, 100, 700, 400)
     -- pitch lines
     lurek.render.setColor(1, 1, 1, 0.4)
-    lurek.render.rectangle("fill", "line", 50, 100, 700, 400)
-    lurek.render.line(400, 100, 400, 500)
-    lurek.render.circle("line", 400, 300, 60)
+    rect("fill", "line", 50, 100, 700, 400)
+    ln(400, 100, 400, 500)
+    circ("line", 400, 300, 60)
     -- goals
     lurek.render.setColor(1, 1, 1, 0.7)
-    lurek.render.rectangle("fill", "line", 50, 240, 40, 120)
-    lurek.render.rectangle("fill", "line", 710, 240, 40, 120)
+    rect("fill", "line", 50, 240, 40, 120)
+    rect("fill", "line", 710, 240, 40, 120)
 
     -- animated "players" as dots
     local time = match_timer
@@ -670,42 +717,42 @@ function lurek.draw()
       local bx = 100 + math.sin(time * 2 + i * 0.7) * 40 + (i * 50) % 300
       local by = 150 + math.cos(time * 1.5 + i * 1.1) * 30 + (i * 30) % 250
       lurek.render.setColor(0.2, 0.4, 1, 0.9)
-      lurek.render.circle("fill", bx, by, 6)
+      circ("fill", bx, by, 6)
     end
     for i = 1, 11 do
       local rx = 400 + math.sin(time * 1.8 + i * 0.9) * 40 + (i * 45) % 250
       local ry = 150 + math.cos(time * 2.2 + i * 0.6) * 30 + (i * 35) % 250
       lurek.render.setColor(1, 0.2, 0.2, 0.9)
-      lurek.render.circle("fill", rx, ry, 6)
+      circ("fill", rx, ry, 6)
     end
 
     -- goal particles
     for _, p in ipairs(goal_particles) do
       local a = clamp(p.life, 0, 1)
       lurek.render.setColor(p.r, p.g, p.b, a)
-      lurek.render.circle("fill", p.x, p.y, p.size)
+      circ("fill", p.x, p.y, p.size)
     end
   end
 
   -- training particles (on field background)
   if state == STATE_TRAINING then
     lurek.render.setColor(0.12, 0.4, 0.12, 1)
-    lurek.render.rectangle("fill", "fill", 100, 200, 600, 250)
+    rect("fill", "fill", 100, 200, 600, 250)
     lurek.render.setColor(1, 1, 1, 0.3)
-    lurek.render.rectangle("fill", "line", 100, 200, 600, 250)
+    rect("fill", "line", 100, 200, 600, 250)
   end
 
   for _, p in ipairs(train_particles) do
     local a = clamp(p.life, 0, 1)
     lurek.render.setColor(0.6, 0.8, 1.0, a * 0.7)
-    lurek.render.circle("fill", p.x, p.y, p.size)
+    circ("fill", p.x, p.y, p.size)
   end
 
   -- transfer sparkle
   for _, p in ipairs(transfer_particles) do
     local a = clamp(p.life, 0, 1)
     lurek.render.setColor(p.r, p.g, p.b, a)
-    lurek.render.circle("fill", p.x, p.y, p.size)
+    circ("fill", p.x, p.y, p.size)
   end
 end
 
@@ -715,56 +762,56 @@ function lurek.draw_ui()
 
   -- FPS
   lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-  lurek.render.print("FPS: " .. tostring(lurek.timer.getFPS()), 10, SCREEN_H - 20)
+  text_("FPS: " .. tostring(lurek.timer.getFPS()), 10, SCREEN_H - 20)
   lurek.render.setColor(1, 1, 1, 1)
 
   -- TITLE
   if state == STATE_TITLE then
     lurek.render.setColor(0.1, 0.7, 0.3, 1)
-    lurek.render.print("SPORTS MANAGER", SCREEN_W / 2 - 100, 150)
+    text_("SPORTS MANAGER", SCREEN_W / 2 - 100, 150)
     lurek.render.setColor(0.8, 0.9, 0.8, 1)
-    lurek.render.print("LEAD YOUR TEAM", SCREEN_W / 2 - 80, 200)
+    text_("LEAD YOUR TEAM", SCREEN_W / 2 - 80, 200)
     local blink_a = 0.5 + 0.5 * math.sin(title_blink * 3)
     lurek.render.setColor(1, 1, 1, blink_a)
-    lurek.render.print("Press ENTER to start", SCREEN_W / 2 - 90, 320)
+    text_("Press ENTER to start", SCREEN_W / 2 - 90, 320)
 
     lurek.render.setColor(0.6, 0.6, 0.6, 0.7)
-    lurek.render.print("R=Roster  T=Train  B=Buy  Space=Next Match", SCREEN_W / 2 - 180, 400)
+    text_("R=Roster  T=Train  B=Buy  Space=Next Match", SCREEN_W / 2 - 180, 400)
     return
   end
 
   -- OFFICE
   if state == STATE_OFFICE then
     lurek.render.setColor(0.1, 0.7, 0.3, 1)
-    lurek.render.print("OFFICE — " .. TEAM_NAMES[my_team_index], 20, 15)
+    text_("OFFICE — " .. TEAM_NAMES[my_team_index], 20, 15)
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("Week " .. week .. " / " .. SEASON_WEEKS .. "    Budget: " .. budget .. "g", 20, 40)
+    text_("Week " .. week .. " / " .. SEASON_WEEKS .. "    Budget: " .. budget .. "g", 20, 40)
 
     local starters = count_starters()
-    lurek.render.print("Starters: " .. starters .. "/" .. TEAM_SIZE .. "    Roster: " .. #roster, 20, 60)
+    text_("Starters: " .. starters .. "/" .. TEAM_SIZE .. "    Roster: " .. #roster, 20, 60)
 
     if training_done then
       lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
-      lurek.render.print("[T] Train (done this week)", 20, 90)
+      text_("[T] Train (done this week)", 20, 90)
     else
       lurek.render.setColor(0.8, 1, 0.8, 1)
-      lurek.render.print("[T] Train", 20, 90)
+      text_("[T] Train", 20, 90)
     end
     lurek.render.setColor(0.8, 1, 0.8, 1)
-    lurek.render.print("[R] Roster    [B] Transfer Market    [Space] Next Match", 20, 110)
+    text_("[R] Roster    [B] Transfer Market    [Space] Next Match", 20, 110)
 
     -- Mini league table
     sort_league()
     lurek.render.setColor(0.2, 0.6, 0.2, 1)
-    lurek.render.print("LEAGUE TABLE", 20, 150)
+    text_("LEAGUE TABLE", 20, 150)
     lurek.render.setColor(0.7, 0.7, 0.7, 1)
-    lurek.render.print("#   Team             W   D   L   GF  GA  Pts", 20, 170)
+    text_("#   Team             W   D   L   GF  GA  Pts", 20, 170)
     for i, t in ipairs(league) do
       local y = 190 + (i - 1) * 22
       local is_me = (t.name == TEAM_NAMES[my_team_index])
       if is_me then
         lurek.render.setColor(0.2, 0.4, 0.2, 0.5)
-        lurek.render.rectangle("fill", "fill", 18, y - 2, 550, 20)
+        rect("fill", "fill", 18, y - 2, 550, 20)
       end
       if i <= 3 then
         lurek.render.setColor(0.3, 1, 0.5, 1)
@@ -774,7 +821,7 @@ function lurek.draw_ui()
       local pts_show = math.floor((t.display_pts or t.pts) + 0.5)
       local line = string.format("%-3d %-16s %3d %3d %3d %3d %3d  %3d",
         i, t.name, t.w, t.d, t.l, t.gf, t.ga, pts_show)
-      lurek.render.print(line, 20, y)
+      text_(line, 20, y)
     end
 
     -- next opponent
@@ -786,13 +833,13 @@ function lurek.draw_ui()
             local opp_idx = m.home == my_team_index and m.away or m.home
             local venue = m.home == my_team_index and "HOME" or "AWAY"
             lurek.render.setColor(1, 0.9, 0.4, 1)
-            lurek.render.print("Next: vs " .. TEAM_NAMES[opp_idx] .. " (" .. venue .. ")", 20, 390 + 20)
+            text_("Next: vs " .. TEAM_NAMES[opp_idx] .. " (" .. venue .. ")", 20, 390 + 20)
           end
         end
       end
     else
       lurek.render.setColor(1, 0.6, 0.2, 1)
-      lurek.render.print("Season complete! Press SPACE to see results.", 20, 410)
+      text_("Season complete! Press SPACE to see results.", 20, 410)
     end
     return
   end
@@ -800,16 +847,16 @@ function lurek.draw_ui()
   -- ROSTER
   if state == STATE_ROSTER then
     lurek.render.setColor(0.1, 0.7, 0.3, 1)
-    lurek.render.print("ROSTER — Click to toggle starter/bench", 20, 15)
+    text_("ROSTER — Click to toggle starter/bench", 20, 15)
     lurek.render.setColor(0.7, 0.7, 0.7, 1)
-    lurek.render.print("Name                 Pos  Skill  Stam  Morale  Status", 40, 55)
+    text_("Name                 Pos  Skill  Stam  Morale  Status", 40, 55)
 
     for i, p in ipairs(roster) do
       local y = 80 + (i - 1) * 30
       -- highlight starters
       if p.starter then
         lurek.render.setColor(0.15, 0.3, 0.15, 0.5)
-        lurek.render.rectangle("fill", "fill", 38, y - 2, 720, 26)
+        rect("fill", "fill", 38, y - 2, 720, 26)
       end
 
       if p.injured > 0 then
@@ -830,7 +877,7 @@ function lurek.draw_ui()
       local bar_h = 10
       local fill = p.morale / 100
       lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
-      lurek.render.rectangle("fill", "fill", bar_x, y + 4, bar_w, bar_h)
+      rect("fill", "fill", bar_x, y + 4, bar_w, bar_h)
       if p.morale > 70 then
         lurek.render.setColor(0.2, 0.8, 0.3, 0.8)
       elseif p.morale > 40 then
@@ -838,7 +885,7 @@ function lurek.draw_ui()
       else
         lurek.render.setColor(0.8, 0.2, 0.2, 0.8)
       end
-      lurek.render.rectangle("fill", "fill", bar_x, y + 4, bar_w * fill, bar_h)
+      rect("fill", "fill", bar_x, y + 4, bar_w * fill, bar_h)
 
       local c = POS_COLORS[p.pos] or {1, 1, 1}
       if p.injured > 0 then
@@ -851,11 +898,11 @@ function lurek.draw_ui()
 
       local line = string.format("%-20s %-4s %3d    %3d    %3d     %s",
         p.name, p.pos, p.skill, p.stamina, p.morale, status)
-      lurek.render.print(line, 40, y)
+      text_(line, 40, y)
     end
 
     lurek.render.setColor(0.6, 0.6, 0.6, 0.7)
-    lurek.render.print("Press R or ENTER to return to office", 20, SCREEN_H - 30)
+    text_("Press R or ENTER to return to office", 20, SCREEN_H - 30)
     return
   end
 
@@ -863,26 +910,26 @@ function lurek.draw_ui()
   if state == STATE_MATCH then
     -- scoreboard
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.rectangle("fill", "fill", 200, 20, 400, 70)
+    rect("fill", "fill", 200, 20, 400, 70)
     lurek.render.setColor(0.3, 0.6, 1, 1)
-    lurek.render.print(TEAM_NAMES[my_team_index], 220, 30)
+    text_(TEAM_NAMES[my_team_index], 220, 30)
     lurek.render.setColor(1, 0.3, 0.3, 1)
-    lurek.render.print(match_opponent, 480, 30)
+    text_(match_opponent, 480, 30)
     lurek.render.setColor(1, 1, 1, 1)
     local h_disp = math.floor(score_display.home + 0.5)
     local a_disp = math.floor(score_display.away + 0.5)
-    lurek.render.print(h_disp .. " — " .. a_disp, 370, 50)
+    text_(h_disp .. " — " .. a_disp, 370, 50)
 
     -- match time bar
     local progress = clamp(match_timer / MATCH_DURATION, 0, 1)
     lurek.render.setColor(0.3, 0.3, 0.3, 0.6)
-    lurek.render.rectangle("fill", "fill", 200, 95, 400, 8)
+    rect("fill", "fill", 200, 95, 400, 8)
     lurek.render.setColor(0.4, 0.9, 0.4, 0.9)
-    lurek.render.rectangle("fill", "fill", 200, 95, 400 * progress, 8)
+    rect("fill", "fill", 200, 95, 400 * progress, 8)
 
     -- event feed
     lurek.render.setColor(0, 0, 0, 0.6)
-    lurek.render.rectangle("fill", "fill", 50, 520, 700, 70)
+    rect("fill", "fill", 50, 520, 700, 70)
     for i = math.max(1, match_event_index - 2), match_event_index do
       if match_events[i] then
         local ey = 525 + (i - math.max(1, match_event_index - 2)) * 20
@@ -898,7 +945,7 @@ function lurek.draw_ui()
         else
           lurek.render.setColor(0.8, 0.8, 0.8, 1)
         end
-        lurek.render.print(ev.time .. "' — " .. ev.text, 60, ey)
+        text_(ev.time .. "' — " .. ev.text, 60, ey)
       end
     end
     return
@@ -907,33 +954,33 @@ function lurek.draw_ui()
   -- TRAINING
   if state == STATE_TRAINING then
     lurek.render.setColor(0.1, 0.7, 0.3, 1)
-    lurek.render.print("TRAINING SESSION", SCREEN_W / 2 - 80, 30)
+    text_("TRAINING SESSION", SCREEN_W / 2 - 80, 30)
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("Choose training focus:", SCREEN_W / 2 - 90, 80)
+    text_("Choose training focus:", SCREEN_W / 2 - 90, 80)
 
     lurek.render.setColor(0.9, 0.4, 0.4, 1)
-    lurek.render.print("[O] Offense — +2 skill to Forwards", 200, 130)
+    text_("[O] Offense — +2 skill to Forwards", 200, 130)
     lurek.render.setColor(0.4, 0.5, 0.9, 1)
-    lurek.render.print("[D] Defense — +2 skill to Defenders & GK", 200, 160)
+    text_("[D] Defense — +2 skill to Defenders & GK", 200, 160)
     lurek.render.setColor(0.4, 0.9, 0.4, 1)
-    lurek.render.print("[F] Fitness — +5 stamina to all", 200, 190)
+    text_("[F] Fitness — +5 stamina to all", 200, 190)
     lurek.render.setColor(0.9, 0.8, 0.3, 1)
-    lurek.render.print("[M] Morale — +10 morale to all", 200, 220)
+    text_("[M] Morale — +10 morale to all", 200, 220)
 
     lurek.render.setColor(0.6, 0.6, 0.6, 0.7)
-    lurek.render.print("Press ENTER to cancel", SCREEN_W / 2 - 70, SCREEN_H - 40)
+    text_("Press ENTER to cancel", SCREEN_W / 2 - 70, SCREEN_H - 40)
     return
   end
 
   -- TRANSFER
   if state == STATE_TRANSFER then
     lurek.render.setColor(0.1, 0.7, 0.3, 1)
-    lurek.render.print("TRANSFER MARKET", SCREEN_W / 2 - 80, 20)
+    text_("TRANSFER MARKET", SCREEN_W / 2 - 80, 20)
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("Budget: " .. budget .. "g    Roster: " .. #roster .. "/24", 20, 50)
+    text_("Budget: " .. budget .. "g    Roster: " .. #roster .. "/24", 20, 50)
 
     lurek.render.setColor(0.7, 0.7, 0.7, 1)
-    lurek.render.print("#   Name                 Pos  Skill  Price", 40, 90)
+    text_("#   Name                 Pos  Skill  Price", 40, 90)
 
     for i, p in ipairs(market) do
       if p then
@@ -948,16 +995,16 @@ function lurek.draw_ui()
         lurek.render.setColor(c[1], c[2], c[3], can_buy and 1 or 0.5)
         local line = string.format("[%d] %-20s %-4s %3d    %dg",
           i, p.name, p.pos, p.skill, p.price)
-        lurek.render.print(line, 40, y)
+        text_(line, 40, y)
       else
         local y = 120 + (i - 1) * 60
         lurek.render.setColor(0.4, 0.4, 0.4, 0.5)
-        lurek.render.print("[" .. i .. "] — SOLD —", 40, y)
+        text_("[" .. i .. "] — SOLD —", 40, y)
       end
     end
 
     lurek.render.setColor(0.6, 0.6, 0.6, 0.7)
-    lurek.render.print("Press 1-3 to buy, B or ENTER to return", 20, SCREEN_H - 30)
+    text_("Press 1-3 to buy, B or ENTER to return", 20, SCREEN_H - 30)
     return
   end
 
@@ -969,18 +1016,18 @@ function lurek.draw_ui()
     else
       lurek.render.setColor(0.8, 0.3, 0.3, 1)
     end
-    lurek.render.print(season_result, SCREEN_W / 2 - 140, 100)
+    text_(season_result, SCREEN_W / 2 - 140, 100)
 
     sort_league()
     lurek.render.setColor(0.7, 0.7, 0.7, 1)
-    lurek.render.print("FINAL STANDINGS", SCREEN_W / 2 - 70, 160)
-    lurek.render.print("#   Team             W   D   L   GF  GA  Pts", 80, 190)
+    text_("FINAL STANDINGS", SCREEN_W / 2 - 70, 160)
+    text_("#   Team             W   D   L   GF  GA  Pts", 80, 190)
     for i, t in ipairs(league) do
       local y = 215 + (i - 1) * 24
       local is_me = (t.name == TEAM_NAMES[my_team_index])
       if is_me then
         lurek.render.setColor(0.2, 0.4, 0.2, 0.6)
-        lurek.render.rectangle("fill", "fill", 78, y - 2, 500, 22)
+        rect("fill", "fill", 78, y - 2, 500, 22)
       end
       if i <= 3 then
         lurek.render.setColor(0.3, 1, 0.5, 1)
@@ -989,10 +1036,10 @@ function lurek.draw_ui()
       end
       local line = string.format("%-3d %-16s %3d %3d %3d %3d %3d  %3d",
         i, t.name, t.w, t.d, t.l, t.gf, t.ga, t.pts)
-      lurek.render.print(line, 80, y)
+      text_(line, 80, y)
     end
 
     lurek.render.setColor(1, 1, 1, 0.5 + 0.5 * math.sin(title_blink * 3))
-    lurek.render.print("Press ENTER to play again", SCREEN_W / 2 - 100, SCREEN_H - 50)
+    text_("Press ENTER to play again", SCREEN_W / 2 - 100, SCREEN_H - 50)
   end
 end

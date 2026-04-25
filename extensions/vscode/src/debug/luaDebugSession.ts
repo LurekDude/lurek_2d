@@ -602,13 +602,22 @@ export class LuaDebugSession extends LoggingDebugSession {
     const text = args.text;
     const targets: CompletionItem[] = [];
 
-    // Provide lurek.* namespace completions
+    // Provide lurek.* namespace completions — loaded from bundled lurek-api.json
     if (text.startsWith("lurek.")) {
-      const lurekModules = [
-        "render", "audio", "timer", "keyboard", "mouse", "gamepad",
-        "touch", "window", "filesystem", "math", "physics", "system",
-        "data", "event", "thread", "scene", "ecs", "particle",
-      ];
+      let lurekModules: string[] = [];
+      try {
+        const apiJsonPath = path.join(__dirname, "..", "data", "lurek-api.json");
+        const raw = JSON.parse(fs.readFileSync(apiJsonPath, "utf8")) as { modules?: { name: string }[] };
+        lurekModules = (raw.modules ?? []).map(m => m.name);
+      } catch {
+        // Fallback if JSON is unavailable
+        lurekModules = [
+          "ai", "animation", "audio", "camera", "compute", "data", "ecs",
+          "event", "filesystem", "image", "input", "math", "mods", "particle",
+          "pathfind", "physics", "render", "save", "scene", "thread",
+          "tilemap", "timer", "tween", "ui", "window",
+        ];
+      }
       for (const mod of lurekModules) {
         if (mod.startsWith(text.slice(5))) {
           targets.push(new CompletionItem(mod, 9)); // 9 = Module

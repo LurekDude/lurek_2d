@@ -26,7 +26,7 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.1, 0.1, 0.2)
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.print("Hello, Lurek2D!", 100, 100)
 end
 ```
@@ -129,8 +129,8 @@ Every callback is optional. An empty `main.lua` is a valid Lurek2D program.
 function lurek.init()        end  -- once at startup
 function lurek.ready()       end  -- after first frame is ready
 function lurek.process(dt)   end  -- every frame (game logic)
-function lurek.render()      end  -- every frame (draw calls)
-function lurek.render_ui()   end  -- every frame (HUD layer)
+function lurek.draw()        end  -- every frame (draw calls)
+function lurek.draw_ui()     end  -- every frame (HUD layer)
 -- Input, physics, window, and error callbacks also available (22 total)
 ```
 

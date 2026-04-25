@@ -211,6 +211,53 @@ end
 -- Callbacks
 -- ============================================================================
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Boulder Dash — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.04, 0.02)
@@ -404,44 +451,44 @@ function lurek.draw()
             if sx > -CELL and sx < 800 and sy > -CELL and sy < 600 then
                 local c = grid[y][x]
                 if c == EARTH then
-                    lurek.render.rectangle(sx, sy, CELL - 1, CELL - 1, 0.55, 0.35, 0.15, 1)
+                    rect(sx, sy, CELL - 1, CELL - 1, 0.55, 0.35, 0.15, 1)
                     -- Earth detail dots
-                    lurek.render.rectangle(sx + 4, sy + 4, 2, 2, 0.45, 0.28, 0.10, 0.5)
-                    lurek.render.rectangle(sx + 12, sy + 10, 2, 2, 0.45, 0.28, 0.10, 0.5)
+                    rect(sx + 4, sy + 4, 2, 2, 0.45, 0.28, 0.10, 0.5)
+                    rect(sx + 12, sy + 10, 2, 2, 0.45, 0.28, 0.10, 0.5)
                 elseif c == WALL then
-                    lurek.render.rectangle(sx, sy, CELL - 1, CELL - 1, 0.4, 0.4, 0.45, 1)
-                    lurek.render.rectangle(sx + 1, sy + 1, CELL - 3, 1, 0.5, 0.5, 0.55, 0.3)
+                    rect(sx, sy, CELL - 1, CELL - 1, 0.4, 0.4, 0.45, 1)
+                    rect(sx + 1, sy + 1, CELL - 3, 1, 0.5, 0.5, 0.55, 0.3)
                 elseif c == BOULDER then
                     -- Tan boulder
-                    lurek.render.rectangle(sx + 2, sy + 2, CELL - 4, CELL - 4, 0.7, 0.6, 0.4, 1)
-                    lurek.render.rectangle(sx + 4, sy + 3, 4, 3, 0.8, 0.7, 0.5, 0.4)
+                    rect(sx + 2, sy + 2, CELL - 4, CELL - 4, 0.7, 0.6, 0.4, 1)
+                    rect(sx + 4, sy + 3, 4, 3, 0.8, 0.7, 0.5, 0.4)
                 elseif c == DIAMOND then
                     -- Cyan diamond shape (two rects as cross)
                     local pulse = math.sin(lurek.timer.getTime() * 6 + x * 0.7 + y * 0.5) * 0.15
                     local dr = 0.0
                     local dg = 0.7 + pulse
                     local db = 1.0
-                    lurek.render.rectangle(sx + 6, sy + 2, 8, CELL - 4, dr, dg, db, 1)
-                    lurek.render.rectangle(sx + 3, sy + 6, CELL - 6, 8, dr, dg, db, 1)
+                    rect(sx + 6, sy + 2, 8, CELL - 4, dr, dg, db, 1)
+                    rect(sx + 3, sy + 6, CELL - 6, 8, dr, dg, db, 1)
                     -- Sparkle highlight
-                    lurek.render.rectangle(sx + 8, sy + 4, 3, 3, 1, 1, 1, 0.6)
+                    rect(sx + 8, sy + 4, 3, 3, 1, 1, 1, 0.6)
                 elseif c == PLAYER then
                     if not player_dead then
                         -- Yellow player
-                        lurek.render.rectangle(sx + 2, sy + 2, CELL - 4, CELL - 4, 1.0, 0.9, 0.2, 1)
+                        rect(sx + 2, sy + 2, CELL - 4, CELL - 4, 1.0, 0.9, 0.2, 1)
                         -- Eyes
-                        lurek.render.rectangle(sx + 5, sy + 6, 3, 3, 0.1, 0.1, 0.1, 1)
-                        lurek.render.rectangle(sx + 12, sy + 6, 3, 3, 0.1, 0.1, 0.1, 1)
+                        rect(sx + 5, sy + 6, 3, 3, 0.1, 0.1, 0.1, 1)
+                        rect(sx + 12, sy + 6, 3, 3, 0.1, 0.1, 0.1, 1)
                     end
                 elseif c == EXIT then
                     if exit_open then
                         -- Bright green open exit
                         local glow = 0.7 + math.sin(lurek.timer.getTime() * 4) * 0.3
-                        lurek.render.rectangle(sx, sy, CELL - 1, CELL - 1, 0.0, glow, 0.1, 1)
-                        lurek.render.rectangle(sx + 4, sy + 4, CELL - 9, CELL - 9, 0.2, 1.0, 0.3, 0.7)
+                        rect(sx, sy, CELL - 1, CELL - 1, 0.0, glow, 0.1, 1)
+                        rect(sx + 4, sy + 4, CELL - 9, CELL - 9, 0.2, 1.0, 0.3, 0.7)
                     else
                         -- Dark closed exit
-                        lurek.render.rectangle(sx, sy, CELL - 1, CELL - 1, 0.15, 0.2, 0.15, 1)
+                        rect(sx, sy, CELL - 1, CELL - 1, 0.15, 0.2, 0.15, 1)
                     end
                 end
             end
@@ -452,13 +499,13 @@ function lurek.draw()
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
         local sz = p.size * alpha
-        lurek.render.rectangle(p.x + ox - sz / 2, p.y + oy - sz / 2, sz, sz,
+        rect(p.x + ox - sz / 2, p.y + oy - sz / 2, sz, sz,
             p.r, p.g, p.b, alpha)
     end
 
     -- Level flash overlay
     if level_flash > 0 then
-        lurek.render.rectangle(0, 0, 800, 600, 1, 1, 1, level_flash * 0.3)
+        rect(0, 0, 800, 600, 1, 1, 1, level_flash * 0.3)
     end
 end
 
@@ -470,29 +517,29 @@ function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
 
     if state == TITLE then
-        lurek.render.print("BOULDER DASH", 200, 180, 48, 0.7, 0.5, 0.2, 1)
-        lurek.render.print("Dig. Collect. Escape.", 255, 240, 20, 0.6, 0.6, 0.5, 1)
+        text_("BOULDER DASH", 200, 180, 48, 0.7, 0.5, 0.2, 1)
+        text_("Dig. Collect. Escape.", 255, 240, 20, 0.6, 0.6, 0.5, 1)
 
         local blink = math.sin(lurek.timer.getTime() * 3) * 0.4 + 0.6
-        lurek.render.print("PRESS ENTER", 305, 350, 22, 1, 1, 1, blink)
+        text_("PRESS ENTER", 305, 350, 22, 1, 1, 1, blink)
 
-        lurek.render.print("Arrow keys to move | Collect diamonds | Avoid boulders", 135, 430, 14, 0.5, 0.5, 0.4, 1)
-        lurek.render.print(string.format("FPS: %d", fps), 10, 580, 12, 0.3, 0.3, 0.3, 1)
+        text_("Arrow keys to move | Collect diamonds | Avoid boulders", 135, 430, 14, 0.5, 0.5, 0.4, 1)
+        text_(string.format("FPS: %d", fps), 10, 580, 12, 0.3, 0.3, 0.3, 1)
 
     elseif state == PLAYING or state == LEVEL_COMPLETE then
         -- HUD background bar
-        lurek.render.rectangle(0, 0, 800, 28, 0.0, 0.0, 0.0, 0.7)
+        rect(0, 0, 800, 28, 0.0, 0.0, 0.0, 0.7)
 
         -- Diamond count with pulse
         local pulse_scale = 1.0 + diamond_pulse * 0.3
         local dc_color_g = 0.8 + diamond_pulse * 0.2
         local diamond_text = string.format("Diamonds: %d / %d", diamonds_collected, diamonds_needed)
-        lurek.render.print(diamond_text, 10, 5,
+        text_(diamond_text, 10, 5,
             math.floor(16 * pulse_scale), 0.0, dc_color_g, 1.0, 1)
 
         -- Exit status
         if exit_open then
-            lurek.render.print("EXIT OPEN!", 300, 5, 16, 0.2, 1.0, 0.3, 1)
+            text_("EXIT OPEN!", 300, 5, 16, 0.2, 1.0, 0.3, 1)
         end
 
         -- Timer
@@ -500,42 +547,42 @@ function lurek.draw_ui()
         local t_seconds = math.floor(timer_left % 60)
         local timer_r = timer_left < 20 and 1.0 or 0.9
         local timer_g = timer_left < 20 and 0.3 or 0.9
-        lurek.render.print(string.format("Time: %d:%02d", t_minutes, t_seconds),
+        text_(string.format("Time: %d:%02d", t_minutes, t_seconds),
             500, 5, 16, timer_r, timer_g, 0.8, 1)
 
         -- Lives
-        lurek.render.print(string.format("Lives: %d", lives), 650, 5, 16, 1, 0.9, 0.2, 1)
+        text_(string.format("Lives: %d", lives), 650, 5, 16, 1, 0.9, 0.2, 1)
 
         -- Level
-        lurek.render.print(string.format("Lv %d", level), 750, 5, 16, 0.7, 0.7, 0.7, 1)
+        text_(string.format("Lv %d", level), 750, 5, 16, 0.7, 0.7, 0.7, 1)
 
         -- FPS
-        lurek.render.print(string.format("FPS: %d", fps), 10, 580, 12, 0.3, 0.3, 0.3, 1)
+        text_(string.format("FPS: %d", fps), 10, 580, 12, 0.3, 0.3, 0.3, 1)
 
         if state == LEVEL_COMPLETE then
-            lurek.render.rectangle(150, 200, 500, 120, 0.0, 0.0, 0.0, 0.85)
+            rect(150, 200, 500, 120, 0.0, 0.0, 0.0, 0.85)
             if level < #LEVELS then
-                lurek.render.print("LEVEL COMPLETE!", 260, 220, 32, 0.2, 1.0, 0.3, 1)
-                lurek.render.print("Press ENTER for next level", 275, 270, 18, 0.8, 0.8, 0.8, 1)
+                text_("LEVEL COMPLETE!", 260, 220, 32, 0.2, 1.0, 0.3, 1)
+                text_("Press ENTER for next level", 275, 270, 18, 0.8, 0.8, 0.8, 1)
             else
-                lurek.render.print("YOU WIN!", 310, 220, 36, 1.0, 0.9, 0.2, 1)
-                lurek.render.print("All caves cleared! Press ENTER", 255, 270, 18, 0.8, 0.8, 0.8, 1)
+                text_("YOU WIN!", 310, 220, 36, 1.0, 0.9, 0.2, 1)
+                text_("All caves cleared! Press ENTER", 255, 270, 18, 0.8, 0.8, 0.8, 1)
             end
         end
 
         if player_dead then
             local flash = math.sin(death_timer * 12) * 0.3 + 0.3
-            lurek.render.rectangle(0, 0, 800, 600, 1.0, 0.0, 0.0, flash)
+            rect(0, 0, 800, 600, 1.0, 0.0, 0.0, flash)
         end
 
     elseif state == GAME_OVER then
-        lurek.render.print("GAME OVER", 250, 200, 48, 0.9, 0.2, 0.1, 1)
-        lurek.render.print(string.format("Reached Level %d", level), 300, 270, 22, 0.7, 0.7, 0.6, 1)
-        lurek.render.print(string.format("Diamonds: %d", diamonds_collected), 310, 310, 18, 0.0, 0.8, 1.0, 1)
+        text_("GAME OVER", 250, 200, 48, 0.9, 0.2, 0.1, 1)
+        text_(string.format("Reached Level %d", level), 300, 270, 22, 0.7, 0.7, 0.6, 1)
+        text_(string.format("Diamonds: %d", diamonds_collected), 310, 310, 18, 0.0, 0.8, 1.0, 1)
 
         local blink = math.sin(lurek.timer.getTime() * 3) * 0.4 + 0.6
-        lurek.render.print("PRESS ENTER", 310, 400, 22, 1, 1, 1, blink)
+        text_("PRESS ENTER", 310, 400, 22, 1, 1, 1, blink)
 
-        lurek.render.print(string.format("FPS: %d", fps), 10, 580, 12, 0.3, 0.3, 0.3, 1)
+        text_(string.format("FPS: %d", fps), 10, 580, 12, 0.3, 0.3, 0.3, 1)
     end
 end

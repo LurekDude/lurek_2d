@@ -122,9 +122,9 @@ local dialog        = { full = "", shown = "", timer = 0, active = false, char_i
 -- Tweens
 local pickup_anim   = { active = false, x = 0, y = 0, alpha = 1, text = "" }
 -- Particles
-local sparkle_ps    = nil
-local burst_ps      = nil
-local dust_ps       = nil
+local sparkle_ps    = nil ---@type any
+local burst_ps      = nil ---@type any
+local dust_ps       = nil ---@type any
 -- Title
 local title_blink   = 0
 
@@ -161,7 +161,7 @@ local function start_pickup_anim(x, y, text)
     pickup_anim.y      = y
     pickup_anim.alpha  = 1.0
     pickup_anim.text   = text
-    lurek.tween.to(pickup_anim, 0.8, { y = y - 40, alpha = 0 })
+    lurek.tween.tween(0.8, pickup_anim, { y = y - 40, alpha = 0 }, "linear")
 end
 
 local function get_room()
@@ -306,7 +306,57 @@ end
 -- Init
 ------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+local _cam = nil ---@type any
+
 function lurek.init()
+    _cam = lurek.camera.new()
     lurek.input.bind("up",        {"w", "up"})
     lurek.input.bind("down",      {"s", "down"})
     lurek.input.bind("left",      {"a", "left"})
@@ -504,17 +554,17 @@ local function draw_room_bg()
     local pal = get_palette()
     -- Floor
     lurek.render.setColor(pal.floor[1], pal.floor[2], pal.floor[3], 1)
-    lurek.render.rectangle(0, SCREEN_H * 0.55, SCREEN_W, SCREEN_H * 0.45)
+    rect(0, SCREEN_H * 0.55, SCREEN_W, SCREEN_H * 0.45)
     -- Walls
     lurek.render.setColor(pal.wall[1], pal.wall[2], pal.wall[3], 1)
-    lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H * 0.55)
+    rect(0, 0, SCREEN_W, SCREEN_H * 0.55)
     -- Wall trim
     lurek.render.setColor(pal.accent[1], pal.accent[2], pal.accent[3], 1)
-    lurek.render.rectangle(0, SCREEN_H * 0.55 - 4, SCREEN_W, 4)
+    rect(0, SCREEN_H * 0.55 - 4, SCREEN_W, 4)
     -- Side walls
     lurek.render.setColor(pal.wall[1] * 0.7, pal.wall[2] * 0.7, pal.wall[3] * 0.7, 1)
-    lurek.render.rectangle(0, 0, 30, SCREEN_H * 0.55)
-    lurek.render.rectangle(SCREEN_W - 30, 0, 30, SCREEN_H * 0.55)
+    rect(0, 0, 30, SCREEN_H * 0.55)
+    rect(SCREEN_W - 30, 0, 30, SCREEN_H * 0.55)
 end
 
 local function draw_hotspot(hs, idx)
@@ -528,18 +578,18 @@ local function draw_hotspot(hs, idx)
     else
         lurek.render.setColor(pal.accent[1] * 0.6, pal.accent[2] * 0.6, pal.accent[3] * 0.6, 0.7)
     end
-    lurek.render.rectangle(hs.x, hs.y, hs.w, hs.h)
+    rect(hs.x, hs.y, hs.w, hs.h)
 
     -- Border
     if is_sel then
         local pulse = 0.7 + 0.3 * math.sin(title_blink * 4)
         lurek.render.setColor(1, 1, 0.6, pulse)
-        lurek.render.rectangle("line", hs.x - 2, hs.y - 2, hs.w + 4, hs.h + 4, 2)
+        rect("line", hs.x - 2, hs.y - 2, hs.w + 4, hs.h + 4, 2)
     end
 
     -- Label
     lurek.render.setColor(1, 1, 1, is_sel and 1 or 0.6)
-    lurek.render.print(hs.id, hs.x + 4, hs.y + hs.h + 4, 12)
+    text_(hs.id, hs.x + 4, hs.y + hs.h + 4, 12)
 end
 
 local function draw_exit_arrows()
@@ -548,16 +598,16 @@ local function draw_exit_arrows()
     local a = 0.4 + 0.3 * math.sin(title_blink * 3)
     lurek.render.setColor(1, 1, 1, a)
     if exits.left then
-        lurek.render.print("<", 8, SCREEN_H / 2 - 10, 24)
+        text_("<", 8, SCREEN_H / 2 - 10, 24)
     end
     if exits.right then
-        lurek.render.print(">", SCREEN_W - 24, SCREEN_H / 2 - 10, 24)
+        text_(">", SCREEN_W - 24, SCREEN_H / 2 - 10, 24)
     end
     if exits.up then
-        lurek.render.print("^", SCREEN_W / 2 - 8, 8, 24)
+        text_("^", SCREEN_W / 2 - 8, 8, 24)
     end
     if exits.down then
-        lurek.render.print("v", SCREEN_W / 2 - 8, SCREEN_H - 80, 24)
+        text_("v", SCREEN_W / 2 - 8, SCREEN_H - 80, 24)
     end
 end
 
@@ -567,41 +617,41 @@ local function draw_room_objects()
     if current_room == "bedroom" then
         -- Bed frame
         lurek.render.setColor(0.35, 0.22, 0.12, 1)
-        lurek.render.rectangle(90, 190, 200, 140)
+        rect(90, 190, 200, 140)
         -- Pillow
         lurek.render.setColor(0.85, 0.80, 0.70, 1)
-        lurek.render.rectangle(140, 195, 80, 35)
+        rect(140, 195, 80, 35)
     elseif current_room == "hallway" then
         -- Floor runner
         lurek.render.setColor(0.35, 0.12, 0.12, 0.5)
-        lurek.render.rectangle(50, 430, SCREEN_W - 100, 30)
+        rect(50, 430, SCREEN_W - 100, 30)
     elseif current_room == "kitchen" then
         -- Counter top
         lurek.render.setColor(0.5, 0.4, 0.3, 1)
-        lurek.render.rectangle(70, 195, 220, 10)
+        rect(70, 195, 220, 10)
     elseif current_room == "garden" then
         -- Grass tufts
         for i = 0, 15 do
             local gx = (i * 53 + 17) % SCREEN_W
             local gy = 400 + (i * 7) % 80
             lurek.render.setColor(0.15, 0.45, 0.15, 0.6)
-            lurek.render.rectangle(gx, gy, 8, 16)
+            rect(gx, gy, 8, 16)
         end
         -- Tree trunk
         lurek.render.setColor(0.35, 0.22, 0.10, 1)
-        lurek.render.rectangle(560, 180, 30, 200)
+        rect(560, 180, 30, 200)
         -- Canopy
         lurek.render.setColor(0.12, 0.40, 0.12, 0.9)
-        lurek.render.circle(575, 120, 80)
+        circ(575, 120, 80)
     elseif current_room == "attic" then
         -- Rafters
         lurek.render.setColor(0.30, 0.22, 0.12, 0.8)
-        lurek.render.rectangle(0, 30, SCREEN_W, 12)
-        lurek.render.rectangle(0, 70, SCREEN_W, 8)
+        rect(0, 30, SCREEN_W, 12)
+        rect(0, 70, SCREEN_W, 8)
         -- Pedestal
         if flags.egg_placed then
             lurek.render.setColor(0.95, 0.85, 0.3, 1)
-            lurek.render.circle(400, 250, 20)
+            circ(400, 250, 20)
         end
     end
 end
@@ -613,49 +663,49 @@ function lurek.draw()
     if game_state == STATE.TITLE then
         -- Title screen background
         lurek.render.setColor(0.05, 0.03, 0.08, 1)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
 
         -- Decorative border
         lurek.render.setColor(0.6, 0.45, 0.15, 0.6)
-        lurek.render.rectangle("line", 40, 40, SCREEN_W - 80, SCREEN_H - 80, 3)
-        lurek.render.rectangle("line", 50, 50, SCREEN_W - 100, SCREEN_H - 100, 1)
+        rect("line", 40, 40, SCREEN_W - 80, SCREEN_H - 80, 3)
+        rect("line", 50, 50, SCREEN_W - 100, SCREEN_H - 100, 1)
 
         -- Title
         lurek.render.setColor(0.95, 0.85, 0.3, 1)
-        lurek.render.print("THE LOST EGG", SCREEN_W / 2 - 100, 180, 32)
+        text_("THE LOST EGG", SCREEN_W / 2 - 100, 180, 32)
         lurek.render.setColor(0.7, 0.6, 0.3, 1)
-        lurek.render.print("A Point & Click Adventure", SCREEN_W / 2 - 120, 230, 16)
+        text_("A Point & Click Adventure", SCREEN_W / 2 - 120, 230, 16)
 
         -- Golden egg icon
         lurek.render.setColor(0.95, 0.82, 0.2, 1)
-        lurek.render.circle(SCREEN_W / 2, 320, 30)
+        circ(SCREEN_W / 2, 320, 30)
         lurek.render.setColor(1, 0.95, 0.5, 0.5)
-        lurek.render.circle(SCREEN_W / 2 - 8, 310, 8)
+        circ(SCREEN_W / 2 - 8, 310, 8)
 
         -- Blink prompt
         local blink = math.sin(title_blink * 3) > 0
         if blink then
             lurek.render.setColor(0.8, 0.8, 0.6, 0.9)
-            lurek.render.print("Press [E] to begin", SCREEN_W / 2 - 80, 440, 14)
+            text_("Press [E] to begin", SCREEN_W / 2 - 80, 440, 14)
         end
         return
     end
 
     if game_state == STATE.WIN then
         lurek.render.setColor(0.02, 0.01, 0.05, 1)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
 
         local glow = 0.7 + 0.3 * math.sin(title_blink * 2)
         lurek.render.setColor(0.95, 0.85, 0.3, glow)
-        lurek.render.circle(SCREEN_W / 2, 250, 50)
+        circ(SCREEN_W / 2, 250, 50)
         lurek.render.setColor(1, 0.95, 0.5, 0.4 * glow)
-        lurek.render.circle(SCREEN_W / 2, 250, 70)
+        circ(SCREEN_W / 2, 250, 70)
 
         lurek.render.setColor(1, 0.95, 0.6, 1)
-        lurek.render.print("YOU FOUND THE GOLDEN EGG!", SCREEN_W / 2 - 140, 360, 20)
+        text_("YOU FOUND THE GOLDEN EGG!", SCREEN_W / 2 - 140, 360, 20)
         lurek.render.setColor(0.7, 0.65, 0.4, 0.8)
-        lurek.render.print("The ancient mystery is solved.", SCREEN_W / 2 - 120, 400, 14)
-        lurek.render.print("Press [Escape] to quit.", SCREEN_W / 2 - 90, 440, 12)
+        text_("The ancient mystery is solved.", SCREEN_W / 2 - 120, 400, 14)
+        text_("Press [Escape] to quit.", SCREEN_W / 2 - 90, 440, 12)
 
         -- Draw particles on win screen
         sparkle_ps:draw()
@@ -684,7 +734,7 @@ function lurek.draw()
     -- Pickup animation
     if pickup_anim.active then
         lurek.render.setColor(1, 1, 0.6, pickup_anim.alpha)
-        lurek.render.print(pickup_anim.text, pickup_anim.x - 20, pickup_anim.y, 16)
+        text_(pickup_anim.text, pickup_anim.x - 20, pickup_anim.y, 16)
     end
 end
 
@@ -697,28 +747,28 @@ function lurek.draw_ui()
     -- Room name banner
     local room = get_room()
     lurek.render.setColor(0, 0, 0, 0.7)
-    lurek.render.rectangle(0, 0, SCREEN_W, 28)
+    rect(0, 0, SCREEN_W, 28)
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print(room.name, 10, 6, 16)
+    text_(room.name, 10, 6, 16)
 
     -- Selected hotspot description
     if game_state == STATE.EXPLORING and selected_idx >= 1 and selected_idx <= #room.hotspots then
         local hs = room.hotspots[selected_idx]
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.rectangle(0, 28, SCREEN_W, 22)
+        rect(0, 28, SCREEN_W, 22)
         lurek.render.setColor(0.9, 0.85, 0.6, 1)
-        lurek.render.print("[" .. selected_idx .. "] " .. hs.id .. ": " .. hs.desc, 10, 32, 12)
+        text_("[" .. selected_idx .. "] " .. hs.id .. ": " .. hs.desc, 10, 32, 12)
     end
 
     -- Inventory bar
     lurek.render.setColor(0, 0, 0, 0.8)
-    lurek.render.rectangle(0, INV_Y, SCREEN_W, 60)
+    rect(0, INV_Y, SCREEN_W, 60)
     lurek.render.setColor(0.4, 0.35, 0.2, 1)
-    lurek.render.line(0, INV_Y, SCREEN_W, INV_Y, 2)
+    ln(0, INV_Y, SCREEN_W, INV_Y, 2)
 
     -- Inventory label
     lurek.render.setColor(0.8, 0.75, 0.5, 1)
-    lurek.render.print("Inventory [C]", 10, INV_Y + 4, 11)
+    text_("Inventory [C]", 10, INV_Y + 4, 11)
 
     -- Items
     for i, item in ipairs(inventory) do
@@ -727,42 +777,42 @@ function lurek.draw_ui()
 
         if i == inv_selected then
             lurek.render.setColor(0.8, 0.7, 0.2, 0.8)
-            lurek.render.rectangle("line", sx - 2, sy - 2, INV_SLOT_W + 4, INV_SLOT_H - 14, 2)
+            rect("line", sx - 2, sy - 2, INV_SLOT_W + 4, INV_SLOT_H - 14, 2)
         end
 
         -- Item background
         lurek.render.setColor(0.15, 0.12, 0.08, 0.9)
-        lurek.render.rectangle(sx, sy, INV_SLOT_W, INV_SLOT_H - 16)
+        rect(sx, sy, INV_SLOT_W, INV_SLOT_H - 16)
 
         -- Item name
         lurek.render.setColor(1, 0.95, 0.7, 1)
         local display_name = item:gsub("_", " ")
-        lurek.render.print(display_name, sx + 3, sy + 6, 10)
+        text_(display_name, sx + 3, sy + 6, 10)
     end
 
     -- Combine mode indicator
     if combine_mode then
         lurek.render.setColor(1, 0.6, 0.1, 0.9)
-        lurek.render.print("COMBINE MODE — select second item", SCREEN_W / 2 - 130, INV_Y - 18, 12)
+        text_("COMBINE MODE — select second item", SCREEN_W / 2 - 130, INV_Y - 18, 12)
     end
 
     -- Dialog box
     if game_state == STATE.DIALOG and dialog.active then
         -- Background
         lurek.render.setColor(0, 0, 0, 0.85)
-        lurek.render.rectangle(40, SCREEN_H / 2 - 50, SCREEN_W - 80, 100)
+        rect(40, SCREEN_H / 2 - 50, SCREEN_W - 80, 100)
         -- Border
         lurek.render.setColor(0.6, 0.5, 0.2, 1)
-        lurek.render.rectangle("line", 40, SCREEN_H / 2 - 50, SCREEN_W - 80, 100, 2)
+        rect("line", 40, SCREEN_H / 2 - 50, SCREEN_W - 80, 100, 2)
         -- Text (typewriter)
         lurek.render.setColor(0.95, 0.9, 0.8, 1)
-        lurek.render.print(dialog.shown, 60, SCREEN_H / 2 - 30, 14)
+        text_(dialog.shown, 60, SCREEN_H / 2 - 30, 14)
         -- Continue hint
         if dialog.char_idx >= #dialog.full then
             local blink = math.sin(title_blink * 4) > 0
             if blink then
                 lurek.render.setColor(0.7, 0.65, 0.4, 0.8)
-                lurek.render.print("[E] continue", SCREEN_W - 180, SCREEN_H / 2 + 30, 11)
+                text_("[E] continue", SCREEN_W - 180, SCREEN_H / 2 + 30, 11)
             end
         end
     end
@@ -770,18 +820,18 @@ function lurek.draw_ui()
     -- Inventory screen overlay
     if game_state == STATE.INVENTORY then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(0.08, 0.06, 0.12, 0.95)
-        lurek.render.rectangle(100, 100, SCREEN_W - 200, SCREEN_H - 260)
+        rect(100, 100, SCREEN_W - 200, SCREEN_H - 260)
         lurek.render.setColor(0.6, 0.5, 0.2, 1)
-        lurek.render.rectangle("line", 100, 100, SCREEN_W - 200, SCREEN_H - 260, 2)
+        rect("line", 100, 100, SCREEN_W - 200, SCREEN_H - 260, 2)
 
         lurek.render.setColor(0.95, 0.85, 0.4, 1)
-        lurek.render.print("INVENTORY", 320, 115, 20)
+        text_("INVENTORY", 320, 115, 20)
 
         lurek.render.setColor(0.7, 0.65, 0.5, 0.8)
-        lurek.render.print("[Left/Right] Select   [C] Combine   [E] Close", 180, 140, 11)
+        text_("[Left/Right] Select   [C] Combine   [E] Close", 180, 140, 11)
 
         for i, item in ipairs(inventory) do
             local ix = 140 + ((i - 1) % 4) * 150
@@ -789,26 +839,26 @@ function lurek.draw_ui()
 
             if i == inv_selected then
                 lurek.render.setColor(0.8, 0.7, 0.2, 0.9)
-                lurek.render.rectangle("line", ix - 4, iy - 4, 140, 50, 2)
+                rect("line", ix - 4, iy - 4, 140, 50, 2)
             end
 
             lurek.render.setColor(0.15, 0.12, 0.08, 0.9)
-            lurek.render.rectangle(ix, iy, 132, 42)
+            rect(ix, iy, 132, 42)
 
             lurek.render.setColor(1, 0.95, 0.7, 1)
             local display_name = item:gsub("_", " ")
-            lurek.render.print(display_name, ix + 8, iy + 14, 13)
+            text_(display_name, ix + 8, iy + 14, 13)
         end
 
         if #inventory == 0 then
             lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
-            lurek.render.print("No items yet.", 320, 220, 14)
+            text_("No items yet.", 320, 220, 14)
         end
     end
 
     -- Controls hint
     if game_state == STATE.EXPLORING then
         lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
-        lurek.render.print("[Tab] Cycle   [E] Interact   [C] Inventory   [Arrows] Move", 140, SCREEN_H - 14, 10)
+        text_("[Tab] Cycle   [E] Interact   [C] Inventory   [Arrows] Move", 140, SCREEN_H - 14, 10)
     end
 end

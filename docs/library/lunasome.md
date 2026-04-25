@@ -10291,7 +10291,7 @@ Set a synced value. Only the authority can set values. Non-authority calls are r
 **Parameters**
 
 - `key` *string* — The state key (must be a non-empty string).
-- `value` *Any* — MessagePack-serializable value.
+- `value` *any* — MessagePack-serializable value.
 
 **Returns**
 
@@ -12649,7 +12649,7 @@ Call a function on a specific remote peer (request/response pattern). When a mat
 - `peer_id` *number* — Target peer.
 - `name` *string* — Function name registered on the remote side.
 - `callback` *function* — `fn(success, result)` — called when the response arrives.
-- `...` *Arguments* — (must be MessagePack-serializable).
+- `...` *any* — Arguments (must be MessagePack-serializable).
 
 **Returns**
 
@@ -12663,7 +12663,7 @@ Fire-and-forget call: no response expected. Includes `peer_id` in the wire messa
 
 - `peer_id` *number* — Target peer.
 - `name` *string* — Function name registered on the remote side.
-- `...` *Arguments* — (must be MessagePack-serializable).
+- `...` *any* — Arguments (must be MessagePack-serializable).
 
 #### `broadcast(name, ...)`
 
@@ -12672,7 +12672,7 @@ Broadcast an RPC call to all connected peers (fire-and-forget). Includes `peer_i
 **Parameters**
 
 - `name` *string* — Function name registered on remote peers.
-- `...` *Arguments* — (must be MessagePack-serializable).
+- `...` *any* — Arguments (must be MessagePack-serializable).
 
 #### `resetIdCounter()`
 

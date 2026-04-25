@@ -388,23 +388,23 @@ function lurek.process(dt)
 
     -- ── Player movement ───────────────────────────────────────────
     local spd = 250 * dt
-    if lurek.input.isDown("move_up") then
+    if lurek.input.isActionDown("move_up") then
         player.y = clamp(player.y - spd, NET_Y + 10, COURT_B - 10)
     end
-    if lurek.input.isDown("move_down") then
+    if lurek.input.isActionDown("move_down") then
         player.y = clamp(player.y + spd, NET_Y + 10, COURT_B - 10)
     end
-    if lurek.input.isDown("move_left") then
+    if lurek.input.isActionDown("move_left") then
         player.x = clamp(player.x - spd, COURT_L + 10, COURT_R - 10)
         aim_dir = -1
     end
-    if lurek.input.isDown("move_right") then
+    if lurek.input.isActionDown("move_right") then
         player.x = clamp(player.x + spd, COURT_L + 10, COURT_R - 10)
         aim_dir = 1
     end
     -- Spin modifier
-    if lurek.input.isDown("move_up") then spin_type = 1 end   -- topspin
-    if lurek.input.isDown("move_down") then spin_type = -1 end -- slice
+    if lurek.input.isActionDown("move_up") then spin_type = 1 end   -- topspin
+    if lurek.input.isActionDown("move_down") then spin_type = -1 end -- slice
 
     -- ── SERVING ───────────────────────────────────────────────────
     if state == ST.SERVING then

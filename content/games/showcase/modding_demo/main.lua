@@ -132,7 +132,9 @@ local chaos_elapsed  = 0
 -- Engine objects
 -- ---------------------------------------------------------------------------
 local camera         = nil
+---@type any
 local ps_activate    = nil  -- mod activation particles
+---@type any
 local ps_coin        = nil  -- coin collect particles
 local tw_preview     = { alpha = 0.0 }
 local tw_test_fade   = { alpha = 0.0 }
@@ -205,6 +207,8 @@ local function get_palette()
     return pal
 end
 
+local tween_to
+
 -- ---------------------------------------------------------------------------
 -- Test scene setup
 -- ---------------------------------------------------------------------------
@@ -242,11 +246,11 @@ local function enter_test_scene()
     spawn_coins()
     spawn_enemies()
     tw_test_fade.alpha = 0.0
-    lurek.tween.to(tw_test_fade, 0.4, { alpha = 1.0 })
+    tween_to(tw_test_fade, 0.4, { alpha = 1.0 })
 end
 
 local function exit_test_scene()
-    lurek.tween.to(tw_test_fade, 0.3, { alpha = 0.0 })
+    tween_to(tw_test_fade, 0.3, { alpha = 0.0 })
     lurek.timer.afterReal(0.35, function() current_state = STATE_BROWSER end)
 end
 
@@ -264,6 +268,76 @@ lurek.input.bind("escape", "quit")
 -- Callbacks
 -- ---------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(...)
+    local a, b, c, d, e, f, g, h, i = ...
+    if type(a) == "string" then
+        if type(f) == "table" then
+            _sc(f)
+        elseif type(f) == "number" then
+            _gfx.setColor(f or 1, g or 1, h or 1, i or 1)
+        end
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+tween_to = function(...)
+    local target, duration, fields, easing = ...
+    return lurek.tween.to(target, fields, duration, easing)
+end
+
+local function particle_update(ps, dt)
+    if ps then ps:update(dt) end
+end
+
+local function particle_set_position(ps, x, y)
+    if ps then ps:setPosition(x, y) end
+end
+
+local function particle_emit(ps, count)
+    if ps then ps:emit(count) end
+end
+
 function lurek.init()
     lurek.window.setTitle("Modding Demo — Lurek2D")
     lurek.render.setBackgroundColor(COL_BG[1], COL_BG[2], COL_BG[3])
@@ -278,8 +352,8 @@ function lurek.init()
     ps_activate:setSpeed(60, 140)
     ps_activate:setSpread(math.pi * 2)
     ps_activate:setColors(
-        COL_ACTIVE[1], COL_ACTIVE[2], COL_ACTIVE[3], 1,
-        COL_ACTIVE[1], COL_ACTIVE[2], COL_ACTIVE[3], 0
+        { COL_ACTIVE[1], COL_ACTIVE[2], COL_ACTIVE[3], 1 },
+        { COL_ACTIVE[1], COL_ACTIVE[2], COL_ACTIVE[3], 0 }
     )
     ps_activate:setSizes(4, 1)
 
@@ -290,8 +364,8 @@ function lurek.init()
     ps_coin:setSpeed(40, 100)
     ps_coin:setSpread(math.pi * 2)
     ps_coin:setColors(
-        COL_COIN[1], COL_COIN[2], COL_COIN[3], 1,
-        COL_COIN[1], COL_COIN[2], COL_COIN[3], 0
+        { COL_COIN[1], COL_COIN[2], COL_COIN[3], 1 },
+        { COL_COIN[1], COL_COIN[2], COL_COIN[3], 0 }
     )
     ps_coin:setSizes(3, 1)
 end
@@ -307,7 +381,7 @@ function lurek.process(dt)
         title_timer = title_timer + dt
         if title_timer >= title_hold or lurek.input.wasActionPressed("toggle") then
             current_state = STATE_BROWSER
-            lurek.tween.to(tw_preview, 0.3, { alpha = 1.0 })
+            tween_to(tw_preview, 0.3, { alpha = 1.0 })
         end
         return
     end
@@ -319,8 +393,8 @@ function lurek.process(dt)
     end
 
     -- Particle updates
-    ps_activate:update(dt)
-    ps_coin:update(dt)
+    particle_update(ps_activate, dt)
+    particle_update(ps_coin, dt)
 
     -- -----------------------------------------------------------------------
     -- BROWSER state input
@@ -330,21 +404,21 @@ function lurek.process(dt)
             selected_index = selected_index - 1
             if selected_index < 1 then selected_index = #MODS end
             tw_preview.alpha = 0.0
-            lurek.tween.to(tw_preview, 0.25, { alpha = 1.0 })
+            tween_to(tw_preview, 0.25, { alpha = 1.0 })
         end
         if lurek.input.wasActionPressed("nav_down") then
             selected_index = selected_index + 1
             if selected_index > #MODS then selected_index = 1 end
             tw_preview.alpha = 0.0
-            lurek.tween.to(tw_preview, 0.25, { alpha = 1.0 })
+            tween_to(tw_preview, 0.25, { alpha = 1.0 })
         end
         if lurek.input.wasActionPressed("toggle") then
             local mod = MODS[selected_index]
             mod.enabled = not mod.enabled
             -- Activation flash
             local flash_y = LIST_Y + (selected_index - 1) * LIST_SPACING + 12
-            ps_activate:setPosition(LIST_X + 180, flash_y)
-            ps_activate:emit(25)
+            particle_set_position(ps_activate, LIST_X + 180, flash_y)
+            particle_emit(ps_activate, 25)
         end
         if lurek.input.wasActionPressed("test") then
             enter_test_scene()
@@ -380,8 +454,8 @@ function lurek.process(dt)
         if lurek.input.wasActionPressed("toggle") then
             local mod = MODS[selected_index]
             mod.enabled = not mod.enabled
-            ps_activate:setPosition(player.x, player.y)
-            ps_activate:emit(20)
+            particle_set_position(ps_activate, player.x, player.y)
+            particle_emit(ps_activate, 20)
         end
         if lurek.input.wasActionPressed("test") then
             exit_test_scene()
@@ -391,8 +465,8 @@ function lurek.process(dt)
         -- Player movement
         local spd = get_player_speed()
         player.vx, player.vy = 0, 0
-        if lurek.input.isDown("nav_up")   then player.vy = -spd end
-        if lurek.input.isDown("nav_down") then player.vy =  spd end
+        if lurek.input.isActionDown("nav_up")   then player.vy = -spd end
+        if lurek.input.isActionDown("nav_down") then player.vy =  spd end
         if lurek.input.isActionDown("left")   then player.vx = -spd end
         if lurek.input.isActionDown("right")  then player.vx =  spd end
         player.x = clamp(player.x + player.vx * dt, PLAYER_SIZE, SCREEN_W - PLAYER_SIZE)
@@ -410,8 +484,8 @@ function lurek.process(dt)
                 if dx * dx + dy * dy < (PLAYER_SIZE + COIN_SIZE) * (PLAYER_SIZE + COIN_SIZE) then
                     c.alive = false
                     score = score + get_score_value()
-                    ps_coin:setPosition(c.x, c.y)
-                    ps_coin:emit(15)
+                    particle_set_position(ps_coin, c.x, c.y)
+                    particle_emit(ps_coin, 15)
                 end
             end
         end
@@ -476,8 +550,8 @@ function lurek.draw()
     for _, c in ipairs(coins) do
         if c.alive then
             local col = invert and { 0.2, 0.3, 0.8 } or COL_COIN
-            lurek.render.circle("fill", c.x, c.y, COIN_SIZE, col[1], col[2], col[3], tw_test_fade.alpha)
-            lurek.render.circle("line", c.x, c.y, COIN_SIZE + 2, col[1] * 0.7, col[2] * 0.7, col[3] * 0.7, tw_test_fade.alpha * 0.5)
+            circ("fill", c.x, c.y, COIN_SIZE, col[1], col[2], col[3], tw_test_fade.alpha)
+            circ("line", c.x, c.y, COIN_SIZE + 2, col[1] * 0.7, col[2] * 0.7, col[3] * 0.7, tw_test_fade.alpha * 0.5)
         end
     end
 
@@ -485,23 +559,23 @@ function lurek.draw()
     for i, e in ipairs(enemies) do
         local ci = ((i - 1) % #pal) + 1
         local col = invert and { 1 - pal[ci][1], 1 - pal[ci][2], 1 - pal[ci][3] } or COL_ENEMY
-        lurek.render.rectangle("fill", e.x - esz * 0.5, e.y - esz * 0.5, esz, esz, col[1], col[2], col[3], tw_test_fade.alpha)
+        rect("fill", e.x - esz * 0.5, e.y - esz * 0.5, esz, esz, col[1], col[2], col[3], tw_test_fade.alpha)
     end
 
     -- Player
     local pcol = invert and { 0.7, 0.45, 0.1 } or COL_PLAYER
-    lurek.render.rectangle("fill", player.x - PLAYER_SIZE * 0.5, player.y - PLAYER_SIZE * 0.5,
+    rect("fill", player.x - PLAYER_SIZE * 0.5, player.y - PLAYER_SIZE * 0.5,
         PLAYER_SIZE, PLAYER_SIZE, pcol[1], pcol[2], pcol[3], tw_test_fade.alpha)
     -- Player direction indicator
-    lurek.render.circle("fill", player.x, player.y - PLAYER_SIZE * 0.35,
+    circ("fill", player.x, player.y - PLAYER_SIZE * 0.35,
         3, 1, 1, 1, tw_test_fade.alpha * 0.8)
 
     -- Night mode visibility circle
     if is_mod_enabled("Night Mode") then
         -- Draw a large dark overlay with a cutout hint
-        lurek.render.circle("line", player.x, player.y, 120,
+        circ("line", player.x, player.y, 120,
             0.15, 0.15, 0.25, tw_test_fade.alpha * 0.4)
-        lurek.render.circle("line", player.x, player.y, 121,
+        circ("line", player.x, player.y, 121,
             0.10, 0.10, 0.20, tw_test_fade.alpha * 0.3)
     end
 
@@ -521,19 +595,19 @@ function lurek.draw_ui()
     -- -----------------------------------------------------------------------
     if current_state == STATE_TITLE then
         local pulse = 0.7 + 0.3 * math.abs(math.sin(title_timer * 2.0))
-        lurek.render.print("MODDING DEMO", SCREEN_W * 0.5 - 130, SCREEN_H * 0.35,
+        text_("MODDING DEMO", SCREEN_W * 0.5 - 130, SCREEN_H * 0.35,
             COL_TITLE[1], COL_TITLE[2], COL_TITLE[3], pulse)
-        lurek.render.print("CUSTOMIZE YOUR GAME", SCREEN_W * 0.5 - 110, SCREEN_H * 0.35 + 40,
+        text_("CUSTOMIZE YOUR GAME", SCREEN_W * 0.5 - 110, SCREEN_H * 0.35 + 40,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], pulse * 0.7)
-        lurek.render.print("Press ENTER to continue", SCREEN_W * 0.5 - 100, SCREEN_H * 0.65,
+        text_("Press ENTER to continue", SCREEN_W * 0.5 - 100, SCREEN_H * 0.65,
             COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 0.5 + 0.5 * math.sin(title_timer * 3))
-        lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, 10,
+        text_(string.format("FPS: %d", fps), SCREEN_W - 80, 10,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.6)
         return
     end
 
     -- FPS in top-right
-    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, 10,
+    text_(string.format("FPS: %d", fps), SCREEN_W - 80, 10,
         COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.6)
 
     -- -----------------------------------------------------------------------
@@ -541,9 +615,9 @@ function lurek.draw_ui()
     -- -----------------------------------------------------------------------
     if current_state == STATE_BROWSER then
         -- Header
-        lurek.render.print("MOD BROWSER", LIST_X, 20,
+        text_("MOD BROWSER", LIST_X, 20,
             COL_TITLE[1], COL_TITLE[2], COL_TITLE[3], 1)
-        lurek.render.print(string.format("Active: %d / %d   Load order: list order",
+        text_(string.format("Active: %d / %d   Load order: list order",
             active_mod_count(), #MODS), LIST_X, 48,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.8)
 
@@ -555,7 +629,7 @@ function lurek.draw_ui()
 
             -- Selection highlight
             if is_sel then
-                lurek.render.rectangle("fill", LIST_X - 8, y - 4, 410, LIST_SPACING - 6,
+                rect("fill", LIST_X - 8, y - 4, 410, LIST_SPACING - 6,
                     COL_SELECTED[1], COL_SELECTED[2], COL_SELECTED[3], 0.15)
             end
 
@@ -571,64 +645,64 @@ function lurek.draw_ui()
                 icon = "-"
                 icon_col = COL_INACTIVE
             end
-            lurek.render.print(icon, LIST_X, y,
+            text_(icon, LIST_X, y,
                 icon_col[1], icon_col[2], icon_col[3], 1)
 
             -- Mod name + version
             local name_col = m.enabled and COL_TEXT or COL_DIM
-            lurek.render.print(string.format("%s v%s", m.name, m.version), LIST_X + 20, y,
+            text_(string.format("%s v%s", m.name, m.version), LIST_X + 20, y,
                 name_col[1], name_col[2], name_col[3], 1)
 
             -- Author
-            lurek.render.print(string.format("by %s", m.author), LIST_X + 20, y + 16,
+            text_(string.format("by %s", m.author), LIST_X + 20, y + 16,
                 COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.6)
 
             -- Conflict warning text
             if conflict then
-                lurek.render.print("CONFLICT", LIST_X + 300, y,
+                text_("CONFLICT", LIST_X + 300, y,
                     COL_WARNING[1], COL_WARNING[2], COL_WARNING[3], 0.9)
             end
         end
 
         -- Preview panel (right side)
-        lurek.render.rectangle("fill", PREVIEW_X, PREVIEW_Y, PREVIEW_W, PREVIEW_H,
+        rect("fill", PREVIEW_X, PREVIEW_Y, PREVIEW_W, PREVIEW_H,
             COL_PANEL[1], COL_PANEL[2], COL_PANEL[3], tw_preview.alpha * 0.9)
-        lurek.render.rectangle("line", PREVIEW_X, PREVIEW_Y, PREVIEW_W, PREVIEW_H,
+        rect("line", PREVIEW_X, PREVIEW_Y, PREVIEW_W, PREVIEW_H,
             COL_SELECTED[1], COL_SELECTED[2], COL_SELECTED[3], tw_preview.alpha * 0.4)
 
         local sel = MODS[selected_index]
         local pa = tw_preview.alpha
 
-        lurek.render.print("PREVIEW", PREVIEW_X + 12, PREVIEW_Y + 10,
+        text_("PREVIEW", PREVIEW_X + 12, PREVIEW_Y + 10,
             COL_TITLE[1], COL_TITLE[2], COL_TITLE[3], pa)
-        lurek.render.print(sel.name, PREVIEW_X + 12, PREVIEW_Y + 40,
+        text_(sel.name, PREVIEW_X + 12, PREVIEW_Y + 40,
             COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], pa)
-        lurek.render.print(string.format("v%s by %s", sel.version, sel.author),
+        text_(string.format("v%s by %s", sel.version, sel.author),
             PREVIEW_X + 12, PREVIEW_Y + 60,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], pa * 0.7)
 
         -- Description
-        lurek.render.print(sel.description, PREVIEW_X + 12, PREVIEW_Y + 95,
+        text_(sel.description, PREVIEW_X + 12, PREVIEW_Y + 95,
             COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], pa * 0.9)
 
         -- Preview effect text
-        lurek.render.print("Effect:", PREVIEW_X + 12, PREVIEW_Y + 130,
+        text_("Effect:", PREVIEW_X + 12, PREVIEW_Y + 130,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], pa * 0.7)
-        lurek.render.print(sel.preview, PREVIEW_X + 12, PREVIEW_Y + 150,
+        text_(sel.preview, PREVIEW_X + 12, PREVIEW_Y + 150,
             COL_ACTIVE[1], COL_ACTIVE[2], COL_ACTIVE[3], pa * 0.85)
 
         -- Status
         local status = sel.enabled and "ENABLED" or "DISABLED"
         local status_col = sel.enabled and COL_ACTIVE or COL_INACTIVE
-        lurek.render.print(string.format("Status: %s", status), PREVIEW_X + 12, PREVIEW_Y + 190,
+        text_(string.format("Status: %s", status), PREVIEW_X + 12, PREVIEW_Y + 190,
             status_col[1], status_col[2], status_col[3], pa)
 
         -- Conflicts
         if sel.conflicts then
-            lurek.render.print("Conflicts with:", PREVIEW_X + 12, PREVIEW_Y + 225,
+            text_("Conflicts with:", PREVIEW_X + 12, PREVIEW_Y + 225,
                 COL_WARNING[1], COL_WARNING[2], COL_WARNING[3], pa * 0.8)
             for ci, cname in ipairs(sel.conflicts) do
-                lurek.render.print(string.format("  - %s", cname),
+                text_(string.format("  - %s", cname),
                     PREVIEW_X + 12, PREVIEW_Y + 225 + ci * 18,
                     COL_WARNING[1], COL_WARNING[2], COL_WARNING[3], pa * 0.65)
             end
@@ -636,24 +710,24 @@ function lurek.draw_ui()
 
         -- Load order display
         local load_y = PREVIEW_Y + 300
-        lurek.render.print("Load Order:", PREVIEW_X + 12, load_y,
+        text_("Load Order:", PREVIEW_X + 12, load_y,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], pa * 0.7)
         local order = 1
         for _, m in ipairs(MODS) do
             if m.enabled then
-                lurek.render.print(string.format("%d. %s", order, m.name),
+                text_(string.format("%d. %s", order, m.name),
                     PREVIEW_X + 12, load_y + order * 18,
                     COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], pa * 0.8)
                 order = order + 1
             end
         end
         if order == 1 then
-            lurek.render.print("(none)", PREVIEW_X + 12, load_y + 18,
+            text_("(none)", PREVIEW_X + 12, load_y + 18,
                 COL_DIM[1], COL_DIM[2], COL_DIM[3], pa * 0.5)
         end
 
         -- Footer controls
-        lurek.render.print("Up/Down: Select  Enter: Toggle  T: Test  E: Export  Esc: Quit",
+        text_("Up/Down: Select  Enter: Toggle  T: Test  E: Export  Esc: Quit",
             LIST_X, SCREEN_H - 30,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.6)
     end
@@ -665,16 +739,16 @@ function lurek.draw_ui()
         local ta = tw_test_fade.alpha
 
         -- Score
-        lurek.render.print(string.format("Score: %d", score), 20, 10,
+        text_(string.format("Score: %d", score), 20, 10,
             COL_COIN[1], COL_COIN[2], COL_COIN[3], ta)
 
         -- Active mods strip
-        lurek.render.print("Active Mods:", 20, 35,
+        text_("Active Mods:", 20, 35,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], ta * 0.7)
         local mx = 120
         for _, m in ipairs(MODS) do
             if m.enabled then
-                lurek.render.print(m.name, mx, 35,
+                text_(m.name, mx, 35,
                     COL_ACTIVE[1], COL_ACTIVE[2], COL_ACTIVE[3], ta * 0.8)
                 mx = mx + #m.name * 8 + 16
             end
@@ -687,23 +761,23 @@ function lurek.draw_ui()
             local is_sel = (i == selected_index)
             local col = m.enabled and COL_ACTIVE or COL_INACTIVE
             if is_sel then
-                lurek.render.rectangle("fill", bx - 4, by - 3, 118, 22,
+                rect("fill", bx - 4, by - 3, 118, 22,
                     COL_SELECTED[1], COL_SELECTED[2], COL_SELECTED[3], ta * 0.2)
             end
-            lurek.render.print(m.name, bx, by,
+            text_(m.name, bx, by,
                 col[1], col[2], col[3], ta * 0.7)
         end
 
         -- Chaos effect indicator
         if chaos_effect then
             local remaining = chaos_duration - chaos_elapsed
-            lurek.render.print(string.format("CHAOS: %s (%.1fs)", chaos_effect, remaining),
+            text_(string.format("CHAOS: %s (%.1fs)", chaos_effect, remaining),
                 SCREEN_W * 0.5 - 80, 10,
                 COL_WARNING[1], COL_WARNING[2], COL_WARNING[3], ta * (0.6 + 0.4 * math.sin(chaos_elapsed * 6)))
         end
 
         -- Controls
-        lurek.render.print("Arrows: Move  Enter: Toggle Mod  T: Exit Test",
+        text_("Arrows: Move  Enter: Toggle Mod  T: Exit Test",
             SCREEN_W * 0.5 - 140, SCREEN_H - 50,
             COL_DIM[1], COL_DIM[2], COL_DIM[3], ta * 0.5)
     end
@@ -713,14 +787,14 @@ function lurek.draw_ui()
     -- -----------------------------------------------------------------------
     if export_msg then
         local ea = clamp(export_timer / 0.5, 0, 1)
-        lurek.render.rectangle("fill", SCREEN_W * 0.5 - 160, SCREEN_H * 0.5 - 80, 320, 160,
+        rect("fill", SCREEN_W * 0.5 - 160, SCREEN_H * 0.5 - 80, 320, 160,
             0.05, 0.05, 0.10, ea * 0.92)
-        lurek.render.rectangle("line", SCREEN_W * 0.5 - 160, SCREEN_H * 0.5 - 80, 320, 160,
+        rect("line", SCREEN_W * 0.5 - 160, SCREEN_H * 0.5 - 80, 320, 160,
             COL_ACTIVE[1], COL_ACTIVE[2], COL_ACTIVE[3], ea * 0.6)
         local lines = {}
         for line in export_msg:gmatch("[^\n]+") do lines[#lines + 1] = line end
         for li, line in ipairs(lines) do
-            lurek.render.print(line, SCREEN_W * 0.5 - 140, SCREEN_H * 0.5 - 60 + (li - 1) * 18,
+            text_(line, SCREEN_W * 0.5 - 140, SCREEN_H * 0.5 - 60 + (li - 1) * 18,
                 COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], ea)
         end
     end

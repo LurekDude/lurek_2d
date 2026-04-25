@@ -1,7 +1,6 @@
 //! `lurek.spine` — Skeletal animation: bone hierarchies, slots, world-transform propagation,
 //! keyframe timelines, IK constraints, and skins.
 
-use super::render_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -47,8 +46,8 @@ impl LuaUserData for LuaSkeleton {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addBone --
         /// Adds a root bone with optional local transform and returns its index.
-        /// @param name : string
-        /// @param opts : table?
+        /// @param name string
+        /// @param opts table?
         /// @return integer
         methods.add_method_mut(
             "addBone",
@@ -68,9 +67,9 @@ impl LuaUserData for LuaSkeleton {
 
         // -- addChildBone --
         /// Adds a child bone attached to a parent and returns its index.
-        /// @param name : string
-        /// @param parent_idx : integer
-        /// @param opts : table?
+        /// @param name string
+        /// @param parent_idx integer
+        /// @param opts table?
         /// @return integer
         methods.add_method_mut(
             "addChildBone",
@@ -90,9 +89,9 @@ impl LuaUserData for LuaSkeleton {
 
         // -- addSlot --
         /// Adds a slot bound to a bone and returns its index.
-        /// @param name : string
-        /// @param bone_idx : integer
-        /// @param attachment : string?
+        /// @param name string
+        /// @param bone_idx integer
+        /// @param attachment string?
         /// @return integer
         methods.add_method_mut(
             "addSlot",
@@ -103,7 +102,7 @@ impl LuaUserData for LuaSkeleton {
 
         // -- findBone --
         /// Returns the index of the named bone, or nil if not found.
-        /// @param name : string
+        /// @param name string
         /// @return integer?
         methods.add_method("findBone", |_, this, name: String| {
             Ok(this.inner.find_bone(&name))
@@ -111,7 +110,7 @@ impl LuaUserData for LuaSkeleton {
 
         // -- findSlot --
         /// Returns the index of the named slot, or nil if not found.
-        /// @param name : string
+        /// @param name string
         /// @return integer?
         methods.add_method("findSlot", |_, this, name: String| {
             Ok(this.inner.find_slot(&name))
@@ -127,7 +126,7 @@ impl LuaUserData for LuaSkeleton {
 
         // -- getBoneWorld --
         /// Returns the world-space transform of a bone as a table, or nil if out of range.
-        /// @param idx : integer
+        /// @param idx integer
         /// @return table?
         methods.add_method("getBoneWorld", |lua, this, idx: usize| {
             match this.inner.bone_world_transform(idx) {
@@ -146,8 +145,8 @@ impl LuaUserData for LuaSkeleton {
 
         // -- setPosition --
         /// Sets the root bone position and propagates world transforms.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method_mut("setPosition", |_, this, (x, y): (f32, f32)| {
             this.inner.set_root_position(x, y);
@@ -166,18 +165,18 @@ impl LuaUserData for LuaSkeleton {
 
         // -- drawToImage --
         /// Renders the skeleton as a stick-figure debug view into a new ImageData.
-        /// @param width : integer
-        /// @param height : integer
+        /// @param width integer
+        /// @param height integer
         /// @return ImageData
         methods.add_method("drawToImage", |lua, this, (w, h): (u32, u32)| {
             let img = this.inner.draw_to_image(w, h);
-            lua.create_userdata(LuaImageData { inner: img })
+            lua.create_userdata(img)
         });
 
         // -- playAnimation --
         /// Starts playback of the named skeletal animation clip.
-        /// @param name : string
-        /// @param looping : boolean?
+        /// @param name string
+        /// @param looping boolean?
         /// @return boolean
         methods.add_method_mut(
             "playAnimation",
@@ -196,7 +195,7 @@ impl LuaUserData for LuaSkeleton {
 
         // -- updateAnimation --
         /// Advances the playing animation by `dt` seconds and applies keyframes.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("updateAnimation", |_, this, dt: f32| {
             this.inner.update_animation(dt);
@@ -212,7 +211,7 @@ impl LuaUserData for LuaSkeleton {
 
         // -- addAnimation --
         /// Adds a SkeletonAnimation to this skeleton's library.
-        /// @param anim : SkeletonAnimation
+        /// @param anim SkeletonAnimation
         /// @return nil
         methods.add_method_mut("addAnimation", |_, this, anim_ud: LuaAnyUserData| {
             let anim = anim_ud.take::<LuaSkeletonAnimation>()?.inner;
@@ -222,9 +221,9 @@ impl LuaUserData for LuaSkeleton {
 
         // -- addIKConstraint --
         /// Adds a two-bone IK constraint and returns its index.
-        /// @param name : string
-        /// @param bone_chain : table
-        /// @param bend_positive : boolean?
+        /// @param name string
+        /// @param bone_chain table
+        /// @param bend_positive boolean?
         /// @return integer
         methods.add_method_mut(
             "addIKConstraint",
@@ -240,9 +239,9 @@ impl LuaUserData for LuaSkeleton {
 
         // -- setIKTarget --
         /// Sets the world-space target position for the named IK constraint.
-        /// @param name : string
-        /// @param x : number
-        /// @param y : number
+        /// @param name string
+        /// @param x number
+        /// @param y number
         /// @return boolean
         methods.add_method_mut(
             "setIKTarget",
@@ -251,7 +250,7 @@ impl LuaUserData for LuaSkeleton {
 
         // -- addSkin --
         /// Registers a new empty skin by name.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method_mut("addSkin", |_, this, name: String| {
             this.inner.add_skin(&name);
@@ -260,7 +259,7 @@ impl LuaUserData for LuaSkeleton {
 
         // -- setSkin --
         /// Activates the named skin for attachment lookups.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method_mut("setSkin", |_, this, name: String| {
             Ok(this.inner.set_skin(&name))
@@ -275,9 +274,9 @@ impl LuaUserData for LuaSkeleton {
 
         // -- setSkinMapping --
         /// Registers a slot-to-attachment mapping in the named skin.
-        /// @param skin : string
-        /// @param slot : string
-        /// @param attachment : string
+        /// @param skin string
+        /// @param slot string
+        /// @param attachment string
         /// @return nil
         methods.add_method_mut(
             "setSkinMapping",
@@ -296,9 +295,9 @@ impl LuaUserData for LuaSkeleton {
         /// skeleton:updateAnimation(dt)           -- advance primary clip
         /// skeleton:blendAnimation(overlay, t, 0.4) -- blend in secondary
         /// ```
-        /// @param anim : SkeletonAnimation
-        /// @param time : number
-        /// @param blend_weight : number?
+        /// @param anim SkeletonAnimation
+        /// @param time number
+        /// @param blend_weight number?
         /// @return nil
         methods.add_method_mut(
             "blendAnimation",
@@ -331,11 +330,11 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// Adds a keyframe to the bone timeline for the given property and bone index.
         /// The `property` string maps to `BoneProperty` names: "x", "y", "rotation", "scale_x", "scale_y".
         /// The optional `easing` string: "linear", "ease_in", "ease_out", "ease_in_out", "step".
-        /// @param bone_idx : integer
-        /// @param property : string
-        /// @param time : number
-        /// @param value : number
-        /// @param easing : string?
+        /// @param bone_idx integer
+        /// @param property string
+        /// @param time number
+        /// @param value number
+        /// @param easing string?
         /// @return nil
         methods.add_method_mut(
             "addKeyframe",
@@ -408,9 +407,9 @@ impl LuaUserData for LuaSkeletonAnimation {
         ///
         /// Registered Lua callbacks receive these events when the playhead crosses
         /// each marker.  Events are sorted by time automatically.
-        /// @param time : number
-        /// @param name : string
-        /// @param value : number?
+        /// @param time number
+        /// @param name string
+        /// @param value number?
         /// @return nil
         methods.add_method_mut(
             "addEventKey",
@@ -424,8 +423,8 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// Returns a list of event names that fall in the half-open interval `(from, to]`.
         ///
         /// Useful for polling events after each `updateAnimation` call.
-        /// @param from : number
-        /// @param to : number
+        /// @param from number
+        /// @param to number
         /// @return nil
         /// table  — Array of `{name: string, value: number}` tables.
         methods.add_method("getEvents", |lua, this, (from, to): (f32, f32)| {
@@ -455,16 +454,16 @@ impl LuaUserData for LuaSkeletonAnimation {
 
 /// Registers the `lurek.spine` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param luna &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- newSkeleton --
     /// Creates a new empty skeleton with the given name.
-    /// @param name : string
+    /// @param name string
     /// @return Skeleton
     tbl.set(
         "newSkeleton",
@@ -477,8 +476,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- newSkeletonAnimation --
     /// Creates a new empty SkeletonAnimation clip with the given name and duration.
-    /// @param name : string
-    /// @param duration : number
+    /// @param name string
+    /// @param duration number
     /// @return SkeletonAnimation
     tbl.set(
         "newSkeletonAnimation",

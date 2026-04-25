@@ -1,29 +1,26 @@
-local sceneCanvas   -- off-screen render target
-local effectShader  -- WGSL shader that reads from the canvas
+local sceneCanvas = lurek.render.newCanvas(800, 600)   -- off-screen render target
+local effectShader = lurek.render.newShader([[         -- WGSL shader that reads from the canvas
+    @group(0) @binding(0) var tex: texture_2d<f32>;
+    @group(0) @binding(1) var smp: sampler;
 
-function lurek.init()
-    local w, h = lurek.window.getWidth(), lurek.window.getHeight()
-    sceneCanvas = lurek.render.newCanvas(w, h)
+    @fragment
+    fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
+        let colour = textureSample(tex, smp, uv);
 
-    effectShader = lurek.render.newShader([[
-        @group(0) @binding(0) var tex: texture_2d<f32>;
-        @group(0) @binding(1) var smp: sampler;
+        // Example: vignette
+        let center = uv - vec2<f32>(0.5, 0.5);
+        let dist   = length(center);
+        let vignette = 1.0 - smoothstep(0.4, 0.8, dist);
 
-        @fragment
-        fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
-            let colour = textureSample(tex, smp, uv);
+        return vec4<f32>(colour.rgb * vignette, colour.a);
+    }
+]])
 
-            // Example: vignette
-            let center = uv - vec2<f32>(0.5, 0.5);
-            let dist   = length(center);
-            let vignette = 1.0 - smoothstep(0.4, 0.8, dist);
-
-            return vec4<f32>(colour.rgb * vignette, colour.a);
-        }
-    ]])
+local function drawScene()
+    lurek.render.clear(0.02, 0.02, 0.03)
 end
 
-function lurek.render()
+function lurek.draw()
     -- Phase 1: render scene to canvas
     lurek.render.setCanvas(sceneCanvas)
     lurek.render.clear()

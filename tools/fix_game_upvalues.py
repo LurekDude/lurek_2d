@@ -197,7 +197,7 @@ text = re.sub(r'^-- Powerup types\n', '', text, flags=re.MULTILINE)
 # Insert PU after EN block
 text = re.sub(r'(local PU = \{ SPREAD.*?\}\n)', r'\1', text)  # already inserted? no...
 # Just append PU after EN
-text = re.sub(r'(    SCORE=50, TURRET_INTERVAL=2\.0, TURRET_BULLET_SPEED=200,\n\})', 
+text = re.sub(r'(    SCORE=50, TURRET_INTERVAL=2\.0, TURRET_BULLET_SPEED=200,\n\})',
               r'\1\n' + NEW_PU, text)
 
 # Apply K replacements

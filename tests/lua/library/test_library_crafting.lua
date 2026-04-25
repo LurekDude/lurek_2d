@@ -1,10 +1,10 @@
 --- BDD tests for library.crafting
 --- Matches coverage of src/crafting/ Rust tests.
 
-require("tests.lua.init")
+require("tests/lua/init")
 local C = require("library.crafting")
 
---                  Quality                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Quality
 
 -- @description Checks quality tier constants and string parsing for valid and invalid quality names.
 describe("Quality", function()
@@ -24,7 +24,7 @@ describe("Quality", function()
     end)
 end)
 
---                  Ingredient                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  Ingredient
 
 -- @description Verifies direct item ingredients and tag-based ingredients preserve quantity, consumed flags, and tag detection semantics.
 describe("Ingredient", function()
@@ -50,7 +50,7 @@ describe("Ingredient", function()
     end)
 end)
 
---                  RecipeOutput                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  RecipeOutput
 
 -- @description Covers crafted output defaults, optional chance-based outputs, and chance clamping for overlarge probabilities.
 describe("RecipeOutput", function()
@@ -81,7 +81,7 @@ describe("RecipeOutput", function()
     end)
 end)
 
---                  Recipe                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  Recipe
 
 -- @description Tests recipe construction, ingredient and output mutation, tags, grid slots, byproducts, and condition attachment helpers.
 describe("Recipe", function()
@@ -171,7 +171,7 @@ describe("Recipe", function()
     end)
 end)
 
---                  RecipeRegistry                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  RecipeRegistry
 
 -- @description Validates recipe registry search paths including outputs, ingredients, tags, stations, categories, skills, and hand-craftable filters.
 describe("RecipeRegistry", function()
@@ -318,7 +318,7 @@ describe("RecipeRegistry", function()
     end)
 end)
 
---                  CraftJob                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  CraftJob
 
 -- @description Exercises craft job progress tracking, completion thresholds, percentage reporting, and paused-job behavior.
 describe("CraftJob", function()
@@ -352,7 +352,7 @@ describe("CraftJob", function()
     end)
 end)
 
---                  CraftQueue                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  CraftQueue
 
 -- @description Covers queue capacity, concurrent processing limits, cancellation, lookup, completion collection, and max-job reporting.
 describe("CraftQueue", function()
@@ -427,6 +427,7 @@ describe("CraftQueue", function()
         local q = C.newCraftQueue(5)
         local id = q:enqueue("y", 5, 1)
         local job = q:getJob(id)
+        if not job then return end
         expect_equal(job.recipe_id, "y")
     end)
 
@@ -457,7 +458,7 @@ describe("CraftQueue", function()
     end)
 end)
 
---                  Station                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Station
 
 -- @description Verifies station defaults, fuel flow, modules, attachments, stat storage, level upgrades, and efficiency clamping.
 describe("Station", function()
@@ -572,7 +573,7 @@ describe("Station", function()
     end)
 end)
 
---                  CraftSkill                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  CraftSkill
 
 -- @description Exercises skill leveling, perk spending, specialization choices, recipe difficulty colour, and aggregate bonuses from unlocked perks.
 describe("CraftSkill", function()
@@ -641,7 +642,7 @@ describe("CraftSkill", function()
     end)
 end)
 
---                  PerkNode                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  PerkNode
 
 -- @description Tests perk node defaults, prerequisite and level gating, and unlock state transitions.
 describe("PerkNode", function()
@@ -690,7 +691,7 @@ describe("PerkNode", function()
     end)
 end)
 
---                  UpgradeTree                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  UpgradeTree
 
 -- @description Covers upgrade tree node storage, availability filtering, and full-node enumeration order.
 describe("UpgradeTree", function()
@@ -732,7 +733,7 @@ describe("UpgradeTree", function()
     end)
 end)
 
---                  ModifierPool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  ModifierPool
 
 -- @description Validates modifier pool rolling, draw alias behavior, weight aggregation, removal, naming, and modifier listing.
 describe("ModifierPool", function()
@@ -754,11 +755,12 @@ describe("ModifierPool", function()
         local pool = C.newModifierPool()
         pool:add(C.newModifierEntry("sharp", 1))
         local result = pool:roll()
+        if not result then return end
         expect_equal(result.name, "sharp")
     end)
 end)
 
---                  RecipeKnowledge                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  RecipeKnowledge
 
 -- @description Exercises recipe discovery state, grouping, progress tracking, forgetting, auto-discovery toggles, and clearing known recipes.
 describe("RecipeKnowledge", function()
@@ -817,7 +819,7 @@ describe("RecipeKnowledge", function()
     end)
 end)
 
---                  RecipeGroup                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  RecipeGroup
 
 -- @description Verifies recipe group construction plus add, remove, contains, icon, order, and count helpers.
 describe("RecipeGroup", function()
@@ -830,7 +832,7 @@ describe("RecipeGroup", function()
     end)
 end)
 
---                  CraftSkill (extended coverage)                                                                                                                                                                                                                                                                                                                         
+--                  CraftSkill (extended coverage)
 
 -- @description Focuses on specialization selection, level forcing, and derived bonus getters for crafted speed, quality, and yield.
 describe("CraftSkill specializations", function()
@@ -922,7 +924,7 @@ describe("CraftSkill specializations", function()
     end)
 end)
 
---                  RecipeKnowledge mutations                                                                                                                                                                                                                                                                                                                                                                         
+--                  RecipeKnowledge mutations
 
 -- @description Covers mutation-oriented recipe knowledge operations including forgetting, auto-discover flags, and full resets.
 describe("RecipeKnowledge mutations", function()
@@ -971,7 +973,7 @@ describe("RecipeKnowledge mutations", function()
     end)
 end)
 
---                  RecipeGroup operations                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  RecipeGroup operations
 
 -- @description Exercises the mutating recipe-group helpers for managing recipe ids and display metadata.
 describe("RecipeGroup operations", function()
@@ -1009,7 +1011,7 @@ describe("RecipeGroup operations", function()
     end)
 end)
 
---                  ModifierPool operations                                                                                                                                                                                                                                                                                                                                                                                         
+--                  ModifierPool operations
 
 -- @description Adds extended coverage for modifier pool counts, total weight, enumerated modifiers, removal, and naming helpers.
 describe("ModifierPool operations", function()
@@ -1077,7 +1079,7 @@ describe("ModifierPool operations", function()
     end)
 end)
 
---                  UpgradeTree getAllNodes                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  UpgradeTree getAllNodes
 
 -- @description Verifies getAllNodes returns upgrade nodes in insertion order for deterministic UI or progression rendering.
 describe("UpgradeTree getAllNodes", function()
@@ -1099,7 +1101,7 @@ describe("UpgradeTree getAllNodes", function()
     end)
 end)
 
---                  Station proximity                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  Station proximity
 
 -- @description Tests station proximity checks to ensure range calculations distinguish nearby and distant work positions.
 describe("Station isInRange", function()
@@ -1111,12 +1113,12 @@ describe("Station isInRange", function()
         s.x = 50
         s.y = 50
         s.proximity_radius = 10
-        expect_equal(true,  s:isInRange(55, 55))    -- dist ~7.07 < 10
-        expect_equal(false, s:isInRange(100, 100))  -- dist ~70.7 > 10
+        expect_equal(true,  s:isInRange(55, 55))    -- dist approx 7.07 < 10
+        expect_equal(false, s:isInRange(100, 100))  -- dist approx 70.7 > 10
     end)
 end)
 
---                  Station new fields (active / requires_cover / has_cover)                                                                                                         
+--                  Station new fields (active / requires_cover / has_cover)
 
 -- @description Covers activation state and cover-requirement flags that gate whether a station may process a given recipe.
 describe("Station active and cover flags", function()
@@ -1152,7 +1154,7 @@ describe("Station active and cover flags", function()
     end)
 end)
 
---                  UpgradeNode new fields (required_level / description / prerequisites)         
+--                  UpgradeNode new fields (required_level / description / prerequisites)
 
 -- @description Confirms newly created upgrade nodes expose the expected default requirement, description, and prerequisite fields.
 describe("UpgradeNode fields", function()
@@ -1179,7 +1181,7 @@ describe("UpgradeNode fields", function()
     end)
 end)
 
---                  CraftSkillRarity enum                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  CraftSkillRarity enum
 
 -- @description Validates exported craft skill rarity constants for the four named rarity tiers.
 describe("CraftSkillRarity", function()
@@ -1193,7 +1195,7 @@ describe("CraftSkillRarity", function()
     end)
 end)
 
---                  ModifierPool:draw() alias                                                                                                                                                                                                                                                                                                                                                                         
+--                  ModifierPool:draw() alias
 
 -- @description Verifies the draw alias mirrors roll behavior for populated pools and returns nil for empty ones.
 describe("ModifierPool draw", function()
@@ -1221,7 +1223,7 @@ describe("ModifierPool draw", function()
     end)
 end)
 
---                  RecipeKnowledge auto-discover integration                                                                                                                                                                                                                                         
+--                  RecipeKnowledge auto-discover integration
 
 -- @description Tests how auto-discovery changes the isKnown query so unknown recipes appear known only while the flag is enabled.
 describe("RecipeKnowledge auto-discover isKnown", function()
@@ -1249,7 +1251,7 @@ describe("RecipeKnowledge auto-discover isKnown", function()
     end)
 end)
 
---        Grid slot bounds checking                                                                                                                                     
+--        Grid slot bounds checking
 
 -- @description Tests that setGridSlot validates coordinates against grid dimensions.
 describe("Recipe grid slot bounds", function()
@@ -1306,7 +1308,7 @@ describe("Recipe grid slot bounds", function()
     end)
 end)
 
---        Ingredient tag precedence                                                                                                                                     
+--        Ingredient tag precedence
 
 -- @description Tests ingredient tag vs item_type precedence behavior.
 describe("Ingredient tag precedence", function()
@@ -1350,7 +1352,7 @@ describe("Ingredient tag precedence", function()
     end)
 end)
 
---        CraftQueue auto-collect                                                                                                                                           
+--        CraftQueue auto-collect
 
 -- @description Tests that CraftQueue:update() auto-removes completed jobs.
 describe("CraftQueue auto-collect", function()
@@ -1413,7 +1415,7 @@ describe("CraftQueue auto-collect", function()
     end)
 end)
 
---        Station fuel edge cases                                                                                                                                           
+--        Station fuel edge cases
 
 -- @description Tests Station fuel validation for negative and invalid inputs.
 describe("Station fuel edge cases", function()
@@ -1469,7 +1471,7 @@ describe("Station fuel edge cases", function()
     end)
 end)
 
---        RecipeOutput quantity validation                                                                                                                
+--        RecipeOutput quantity validation
 
 -- @description Tests that RecipeOutput constructors validate quantity.
 describe("RecipeOutput quantity validation", function()

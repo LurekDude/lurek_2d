@@ -13,16 +13,16 @@ use rfd;
 
 /// Registers the `lurek.window` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- setTitle --
     /// Sets the window title bar text.
-    /// @param title : string
+    /// @param title string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -74,8 +74,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setFullscreen --
     /// Enables or disables fullscreen mode.
-    /// @param enabled : boolean
-    /// @param fstype : string?
+    /// @param enabled boolean
+    /// @param fstype string?
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -107,7 +107,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setVSync --
     /// Sets the VSync mode (1=on, 0=off, -1=adaptive).
-    /// @param mode : integer
+    /// @param mode integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -219,8 +219,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setPosition --
     /// Moves the window to the given screen position.
-    /// @param x : integer
-    /// @param y : integer
+    /// @param x integer
+    /// @param y integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -276,7 +276,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- toPixels --
     /// Converts a device-independent coordinate to physical pixels.
-    /// @param value : number
+    /// @param value number
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -288,7 +288,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- fromPixels --
     /// Converts physical pixels to device-independent coordinates.
-    /// @param value : number
+    /// @param value number
     /// @return number
     let s = state.clone();
     tbl.set(
@@ -302,7 +302,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the window icon from a file path.
     /// The file must exist in the game directory; the change is applied on the
     /// next frame. Raises a runtime error if the path is empty or not found.
-    /// @param path : string
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -325,9 +325,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setMode --
     /// Resizes the window and optionally changes fullscreen and vsync.
-    /// @param w : integer
-    /// @param h : integer
-    /// @param flags : table?
+    /// @param w integer
+    /// @param h integer
+    /// @param flags table?
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -423,7 +423,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getDisplayName --
     /// Returns the name of the current display.
-    /// @param display : integer?
+    /// @param display integer?
     /// @return string
     let s = state.clone();
     tbl.set(
@@ -459,10 +459,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- showMessageBox --
     /// Shows a platform-native message box dialog.
-    /// @param title : string
-    /// @param message : string
-    /// @param boxType : string?
-    /// @param btnType : string?
+    /// @param title string
+    /// @param message string
+    /// @param boxType string?
+    /// @param btnType string?
     /// @return string
     tbl.set(
         "showMessageBox",
@@ -576,7 +576,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setScaleMode --
     /// Sets the viewport scale mode.
-    /// @param mode : string
+    /// @param mode string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -638,7 +638,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- onDpiChange --
     /// Registers a callback invoked (with the new scale factor) when the display
     /// DPI changes. Call `lurek.window.pollDpiChange()` once per frame to check.
-    /// @param fn : function
+    /// @param fn function
     /// @return nil
     let dc = dpi_callback.clone();
     tbl.set(
@@ -689,7 +689,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// - `filters`      : table    array of `{name=string, extensions={...}}` entries
     /// - `multiple`     : boolean  allow multi-select (returns table of paths)
     /// - `defaultPath`  : string   initial directory
-    /// @param opts : table?
+    /// @param opts table?
     /// string | table | nil
     tbl.set(
         "openFileDialog",

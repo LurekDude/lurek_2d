@@ -934,8 +934,9 @@ end
 -- Returns a new ParticleSystem configured from the parsed TOML definition.
 do  -- lurek.particle.fromTOML
   if lurek.particle.fromTOML then
-    local toml_str = '[emitter]\nmaxParticles = 100\nlifetime = 2.0\n'
-    local ps = lurek.particle.fromTOML(toml_str)
+    local toml_str = 'max_particles = 100\nemission_rate = 30.0\nlifetime_min = 0.5\nlifetime_max = 2.0\nspeed_min = 30.0\nspeed_max = 80.0\ndirection = 0.0\nspread = 1.57\ngravity_y = 0.0\n'
+    lurek.filesystem.write("save/particle_test.toml", toml_str)
+    local ps = lurek.particle.fromTOML("save/particle_test.toml")
     lurek.log.debug("fromTOML: " .. tostring(ps), "particle")
   end
 end
@@ -944,7 +945,7 @@ end
 -- Adds a point attractor that pulls or repels particles during their lifetime.
 -- Negative strength repels; call multiple times to create complex force fields.
 do  -- ParticleSystem:addAttractor
-  local ps = lurek.particle.newSystem(1000)
+  local ps = lurek.particle.newSystem({max_particles=1000})
   ps:addAttractor(400, 300, 80, -50)
   ps:start()
   lurek.log.info("attractor added", "particle")
@@ -954,8 +955,8 @@ end
 -- Attaches a child emitter that spawns when each particle from the parent dies.
 -- Use for chain explosions: each fragment spawns a spark sub-emitter on death.
 do  -- ParticleSystem:addSubEmitter
-  local parent = lurek.particle.newSystem(200)
-  local sparks  = lurek.particle.newSystem(50)
+  local parent = lurek.particle.newSystem({max_particles=200})
+  local sparks  = lurek.particle.newSystem({max_particles=50})
   parent:addSubEmitter(sparks, "on_death")
   parent:start()
   lurek.log.info("sub emitter count: " .. parent:subSystemCount(), "particle")
@@ -965,7 +966,7 @@ end
 -- Constrains particle movement to a world-space rectangle; particles bounce or die at edges.
 -- Pass bounce=true to reflect velocity; false causes particles to be killed on contact.
 do  -- ParticleSystem:setBounds
-  local ps = lurek.particle.newSystem(500)
+  local ps = lurek.particle.newSystem({max_particles=500})
   ps:setBounds(0, 0, 800, 600, false)
   ps:start()
   lurek.log.info("bounds set", "particle")
@@ -975,7 +976,7 @@ end
 -- Sets a flipbook animation sheet so particles cycle through sprite frames over their lifetime.
 -- cols*rows must equal or exceed the desired frame count.
 do  -- ParticleSystem:setFlipbook
-  local ps = lurek.particle.newSystem(300)
+  local ps = lurek.particle.newSystem({max_particles=300})
   ps:setFlipbook(4, 4, 16)
   ps:start()
   lurek.log.info("flipbook set", "particle")
@@ -985,7 +986,7 @@ end
 -- Sets the RGBA colour at the start (head) of a particle trail.
 -- The trail interpolates between head and tail colour along its length.
 do  -- Trail:setHeadColor
-  local trail = lurek.particle.newTrail()
+  local trail = lurek.particle.newTrail(2.0, 8.0)
   trail:setHeadColor(1.0, 0.8, 0.0, 1.0)
   trail:setTailColor(1.0, 0.2, 0.0, 0.0)
   lurek.log.info("trail head colour set", "particle")
@@ -995,7 +996,7 @@ end
 -- Sets a constant linear (x, y) acceleration applied to all particles each frame.
 -- Use for gravity (0, 200) or wind effects with a positive x component.
 do  -- ParticleSystem:setLinearAcceleration
-  local ps = lurek.particle.newSystem(500)
+  local ps = lurek.particle.newSystem({max_particles=500})
   ps:setLinearAcceleration(0, 200, 0, 250)
   ps:start()
   lurek.log.info("linear accel set", "particle")
@@ -1005,7 +1006,7 @@ end
 -- Sets a centripetal/centrifugal acceleration along the particle's radial direction.
 -- Positive pushes outward from the emitter origin; negative pulls inward.
 do  -- ParticleSystem:setRadialAcceleration
-  local ps = lurek.particle.newSystem(400)
+  local ps = lurek.particle.newSystem({max_particles=400})
   ps:setRadialAcceleration(50, 100)
   ps:start()
   lurek.log.info("radial accel set", "particle")
@@ -1015,7 +1016,7 @@ end
 -- Sets the RGBA colour at the end (tail) of a particle trail.
 -- Fade the alpha to 0 for a natural dissipating effect.
 do  -- Trail:setTailColor
-  local trail = lurek.particle.newTrail()
+  local trail = lurek.particle.newTrail(2.0, 8.0)
   trail:setHeadColor(0.5, 0.8, 1.0, 1.0)
   trail:setTailColor(0.3, 0.5, 1.0, 0.0)
   lurek.log.info("trail tail colour set", "particle")
@@ -1025,7 +1026,7 @@ end
 -- Sets a tangential (perpendicular to radius) acceleration that curves particle paths.
 -- Positive rotates clockwise; negative rotates anticlockwise for spiral effects.
 do  -- ParticleSystem:setTangentialAcceleration
-  local ps = lurek.particle.newSystem(400)
+  local ps = lurek.particle.newSystem({max_particles=400})
   ps:setTangentialAcceleration(30, 80)
   ps:start()
   lurek.log.info("tangential accel set", "particle")

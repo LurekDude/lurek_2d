@@ -166,6 +166,53 @@ end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Hello World — Lurek2D")
     lurek.render.setBackgroundColor(bg.r, bg.g, bg.b)
@@ -320,7 +367,7 @@ function lurek.draw()
             local bright = 0.5 + wave * 0.3
             local hr, hg, hb = hsv_to_rgb(((col + row * GRID_COLS) / (GRID_COLS * GRID_ROWS) + time * 0.1) % 1.0)
             lurek.render.setColor(hr * bright, hg * bright, hb * bright, 0.9)
-            lurek.render.rectangle("fill", gx - sz / 2, gy - sz / 2, sz, sz)
+            rect("fill", gx - sz / 2, gy - sz / 2, sz, sz)
         end
     end
 
@@ -329,22 +376,22 @@ function lurek.draw()
     local oy = orbit.cy + math.sin(orbit.angle) * orbit.radius
     local pcol = PALETTE[palette_index]
     lurek.render.setColor(pcol[1], pcol[2], pcol[3], 0.9)
-    lurek.render.rectangle("fill", ox - orbit.size / 2, oy - orbit.size / 2, orbit.size, orbit.size)
+    rect("fill", ox - orbit.size / 2, oy - orbit.size / 2, orbit.size, orbit.size)
     lurek.render.setColor(1, 1, 1, 0.4)
-    lurek.render.rectangle("line", ox - orbit.size / 2, oy - orbit.size / 2, orbit.size, orbit.size)
+    rect("line", ox - orbit.size / 2, oy - orbit.size / 2, orbit.size, orbit.size)
 
     -- ── Bouncing circle ───────────────────────────────────────
     lurek.render.setColor(0.3, 0.85, 1.0, 0.9)
-    lurek.render.circle("fill", ball.x, ball.y, ball.r)
+    circ("fill", ball.x, ball.y, ball.r)
     lurek.render.setColor(1, 1, 1, 0.3)
-    lurek.render.circle("line", ball.x, ball.y, ball.r + 2)
+    circ("line", ball.x, ball.y, ball.r + 2)
 
     -- ── Mouse follower ────────────────────────────────────────
     local fpulse = 0.6 + 0.4 * math.sin(time * 5)
     lurek.render.setColor(1.0, 0.8, 0.2, fpulse)
-    lurek.render.circle("fill", follower.x, follower.y, 10)
+    circ("fill", follower.x, follower.y, 10)
     lurek.render.setColor(1, 1, 1, 0.5)
-    lurek.render.circle("line", follower.x, follower.y, 14)
+    circ("line", follower.x, follower.y, 14)
 
     -- ── Spawned shapes ────────────────────────────────────────
     for i = 1, #shapes do
@@ -355,16 +402,16 @@ function lurek.draw()
 
         if s.kind == "rect" then
             local hw = s.size * sc / 2
-            lurek.render.rectangle("fill", s.x - hw, s.y - hw, s.size * sc, s.size * sc)
+            rect("fill", s.x - hw, s.y - hw, s.size * sc, s.size * sc)
 
         elseif s.kind == "circle" then
-            lurek.render.circle("fill", s.x, s.y, s.size * sc / 2)
+            circ("fill", s.x, s.y, s.size * sc / 2)
 
         elseif s.kind == "line" then
             local len = s.size * sc
             local dx = math.cos(s.rot) * len
             local dy = math.sin(s.rot) * len
-            lurek.render.line(s.x - dx, s.y - dy, s.x + dx, s.y + dy)
+            ln(s.x - dx, s.y - dy, s.x + dx, s.y + dy)
 
         elseif s.kind == "triangle" then
             local r = s.size * sc / 2
@@ -374,9 +421,9 @@ function lurek.draw()
             local y2 = s.y + math.sin(s.rot + 2.094) * r
             local x3 = s.x + math.cos(s.rot + 4.189) * r
             local y3 = s.y + math.sin(s.rot + 4.189) * r
-            lurek.render.line(x1, y1, x2, y2)
-            lurek.render.line(x2, y2, x3, y3)
-            lurek.render.line(x3, y3, x1, y1)
+            ln(x1, y1, x2, y2)
+            ln(x2, y2, x3, y3)
+            ln(x3, y3, x1, y1)
 
         elseif s.kind == "polygon" then
             local r = s.size * sc / 2
@@ -385,7 +432,7 @@ function lurek.draw()
             for n = 0, sides - 1 do
                 local a1 = s.rot + n * step
                 local a2 = s.rot + (n + 1) * step
-                lurek.render.line(
+                ln(
                     s.x + math.cos(a1) * r, s.y + math.sin(a1) * r,
                     s.x + math.cos(a2) * r, s.y + math.sin(a2) * r
                 )
@@ -410,18 +457,18 @@ function lurek.draw_ui()
     -- ── TITLE SCREEN ──────────────────────────────────────────
     if current_state == STATE.TITLE then
         lurek.render.setColor(1.0, 0.85, 0.3, 1)
-        lurek.render.print("HELLO WORLD", SCREEN_W / 2 - 100, SCREEN_H / 2 - 60, 32)
+        text_("HELLO WORLD", SCREEN_W / 2 - 100, SCREEN_H / 2 - 60, 32)
 
         lurek.render.setColor(0.7, 0.65, 0.5, 1)
-        lurek.render.print("YOUR FIRST LUREK2D APP", SCREEN_W / 2 - 130, SCREEN_H / 2 - 10, 20)
+        text_("YOUR FIRST LUREK2D APP", SCREEN_W / 2 - 130, SCREEN_H / 2 - 10, 20)
 
         local blink = 0.5 + 0.5 * math.sin(time * 4)
         lurek.render.setColor(1, 1, 1, blink)
-        lurek.render.print("Press Enter to Start", SCREEN_W / 2 - 90, SCREEN_H / 2 + 60, 16)
+        text_("Press Enter to Start", SCREEN_W / 2 - 90, SCREEN_H / 2 + 60, 16)
 
         -- Version
         lurek.render.setColor(0.4, 0.4, 0.4, 0.6)
-        lurek.render.print("Lurek2D Engine Showcase", SCREEN_W / 2 - 80, SCREEN_H - 40, 12)
+        text_("Lurek2D Engine Showcase", SCREEN_W / 2 - 80, SCREEN_H - 40, 12)
         return
     end
 
@@ -431,30 +478,30 @@ function lurek.draw_ui()
     local hs = header_scale.s
     local hc = header_color
     lurek.render.setColor(hc.r, hc.g, hc.b, 1)
-    lurek.render.print(header_text, SCREEN_W / 2 - 110, 16, math.floor(28 * hs))
+    text_(header_text, SCREEN_W / 2 - 110, 16, math.floor(28 * hs))
 
     -- Shape counter (top left)
     lurek.render.setColor(0.9, 0.9, 0.9, 0.9)
-    lurek.render.print("Shapes: " .. tostring(shape_count), 16, 16, 16)
+    text_("Shapes: " .. tostring(shape_count), 16, 16, 16)
 
     -- Animation timer (top left, second row)
-    lurek.render.print("Time: " .. string.format("%.1f", anim_timer) .. "s", 16, 38, 14)
+    text_("Time: " .. string.format("%.1f", anim_timer) .. "s", 16, 38, 14)
 
     -- Speed multiplier
-    lurek.render.print("Speed: " .. string.format("%.2f", speed_mult) .. "x", 16, 56, 14)
+    text_("Speed: " .. string.format("%.2f", speed_mult) .. "x", 16, 56, 14)
 
     -- Active palette color swatch
     local pcol = PALETTE[palette_index]
     lurek.render.setColor(pcol[1], pcol[2], pcol[3], 1)
-    lurek.render.rectangle("fill", 16, 78, 14, 14)
+    rect("fill", 16, 78, 14, 14)
     lurek.render.setColor(0.9, 0.9, 0.9, 0.8)
-    lurek.render.print("Palette " .. tostring(palette_index), 36, 78, 14)
+    text_("Palette " .. tostring(palette_index), 36, 78, 14)
 
     -- Controls reminder (bottom left)
     lurek.render.setColor(0.6, 0.6, 0.6, 0.6)
-    lurek.render.print("Space: BG  1-5: Shapes  C: Color  +/-: Speed", 16, SCREEN_H - 24, 12)
+    text_("Space: BG  1-5: Shapes  C: Color  +/-: Speed", 16, SCREEN_H - 24, 12)
 
     -- FPS (bottom right)
     lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
-    lurek.render.print("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 24, 12)
+    text_("FPS: " .. tostring(lurek.timer.getFPS()), SCREEN_W - 80, SCREEN_H - 24, 12)
 end

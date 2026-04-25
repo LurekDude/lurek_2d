@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 local npc = world:newAgent("merchant", x, y)
 local ua  = npc:useUtility()
 

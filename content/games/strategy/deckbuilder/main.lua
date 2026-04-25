@@ -127,9 +127,56 @@ lurek.input.bind("quit",       "escape")
 
 -- ── Init ─────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Deckbuilder — Lurek2D")
-    lurek.render.setBackgroundColor(0.08, 0.06, 0.14, 1.0)
+    lurek.render.setBackgroundColor(0.08, 0.06, 0.14)
     math.randomseed(os.time())
 
     hit_particles = lurek.particle.newSystem({
@@ -220,7 +267,7 @@ function lurek.process(dt)
                         if monster.vuln > 0 then dmg = math.floor(dmg * 1.5) end
                         monster.hp = monster.hp - dmg
                         if hit_particles then hit_particles:emit(560, 200, 8) end
-                        lurek.tween.to(enemy_hp_tween, 0.3, { v = math.max(0, monster.hp / monster.maxHp) })
+                        lurek.tween.to(enemy_hp_tween, { v = math.max(0, monster.hp / monster.maxHp) }, 0.3)
                         add_log("You deal " .. dmg .. " damage!")
                         if card.vuln then monster.vuln = (monster.vuln or 0) + card.vuln end
                         if card.stun then monster.stun = (monster.stun or 0) + card.stun end
@@ -230,7 +277,7 @@ function lurek.process(dt)
                         add_log("You gain " .. card.value .. " block.")
                     elseif card.type == "heal" then
                         player.hp = math.min(player.maxHp, player.hp + card.value)
-                        lurek.tween.to(hp_tween_val, 0.3, { v = player.hp / player.maxHp })
+                        lurek.tween.to(hp_tween_val, { v = player.hp / player.maxHp }, 0.3)
                         add_log("You heal " .. card.value .. " HP.")
                     end
 
@@ -255,7 +302,7 @@ function lurek.process(dt)
             else
                 local dmg = math.max(0, monster.atk - player.block)
                 player.hp = player.hp - dmg
-                lurek.tween.to(hp_tween_val, 0.3, { v = math.max(0, player.hp / player.maxHp) })
+                lurek.tween.to(hp_tween_val, { v = math.max(0, player.hp / player.maxHp) }, 0.3)
                 if hit_particles then hit_particles:emit(200, 300, 6) end
                 add_log(monster.name .. " deals " .. dmg .. " damage!")
                 if monster.vuln > 0 then monster.vuln = monster.vuln - 1 end
@@ -279,42 +326,42 @@ end
 function lurek.draw_ui()
     local t = state.turn
     if t == "win" then
-        lurek.render.print("YOU WIN!", 280, 220, { color = {1,0.9,0.2,1}, size = 48 })
-        lurek.render.print("Press SPACE to restart", 270, 310, { color = {0.7,0.7,0.7,1}, size = 18 })
+        text_("YOU WIN!", 280, 220, { color = {1,0.9,0.2,1}, size = 48 })
+        text_("Press SPACE to restart", 270, 310, { color = {0.7,0.7,0.7,1}, size = 18 })
         return
     end
     if t == "lost" then
-        lurek.render.print("DEFEATED", 260, 220, { color = {0.9,0.2,0.2,1}, size = 48 })
-        lurek.render.print("Press SPACE to restart", 270, 310, { color = {0.7,0.7,0.7,1}, size = 18 })
+        text_("DEFEATED", 260, 220, { color = {0.9,0.2,0.2,1}, size = 48 })
+        text_("Press SPACE to restart", 270, 310, { color = {0.7,0.7,0.7,1}, size = 18 })
         return
     end
     if t == "reward" and state.reward then
-        lurek.render.print("Choose a card reward:", 260, 150, { color = {1,0.85,0.3,1}, size = 22 })
+        text_("Choose a card reward:", 260, 150, { color = {1,0.85,0.3,1}, size = 22 })
         local r = state.reward
-        lurek.render.rectangle(150, 220, 180, 100, { color = {0.2,0.3,0.6,1} })
-        lurek.render.print("[Q] " .. r[1].name, 160, 250, { color = {1,1,1,1}, size = 16 })
-        lurek.render.print(r[1].desc,            160, 270, { color = {0.7,0.7,0.7,1}, size = 12 })
-        lurek.render.rectangle(470, 220, 180, 100, { color = {0.2,0.3,0.6,1} })
-        lurek.render.print("[E] " .. r[2].name, 480, 250, { color = {1,1,1,1}, size = 16 })
-        lurek.render.print(r[2].desc,            480, 270, { color = {0.7,0.7,0.7,1}, size = 12 })
+        rect(150, 220, 180, 100, { color = {0.2,0.3,0.6,1} })
+        text_("[Q] " .. r[1].name, 160, 250, { color = {1,1,1,1}, size = 16 })
+        text_(r[1].desc,            160, 270, { color = {0.7,0.7,0.7,1}, size = 12 })
+        rect(470, 220, 180, 100, { color = {0.2,0.3,0.6,1} })
+        text_("[E] " .. r[2].name, 480, 250, { color = {1,1,1,1}, size = 16 })
+        text_(r[2].desc,            480, 270, { color = {0.7,0.7,0.7,1}, size = 12 })
         return
     end
 
     -- Monster info
-    lurek.render.print(monster.name, 440, 80, { color = {0.9,0.4,0.4,1}, size = 20 })
-    lurek.render.rectangle(440, 110, 240, 16, { color = {0.3,0.0,0.0,1} })
-    lurek.render.rectangle(440, 110, math.floor(240 * clamp(enemy_hp_tween.v, 0, 1)), 16, { color = {0.8,0.2,0.2,1} })
-    lurek.render.print("HP: " .. math.max(0, monster.hp) .. "/" .. monster.maxHp, 440, 130, { color = {1,1,1,1}, size = 12 })
-    if monster.vuln > 0 then lurek.render.print("VULNERABLE x" .. monster.vuln, 440, 148, { color = {1,0.5,0.1,1}, size = 11 }) end
-    if monster.stun and monster.stun > 0 then lurek.render.print("STUNNED", 560, 148, { color = {0.3,0.8,1,1}, size = 11 }) end
+    text_(monster.name, 440, 80, { color = {0.9,0.4,0.4,1}, size = 20 })
+    rect(440, 110, 240, 16, { color = {0.3,0.0,0.0,1} })
+    rect(440, 110, math.floor(240 * clamp(enemy_hp_tween.v, 0, 1)), 16, { color = {0.8,0.2,0.2,1} })
+    text_("HP: " .. math.max(0, monster.hp) .. "/" .. monster.maxHp, 440, 130, { color = {1,1,1,1}, size = 12 })
+    if monster.vuln > 0 then text_("VULNERABLE x" .. monster.vuln, 440, 148, { color = {1,0.5,0.1,1}, size = 11 }) end
+    if monster.stun and monster.stun > 0 then text_("STUNNED", 560, 148, { color = {0.3,0.8,1,1}, size = 11 }) end
 
     -- Player info
-    lurek.render.rectangle(20, 20, 200, 14, { color = {0.2,0.0,0.0,1} })
-    lurek.render.rectangle(20, 20, math.floor(200 * clamp(hp_tween_val.v, 0, 1)), 14, { color = {0.1,0.8,0.2,1} })
-    lurek.render.print("HP " .. math.max(0, player.hp) .. "/" .. player.maxHp, 22, 22, { color = {1,1,1,1}, size = 11 })
-    lurek.render.print("Block: " .. player.block, 240, 22, { color = {0.3,0.5,1,1}, size = 14 })
-    lurek.render.print("Energy: " .. state.energy .. "/3", 360, 22, { color = {1,0.8,0.2,1}, size = 14 })
-    lurek.render.print("Floor: " .. state.floor .. "/" .. #MONSTERS, 500, 22, { color = {0.6,0.6,0.8,1}, size = 14 })
+    rect(20, 20, 200, 14, { color = {0.2,0.0,0.0,1} })
+    rect(20, 20, math.floor(200 * clamp(hp_tween_val.v, 0, 1)), 14, { color = {0.1,0.8,0.2,1} })
+    text_("HP " .. math.max(0, player.hp) .. "/" .. player.maxHp, 22, 22, { color = {1,1,1,1}, size = 11 })
+    text_("Block: " .. player.block, 240, 22, { color = {0.3,0.5,1,1}, size = 14 })
+    text_("Energy: " .. state.energy .. "/3", 360, 22, { color = {1,0.8,0.2,1}, size = 14 })
+    text_("Floor: " .. state.floor .. "/" .. #MONSTERS, 500, 22, { color = {0.6,0.6,0.8,1}, size = 14 })
 
     -- Hand
     local cx = 80
@@ -323,19 +370,19 @@ function lurek.draw_ui()
         local affordable = state.energy >= card.cost
         local alpha = affordable and 1.0 or 0.5
         col[4] = alpha
-        lurek.render.rectangle(cx, 450, 120, 120, { color = {0.15,0.15,0.25, alpha} })
-        lurek.render.rectangle(cx, 450, 120, 4,   { color = col })
-        lurek.render.print("[" .. i .. "] " .. card.name, cx + 6, 460, { color = {1,1,1, alpha}, size = 13 })
-        lurek.render.print(card.desc, cx + 6, 482, { color = {0.7,0.7,0.7, alpha}, size = 10 })
-        lurek.render.print("Cost: " .. card.cost, cx + 6, 552, { color = {1,0.8,0.2, alpha}, size = 11 })
+        rect(cx, 450, 120, 120, { color = {0.15,0.15,0.25, alpha} })
+        rect(cx, 450, 120, 4,   { color = col })
+        text_("[" .. i .. "] " .. card.name, cx + 6, 460, { color = {1,1,1, alpha}, size = 13 })
+        text_(card.desc, cx + 6, 482, { color = {0.7,0.7,0.7, alpha}, size = 10 })
+        text_("Cost: " .. card.cost, cx + 6, 552, { color = {1,0.8,0.2, alpha}, size = 11 })
         cx = cx + 130
     end
 
     -- Log
     for i, msg in ipairs(log_messages) do
         local a = math.min(1.0, msg.timer)
-        lurek.render.print(msg.text, 20, 380 + i * 18, { color = {0.8, 0.8, 0.6, a}, size = 12 })
+        text_(msg.text, 20, 380 + i * 18, { color = {0.8, 0.8, 0.6, a}, size = 12 })
     end
 
-    lurek.render.print("1-5: play card  Enter: end turn  Esc: quit", 20, H - 20, { color = {0.4,0.4,0.4,1}, size = 12 })
+    text_("1-5: play card  Enter: end turn  Esc: quit", 20, H - 20, { color = {0.4,0.4,0.4,1}, size = 12 })
 end

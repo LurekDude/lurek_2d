@@ -42,7 +42,7 @@ impl LuaUserData for LuaTweenState {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- tick --
         /// Advances the tween state by `dt` seconds.
-        /// @param dt : number
+        /// @param dt number
         /// @return boolean
         methods.add_method_mut("tick", |_, this, dt: f64| Ok(this.inner.tick(dt)));
 
@@ -58,8 +58,8 @@ impl LuaUserData for LuaTweenState {
 
         // -- lerp --
         /// Interpolates from `start` to `finish` using the eased tween progress.
-        /// @param start : number
-        /// @param finish : number
+        /// @param start number
+        /// @param finish number
         /// @return number
         methods.add_method("lerp", |_, this, (start, finish): (f64, f64)| {
             Ok(this.inner.lerp(start, finish))
@@ -104,7 +104,7 @@ impl LuaSpring {
     /// Advances the spring by `dt` seconds, writes positions to the target table,
     /// fires the settle callback if all axes converge, and returns `true` when done.
     ///
-    /// @param lua : &Lua
+    /// @param lua &Lua
     /// - `dt` â€” `f64` â€” Delta-time in seconds.
     ///
     /// `LuaResult<bool>` â€” `true` when settled / done, `false` while still moving.
@@ -131,9 +131,9 @@ impl LuaSpring {
 }
 
 /// Registers the `lurek.tween` property tweening API.
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 ///
 /// Exposes factory functions (`tween`, `sequence`, `parallel`, `delay`), lifecycle
@@ -141,9 +141,9 @@ impl LuaSpring {
 /// (`registerEasing`, `getEasingNames`). Three UserData types â€” `LuaTween`,
 /// `LuaTweenSequence`, and `LuaTweenParallel` â€” are registered via
 /// `lua.register_userdata_type`.
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 /// @return LuaResult<()>
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -152,7 +152,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€â”€ update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Advances all active tweens, sequences, and parallels by `dt` seconds.
     /// Call this once per frame from `lurek.process(dt)`.
-    /// @param dt : number
+    /// @param dt number
     /// @return nil
     let s = engine.clone();
     // â”€â”€â”€ Bindings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -188,10 +188,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a new property tween and registers it for automatic updating.
     /// `target` is any Lua table; `fields` maps field names to their end values.
     /// Start values are captured lazily on the first `update()` call.
-    /// @param duration : number
-    /// @param target : table
-    /// @param fields : table
-    /// @param easing : string
+    /// @param duration number
+    /// @param target table
+    /// @param fields table
+    /// @param easing? string
     /// @return Tween
     let s = engine.clone();
     tbl.set(
@@ -257,8 +257,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€â”€ delay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a no-op tween that waits `seconds`, then optionally calls `callback`.
     /// Convenience wrapper around `sequence():delay():start()`.
-    /// @param seconds : number
-    /// @param fn : function
+    /// @param seconds number
+    /// @param fn function
     /// @return TweenSequence
     let s = engine.clone();
     tbl.set(
@@ -320,8 +320,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€â”€ registerEasing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Registers a custom easing function under `name`. `fn(t)` receives 0..1, returns 0..1.
     /// Overwrites any previous function registered under the same name.
-    /// @param name : string
-    /// @param fn : function
+    /// @param name string
+    /// @param fn function
     /// @return nil
     let s = engine.clone();
     tbl.set(
@@ -362,8 +362,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€â”€ newState â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a standalone tween timing state without registering it with the engine.
     /// Useful for unit-style Lua tests and custom interpolation flows.
-    /// @param duration : number
-    /// @param easing : string
+    /// @param duration number
+    /// @param easing? string
     /// @return TweenState
     tbl.set(
         "newState",
@@ -377,10 +377,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // â”€â”€â”€ to â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sugar for `tween()` with `target` first â€” natural read order.
     /// Equivalent to `lurek.tween.tween(duration, target, fields, easing)`.
-    /// @param target : table
-    /// @param fields : table
-    /// @param duration : number
-    /// @param easing : string?
+    /// @param target table
+    /// @param fields table
+    /// @param duration number
+    /// @param easing string?
     /// @return Tween
     let s = engine.clone();
     tbl.set(
@@ -417,9 +417,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     ///
     /// `opts` may contain: `stiffness` (default 100), `damping` (default 10),
     /// `precision` (default 0.001).
-    /// @param target_table : table
-    /// @param fields_table : table
-    /// @param opts : table?
+    /// @param target_table table
+    /// @param fields_table table
+    /// @param opts table?
     /// @return Spring
     let s = engine.clone();
     tbl.set(
@@ -516,7 +516,7 @@ impl LuaUserData for LuaTween {
 
         // â”€â”€ setRepeat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets the number of extra play cycles after the first (0 = play once, -1 = infinite).
-        /// @param n : integer
+        /// @param n integer
         /// @return nil
         methods.add_method_mut("setRepeat", |_, this, n: i32| {
             this.repeat_count = n;
@@ -526,7 +526,7 @@ impl LuaUserData for LuaTween {
 
         // â”€â”€ setYoyo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Enables or disables yoyo (ping-pong) on each repeat cycle.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setYoyo", |_, this, enabled: bool| {
             this.yoyo = enabled;
@@ -535,7 +535,7 @@ impl LuaUserData for LuaTween {
 
         // â”€â”€ onComplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets a callback to fire when the tween finishes all cycles. Returns self for chaining.
-        /// @param fn : function
+        /// @param fn function
         /// @return Tween
         methods.add_function(
             "onComplete",
@@ -553,7 +553,7 @@ impl LuaUserData for LuaTween {
 
         // â”€â”€ onUpdate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets a callback called every tick with the current eased `t` (0..=1). Returns self.
-        /// @param fn : function
+        /// @param fn function
         /// @return Tween
         methods.add_function("onUpdate", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             {
@@ -568,7 +568,7 @@ impl LuaUserData for LuaTween {
 
         // â”€â”€ onCancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets a callback called when the tween is cancelled. Returns self.
-        /// @param fn : function
+        /// @param fn function
         /// @return Tween
         methods.add_function("onCancel", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             {
@@ -588,10 +588,11 @@ impl LuaUserData for LuaTweenSequence {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // â”€â”€ tween â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Appends a tween step: animates `fields` on `target` over `duration`. Returns self.
-        /// @param duration : number
-        /// @param target : table
-        /// @param fields : table
-        /// @param easing : string
+        /// @param self TweenSequence
+        /// @param duration number
+        /// @param target table
+        /// @param fields table
+        /// @param easing? string
         /// @return TweenSequence
         methods.add_function(
             "tween",
@@ -629,8 +630,9 @@ impl LuaUserData for LuaTweenSequence {
 
         // â”€â”€ delay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Appends a delay step that waits `seconds` before proceeding. Returns self.
-        /// @param seconds : number
-        /// @param fn : function
+        /// @param self TweenSequence
+        /// @param seconds number
+        /// @param fn function
         /// @return TweenSequence
         methods.add_function(
             "delay",
@@ -653,7 +655,8 @@ impl LuaUserData for LuaTweenSequence {
 
         // â”€â”€ callback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Appends an immediate callback step. Returns self.
-        /// @param fn : function
+        /// @param self TweenSequence
+        /// @param fn function
         /// @return TweenSequence
         methods.add_function("callback", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
@@ -665,6 +668,7 @@ impl LuaUserData for LuaTweenSequence {
 
         // â”€â”€ start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Marks the sequence as active so `lurek.tween.update(dt)` begins ticking it. Returns self.
+        /// @param self TweenSequence
         /// @return TweenSequence
         methods.add_function("start", |_lua, ud: LuaAnyUserData| {
             ud.borrow_mut::<LuaTweenSequence>()?.active = true;
@@ -686,7 +690,8 @@ impl LuaUserData for LuaTweenSequence {
 
         // â”€â”€ onComplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets a callback fired when all steps complete. Returns self.
-        /// @param fn : function
+        /// @param self TweenSequence
+        /// @param fn function
         /// @return TweenSequence
         methods.add_function(
             "onComplete",
@@ -709,7 +714,8 @@ impl LuaUserData for LuaTweenParallel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // â”€â”€ add â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Adds an existing LuaTween to the parallel group; marks the tween as owned.
-        /// @param tween : Tween
+        /// @param self TweenParallel
+        /// @param tween Tween
         /// @return nil
         methods.add_function(
             "add",
@@ -738,10 +744,11 @@ impl LuaUserData for LuaTweenParallel {
 
         // â”€â”€ tween â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Creates and adds an inline tween entry to the parallel group. Returns self.
-        /// @param duration : number
-        /// @param target : table
-        /// @param fields : table
-        /// @param easing : string
+        /// @param self TweenParallel
+        /// @param duration number
+        /// @param target table
+        /// @param fields table
+        /// @param easing? string
         /// @return TweenParallel
         methods.add_function(
             "tween",
@@ -780,6 +787,7 @@ impl LuaUserData for LuaTweenParallel {
 
         // â”€â”€ start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Marks the parallel as active. Returns self.
+        /// @param self TweenParallel
         /// @return TweenParallel
         methods.add_function("start", |_lua, ud: LuaAnyUserData| {
             ud.borrow_mut::<LuaTweenParallel>()?.active = true;
@@ -801,7 +809,8 @@ impl LuaUserData for LuaTweenParallel {
 
         // â”€â”€ onComplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets a callback fired when all child tweens finish. Returns self.
-        /// @param fn : function
+        /// @param self TweenParallel
+        /// @param fn function
         /// @return TweenParallel
         methods.add_function(
             "onComplete",
@@ -825,7 +834,7 @@ impl LuaUserData for LuaSpring {
         // â”€â”€ update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Advances the spring by `dt` seconds and writes positions to the target table.
         /// Returns `true` while still moving, `false` when settled.
-        /// @param dt : number
+        /// @param dt number
         /// @return boolean
         methods.add_method_mut("update", |lua, this, dt: f64| {
             if !this.active {
@@ -848,7 +857,7 @@ impl LuaUserData for LuaSpring {
         // â”€â”€ setTarget â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Updates target values for all fields present in `fields_table`.
         /// Clears the settled flag so the spring responds to the new targets.
-        /// @param fields_table : table
+        /// @param fields_table table
         /// @return nil
         methods.add_method_mut("setTarget", |_, this, fields_tbl: LuaTable| {
             for pair in fields_tbl.pairs::<String, f64>() {
@@ -863,7 +872,7 @@ impl LuaUserData for LuaSpring {
 
         // â”€â”€ setStiffness â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Updates the stiffness constant on all axes.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setStiffness", |_, this, value: f32| {
             this.system.stiffness = value;
@@ -875,7 +884,7 @@ impl LuaUserData for LuaSpring {
 
         // â”€â”€ setDamping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Updates the damping coefficient on all axes.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setDamping", |_, this, value: f32| {
             this.system.damping = value;
@@ -898,7 +907,7 @@ impl LuaUserData for LuaSpring {
 
         // â”€â”€ getPosition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Returns the current interpolated position for the named field, or `nil`.
-        /// @param field : string
+        /// @param field string
         /// @return number?
         methods.add_method("getPosition", |_, this, field: String| {
             Ok(this.system.get_position(&field).map(|p| p as f64))

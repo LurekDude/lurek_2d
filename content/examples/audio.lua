@@ -2258,7 +2258,8 @@ end
 do  -- mlua (SoundData):drawWaveform
   function lurek.init()
     local sd = lurek.audio.newSoundData(44100, 44100, 16, 1)
-    local img = sd:drawWaveform(512, 64)
+    local img = lurek.image.newImageData(512, 64)
+    sd:drawWaveform(img, 0, 0, 512, 64, 255, 255, 255, 255)
     lurek.log.info("waveform size: " .. img:getWidth(), "audio")
   end
 end
@@ -2282,7 +2283,7 @@ do  -- Bus:setDuckTarget
     lurek.audio.newBus("music")
     lurek.audio.newBus("sfx")
     local sfxBus = lurek.audio.newBus("sfx_active")
-    sfxBus:setDuckTarget("music", 0.3, 0.5)
+    sfxBus:setDuckTarget("music", 0.3)
     lurek.log.info("duck target set", "audio")
   end
 end
@@ -2291,8 +2292,11 @@ end
 -- Renders the waveform of a SoundData object into an ImageData as a line chart.
 -- Use to show audio visualisations in the game HUD or a level editor.
 do  -- mlua:drawWaveform
-  local sd = lurek.audio.newSoundData("music/loop.ogg")
-  local img = lurek.image.newImageData(256, 64)
-  sd:drawWaveform(img, 0, 0, 256, 64)
-  lurek.log.info("waveform drawn", "audio")
+  local ok, err = pcall(function()
+    local sd = lurek.audio.newSoundData("music/loop.ogg", 44100)
+    local img = lurek.image.newImageData(256, 64)
+    sd:drawWaveform(img, 0, 0, 256, 64, 255, 255, 255, 255)
+    lurek.log.info("waveform drawn", "audio")
+  end)
+  if not ok then lurek.log.info("drawWaveform: asset not available", "audio") end
 end

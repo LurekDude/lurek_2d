@@ -1,4 +1,51 @@
-﻿-- ============================================================================
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+-- ============================================================================
 -- PostFX Demo — Lurek2D
 -- ============================================================================
 -- Category : showcase
@@ -83,7 +130,7 @@ local function draw_base_scene(time)
         local g = 0.12 + 0.1 * math.cos(t * 2.1 + time * 0.5)
         local b = 0.2 + 0.18 * math.sin(t * 4.0 + time * 0.4)
         lurek.render.setColor(r, g, b, 1)
-        lurek.render.rectangle("fill", 0, i * 30, SCREEN_W, 30)
+        rect("fill", 0, i * 30, SCREEN_W, 30)
     end
 
     -- Rotating colorful squares (test for color transforms)
@@ -99,17 +146,17 @@ local function draw_base_scene(time)
         local sy = cy + math.sin(angle) * dist
         local sz = 30 + 10 * math.sin(time * 2 + i * 0.7)
         lurek.render.setColor(c[1], c[2], c[3], 0.9)
-        lurek.render.rectangle("fill", sx - sz / 2, sy - sz / 2, sz, sz)
+        rect("fill", sx - sz / 2, sy - sz / 2, sz, sz)
         lurek.render.setColor(1, 1, 1, 0.3)
-        lurek.render.rectangle("line", sx - sz / 2, sy - sz / 2, sz, sz)
+        rect("line", sx - sz / 2, sy - sz / 2, sz, sz)
     end
 
     -- Central pulsing circle (bright — bloom test target)
     local pulse = 0.7 + 0.3 * math.sin(time * 3)
     lurek.render.setColor(1.0, 0.95, 0.8, pulse)
-    lurek.render.circle("fill", cx, cy, 40 + 10 * math.sin(time * 2))
+    circ("fill", cx, cy, 40 + 10 * math.sin(time * 2))
     lurek.render.setColor(1, 1, 1, 0.6)
-    lurek.render.circle("line", cx, cy, 55)
+    circ("line", cx, cy, 55)
 
     -- Grid of small dots (pixelation test target)
     for gx = 20, SCREEN_W - 20, 40 do
@@ -117,15 +164,15 @@ local function draw_base_scene(time)
             local d = math.sqrt((gx - cx) ^ 2 + (gy - cy) ^ 2)
             local a = clamp(1.0 - d / 350, 0.05, 0.5)
             lurek.render.setColor(0.6, 0.7, 0.9, a)
-            lurek.render.circle("fill", gx, gy, 2)
+            circ("fill", gx, gy, 2)
         end
     end
 
     -- Text label (for CRT/chromatic/blur readability test)
     lurek.render.setColor(1, 1, 1, 0.9)
-    lurek.render.print("LUREK2D POST-FX", cx - 100, 30, 24)
+    text_("LUREK2D POST-FX", cx - 100, 30, 24)
     lurek.render.setColor(0.7, 0.8, 1.0, 0.7)
-    lurek.render.print("Stacking Effects Engine", cx - 90, 60, 14)
+    text_("Stacking Effects Engine", cx - 90, 60, 14)
 
     -- Horizontal rainbow bar (color transform test)
     local bar_y = SCREEN_H - 80
@@ -135,7 +182,7 @@ local function draw_base_scene(time)
         local g = clamp(2 - math.abs(hue * 6 - 2), 0, 1)
         local b = clamp(2 - math.abs(hue * 6 - 4), 0, 1)
         lurek.render.setColor(r, g, b, 0.85)
-        lurek.render.rectangle("fill", bx, bar_y, 4, 20)
+        rect("fill", bx, bar_y, 4, 20)
     end
 end
 
@@ -150,7 +197,7 @@ local function apply_bloom(intensity, time)
     for r = 1, 5 do
         local rad = 50 + r * 18
         lurek.render.setColor(1.0, 0.95, 0.8, glow / r)
-        lurek.render.circle("fill", cx, cy, rad)
+        circ("fill", cx, cy, rad)
     end
     -- Bloom halos on the rotating squares
     local colors = {
@@ -163,7 +210,7 @@ local function apply_bloom(intensity, time)
         local sx = cx + math.cos(angle) * dist
         local sy = cy + math.sin(angle) * dist
         lurek.render.setColor(c[1], c[2], c[3], 0.05 * intensity)
-        lurek.render.circle("fill", sx, sy, 35)
+        circ("fill", sx, sy, 35)
     end
 end
 
@@ -174,7 +221,7 @@ local function apply_blur(intensity)
     for _, ox in ipairs(offsets) do
         for _, oy in ipairs(offsets) do
             lurek.render.setColor(0.5, 0.5, 0.55, alpha)
-            lurek.render.rectangle("fill", ox, oy, SCREEN_W, SCREEN_H)
+            rect("fill", ox, oy, SCREEN_W, SCREEN_H)
         end
     end
 end
@@ -184,7 +231,7 @@ local function apply_crt(intensity, time)
     local line_alpha = 0.12 * intensity
     for y = 0, SCREEN_H - 1, 3 do
         lurek.render.setColor(0, 0, 0, line_alpha)
-        lurek.render.rectangle("fill", 0, y, SCREEN_W, 1)
+        rect("fill", 0, y, SCREEN_W, 1)
     end
     -- Slight barrel curvature simulation (darkened edges)
     local cx, cy = SCREEN_W / 2, SCREEN_H / 2
@@ -195,17 +242,17 @@ local function apply_crt(intensity, time)
         local inset = t * 40 * intensity
         local alpha = t * t * 0.15 * intensity
         lurek.render.setColor(0, 0, 0, alpha)
-        lurek.render.rectangle("fill", 0, 0, inset, SCREEN_H)
-        lurek.render.rectangle("fill", SCREEN_W - inset, 0, inset, SCREEN_H)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, inset * 0.6)
-        lurek.render.rectangle("fill", 0, SCREEN_H - inset * 0.6, SCREEN_W, inset * 0.6)
+        rect("fill", 0, 0, inset, SCREEN_H)
+        rect("fill", SCREEN_W - inset, 0, inset, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, inset * 0.6)
+        rect("fill", 0, SCREEN_H - inset * 0.6, SCREEN_W, inset * 0.6)
     end
     -- Color fringing (red/blue offset lines)
     local fringe = 1.5 * intensity
     lurek.render.setColor(1, 0, 0, 0.03 * intensity)
-    lurek.render.rectangle("fill", -fringe, 0, SCREEN_W, SCREEN_H)
+    rect("fill", -fringe, 0, SCREEN_W, SCREEN_H)
     lurek.render.setColor(0, 0, 1, 0.03 * intensity)
-    lurek.render.rectangle("fill", fringe, 0, SCREEN_W, SCREEN_H)
+    rect("fill", fringe, 0, SCREEN_W, SCREEN_H)
 end
 
 local function apply_vignette(intensity)
@@ -219,29 +266,29 @@ local function apply_vignette(intensity)
         local alpha = t * t * 0.08 * intensity
         lurek.render.setColor(0, 0, 0, alpha)
         -- Draw darkening borders
-        lurek.render.rectangle("fill", 0, 0, inset, SCREEN_H)
-        lurek.render.rectangle("fill", SCREEN_W - inset, 0, inset, SCREEN_H)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, inset * 0.75)
-        lurek.render.rectangle("fill", 0, SCREEN_H - inset * 0.75, SCREEN_W, inset * 0.75)
+        rect("fill", 0, 0, inset, SCREEN_H)
+        rect("fill", SCREEN_W - inset, 0, inset, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, inset * 0.75)
+        rect("fill", 0, SCREEN_H - inset * 0.75, SCREEN_W, inset * 0.75)
     end
     -- Corner darkening (extra)
     local corner = 100 * intensity
     lurek.render.setColor(0, 0, 0, 0.15 * intensity)
-    lurek.render.circle("fill", 0, 0, corner)
-    lurek.render.circle("fill", SCREEN_W, 0, corner)
-    lurek.render.circle("fill", 0, SCREEN_H, corner)
-    lurek.render.circle("fill", SCREEN_W, SCREEN_H, corner)
+    circ("fill", 0, 0, corner)
+    circ("fill", SCREEN_W, 0, corner)
+    circ("fill", 0, SCREEN_H, corner)
+    circ("fill", SCREEN_W, SCREEN_H, corner)
 end
 
 local function apply_chromatic(intensity, time)
     -- Red/green/blue channel offsets
     local offset = 3 * intensity
     lurek.render.setColor(1, 0, 0, 0.06 * intensity)
-    lurek.render.rectangle("fill", -offset, -offset * 0.5, SCREEN_W, SCREEN_H)
+    rect("fill", -offset, -offset * 0.5, SCREEN_W, SCREEN_H)
     lurek.render.setColor(0, 1, 0, 0.04 * intensity)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+    rect("fill", 0, 0, SCREEN_W, SCREEN_H)
     lurek.render.setColor(0, 0, 1, 0.06 * intensity)
-    lurek.render.rectangle("fill", offset, offset * 0.5, SCREEN_W, SCREEN_H)
+    rect("fill", offset, offset * 0.5, SCREEN_W, SCREEN_H)
 end
 
 local function apply_pixelate(intensity)
@@ -251,17 +298,17 @@ local function apply_pixelate(intensity)
     lurek.render.setColor(0, 0, 0, alpha * 0.4)
     -- Vertical grid lines
     for gx = 0, SCREEN_W, block do
-        lurek.render.line(gx, 0, gx, SCREEN_H)
+        ln(gx, 0, gx, SCREEN_H)
     end
     -- Horizontal grid lines
     for gy = 0, SCREEN_H, block do
-        lurek.render.line(0, gy, SCREEN_W, gy)
+        ln(0, gy, SCREEN_W, gy)
     end
     -- Fill alternating blocks for mosaic impression
     for gx = 0, SCREEN_W - 1, block * 2 do
         for gy = 0, SCREEN_H - 1, block * 2 do
             lurek.render.setColor(0, 0, 0, alpha * 0.15)
-            lurek.render.rectangle("fill", gx, gy, block, block)
+            rect("fill", gx, gy, block, block)
         end
     end
 end
@@ -269,26 +316,26 @@ end
 local function apply_sepia(intensity)
     -- Warm brown tone overlay
     lurek.render.setColor(0.45, 0.32, 0.18, 0.18 * intensity)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+    rect("fill", 0, 0, SCREEN_W, SCREEN_H)
     -- Slight yellow highlight
     lurek.render.setColor(0.6, 0.5, 0.3, 0.06 * intensity)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H / 2)
+    rect("fill", 0, 0, SCREEN_W, SCREEN_H / 2)
 end
 
 local function apply_grayscale(intensity)
     -- Desaturation overlay: neutral gray wash
     lurek.render.setColor(0.3, 0.3, 0.3, 0.3 * intensity)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+    rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 end
 
 local function apply_invert(intensity)
     -- Simulated inversion: bright white overlay with subtractive hints
     lurek.render.setColor(1, 1, 1, 0.2 * intensity)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+    rect("fill", 0, 0, SCREEN_W, SCREEN_H)
     -- Dark contrast bars
     lurek.render.setColor(0, 0, 0, 0.08 * intensity)
     for y = 0, SCREEN_H - 1, 6 do
-        lurek.render.rectangle("fill", 0, y, SCREEN_W, 2)
+        rect("fill", 0, y, SCREEN_W, 2)
     end
 end
 
@@ -306,7 +353,7 @@ local function apply_grain(intensity, seed)
         ry = ry % SCREEN_H
         local bright = ((seed + i * 7) % 100) / 100
         lurek.render.setColor(bright, bright, bright, 0.12 * intensity)
-        lurek.render.rectangle("fill", rx, ry, 2, 2)
+        rect("fill", rx, ry, 2, 2)
     end
 end
 
@@ -326,6 +373,7 @@ EFFECT_APPLY[10] = function(int, _, s) apply_grain(int, s) end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("PostFX Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.1, 0.15)
@@ -521,20 +569,20 @@ function lurek.draw_ui()
     if current_state == STATE.TITLE then
         -- Title
         lurek.render.setColor(0.4, 0.9, 1.0, 1)
-        lurek.render.print("POSTFX DEMO", SCREEN_W / 2 - 100, SCREEN_H / 2 - 80, 32)
+        text_("POSTFX DEMO", SCREEN_W / 2 - 100, SCREEN_H / 2 - 80, 32)
 
         -- Subtitle
         lurek.render.setColor(0.7, 0.8, 0.9, 1)
-        lurek.render.print("STACK YOUR EFFECTS", SCREEN_W / 2 - 85, SCREEN_H / 2 - 30, 18)
+        text_("STACK YOUR EFFECTS", SCREEN_W / 2 - 85, SCREEN_H / 2 - 30, 18)
 
         -- Blink prompt
         local blink = 0.5 + 0.5 * math.sin(time * 4)
         lurek.render.setColor(1, 1, 1, blink)
-        lurek.render.print("Press Enter to Start", SCREEN_W / 2 - 90, SCREEN_H / 2 + 40, 16)
+        text_("Press Enter to Start", SCREEN_W / 2 - 90, SCREEN_H / 2 + 40, 16)
 
         -- Engine credit
         lurek.render.setColor(0.4, 0.4, 0.4, 0.5)
-        lurek.render.print("Lurek2D Engine Showcase", SCREEN_W / 2 - 80, SCREEN_H - 40, 12)
+        text_("Lurek2D Engine Showcase", SCREEN_W / 2 - 80, SCREEN_H - 40, 12)
         return
     end
 
@@ -542,9 +590,9 @@ function lurek.draw_ui()
 
     -- FPS (top-left)
     lurek.render.setColor(0.0, 0.0, 0.0, 0.4)
-    lurek.render.rectangle("fill", 8, 8, 90, 20)
+    rect("fill", 8, 8, 90, 20)
     lurek.render.setColor(0.8, 0.8, 0.8, 0.8)
-    lurek.render.print(string.format("FPS: %d", lurek.timer.getFPS()), 14, 10, 14)
+    text_(string.format("FPS: %d", lurek.timer.getFPS()), 14, 10, 14)
 
     -- Effect list panel (right side)
     local panel_x = SCREEN_W - 210
@@ -552,14 +600,14 @@ function lurek.draw_ui()
     local panel_w = 200
     local panel_h = #EFFECT_DEFS * 18 + 28
     lurek.render.setColor(0.0, 0.0, 0.0, 0.55)
-    lurek.render.rectangle("fill", panel_x, panel_y, panel_w, panel_h)
+    rect("fill", panel_x, panel_y, panel_w, panel_h)
     lurek.render.setColor(0.3, 0.7, 0.9, 0.4)
-    lurek.render.rectangle("line", panel_x, panel_y, panel_w, panel_h)
+    rect("line", panel_x, panel_y, panel_w, panel_h)
 
     -- Panel header
     local active_count = count_active()
     lurek.render.setColor(0.5, 0.9, 1.0, 1)
-    lurek.render.print("EFFECTS (" .. active_count .. " active)", panel_x + 6, panel_y + 4, 13)
+    text_("EFFECTS (" .. active_count .. " active)", panel_x + 6, panel_y + 4, 13)
 
     -- Effect entries
     local keys_display = { "B", "U", "C", "V", "A", "P", "S", "G", "I", "F" }
@@ -571,7 +619,7 @@ function lurek.draw_ui()
         -- Selection highlight
         if is_selected and e.enabled then
             lurek.render.setColor(0.2, 0.5, 0.7, 0.2)
-            lurek.render.rectangle("fill", panel_x + 2, ey - 1, panel_w - 4, 17)
+            rect("fill", panel_x + 2, ey - 1, panel_w - 4, 17)
         end
 
         -- Status indicator (green dot / gray dot)
@@ -580,11 +628,11 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
         end
-        lurek.render.circle("fill", panel_x + 12, ey + 6, 4)
+        circ("fill", panel_x + 12, ey + 6, 4)
 
         -- Key label
         lurek.render.setColor(0.9, 0.8, 0.3, e.enabled and 1 or 0.4)
-        lurek.render.print("[" .. keys_display[i] .. "]", panel_x + 20, ey, 12)
+        text_("[" .. keys_display[i] .. "]", panel_x + 20, ey, 12)
 
         -- Effect name
         if e.enabled then
@@ -592,7 +640,7 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
         end
-        lurek.render.print(def.name, panel_x + 46, ey, 12)
+        text_(def.name, panel_x + 46, ey, 12)
 
         -- Intensity bar (only for enabled effects)
         if e.enabled then
@@ -600,31 +648,31 @@ function lurek.draw_ui()
             local bar_w = 45
             local bar_h = 8
             lurek.render.setColor(0.2, 0.2, 0.2, 0.6)
-            lurek.render.rectangle("fill", bar_x, ey + 2, bar_w, bar_h)
+            rect("fill", bar_x, ey + 2, bar_w, bar_h)
             lurek.render.setColor(0.3, 0.8, 0.5, 0.9)
-            lurek.render.rectangle("fill", bar_x, ey + 2, bar_w * e.intensity, bar_h)
+            rect("fill", bar_x, ey + 2, bar_w * e.intensity, bar_h)
             lurek.render.setColor(0.5, 1.0, 0.7, 0.5)
-            lurek.render.rectangle("line", bar_x, ey + 2, bar_w, bar_h)
+            rect("line", bar_x, ey + 2, bar_w, bar_h)
         end
     end
 
     -- Compare indicator
     if compare_mode then
         lurek.render.setColor(1.0, 0.3, 0.3, 0.8 + 0.2 * math.sin(time * 8))
-        lurek.render.print("[ ORIGINAL — NO FX ]", SCREEN_W / 2 - 80, SCREEN_H / 2 - 10, 18)
+        text_("[ ORIGINAL — NO FX ]", SCREEN_W / 2 - 80, SCREEN_H / 2 - 10, 18)
     end
 
     -- Controls bar (bottom)
     lurek.render.setColor(0.0, 0.0, 0.0, 0.45)
-    lurek.render.rectangle("fill", 8, SCREEN_H - 58, SCREEN_W - 16, 50)
+    rect("fill", 8, SCREEN_H - 58, SCREEN_W - 16, 50)
 
     lurek.render.setColor(0.6, 0.6, 0.6, 0.7)
-    lurek.render.print("B/U/C/V/A/P/S/G/I/F: Toggle FX   Tab: Select FX   +/-: Intensity", 14, SCREEN_H - 52, 12)
-    lurek.render.print("Space: Compare (hold)   R: Reset All   Esc: Quit", 14, SCREEN_H - 36, 12)
+    text_("B/U/C/V/A/P/S/G/I/F: Toggle FX   Tab: Select FX   +/-: Intensity", 14, SCREEN_H - 52, 12)
+    text_("Space: Compare (hold)   R: Reset All   Esc: Quit", 14, SCREEN_H - 36, 12)
 
     -- Selected effect label (bottom-right)
     if effects[selected_idx].enabled then
         lurek.render.setColor(0.3, 0.9, 0.6, 0.8)
-        lurek.render.print("Editing: " .. EFFECT_DEFS[selected_idx].name, SCREEN_W - 200, SCREEN_H - 36, 12)
+        text_("Editing: " .. EFFECT_DEFS[selected_idx].name, SCREEN_W - 200, SCREEN_H - 36, 12)
     end
 end

@@ -1,4 +1,5 @@
 local saveChannel = lurek.thread.newChannel()
+local gameState = { player = { x = 10, y = 20 } }
 
 local saver = lurek.thread.newThread([[
     local ch = ...
@@ -11,4 +12,4 @@ local saver = lurek.thread.newThread([[
 saver:start(saveChannel)
 
 -- Trigger save from main thread (non-blocking):
-saveChannel:push(lurek.data.toJSON(gameState))
+saveChannel:push(lurek.serial.toJson(gameState))

@@ -110,7 +110,7 @@ impl LuaUserData for LuaRingBuffer {
         /// Pushes a value onto the ring buffer.
         /// Returns false if the buffer was full and the oldest element was overwritten,
         /// true if there was space available.
-        /// @param value : any
+        /// @param value any
         /// @return boolean
         methods.add_method_mut("push", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
@@ -279,16 +279,16 @@ fn lua_table_to_toml_value(value: &LuaValue) -> LuaResult<toml::Value> {
 
 /// Registers the `lurek.data` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param luna &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- pack --
     /// Packs values into a binary byte string using the format string.
-    /// @param format : string
+    /// @param format string
     /// @return string
     tbl.set(
         "pack",
@@ -302,9 +302,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- unpack --
     /// Unpacks values from a binary byte string, returning values followed by next offset.
     /// @return table|nil
-    /// @param format : string
-    /// @param data : string
-    /// @param offset : integer?
+    /// @param format string
+    /// @param data string
+    /// @param offset integer?
     /// ...
     tbl.set(
         "unpack",
@@ -321,7 +321,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- getPackedSize --
     /// Returns the number of bytes the given format and values would occupy.
-    /// @param format : string
+    /// @param format string
     /// @return integer
     tbl.set(
         "getPackedSize",
@@ -335,9 +335,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- compress --
     /// Compresses data using the given algorithm (deflate, gzip, lz4).
-    /// @param format : string
-    /// @param data : string
-    /// @param level : integer?
+    /// @param format string
+    /// @param data string
+    /// @param level integer?
     /// @return string
     tbl.set(
         "compress",
@@ -354,8 +354,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- decompress --
     /// Decompresses data using the given algorithm (deflate, gzip, lz4).
-    /// @param format : string
-    /// @param data : string
+    /// @param format string
+    /// @param data string
     /// @return string
     tbl.set(
         "decompress",
@@ -369,8 +369,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- encode --
     /// Encodes binary data using the given format (base64, hex).
-    /// @param format : string
-    /// @param data : string
+    /// @param format string
+    /// @param data string
     /// @return string
     tbl.set(
         "encode",
@@ -382,8 +382,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- decode --
     /// Decodes encoded text back to binary (base64, hex).
-    /// @param format : string
-    /// @param encoded : string
+    /// @param format string
+    /// @param encoded string
     /// @return string
     tbl.set(
         "decode",
@@ -396,8 +396,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- hash --
     /// Returns the cryptographic hash of the input (md5, sha1, sha256, sha512).
-    /// @param algorithm : string
-    /// @param data : string
+    /// @param algorithm string
+    /// @param data string
     /// @return string
     tbl.set(
         "hash",
@@ -413,7 +413,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Uses the IEEE polynomial. Suitable for non-security integrity checks and
     /// binary format validation. Not suitable as a cryptographic hash.
     ///
-    /// @param data : string   Input bytes (may be binary).
+    /// @param data string   Input bytes (may be binary).
     /// @return integer        CRC-32 value in [0, 2^32).
     tbl.set(
         "crc32",
@@ -443,9 +443,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- newDataView --
     /// Creates a read-only windowed view into a byte string.
-    /// @param data : string
-    /// @param offset : integer?
-    /// @param size : integer?
+    /// @param data string
+    /// @param offset integer?
+    /// @param size integer?
     /// @return DataView
     tbl.set(
         "newDataView",
@@ -463,7 +463,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- write --
     /// Writes values using the Lurek2D Binary Pack Format.
-    /// @param format : string
+    /// @param format string
     /// @return string
     tbl.set(
         "write",
@@ -477,9 +477,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- read --
     /// Reads values using the Lurek2D Binary Pack Format.
     /// @return table|nil
-    /// @param format : string
-    /// @param data : string
-    /// @param offset : integer?
+    /// @param format string
+    /// @param data string
+    /// @param offset integer?
     /// ...
     tbl.set(
         "read",
@@ -495,7 +495,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- size --
     /// Returns the byte size of a Lurek2D Binary Pack Format string.
-    /// @param format : string
+    /// @param format string
     /// @return integer
     tbl.set(
         "size",
@@ -506,7 +506,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- parseToml --
     /// Parses a TOML string into a Lua table.
-    /// @param text : string
+    /// @param text string
     /// @return table
     tbl.set(
         "parseToml",
@@ -518,7 +518,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- encodeToml --
     /// Encodes a Lua table into a TOML string.
-    /// @param tbl : table
+    /// @param tbl table
     /// @return string
     tbl.set(
         "encodeToml",
@@ -531,7 +531,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- newRingBuffer --
     /// Creates a fixed-capacity ring buffer that can store any Lua value.
     /// When the buffer is full, pushing a new value overwrites the oldest.
-    /// @param capacity : integer
+    /// @param capacity integer
     /// @return RingBuffer
     tbl.set(
         "newRingBuffer",
@@ -551,7 +551,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- toMsgPack --
     /// Serializes a Lua value (table, string, number, boolean, or nil) to MessagePack binary.
     /// Returns the raw bytes as a Lua string.
-    /// @param value : any
+    /// @param value any
     /// @return string
     tbl.set(
         "toMsgPack",
@@ -566,7 +566,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- fromMsgPack --
     /// Deserializes a MessagePack binary string back into a Lua value.
-    /// @param bytes : string
+    /// @param bytes string
     /// @return table|nil
     tbl.set(
         "fromMsgPack",
@@ -657,7 +657,7 @@ impl LuaUserData for LuaDataView {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getUInt8 --
         /// Reads an unsigned 8-bit integer at the given offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return integer
         methods.add_method("getUInt8", |_, this, offset: usize| {
             this.inner
@@ -668,7 +668,7 @@ impl LuaUserData for LuaDataView {
 
         // -- getInt8 --
         /// Reads a signed 8-bit integer at the given offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return integer
         methods.add_method("getInt8", |_, this, offset: usize| {
             this.inner
@@ -679,7 +679,7 @@ impl LuaUserData for LuaDataView {
 
         // -- getInt16 --
         /// Reads a signed 16-bit integer at the given offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return integer
         methods.add_method("getInt16", |_, this, offset: usize| {
             this.inner
@@ -690,7 +690,7 @@ impl LuaUserData for LuaDataView {
 
         // -- getUInt16 --
         /// Reads an unsigned 16-bit integer at the given offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return integer
         methods.add_method("getUInt16", |_, this, offset: usize| {
             this.inner
@@ -701,7 +701,7 @@ impl LuaUserData for LuaDataView {
 
         // -- getInt32 --
         /// Reads a signed 32-bit integer at the given offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return integer
         methods.add_method("getInt32", |_, this, offset: usize| {
             this.inner
@@ -712,7 +712,7 @@ impl LuaUserData for LuaDataView {
 
         // -- getUInt32 --
         /// Reads an unsigned 32-bit integer at the given offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return integer
         methods.add_method("getUInt32", |_, this, offset: usize| {
             this.inner
@@ -723,7 +723,7 @@ impl LuaUserData for LuaDataView {
 
         // -- getFloat --
         /// Reads a 32-bit float at the given offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return number
         methods.add_method("getFloat", |_, this, offset: usize| {
             this.inner
@@ -734,7 +734,7 @@ impl LuaUserData for LuaDataView {
 
         // -- getDouble --
         /// Reads a 64-bit float at the given offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return number
         methods.add_method("getDouble", |_, this, offset: usize| {
             this.inner.get_f64(offset).map_err(LuaError::RuntimeError)
@@ -760,84 +760,84 @@ impl LuaUserData for LuaDataWriter {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- writeU8 --
         /// Writes an unsigned 8-bit integer.
-        /// @param value : integer
+        /// @param value integer
         methods.add_method_mut("writeU8", |_, this, v: u8| {
             this.inner.write_u8(v);
             Ok(())
         });
         // -- writeI8 --
         /// Writes a signed 8-bit integer.
-        /// @param value : integer
+        /// @param value integer
         methods.add_method_mut("writeI8", |_, this, v: i8| {
             this.inner.write_i8(v);
             Ok(())
         });
         // -- writeU16LE --
         /// Writes an unsigned 16-bit LE integer.
-        /// @param value : integer
+        /// @param value integer
         methods.add_method_mut("writeU16LE", |_, this, v: u16| {
             this.inner.write_u16_le(v);
             Ok(())
         });
         // -- writeU16BE --
         /// Writes an unsigned 16-bit BE integer.
-        /// @param value : integer
+        /// @param value integer
         methods.add_method_mut("writeU16BE", |_, this, v: u16| {
             this.inner.write_u16_be(v);
             Ok(())
         });
         // -- writeI16LE --
         /// Writes a signed 16-bit LE integer.
-        /// @param value : integer
+        /// @param value integer
         methods.add_method_mut("writeI16LE", |_, this, v: i16| {
             this.inner.write_i16_le(v);
             Ok(())
         });
         // -- writeU32LE --
         /// Writes an unsigned 32-bit LE integer.
-        /// @param value : integer
+        /// @param value integer
         methods.add_method_mut("writeU32LE", |_, this, v: u32| {
             this.inner.write_u32_le(v);
             Ok(())
         });
         // -- writeI32LE --
         /// Writes a signed 32-bit LE integer.
-        /// @param value : integer
+        /// @param value integer
         methods.add_method_mut("writeI32LE", |_, this, v: i32| {
             this.inner.write_i32_le(v);
             Ok(())
         });
         // -- writeF32LE --
         /// Writes a 32-bit LE float.
-        /// @param value : number
+        /// @param value number
         methods.add_method_mut("writeF32LE", |_, this, v: f32| {
             this.inner.write_f32_le(v);
             Ok(())
         });
         // -- writeF64LE --
         /// Writes a 64-bit LE float.
-        /// @param value : number
+        /// @param value number
         methods.add_method_mut("writeF64LE", |_, this, v: f64| {
             this.inner.write_f64_le(v);
             Ok(())
         });
         // -- writeString --
         /// Writes a length-prefixed UTF-8 string (4-byte LE length + bytes).
-        /// @param value : string
+        /// @param value string
         methods.add_method_mut("writeString", |_, this, s: String| {
             this.inner.write_string(&s);
             Ok(())
         });
         // -- writeBytes --
         /// Writes raw bytes from a Lua string.
-        /// @param value : string
+        /// @param value string
         methods.add_method_mut("writeBytes", |_, this, s: mlua::String| {
             this.inner.write_bytes(s.as_bytes());
             Ok(())
         });
         // -- seek --
         /// Moves the write cursor to the given position.
-        /// @param pos : integer
+        /// @param pos integer
         methods.add_method_mut("seek", |_, this, pos: usize| {
             this.inner.seek(pos);
             Ok(())
@@ -871,7 +871,7 @@ impl mlua::UserData for ByteData {
         methods.add_method("getString", |_, this, ()| Ok(this.get_string()));
         // ── getByte ──────────────────────────────────────────────
         /// Get a byte at the specified offset.
-        /// @param offset : integer
+        /// @param offset integer
         /// @return integer
         methods.add_method("getByte", |_, this, offset: usize| {
             this.get_byte(offset).ok_or_else(|| {
@@ -884,8 +884,8 @@ impl mlua::UserData for ByteData {
         });
         // ── setByte ──────────────────────────────────────────────
         /// Set a byte at the specified offset.
-        /// @param offset : integer
-        /// @param value : integer
+        /// @param offset integer
+        /// @param value integer
         /// @return nil
         methods.add_method_mut("setByte", |_, this, (offset, value): (usize, u8)| {
             if this.set_byte(offset, value) {
@@ -910,9 +910,9 @@ impl mlua::UserData for ByteData {
         /// `byte_offset` is 0-based byte index, `bit_offset` is 0-7 (0 = LSB).
         /// Returns an error if indices are out of range.
         ///
-        /// @param byte_offset : integer   0-based byte index
-        /// @param bit_offset  : integer   bit index within byte [0..7], 0 = LSB
-        /// @param value       : boolean   true = set, false = clear
+        /// @param byte_offset integer   0-based byte index
+        /// @param bit_offset integer   bit index within byte [0..7], 0 = LSB
+        /// @param value boolean   true = set, false = clear
         /// @return nil
         methods.add_method_mut(
             "setBit",
@@ -945,8 +945,8 @@ impl mlua::UserData for ByteData {
         /// Returns the value of a single bit within the buffer.
         /// `byte_offset` is 0-based, `bit_offset` is 0–7 (0 = LSB).
         ///
-        /// @param byte_offset : integer   0-based byte index
-        /// @param bit_offset  : integer   bit index within byte [0..7]
+        /// @param byte_offset integer   0-based byte index
+        /// @param bit_offset integer   bit index within byte [0..7]
         /// @return boolean
         methods.add_method(
             "getBit",
@@ -974,9 +974,9 @@ impl mlua::UserData for ByteData {
         /// and returns them packed into a u32 (LSB-first, so first bit = bit 0 of result).
         /// `count` must be in [1..32]. Reading across byte boundaries is supported.
         ///
-        /// @param byte_offset : integer   0-based starting byte index
-        /// @param bit_offset  : integer   starting bit within starting byte [0..7]
-        /// @param count       : integer   number of bits to read [1..32]
+        /// @param byte_offset integer   0-based starting byte index
+        /// @param bit_offset integer   starting bit within starting byte [0..7]
+        /// @param count integer   number of bits to read [1..32]
         /// @return nil
         /// integer    uint32 with bits packed LSB-first
         methods.add_method(

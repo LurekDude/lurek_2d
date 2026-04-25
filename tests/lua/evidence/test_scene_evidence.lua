@@ -100,8 +100,8 @@ describe("Evidence: lurek.scene DepthSorter sort order", function()
             drawSorted = function(self) call_order[#call_order + 1] = 1 end
         }
 
-        ds:addObject(obj1, 2.0)
-        ds:addObject(obj2, 1.0)
+        ds:addObject(obj1)
+        ds:addObject(obj2)
         ds:flush()
 
         expect_equal(#call_order, 2)
@@ -228,8 +228,8 @@ describe("Evidence: lurek.scene DepthSorter sort order", function()
             drawSorted = function(self) call_order[#call_order + 1] = 1 end
         }
 
-        ds:addObject(obj1, 2.0)
-        ds:addObject(obj2, 1.0)
+        ds:addObject(obj1)
+        ds:addObject(obj2)
         ds:flush()
 
         expect_equal(#call_order, 2)

@@ -421,6 +421,58 @@ lurek.input.bind("quit", "escape")
 
 -- ─── Callbacks ─────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(...)
+    local x1, y1, x2, y2, c, r, g, b = ...
+    if type(c) == "number" then
+        _gfx.setColor(c or 1, r or 1, g or 1, b or 1)
+    elseif type(c) == "table" then
+        _sc(c)
+    end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("God Game — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.1, 0.15)
@@ -579,25 +631,25 @@ function lurek.draw()
         for x = 1, GRID_W do
             local sx, sy = grid_to_screen(x, y)
             local c = display_colors[y][x]
-            lurek.render.rectangle(sx, sy, TILE, TILE, c[1], c[2], c[3], 1)
+            rect(sx, sy, TILE, TILE, c[1], c[2], c[3], 1)
         end
     end
 
     -- Grid lines (subtle)
     for y = 0, GRID_H do
         local sy = y * TILE - cam_y
-        lurek.render.line(0 - cam_x, sy, WORLD_W - cam_x, sy, 0.2, 0.2, 0.2, 0.15)
+        ln(0 - cam_x, sy, WORLD_W - cam_x, sy, 0.2, 0.2, 0.2, 0.15)
     end
     for x = 0, GRID_W do
         local sx = x * TILE - cam_x
-        lurek.render.line(sx, 0 - cam_y, sx, WORLD_H - cam_y, 0.2, 0.2, 0.2, 0.15)
+        ln(sx, 0 - cam_y, sx, WORLD_H - cam_y, 0.2, 0.2, 0.2, 0.15)
     end
 
     -- Walls
     for _, w in ipairs(walls) do
         local sx, sy = grid_to_screen(w.gx, w.gy)
-        lurek.render.rectangle(sx + 2, sy + 2, TILE - 4, TILE - 4, 0.55, 0.45, 0.35, 0.9)
-        lurek.render.rectangle(sx + 4, sy + 4, TILE - 8, TILE - 8, 0.65, 0.55, 0.40, 0.8)
+        rect(sx + 2, sy + 2, TILE - 4, TILE - 4, 0.55, 0.45, 0.35, 0.9)
+        rect(sx + 4, sy + 4, TILE - 8, TILE - 8, 0.65, 0.55, 0.40, 0.8)
     end
 
     -- Houses
@@ -605,17 +657,17 @@ function lurek.draw()
         local sx, sy = grid_to_screen(h.gx, h.gy)
         local cx, cy = sx + TILE / 2, sy + TILE / 2
         -- Base
-        lurek.render.rectangle(cx - 6, cy - 4, 12, 10, 0.7, 0.55, 0.3, 0.9)
+        rect(cx - 6, cy - 4, 12, 10, 0.7, 0.55, 0.3, 0.9)
         -- Roof
-        lurek.render.rectangle(cx - 8, cy - 6, 16, 4, 0.6, 0.2, 0.15, 0.9)
+        rect(cx - 8, cy - 6, 16, 4, 0.6, 0.2, 0.15, 0.9)
     end
 
     -- Player villagers (blue circles)
     for _, v in ipairs(villagers) do
         if v.alive then
             local sx, sy = v.x - cam_x, v.y - cam_y
-            lurek.render.circle(sx, sy, 4, 0.3, 0.5, 0.95, 1)
-            lurek.render.circle(sx, sy, 2, 0.5, 0.7, 1.0, 1)
+            circ(sx, sy, 4, 0.3, 0.5, 0.95, 1)
+            circ(sx, sy, 2, 0.5, 0.7, 1.0, 1)
         end
     end
 
@@ -623,88 +675,88 @@ function lurek.draw()
     for _, rv in ipairs(rival_villagers) do
         if rv.alive then
             local sx, sy = rv.x - cam_x, rv.y - cam_y
-            lurek.render.circle(sx, sy, 4, 0.85, 0.2, 0.15, 1)
-            lurek.render.circle(sx, sy, 2, 1.0, 0.35, 0.25, 1)
+            circ(sx, sy, 4, 0.85, 0.2, 0.15, 1)
+            circ(sx, sy, 2, 1.0, 0.35, 0.25, 1)
         end
     end
 
     -- Cursor highlight
     if state == PLAYING and in_grid(cursor_gx, cursor_gy) then
         local sx, sy = grid_to_screen(cursor_gx, cursor_gy)
-        lurek.render.rectangle(sx, sy, TILE, TILE, 1, 1, 1, 0.15)
+        rect(sx, sy, TILE, TILE, 1, 1, 1, 0.15)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        lurek.render.circle(p.x, p.y, 2, p.r, p.g, p.b, p.a)
+        circ(p.x, p.y, 2, p.r, p.g, p.b, p.a)
     end
 end
 
 function lurek.draw_ui()
     if state == TITLE then
-        lurek.render.print("GOD GAME", 240, 180, 48, 0.9, 0.85, 0.6, 1)
-        lurek.render.print("SHAPE THE WORLD", 260, 250, 20, 0.7, 0.7, 0.6, 0.8)
-        lurek.render.print("Click to Start", 310, 350, 16, 0.6, 0.6, 0.5, 0.6 + math.sin(lurek.timer.getTime() * 3) * 0.3)
-        lurek.render.print("Left Click: Raise  |  Right Click: Lower", 180, 420, 14, 0.5, 0.5, 0.5, 0.7)
-        lurek.render.print("R-Rain  E-Earthquake  L-Lightning  B-Blessing  W-Wall", 130, 445, 14, 0.5, 0.5, 0.5, 0.7)
+        text_("GOD GAME", 240, 180, 48, 0.9, 0.85, 0.6, 1)
+        text_("SHAPE THE WORLD", 260, 250, 20, 0.7, 0.7, 0.6, 0.8)
+        text_("Click to Start", 310, 350, 16, 0.6, 0.6, 0.5, 0.6 + math.sin(lurek.timer.getTime() * 3) * 0.3)
+        text_("Left Click: Raise  |  Right Click: Lower", 180, 420, 14, 0.5, 0.5, 0.5, 0.7)
+        text_("R-Rain  E-Earthquake  L-Lightning  B-Blessing  W-Wall", 130, 445, 14, 0.5, 0.5, 0.5, 0.7)
         return
     end
 
     if state == VICTORY then
-        lurek.render.rectangle(150, 180, 500, 200, 0.05, 0.15, 0.05, 0.85)
-        lurek.render.print("DIVINE VICTORY!", 260, 220, 36, 0.9, 0.85, 0.4, 1)
-        lurek.render.print("Your people flourish — " .. population .. " souls", 245, 280, 18, 0.7, 0.8, 0.6, 0.9)
-        lurek.render.print("Click to play again", 310, 340, 14, 0.6, 0.6, 0.5, 0.6)
+        rect(150, 180, 500, 200, 0.05, 0.15, 0.05, 0.85)
+        text_("DIVINE VICTORY!", 260, 220, 36, 0.9, 0.85, 0.4, 1)
+        text_("Your people flourish — " .. population .. " souls", 245, 280, 18, 0.7, 0.8, 0.6, 0.9)
+        text_("Click to play again", 310, 340, 14, 0.6, 0.6, 0.5, 0.6)
         return
     end
 
     if state == GAME_OVER then
-        lurek.render.rectangle(150, 180, 500, 200, 0.15, 0.05, 0.05, 0.85)
-        lurek.render.print("YOUR PEOPLE PERISHED", 220, 220, 32, 0.9, 0.3, 0.2, 1)
-        lurek.render.print("The land is silent.", 300, 280, 18, 0.7, 0.5, 0.4, 0.9)
-        lurek.render.print("Click to try again", 310, 340, 14, 0.6, 0.6, 0.5, 0.6)
+        rect(150, 180, 500, 200, 0.15, 0.05, 0.05, 0.85)
+        text_("YOUR PEOPLE PERISHED", 220, 220, 32, 0.9, 0.3, 0.2, 1)
+        text_("The land is silent.", 300, 280, 18, 0.7, 0.5, 0.4, 0.9)
+        text_("Click to try again", 310, 340, 14, 0.6, 0.6, 0.5, 0.6)
         return
     end
 
     -- HUD background
-    lurek.render.rectangle(0, 0, 800, 32, 0.05, 0.05, 0.1, 0.8)
+    rect(0, 0, 800, 32, 0.05, 0.05, 0.1, 0.8)
 
     -- Population
     local pop_color_r = population >= WIN_POP * 0.8 and 0.3 or 0.8
     local pop_color_g = population >= WIN_POP * 0.8 and 0.9 or 0.8
-    lurek.render.print("Pop: " .. population .. "/" .. WIN_POP, 10, 8, 16, pop_color_r, pop_color_g, 0.7, 1)
+    text_("Pop: " .. population .. "/" .. WIN_POP, 10, 8, 16, pop_color_r, pop_color_g, 0.7, 1)
 
     -- Food
-    lurek.render.print("Food: " .. food, 160, 8, 16, 0.7, 0.8, 0.5, 1)
+    text_("Food: " .. food, 160, 8, 16, 0.7, 0.8, 0.5, 1)
 
     -- Faith bar
     local faith_display = math.min(faith, 100)
-    lurek.render.rectangle(290, 6, 102, 18, 0.2, 0.2, 0.3, 0.8)
-    lurek.render.rectangle(291, 7, faith_display, 16, 0.6, 0.5, 0.9, 0.9)
-    lurek.render.print("Faith: " .. faith, 300, 8, 14, 0.85, 0.8, 1, 1)
+    rect(290, 6, 102, 18, 0.2, 0.2, 0.3, 0.8)
+    rect(291, 7, faith_display, 16, 0.6, 0.5, 0.9, 0.9)
+    text_("Faith: " .. faith, 300, 8, 14, 0.85, 0.8, 1, 1)
 
     -- Houses
-    lurek.render.print("Houses: " .. #houses, 430, 8, 14, 0.7, 0.6, 0.4, 0.9)
+    text_("Houses: " .. #houses, 430, 8, 14, 0.7, 0.6, 0.4, 0.9)
 
     -- Rivals
     local rival_count = count_alive(rival_villagers)
-    lurek.render.print("Rivals: " .. rival_count, 530, 8, 14, 0.9, 0.4, 0.3, 0.9)
+    text_("Rivals: " .. rival_count, 530, 8, 14, 0.9, 0.4, 0.3, 0.9)
 
     -- Speed indicator
-    lurek.render.print("Speed: " .. game_speed .. "x", 640, 8, 14, 0.6, 0.6, 0.6, 0.8)
+    text_("Speed: " .. game_speed .. "x", 640, 8, 14, 0.6, 0.6, 0.6, 0.8)
 
     -- FPS
-    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 730, 8, 12, 0.4, 0.4, 0.4, 0.6)
+    text_("FPS: " .. lurek.timer.getFPS(), 730, 8, 12, 0.4, 0.4, 0.4, 0.6)
 
     -- Bottom bar — miracle costs
-    lurek.render.rectangle(0, 572, 800, 28, 0.05, 0.05, 0.1, 0.7)
-    lurek.render.print("[R] Rain:10  [E] Quake:20  [L] Lightning:15  [B] Bless:5  [W] Wall:5", 100, 578, 13, 0.55, 0.55, 0.6, 0.8)
+    rect(0, 572, 800, 28, 0.05, 0.05, 0.1, 0.7)
+    text_("[R] Rain:10  [E] Quake:20  [L] Lightning:15  [B] Bless:5  [W] Wall:5", 100, 578, 13, 0.55, 0.55, 0.6, 0.8)
 
     -- Terrain info at cursor
     if in_grid(cursor_gx, cursor_gy) then
         local terrain_names = {[WATER]="Water", [SAND]="Sand", [GRASS]="Grass", [FOREST]="Forest", [MOUNTAIN]="Mountain"}
         local t = grid[cursor_gy][cursor_gx]
         local name = terrain_names[t] or "?"
-        lurek.render.print(name .. " (" .. cursor_gx .. "," .. cursor_gy .. ")", 10, 555, 12, 0.5, 0.5, 0.5, 0.7)
+        text_(name .. " (" .. cursor_gx .. "," .. cursor_gy .. ")", 10, 555, 12, 0.5, 0.5, 0.5, 0.7)
     end
 end

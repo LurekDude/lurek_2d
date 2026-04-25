@@ -388,6 +388,53 @@ end
 
 -- ── Init ────────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Colony Sim — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.15, 0.1)
@@ -522,23 +569,23 @@ end
 -- ── Render (world) ──────────────────────────────────────────
 function lurek.draw()
     if state == "TITLE" then
-        lurek.render.print("COLONY SIM", 200, 180, {size = 48, color = {0.9, 0.8, 0.3, 1}})
-        lurek.render.print("BUILD YOUR SETTLEMENT", 220, 250, {size = 20, color = {0.7, 0.7, 0.7, 1}})
-        lurek.render.print("Click to Start", 310, 350, {size = 16, color = {0.5, 0.5, 0.5, 1}})
+        text_("COLONY SIM", 200, 180, {size = 48, color = {0.9, 0.8, 0.3, 1}})
+        text_("BUILD YOUR SETTLEMENT", 220, 250, {size = 20, color = {0.7, 0.7, 0.7, 1}})
+        text_("Click to Start", 310, 350, {size = 16, color = {0.5, 0.5, 0.5, 1}})
         return
     end
 
     if state == "VICTORY" then
-        lurek.render.print("VICTORY!", 270, 200, {size = 48, color = {0.9, 0.85, 0.2, 1}})
-        lurek.render.print("Colony reached " .. WIN_POP .. " colonists!", 230, 270, {size = 20, color = {0.8, 0.8, 0.8, 1}})
-        lurek.render.print("Click to play again", 300, 350, {size = 16, color = {0.5, 0.5, 0.5, 1}})
+        text_("VICTORY!", 270, 200, {size = 48, color = {0.9, 0.85, 0.2, 1}})
+        text_("Colony reached " .. WIN_POP .. " colonists!", 230, 270, {size = 20, color = {0.8, 0.8, 0.8, 1}})
+        text_("Click to play again", 300, 350, {size = 16, color = {0.5, 0.5, 0.5, 1}})
         return
     end
 
     if state == "GAME_OVER" then
-        lurek.render.print("GAME OVER", 260, 200, {size = 48, color = {0.9, 0.2, 0.2, 1}})
-        lurek.render.print("All colonists are gone...", 250, 270, {size = 20, color = {0.7, 0.5, 0.5, 1}})
-        lurek.render.print("Click to try again", 305, 350, {size = 16, color = {0.5, 0.5, 0.5, 1}})
+        text_("GAME OVER", 260, 200, {size = 48, color = {0.9, 0.2, 0.2, 1}})
+        text_("All colonists are gone...", 250, 270, {size = 20, color = {0.7, 0.5, 0.5, 1}})
+        text_("Click to try again", 305, 350, {size = 16, color = {0.5, 0.5, 0.5, 1}})
         return
     end
 
@@ -549,9 +596,9 @@ function lurek.draw()
             local clr = TERRAIN_COLORS[t]
             local px = (c - 1) * TILE_SIZE
             local py = (r - 1) * TILE_SIZE
-            lurek.render.rectangle(px, py, TILE_SIZE, TILE_SIZE, {color = {clr[1], clr[2], clr[3], 1}})
+            rect(px, py, TILE_SIZE, TILE_SIZE, {color = {clr[1], clr[2], clr[3], 1}})
             -- Grid line
-            lurek.render.rectangle(px, py, TILE_SIZE, TILE_SIZE, {color = {0, 0, 0, 0.1}, mode = "line"})
+            rect(px, py, TILE_SIZE, TILE_SIZE, {color = {0, 0, 0, 0.1}, mode = "line"})
         end
     end
 
@@ -560,10 +607,10 @@ function lurek.draw()
         local px = (b.col - 1) * TILE_SIZE + 2
         local py = (b.row - 1) * TILE_SIZE + 2
         local clr = BUILD_COLORS[b.type]
-        lurek.render.rectangle(px, py, TILE_SIZE - 4, TILE_SIZE - 4, {color = {clr[1], clr[2], clr[3], 0.9}})
+        rect(px, py, TILE_SIZE - 4, TILE_SIZE - 4, {color = {clr[1], clr[2], clr[3], 0.9}})
         -- Label
         local label = string.upper(string.sub(b.type, 1, 1))
-        lurek.render.print(label, px + 10, py + 8, {size = 14, color = {1, 1, 1, 1}})
+        text_(label, px + 10, py + 8, {size = 14, color = {1, 1, 1, 1}})
     end
 
     -- Draw colonists
@@ -574,19 +621,19 @@ function lurek.draw()
 
         -- Selection ring
         if c.selected or i == selected_colonist then
-            lurek.render.circle(cx, cy, 10, {color = {1, 1, 0, 0.6}, mode = "line"})
+            circ(cx, cy, 10, {color = {1, 1, 0, 0.6}, mode = "line"})
         end
 
         -- Body
-        lurek.render.circle(cx, cy, 6, {color = {clr[1], clr[2], clr[3], 1}})
+        circ(cx, cy, 6, {color = {clr[1], clr[2], clr[3], 1}})
 
         -- Job letter
-        lurek.render.print(c.job, cx - 4, cy - 18, {size = 10, color = {1, 1, 1, 0.9}})
+        text_(c.job, cx - 4, cy - 18, {size = 10, color = {1, 1, 1, 0.9}})
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
-        lurek.render.circle(p.x, p.y, 2, {color = {p.r, p.g, p.b, p.a}})
+        circ(p.x, p.y, 2, {color = {p.r, p.g, p.b, p.a}})
     end
 
     -- Build mode cursor
@@ -597,7 +644,7 @@ function lurek.draw()
         local px = col * TILE_SIZE
         local py = row * TILE_SIZE
         local clr = BUILD_COLORS[build_mode] or {1, 1, 1}
-        lurek.render.rectangle(px, py, TILE_SIZE, TILE_SIZE, {color = {clr[1], clr[2], clr[3], 0.4}})
+        rect(px, py, TILE_SIZE, TILE_SIZE, {color = {clr[1], clr[2], clr[3], 0.4}})
     end
 end
 
@@ -608,7 +655,7 @@ function lurek.draw_ui()
     local W = 800
 
     -- Top bar background
-    lurek.render.rectangle(0, 0, W, HUD_HEIGHT, {color = {0, 0, 0, 0.7}})
+    rect(0, 0, W, HUD_HEIGHT, {color = {0, 0, 0, 0.7}})
 
     -- Resources with tweened bars
     local bar_w = 60
@@ -616,68 +663,68 @@ function lurek.draw_ui()
     local max_res = 100
 
     -- Wood
-    lurek.render.print("Wood:", 10, 4, {size = 12, color = {0.8, 0.6, 0.3, 1}})
-    lurek.render.rectangle(55, 8, bar_w, bar_h, {color = {0.2, 0.2, 0.2, 0.8}})
+    text_("Wood:", 10, 4, {size = 12, color = {0.8, 0.6, 0.3, 1}})
+    rect(55, 8, bar_w, bar_h, {color = {0.2, 0.2, 0.2, 0.8}})
     local w_fill = math.min(1, res_display.wood / max_res) * bar_w
-    lurek.render.rectangle(55, 8, w_fill, bar_h, {color = {0.7, 0.5, 0.2, 1}})
-    lurek.render.print(tostring(math.floor(res_display.wood)), 120, 4, {size = 12, color = {1, 1, 1, 1}})
+    rect(55, 8, w_fill, bar_h, {color = {0.7, 0.5, 0.2, 1}})
+    text_(tostring(math.floor(res_display.wood)), 120, 4, {size = 12, color = {1, 1, 1, 1}})
 
     -- Stone
-    lurek.render.print("Stone:", 160, 4, {size = 12, color = {0.6, 0.6, 0.7, 1}})
-    lurek.render.rectangle(210, 8, bar_w, bar_h, {color = {0.2, 0.2, 0.2, 0.8}})
+    text_("Stone:", 160, 4, {size = 12, color = {0.6, 0.6, 0.7, 1}})
+    rect(210, 8, bar_w, bar_h, {color = {0.2, 0.2, 0.2, 0.8}})
     local s_fill = math.min(1, res_display.stone / max_res) * bar_w
-    lurek.render.rectangle(210, 8, s_fill, bar_h, {color = {0.5, 0.5, 0.7, 1}})
-    lurek.render.print(tostring(math.floor(res_display.stone)), 275, 4, {size = 12, color = {1, 1, 1, 1}})
+    rect(210, 8, s_fill, bar_h, {color = {0.5, 0.5, 0.7, 1}})
+    text_(tostring(math.floor(res_display.stone)), 275, 4, {size = 12, color = {1, 1, 1, 1}})
 
     -- Food
-    lurek.render.print("Food:", 320, 4, {size = 12, color = {0.4, 0.8, 0.3, 1}})
-    lurek.render.rectangle(365, 8, bar_w, bar_h, {color = {0.2, 0.2, 0.2, 0.8}})
+    text_("Food:", 320, 4, {size = 12, color = {0.4, 0.8, 0.3, 1}})
+    rect(365, 8, bar_w, bar_h, {color = {0.2, 0.2, 0.2, 0.8}})
     local f_fill = math.min(1, res_display.food / max_res) * bar_w
-    lurek.render.rectangle(365, 8, f_fill, bar_h, {color = {0.3, 0.7, 0.2, 1}})
-    lurek.render.print(tostring(math.floor(res_display.food)), 430, 4, {size = 12, color = {1, 1, 1, 1}})
+    rect(365, 8, f_fill, bar_h, {color = {0.3, 0.7, 0.2, 1}})
+    text_(tostring(math.floor(res_display.food)), 430, 4, {size = 12, color = {1, 1, 1, 1}})
 
     -- Population
     local pop_str = string.format("Pop: %d/%d", #colonists, max_pop)
-    lurek.render.print(pop_str, 480, 4, {size = 12, color = {0.9, 0.9, 0.9, 1}})
+    text_(pop_str, 480, 4, {size = 12, color = {0.9, 0.9, 0.9, 1}})
 
     -- Speed indicator
     local spd_str = string.format("Speed: %dx", speed_mult)
-    lurek.render.print(spd_str, 580, 4, {size = 12, color = {0.7, 0.7, 0.4, 1}})
+    text_(spd_str, 580, 4, {size = 12, color = {0.7, 0.7, 0.4, 1}})
 
     -- FPS
     local fps = lurek.timer.getFPS()
-    lurek.render.print(string.format("FPS: %d", fps), W - 70, 4, {size = 12, color = {0.5, 0.5, 0.5, 1}})
+    text_(string.format("FPS: %d", fps), W - 70, 4, {size = 12, color = {0.5, 0.5, 0.5, 1}})
 
     -- Cycle / raid timers at bottom
     local bottom_y = 600 - 40
-    lurek.render.rectangle(0, bottom_y, W, 40, {color = {0, 0, 0, 0.5}})
+    rect(0, bottom_y, W, 40, {color = {0, 0, 0, 0.5}})
 
     local cycle_pct = cycle_timer / CYCLE_TIME
-    lurek.render.print("Next cycle:", 10, bottom_y + 4, {size = 12, color = {0.7, 0.7, 0.7, 1}})
-    lurek.render.rectangle(100, bottom_y + 8, 100, 6, {color = {0.2, 0.2, 0.2, 0.8}})
-    lurek.render.rectangle(100, bottom_y + 8, cycle_pct * 100, 6, {color = {0.3, 0.8, 0.3, 1}})
+    text_("Next cycle:", 10, bottom_y + 4, {size = 12, color = {0.7, 0.7, 0.7, 1}})
+    rect(100, bottom_y + 8, 100, 6, {color = {0.2, 0.2, 0.2, 0.8}})
+    rect(100, bottom_y + 8, cycle_pct * 100, 6, {color = {0.3, 0.8, 0.3, 1}})
 
     local raid_pct = raid_timer / RAID_TIME
-    lurek.render.print("Next raid:", 230, bottom_y + 4, {size = 12, color = {0.9, 0.4, 0.4, 1}})
-    lurek.render.rectangle(320, bottom_y + 8, 100, 6, {color = {0.2, 0.2, 0.2, 0.8}})
-    lurek.render.rectangle(320, bottom_y + 8, raid_pct * 100, 6, {color = {0.9, 0.2, 0.2, 1}})
+    text_("Next raid:", 230, bottom_y + 4, {size = 12, color = {0.9, 0.4, 0.4, 1}})
+    rect(320, bottom_y + 8, 100, 6, {color = {0.2, 0.2, 0.2, 0.8}})
+    rect(320, bottom_y + 8, raid_pct * 100, 6, {color = {0.9, 0.2, 0.2, 1}})
 
     -- Build mode indicator
     if build_mode then
-        lurek.render.print("PLACING: " .. string.upper(build_mode), 460, bottom_y + 4, {size = 12, color = {1, 0.9, 0.3, 1}})
+        text_("PLACING: " .. string.upper(build_mode), 460, bottom_y + 4, {size = 12, color = {1, 0.9, 0.3, 1}})
     end
 
     -- Job summary
     local job_str = string.format("B:%d F:%d M:%d G:%d I:%d",
         count_job(J_BUILDER), count_job(J_FARMER), count_job(J_MINER), count_job(J_GUARD), count_job(J_IDLE))
-    lurek.render.print(job_str, 10, bottom_y + 22, {size = 11, color = {0.6, 0.6, 0.6, 1}})
+    text_(job_str, 10, bottom_y + 22, {size = 11, color = {0.6, 0.6, 0.6, 1}})
 
     -- Win target
-    lurek.render.print(string.format("Goal: %d/%d colonists", #colonists, WIN_POP), 230, bottom_y + 22,
+    text_(string.format("Goal: %d/%d colonists", #colonists, WIN_POP), 230, bottom_y + 22,
         {size = 11, color = {0.8, 0.8, 0.4, 1}})
 
     -- Message display
     if message ~= "" then
-        lurek.render.print(message, 10, bottom_y - 20, {size = 13, color = {1, 1, 0.7, math.min(1, message_timer)}})
+        text_(message, 10, bottom_y - 20, {size = 13, color = {1, 1, 0.7, math.min(1, message_timer)}})
     end
 end

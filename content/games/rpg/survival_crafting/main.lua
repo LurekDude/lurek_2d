@@ -15,6 +15,7 @@ local MAP_W    = 25
 local MAP_H    = 18
 local SCREEN_W = 800
 local SCREEN_H = 600
+local _cam = nil ---@type any
 
 -- Tile types
 local T_GRASS = 0
@@ -220,9 +221,57 @@ end
 -- Input bindings
 -- ============================================================================
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Survival Crafting — Lurek2D")
     lurek.render.setBackgroundColor(0.30, 0.65, 0.20)
+    _cam = lurek.camera.new()
 
     lurek.input.bind("up",    {"w", "up"})
     lurek.input.bind("down",  {"s", "down"})
@@ -484,23 +533,23 @@ function lurek.draw()
             local c = TILE_COLORS[t] or TILE_COLORS[T_GRASS]
             local px = (x - 1) * TILE
             local py = (y - 1) * TILE
-            lurek.render.rectangle(px, py, TILE, TILE, c[1], c[2], c[3], 1)
+            rect(px, py, TILE, TILE, c[1], c[2], c[3], 1)
             -- Tile detail
             if t == T_TREE then
-                lurek.render.circle(px + TILE / 2, py + TILE / 3, 10, 0.10, 0.55, 0.08, 1)
-                lurek.render.rectangle(px + 14, py + 14, 4, 14, 0.4, 0.25, 0.1, 1)
+                circ(px + TILE / 2, py + TILE / 3, 10, 0.10, 0.55, 0.08, 1)
+                rect(px + 14, py + 14, 4, 14, 0.4, 0.25, 0.1, 1)
             elseif t == T_STONE then
-                lurek.render.circle(px + TILE / 2, py + TILE / 2, 8, 0.65, 0.65, 0.60, 1)
+                circ(px + TILE / 2, py + TILE / 2, 8, 0.65, 0.65, 0.60, 1)
             elseif t == T_BERRY then
-                lurek.render.circle(px + 10, py + 20, 4, 0.85, 0.15, 0.4, 1)
-                lurek.render.circle(px + 22, py + 18, 4, 0.85, 0.15, 0.4, 1)
-                lurek.render.circle(px + 16, py + 24, 4, 0.85, 0.15, 0.4, 1)
+                circ(px + 10, py + 20, 4, 0.85, 0.15, 0.4, 1)
+                circ(px + 22, py + 18, 4, 0.85, 0.15, 0.4, 1)
+                circ(px + 16, py + 24, 4, 0.85, 0.15, 0.4, 1)
             elseif t == T_WATER then
-                lurek.render.circle(px + 10, py + 16, 3, 0.4, 0.6, 0.9, 0.6)
-                lurek.render.circle(px + 22, py + 12, 3, 0.4, 0.6, 0.9, 0.6)
+                circ(px + 10, py + 16, 3, 0.4, 0.6, 0.9, 0.6)
+                circ(px + 22, py + 12, 3, 0.4, 0.6, 0.9, 0.6)
             elseif t == T_WALL then
-                lurek.render.rectangle(px + 2, py + 2, TILE - 4, TILE - 4, 0.55, 0.40, 0.28, 1)
-                lurek.render.rectangle(px + 4, py + TILE / 2 - 1, TILE - 8, 2, 0.35, 0.25, 0.15, 1)
+                rect(px + 2, py + 2, TILE - 4, TILE - 4, 0.55, 0.40, 0.28, 1)
+                rect(px + 4, py + TILE / 2 - 1, TILE - 8, 2, 0.35, 0.25, 0.15, 1)
             end
         end
     end
@@ -508,13 +557,13 @@ function lurek.draw()
     -- Draw player
     local ppx = (player.gx - 1) * TILE
     local ppy = (player.gy - 1) * TILE
-    lurek.render.rectangle(ppx + 4, ppy + 4, TILE - 8, TILE - 8, 0.2, 0.6, 0.9, 1)
-    lurek.render.rectangle(ppx + 10, ppy + 8, 4, 4, 1, 1, 1, 1) -- eye left
-    lurek.render.rectangle(ppx + 18, ppy + 8, 4, 4, 1, 1, 1, 1) -- eye right
+    rect(ppx + 4, ppy + 4, TILE - 8, TILE - 8, 0.2, 0.6, 0.9, 1)
+    rect(ppx + 10, ppy + 8, 4, 4, 1, 1, 1, 1) -- eye left
+    rect(ppx + 18, ppy + 8, 4, 4, 1, 1, 1, 1) -- eye right
     -- Facing indicator
     local dir = DIR[player.facing]
     if dir then
-        lurek.render.rectangle(
+        rect(
             ppx + TILE / 2 - 2 + dir.dx * 10,
             ppy + TILE / 2 - 2 + dir.dy * 10,
             4, 4, 1, 0.8, 0.2, 1
@@ -527,26 +576,26 @@ function lurek.draw()
         local my = (mining.target_y - 1) * TILE - 6
         local max_t = (inventory.pickaxe > 0) and MINE_TIME_PICK or MINE_TIME
         local frac = 1 - (mining.timer / max_t)
-        lurek.render.rectangle(mx, my, TILE, 4, 0.2, 0.2, 0.2, 0.8)
-        lurek.render.rectangle(mx, my, TILE * frac, 4, 0.9, 0.7, 0.1, 1)
+        rect(mx, my, TILE, 4, 0.2, 0.2, 0.2, 0.8)
+        rect(mx, my, TILE * frac, 4, 0.9, 0.7, 0.1, 1)
     end
 
     -- Draw enemies
     for _, e in ipairs(enemies) do
-        lurek.render.circle(e.x, e.y, 10, 0.85, 0.15, 0.15, 1)
-        lurek.render.circle(e.x - 3, e.y - 3, 2, 1, 1, 0.2, 1)
-        lurek.render.circle(e.x + 3, e.y - 3, 2, 1, 1, 0.2, 1)
+        circ(e.x, e.y, 10, 0.85, 0.15, 0.15, 1)
+        circ(e.x - 3, e.y - 3, 2, 1, 1, 0.2, 1)
+        circ(e.x + 3, e.y - 3, 2, 1, 1, 0.2, 1)
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
-        lurek.render.circle(p.x, p.y, p.size * alpha, p.r, p.g, p.b, alpha)
+        circ(p.x, p.y, p.size * alpha, p.r, p.g, p.b, alpha)
     end
 
     -- Night overlay
     if night_alpha > 0.01 then
-        lurek.render.rectangle(
+        rect(
             camera_x, camera_y, SCREEN_W, SCREEN_H,
             0.02, 0.02, 0.08, night_alpha
         )
@@ -561,43 +610,43 @@ function lurek.draw_ui()
 
     -- TITLE SCREEN
     if state == STATE_TITLE then
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.12, 0.08, 1)
-        lurek.render.print("SURVIVAL CRAFTING", SCREEN_W / 2 - 160, 180, 36, 0.4, 0.85, 0.3, 1)
-        lurek.render.print("Gather. Craft. Survive the Night.", SCREEN_W / 2 - 140, 240, 16, 0.7, 0.7, 0.6, 1)
-        lurek.render.print("WASD - Move    SPACE - Mine    C - Craft", SCREEN_W / 2 - 170, 310, 14, 0.6, 0.6, 0.5, 1)
-        lurek.render.print("P - Place Wall    B - Eat Berry", SCREEN_W / 2 - 130, 335, 14, 0.6, 0.6, 0.5, 1)
-        lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 60, 420, 20, 1, 1, 0.6, 1)
-        lurek.render.print("FPS: " .. fps, 10, SCREEN_H - 20, 12, 0.5, 0.5, 0.5, 1)
+        rect(0, 0, SCREEN_W, SCREEN_H, 0.08, 0.12, 0.08, 1)
+        text_("SURVIVAL CRAFTING", SCREEN_W / 2 - 160, 180, 36, 0.4, 0.85, 0.3, 1)
+        text_("Gather. Craft. Survive the Night.", SCREEN_W / 2 - 140, 240, 16, 0.7, 0.7, 0.6, 1)
+        text_("WASD - Move    SPACE - Mine    C - Craft", SCREEN_W / 2 - 170, 310, 14, 0.6, 0.6, 0.5, 1)
+        text_("P - Place Wall    B - Eat Berry", SCREEN_W / 2 - 130, 335, 14, 0.6, 0.6, 0.5, 1)
+        text_("PRESS ENTER", SCREEN_W / 2 - 60, 420, 20, 1, 1, 0.6, 1)
+        text_("FPS: " .. fps, 10, SCREEN_H - 20, 12, 0.5, 0.5, 0.5, 1)
         return
     end
 
     -- GAME OVER
     if state == STATE_GAME_OVER then
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, 0.12, 0.04, 0.04, 0.85)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 90, 200, 36, 0.9, 0.2, 0.2, 1)
-        lurek.render.print(
+        rect(0, 0, SCREEN_W, SCREEN_H, 0.12, 0.04, 0.04, 0.85)
+        text_("GAME OVER", SCREEN_W / 2 - 90, 200, 36, 0.9, 0.2, 0.2, 1)
+        text_(
             string.format("Survived %d days (%.0fs)", day_count, survival_time),
             SCREEN_W / 2 - 110, 260, 18, 0.8, 0.8, 0.7, 1
         )
-        lurek.render.print("PRESS ENTER TO RETRY", SCREEN_W / 2 - 100, 340, 18, 1, 1, 0.6, 1)
-        lurek.render.print("FPS: " .. fps, 10, SCREEN_H - 20, 12, 0.5, 0.5, 0.5, 1)
+        text_("PRESS ENTER TO RETRY", SCREEN_W / 2 - 100, 340, 18, 1, 1, 0.6, 1)
+        text_("FPS: " .. fps, 10, SCREEN_H - 20, 12, 0.5, 0.5, 0.5, 1)
         return
     end
 
     -- HUD background
-    lurek.render.rectangle(0, 0, SCREEN_W, 52, 0, 0, 0, 0.65)
+    rect(0, 0, SCREEN_W, 52, 0, 0, 0, 0.65)
 
     -- HP bar (tween-style smooth interpolation is handled in process)
     local hp_frac = player.hp / 100
-    lurek.render.rectangle(10, 8, 150, 14, 0.25, 0.05, 0.05, 1)
-    lurek.render.rectangle(10, 8, 150 * hp_frac, 14, 0.85, 0.15, 0.15, 1)
-    lurek.render.print(string.format("HP: %d", math.ceil(player.hp)), 15, 8, 12, 1, 1, 1, 1)
+    rect(10, 8, 150, 14, 0.25, 0.05, 0.05, 1)
+    rect(10, 8, 150 * hp_frac, 14, 0.85, 0.15, 0.15, 1)
+    text_(string.format("HP: %d", math.ceil(player.hp)), 15, 8, 12, 1, 1, 1, 1)
 
     -- Hunger bar
     local hun_frac = player.hunger / 100
-    lurek.render.rectangle(10, 28, 150, 14, 0.15, 0.12, 0.02, 1)
-    lurek.render.rectangle(10, 28, 150 * hun_frac, 14, 0.85, 0.65, 0.15, 1)
-    lurek.render.print(string.format("Hunger: %d", math.ceil(player.hunger)), 15, 28, 12, 1, 1, 1, 1)
+    rect(10, 28, 150, 14, 0.15, 0.12, 0.02, 1)
+    rect(10, 28, 150 * hun_frac, 14, 0.85, 0.65, 0.15, 1)
+    text_(string.format("Hunger: %d", math.ceil(player.hunger)), 15, 28, 12, 1, 1, 1, 1)
 
     -- Inventory
     local inv_x = 180
@@ -609,63 +658,63 @@ function lurek.draw_ui()
         {"Wall: " .. inventory.wall, 0.45, 0.35, 0.25},
     }
     for i, item in ipairs(inv_items) do
-        lurek.render.print(item[1], inv_x, 10, 13, item[2], item[3], item[4], 1)
+        text_(item[1], inv_x, 10, 13, item[2], item[3], item[4], 1)
         inv_x = inv_x + 80
     end
 
     -- Day counter and time
     local day_label = (day_time / DAY_LENGTH >= NIGHT_START) and "NIGHT" or "DAY"
-    lurek.render.print(
+    text_(
         string.format("Day %d  %s  Time: %.0fs", day_count, day_label, survival_time),
         inv_x + 10, 10, 13, 0.9, 0.9, 0.7, 1
     )
 
     -- FPS
-    lurek.render.print("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 20, 12, 0.5, 0.5, 0.5, 1)
+    text_("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 20, 12, 0.5, 0.5, 0.5, 1)
 
     -- Controls hint
-    lurek.render.print(
+    text_(
         "WASD:Move  SPACE:Mine  C:Craft  P:Place  B:Eat  ESC:Quit",
         10, SCREEN_H - 20, 11, 0.5, 0.5, 0.4, 1
     )
 
     -- Mining indicator
     if mining.active then
-        lurek.render.print("MINING...", SCREEN_W / 2 - 30, 60, 16, 1, 0.8, 0.2, 1)
+        text_("MINING...", SCREEN_W / 2 - 30, 60, 16, 1, 0.8, 0.2, 1)
     end
 
     -- CRAFT MENU OVERLAY
     if state == STATE_CRAFT then
-        lurek.render.rectangle(150, 100, 500, 350, 0.08, 0.08, 0.10, 0.92)
-        lurek.render.rectangle(152, 102, 496, 346, 0.15, 0.15, 0.18, 0.95)
+        rect(150, 100, 500, 350, 0.08, 0.08, 0.10, 0.92)
+        rect(152, 102, 496, 346, 0.15, 0.15, 0.18, 0.95)
 
-        lurek.render.print("CRAFTING MENU", 310, 115, 24, 0.4, 0.85, 0.3, 1)
-        lurek.render.rectangle(170, 145, 460, 2, 0.3, 0.3, 0.3, 1)
+        text_("CRAFTING MENU", 310, 115, 24, 0.4, 0.85, 0.3, 1)
+        rect(170, 145, 460, 2, 0.3, 0.3, 0.3, 1)
 
         -- Recipe 1: Pickaxe
         local can_pick = inventory.wood >= 2 and inventory.stone >= 3
         local pick_r = can_pick and 1 or 0.4
         local pick_g = can_pick and 1 or 0.4
-        lurek.render.print("[1] Pickaxe", 180, 165, 18, pick_r, pick_g, 0.6, 1)
-        lurek.render.print("    Cost: 2 Wood + 3 Stone", 180, 190, 14, 0.6, 0.6, 0.5, 1)
-        lurek.render.print("    Effect: Mines 2x faster", 180, 210, 14, 0.5, 0.7, 0.5, 1)
-        lurek.render.print(string.format("    You have: %d Pickaxe(s)", inventory.pickaxe), 180, 230, 14, 0.7, 0.7, 0.8, 1)
+        text_("[1] Pickaxe", 180, 165, 18, pick_r, pick_g, 0.6, 1)
+        text_("    Cost: 2 Wood + 3 Stone", 180, 190, 14, 0.6, 0.6, 0.5, 1)
+        text_("    Effect: Mines 2x faster", 180, 210, 14, 0.5, 0.7, 0.5, 1)
+        text_(string.format("    You have: %d Pickaxe(s)", inventory.pickaxe), 180, 230, 14, 0.7, 0.7, 0.8, 1)
 
         -- Recipe 2: Wall
         local can_wall = inventory.wood >= 4
         local wall_r = can_wall and 1 or 0.4
         local wall_g = can_wall and 1 or 0.4
-        lurek.render.print("[2] Wall Block", 180, 270, 18, wall_r, wall_g, 0.6, 1)
-        lurek.render.print("    Cost: 4 Wood", 180, 295, 14, 0.6, 0.6, 0.5, 1)
-        lurek.render.print("    Effect: Placeable defense (P key)", 180, 315, 14, 0.5, 0.7, 0.5, 1)
-        lurek.render.print(string.format("    You have: %d Wall(s)", inventory.wall), 180, 335, 14, 0.7, 0.7, 0.8, 1)
+        text_("[2] Wall Block", 180, 270, 18, wall_r, wall_g, 0.6, 1)
+        text_("    Cost: 4 Wood", 180, 295, 14, 0.6, 0.6, 0.5, 1)
+        text_("    Effect: Placeable defense (P key)", 180, 315, 14, 0.5, 0.7, 0.5, 1)
+        text_(string.format("    You have: %d Wall(s)", inventory.wall), 180, 335, 14, 0.7, 0.7, 0.8, 1)
 
         -- Inventory summary
-        lurek.render.rectangle(170, 370, 460, 2, 0.3, 0.3, 0.3, 1)
-        lurek.render.print(
+        rect(170, 370, 460, 2, 0.3, 0.3, 0.3, 1)
+        text_(
             string.format("Inventory: %d Wood  %d Stone  %d Berry", inventory.wood, inventory.stone, inventory.berry),
             180, 385, 14, 0.8, 0.8, 0.6, 1
         )
-        lurek.render.print("Press C to close", 330, 420, 13, 0.5, 0.5, 0.4, 1)
+        text_("Press C to close", 330, 420, 13, 0.5, 0.5, 0.4, 1)
     end
 end

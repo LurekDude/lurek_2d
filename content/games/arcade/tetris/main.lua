@@ -1,4 +1,51 @@
-﻿-- ============================================================================
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+-- ============================================================================
 --  Tetris — Rotate and stack falling tetrominoes
 -- ----------------------------------------------------------------------------
 --  Category : arcade
@@ -213,7 +260,7 @@ local function draw_cell(x, y, color, alpha)
     local px = BOARD_X + x * CELL
     local py = BOARD_Y + y * CELL
     lurek.render.setColor(color[1], color[2], color[3], alpha or 1)
-    lurek.render.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
+    rect("fill", px + 1, py + 1, CELL - 2, CELL - 2)
     -- Highlight border
     lurek.render.setColor(
         math.min(1, color[1] * 1.4),
@@ -221,7 +268,7 @@ local function draw_cell(x, y, color, alpha)
         math.min(1, color[3] * 1.4),
         alpha or 1
     )
-    lurek.render.rectangle("line", px + 1, py + 1, CELL - 2, CELL - 2)
+    rect("line", px + 1, py + 1, CELL - 2, CELL - 2)
 end
 
 -- ── Draw a piece preview at arbitrary pixel position ──────────────────────
@@ -231,19 +278,20 @@ local function draw_piece_preview(p, px, py)
         local cx = px + c[1] * CELL
         local cy = py + c[2] * CELL
         lurek.render.setColor(p.color[1], p.color[2], p.color[3])
-        lurek.render.rectangle("fill", cx + 1, cy + 1, CELL - 2, CELL - 2)
+        rect("fill", cx + 1, cy + 1, CELL - 2, CELL - 2)
         lurek.render.setColor(
             math.min(1, p.color[1] * 1.4),
             math.min(1, p.color[2] * 1.4),
             math.min(1, p.color[3] * 1.4)
         )
-        lurek.render.rectangle("line", cx + 1, cy + 1, CELL - 2, CELL - 2)
+        rect("line", cx + 1, cy + 1, CELL - 2, CELL - 2)
     end
 end
 
 -- ===========================================================================
 --  lurek.init — runs ONCE before the window opens
 -- ===========================================================================
+
 function lurek.init()
     lurek.window.setTitle("Tetris — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
@@ -408,7 +456,7 @@ function lurek.draw()
 
     -- Board border
     lurek.render.setColor(0.3, 0.3, 0.5)
-    lurek.render.rectangle("line",
+    rect("line",
         BOARD_X - 1 + sx_off, BOARD_Y - 1 + sy_off,
         COLS * CELL + 2, ROWS * CELL + 2)
 
@@ -416,7 +464,7 @@ function lurek.draw()
     lurek.render.setColor(0.12, 0.12, 0.18)
     for y = 0, ROWS - 1 do
         for x = 0, COLS - 1 do
-            lurek.render.rectangle("line",
+            rect("line",
                 BOARD_X + x * CELL + 1 + sx_off,
                 BOARD_Y + y * CELL + 1 + sy_off,
                 CELL - 2, CELL - 2)
@@ -431,12 +479,12 @@ function lurek.draw()
                 local py = BOARD_Y + (y - 1) * CELL + sy_off
                 local c = board[y][x]
                 lurek.render.setColor(c[1], c[2], c[3])
-                lurek.render.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
+                rect("fill", px + 1, py + 1, CELL - 2, CELL - 2)
                 lurek.render.setColor(
                     math.min(1, c[1] * 1.4),
                     math.min(1, c[2] * 1.4),
                     math.min(1, c[3] * 1.4))
-                lurek.render.rectangle("line", px + 1, py + 1, CELL - 2, CELL - 2)
+                rect("line", px + 1, py + 1, CELL - 2, CELL - 2)
             end
         end
     end
@@ -450,7 +498,7 @@ function lurek.draw()
                 local px = BOARD_X + cx * CELL + sx_off
                 local py = BOARD_Y + cy * CELL + sy_off
                 lurek.render.setColor(piece.color[1], piece.color[2], piece.color[3], 0.25)
-                lurek.render.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
+                rect("fill", px + 1, py + 1, CELL - 2, CELL - 2)
             end
         end
 
@@ -461,12 +509,12 @@ function lurek.draw()
                 local px = BOARD_X + cx * CELL + sx_off
                 local py = BOARD_Y + cy * CELL + sy_off
                 lurek.render.setColor(piece.color[1], piece.color[2], piece.color[3])
-                lurek.render.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
+                rect("fill", px + 1, py + 1, CELL - 2, CELL - 2)
                 lurek.render.setColor(
                     math.min(1, piece.color[1] * 1.4),
                     math.min(1, piece.color[2] * 1.4),
                     math.min(1, piece.color[3] * 1.4))
-                lurek.render.rectangle("line", px + 1, py + 1, CELL - 2, CELL - 2)
+                rect("line", px + 1, py + 1, CELL - 2, CELL - 2)
             end
         end
     end
@@ -477,7 +525,7 @@ function lurek.draw()
     -- Line-clear flash overlay
     if flash_alpha > 0.01 then
         lurek.render.setColor(1, 1, 1, flash_alpha)
-        lurek.render.rectangle("fill", BOARD_X, BOARD_Y, COLS * CELL, ROWS * CELL)
+        rect("fill", BOARD_X, BOARD_Y, COLS * CELL, ROWS * CELL)
     end
 end
 
@@ -490,86 +538,86 @@ function lurek.draw_ui()
     if state == STATE.TITLE then
         -- Title screen
         lurek.render.setColor(0.0, 0.9, 0.9)
-        lurek.render.print("T E T R I S", SCREEN_W / 2 - 100, 180, 4)
+        text_("T E T R I S", SCREEN_W / 2 - 100, 180, 4)
 
         lurek.render.setColor(0.7, 0.7, 0.9)
-        lurek.render.print("Rotate and stack falling tetrominoes", SCREEN_W / 2 - 160, 240, 1.5)
+        text_("Rotate and stack falling tetrominoes", SCREEN_W / 2 - 160, 240, 1.5)
 
         -- Blinking "press enter"
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(1, 1, 1)
-            lurek.render.print("PRESS ENTER TO START", SCREEN_W / 2 - 120, 340, 2)
+            text_("PRESS ENTER TO START", SCREEN_W / 2 - 120, 340, 2)
         end
 
         -- Controls preview
         lurek.render.setColor(0.4, 0.4, 0.5)
-        lurek.render.print("←→ / AD   Move",     200, 430, 1.3)
-        lurek.render.print("↑  / W    Rotate",    200, 450, 1.3)
-        lurek.render.print("↓  / S    Soft drop", 200, 470, 1.3)
-        lurek.render.print("Space     Hard drop", 200, 490, 1.3)
-        lurek.render.print("C         Hold",      200, 510, 1.3)
-        lurek.render.print("Escape    Quit",      200, 530, 1.3)
+        text_("←→ / AD   Move",     200, 430, 1.3)
+        text_("↑  / W    Rotate",    200, 450, 1.3)
+        text_("↓  / S    Soft drop", 200, 470, 1.3)
+        text_("Space     Hard drop", 200, 490, 1.3)
+        text_("C         Hold",      200, 510, 1.3)
+        text_("Escape    Quit",      200, 530, 1.3)
         return
     end
 
     -- ── Sidebar: Score / Level / Lines ────────────────────────────────
     lurek.render.setColor(0.7, 0.7, 0.9)
-    lurek.render.print("SCORE", sx, BOARD_Y + 10, 1.5)
+    text_("SCORE", sx, BOARD_Y + 10, 1.5)
     lurek.render.setColor(1, 1, 1)
-    lurek.render.print(tostring(score), sx, BOARD_Y + 30, 1.8)
+    text_(tostring(score), sx, BOARD_Y + 30, 1.8)
 
     lurek.render.setColor(0.7, 0.7, 0.9)
-    lurek.render.print("LEVEL", sx, BOARD_Y + 70, 1.5)
+    text_("LEVEL", sx, BOARD_Y + 70, 1.5)
     lurek.render.setColor(1, 1, 1)
-    lurek.render.print(tostring(level), sx, BOARD_Y + 90, 2)
+    text_(tostring(level), sx, BOARD_Y + 90, 2)
 
     lurek.render.setColor(0.7, 0.7, 0.9)
-    lurek.render.print("LINES", sx, BOARD_Y + 130, 1.5)
+    text_("LINES", sx, BOARD_Y + 130, 1.5)
     lurek.render.setColor(1, 1, 1)
-    lurek.render.print(tostring(lines_cleared), sx, BOARD_Y + 150, 2)
+    text_(tostring(lines_cleared), sx, BOARD_Y + 150, 2)
 
     -- ── Sidebar: Next piece preview ──────────────────────────────────
     lurek.render.setColor(0.7, 0.7, 0.9)
-    lurek.render.print("NEXT", sx, BOARD_Y + 195, 1.5)
+    text_("NEXT", sx, BOARD_Y + 195, 1.5)
     draw_piece_preview(next_piece, sx, BOARD_Y + 215)
 
     -- ── Sidebar: Hold piece preview ──────────────────────────────────
     lurek.render.setColor(0.7, 0.7, 0.9)
-    lurek.render.print("HOLD", sx, BOARD_Y + 300, 1.5)
+    text_("HOLD", sx, BOARD_Y + 300, 1.5)
     if hold_piece then
         draw_piece_preview(hold_piece, sx, BOARD_Y + 320)
     else
         lurek.render.setColor(0.3, 0.3, 0.4)
-        lurek.render.print("(empty)", sx, BOARD_Y + 325, 1.2)
+        text_("(empty)", sx, BOARD_Y + 325, 1.2)
     end
 
     -- ── Sidebar: Controls ────────────────────────────────────────────
     lurek.render.setColor(0.4, 0.4, 0.5)
-    lurek.render.print("←→  Move",      sx, SCREEN_H - 140, 1.2)
-    lurek.render.print("↑   Rotate",    sx, SCREEN_H - 125, 1.2)
-    lurek.render.print("↓   Soft drop", sx, SCREEN_H - 110, 1.2)
-    lurek.render.print("SPC Hard drop", sx, SCREEN_H - 95,  1.2)
-    lurek.render.print("C   Hold",      sx, SCREEN_H - 80,  1.2)
-    lurek.render.print("ESC Quit",      sx, SCREEN_H - 65,  1.2)
+    text_("←→  Move",      sx, SCREEN_H - 140, 1.2)
+    text_("↑   Rotate",    sx, SCREEN_H - 125, 1.2)
+    text_("↓   Soft drop", sx, SCREEN_H - 110, 1.2)
+    text_("SPC Hard drop", sx, SCREEN_H - 95,  1.2)
+    text_("C   Hold",      sx, SCREEN_H - 80,  1.2)
+    text_("ESC Quit",      sx, SCREEN_H - 65,  1.2)
 
     -- ── Left sidebar: FPS ────────────────────────────────────────────
     lurek.render.setColor(0.4, 0.4, 0.5)
-    lurek.render.print("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 20, 1)
+    text_("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 20, 1)
 
     -- ── Game over overlay ────────────────────────────────────────────
     if state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1, 0.2, 0.2)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 90, SCREEN_H / 2 - 40, 3.5)
+        text_("GAME OVER", SCREEN_W / 2 - 90, SCREEN_H / 2 - 40, 3.5)
 
         lurek.render.setColor(1, 1, 1)
-        lurek.render.print("Score: " .. score, SCREEN_W / 2 - 60, SCREEN_H / 2 + 10, 2)
-        lurek.render.print("Level: " .. level, SCREEN_W / 2 - 60, SCREEN_H / 2 + 35, 2)
-        lurek.render.print("Lines: " .. lines_cleared, SCREEN_W / 2 - 60, SCREEN_H / 2 + 60, 2)
+        text_("Score: " .. score, SCREEN_W / 2 - 60, SCREEN_H / 2 + 10, 2)
+        text_("Level: " .. level, SCREEN_W / 2 - 60, SCREEN_H / 2 + 35, 2)
+        text_("Lines: " .. lines_cleared, SCREEN_W / 2 - 60, SCREEN_H / 2 + 60, 2)
 
         lurek.render.setColor(0.7, 0.7, 0.7)
-        lurek.render.print("Press R to restart", SCREEN_W / 2 - 100, SCREEN_H / 2 + 100, 2)
+        text_("Press R to restart", SCREEN_W / 2 - 100, SCREEN_H / 2 + 100, 2)
     end
 end

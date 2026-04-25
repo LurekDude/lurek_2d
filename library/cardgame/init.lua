@@ -1,4 +1,4 @@
-﻿--- @module library.cardgame
+﻿-- @module library.cardgame
 --- @status full
 --- Card game system: card types, cards, stacks (decks/hands/zones), slots,
 --- card pools, stack manager, deck builder, history, and card groups.
@@ -104,6 +104,26 @@ end
 
 -- ÔöÇÔöÇ Card ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
+---@class Card
+---@field id number
+---@field card_type string
+---@field name string
+---@field category string
+---@field subtype string
+---@field rarity string
+---@field stats table<string, number>
+---@field tags string[]
+---@field counters table<string, number>
+---@field metadata table<string, string>
+---@field owner string
+---@field controller string
+---@field slot string
+---@field face_up boolean
+---@field tapped boolean
+---@field tile_x number
+---@field tile_y number
+---@field tile_w number
+---@field tile_h number
 local Card = {}
 Card.__index = Card
 
@@ -280,6 +300,13 @@ function Card:getTilePosition() return self.tile_x, self.tile_y end
 
 -- ÔöÇÔöÇ Stack ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
+---@class Stack
+---@field name string
+---@field cards Card[]
+---@field _cap number|nil
+---@field ordered boolean
+---@field public boolean
+---@field size fun(self: Stack): number
 local Stack = {}
 Stack.__index = Stack
 

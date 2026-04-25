@@ -190,13 +190,22 @@ local function apply_preset(idx)
 
     psys:setSizes(unpack(cfg.sizes))
     psys:setSizeVariation(0.2)
-    psys:setColors(unpack(cfg.colors))
+    local color_keys = {}
+    for i = 1, #cfg.colors, 4 do
+        color_keys[#color_keys + 1] = {
+            cfg.colors[i],
+            cfg.colors[i + 1],
+            cfg.colors[i + 2],
+            cfg.colors[i + 3],
+        }
+    end
+    psys:setColors(unpack(color_keys))
     psys:setEmissionArea(cfg.area[1], cfg.area[2], cfg.area[3])
     psys:setLinearDamping(0.1, 0.3)
     psys:setSpin(-1, 1)
     psys:setRotation(0, math.pi * 2)
 
-    local mx, my = lurek.input.mouse.getPosition()
+    local mx, my = lurek.input.getPosition()
     if idx == 6 then
         psys:setPosition(SCREEN_W / 2, 10)
     else
@@ -277,7 +286,57 @@ lurek.input.bind("quit", "escape")
 -- Init
 -- ============================================================
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+local _cam = nil ---@type any
+
 function lurek.init()
+    _cam = lurek.camera.new()
     lurek.window.setTitle("Particles Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
     _cam:setPosition(0, 0)
@@ -379,7 +438,7 @@ function lurek.process(dt)
 
     -- Mouse follow (except snow which emits from top)
     if psys then
-        local mx, my = lurek.input.mouse.getPosition()
+        local mx, my = lurek.input.getPosition()
         if preset_index == 6 then
             psys:setPosition(SCREEN_W / 2, 10)
         else
@@ -454,7 +513,7 @@ function lurek.draw()
 
     -- Subtle floor line
     lurek.render.setColor(0.15, 0.15, 0.2, 0.3)
-    lurek.render.rectangle(0, SCREEN_H - 2, SCREEN_W, 2)
+    rect(0, SCREEN_H - 2, SCREEN_W, 2)
 end
 
 -- ============================================================
@@ -467,30 +526,30 @@ function lurek.draw_ui()
 
         -- Background glow
         lurek.render.setColor(0.15, 0.08, 0.25, a * 0.4)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
 
         -- Title
         lurek.render.setColor(1.0, 0.85, 0.4, a)
-        lurek.render.print("PARTICLES DEMO", SCREEN_W / 2 - 110, SCREEN_H / 2 - 60)
+        text_("PARTICLES DEMO", SCREEN_W / 2 - 110, SCREEN_H / 2 - 60)
 
         -- Subtitle
         lurek.render.setColor(0.7, 0.5, 1.0, a * 0.8)
-        lurek.render.print("BEAUTIFUL EFFECTS", SCREEN_W / 2 - 95, SCREEN_H / 2 - 30)
+        text_("BEAUTIFUL EFFECTS", SCREEN_W / 2 - 95, SCREEN_H / 2 - 30)
 
         -- Instructions
         lurek.render.setColor(0.6, 0.6, 0.7, a * 0.6)
-        lurek.render.print("Press 1-8 to select a preset or SPACE to start", SCREEN_W / 2 - 195, SCREEN_H / 2 + 30)
+        text_("Press 1-8 to select a preset or SPACE to start", SCREEN_W / 2 - 195, SCREEN_H / 2 + 30)
 
         -- Preset list preview
         for i = 1, NUM_PRESETS do
             local y = SCREEN_H / 2 + 60 + (i - 1) * 18
             lurek.render.setColor(0.5, 0.5, 0.6, a * 0.5)
-            lurek.render.print(i .. ". " .. preset_names[i], SCREEN_W / 2 - 60, y)
+            text_(i .. ". " .. preset_names[i], SCREEN_W / 2 - 60, y)
         end
 
         -- FPS
         lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-        lurek.render.print("FPS: " .. fps, 10, SCREEN_H - 20)
+        text_("FPS: " .. fps, 10, SCREEN_H - 20)
         return
     end
 
@@ -499,16 +558,16 @@ function lurek.draw_ui()
 
     -- Top bar background
     lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
-    lurek.render.rectangle(0, 0, SCREEN_W, 50)
+    rect(0, 0, SCREEN_W, 50)
 
     -- Preset name with tween fade-in
     local pa = preset_tween_alpha
     lurek.render.setColor(1.0, 0.9, 0.4, pa)
-    lurek.render.print("[" .. preset_index .. "] " .. preset_names[preset_index], 12, 6)
+    text_("[" .. preset_index .. "] " .. preset_names[preset_index], 12, 6)
 
     -- Stats line
     lurek.render.setColor(0.7, 0.8, 0.9, 0.8)
-    lurek.render.print(
+    text_(
         "Active: " .. active_count
         .. "  |  Total: " .. math.floor(total_emitted)
         .. "  |  Rate: " .. emit_per_sec .. "/s",
@@ -524,7 +583,7 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
         end
-        lurek.render.print(label, rx, ry + y_off)
+        text_(label, rx, ry + y_off)
     end
     toggle_text("[C]ontinuous", continuous, 0)
     toggle_text("[G]ravity", gravity_on, 14)
@@ -537,21 +596,21 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
         end
-        lurek.render.print(label, rx2, ry + y_off)
+        text_(label, rx2, ry + y_off)
     end
     toggle_text("[W]ind", wind_on, 0)
 
     -- Bottom bar: controls hint
     lurek.render.setColor(0.0, 0.0, 0.0, 0.4)
-    lurek.render.rectangle(0, SCREEN_H - 24, SCREEN_W, 24)
+    rect(0, SCREEN_H - 24, SCREEN_W, 24)
 
     lurek.render.setColor(0.5, 0.5, 0.6, 0.6)
-    lurek.render.print(
+    text_(
         "1-8: Preset  |  SPACE: Burst  |  C: Continuous  |  G: Gravity  |  R: Rainbow  |  W: Wind  |  ESC: Quit",
         10, SCREEN_H - 18
     )
 
     -- FPS
     lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-    lurek.render.print("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 18)
+    text_("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 18)
 end

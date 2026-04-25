@@ -13,9 +13,9 @@ use crate::automation::{Action, Script, Simulator, Step};
 
 /// Registers the `lurek.automation` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -26,8 +26,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ load â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Loads a named script from a Lua data table containing a steps array.
-    /// @param name : string
-    /// @param data : table
+    /// @param name string
+    /// @param data table
     /// @return nil
     let sim = simulator.clone();
     tbl.set(
@@ -51,7 +51,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ unload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Removes a loaded script by name, returning true if it existed.
-    /// @param name : string
+    /// @param name string
     /// @return boolean
     let sim = simulator.clone();
     tbl.set(
@@ -61,7 +61,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ hasScript â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns true if a script with the given name is registered.
-    /// @param name : string
+    /// @param name string
     /// @return boolean
     let sim = simulator.clone();
     tbl.set(
@@ -80,7 +80,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Starts playback of the named script from the beginning.
-    /// @param name : string
+    /// @param name string
     /// @return nil
     let sim = simulator.clone();
     tbl.set(
@@ -131,7 +131,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// If `waitUntil` is active the predicate is polled before forwarding `dt`;
     /// until the predicate returns `true` or the timeout expires the simulator
     /// clock is frozen.
-    /// @param dt : number
+    /// @param dt number
     /// @return nil
     let sim = simulator.clone();
     let s = state.clone();
@@ -231,8 +231,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ loadFromToml â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Parses a TOML string and registers it as a named script.
-    /// @param name : string
-    /// @param toml_str : string
+    /// @param name string
+    /// @param toml_str string
     /// @return nil
     let sim = simulator.clone();
     tbl.set(
@@ -247,7 +247,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ getStepLimit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns the step limit for the named script, or nil if not found.
-    /// @param name : string
+    /// @param name string
     /// @return integer?
     let sim = simulator.clone();
     tbl.set(
@@ -260,8 +260,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // â”€â”€ setStepLimit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the step limit for the named script (clamped to 1..MAX_STEPS).
     /// Returns true if the script was found, false otherwise.
-    /// @param name : string
-    /// @param n : integer
+    /// @param name string
+    /// @param n integer
     /// @return boolean
     let sim = simulator.clone();
     tbl.set(
@@ -274,8 +274,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // â”€â”€ saveMacro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Saves a currently-loaded script under a macro name for fast replay.
     /// The script must already be loaded via `load` or `loadFromToml`.
-    /// @param macro_name : string
-    /// @param script_name : string
+    /// @param macro_name string
+    /// @param script_name string
     /// @return nil
     let sim = simulator.clone();
     tbl.set(
@@ -292,7 +292,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // â”€â”€ playMacro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Loads and starts playback of a previously saved macro.
     /// Errors if the macro name has not been saved.
-    /// @param name : string
+    /// @param name string
     /// @return nil
     let sim = simulator.clone();
     tbl.set(
@@ -306,7 +306,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // â”€â”€ hasMacro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Returns true if a macro with the given name has been saved.
-    /// @param name : string
+    /// @param name string
     /// @return boolean
     let sim = simulator.clone();
     tbl.set(
@@ -326,7 +326,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // â”€â”€ setPlaybackSpeed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Sets the dt multiplier for script playback (0.5 = half speed, 2.0 = double).
     /// Negative values are clamped to 0 (frozen clock).
-    /// @param factor : number
+    /// @param factor number
     /// @return nil
     let sim = simulator.clone();
     tbl.set(
@@ -350,7 +350,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Enables or disables the highlight overlay hint.
     /// When true, a game render pass can visualise the current simulated cursor/key
     /// position by calling `lurek.automation:isHighlightMode()`.
-    /// @param enable : boolean
+    /// @param enable boolean
     /// @return nil
     let sim = simulator.clone();
     tbl.set(
@@ -373,8 +373,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // â”€â”€ waitUntil â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Pauses playback advancement until predicate() returns true or timeout seconds elapse.
     /// While waiting, `update` does not forward elapsed time to the simulator.
-    /// @param predicate : function -- must return boolean
-    /// @param timeout : number -- maximum seconds to wait before auto-resuming
+    /// @param predicate function -- must return boolean
+    /// @param timeout number -- maximum seconds to wait before auto-resuming
     /// @return nil
     let ws = wait_state.clone();
     tbl.set(

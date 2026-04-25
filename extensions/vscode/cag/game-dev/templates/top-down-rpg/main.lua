@@ -17,7 +17,7 @@ function lurek.process(dt)
     end
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.15, 0.2, 0.1)
     if scene == "title" then
         lurek.render.print("Press ENTER to start", 300, 280)

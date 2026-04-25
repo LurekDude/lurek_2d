@@ -581,19 +581,19 @@ end
 -- Returns the value of a single bit at the given bit index in a FileData buffer.
 -- bit_index is 0-based; returns 0 or 1. Useful for packed bitfield reads.
 do  -- mlua:getBit
-  local fd = lurek.data.newFileData(16)
+  local fd = lurek.data.newByteData(16)
   fd:setByte(0, 0b10110110)
-  local bit = fd:getBit(1)
-  lurek.log.info("bit 1 = " .. bit, "data")
+  local bit = fd:getBit(0, 1)
+  lurek.log.info("bit 1 = " .. tostring(bit), "data")
 end
 
 --@api-stub: mlua:readBits
 -- Reads multiple consecutive bits starting at bit_index and returns the integer value.
 -- count up to 32 bits; useful for bitpacked binary protocols.
 do  -- mlua:readBits
-  local fd = lurek.data.newFileData(16)
+  local fd = lurek.data.newByteData(16)
   fd:setByte(0, 0xFF)
-  local val = fd:readBits(0, 8)
+  local val = fd:readBits(0, 0, 8)
   lurek.log.info("read bits: " .. val, "data")
 end
 
@@ -601,7 +601,7 @@ end
 -- Sets a single bit at the given bit index in a FileData buffer to 0 or 1.
 -- Leaves all other bits in the byte unchanged.
 do  -- mlua:setBit
-  local fd = lurek.data.newFileData(16)
+  local fd = lurek.data.newByteData(16)
   fd:setBit(3, 1)
   lurek.log.info("bit 3 set to 1", "data")
 end

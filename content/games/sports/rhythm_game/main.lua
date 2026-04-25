@@ -401,7 +401,7 @@ function lurek.process(dt)
     -- Update lane input state
     for i = 1, LANE_COUNT do
         local was_held = lane_held[i]
-        lane_held[i] = lurek.input.isDown(LANE_KEYS[i])
+        lane_held[i] = lurek.input.keyboard.isDown(LANE_KEYS[i])
         lane_just_pressed[i] = lane_held[i] and not was_held
     end
 

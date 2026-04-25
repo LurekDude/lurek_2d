@@ -52,10 +52,13 @@ local img_coin = {}    -- 2 rotation frames
 local img_tree = nil
 local img_heart = nil
 local img_star = nil
+---@type any
+local _cam = nil
 
 -- ============================================================
 -- Particles & tweens
 -- ============================================================
+---@type any
 local ps_sparkle = nil
 local coin_tweens = {}  -- per-coin hover offset { y = 0 }
 local popups = {}       -- score popups { x, y, alpha, text }
@@ -233,9 +236,78 @@ lurek.input.bind("start",       { "return" })
 -- ============================================================
 -- Init
 -- ============================================================
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+local function tween_to(...)
+    local target, duration, fields, easing, on_complete = ...
+    local tween = lurek.tween.to(target, fields, duration, easing)
+    if on_complete then
+        lurek.timer.afterReal(duration, on_complete)
+    end
+    return tween
+end
+
+local function particle_update(ps, dt)
+    if ps then ps:update(dt) end
+end
+
+local function particle_set_position(ps, x, y)
+    if ps then ps:setPosition(x, y) end
+end
+
+local function particle_emit(ps, count)
+    if ps then ps:emit(count) end
+end
+
 function lurek.init()
     lurek.window.setTitle("Sprites Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.15, 0.1)
+    _cam = lurek.camera.new()
 
     -- Generate sprites
     img_char[1] = make_character_frame1()
@@ -286,12 +358,12 @@ function lurek.init()
     for i = 1, COIN_COUNT do
         local ct = coin_tweens[i]
         local function bounce()
-            lurek.tween.to(ct, 0.6, { y = -4 }, "inOutSine", function()
-                lurek.tween.to(ct, 0.6, { y = 4 }, "inOutSine", bounce)
+            tween_to(ct, 0.6, { y = -4 }, "inOutSine", function()
+                tween_to(ct, 0.6, { y = 4 }, "inOutSine", bounce)
             end)
         end
         -- Stagger start
-        lurek.tween.to(ct, 0.3 + i * 0.05, { y = 4 }, "inOutSine", bounce)
+        tween_to(ct, 0.3 + i * 0.05, { y = 4 }, "inOutSine", bounce)
     end
 
     _cam:setPosition(0, 0)
@@ -325,7 +397,7 @@ function lurek.process(dt)
 
     -- Update tweens + particles
     lurek.tween.update(dt)
-    ps_sparkle:update(dt)
+    particle_update(ps_sparkle, dt)
 
     -- Update popups
     for i = #popups, 1, -1 do
@@ -431,8 +503,8 @@ function lurek.process(dt)
                 c.alive = false
                 score = score + 1
                 -- Sparkle burst at coin position
-                ps_sparkle:setPosition(c.x + cs / 2, c.y + cs / 2)
-                ps_sparkle:emit(12)
+                particle_set_position(ps_sparkle, c.x + cs / 2, c.y + cs / 2)
+                particle_emit(ps_sparkle, 12)
                 -- Score popup
                 table.insert(popups, {
                     x = c.x, y = c.y - 10,
@@ -521,7 +593,7 @@ function lurek.draw()
     -- Score popups
     for _, p in ipairs(popups) do
         lurek.render.setColor(1, 1, 0.3, p.alpha)
-        lurek.render.print(p.text, p.x, p.y, 3)
+        text_(p.text, p.x, p.y, 3)
     end
 end
 
@@ -533,12 +605,12 @@ function lurek.draw_ui()
         -- Title screen
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 3)
         lurek.render.setColor(0.3, 1.0, 0.4, title_alpha)
-        lurek.render.print("SPRITES DEMO", SCREEN_W / 2 - 120, SCREEN_H / 2 - 60, 4)
+        text_("SPRITES DEMO", SCREEN_W / 2 - 120, SCREEN_H / 2 - 60, 4)
         lurek.render.setColor(0.6, 0.8, 0.6, title_alpha * 0.8)
-        lurek.render.print("PIXEL ART SHOWCASE", SCREEN_W / 2 - 130, SCREEN_H / 2 - 10, 3)
+        text_("PIXEL ART SHOWCASE", SCREEN_W / 2 - 130, SCREEN_H / 2 - 10, 3)
 
         lurek.render.setColor(1, 1, 1, pulse * title_alpha)
-        lurek.render.print("Press ENTER to start", SCREEN_W / 2 - 100, SCREEN_H / 2 + 60, 2)
+        text_("Press ENTER to start", SCREEN_W / 2 - 100, SCREEN_H / 2 + 60, 2)
 
         -- Preview sprites on title
         lurek.render.setColor(1, 1, 1, title_alpha)
@@ -551,12 +623,12 @@ function lurek.draw_ui()
 
     -- HUD background
     lurek.render.setColor(0, 0, 0, 0.6)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 32)
+    rect("fill", 0, 0, SCREEN_W, 32)
 
     -- Score
     lurek.render.setColor(1, 1, 0.3)
     if img_coin[1] then lurek.render.draw(img_coin[1], 8, 4, 0, 3, 3) end
-    lurek.render.print("x " .. score .. " / " .. COIN_COUNT, 38, 8, 2)
+    text_("x " .. score .. " / " .. COIN_COUNT, 38, 8, 2)
 
     -- Lives / hearts
     lurek.render.setColor(1, 1, 1)
@@ -566,11 +638,11 @@ function lurek.draw_ui()
 
     -- FPS
     lurek.render.setColor(0.6, 0.6, 0.6)
-    lurek.render.print("FPS: " .. fps, SCREEN_W - 90, 8, 2)
+    text_("FPS: " .. fps, SCREEN_W - 90, 8, 2)
 
     -- Info bar at bottom
     lurek.render.setColor(0, 0, 0, 0.5)
-    lurek.render.rectangle("fill", 0, SCREEN_H - 28, SCREEN_W, 28)
+    rect("fill", 0, SCREEN_H - 28, SCREEN_W, 28)
 
     lurek.render.setColor(0.7, 0.7, 0.7)
     local tint = tint_modes[tint_index]
@@ -582,9 +654,9 @@ function lurek.draw_ui()
         sprite_scale, tint.name, player.frame, trail_str,
         COIN_COUNT + TREE_COUNT + 1, alive_coins
     )
-    lurek.render.print(info, 10, SCREEN_H - 22, 1.5)
+    text_(info, 10, SCREEN_H - 22, 1.5)
 
     -- Controls hint
     lurek.render.setColor(0.5, 0.5, 0.5, 0.7)
-    lurek.render.print("WASD:move  +/-:scale  C:tint  T:trail  ESC:quit", 10, SCREEN_H - 10, 1)
+    text_("WASD:move  +/-:scale  C:tint  T:trail  ESC:quit", 10, SCREEN_H - 10, 1)
 end

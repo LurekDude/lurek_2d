@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- BAD: creates a new table every frame (200+ KB/s GC pressure)
 function lurek.process(dt)
     local args = { x = player.x, y = player.y }  -- heap allocation

@@ -328,6 +328,28 @@ export class ApiDataService {
     return methods?.find(m => m.name === methodName);
   }
 
+  /**
+   * Returns a map of factory function fullPath → return type name
+   * for all non-primitive-returning non-method functions in the API.
+   * Used by typeInference to avoid hardcoded factory type maps.
+   */
+  getFactoryTypes(): Map<string, string> {
+    const primitives = new Set([
+      "nil", "any", "string", "number", "boolean", "table",
+      "function", "multiple", "integer", "thread", "userdata",
+    ]);
+    const result = new Map<string, string>();
+    for (const fn of this.allFunctions.values()) {
+      if (!fn.isMethod && fn.returnType) {
+        const rt = fn.returnType.trim();
+        if (rt.length > 0 && !primitives.has(rt.toLowerCase())) {
+          result.set(fn.fullPath, rt);
+        }
+      }
+    }
+    return result;
+  }
+
   // â”€â”€ Enum access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   getEnumValues(enumName: string): string[] {
@@ -467,6 +489,24 @@ export class ApiDataService {
         : [],
       isMethod: false,
     }));
+
+    // Load top-level classes array — methods indexed into methodsByObjectType.
+    // gen_extension_api.py emits { name, description, methods[] } entries here.
+    if (Array.isArray(obj.classes)) {
+      for (const cls of obj.classes as Record<string, unknown>[]) {
+        const clsName = String(cls.name ?? "");
+        const methods = Array.isArray(cls.methods) ? cls.methods as Record<string, unknown>[] : [];
+        for (const rm of methods) {
+          const fn = this.rawToApiFunction(clsName, rm);
+          fn.isMethod = true;
+          if (!fn.objectType) fn.objectType = clsName;
+          if (!this.allFunctions.has(fn.fullPath)) {
+            this.allFunctions.set(fn.fullPath, fn);
+            this.indexMethod(fn);
+          }
+        }
+      }
+    }
 
     // Key names / gamepad
     this.keyNames = Array.isArray(obj.keyNames) ? (obj.keyNames as string[]) : [];

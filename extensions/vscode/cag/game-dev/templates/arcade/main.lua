@@ -44,7 +44,7 @@ function lurek.process(dt)
     end
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.05, 0.05, 0.1)
 
     -- Ball

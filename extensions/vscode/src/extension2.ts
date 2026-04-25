@@ -16,9 +16,6 @@ import {
 } from "./providers/sidebar.js";
 
 // Language providers
-import * as completionProvider from "./providers/completion.js";
-import * as hoverProvider from "./providers/hover.js";
-import * as signatureProvider from "./providers/signature.js";
 import * as definitionProvider from "./providers/definition.js";
 // referencesProvider removed — sumneko.lua handles cross-file references
 // symbolsProvider removed — sumneko.lua handles document outline
@@ -38,7 +35,7 @@ import * as symbolIndexService from "./services/symbolIndex.js";
 // registerFormatting removed — sumneko.lua/stylua handles Lua formatting
 // registerFolding removed — sumneko.lua handles folding ranges
 // registerRename removed — sumneko.lua handles symbol rename
-// registerSemanticTokens removed — sumneko.lua handles semantic highlighting
+import * as semanticTokensProvider from "./providers/semanticTokens.js";
 
 // New providers (Phase 4+)
 // NOTE: luacatsProvider (@class/@field) is now handled by sumneko.lua — not registered.
@@ -134,9 +131,8 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   // ─── Language Providers (IntelliSense) ───────────────────
-  completionProvider.register(context, apiData);
-  hoverProvider.register(context, apiData);
-  signatureProvider.register(context, apiData);
+  // Completion, hover, and signature help come from sumneko.lua via docs/api/*.lua.
+  // Registering our own copies duplicates entries and fights LuaLS' LuaCATS model.
   definitionProvider.register(context, apiData);
   // references — handled by sumneko.lua
   // symbols (outline) — handled by sumneko.lua
@@ -151,7 +147,10 @@ export function activate(context: vscode.ExtensionContext): void {
   typeInferenceProvider.register(context, apiData);
   requireGraphProvider.register(context);
   symbolIndexService.register(context);
-  // NOTE: @class/@field completions/hover/formatting/folding/rename/semanticTokens
+  // Semantic tokens: Lurek-specific highlighting (callbacks as events, namespaces, etc.)
+  // sumneko.lua handles general Lua; we layer lurek.* tokens on top
+  semanticTokensProvider.register(context, apiData);
+  // NOTE: @class/@field completions/hover/formatting/folding/rename
   // are all provided by sumneko.lua — not registered here to avoid conflicts
 
   // ─── Asset Explorer Tree View ────────────────────────────

@@ -28,12 +28,59 @@ These appear as `// (undocumented)` in `docs/api/rust.md`.
 
 ---
 
-## 3. Lua Docstring Issues (0 items)
+## 3. Lua Docstring Issues (37 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/api/lurek.md` and IntelliSense.
 
-*All Lua API items have adequate descriptions.*
+### `audio`
+
+- `class` **`lurek.audio.SoundData`** — *(no description)*
+- `method` **`SoundData:getBitDepth`** — *"Get the bit depth."* (too short)
+- `method` **`SoundData:getSampleRate`** — *"Get the sample rate."* (too short)
+
+### `data`
+
+- `class` **`lurek.data.ByteData`** — *(no description)*
+- `method` **`ByteData:clone`** — *"Clone the ByteData."* (too short)
+- `method` **`ByteData:getSize`** — *"Get the size."* (too short)
+
+### `effect`
+
+- `method` **`ScreenTransition:type`** — *"Type."* (too short)
+- `method` **`ScreenTransition:typeOf`** — *"Type of."* (too short)
+
+### `image`
+
+- `class` **`lurek.image.ImageData`** — *(no description)*
+- `method` **`ImageData:alphaMask`** — *"Alpha mask."* (too short)
+- `method` **`ImageData:blur`** — *"Blur."* (too short)
+- `method` **`ImageData:brightness`** — *"Brightness."* (too short)
+- `method` **`ImageData:contrast`** — *"Contrast."* (too short)
+- `method` **`ImageData:crop`** — *"Crop."* (too short)
+- `method` **`ImageData:encode`** — *"Encode."* (too short)
+- `method` **`ImageData:fill`** — *"Fill."* (too short)
+- `method` **`ImageData:flipHorizontal`** — *"Flip horizontal."* (too short)
+- `method` **`ImageData:flipVertical`** — *"Flip vertical."* (too short)
+- `method` **`ImageData:gamma`** — *"Gamma."* (too short)
+- `method` **`ImageData:getDimensions`** — *"Returns the dimensions."* (too short)
+- `method` **`ImageData:getHeight`** — *"Returns the height."* (too short)
+- `method` **`ImageData:getPixel`** — *"Returns the pixel."* (too short)
+- `method` **`ImageData:getString`** — *"Returns the string."* (too short)
+- `method` **`ImageData:getWidth`** — *"Returns the width."* (too short)
+- `method` **`ImageData:grayscale`** — *"Grayscale."* (too short)
+- `method` **`ImageData:invert`** — *"Invert."* (too short)
+- `method` **`ImageData:mapPixel`** — *"Map pixel."* (too short)
+- `method` **`ImageData:noise`** — *"Noise."* (too short)
+- `method` **`ImageData:posterize`** — *"Posterize."* (too short)
+- `method` **`ImageData:resizeNearest`** — *"Resize nearest."* (too short)
+- `method` **`ImageData:rotate90cw`** — *"Rotate90cw."* (too short)
+- `method` **`ImageData:saturation`** — *"Saturation."* (too short)
+- `method` **`ImageData:sepia`** — *"Sepia."* (too short)
+- `method` **`ImageData:setPixel`** — *(no description)*
+- `method` **`ImageData:sharpen`** — *"Sharpen."* (too short)
+- `method` **`ImageData:threshold`** — *"Threshold."* (too short)
+- `method` **`ImageData:tint`** — *(no description)*
 
 ---
 

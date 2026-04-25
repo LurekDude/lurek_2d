@@ -571,9 +571,8 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- tcpConnect --
         /// Opens a TCP connection to a remote address.
-        /// @param addr string — "host:port"
-        /// @return nil
-        /// integer — connection ID
+        /// @param addr string
+        /// @return integer
         methods.add_method("tcpConnect", |_, this, addr: String| {
             let id = this
                 .inner
@@ -608,9 +607,8 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- wsConnect --
         /// Opens a WebSocket connection.
-        /// @param url string — "ws://host:port/path" or "wss://..."
-        /// @return nil
-        /// integer — connection ID
+        /// @param url string
+        /// @return integer
         methods.add_method("wsConnect", |_, this, url: String| {
             let id = this
                 .inner

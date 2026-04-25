@@ -49,7 +49,7 @@ local wind = 0      -- horizontal drift (reset each turn)
 local expl = { x=0, y=0, r=0, max_r=EXPLOSION_R, t=0, dur=0.55 }
 
 -- Particle systems (sparks)
-local sparks = nil
+local sparks = nil ---@type any
 
 -- ── Terrain helpers ───────────────────────────────────────────────────────
 local function terrain_y(col)
@@ -120,15 +120,61 @@ local function count_alive(t)
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Worms Artillery — Lurek2D")
     lurek.render.setBackgroundColor(0.35, 0.6, 0.85)
 
     -- Generate terrain with fractal noise
-    local ng = lurek.math.newNoiseGenerator(42)
     for c = 1, TERRAIN_COLS do
         local nx   = c / TERRAIN_COLS
-        local base = (ng:noise(nx * 3, 0) + 1) * 0.5
+        local base = (lurek.math.perlin2d(nx * 3, 0, 42) + 1) * 0.5
         terrain_h[c] = TERRAIN_MIN_H + base * (TERRAIN_MAX_H - TERRAIN_MIN_H)
     end
 
@@ -148,7 +194,10 @@ end
 
 -- ── Update ────────────────────────────────────────────────────────────────
 function lurek.update(dt)
-    sparks:update(dt)
+    local explosion_sparks = sparks
+    if explosion_sparks ~= nil then
+        explosion_sparks:update(dt)
+    end
 
     if state == STATE.AIM then
         turn_timer = turn_timer - dt
@@ -185,8 +234,11 @@ function lurek.update(dt)
                     end
                 end
             end
-            sparks:setPosition(proj.x, proj.y)
-            sparks:emit(80)
+            local explosion_sparks = sparks
+            if explosion_sparks ~= nil then
+                explosion_sparks:setPosition(proj.x, proj.y)
+                explosion_sparks:emit(80)
+            end
             state = STATE.EXPLODING
         end
 
@@ -213,19 +265,19 @@ end
 function lurek.draw()
     -- Sky gradient (simple top strip)
     lurek.render.setColor(0.35, 0.6, 0.85)
-    lurek.render.rectangle("fill", 0, 0, W, H)
+    rect("fill", 0, 0, W, H)
 
     -- Terrain
     lurek.render.setColor(0.28, 0.55, 0.18)
     for c = 1, TERRAIN_COLS do
         local tx = (c-1) * COL_W
         local ty = terrain_y(c)
-        lurek.render.rectangle("fill", tx, ty, COL_W + 1, H - ty)
+        rect("fill", tx, ty, COL_W + 1, H - ty)
     end
     -- Terrain edge highlight
     lurek.render.setColor(0.4, 0.7, 0.25)
     for c = 1, TERRAIN_COLS - 1 do
-        lurek.render.line((c-1)*COL_W, terrain_y(c), c*COL_W, terrain_y(c+1))
+        ln((c-1)*COL_W, terrain_y(c), c*COL_W, terrain_y(c+1))
     end
 
     -- Worms
@@ -233,20 +285,20 @@ function lurek.draw()
         for i, w in ipairs(team.worms) do
             if w.hp > 0 then
                 lurek.render.setColor(team.color[1], team.color[2], team.color[3])
-                lurek.render.circle("fill", w.x, w.y, WORM_R)
+                circ("fill", w.x, w.y, WORM_R)
                 -- HP bar
                 lurek.render.setColor(0,0,0,0.7)
-                lurek.render.rectangle("fill", w.x - 14, w.y - 22, 28, 5)
+                rect("fill", w.x - 14, w.y - 22, 28, 5)
                 lurek.render.setColor(0.1, 0.9, 0.1)
-                lurek.render.rectangle("fill", w.x - 14, w.y - 22, 28*(w.hp/100), 5)
+                rect("fill", w.x - 14, w.y - 22, 28*(w.hp/100), 5)
                 -- Active marker
                 if ti == turn and i == active_worm and state == STATE.AIM then
                     lurek.render.setColor(1, 1, 0)
-                    lurek.render.circle("line", w.x, w.y, WORM_R + 4)
+                    circ("line", w.x, w.y, WORM_R + 4)
                     -- Aim line
                     lurek.render.setColor(1, 1, 0, 0.7)
                     local len = 30 + (fire_power / POWER_MAX) * 40
-                    lurek.render.line(w.x, w.y,
+                    ln(w.x, w.y,
                         w.x + math.cos(aim_angle)*len,
                         w.y + math.sin(aim_angle)*len)
                 end
@@ -257,28 +309,30 @@ function lurek.draw()
     -- Projectile
     if proj.active then
         lurek.render.setColor(1, 0.8, 0.1)
-        lurek.render.circle("fill", proj.x, proj.y, PROJ_R)
+        circ("fill", proj.x, proj.y, PROJ_R)
     end
 
     -- Explosion
     if state == STATE.EXPLODING and expl.r > 0 then
         local alpha = 1 - expl.t / expl.dur
         lurek.render.setColor(1, 0.5, 0, alpha * 0.7)
-        lurek.render.circle("fill", expl.x, expl.y, expl.r)
+        circ("fill", expl.x, expl.y, expl.r)
         lurek.render.setColor(1, 1, 0, alpha)
-        lurek.render.circle("line", expl.x, expl.y, expl.r)
+        circ("line", expl.x, expl.y, expl.r)
     end
 
     -- Sparks
     lurek.render.setColor(1, 1, 1)
-    lurek.render.draw(sparks, 0, 0)
+    if sparks ~= nil then
+        lurek.render.draw(sparks, 0, 0)
+    end
 
     -- HUD
     lurek.render.setColor(0, 0, 0, 0.6)
-    lurek.render.rectangle("fill", 0, 0, W, 28)
+    rect("fill", 0, 0, W, 28)
     local tc = teams[turn].color
     lurek.render.setColor(tc[1], tc[2], tc[3])
-    lurek.render.print(string.format("%s — Power: %d  Wind: %+.0f  Time: %d",
+    text_(string.format("%s — Power: %d  Wind: %+.0f  Time: %d",
         teams[turn].name, math.floor(fire_power), wind, math.max(0, math.ceil(turn_timer))), 10, 6)
     -- Team health totals
     for t = 1, 2 do
@@ -286,23 +340,23 @@ function lurek.draw()
         for _, w in ipairs(teams[t].worms) do total = total + w.hp end
         local c2 = teams[t].color
         lurek.render.setColor(c2[1], c2[2], c2[3])
-        lurek.render.print(string.format("%s HP: %d", teams[t].name, total), W - 240 + (t-1)*120, 6)
+        text_(string.format("%s HP: %d", teams[t].name, total), W - 240 + (t-1)*120, 6)
     end
 
     -- Wind arrow
     lurek.render.setColor(1, 1, 1, 0.8)
     local wx = W/2
-    lurek.render.line(wx, H - 12, wx + wind * 0.5, H - 12)
+    ln(wx, H - 12, wx + wind * 0.5, H - 12)
 
     -- Game over
     if state == STATE.OVER then
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", W/2 - 160, H/2 - 30, 320, 60)
+        rect("fill", W/2 - 160, H/2 - 30, 320, 60)
         lurek.render.setColor(1, 1, 0)
         local winner = (count_alive(1) > 0) and teams[1].name or teams[2].name
-        lurek.render.print(winner .. " wins!", W/2 - 55, H/2 - 10, 0, 1.4)
+        text_(winner .. " wins!", W/2 - 55, H/2 - 10, 0, 1.4)
         lurek.render.setColor(1,1,1)
-        lurek.render.print("Press R to restart or Esc to quit", W/2 - 130, H/2 + 18)
+        text_("Press R to restart or Esc to quit", W/2 - 130, H/2 + 18)
     end
 end
 

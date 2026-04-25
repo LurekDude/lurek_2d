@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 local guard = world:newAgent("guard", startX, startY)
 local fsm   = guard:useFsm()
 

@@ -15,7 +15,7 @@ local function screenshot()
   return result
 end
 
--- ── lurek.render.* functions ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ lurek.render.* functions Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: lurek.render.setColor
 -- Sets the current drawing color.
@@ -169,7 +169,7 @@ end
 -- Inline color tags like {color=red} let you mix colors in a single string.
 do  -- lurek.render.printRich
   function lurek.draw()
-    lurek.render.printRich('{color=red}HP{/color}: 12 / {color=green}20{/color}', 10, 30)
+    lurek.render.printRich({{text='HP', r=255, g=0, b=0, a=255}, {text=': 12 / ', r=255, g=255, b=255, a=255}, {text='20', r=0, g=255, b=0, a=255}}, 10, 30)
   end
 end
 
@@ -177,7 +177,7 @@ end
 -- Clears the draw command queue (resets the screen).
 -- Manually clear the active target (canvas or screen) outside the engine's normal clear.
 do  -- lurek.render.clear
-  function lurek.draw() lurek.render.clear(0.0, 0.0, 0.05, 1.0) end
+  function lurek.draw() lurek.render.clear(0.0, 0.0, 0.05) end
 end
 
 --@api-stub: lurek.render.setLineWidth
@@ -265,7 +265,7 @@ end
 -- Returns a table of available built-in font pixel heights.
 -- Returns the discrete sizes the engine has rasterised so far for a face path.
 do  -- lurek.render.getFontSizes
-  local sizes = lurek.render.getFontSizes('assets/fonts/Inter.ttf')
+  local sizes = lurek.render.getFontSizes()
   for _, sz in ipairs(sizes or {}) do lurek.log.debug('cached size ' .. sz) end
 end
 
@@ -322,7 +322,7 @@ do  -- lurek.render.getFontLineHeight
 end
 
 --@api-stub: lurek.render.setFontLineHeight
--- Sets the line height of the given font (stub â€” returns nil; fonts are immutable in headless mode).
+-- Sets the line height of the given font (stub Ă„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ä‚ËĂ˘â€šÂ¬ÄąÄ„ returns nil; fonts are immutable in headless mode).
 -- Pass 1.25 for paragraph text; 1.0 for tight HUD readouts.
 do  -- lurek.render.setFontLineHeight
   pcall(function()
@@ -383,7 +383,7 @@ do  -- lurek.render.setCanvas
   local rt
   function lurek.init() rt = lurek.render.newCanvas(320, 240) end
   function lurek.draw()
-    lurek.render.setCanvas(rt); lurek.render.clear(0, 0, 0, 1); lurek.render.rectangle('fill', 10, 10, 50, 50)
+    lurek.render.setCanvas(rt); lurek.render.clear(0, 0, 0); lurek.render.rectangle('fill', 10, 10, 50, 50)
     lurek.render.setCanvas(); lurek.render.draw(rt, 0, 0)
   end
 end
@@ -400,7 +400,8 @@ end
 -- Returns width, height of the bound canvas (or screen size when none is bound).
 do  -- lurek.render.getCanvasSize
   pcall(function()
-    local w, h = lurek.render.getCanvasSize()
+    local c = lurek.render.newCanvas(320, 240)
+    local w, h = lurek.render.getCanvasSize(c)
     lurek.log.debug('canvas dim ' .. w .. 'x' .. h)
   end)
 end
@@ -594,7 +595,7 @@ end
 -- Pass a function whose draws populate the stencil buffer; use setStencilTest to read.
 do  -- lurek.render.stencil
   function lurek.draw()
-    lurek.render.stencil(function() lurek.render.circle('fill', 200, 200, 80) end)
+    lurek.render.stencil('replace', 1); lurek.render.circle('fill', 200, 200, 80)
     lurek.render.setStencilTest('greater', 0)
     lurek.render.rectangle('fill', 0, 0, 800, 600)
     lurek.render.setStencilTest()
@@ -627,7 +628,7 @@ end
 -- Resets the stencil mode to the default (keep / always / 0).
 -- Resets the stencil buffer; call between distinct stencil passes.
 do  -- lurek.render.clearStencil
-  function lurek.draw() lurek.render.clearStencil(); lurek.render.stencil(function() lurek.render.rectangle('fill', 0, 0, 64, 64) end) end
+  function lurek.draw() lurek.render.clearStencil(); lurek.render.stencil('replace', 1); lurek.render.rectangle('fill', 0, 0, 64, 64) end
 end
 
 --@api-stub: lurek.render.setDepthMode
@@ -739,7 +740,7 @@ end
 
 --@api-stub: lurek.render.newDrawLayer
 -- Creates a new z-ordered draw-call queue.
--- Queue draws then flush in a custom order — a poor man's render graph.
+-- Queue draws then flush in a custom order Ä‚ËĂ˘â€šÂ¬Ă˘â‚¬ĹĄ a poor man's render graph.
 do  -- lurek.render.newDrawLayer
   local layer
   function lurek.init() layer = lurek.render.newDrawLayer() end
@@ -747,7 +748,7 @@ do  -- lurek.render.newDrawLayer
 end
 
 --@api-stub: lurek.render.drawQuadBezier
--- Queues a quadratic BĂ©zier curve from (x1,y1) to (x2,y2) with one control point.
+-- Queues a quadratic BÄ‚â€žĂ˘â‚¬ĹˇÄ‚â€šĂ‚Â©zier curve from (x1,y1) to (x2,y2) with one control point.
 -- Two control points (p0, c1, p2); resolution arg controls segment count.
 do  -- lurek.render.drawQuadBezier
   function lurek.draw()
@@ -756,7 +757,7 @@ do  -- lurek.render.drawQuadBezier
 end
 
 --@api-stub: lurek.render.drawCubicBezier
--- Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
+-- Queues a cubic BÄ‚â€žĂ˘â‚¬ĹˇÄ‚â€šĂ‚Â©zier curve from (x1,y1) to (x2,y2) with two control points.
 -- Four control points (p0, c1, c2, p3); useful for cable / hose visuals.
 do  -- lurek.render.drawCubicBezier
   function lurek.draw()
@@ -769,7 +770,7 @@ end
 -- Pass a flat coord list for a polyline path; closed flag joins the last to first.
 do  -- lurek.render.drawPath
   function lurek.draw()
-    lurek.render.drawPath({100, 100, 150, 80, 200, 120, 180, 170}, false)
+    lurek.render.drawPath({100, 100, 150, 80, 200, 120, 180, 170}, "line", false)
   end
 end
 
@@ -796,7 +797,7 @@ end
 -- One-call iso voxel; pass top, left, right colors plus screen x, y, tile size.
 do  -- lurek.render.drawIsoCubeTile
   function lurek.draw()
-    lurek.render.drawIsoCubeTile(200, 200, 32, {0.6, 0.7, 0.5, 1}, {0.4, 0.5, 0.3, 1}, {0.5, 0.6, 0.4, 1})
+    lurek.render.drawIsoCubeTile(200, 200, 16, 9, {topColor={0.6,0.7,0.5,1}, leftColor={0.4,0.5,0.3,1}, rightColor={0.5,0.6,0.4,1}})
   end
 end
 
@@ -805,7 +806,7 @@ end
 -- Pointy-top hex with one fill color; pass center x, y and radius.
 do  -- lurek.render.drawHexTile
   function lurek.draw()
-    lurek.render.drawHexTile(200, 200, 32, {0.3, 0.5, 0.8, 1})
+    lurek.render.setColor(0.3, 0.5, 0.8, 1); lurek.render.drawHexTile(200, 200, 32)
   end
 end
 
@@ -814,10 +815,10 @@ end
 -- Open a sort scope: subsequent draws collect with pushSortKey then flushSortGroup orders them.
 do  -- lurek.render.beginSortGroup
   function lurek.draw()
-    lurek.render.beginSortGroup()
+    lurek.render.beginSortGroup(1)
     lurek.render.pushSortKey(10); lurek.render.rectangle('fill', 0, 0, 32, 32)
     lurek.render.pushSortKey(5);  lurek.render.rectangle('fill', 16, 16, 32, 32)
-    lurek.render.flushSortGroup()
+    lurek.render.flushSortGroup(1)
   end
 end
 
@@ -826,9 +827,9 @@ end
 -- Tag the next draw with a sort key (lower keys render first when flushed).
 do  -- lurek.render.pushSortKey
   function lurek.draw()
-    lurek.render.beginSortGroup()
+    lurek.render.beginSortGroup(1)
     lurek.render.pushSortKey(2); lurek.render.circle('fill', 100, 100, 16)
-    lurek.render.flushSortGroup()
+    lurek.render.flushSortGroup(1)
   end
 end
 
@@ -837,9 +838,9 @@ end
 -- Closes the sort scope and flushes draws ordered by their pushed keys.
 do  -- lurek.render.flushSortGroup
   function lurek.draw()
-    lurek.render.beginSortGroup()
+    lurek.render.beginSortGroup(1)
     lurek.render.pushSortKey(0); lurek.render.rectangle('fill', 0, 0, 16, 16)
-    lurek.render.flushSortGroup()
+    lurek.render.flushSortGroup(1)
   end
 end
 
@@ -859,7 +860,7 @@ do  -- lurek.render.pushLayer
   function lurek.draw()
     lurek.render.pushLayer('hud')
     lurek.render.print('HP 100', 10, 10)
-    lurek.render.popLayer()
+    lurek.render.popLayer(1)
   end
 end
 
@@ -867,7 +868,7 @@ end
 -- Ends and composites the named layer back to its parent.
 -- Pop the most recently pushed layer; balance pushes per frame.
 do  -- lurek.render.popLayer
-  function lurek.draw() lurek.render.pushLayer('overlay'); lurek.render.rectangle('fill', 0, 0, 32, 32); lurek.render.popLayer() end
+  function lurek.draw() lurek.render.pushLayer('overlay'); lurek.render.rectangle('fill', 0, 0, 32, 32); lurek.render.popLayer(1) end
 end
 
 --@api-stub: lurek.render.drawQuadBezier
@@ -880,7 +881,7 @@ do  -- lurek.render.drawQuadBezier
 end
 
 --@api-stub: lurek.render.drawCubicBezier
--- Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
+-- Queues a cubic BÄ‚â€žĂ˘â‚¬ĹˇÄ‚â€šĂ‚Â©zier curve from (x1,y1) to (x2,y2) with two control points.
 -- Four control points (p0, c1, c2, p3); useful for cable / hose visuals.
 do  -- lurek.render.drawCubicBezier
   function lurek.draw()
@@ -893,7 +894,7 @@ end
 -- Pass a flat coord list for a polyline path; closed flag joins the last to first.
 do  -- lurek.render.drawPath
   function lurek.draw()
-    lurek.render.drawPath({100, 100, 150, 80, 200, 120, 180, 170}, false)
+    lurek.render.drawPath({100, 100, 150, 80, 200, 120, 180, 170}, "line", false)
   end
 end
 
@@ -920,7 +921,7 @@ end
 -- One-call iso voxel; pass top, left, right colors plus screen x, y, tile size.
 do  -- lurek.render.drawIsoCubeTile
   function lurek.draw()
-    lurek.render.drawIsoCubeTile(200, 200, 32, {0.6, 0.7, 0.5, 1}, {0.4, 0.5, 0.3, 1}, {0.5, 0.6, 0.4, 1})
+    lurek.render.drawIsoCubeTile(200, 200, 16, 9, {topColor={0.6,0.7,0.5,1}, leftColor={0.4,0.5,0.3,1}, rightColor={0.5,0.6,0.4,1}})
   end
 end
 
@@ -929,7 +930,7 @@ end
 -- Pointy-top hex with one fill color; pass center x, y and radius.
 do  -- lurek.render.drawHexTile
   function lurek.draw()
-    lurek.render.drawHexTile(200, 200, 32, {0.3, 0.5, 0.8, 1})
+    lurek.render.setColor(0.3, 0.5, 0.8, 1); lurek.render.drawHexTile(200, 200, 32)
   end
 end
 
@@ -938,10 +939,10 @@ end
 -- Open a sort scope: subsequent draws collect with pushSortKey then flushSortGroup orders them.
 do  -- lurek.render.beginSortGroup
   function lurek.draw()
-    lurek.render.beginSortGroup()
+    lurek.render.beginSortGroup(1)
     lurek.render.pushSortKey(10); lurek.render.rectangle('fill', 0, 0, 32, 32)
     lurek.render.pushSortKey(5);  lurek.render.rectangle('fill', 16, 16, 32, 32)
-    lurek.render.flushSortGroup()
+    lurek.render.flushSortGroup(1)
   end
 end
 
@@ -950,9 +951,9 @@ end
 -- Tag the next draw with a sort key (lower keys render first when flushed).
 do  -- lurek.render.pushSortKey
   function lurek.draw()
-    lurek.render.beginSortGroup()
+    lurek.render.beginSortGroup(1)
     lurek.render.pushSortKey(2); lurek.render.circle('fill', 100, 100, 16)
-    lurek.render.flushSortGroup()
+    lurek.render.flushSortGroup(1)
   end
 end
 
@@ -961,9 +962,9 @@ end
 -- Closes the sort scope and flushes draws ordered by their pushed keys.
 do  -- lurek.render.flushSortGroup
   function lurek.draw()
-    lurek.render.beginSortGroup()
+    lurek.render.beginSortGroup(1)
     lurek.render.pushSortKey(0); lurek.render.rectangle('fill', 0, 0, 16, 16)
-    lurek.render.flushSortGroup()
+    lurek.render.flushSortGroup(1)
   end
 end
 
@@ -983,7 +984,7 @@ do  -- lurek.render.pushLayer
   function lurek.draw()
     lurek.render.pushLayer('hud')
     lurek.render.print('HP 100', 10, 10)
-    lurek.render.popLayer()
+    lurek.render.popLayer(1)
   end
 end
 
@@ -991,7 +992,7 @@ end
 -- Ends and composites the named layer.
 -- Pop the most recently pushed layer; balance pushes per frame.
 do  -- lurek.render.popLayer
-  function lurek.draw() lurek.render.pushLayer('overlay'); lurek.render.rectangle('fill', 0, 0, 32, 32); lurek.render.popLayer() end
+  function lurek.draw() lurek.render.pushLayer('overlay'); lurek.render.rectangle('fill', 0, 0, 32, 32); lurek.render.popLayer(1) end
 end
 
 --@api-stub: lurek.render.newLayer
@@ -1045,7 +1046,7 @@ do  -- lurek.render.setLayerZOrder
   function lurek.init() lurek.render.setLayerZOrder('pause_overlay', 1000) end
 end
 
--- ── ImageData methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ ImageData methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: ImageData:getWidth
 -- Returns the pixel width of this image buffer.
@@ -1104,7 +1105,7 @@ do  -- ImageData:typeOf
   if data and data:typeOf('ImageData') then lurek.log.debug('confirmed ImageData') end
 end
 
--- ── NineSlice methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ NineSlice methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: NineSlice:getInsets
 -- Returns the four inset values as (top, right, bottom, left).
@@ -1144,7 +1145,7 @@ do  -- NineSlice:typeOf
   function lurek.init() panel = lurek.render.newNineSlice('img/panel.png', 8, 8, 8, 8); if panel:typeOf('NineSlice') then lurek.log.debug('ok') end end
 end
 
--- ── Image methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Image methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: Image:getWidth
 -- Returns the width of this image in pixels.
@@ -1195,7 +1196,7 @@ do  -- Image:type
   function lurek.init() img = lurek.render.newImage('img/hero.png'); lurek.log.debug(img:type()) end
 end
 
--- ── Font methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Font methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: Font:getWidth
 -- Returns the rendered width of the given text string.
@@ -1281,7 +1282,7 @@ do  -- Font:type
   function lurek.init() f = lurek.render.newFont('assets/fonts/Inter.ttf', 18); lurek.log.debug(f:type()) end
 end
 
--- ── Canvas methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Canvas methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: Canvas:getWidth
 -- Returns the width of this canvas in pixels.
@@ -1332,7 +1333,7 @@ do  -- Canvas:type
   function lurek.init() c = lurek.render.newCanvas(320, 240); lurek.log.debug(c:type()) end
 end
 
--- ── SpriteBatch methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ SpriteBatch methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: SpriteBatch:clear
 -- Removes all sprites from this batch.
@@ -1385,7 +1386,7 @@ do  -- SpriteBatch:type
   function lurek.init() batch = lurek.render.newSpriteBatch(lurek.render.newImage('img/tiles.png'), 64); lurek.log.debug(batch:type()) end
 end
 
--- ── Mesh methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Mesh methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: Mesh:getVertexCount
 -- Returns the number of vertices in this mesh.
@@ -1402,7 +1403,7 @@ do  -- Mesh:getVertex
   local m
   function lurek.init()
     m = lurek.render.newMesh({ {0,0,0,0,1,1,1,1}, {64,0,1,0,1,1,1,1}, {32,64,0.5,1,1,1,1,1} })
-    local v = m:getVertex(1); lurek.log.debug('v0.x=' .. tostring(v[1]))
+    local v = m:getVertex(1); if v then lurek.log.debug('v0.x=' .. tostring(v[1])) end
   end
 end
 
@@ -1451,7 +1452,7 @@ do  -- Mesh:type
   function lurek.init() m = lurek.render.newMesh({ {0,0,0,0,1,1,1,1}, {64,0,1,0,1,1,1,1}, {32,64,0.5,1,1,1,1,1} }); lurek.log.debug(m:type()) end
 end
 
--- ── Shader methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Shader methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: Shader:send
 -- Sends a uniform value to this shader.
@@ -1459,7 +1460,7 @@ end
 do  -- Shader:send
   local sh
   function lurek.init() sh = lurek.render.newShader('// shader source') end
-  function lurek.process(dt) if sh then sh:send('time', lurek.time and lurek.time.now() or 0.0) end end
+  function lurek.process(dt) if sh then sh:send('time', lurek.time and lurek.time.getTime() or 0.0) end end
 end
 
 --@api-stub: Shader:hasUniform
@@ -1495,7 +1496,7 @@ do  -- Shader:type
   function lurek.init() sh = lurek.render.newShader('// shader source'); lurek.log.debug(sh:type()) end
 end
 
--- ── Quad methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Quad methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: Quad:getViewport
 -- Returns the quad viewport rectangle.
@@ -1529,7 +1530,7 @@ do  -- Quad:type
   function lurek.init() q = lurek.render.newQuad(0, 0, 32, 32, 256, 256); lurek.log.debug(q:type()) end
 end
 
--- ── Shape methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Shape methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: Shape:getCommandCount
 -- Returns the number of drawing commands currently stored.
@@ -1588,7 +1589,7 @@ do  -- Shape:type
   function lurek.init() s = lurek.render.newShape(); lurek.log.debug(s:type()) end
 end
 
--- ── DrawLayer methods ──
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ DrawLayer methods Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 --@api-stub: DrawLayer:queue
 -- Queues a draw callback at the given z-order.
@@ -1667,7 +1668,7 @@ end
 -- Copies pixels from a source ImageData onto this one at destination offset.
 -- Pixels outside the destination boundary are clipped silently.
 do  -- ImageData:blit
-  local dst = lurek.render.newImageData and lurek.image.newImageData(64, 64)
+  local dst = lurek.image.newImageData(64, 64)
   lurek.log.info("ImageData blit available", "render")
 end
 

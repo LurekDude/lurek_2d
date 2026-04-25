@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 local squad = world:newSquad("alpha")
 squad:addMember(agent1)
 squad:addMember(agent2)

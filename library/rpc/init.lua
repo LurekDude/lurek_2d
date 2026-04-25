@@ -1,4 +1,4 @@
---- @module library.rpc
+-- @module library.rpc
 --- @status full
 --- @description Pure-Lua Remote Procedure Call library built on `lurek.network`.
 --- Enables calling functions on remote peers over ENet with automatic
@@ -131,7 +131,7 @@ end
 --- @tparam number peer_id  Target peer.
 --- @tparam string name     Function name registered on the remote side.
 --- @tparam function callback  `fn(success, result)` — called when the response arrives.
---- @param ...               Arguments (must be MessagePack-serializable).
+--- @param ... any           Arguments (must be MessagePack-serializable).
 --- @treturn number          Request ID for the pending call.
 function RPC:call(peer_id, name, callback, ...)
     if type(name) ~= "string" or name == "" then
@@ -169,7 +169,7 @@ end
 --- receiving side can identify the originator.
 --- @tparam number peer_id  Target peer.
 --- @tparam string name     Function name registered on the remote side.
---- @param ...               Arguments (must be MessagePack-serializable).
+--- @param ... any           Arguments (must be MessagePack-serializable).
 function RPC:notify(peer_id, name, ...)
     if type(name) ~= "string" or name == "" then
         error("RPC:notify: name must be a non-empty string", 2)
@@ -189,7 +189,7 @@ end
 --- Broadcast an RPC call to all connected peers (fire-and-forget).
 --- Includes `peer_id = 0` in the wire message (server/broadcast origin).
 --- @tparam string name  Function name registered on remote peers.
---- @param ...            Arguments (must be MessagePack-serializable).
+--- @param ... any        Arguments (must be MessagePack-serializable).
 function RPC:broadcast(name, ...)
     if type(name) ~= "string" or name == "" then
         error("RPC:broadcast: name must be a non-empty string", 2)

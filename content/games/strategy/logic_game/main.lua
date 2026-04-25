@@ -120,9 +120,56 @@ lurek.input.bind("quit",      "escape")
 
 -- ── Init ──────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Logic Game — Lurek2D")
-    lurek.render.setBackgroundColor(0.06, 0.06, 0.12, 1.0)
+    lurek.render.setBackgroundColor(0.06, 0.06, 0.12)
 
     step_particles = lurek.particle.newSystem({
         maxParticles = 16,
@@ -244,11 +291,11 @@ function lurek.draw()
         for c = 1, COLS do
             local v = grid[r][c]
             local col = cell_color(v)
-            lurek.render.rectangle(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-2, CELL-2, { color = col })
+            rect(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-2, CELL-2, { color = col })
         end
     end
     -- Robot
-    lurek.render.rectangle(OX + (robot.x-1)*CELL + 8, OY + (robot.y-1)*CELL + 8, CELL-18, CELL-18, { color = {0.3,0.7,1.0,1} })
+    rect(OX + (robot.x-1)*CELL + 8, OY + (robot.y-1)*CELL + 8, CELL-18, CELL-18, { color = {0.3,0.7,1.0,1} })
 
     if step_particles then step_particles:draw() end
     if win_particles  then win_particles:draw()  end
@@ -257,8 +304,8 @@ end
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.draw_ui()
     local lv = LEVELS[level_idx]
-    lurek.render.print("Level " .. level_idx .. ": " .. lv.title, 40, 14, { color = {1,0.9,0.3,1}, size = 16 })
-    lurek.render.print("Program (" .. #program .. " slots):", 40, 520, { color = {0.7,0.7,0.9,1}, size = 14 })
+    text_("Level " .. level_idx .. ": " .. lv.title, 40, 14, { color = {1,0.9,0.3,1}, size = 16 })
+    text_("Program (" .. #program .. " slots):", 40, 520, { color = {0.7,0.7,0.9,1}, size = 14 })
 
     local px = 40
     for i, cmd in ipairs(program) do
@@ -266,14 +313,14 @@ function lurek.draw_ui()
         local bg   = sel and {0.4,0.3,0.6,1} or {0.2,0.2,0.3,1}
         local step = running and (i == run_step)
         if step then bg = {0.7,0.5,0.1,1} end
-        lurek.render.rectangle(px, 540, 48, 28, { color = bg })
-        lurek.render.print(string.upper(cmd):sub(1,2), px+14, 548, { color = {1,1,1,1}, size = 12 })
+        rect(px, 540, 48, 28, { color = bg })
+        text_(string.upper(cmd):sub(1,2), px+14, 548, { color = {1,1,1,1}, size = 12 })
         px = px + 52
     end
 
-    lurek.render.print("W/A/S/D=set cmd  ←/→=slot  Enter=run  R=reset", 40, 578, { color = {0.4,0.4,0.4,1}, size = 11 })
+    text_("W/A/S/D=set cmd  ←/→=slot  Enter=run  R=reset", 40, 578, { color = {0.4,0.4,0.4,1}, size = 11 })
 
     if msg_timer > 0 and msg ~= "" then
-        lurek.render.print(msg, 40, 494, { color = {1,0.9,0.4,1}, size = 13 })
+        text_(msg, 40, 494, { color = {1,0.9,0.4,1}, size = 13 })
     end
 end

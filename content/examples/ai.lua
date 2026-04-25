@@ -6,6 +6,7 @@
 -- MCTS, ORCA crowd avoidance, neural nets, genetic / neuroevolution, bandits,
 -- influence maps, squads with formations, command queues, traits, perception,
 -- emotion models, needs, the AI director, strategy planners, and AI LOD.
+---@diagnostic disable: undefined-field, missing-parameter, redundant-parameter, param-type-mismatch
 --
 -- Every --@api-stub: block below is a real love2d-wiki-style snippet showing
 -- how to call the API in actual game context. State names ("patrol", "chase",
@@ -146,8 +147,8 @@ end
 -- Add scored actions then call evaluate() per decision; the highest-scoring action wins.
 do  -- lurek.ai.newUtilityAI
   local uai = lurek.ai.newUtilityAI()
-  uai:addAction("flee", function() return 0.8 end)
-  uai:addAction("attack", function() return 0.4 end)
+  uai:addAction("flee", function() return 0.8 end, 1.0)
+  uai:addAction("attack", function() return 0.4 end, 1.0)
 end
 
 --@api-stub: lurek.ai.newGOAPPlanner
@@ -2261,12 +2262,12 @@ end
 -- Accepts either a string curve name or a fn(x)->y for a custom response curve.
 do  -- UtilityAI:addConsideration (custom curve)
   local ua = lurek.ai.newUtilityAI()
-  ua:addAction("patrol", function() return 0.4 end)
+  ua:addAction("patrol", function() return 0.4 end, 1.0)
   ua:addConsideration(
     "patrol",
     "health_curve",
     function() return 0.8 end,
-    function(x) return x * x end   -- quadratic custom curve
+    "quadratic"
   )
   lurek.log.debug("considerations registered without error", "ai")
 end
@@ -2344,7 +2345,7 @@ end
 do  -- SteeringManager:addArrive
   local sm = lurek.ai.newSteeringManager()
   sm:addArrive(400, 300, 1.0)
-  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
   lurek.log.info("arrive: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2364,7 +2365,7 @@ do  -- ContextSteering:addAvoidPoint
   local cs = lurek.ai.newContextSteering(16)
   cs:addAvoidPoint(300, 200, 64, 1.5)
   cs:addAvoidPoint(100, 350, 48, 1.0)
-  local fx, fy = cs:evaluate(150, 150)
+  local fx, fy = cs:evaluate(150, 150, 0, 0)
   lurek.log.info("context steer: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2383,8 +2384,8 @@ end
 -- Predicts where the target will be and steers away from that projected point.
 do  -- SteeringManager:addEvade
   local sm = lurek.ai.newSteeringManager()
-  sm:addEvade(400, 300, 80, 50, 1.0)
-  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  sm:addEvade("player", 1.0)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
   lurek.log.info("evade: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2394,7 +2395,7 @@ end
 do  -- SteeringManager:addFlee
   local sm = lurek.ai.newSteeringManager()
   sm:addFlee(400, 300, 1.0)
-  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
   lurek.log.info("flee: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2404,7 +2405,7 @@ end
 do  -- SteeringManager:addFlock
   local sm = lurek.ai.newSteeringManager()
   sm:addFlock(80, 1.0, 0.8, 0.6)
-  local fx, fy = sm:calculate(200, 200, 10, 0, 100)
+  local fx, fy = sm:calculate(200, 200, 10, 0, 100, 50, 1 / 60)
   lurek.log.info("flock: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2435,7 +2436,7 @@ end
 do  -- TraitProfile:addModifier
   local traits = lurek.ai.newTraitProfile()
   traits:set("courage", 0.5)
-  traits:addModifier("courage", "fear_potion", -0.3)
+  traits:addModifier("courage", -0.3, 5.0, "fear_potion")
   lurek.log.info("effective courage: " .. traits:get("courage"), "ai")
 end
 
@@ -2444,8 +2445,8 @@ end
 -- More effective than addSeek against moving targets; uses linear prediction.
 do  -- SteeringManager:addPursue
   local sm = lurek.ai.newSteeringManager()
-  sm:addPursue(400, 300, 80, 50, 1.0)
-  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  sm:addPursue("player", 1.0)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
   lurek.log.info("pursue: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2455,7 +2456,7 @@ end
 do  -- SteeringManager:addSeek
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(500, 400, 1.0)
-  local fx, fy = sm:calculate(100, 100, 0, 0, 150)
+  local fx, fy = sm:calculate(100, 100, 0, 0, 150, 50, 1 / 60)
   lurek.log.info("seek force: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2466,7 +2467,7 @@ do  -- ContextSteering:addSeekTarget
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:addSeekTarget(400, 400, 0.6)
-  local fx, fy = cs:evaluate(200, 200)
+  local fx, fy = cs:evaluate(200, 200, 0, 0)
   lurek.log.info("context direction: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2487,7 +2488,7 @@ end
 -- Agents can query for nearby visuals in their perception radius each tick.
 do  -- StimulusWorld:addVisual
   local sw = lurek.ai.newStimulusWorld()
-  sw:addVisual(300, 200, 0, 180, 200, 1.0, "player")
+  sw:addVisual(300, 200, 1.0, 200, "player")
   sw:addAuditory(300, 200, 1.0, 80, 0.5, "footstep")
   lurek.log.info("stimuli count: " .. sw:count(), "ai")
 end
@@ -2498,7 +2499,7 @@ end
 do  -- SteeringManager:addWander
   local sm = lurek.ai.newSteeringManager()
   sm:addWander(25, 50, 8, 0.4)
-  local fx, fy = sm:calculate(200, 200, 0, 0, 100)
+  local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
   lurek.log.info("wander: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2510,7 +2511,7 @@ do  -- InfluenceMap:blend
   im:addLayer("threat")
   im:addLayer("resource")
   im:stampInfluence("threat", 256, 256, 64, 1.0, 1.0)
-  im:blend("threat", "resource", 0.5)
+  im:blend("threat", 0.5, "resource", 0.5, "resource")
   lurek.log.info("blend complete", "ai")
 end
 
@@ -2520,7 +2521,7 @@ end
 do  -- SteeringManager:calculate
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
-  local fx, fy = sm:calculate(100, 100, 0, 0, 120)
+  local fx, fy = sm:calculate(100, 100, 0, 0, 120, 50, 1 / 60)
   lurek.log.info("steering force: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2551,7 +2552,7 @@ do  -- ContextSteering:evaluate
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:addAvoidPoint(350, 250, 50, 1.0)
-  local fx, fy = cs:evaluate(200, 200)
+  local fx, fy = cs:evaluate(200, 200, 0, 0)
   lurek.log.info("evaluated: " .. fx .. "," .. fy, "ai")
 end
 
@@ -2572,7 +2573,7 @@ do  -- Squad:getFormationPosition
   local squad = lurek.ai.newSquad("alpha")
   squad:addMember("guard_01")
   squad:setFormation("wedge", 32)
-  local px, py = squad:getFormationPosition("guard_01", 400, 300, 0)
+  local px, py = squad:getFormationPosition(1, 400, 300)
   lurek.log.info("slot: " .. px .. "," .. py, "ai")
 end
 
@@ -2668,8 +2669,8 @@ do  -- InfluenceMap:queryRect
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("resource")
   im:setInfluence("resource", 10, 10, 1.0)
-  local cells = im:queryRect("resource", 100, 100, 300, 300, 0.5)
-  lurek.log.info("cells found: " .. #cells, "ai")
+  local total = im:queryRect("resource", 100, 100, 300, 300)
+  lurek.log.info("influence sum: " .. total, "ai")
 end
 
 --@api-stub: CommandQueue:replace
@@ -2752,7 +2753,7 @@ do  -- ORCASolver:setPreferredVelocity
   local orca = lurek.ai.newORCASolver(2.0)
   local idx = orca:addAgent(100, 100, 14, 80)
   orca:setPreferredVelocity(idx, 60, 0)
-  orca:compute()
+  orca:compute(1 / 60)
   local vx, vy = orca:getSafeVelocity(idx)
   lurek.log.info("safe vel: " .. vx .. "," .. vy, "ai")
 end
@@ -2782,7 +2783,7 @@ end
 -- Use to throttle AI update rate for distant agents and save CPU budget.
 do  -- AILod:tierFor
   local lod = lurek.ai.newAILod()
-  local tier = lod:tierFor(350)
+  local tier = lod:tierFor(350, 0, 0, 0)
   lurek.log.info("lod tier at 350: " .. tier, "ai")
 end
 
@@ -2790,9 +2791,9 @@ end
 -- Registers an agent with the ORCA solver so it participates in velocity planning.
 -- Each agent needs a position, preferred velocity, radius, and max speed.
 do  -- ORCASolver:addAgent
-  local solver = lurek.ai.newORCASolver()
-  solver:addAgent(1, 200, 300, 50, 100)
-  solver:update(1/60)
+  local solver = lurek.ai.newORCASolver(2.0)
+  solver:addAgent(200, 300, 50, 100)
+  solver:compute(1 / 60)
   lurek.log.info("ORCA agent added", "ai")
 end
 
@@ -2801,8 +2802,8 @@ end
 -- Call before NeuralNet:build() to define the network architecture.
 do  -- NeuralNet:addLayer
   local net = lurek.ai.newNeuralNet()
-  net:addLayer(4, "relu")
-  net:addLayer(4, "relu")
-  net:build(2, 1)
-  lurek.log.info("layer count: " .. net:getLayerCount(), "ai")
+  net:addLayer(2, 4, "relu")
+  net:addLayer(4, 1, "relu")
+  local out = net:forward({0.25, 0.75})
+  lurek.log.info("forward count: " .. #out, "ai")
 end

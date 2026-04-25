@@ -353,6 +353,53 @@ end
 -- Callbacks
 -- ============================================================
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Entity Showcase — Lurek2D")
     lurek.render.setBackgroundColor(0.06, 0.08, 0.1)
@@ -550,39 +597,39 @@ function lurek.draw()
             if state == STATE_CH4 and e.has_velocity and e.has_health then
                 is_match = true
                 lurek.render.setColor(1, 1, 0.3, 0.25)
-                lurek.render.circle("fill", e.x, e.y, ENTITY_RADIUS * s + 6)
+                circ("fill", e.x, e.y, ENTITY_RADIUS * s + 6)
             end
 
             -- Selection ring
             if id == selected_id then
                 lurek.render.setColor(1, 1, 1, 0.7)
-                lurek.render.circle("line", e.x, e.y, ENTITY_RADIUS * s + 3)
+                circ("line", e.x, e.y, ENTITY_RADIUS * s + 3)
             end
 
             -- Entity body
             lurek.render.setColor(r, g, b, e.a)
-            lurek.render.circle("fill", e.x, e.y, ENTITY_RADIUS * s)
+            circ("fill", e.x, e.y, ENTITY_RADIUS * s)
 
             -- Component indicators (small dots around entity)
             local ind_r = ENTITY_RADIUS * s + 5
             if e.has_velocity then
                 lurek.render.setColor(0.2, 1, 0.4, 0.8)
-                lurek.render.circle("fill", e.x + ind_r, e.y, 2.5)
+                circ("fill", e.x + ind_r, e.y, 2.5)
             end
             if e.has_health then
                 lurek.render.setColor(1, 0.3, 0.3, 0.8)
-                lurek.render.circle("fill", e.x, e.y - ind_r, 2.5)
+                circ("fill", e.x, e.y - ind_r, 2.5)
                 -- Health bar
                 local hp_frac = (e.health or 0) / e.max_health
                 local bar_w = ENTITY_RADIUS * 2 * s
                 lurek.render.setColor(0.2, 0.2, 0.2, 0.6)
-                lurek.render.rectangle("fill", e.x - bar_w / 2, e.y + ENTITY_RADIUS * s + 4, bar_w, 3)
+                rect("fill", e.x - bar_w / 2, e.y + ENTITY_RADIUS * s + 4, bar_w, 3)
                 lurek.render.setColor(lerp(1, 0, hp_frac), lerp(0, 1, hp_frac), 0.1, 0.9)
-                lurek.render.rectangle("fill", e.x - bar_w / 2, e.y + ENTITY_RADIUS * s + 4, bar_w * hp_frac, 3)
+                rect("fill", e.x - bar_w / 2, e.y + ENTITY_RADIUS * s + 4, bar_w * hp_frac, 3)
             end
             if e.has_color then
                 lurek.render.setColor(0.9, 0.9, 0.2, 0.8)
-                lurek.render.circle("fill", e.x - ind_r, e.y, 2.5)
+                circ("fill", e.x - ind_r, e.y, 2.5)
             end
         end
     end
@@ -590,7 +637,7 @@ function lurek.draw()
     -- Particles
     for _, p in ipairs(particles) do
         lurek.render.setColor(p.r, p.g, p.b, p.a)
-        lurek.render.circle("fill", p.x, p.y, p.size)
+        circ("fill", p.x, p.y, p.size)
     end
 end
 
@@ -602,46 +649,46 @@ function lurek.draw_ui()
     if state == STATE_TITLE then
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
         lurek.render.setColor(0.4, 0.7, 1.0, pulse)
-        lurek.render.print("ENTITY SHOWCASE", SCREEN_W / 2 - 120, SCREEN_H / 2 - 60, 28)
+        text_("ENTITY SHOWCASE", SCREEN_W / 2 - 120, SCREEN_H / 2 - 60, 28)
         lurek.render.setColor(0.7, 0.8, 0.9, 0.8)
-        lurek.render.print("ECS DEEP DIVE", SCREEN_W / 2 - 80, SCREEN_H / 2 - 20, 18)
+        text_("ECS DEEP DIVE", SCREEN_W / 2 - 80, SCREEN_H / 2 - 20, 18)
         lurek.render.setColor(0.6, 0.6, 0.7, 0.5 + 0.3 * math.sin(title_timer * 1.8))
-        lurek.render.print("Press 1-6 to select a chapter", SCREEN_W / 2 - 130, SCREEN_H / 2 + 40, 14)
+        text_("Press 1-6 to select a chapter", SCREEN_W / 2 - 130, SCREEN_H / 2 + 40, 14)
         lurek.render.setColor(0.4, 0.4, 0.5, 0.6)
-        lurek.render.print("1: Create/Destroy   2: Components   3: Systems", SCREEN_W / 2 - 190, SCREEN_H / 2 + 80, 12)
-        lurek.render.print("4: Queries   5: Events   6: Stress Test", SCREEN_W / 2 - 150, SCREEN_H / 2 + 100, 12)
+        text_("1: Create/Destroy   2: Components   3: Systems", SCREEN_W / 2 - 190, SCREEN_H / 2 + 80, 12)
+        text_("4: Queries   5: Events   6: Stress Test", SCREEN_W / 2 - 150, SCREEN_H / 2 + 100, 12)
         lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-        lurek.render.print("ESC to quit", SCREEN_W / 2 - 40, SCREEN_H - 40, 12)
+        text_("ESC to quit", SCREEN_W / 2 - 40, SCREEN_H - 40, 12)
         return
     end
 
     -- HUD bar
     lurek.render.setColor(0.08, 0.1, 0.14, 0.9)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, HUD_H)
+    rect("fill", 0, 0, SCREEN_W, HUD_H)
     lurek.render.setColor(0.3, 0.5, 0.8, 1)
     local ch_name = chapter_names[state] or "?"
-    lurek.render.print(string.format("Ch %s: %s", string.sub(state, -1), ch_name), 10, 8, 13)
+    text_(string.format("Ch %s: %s", string.sub(state, -1), ch_name), 10, 8, 13)
     lurek.render.setColor(0.6, 0.8, 0.6, 1)
-    lurek.render.print(string.format("Entities: %d", entity_count()), 280, 8, 12)
+    text_(string.format("Entities: %d", entity_count()), 280, 8, 12)
     lurek.render.setColor(0.8, 0.8, 0.6, 1)
-    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, 8, 12)
+    text_(string.format("FPS: %d", fps), SCREEN_W - 80, 8, 12)
 
     -- Instructions bar
     lurek.render.setColor(0.06, 0.07, 0.1, 0.85)
-    lurek.render.rectangle("fill", 0, HUD_H, SCREEN_W, 26)
+    rect("fill", 0, HUD_H, SCREEN_W, 26)
     lurek.render.setColor(0.5, 0.6, 0.7, 0.9)
     local inst = chapter_instructions[state] or ""
-    lurek.render.print(inst, 10, HUD_H + 6, 11)
+    text_(inst, 10, HUD_H + 6, 11)
 
     -- Component panel (right side, slides in)
     local px = PANEL_X + panel_offset
     lurek.render.setColor(0.1, 0.12, 0.16, 0.92)
-    lurek.render.rectangle("fill", px, 70, PANEL_W, SCREEN_H - 80)
+    rect("fill", px, 70, PANEL_W, SCREEN_H - 80)
     lurek.render.setColor(0.3, 0.4, 0.6, 0.6)
-    lurek.render.rectangle("line", px, 70, PANEL_W, SCREEN_H - 80)
+    rect("line", px, 70, PANEL_W, SCREEN_H - 80)
 
     lurek.render.setColor(0.5, 0.7, 1, 1)
-    lurek.render.print("Components", px + 10, 78, 13)
+    text_("Components", px + 10, 78, 13)
 
     -- Component counts
     local cy = 100
@@ -655,70 +702,70 @@ function lurek.draw_ui()
     for _, cname in ipairs(comp_list) do
         local cc = comp_colors[cname]
         lurek.render.setColor(cc[1], cc[2], cc[3], 0.9)
-        lurek.render.circle("fill", px + 16, cy + 5, 4)
+        circ("fill", px + 16, cy + 5, 4)
         lurek.render.setColor(0.7, 0.7, 0.8, 0.9)
-        lurek.render.print(string.format("%s: %d", cname, component_counts[cname]), px + 26, cy, 11)
+        text_(string.format("%s: %d", cname, component_counts[cname]), px + 26, cy, 11)
         cy = cy + 20
     end
 
     -- Selected entity details
     cy = cy + 15
     lurek.render.setColor(0.4, 0.5, 0.7, 0.8)
-    lurek.render.print("Selected:", px + 10, cy, 12)
+    text_("Selected:", px + 10, cy, 12)
     cy = cy + 18
     if selected_id and entities[selected_id] then
         local e = entities[selected_id]
         lurek.render.setColor(0.8, 0.9, 1, 1)
-        lurek.render.print(string.format("Entity #%d", e.id), px + 14, cy, 11)
+        text_(string.format("Entity #%d", e.id), px + 14, cy, 11)
         cy = cy + 18
         lurek.render.setColor(0.6, 0.7, 0.8, 0.8)
-        lurek.render.print(string.format("Pos: %.0f, %.0f", e.x, e.y), px + 14, cy, 10)
+        text_(string.format("Pos: %.0f, %.0f", e.x, e.y), px + 14, cy, 10)
         cy = cy + 15
         if e.has_velocity then
             lurek.render.setColor(0.2, 1, 0.4, 0.8)
-            lurek.render.print(string.format("Vel: %.1f, %.1f", e.vx, e.vy), px + 14, cy, 10)
+            text_(string.format("Vel: %.1f, %.1f", e.vx, e.vy), px + 14, cy, 10)
             cy = cy + 15
         end
         if e.has_health then
             local hp_frac = (e.health or 0) / e.max_health
             lurek.render.setColor(lerp(1, 0, hp_frac), lerp(0, 1, hp_frac), 0.1, 0.9)
-            lurek.render.print(string.format("HP: %.0f / %d", e.health or 0, e.max_health), px + 14, cy, 10)
+            text_(string.format("HP: %.0f / %d", e.health or 0, e.max_health), px + 14, cy, 10)
             cy = cy + 15
         end
         if e.has_color then
             lurek.render.setColor(e.r, e.g, e.b, 1)
-            lurek.render.rectangle("fill", px + 14, cy, 30, 10)
+            rect("fill", px + 14, cy, 30, 10)
             lurek.render.setColor(0.7, 0.7, 0.8, 0.8)
-            lurek.render.print(string.format("%.2f %.2f %.2f", e.r, e.g, e.b), px + 50, cy, 10)
+            text_(string.format("%.2f %.2f %.2f", e.r, e.g, e.b), px + 50, cy, 10)
             cy = cy + 15
         end
     else
         lurek.render.setColor(0.4, 0.4, 0.5, 0.6)
-        lurek.render.print("(none — click entity)", px + 14, cy, 10)
+        text_("(none — click entity)", px + 14, cy, 10)
     end
 
     -- Performance metrics (Chapter 6)
     if state == STATE_CH6 then
         cy = cy + 25
         lurek.render.setColor(0.5, 0.8, 0.5, 0.9)
-        lurek.render.print("Performance", px + 10, cy, 12)
+        text_("Performance", px + 10, cy, 12)
         cy = cy + 18
         lurek.render.setColor(0.7, 0.8, 0.7, 0.8)
-        lurek.render.print(string.format("Update: %.2f ms", perf_update_ms), px + 14, cy, 10)
+        text_(string.format("Update: %.2f ms", perf_update_ms), px + 14, cy, 10)
         cy = cy + 15
-        lurek.render.print(string.format("Entities: %d", entity_count()), px + 14, cy, 10)
+        text_(string.format("Entities: %d", entity_count()), px + 14, cy, 10)
         cy = cy + 15
-        lurek.render.print(string.format("FPS: %d", fps), px + 14, cy, 10)
+        text_(string.format("FPS: %d", fps), px + 14, cy, 10)
     end
 
     -- Event log (Chapter 5)
     if state == STATE_CH5 and #event_log > 0 then
         lurek.render.setColor(0.08, 0.1, 0.14, 0.85)
-        lurek.render.rectangle("fill", 10, SCREEN_H - 20 - EVENT_LOG_MAX * 15, 280, EVENT_LOG_MAX * 15 + 10)
+        rect("fill", 10, SCREEN_H - 20 - EVENT_LOG_MAX * 15, 280, EVENT_LOG_MAX * 15 + 10)
         for i, ev in ipairs(event_log) do
             local alpha = math.min(ev.timer / 1.0, 1.0)
             lurek.render.setColor(ev.r, ev.g, ev.b, alpha * 0.9)
-            lurek.render.print(ev.text, 16, SCREEN_H - 18 - i * 15, 10)
+            text_(ev.text, 16, SCREEN_H - 18 - i * 15, 10)
         end
     end
 end

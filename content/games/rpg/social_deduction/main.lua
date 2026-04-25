@@ -13,6 +13,7 @@ local TASK_RADIUS = 14
 local KILL_RANGE = 40
 local SABOTAGE_VISION = 80
 local SABOTAGE_DURATION = 8.0
+local tween_api = lurek.tween ---@type any
 
 -- ── States ─────────────────────────────────────────────────────────────────
 local STATE_TITLE = "TITLE"
@@ -372,7 +373,7 @@ local function start_meeting(caller_idx)
         end
     end
     -- transition to voting after brief pause
-    lurek.tween.to(1.5, function(t)
+    tween_api.to(1.5, function(t)
         vote_timer = t
     end, { ease = "linear", on_complete = function()
         state = STATE_VOTING
@@ -426,10 +427,60 @@ end
 
 -- ── Callbacks ──────────────────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+local _cam = nil ---@type any
+
 function lurek.init()
+    _cam = lurek.camera.new()
     lurek.window.setTitle("Social Deduction — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
-    lurek.tween.to(1.0, function(t) title_alpha = t end, { ease = "outQuad" })
+    tween_api.to(1.0, function(t) title_alpha = t end, { ease = "outQuad" })
 end
 
 local function _ready_setup()
@@ -471,10 +522,10 @@ function lurek.process(delta)
 
         -- player movement
         local mx, my = 0, 0
-        if lurek.input.isDown("up")    then my = my - 1 end
-        if lurek.input.isDown("down")  then my = my + 1 end
-        if lurek.input.isDown("left")  then mx = mx - 1 end
-        if lurek.input.isDown("right") then mx = mx + 1 end
+        if lurek.input.keyboard.isDown("up")    then my = my - 1 end
+        if lurek.input.keyboard.isDown("down")  then my = my + 1 end
+        if lurek.input.keyboard.isDown("left")  then mx = mx - 1 end
+        if lurek.input.keyboard.isDown("right") then mx = mx + 1 end
         if mx ~= 0 or my ~= 0 then
             local len = math.sqrt(mx * mx + my * my)
             p.x = clamp(p.x + (mx / len) * PLAYER_SPEED * dt, 20, 750)
@@ -485,7 +536,7 @@ function lurek.process(delta)
         _cam:setPosition(p.x - SCREEN_W / 2, p.y - SCREEN_H / 2)
 
         -- task interaction
-        if lurek.input.isDown("interact") then
+        if lurek.input.isActionDown("interact") then
             if is_player_traitor then
                 -- traitor: eliminate nearby player
                 for j = 2, PLAYER_COUNT do
@@ -585,7 +636,7 @@ function lurek.process(delta)
                     if players[v].alive and v ~= 1 then
                         votes[1] = v
                         -- animate then tally
-                        lurek.tween.to(1.0, function() end, { ease = "outQuad", on_complete = function()
+                        tween_api.to(1.0, function() end, { ease = "outQuad", on_complete = function()
                             tally_votes()
                         end })
                     end
@@ -628,22 +679,22 @@ function lurek.draw()
     for _, rm in ipairs(rooms) do
         local rx, ry = rm.x - rm.w / 2, rm.y - rm.h / 2
         lurek.render.setColor(0.15, 0.18, 0.25, 0.8)
-        lurek.render.rectangle("fill", rx, ry, rm.w, rm.h)
+        rect("fill", rx, ry, rm.w, rm.h)
         lurek.render.setColor(0.3, 0.35, 0.45, 1.0)
-        lurek.render.rectangle("line", rx, ry, rm.w, rm.h)
+        rect("line", rx, ry, rm.w, rm.h)
         lurek.render.setColor(0.4, 0.5, 0.6, 0.6)
-        lurek.render.print(rm.name, rm.x - 20, rm.y - rm.h / 2 + 4)
+        text_(rm.name, rm.x - 20, rm.y - rm.h / 2 + 4)
     end
 
     -- corridors (simple connecting lines)
     lurek.render.setColor(0.12, 0.14, 0.2, 0.6)
-    lurek.render.rectangle("fill", 260, 190, 240, 20)
-    lurek.render.rectangle("fill", 190, 210, 20, 140)
-    lurek.render.rectangle("fill", 340, 250, 20, 100)
-    lurek.render.rectangle("fill", 490, 210, 20, 140)
-    lurek.render.rectangle("fill", 260, 400, 90, 20)
-    lurek.render.rectangle("fill", 420, 400, 180, 20)
-    lurek.render.rectangle("fill", 340, 420, 20, 100)
+    rect("fill", 260, 190, 240, 20)
+    rect("fill", 190, 210, 20, 140)
+    rect("fill", 340, 250, 20, 100)
+    rect("fill", 490, 210, 20, 140)
+    rect("fill", 260, 400, 90, 20)
+    rect("fill", 420, 400, 180, 20)
+    rect("fill", 340, 420, 20, 100)
 
     -- draw tasks
     for t = 1, TASK_COUNT do
@@ -652,16 +703,16 @@ function lurek.draw()
         if d < vis + 30 then
             if tk.completed then
                 lurek.render.setColor(0.2, 0.5, 0.3, 0.4)
-                lurek.render.rectangle("fill", tk.x - TASK_RADIUS, tk.y - TASK_RADIUS, TASK_RADIUS * 2, TASK_RADIUS * 2)
+                rect("fill", tk.x - TASK_RADIUS, tk.y - TASK_RADIUS, TASK_RADIUS * 2, TASK_RADIUS * 2)
                 lurek.render.setColor(0.3, 0.8, 0.4, 0.7)
-                lurek.render.print("✓", tk.x - 4, tk.y - 6)
+                text_("✓", tk.x - 4, tk.y - 6)
             else
                 lurek.render.setColor(1.0, 0.9, 0.2, 0.8)
-                lurek.render.rectangle("fill", tk.x - TASK_RADIUS, tk.y - TASK_RADIUS, TASK_RADIUS * 2, TASK_RADIUS * 2)
+                rect("fill", tk.x - TASK_RADIUS, tk.y - TASK_RADIUS, TASK_RADIUS * 2, TASK_RADIUS * 2)
                 lurek.render.setColor(0.9, 0.8, 0.1, 1.0)
-                lurek.render.rectangle("line", tk.x - TASK_RADIUS, tk.y - TASK_RADIUS, TASK_RADIUS * 2, TASK_RADIUS * 2)
+                rect("line", tk.x - TASK_RADIUS, tk.y - TASK_RADIUS, TASK_RADIUS * 2, TASK_RADIUS * 2)
                 lurek.render.setColor(0.3, 0.2, 0.0, 1.0)
-                lurek.render.print("!", tk.x - 3, tk.y - 6)
+                text_("!", tk.x - 3, tk.y - 6)
             end
         end
     end
@@ -674,16 +725,16 @@ function lurek.draw()
             if p.alive then
                 local c = p.color
                 lurek.render.setColor(c[1], c[2], c[3], 1.0)
-                lurek.render.circle("fill", p.x, p.y, PLAYER_RADIUS)
+                circ("fill", p.x, p.y, PLAYER_RADIUS)
                 lurek.render.setColor(c[1] * 0.7, c[2] * 0.7, c[3] * 0.7, 1.0)
-                lurek.render.circle("line", p.x, p.y, PLAYER_RADIUS)
+                circ("line", p.x, p.y, PLAYER_RADIUS)
                 -- name label
                 lurek.render.setColor(1, 1, 1, 0.7)
-                lurek.render.print(p.name, p.x - 10, p.y - PLAYER_RADIUS - 14)
+                text_(p.name, p.x - 10, p.y - PLAYER_RADIUS - 14)
             else
                 -- dead body / X mark
                 lurek.render.setColor(0.6, 0.1, 0.1, 0.8)
-                lurek.render.print("X", p.x - 5, p.y - 6)
+                text_("X", p.x - 5, p.y - 6)
             end
         end
     end
@@ -694,11 +745,11 @@ function lurek.draw_ui()
     -- ── Title screen ───────────────────────────────────────────────────
     if state == STATE_TITLE then
         lurek.render.setColor(0.9, 0.1, 0.15, title_alpha)
-        lurek.render.print("SOCIAL DEDUCTION", 240, 180)
+        text_("SOCIAL DEDUCTION", 240, 180)
         lurek.render.setColor(0.7, 0.7, 0.8, title_alpha * 0.8)
-        lurek.render.print("TRUST NO ONE", 300, 230)
+        text_("TRUST NO ONE", 300, 230)
         lurek.render.setColor(0.5, 0.5, 0.6, 0.5 + math.sin(frame_count * 0.05) * 0.3)
-        lurek.render.print("Press E to start", 310, 350)
+        text_("Press E to start", 310, 350)
         return
     end
 
@@ -707,11 +758,11 @@ function lurek.draw_ui()
         local cr, cg, cb = 0.2, 0.8, 0.3
         if game_winner == "traitor" then cr, cg, cb = 0.9, 0.15, 0.15 end
         lurek.render.setColor(cr, cg, cb, 1.0)
-        lurek.render.print("GAME OVER", 320, 200)
+        text_("GAME OVER", 320, 200)
         lurek.render.setColor(0.9, 0.9, 0.95, 0.9)
-        lurek.render.print(game_message, 200, 260)
+        text_(game_message, 200, 260)
         lurek.render.setColor(0.5, 0.5, 0.6, 0.5 + math.sin(frame_count * 0.05) * 0.3)
-        lurek.render.print("Press E to return to title", 270, 400)
+        text_("Press E to return to title", 270, 400)
         return
     end
 
@@ -720,16 +771,16 @@ function lurek.draw_ui()
         local vis = sabotage_active and (SABOTAGE_VISION + math.sin(vision_pulse) * 15) or VISION_RADIUS
         -- darken screen edges to simulate limited vision
         lurek.render.setColor(0.0, 0.0, 0.0, 0.4)
-        lurek.render.rectangle("fill", 0, 0, 30, SCREEN_H)
-        lurek.render.rectangle("fill", SCREEN_W - 30, 0, 30, SCREEN_H)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, 30)
-        lurek.render.rectangle("fill", 0, SCREEN_H - 30, SCREEN_W, 30)
+        rect("fill", 0, 0, 30, SCREEN_H)
+        rect("fill", SCREEN_W - 30, 0, 30, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, 30)
+        rect("fill", 0, SCREEN_H - 30, SCREEN_W, 30)
 
         if sabotage_active then
             lurek.render.setColor(0.1, 0.0, 0.15, 0.3 + math.sin(vision_pulse) * 0.1)
-            lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+            rect("fill", 0, 0, SCREEN_W, SCREEN_H)
             lurek.render.setColor(1.0, 0.3, 0.3, 0.9)
-            lurek.render.print("⚠ SABOTAGE — LIGHTS OUT ⚠", 280, 10)
+            text_("⚠ SABOTAGE — LIGHTS OUT ⚠", 280, 10)
         end
 
         -- task progress bar
@@ -738,35 +789,35 @@ function lurek.draw_ui()
             local bx, by = SCREEN_W / 2 - bw / 2, SCREEN_H - 60
             local pct = current_task_progress / TASK_HOLD_TIME
             lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-            lurek.render.rectangle("fill", bx, by, bw, bh)
+            rect("fill", bx, by, bw, bh)
             lurek.render.setColor(0.2, 0.9, 0.4, 0.9)
-            lurek.render.rectangle("fill", bx, by, bw * pct, bh)
+            rect("fill", bx, by, bw * pct, bh)
             lurek.render.setColor(0.8, 0.8, 0.8, 1.0)
-            lurek.render.print(tasks[current_task_index].label, bx, by - 16)
+            text_(tasks[current_task_index].label, bx, by - 16)
         end
 
         -- HUD: task counter
         lurek.render.setColor(0.9, 0.9, 0.95, 0.9)
-        lurek.render.print("Tasks: " .. tasks_completed .. " / " .. TASK_COUNT, 10, 10)
-        lurek.render.print("Alive: " .. alive_count() .. " / " .. PLAYER_COUNT, 10, 28)
+        text_("Tasks: " .. tasks_completed .. " / " .. TASK_COUNT, 10, 10)
+        text_("Alive: " .. alive_count() .. " / " .. PLAYER_COUNT, 10, 28)
 
         -- role indicator
         if is_player_traitor then
             lurek.render.setColor(1.0, 0.2, 0.2, 0.9)
-            lurek.render.print("ROLE: TRAITOR", SCREEN_W - 130, 10)
+            text_("ROLE: TRAITOR", SCREEN_W - 130, 10)
         else
             lurek.render.setColor(0.3, 0.7, 1.0, 0.9)
-            lurek.render.print("ROLE: CREWMATE", SCREEN_W - 140, 10)
+            text_("ROLE: CREWMATE", SCREEN_W - 140, 10)
         end
 
         -- controls hint
         lurek.render.setColor(0.5, 0.5, 0.6, 0.5)
-        lurek.render.print("WASD move | E interact | M meeting", 220, SCREEN_H - 20)
+        text_("WASD move | E interact | M meeting", 220, SCREEN_H - 20)
 
         -- game message
         if #game_message > 0 then
             lurek.render.setColor(1.0, 0.9, 0.4, 0.9)
-            lurek.render.print(game_message, 140, 50)
+            text_(game_message, 140, 50)
         end
     end
 
@@ -774,16 +825,16 @@ function lurek.draw_ui()
     if state == STATE_MEETING or state == STATE_VOTING or state == STATE_RESULT then
         -- background panel
         lurek.render.setColor(0.1, 0.1, 0.15, 0.95)
-        lurek.render.rectangle("fill", 80, 60, 640, 480)
+        rect("fill", 80, 60, 640, 480)
         lurek.render.setColor(0.4, 0.4, 0.5, 1.0)
-        lurek.render.rectangle("line", 80, 60, 640, 480)
+        rect("line", 80, 60, 640, 480)
 
         lurek.render.setColor(1.0, 0.8, 0.2, 1.0)
-        lurek.render.print("EMERGENCY MEETING", 290, 80)
+        text_("EMERGENCY MEETING", 290, 80)
 
         if meeting_caller then
             lurek.render.setColor(0.7, 0.7, 0.8, 0.7)
-            lurek.render.print("Called by: " .. player_names[meeting_caller], 310, 105)
+            text_("Called by: " .. player_names[meeting_caller], 310, 105)
         end
 
         -- player list
@@ -793,31 +844,31 @@ function lurek.draw_ui()
 
             if players[i].alive then
                 lurek.render.setColor(c[1], c[2], c[3], 1.0)
-                lurek.render.circle("fill", 130, py + 15, 12)
+                circ("fill", 130, py + 15, 12)
                 lurek.render.setColor(0.9, 0.9, 0.95, 1.0)
-                lurek.render.print(i .. ". " .. player_names[i], 155, py + 6)
+                text_(i .. ". " .. player_names[i], 155, py + 6)
 
                 -- show votes
                 if votes[i] then
                     lurek.render.setColor(0.6, 0.6, 0.7, 0.8)
-                    lurek.render.print("voted: " .. player_names[votes[i]], 350, py + 6)
+                    text_("voted: " .. player_names[votes[i]], 350, py + 6)
                 end
             else
                 lurek.render.setColor(0.4, 0.2, 0.2, 0.6)
-                lurek.render.circle("fill", 130, py + 15, 12)
+                circ("fill", 130, py + 15, 12)
                 lurek.render.setColor(0.5, 0.3, 0.3, 0.6)
-                lurek.render.print(i .. ". " .. player_names[i] .. " [ELIMINATED]", 155, py + 6)
+                text_(i .. ". " .. player_names[i] .. " [ELIMINATED]", 155, py + 6)
             end
         end
 
         if state == STATE_VOTING and not votes[1] then
             lurek.render.setColor(0.8, 0.9, 1.0, 0.6 + math.sin(frame_count * 0.08) * 0.3)
-            lurek.render.print("Press 1-6 to cast your vote", 270, 490)
+            text_("Press 1-6 to cast your vote", 270, 490)
         end
 
         if state == STATE_RESULT and vote_result then
             lurek.render.setColor(1.0, 0.6, 0.2, 1.0)
-            lurek.render.print(vote_result.message, 180, 460)
+            text_(vote_result.message, 180, 460)
         end
     end
 end

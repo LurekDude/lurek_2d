@@ -278,9 +278,9 @@ impl LuaUserData for LuaSaveManager {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- register --
         /// Registers a named module with collector and restorer callbacks
-        /// @param name : string
-        /// @param collector : function
-        /// @param restorer : function
+        /// @param name string
+        /// @param collector function
+        /// @param restorer function
         /// @return nil
         methods.add_method_mut(
             "register",
@@ -300,7 +300,7 @@ impl LuaUserData for LuaSaveManager {
         /// Removes a named module and its callbacks
         /// Unregister.
         ///
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method_mut("unregister", |lua, this, name: String| {
             this.manager.unregister(&name);
@@ -313,7 +313,7 @@ impl LuaUserData for LuaSaveManager {
         /// Sets the current schema version for new saves
         /// Sets the schema version.
         ///
-        /// @param version : integer
+        /// @param version integer
         /// @return nil
         methods.add_method_mut("setSchemaVersion", |_, this, version: i32| {
             this.manager.set_schema_version(version);
@@ -331,8 +331,8 @@ impl LuaUserData for LuaSaveManager {
 
         // -- addMigration --
         /// Registers a migration function for upgrading from a schema version
-        /// @param from_version : integer
-        /// @param func : function
+        /// @param from_version integer
+        /// @param func function
         /// @return nil
         methods.add_method_mut(
             "addMigration",
@@ -356,7 +356,7 @@ impl LuaUserData for LuaSaveManager {
         /// Restores data from a table, applying migrations and calling restorers
         /// Restore.
         ///
-        /// @param data : table
+        /// @param data table
         /// @return nil
         methods.add_method_mut("restore", |lua, this, data: LuaTable| {
             this.restore_from_table(lua, data)
@@ -381,8 +381,8 @@ impl LuaUserData for LuaSaveManager {
 
         // -- enableAutoSave --
         /// Enables auto-save with a given interval and target slot
-        /// @param interval : number
-        /// @param slot : string
+        /// @param interval number
+        /// @param slot string
         /// @return nil
         methods.add_method_mut(
             "enableAutoSave",
@@ -404,7 +404,7 @@ impl LuaUserData for LuaSaveManager {
         /// Advances the auto-save timer, returning the slot name if a save should trigger
         /// Update.
         ///
-        /// @param dt : number
+        /// @param dt number
         /// @return string?
         methods.add_method_mut("update", |_, this, dt: f64| Ok(this.manager.update(dt)));
 
@@ -412,7 +412,7 @@ impl LuaUserData for LuaSaveManager {
         /// Sets the summary string included in save metadata
         /// Sets the summary.
         ///
-        /// @param summary : string
+        /// @param summary string
         /// @return nil
         methods.add_method_mut("setSummary", |_, this, summary: String| {
             this.manager.set_summary(summary);
@@ -460,7 +460,7 @@ impl LuaUserData for LuaSaveManager {
         ///
         /// When enabled, save files are written as base64-encoded LZ4 compressed
         /// data. The engine automatically detects and decompresses on load.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setCompress", |_, this, enabled: bool| {
             this.compress = enabled;
@@ -477,7 +477,7 @@ impl LuaUserData for LuaSaveManager {
         ///
         /// The callback receives the slot name as its first argument. Pass `nil`
         /// to remove an existing callback.
-        /// @param func : function?
+        /// @param func function?
         /// @return nil
         methods.add_method_mut("onBeforeSave", |lua, this, func: LuaValue| {
             if let Some(key) = this.before_save.take() {
@@ -494,7 +494,7 @@ impl LuaUserData for LuaSaveManager {
         ///
         /// The callback receives the slot name as its first argument. Pass `nil`
         /// to remove an existing callback.
-        /// @param func : function?
+        /// @param func function?
         /// @return nil
         methods.add_method_mut("onAfterLoad", |lua, this, func: LuaValue| {
             if let Some(key) = this.after_load.take() {
@@ -508,7 +508,7 @@ impl LuaUserData for LuaSaveManager {
 
         // -- save --
         /// Collects data and writes it to a slot file.
-        /// @param slot : string
+        /// @param slot string
         /// @return nil
         methods.add_method_mut("save", |lua, this, slot: String| {
             this.save_to_slot(lua, &slot)
@@ -516,7 +516,7 @@ impl LuaUserData for LuaSaveManager {
 
         // -- load --
         /// Loads data from a slot file, applies migrations, and restores.
-        /// @param slot : string
+        /// @param slot string
         /// @return nil
         /// boolean, string?
         methods.add_method_mut("load", |lua, this, slot: String| {
@@ -525,13 +525,13 @@ impl LuaUserData for LuaSaveManager {
 
         // -- delete --
         /// Deletes a save file for the given slot.
-        /// @param slot : string
+        /// @param slot string
         /// @return nil
         methods.add_method("delete", |_, this, slot: String| this.delete_slot(&slot));
 
         // -- exists --
         /// Returns whether a save file exists for the given slot.
-        /// @param slot : string
+        /// @param slot string
         /// @return boolean
         methods.add_method(
             "exists",
@@ -545,7 +545,7 @@ impl LuaUserData for LuaSaveManager {
 
         // -- getSlotInfo --
         /// Returns metadata for a single slot, or nil if not found.
-        /// @param slot : string
+        /// @param slot string
         /// @return table?
         methods.add_method("getSlotInfo", |lua, this, slot: String| {
             match this.read_slot_meta(lua, &slot)? {
@@ -562,9 +562,9 @@ impl LuaUserData for LuaSaveManager {
 
 /// Registers the `lurek.save` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;

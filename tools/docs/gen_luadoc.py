@@ -13,9 +13,140 @@ import json
 import os
 import re
 
+# Lua reserved keywords — cannot be used as parameter names in stub declarations.
+LUA_KEYWORDS = {
+    "and", "break", "do", "else", "elseif", "end", "false", "for",
+    "function", "goto", "if", "in", "local", "nil", "not", "or",
+    "repeat", "return", "then", "true", "until", "while",
+}
+
 WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-INPUT_FILE = os.path.join(WORKSPACE_ROOT, "logs", "lua_api_data.json")
+INPUT_FILE = os.path.join(WORKSPACE_ROOT, "logs", "data", "lua_api_data.json")
 OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "api", "lurek.lua")
+
+BUILTIN_TYPES = {
+    "any", "nil", "boolean", "number", "integer", "string", "table",
+    "function", "userdata", "thread", "unknown", "self",
+}
+
+TYPE_NORMALIZATIONS = {
+    "bool": "boolean",
+    "int": "integer",
+    "u8": "integer",
+    "u16": "integer",
+    "u32": "integer",
+    "u64": "integer",
+    "usize": "integer",
+    "isize": "integer",
+    "f32": "number",
+    "f64": "number",
+    "index": "integer",
+    "count": "integer",
+    "Thread": "ThreadHandle",
+    "void": "nil",
+}
+
+
+def split_top_level_types(text):
+    parts = []
+    current = []
+    depth_angle = 0
+    depth_brace = 0
+    depth_paren = 0
+    depth_bracket = 0
+
+    for ch in text:
+        if ch == "<":
+            depth_angle += 1
+        elif ch == ">" and depth_angle > 0:
+            depth_angle -= 1
+        elif ch == "{":
+            depth_brace += 1
+        elif ch == "}" and depth_brace > 0:
+            depth_brace -= 1
+        elif ch == "(":
+            depth_paren += 1
+        elif ch == ")" and depth_paren > 0:
+            depth_paren -= 1
+        elif ch == "[":
+            depth_bracket += 1
+        elif ch == "]" and depth_bracket > 0:
+            depth_bracket -= 1
+
+        if ch == "," and depth_angle == 0 and depth_brace == 0 and depth_paren == 0 and depth_bracket == 0:
+            part = "".join(current).strip()
+            if part:
+                parts.append(part)
+            current = []
+            continue
+
+        current.append(ch)
+
+    tail = "".join(current).strip()
+    if tail:
+        parts.append(tail)
+    return parts
+
+
+def normalize_type(type_name):
+    if not type_name:
+        return "any"
+
+    type_name = type_name.strip()
+    type_name = re.sub(r"\s*([<>|,{}()\[\]])\s*", r"\1", type_name)
+
+    for old, new in TYPE_NORMALIZATIONS.items():
+        type_name = re.sub(rf"\b{re.escape(old)}\b", new, type_name)
+
+    return type_name or "any"
+
+
+def extract_return_from_full_doc(full_doc):
+    for line in full_doc.splitlines():
+        match = re.match(r"^@return\s+(.+?)\s*$", line.strip())
+        if match:
+            return match.group(1).strip()
+    return ""
+
+
+def normalize_param_type(type_name, is_optional=False):
+    normalized = normalize_type(type_name)
+    optional = is_optional or normalized.endswith("?")
+    if normalized.endswith("?"):
+        normalized = normalized[:-1] or "any"
+    if optional and normalized != "nil" and "|nil" not in normalized:
+        normalized = f"{normalized}|nil"
+    return normalized
+
+
+def collect_declared_and_referenced_types(lua_api):
+    declared = set(BUILTIN_TYPES)
+    referenced = set()
+
+    def collect_from_type(type_name):
+        normalized = normalize_type(type_name)
+        for token in re.findall(r"[A-Za-z_][A-Za-z0-9_]*", normalized):
+            lowered = token.lower()
+            if lowered in BUILTIN_TYPES or token == "lurek":
+                continue
+            referenced.add(token)
+
+    for mod_name, mod_data in lua_api.items():
+        declared.add(mod_name)
+        for class_name, class_data in mod_data.get("classes", {}).items():
+            declared.add(class_name)
+            for method in class_data.get("methods", []):
+                for param in method.get("typed_params", []):
+                    if len(param) > 1:
+                        collect_from_type(param[1])
+                collect_from_type(method.get("inferred_return", ""))
+        for func in mod_data.get("functions", []):
+            for param in func.get("typed_params", []):
+                if len(param) > 1:
+                    collect_from_type(param[1])
+            collect_from_type(func.get("inferred_return", ""))
+
+    return declared, referenced
 
 def guess_type(text, is_return=False):
     t = text.lower()
@@ -68,6 +199,19 @@ def parse_params(fn):
     ptype_map = {}
     pdesc_map = {}
 
+    typed = fn.get("typed_params", [])
+    if typed:
+        for p in typed:
+            pname = p[0].strip()
+            ptype = p[1].strip() if len(p) > 1 else "any"
+            is_opt = p[2] if len(p) > 2 else False
+            pname_clean = pname if pname == "..." else re.sub(r'[^a-zA-Z0-9_]', '', pname.replace(' ', '_'))
+            if pname_clean and pname_clean not in pkeys:
+                pkeys.append(pname_clean)
+                ptype_map[pname_clean] = normalize_param_type(ptype, is_opt)
+                pdesc_map[pname_clean] = "(optional)" if is_opt else ""
+        return pkeys, ptype_map, pdesc_map
+
     # 1. Start with params_doc
     params_doc = fn.get("params_doc", "")
     for line in params_doc.splitlines():
@@ -116,39 +260,36 @@ def parse_params(fn):
                     name_clean = name if name == "..." else re.sub(r'[^a-zA-Z0-9_]', '', name.replace(' ', '_'))
                     if name_clean and name_clean not in pkeys:
                         pkeys.append(name_clean)
-                        ptype_map[name_clean] = "any"
+                        ptype_map[name_clean] = normalize_param_type("any", is_opt)
                         pdesc_map[name_clean] = "(optional)" if is_opt else ""
-
-    # 3. Fallback to typed_params if both empty (this handles edge cases)
-    if not pkeys:
-        typed = fn.get("typed_params", [])
-        if typed:
-            for p in typed:
-                pname = p[0].strip()
-                ptype = p[1].strip() if len(p) > 1 else "any"
-                is_opt = p[2] if len(p) > 2 else False
-                pname_clean = pname if pname == "..." else re.sub(r'[^a-zA-Z0-9_]', '', pname.replace(' ', '_'))
-                if pname_clean not in pkeys:
-                    pkeys.append(pname_clean)
-                    ptype_map[pname_clean] = ptype
-                    pdesc_map[pname_clean] = "(optional)" if is_opt else ""
 
     return pkeys, ptype_map, pdesc_map
 
 def parse_returns(fn):
     ret_doc = fn.get('returns_doc', '').strip()
+    if not ret_doc:
+        ret_doc = extract_return_from_full_doc(fn.get('full_doc', ''))
+
     if ret_doc:
-        res = guess_type(ret_doc, is_return=True)
+        # If it looks like a class/type name (starts with uppercase), use it directly
+        # without the heuristic guess_type, which can false-match on substrings like "y".
+        if ret_doc and ret_doc[0].isupper():
+            return normalize_type(ret_doc)
+        # Extract just the type token (before 2+ spaces / inline description).
+        # e.g. "table  {x, y, width, height}" → "table" to avoid heuristic
+        # false-matches on description words (e.g. "width, height" → "number, number").
+        type_token = re.split(r'\s{2,}', ret_doc)[0].strip()
+        res = guess_type(type_token, is_return=True)
         if res != "any":
-            return res
+            return normalize_type(res)
+        if re.match(r'^[A-Za-z_][A-Za-z0-9_<>{}, |?]*$', ret_doc):
+            return normalize_type(ret_doc)
+
     inferred = fn.get('inferred_return', '').strip()
     if inferred:
         if inferred == "()":
             return None
-        parts = inferred.split(',')
-        if len(parts) > 1:
-            return ', '.join([guess_type(p, is_return=False) if guess_type(p, is_return=False) != "any" else "any" for p in parts])
-        return inferred
+        return normalize_type(inferred)
     if ret_doc:
         return "any"
     return None
@@ -163,13 +304,11 @@ def write_function_doc(out, fn, name):
     param_names = []
 
     for k in pkeys:
-        opt = ""
         pd = pdesc.get(k, "")
         t = ptyp.get(k, "any")
+        k = k.replace("?", "")
 
-        if "?" in k or "optional" in pd.lower():
-            opt = "?"
-            k = k.replace("?", "")
+        is_optional = pd == "(optional)"
 
         if k == "...":
             if pd:
@@ -178,21 +317,31 @@ def write_function_doc(out, fn, name):
                 out.append(f"---@param ... {t}".strip())
             param_names.append("...")
         else:
-            if pd:
-                out.append(f"---@param {k}{opt} {t} {pd}".strip())
+            safe_k = (k + "_") if k in LUA_KEYWORDS else k
+            if is_optional:
+                # LuaCATS optional syntax: name? type (NOT name type|nil)
+                clean_t = re.sub(r"\|nil$", "", t) or "any"
+                out.append(f"---@param {safe_k}? {clean_t}".strip())
+            elif pd:
+                out.append(f"---@param {safe_k} {t} {pd}".strip())
             else:
-                out.append(f"---@param {k}{opt} {t}".strip())
-            param_names.append(k)
+                out.append(f"---@param {safe_k} {t}".strip())
+            param_names.append(safe_k)
 
     ret = parse_returns(fn)
     if ret:
-        if "," in ret:
-            for r in ret.split(','):
+        ret_parts = split_top_level_types(ret)
+        if len(ret_parts) > 1:
+            for r in ret_parts:
                 out.append(f"---@return {r.strip()}")
         else:
             out.append(f"---@return {ret}")
 
-    out.append(f"function {name}({', '.join(param_names)}) end")
+    signature = ', '.join(param_names)
+    if ':' in name:
+        out.append(f"function {name}({signature}) end")
+    else:
+        out.append(f"{name} = function({signature}) end")
     out.append("")
 
 def main():
@@ -219,10 +368,42 @@ def main():
     out.append("lurek = {}")
     out.append("")
 
+    declared_types, referenced_types = collect_declared_and_referenced_types(lua_api)
+    opaque_types = sorted(
+        token for token in referenced_types
+        if token not in declared_types and (token[0].isupper() or token in {"Lua", "LuaValue", "Thread"})
+    )
+
+    # LuaValue is mlua's dynamic value type — alias to `any` so LuaLS treats it correctly.
+    _OPAQUE_ALIASES = {"LuaValue": "any"}
+
+    for type_name in opaque_types:
+        if type_name in _OPAQUE_ALIASES:
+            out.append(f"---@alias {type_name} {_OPAQUE_ALIASES[type_name]}")
+            out.append("")
+        else:
+            out.append(f"---@class {type_name}")
+            out.append(f"{type_name} = {{}}")
+            out.append("")
+
+    # Module-level constants that the Rust parser cannot auto-discover.
+    _MODULE_CONSTANTS = {
+        "physics": [
+            ("CELL_AIR",   "integer", "empty air cell (0)"),
+            ("CELL_SAND",  "integer", "sand cell (1)"),
+            ("CELL_WATER", "integer", "water cell (2)"),
+            ("CELL_ROCK",  "integer", "rock cell (3)"),
+            ("CELL_FIRE",  "integer", "fire cell (4)"),
+            ("CELL_GAS",   "integer", "gas cell (5)"),
+        ],
+    }
+
     for mod_name in sorted(lua_api.keys()):
         lua_ns = _LUA_NAMESPACE.get(mod_name, mod_name)
         mod_data = lua_api[mod_name]
         out.append(f"---@class lurek.{lua_ns}")
+        for const_name, const_type, const_desc in _MODULE_CONSTANTS.get(mod_name, []):
+            out.append(f"---@field {const_name} {const_type}  {const_desc}")
         out.append(f"lurek.{lua_ns} = {{}}")
         out.append("")
 
@@ -234,7 +415,7 @@ def main():
                 for line in desc.splitlines():
                     out.append(f"--- {line}")
             out.append(f"---@class {class_name}")
-            out.append(f"local {class_name} = {{}}")
+            out.append(f"{class_name} = {{}}")
             out.append("")
 
             methods = class_data.get("methods", [])

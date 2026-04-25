@@ -17,7 +17,7 @@ function lurek.process(dt)
     if s and s.update then s.update(dt) end
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.08, 0.08, 0.12)
     local s = scenes[current]
     if s and s.draw then s.draw() end

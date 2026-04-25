@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { WebviewEditor, getNonce, wrapHtml } from "./shared.js";
+import { WebviewEditor, getNonce, wrapHtml, ICONS, iconButton, panelSection, fieldInline, toolbarSep, toolbarSpacer } from "./shared.js";
 
 export class ShaderPreviewEditor extends WebviewEditor {
   static open(context: vscode.ExtensionContext): ShaderPreviewEditor {
@@ -27,43 +27,51 @@ export class ShaderPreviewEditor extends WebviewEditor {
         height: 100vh;
       }
       .toolbar { grid-column: 1 / -1; }
-      .code-area { grid-row: 2; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
-      .preview-area { grid-row: 2; display: flex; flex-direction: column; }
       .status-bar { grid-column: 1 / -1; }
+      .code-area { grid-row: 2; display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow: hidden; }
+      .preview-area { grid-row: 2; display: flex; flex-direction: column; overflow: hidden; }
       .code-editor {
-        flex: 1; background: var(--bg); color: #d4d4d4; font-family: 'Consolas', 'Courier New', monospace;
-        font-size: 13px; line-height: 1.5; padding: 10px; border: none; resize: none;
+        flex: 1; background: var(--bg); color: var(--text); font-family: var(--font-mono, 'Consolas', monospace);
+        font-size: 12px; line-height: 1.5; padding: 8px; border: none; resize: none;
         tab-size: 2; white-space: pre; overflow: auto;
       }
-      .code-editor:focus { outline: none; }
-      .preview-canvas-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; background: #111; }
+      .code-editor:focus { outline: 1px solid var(--accent); }
+      .preview-canvas-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; background: var(--bg); }
       .params-bar {
-        padding: 8px; background: var(--surface); border-top: 1px solid var(--border);
-        display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+        padding: 6px; background: var(--surface); border-top: 1px solid var(--border);
+        display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
       }
-      .param-item { display: flex; align-items: center; gap: 4px; font-size: 11px; }
-      .param-item input[type="range"] { width: 80px; }
+      .param-item { display: flex; align-items: center; gap: 4px; font-size: 10px; }
+      .param-item input[type="range"] { width: 72px; }
       .error-bar {
-        padding: 4px 10px; background: rgba(244,67,54,0.15); color: var(--danger);
-        font-family: monospace; font-size: 11px; white-space: pre-wrap; max-height: 60px; overflow-y: auto;
+        padding: 4px 8px; background: rgba(243,139,168,0.15); color: var(--error);
+        font-family: var(--font-mono, monospace); font-size: 10px; white-space: pre-wrap; max-height: 50px; overflow-y: auto;
       }
-      .preset-btn { font-size: 11px; padding: 2px 8px; }
-      .perf-stat { font-family: monospace; }
+      .preset-btn {
+        font-size: 10px; padding: 2px 7px; background: var(--surface-2); color: var(--text);
+        border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer;
+      }
+      .preset-btn:hover { background: var(--hover); }
+      .preset-btn.sel { background: var(--accent); color: var(--bg); }
     `, `
       <div class="editor-layout">
         <div class="toolbar">
-          <label>Preset:</label>
-          <button class="preset-btn active" data-preset="blur">Blur</button>
-          <button class="preset-btn" data-preset="glow">Glow</button>
-          <button class="preset-btn" data-preset="dissolve">Dissolve</button>
-          <button class="preset-btn" data-preset="pixel">Pixelate</button>
-          <button class="preset-btn" data-preset="wave">Wave</button>
-          <button class="preset-btn" data-preset="custom">Custom</button>
-          <div class="sep"></div>
-          <button id="btnRun">&#9654; Run</button>
-          <button id="btnPause">&#10074;&#10074;</button>
-          <div class="sep"></div>
-          <button id="btnExport">Export</button>
+          <div class="group">
+            <label style="font-size:10px">Preset:</label>
+            <button class="preset-btn sel" data-preset="blur">Blur</button>
+            <button class="preset-btn" data-preset="glow">Glow</button>
+            <button class="preset-btn" data-preset="dissolve">Dissolve</button>
+            <button class="preset-btn" data-preset="pixel">Pixelate</button>
+            <button class="preset-btn" data-preset="wave">Wave</button>
+            <button class="preset-btn" data-preset="custom">Custom</button>
+          </div>
+          ${toolbarSep()}
+          <div class="group">
+            ${iconButton(ICONS.play, 'btnRun', 'Run')}
+            ${iconButton(ICONS.pause, 'btnPause', 'Pause')}
+          </div>
+          ${toolbarSpacer()}
+          ${iconButton(ICONS.save, 'btnExport', 'Export Lua')}
         </div>
 
         <div class="code-area">
@@ -79,19 +87,21 @@ export class ShaderPreviewEditor extends WebviewEditor {
         </div>
 
         <div class="status-bar">
-          <span id="statusPreset">Preset: blur</span>
-          <span class="perf-stat" id="perfFps">FPS: --</span>
-          <span class="perf-stat" id="perfTime">Frame: -- ms</span>
+          <span id="statusPreset" class="badge">blur</span>
+          <div class="sep"></div>
+          <span id="perfFps" style="font-family:var(--font-mono,monospace)">FPS: --</span>
+          <div class="sep"></div>
+          <span id="perfTime" style="font-family:var(--font-mono,monospace)">Frame: -- ms</span>
+          <div class="spacer"></div>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
         </div>
       </div>
     `, `
       const canvas = document.getElementById('previewCanvas');
       const ctx = canvas.getContext('2d');
       const editor = document.getElementById('codeEditor');
-      let running = true;
-      let frameCount = 0;
-      let lastFpsTime = performance.now();
-      let currentPreset = 'blur';
+      const undo = new UndoStack();
+      let running = true, frameCount = 0, lastFpsTime = performance.now(), currentPreset = 'blur';
 
       const PRESETS = {
         blur: {
@@ -99,7 +109,7 @@ export class ShaderPreviewEditor extends WebviewEditor {
           params: [{ name: 'radius', min: 1, max: 20, value: 3 }, { name: 'intensity', min: 0, max: 100, value: 50 }],
         },
         glow: {
-          code: '-- Glow Shader\\n-- Uniforms: threshold, strength, color\\n\\nfunction effect(pixel, x, y, uniforms)\\n  local lum = pixel.r * 0.299 + pixel.g * 0.587 + pixel.b * 0.114\\n  local t = uniforms.threshold or 0.5\\n  local s = (uniforms.strength or 50) / 100\\n  if lum > t then\\n    return {\\n      r = math.min(1, pixel.r + pixel.r * s),\\n      g = math.min(1, pixel.g + pixel.g * s),\\n      b = math.min(1, pixel.b + pixel.b * s),\\n      a = pixel.a\\n    }\\n  end\\n  return pixel\\nend',
+          code: '-- Glow Shader\\n-- Uniforms: threshold, strength\\n\\nfunction effect(pixel, x, y, uniforms)\\n  local lum = pixel.r * 0.299 + pixel.g * 0.587 + pixel.b * 0.114\\n  local t = uniforms.threshold or 0.5\\n  local s = (uniforms.strength or 50) / 100\\n  if lum > t then\\n    return {\\n      r = math.min(1, pixel.r + pixel.r * s),\\n      g = math.min(1, pixel.g + pixel.g * s),\\n      b = math.min(1, pixel.b + pixel.b * s),\\n      a = pixel.a\\n    }\\n  end\\n  return pixel\\nend',
           params: [{ name: 'threshold', min: 0, max: 100, value: 50 }, { name: 'strength', min: 0, max: 100, value: 50 }],
         },
         dissolve: {
@@ -121,6 +131,9 @@ export class ShaderPreviewEditor extends WebviewEditor {
       };
 
       let params = {};
+      registerShortcut('ctrl+z', () => { const s = undo.undo(); if (s) { editor.value = s.code; params = {...s.params}; } });
+      registerShortcut('ctrl+shift+z', () => { const s = undo.redo(); if (s) { editor.value = s.code; params = {...s.params}; } });
+      registerShortcut('ctrl+s', () => document.getElementById('btnExport').click());
 
       function loadPreset(name) {
         currentPreset = name;
@@ -129,28 +142,21 @@ export class ShaderPreviewEditor extends WebviewEditor {
         params = {};
         preset.params.forEach(p => { params[p.name] = p.value; });
         buildParams(preset.params);
-        document.getElementById('statusPreset').textContent = 'Preset: ' + name;
+        document.getElementById('statusPreset').textContent = name;
         document.getElementById('errorBar').style.display = 'none';
-        document.querySelectorAll('.preset-btn').forEach(b => b.classList.toggle('active', b.dataset.preset === name));
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.toggle('sel', b.dataset.preset === name));
       }
 
       function buildParams(paramDefs) {
-        const bar = document.getElementById('paramsBar');
-        bar.innerHTML = '';
+        const bar = document.getElementById('paramsBar'); bar.innerHTML = '';
         paramDefs.forEach(p => {
-          const item = document.createElement('div');
-          item.className = 'param-item';
+          const item = document.createElement('div'); item.className = 'param-item';
           item.innerHTML = '<label>' + p.name + '</label><input type="range" min="' + p.min + '" max="' + p.max + '" value="' + p.value + '" data-p="' + p.name + '"><span>' + p.value + '</span>';
-          item.querySelector('input').addEventListener('input', (e) => {
-            const v = parseInt(e.target.value);
-            params[p.name] = v;
-            e.target.nextElementSibling.textContent = v;
-          });
+          item.querySelector('input').addEventListener('input', e => { const v = parseInt(e.target.value); params[p.name] = v; e.target.nextElementSibling.textContent = v; });
           bar.appendChild(item);
         });
       }
 
-      // Simple preview: draw a colorful pattern and show effect visually
       let time = 0;
       function renderPreview() {
         if (!running) return;
@@ -160,78 +166,48 @@ export class ShaderPreviewEditor extends WebviewEditor {
         for (let y = 0; y < h; y++) {
           for (let x = 0; x < w; x++) {
             const i = (y * w + x) * 4;
-            // Base pattern: gradient + circles
             const cx = w/2, cy = h/2;
             const dist = Math.sqrt((x-cx)*(x-cx) + (y-cy)*(y-cy));
             const wave = Math.sin(dist * 0.05 - time * 0.02) * 0.5 + 0.5;
             let r = Math.floor((x / w) * 200 * wave + 55);
             let g = Math.floor((y / h) * 200 * wave + 55);
             let b = Math.floor(128 + 127 * Math.sin(time * 0.01 + x * 0.02));
-
-            // Apply simple param-based effects for visual demo
             if (currentPreset === 'pixel') {
               const s = Math.max(1, params.size || 8);
-              const bx = Math.floor(x / s) * s;
-              const by = Math.floor(y / s) * s;
+              const bx = Math.floor(x / s) * s, by = Math.floor(y / s) * s;
               const bd = Math.sqrt((bx-cx)*(bx-cx) + (by-cy)*(by-cy));
               const bw = Math.sin(bd * 0.05 - time * 0.02) * 0.5 + 0.5;
-              r = Math.floor((bx / w) * 200 * bw + 55);
-              g = Math.floor((by / h) * 200 * bw + 55);
+              r = Math.floor((bx / w) * 200 * bw + 55); g = Math.floor((by / h) * 200 * bw + 55);
             } else if (currentPreset === 'dissolve') {
               const noise = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
               const n = noise - Math.floor(noise);
               const p = (params.progress || 30) / 100;
-              if (n < p) { r = 0; g = 0; b = 0; }
-              else if (n < p + 0.05) { r = 255; g = 128; b = 0; }
+              if (n < p) { r = 0; g = 0; b = 0; } else if (n < p + 0.05) { r = 255; g = 128; b = 0; }
             } else if (currentPreset === 'wave') {
-              const amp = params.amplitude || 10;
-              const freq = (params.frequency || 20) / 100;
+              const amp = params.amplitude || 10, freq = (params.frequency || 20) / 100;
               const off = Math.sin(y * freq + time * 0.03) * amp;
               const sx = Math.floor(x + off);
-              if (sx >= 0 && sx < w) {
-                const sd = Math.sqrt((sx-cx)*(sx-cx) + (y-cy)*(y-cy));
-                const sw = Math.sin(sd * 0.05 - time * 0.02) * 0.5 + 0.5;
-                r = Math.floor((sx / w) * 200 * sw + 55);
-              }
+              if (sx >= 0 && sx < w) { const sd = Math.sqrt((sx-cx)*(sx-cx) + (y-cy)*(y-cy)); const sw = Math.sin(sd * 0.05 - time * 0.02) * 0.5 + 0.5; r = Math.floor((sx / w) * 200 * sw + 55); }
             }
-
-            imgData.data[i] = Math.min(255, Math.max(0, r));
-            imgData.data[i+1] = Math.min(255, Math.max(0, g));
-            imgData.data[i+2] = Math.min(255, Math.max(0, b));
-            imgData.data[i+3] = 255;
+            imgData.data[i] = Math.min(255, Math.max(0, r)); imgData.data[i+1] = Math.min(255, Math.max(0, g));
+            imgData.data[i+2] = Math.min(255, Math.max(0, b)); imgData.data[i+3] = 255;
           }
         }
-        ctx.putImageData(imgData, 0, 0);
-        time++;
-        frameCount++;
-
+        ctx.putImageData(imgData, 0, 0); time++; frameCount++;
         const elapsed = performance.now() - t0;
         document.getElementById('perfTime').textContent = 'Frame: ' + elapsed.toFixed(1) + ' ms';
         const now = performance.now();
-        if (now - lastFpsTime >= 1000) {
-          document.getElementById('perfFps').textContent = 'FPS: ' + frameCount;
-          frameCount = 0;
-          lastFpsTime = now;
-        }
+        if (now - lastFpsTime >= 1000) { document.getElementById('perfFps').textContent = 'FPS: ' + frameCount; frameCount = 0; lastFpsTime = now; }
         requestAnimationFrame(renderPreview);
       }
 
-      document.querySelectorAll('.preset-btn').forEach(btn => {
-        btn.addEventListener('click', () => loadPreset(btn.dataset.preset));
-      });
-
-      document.getElementById('btnRun').addEventListener('click', () => {
-        running = true;
-        renderPreview();
-      });
+      editor.addEventListener('input', () => { undo.push({ code: editor.value, params: {...params} }); markDirty(); });
+      document.querySelectorAll('.preset-btn').forEach(btn => { btn.addEventListener('click', () => loadPreset(btn.dataset.preset)); });
+      document.getElementById('btnRun').addEventListener('click', () => { running = true; renderPreview(); });
       document.getElementById('btnPause').addEventListener('click', () => { running = false; });
+      document.getElementById('btnExport').addEventListener('click', () => { vscode.postMessage({ type: 'exportLua', content: editor.value }); });
 
-      document.getElementById('btnExport').addEventListener('click', () => {
-        vscode.postMessage({ type: 'exportLua', content: editor.value });
-      });
-
-      loadPreset('blur');
-      renderPreview();
+      loadPreset('blur'); renderPreview();
     `);
   }
 }

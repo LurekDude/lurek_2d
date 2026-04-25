@@ -62,6 +62,8 @@ local tweens_list = {}
 
 local title_blink = 0
 local gold_display = 0
+---@type any
+local _cam = nil
 
 ------------------------------------------------------------
 -- Helpers
@@ -166,9 +168,58 @@ lurek.input.bind("escape", "quit")
 -- Callbacks
 ------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(...)
+    local a, b, c, d, e, f, g, h = ...
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Cooking Sim — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.1, 0.05)
+    _cam = lurek.camera.new()
     _cam:setPosition(0, 0)
     reset_inventory()
     fill_customer_queue()
@@ -411,13 +462,13 @@ function lurek.draw()
         local c = STATION_COLORS[i]
         local alpha = (i == current_station) and 1.0 or 0.5
 
-        lurek.render.rectangle(sx, STATION_Y, STATION_W, STATION_H, c[1], c[2], c[3], alpha)
-        lurek.render.rectangle("line", sx, STATION_Y, STATION_W, STATION_H, 1, 1, 1, alpha, 2)
-        lurek.render.print(STATION_NAMES[i], sx + 8, STATION_Y + 8, 14, 1, 1, 1, alpha)
+        rect(sx, STATION_Y, STATION_W, STATION_H, c[1], c[2], c[3], alpha)
+        rect("line", sx, STATION_Y, STATION_W, STATION_H, 1, 1, 1, alpha, 2)
+        text_(STATION_NAMES[i], sx + 8, STATION_Y + 8, 14, 1, 1, 1, alpha)
 
         -- Selection arrow
         if i == current_station then
-            lurek.render.print("v", sx + STATION_W / 2 - 4, STATION_Y - 24, 20, 1, 1, 0.3, 1)
+            text_("v", sx + STATION_W / 2 - 4, STATION_Y - 24, 20, 1, 1, 0.3, 1)
         end
     end
 
@@ -425,8 +476,8 @@ function lurek.draw()
     if #placed_ingredients > 0 then
         for pi, ingr in ipairs(placed_ingredients) do
             local px = station_x(1) + 10 + (pi - 1) * 50
-            lurek.render.rectangle(px, STATION_Y + 50, 44, 20, 0.9, 0.8, 0.5, 0.9)
-            lurek.render.print(ingr, px + 2, STATION_Y + 53, 11, 0.1, 0.1, 0.1, 1)
+            rect(px, STATION_Y + 50, 44, 20, 0.9, 0.8, 0.5, 0.9)
+            text_(ingr, px + 2, STATION_Y + 53, 11, 0.1, 0.1, 0.1, 1)
         end
     end
 
@@ -438,15 +489,15 @@ function lurek.draw()
         local bar_w = STATION_W - 16
         local burned = cooking.timer >= cooking.max_time + BURN_EXTRA
 
-        lurek.render.rectangle(sx + 8, STATION_Y + STATION_H - 30, bar_w, 12, 0.2, 0.2, 0.2, 1)
+        rect(sx + 8, STATION_Y + STATION_H - 30, bar_w, 12, 0.2, 0.2, 0.2, 1)
         local br, bg = 0.2, 0.8
         if burned then br, bg = 0.9, 0.1 end
-        lurek.render.rectangle(sx + 8, STATION_Y + STATION_H - 30, bar_w * math.min(progress, 1.0), 12, br, bg, 0.2, 1)
-        lurek.render.print(cooking.dish_name, sx + 8, STATION_Y + 40, 12, 1, 1, 1, 1)
+        rect(sx + 8, STATION_Y + STATION_H - 30, bar_w * math.min(progress, 1.0), 12, br, bg, 0.2, 1)
+        text_(cooking.dish_name, sx + 8, STATION_Y + 40, 12, 1, 1, 1, 1)
         if progress >= 1.0 and not burned then
-            lurek.render.print("READY!", sx + 8, STATION_Y + 56, 13, 0.2, 1, 0.2, 1)
+            text_("READY!", sx + 8, STATION_Y + 56, 13, 0.2, 1, 0.2, 1)
         elseif burned then
-            lurek.render.print("BURNED!", sx + 8, STATION_Y + 56, 13, 1, 0.2, 0.2, 1)
+            text_("BURNED!", sx + 8, STATION_Y + 56, 13, 1, 0.2, 0.2, 1)
         end
     end
 
@@ -455,14 +506,14 @@ function lurek.draw()
         local sx = station_x(4)
         local color_r = cooked_dish == "Burned" and 0.5 or 0.2
         local color_g = cooked_dish == "Burned" and 0.2 or 0.7
-        lurek.render.rectangle(sx + 20, STATION_Y + 45, STATION_W - 40, 28, color_r, color_g, 0.2, 0.9)
-        lurek.render.print(cooked_dish, sx + 30, STATION_Y + 49, 13, 1, 1, 1, 1)
+        rect(sx + 20, STATION_Y + 45, STATION_W - 40, 28, color_r, color_g, 0.2, 0.9)
+        text_(cooked_dish, sx + 30, STATION_Y + 49, 13, 1, 1, 1, 1)
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
-        lurek.render.rectangle(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size, p.r, p.g, p.b, alpha * 0.8)
+        rect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size, p.r, p.g, p.b, alpha * 0.8)
     end
 end
 
@@ -472,69 +523,69 @@ end
 function lurek.draw_ui()
     if state == STATES.TITLE then
         local alpha = 0.7 + 0.3 * math.sin(title_blink * 3)
-        lurek.render.print("COOKING SIM", SCREEN_W / 2 - 100, 160, 36, 1, 0.85, 0.3, 1)
-        lurek.render.print("SERVE DELICIOUS FOOD", SCREEN_W / 2 - 120, 210, 18, 0.9, 0.8, 0.6, 0.9)
-        lurek.render.print("Press SPACE to start", SCREEN_W / 2 - 90, 320, 16, 1, 1, 1, alpha)
-        lurek.render.print("Arrow keys: navigate | Enter: place | Space: action", SCREEN_W / 2 - 200, 370, 13, 0.6, 0.6, 0.6, 0.8)
+        text_("COOKING SIM", SCREEN_W / 2 - 100, 160, 36, 1, 0.85, 0.3, 1)
+        text_("SERVE DELICIOUS FOOD", SCREEN_W / 2 - 120, 210, 18, 0.9, 0.8, 0.6, 0.9)
+        text_("Press SPACE to start", SCREEN_W / 2 - 90, 320, 16, 1, 1, 1, alpha)
+        text_("Arrow keys: navigate | Enter: place | Space: action", SCREEN_W / 2 - 200, 370, 13, 0.6, 0.6, 0.6, 0.8)
         return
     end
 
     if state == STATES.GAME_OVER then
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 80, 180, 32, 1, 0.3, 0.3, 1)
-        lurek.render.print(string.format("Total Gold Earned: %d", gold), SCREEN_W / 2 - 100, 240, 18, 1, 0.9, 0.4, 1)
-        lurek.render.print(string.format("Days Survived: %d", day), SCREEN_W / 2 - 80, 270, 16, 0.8, 0.8, 0.8, 1)
-        lurek.render.print("Press SPACE to restart", SCREEN_W / 2 - 100, 340, 16, 1, 1, 1, 0.8)
+        text_("GAME OVER", SCREEN_W / 2 - 80, 180, 32, 1, 0.3, 0.3, 1)
+        text_(string.format("Total Gold Earned: %d", gold), SCREEN_W / 2 - 100, 240, 18, 1, 0.9, 0.4, 1)
+        text_(string.format("Days Survived: %d", day), SCREEN_W / 2 - 80, 270, 16, 0.8, 0.8, 0.8, 1)
+        text_("Press SPACE to restart", SCREEN_W / 2 - 100, 340, 16, 1, 1, 1, 0.8)
         return
     end
 
     if state == STATES.DAY_END then
-        lurek.render.print(string.format("Day %d Complete!", day), SCREEN_W / 2 - 90, 150, 28, 1, 0.9, 0.4, 1)
-        lurek.render.print(string.format("Earnings: %d gold", day_earnings), SCREEN_W / 2 - 80, 200, 18, 0.9, 0.85, 0.5, 1)
-        lurek.render.print(string.format("Total Gold: %d", gold), SCREEN_W / 2 - 70, 230, 16, 0.8, 0.8, 0.8, 1)
-        lurek.render.print(string.format("Satisfaction: %d%%", satisfaction), SCREEN_W / 2 - 70, 260, 16, 0.7, 0.9, 0.7, 1)
-        lurek.render.print(string.format("Press SPACE to buy ingredients (%d gold)", INGREDIENT_PACK_COST), SCREEN_W / 2 - 170, 320, 14, 0.6, 0.8, 1, 0.9)
-        lurek.render.print("Press ENTER to start next day", SCREEN_W / 2 - 120, 350, 14, 1, 1, 1, 0.8)
+        text_(string.format("Day %d Complete!", day), SCREEN_W / 2 - 90, 150, 28, 1, 0.9, 0.4, 1)
+        text_(string.format("Earnings: %d gold", day_earnings), SCREEN_W / 2 - 80, 200, 18, 0.9, 0.85, 0.5, 1)
+        text_(string.format("Total Gold: %d", gold), SCREEN_W / 2 - 70, 230, 16, 0.8, 0.8, 0.8, 1)
+        text_(string.format("Satisfaction: %d%%", satisfaction), SCREEN_W / 2 - 70, 260, 16, 0.7, 0.9, 0.7, 1)
+        text_(string.format("Press SPACE to buy ingredients (%d gold)", INGREDIENT_PACK_COST), SCREEN_W / 2 - 170, 320, 14, 0.6, 0.8, 1, 0.9)
+        text_("Press ENTER to start next day", SCREEN_W / 2 - 120, 350, 14, 1, 1, 1, 0.8)
         return
     end
 
     -- HUD top bar
-    lurek.render.rectangle(0, 0, SCREEN_W, 40, 0.1, 0.08, 0.04, 0.9)
-    lurek.render.print(string.format("Day %d", day), 16, 10, 18, 1, 0.9, 0.5, 1)
-    lurek.render.print(string.format("Gold: %d", math.floor(gold_display + 0.5)), 140, 10, 18, 1, 0.85, 0.2, 1)
-    lurek.render.print(string.format("Satisfaction: %d%%", satisfaction), 320, 10, 16, 0.6, 0.9, 0.6, 1)
+    rect(0, 0, SCREEN_W, 40, 0.1, 0.08, 0.04, 0.9)
+    text_(string.format("Day %d", day), 16, 10, 18, 1, 0.9, 0.5, 1)
+    text_(string.format("Gold: %d", math.floor(gold_display + 0.5)), 140, 10, 18, 1, 0.85, 0.2, 1)
+    text_(string.format("Satisfaction: %d%%", satisfaction), 320, 10, 16, 0.6, 0.9, 0.6, 1)
 
     -- Day timer bar
     local timer_frac = day_timer / DAY_LENGTH
-    lurek.render.rectangle(520, 12, 200, 16, 0.2, 0.2, 0.2, 0.8)
-    lurek.render.rectangle(520, 12, 200 * timer_frac, 16, 0.3, 0.7, 0.9, 0.9)
-    lurek.render.print(string.format("%.0fs", day_timer), 730, 12, 14, 0.8, 0.8, 0.8, 1)
+    rect(520, 12, 200, 16, 0.2, 0.2, 0.2, 0.8)
+    rect(520, 12, 200 * timer_frac, 16, 0.3, 0.7, 0.9, 0.9)
+    text_(string.format("%.0fs", day_timer), 730, 12, 14, 0.8, 0.8, 0.8, 1)
 
     -- Customer orders panel
-    lurek.render.rectangle(10, 440, 500, 150, 0.12, 0.1, 0.08, 0.85)
-    lurek.render.print("ORDERS", 20, 448, 16, 1, 0.8, 0.4, 1)
+    rect(10, 440, 500, 150, 0.12, 0.1, 0.08, 0.85)
+    text_("ORDERS", 20, 448, 16, 1, 0.8, 0.4, 1)
     for ci = 1, #customers do
         local cust = customers[ci]
         local cy = 470 + (ci - 1) * 38
-        lurek.render.print(string.format("#%d: %s", ci, cust.dish), 20, cy, 14, 1, 1, 1, 0.9)
+        text_(string.format("#%d: %s", ci, cust.dish), 20, cy, 14, 1, 1, 1, 0.9)
         -- Patience bar
         local pat_frac = cust.patience / cust.max_patience
         local pr = pat_frac < 0.3 and 1.0 or 0.3
         local pg = pat_frac < 0.3 and 0.3 or 0.8
-        lurek.render.rectangle(160, cy + 2, 120, 10, 0.2, 0.2, 0.2, 0.7)
-        lurek.render.rectangle(160, cy + 2, 120 * pat_frac, 10, pr, pg, 0.2, 0.9)
-        lurek.render.print(string.format("%.0fs", cust.patience), 290, cy, 12, 0.7, 0.7, 0.7, 0.8)
+        rect(160, cy + 2, 120, 10, 0.2, 0.2, 0.2, 0.7)
+        rect(160, cy + 2, 120 * pat_frac, 10, pr, pg, 0.2, 0.9)
+        text_(string.format("%.0fs", cust.patience), 290, cy, 12, 0.7, 0.7, 0.7, 0.8)
     end
 
     -- Inventory panel
-    lurek.render.rectangle(540, 440, 250, 150, 0.12, 0.1, 0.08, 0.85)
-    lurek.render.print("INVENTORY", 550, 448, 16, 1, 0.8, 0.4, 1)
+    rect(540, 440, 250, 150, 0.12, 0.1, 0.08, 0.85)
+    text_("INVENTORY", 550, 448, 16, 1, 0.8, 0.4, 1)
     for ii, name in ipairs(INGREDIENTS) do
         local iy = 470 + (ii - 1) * 24
         local sel = (ii == selected_ingredient)
         local prefix = sel and "> " or "  "
         local alpha = sel and 1.0 or 0.6
         local count = inventory[name] or 0
-        lurek.render.print(string.format("%s%s: %d", prefix, name, count), 555, iy, 14, 0.9, 0.9, 0.8, alpha)
+        text_(string.format("%s%s: %d", prefix, name, count), 555, iy, 14, 0.9, 0.9, 0.8, alpha)
     end
 
     -- Current action hint
@@ -559,5 +610,5 @@ function lurek.draw_ui()
             hint = "No dish ready to serve"
         end
     end
-    lurek.render.print(hint, 16, SCREEN_H - 24, 12, 0.6, 0.6, 0.6, 0.8)
+    text_(hint, 16, SCREEN_H - 24, 12, 0.6, 0.6, 0.6, 0.8)
 end

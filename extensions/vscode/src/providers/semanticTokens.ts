@@ -1,29 +1,26 @@
 import * as vscode from 'vscode';
 import { ApiDataService } from '../services/apiData.js';
 import { LuaDocumentAnalyzer, TokenType, Token } from '../services/luaParser.js';
+import { LUREK_CALLBACK_NAMES } from '../generated/lurekApiData.js';
 
 const LUA_SELECTOR: vscode.DocumentSelector = { scheme: 'file', language: 'lua' };
 const analyzer = new LuaDocumentAnalyzer();
 
 // ── Token legend ─────────────────────────────────────────────
+//
+// sumneko.lua handles all generic Lua semantic tokens (keywords, variables,
+// functions, parameters, strings, numbers, operators, comments, LuaCATS).
+// This provider adds ONLY Lurek2D-specific layers on top:
+//   - lurekCallback: lurek.init, lurek.draw, lurek.process, etc.
+//   - namespace:     lurek, lurek.graphics, lurek.physics, etc.
+//   - function/defaultLibrary: lurek API function calls
+//   - enumMember:   string literals that match a known lurek enum value
 
 const tokenTypes = [
-    'namespace',    // 0  lurek, lurek.graphics, lurek.physics
-    'function',     // 1  function definitions and calls
-    'method',       // 2  obj:method calls
-    'parameter',    // 3  function parameters
-    'variable',     // 4  local variables
-    'property',     // 5  table properties
-    'keyword',      // 6  Lua keywords
-    'string',       // 7  string literals
-    'number',       // 8  numeric literals
-    'comment',      // 9  comments
-    'operator',     // 10 operators
-    'type',         // 11 type annotations in comments
-    'enumMember',   // 12 enum string values
-    'macro',        // 13 LuaJIT FFI
-    'decorator',    // 14 LuaCATS annotations
-    'event',        // 15 lurek.* callbacks
+    'namespace',      // 0  lurek, lurek.graphics, lurek.physics, ...
+    'function',       // 1  lurek API function calls
+    'enumMember',     // 2  enum string literals ("fill", "alpha", "nearest", ...)
+    'lurekCallback',  // 3  lifecycle callbacks (lurek.init, lurek.draw, ...)
 ];
 
 const tokenModifiers = [
@@ -38,20 +35,16 @@ const tokenModifiers = [
 
 const legend = new vscode.SemanticTokensLegend(tokenTypes, tokenModifiers);
 
-const LUREK_CALLBACKS = new Set([
-    'load', 'update', 'draw', 'keypressed', 'keyreleased', 'textinput',
-    'mousepressed', 'mousereleased', 'wheelmoved',
-    'gamepadpressed', 'gamepadreleased', 'gamepadaxis',
-    'joystickadded', 'joystickremoved',
-    'touchpressed', 'touchmoved', 'touchreleased',
-    'focus', 'visible', 'resize', 'quit',
-]);
-
 // Cached results per document version
 const cache = new Map<string, { version: number; tokens: vscode.SemanticTokens }>();
 
 /**
- * Registers the semantic tokens provider for Lua files.
+ * Registers the Lurek2D-specific semantic tokens provider for Lua files.
+ *
+ * This provider runs AFTER sumneko.lua and adds only Lurek2D-specific token
+ * classifications on top — callbacks, namespaces, API functions, and enum
+ * string values.  All generic Lua tokens (keywords, variables, comments, etc.)
+ * are intentionally left to sumneko.lua.
  */
 export function register(context: vscode.ExtensionContext, apiData: ApiDataService): void {
     context.subscriptions.push(
@@ -78,25 +71,13 @@ function computeSemanticTokens(document: vscode.TextDocument, apiData: ApiDataSe
 
     const text = document.getText();
     const tokens = analyzer.tokenize(text);
-    const info = analyzer.analyze(text);
     const builder = new vscode.SemanticTokensBuilder(legend);
 
-    // Build lookup sets for efficient classification
-    const paramNames = new Set(info.symbols.filter(s => s.kind === 'parameter').map(s => s.name));
-    const localNames = new Set(info.symbols.filter(s => s.kind === 'local').map(s => s.name));
-    const localFuncNames = new Set(info.symbols.filter(s => s.kind === 'function' && s.isLocal).map(s => s.name));
-    const declaredLines = new Map<string, number>();
-    for (const sym of info.symbols) {
-        if ((sym.kind === 'local' || sym.kind === 'parameter') && !declaredLines.has(sym.name)) {
-            declaredLines.set(sym.name, sym.line);
-        }
-    }
-
-    // Collect known lurek API function names
+    // Build lookup sets
     const lurekFuncNames = new Set(apiData.getAllFunctions().map(f => f.name));
     const deprecatedFuncs = new Set(apiData.getAllFunctions().filter(f => f.deprecated).map(f => f.name));
 
-    // Collect enum values
+    // Collect known lurek enum string values (e.g. "fill", "alpha", "nearest")
     const enumValues = new Set<string>();
     for (const modName of apiData.getModuleNames()) {
         const mod = apiData.getModule(modName);
@@ -114,42 +95,62 @@ function computeSemanticTokens(document: vscode.TextDocument, apiData: ApiDataSe
         }
     }
 
-    // Process tokens in order
+    // Process tokens — only emit for Lurek-specific cases
     for (let i = 0; i < tokens.length; i++) {
         const tok = tokens[i];
-        const prev = i > 0 ? tokens[i - 1] : undefined;
+
+        if (tok.type === TokenType.String) {
+            // Enum member string: "fill", "alpha", "nearest", etc.
+            const content = extractStringContent(tok.value);
+            if (content && enumValues.has(content)) {
+                pushToken(builder, tok, 'enumMember', []);
+            }
+            // All other strings: left to sumneko.lua
+            continue;
+        }
+
+        if (tok.type !== TokenType.Identifier) continue;
+
+        const name = tok.value;
         const prevCode = findPrevNonWhitespace(tokens, i);
         const nextCode = findNextNonWhitespace(tokens, i);
 
-        switch (tok.type) {
-            case TokenType.Keyword:
-                pushToken(builder, tok, 'keyword', []);
-                break;
-
-            case TokenType.Comment:
-                classifyComment(builder, tok);
-                break;
-
-            case TokenType.String:
-                classifyString(builder, tok, enumValues);
-                break;
-
-            case TokenType.Number:
-                pushToken(builder, tok, 'number', []);
-                break;
-
-            case TokenType.Operator:
-                pushToken(builder, tok, 'operator', []);
-                break;
-
-            case TokenType.Identifier:
-                classifyIdentifier(
-                    builder, tok, prevCode, nextCode, tokens, i,
-                    paramNames, localNames, localFuncNames, declaredLines,
-                    lurekFuncNames, deprecatedFuncs, apiData,
-                );
-                break;
+        // `lurek` as namespace token
+        if (name === 'lurek') {
+            pushToken(builder, tok, 'namespace', []);
+            continue;
         }
+
+        // Tokens after `.` or `:` within a `lurek.*` chain
+        if (prevCode?.value === '.' || prevCode?.value === ':') {
+            const chain = getIdentifierChain(tokens, i);
+
+            if (chain.startsWith('lurek.')) {
+                const afterLurek = chain.slice(6); // e.g. "graphics", "graphics.draw", "init"
+                const parts = afterLurek.split('.');
+
+                // lurek.init, lurek.draw, etc. → lifecycle callback
+                if (parts.length === 1 && LUREK_CALLBACK_NAMES.has(name)) {
+                    pushToken(builder, tok, 'lurekCallback', []);
+                    continue;
+                }
+
+                // lurek.graphics, lurek.physics, etc. → sub-namespace
+                if (parts.length === 1 && apiData.getModule(name)) {
+                    pushToken(builder, tok, 'namespace', []);
+                    continue;
+                }
+
+                // lurek API function call (lurek.module.funcName or lurek.funcName)
+                if (lurekFuncNames.has(name)) {
+                    const mods: string[] = ['defaultLibrary'];
+                    if (deprecatedFuncs.has(name)) mods.push('deprecated');
+                    pushToken(builder, tok, 'function', mods);
+                    continue;
+                }
+            }
+        }
+        // All other identifiers (variables, parameters, stdlib calls, etc.) left to sumneko.lua
     }
 
     const result = builder.build();
@@ -157,147 +158,7 @@ function computeSemanticTokens(document: vscode.TextDocument, apiData: ApiDataSe
     return result;
 }
 
-// ── Identifier classification ────────────────────────────────
-
-function classifyIdentifier(
-    builder: vscode.SemanticTokensBuilder,
-    tok: Token,
-    prevCode: Token | undefined,
-    nextCode: Token | undefined,
-    allTokens: Token[],
-    idx: number,
-    paramNames: Set<string>,
-    localNames: Set<string>,
-    localFuncNames: Set<string>,
-    declaredLines: Map<string, number>,
-    lurekFuncNames: Set<string>,
-    deprecatedFuncs: Set<string>,
-    apiData: ApiDataService,
-): void {
-    const name = tok.value;
-
-    // `lurek` as namespace
-    if (name === 'lurek') {
-        // Check if next is `.callbackName` → event
-        if (nextCode?.value === '.') {
-            const afterDot = findNextNonWhitespaceAfter(allTokens, idx, 2);
-            if (afterDot?.type === TokenType.Identifier && LUREK_CALLBACKS.has(afterDot.value)) {
-                pushToken(builder, tok, 'namespace', []);
-                return;
-            }
-        }
-        pushToken(builder, tok, 'namespace', []);
-        return;
-    }
-
-    // Property after `lurek.` — could be module namespace, callback (event), or API function
-    if (prevCode?.value === '.' || prevCode?.value === ':') {
-        // Walk back to find the root
-        const chain = getIdentifierChain(allTokens, idx);
-
-        if (chain.startsWith('lurek.')) {
-            const afterLurek = chain.slice(5);
-            const parts = afterLurek.split('.');
-
-            // lurek.graphics, lurek.physics etc → submodule names = namespace
-            if (apiData.getModule(parts[0])) {
-                if (parts.length === 1 && nextCode?.value !== '(') {
-                    pushToken(builder, tok, 'namespace', []);
-                    return;
-                }
-            }
-
-            // lurek.update, lurek.draw etc → callback event
-            if (parts.length === 1 && LUREK_CALLBACKS.has(name)) {
-                pushToken(builder, tok, 'event', []);
-                return;
-            }
-
-            // lurek API function call
-            if (lurekFuncNames.has(name)) {
-                const mods: string[] = ['defaultLibrary'];
-                if (deprecatedFuncs.has(name)) mods.push('deprecated');
-                pushToken(builder, tok, 'function', mods);
-                return;
-            }
-        }
-
-        // obj:method()
-        if (prevCode?.value === ':') {
-            pushToken(builder, tok, 'method', []);
-            return;
-        }
-
-        // table.property
-        pushToken(builder, tok, 'property', []);
-        return;
-    }
-
-    // Function definition: `function name` or `local function name`
-    if (prevCode?.type === TokenType.Keyword && prevCode.value === 'function') {
-        pushToken(builder, tok, 'function', ['definition']);
-        return;
-    }
-
-    // Function call: `name(`
-    if (nextCode?.value === '(') {
-        if (localFuncNames.has(name)) {
-            pushToken(builder, tok, 'function', []);
-        } else if (lurekFuncNames.has(name)) {
-            const mods: string[] = ['defaultLibrary'];
-            if (deprecatedFuncs.has(name)) mods.push('deprecated');
-            pushToken(builder, tok, 'function', mods);
-        } else {
-            pushToken(builder, tok, 'function', []);
-        }
-        return;
-    }
-
-    // Parameter
-    if (paramNames.has(name)) {
-        const isDecl = declaredLines.get(name) === tok.line;
-        pushToken(builder, tok, 'parameter', isDecl ? ['declaration'] : []);
-        return;
-    }
-
-    // Local variable
-    if (localNames.has(name)) {
-        const isDecl = declaredLines.get(name) === tok.line;
-        pushToken(builder, tok, 'variable', isDecl ? ['declaration'] : []);
-        return;
-    }
-
-    // Fallback: global variable
-    pushToken(builder, tok, 'variable', []);
-}
-
-// ── Comment classification ───────────────────────────────────
-
-function classifyComment(builder: vscode.SemanticTokensBuilder, tok: Token): void {
-    const value = tok.value;
-
-    // LuaCATS annotations: ---@param, ---@return, etc.
-    if (/^---@\w+/.test(value)) {
-        // Push the whole token as decorator
-        pushToken(builder, tok, 'decorator', ['documentation']);
-        return;
-    }
-
-    pushToken(builder, tok, 'comment', []);
-}
-
-// ── String classification ────────────────────────────────────
-
-function classifyString(builder: vscode.SemanticTokensBuilder, tok: Token, enumValues: Set<string>): void {
-    // Check if the string content (without quotes) is a known enum value
-    const content = extractStringContent(tok.value);
-    if (content && enumValues.has(content)) {
-        pushToken(builder, tok, 'enumMember', []);
-        return;
-    }
-
-    pushToken(builder, tok, 'string', []);
-}
+// ── Helpers ──────────────────────────────────────────────────
 
 function extractStringContent(raw: string): string {
     if ((raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'"))) {
@@ -306,16 +167,12 @@ function extractStringContent(raw: string): string {
     return '';
 }
 
-// ── Token builder helpers ────────────────────────────────────
-
 function pushToken(
     builder: vscode.SemanticTokensBuilder,
     tok: Token,
     tokenType: string,
     modifiers: string[],
 ): void {
-    // SemanticTokensBuilder expects single-line tokens.
-    // For multiline tokens (comments, strings), push only the first line.
     const lines = tok.value.split('\n');
     const firstLineLen = lines[0].length;
     if (firstLineLen === 0) return;
@@ -332,8 +189,6 @@ function pushToken(
     builder.push(tok.line, tok.column, firstLineLen, typeIdx, modBits);
 }
 
-// ── Token navigation helpers ─────────────────────────────────
-
 function findPrevNonWhitespace(tokens: Token[], idx: number): Token | undefined {
     for (let i = idx - 1; i >= 0; i--) {
         if (tokens[i].type !== TokenType.Whitespace) return tokens[i];
@@ -348,36 +203,17 @@ function findNextNonWhitespace(tokens: Token[], idx: number): Token | undefined 
     return undefined;
 }
 
-function findNextNonWhitespaceAfter(tokens: Token[], idx: number, skip: number): Token | undefined {
-    let found = 0;
-    for (let i = idx + 1; i < tokens.length; i++) {
-        if (tokens[i].type !== TokenType.Whitespace) {
-            found++;
-            if (found >= skip) return tokens[i];
-        }
-    }
-    return undefined;
-}
-
-/**
- * Walk backwards from the given index to build a dotted identifier chain
- * like "lurek.graphics.draw".
- */
 function getIdentifierChain(tokens: Token[], idx: number): string {
     let chain = tokens[idx].value;
     let i = idx - 1;
 
     while (i >= 0) {
-        // Skip whitespace
         if (tokens[i].type === TokenType.Whitespace) { i--; continue; }
-        // Expect `.` or `:`
         if (tokens[i].type === TokenType.Punctuation && (tokens[i].value === '.' || tokens[i].value === ':')) {
-            const sep = tokens[i].value;
             i--;
-            // Skip whitespace
             while (i >= 0 && tokens[i].type === TokenType.Whitespace) i--;
             if (i >= 0 && tokens[i].type === TokenType.Identifier) {
-                chain = tokens[i].value + sep + chain;
+                chain = tokens[i].value + '.' + chain;
                 i--;
                 continue;
             }
@@ -387,3 +223,4 @@ function getIdentifierChain(tokens: Token[], idx: number): string {
 
     return chain;
 }
+

@@ -53,8 +53,8 @@ fn lua_table_to_fields(tbl: LuaTable) -> LuaResult<BTreeMap<String, String>> {
 
 /// Registers the `lurek.log.*` namespace into the shared `lurek` table.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
+/// @param lua &Lua
+/// @param lurek &LuaTable
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     let log_table = lua.create_table()?;
@@ -64,8 +64,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ debug â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits a debug-severity log message. Also dispatches to configured sinks.
-    /// @param message : string
-    /// @param tag : string?
+    /// @param message string
+    /// @param tag string?
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -80,8 +80,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits an info-severity log message. Also dispatches to configured sinks.
-    /// @param message : string
-    /// @param tag : string?
+    /// @param message string
+    /// @param tag string?
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -96,8 +96,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ warn â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits a warn-severity log message. Also dispatches to configured sinks.
-    /// @param message : string
-    /// @param tag : string?
+    /// @param message string
+    /// @param tag string?
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -112,8 +112,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits an error-severity log message. Also dispatches to configured sinks.
-    /// @param message : string
-    /// @param tag : string?
+    /// @param message string
+    /// @param tag string?
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -128,9 +128,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ print â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits a log message at the specified level. Also dispatches to sinks.
-    /// @param level : string
-    /// @param message : string
-    /// @param tag : string?
+    /// @param level string
+    /// @param message string
+    /// @param tag string?
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -170,7 +170,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// Sets the minimum severity level for the default log channel.
     /// Accepted values: "error", "warn", "info", "debug", "trace", "off".
     /// Returns a LuaError when an unrecognised level is supplied.
-    /// @param level : string
+    /// @param level string
     /// @return nil
     log_table.set("setLevel", lua.create_function(|_, level: String| {
         match level.to_lowercase().as_str() {
@@ -203,7 +203,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     ///   max_bytes  : integer  (for type="rotating", default 10_485_760 = 10 MiB)
     ///   keep_files : integer  (for type="rotating", default 3)
     ///
-    /// @param config : table
+    /// @param config table
     let s = sinks.clone();
     /// @return integer
     log_table.set(
@@ -246,7 +246,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ removeSink â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Removes a sink by id. Returns true if one was removed.
-    /// @param id : integer
+    /// @param id integer
     let s = sinks.clone();
     /// @return boolean
     log_table.set(
@@ -291,8 +291,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     // â”€â”€ readMemory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Reads entries from a memory sink. If drain=true the buffer is cleared.
     /// Returns an array of {level, tag, message} tables. Returns nil if id not found or wrong type.
-    /// @param id : integer
-    /// @param drain : boolean?
+    /// @param id integer
+    /// @param drain boolean?
     let s = sinks.clone();
     /// @return table?
     log_table.set(
@@ -330,7 +330,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ flushFile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Flushes the OS write buffer for a file sink.
-    /// @param id : integer
+    /// @param id integer
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -346,9 +346,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     // â”€â”€ struct â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits a structured log message with key-value fields.
     /// `fields_table` values are converted to strings (string/number/bool/nil supported).
-    /// @param level : string
-    /// @param message : string
-    /// @param fields_table : table
+    /// @param level string
+    /// @param message string
+    /// @param fields_table table
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -373,8 +373,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ debug_fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits a debug structured log message. Shorthand for `struct("debug", ...)`.
-    /// @param message : string
-    /// @param fields_table : table
+    /// @param message string
+    /// @param fields_table table
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -390,8 +390,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ info_fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits an info structured log message. Shorthand for `struct("info", ...)`.
-    /// @param message : string
-    /// @param fields_table : table
+    /// @param message string
+    /// @param fields_table table
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -407,8 +407,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ warn_fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits a warn structured log message. Shorthand for `struct("warn", ...)`.
-    /// @param message : string
-    /// @param fields_table : table
+    /// @param message string
+    /// @param fields_table table
     let s = sinks.clone();
     /// @return nil
     log_table.set(
@@ -424,8 +424,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     // â”€â”€ error_fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Emits an error structured log message. Shorthand for `struct("error", ...)`.
-    /// @param message : string
-    /// @param fields_table : table
+    /// @param message string
+    /// @param fields_table table
     let s = sinks.clone();
     /// @return nil
     log_table.set(

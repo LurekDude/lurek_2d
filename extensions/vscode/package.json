@@ -747,12 +747,32 @@
           }
         ]
       }
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "lurekCallback",
+        "superType": "function",
+        "description": "Lurek2D engine lifecycle callback (init, draw, process, keypressed, etc.)"
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "lua",
+        "scopes": {
+          "lurekCallback": [
+            "entity.name.function.lurek-callback.lua",
+            "keyword.control.lurek.lua",
+            "keyword.control"
+          ]
+        }
+      }
     ]
   },
   "scripts": {
     "vscode:prepublish": "npm run build",
+    "prebuild": "npx tsx tools/generate-api-data.ts",
     "build": "node esbuild.config.mjs --production",
-    "watch": "node esbuild.config.mjs --watch",
+    "watch": "npm run generate-api && node esbuild.config.mjs --watch",
     "test": "node esbuild.config.mjs --test && node ./dist/test/runTest.js",
     "lint": "eslint src --ext ts",
     "generate-api": "npx tsx tools/generate-api-data.ts",

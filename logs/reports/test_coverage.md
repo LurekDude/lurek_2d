@@ -5,7 +5,7 @@
 | Category | Covered | Total | Coverage |
 |----------|---------|-------|----------|
 | Rust public functions | 3228 | 4155 | 77.7% |
-| Lua API functions | 4079 | 4102 | 99.4% |
+| Lua API functions | 4043 | 4067 | 99.4% |
 
 ## Rust Coverage by Module
 
@@ -73,10 +73,10 @@
 | automation | 28 | 28 | 100.0% |
 | camera | 47 | 47 | 100.0% |
 | compute | 76 | 77 | 98.7% |
-| data | 61 | 61 | 100.0% |
+| data | 62 | 62 | 100.0% |
 | dataframe | 114 | 116 | 98.3% |
 | debugbridge | 14 | 14 | 100.0% |
-| devtools | 48 | 48 | 100.0% |
+| devtools | 53 | 54 | 98.1% |
 | docs | 75 | 75 | 100.0% |
 | ecs | 61 | 61 | 100.0% |
 | effect | 157 | 158 | 99.4% |
@@ -90,7 +90,7 @@
 | input | 81 | 81 | 100.0% |
 | light | 86 | 86 | 100.0% |
 | log | 18 | 18 | 100.0% |
-| math | 220 | 223 | 98.7% |
+| math | 217 | 220 | 98.6% |
 | minimap | 76 | 76 | 100.0% |
 | mods | 47 | 47 | 100.0% |
 | network | 47 | 47 | 100.0% |
@@ -100,21 +100,21 @@
 | patterns | 170 | 170 | 100.0% |
 | physics | 189 | 193 | 97.9% |
 | pipeline | 61 | 62 | 98.4% |
-| procgen | 29 | 29 | 100.0% |
+| procgen | 18 | 18 | 100.0% |
 | raycaster | 55 | 59 | 93.2% |
-| render | 197 | 197 | 100.0% |
+| render | 175 | 175 | 100.0% |
 | save | 26 | 26 | 100.0% |
 | scene | 53 | 53 | 100.0% |
 | serial | 10 | 10 | 100.0% |
 | spine | 30 | 30 | 100.0% |
 | sprite | 20 | 20 | 100.0% |
 | system | 26 | 26 | 100.0% |
-| terminal | 84 | 84 | 100.0% |
+| terminal | 83 | 83 | 100.0% |
 | thread | 37 | 37 | 100.0% |
 | tilemap | 166 | 168 | 98.8% |
 | timer | 47 | 47 | 100.0% |
 | tween | 35 | 35 | 100.0% |
-| ui | 371 | 371 | 100.0% |
+| ui | 366 | 366 | 100.0% |
 | window | 50 | 50 | 100.0% |
 
 ## Uncovered Rust Functions (top 50)
@@ -176,8 +176,9 @@
 - `InfluenceMap:stampInfluence` (method) in `src/lua_api/ai_api.rs:1843`
 - `Bus:setDuckTarget` (method) in `src/lua_api/audio_api.rs:535`
 - `Array:eigenPower` (method) in `src/lua_api/compute_api.rs:855`
-- `DataFrame:withRollingMin` (method) in `src/lua_api/dataframe_api.rs:737`
-- `DataFrame:withRollingMax` (method) in `src/lua_api/dataframe_api.rs:754`
+- `DataFrame:withRollingMin` (method) in `src/lua_api/dataframe_api.rs:727`
+- `DataFrame:withRollingMax` (method) in `src/lua_api/dataframe_api.rs:744`
+- `lurek.devtools.fatal` (function) in `src/lua_api/devtools_api.rs:217`
 - `Overlay:triggerShake` (method) in `src/lua_api/effect_api.rs:743`
 - `NoiseGenerator:worley3d` (method) in `src/lua_api/math_api.rs:1203`
 - `NoiseGenerator:warpDomain` (method) in `src/lua_api/math_api.rs:1328`
@@ -185,14 +186,14 @@
 - `Trail:setHeadColor` (method) in `src/lua_api/particle_api.rs:1420`
 - `Trail:setTailColor` (method) in `src/lua_api/particle_api.rs:1436`
 - `FlowField:calculateMulti` (method) in `src/lua_api/pathfind_api.rs:604`
-- `World:setJointMotorSpeed` (method) in `src/lua_api/physics_api.rs:690`
-- `World:setJointLimitsEnabled` (method) in `src/lua_api/physics_api.rs:711`
-- `World:setJointLimits` (method) in `src/lua_api/physics_api.rs:727`
-- `World:setMouseJointTarget` (method) in `src/lua_api/physics_api.rs:749`
+- `World:setJointMotorSpeed` (method) in `src/lua_api/physics_api.rs:689`
+- `World:setJointLimitsEnabled` (method) in `src/lua_api/physics_api.rs:710`
+- `World:setJointLimits` (method) in `src/lua_api/physics_api.rs:726`
+- `World:setMouseJointTarget` (method) in `src/lua_api/physics_api.rs:748`
 - `Pipeline:addSubPipeline` (method) in `src/lua_api/pipeline_api.rs:1212`
-- `Raycaster:drawView` (method) in `src/lua_api/raycaster_api.rs:554`
-- `Raycaster:drawDepthMap` (method) in `src/lua_api/raycaster_api.rs:575`
-- `Raycaster:drawLineOfSight` (method) in `src/lua_api/raycaster_api.rs:604`
-- `Raycaster:drawCameraSweep` (method) in `src/lua_api/raycaster_api.rs:624`
-- `ChunkMap:getChunksInView` (method) in `src/lua_api/tilemap_api.rs:1150`
-- `MapBlock:setSide` (method) in `src/lua_api/tilemap_api.rs:1592`
+- `Raycaster:drawView` (method) in `src/lua_api/raycaster_api.rs:552`
+- `Raycaster:drawDepthMap` (method) in `src/lua_api/raycaster_api.rs:573`
+- `Raycaster:drawLineOfSight` (method) in `src/lua_api/raycaster_api.rs:602`
+- `Raycaster:drawCameraSweep` (method) in `src/lua_api/raycaster_api.rs:622`
+- `ChunkMap:getChunksInView` (method) in `src/lua_api/tilemap_api.rs:1160`
+- `MapBlock:setSide` (method) in `src/lua_api/tilemap_api.rs:1602`

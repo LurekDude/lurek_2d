@@ -23,6 +23,8 @@ local title_blink = 0
 local transition_timer = 0
 local particles = {}
 local tweens = {}
+---@type any
+local _cam = nil
 
 -- Per-sport scores
 local scores = { 0, 0, 0, 0 }
@@ -116,7 +118,7 @@ local function medal_for(sport_id, score)
         if score >= 24 then return "GOLD"
         elseif score >= 16 then return "SILVER"
         elseif score >= 8 then return "BRONZE" end
-    elseif sport_id == 3 then -- bowling: max ~300
+    elseif sport_id == 3 then -- bowling: around 300 max
         if score >= 150 then return "GOLD"
         elseif score >= 90 then return "SILVER"
         elseif score >= 40 then return "BRONZE" end
@@ -206,6 +208,7 @@ local function archery_update(dt)
 
     -- Arrow flight
     if arch.arrow then
+        ---@type {x:number,y:number,vx:number,vy:number,trail_t:number}
         local a = arch.arrow
         a.vx = a.vx + arch.wind * dt
         a.vy = a.vy + GRAVITY * dt
@@ -288,6 +291,7 @@ local function bball_update(dt)
     end
 
     if bball.ball then
+        ---@type {x:number,y:number,vx:number,vy:number,trail_t:number,bounced:boolean}
         local b = bball.ball
         b.vy = b.vy + GRAVITY * dt
         b.x = b.x + b.vx * dt
@@ -628,9 +632,63 @@ end
 -- Callbacks
 -- ═══════════════════════════════════════════════════════════════════
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(...)
+    local a, b, c, d, e, f, g, h = ...
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(...)
+    local x1, y1, x2, y2, c, r, g, b = ...
+    if type(c) == "number" then
+        _gfx.setColor(c or 1, r or 1, g or 1, b or 1)
+    elseif type(c) == "table" then
+        _sc(c)
+    end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Trajectory Sports — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.1, 0.15)
+    _cam = lurek.camera.new()
 end
 
 local function _ready_setup()
@@ -718,107 +776,108 @@ function lurek.draw()
         if sport == 1 then
             -- Archery field
             -- Ground
-            lurek.render.rectangle(0, 450, W, 150, 0.2, 0.5, 0.2)
+            rect(0, 450, W, 150, 0.2, 0.5, 0.2)
             -- Bow
             local bx, by = 80, 400
             local rad = math.rad(arch.angle)
             local ex = bx + math.cos(rad) * 40
             local ey = by - math.sin(rad) * 40
-            lurek.render.line(bx, by - 20, bx, by + 20, 0.5, 0.3, 0.1)
-            lurek.render.line(bx, by - 20, ex, ey, 0.9, 0.9, 0.9)
-            lurek.render.line(bx, by + 20, ex, ey, 0.9, 0.9, 0.9)
+            ln(bx, by - 20, bx, by + 20, 0.5, 0.3, 0.1)
+            ln(bx, by - 20, ex, ey, 0.9, 0.9, 0.9)
+            ln(bx, by + 20, ex, ey, 0.9, 0.9, 0.9)
             -- Target
             local tx, ty = arch.target_x, arch.target_y
-            lurek.render.circle(tx, ty, 70, 1, 1, 1)
-            lurek.render.circle(tx, ty, 55, 0, 0, 0.8)
-            lurek.render.circle(tx, ty, 40, 1, 0, 0)
-            lurek.render.circle(tx, ty, 25, 1, 1, 0)
-            lurek.render.circle(tx, ty, 12, 1, 0, 0)
+            circ(tx, ty, 70, 1, 1, 1)
+            circ(tx, ty, 55, 0, 0, 0.8)
+            circ(tx, ty, 40, 1, 0, 0)
+            circ(tx, ty, 25, 1, 1, 0)
+            circ(tx, ty, 12, 1, 0, 0)
             -- Arrow in flight
-            if arch.arrow then
-                local a = arch.arrow
-                lurek.render.circle(a.x, a.y, 3, 0.8, 0.6, 0.1)
+            local a = arch.arrow
+            if a ~= nil then
+                circ(a.x, a.y, 3, 0.8, 0.6, 0.1)
                 local len = 20
                 local spd = math.sqrt(a.vx * a.vx + a.vy * a.vy)
                 if spd > 1 then
                     local nx, ny = a.vx / spd, a.vy / spd
-                    lurek.render.line(a.x, a.y, a.x - nx * len, a.y - ny * len, 0.6, 0.4, 0.1)
+                    ln(a.x, a.y, a.x - nx * len, a.y - ny * len, 0.6, 0.4, 0.1)
                 end
             end
 
         elseif sport == 2 then
             -- Basketball court
-            lurek.render.rectangle(0, 480, W, 120, 0.6, 0.35, 0.15)
+            rect(0, 480, W, 120, 0.6, 0.35, 0.15)
             -- Backboard
-            lurek.render.rectangle(bball.hoop_x + 15, bball.hoop_y - 40, 8, 80, 0.9, 0.9, 0.9)
+            rect(bball.hoop_x + 15, bball.hoop_y - 40, 8, 80, 0.9, 0.9, 0.9)
             -- Hoop rim
-            lurek.render.circle(bball.hoop_x, bball.hoop_y, bball.rim_r + 3, 0.8, 0.3, 0.1)
-            lurek.render.circle(bball.hoop_x, bball.hoop_y, bball.rim_r - 2, 0.6, 0.35, 0.15)
+            circ(bball.hoop_x, bball.hoop_y, bball.rim_r + 3, 0.8, 0.3, 0.1)
+            circ(bball.hoop_x, bball.hoop_y, bball.rim_r - 2, 0.6, 0.35, 0.15)
             -- Net lines
             for i = 0, 3 do
                 local nx = bball.hoop_x - bball.rim_r + i * (bball.rim_r * 2 / 3)
-                lurek.render.line(nx, bball.hoop_y, nx + 3, bball.hoop_y + 30, 0.9, 0.9, 0.9)
+                ln(nx, bball.hoop_y, nx + 3, bball.hoop_y + 30, 0.9, 0.9, 0.9)
             end
             -- Player
-            lurek.render.rectangle(bball.player_x - 10, bball.player_y - 40, 20, 40, 0.2, 0.4, 0.8)
-            lurek.render.circle(bball.player_x, bball.player_y - 50, 10, 0.9, 0.7, 0.5)
+            rect(bball.player_x - 10, bball.player_y - 40, 20, 40, 0.2, 0.4, 0.8)
+            circ(bball.player_x, bball.player_y - 50, 10, 0.9, 0.7, 0.5)
             -- Ball in flight
-            if bball.ball then
-                lurek.render.circle(bball.ball.x, bball.ball.y, 8, 0.9, 0.5, 0.1)
+            local ball = bball.ball
+            if ball ~= nil then
+                circ(ball.x, ball.y, 8, 0.9, 0.5, 0.1)
             end
 
         elseif sport == 3 then
             -- Bowling lane
-            lurek.render.rectangle(290, 40, 220, 520, 0.7, 0.55, 0.3)
+            rect(290, 40, 220, 520, 0.7, 0.55, 0.3)
             -- Lane lines
-            lurek.render.line(290, 40, 290, 560, 0.5, 0.4, 0.2)
-            lurek.render.line(510, 40, 510, 560, 0.5, 0.4, 0.2)
+            ln(290, 40, 290, 560, 0.5, 0.4, 0.2)
+            ln(510, 40, 510, 560, 0.5, 0.4, 0.2)
             -- Gutters
-            lurek.render.rectangle(280, 40, 10, 520, 0.3, 0.3, 0.3)
-            lurek.render.rectangle(510, 40, 10, 520, 0.3, 0.3, 0.3)
+            rect(280, 40, 10, 520, 0.3, 0.3, 0.3)
+            rect(510, 40, 10, 520, 0.3, 0.3, 0.3)
             -- Pins
             for _, p in ipairs(bowl.pins) do
                 if p.alive then
-                    lurek.render.circle(p.x, p.y, PIN_R, 1, 1, 1)
-                    lurek.render.circle(p.x, p.y, PIN_R - 2, 0.9, 0.1, 0.1)
+                    circ(p.x, p.y, PIN_R, 1, 1, 1)
+                    circ(p.x, p.y, PIN_R - 2, 0.9, 0.1, 0.1)
                 else
-                    lurek.render.circle(p.x, p.y, PIN_R * 0.6, 0.5, 0.5, 0.5)
+                    circ(p.x, p.y, PIN_R * 0.6, 0.5, 0.5, 0.5)
                 end
             end
             -- Ball
-            lurek.render.circle(bowl.ball_x, bowl.ball_y, BALL_R, 0.15, 0.15, 0.15)
-            lurek.render.circle(bowl.ball_x - 2, bowl.ball_y - 2, 2, 0.3, 0.3, 0.3)
+            circ(bowl.ball_x, bowl.ball_y, BALL_R, 0.15, 0.15, 0.15)
+            circ(bowl.ball_x - 2, bowl.ball_y - 2, 2, 0.3, 0.3, 0.3)
 
         elseif sport == 4 then
             -- Dartboard
             local cx, cy, r = dart.cx, dart.cy, dart.board_r
             -- Outer ring
-            lurek.render.circle(cx, cy, r + 5, 0.2, 0.2, 0.2)
+            circ(cx, cy, r + 5, 0.2, 0.2, 0.2)
             -- Board rings
-            lurek.render.circle(cx, cy, r, 0.1, 0.4, 0.1)
-            lurek.render.circle(cx, cy, r * 0.90, 0.8, 0.2, 0.2)
-            lurek.render.circle(cx, cy, r * 0.82, 0.1, 0.4, 0.1)
-            lurek.render.circle(cx, cy, r * 0.48, 0.8, 0.2, 0.2)
-            lurek.render.circle(cx, cy, r * 0.40, 0.1, 0.4, 0.1)
-            lurek.render.circle(cx, cy, r * 0.10, 0.1, 0.6, 0.1)
-            lurek.render.circle(cx, cy, r * 0.04, 0.9, 0.2, 0.1)
+            circ(cx, cy, r, 0.1, 0.4, 0.1)
+            circ(cx, cy, r * 0.90, 0.8, 0.2, 0.2)
+            circ(cx, cy, r * 0.82, 0.1, 0.4, 0.1)
+            circ(cx, cy, r * 0.48, 0.8, 0.2, 0.2)
+            circ(cx, cy, r * 0.40, 0.1, 0.4, 0.1)
+            circ(cx, cy, r * 0.10, 0.1, 0.6, 0.1)
+            circ(cx, cy, r * 0.04, 0.9, 0.2, 0.1)
             -- Hit markers
             for _, h in ipairs(dart.hits) do
-                lurek.render.circle(h.x, h.y, 3, 0.9, 0.9, 0.1)
+                circ(h.x, h.y, 3, 0.9, 0.9, 0.1)
             end
             -- Crosshair
             if not dart.thrown then
                 local chx, chy = dart.crosshair_x, dart.crosshair_y
-                lurek.render.line(chx - 10, chy, chx + 10, chy, 1, 1, 1)
-                lurek.render.line(chx, chy - 10, chx, chy + 10, 1, 1, 1)
-                lurek.render.circle(chx, chy, 4, 1, 0.3, 0.3)
+                ln(chx - 10, chy, chx + 10, chy, 1, 1, 1)
+                ln(chx, chy - 10, chx, chy + 10, 1, 1, 1)
+                circ(chx, chy, 4, 1, 0.3, 0.3)
             end
         end
     end
 
     -- Particles (world-space)
     for _, p in ipairs(particles) do
-        lurek.render.circle(p.x, p.y, p.size, p.r, p.g, p.b)
+        circ(p.x, p.y, p.size, p.r, p.g, p.b)
     end
 end
 
@@ -827,22 +886,22 @@ end
 -- ═══════════════════════════════════════════════════════════════════
 function lurek.draw_ui()
     local fps = lurek.timer.getFPS()
-    lurek.render.print(string.format("FPS: %d", fps), W - 80, 10, 14, 0.6, 0.6, 0.6)
+    text_(string.format("FPS: %d", fps), W - 80, 10, 14, 0.6, 0.6, 0.6)
 
     -- ── TITLE ──
     if state == S_TITLE then
-        lurek.render.print("TRAJECTORY SPORTS", W / 2 - 140, 160, 32, 1, 0.9, 0.3)
-        lurek.render.print("AIM AND FIRE", W / 2 - 80, 210, 20, 0.8, 0.8, 0.8)
+        text_("TRAJECTORY SPORTS", W / 2 - 140, 160, 32, 1, 0.9, 0.3)
+        text_("AIM AND FIRE", W / 2 - 80, 210, 20, 0.8, 0.8, 0.8)
         if math.floor(title_blink * 2) % 2 == 0 then
-            lurek.render.print("Press SPACE to start", W / 2 - 100, 350, 18, 0.7, 0.7, 0.7)
+            text_("Press SPACE to start", W / 2 - 100, 350, 18, 0.7, 0.7, 0.7)
         end
-        lurek.render.print("W/S = Aim   A/D = Move   Space = Power", W / 2 - 180, 450, 14, 0.5, 0.5, 0.5)
+        text_("W/S = Aim   A/D = Move   Space = Power", W / 2 - 180, 450, 14, 0.5, 0.5, 0.5)
         return
     end
 
     -- ── SPORT SELECT ──
     if state == S_SPORT_SELECT then
-        lurek.render.print("SELECT SPORT", W / 2 - 90, 80, 28, 1, 0.9, 0.3)
+        text_("SELECT SPORT", W / 2 - 90, 80, 28, 1, 0.9, 0.3)
         local items = {
             "[1] ARCHERY    — Bow & Target",
             "[2] BASKETBALL — Hoop Shots",
@@ -852,96 +911,96 @@ function lurek.draw_ui()
         for i, txt in ipairs(items) do
             local c = medals[i] ~= "" and 0.4 or 1.0
             local medal_txt = medals[i] ~= "" and ("  [" .. medals[i] .. "]") or ""
-            lurek.render.print(txt .. medal_txt, 200, 160 + i * 50, 20, c, c, c * 0.8)
+            text_(txt .. medal_txt, 200, 160 + i * 50, 20, c, c, c * 0.8)
         end
         local done = 0
         for i = 1, 4 do if medals[i] ~= "" then done = done + 1 end end
-        lurek.render.print(string.format("Completed: %d/4", done), W / 2 - 60, 480, 16, 0.6, 0.6, 0.6)
+        text_(string.format("Completed: %d/4", done), W / 2 - 60, 480, 16, 0.6, 0.6, 0.6)
         return
     end
 
     -- ── ROUND END ──
     if state == S_ROUND_END then
-        lurek.render.print(sport_names[sport] .. " COMPLETE!", W / 2 - 120, 180, 28, 1, 0.9, 0.3)
+        text_(sport_names[sport] .. " COMPLETE!", W / 2 - 120, 180, 28, 1, 0.9, 0.3)
         if sport == 4 then
-            lurek.render.print(string.format("Remaining: %d", scores[4]), W / 2 - 70, 250, 22, 1, 1, 1)
+            text_(string.format("Remaining: %d", scores[4]), W / 2 - 70, 250, 22, 1, 1, 1)
         else
-            lurek.render.print(string.format("Score: %d", scores[sport]), W / 2 - 50, 250, 22, 1, 1, 1)
+            text_(string.format("Score: %d", scores[sport]), W / 2 - 50, 250, 22, 1, 1, 1)
         end
         local mc = medals[sport] == "GOLD" and {1, 0.85, 0.1} or
                    medals[sport] == "SILVER" and {0.75, 0.75, 0.8} or
                    medals[sport] == "BRONZE" and {0.8, 0.5, 0.2} or {0.5, 0.5, 0.5}
-        lurek.render.print("Medal: " .. medals[sport], W / 2 - 60, 300, 22, mc[1], mc[2], mc[3])
+        text_("Medal: " .. medals[sport], W / 2 - 60, 300, 22, mc[1], mc[2], mc[3])
         return
     end
 
     -- ── FINAL SCORES ──
     if state == S_FINAL_SCORES then
-        lurek.render.print("FINAL RESULTS", W / 2 - 100, 60, 28, 1, 0.9, 0.3)
+        text_("FINAL RESULTS", W / 2 - 100, 60, 28, 1, 0.9, 0.3)
         for i = 1, 4 do
             local sc = sport == 4 and string.format("Remaining: %d", scores[i])
                        or string.format("Score: %d", scores[i])
             if i == 4 then sc = string.format("Remaining: %d", scores[4]) end
-            lurek.render.print(string.format("%s: %s  [%s]", sport_names[i], sc, medals[i]),
+            text_(string.format("%s: %s  [%s]", sport_names[i], sc, medals[i]),
                 120, 120 + i * 50, 18, 0.9, 0.9, 0.9)
         end
         local rank = final_rank()
-        lurek.render.print("Overall: " .. rank, W / 2 - 80, 420, 26, 1, 0.8, 0.2)
+        text_("Overall: " .. rank, W / 2 - 80, 420, 26, 1, 0.8, 0.2)
         if math.floor(title_blink * 2) % 2 == 0 then
-            lurek.render.print("Press SPACE to restart", W / 2 - 110, 500, 16, 0.6, 0.6, 0.6)
+            text_("Press SPACE to restart", W / 2 - 110, 500, 16, 0.6, 0.6, 0.6)
         end
         return
     end
 
     -- ── PLAYING HUD ──
     if state == S_PLAYING then
-        lurek.render.print(sport_names[sport], 10, 10, 20, 1, 0.9, 0.3)
+        text_(sport_names[sport], 10, 10, 20, 1, 0.9, 0.3)
 
         if sport == 1 then
             -- Archery HUD
-            lurek.render.print(string.format("Score: %d", math.floor(arch.display_score)), 10, 40, 16, 1, 1, 1)
-            lurek.render.print(string.format("Arrows: %d", arch.arrows_left), 10, 60, 16, 1, 1, 1)
-            lurek.render.print(string.format("Angle: %.0f°", arch.angle), 10, 80, 14, 0.8, 0.8, 0.8)
-            lurek.render.print(string.format("Wind: %.0f", arch.wind), 10, 100, 14, 0.6, 0.8, 1.0)
+            text_(string.format("Score: %d", math.floor(arch.display_score)), 10, 40, 16, 1, 1, 1)
+            text_(string.format("Arrows: %d", arch.arrows_left), 10, 60, 16, 1, 1, 1)
+            text_(string.format("Angle: %.0f°", arch.angle), 10, 80, 14, 0.8, 0.8, 0.8)
+            text_(string.format("Wind: %.0f", arch.wind), 10, 100, 14, 0.6, 0.8, 1.0)
             -- Power bar
             local pw = arch.power / 100
-            lurek.render.rectangle(10, 125, 100, 10, 0.3, 0.3, 0.3)
-            lurek.render.rectangle(10, 125, pw * 100, 10, 1.0, 1.0 - pw, 0.1)
+            rect(10, 125, 100, 10, 0.3, 0.3, 0.3)
+            rect(10, 125, pw * 100, 10, 1.0, 1.0 - pw, 0.1)
 
         elseif sport == 2 then
             -- Basketball HUD
-            lurek.render.print(string.format("Score: %d", math.floor(bball.display_score)), 10, 40, 16, 1, 1, 1)
-            lurek.render.print(string.format("Shots: %d", bball.shots_left), 10, 60, 16, 1, 1, 1)
-            lurek.render.print(string.format("Angle: %.0f°", bball.angle), 10, 80, 14, 0.8, 0.8, 0.8)
+            text_(string.format("Score: %d", math.floor(bball.display_score)), 10, 40, 16, 1, 1, 1)
+            text_(string.format("Shots: %d", bball.shots_left), 10, 60, 16, 1, 1, 1)
+            text_(string.format("Angle: %.0f°", bball.angle), 10, 80, 14, 0.8, 0.8, 0.8)
             -- Power bar
             local pw = bball.power / 100
-            lurek.render.rectangle(10, 105, 100, 10, 0.3, 0.3, 0.3)
-            lurek.render.rectangle(10, 105, pw * 100, 10, 1.0, 0.5, 0.1)
+            rect(10, 105, 100, 10, 0.3, 0.3, 0.3)
+            rect(10, 105, pw * 100, 10, 1.0, 0.5, 0.1)
 
         elseif sport == 3 then
             -- Bowling HUD
-            lurek.render.print(string.format("Frame: %d/10", bowl.frame), 10, 40, 16, 1, 1, 1)
-            lurek.render.print(string.format("Throw: %d", bowl.throw_in_frame), 10, 60, 14, 0.8, 0.8, 0.8)
+            text_(string.format("Frame: %d/10", bowl.frame), 10, 40, 16, 1, 1, 1)
+            text_(string.format("Throw: %d", bowl.throw_in_frame), 10, 60, 14, 0.8, 0.8, 0.8)
             local standing = count_standing()
-            lurek.render.print(string.format("Pins: %d/10", standing), 10, 80, 14, 0.8, 0.8, 0.8)
+            text_(string.format("Pins: %d/10", standing), 10, 80, 14, 0.8, 0.8, 0.8)
             -- Score
             local t = 0
             for _, fs in pairs(bowl.frame_scores) do t = t + (fs.total or 0) end
-            lurek.render.print(string.format("Total: %d", t), 10, 100, 16, 1, 1, 1)
+            text_(string.format("Total: %d", t), 10, 100, 16, 1, 1, 1)
             -- Power bar
             if not bowl.rolling then
                 local pw = bowl.power / 100
-                lurek.render.rectangle(10, 125, 100, 10, 0.3, 0.3, 0.3)
-                lurek.render.rectangle(10, 125, pw * 100, 10, 0.2, 0.6, 1.0)
+                rect(10, 125, 100, 10, 0.3, 0.3, 0.3)
+                rect(10, 125, pw * 100, 10, 0.2, 0.6, 1.0)
             end
 
         elseif sport == 4 then
             -- Darts HUD
-            lurek.render.print(string.format("Remaining: %d", dart.remaining), 10, 40, 18, 1, 1, 1)
-            lurek.render.print(string.format("Turn: %d/%d", dart.turn, dart.max_turns), 10, 65, 14, 0.8, 0.8, 0.8)
-            lurek.render.print(string.format("Darts: %d", dart.darts_in_turn), 10, 85, 14, 0.8, 0.8, 0.8)
+            text_(string.format("Remaining: %d", dart.remaining), 10, 40, 18, 1, 1, 1)
+            text_(string.format("Turn: %d/%d", dart.turn, dart.max_turns), 10, 65, 14, 0.8, 0.8, 0.8)
+            text_(string.format("Darts: %d", dart.darts_in_turn), 10, 85, 14, 0.8, 0.8, 0.8)
             if dart.last_points > 0 then
-                lurek.render.print(string.format("Last: %d pts", dart.last_points), 10, 110, 16, 1, 0.8, 0.2)
+                text_(string.format("Last: %d pts", dart.last_points), 10, 110, 16, 1, 0.8, 0.2)
             end
         end
     end

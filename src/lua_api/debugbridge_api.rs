@@ -19,8 +19,8 @@ use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingRes
 
 /// Registers the `lurek.debugbridge` namespace.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
+/// @param lua &Lua
+/// @param lurek &LuaTable
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     let db = lua.create_table()?;
@@ -37,7 +37,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     let sh = shared.clone();
     let run = running.clone();
     let th = thread_handle.clone();
-    /// @param port : u16?
+    /// @param port u16?
     /// @return boolean
     db.set(
         "start",
@@ -292,9 +292,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     /// Captures a print message and broadcasts it to connected clients.
     let sh = shared.clone();
-    /// @param msg : string
-    /// @param source : string?
-    /// @param line : integer?
+    /// @param msg string
+    /// @param source string?
+    /// @param line integer?
     db.set(
         "capturePrint",
         lua.create_function(
@@ -312,7 +312,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     /// Returns the print history.
     let sh = shared.clone();
-    /// @param count : integer?
+    /// @param count integer?
     /// @return table
     db.set(
         "getPrintHistory",
@@ -355,7 +355,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     /// Sets the maximum print history size.
     let sh = shared.clone();
-    /// @param max : integer
+    /// @param max integer
     db.set(
         "setMaxPrintHistory",
         lua.create_function(move |_, max: usize| {
@@ -395,7 +395,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     /// Flags a screenshot request for the next frame.
     let sh = shared.clone();
-    /// @param scale : integer?
+    /// @param scale integer?
     db.set(
         "requestScreenshot",
         lua.create_function(move |_, scale: Option<u32>| {
@@ -422,8 +422,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 
     /// Broadcasts a JSON event to all connected clients.
     let sh = shared.clone();
-    /// @param event : string
-    /// @param json_data : string
+    /// @param event string
+    /// @param json_data string
     db.set(
         "broadcast",
         lua.create_function(move |_, (event, json_data): (String, String)| {

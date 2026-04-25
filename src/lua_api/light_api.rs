@@ -163,8 +163,8 @@ impl LuaUserData for LuaLight {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- setPosition --
         /// Sets the light's world-space position.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut st = this.state.borrow_mut();
@@ -190,7 +190,7 @@ impl LuaUserData for LuaLight {
 
         // -- setRadius --
         /// Sets the light's influence radius.
-        /// @param r : number
+        /// @param r number
         /// @return nil
         methods.add_method("setRadius", |_, this, r: f32| {
             let mut st = this.state.borrow_mut();
@@ -216,10 +216,10 @@ impl LuaUserData for LuaLight {
 
         // -- setColor --
         /// Sets the light's tint color.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number?
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param a number?
         /// @return nil
         methods.add_method(
             "setColor",
@@ -249,7 +249,7 @@ impl LuaUserData for LuaLight {
 
         // -- setIntensity --
         /// Sets the brightness multiplier.
-        /// @param i : number
+        /// @param i number
         /// @return nil
         methods.add_method("setIntensity", |_, this, i: f32| {
             let mut st = this.state.borrow_mut();
@@ -275,7 +275,7 @@ impl LuaUserData for LuaLight {
 
         // -- setEnergy --
         /// Sets the energy scaling factor.
-        /// @param e : number
+        /// @param e number
         /// @return nil
         methods.add_method("setEnergy", |_, this, e: f32| {
             let mut st = this.state.borrow_mut();
@@ -301,7 +301,7 @@ impl LuaUserData for LuaLight {
 
         // -- setBlendMode --
         /// Sets the blend mode ('add', 'sub', or 'mix').
-        /// @param mode : string
+        /// @param mode string
         /// @return nil
         methods.add_method("setBlendMode", |_, this, mode: String| {
             let bm = parse_blend_mode(&mode)?;
@@ -328,7 +328,7 @@ impl LuaUserData for LuaLight {
 
         // -- setFalloff --
         /// Sets the falloff mode ('linear', 'smooth', or 'constant').
-        /// @param mode : string
+        /// @param mode string
         /// @return nil
         methods.add_method("setFalloff", |_, this, mode: String| {
             let fm = parse_falloff(&mode)?;
@@ -355,7 +355,7 @@ impl LuaUserData for LuaLight {
 
         // -- setShadowEnabled --
         /// Sets whether this light casts shadows.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method("setShadowEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
@@ -381,10 +381,10 @@ impl LuaUserData for LuaLight {
 
         // -- setShadowColor --
         /// Sets the shadow region color.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number?
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param a number?
         /// @return nil
         methods.add_method(
             "setShadowColor",
@@ -414,7 +414,7 @@ impl LuaUserData for LuaLight {
 
         // -- setShadowFilter --
         /// Sets the shadow edge filter ('none', 'pcf5', or 'pcf13').
-        /// @param filter : string
+        /// @param filter string
         /// @return nil
         methods.add_method("setShadowFilter", |_, this, filter: String| {
             let sf = parse_shadow_filter(&filter)?;
@@ -441,7 +441,7 @@ impl LuaUserData for LuaLight {
 
         // -- setShadowSmooth --
         /// Sets the shadow edge smoothing factor.
-        /// @param smooth : number
+        /// @param smooth number
         /// @return nil
         methods.add_method("setShadowSmooth", |_, this, s: f32| {
             let mut st = this.state.borrow_mut();
@@ -467,7 +467,7 @@ impl LuaUserData for LuaLight {
 
         // -- setLightMask --
         /// Sets the light interaction bitmask.
-        /// @param mask : integer
+        /// @param mask integer
         /// @return nil
         methods.add_method("setLightMask", |_, this, mask: u16| {
             let mut st = this.state.borrow_mut();
@@ -493,7 +493,7 @@ impl LuaUserData for LuaLight {
 
         // -- setShadowMask --
         /// Sets the shadow casting bitmask.
-        /// @param mask : integer
+        /// @param mask integer
         /// @return nil
         methods.add_method("setShadowMask", |_, this, mask: u16| {
             let mut st = this.state.borrow_mut();
@@ -519,7 +519,7 @@ impl LuaUserData for LuaLight {
 
         // -- setEnabled --
         /// Sets whether this light is active.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method("setEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
@@ -545,7 +545,7 @@ impl LuaUserData for LuaLight {
 
         // -- setLightType --
         /// Sets the geometric light type ('point', 'directional', or 'spot').
-        /// @param t : string
+        /// @param t string
         /// @return nil
         methods.add_method("setLightType", |_, this, t: String| {
             let lt = parse_light_type(&t)?;
@@ -572,7 +572,7 @@ impl LuaUserData for LuaLight {
 
         // -- setDirection --
         /// Sets the direction angle in radians.
-        /// @param dir : number
+        /// @param dir number
         /// @return nil
         methods.add_method("setDirection", |_, this, dir: f32| {
             let mut st = this.state.borrow_mut();
@@ -598,7 +598,7 @@ impl LuaUserData for LuaLight {
 
         // -- setInnerAngle --
         /// Sets the inner cone angle in radians for spot lights.
-        /// @param angle : number
+        /// @param angle number
         /// @return nil
         methods.add_method("setInnerAngle", |_, this, a: f32| {
             let mut st = this.state.borrow_mut();
@@ -624,7 +624,7 @@ impl LuaUserData for LuaLight {
 
         // -- setOuterAngle --
         /// Sets the outer cone angle in radians for spot lights.
-        /// @param angle : number
+        /// @param angle number
         /// @return nil
         methods.add_method("setOuterAngle", |_, this, a: f32| {
             let mut st = this.state.borrow_mut();
@@ -650,9 +650,9 @@ impl LuaUserData for LuaLight {
 
         // -- setAttenuation --
         /// Sets the custom attenuation coefficients (constant, linear, quadratic).
-        /// @param c : number
-        /// @param l : number
-        /// @param q : number
+        /// @param c number
+        /// @param l number
+        /// @param q number
         /// @return nil
         methods.add_method("setAttenuation", |_, this, (c, l, q): (f32, f32, f32)| {
             let mut st = this.state.borrow_mut();
@@ -679,8 +679,8 @@ impl LuaUserData for LuaLight {
 
         // -- setFlicker --
         /// Sets the flicker effect speed and strength (enables flicker).
-        /// @param speed : number
-        /// @param strength : number
+        /// @param speed number
+        /// @param strength number
         /// @return nil
         methods.add_method("setFlicker", |_, this, (speed, strength): (f32, f32)| {
             let mut st = this.state.borrow_mut();
@@ -707,7 +707,7 @@ impl LuaUserData for LuaLight {
 
         // -- setFlickerEnabled --
         /// Sets whether the flicker effect is active.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method("setFlickerEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
@@ -733,7 +733,7 @@ impl LuaUserData for LuaLight {
 
         // -- setGroupId --
         /// Sets the group identifier for batch operations.
-        /// @param id : integer
+        /// @param id integer
         /// @return nil
         methods.add_method("setGroupId", |_, this, id: u16| {
             let mut st = this.state.borrow_mut();
@@ -759,7 +759,7 @@ impl LuaUserData for LuaLight {
 
         // -- setVolumetric --
         /// Sets whether this light hints at volumetric scattering.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method("setVolumetric", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
@@ -819,9 +819,9 @@ impl LuaUserData for LuaLight {
         /// frequency. `min` and `max` are multipliers for the base intensity
         /// (e.g. `0.8, 1.2` = Â±20%). `hz` is the oscillation frequency in
         /// cycles per second.
-        /// @param min : number  â€” lower intensity multiplier
-        /// @param max : number  â€” upper intensity multiplier
-        /// @param hz  : number  â€” oscillation frequency (cycles/s)
+        /// @param min number  â€” lower intensity multiplier
+        /// @param max number  â€” upper intensity multiplier
+        /// @param hz number  â€” oscillation frequency (cycles/s)
         /// @return nil
         methods.add_method("addFlicker", |_, this, (min, max, hz): (f32, f32, f32)| {
             let strength = ((max - min) / 2.0).abs();
@@ -846,8 +846,8 @@ impl LuaUserData for LuaLight {
         /// - `intensity` : `number`
         /// - `radius`    : `number`
         ///
-        /// @param target   : table
-        /// @param duration : number
+        /// @param target table
+        /// @param duration number
         /// @return nil
         methods.add_method(
             "transitionTo",
@@ -890,7 +890,7 @@ impl LuaUserData for LuaLight {
         /// Advances the active transition by `dt` seconds and applies the
         /// interpolated values to the light. Returns `true` while the
         /// transition is still running.
-        /// @param dt : number
+        /// @param dt number
         /// @return boolean
         methods.add_method("updateTransition", |_, this, dt: f32| {
             let result = this
@@ -938,7 +938,7 @@ impl LuaUserData for LuaLight {
         // -- setCookie --
         /// Sets the texture path used as a light cookie (mask) for projection.
         /// The engine will use this path when rendering the light's projection.
-        /// @param path : string
+        /// @param path string
         /// @return nil
         methods.add_method("setCookie", |_, this, path: String| {
             *this.cookie_path.borrow_mut() = Some(path);
@@ -977,7 +977,7 @@ impl LuaUserData for LuaOccluder {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- setVertices --
         /// Replaces the polygon vertices from a flat table {x1,y1,x2,y2,...}.
-        /// @param vertices : table
+        /// @param vertices table
         /// @return nil
         methods.add_method("setVertices", |_, this, tbl: LuaTable| {
             let flat: Vec<f32> = tbl.sequence_values::<f32>().collect::<LuaResult<_>>()?;
@@ -1010,8 +1010,8 @@ impl LuaUserData for LuaOccluder {
 
         // -- setPosition --
         /// Sets the translation offset applied to all vertices.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut st = this.state.borrow_mut();
@@ -1038,7 +1038,7 @@ impl LuaUserData for LuaOccluder {
 
         // -- setOpacity --
         /// Sets the shadow opacity (0.0â€“1.0).
-        /// @param opacity : number
+        /// @param opacity number
         /// @return nil
         methods.add_method("setOpacity", |_, this, o: f32| {
             let mut st = this.state.borrow_mut();
@@ -1064,7 +1064,7 @@ impl LuaUserData for LuaOccluder {
 
         // -- setLightMask --
         /// Sets the light interaction bitmask.
-        /// @param mask : integer
+        /// @param mask integer
         /// @return nil
         methods.add_method("setLightMask", |_, this, mask: u16| {
             let mut st = this.state.borrow_mut();
@@ -1090,7 +1090,7 @@ impl LuaUserData for LuaOccluder {
 
         // -- setEnabled --
         /// Sets whether this occluder is active.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method("setEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
@@ -1156,19 +1156,19 @@ impl LuaUserData for LuaOccluder {
 
 /// Registers the `lurek.light` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- newLight --
     /// Creates a new light at (x, y) with the given radius and optional settings.
-    /// @param x : number
-    /// @param y : number
-    /// @param radius : number
-    /// @param opts : table?
+    /// @param x number
+    /// @param y number
+    /// @param radius number
+    /// @param opts table?
     /// @return Light
     let s = state.clone();
     tbl.set(
@@ -1192,8 +1192,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newOccluder --
     /// Creates a new shadow occluder from a vertex table and optional settings.
-    /// @param vertices : table
-    /// @param opts : table?
+    /// @param vertices table
+    /// @param opts table?
     /// @return Occluder
     let s = state.clone();
     tbl.set(
@@ -1214,10 +1214,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setAmbient --
     /// Sets the global ambient light color.
-    /// @param r : number
-    /// @param g : number
-    /// @param b : number
-    /// @param a : number?
+    /// @param r number
+    /// @param g number
+    /// @param b number
+    /// @param a number?
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1242,7 +1242,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setEnabled --
     /// Sets whether the lighting system is active.
-    /// @param enabled : boolean
+    /// @param enabled boolean
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1291,7 +1291,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setMaxLights --
     /// Sets the maximum number of lights processed per frame (clamped 1â€“256).
-    /// @param n : integer
+    /// @param n integer
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1316,8 +1316,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setGroupEnabled --
     /// Sets the enabled state for all lights in the given group.
-    /// @param groupId : integer
-    /// @param enabled : boolean
+    /// @param groupId integer
+    /// @param enabled boolean
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1332,8 +1332,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setGroupIntensity --
     /// Sets the intensity for all lights in the given group.
-    /// @param groupId : integer
-    /// @param intensity : number
+    /// @param groupId integer
+    /// @param intensity number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1348,11 +1348,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setGroupColor --
     /// Sets the color for all lights in the given group.
-    /// @param groupId : integer
-    /// @param r : number
-    /// @param g : number
-    /// @param b : number
-    /// @param a : number?
+    /// @param groupId integer
+    /// @param r number
+    /// @param g number
+    /// @param b number
+    /// @param a number?
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -1369,7 +1369,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getGroupCount --
     /// Returns the number of lights in the given group.
-    /// @param groupId : integer
+    /// @param groupId integer
     /// @return integer
     let s = state.clone();
     tbl.set(
@@ -1381,7 +1381,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- advanceFlickers --
     /// Advances flicker phase for all lights with flicker enabled.
-    /// @param dt : number
+    /// @param dt number
     /// @return nil
     let s = state.clone();
     tbl.set(

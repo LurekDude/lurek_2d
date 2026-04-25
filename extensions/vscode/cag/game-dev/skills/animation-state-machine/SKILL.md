@@ -77,7 +77,7 @@ end
 ## Drawing
 
 ```lua
-function lurek.render()
+function lurek.draw()
     local def = anims[anim.state]
     local quad_index = def.frames[anim.frame]
     -- Use lurek.render.draw with quad from sprite sheet

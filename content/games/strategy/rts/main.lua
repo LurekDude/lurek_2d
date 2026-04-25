@@ -148,9 +148,56 @@ lurek.input.bind("quit",      "escape")
 
 -- ── Init ──────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("RTS — Lurek2D")
-    lurek.render.setBackgroundColor(0.06, 0.12, 0.06, 1.0)
+    lurek.render.setBackgroundColor(0.06, 0.12, 0.06)
 
     death_sparks = lurek.particle.newSystem({
         maxParticles = 30,
@@ -195,7 +242,7 @@ function lurek.process(dt)
     cam.y = math.max(0, math.min(MAP_H - H + ui_panel_h, cam.y))
 
     -- Mouse world pos
-    local mx, my = lurek.input.mouse.getPosition()
+    local mx, my = lurek.input.getPosition()
     local wx, wy = mx + cam.x, my + cam.y
 
     -- Select units
@@ -350,7 +397,7 @@ end
 -- ── Render world ──────────────────────────────────────────
 function lurek.draw()
     -- Map background tint
-    lurek.render.rectangle(0, 0, W, H - ui_panel_h, { color = {0.08,0.14,0.08,1} })
+    rect(0, 0, W, H - ui_panel_h, { color = {0.08,0.14,0.08,1} })
 
     -- Resource nodes
     for _, node in ipairs(resource_nodes) do
@@ -358,7 +405,7 @@ function lurek.draw()
             local sx, sy = node.x - cam.x, node.y - cam.y
             if sx > -20 and sx < W and sy > -20 and sy < H then
                 local col = node.gold > 0 and {0.9,0.75,0.1,1} or {0.4,0.7,0.3,1}
-                lurek.render.circle(sx, sy, 12, { color = col, segments = 8 })
+                circ(sx, sy, 12, { color = col, segments = 8 })
             end
         end
     end
@@ -372,19 +419,19 @@ function lurek.draw()
         if e.kind == BUILD then
             local col = e.btype == "base" and {0.2,0.5,0.8,1} or {0.4,0.6,0.3,1}
             local size = e.btype == "base" and 36 or 24
-            lurek.render.rectangle(sx - size/2, sy - size/2, size, size, { color = col })
+            rect(sx - size/2, sy - size/2, size, size, { color = col })
         elseif e.kind == UNIT then
             local col = e.team == "player" and {0.3,0.7,1.0,1} or {0.8,0.3,0.2,1}
-            lurek.render.circle(sx, sy, 10, { color = col, segments = 8 })
+            circ(sx, sy, 10, { color = col, segments = 8 })
             -- HP bar
-            lurek.render.rectangle(sx - 10, sy - 16, 20, 3, { color = {0.3,0,0,1} })
-            lurek.render.rectangle(sx - 10, sy - 16, math.floor(20 * e.hp / e.maxHp), 3, { color = {0.2,0.8,0.2,1} })
+            rect(sx - 10, sy - 16, 20, 3, { color = {0.3,0,0,1} })
+            rect(sx - 10, sy - 16, math.floor(20 * e.hp / e.maxHp), 3, { color = {0.2,0.8,0.2,1} })
         end
 
         -- Selection ring
         for _, id in ipairs(selected) do
             if id == e.id then
-                lurek.render.circle(sx, sy, 14, { color = {0.3,0.9,1.0,0.4}, segments = 10 })
+                circ(sx, sy, 14, { color = {0.3,0.9,1.0,0.4}, segments = 10 })
             end
         end
 
@@ -398,25 +445,25 @@ end
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.draw_ui()
     -- Panel
-    lurek.render.rectangle(0, H - ui_panel_h, W, ui_panel_h, { color = {0.1,0.1,0.1,0.9} })
+    rect(0, H - ui_panel_h, W, ui_panel_h, { color = {0.1,0.1,0.1,0.9} })
 
-    lurek.render.print("Gold: " .. math.floor(resources.gold), 10, H - ui_panel_h + 8, { color = {1,0.85,0.2,1}, size = 14 })
-    lurek.render.print("Wood: " .. math.floor(resources.wood), 130, H - ui_panel_h + 8, { color = {0.5,0.8,0.3,1}, size = 14 })
-    lurek.render.print("Wave: " .. wave .. "/5  Next: " .. math.floor(wave_timer) .. "s", 260, H - ui_panel_h + 8, { color = {0.8,0.6,0.6,1}, size = 14 })
-    lurek.render.print("Score: " .. score, 480, H - ui_panel_h + 8, { color = {1,1,1,1}, size = 14 })
-    lurek.render.print("T=train unit(50g)  WASD=camera  LMB=select  RMB=order", 10, H - ui_panel_h + 28, { color = {0.5,0.5,0.5,1}, size = 12 })
+    text_("Gold: " .. math.floor(resources.gold), 10, H - ui_panel_h + 8, { color = {1,0.85,0.2,1}, size = 14 })
+    text_("Wood: " .. math.floor(resources.wood), 130, H - ui_panel_h + 8, { color = {0.5,0.8,0.3,1}, size = 14 })
+    text_("Wave: " .. wave .. "/5  Next: " .. math.floor(wave_timer) .. "s", 260, H - ui_panel_h + 8, { color = {0.8,0.6,0.6,1}, size = 14 })
+    text_("Score: " .. score, 480, H - ui_panel_h + 8, { color = {1,1,1,1}, size = 14 })
+    text_("T=train unit(50g)  WASD=camera  LMB=select  RMB=order", 10, H - ui_panel_h + 28, { color = {0.5,0.5,0.5,1}, size = 12 })
 
     if #selected > 0 then
-        lurek.render.print("Selected: " .. #selected .. " units", 10, H - ui_panel_h + 48, { color = {0.4,0.8,1.0,1}, size = 12 })
+        text_("Selected: " .. #selected .. " units", 10, H - ui_panel_h + 48, { color = {0.4,0.8,1.0,1}, size = 12 })
     end
 
     if state == "gameover" then
-        lurek.render.rectangle(200, 200, 400, 120, { color = {0,0,0,0.85} })
-        lurek.render.print("BASE DESTROYED", 250, 225, { color = {0.9,0.2,0.2,1}, size = 28 })
-        lurek.render.print("Score: " .. score, 330, 270, { color = {1,1,1,1}, size = 18 })
+        rect(200, 200, 400, 120, { color = {0,0,0,0.85} })
+        text_("BASE DESTROYED", 250, 225, { color = {0.9,0.2,0.2,1}, size = 28 })
+        text_("Score: " .. score, 330, 270, { color = {1,1,1,1}, size = 18 })
     elseif state == "victory" then
-        lurek.render.rectangle(200, 200, 400, 120, { color = {0,0,0,0.85} })
-        lurek.render.print("VICTORY!", 290, 225, { color = {1,0.9,0.2,1}, size = 32 })
-        lurek.render.print("Score: " .. score, 330, 270, { color = {1,1,1,1}, size = 18 })
+        rect(200, 200, 400, 120, { color = {0,0,0,0.85} })
+        text_("VICTORY!", 290, 225, { color = {1,0.9,0.2,1}, size = 32 })
+        text_("Score: " .. score, 330, 270, { color = {1,1,1,1}, size = 18 })
     end
 end

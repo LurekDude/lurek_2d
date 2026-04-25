@@ -87,7 +87,9 @@ local title_timer     = 0
 local graph_scroll = { offset = 0 }
 
 -- Particle systems
+---@type ParticleSystem|nil
 local ps_log_pulse  = nil
+---@type ParticleSystem|nil
 local ps_breakpoint = nil
 
 -- Tween highlight
@@ -180,6 +182,53 @@ end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Debug Bridge Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
@@ -234,8 +283,8 @@ end
 function lurek.process(dt)
     if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
 
-    ps_log_pulse:update(dt)
-    ps_breakpoint:update(dt)
+    if ps_log_pulse  then ps_log_pulse:update(dt)  end
+    if ps_breakpoint then ps_breakpoint:update(dt) end
     lurek.tween.update(dt)
 
     -- ── TITLE ─────────────────────────────────────────────────
@@ -266,7 +315,7 @@ function lurek.process(dt)
             if lurek.input.wasActionPressed(action) then
                 selected_entity = idx
                 entity_highlight.alpha = 1.0
-                lurek.tween.to(entity_highlight, 0.6, { alpha = 0.3 })
+                lurek.tween.to(entity_highlight, { alpha = 0.3 }, 0.6)
                 add_console("[INSPECT] " .. entities[idx].name .. " (frozen)", true)
             end
         end
@@ -305,7 +354,10 @@ function lurek.process(dt)
     -- Generate random log messages
     if math.random() < 0.15 then
         generate_log_message()
-        ps_log_pulse:emit(PANEL_X_LEFT + 10, SCREEN_H - 60, 5)
+        if ps_log_pulse then
+            ps_log_pulse:setPosition(PANEL_X_LEFT + 10, SCREEN_H - 60)
+            ps_log_pulse:emit(5)
+        end
     end
 
     -- Entity inspection
@@ -314,7 +366,7 @@ function lurek.process(dt)
         if lurek.input.wasActionPressed(action) then
             selected_entity = idx
             entity_highlight.alpha = 1.0
-            lurek.tween.to(entity_highlight, 0.6, { alpha = 0.3 })
+            lurek.tween.to(entity_highlight, { alpha = 0.3 }, 0.6)
             local e = entities[idx]
             add_console("[INSPECT] " .. e.name .. " @ (" .. string.format("%.0f, %.0f", e.x, e.y) .. ")", true)
             add_log(LOG_DEBUG, "Inspector focused on entity #" .. idx)
@@ -344,7 +396,10 @@ function lurek.process(dt)
         current_state = STATE.PAUSED
         add_log(LOG_WARN, "BREAKPOINT HIT — execution paused")
         add_console("[BREAKPOINT] Execution frozen — press B to resume", true)
-        ps_breakpoint:emit(SCREEN_W / 2, SCREEN_H / 2, 40)
+        if ps_breakpoint then
+            ps_breakpoint:setPosition(SCREEN_W / 2, SCREEN_H / 2)
+            ps_breakpoint:emit(40)
+        end
     end
 end
 
@@ -355,8 +410,8 @@ function lurek.draw()
     if current_state == STATE.TITLE then return end
 
     -- Draw particle effects in world space
-    lurek.render.draw(ps_log_pulse)
-    lurek.render.draw(ps_breakpoint)
+    if ps_log_pulse  then ps_log_pulse:render()  end
+    if ps_breakpoint then ps_breakpoint:render() end
 
     -- Frame time graph (drawn in world-space for camera interaction)
     local gx = PANEL_X_RIGHT + 10
@@ -365,12 +420,12 @@ function lurek.draw()
 
     -- Graph background
     lurek.render.setColor(0.06, 0.06, 0.1, 0.9)
-    lurek.render.rectangle("fill", gx - 2, gy - 2, GRAPH_W + 4, GRAPH_H + 4)
+    rect("fill", gx - 2, gy - 2, GRAPH_W + 4, GRAPH_H + 4)
 
     -- Target line (16.67ms = 60fps)
     local target_y = gy + GRAPH_H - (16.67 / 50 * GRAPH_H)
     lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-    lurek.render.line(gx, target_y, gx + GRAPH_W, target_y)
+    ln(gx, target_y, gx + GRAPH_W, target_y)
 
     -- Frame time bars
     for i = 1, GRAPH_FRAMES do
@@ -383,14 +438,14 @@ function lurek.draw()
         else
             lurek.render.setColor(COL_GRAPH_LINE[1], COL_GRAPH_LINE[2], COL_GRAPH_LINE[3], 0.7)
         end
-        lurek.render.rectangle("fill", bx, by, math.max(bar_w - 1, 1), h)
+        rect("fill", bx, by, math.max(bar_w - 1, 1), h)
     end
 
     -- Graph labels
     lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-    lurek.render.print("50ms", gx - 2, gy - 14, 10)
-    lurek.render.print("0ms", gx - 2, gy + GRAPH_H + 2, 10)
-    lurek.render.print("16.7ms (60fps)", gx + GRAPH_W - 80, target_y - 12, 10)
+    text_("50ms", gx - 2, gy - 14, 10)
+    text_("0ms", gx - 2, gy + GRAPH_H + 2, 10)
+    text_("16.7ms (60fps)", gx + GRAPH_W - 80, target_y - 12, 10)
 
     -- Memory bar chart
     local mem_y = gy + GRAPH_H + 30
@@ -399,16 +454,16 @@ function lurek.draw()
     local used_frac = sim_memory_used / sim_memory_max
 
     lurek.render.setColor(COL_MEM_BAR[1], COL_MEM_BAR[2], COL_MEM_BAR[3], 0.3)
-    lurek.render.rectangle("fill", gx, mem_y, mem_w, mem_h)
+    rect("fill", gx, mem_y, mem_w, mem_h)
     lurek.render.setColor(COL_MEM_USED[1], COL_MEM_USED[2], COL_MEM_USED[3], 0.8)
-    lurek.render.rectangle("fill", gx, mem_y, mem_w * used_frac, mem_h)
+    rect("fill", gx, mem_y, mem_w * used_frac, mem_h)
     lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-    lurek.render.print(string.format("Heap: %.1f / %.1f MB", sim_memory_used, sim_memory_max), gx + 4, mem_y + 3, 12)
+    text_(string.format("Heap: %.1f / %.1f MB", sim_memory_used, sim_memory_max), gx + 4, mem_y + 3, 12)
 
     -- Breakpoint frozen overlay
     if current_state == STATE.PAUSED then
         lurek.render.setColor(COL_BREAKPOINT[1], COL_BREAKPOINT[2], COL_BREAKPOINT[3], 0.08 + math.sin(sim_time * 4) * 0.04)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
     end
 end
 
@@ -421,56 +476,56 @@ function lurek.draw_ui()
         -- Background grid effect
         lurek.render.setColor(0.08, 0.1, 0.15, 0.3)
         for gx = 0, SCREEN_W, 40 do
-            lurek.render.line(gx, 0, gx, SCREEN_H)
+            ln(gx, 0, gx, SCREEN_H)
         end
         for gy = 0, SCREEN_H, 40 do
-            lurek.render.line(0, gy, SCREEN_W, gy)
+            ln(0, gy, SCREEN_W, gy)
         end
 
         -- Glowing title
         local pulse = 0.6 + math.sin(title_timer * 2) * 0.4
         lurek.render.setColor(COL_TITLE_GLOW[1] * pulse, COL_TITLE_GLOW[2] * pulse, COL_TITLE_GLOW[3] * pulse, 1)
-        lurek.render.print("DEBUG BRIDGE", SCREEN_W / 2 - 110, SCREEN_H / 2 - 60, 32)
+        text_("DEBUG BRIDGE", SCREEN_W / 2 - 110, SCREEN_H / 2 - 60, 32)
 
         lurek.render.setColor(COL_ACCENT[1], COL_ACCENT[2], COL_ACCENT[3], 0.7)
-        lurek.render.print("RUNTIME INSPECTION", SCREEN_W / 2 - 95, SCREEN_H / 2 - 15, 16)
+        text_("RUNTIME INSPECTION", SCREEN_W / 2 - 95, SCREEN_H / 2 - 15, 16)
 
         -- Decorative brackets
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.5 + math.sin(title_timer * 3) * 0.3)
-        lurek.render.print("{", SCREEN_W / 2 - 140, SCREEN_H / 2 - 55, 28)
-        lurek.render.print("}", SCREEN_W / 2 + 120, SCREEN_H / 2 - 55, 28)
+        text_("{", SCREEN_W / 2 - 140, SCREEN_H / 2 - 55, 28)
+        text_("}", SCREEN_W / 2 + 120, SCREEN_H / 2 - 55, 28)
 
         -- Prompt
         lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 0.5 + math.sin(title_timer * 4) * 0.3)
-        lurek.render.print("Press any key to start debug session", SCREEN_W / 2 - 150, SCREEN_H / 2 + 50, 13)
+        text_("Press any key to start debug session", SCREEN_W / 2 - 150, SCREEN_H / 2 + 50, 13)
 
         -- Version / credit
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.5)
-        lurek.render.print("Lurek2D — Debug Bridge Showcase", SCREEN_W / 2 - 120, SCREEN_H - 30, 11)
+        text_("Lurek2D — Debug Bridge Showcase", SCREEN_W / 2 - 120, SCREEN_H - 30, 11)
         return
     end
 
     -- ── HUD header ────────────────────────────────────────────
     lurek.render.setColor(COL_PANEL_HEAD[1], COL_PANEL_HEAD[2], COL_PANEL_HEAD[3], 0.95)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 40)
+    rect("fill", 0, 0, SCREEN_W, 40)
 
     lurek.render.setColor(COL_ACCENT[1], COL_ACCENT[2], COL_ACCENT[3], 1)
-    lurek.render.print("DEBUG BRIDGE", 10, 10, 16)
+    text_("DEBUG BRIDGE", 10, 10, 16)
 
     local status_text = current_state == STATE.PAUSED and "PAUSED" or "RUNNING"
     local status_col = current_state == STATE.PAUSED and COL_BREAKPOINT or COL_GRAPH_LINE
     lurek.render.setColor(status_col[1], status_col[2], status_col[3], 1)
-    lurek.render.print(status_text, 160, 12, 14)
+    text_(status_text, 160, 12, 14)
 
     lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-    lurek.render.print("Uptime: " .. fmt_time(), 280, 14, 11)
-    lurek.render.print("Entities: " .. #entities, 420, 14, 11)
-    lurek.render.print("Filter: " .. LOG_NAMES[log_filter], 540, 14, 11)
+    text_("Uptime: " .. fmt_time(), 280, 14, 11)
+    text_("Entities: " .. #entities, 420, 14, 11)
+    text_("Filter: " .. LOG_NAMES[log_filter], 540, 14, 11)
 
     -- FPS
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 80, 14, 11)
+    text_(string.format("FPS: %d", fps), SCREEN_W - 80, 14, 11)
 
     -- ── LEFT PANEL: Debug Console ─────────────────────────────
     local lx = PANEL_X_LEFT
@@ -478,13 +533,13 @@ function lurek.draw_ui()
 
     -- Panel background
     lurek.render.setColor(COL_PANEL[1], COL_PANEL[2], COL_PANEL[3], 0.92)
-    lurek.render.rectangle("fill", lx, ly, PANEL_LEFT_W, 200)
+    rect("fill", lx, ly, PANEL_LEFT_W, 200)
 
     -- Panel header
     lurek.render.setColor(COL_PANEL_HEAD[1], COL_PANEL_HEAD[2], COL_PANEL_HEAD[3], 1)
-    lurek.render.rectangle("fill", lx, ly, PANEL_LEFT_W, 20)
+    rect("fill", lx, ly, PANEL_LEFT_W, 20)
     lurek.render.setColor(COL_ACCENT[1], COL_ACCENT[2], COL_ACCENT[3], 1)
-    lurek.render.print("Debug Console", lx + 6, ly + 3, 12)
+    text_("Debug Console", lx + 6, ly + 3, 12)
 
     -- Console lines (show last ~12 lines)
     local visible_lines = 12
@@ -501,7 +556,7 @@ function lurek.draw_ui()
         end
         local display = line.text
         if #display > 52 then display = display:sub(1, 52) .. "…" end
-        lurek.render.print(display, tx, ty, 11)
+        text_(display, tx, ty, 11)
     end
 
     -- ── LEFT PANEL: Log Window ────────────────────────────────
@@ -509,17 +564,17 @@ function lurek.draw_ui()
     local log_h = SCREEN_H - log_y - 10
 
     lurek.render.setColor(COL_PANEL[1], COL_PANEL[2], COL_PANEL[3], 0.92)
-    lurek.render.rectangle("fill", lx, log_y, PANEL_LEFT_W, log_h)
+    rect("fill", lx, log_y, PANEL_LEFT_W, log_h)
 
     lurek.render.setColor(COL_PANEL_HEAD[1], COL_PANEL_HEAD[2], COL_PANEL_HEAD[3], 1)
-    lurek.render.rectangle("fill", lx, log_y, PANEL_LEFT_W, 20)
+    rect("fill", lx, log_y, PANEL_LEFT_W, 20)
     lurek.render.setColor(COL_ACCENT[1], COL_ACCENT[2], COL_ACCENT[3], 1)
-    lurek.render.print("Log Output", lx + 6, log_y + 3, 12)
+    text_("Log Output", lx + 6, log_y + 3, 12)
 
     -- Filter indicator
     local fc = LOG_COLORS[log_filter]
     lurek.render.setColor(fc[1], fc[2], fc[3], 1)
-    lurek.render.print("[" .. LOG_NAMES[log_filter] .. "+]", lx + PANEL_LEFT_W - 70, log_y + 3, 11)
+    text_("[" .. LOG_NAMES[log_filter] .. "+]", lx + PANEL_LEFT_W - 70, log_y + 3, 11)
 
     -- Filtered log entries
     local filtered = {}
@@ -539,17 +594,17 @@ function lurek.draw_ui()
 
         -- Level tag
         lurek.render.setColor(lc[1], lc[2], lc[3], 0.9)
-        lurek.render.print(string.format("[%s]", LOG_NAMES[entry.level]), lx + 6, ty, 10)
+        text_(string.format("[%s]", LOG_NAMES[entry.level]), lx + 6, ty, 10)
 
         -- Timestamp
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.7)
-        lurek.render.print(entry.time, lx + 55, ty, 10)
+        text_(entry.time, lx + 55, ty, 10)
 
         -- Message
         lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 0.8)
         local msg = entry.text
         if #msg > 38 then msg = msg:sub(1, 38) .. "…" end
-        lurek.render.print(msg, lx + 110, ty, 10)
+        text_(msg, lx + 110, ty, 10)
     end
 
     -- ── RIGHT PANEL: Engine State ─────────────────────────────
@@ -558,25 +613,25 @@ function lurek.draw_ui()
 
     -- Panel header
     lurek.render.setColor(COL_PANEL_HEAD[1], COL_PANEL_HEAD[2], COL_PANEL_HEAD[3], 1)
-    lurek.render.rectangle("fill", rx, ry, PANEL_RIGHT_W, 20)
+    rect("fill", rx, ry, PANEL_RIGHT_W, 20)
     lurek.render.setColor(COL_ACCENT[1], COL_ACCENT[2], COL_ACCENT[3], 1)
-    lurek.render.print("Engine State", rx + 6, ry + 3, 12)
+    text_("Engine State", rx + 6, ry + 3, 12)
 
     -- Frame graph label
     lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 0.8)
-    lurek.render.print("Frame Time (ms)", rx + 10, ry + 5 + GRAPH_H + 20, 11)
+    text_("Frame Time (ms)", rx + 10, ry + 5 + GRAPH_H + 20, 11)
 
     -- ── RIGHT PANEL: Entity Inspector ─────────────────────────
     local insp_y = ry + GRAPH_H + 80
     local insp_h = SCREEN_H - insp_y - 10
 
     lurek.render.setColor(COL_PANEL[1], COL_PANEL[2], COL_PANEL[3], 0.92)
-    lurek.render.rectangle("fill", rx, insp_y, PANEL_RIGHT_W, insp_h)
+    rect("fill", rx, insp_y, PANEL_RIGHT_W, insp_h)
 
     lurek.render.setColor(COL_PANEL_HEAD[1], COL_PANEL_HEAD[2], COL_PANEL_HEAD[3], 1)
-    lurek.render.rectangle("fill", rx, insp_y, PANEL_RIGHT_W, 20)
+    rect("fill", rx, insp_y, PANEL_RIGHT_W, 20)
     lurek.render.setColor(COL_ACCENT[1], COL_ACCENT[2], COL_ACCENT[3], 1)
-    lurek.render.print("Entity Inspector [1-5]", rx + 6, insp_y + 3, 12)
+    text_("Entity Inspector [1-5]", rx + 6, insp_y + 3, 12)
 
     if selected_entity >= 1 and selected_entity <= #entities then
         local e = entities[selected_entity]
@@ -584,58 +639,58 @@ function lurek.draw_ui()
 
         -- Entity name with highlight
         lurek.render.setColor(COL_ACCENT[1], COL_ACCENT[2], COL_ACCENT[3], entity_highlight.alpha)
-        lurek.render.rectangle("fill", rx + 4, iy - 2, PANEL_RIGHT_W - 8, 18)
+        rect("fill", rx + 4, iy - 2, PANEL_RIGHT_W - 8, 18)
 
         lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-        lurek.render.print(string.format("#%d  %s", e.id, e.name), rx + 8, iy, 12)
+        text_(string.format("#%d  %s", e.id, e.name), rx + 8, iy, 12)
         iy = iy + 20
 
         -- Properties
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-        lurek.render.print("Type:", rx + 8, iy, 11)
+        text_("Type:", rx + 8, iy, 11)
         lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-        lurek.render.print(e.etype, rx + 55, iy, 11)
+        text_(e.etype, rx + 55, iy, 11)
         iy = iy + 16
 
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-        lurek.render.print("Pos:", rx + 8, iy, 11)
+        text_("Pos:", rx + 8, iy, 11)
         lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-        lurek.render.print(string.format("(%.1f, %.1f)", e.x, e.y), rx + 55, iy, 11)
+        text_(string.format("(%.1f, %.1f)", e.x, e.y), rx + 55, iy, 11)
         iy = iy + 16
 
         if e.hp >= 0 then
             lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-            lurek.render.print("HP:", rx + 8, iy, 11)
+            text_("HP:", rx + 8, iy, 11)
             local hp_col = e.hp > 50 and COL_GRAPH_LINE or (e.hp > 25 and LOG_COLORS[LOG_WARN] or COL_BREAKPOINT)
             lurek.render.setColor(hp_col[1], hp_col[2], hp_col[3], 1)
-            lurek.render.print(tostring(e.hp), rx + 55, iy, 11)
+            text_(tostring(e.hp), rx + 55, iy, 11)
             iy = iy + 16
         end
 
         -- Components
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 1)
-        lurek.render.print("Components:", rx + 8, iy, 11)
+        text_("Components:", rx + 8, iy, 11)
         iy = iy + 16
 
         for c = 1, #e.components do
             lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 0.8)
-            lurek.render.print("• " .. e.components[c], rx + 16, iy, 10)
+            text_("• " .. e.components[c], rx + 16, iy, 10)
             iy = iy + 14
         end
     else
         lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.7)
-        lurek.render.print("Press 1-5 to inspect an entity", rx + 10, insp_y + 30, 11)
+        text_("Press 1-5 to inspect an entity", rx + 10, insp_y + 30, 11)
     end
 
     -- ── Breakpoint overlay text ───────────────────────────────
     if current_state == STATE.PAUSED then
         lurek.render.setColor(COL_BREAKPOINT[1], COL_BREAKPOINT[2], COL_BREAKPOINT[3], 0.6 + math.sin(sim_time * 6) * 0.3)
-        lurek.render.print("BREAKPOINT", SCREEN_W / 2 - 55, SCREEN_H - 30, 16)
+        text_("BREAKPOINT", SCREEN_W / 2 - 55, SCREEN_H - 30, 16)
         lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 0.5)
-        lurek.render.print("Press B to resume", SCREEN_W / 2 - 55, SCREEN_H - 12, 10)
+        text_("Press B to resume", SCREEN_W / 2 - 55, SCREEN_H - 12, 10)
     end
 
     -- ── Key hints ─────────────────────────────────────────────
     lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.5)
-    lurek.render.print("[1-5] Inspect  [D/I/W/E] Filter  [B] Break  [Esc] Quit", 10, SCREEN_H - 14, 10)
+    text_("[1-5] Inspect  [D/I/W/E] Filter  [B] Break  [Esc] Quit", 10, SCREEN_H - 14, 10)
 end

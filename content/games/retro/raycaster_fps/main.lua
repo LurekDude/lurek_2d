@@ -463,6 +463,53 @@ end
 
 -- ── lurek.init ────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Raycaster FPS — Lurek2D")
     lurek.render.setBackgroundColor(0, 0, 0)
@@ -681,7 +728,7 @@ function lurek.draw()
         local t = 1.0 - i / bands
         local br = 0.05 + 0.08 * t
         lurek.render.setColor(br * 0.4, br * 0.5, br * 1.0, 1)
-        lurek.render.rectangle("fill", 0, i * band_h, SCREEN_W, band_h + 1)
+        rect("fill", 0, i * band_h, SCREEN_W, band_h + 1)
     end
 
     -- Floor gradient (16 bands)
@@ -689,7 +736,7 @@ function lurek.draw()
         local t = i / bands
         local br = 0.04 + 0.07 * t
         lurek.render.setColor(br * 0.7, br * 0.45, br * 0.2, 1)
-        lurek.render.rectangle("fill", 0, SCREEN_H / 2 + i * band_h, SCREEN_W, band_h + 1)
+        rect("fill", 0, SCREEN_H / 2 + i * band_h, SCREEN_W, band_h + 1)
     end
 
     -- Raycast walls and build depth buffer
@@ -711,7 +758,7 @@ function lurek.draw()
         if wtype > 0 then
             local cr, cg, cb = wall_color(wtype, corr, side, r, sy)
             lurek.render.setColor(cr, cg, cb, 1)
-            lurek.render.rectangle("fill", sx, sy, SCALE_X + 0.5, strip_h)
+            rect("fill", sx, sy, SCALE_X + 0.5, strip_h)
         end
     end
 
@@ -738,15 +785,15 @@ function lurek.draw()
                         local ic = ITEM_COLORS[it.kind]
                         local fog = clamp(1.0 - idist / 16.0, 0.15, 1.0)
                         lurek.render.setColor(ic[1] * fog, ic[2] * fog, ic[3] * fog, 1)
-                        lurek.render.rectangle("fill", scr_x - iw / 2, iy, iw, ih)
+                        rect("fill", scr_x - iw / 2, iy, iw, ih)
 
                         -- Icon detail
                         if it.kind <= ITEM_KEY_GREEN then
                             lurek.render.setColor(1, 1, 1, fog * 0.5)
-                            lurek.render.rectangle("fill", scr_x - iw * 0.15, iy + ih * 0.3, iw * 0.3, ih * 0.15)
+                            rect("fill", scr_x - iw * 0.15, iy + ih * 0.3, iw * 0.3, ih * 0.15)
                         else
                             lurek.render.setColor(1, 1, 1, fog * 0.4)
-                            lurek.render.rectangle("fill", scr_x - iw * 0.1, iy + ih * 0.2, iw * 0.2, ih * 0.6)
+                            rect("fill", scr_x - iw * 0.1, iy + ih * 0.2, iw * 0.2, ih * 0.6)
                         end
                     end
                 end
@@ -777,15 +824,15 @@ function lurek.draw()
 
                     -- Body
                     lurek.render.setColor(ec[1] * fog, ec[2] * fog, ec[3] * fog, 1)
-                    lurek.render.rectangle("fill", scr_x - ew / 2, ey + eh * 0.1, ew, eh * 0.7)
+                    rect("fill", scr_x - ew / 2, ey + eh * 0.1, ew, eh * 0.7)
 
                     -- Head
                     lurek.render.setColor(0.9 * fog, 0.75 * fog, 0.6 * fog, 1)
-                    lurek.render.circle("fill", scr_x, ey + eh * 0.08, ew * 0.3)
+                    circ("fill", scr_x, ey + eh * 0.08, ew * 0.3)
 
                     -- Weapon
                     lurek.render.setColor(0.3 * fog, 0.3 * fog, 0.3 * fog, 1)
-                    lurek.render.rectangle("fill", scr_x + ew * 0.2, ey + eh * 0.35, ew * 0.4, eh * 0.08)
+                    rect("fill", scr_x + ew * 0.2, ey + eh * 0.35, ew * 0.4, eh * 0.08)
                 end
             end
         end
@@ -795,13 +842,13 @@ function lurek.draw()
     if muzzle_flash_timer > 0 then
         local a = muzzle_flash_timer / 0.06
         lurek.render.setColor(1, 0.9, 0.3, a * 0.4)
-        lurek.render.circle("fill", SCREEN_W / 2, SCREEN_H - 70, 30 + 20 * a)
+        circ("fill", SCREEN_W / 2, SCREEN_H - 70, 30 + 20 * a)
     end
 
     -- Damage flash overlay
     if damage_flash_alpha > 0 then
         lurek.render.setColor(1, 0, 0, damage_flash_alpha)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
     end
 
     cam:reset()
@@ -812,74 +859,74 @@ function lurek.draw_ui()
     -- === TITLE SCREEN ===
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.8, 0.15, 0.1, 1)
-        lurek.render.print("RAYCASTER FPS", 300, 160, 40)
+        text_("RAYCASTER FPS", 300, 160, 40)
         lurek.render.setColor(0.6, 0.6, 0.7, 1)
-        lurek.render.print("Wolfenstein 3D-style raycaster with 6 wall types", 225, 230, 16)
-        lurek.render.print("WASD = Move/Strafe   Q/E = Rotate   Space = Fire", 220, 260, 14)
-        lurek.render.print("F1-F3 = Weather   Esc = Quit", 320, 285, 14)
+        text_("Wolfenstein 3D-style raycaster with 6 wall types", 225, 230, 16)
+        text_("WASD = Move/Strafe   Q/E = Rotate   Space = Fire", 220, 260, 14)
+        text_("F1-F3 = Weather   Esc = Quit", 320, 285, 14)
         local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.print("PRESS ENTER", 395, 360, 22)
+            text_("PRESS ENTER", 395, 360, 22)
         end
         lurek.render.setColor(0.3, 0.3, 0.4, 1)
-        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
+        text_("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
         return
     end
 
     -- === GAME OVER ===
     if current_state == STATE.GAME_OVER then
         lurek.render.setColor(0.8, 0.1, 0.1, 1)
-        lurek.render.print("GAME OVER", 350, 200, 36)
+        text_("GAME OVER", 350, 200, 36)
         lurek.render.setColor(0.9, 0.9, 1, 1)
-        lurek.render.print("Score: " .. score, 420, 260, 20)
+        text_("Score: " .. score, 420, 260, 20)
         local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.print("PRESS ENTER TO RESTART", 340, 330, 18)
+            text_("PRESS ENTER TO RESTART", 340, 330, 18)
         end
         lurek.render.setColor(0.3, 0.3, 0.4, 1)
-        lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
+        text_("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
         return
     end
 
     -- === HUD ===
     -- HP bar
     lurek.render.setColor(0.15, 0.15, 0.2, 0.8)
-    lurek.render.rectangle("fill", 10, SCREEN_H - 40, 204, 24)
+    rect("fill", 10, SCREEN_H - 40, 204, 24)
     local hp_frac = clamp(player.hp / 100, 0, 1)
     local hp_r = 1.0 - hp_frac
     local hp_g = hp_frac
     lurek.render.setColor(hp_r, hp_g, 0.1, 1)
-    lurek.render.rectangle("fill", 12, SCREEN_H - 38, 200 * hp_frac, 20)
+    rect("fill", 12, SCREEN_H - 38, 200 * hp_frac, 20)
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("HP: " .. math.floor(player.hp), 15, SCREEN_H - 38, 14)
+    text_("HP: " .. math.floor(player.hp), 15, SCREEN_H - 38, 14)
 
     -- Ammo
     lurek.render.setColor(1, 0.8, 0.1, 1)
-    lurek.render.print("AMMO: " .. player.ammo, 230, SCREEN_H - 38, 14)
+    text_("AMMO: " .. player.ammo, 230, SCREEN_H - 38, 14)
 
     -- Score
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("SCORE: " .. score, 380, SCREEN_H - 38, 14)
+    text_("SCORE: " .. score, 380, SCREEN_H - 38, 14)
 
     -- Weapon graphic (simple crosshair + gun shape)
     lurek.render.setColor(0.3, 0.3, 0.35, 1)
-    lurek.render.rectangle("fill", SCREEN_W / 2 - 8, SCREEN_H - 60, 16, 40)
-    lurek.render.rectangle("fill", SCREEN_W / 2 - 16, SCREEN_H - 30, 32, 12)
+    rect("fill", SCREEN_W / 2 - 8, SCREEN_H - 60, 16, 40)
+    rect("fill", SCREEN_W / 2 - 16, SCREEN_H - 30, 32, 12)
     lurek.render.setColor(0.2, 0.2, 0.2, 1)
-    lurek.render.rectangle("fill", SCREEN_W / 2 - 3, SCREEN_H - 65, 6, 10)
+    rect("fill", SCREEN_W / 2 - 3, SCREEN_H - 65, 6, 10)
 
     -- Crosshair
     lurek.render.setColor(1, 1, 1, 0.7)
-    lurek.render.line(SCREEN_W / 2 - 10, SCREEN_H / 2, SCREEN_W / 2 - 3, SCREEN_H / 2)
-    lurek.render.line(SCREEN_W / 2 + 3, SCREEN_H / 2, SCREEN_W / 2 + 10, SCREEN_H / 2)
-    lurek.render.line(SCREEN_W / 2, SCREEN_H / 2 - 10, SCREEN_W / 2, SCREEN_H / 2 - 3)
-    lurek.render.line(SCREEN_W / 2, SCREEN_H / 2 + 3, SCREEN_W / 2, SCREEN_H / 2 + 10)
+    ln(SCREEN_W / 2 - 10, SCREEN_H / 2, SCREEN_W / 2 - 3, SCREEN_H / 2)
+    ln(SCREEN_W / 2 + 3, SCREEN_H / 2, SCREEN_W / 2 + 10, SCREEN_H / 2)
+    ln(SCREEN_W / 2, SCREEN_H / 2 - 10, SCREEN_W / 2, SCREEN_H / 2 - 3)
+    ln(SCREEN_W / 2, SCREEN_H / 2 + 3, SCREEN_W / 2, SCREEN_H / 2 + 10)
 
     -- Weather indicator
     lurek.render.setColor(0.5, 0.5, 0.6, 1)
-    lurek.render.print("Weather: " .. weather .. "  (F1/F2/F3)", 10, 10, 12)
+    text_("Weather: " .. weather .. "  (F1/F2/F3)", 10, 10, 12)
 
     -- === MINIMAP (top-right) ===
     local MM_SIZE = 130
@@ -889,7 +936,7 @@ function lurek.draw_ui()
 
     -- Background
     lurek.render.setColor(0.0, 0.0, 0.0, 0.7)
-    lurek.render.rectangle("fill", MM_X - 2, MM_Y - 2, MM_SIZE + 4, MM_SIZE + 4)
+    rect("fill", MM_X - 2, MM_Y - 2, MM_SIZE + 4, MM_SIZE + 4)
 
     -- Walls
     for gy = 1, MAP_H do
@@ -899,10 +946,10 @@ function lurek.draw_ui()
             if world_map[gy][gx] > 0 then
                 local wc = WALL_COLORS[world_map[gy][gx]]
                 lurek.render.setColor(wc[1] * 0.5, wc[2] * 0.5, wc[3] * 0.5, 1)
-                lurek.render.rectangle("fill", cx, cy, MM_CELL, MM_CELL)
+                rect("fill", cx, cy, MM_CELL, MM_CELL)
             else
                 lurek.render.setColor(0.1, 0.1, 0.12, 1)
-                lurek.render.rectangle("fill", cx, cy, MM_CELL, MM_CELL)
+                rect("fill", cx, cy, MM_CELL, MM_CELL)
             end
         end
     end
@@ -914,7 +961,7 @@ function lurek.draw_ui()
             lurek.render.setColor(ic[1], ic[2], ic[3], 0.8)
             local ix = MM_X + (it.x - 1) * MM_CELL
             local iy = MM_Y + (it.y - 1) * MM_CELL
-            lurek.render.circle("fill", ix, iy, 2)
+            circ("fill", ix, iy, 2)
         end
     end
 
@@ -924,28 +971,28 @@ function lurek.draw_ui()
         lurek.render.setColor(ec[1], ec[2], ec[3], 0.9)
         local ex = MM_X + (e.x - 1) * MM_CELL
         local ey = MM_Y + (e.y - 1) * MM_CELL
-        lurek.render.circle("fill", ex, ey, 2.5)
+        circ("fill", ex, ey, 2.5)
     end
 
     -- Player on minimap
     local pmx = MM_X + (player.x - 1) * MM_CELL
     local pmy = MM_Y + (player.y - 1) * MM_CELL
     lurek.render.setColor(0.2, 1, 0.3, 1)
-    lurek.render.circle("fill", pmx, pmy, 3)
+    circ("fill", pmx, pmy, 3)
     local dir_len = 8
-    lurek.render.line(pmx, pmy,
+    ln(pmx, pmy,
         pmx + math.cos(player.angle) * dir_len,
         pmy + math.sin(player.angle) * dir_len)
 
     -- Minimap border
     lurek.render.setColor(0.4, 0.4, 0.5, 1)
-    lurek.render.rectangle("line", MM_X - 2, MM_Y - 2, MM_SIZE + 4, MM_SIZE + 4)
+    rect("line", MM_X - 2, MM_Y - 2, MM_SIZE + 4, MM_SIZE + 4)
 
     -- === PARTICLES (screen-space) ===
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        rect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 
     -- === WEATHER OVERLAY ===
@@ -953,10 +1000,10 @@ function lurek.draw_ui()
         local a = 1.0 - wp.life / wp.max_life
         if weather == "rain" then
             lurek.render.setColor(0.5, 0.6, 0.9, a * 0.6)
-            lurek.render.rectangle("fill", wp.x, wp.y, 1, 4)
+            rect("fill", wp.x, wp.y, 1, 4)
         else
             lurek.render.setColor(1, 1, 1, a * 0.7)
-            lurek.render.circle("fill", wp.x, wp.y, wp.size)
+            circ("fill", wp.x, wp.y, wp.size)
         end
     end
 
@@ -964,10 +1011,10 @@ function lurek.draw_ui()
     for _, pu in ipairs(popups) do
         local a = clamp(pu.life / pu.max_life, 0, 1)
         lurek.render.setColor(1, 1, 0.3, a)
-        lurek.render.print(pu.text, pu.x - 20, pu.y, 14)
+        text_(pu.text, pu.x - 20, pu.y, 14)
     end
 
     -- FPS
     lurek.render.setColor(0.3, 0.3, 0.4, 1)
-    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
+    text_("FPS: " .. lurek.timer.getFPS(), 10, SCREEN_H - 20, 12)
 end

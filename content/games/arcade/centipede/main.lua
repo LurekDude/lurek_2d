@@ -283,6 +283,53 @@ local centi_timer     = 0
 local centi_interval  = 0.08
 
 -- ── load ──────────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Centipede — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.06)
@@ -636,7 +683,7 @@ local function draw_mushrooms()
                 end
                 local x = (c - 1) * CELL + 2
                 local y = (r - 1) * CELL + 2
-                lurek.render.rectangle("fill", x, y, CELL - 4, CELL - 4)
+                rect("fill", x, y, CELL - 4, CELL - 4)
             end
         end
     end
@@ -653,13 +700,13 @@ local function draw_centipede()
             else
                 lurek.render.setColor(0.1, 0.7, 0.2, 1)
             end
-            lurek.render.circle("fill", cx, cy, CELL * 0.45)
+            circ("fill", cx, cy, CELL * 0.45)
             -- Eye dots on head
             if i == 1 then
                 lurek.render.setColor(1, 1, 1, 1)
                 local ex = chain.dx > 0 and 3 or -3
-                lurek.render.circle("fill", cx + ex - 2, cy - 3, 2)
-                lurek.render.circle("fill", cx + ex + 2, cy - 3, 2)
+                circ("fill", cx + ex - 2, cy - 3, 2)
+                circ("fill", cx + ex + 2, cy - 3, 2)
             end
         end
     end
@@ -671,17 +718,17 @@ local function draw_player()
     -- Triangle pointing up
     lurek.render.setColor(0.3, 0.6, 1.0, 1)
     local half = CELL * 0.45
-    lurek.render.line(px, py - half, px - half, py + half)
-    lurek.render.line(px - half, py + half, px + half, py + half)
-    lurek.render.line(px + half, py + half, px, py - half)
+    ln(px, py - half, px - half, py + half)
+    ln(px - half, py + half, px + half, py + half)
+    ln(px + half, py + half, px, py - half)
     -- Fill body as small rect
-    lurek.render.rectangle("fill", px - 4, py - 2, 8, 10)
+    rect("fill", px - 4, py - 2, 8, 10)
 end
 
 local function draw_bullet()
     if not bullet then return end
     lurek.render.setColor(1, 1, 0.3, 1)
-    lurek.render.rectangle("fill", bullet.x - 1.5, bullet.y - 4, 3, 8)
+    rect("fill", bullet.x - 1.5, bullet.y - 4, 3, 8)
 end
 
 local function draw_spider()
@@ -689,12 +736,12 @@ local function draw_spider()
     -- Diamond shape
     lurek.render.setColor(0.8, 0.2, 0.8, 1)
     local sz = 8
-    lurek.render.line(spider.x, spider.y - sz, spider.x + sz, spider.y)
-    lurek.render.line(spider.x + sz, spider.y, spider.x, spider.y + sz)
-    lurek.render.line(spider.x, spider.y + sz, spider.x - sz, spider.y)
-    lurek.render.line(spider.x - sz, spider.y, spider.x, spider.y - sz)
+    ln(spider.x, spider.y - sz, spider.x + sz, spider.y)
+    ln(spider.x + sz, spider.y, spider.x, spider.y + sz)
+    ln(spider.x, spider.y + sz, spider.x - sz, spider.y)
+    ln(spider.x - sz, spider.y, spider.x, spider.y - sz)
     lurek.render.setColor(0.9, 0.3, 0.9, 1)
-    lurek.render.circle("fill", spider.x, spider.y, 4)
+    circ("fill", spider.x, spider.y, 4)
 end
 
 local function draw_flea()
@@ -702,24 +749,24 @@ local function draw_flea()
     local fx = (flea.col - 0.5) * CELL
     local fy = flea.row_f * CELL
     lurek.render.setColor(1.0, 0.3, 0.3, 1)
-    lurek.render.rectangle("fill", fx - 3, fy - 5, 6, 10)
+    rect("fill", fx - 3, fy - 5, 6, 10)
     lurek.render.setColor(1.0, 0.5, 0.5, 1)
-    lurek.render.circle("fill", fx, fy - 5, 3)
+    circ("fill", fx, fy - 5, 3)
 end
 
 local function draw_scorpion()
     if not scorpion then return end
     local sy = (scorpion.row - 0.5) * CELL
     lurek.render.setColor(0.9, 0.6, 0.1, 1)
-    lurek.render.rectangle("fill", scorpion.x - 8, sy - 4, 16, 8)
+    rect("fill", scorpion.x - 8, sy - 4, 16, 8)
     -- Tail
     local tail_dir = scorpion.dx > 0 and -1 or 1
-    lurek.render.line(scorpion.x + tail_dir * 8, sy, scorpion.x + tail_dir * 14, sy - 6)
-    lurek.render.line(scorpion.x + tail_dir * 14, sy - 6, scorpion.x + tail_dir * 18, sy - 3)
+    ln(scorpion.x + tail_dir * 8, sy, scorpion.x + tail_dir * 14, sy - 6)
+    ln(scorpion.x + tail_dir * 14, sy - 6, scorpion.x + tail_dir * 18, sy - 3)
     -- Eyes
     lurek.render.setColor(1, 1, 1, 1)
     local eye_x = scorpion.dx > 0 and 5 or -5
-    lurek.render.circle("fill", scorpion.x + eye_x, sy - 2, 2)
+    circ("fill", scorpion.x + eye_x, sy - 2, 2)
 end
 
 -- ── render (world space) ──────────────────────────────────────────────────
@@ -731,7 +778,7 @@ function lurek.draw()
                 if math.sin(r * 7.3 + c * 3.1) > 0.7 then
                     local g = 0.15 + math.sin(r + c + title_blink) * 0.05
                     lurek.render.setColor(0.1, g, 0.1, 0.5)
-                    lurek.render.rectangle("fill", (c-1)*CELL+4, (r-1)*CELL+4, CELL-8, CELL-8)
+                    rect("fill", (c-1)*CELL+4, (r-1)*CELL+4, CELL-8, CELL-8)
                 end
             end
         end
@@ -741,7 +788,7 @@ function lurek.draw()
     if state == STATE.PLAYING or state == STATE.GAME_OVER then
         -- Player zone boundary line
         lurek.render.setColor(0.15, 0.15, 0.25, 1)
-        lurek.render.line(0, PLAYER_ZONE_TOP * CELL, SCREEN_W, PLAYER_ZONE_TOP * CELL)
+        ln(0, PLAYER_ZONE_TOP * CELL, SCREEN_W, PLAYER_ZONE_TOP * CELL)
 
         draw_mushrooms()
         draw_centipede()
@@ -757,52 +804,52 @@ end
 function lurek.draw_ui()
     if state == STATE.TITLE then
         lurek.render.setColor(0.2, 0.9, 0.3, 1)
-        lurek.render.print("CENTIPEDE", SCREEN_W / 2 - 100, 160, 3)
+        text_("CENTIPEDE", SCREEN_W / 2 - 100, 160, 3)
 
         lurek.render.setColor(0.8, 0.8, 0.8, 1)
-        lurek.render.print("Blast the centipede through a mushroom field", SCREEN_W / 2 - 190, 230, 1)
+        text_("Blast the centipede through a mushroom field", SCREEN_W / 2 - 190, 230, 1)
 
         local alpha = 0.5 + 0.5 * math.sin(title_blink * 3)
         lurek.render.setColor(1, 1, 0.3, alpha)
-        lurek.render.print("Press SPACE to start", SCREEN_W / 2 - 90, 340, 1.2)
+        text_("Press SPACE to start", SCREEN_W / 2 - 90, 340, 1.2)
 
         lurek.render.setColor(0.5, 0.5, 0.5, 1)
-        lurek.render.print("Move: WASD / Arrows   Fire: Space   Quit: Escape", SCREEN_W / 2 - 210, 420, 1)
+        text_("Move: WASD / Arrows   Fire: Space   Quit: Escape", SCREEN_W / 2 - 210, 420, 1)
         return
     end
 
     -- HUD
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("SCORE", 10, 4, 1)
+    text_("SCORE", 10, 4, 1)
     lurek.render.setColor(0.3, 1, 0.3, 1)
-    lurek.render.print(tostring(score), 70, 4, score_pop.scale)
+    text_(tostring(score), 70, 4, score_pop.scale)
 
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("WAVE " .. wave, SCREEN_W / 2 - 30, 4, 1)
+    text_("WAVE " .. wave, SCREEN_W / 2 - 30, 4, 1)
 
     lurek.render.setColor(1, 0.3, 0.3, 1)
     for i = 1, lives do
         local lx = SCREEN_W - 30 * i
-        lurek.render.circle("fill", lx, 12, 6)
+        circ("fill", lx, 12, 6)
     end
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
-    lurek.render.print(tostring(lurek.timer.getFPS()) .. " FPS", SCREEN_W - 80, SCREEN_H - 18, 1)
+    text_(tostring(lurek.timer.getFPS()) .. " FPS", SCREEN_W - 80, SCREEN_H - 18, 1)
 
     if state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.rectangle("fill", SCREEN_W / 2 - 160, SCREEN_H / 2 - 60, 320, 120)
+        rect("fill", SCREEN_W / 2 - 160, SCREEN_H / 2 - 60, 320, 120)
 
         lurek.render.setColor(0.9, 0.2, 0.2, 1)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 80, SCREEN_H / 2 - 40, 2)
+        text_("GAME OVER", SCREEN_W / 2 - 80, SCREEN_H / 2 - 40, 2)
 
         lurek.render.setColor(1, 1, 1, 1)
-        lurek.render.print("Final Score: " .. score, SCREEN_W / 2 - 60, SCREEN_H / 2 + 10, 1)
+        text_("Final Score: " .. score, SCREEN_W / 2 - 60, SCREEN_H / 2 + 10, 1)
 
         local alpha = 0.5 + 0.5 * math.sin(title_blink * 3)
         lurek.render.setColor(1, 1, 0.3, alpha)
-        lurek.render.print("Press R to restart", SCREEN_W / 2 - 75, SCREEN_H / 2 + 40, 1)
+        text_("Press R to restart", SCREEN_W / 2 - 75, SCREEN_H / 2 + 40, 1)
     end
 end
 

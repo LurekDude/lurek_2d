@@ -373,7 +373,7 @@ end
 do  -- Camera2D:followPath
   local cam = lurek.camera.new()
   local path = {{x=0,y=0},{x=200,y=100},{x=400,y=0}}
-  cam:followPath(path, 120, function() lurek.log.info("path done", "camera") end)
+  cam:followPath(path, 120)
   lurek.log.info("following path", "camera")
 end
 
@@ -381,7 +381,7 @@ end
 -- Creates a named Camera2D and registers it with the camera manager.
 -- Named cameras can be retrieved later by name for scene-switching.
 do  -- lurek.camera.newCamera
-  local cam = lurek.camera.newCamera("level_cam")
+  local cam = lurek.camera.newCamera(800, 600)
   cam:setPosition(400, 300)
   cam:setZoom(1.0)
   lurek.log.info("named camera created", "camera")

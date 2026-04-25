@@ -95,11 +95,9 @@ export function register(
           }
         }
 
-        // ── Lua stdlib functions ──
-        if (!fn) {
-          const stdlib = apiData.getLuaStdlib("luajit");
-          fn = stdlib.find(f => f.fullPath === functionName);
-        }
+        // ── Lua stdlib functions — sumneko.lua handles these ──
+        // Do NOT fall back to stdlib here; let sumneko.lua provide
+        // signature help for string.*, table.*, math.*, etc.
 
         if (!fn || fn.parameters.length === 0) return undefined;
 

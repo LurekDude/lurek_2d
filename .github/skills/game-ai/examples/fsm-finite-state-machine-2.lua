@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- State callbacks have access to dt and the agent
 function onUpdatePatrol(agent, dt)
     local next = patrolPath[agent.waypointIndex]

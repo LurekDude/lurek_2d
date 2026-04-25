@@ -11,7 +11,7 @@ describe("stress: light creation throughput", function()
         local lights = {}
 
         local elapsed = measure("light.newLight x" .. COUNT, COUNT, function()
-            local l = lurek.light.newLight("point")
+            local l = lurek.light.newLight(0, 0, 100)
             lights[#lights + 1] = l
         end)
 
@@ -33,7 +33,7 @@ describe("stress: light position update throughput", function()
         local lights    = {}
 
         for _ = 1, N_LIGHTS do
-            local l = lurek.light.newLight("point")
+            local l = lurek.light.newLight(0, 0, 100)
             lurek.light.setIntensity(l, 0.8)
             lights[#lights + 1] = l
         end
@@ -67,7 +67,7 @@ describe("stress: mixed light operations", function()
     xit("1000 create + setPosition + setRadius + setColor cycles: <5s", function()
         local COUNT   = 1000
         local elapsed = measure("light full-config cycle x" .. COUNT, COUNT, function()
-            local l = lurek.light.newLight("point")
+            local l = lurek.light.newLight(0, 0, 100)
             lurek.light.setPosition(l, math.random() * 1920, math.random() * 1080)
             lurek.light.setRadius(l, 50 + math.random() * 200)
             lurek.light.setColor(l, math.random(), math.random(), math.random(), 1.0)

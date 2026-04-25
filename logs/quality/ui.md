@@ -1,6 +1,6 @@
 # Module Quality Report: `ui`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-12  |  **Score**: 33 ✅ / 4 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-25  |  **Score**: 32 ✅ / 6 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -8,17 +8,18 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **T-01** — Rust test file: No test file found for module 'ui'
+- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Fields
 - [ ] **T-02** — Lua test file: Module has Lua API but no tests/lua/unit/test_ui.lua
-- [ ] **W-01** — Example file exists: content/examples/ui.lua not found — create it
-- [ ] **W-02** — API surface coverage: Skipped — no example file
+- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 86, line 87, line 88, line 229, line 244
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic in closures: '<closure@1929>' (23 LOC, line 1929) — extract body to src/ui/ | '<closure@3662>' (16 LOC, line 3662) — extract body to src/ui/ | '<closure@4021>' (17 LOC, line 4021) — extract body to src/ui/ | '<closure@5171>' (33 LOC, line 5171) — extract body to src/ui/ | '<closure@59>' has if/match/for — extract to src/ui/ | '<closure@77>' has if/match/for — extract to src/ui/
-- [ ] **T-05** — Test adequacy: 192 pub methods, 0 Rust tests — create test file
-- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Ui-API.md)
-- [ ] **Q-04** — Error handling: .unwrap() calls: data_graph_renderer:538
+- [ ] **D-03** — Structured doc sections: Missing structured sections: document::HtmlDocumentOptions (# Fields), document::HtmlDrawCommand (# Fields), document::HtmlDocument (# Fields), element::HtmlRect (# Fields), element::HtmlElement (# Fields), layout_loader::WidgetDef (# Fields)
+- [ ] **D-04** — Doc quality: Stub/placeholder docs found: layout_loader:71, layout_loader:109, layout_loader:382
+- [ ] **B-04** — No business logic in closures: '<closure@875>' (16 LOC, line 875) — extract body to src/ui/ | '<closure@1235>' (18 LOC, line 1235) — extract body to src/ui/ | '<closure@3207>' (23 LOC, line 3207) — extract body to src/ui/ | '<closure@4940>' (16 LOC, line 4940) — extract body to src/ui/ | '<closure@900>' has if/match/for — extract to src/ui/ | '<closure@945>' has if/match/for — extract to src/ui/
+- [ ] **B-05** — Rc clone pattern: Possible missing state.clone() before move: line 2722, line 2735, line 2748
+- [ ] **T-05** — Test adequacy: 61 tests / 270 pub methods (23%) — low coverage
+- [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Ui-API.md)
 
 ## Full Check Results
 
@@ -40,7 +41,7 @@
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/ui.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Skipped — summary length no longer tracked |
-| **SP-04** Lua API completeness | ✅ PASS | All 53 bound functions in spec |
+| **SP-04** Lua API completeness | ✅ PASS | All 71 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
@@ -50,12 +51,12 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ✅ PASS | No stub docs found |
+| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: document::HtmlDocumentOptions (# Fields), document::HtmlDrawCommand (# Fields), document::HtmlDocument (# Fields), element::HtmlRect (# Fields), element::HtmlElement (# Fields), layout_loader::WidgetDef (# Fields) |
+| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: layout_loader:71, layout_loader:109, layout_loader:382 |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
+| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Fields |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -65,8 +66,8 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/ui_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1929>' (23 LOC, line 1929) — extract body to src/ui/ \| '<closure@3662>' (16 LOC, line 3662) — extract body to src/ui/ \| '<closure@4021>' (17 LOC, line 4021) — extract body to src/ui/ \| '<closure@5171>' (33 LOC, line 5171) — extract body to src/ui/ \| '<closure@59>' has if/match/for — extract to src/ui/ \| '<closure@77>' has if/match/for — extract to src/ui/ |
-| **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@875>' (16 LOC, line 875) — extract body to src/ui/ \| '<closure@1235>' (18 LOC, line 1235) — extract body to src/ui/ \| '<closure@3207>' (23 LOC, line 3207) — extract body to src/ui/ \| '<closure@4940>' (16 LOC, line 4940) — extract body to src/ui/ \| '<closure@900>' has if/match/for — extract to src/ui/ \| '<closure@945>' has if/match/for — extract to src/ui/ |
+| **B-05** Rc clone pattern | ⚠️ WARNING | Possible missing state.clone() before move: line 2722, line 2735, line 2748 |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
 ### Phase 6 — Architecture Compliance
@@ -83,11 +84,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **T-01** Rust test file | ❌ ERROR | No test file found for module 'ui' |
+| **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\ui_tests.rs |
 | **T-02** Lua test file | ❌ ERROR | Module has Lua API but no tests/lua/unit/test_ui.lua |
-| **T-03** Test naming | ✅ PASS | No Rust test file — skip |
-| **T-04** Float comparisons | ✅ PASS | No Rust test file — skip |
-| **T-05** Test adequacy | ⚠️ WARNING | 192 pub methods, 0 Rust tests — create test file |
+| **T-03** Test naming | ✅ PASS | Test names follow convention |
+| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 86, line 87, line 88, line 229, line 244 |
+| **T-05** Test adequacy | ⚠️ WARNING | 61 tests / 270 pub methods (23%) — low coverage |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test ui_tests -- --nocapture |
 
@@ -95,11 +96,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ❌ ERROR | content/examples/ui.lua not found — create it |
-| **W-02** API surface coverage | ❌ ERROR | Skipped — no example file |
+| **W-01** Example file exists | ✅ PASS | content/examples/ui.lua present |
+| **W-02** API surface coverage | ✅ PASS | All 71 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/ui.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Ui-API.md) |
+| **W-04** Example–spec sync | ✅ PASS | All 71 functions consistent across spec and example |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Ui-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality
@@ -109,7 +110,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: data_graph_renderer:538 |
+| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

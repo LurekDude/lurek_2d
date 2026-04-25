@@ -14,7 +14,7 @@ function lurek.process(dt)
 end
 
 -- ── draw ──────────────────────────────────────────────────────
-function lurek.render()
+function lurek.draw()
     lurek.render.print("FPS: " .. lurek.timer.getFPS(), 10, 10)
     lurek.render.print("Elapsed: " .. string.format("%.2f", elapsed), 10, 30)
 end

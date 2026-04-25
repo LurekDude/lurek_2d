@@ -149,7 +149,7 @@ impl LuaUserData for LuaArray {
 
         // -- set --
         /// Sets the element at the given 1-based indices to a value.
-        /// @param indices_and_value : integer..., number
+        /// @param ... : number
         /// @return nil
         methods.add_method_mut("set", |_, this, args: LuaMultiValue| {
             let args_vec = args.into_vec();
@@ -881,8 +881,8 @@ impl LuaUserData for LuaArray {
         methods.add_method("map", |_lua, this, func: LuaFunction| {
             let src = &this.inner;
             let n = src.size();
-            let mut out = NdArray::zeros(src.shape(), src.dtype())
-                .map_err(LuaError::RuntimeError)?;
+            let mut out =
+                NdArray::zeros(src.shape(), src.dtype()).map_err(LuaError::RuntimeError)?;
             for i in 0..n {
                 let v = src.get_f64(i);
                 let result: f64 = func.call(v)?;
@@ -902,8 +902,8 @@ impl LuaUserData for LuaArray {
             let func: LuaFunction = lua.load(&src_code).eval()?;
             let src = &this.inner;
             let n = src.size();
-            let mut out = NdArray::zeros(src.shape(), src.dtype())
-                .map_err(LuaError::RuntimeError)?;
+            let mut out =
+                NdArray::zeros(src.shape(), src.dtype()).map_err(LuaError::RuntimeError)?;
             for i in 0..n {
                 let v = src.get_f64(i);
                 let result: f64 = func.call(v)?;
@@ -937,8 +937,8 @@ impl LuaUserData for LuaArray {
         methods.add_method("scan", |_lua, this, (func, init): (LuaFunction, f64)| {
             let src = &this.inner;
             let n = src.size();
-            let mut out = NdArray::zeros(src.shape(), src.dtype())
-                .map_err(LuaError::RuntimeError)?;
+            let mut out =
+                NdArray::zeros(src.shape(), src.dtype()).map_err(LuaError::RuntimeError)?;
             let mut acc = init;
             for i in 0..n {
                 let v = src.get_f64(i);

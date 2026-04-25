@@ -524,9 +524,12 @@ end
 -- Systems run in registration order inside universe:update(); pass a query table and callback.
 do  -- Universe:addSystem
   local u = lurek.ecs.newUniverse()
-  u:addSystem({query={"Position", "Velocity"}}, function(entity, pos, vel)
-    lurek.log.info("system tick", "ecs")
-  end)
+  u:addSystem({
+    query = {"Position", "Velocity"},
+    run = function(entity, pos, vel)
+      lurek.log.info("system tick", "ecs")
+    end,
+  })
   lurek.log.info("system count: " .. u:getSystemCount(), "ecs")
 end
 
@@ -546,7 +549,7 @@ do  -- Universe:each
   local u = lurek.ecs.newUniverse()
   local e = u:spawn()
   u:set(e, "Tag", {})
-  u:each({"Tag"}, function(eid, tag)
+  u:each("Tag", function(eid, tag)
     lurek.log.info("entity: " .. eid, "ecs")
   end)
 end
@@ -603,7 +606,7 @@ do  -- Universe:queryNot
   local u = lurek.ecs.newUniverse()
   local e1 = u:spawn(); u:set(e1, "Health", {hp=100})
   local e2 = u:spawn()
-  local uninjured = u:queryNot({"Health"})
+  local uninjured = u:queryNot({}, {"Health"})
   lurek.log.info("without health: " .. #uninjured, "ecs")
 end
 
@@ -655,6 +658,7 @@ end
 -- Much faster than calling spawn() in a loop; returns a table of new entity ids.
 do  -- Universe:spawnBulk
   local u = lurek.ecs.newUniverse()
-  local ids = u:spawnBulk(50, {Health={max=100}, Position={x=0,y=0}})
+  u:defineBlueprint("bulk_unit", {Health={max=100}, Position={x=0,y=0}})
+  local ids = u:spawnBulk("bulk_unit", 50, {})
   lurek.log.info("bulk spawned: " .. #ids, "ecs")
 end

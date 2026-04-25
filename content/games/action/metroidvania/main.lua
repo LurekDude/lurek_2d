@@ -382,6 +382,53 @@ local function try_break_dash_gates()
 end
 
 -- ── load ──────────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Metroidvania — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.03, 0.08)
@@ -644,17 +691,17 @@ function lurek.draw()
     if current_state == STATE.TITLE then
         local pulse = math.abs(math.sin(title_blink * 2))
         lurek.render.scale(SCALE_X, SCALE_Y)
-        lurek.render.print("METROIDVANIA", LOGICAL_W / 2 - 60, LOGICAL_H / 2 - 30, { 0.4, 0.7, 1, 1 })
+        text_("METROIDVANIA", LOGICAL_W / 2 - 60, LOGICAL_H / 2 - 30, { 0.4, 0.7, 1, 1 })
         if math.floor(title_blink * 2) % 2 == 0 then
-            lurek.render.print("PRESS SPACE", LOGICAL_W / 2 - 50, LOGICAL_H / 2 + 10, { 0.7, 0.7, 0.7, pulse })
+            text_("PRESS SPACE", LOGICAL_W / 2 - 50, LOGICAL_H / 2 + 10, { 0.7, 0.7, 0.7, pulse })
         end
         return
     end
 
     if current_state == STATE.GAME_OVER then
         lurek.render.scale(SCALE_X, SCALE_Y)
-        lurek.render.print("GAME OVER", LOGICAL_W / 2 - 40, LOGICAL_H / 2 - 10, { 1, 0.2, 0.2, 1 })
-        lurek.render.print("PRESS SPACE", LOGICAL_W / 2 - 50, LOGICAL_H / 2 + 15, { 0.7, 0.7, 0.7, 1 })
+        text_("GAME OVER", LOGICAL_W / 2 - 40, LOGICAL_H / 2 - 10, { 1, 0.2, 0.2, 1 })
+        text_("PRESS SPACE", LOGICAL_W / 2 - 50, LOGICAL_H / 2 + 15, { 0.7, 0.7, 0.7, 1 })
         return
     end
 
@@ -672,7 +719,7 @@ function lurek.draw()
                     local c = TILE_COLORS[t]
                     if c then
                         lurek.render.setColor(c[1], c[2], c[3], 1)
-                        lurek.render.rectangle((col - 1) * TILE, (row - 1) * TILE, TILE, TILE)
+                        rect((col - 1) * TILE, (row - 1) * TILE, TILE, TILE)
                     end
                 end
             end
@@ -684,7 +731,7 @@ function lurek.draw()
         if not hp.collected and hp.rx == room_x and hp.ry == room_y then
             local pulse = 0.6 + 0.4 * math.sin(lurek.timer.getTime() * 4)
             lurek.render.setColor(0.2, 1, 0.3, pulse)
-            lurek.render.circle(hp.x, hp.y, 4)
+            circ(hp.x, hp.y, 4)
         end
     end
 
@@ -697,9 +744,9 @@ function lurek.draw()
             else
                 lurek.render.setColor(1, 1, 0.3, pulse)
             end
-            lurek.render.circle(it.x, it.y, 6)
+            circ(it.x, it.y, 6)
             lurek.render.setColor(1, 1, 1, pulse * 0.5)
-            lurek.render.circle(it.x, it.y, 3)
+            circ(it.x, it.y, 3)
         end
     end
 
@@ -707,22 +754,22 @@ function lurek.draw()
     for _, e in ipairs(enemies) do
         if e.type == "walker" then
             lurek.render.setColor(0.9, 0.2, 0.2, 1)
-            lurek.render.rectangle(e.x, e.y, e.w, e.h)
+            rect(e.x, e.y, e.w, e.h)
         elseif e.type == "flyer" then
             lurek.render.setColor(1, 0.5, 0.1, 1)
-            lurek.render.circle(e.x + e.w / 2, e.y + e.h / 2, e.w / 2)
+            circ(e.x + e.w / 2, e.y + e.h / 2, e.w / 2)
         elseif e.type == "turret" then
             lurek.render.setColor(0.8, 0.2, 0.6, 1)
-            lurek.render.rectangle(e.x, e.y, e.w, e.h)
+            rect(e.x, e.y, e.w, e.h)
             lurek.render.setColor(1, 0.3, 0.3, 1)
-            lurek.render.circle(e.x + e.w / 2, e.y + e.h / 2, 3)
+            circ(e.x + e.w / 2, e.y + e.h / 2, 3)
         end
     end
 
     -- Draw projectiles
     lurek.render.setColor(1, 0.3, 0.3, 0.9)
     for _, p in ipairs(projectiles) do
-        lurek.render.circle(p.x, p.y, p.r)
+        circ(p.x, p.y, p.r)
     end
 
     -- Draw player
@@ -736,11 +783,11 @@ function lurek.draw()
         else
             lurek.render.setColor(0.3, 0.5, 1, 1)
         end
-        lurek.render.rectangle(player.x, player.y, PLAYER_W, PLAYER_H)
+        rect(player.x, player.y, PLAYER_W, PLAYER_H)
         -- Eyes
         lurek.render.setColor(1, 1, 1, 1)
         local eye_x = player.facing == 1 and (player.x + 10) or (player.x + 4)
-        lurek.render.rectangle(eye_x, player.y + 6, 3, 3)
+        rect(eye_x, player.y + 6, 3, 3)
     end
 
     -- Particles (in world space)
@@ -752,13 +799,13 @@ function lurek.draw()
     -- Transition fade overlay
     if fade_alpha > 0 then
         lurek.render.setColor(0, 0, 0, fade_alpha)
-        lurek.render.rectangle(0, 0, LOGICAL_W, LOGICAL_H)
+        rect(0, 0, LOGICAL_W, LOGICAL_H)
     end
 
     -- Damage flash overlay
     if damage_flash > 0 then
         lurek.render.setColor(1, 0, 0, damage_flash * 0.4)
-        lurek.render.rectangle(0, 0, LOGICAL_W, LOGICAL_H)
+        rect(0, 0, LOGICAL_W, LOGICAL_H)
     end
 
     lurek.render.pop()
@@ -770,41 +817,41 @@ function lurek.draw_ui()
 
     -- HP bar
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.rectangle(8, 8, MAX_HP * 22 + 4, 18)
+    rect(8, 8, MAX_HP * 22 + 4, 18)
     for i = 1, MAX_HP do
         if i <= player.hp then
             lurek.render.setColor(0.2, 0.9, 0.3, 1)
         else
             lurek.render.setColor(0.3, 0.1, 0.1, 1)
         end
-        lurek.render.rectangle(10 + (i - 1) * 22, 10, 18, 14)
+        rect(10 + (i - 1) * 22, 10, 18, 14)
     end
 
     -- Ability icons
     local ax = SCREEN_W - 90
     lurek.render.setColor(0.15, 0.15, 0.2, 0.8)
-    lurek.render.rectangle(ax - 4, 6, 88, 22)
+    rect(ax - 4, 6, 88, 22)
     -- Dash
     if player.has_dash then
         lurek.render.setColor(0.3, 0.8, 1, 1)
     else
         lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
     end
-    lurek.render.print("DASH", ax, 10, nil)
+    text_("DASH", ax, 10, nil)
     -- Double jump
     if player.has_double then
         lurek.render.setColor(1, 1, 0.3, 1)
     else
         lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
     end
-    lurek.render.print("2xJMP", ax + 45, 10, nil)
+    text_("2xJMP", ax + 45, 10, nil)
 
     -- Minimap (3x3 grid)
     local mm_x = SCREEN_W - 70
     local mm_y = SCREEN_H - 70
     local mm_cell = 16
     lurek.render.setColor(0.1, 0.1, 0.15, 0.8)
-    lurek.render.rectangle(mm_x - 4, mm_y - 4, 3 * mm_cell + 8, 3 * mm_cell + 8)
+    rect(mm_x - 4, mm_y - 4, 3 * mm_cell + 8, 3 * mm_cell + 8)
 
     for ry = 0, 2 do
         for rx = 0, 2 do
@@ -819,17 +866,17 @@ function lurek.draw_ui()
                 else
                     lurek.render.setColor(0.15, 0.15, 0.2, 0.6)
                 end
-                lurek.render.rectangle(cx + 1, cy + 1, mm_cell - 2, mm_cell - 2)
+                rect(cx + 1, cy + 1, mm_cell - 2, mm_cell - 2)
             end
         end
     end
 
     -- Room label
     lurek.render.setColor(0.5, 0.5, 0.6, 0.7)
-    lurek.render.print("Room " .. room_x .. "," .. room_y, mm_x - 4, mm_y - 18, nil)
+    text_("Room " .. room_x .. "," .. room_y, mm_x - 4, mm_y - 18, nil)
 
     -- FPS
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
-    lurek.render.print(tostring(fps) .. " FPS", SCREEN_W - 60, SCREEN_H - 18, nil)
+    text_(tostring(fps) .. " FPS", SCREEN_W - 60, SCREEN_H - 18, nil)
 end

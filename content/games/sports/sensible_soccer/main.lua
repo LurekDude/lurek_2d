@@ -98,6 +98,53 @@ local function find_nearest_player(team)
 end
 
 -- ── Load ──────────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Sensible Soccer — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.48, 0.18)
@@ -245,18 +292,18 @@ end
 function lurek.draw()
     -- Pitch markings
     lurek.render.setColor(0.12, 0.40, 0.14)
-    lurek.render.rectangle("fill", PITCH_L, PITCH_T, PITCH_W, PITCH_H)
+    rect("fill", PITCH_L, PITCH_T, PITCH_W, PITCH_H)
     lurek.render.setColor(1, 1, 1, 0.9)
-    lurek.render.rectangle("line", PITCH_L, PITCH_T, PITCH_W, PITCH_H)
+    rect("line", PITCH_L, PITCH_T, PITCH_W, PITCH_H)
     -- Centre line & circle
     local cx = W/2
-    lurek.render.line(cx, PITCH_T, cx, PITCH_B)
-    lurek.render.circle("line", cx, H/2, 50)
-    lurek.render.circle("fill", cx, H/2, 3)
+    ln(cx, PITCH_T, cx, PITCH_B)
+    circ("line", cx, H/2, 50)
+    circ("fill", cx, H/2, 3)
     -- Goals
     lurek.render.setColor(1, 1, 1)
-    lurek.render.rectangle("fill", PITCH_L - GOAL_W, GOAL_Y, GOAL_W, GOAL_H)
-    lurek.render.rectangle("fill", PITCH_R, GOAL_Y, GOAL_W, GOAL_H)
+    rect("fill", PITCH_L - GOAL_W, GOAL_Y, GOAL_W, GOAL_H)
+    rect("fill", PITCH_R, GOAL_Y, GOAL_W, GOAL_H)
 
     -- Players
     for _, p in ipairs(players) do
@@ -265,50 +312,50 @@ function lurek.draw()
         else
             lurek.render.setColor(0.15, 0.3, 0.9)
         end
-        lurek.render.circle("fill", p.x, p.y, PLAYER_R)
+        circ("fill", p.x, p.y, PLAYER_R)
         -- direction dot
         lurek.render.setColor(1, 1, 1, 0.8)
-        lurek.render.circle("fill", p.x + p.dir_x*PLAYER_R*0.6, p.y + p.dir_y*PLAYER_R*0.6, 2)
+        circ("fill", p.x + p.dir_x*PLAYER_R*0.6, p.y + p.dir_y*PLAYER_R*0.6, 2)
         -- controlled marker
         if p == controlled then
             lurek.render.setColor(1, 1, 0, 0.8)
-            lurek.render.circle("line", p.x, p.y, PLAYER_R + 3)
+            circ("line", p.x, p.y, PLAYER_R + 3)
         end
     end
 
     -- Ball
     lurek.render.setColor(1, 1, 1)
-    lurek.render.circle("fill", ball.x, ball.y, BALL_R)
+    circ("fill", ball.x, ball.y, BALL_R)
     lurek.render.setColor(0, 0, 0, 0.5)
-    lurek.render.circle("line", ball.x, ball.y, BALL_R)
+    circ("line", ball.x, ball.y, BALL_R)
 
     -- HUD
     lurek.render.setColor(0, 0, 0, 0.55)
-    lurek.render.rectangle("fill", W/2 - 90, 4, 180, 30)
+    rect("fill", W/2 - 90, 4, 180, 30)
     lurek.render.setColor(0.9, 0.15, 0.15)
-    lurek.render.print(tostring(score[1]), W/2 - 65, 8, 0, 1.4)
+    text_(tostring(score[1]), W/2 - 65, 8, 0, 1.4)
     lurek.render.setColor(1, 1, 1)
-    lurek.render.print("–", W/2 - 9, 8, 0, 1.4)
+    text_("–", W/2 - 9, 8, 0, 1.4)
     lurek.render.setColor(0.15, 0.3, 0.9)
-    lurek.render.print(tostring(score[2]), W/2 + 30, 8, 0, 1.4)
+    text_(tostring(score[2]), W/2 + 30, 8, 0, 1.4)
     -- Clock
     local remaining = math.max(0, MATCH_LEN - match_time)
     lurek.render.setColor(1, 1, 1)
-    lurek.render.print(string.format("%d'", math.floor(remaining)), W/2 - 10, H - 24)
+    text_(string.format("%d'", math.floor(remaining)), W/2 - 10, H - 24)
 
     if state == STATE.KICKOFF then
         lurek.render.setColor(1, 1, 0, 0.9)
-        lurek.render.print("KICK OFF — press Space", W/2 - 100, H/2 - 15)
+        text_("KICK OFF — press Space", W/2 - 100, H/2 - 15)
     elseif state == STATE.GOAL then
         lurek.render.setColor(1, 0.9, 0, 0.95)
-        lurek.render.print("G O A L !", W/2 - 45, H/2 - 14, 0, 1.8)
+        text_("G O A L !", W/2 - 45, H/2 - 14, 0, 1.8)
     elseif state == STATE.FT then
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", W/2 - 130, H/2 - 30, 260, 60)
+        rect("fill", W/2 - 130, H/2 - 30, 260, 60)
         lurek.render.setColor(1, 1, 0)
-        lurek.render.print("FULL TIME", W/2 - 50, H/2 - 22, 0, 1.4)
+        text_("FULL TIME", W/2 - 50, H/2 - 22, 0, 1.4)
         lurek.render.setColor(1,1,1)
-        lurek.render.print(string.format("Final: %d – %d  (Esc to quit)", score[1], score[2]), W/2 - 110, H/2 + 8)
+        text_(string.format("Final: %d – %d  (Esc to quit)", score[1], score[2]), W/2 - 110, H/2 + 8)
     end
 end
 

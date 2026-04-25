@@ -383,8 +383,8 @@ end
 -- Sends a message to all connected peers on the specified channel.
 -- Efficient for authoritative-state updates; peers filter by channel number.
 do  -- NetworkHost:broadcast
-  local host = lurek.network.newServer(7777, 32)
-  host:broadcast(0, "state_update", "reliable")
+  local host = lurek.network.newServer({port=7777, maxPeers=32})
+  host:broadcast(0, "state_update", true)
   lurek.log.info("broadcast sent", "network")
 end
 
@@ -392,16 +392,19 @@ end
 -- Attempts to connect this client host to a remote server address and port.
 -- Returns a peer handle; the connection is established asynchronously via service().
 do  -- NetworkHost:connect
-  local client = lurek.network.newClient(1)
-  local peer = client:connect("127.0.0.1", 7777, 0)
-  lurek.log.info("connect initiated", "network")
+  local client = lurek.network.newClient({addr="127.0.0.1:7777"})
+  local ok, err = pcall(function()
+    local peer = client:connect("127.0.0.1:7777")
+    lurek.log.info("connect initiated", "network")
+  end)
+  if not ok then lurek.log.info("connect: no server available", "network") end
 end
 
 --@api-stub: NetworkHost:disconnect
 -- Sends a disconnect notification and flushes all queued data before closing.
 -- Graceful disconnect; peer receives ENet disconnect event after data drains.
 do  -- NetworkHost:disconnect
-  local host = lurek.network.newServer(7778, 8)
+  local host = lurek.network.newServer({port=7778, maxPeers=8})
   host:disconnect(1)
   lurek.log.info("disconnect requested", "network")
 end
@@ -410,8 +413,8 @@ end
 -- Queues a disconnect that fires only after all outgoing packets are delivered.
 -- Use when you need the remote to receive a final message before the channel closes.
 do  -- NetworkHost:disconnectLater
-  local host = lurek.network.newServer(7779, 8)
-  host:send(1, 0, "game_over", "reliable")
+  local host = lurek.network.newServer({port=7779, maxPeers=8})
+  host:send(1, 0, "game_over", true)
   host:disconnectLater(1)
   lurek.log.info("disconnect-later queued", "network")
 end
@@ -420,7 +423,7 @@ end
 -- Closes the connection immediately without waiting for queued packets.
 -- Use for timeout handling or when the connection is already known to be dead.
 do  -- NetworkHost:disconnectNow
-  local host = lurek.network.newServer(7780, 8)
+  local host = lurek.network.newServer({port=7780, maxPeers=8})
   host:disconnectNow(1)
   lurek.log.info("disconnect-now issued", "network")
 end
@@ -430,10 +433,8 @@ end
 -- poll() returns the response; subscribe to its result in the next frame.
 do  -- NetworkRuntime:httpGet
   local rt = lurek.network.newRuntime()
-  rt:httpGet("https://httpbin.org/get", {}, function(status, body)
-    lurek.log.info("GET status: " .. status, "network")
-  end)
-  lurek.log.info("GET dispatched", "network")
+  local id = rt:httpGet("https://httpbin.org/get")
+  lurek.log.info("GET id=" .. id, "network")
 end
 
 --@api-stub: NetworkRuntime:httpPost
@@ -441,17 +442,16 @@ end
 -- Pass headers table and body string; response arrives via the callback.
 do  -- NetworkRuntime:httpPost
   local rt = lurek.network.newRuntime()
-  rt:httpPost("https://httpbin.org/post", {}, '{"key":"val"}',
-    function(status, body) lurek.log.info("POST " .. status, "network") end)
-  lurek.log.info("POST dispatched", "network")
+  local id = rt:httpPost("https://httpbin.org/post", '{"key":"val"}')
+  lurek.log.info("POST id=" .. id, "network")
 end
 
 --@api-stub: NetworkHost:send
 -- Sends a packet to a single peer on the given channel.
 -- channel is a 0-based integer; mode is "reliable", "unsequenced", or "unreliable".
 do  -- NetworkHost:send
-  local host = lurek.network.newServer(7781, 8)
-  host:send(1, 0, "ping", "reliable")
+  local host = lurek.network.newServer({port=7781, maxPeers=8})
+  host:send(1, 0, "ping", true)
   lurek.log.info("packet sent to peer 1", "network")
 end
 
@@ -459,7 +459,7 @@ end
 -- Sets incoming and outgoing bandwidth caps (bytes/sec) on the host.
 -- 0 = unlimited; use to simulate poor network conditions during testing.
 do  -- NetworkHost:setBandwidthLimit
-  local host = lurek.network.newServer(7782, 8)
+  local host = lurek.network.newServer({port=7782, maxPeers=8})
   host:setBandwidthLimit(128000, 64000)
   lurek.log.info("bandwidth limits set", "network")
 end

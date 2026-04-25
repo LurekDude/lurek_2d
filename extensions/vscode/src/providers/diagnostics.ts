@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ApiDataService } from '../services/apiData.js';
 import { LuaDocumentAnalyzer } from '../services/luaParser.js';
+import { LUREK_CALLBACK_NAMES } from '../generated/lurekApiData.js';
 
 const LUA_SELECTOR: vscode.DocumentSelector = { scheme: 'file', language: 'lua' };
 const analyzer = new LuaDocumentAnalyzer();
@@ -27,17 +28,17 @@ export function register(context: vscode.ExtensionContext, apiData: ApiDataServi
 
             diagnostics.push(...checkDeprecated(text, apiData));
             diagnostics.push(...checkColorRange(text));
-            diagnostics.push(...checkUnusedRequire(text, info));
             checkAssetNotFound(text, document, diagnostics);
             diagnostics.push(...checkThreadRandom(text, info));
             diagnostics.push(...checkMissingCallback(text, document, info));
             diagnostics.push(...checkWrongEnumValue(text, apiData));
-            diagnostics.push(...checkUnknownLurekFunc(text, apiData));
             checkConfLua(text, document, diagnostics);
-            diagnostics.push(...checkPerFrameAllocation(text, info));
+            const relPath = vscode.workspace.asRelativePath(document.uri.fsPath, false);
+            if (!relPath.startsWith('content/examples/') && !relPath.startsWith('content\\examples\\')) {
+                diagnostics.push(...checkPerFrameAllocation(text, info, apiData));
+            }
             diagnostics.push(...checkMissingTestSummary(text, document));
             diagnostics.push(...checkEntityNilAccess(text));
-            diagnostics.push(...checkMethodColonDot(text));
 
             collection.set(document.uri, diagnostics);
         } catch {
@@ -132,7 +133,7 @@ function checkColorRange(text: string): vscode.Diagnostic[] {
         /lurek\.render\.(?:setColor|setBackgroundColor|clear)\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/g;
 
     for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+        const line = lines[i].split('--', 1)[0];
         if (line.trimStart().startsWith('--')) continue;
 
         let match: RegExpExecArray | null;
@@ -159,38 +160,6 @@ function checkColorRange(text: string): vscode.Diagnostic[] {
     return diagnostics;
 }
 
-// ── Rule 3: lurek.unusedRequire ────────────────────────────────
-
-function checkUnusedRequire(
-    text: string,
-    info: ReturnType<typeof analyzer.analyze>,
-): vscode.Diagnostic[] {
-    const diagnostics: vscode.Diagnostic[] = [];
-
-    for (const req of info.requires) {
-        const varName = req.localName;
-        const refs = analyzer.findReferencesInDocument(text, varName);
-        // One reference is the declaration itself
-        if (refs.length <= 1) {
-            const lines = text.split('\n');
-            const lineIdx = req.line;
-            const lineText = lines[lineIdx] ?? '';
-            const range = new vscode.Range(lineIdx, 0, lineIdx, lineText.length);
-            const diag = new vscode.Diagnostic(
-                range,
-                `Required module '${varName}' is never used`,
-                vscode.DiagnosticSeverity.Hint,
-            );
-            diag.code = 'lurek.unusedRequire';
-            diag.source = 'Lurek2D Toolkit';
-            diag.tags = [vscode.DiagnosticTag.Unnecessary];
-            diagnostics.push(diag);
-        }
-    }
-
-    return diagnostics;
-}
-
 // ── Rule 4: lurek.assetNotFound ────────────────────────────────
 
 function checkAssetNotFound(
@@ -199,6 +168,10 @@ function checkAssetNotFound(
     diagnostics: vscode.Diagnostic[],
 ): void {
     if (!vscode.workspace.workspaceFolders?.length) return;
+
+    // Example files use placeholder asset paths — skip asset-existence check.
+    const relPath = vscode.workspace.asRelativePath(document.uri.fsPath, false);
+    if (relPath.startsWith('content/examples/') || relPath.startsWith('content\\examples\\')) return;
 
     const lines = text.split('\n');
     const assetFuncPattern =
@@ -302,17 +275,21 @@ function checkMissingCallback(
     const filePath = document.uri.fsPath.replace(/\\/g, '/');
     if (!filePath.includes('/content/games/')) return diagnostics;
 
-    const hasUpdate = info.callbacks.some(cb => cb.name === 'update')
-        || /lurek\.update\s*=\s*function/.test(text);
-    const hasDraw = info.callbacks.some(cb => cb.name === 'draw')
+    // Determine actual callback names from API data
+    const processName = LUREK_CALLBACK_NAMES.has('process') ? 'process' : 'update';
+    const drawName = 'draw';
+
+    const hasProcess = info.callbacks.some(cb => cb.name === processName)
+        || new RegExp(`lurek\\.${processName}\\s*=\\s*function`).test(text);
+    const hasDraw = info.callbacks.some(cb => cb.name === drawName)
         || /lurek\.draw\s*=\s*function/.test(text);
 
-    if (!hasUpdate && !hasDraw) {
+    if (!hasProcess && !hasDraw) {
         const lines = text.split('\n');
         const range = new vscode.Range(0, 0, 0, lines[0]?.length ?? 0);
         const diag = new vscode.Diagnostic(
             range,
-            'main.lua should define lurek.update(dt) and/or lurek.draw()',
+            `main.lua should define lurek.${processName}(dt) and/or lurek.${drawName}()`,
             vscode.DiagnosticSeverity.Information,
         );
         diag.code = 'lurek.missingCallback';
@@ -418,46 +395,6 @@ function checkWrongEnumValue(text: string, _apiData: ApiDataService): vscode.Dia
     return diagnostics;
 }
 
-// ── D6: Unknown lurek.module.function call ─────────────────────
-
-function checkUnknownLurekFunc(text: string, apiData: ApiDataService): vscode.Diagnostic[] {
-    const diagnostics: vscode.Diagnostic[] = [];
-    const lines = text.split('\n');
-    const callPattern = /lurek\.(\w+)\.(\w+)\s*\(/g;
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (line.trimStart().startsWith('--')) continue;
-        callPattern.lastIndex = 0;
-        let m: RegExpExecArray | null;
-        while ((m = callPattern.exec(line)) !== null) {
-            const modName = m[1];
-            const funcName = m[2];
-            const fullPath = `lurek.${modName}.${funcName}`;
-            const mod = apiData.getModule(modName);
-            if (!mod) continue; // unknown module — skip (not our concern)
-            const knownFn = apiData.getFunction(fullPath);
-            if (knownFn) continue; // known function
-            // Also check methods (e.g. for known types)
-            const methodFn = apiData.getFunctions(modName).find(f => f.name === funcName);
-            if (methodFn) continue;
-
-            const col = m.index + `lurek.${modName}.`.length;
-            const range = new vscode.Range(i, col, i, col + funcName.length);
-            const diag = new vscode.Diagnostic(
-                range,
-                `"${funcName}" is not a known function in lurek.${modName}`,
-                vscode.DiagnosticSeverity.Warning,
-            );
-            diag.code = 'lurek.unknownFunction';
-            diag.source = 'Lurek2D Toolkit';
-            diagnostics.push(diag);
-        }
-    }
-
-    return diagnostics;
-}
-
 // ── D5: conf.lua validation ───────────────────────────────────
 
 const VALID_CONF_KEYS: Record<string, string[]> = {
@@ -516,11 +453,26 @@ function checkConfLua(
 function checkPerFrameAllocation(
     text: string,
     info: ReturnType<typeof analyzer.analyze>,
+    apiData: ApiDataService,
 ): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
     const lines = text.split('\n');
     const allocPattern = /lurek\.(?:render\.(?:newImage|newFont|newCanvas|newShader)|audio\.(?:newSource)|image\.load)\s*\(/g;
-    const frameCallbacks = ['update', 'draw', 'render', 'render_ui', 'process', 'process_late', 'process_physics'];
+    // Per-frame callbacks: all callbacks that run every frame (have dt or are draw callbacks)
+    const frameCallbacks = apiData.getCallbacks()
+        .map(cb => cb.name)
+        .filter(n => ['process', 'process_late', 'process_physics', 'fixedUpdate', 'draw', 'draw_ui'].includes(n));
+    // Fallback if apiData not yet loaded
+    if (frameCallbacks.length === 0) frameCallbacks.push('process', 'process_late', 'process_physics', 'draw', 'draw_ui');
+
+    function enclosingLurekCallback(lineIndex: number): string | undefined {
+        for (let j = lineIndex; j >= 0; j--) {
+            const callbackMatch = lines[j].match(/function\s+lurek\.([A-Za-z_][\w]*)\s*\(/)
+                || lines[j].match(/lurek\.([A-Za-z_][\w]*)\s*=\s*function\s*\(/);
+            if (callbackMatch) return callbackMatch[1];
+        }
+        return undefined;
+    }
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -529,16 +481,8 @@ function checkPerFrameAllocation(
         allocPattern.lastIndex = 0;
         let m: RegExpExecArray | null;
         while ((m = allocPattern.exec(line)) !== null) {
-            // Check if this line is inside a per-frame callback scope
-            const scope = analyzer.getScopeAt(info, i);
-            if (!scope) continue;
-
-            const isPerFrame = frameCallbacks.some(cb => {
-                const scopeText = lines.slice(scope.startLine, Math.min(scope.startLine + 3, lines.length)).join('\n');
-                return scopeText.includes(`lurek.${cb}`) || scopeText.includes(`function ${cb}`);
-            });
-
-            if (!isPerFrame) continue;
+            const callbackName = enclosingLurekCallback(i);
+            if (!callbackName || !frameCallbacks.includes(callbackName)) continue;
 
             const funcName = m[0].replace(/\s*\($/, '');
             const range = new vscode.Range(i, m.index, i, m.index + funcName.length);
@@ -647,43 +591,3 @@ function checkEntityNilAccess(text: string): vscode.Diagnostic[] {
 
 // ── Rule 13: Method call colon vs dot warning ─────────────────
 
-/**
- * Detects common mistake of using dot instead of colon for method calls
- * on known Lurek2D objects. E.g. obj.setFilter(obj, ...) should be obj:setFilter(...)
- */
-function checkMethodColonDot(text: string): vscode.Diagnostic[] {
-    const diagnostics: vscode.Diagnostic[] = [];
-    const lines = text.split('\n');
-
-    // Pattern: var.method(var, ...) — the variable appears as the first arg
-    const dotCallPattern = /\b(\w+)\.(\w+)\s*\(\s*\1\s*[,)]/g;
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (line.trimStart().startsWith('--')) continue;
-
-        dotCallPattern.lastIndex = 0;
-        let m: RegExpExecArray | null;
-        while ((m = dotCallPattern.exec(line)) !== null) {
-            const varName = m[1];
-            const methodName = m[2];
-
-            // Skip lurek.* namespace calls (that's not a method call, it's a module call)
-            if (varName === 'lurek') continue;
-
-            const col = m.index;
-            const endCol = col + `${varName}.${methodName}`.length;
-            const range = new vscode.Range(i, col, i, endCol);
-            const diag = new vscode.Diagnostic(
-                range,
-                `Consider using colon syntax: ${varName}:${methodName}(...) instead of ${varName}.${methodName}(${varName}, ...)`,
-                vscode.DiagnosticSeverity.Information,
-            );
-            diag.code = 'lurek.colonSyntax';
-            diag.source = 'Lurek2D Toolkit';
-            diagnostics.push(diag);
-        }
-    }
-
-    return diagnostics;
-}

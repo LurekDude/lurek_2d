@@ -263,8 +263,8 @@ end
 -- Returns a flipped variant entry (flipped-X, flipped-Y, or both) for a sprite name.
 -- Use for mirroring walk cycles without duplicate atlas entries.
 do  -- SpriteAtlas:getFlipped
-  local atlas = lurek.sprite.parseAtlas("atlas_data.lua")
-  local entry = atlas:getFlipped("hero_run_01", "x")
+  local atlas = lurek.sprite.parseAtlas('{"frames":{},"meta":{"app":"TexturePacker","version":"1.0","image":"sheet.png","format":"RGBA8888","size":{"w":256,"h":256},"scale":"1"}}')
+  local entry = atlas:getFlipped("hero_run_01", true, false)
   lurek.log.info("flipped entry: " .. tostring(entry ~= nil), "sprite")
 end
 
@@ -272,9 +272,9 @@ end
 -- Assigns a friendly group name to a row of frames for convenient clip building.
 -- After naming, getGroupFrames("walk") returns that row's frame indices.
 do  -- SpriteSheet:nameGroup
-  local sheet = lurek.sprite.newSheet("hero_sheet.png", 32, 32)
-  sheet:nameGroup("walk", 1)
-  sheet:nameGroup("run",  2)
+  local sheet = lurek.sprite.newSheet(256, 256, 32, 32)
+  sheet:nameGroup("walk", 0, 4)
+  sheet:nameGroup("run",  4, 4)
   local frames = sheet:getGroupFrames("walk")
   lurek.log.info("walk frames: " .. #frames, "sprite")
 end

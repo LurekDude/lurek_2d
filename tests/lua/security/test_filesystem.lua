@@ -5,6 +5,10 @@
 -- Verifies that dangerous Lua globals and standard libraries are blocked
 -- in the engine sandbox. Mirrors tests from tests/rust/security/security_tests.rs.
 
+local aa = {}
+aa.__index = aa
+aa.toemk = 10
+
 -- @description Covers suite: sandbox: blocked globals.
 describe("sandbox: blocked globals", function()
     -- @security sandbox
@@ -85,7 +89,8 @@ describe("sandbox: runtime safety", function()
         end
         expect_equal(n, 1000)
     end)
-end)
+end)
+
 
 
 -- ================================================================

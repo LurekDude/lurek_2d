@@ -245,6 +245,53 @@ lurek.input.bind("quit",    "escape")
 -- Init
 -- ---------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Vehicle Builder — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.1, 0.12)
@@ -524,11 +571,11 @@ function lurek.draw()
     -- -----------------------------------------------------------------------
     if current_state == STATE.TITLE then
         local pulse = 0.6 + 0.4 * math.sin(title_timer * 3)
-        lurek.render.print("VEHICLE BUILDER", SCREEN_W / 2 - 130, 180, 32)
+        text_("VEHICLE BUILDER", SCREEN_W / 2 - 130, 180, 32)
         lurek.render.setColor(0.7, 0.8, 1.0, pulse)
-        lurek.render.print("DESIGN AND TEST", SCREEN_W / 2 - 110, 240, 20)
+        text_("DESIGN AND TEST", SCREEN_W / 2 - 110, 240, 20)
         lurek.render.setColor(0.5, 0.5, 0.5, 1)
-        lurek.render.print("Click to start", SCREEN_W / 2 - 70, 340, 16)
+        text_("Click to start", SCREEN_W / 2 - 70, 340, 16)
         lurek.render.setColor(1, 1, 1, 1)
         return
     end
@@ -541,11 +588,11 @@ function lurek.draw()
         lurek.render.setColor(0.2, 0.2, 0.25, 1)
         for r = 0, GRID_ROWS do
             local y = GRID_Y + r * CELL
-            lurek.render.line(GRID_X, y, GRID_X + GRID_COLS * CELL, y)
+            ln(GRID_X, y, GRID_X + GRID_COLS * CELL, y)
         end
         for c = 0, GRID_COLS do
             local x = GRID_X + c * CELL
-            lurek.render.line(x, GRID_Y, x, GRID_Y + GRID_ROWS * CELL)
+            ln(x, GRID_Y, x, GRID_Y + GRID_ROWS * CELL)
         end
 
         -- Parts on grid
@@ -558,9 +605,9 @@ function lurek.draw()
                     local clr = PART_COLOR[p]
                     lurek.render.setColor(clr[1], clr[2], clr[3], 1)
                     if p == PART.WHEEL then
-                        lurek.render.circle(px + CELL / 2 - 2, py + CELL / 2 - 2, CELL / 2 - 4)
+                        circ(px + CELL / 2 - 2, py + CELL / 2 - 2, CELL / 2 - 4)
                     else
-                        lurek.render.rectangle(px, py, CELL - 4, CELL - 4)
+                        rect(px, py, CELL - 4, CELL - 4)
                     end
                 end
             end
@@ -575,7 +622,7 @@ function lurek.draw()
             lurek.render.setColor(clr[1], clr[2], clr[3], 0.35)
             local px = GRID_X + (hc - 1) * CELL + 2
             local py = GRID_Y + (hr - 1) * CELL + 2
-            lurek.render.rectangle(px, py, CELL - 4, CELL - 4)
+            rect(px, py, CELL - 4, CELL - 4)
         end
 
         lurek.render.setColor(1, 1, 1, 1)
@@ -597,12 +644,12 @@ function lurek.draw()
         for _, obs in ipairs(track.obstacles) do
             if obs.kind == "gap" then
                 -- draw ground before gap
-                lurek.render.rectangle(segment_start - test.cam_x, TRACK_GROUND, obs.x - segment_start, 40)
+                rect(segment_start - test.cam_x, TRACK_GROUND, obs.x - segment_start, 40)
                 segment_start = obs.x + obs.w
             end
         end
         -- draw remaining ground
-        lurek.render.rectangle(segment_start - test.cam_x, TRACK_GROUND, track.length + 500 - segment_start, 40)
+        rect(segment_start - test.cam_x, TRACK_GROUND, track.length + 500 - segment_start, 40)
 
         -- Obstacles
         for _, obs in ipairs(track.obstacles) do
@@ -613,10 +660,10 @@ function lurek.draw()
                 else
                     lurek.render.setColor(0.6, 0.3, 0.15, 1)
                 end
-                lurek.render.rectangle(ox, TRACK_GROUND - (obs.h or 40), obs.w, obs.h or 40)
+                rect(ox, TRACK_GROUND - (obs.h or 40), obs.w, obs.h or 40)
             elseif obs.kind == "ramp" then
                 lurek.render.setColor(0.5, 0.5, 0.2, 1)
-                lurek.render.rectangle(ox, TRACK_GROUND - (obs.h or 20), obs.w, obs.h or 20)
+                rect(ox, TRACK_GROUND - (obs.h or 20), obs.w, obs.h or 20)
             end
         end
 
@@ -626,35 +673,35 @@ function lurek.draw()
         if test.alive then
             -- body
             lurek.render.setColor(0.5, 0.5, 0.55, 1)
-            lurek.render.rectangle(vx_screen - 20, vy_screen - 24, 40, 16)
+            rect(vx_screen - 20, vy_screen - 24, 40, 16)
             -- wheels
             lurek.render.setColor(0.3, 0.3, 0.3, 1)
-            lurek.render.circle(vx_screen - 12, vy_screen - 4, 6)
-            lurek.render.circle(vx_screen + 12, vy_screen - 4, 6)
+            circ(vx_screen - 12, vy_screen - 4, 6)
+            circ(vx_screen + 12, vy_screen - 4, 6)
             -- engine glow
             if stats.engines > 0 then
                 lurek.render.setColor(0.9, 0.5, 0.1, 0.7)
-                lurek.render.rectangle(vx_screen - 6, vy_screen - 22, 12, 8)
+                rect(vx_screen - 6, vy_screen - 22, 12, 8)
             end
             -- booster indicator
             if test.boosting then
                 lurek.render.setColor(1.0, 0.2, 0.0, 0.9)
-                lurek.render.rectangle(vx_screen - 24, vy_screen - 18, 6, 10)
+                rect(vx_screen - 24, vy_screen - 18, 6, 10)
             end
         end
 
         -- Particles
         for _, p in ipairs(particles) do
             lurek.render.setColor(p.r, p.g, p.b, p.a)
-            lurek.render.rectangle(p.x, p.y, 3, 3)
+            rect(p.x, p.y, 3, 3)
         end
 
         -- Finish line
         local finish_x = track.length - test.cam_x
         if finish_x > -20 and finish_x < SCREEN_W + 20 then
             lurek.render.setColor(1, 1, 0, 0.8)
-            lurek.render.rectangle(finish_x, TRACK_GROUND - 80, 4, 80)
-            lurek.render.print("FINISH", finish_x - 20, TRACK_GROUND - 95, 14)
+            rect(finish_x, TRACK_GROUND - 80, 4, 80)
+            text_("FINISH", finish_x - 20, TRACK_GROUND - 95, 14)
         end
 
         lurek.render.setColor(1, 1, 1, 1)
@@ -662,14 +709,14 @@ function lurek.draw()
         -- Death / finish overlay
         if not test.alive then
             lurek.render.setColor(1, 0.2, 0.2, 0.8)
-            lurek.render.print("CRASHED!", SCREEN_W / 2 - 60, SCREEN_H / 2, 28)
+            text_("CRASHED!", SCREEN_W / 2 - 60, SCREEN_H / 2, 28)
             lurek.render.setColor(0.7, 0.7, 0.7, 1)
-            lurek.render.print("Click or press B to continue", SCREEN_W / 2 - 120, SCREEN_H / 2 + 40, 14)
+            text_("Click or press B to continue", SCREEN_W / 2 - 120, SCREEN_H / 2 + 40, 14)
         elseif test.finished then
             lurek.render.setColor(0.2, 1, 0.2, 0.8)
-            lurek.render.print("TRACK COMPLETE!", SCREEN_W / 2 - 100, SCREEN_H / 2, 28)
+            text_("TRACK COMPLETE!", SCREEN_W / 2 - 100, SCREEN_H / 2, 28)
             lurek.render.setColor(0.7, 0.7, 0.7, 1)
-            lurek.render.print("Click or press B to continue", SCREEN_W / 2 - 120, SCREEN_H / 2 + 40, 14)
+            text_("Click or press B to continue", SCREEN_W / 2 - 120, SCREEN_H / 2 + 40, 14)
         end
 
         lurek.render.setColor(1, 1, 1, 1)
@@ -681,24 +728,24 @@ function lurek.draw()
     -- -----------------------------------------------------------------------
     if current_state == STATE.RESULTS then
         lurek.render.setColor(1, 0.9, 0.4, 1)
-        lurek.render.print("TEST RESULTS", SCREEN_W / 2 - 90, 120, 28)
+        text_("TEST RESULTS", SCREEN_W / 2 - 90, 120, 28)
 
         lurek.render.setColor(0.9, 0.9, 0.9, 1)
-        lurek.render.print(string.format("Track: %d / %d", track_index, #TRACKS), 280, 200, 18)
-        lurek.render.print(string.format("Distance: %d px", math.floor(test.distance)), 280, 230, 18)
-        lurek.render.print(string.format("Score: %d", test.score), 280, 260, 18)
-        lurek.render.print(string.format("Armor remaining: %d / %d", test.armor_hp, stats.armor), 280, 290, 18)
+        text_(string.format("Track: %d / %d", track_index, #TRACKS), 280, 200, 18)
+        text_(string.format("Distance: %d px", math.floor(test.distance)), 280, 230, 18)
+        text_(string.format("Score: %d", test.score), 280, 260, 18)
+        text_(string.format("Armor remaining: %d / %d", test.armor_hp, stats.armor), 280, 290, 18)
 
         if test.finished then
             lurek.render.setColor(0.3, 1, 0.3, 1)
-            lurek.render.print("PASSED!", 280, 330, 22)
+            text_("PASSED!", 280, 330, 22)
         else
             lurek.render.setColor(1, 0.3, 0.3, 1)
-            lurek.render.print("FAILED", 280, 330, 22)
+            text_("FAILED", 280, 330, 22)
         end
 
         lurek.render.setColor(0.5, 0.5, 0.5, 1)
-        lurek.render.print("Press B to return to build mode", 250, 420, 14)
+        text_("Press B to return to build mode", 250, 420, 14)
         lurek.render.setColor(1, 1, 1, 1)
     end
 end
@@ -710,43 +757,43 @@ function lurek.draw_ui()
     if current_state == STATE.BUILDING then
         -- Top bar
         lurek.render.setColor(0.12, 0.12, 0.15, 0.9)
-        lurek.render.rectangle(0, 0, SCREEN_W, 28)
+        rect(0, 0, SCREEN_W, 28)
 
         lurek.render.setColor(0.9, 0.9, 0.9, 1)
-        lurek.render.print(string.format("FPS: %d", lurek.timer.getFPS()), 10, 6, 14)
+        text_(string.format("FPS: %d", lurek.timer.getFPS()), 10, 6, 14)
 
         -- Budget
         local budget_color = total_cost <= BUDGET and { 0.3, 1, 0.3 } or { 1, 0.3, 0.3 }
         lurek.render.setColor(budget_color[1], budget_color[2], budget_color[3], 1)
-        lurek.render.print(string.format("Budget: %dg / %dg", total_cost, BUDGET), 120, 6, 14)
+        text_(string.format("Budget: %dg / %dg", total_cost, BUDGET), 120, 6, 14)
 
         -- Mode
         lurek.render.setColor(1, 1, 0.5, 1)
         if delete_mode then
-            lurek.render.print("[DELETE MODE]", 340, 6, 14)
+            text_("[DELETE MODE]", 340, 6, 14)
         else
-            lurek.render.print("[" .. PART_NAMES[selected_part] .. "]", 340, 6, 14)
+            text_("[" .. PART_NAMES[selected_part] .. "]", 340, 6, 14)
         end
 
         -- Stats panel (right side)
         local sx = GRID_X + GRID_COLS * CELL + 20
         local sy = GRID_Y
         lurek.render.setColor(0.15, 0.15, 0.18, 0.9)
-        lurek.render.rectangle(sx - 5, sy - 5, 130, 180)
+        rect(sx - 5, sy - 5, 130, 180)
 
         lurek.render.setColor(1, 0.9, 0.5, 1)
-        lurek.render.print("STATS", sx, sy, 16)
+        text_("STATS", sx, sy, 16)
         lurek.render.setColor(0.8, 0.8, 0.8, 1)
-        lurek.render.print(string.format("Speed:   %.0f", stats.speed), sx, sy + 25, 13)
-        lurek.render.print(string.format("Weight:  %d", stats.weight), sx, sy + 45, 13)
-        lurek.render.print(string.format("Engines: %d", stats.engines), sx, sy + 65, 13)
-        lurek.render.print(string.format("Wheels:  %d", stats.wheels), sx, sy + 85, 13)
-        lurek.render.print(string.format("Armor:   %d", stats.armor), sx, sy + 105, 13)
-        lurek.render.print(string.format("Boost:   %d", stats.boosters), sx, sy + 125, 13)
+        text_(string.format("Speed:   %.0f", stats.speed), sx, sy + 25, 13)
+        text_(string.format("Weight:  %d", stats.weight), sx, sy + 45, 13)
+        text_(string.format("Engines: %d", stats.engines), sx, sy + 65, 13)
+        text_(string.format("Wheels:  %d", stats.wheels), sx, sy + 85, 13)
+        text_(string.format("Armor:   %d", stats.armor), sx, sy + 105, 13)
+        text_(string.format("Boost:   %d", stats.boosters), sx, sy + 125, 13)
 
         -- Parts legend
         lurek.render.setColor(1, 0.9, 0.5, 1)
-        lurek.render.print("PARTS", sx, sy + 155, 16)
+        text_("PARTS", sx, sy + 155, 16)
         local parts_info = {
             "F: Frame  (0g)",
             "W: Wheel  (20g)",
@@ -757,37 +804,37 @@ function lurek.draw_ui()
         for i, txt in ipairs(parts_info) do
             local clr = PART_COLOR[i]
             lurek.render.setColor(clr[1], clr[2], clr[3], 1)
-            lurek.render.print(txt, sx, sy + 155 + i * 18, 12)
+            text_(txt, sx, sy + 155 + i * 18, 12)
         end
 
         -- Controls hint
         lurek.render.setColor(0.4, 0.4, 0.4, 1)
-        lurek.render.print("D: toggle delete | T: test", GRID_X, GRID_Y + GRID_ROWS * CELL + 12, 12)
-        lurek.render.print("Need wheels + engine to test", GRID_X, GRID_Y + GRID_ROWS * CELL + 28, 12)
+        text_("D: toggle delete | T: test", GRID_X, GRID_Y + GRID_ROWS * CELL + 12, 12)
+        text_("Need wheels + engine to test", GRID_X, GRID_Y + GRID_ROWS * CELL + 28, 12)
 
     elseif current_state == STATE.TESTING then
         -- Test HUD
         lurek.render.setColor(0.12, 0.12, 0.15, 0.85)
-        lurek.render.rectangle(0, 0, SCREEN_W, 28)
+        rect(0, 0, SCREEN_W, 28)
 
         lurek.render.setColor(0.9, 0.9, 0.9, 1)
-        lurek.render.print(string.format("FPS: %d", lurek.timer.getFPS()), 10, 6, 14)
-        lurek.render.print(string.format("Distance: %d", math.floor(test.distance)), 120, 6, 14)
-        lurek.render.print(string.format("Track %d/%d", track_index, #TRACKS), 320, 6, 14)
+        text_(string.format("FPS: %d", lurek.timer.getFPS()), 10, 6, 14)
+        text_(string.format("Distance: %d", math.floor(test.distance)), 120, 6, 14)
+        text_(string.format("Track %d/%d", track_index, #TRACKS), 320, 6, 14)
 
         -- Armor bar
         if stats.armor > 0 then
             lurek.render.setColor(0.2, 0.5, 0.8, 1)
-            lurek.render.print(string.format("Armor: %d/%d", test.armor_hp, stats.armor), 480, 6, 14)
+            text_(string.format("Armor: %d/%d", test.armor_hp, stats.armor), 480, 6, 14)
         end
 
         -- Boost indicator
         if test.boosting then
             lurek.render.setColor(1, 0.3, 0.0, 1)
-            lurek.render.print(string.format("BOOST %.1fs", test.boost_timer), 640, 6, 14)
+            text_(string.format("BOOST %.1fs", test.boost_timer), 640, 6, 14)
         elseif stats.boosters > 0 then
             lurek.render.setColor(0.5, 0.5, 0.5, 1)
-            lurek.render.print("[Space] Boost", 640, 6, 14)
+            text_("[Space] Boost", 640, 6, 14)
         end
     end
 

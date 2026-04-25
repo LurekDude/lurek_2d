@@ -21,8 +21,7 @@ local function hex_to_pixel(c, r)
 end
 
 local function pixel_to_hex(px, py)
-    local r = math.round and math.round((py - OY) / (HEX_H * 0.75)) + 1
-           or math.floor((py - OY) / (HEX_H * 0.75) + 0.5) + 1
+    local r = math.floor((py - OY) / (HEX_H * 0.75) + 0.5) + 1
     local c_offset = (r % 2 == 0) and HEX_W / 2 or 0
     local c = math.floor((px - OX - c_offset) / HEX_W + 0.5) + 1
     return c, r
@@ -58,8 +57,26 @@ local UT = {
 }
 
 -- Units
+---@class WargameUnit
+---@field id integer
+---@field kind string
+---@field team string
+---@field c integer
+---@field r integer
+---@field hp integer
+---@field maxHp integer
+---@field atk integer
+---@field def integer
+---@field mov integer
+---@field rng integer
+---@field icon string
+---@field moved boolean
+---@field attacked boolean
+
+---@type WargameUnit[]
 local units   = {}
 local next_id = 1
+---@type WargameUnit?
 local selected_unit = nil
 local reachable     = {}
 local attackable    = {}
@@ -236,9 +253,56 @@ local hover_c, hover_r = 0, 0
 
 -- ── Init ──────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Wargame — Lurek2D")
-    lurek.render.setBackgroundColor(0.07, 0.07, 0.05, 1.0)
+    lurek.render.setBackgroundColor(0.07, 0.07, 0.05)
     math.randomseed(os.time())
 
     attack_sparks = lurek.particle.newSystem({
@@ -287,7 +351,7 @@ function lurek.process(dt)
 
     if state == "enemy_turn" then enemy_ai(dt) return end
 
-    local mx, my = lurek.input.mouse.getPosition()
+    local mx, my = lurek.input.getPosition()
     hover_c, hover_r = pixel_to_hex(mx, my)
 
     if lurek.input.wasActionPressed("end_turn") and turn == "player" then
@@ -315,15 +379,20 @@ function lurek.process(dt)
             end
 
         elseif state == "move" then
+            local actor = selected_unit
+            if actor == nil then
+                selected_unit = nil ; reachable = {} ; attackable = {} ; state = "select"
+                return
+            end
             -- Check move
             for _, t in ipairs(reachable) do
                 if t.c == hc and t.r == hr then
-                    local ox, oy = hex_to_pixel(selected_unit.c, selected_unit.r)
+                    local ox, oy = hex_to_pixel(actor.c, actor.r)
                     if move_dust then move_dust:emit(ox + HEX_W/2, oy + HEX_H/2, 5) end
-                    selected_unit.c = hc ; selected_unit.r = hr
-                    selected_unit.moved = true
+                    actor.c = hc ; actor.r = hr
+                    actor.moved = true
                     reachable = {}
-                    attackable = not selected_unit.attacked and get_attackable(selected_unit) or {}
+                    attackable = not actor.attacked and get_attackable(actor) or {}
                     state = "attack"
                     return
                 end
@@ -333,8 +402,8 @@ function lurek.process(dt)
                 if t.c == hc and t.r == hr then
                     local target = find_unit(hc, hr)
                     if target and target.team == "enemy" then
-                        do_attack(selected_unit, target)
-                        selected_unit.attacked = true
+                        do_attack(actor, target)
+                        actor.attacked = true
                         selected_unit = nil ; reachable = {} ; attackable = {}
                         state = "select"
 
@@ -350,12 +419,17 @@ function lurek.process(dt)
             selected_unit = nil ; reachable = {} ; attackable = {} ; state = "select"
 
         elseif state == "attack" then
+            local actor = selected_unit
+            if actor == nil then
+                selected_unit = nil ; reachable = {} ; attackable = {} ; state = "select"
+                return
+            end
             for _, t in ipairs(attackable) do
                 if t.c == hc and t.r == hr then
                     local target = find_unit(hc, hr)
                     if target and target.team == "enemy" then
-                        do_attack(selected_unit, target)
-                        selected_unit.attacked = true
+                        do_attack(actor, target)
+                        actor.attacked = true
                     end
                 end
             end
@@ -379,24 +453,24 @@ function lurek.draw()
                      or ter == T_CITY     and {0.3,0.3,0.45,1}
                      or                       {0.1,0.14,0.1,1}
             local hx, hy = hex_to_pixel(c, r)
-            lurek.render.rectangle(hx, hy, HEX_W - 2, HEX_H - 2, { color = col })
+            rect(hx, hy, HEX_W - 2, HEX_H - 2, { color = col })
         end
     end
 
     -- Reachable / attackable highlight
     for _, t in ipairs(reachable) do
         local hx, hy = hex_to_pixel(t.c, t.r)
-        lurek.render.rectangle(hx, hy, HEX_W-2, HEX_H-2, { color = {0.3,0.6,1.0,0.3} })
+        rect(hx, hy, HEX_W-2, HEX_H-2, { color = {0.3,0.6,1.0,0.3} })
     end
     for _, t in ipairs(attackable) do
         local hx, hy = hex_to_pixel(t.c, t.r)
-        lurek.render.rectangle(hx, hy, HEX_W-2, HEX_H-2, { color = {0.9,0.2,0.2,0.3} })
+        rect(hx, hy, HEX_W-2, HEX_H-2, { color = {0.9,0.2,0.2,0.3} })
     end
 
     -- Hover
     if hover_c >= 1 and hover_c <= COLS and hover_r >= 1 and hover_r <= ROWS then
         local hx, hy = hex_to_pixel(hover_c, hover_r)
-        lurek.render.rectangle(hx, hy, HEX_W-2, HEX_H-2, { color = {1,1,1,0.12} })
+        rect(hx, hy, HEX_W-2, HEX_H-2, { color = {1,1,1,0.12} })
     end
 
     -- Units
@@ -405,14 +479,14 @@ function lurek.draw()
         local hx, hy = hex_to_pixel(u.c, u.r)
         local col = u.team == "player" and {0.3,0.6,1.0,1} or {0.8,0.3,0.2,1}
         if u.moved and u.attacked then col[4] = 0.45 end
-        lurek.render.rectangle(hx + 5, hy + 5, HEX_W - 12, HEX_H - 12, { color = col })
-        lurek.render.print(u.icon, hx + 7, hy + 14, { color = {1,1,1,1}, size = 10 })
+        rect(hx + 5, hy + 5, HEX_W - 12, HEX_H - 12, { color = col })
+        text_(u.icon, hx + 7, hy + 14, { color = {1,1,1,1}, size = 10 })
         -- HP
-        lurek.render.rectangle(hx + 2, hy + HEX_H - 10, HEX_W - 6, 5, { color = {0.2,0,0,1} })
-        lurek.render.rectangle(hx + 2, hy + HEX_H - 10, math.floor((HEX_W-6) * u.hp / u.maxHp), 5, { color = {0.2,0.8,0.2,1} })
+        rect(hx + 2, hy + HEX_H - 10, HEX_W - 6, 5, { color = {0.2,0,0,1} })
+        rect(hx + 2, hy + HEX_H - 10, math.floor((HEX_W-6) * u.hp / u.maxHp), 5, { color = {0.2,0.8,0.2,1} })
 
         if selected_unit and selected_unit.id == u.id then
-            lurek.render.rectangle(hx + 1, hy + 1, HEX_W-4, HEX_H-4, { color = {1,1,0.3,0.3} })
+            rect(hx + 1, hy + 1, HEX_W-4, HEX_H-4, { color = {1,1,0.3,0.3} })
         end
         ::skip::
     end
@@ -424,23 +498,23 @@ end
 
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.draw_ui()
-    lurek.render.rectangle(0, 0, W, OY - 4, { color = {0.08,0.08,0.06,1} })
+    rect(0, 0, W, OY - 4, { color = {0.08,0.08,0.06,1} })
     local turn_col = turn == "player" and {0.3,0.9,0.4,1} or {0.9,0.3,0.3,1}
-    lurek.render.print(turn == "player" and "YOUR TURN" or "ENEMY TURN", 12, 8, { color = turn_col, size = 16 })
-    lurek.render.print("Score: " .. score, 400, 8, { color = {1,1,1,1}, size = 14 })
-    lurek.render.print("Enter=end turn  Esc=quit", 600, 8, { color = {0.4,0.4,0.4,1}, size = 12 })
+    text_(turn == "player" and "YOUR TURN" or "ENEMY TURN", 12, 8, { color = turn_col, size = 16 })
+    text_("Score: " .. score, 400, 8, { color = {1,1,1,1}, size = 14 })
+    text_("Enter=end turn  Esc=quit", 600, 8, { color = {0.4,0.4,0.4,1}, size = 12 })
 
     -- Combat log
     for i, msg in ipairs(log) do
         local a = math.min(1.0, msg.timer)
-        lurek.render.print(msg.t, 12, H - 12 - (i-1)*16, { color = {0.8,0.8,0.6,a}, size = 11 })
+        text_(msg.t, 12, H - 12 - (i-1)*16, { color = {0.8,0.8,0.6,a}, size = 11 })
     end
 
     if state == "win" then
-        lurek.render.rectangle(240, 220, 400, 100, { color = {0,0,0,0.88} })
-        lurek.render.print("VICTORY!", 340, 248, { color = {1,0.9,0.2,1}, size = 36 })
+        rect(240, 220, 400, 100, { color = {0,0,0,0.88} })
+        text_("VICTORY!", 340, 248, { color = {1,0.9,0.2,1}, size = 36 })
     elseif state == "lose" then
-        lurek.render.rectangle(240, 220, 400, 100, { color = {0,0,0,0.88} })
-        lurek.render.print("DEFEATED", 320, 248, { color = {0.9,0.2,0.2,1}, size = 34 })
+        rect(240, 220, 400, 100, { color = {0,0,0,0.88} })
+        text_("DEFEATED", 320, 248, { color = {0.9,0.2,0.2,1}, size = 34 })
     end
 end

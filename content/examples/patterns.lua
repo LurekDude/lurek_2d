@@ -52,7 +52,7 @@ do  -- lurek.patterns.newServiceLocator
   local services = lurek.patterns.newServiceLocator()
   services:provide("logger", { info = function(m) print("[info] " .. m) end })
   local log = services:locate("logger")
-  log.info("services online")
+  if log then log.info("services online") end
 end
 
 --@api-stub: lurek.patterns.newFactory
@@ -103,7 +103,7 @@ end
 do  -- lurek.patterns.newThrottle
   local fire = lurek.patterns.newThrottle(0.25)
   fire:onFire(function() print("BANG") end)
-  function lurek.process(dt) if lurek.input.keyboard.isDown("space") then fire:update(dt) end end
+  function lurek.process(dt) if lurek.input.isDown("space") then fire:update(dt) end end
 end
 
 --@api-stub: lurek.patterns.newDebounce
@@ -124,7 +124,7 @@ do  -- lurek.patterns.newPriorityQueue
   jobs:push(10, { kind = "patrol" })
   jobs:push(50, { kind = "attack", target = "player" })
   local top = jobs:pop()
-  print("running job: " .. top.kind)
+  if top then print("running job: " .. top.kind) end
 end
 
 --@api-stub: lurek.patterns.newRing

@@ -79,9 +79,9 @@ impl LuaUserData for LuaNavGrid {
 
         // -- setCost --
         /// Sets the traversal cost of a cell (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param cost : integer
+        /// @param x integer
+        /// @param y integer
+        /// @param cost integer
         /// @return nil
         methods.add_method("setCost", |_, this, (x, y, cost): (u32, u32, u8)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
@@ -90,8 +90,8 @@ impl LuaUserData for LuaNavGrid {
 
         // -- getCost --
         /// Returns the traversal cost of a cell (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return integer
         methods.add_method("getCost", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_cost(x - 1, y - 1))
@@ -99,9 +99,9 @@ impl LuaUserData for LuaNavGrid {
 
         // -- setBlocked --
         /// Marks a cell as blocked or unblocked (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param blocked : boolean
+        /// @param x integer
+        /// @param y integer
+        /// @param blocked boolean
         /// @return nil
         methods.add_method(
             "setBlocked",
@@ -113,8 +113,8 @@ impl LuaUserData for LuaNavGrid {
 
         // -- isBlocked --
         /// Returns true if the cell is blocked (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return boolean
         methods.add_method("isBlocked", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().is_blocked(x - 1, y - 1))
@@ -122,9 +122,9 @@ impl LuaUserData for LuaNavGrid {
 
         // -- isWalkable --
         /// Returns true if a unit footprint is fully walkable (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param unitSize : integer?
+        /// @param x integer
+        /// @param y integer
+        /// @param unitSize integer?
         /// @return boolean
         methods.add_method(
             "isWalkable",
@@ -138,7 +138,7 @@ impl LuaUserData for LuaNavGrid {
 
         // -- fill --
         /// Sets every cell to the given cost.
-        /// @param cost : integer
+        /// @param cost integer
         /// @return nil
         methods.add_method("fill", |_, this, cost: u8| {
             this.inner.borrow_mut().fill(cost);
@@ -147,11 +147,11 @@ impl LuaUserData for LuaNavGrid {
 
         // -- fillRect --
         /// Sets all cells in a rectangle to the given cost (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param w : integer
-        /// @param h : integer
-        /// @param cost : integer
+        /// @param x integer
+        /// @param y integer
+        /// @param w integer
+        /// @param h integer
+        /// @param cost integer
         /// @return nil
         methods.add_method(
             "fillRect",
@@ -163,7 +163,7 @@ impl LuaUserData for LuaNavGrid {
 
         // -- loadFromString --
         /// Overwrites the grid from a raw byte string (row-major, one byte per cell).
-        /// @param data : string
+        /// @param data string
         /// @return nil
         methods.add_method("loadFromString", |_, this, data: LuaString| {
             this.inner
@@ -181,7 +181,7 @@ impl LuaUserData for LuaNavGrid {
 
         // -- setChunkSize --
         /// Sets the HPA★ chunk size.
-        /// @param size : integer
+        /// @param size integer
         /// @return nil
         methods.add_method("setChunkSize", |_, this, size: u32| {
             this.inner.borrow_mut().set_chunk_size(size);
@@ -208,10 +208,10 @@ impl LuaUserData for LuaNavGrid {
 
         // -- setDirty --
         /// Records a dirty rectangle for incremental HPA★ updates (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param w : integer
-        /// @param h : integer
+        /// @param x integer
+        /// @param y integer
+        /// @param w integer
+        /// @param h integer
         /// @return nil
         methods.add_method("setDirty", |_, this, (x, y, w, h): (u32, u32, u32, u32)| {
             this.inner.borrow_mut().set_dirty(x - 1, y - 1, w, h);
@@ -228,7 +228,7 @@ impl LuaUserData for LuaNavGrid {
 
         // -- setDiagonalMode --
         /// Sets the diagonal movement mode.
-        /// @param mode : string
+        /// @param mode string
         /// @return nil
         methods.add_method("setDiagonalMode", |_, this, mode: String| {
             let dm = DiagonalMode::from_lua_str(&mode).ok_or_else(|| {
@@ -260,7 +260,7 @@ impl LuaUserData for LuaNavGrid {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "NavGrid" || name == "Object")
@@ -281,11 +281,11 @@ impl LuaUserData for LuaUnitPathfinder {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- findPath --
         /// Finds an A★ path between two cells (1-based coordinates).
-        /// @param x1 : integer
-        /// @param y1 : integer
-        /// @param x2 : integer
-        /// @param y2 : integer
-        /// @param unitSize : integer?
+        /// @param x1 integer
+        /// @param y1 integer
+        /// @param x2 integer
+        /// @param y2 integer
+        /// @param unitSize integer?
         /// @return table?
         methods.add_method(
             "findPath",
@@ -306,11 +306,11 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- findPathSmooth --
         /// Finds a Theta★ smoothed path between two cells (1-based coordinates).
-        /// @param x1 : integer
-        /// @param y1 : integer
-        /// @param x2 : integer
-        /// @param y2 : integer
-        /// @param unitSize : integer?
+        /// @param x1 integer
+        /// @param y1 integer
+        /// @param x2 integer
+        /// @param y2 integer
+        /// @param unitSize integer?
         /// @return table?
         methods.add_method(
             "findPathSmooth",
@@ -334,12 +334,12 @@ impl LuaUserData for LuaUnitPathfinder {
         /// for approximately half the node expansions of standard A★ on large open grids.
         /// Returns a path table (1-based `{x, y}` entries) plus a `complete` boolean.
         /// Returns `nil, false` when start or goal is not walkable or no path exists.
-        /// @param x1 : integer
-        /// @param y1 : integer
-        /// @param x2 : integer
-        /// @param y2 : integer
-        /// @param unitSize : integer?
-        /// @param maxNodes : integer?
+        /// @param x1 integer
+        /// @param y1 integer
+        /// @param x2 integer
+        /// @param y2 integer
+        /// @param unitSize integer?
+        /// @param maxNodes integer?
         /// @return nil
         /// table?, boolean
         methods.add_method(
@@ -381,7 +381,7 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- getPathLength --
         /// Returns the euclidean length of a path table.
-        /// @param path : table
+        /// @param path table
         /// @return number
         methods.add_method("getPathLength", |_, _this, path: LuaTable| {
             let waypoints = lua_to_waypoints(&path)?;
@@ -390,7 +390,7 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- getPathCost --
         /// Returns the sum of grid traversal costs along a path.
-        /// @param path : table
+        /// @param path table
         /// @return number
         methods.add_method("getPathCost", |_, this, path: LuaTable| {
             let waypoints = lua_to_waypoints(&path)?;
@@ -399,12 +399,12 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- findPartialPath --
         /// Finds a partial path with a node expansion limit (1-based coordinates).
-        /// @param x1 : integer
-        /// @param y1 : integer
-        /// @param x2 : integer
-        /// @param y2 : integer
-        /// @param maxNodes : integer
-        /// @param unitSize : integer?
+        /// @param x1 integer
+        /// @param y1 integer
+        /// @param x2 integer
+        /// @param y2 integer
+        /// @param maxNodes integer
+        /// @param unitSize integer?
         /// @return table, boolean
         methods.add_method(
             "findPartialPath",
@@ -432,10 +432,10 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- findNearestWalkable --
         /// Finds the nearest walkable cell within a radius (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param maxRadius : integer
-        /// @param unitSize : integer?
+        /// @param x integer
+        /// @param y integer
+        /// @param maxRadius integer
+        /// @param unitSize integer?
         /// @return nil
         /// integer?, integer?
         methods.add_method(
@@ -455,11 +455,11 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- isReachable --
         /// Returns true if a path exists between two cells (1-based coordinates).
-        /// @param x1 : integer
-        /// @param y1 : integer
-        /// @param x2 : integer
-        /// @param y2 : integer
-        /// @param unitSize : integer?
+        /// @param x1 integer
+        /// @param y1 integer
+        /// @param x2 integer
+        /// @param y2 integer
+        /// @param unitSize integer?
         /// @return boolean
         methods.add_method(
             "isReachable",
@@ -476,10 +476,10 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- heuristicDistance --
         /// Returns the octile heuristic distance between two cells (1-based coordinates).
-        /// @param x1 : integer
-        /// @param y1 : integer
-        /// @param x2 : integer
-        /// @param y2 : integer
+        /// @param x1 integer
+        /// @param y1 integer
+        /// @param x2 integer
+        /// @param y2 integer
         /// @return number
         methods.add_method(
             "heuristicDistance",
@@ -495,11 +495,11 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- lineOfSight --
         /// Returns true if there is a clear line of sight between two cells (1-based coordinates).
-        /// @param x1 : integer
-        /// @param y1 : integer
-        /// @param x2 : integer
-        /// @param y2 : integer
-        /// @param unitSize : integer?
+        /// @param x1 integer
+        /// @param y1 integer
+        /// @param x2 integer
+        /// @param y2 integer
+        /// @param unitSize integer?
         /// @return boolean
         methods.add_method(
             "lineOfSight",
@@ -516,7 +516,7 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- setCacheEnabled --
         /// Enables or disables path result caching.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method("setCacheEnabled", |_, this, enabled: bool| {
             this.inner.borrow_mut().set_cache_enabled(enabled);
@@ -547,7 +547,7 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- setCacheMaxSize --
         /// Sets the maximum number of cached path entries.
-        /// @param n : integer
+        /// @param n integer
         /// @return nil
         methods.add_method("setCacheMaxSize", |_, this, n: usize| {
             this.inner.borrow_mut().set_cache_max_size(n);
@@ -561,7 +561,7 @@ impl LuaUserData for LuaUnitPathfinder {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "UnitPathfinder" || name == "Object")
@@ -582,9 +582,9 @@ impl LuaUserData for LuaFlowField {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- calculate --
         /// Computes the flow field toward a single target (1-based coordinates).
-        /// @param tx : integer
-        /// @param ty : integer
-        /// @param unitSize : integer?
+        /// @param tx integer
+        /// @param ty integer
+        /// @param unitSize integer?
         /// @return nil
         methods.add_method(
             "calculate",
@@ -598,8 +598,8 @@ impl LuaUserData for LuaFlowField {
 
         // -- calculateMulti --
         /// Computes the flow field toward multiple targets (1-based coordinates).
-        /// @param targets : table
-        /// @param unitSize : integer?
+        /// @param targets table
+        /// @param unitSize integer?
         /// @return nil
         methods.add_method(
             "calculateMulti",
@@ -620,8 +620,8 @@ impl LuaUserData for LuaFlowField {
 
         // -- getDirection --
         /// Returns the normalised direction vector at a cell (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return number, number
         methods.add_method("getDirection", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_direction(x - 1, y - 1))
@@ -629,8 +629,8 @@ impl LuaUserData for LuaFlowField {
 
         // -- getDirectionAngle --
         /// Returns the flow direction as an angle in radians (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return number
         methods.add_method("getDirectionAngle", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_direction_angle(x - 1, y - 1))
@@ -638,8 +638,8 @@ impl LuaUserData for LuaFlowField {
 
         // -- getCostToTarget --
         /// Returns the integrated cost to the nearest target (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return number
         methods.add_method("getCostToTarget", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_cost_to_target(x - 1, y - 1))
@@ -669,11 +669,11 @@ impl LuaUserData for LuaFlowField {
 
         // -- steer --
         /// Converts a world-space position into a velocity vector via the flow field.
-        /// @param wx : number
-        /// @param wy : number
-        /// @param speed : number
-        /// @param tw : number
-        /// @param th : number
+        /// @param wx number
+        /// @param wy number
+        /// @param speed number
+        /// @param tw number
+        /// @param th number
         /// @return number, number
         methods.add_method(
             "steer",
@@ -689,7 +689,7 @@ impl LuaUserData for LuaFlowField {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "FlowField" || name == "Object")
@@ -731,9 +731,9 @@ impl LuaUserData for LuaPathGrid {
 
         // -- setWalkable --
         /// Sets the walkability of a cell (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param walkable : boolean
+        /// @param x integer
+        /// @param y integer
+        /// @param walkable boolean
         /// @return nil
         methods.add_method("setWalkable", |_, this, (x, y, w): (usize, usize, bool)| {
             this.inner.borrow_mut().set_walkable(x - 1, y - 1, w);
@@ -742,8 +742,8 @@ impl LuaUserData for LuaPathGrid {
 
         // -- isWalkable --
         /// Returns true if a cell is walkable (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return boolean
         methods.add_method("isWalkable", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().is_walkable(x - 1, y - 1))
@@ -751,9 +751,9 @@ impl LuaUserData for LuaPathGrid {
 
         // -- setCost --
         /// Sets the cost multiplier for a cell (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param cost : number
+        /// @param x integer
+        /// @param y integer
+        /// @param cost number
         /// @return nil
         methods.add_method("setCost", |_, this, (x, y, cost): (usize, usize, f32)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
@@ -762,8 +762,8 @@ impl LuaUserData for LuaPathGrid {
 
         // -- getCost --
         /// Returns the cost multiplier for a cell (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return number
         methods.add_method("getCost", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().get_cost(x - 1, y - 1))
@@ -771,10 +771,10 @@ impl LuaUserData for LuaPathGrid {
 
         // -- findPath --
         /// Finds an A★ path returning world-space waypoints (1-based coordinates).
-        /// @param sx : integer
-        /// @param sy : integer
-        /// @param gx : integer
-        /// @param gy : integer
+        /// @param sx integer
+        /// @param sy integer
+        /// @param gx integer
+        /// @param gy integer
         /// @return table?
         methods.add_method(
             "findPath",
@@ -801,10 +801,10 @@ impl LuaUserData for LuaPathGrid {
 
         // -- findPathSmoothed --
         /// Finds a smoothed A★ path with string-pulling (1-based coordinates).
-        /// @param sx : integer
-        /// @param sy : integer
-        /// @param gx : integer
-        /// @param gy : integer
+        /// @param sx integer
+        /// @param sy integer
+        /// @param gx integer
+        /// @param gy integer
         /// @return table?
         methods.add_method(
             "findPathSmoothed",
@@ -836,7 +836,7 @@ impl LuaUserData for LuaPathGrid {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "PathGrid" || name == "Object")
@@ -878,8 +878,8 @@ impl LuaUserData for LuaAiFlowField {
 
         // -- setGoal --
         /// Sets the goal cell and triggers BFS recomputation (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return nil
         methods.add_method("setGoal", |_, this, (x, y): (usize, usize)| {
             this.inner.borrow_mut().set_goal(x - 1, y - 1);
@@ -905,8 +905,8 @@ impl LuaUserData for LuaAiFlowField {
 
         // -- getDirection --
         /// Returns the normalised direction toward the goal (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return number, number
         methods.add_method("getDirection", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().get_direction(x - 1, y - 1))
@@ -914,8 +914,8 @@ impl LuaUserData for LuaAiFlowField {
 
         // -- getDistance --
         /// Returns the BFS distance to the goal (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return number
         methods.add_method("getDistance", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().get_distance(x - 1, y - 1))
@@ -928,7 +928,7 @@ impl LuaUserData for LuaAiFlowField {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "FlowField" || name == "Object")
@@ -949,9 +949,9 @@ impl LuaUserData for LuaHexGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- setBlocked --
         /// Mark/unmark a cell as blocked (1-based coordinates).
-        /// @param col : integer
-        /// @param row : integer
-        /// @param blocked : boolean
+        /// @param col integer
+        /// @param row integer
+        /// @param blocked boolean
         /// @return nil
         methods.add_method_mut(
             "setBlocked",
@@ -965,9 +965,9 @@ impl LuaUserData for LuaHexGrid {
 
         // -- setCost --
         /// Set movement cost for a cell (1-based coordinates).
-        /// @param col : integer
-        /// @param row : integer
-        /// @param cost : number
+        /// @param col integer
+        /// @param row integer
+        /// @param cost number
         /// @return nil
         methods.add_method_mut("setCost", |_, this, (col, row, cost): (u32, u32, f32)| {
             this.inner.borrow_mut().set_cost(col - 1, row - 1, cost);
@@ -976,8 +976,8 @@ impl LuaUserData for LuaHexGrid {
 
         // -- isBlocked --
         /// Returns true if a cell is blocked (1-based coordinates).
-        /// @param col : integer
-        /// @param row : integer
+        /// @param col integer
+        /// @param row integer
         /// @return boolean
         methods.add_method("isBlocked", |_, this, (col, row): (u32, u32)| {
             Ok(this.inner.borrow().is_blocked(col - 1, row - 1))
@@ -985,10 +985,10 @@ impl LuaUserData for LuaHexGrid {
 
         // -- findPath --
         /// Find A* path between two cells (1-based coordinates).
-        /// @param from_col : integer
-        /// @param from_row : integer
-        /// @param to_col : integer
-        /// @param to_row : integer
+        /// @param from_col integer
+        /// @param from_row integer
+        /// @param to_col integer
+        /// @param to_row integer
         /// @return table?
         methods.add_method(
             "findPath",
@@ -1013,10 +1013,10 @@ impl LuaUserData for LuaHexGrid {
 
         // -- lineOfSight --
         /// Returns true if there is an unobstructed line between two cells (1-based).
-        /// @param from_col : integer
-        /// @param from_row : integer
-        /// @param to_col : integer
-        /// @param to_row : integer
+        /// @param from_col integer
+        /// @param from_row integer
+        /// @param to_col integer
+        /// @param to_row integer
         /// @return boolean
         methods.add_method(
             "lineOfSight",
@@ -1030,9 +1030,9 @@ impl LuaUserData for LuaHexGrid {
 
         // -- fieldOfView --
         /// Returns all cells visible from origin within max_range (1-based coordinates).
-        /// @param col : integer
-        /// @param row : integer
-        /// @param max_range : integer
+        /// @param col integer
+        /// @param row integer
+        /// @param max_range integer
         /// @return table
         methods.add_method(
             "fieldOfView",
@@ -1054,9 +1054,9 @@ impl LuaUserData for LuaHexGrid {
 
         // -- rangeOfMovement --
         /// Returns all cells reachable from origin within movement budget (1-based).
-        /// @param col : integer
-        /// @param row : integer
-        /// @param budget : number
+        /// @param col integer
+        /// @param row integer
+        /// @param budget number
         /// @return table
         methods.add_method(
             "rangeOfMovement",
@@ -1078,10 +1078,10 @@ impl LuaUserData for LuaHexGrid {
 
         // -- distance --
         /// Hex-distance between two cells.
-        /// @param col1 : integer
-        /// @param row1 : integer
-        /// @param col2 : integer
-        /// @param row2 : integer
+        /// @param col1 integer
+        /// @param row1 integer
+        /// @param col2 integer
+        /// @param row2 integer
         /// @return integer
         methods.add_method(
             "distance",
@@ -1108,9 +1108,9 @@ impl LuaUserData for LuaJpsGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- setBlocked --
         /// Mark/unmark a cell as blocked (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
-        /// @param blocked : boolean
+        /// @param x integer
+        /// @param y integer
+        /// @param blocked boolean
         /// @return nil
         methods.add_method_mut(
             "setBlocked",
@@ -1122,8 +1122,8 @@ impl LuaUserData for LuaJpsGrid {
 
         // -- isBlocked --
         /// Returns true if the cell is blocked (1-based coordinates).
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return boolean
         methods.add_method("isBlocked", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().is_blocked(x - 1, y - 1))
@@ -1131,10 +1131,10 @@ impl LuaUserData for LuaJpsGrid {
 
         // -- findPath --
         /// Find a JPS path between two cells (1-based coordinates).
-        /// @param from_x : integer
-        /// @param from_y : integer
-        /// @param to_x : integer
-        /// @param to_y : integer
+        /// @param from_x integer
+        /// @param from_y integer
+        /// @param to_x integer
+        /// @param to_y integer
         /// @return table?
         methods.add_method(
             "findPath",
@@ -1165,17 +1165,17 @@ impl LuaUserData for LuaJpsGrid {
 
 /// Registers the `lurek.pathfind` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- newNavGrid --
     /// Creates a new NavGrid with all cells walkable.
-    /// @param width : integer
-    /// @param height : integer
+    /// @param width integer
+    /// @param height integer
     /// @return NavGrid
     tbl.set(
         "newNavGrid",
@@ -1189,7 +1189,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newPathfinder --
     /// Creates a new UnitPathfinder backed by a NavGrid.
-    /// @param grid : NavGrid
+    /// @param grid NavGrid
     /// @return UnitPathfinder
     tbl.set(
         "newPathfinder",
@@ -1203,7 +1203,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newFlowField --
     /// Creates a new FlowField backed by a NavGrid.
-    /// @param grid : NavGrid
+    /// @param grid NavGrid
     /// @return FlowField
     tbl.set(
         "newFlowField",
@@ -1217,9 +1217,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newPathGrid --
     /// Creates a new PathGrid with per-cell cost and walkability.
-    /// @param w : integer
-    /// @param h : integer
-    /// @param cellSize : number
+    /// @param w integer
+    /// @param h integer
+    /// @param cellSize number
     /// @return PathGrid
     tbl.set(
         "newPathGrid",
@@ -1232,7 +1232,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newPathFlowField --
     /// Creates a new BFS flow field from a PathGrid.
-    /// @param grid : PathGrid
+    /// @param grid PathGrid
     /// @return AiFlowField
     tbl.set(
         "newPathFlowField",
@@ -1251,7 +1251,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- setThreadCount --
     /// Sets the background pathfinding thread count (currently a no-op).
-    /// @param count : integer
+    /// @param count integer
     /// @return nil
     tbl.set(
         "setThreadCount",
@@ -1276,9 +1276,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Tiles whose GID appears in `blocked_gids` get cost 0 (unwalkable);
     /// all other tiles get cost 1.
     ///
-    /// @param tilemap     : TileMap  source tilemap
-    /// @param layer_index : integer  1-based layer index
-    /// @param blocked_gids: table    list of GID integers that are impassable
+    /// @param tilemap TileMap  source tilemap
+    /// @param layer_index integer  1-based layer index
+    /// @param blocked_gids table    list of GID integers that are impassable
     /// @return NavGrid
     tbl.set(
         "newNavGridFromTileMap",
@@ -1317,9 +1317,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newHexGrid --
     /// Creates a hex grid for pathfinding, LOS, FOV, and range queries.
-    /// @param width : integer
-    /// @param height : integer
-    /// @param layout : string?  "flat" | "pointy"  (default "flat")
+    /// @param width integer
+    /// @param height integer
+    /// @param layout string?  "flat" | "pointy"  (default "flat")
     /// @return HexGrid
     tbl.set(
         "newHexGrid",
@@ -1338,8 +1338,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newJpsGrid --
     /// Creates a uniform-cost grid optimised for Jump Point Search (orthogonal + diagonal).
-    /// @param width : integer
-    /// @param height : integer
+    /// @param width integer
+    /// @param height integer
     /// @return JpsGrid
     tbl.set(
         "newJpsGrid",
@@ -1353,7 +1353,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- rangeMap --
     /// Computes a Dijkstra range-of-movement map from an origin within a movement budget.
     /// @return table
-    /// @param opts : table  {width, height, costs, blocked, origin_x, origin_y, budget, diagonal?}
+    /// @param opts table  {width, height, costs, blocked, origin_x, origin_y, budget, diagonal?}
     /// table  {cells = [{x, y, cost},...], width, height}
     tbl.set(
         "rangeMap",

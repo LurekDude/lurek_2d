@@ -66,7 +66,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // -- setEnabled --
         /// Enables or disables this effect.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setEnabled", |_, this, enabled: bool| {
             this.inner.borrow_mut().enabled = enabled;
@@ -75,8 +75,8 @@ impl LuaUserData for LuaPostFxEffect {
 
         // -- setParameter --
         /// Sets a named float parameter on this effect.
-        /// @param name : string
-        /// @param value : number
+        /// @param name string
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setParameter", |_, this, (name, value): (String, f32)| {
             this.inner.borrow_mut().set_parameter(name, value);
@@ -85,8 +85,8 @@ impl LuaUserData for LuaPostFxEffect {
 
         // -- getParameter --
         /// Returns a named parameter value, or the default if not set.
-        /// @param name : string
-        /// @param default : number
+        /// @param name string
+        /// @param default number
         /// @return number
         methods.add_method(
             "getParameter",
@@ -100,7 +100,7 @@ impl LuaUserData for LuaPostFxEffect {
 
         // -- hasParameter --
         /// Returns true if the named parameter exists on this effect.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("hasParameter", |_, this, name: String| {
             Ok(this.inner.borrow().has_parameter(&name))
@@ -132,7 +132,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// @return string
         methods.add_method("type", |_, _, ()| Ok("PostFxEffect"));
         /// Returns true when the given name matches "PostFxEffect" or a parent type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "PostFxEffect" || name == "Object")
@@ -140,35 +140,35 @@ impl LuaUserData for LuaPostFxEffect {
 
         // -- convenience setters --
         /// Sets the threshold parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setThreshold", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("threshold", v);
             Ok(())
         });
         /// Sets the intensity parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setIntensity", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("intensity", v);
             Ok(())
         });
         /// Sets the radius parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setRadius", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("radius", v);
             Ok(())
         });
         /// Sets the strength parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setStrength", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("strength", v);
             Ok(())
         });
         /// Sets the scanline strength parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setScanlineStrength", |_, this, v: f32| {
             this.inner
@@ -177,28 +177,28 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(())
         });
         /// Sets the offset parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setOffset", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("offset", v);
             Ok(())
         });
         /// Sets the brightness parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setBrightness", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("brightness", v);
             Ok(())
         });
         /// Sets the contrast parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setContrast", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("contrast", v);
             Ok(())
         });
         /// Sets the saturation parameter of this effect.
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setSaturation", |_, this, v: f32| {
             this.inner.borrow_mut().set_parameter("saturation", v);
@@ -254,7 +254,7 @@ impl LuaUserData for LuaPostFxStack {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- add --
         /// Appends a PostFxEffect to the end of the pipeline.
-        /// @param effect : PostFxEffect
+        /// @param effect PostFxEffect
         /// @return nil
         methods.add_method_mut("add", |_, this, effect_ud: LuaAnyUserData| {
             let effect = effect_ud.borrow::<LuaPostFxEffect>()?;
@@ -266,7 +266,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // -- remove --
         /// Removes the given PostFxEffect from the pipeline.
-        /// @param effect : PostFxEffect
+        /// @param effect PostFxEffect
         /// @return boolean
         methods.add_method_mut("remove", |_, this, effect_ud: LuaAnyUserData| {
             let effect = effect_ud.borrow::<LuaPostFxEffect>()?;
@@ -286,8 +286,8 @@ impl LuaUserData for LuaPostFxStack {
 
         // -- insert --
         /// Inserts a PostFxEffect at a specific 1-based position in the pipeline.
-        /// @param position : integer
-        /// @param effect : PostFxEffect
+        /// @param position integer
+        /// @param effect PostFxEffect
         /// @return nil
         methods.add_method_mut(
             "insert",
@@ -304,8 +304,8 @@ impl LuaUserData for LuaPostFxStack {
 
         // -- setEnabled --
         /// Enables or disables the effect at the given 1-based position.
-        /// @param position : integer
-        /// @param enabled : boolean
+        /// @param position integer
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut(
             "setEnabled",
@@ -320,7 +320,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // -- isEnabled --
         /// Returns whether the effect at the given 1-based position is enabled.
-        /// @param position : integer
+        /// @param position integer
         /// @return boolean
         methods.add_method("isEnabled", |_, this, position: usize| {
             let idx = position.saturating_sub(1);
@@ -334,7 +334,7 @@ impl LuaUserData for LuaPostFxStack {
 
         // -- getEffect --
         /// Returns the effect at the given 1-based position, or nil.
-        /// @param index : integer
+        /// @param index integer
         /// @return nil
         /// PostFxEffect?
         methods.add_method("getEffect", |lua, this, index: usize| {
@@ -384,8 +384,8 @@ impl LuaUserData for LuaPostFxStack {
 
         // -- resize --
         /// Resizes the render target to the given dimensions.
-        /// @param width : integer
-        /// @param height : integer
+        /// @param width integer
+        /// @param height integer
         /// @return nil
         methods.add_method_mut("resize", |_, this, (w, h): (u32, u32)| {
             this.inner.resize(w, h);
@@ -528,7 +528,7 @@ impl LuaUserData for LuaPostFxStack {
         methods.add_method("type", |_, _, ()| Ok("PostFxStack"));
         // -- typeOf --
         /// Returns true when the given name matches "PostFxStack" or a parent type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "PostFxStack" || name == "Object")
@@ -539,7 +539,7 @@ impl LuaUserData for LuaPostFxStack {
         /// feedback; at `1.0` the previous frame is fully preserved before
         /// post-processing, creating motion-trail / phosphor-persistence effects.
         /// Clamped to `[0.0, 1.0]`.
-        /// @param factor : number
+        /// @param factor number
         /// @return nil
         methods.add_method_mut("setFeedback", |_, this, factor: f32| {
             this.feedback_factor = factor.clamp(0.0, 1.0);
@@ -574,7 +574,7 @@ impl LuaUserData for LuaImageEffect {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addEffect --
         /// Creates a new effect by type name, appends it, and returns the shared PostFxEffect.
-        /// @param name : string
+        /// @param name string
         /// @return PostFxEffect
         methods.add_method_mut("addEffect", |lua, this, name: String| {
             let et = PostFxEffectType::from_name(&name)
@@ -586,7 +586,7 @@ impl LuaUserData for LuaImageEffect {
 
         // -- getEffect --
         /// Returns the effect at the given 1-based index or with the given type name.
-        /// @param key : integer|string
+        /// @param key integer|string
         /// @return nil
         /// PostFxEffect|nil
         methods.add_method("getEffect", |lua, this, key: LuaValue| {
@@ -610,7 +610,7 @@ impl LuaUserData for LuaImageEffect {
 
         // -- removeEffect --
         /// Removes the effect at the given 1-based index or with the given type name.
-        /// @param key : integer|string
+        /// @param key integer|string
         /// @return boolean
         methods.add_method_mut("removeEffect", |_, this, key: LuaValue| match &key {
             LuaValue::Integer(i) => Ok(this.inner.remove_by_index((*i as usize).saturating_sub(1))),
@@ -672,7 +672,7 @@ impl LuaUserData for LuaImageEffect {
         methods.add_method("type", |_, _, ()| Ok("ImageEffect"));
         // -- typeOf --
         /// Returns true when the given name matches "ImageEffect" or a parent type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ImageEffect" || name == "Object")
@@ -682,7 +682,7 @@ impl LuaUserData for LuaImageEffect {
 
         // -- removeByIndex --
         /// Removes the effect at the given 0-based index from the chain.
-        /// @param idx : integer
+        /// @param idx integer
         /// @return boolean
         methods.add_method_mut("removeByIndex", |_, this, idx: usize| {
             Ok(this.inner.remove_by_index(idx))
@@ -690,7 +690,7 @@ impl LuaUserData for LuaImageEffect {
 
         // -- removeByName --
         /// Removes the first effect matching the given type name.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method_mut("removeByName", |_, this, name: String| {
             Ok(this.inner.remove_by_name(&name))
@@ -712,7 +712,7 @@ impl LuaUserData for LuaOverlay {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- update --
         /// Advances all effect subsystems by the given delta time.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.update(dt);
@@ -721,11 +721,11 @@ impl LuaUserData for LuaOverlay {
 
         // -- triggerFlash --
         /// Triggers a screen-wide colour flash effect.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number
-        /// @param duration : number
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param a number
+        /// @param duration number
         /// @return nil
         methods.add_method_mut(
             "triggerFlash",
@@ -737,8 +737,8 @@ impl LuaUserData for LuaOverlay {
 
         // -- triggerShake --
         /// Triggers a screen shake effect with the given intensity and duration.
-        /// @param intensity : number
-        /// @param duration : number
+        /// @param intensity number
+        /// @param duration number
         /// @return nil
         methods.add_method_mut(
             "triggerShake",
@@ -750,11 +750,11 @@ impl LuaUserData for LuaOverlay {
 
         // -- triggerFade --
         /// Triggers a screen fade effect to the given colour and alpha.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param target_alpha : number
-        /// @param duration : number
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param target_alpha number
+        /// @param duration number
         /// @return nil
         methods.add_method_mut(
             "triggerFade",
@@ -794,8 +794,8 @@ impl LuaUserData for LuaOverlay {
 
         // -- resize --
         /// Resizes the effect to match new window dimensions.
-        /// @param width : integer
-        /// @param height : integer
+        /// @param width integer
+        /// @param height integer
         /// @return nil
         methods.add_method_mut("resize", |_, this, (w, h): (u32, u32)| {
             this.inner.resize(w, h);
@@ -837,7 +837,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setAmbientEnabled --
         /// Enables or disables the ambient light layer.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setAmbientEnabled", |_, this, v: bool| {
             this.inner.ambient.enabled = v;
@@ -853,10 +853,10 @@ impl LuaUserData for LuaOverlay {
 
         // -- setAmbientColor --
         /// Sets the ambient light tint colour; alpha defaults to 1.0.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param a number
         /// @return nil
         methods.add_method_mut(
             "setAmbientColor",
@@ -876,7 +876,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setTimeOfDay --
         /// Sets the simulated time-of-day (0â€“24) which drives ambient colour.
-        /// @param hour : number
+        /// @param hour number
         /// @return nil
         methods.add_method_mut("setTimeOfDay", |_, this, v: f32| {
             this.inner.ambient.time_of_day = v;
@@ -894,7 +894,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setFogEnabled --
         /// Enables or disables the fog layer.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setFogEnabled", |_, this, v: bool| {
             this.inner.fog.enabled = v;
@@ -908,7 +908,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setFogDensity --
         /// Sets the fog density (0.0 = clear, 1.0 = fully opaque).
-        /// @param density : number
+        /// @param density number
         /// @return nil
         methods.add_method_mut("setFogDensity", |_, this, v: f32| {
             this.inner.fog.density = v;
@@ -922,10 +922,10 @@ impl LuaUserData for LuaOverlay {
 
         // -- setFogColor --
         /// Sets the fog tint colour; alpha defaults to 1.0.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param a number
         /// @return nil
         methods.add_method_mut(
             "setFogColor",
@@ -947,7 +947,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setHeatHazeEnabled --
         /// Enables or disables the heat-haze distortion layer.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setHeatHazeEnabled", |_, this, v: bool| {
             this.inner.heat_haze.enabled = v;
@@ -963,7 +963,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setHeatHazeIntensity --
         /// Sets the heat-haze distortion intensity (0.0â€“1.0).
-        /// @param intensity : number
+        /// @param intensity number
         /// @return nil
         methods.add_method_mut("setHeatHazeIntensity", |_, this, v: f32| {
             this.inner.heat_haze.intensity = v;
@@ -981,7 +981,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setVignetteEnabled --
         /// Enables or disables the screen-edge vignette layer.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setVignetteEnabled", |_, this, v: bool| {
             this.inner.vignette.enabled = v;
@@ -997,7 +997,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setVignetteStrength --
         /// Sets the vignette darkening strength (0.0â€“1.0).
-        /// @param strength : number
+        /// @param strength number
         /// @return nil
         methods.add_method_mut("setVignetteStrength", |_, this, v: f32| {
             this.inner.vignette.strength = v;
@@ -1015,7 +1015,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setFilmGrainEnabled --
         /// Enables or disables the film-grain noise layer.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setFilmGrainEnabled", |_, this, v: bool| {
             this.inner.film_grain.enabled = v;
@@ -1031,7 +1031,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setFilmGrainIntensity --
         /// Sets the film-grain noise intensity (0.0â€“1.0).
-        /// @param intensity : number
+        /// @param intensity number
         /// @return nil
         methods.add_method_mut("setFilmGrainIntensity", |_, this, v: f32| {
             this.inner.film_grain.intensity = v;
@@ -1049,7 +1049,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setCloudShadows --
         /// Enables or disables scrolling cloud-shadow projection.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setCloudShadows", |_, this, v: bool| {
             this.inner.clouds.enabled = v;
@@ -1065,7 +1065,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setCloudCount --
         /// Sets the number of cloud shadow instances to render.
-        /// @param count : integer
+        /// @param count integer
         /// @return nil
         methods.add_method_mut("setCloudCount", |_, this, v: u32| {
             this.inner.clouds.count = v;
@@ -1079,7 +1079,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setCloudSpeed --
         /// Sets the horizontal scroll speed of cloud shadows in pixels per second.
-        /// @param speed : number
+        /// @param speed number
         /// @return nil
         methods.add_method_mut("setCloudSpeed", |_, this, v: f32| {
             this.inner.clouds.speed = v;
@@ -1093,7 +1093,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setCloudScale --
         /// Sets the scale multiplier applied to each cloud shadow.
-        /// @param scale : number
+        /// @param scale number
         /// @return nil
         methods.add_method_mut("setCloudScale", |_, this, v: f32| {
             this.inner.clouds.scale = v;
@@ -1107,7 +1107,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setCloudOpacity --
         /// Sets the opacity of cloud shadows (0.0 = invisible, 1.0 = fully dark).
-        /// @param opacity : number
+        /// @param opacity number
         /// @return nil
         methods.add_method_mut("setCloudOpacity", |_, this, v: f32| {
             this.inner.clouds.opacity = v;
@@ -1125,7 +1125,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setWeatherEnabled --
         /// Enables or disables the weather particle system.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("setWeatherEnabled", |_, this, v: bool| {
             this.inner.weather.enabled = v;
@@ -1141,7 +1141,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setWeather --
         /// Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen").
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method_mut("setWeather", |_, this, name: String| {
             this.inner.weather.weather_type = WeatherType::from_name(&name)
@@ -1158,7 +1158,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setWeatherIntensity --
         /// Sets the particle spawn rate multiplier (0.0â€“1.0).
-        /// @param intensity : number
+        /// @param intensity number
         /// @return nil
         methods.add_method_mut("setWeatherIntensity", |_, this, v: f32| {
             this.inner.weather.intensity = v;
@@ -1174,7 +1174,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setWindDirection --
         /// Sets the wind direction in radians (0 = right, Ď€/2 = down).
-        /// @param radians : number
+        /// @param radians number
         /// @return nil
         methods.add_method_mut("setWindDirection", |_, this, v: f32| {
             this.inner.weather.wind_direction = v;
@@ -1190,7 +1190,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- setWindSpeed --
         /// Sets the wind speed applied to weather particles in units per second.
-        /// @param speed : number
+        /// @param speed number
         /// @return nil
         methods.add_method_mut("setWindSpeed", |_, this, v: f32| {
             this.inner.weather.wind_speed = v;
@@ -1208,10 +1208,10 @@ impl LuaUserData for LuaOverlay {
 
         // -- setLightningColor --
         /// Sets the lightning flash tint colour; alpha defaults to 1.0.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param a number
         /// @return nil
         methods.add_method_mut(
             "setLightningColor",
@@ -1233,11 +1233,11 @@ impl LuaUserData for LuaOverlay {
 
         // -- flash --
         /// Triggers a full-screen colour flash; alpha defaults to 1.0, duration to 0.2 s.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param a : number
-        /// @param duration : number
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param a number
+        /// @param duration number
         /// @return nil
         methods.add_method_mut(
             "flash",
@@ -1255,8 +1255,8 @@ impl LuaUserData for LuaOverlay {
 
         // -- shake --
         /// Triggers a camera shake; duration defaults to 0.5 s.
-        /// @param intensity : number
-        /// @param duration : number
+        /// @param intensity number
+        /// @param duration number
         /// @return nil
         methods.add_method_mut("shake", |_, this, (intensity, dur): (f32, Option<f32>)| {
             this.inner.trigger_shake(intensity, dur.unwrap_or(0.5));
@@ -1270,11 +1270,11 @@ impl LuaUserData for LuaOverlay {
 
         // -- fade --
         /// Animates a full-screen colour fade; alpha defaults to 1.0, duration to 1.0 s.
-        /// @param r : number
-        /// @param g : number
-        /// @param b : number
-        /// @param alpha : number
-        /// @param duration : number
+        /// @param r number
+        /// @param g number
+        /// @param b number
+        /// @param alpha number
+        /// @param duration number
         /// @return nil
         methods.add_method_mut(
             "fade",
@@ -1308,8 +1308,8 @@ impl LuaUserData for LuaOverlay {
 
         // -- drawToImage --
         /// Renders the effect state (flash, fade, effects) to a CPU ImageData.
-        /// @param width : integer
-        /// @param height : integer
+        /// @param width integer
+        /// @param height integer
         /// @return ImageData
         methods.add_method("drawToImage", |_, this, (w, h): (u32, u32)| {
             let img = this.inner.draw_state_to_image(w, h);
@@ -1319,9 +1319,9 @@ impl LuaUserData for LuaOverlay {
         // -- setWater --
         /// Enables the water UV-distortion overlay and sets its wave parameters.
         ///
-        /// @param amplitude : number  â€” Wave displacement intensity (default 0.02).
-        /// @param frequency : number  â€” Wave spatial frequency in cycles/unit (default 3.0).
-        /// @param speed : number      â€” Wave animation speed in cycles/second (default 1.0).
+        /// @param amplitude number  â€” Wave displacement intensity (default 0.02).
+        /// @param frequency number  â€” Wave spatial frequency in cycles/unit (default 3.0).
+        /// @param speed number      â€” Wave animation speed in cycles/second (default 1.0).
         /// @return nil
         methods.add_method_mut(
             "setWater",
@@ -1337,10 +1337,10 @@ impl LuaUserData for LuaOverlay {
         // -- setWaterTint --
         /// Sets the water tint colour and blend strength.
         ///
-        /// @param r : number       â€” Red channel [0.0, 1.0].
-        /// @param g : number       â€” Green channel [0.0, 1.0].
-        /// @param b : number       â€” Blue channel [0.0, 1.0].
-        /// @param strength : number â€” Tint blend factor [0.0, 1.0].
+        /// @param r number       â€” Red channel [0.0, 1.0].
+        /// @param g number       â€” Green channel [0.0, 1.0].
+        /// @param b number       â€” Blue channel [0.0, 1.0].
+        /// @param strength number â€” Tint blend factor [0.0, 1.0].
         /// @return nil
         methods.add_method_mut(
             "setWaterTint",
@@ -1356,7 +1356,7 @@ impl LuaUserData for LuaOverlay {
         // -- setCustomShader --
         /// Assigns a custom shader name to the effect, or clears it when `nil` is passed.
         ///
-        /// @param name : string?  â€” Shader name registered via `lurek.render`, or nil to clear.
+        /// @param name string?  â€” Shader name registered via `lurek.render`, or nil to clear.
         /// @return nil
         methods.add_method_mut("setCustomShader", |_, this, name: Option<String>| {
             this.inner.custom_shader = name;
@@ -1396,7 +1396,7 @@ impl LuaUserData for LuaOverlay {
 
         // -- typeOf --
         /// Returns true if this object is of the given type ("Object" or "Overlay").
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _this, name: String| {
             Ok(name == "Object" || name == "Overlay")
@@ -1408,12 +1408,11 @@ impl LuaUserData for LuaOverlay {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.effect` API table with the Lua VM.
-///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
-///
+// Registers the `lurek.effect` API table with the Lua VM.
+//
+// @param lua &Lua
+// @param lurek &LuaTable
+// @param state Rc<RefCell<SharedState>>
 
 // â”€â”€ LuaScreenTransition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -1445,7 +1444,7 @@ impl mlua::UserData for LuaScreenTransition {
         // -- update --
         /// Advances the transition by `dt` seconds. Returns `true` while
         /// still running.
-        /// @param dt : number
+        /// @param dt number
         /// @return boolean
         methods.add_method_mut("update", |_, this, dt: f32| Ok(this.inner.update(dt)));
 
@@ -1481,7 +1480,7 @@ impl mlua::UserData for LuaScreenTransition {
 
         // -- setColor --
         /// Updates the fill color from `{r, g, b, a?}`.
-        /// @param color : table
+        /// @param color table
         /// @return nil
         methods.add_method_mut("setColor", |_, this, ct: mlua::Table| {
             this.inner.color = [
@@ -1499,7 +1498,7 @@ impl mlua::UserData for LuaScreenTransition {
         methods.add_method("type", |_, _, ()| Ok("ScreenTransition"));
         /// Type of.
         ///
-        /// @param name : string
+        /// @param name string
         /// @return table|nil
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ScreenTransition" || name == "Object")
@@ -1513,7 +1512,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newEffect --
     /// Creates a new built-in post-processing effect by type name.
-    /// @param type_name : string
+    /// @param type_name string
     /// @return PostFxEffect
     tbl.set(
         "newEffect",
@@ -1527,7 +1526,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newCustomEffect --
     /// Creates a custom shader post-processing effect.
-    /// @param shader_id : integer
+    /// @param shader_id integer
     /// @return PostFxEffect
     tbl.set(
         "newCustomEffect",
@@ -1541,8 +1540,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- newStack --
     /// Creates a new post-processing pipeline stack.
     /// Width and height default to the window dimensions when omitted.
-    /// @param width : integer?
-    /// @param height : integer?
+    /// @param width integer?
+    /// @param height integer?
     /// @return PostFxStack
     let s = state.clone();
     tbl.set(
@@ -1570,9 +1569,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Available presets: `"retro_tv"`, `"horror"`, `"dream"`, `"neon"`, `"sepia_age"`.
     /// Width and height default to window dimensions when omitted.
     ///
-    /// @param name : string
-    /// @param width : integer?
-    /// @param height : integer?
+    /// @param name string
+    /// @param width integer?
+    /// @param height integer?
     /// @return PostFxStack
     let s = state.clone();
     tbl.set(
@@ -1605,7 +1604,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newPass --
     /// Creates a custom-shader post-processing effect (alias for newCustomEffect).
-    /// @param shader_id : integer
+    /// @param shader_id integer
     /// @return PostFxEffect
     tbl.set(
         "newPass",
@@ -1652,7 +1651,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newImageEffect --
     /// Creates a new per-image effect chain. Accepts:
-    /// @param args : MultiValue
+    /// @param args MultiValue
     ///   - no args  â†’ empty chain
     ///   - "name"   â†’ single effect
     ///   - "name", {params}  â†’ single effect with parameters
@@ -1712,8 +1711,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newOverlay --
     /// Creates a new screen overlay controller for weather, flash, shake, and fade effects.
-    /// @param width : integer
-    /// @param height : integer
+    /// @param width integer
+    /// @param height integer
     /// @return Overlay
     let s = state.clone();
     tbl.set(
@@ -1735,9 +1734,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// `"fade"` (default), `"wipe"`, `"iris"`, `"dissolve"`. `duration` is
     /// in seconds. Optional `color` table `{r, g, b, a?}` sets the fill color
     /// (default black).
-    /// @param kind     : string?
-    /// @param duration : number?
-    /// @param color    : table?  â€” `{r, g, b, a?}` in 0..1
+    /// @param kind string?
+    /// @param duration number?
+    /// @param color table?  â€” `{r, g, b, a?}` in 0..1
     /// @return ScreenTransition
     tbl.set(
         "newTransition",
@@ -1769,7 +1768,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let sed = shader_err_display.clone();
     /// Enables or disables the effect that renders shader compile errors as red text
     /// in the top-left corner of the screen.  Intended for dev builds only.
-    /// @param enabled : boolean
+    /// @param enabled boolean
     /// @return nil
     tbl.set(
         "setShaderErrorDisplay",

@@ -150,6 +150,18 @@ def convert(data: dict, verbose: bool = False) -> dict:
             else:
                 functions.append(fn)
 
+        # Also extract methods from the classes dict (lua_api_data.json stores methods
+        # under mod_data["classes"][ClassName]["methods"], not in mod_data["functions"]).
+        for class_name, class_data in mod_data.get("classes", {}).items():
+            cls_desc = class_data.get("description", "")
+            if class_name not in classes_out:
+                classes_out[class_name] = {"name": class_name, "description": cls_desc, "methods": []}
+            elif cls_desc and not classes_out[class_name]["description"]:
+                classes_out[class_name]["description"] = cls_desc
+            for raw_method in class_data.get("methods", []):
+                fn = _convert_function(raw_method)
+                classes_out[class_name]["methods"].append(fn)
+
         modules_out.append({
             "name": mod_name,
             "description": mod_data.get("description", ""),

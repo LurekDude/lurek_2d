@@ -1,0 +1,50 @@
+﻿cargo :    Compiling lurek2d v0.20.0 (C:\Users\tombl\Documents\luna2d)
+At line:1 char:1
++ cargo test --test examples_load_test 2>&1 | Out-File -FilePath test_o ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling lu...cuments\luna2d) 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.77s
+     Running tests\examples_load_test.rs (build\debug\deps\examples_load_test-7
+3d05f11f8d8788c.exe)
+
+running 1 test
+[warn] player hp 12/100  (?:0)
+[debug] verbose traces enabled  (?:0)
+[debug] verbose path active (level=debug)  (?:0)
+[info] console logging on; ready for live debugging  (?:0)
+[debug] world tick: entities=128  (?:0)
+[info] session log file opened  (?:0)
+[info] loaded forest_01  (?:0)
+[debug] last log: [info] loaded forest_01  (?:0)
+[info] old session noise  (?:0)
+[info] fresh start: level transition complete  (?:0)
+[info] profiler now on  (?:0)
+[debug] latest frame: 16 ms  (?:0)
+[info] frame history sized for approx 10s at 60fps  (?:0)
+[info] frame history capacity = 10000 (clamped from 50000)  (?:0)
+[info] now watching devtools.lua for live reload  (?:0)
+[debug] unwatched: true  (?:0)
+[info] watching 2 path(s)  (?:0)
+[info] watch list cleared (0 remain)  (?:0)
+[info] hot-reload poll @ 0.25s  (?:0)
+[info] eval result = 42  (?:0)
+[info] console flag is now true  (?:0)
+[debug] registered watch ids 1, 2  (?:0)
+[debug] removed watch 3 -> true  (?:0)
+[info] actor/player.x = 256  (?:0)
+[info] combat/player.hp = 80  (?:0)
+[info] hud/score = 1500  (?:0)
+[info] snapshot: fps=61.643835616438 watches=3  (?:0)
+[info] benchmark avg=0.00029999999999995ms over 1 calls  (?:0)
+[info] sim avg=0.00080000000000002ms over 1 calls  (?:0)
+[info] repl said: (ok)  (?:0)
+[debug] watcher cancelled for conf.toml  (?:0)
+[info] > (ok)  (?:0)
+[debug] 1: x = 1  (?:0)
+[debug] 2: return x + 1  (?:0)
+[debug] history len after clear = 0  (?:0)
+[info] REPL has 1 stored line(s)  (?:0)
+test examples_load_all has been running for over 60 seconds

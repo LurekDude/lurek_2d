@@ -25,7 +25,7 @@ end
 -- Use for GPU-ready BCn formats so wgpu can upload without a CPU decode pass.
 do  -- lurek.image.newCompressedData
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
-  if not ok_cd then cd = nil end
+  if not ok_cd then return end
   local mips = (cd and cd:getMipmapCount() or 0)
   lurek.log.info("dds " .. (cd and cd:getFormat() or "unknown") .. " mips=" .. mips, "image")
 end
@@ -106,7 +106,7 @@ end
 -- Use for grand-strategy maps where each unique RGB colour identifies one province.
 do  -- lurek.image.newProvinceGrid
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
-  if not ok_grid then grid = nil end
+  if not ok_grid then return end
   local count = (grid and grid:provinceCount() or 0)
   lurek.log.info("loaded " .. count .. " provinces", "map")
 end
@@ -118,7 +118,7 @@ end
 -- Pair with getHeight() to clamp mouse coordinates before calling getAt().
 do  -- ProvinceGrid:getWidth
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
-  if not ok_grid then grid = nil end
+  if not ok_grid then return end
   local w = (grid and grid:getWidth() or 0)
   if w > 0 then
     lurek.log.info("province map width=" .. w, "map")
@@ -130,7 +130,7 @@ end
 -- Use alongside getWidth() to size the rendered minimap or perform bounds checks.
 do  -- ProvinceGrid:getHeight
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
-  if not ok_grid then grid = nil end
+  if not ok_grid then return end
   local h = (grid and grid:getHeight() or 0)
   lurek.log.info("province map height=" .. h, "map")
 end
@@ -140,7 +140,7 @@ end
 -- Returns 0 for the background; check for non-zero before treating the click as a province.
 do  -- ProvinceGrid:getAt
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
-  if not ok_grid then grid = nil end
+  if not ok_grid then return end
   local id = (grid and grid:getAt(128, 96) or 0)
   if id ~= 0 then
     lurek.log.info("clicked province " .. id, "map")
@@ -152,7 +152,7 @@ end
 -- Pre-allocate per-province arrays (owners, populations) using this count at startup.
 do  -- ProvinceGrid:provinceCount
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
-  if not ok_grid then grid = nil end
+  if not ok_grid then return end
   local count = (grid and grid:provinceCount() or 0)
   local owners = {}
   for i = 1, count do owners[i] = 0 end
@@ -164,7 +164,7 @@ end
 -- Walk the result to build a graph for AI invasion planning or border rendering.
 do  -- ProvinceGrid:adjacencies
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
-  if not ok_grid then grid = nil end
+  if not ok_grid then return end
   local edges = (grid and grid:adjacencies() or {})
   lurek.log.info("adjacency edges=" .. #edges, "map")
 end
@@ -323,7 +323,7 @@ end
 -- Use to validate atlases or to compute UV coordinates for compressed textures.
 do  -- CompressedImageData:getWidth
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
-  if not ok_cd then cd = nil end
+  if not ok_cd then return end
   local w = (cd and cd:getWidth() or 0)
   lurek.log.info("dds base width=" .. w, "image")
 end
@@ -333,7 +333,7 @@ end
 -- Pair with getWidth() to size the destination quad before drawing.
 do  -- CompressedImageData:getHeight
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
-  if not ok_cd then cd = nil end
+  if not ok_cd then return end
   local h = (cd and cd:getHeight() or 0)
   lurek.log.info("dds base height=" .. h, "image")
 end
@@ -343,7 +343,7 @@ end
 -- One call instead of two when you need both dimensions in a single statement.
 do  -- CompressedImageData:getDimensions
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
-  if not ok_cd then cd = nil end
+  if not ok_cd then return end
   local w = cd and cd:getWidth() or 0
   local h = cd and cd:getHeight() or 0
   lurek.log.info("dds " .. w .. "x" .. h, "image")
@@ -354,7 +354,7 @@ end
 -- Branch on >1 to enable trilinear sampling; use 1 for pixel-art atlases that ship without mips.
 do  -- CompressedImageData:getMipmapCount
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
-  if not ok_cd then cd = nil end
+  if not ok_cd then return end
   local mips = (cd and cd:getMipmapCount() or 0)
   if mips > 1 then
     lurek.log.info("trilinear ready, mips=" .. mips, "image")
@@ -366,7 +366,7 @@ end
 -- Inspect to confirm the DDS uses an expected BCn variant before uploading.
 do  -- CompressedImageData:getFormat
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
-  if not ok_cd then cd = nil end
+  if not ok_cd then return end
   local fmt = (cd and cd:getFormat() or "unknown")
   lurek.log.info("dds format=" .. fmt, "image")
 end
@@ -712,7 +712,7 @@ end
 do  -- mlua (ImageData):drawCircle
   local img = lurek.image.newImageData(64, 64)
   img:fill(0, 0, 0, 1)
-  img:drawCircle(32, 32, 20, 1, 0.5, 0, 1, true)
+  img:drawCircle(32, 32, 20, 1, 0.5, 0, 1)
   lurek.log.info("circle drawn", "image")
 end
 
@@ -732,7 +732,7 @@ end
 do  -- mlua (ImageData):drawRect
   local img = lurek.image.newImageData(64, 64)
   img:fill(0, 0, 0, 1)
-  img:drawRect(10, 10, 40, 30, 0, 1, 0.5, 1, true)
+  img:drawRect(10, 10, 40, 30, 0, 1, 0.5, 1)
   lurek.log.info("rect drawn", "image")
 end
 
@@ -743,7 +743,9 @@ do  -- mlua (ImageData):getRegion
   local img = lurek.image.newImageData(64, 64)
   img:fill(1, 0, 0, 1)
   local region = img:getRegion(10, 10, 20, 20)
-  lurek.log.info("region size: " .. region:getWidth() .. "x" .. region:getHeight(), "image")
+  if region then
+    lurek.log.info("region size: " .. region:getWidth() .. "x" .. region:getHeight(), "image")
+  end
 end
 
 --@api-stub: LayeredImage:moveLayer
@@ -824,7 +826,7 @@ end
 -- kernel is a flat table of numbers; rows and cols define the kernel dimensions.
 do  -- mlua:convolve
   local img = lurek.image.newImageData(64, 64)
-  local blurred = img:convolve({1,2,1, 2,4,2, 1,2,1}, 3, 3, 16)
+  local blurred = img:convolve({1,2,1, 2,4,2, 1,2,1}, 3)
   lurek.log.info("convolved: " .. blurred:getWidth(), "image")
 end
 
@@ -833,7 +835,7 @@ end
 -- color is an RGBA table; mode is "fill" or "line".
 do  -- mlua:drawCircle
   local img = lurek.image.newImageData(128, 128)
-  img:drawCircle(64, 64, 30, {1, 0, 0, 1}, "fill")
+  img:drawCircle(64, 64, 30, 1, 0, 0, 1)
   lurek.log.info("circle drawn on ImageData", "image")
 end
 
@@ -842,7 +844,7 @@ end
 -- color is an RGBA table; width controls the line thickness in pixels.
 do  -- mlua:drawLine
   local img = lurek.image.newImageData(128, 128)
-  img:drawLine(0, 0, 127, 127, {0, 1, 0, 1}, 2)
+  img:drawLine(0, 0, 127, 127, 0, 1, 0, 1)
   lurek.log.info("line drawn on ImageData", "image")
 end
 
@@ -851,7 +853,7 @@ end
 -- color is an RGBA table; mode is "fill" or "line".
 do  -- mlua:drawRect
   local img = lurek.image.newImageData(128, 128)
-  img:drawRect(10, 10, 60, 40, {0, 0, 1, 1}, "fill")
+  img:drawRect(10, 10, 60, 40, 0, 0, 1, 1)
   lurek.log.info("rect drawn on ImageData", "image")
 end
 
@@ -861,7 +863,9 @@ end
 do  -- mlua:getRegion
   local img = lurek.image.newImageData(128, 128)
   local region = img:getRegion(0, 0, 32, 32)
-  lurek.log.info("region: " .. region:getWidth() .. "x" .. region:getHeight(), "image")
+  if region then
+    lurek.log.info("region: " .. region:getWidth() .. "x" .. region:getHeight(), "image")
+  end
 end
 
 --@api-stub: mlua:paste

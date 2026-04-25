@@ -727,6 +727,53 @@ end
 -- lurek.init
 -- ---------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.render.setBackgroundColor(0.6, 0.3, 0.2)
     lurek.window.setTitle("Track & Field — Lurek2D")
@@ -842,23 +889,23 @@ end
 local function draw_track()
     -- Grass
     lurek.render.setColor(COL_GRASS[1], COL_GRASS[2], COL_GRASS[3])
-    lurek.render.rectangle("fill", 0, TRACK_Y + 30, SCREEN_W + 200, SCREEN_H - TRACK_Y)
+    rect("fill", 0, TRACK_Y + 30, SCREEN_W + 200, SCREEN_H - TRACK_Y)
 
     -- Track surface
     lurek.render.setColor(COL_TRACK[1], COL_TRACK[2], COL_TRACK[3])
-    lurek.render.rectangle("fill", TRACK_LEFT - 20, TRACK_Y - 10, TRACK_RIGHT - TRACK_LEFT + 40, 40)
+    rect("fill", TRACK_LEFT - 20, TRACK_Y - 10, TRACK_RIGHT - TRACK_LEFT + 40, 40)
 
     -- Lane lines
     lurek.render.setColor(COL_LINE[1], COL_LINE[2], COL_LINE[3], 0.4)
     for i = 0, 4 do
         local ly = TRACK_Y - 10 + i * 8
-        lurek.render.line(TRACK_LEFT - 20, ly, TRACK_RIGHT + 20, ly)
+        ln(TRACK_LEFT - 20, ly, TRACK_RIGHT + 20, ly)
     end
 
     -- Start / finish lines
     lurek.render.setColor(COL_LINE[1], COL_LINE[2], COL_LINE[3])
-    lurek.render.rectangle("fill", TRACK_LEFT - 5, TRACK_Y - 15, 4, 50)
-    lurek.render.rectangle("fill", TRACK_RIGHT - 5, TRACK_Y - 15, 4, 50)
+    rect("fill", TRACK_LEFT - 5, TRACK_Y - 15, 4, 50)
+    rect("fill", TRACK_RIGHT - 5, TRACK_Y - 15, 4, 50)
 end
 
 local function draw_runner(x, y, color, w, h)
@@ -866,9 +913,9 @@ local function draw_runner(x, y, color, w, h)
     h = h or RUNNER_H
     -- Body
     lurek.render.setColor(color[1], color[2], color[3])
-    lurek.render.rectangle("fill", x, y, w, h)
+    rect("fill", x, y, w, h)
     -- Head
-    lurek.render.circle("fill", x + w * 0.5, y - 6, 6)
+    circ("fill", x + w * 0.5, y - 6, 6)
 end
 
 local function draw_hurdles()
@@ -878,8 +925,8 @@ local function draw_hurdles()
         else
             lurek.render.setColor(COL_HURDLE[1], COL_HURDLE[2], COL_HURDLE[3])
         end
-        lurek.render.rectangle("fill", h.x - 3, TRACK_Y - HURDLE_H, 6, HURDLE_H)
-        lurek.render.rectangle("fill", h.x - 10, TRACK_Y - HURDLE_H, 20, 3)
+        rect("fill", h.x - 3, TRACK_Y - HURDLE_H, 6, HURDLE_H)
+        rect("fill", h.x - 10, TRACK_Y - HURDLE_H, 20, 3)
     end
 end
 
@@ -899,24 +946,24 @@ function lurek.draw()
     if current_event == EVENT.LONG_JUMP then
         -- Board
         lurek.render.setColor(1, 1, 1)
-        lurek.render.rectangle("fill", BOARD_X - 5, TRACK_Y - 5, 10, 15)
+        rect("fill", BOARD_X - 5, TRACK_Y - 5, 10, 15)
         -- Sand pit
         lurek.render.setColor(0.9, 0.85, 0.6)
-        lurek.render.rectangle("fill", BOARD_X + 30, TRACK_Y - 3, 200, 15)
+        rect("fill", BOARD_X + 30, TRACK_Y - 3, 200, 15)
     end
 
     if current_event == EVENT.HIGH_JUMP then
         -- Bar
         local bar_py = TRACK_Y - hj_bar_height * BAR_PIXEL_SCALE
         lurek.render.setColor(COL_BAR[1], COL_BAR[2], COL_BAR[3])
-        lurek.render.line(BAR_X - 40, bar_py, BAR_X + 40, bar_py)
+        ln(BAR_X - 40, bar_py, BAR_X + 40, bar_py)
         -- Uprights
         lurek.render.setColor(0.5, 0.5, 0.5)
-        lurek.render.rectangle("fill", BAR_X - 42, bar_py, 4, TRACK_Y - bar_py)
-        lurek.render.rectangle("fill", BAR_X + 38, bar_py, 4, TRACK_Y - bar_py)
+        rect("fill", BAR_X - 42, bar_py, 4, TRACK_Y - bar_py)
+        rect("fill", BAR_X + 38, bar_py, 4, TRACK_Y - bar_py)
         -- Mat
         lurek.render.setColor(0.3, 0.3, 0.8, 0.5)
-        lurek.render.rectangle("fill", BAR_X - 50, TRACK_Y - 10, 100, 20)
+        rect("fill", BAR_X - 50, TRACK_Y - 10, 100, 20)
     end
 
     if current_event == EVENT.HURDLES_110 then
@@ -952,27 +999,27 @@ function lurek.draw_ui()
     -- Title screen
     if current_state == STATE.TITLE then
         lurek.render.setColor(COL_DARK[1], COL_DARK[2], COL_DARK[3])
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-        lurek.render.print("TRACK & FIELD", SCREEN_W * 0.5 - 100, 160, 0, 2.5, 2.5)
+        text_("TRACK & FIELD", SCREEN_W * 0.5 - 100, 160, 0, 2.5, 2.5)
 
         lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.print("GO FOR GOLD", SCREEN_W * 0.5 - 60, 230, 0, 1.5, 1.5)
+        text_("GO FOR GOLD", SCREEN_W * 0.5 - 60, 230, 0, 1.5, 1.5)
 
         lurek.render.setColor(0.6, 0.6, 0.6)
-        lurek.render.print("Mash A/D to run — Space for actions", SCREEN_W * 0.5 - 140, 310)
-        lurek.render.print("Press SPACE to start", SCREEN_W * 0.5 - 80, 400)
+        text_("Mash A/D to run — Space for actions", SCREEN_W * 0.5 - 140, 310)
+        text_("Press SPACE to start", SCREEN_W * 0.5 - 80, 400)
         return
     end
 
     -- Final results
     if current_state == STATE.FINAL then
         lurek.render.setColor(COL_DARK[1], COL_DARK[2], COL_DARK[3])
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-        lurek.render.print("FINAL RESULTS", SCREEN_W * 0.5 - 90, 40, 0, 2, 2)
+        text_("FINAL RESULTS", SCREEN_W * 0.5 - 90, 40, 0, 2, 2)
 
         local y = 110
         for i = 1, NUM_EVENTS do
@@ -984,130 +1031,130 @@ function lurek.draw_ui()
                 medal_str = string.upper(r.medal)
             end
             lurek.render.setColor(mc[1], mc[2], mc[3])
-            lurek.render.print(string.format("%-18s  %s  %4d pts", EVENT_NAMES[i], medal_str, r and r.player_score or 0), 120, y)
+            text_(string.format("%-18s  %s  %4d pts", EVENT_NAMES[i], medal_str, r and r.player_score or 0), 120, y)
             y = y + 30
         end
 
         y = y + 20
         lurek.render.setColor(COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-        lurek.render.print(string.format("Gold: %d", medals.gold), 180, y)
+        text_(string.format("Gold: %d", medals.gold), 180, y)
         lurek.render.setColor(COL_SILVER[1], COL_SILVER[2], COL_SILVER[3])
-        lurek.render.print(string.format("Silver: %d", medals.silver), 320, y)
+        text_(string.format("Silver: %d", medals.silver), 320, y)
         lurek.render.setColor(COL_BRONZE[1], COL_BRONZE[2], COL_BRONZE[3])
-        lurek.render.print(string.format("Bronze: %d", medals.bronze), 470, y)
+        text_(string.format("Bronze: %d", medals.bronze), 470, y)
 
         y = y + 40
         lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.print(string.format("Total Points: %d", total_points), 260, y, 0, 1.5, 1.5)
+        text_(string.format("Total Points: %d", total_points), 260, y, 0, 1.5, 1.5)
 
         lurek.render.setColor(0.5, 0.5, 0.5)
-        lurek.render.print("Press SPACE to return to title", SCREEN_W * 0.5 - 120, SCREEN_H - 60)
+        text_("Press SPACE to return to title", SCREEN_W * 0.5 - 120, SCREEN_H - 60)
         return
     end
 
     -- Event intro overlay
     if current_state == STATE.EVENT_INTRO then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-        lurek.render.print(string.format("Event %d / %d", current_event, NUM_EVENTS), SCREEN_W * 0.5 - 60, 200, 0, 1.5, 1.5)
+        text_(string.format("Event %d / %d", current_event, NUM_EVENTS), SCREEN_W * 0.5 - 60, 200, 0, 1.5, 1.5)
         lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.print(EVENT_NAMES[current_event], SCREEN_W * 0.5 - 80, 250, 0, 2, 2)
+        text_(EVENT_NAMES[current_event], SCREEN_W * 0.5 - 80, 250, 0, 2, 2)
 
         local countdown = math.ceil(intro_timer)
         lurek.render.setColor(1, 1, 1)
-        lurek.render.print(tostring(countdown), SCREEN_W * 0.5 - 10, 320, 0, 3, 3)
+        text_(tostring(countdown), SCREEN_W * 0.5 - 10, 320, 0, 3, 3)
         return
     end
 
     -- Event result overlay
     if current_state == STATE.EVENT_RESULT then
         lurek.render.setColor(0, 0, 0, 0.5)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         local r = event_results[current_event]
         lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.print(EVENT_NAMES[current_event] .. " — Results", SCREEN_W * 0.5 - 100, 150, 0, 1.5, 1.5)
+        text_(EVENT_NAMES[current_event] .. " — Results", SCREEN_W * 0.5 - 100, 150, 0, 1.5, 1.5)
 
         if r and r.medal then
             local mc = medal_color(r.medal)
             local a = tw_medal_alpha.value
             lurek.render.setColor(mc[1], mc[2], mc[3], a)
-            lurek.render.print(string.upper(r.medal) .. " MEDAL!", SCREEN_W * 0.5 - 70, 210, 0, 2, 2)
+            text_(string.upper(r.medal) .. " MEDAL!", SCREEN_W * 0.5 - 70, 210, 0, 2, 2)
         else
             lurek.render.setColor(0.5, 0.5, 0.5)
-            lurek.render.print("No medal", SCREEN_W * 0.5 - 40, 210, 0, 1.5, 1.5)
+            text_("No medal", SCREEN_W * 0.5 - 40, 210, 0, 1.5, 1.5)
         end
 
         lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-        lurek.render.print(string.format("Points: %d", r and r.player_score or 0), SCREEN_W * 0.5 - 50, 270)
+        text_(string.format("Points: %d", r and r.player_score or 0), SCREEN_W * 0.5 - 50, 270)
         if r and r.bonus then
             lurek.render.setColor(COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-            lurek.render.print("Qualifying standard met! +25 bonus", SCREEN_W * 0.5 - 120, 300)
+            text_("Qualifying standard met! +25 bonus", SCREEN_W * 0.5 - 120, 300)
         end
         return
     end
 
     -- HUD panel
     lurek.render.setColor(COL_HUD_BG[1], COL_HUD_BG[2], COL_HUD_BG[3], COL_HUD_BG[4])
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 50)
+    rect("fill", 0, 0, SCREEN_W, 50)
 
     -- Event name
     lurek.render.setColor(COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-    lurek.render.print(EVENT_NAMES[current_event], 10, 8, 0, 1.2, 1.2)
+    text_(EVENT_NAMES[current_event], 10, 8, 0, 1.2, 1.2)
 
     -- Speed meter
     lurek.render.setColor(0.3, 0.3, 0.3)
-    lurek.render.rectangle("fill", 200, 10, 120, 14)
+    rect("fill", 200, 10, 120, 14)
     local speed_pct = tw_speed_meter.value / MAX_SPEED
     local sr = lerp(0.2, 1.0, speed_pct)
     local sg = lerp(0.8, 0.2, speed_pct)
     lurek.render.setColor(sr, sg, 0.2)
-    lurek.render.rectangle("fill", 200, 10, 120 * speed_pct, 14)
+    rect("fill", 200, 10, 120 * speed_pct, 14)
     lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-    lurek.render.print("Speed", 200, 26)
+    text_("Speed", 200, 26)
 
     -- Stamina
     lurek.render.setColor(0.3, 0.3, 0.3)
-    lurek.render.rectangle("fill", 200, 32, 120, 8)
+    rect("fill", 200, 32, 120, 8)
     lurek.render.setColor(0.2, 0.7, 0.9)
-    lurek.render.rectangle("fill", 200, 32, 120 * (p_stamina / p_max_stamina), 8)
+    rect("fill", 200, 32, 120 * (p_stamina / p_max_stamina), 8)
 
     -- Event-specific info
     local info_x = 350
     lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
 
     if current_event == EVENT.SPRINT_100 or current_event == EVENT.HURDLES_110 then
-        lurek.render.print(string.format("Time: %.2fs", event_timer + hurdle_penalty), info_x, 10)
+        text_(string.format("Time: %.2fs", event_timer + hurdle_penalty), info_x, 10)
         if current_event == EVENT.HURDLES_110 then
-            lurek.render.print(string.format("Penalty: %.1fs  Cleared: %d/10", hurdle_penalty, hurdles_cleared), info_x, 28)
+            text_(string.format("Penalty: %.1fs  Cleared: %d/10", hurdle_penalty, hurdles_cleared), info_x, 28)
         end
     elseif current_event == EVENT.LONG_JUMP then
-        lurek.render.print(string.format("Attempt: %d/%d  Best: %.2fm", attempt, max_attempts, tw_distance.value), info_x, 10)
+        text_(string.format("Attempt: %d/%d  Best: %.2fm", attempt, max_attempts, tw_distance.value), info_x, 10)
         if distance == -1 then
             lurek.render.setColor(0.9, 0.2, 0.2)
-            lurek.render.print("FOUL!", info_x + 250, 10)
+            text_("FOUL!", info_x + 250, 10)
         end
     elseif current_event == EVENT.JAVELIN then
-        lurek.render.print(string.format("Attempt: %d/%d  Best: %.1fm", attempt, max_attempts, tw_distance.value), info_x, 10)
+        text_(string.format("Attempt: %d/%d  Best: %.1fm", attempt, max_attempts, tw_distance.value), info_x, 10)
         if angle_set then
-            lurek.render.print(string.format("Angle: %.0f°", angle), info_x, 28)
+            text_(string.format("Angle: %.0f°", angle), info_x, 28)
         end
         lurek.render.setColor(0.7, 0.7, 0.9)
-        lurek.render.print(string.format("Wind: %+.1f m/s", wind_speed), info_x + 200, 10)
+        text_(string.format("Wind: %+.1f m/s", wind_speed), info_x + 200, 10)
     elseif current_event == EVENT.HIGH_JUMP then
-        lurek.render.print(string.format("Bar: %.2fm  Fails: %d/3", hj_bar_height, hj_failures), info_x, 10)
+        text_(string.format("Bar: %.2fm  Fails: %d/3", hj_bar_height, hj_failures), info_x, 10)
     end
 
     -- Medal tally (top right)
     local mx = SCREEN_W - 180
     lurek.render.setColor(COL_GOLD[1], COL_GOLD[2], COL_GOLD[3])
-    lurek.render.print(string.format("G:%d", medals.gold), mx, 10)
+    text_(string.format("G:%d", medals.gold), mx, 10)
     lurek.render.setColor(COL_SILVER[1], COL_SILVER[2], COL_SILVER[3])
-    lurek.render.print(string.format("S:%d", medals.silver), mx + 45, 10)
+    text_(string.format("S:%d", medals.silver), mx + 45, 10)
     lurek.render.setColor(COL_BRONZE[1], COL_BRONZE[2], COL_BRONZE[3])
-    lurek.render.print(string.format("B:%d", medals.bronze), mx + 90, 10)
+    text_(string.format("B:%d", medals.bronze), mx + 90, 10)
     lurek.render.setColor(COL_WHITE[1], COL_WHITE[2], COL_WHITE[3])
-    lurek.render.print(string.format("Pts:%d", total_points), mx + 130, 10)
+    text_(string.format("Pts:%d", total_points), mx + 130, 10)
 end

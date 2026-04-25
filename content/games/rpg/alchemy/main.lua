@@ -1,3 +1,52 @@
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+local _cam = nil ---@type any
+
 -- ============================================================================
 -- Alchemy Lab — Lurek2D
 -- Category: rpg
@@ -114,7 +163,7 @@ local function draw_particles()
         local a = p.life / p.max_life
         local sz = 3 + 4 * a
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.rectangle("fill", p.x - sz/2, p.y - sz/2, sz, sz)
+        rect("fill", p.x - sz/2, p.y - sz/2, sz, sz)
     end
 end
 
@@ -199,6 +248,7 @@ end
 -- ── Callbacks ───────────────────────────────────────────────────────────────
 
 function lurek.init()
+    _cam = lurek.camera.new()
     lurek.window.setTitle("Alchemy Lab — Lurek2D")
     lurek.render.setBackgroundColor(0.12, 0.08, 0.06)
     _cam:reset()
@@ -430,19 +480,19 @@ function lurek.draw()
     if state == STATE_TITLE then
         -- dark background vignette
         lurek.render.setColor(0.18, 0.12, 0.08, 1)
-        lurek.render.rectangle("fill", 0, 0, 800, 600)
+        rect("fill", 0, 0, 800, 600)
 
         -- title
         local pulse = 0.7 + 0.3 * math.abs(math.sin(title_blink * 1.5))
         lurek.render.setColor(1.0, 0.85, 0.0, pulse)
-        lurek.render.print("ALCHEMY LAB", 200, 180, 48)
+        text_("ALCHEMY LAB", 200, 180, 48)
 
         lurek.render.setColor(0.8, 0.6, 0.3, 1)
-        lurek.render.print("Brew potions, discover recipes, earn gold", 190, 260, 16)
+        text_("Brew potions, discover recipes, earn gold", 190, 260, 16)
 
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(1, 1, 1, 0.9)
-            lurek.render.print("PRESS ENTER", 320, 380, 20)
+            text_("PRESS ENTER", 320, 380, 20)
         end
 
         draw_particles()
@@ -452,17 +502,17 @@ function lurek.draw()
     -- ── Workbench background ────────────────────────────────────────────
     -- table surface
     lurek.render.setColor(0.22, 0.15, 0.10, 1)
-    lurek.render.rectangle("fill", 0, 340, 800, 260)
+    rect("fill", 0, 340, 800, 260)
     lurek.render.setColor(0.28, 0.18, 0.12, 1)
-    lurek.render.rectangle("fill", 0, 340, 800, 4)
+    rect("fill", 0, 340, 800, 4)
 
     -- wall
     lurek.render.setColor(0.16, 0.11, 0.08, 1)
-    lurek.render.rectangle("fill", 0, 0, 800, 340)
+    rect("fill", 0, 0, 800, 340)
 
     -- shelf
     lurek.render.setColor(0.35, 0.22, 0.12, 1)
-    lurek.render.rectangle("fill", 20, 80, 760, 8)
+    rect("fill", 20, 80, 760, 8)
 
     -- ── Ingredient shelf ────────────────────────────────────────────────
     for i = 1, 6 do
@@ -473,92 +523,92 @@ function lurek.draw()
 
         -- jar
         lurek.render.setColor(0.3, 0.3, 0.3, 0.4)
-        lurek.render.rectangle("fill", x, y, 30, 40)
+        rect("fill", x, y, 30, 40)
         lurek.render.setColor(r, g, b, stock[i] > 0 and 0.9 or 0.2)
-        lurek.render.rectangle("fill", x+4, y+10, 22, 26)
+        rect("fill", x+4, y+10, 22, 26)
 
         -- label
         lurek.render.setColor(1, 1, 1, stock[i] > 0 and 1 or 0.3)
-        lurek.render.print(i .. ":" .. ing.name, x - 10, y + 44, 10)
-        lurek.render.print("x" .. stock[i], x + 8, y + 56, 10)
+        text_(i .. ":" .. ing.name, x - 10, y + 44, 10)
+        text_("x" .. stock[i], x + 8, y + 56, 10)
     end
 
     -- ── Mortar (left station) ───────────────────────────────────────────
     lurek.render.setColor(0.5, 0.45, 0.4, 1)
-    lurek.render.rectangle("fill", 150, 380, 100, 70)
+    rect("fill", 150, 380, 100, 70)
     lurek.render.setColor(0.4, 0.35, 0.3, 1)
-    lurek.render.rectangle("fill", 160, 370, 80, 20)
+    rect("fill", 160, 370, 80, 20)
     lurek.render.setColor(1, 1, 1, 0.8)
-    lurek.render.print("MORTAR", 168, 355, 12)
+    text_("MORTAR", 168, 355, 12)
 
     -- mortar contents
     for j, idx in ipairs(mortar) do
         local c = ingredients[idx].color
         lurek.render.setColor(c[1], c[2], c[3], 0.8)
-        lurek.render.rectangle("fill", 165 + (j-1)*22, 395, 18, 18)
+        rect("fill", 165 + (j-1)*22, 395, 18, 18)
     end
 
     -- grind progress bar
     if is_grinding then
         lurek.render.setColor(0.3, 0.3, 0.3, 0.6)
-        lurek.render.rectangle("fill", 155, 460, 90, 8)
+        rect("fill", 155, 460, 90, 8)
         lurek.render.setColor(0.9, 0.8, 0.3, 1)
-        lurek.render.rectangle("fill", 155, 460, 90 * anim.grind_bar, 8)
+        rect("fill", 155, 460, 90 * anim.grind_bar, 8)
     end
 
     -- ground indicator
     if ground then
         lurek.render.setColor(0.9, 0.8, 0.4, 1)
-        lurek.render.print("GROUND READY", 152, 475, 10)
-        lurek.render.print("Press G → cauldron", 148, 488, 9)
+        text_("GROUND READY", 152, 475, 10)
+        text_("Press G → cauldron", 148, 488, 9)
     end
 
     -- ── Cauldron (center station) ───────────────────────────────────────
     lurek.render.setColor(0.3, 0.3, 0.35, 1)
-    lurek.render.rectangle("fill", 340, 370, 120, 90)
+    rect("fill", 340, 370, 120, 90)
     lurek.render.setColor(0.25, 0.25, 0.3, 1)
-    lurek.render.rectangle("fill", 350, 360, 100, 18)
+    rect("fill", 350, 360, 100, 18)
     lurek.render.setColor(1, 1, 1, 0.8)
-    lurek.render.print("CAULDRON", 362, 346, 12)
+    text_("CAULDRON", 362, 346, 12)
 
     -- liquid
     if cauldron then
         local intensity = temperature / 100
         lurek.render.setColor(0.2 + intensity * 0.5, 0.3 - intensity * 0.2, 0.8 - intensity * 0.6, 0.7)
-        lurek.render.rectangle("fill", 355, 385, 90, 55)
+        rect("fill", 355, 385, 90, 55)
     end
 
     -- temperature gauge
     lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.render.rectangle("fill", 475, 370, 12, 90)
+    rect("fill", 475, 370, 12, 90)
     local temp_h = (anim.temp_display / 100) * 80
     local temp_r = anim.temp_display / 100
     lurek.render.setColor(temp_r, 0.2, 1.0 - temp_r, 1)
-    lurek.render.rectangle("fill", 477, 375 + (80 - temp_h), 8, temp_h)
+    rect("fill", 477, 375 + (80 - temp_h), 8, temp_h)
     lurek.render.setColor(1, 1, 1, 0.7)
-    lurek.render.print(math.floor(anim.temp_display) .. "°", 470, 462, 10)
+    text_(math.floor(anim.temp_display) .. "°", 470, 462, 10)
 
     -- safe zone markers
     lurek.render.setColor(0, 1, 0, 0.3)
     local safe_top = 375 + 80 * (1 - 85/100)
     local safe_bot = 375 + 80 * (1 - 40/100)
-    lurek.render.rectangle("fill", 490, safe_top, 4, safe_bot - safe_top)
+    rect("fill", 490, safe_top, 4, safe_bot - safe_top)
 
     -- ── Bottle station (right) ──────────────────────────────────────────
     lurek.render.setColor(0.4, 0.35, 0.4, 1)
-    lurek.render.rectangle("fill", 570, 380, 80, 70)
+    rect("fill", 570, 380, 80, 70)
     lurek.render.setColor(0.35, 0.3, 0.35, 1)
-    lurek.render.rectangle("fill", 575, 370, 70, 18)
+    rect("fill", 575, 370, 70, 18)
     lurek.render.setColor(1, 1, 1, 0.8)
-    lurek.render.print("BOTTLE", 585, 355, 12)
+    text_("BOTTLE", 585, 355, 12)
 
     -- show last potions in bottles
     for j = 1, math.min(#inventory, 3) do
         local pot = inventory[#inventory - j + 1]
         lurek.render.setColor(0.6, 0.6, 0.6, 0.5)
-        lurek.render.rectangle("fill", 578 + (j-1)*22, 395, 16, 30)
+        rect("fill", 578 + (j-1)*22, 395, 16, 30)
         lurek.render.setColor(pot.color[1], pot.color[2], pot.color[3], 0.9)
-        lurek.render.rectangle("fill", 580 + (j-1)*22, 405, 12, 18)
+        rect("fill", 580 + (j-1)*22, 405, 12, 18)
     end
 
     draw_particles()
@@ -569,41 +619,41 @@ end
 function lurek.draw_ui()
     -- FPS
     lurek.render.setColor(1, 1, 1, 0.4)
-    lurek.render.print("FPS: " .. lurek.timer.getFPS(), 720, 8, 10)
+    text_("FPS: " .. lurek.timer.getFPS(), 720, 8, 10)
 
     if state == STATE_TITLE then return end
 
     -- ── Gold ────────────────────────────────────────────────────────────
     lurek.render.setColor(1, 0.85, 0, 1)
-    lurek.render.print("Gold: " .. gold, 20, 8, 16)
+    text_("Gold: " .. gold, 20, 8, 16)
 
     -- ── Inventory count ─────────────────────────────────────────────────
     lurek.render.setColor(0.8, 0.8, 0.8, 1)
-    lurek.render.print("Potions: " .. #inventory, 160, 8, 14)
+    text_("Potions: " .. #inventory, 160, 8, 14)
 
     -- ── Discoveries ─────────────────────────────────────────────────────
     lurek.render.setColor(0.7, 0.7, 0.4, 1)
-    lurek.render.print("Discovered: " .. #discovered .. "/5", 300, 8, 14)
+    text_("Discovered: " .. #discovered .. "/5", 300, 8, 14)
 
     -- ── Elemental readout ───────────────────────────────────────────────
     if cauldron then
         local y = 100
         lurek.render.setColor(1, 1, 1, 0.8)
-        lurek.render.print("Cauldron Elements:", 640, y, 11)
+        text_("Cauldron Elements:", 640, y, 11)
         y = y + 16
         lurek.render.setColor(1, 0.3, 0.1, 1)
-        lurek.render.print("Fire:  " .. cauldron.fire,  650, y, 11); y = y + 14
+        text_("Fire:  " .. cauldron.fire,  650, y, 11); y = y + 14
         lurek.render.setColor(0.3, 0.5, 1.0, 1)
-        lurek.render.print("Water: " .. cauldron.water, 650, y, 11); y = y + 14
+        text_("Water: " .. cauldron.water, 650, y, 11); y = y + 14
         lurek.render.setColor(0.6, 0.4, 0.2, 1)
-        lurek.render.print("Earth: " .. cauldron.earth, 650, y, 11); y = y + 14
+        text_("Earth: " .. cauldron.earth, 650, y, 11); y = y + 14
         lurek.render.setColor(0.5, 0.9, 0.6, 1)
-        lurek.render.print("Air:   " .. cauldron.air,   650, y, 11)
+        text_("Air:   " .. cauldron.air,   650, y, 11)
     end
 
     -- ── Recipe book (right side) ────────────────────────────────────────
     lurek.render.setColor(0.7, 0.6, 0.4, 0.9)
-    lurek.render.print("Recipe Book:", 640, 200, 12)
+    text_("Recipe Book:", 640, 200, 12)
     for i, rec in ipairs(recipes) do
         local found = false
         for _, d in ipairs(discovered) do
@@ -611,10 +661,10 @@ function lurek.draw_ui()
         end
         if found then
             lurek.render.setColor(rec.color[1], rec.color[2], rec.color[3], 1)
-            lurek.render.print(rec.name, 645, 218 + (i-1)*16, 10)
+            text_(rec.name, 645, 218 + (i-1)*16, 10)
         else
             lurek.render.setColor(0.4, 0.4, 0.4, 0.6)
-            lurek.render.print("??? Unknown ???", 645, 218 + (i-1)*16, 10)
+            text_("??? Unknown ???", 645, 218 + (i-1)*16, 10)
         end
     end
 
@@ -622,28 +672,28 @@ function lurek.draw_ui()
     if message_timer > 0 then
         local a = math.min(message_timer, 1)
         lurek.render.setColor(0, 0, 0, 0.6 * a)
-        lurek.render.rectangle("fill", 150, 560, 500, 30)
+        rect("fill", 150, 560, 500, 30)
         lurek.render.setColor(1, 1, 1, a)
-        lurek.render.print(message, 170, 567, 13)
+        text_(message, 170, 567, 13)
     end
 
     -- ── Controls hint ───────────────────────────────────────────────────
     lurek.render.setColor(0.6, 0.5, 0.4, 0.6)
-    lurek.render.print("1-6:Add  G:Grind  H:Heat  J:Cool  B:Bottle  S:Shop  Esc:Quit", 140, 585, 10)
+    text_("1-6:Add  G:Grind  H:Heat  J:Cool  B:Bottle  S:Shop  Esc:Quit", 140, 585, 10)
 
     -- ── Shop overlay ────────────────────────────────────────────────────
     if state == STATE_SHOP then
         lurek.render.setColor(0, 0, 0, 0.75)
-        lurek.render.rectangle("fill", 100, 60, 600, 480)
+        rect("fill", 100, 60, 600, 480)
 
         lurek.render.setColor(1, 0.85, 0, 1)
-        lurek.render.print("~ ALCHEMIST'S SHOP ~", 280, 80, 22)
+        text_("ALCHEMIST'S SHOP", 280, 80, 22)
         lurek.render.setColor(1, 1, 1, 0.8)
-        lurek.render.print("Gold: " .. gold, 350, 115, 16)
+        text_("Gold: " .. gold, 350, 115, 16)
 
         -- buy section
         lurek.render.setColor(0.8, 0.7, 0.5, 1)
-        lurek.render.print("BUY INGREDIENTS (press 1-6):", 180, 150, 14)
+        text_("BUY INGREDIENTS (press 1-6):", 180, 150, 14)
 
         for i = 1, 6 do
             local ing = ingredients[i]
@@ -651,13 +701,13 @@ function lurek.draw_ui()
             local r, g, b = ing.color[1], ing.color[2], ing.color[3]
 
             lurek.render.setColor(r, g, b, 0.8)
-            lurek.render.rectangle("fill", 180, y, 20, 20)
+            rect("fill", 180, y, 20, 20)
 
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.print(i .. ". " .. ing.name, 210, y + 2, 13)
+            text_(i .. ". " .. ing.name, 210, y + 2, 13)
 
             lurek.render.setColor(0.8, 0.8, 0.3, 1)
-            lurek.render.print(ing.cost .. "g", 420, y + 2, 13)
+            text_(ing.cost .. "g", 420, y + 2, 13)
 
             lurek.render.setColor(0.6, 0.6, 0.6, 1)
             local props = ""
@@ -665,51 +715,51 @@ function lurek.draw_ui()
             if ing.water > 0 then props = props .. "W" .. ing.water .. " " end
             if ing.earth > 0 then props = props .. "E" .. ing.earth .. " " end
             if ing.air > 0 then props = props .. "A" .. ing.air .. " " end
-            lurek.render.print(props, 480, y + 2, 11)
+            text_(props, 480, y + 2, 11)
 
-            lurek.render.print("stock:" .. stock[i], 570, y + 2, 11)
+            text_("stock:" .. stock[i], 570, y + 2, 11)
         end
 
         -- sell section
         lurek.render.setColor(0.8, 0.7, 0.5, 1)
-        lurek.render.print("SELL POTIONS (press B):", 180, 400, 14)
+        text_("SELL POTIONS (press B):", 180, 400, 14)
 
         if #inventory == 0 then
             lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-            lurek.render.print("No potions to sell", 220, 425, 12)
+            text_("No potions to sell", 220, 425, 12)
         else
             for j = 1, math.min(#inventory, 4) do
                 local pot = inventory[j]
                 local y = 420 + (j-1) * 24
                 lurek.render.setColor(pot.color[1], pot.color[2], pot.color[3], 1)
-                lurek.render.rectangle("fill", 200, y, 14, 14)
+                rect("fill", 200, y, 14, 14)
                 lurek.render.setColor(1, 1, 1, 1)
-                lurek.render.print(pot.name .. " — " .. pot.value .. "g", 224, y, 12)
+                text_(pot.name .. " — " .. pot.value .. "g", 224, y, 12)
             end
         end
 
         lurek.render.setColor(0.6, 0.6, 0.6, 0.8)
-        lurek.render.print("Press S or Esc to close shop", 270, 520, 12)
+        text_("Press S or Esc to close shop", 270, 520, 12)
     end
 
     -- ── Discovery overlay ───────────────────────────────────────────────
     if state == STATE_DISCOVERY then
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", 0, 0, 800, 600)
+        rect("fill", 0, 0, 800, 600)
 
         local s = anim.disc_scale
         local r, g, b = discovery_color[1], discovery_color[2], discovery_color[3]
 
         lurek.render.setColor(r, g, b, 0.3 * s)
-        lurek.render.rectangle("fill", 200, 200, 400 * s, 200 * s)
+        rect("fill", 200, 200, 400 * s, 200 * s)
 
         lurek.render.setColor(1, 0.9, 0.2, s)
-        lurek.render.print("NEW DISCOVERY!", 260, 230, math.floor(28 * s))
+        text_("NEW DISCOVERY!", 260, 230, math.floor(28 * s))
 
         lurek.render.setColor(r, g, b, s)
-        lurek.render.print(discovery_name, 280, 300, math.floor(22 * s))
+        text_(discovery_name, 280, 300, math.floor(22 * s))
 
         lurek.render.setColor(1, 1, 1, 0.6 * s)
-        lurek.render.print(#discovered .. " / 5 recipes found", 310, 350, 14)
+        text_(#discovered .. " / 5 recipes found", 310, 350, 14)
     end
 end

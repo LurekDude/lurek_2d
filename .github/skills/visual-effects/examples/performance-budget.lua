@@ -1,2 +1,3 @@
 -- Half-resolution bloom canvas
-local bloomCanvas = lurek.render.newCanvas(w // 2, h // 2)
+local w, h = lurek.window.getWidth(), lurek.window.getHeight()
+local bloomCanvas = lurek.render.newCanvas(math.floor(w / 2), math.floor(h / 2))

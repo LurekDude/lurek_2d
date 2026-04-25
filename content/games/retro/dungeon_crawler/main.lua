@@ -182,6 +182,53 @@ end
 -- lurek.init
 ------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Dungeon Crawler — Lurek2D")
     lurek.render.setBackgroundColor(0.02, 0.02, 0.05)
@@ -357,14 +404,14 @@ function lurek.draw()
     for i = 0, bands - 1 do
         local b = 0.08 + 0.07 * (1.0 - i / bands)
         lurek.render.setColor(b * 0.6, b * 0.7, b * 0.9, 1)
-        lurek.render.rectangle("fill", VP_X, VP_Y + i * band_h, VP_W, band_h + 1)
+        rect("fill", VP_X, VP_Y + i * band_h, VP_W, band_h + 1)
     end
 
     -- Floor gradient (16 bands, brighter closer)
     for i = 0, bands - 1 do
         local b = 0.06 + 0.06 * (i / bands)
         lurek.render.setColor(b * 0.5, b * 0.35, b * 0.2, 1)
-        lurek.render.rectangle("fill", VP_X, VP_Y + VP_H / 2 + i * band_h, VP_W, band_h + 1)
+        rect("fill", VP_X, VP_Y + VP_H / 2 + i * band_h, VP_W, band_h + 1)
     end
 
     -- Raycasting wall strips
@@ -397,7 +444,7 @@ function lurek.draw()
             end
 
             lurek.render.setColor(cr, cg, cb, 1)
-            lurek.render.rectangle("fill", sx, sy, STRIP_W + 0.5, strip_h)
+            rect("fill", sx, sy, STRIP_W + 0.5, strip_h)
         end
     end
 
@@ -414,14 +461,14 @@ function lurek.draw()
                 local flicker  = 8 + 4 * math.sin(torch_time * 8 + torch.x * 3.7 + torch.y * 2.3)
                 local alpha    = math.max(0, 0.25 * (1 - tdist / 8))
                 lurek.render.setColor(1.0, 0.7, 0.2, alpha)
-                lurek.render.circle("fill", scr_x, VP_Y + VP_H / 2 - 20, flicker)
+                circ("fill", scr_x, VP_Y + VP_H / 2 - 20, flicker)
             end
         end
     end
 
     -- Viewport border
     lurek.render.setColor(0.3, 0.3, 0.4, 1)
-    lurek.render.rectangle("line", VP_X, VP_Y, VP_W, VP_H)
+    rect("line", VP_X, VP_Y, VP_W, VP_H)
 
     cam:reset()
 end
@@ -433,27 +480,27 @@ function lurek.draw_ui()
     -- === TITLE SCREEN ===
     if state == STATE.TITLE then
         lurek.render.setColor(0.5, 0.2, 0.7, 1)
-        lurek.render.print("DUNGEON CRAWLER", 220, 200, 36)
+        text_("DUNGEON CRAWLER", 220, 200, 36)
         lurek.render.setColor(0.7, 0.7, 0.8, 1)
-        lurek.render.print("First-person grid dungeon with raycasting", 195, 270, 16)
+        text_("First-person grid dungeon with raycasting", 195, 270, 16)
         local blink = math.sin(lurek.timer.getTime() * 4) > 0
         if blink then
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.print("PRESS ENTER", 330, 380, 20)
+            text_("PRESS ENTER", 330, 380, 20)
         end
         lurek.render.setColor(0.4, 0.4, 0.5, 1)
-        lurek.render.print("W/S = Move   Q/E = Turn   F1-F3 = Weather", 190, 440, 14)
+        text_("W/S = Move   Q/E = Turn   F1-F3 = Weather", 190, 440, 14)
         return
     end
 
     -- === COMPLETE SCREEN ===
     if state == STATE.COMPLETE then
         lurek.render.setColor(1, 0.85, 0.2, 1)
-        lurek.render.print("DUNGEON COMPLETE!", 240, 220, 32)
+        text_("DUNGEON COMPLETE!", 240, 220, 32)
         lurek.render.setColor(0.9, 0.9, 1, 1)
-        lurek.render.print("All orbs collected!   Score: " .. score, 255, 290, 18)
+        text_("All orbs collected!   Score: " .. score, 255, 290, 18)
         lurek.render.setColor(0.6, 0.6, 0.7, 1)
-        lurek.render.print("Press ESCAPE to exit", 300, 350, 16)
+        text_("Press ESCAPE to exit", 300, 350, 16)
         return
     end
 
@@ -462,38 +509,38 @@ function lurek.draw_ui()
     local PY = 30
 
     lurek.render.setColor(0.8, 0.7, 1, 1)
-    lurek.render.print("DUNGEON CRAWLER", PX, PY, 16)
+    text_("DUNGEON CRAWLER", PX, PY, 16)
 
     -- Score
     lurek.render.setColor(1, 0.85, 0.2, 1)
-    lurek.render.print("Score: " .. score, PX, PY + 28, 14)
+    text_("Score: " .. score, PX, PY + 28, 14)
 
     -- Orbs remaining
     local remaining = 0
     for _, o in ipairs(orbs) do if not o.collected then remaining = remaining + 1 end end
     lurek.render.setColor(0.5, 0.9, 1, 1)
-    lurek.render.print("Orbs: " .. (total_orbs - remaining) .. "/" .. total_orbs, PX, PY + 48, 14)
+    text_("Orbs: " .. (total_orbs - remaining) .. "/" .. total_orbs, PX, PY + 48, 14)
 
     -- Compass
     lurek.render.setColor(0.6, 0.6, 0.7, 1)
-    lurek.render.print("Facing: " .. DIR_NAMES[player.dir + 1], PX, PY + 72, 14)
+    text_("Facing: " .. DIR_NAMES[player.dir + 1], PX, PY + 72, 14)
     local comp_cx = PX + 130
     local comp_cy = PY + 86
     local comp_r  = 18
     lurek.render.setColor(0.2, 0.2, 0.3, 0.8)
-    lurek.render.circle("fill", comp_cx, comp_cy, comp_r)
+    circ("fill", comp_cx, comp_cy, comp_r)
     lurek.render.setColor(0.5, 0.5, 0.6, 1)
-    lurek.render.circle("line", comp_cx, comp_cy, comp_r)
+    circ("line", comp_cx, comp_cy, comp_r)
     local needle_a = DIR_ANGLE[player.dir + 1]
     local nx = comp_cx + math.cos(needle_a) * (comp_r - 4)
     local ny = comp_cy + math.sin(needle_a) * (comp_r - 4)
     lurek.render.setColor(1, 0.3, 0.3, 1)
-    lurek.render.line(comp_cx, comp_cy, nx, ny)
+    ln(comp_cx, comp_cy, nx, ny)
 
     -- Weather indicator
     lurek.render.setColor(0.5, 0.5, 0.6, 1)
-    lurek.render.print("Weather: " .. weather, PX, PY + 115, 12)
-    lurek.render.print("F1=Clear  F2=Rain  F3=Snow", PX, PY + 132, 10)
+    text_("Weather: " .. weather, PX, PY + 115, 12)
+    text_("F1=Clear  F2=Rain  F3=Snow", PX, PY + 132, 10)
 
     -- === MINIMAP ===
     local MM_X    = PX + 5
@@ -501,7 +548,7 @@ function lurek.draw_ui()
     local MM_CELL = 18
 
     lurek.render.setColor(0.05, 0.05, 0.1, 0.9)
-    lurek.render.rectangle("fill", MM_X - 2, MM_Y - 2,
+    rect("fill", MM_X - 2, MM_Y - 2,
         MAP_W * MM_CELL + 4, MAP_H * MM_CELL + 4)
 
     for y = 1, MAP_H do
@@ -515,25 +562,25 @@ function lurek.draw_ui()
                 else
                     lurek.render.setColor(0.15, 0.15, 0.2, 1)
                 end
-                lurek.render.rectangle("fill", cx, cy, MM_CELL - 1, MM_CELL - 1)
+                rect("fill", cx, cy, MM_CELL - 1, MM_CELL - 1)
 
                 -- Orbs on minimap
                 for _, o in ipairs(orbs) do
                     if o.x == x and o.y == y and not o.collected then
                         lurek.render.setColor(1, 0.85, 0.2, 0.8)
-                        lurek.render.circle("fill", cx + MM_CELL / 2, cy + MM_CELL / 2, 3)
+                        circ("fill", cx + MM_CELL / 2, cy + MM_CELL / 2, 3)
                     end
                 end
                 -- Torches on minimap
                 for _, t in ipairs(torches) do
                     if t.x == x and t.y == y then
                         lurek.render.setColor(1, 0.5, 0.1, 0.6)
-                        lurek.render.circle("fill", cx + MM_CELL / 2, cy + MM_CELL / 2, 2)
+                        circ("fill", cx + MM_CELL / 2, cy + MM_CELL / 2, 2)
                     end
                 end
             else
                 lurek.render.setColor(0.08, 0.08, 0.08, 1)
-                lurek.render.rectangle("fill", cx, cy, MM_CELL - 1, MM_CELL - 1)
+                rect("fill", cx, cy, MM_CELL - 1, MM_CELL - 1)
             end
         end
     end
@@ -542,16 +589,16 @@ function lurek.draw_ui()
     local pmx = MM_X + player.vx * MM_CELL
     local pmy = MM_Y + player.vy * MM_CELL
     lurek.render.setColor(0.2, 1, 0.3, 1)
-    lurek.render.circle("fill", pmx, pmy, 4)
+    circ("fill", pmx, pmy, 4)
     local di = player.dir + 1
-    lurek.render.line(pmx, pmy, pmx + DIR_DX[di] * 8, pmy + DIR_DY[di] * 8)
+    ln(pmx, pmy, pmx + DIR_DX[di] * 8, pmy + DIR_DY[di] * 8)
 
     -- Minimap border and label
     lurek.render.setColor(0.4, 0.4, 0.5, 1)
-    lurek.render.rectangle("line", MM_X - 2, MM_Y - 2,
+    rect("line", MM_X - 2, MM_Y - 2,
         MAP_W * MM_CELL + 4, MAP_H * MM_CELL + 4)
     lurek.render.setColor(0.5, 0.5, 0.6, 1)
-    lurek.render.print("MINIMAP", MM_X + MAP_W * MM_CELL / 2 - 25,
+    text_("MINIMAP", MM_X + MAP_W * MM_CELL / 2 - 25,
         MM_Y + MAP_H * MM_CELL + 6, 11)
 
     -- === WEATHER OVERLAY ===
@@ -559,10 +606,10 @@ function lurek.draw_ui()
         local alpha = 1.0 - p.life / p.max_life
         if weather == "rain" then
             lurek.render.setColor(0.5, 0.6, 0.9, alpha * 0.7)
-            lurek.render.line(p.x, p.y, p.x + p.vx * 0.02, p.y + 6)
+            ln(p.x, p.y, p.x + p.vx * 0.02, p.y + 6)
         else
             lurek.render.setColor(0.9, 0.95, 1, alpha * 0.6)
-            lurek.render.circle("fill", p.x, p.y, p.size)
+            circ("fill", p.x, p.y, p.size)
         end
     end
 
@@ -570,7 +617,7 @@ function lurek.draw_ui()
     for _, p in ipairs(sparkle_particles) do
         local alpha = 1.0 - p.life / p.max_life
         lurek.render.setColor(p.r, p.g, p.b, alpha)
-        lurek.render.circle("fill", p.x, p.y, 3 * alpha)
+        circ("fill", p.x, p.y, 3 * alpha)
     end
 
     -- Torch flicker particles near player
@@ -583,12 +630,12 @@ function lurek.draw_ui()
                 local fx = VP_X + VP_W / 2 + tdx * 40 + math.random() * 10 - 5
                 local fy = VP_Y + 40 + math.random() * 20
                 lurek.render.setColor(1, 0.6, 0.1, fl_alpha * 0.5)
-                lurek.render.circle("fill", fx, fy, 2 + math.random() * 2)
+                circ("fill", fx, fy, 2 + math.random() * 2)
             end
         end
     end
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.5, 1)
-    lurek.render.print("FPS: " .. lurek.timer.getFPS(), PX, 575, 11)
+    text_("FPS: " .. lurek.timer.getFPS(), PX, 575, 11)
 end

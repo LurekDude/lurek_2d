@@ -97,7 +97,7 @@ function lurek.process(dt)
     seq:update(dt)
 end
 
-function lurek.render()
+function lurek.draw()
     -- dialog box at bottom 25% of screen
     lurek.render.setColor(0, 0, 0, 0.8)
     lurek.render.rectangle("fill", 20, 450, 760, 140)
@@ -172,7 +172,7 @@ function lurek.process(dt)
     end
 end
 
-function lurek.render()
+function lurek.draw()
     -- draw world drops
     for _, d in ipairs(world_drops) do
         lurek.render.setColor(1, 0.8, 0.2)

@@ -186,10 +186,56 @@ lurek.input.bind("quit",         "escape")
 -- Init
 -- ============================================================
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Tween Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.06, 0.1)
-    _cam:setPosition(0, 0)
 end
 
 -- ============================================================
@@ -205,11 +251,7 @@ local function _ready_setup()
     psys_burst:setSpread(math.pi * 2)
     psys_burst:setGravity(0, 60)
     psys_burst:setSizes(1.5, 0.8, 0.2)
-    psys_burst:setColors(
-        1.0, 0.9, 0.3, 1.0,
-        1.0, 0.6, 0.1, 0.8,
-        1.0, 0.3, 0.0, 0.0
-    )
+    psys_burst:setColors({{1.0, 0.9, 0.3, 1.0}, {1.0, 0.6, 0.1, 0.8}, {1.0, 0.3, 0.0, 0.0}})
     psys_burst:setPosition(END_X + RECT_W / 2, SCREEN_H / 2)
     psys_burst:start()
 
@@ -222,11 +264,7 @@ local function _ready_setup()
     psys_flash:setSpread(math.pi * 2)
     psys_flash:setGravity(0, 0)
     psys_flash:setSizes(1.0, 1.5, 0.5, 0.0)
-    psys_flash:setColors(
-        0.6, 0.4, 1.0, 1.0,
-        0.8, 0.6, 1.0, 0.7,
-        1.0, 0.8, 1.0, 0.0
-    )
+    psys_flash:setColors({{0.6, 0.4, 1.0, 1.0}, {0.8, 0.6, 1.0, 0.7}, {1.0, 0.8, 1.0, 0.0}})
     psys_flash:setPosition(SCREEN_W / 2, 30)
     psys_flash:start()
 end
@@ -363,13 +401,13 @@ function lurek.draw()
         -- Selection highlight bar
         if i == selected then
             lurek.render.setColor(1.0, 1.0, 0.3, 0.12)
-            lurek.render.rectangle(START_X - 5, y - 3, END_X - START_X + RECT_W + 10, RECT_H + 6)
+            rect(START_X - 5, y - 3, END_X - START_X + RECT_W + 10, RECT_H + 6)
         end
 
         if current_prop == PROP_POSITION then
             local x = t.x or START_X
             lurek.render.setColor(c[1], c[2], c[3], 1.0)
-            lurek.render.rectangle(x, y, RECT_W, RECT_H)
+            rect(x, y, RECT_W, RECT_H)
 
         elseif current_prop == PROP_SCALE then
             local s = t.scale or 0.5
@@ -377,7 +415,7 @@ function lurek.draw()
             local h = RECT_H * s
             local cx = (START_X + END_X) / 2
             lurek.render.setColor(c[1], c[2], c[3], 1.0)
-            lurek.render.rectangle(cx - w / 2, y + RECT_H / 2 - h / 2, w, h)
+            rect(cx - w / 2, y + RECT_H / 2 - h / 2, w, h)
 
         elseif current_prop == PROP_ROTATION then
             local angle = t.angle or 0
@@ -386,25 +424,25 @@ function lurek.draw()
             local oy = math.sin(rad) * 10
             local cx = (START_X + END_X) / 2
             lurek.render.setColor(c[1], c[2], c[3], 1.0)
-            lurek.render.rectangle(cx + ox - RECT_W / 2, y + oy, RECT_W, RECT_H)
+            rect(cx + ox - RECT_W / 2, y + oy, RECT_W, RECT_H)
 
         elseif current_prop == PROP_ALPHA then
             local a = t.alpha or 0.2
             local cx = (START_X + END_X) / 2
             lurek.render.setColor(c[1], c[2], c[3], a)
-            lurek.render.rectangle(cx - RECT_W / 2, y, RECT_W, RECT_H)
+            rect(cx - RECT_W / 2, y, RECT_W, RECT_H)
 
         elseif current_prop == PROP_COLOR then
             local hue = t.hue or 0
             local r, g, b = hue_to_rgb(hue * 0.66)
             local cx = (START_X + END_X) / 2
             lurek.render.setColor(r, g, b, 1.0)
-            lurek.render.rectangle(cx - RECT_W / 2, y, RECT_W, RECT_H)
+            rect(cx - RECT_W / 2, y, RECT_W, RECT_H)
         end
 
         -- Track line (faint)
         lurek.render.setColor(0.2, 0.2, 0.3, 0.25)
-        lurek.render.line(START_X, y + RECT_H / 2, END_X + RECT_W, y + RECT_H / 2)
+        ln(START_X, y + RECT_H / 2, END_X + RECT_W, y + RECT_H / 2)
 
         ::continue::
     end
@@ -422,52 +460,52 @@ function lurek.draw_ui()
         local a = title_alpha
 
         lurek.render.setColor(0.12, 0.08, 0.2, a * 0.5)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1.0, 0.85, 0.4, a)
-        lurek.render.print("TWEEN DEMO", SCREEN_W / 2 - 80, SCREEN_H / 2 - 50)
+        text_("TWEEN DEMO", SCREEN_W / 2 - 80, SCREEN_H / 2 - 50)
 
         lurek.render.setColor(0.6, 0.4, 1.0, a * 0.8)
-        lurek.render.print("EASING CURVES", SCREEN_W / 2 - 75, SCREEN_H / 2 - 20)
+        text_("EASING CURVES", SCREEN_W / 2 - 75, SCREEN_H / 2 - 20)
 
         lurek.render.setColor(0.6, 0.6, 0.7, a * 0.6)
-        lurek.render.print("Press SPACE or DOWN to start", SCREEN_W / 2 - 110, SCREEN_H / 2 + 30)
+        text_("Press SPACE or DOWN to start", SCREEN_W / 2 - 110, SCREEN_H / 2 + 30)
 
         lurek.render.setColor(0.4, 0.4, 0.5, a * 0.4)
-        lurek.render.print("12 easing types — interactive curve viewer", SCREEN_W / 2 - 150, SCREEN_H / 2 + 60)
+        text_("12 easing types — interactive curve viewer", SCREEN_W / 2 - 150, SCREEN_H / 2 + 60)
 
         lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-        lurek.render.print("FPS: " .. fps, 10, SCREEN_H - 20)
+        text_("FPS: " .. fps, 10, SCREEN_H - 20)
         return
     end
 
     -- ── Top bar ────────────────────────────────────────────
     lurek.render.setColor(0.0, 0.0, 0.0, 0.55)
-    lurek.render.rectangle(0, 0, SCREEN_W, 44)
+    rect(0, 0, SCREEN_W, 44)
 
     lurek.render.setColor(1.0, 0.9, 0.4, 1.0)
-    lurek.render.print("Tween Demo", 12, 6)
+    text_("Tween Demo", 12, 6)
 
     lurek.render.setColor(0.7, 0.8, 0.9, 0.85)
-    lurek.render.print("Property: " .. prop_names[current_prop], 160, 6)
+    text_("Property: " .. prop_names[current_prop], 160, 6)
 
     local speed_label = speed_mult == 0.5 and "0.5x" or (speed_mult == 2.0 and "2.0x" or "1.0x")
     lurek.render.setColor(0.7, 0.8, 0.9, 0.85)
-    lurek.render.print("Speed: " .. speed_label, 360, 6)
+    text_("Speed: " .. speed_label, 360, 6)
 
     if paused then
         lurek.render.setColor(1.0, 0.4, 0.4, 1.0)
-        lurek.render.print("PAUSED", 500, 6)
+        text_("PAUSED", 500, 6)
     end
 
     lurek.render.setColor(0.5, 0.5, 0.6, 0.7)
-    lurek.render.print("Cycle: " .. cycle_count, 620, 6)
+    text_("Cycle: " .. cycle_count, 620, 6)
 
     lurek.render.setColor(0.5, 0.5, 0.6, 0.7)
-    lurek.render.print(string.format("Elapsed: %.2fs / %.1fs", math.min(elapsed, TWEEN_DURATION), TWEEN_DURATION), 160, 26)
+    text_(string.format("Elapsed: %.2fs / %.1fs", math.min(elapsed, TWEEN_DURATION), TWEEN_DURATION), 160, 26)
 
     lurek.render.setColor(0.5, 0.5, 0.6, 0.5)
-    lurek.render.print("Active tweens: " .. lurek.tween.getActiveCount(), 420, 26)
+    text_("Active tweens: " .. lurek.tween.getActiveCount(), 420, 26)
 
     -- ── Easing labels (left side) ──────────────────────────
     for i = 1, NUM_EASINGS do
@@ -477,7 +515,7 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.6, 0.6, 0.7, 0.75)
         end
-        lurek.render.print(string.format("%2d. %s", i, easing_names[i]), 10, y)
+        text_(string.format("%2d. %s", i, easing_names[i]), 10, y)
     end
 
     -- ── Easing curve graph ─────────────────────────────────
@@ -485,25 +523,25 @@ function lurek.draw_ui()
 
     -- Background
     lurek.render.setColor(0.0, 0.0, 0.0, 0.4)
-    lurek.render.rectangle(gx - 8, gy - 22, gw + 16, gh + 34)
+    rect(gx - 8, gy - 22, gw + 16, gh + 34)
 
     -- Border
     lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-    lurek.render.rectangle(gx, gy, gw, gh)
+    rect(gx, gy, gw, gh)
 
     -- Grid lines
     lurek.render.setColor(0.2, 0.2, 0.3, 0.3)
     for gi = 1, 3 do
         local frac = gi / 4
-        lurek.render.line(gx, gy + gh * (1 - frac), gx + gw, gy + gh * (1 - frac))
-        lurek.render.line(gx + gw * frac, gy, gx + gw * frac, gy + gh)
+        ln(gx, gy + gh * (1 - frac), gx + gw, gy + gh * (1 - frac))
+        ln(gx + gw * frac, gy, gx + gw * frac, gy + gh)
     end
 
     -- Axis labels
     lurek.render.setColor(0.4, 0.4, 0.5, 0.5)
-    lurek.render.print("0", gx - 14, gy + gh - 6)
-    lurek.render.print("1", gx - 14, gy - 4)
-    lurek.render.print("time ->", gx + gw / 2 - 20, gy + gh + 4)
+    text_("0", gx - 14, gy + gh - 6)
+    text_("1", gx - 14, gy - 4)
+    text_("time ->", gx + gw / 2 - 20, gy + gh + 4)
 
     -- Draw the selected easing curve
     local sel_name  = easing_names[selected]
@@ -518,7 +556,7 @@ function lurek.draw_ui()
             local t2 = (s + 1) / steps
             local v1 = sel_func(t1)
             local v2 = sel_func(t2)
-            lurek.render.line(
+            ln(
                 gx + t1 * gw, gy + gh - v1 * gh,
                 gx + t2 * gw, gy + gh - v2 * gh
             )
@@ -526,37 +564,37 @@ function lurek.draw_ui()
 
         -- Linear reference line (faint)
         lurek.render.setColor(0.3, 0.3, 0.4, 0.25)
-        lurek.render.line(gx, gy + gh, gx + gw, gy)
+        ln(gx, gy + gh, gx + gw, gy)
 
         -- Progress indicator dot
         local progress = clamp(elapsed / TWEEN_DURATION, 0, 1)
         local v = sel_func(progress)
         lurek.render.setColor(1.0, 1.0, 1.0, 1.0)
-        lurek.render.circle("fill", gx + progress * gw, gy + gh - v * gh, 5)
+        circ("fill", gx + progress * gw, gy + gh - v * gh, 5)
 
         -- Crosshair lines at progress point
         lurek.render.setColor(1.0, 1.0, 1.0, 0.2)
-        lurek.render.line(gx + progress * gw, gy, gx + progress * gw, gy + gh)
-        lurek.render.line(gx, gy + gh - v * gh, gx + gw, gy + gh - v * gh)
+        ln(gx + progress * gw, gy, gx + progress * gw, gy + gh)
+        ln(gx, gy + gh - v * gh, gx + gw, gy + gh - v * gh)
     end
 
     -- Graph title: selected easing name
     lurek.render.setColor(sel_color[1], sel_color[2], sel_color[3], 1.0)
-    lurek.render.print(sel_name, gx, gy - 18)
+    text_(sel_name, gx, gy - 18)
 
     -- ── Bottom controls bar ────────────────────────────────
     lurek.render.setColor(0.0, 0.0, 0.0, 0.45)
-    lurek.render.rectangle(0, SCREEN_H - 26, SCREEN_W, 26)
+    rect(0, SCREEN_H - 26, SCREEN_W, 26)
 
     lurek.render.setColor(0.5, 0.5, 0.6, 0.6)
-    lurek.render.print(
+    text_(
         "SPACE: Pause  |  1-3: Speed  |  Left/Right: Scrub  |  Up/Down: Select  |  P: Property  |  ESC: Quit",
         10, SCREEN_H - 19
     )
 
     -- FPS
     lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-    lurek.render.print("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 19)
+    text_("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 19)
 
     -- Flash particles (UI layer)
     if psys_flash then psys_flash:render() end

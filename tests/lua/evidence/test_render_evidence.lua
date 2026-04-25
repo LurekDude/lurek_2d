@@ -612,7 +612,7 @@ describe("Migrated Evidence Tests 20", function()
 
             -- draw points
             for _, pt in ipairs(pts) do
-                bg:drawCircle(pt.x, pt.y, 3, 255, 100, 100, 255, true)
+                bg:drawCircle(pt.x, pt.y, 3, 255, 100, 100, 255)
             end
         end
         return bg
@@ -1128,7 +1128,7 @@ describe("Migrated Evidence Tests 20", function()
 
             -- draw points
             for _, pt in ipairs(pts) do
-                bg:drawCircle(pt.x, pt.y, 3, 255, 100, 100, 255, true)
+                bg:drawCircle(pt.x, pt.y, 3, 255, 100, 100, 255)
             end
         end
         return bg

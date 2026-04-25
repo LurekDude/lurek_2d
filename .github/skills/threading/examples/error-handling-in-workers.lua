@@ -1,4 +1,8 @@
 -- Worker script:
+local function processTask(task)
+    return task
+end
+
 local inbox  = ...
 local outbox = ...
 local errors = ...  -- error channel

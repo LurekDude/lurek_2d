@@ -1,4 +1,5 @@
 // ── Token types ──────────────────────────────────────────────
+import { LUREK_CALLBACK_NAMES } from "../generated/lurekApiData.js";
 
 export enum TokenType {
   Keyword,
@@ -79,14 +80,6 @@ const LUA_KEYWORDS = new Set([
   "repeat", "return", "then", "true", "until", "while",
 ]);
 
-const LUREK_CALLBACKS = new Set([
-  "load", "update", "draw", "keypressed", "keyreleased", "textinput",
-  "mousepressed", "mousereleased", "wheelmoved",
-  "gamepadpressed", "gamepadreleased", "gamepadaxis",
-  "joystickadded", "joystickremoved",
-  "touchpressed", "touchmoved", "touchreleased",
-  "focus", "visible", "resize", "quit",
-]);
 
 const OPERATORS = new Set([
   "+", "-", "*", "/", "%", "^", "#",
@@ -488,7 +481,7 @@ export class LuaDocumentAnalyzer {
           symbols.push(sym);
 
           // Check for lurek.* callbacks
-          if (fullName.startsWith("lurek.") && LUREK_CALLBACKS.has(shortName)) {
+          if (fullName.startsWith("lurek.") && LUREK_CALLBACK_NAMES.has(shortName)) {
             callbacks.push(sym);
           }
 
@@ -564,7 +557,7 @@ export class LuaDocumentAnalyzer {
             };
             symbols.push(sym);
 
-            if (fullName.startsWith("lurek.") && LUREK_CALLBACKS.has(shortName)) {
+            if (fullName.startsWith("lurek.") && LUREK_CALLBACK_NAMES.has(shortName)) {
               callbacks.push(sym);
             }
 

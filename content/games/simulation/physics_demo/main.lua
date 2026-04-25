@@ -313,9 +313,60 @@ end
 
 -- ═════════════════════════ CALLBACKS ═════════════════════════
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+---@type any
+local _cam = nil
+
 function lurek.init()
   lurek.window.setTitle("Physics Demo — Lurek2D")
   lurek.render.setBackgroundColor(0.08, 0.08, 0.1)
+  _cam = lurek.camera.new()
 
   -- shape selectors
   lurek.input.bind("key_1", function() spawn_type = 1 end)
@@ -325,7 +376,7 @@ function lurek.init()
   -- gravity toggle
   lurek.input.bind("key_g", function()
     gravity_on = not gravity_on
-    lurek.tween.to({ time_scale }, 0.3, { [1] = time_scale })  -- pulse feel
+    lurek.tween.to({ time_scale }, { [1] = time_scale }, 0.3)  -- pulse feel
   end)
 
   -- bounce cycle
@@ -344,7 +395,7 @@ function lurek.init()
   lurek.input.bind("key_m", function()
     slow_mo = not slow_mo
     local target = slow_mo and 0.25 or 1.0
-    lurek.tween.to(_G, 0.4, { time_scale = target })
+    lurek.tween.to(_G, { time_scale = target }, 0.4)
   end)
 
   -- wind toggle
@@ -354,7 +405,7 @@ function lurek.init()
 
   -- ramp placement
   lurek.input.bind("key_r", function()
-    local mx, my = lurek.input.mouse.getPosition()
+    local mx, my = lurek.input.getPosition()
     ramps[#ramps + 1] = {
       x = mx - 40, y = my - 10, w = 80, h = 40,
       dir = (math.random() > 0.5) and "right" or "left",
@@ -363,7 +414,7 @@ function lurek.init()
 
   -- pin nearest object
   lurek.input.bind("key_p", function()
-    local mx, my = lurek.input.mouse.getPosition()
+    local mx, my = lurek.input.getPosition()
     local best_i, best_d = nil, math.huge
     for i, o in ipairs(objects) do
       local d = dist(mx, my, o.x, o.y)
@@ -383,7 +434,9 @@ function lurek.init()
       state = "RUNNING"
       return
     end
-    local mx, my = lurek.input.mouse.getPosition()
+    local mx, my = lurek.input.getPosition()
+    if mx == nil then mx = 0 end
+    if my == nil then my = 0 end
     local idx = find_at(mx, my)
     if idx then
       dragging = idx
@@ -417,7 +470,7 @@ function lurek.process(dt)
 
   -- mouse release
   if dragging then
-    if not lurek.input.isDown(1) then
+    if not lurek.input.mouse.isDown(1) then
       local o = objects[dragging]
       if o and not o.pinned then
         o.vx = throw_vx
@@ -425,7 +478,9 @@ function lurek.process(dt)
       end
       dragging = nil
     else
-      local mx, my = lurek.input.mouse.getPosition()
+      local mx, my = lurek.input.getPosition()
+      if mx == nil then mx = 0 end
+      if my == nil then my = 0 end
       throw_vx = (mx - prev_mouse_x) / math.max(sdt, 0.001)
       throw_vy = (my - prev_mouse_y) / math.max(sdt, 0.001)
       throw_vx = clamp(throw_vx, -1200, 1200)
@@ -497,22 +552,22 @@ function lurek.draw()
 
   -- walls
   lurek.render.setColor(0.25, 0.25, 0.3, 1)
-  lurek.render.rectangle(0, 0, SCREEN_W, WALL_THICK)
-  lurek.render.rectangle(0, SCREEN_H - WALL_THICK, SCREEN_W, WALL_THICK)
-  lurek.render.rectangle(0, 0, WALL_THICK, SCREEN_H)
-  lurek.render.rectangle(SCREEN_W - WALL_THICK, 0, WALL_THICK, SCREEN_H)
+  rect(0, 0, SCREEN_W, WALL_THICK)
+  rect(0, SCREEN_H - WALL_THICK, SCREEN_W, WALL_THICK)
+  rect(0, 0, WALL_THICK, SCREEN_H)
+  rect(SCREEN_W - WALL_THICK, 0, WALL_THICK, SCREEN_H)
 
   -- ramps
   for _, ramp in ipairs(ramps) do
     lurek.render.setColor(0.5, 0.4, 0.2, 0.9)
     if ramp.dir == "right" then
-      lurek.render.polygon("fill", 
+      lurek.render.polygon("fill",
         ramp.x, ramp.y + ramp.h,
         ramp.x + ramp.w, ramp.y + ramp.h,
         ramp.x + ramp.w, ramp.y
       )
     else
-      lurek.render.polygon("fill", 
+      lurek.render.polygon("fill",
         ramp.x, ramp.y,
         ramp.x, ramp.y + ramp.h,
         ramp.x + ramp.w, ramp.y + ramp.h
@@ -526,12 +581,12 @@ function lurek.draw()
     lurek.render.setColor(o.r, o.g, o.b, a)
 
     if o.shape == "circle" then
-      lurek.render.circle("fill", o.x, o.y, o.radius)
+      circ("fill", o.x, o.y, o.radius)
     elseif o.shape == "rect" then
-      lurek.render.rectangle(o.x - o.w * 0.5, o.y - o.h * 0.5, o.w, o.h)
+      rect(o.x - o.w * 0.5, o.y - o.h * 0.5, o.w, o.h)
     elseif o.shape == "triangle" then
       local s = o.size
-      lurek.render.polygon("fill", 
+      lurek.render.polygon("fill",
         o.x, o.y - s * 0.5,
         o.x - s * 0.5, o.y + s * 0.5,
         o.x + s * 0.5, o.y + s * 0.5
@@ -541,14 +596,14 @@ function lurek.draw()
     -- pinned indicator
     if o.pinned then
       lurek.render.setColor(1, 1, 1, 0.5)
-      lurek.render.circle(o.x, o.y, 5)
+      circ(o.x, o.y, 5)
     end
   end
 
   -- particles
   for _, p in ipairs(particles) do
     lurek.render.setColor(p.r, p.g, p.b, p.a)
-    lurek.render.circle("fill", p.x, p.y, p.size)
+    circ("fill", p.x, p.y, p.size)
   end
 end
 
@@ -558,11 +613,11 @@ function lurek.draw_ui()
     -- title screen
     local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
     lurek.render.setColor(0.3, 0.7, 1.0, 1)
-    lurek.render.print("PHYSICS DEMO", SCREEN_W * 0.5 - 120, SCREEN_H * 0.35, 36)
+    text_("PHYSICS DEMO", SCREEN_W * 0.5 - 120, SCREEN_H * 0.35, 36)
     lurek.render.setColor(0.8, 0.8, 0.8, pulse)
-    lurek.render.print("PLAY WITH FORCES", SCREEN_W * 0.5 - 100, SCREEN_H * 0.5, 20)
+    text_("PLAY WITH FORCES", SCREEN_W * 0.5 - 100, SCREEN_H * 0.5, 20)
     lurek.render.setColor(0.5, 0.5, 0.5, pulse * 0.8)
-    lurek.render.print("Click to Start", SCREEN_W * 0.5 - 60, SCREEN_H * 0.62, 16)
+    text_("Click to Start", SCREEN_W * 0.5 - 60, SCREEN_H * 0.62, 16)
     return
   end
 
@@ -572,9 +627,9 @@ function lurek.draw_ui()
 
   -- top-left stats
   lurek.render.setColor(1, 1, 1, 0.9)
-  lurek.render.print(string.format("FPS: %d", fps), 10, 10, 14)
-  lurek.render.print(string.format("Objects: %d / %d", #objects, MAX_OBJECTS), 10, 28, 14)
-  lurek.render.print(string.format("Energy: %.0f", energy), 10, 46, 14)
+  text_(string.format("FPS: %d", fps), 10, 10, 14)
+  text_(string.format("Objects: %d / %d", #objects, MAX_OBJECTS), 10, 28, 14)
+  text_(string.format("Energy: %.0f", energy), 10, 46, 14)
 
   -- indicators
   local y = 70
@@ -584,7 +639,7 @@ function lurek.draw_ui()
     else
       lurek.render.setColor(0.4, 0.4, 0.4, 0.5)
     end
-    lurek.render.print(label, 10, y, 13)
+    text_(label, 10, y, 14)
     y = y + 16
   end
 
@@ -595,7 +650,7 @@ function lurek.draw_ui()
 
   -- shape selector
   lurek.render.setColor(0.7, 0.7, 0.7, 0.8)
-  lurek.render.print("Shape:", SCREEN_W - 180, 10, 14)
+  text_("Shape:", SCREEN_W - 180, 10, 14)
   local shapes = { "Circle[1]", "Rect[2]", "Tri[3]" }
   for i, name in ipairs(shapes) do
     if i == spawn_type then
@@ -603,10 +658,10 @@ function lurek.draw_ui()
     else
       lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
     end
-    lurek.render.print(name, SCREEN_W - 180 + (i - 1) * 60, 28, 13)
+    text_(name, SCREEN_W - 180 + (i - 1) * 60, 28, 13)
   end
 
   -- bottom help
   lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
-  lurek.render.print("R=Ramp  P=Pin  C=Clear  Click=Spawn/Drag  ESC=Quit", 10, SCREEN_H - 20, 12)
+  text_("R=Ramp  P=Pin  C=Clear  Click=Spawn/Drag  ESC=Quit", 10, SCREEN_H - 20, 12)
 end

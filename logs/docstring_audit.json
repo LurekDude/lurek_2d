@@ -1,0 +1,19 @@
+{
+  "total_violations": 1,
+  "by_type": {
+    "missing_param": 1
+  },
+  "files_with_violations": 1,
+  "violations": [
+    {
+      "file": "src/lua_api/data_api.rs",
+      "line": 424,
+      "module": "data",
+      "owner": "",
+      "name": "newByteData",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: value : any"
+    }
+  ]
+}

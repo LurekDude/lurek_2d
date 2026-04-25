@@ -10,9 +10,9 @@ use std::rc::Rc;
 
 /// Registers the `lurek.runtime.*` namespace.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -106,7 +106,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// engine automatically evicts the least-recently-used textures each frame.
     /// Pass `0` to disable the budget (unlimited, the default).
     ///
-    /// @param budget_bytes : integer
+    /// @param budget_bytes integer
     let s = state.clone();
     tbl.set(
         "setResourceBudget",

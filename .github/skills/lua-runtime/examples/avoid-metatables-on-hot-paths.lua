@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- BAD: __index metamethod on every `obj.x` access prevents JIT optimization
 local obj = setmetatable({}, { __index = function(t, k) return defaults[k] end })
 

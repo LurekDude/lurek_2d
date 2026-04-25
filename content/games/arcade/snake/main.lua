@@ -90,6 +90,53 @@ local function reset()
 end
 
 -- ── lurek.init ────────────────────────────────────────────────────────────
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Snake — Lurek2D")
     lurek.render.setBackgroundColor(0.04, 0.06, 0.04)
@@ -234,15 +281,15 @@ function lurek.draw()
 
     -- Grid background
     lurek.render.setColor(0.06, 0.08, 0.06)
-    lurek.render.rectangle("fill", 0, HUD_H, GRID_W, GRID_H)
+    rect("fill", 0, HUD_H, GRID_W, GRID_H)
 
     -- Subtle grid lines
     lurek.render.setColor(0.09, 0.12, 0.09)
     for gx = 0, COLS do
-        lurek.render.line(gx * CELL, HUD_H, gx * CELL, HUD_H + GRID_H)
+        ln(gx * CELL, HUD_H, gx * CELL, HUD_H + GRID_H)
     end
     for gy = 0, ROWS do
-        lurek.render.line(0, HUD_H + gy * CELL, GRID_W, HUD_H + gy * CELL)
+        ln(0, HUD_H + gy * CELL, GRID_W, HUD_H + gy * CELL)
     end
 
     -- Food: red circle with green stem
@@ -251,10 +298,10 @@ function lurek.draw()
         local cy = f[2] * CELL + HUD_H + CELL / 2
         -- Body
         lurek.render.setColor(1, 0.2, 0.2)
-        lurek.render.circle("fill", cx, cy, CELL / 2 - 3)
+        circ("fill", cx, cy, CELL / 2 - 3)
         -- Stem
         lurek.render.setColor(0.2, 0.8, 0.2)
-        lurek.render.rectangle("fill", cx - 1, f[2] * CELL + HUD_H + 2, 3, 5)
+        rect("fill", cx - 1, f[2] * CELL + HUD_H + 2, 3, 5)
     end
 
     -- Snake body: gradient coloring (darker tail → brighter head)
@@ -266,7 +313,7 @@ function lurek.draw()
         if i == #snake then
             -- Head — brightest green
             lurek.render.setColor(0.4, 1.0, 0.4)
-            lurek.render.rectangle("fill", sx + 1, sy + 1, CELL - 2, CELL - 2)
+            rect("fill", sx + 1, sy + 1, CELL - 2, CELL - 2)
 
             -- Eyes: two black dots that follow direction
             lurek.render.setColor(0, 0, 0)
@@ -280,12 +327,12 @@ function lurek.draw()
             else                        -- up
                 ex = sx + CELL / 2 - 3;  ey = sy + 3
             end
-            lurek.render.circle("fill", ex, ey, 2)
+            circ("fill", ex, ey, 2)
             -- Second eye (offset perpendicular to direction)
             if dir[1] ~= 0 then
-                lurek.render.circle("fill", ex, ey + 6, 2)
+                circ("fill", ex, ey + 6, 2)
             else
-                lurek.render.circle("fill", ex + 6, ey, 2)
+                circ("fill", ex + 6, ey, 2)
             end
         else
             -- Body segment — gradient
@@ -293,7 +340,7 @@ function lurek.draw()
             local gg = 0.7 + t * 0.3
             local gb = 0.3 + t * 0.2
             lurek.render.setColor(gr, gg, gb)
-            lurek.render.rectangle("fill", sx + 2, sy + 2, CELL - 4, CELL - 4)
+            rect("fill", sx + 2, sy + 2, CELL - 4, CELL - 4)
         end
     end
 
@@ -307,66 +354,66 @@ end
 function lurek.draw_ui()
     -- Top bar background
     lurek.render.setColor(0.08, 0.12, 0.08)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, HUD_H)
+    rect("fill", 0, 0, SCREEN_W, HUD_H)
 
     -- Title
     lurek.render.setColor(0.4, 0.9, 0.4)
-    lurek.render.print("SNAKE", 8, 8, 2)
+    text_("SNAKE", 8, 8, 2)
 
     -- Score (uses tweened display value for smooth pops)
     lurek.render.setColor(1, 1, 1)
-    lurek.render.print("Score: " .. math.floor(display_score), SCREEN_W / 2 - 50, 10, 1.8)
+    text_("Score: " .. math.floor(display_score), SCREEN_W / 2 - 50, 10, 1.8)
 
     -- High score
     lurek.render.setColor(0.6, 0.8, 0.6)
-    lurek.render.print("Best: " .. high_score, SCREEN_W - 130, 10, 1.5)
+    text_("Best: " .. high_score, SCREEN_W - 130, 10, 1.5)
 
     -- FPS counter (bottom-left)
     lurek.render.setColor(0.4, 0.4, 0.4)
-    lurek.render.print("FPS: " .. math.floor(lurek.timer.getFPS()), 4, SCREEN_H - 18, 1)
+    text_("FPS: " .. math.floor(lurek.timer.getFPS()), 4, SCREEN_H - 18, 1)
 
     -- Controls hint (bottom-right)
     lurek.render.setColor(0.35, 0.35, 0.35)
-    lurek.render.print("WASD / Arrows  |  ESC quit", SCREEN_W - 230, SCREEN_H - 18, 1)
+    text_("WASD / Arrows  |  ESC quit", SCREEN_W - 230, SCREEN_H - 18, 1)
 
     -- ── State overlays ────────────────────────────────────────────────────
 
     if state == STATE.TITLE then
         -- Dim overlay
         lurek.render.setColor(0, 0, 0, 0.75)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         -- Title text
         lurek.render.setColor(0.4, 1.0, 0.4)
-        lurek.render.print("SNAKE", SCREEN_W / 2 - 60, SCREEN_H / 2 - 60, 4)
+        text_("SNAKE", SCREEN_W / 2 - 60, SCREEN_H / 2 - 60, 4)
 
         lurek.render.setColor(0.7, 0.9, 0.7)
-        lurek.render.print("Eat, grow, avoid yourself", SCREEN_W / 2 - 110, SCREEN_H / 2 - 10, 1.8)
+        text_("Eat, grow, avoid yourself", SCREEN_W / 2 - 110, SCREEN_H / 2 - 10, 1.8)
 
         lurek.render.setColor(1, 1, 1)
-        lurek.render.print("Press ENTER to start", SCREEN_W / 2 - 95, SCREEN_H / 2 + 30, 2)
+        text_("Press ENTER to start", SCREEN_W / 2 - 95, SCREEN_H / 2 + 30, 2)
 
         lurek.render.setColor(0.5, 0.5, 0.5)
-        lurek.render.print("WASD or Arrow Keys to steer", SCREEN_W / 2 - 115, SCREEN_H / 2 + 65, 1.5)
+        text_("WASD or Arrow Keys to steer", SCREEN_W / 2 - 115, SCREEN_H / 2 + 65, 1.5)
     end
 
     if state == STATE.DEAD then
         -- Dim overlay
         lurek.render.setColor(0, 0, 0, 0.7)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1, 0.3, 0.3)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 90, SCREEN_H / 2 - 40, 3)
+        text_("GAME OVER", SCREEN_W / 2 - 90, SCREEN_H / 2 - 40, 3)
 
         lurek.render.setColor(1, 1, 1)
-        lurek.render.print("Score: " .. score, SCREEN_W / 2 - 50, SCREEN_H / 2 + 5, 2)
+        text_("Score: " .. score, SCREEN_W / 2 - 50, SCREEN_H / 2 + 5, 2)
 
         if score >= high_score and score > 0 then
             lurek.render.setColor(1, 1, 0.3)
-            lurek.render.print("NEW BEST!", SCREEN_W / 2 - 50, SCREEN_H / 2 + 35, 2)
+            text_("NEW BEST!", SCREEN_W / 2 - 50, SCREEN_H / 2 + 35, 2)
         end
 
         lurek.render.setColor(0.7, 0.7, 0.7)
-        lurek.render.print("Press ENTER to restart", SCREEN_W / 2 - 100, SCREEN_H / 2 + 65, 2)
+        text_("Press ENTER to restart", SCREEN_W / 2 - 100, SCREEN_H / 2 + 65, 2)
     end
 end

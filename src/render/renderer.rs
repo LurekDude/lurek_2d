@@ -222,7 +222,6 @@ pub enum BlendMode {
 /// - `EndPostFx` — Stop capturing; resume rendering to the previous target.
 /// - `ApplyPostFx` — Apply the registered post-processing effects from the named stack and composite the result onto the current target.
 /// - `DrawTexturedQuad` — Draws an arbitrary textured quad specified by four explicit screen-space corners and four UV coordinates.
-
 /// A single shader pass in a post-FX pipeline.
 ///
 /// Produced by the Lua PostFx stack at `apply()` time and stored inside
@@ -312,7 +311,6 @@ pub struct PostFxPass {
 /// - `PushLayer` — PushLayer variant.
 /// - `PopLayer` — PopLayer variant.
 /// - `DrawRichText` — DrawRichText variant.
-
 /// One styled segment inside a [`RenderCommand::DrawRichText`] command.
 ///
 /// Each span can carry its own colour and scale, while the command as a

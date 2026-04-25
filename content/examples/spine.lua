@@ -118,8 +118,7 @@ do  -- Skeleton:drawToImage
   rig:addBone("root", { x = 64, y = 64 })
   rig:addChildBone("arm", 0, { x = 32 })
   rig:updateWorldTransforms()
-  local debug_tex
-  function lurek.init() debug_tex = lurek.render.newImage(rig:drawToImage(128, 128)) end
+  local debug_tex = lurek.render.newImage(rig:drawToImage(128, 128))
   function lurek.draw() lurek.render.draw(debug_tex, 16, 16) end
 end
 
@@ -244,8 +243,8 @@ end
 -- Adds a root bone to the skeleton at the given local position and angle.
 -- Root bones have no parent; use addChildBone to build the hierarchy.
 do  -- Skeleton:addBone
-  local sk = lurek.spine.newSkeleton()
-  local bid = sk:addBone("root", 0, 0, 0, 20)
+  local sk = lurek.spine.newSkeleton("hero")
+  local bid = sk:addBone("root", { x = 0, y = 0 })
   lurek.log.info("root bone: " .. bid, "spine")
 end
 
@@ -253,9 +252,9 @@ end
 -- Adds a child bone parented to an existing bone.
 -- Position and angle are in the parent bone's local space.
 do  -- Skeleton:addChildBone
-  local sk = lurek.spine.newSkeleton()
-  local root = sk:addBone("root", 0, 0, 0, 20)
-  local upper = sk:addChildBone("upper_arm", root, 0, 20, 0, 16)
+  local sk = lurek.spine.newSkeleton("hero")
+  local root = sk:addBone("root")
+  local upper = sk:addChildBone("upper_arm", root, { x = 0, y = 20 })
   lurek.log.info("child bone: " .. upper, "spine")
 end
 
@@ -263,9 +262,9 @@ end
 -- Adds a timed event key to the animation track at the given time offset.
 -- Events fire in getEvents() so Lua can react to footsteps, sound cues, etc.
 do  -- SkeletonAnimation:addEventKey
-  local anim = lurek.spine.newSkeletonAnimation()
-  anim:addKeyframe(0.0, 1, 0, 0, 0)
-  anim:addEventKey(0.5, "footstep", {foot="left"})
+  local anim = lurek.spine.newSkeletonAnimation("walk", 1.0)
+  anim:addKeyframe(0, "y", 0.0, 0)
+  anim:addEventKey(0.5, "footstep")
   lurek.log.info("event key added at t=0.5", "spine")
 end
 
@@ -273,10 +272,10 @@ end
 -- Adds an inverse-kinematics constraint between a chain of bones and a target bone.
 -- chainLength specifies how many parent bones to include in the IK solve.
 do  -- Skeleton:addIKConstraint
-  local sk = lurek.spine.newSkeleton()
-  local root = sk:addBone("root", 0, 0, 0, 30)
-  local lower = sk:addChildBone("lower_arm", root, 0, 30, 0, 25)
-  sk:addIKConstraint("arm_ik", lower, root, 2, 1.0)
+  local sk = lurek.spine.newSkeleton("hero")
+  local root = sk:addBone("root")
+  local lower = sk:addChildBone("lower_arm", root, { y = -30 })
+  sk:addIKConstraint("arm_ik", {root, lower}, true)
   lurek.log.info("IK constraint added", "spine")
 end
 
@@ -284,10 +283,10 @@ end
 -- Adds a keyframe at the given time for a bone, specifying its local transform.
 -- Keyframes are interpolated between by the animation playback system.
 do  -- SkeletonAnimation:addKeyframe
-  local anim = lurek.spine.newSkeletonAnimation()
-  anim:addKeyframe(0.0, 1, 0, 0, 0)
-  anim:addKeyframe(0.5, 1, 10, 5, 0.2)
-  anim:addKeyframe(1.0, 1, 0, 0, 0)
+  local anim = lurek.spine.newSkeletonAnimation("bob", 1.0)
+  anim:addKeyframe(0, "y", 0.0,  0)
+  anim:addKeyframe(0, "y", 0.5, 10)
+  anim:addKeyframe(0, "y", 1.0,  0)
   lurek.log.info("keyframes: " .. anim:getTimelineCount(), "spine")
 end
 
@@ -295,8 +294,8 @@ end
 -- Adds a named slot to the skeleton, optionally parenting it to a bone.
 -- Slots determine which sprite or attachment is drawn for each body part.
 do  -- Skeleton:addSlot
-  local sk = lurek.spine.newSkeleton()
-  local root = sk:addBone("root", 0, 0, 0, 20)
+  local sk = lurek.spine.newSkeleton("hero")
+  local root = sk:addBone("root")
   local sid = sk:addSlot("body_slot", root, "body_sprite.png")
   lurek.log.info("slot: " .. sid, "spine")
 end
@@ -305,10 +304,10 @@ end
 -- Blends two animation tracks by weight for upper/lower-body splits.
 -- weight=1 fully applies the secondary animation; 0 is equivalent to removing it.
 do  -- Skeleton:blendAnimation
-  local sk = lurek.spine.newSkeleton()
-  local root = sk:addBone("root", 0, 0, 0, 20)
-  sk:playAnimation("walk", true)
-  sk:blendAnimation("aim", 0.6, {"spine", "shoulder_r", "arm_r"})
+  local sk = lurek.spine.newSkeleton("hero")
+  sk:addBone("root")
+  local aim_clip = lurek.spine.newSkeletonAnimation("aim", 1.0)
+  sk:blendAnimation(aim_clip, 0.0, 0.6)
   lurek.log.info("blend applied", "spine")
 end
 
@@ -316,8 +315,10 @@ end
 -- Starts playback of a named animation on this skeleton.
 -- loop=true repeats indefinitely; false plays once and freezes at the last frame.
 do  -- Skeleton:playAnimation
-  local sk = lurek.spine.newSkeleton()
-  sk:addBone("root", 0, 0, 0, 20)
+  local sk = lurek.spine.newSkeleton("hero")
+  sk:addBone("root")
+  local idle = lurek.spine.newSkeletonAnimation("idle", 1.0)
+  sk:addAnimation(idle)
   sk:playAnimation("idle", true)
   lurek.log.info("animation playing", "spine")
 end
@@ -326,10 +327,10 @@ end
 -- Sets the world-space target position for a named IK constraint.
 -- Call each frame to drive the IK end-effector toward the desired position.
 do  -- Skeleton:setIKTarget
-  local sk = lurek.spine.newSkeleton()
-  local root = sk:addBone("root", 0, 0, 0, 30)
-  local lower = sk:addChildBone("lower_arm", root, 0, 30, 0, 25)
-  sk:addIKConstraint("arm_ik", lower, root, 2, 1.0)
+  local sk = lurek.spine.newSkeleton("hero")
+  local root = sk:addBone("root")
+  local lower = sk:addChildBone("lower_arm", root, { y = -30 })
+  sk:addIKConstraint("arm_ik", {root, lower}, true)
   sk:setIKTarget("arm_ik", 40, 10)
   lurek.log.info("IK target set", "spine")
 end
@@ -338,10 +339,10 @@ end
 -- Maps a skin name to a set of slot replacements for costume swapping.
 -- Calling setSkin("winter") swaps all slots registered under that mapping.
 do  -- Skeleton:setSkinMapping
-  local sk = lurek.spine.newSkeleton()
-  sk:addBone("root", 0, 0, 0, 20)
-  sk:addSlot("body_slot", 1, "hero_default.png")
-  sk:setSkinMapping("winter", {body_slot="hero_winter.png"})
+  local sk = lurek.spine.newSkeleton("hero")
+  local root = sk:addBone("root")
+  sk:addSlot("body_slot", root, "hero_default.png")
+  sk:setSkinMapping("winter", "body_slot", "hero_winter.png")
   sk:setSkin("winter")
   lurek.log.info("skin mapping set", "spine")
 end

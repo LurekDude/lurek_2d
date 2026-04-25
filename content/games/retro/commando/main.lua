@@ -1,3 +1,50 @@
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 -- ============================================================================
 -- Commando — Lurek2D
 -- ============================================================================
@@ -197,7 +244,7 @@ local function draw_particles()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a)
-        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        rect("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 end
 
@@ -231,7 +278,7 @@ end
 local function draw_score_pops()
     for _, sp in ipairs(score_pops) do
         lurek.render.setColor(sp.r, sp.g, sp.b, sp.alpha)
-        lurek.render.print(sp.text, sp.x, sp.y)
+        text_(sp.text, sp.x, sp.y)
     end
 end
 
@@ -256,7 +303,7 @@ local function draw_jungle(scroll_y)
             else
                 lurek.render.setColor(0.13, 0.26, 0.09, 1)
             end
-            lurek.render.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
+            rect("fill", px, py, TILE_SIZE, TILE_SIZE)
         end
     end
 end
@@ -417,6 +464,7 @@ end
 -- ---------------------------------------------------------------------------
 -- lurek.init — one-time setup
 -- ---------------------------------------------------------------------------
+
 function lurek.init()
     lurek.window.setTitle("Commando — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.18, 0.06)
@@ -489,10 +537,10 @@ function lurek.process(dt)
 
     -- Player movement
     local dx, dy = 0, 0
-    if lurek.input.isDown("w") or lurek.input.isDown("up")    then dy = -1 end
-    if lurek.input.isDown("s") or lurek.input.isDown("down")  then dy =  1 end
-    if lurek.input.isDown("a") or lurek.input.isDown("left")  then dx = -1 end
-    if lurek.input.isDown("d") or lurek.input.isDown("right") then dx =  1 end
+    if lurek.input.keyboard.isDown("w") or lurek.input.keyboard.isDown("up")    then dy = -1 end
+    if lurek.input.keyboard.isDown("s") or lurek.input.keyboard.isDown("down")  then dy =  1 end
+    if lurek.input.keyboard.isDown("a") or lurek.input.keyboard.isDown("left")  then dx = -1 end
+    if lurek.input.keyboard.isDown("d") or lurek.input.keyboard.isDown("right") then dx =  1 end
     if dx ~= 0 and dy ~= 0 then
         local inv = 1 / math.sqrt(2)
         dx, dy = dx * inv, dy * inv
@@ -507,7 +555,7 @@ function lurek.process(dt)
 
     -- Shoot
     fire_timer = math.max(0, fire_timer - dt)
-    if lurek.input.isDown("space") and fire_timer <= 0 then
+    if lurek.input.keyboard.isDown("space") and fire_timer <= 0 then
         fire_timer = FIRE_COOLDOWN
         table.insert(player_bullets, { x = player.x + PLAYER_W / 2 - BULLET_W / 2, y = player.y - BULLET_H })
     end
@@ -717,7 +765,7 @@ end
 function lurek.draw()
     if current_state == STATE.TITLE then
         lurek.render.setColor(0.08, 0.18, 0.06, 1)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
         return
     end
 
@@ -734,7 +782,7 @@ function lurek.draw()
             else -- tree
                 lurek.render.setColor(0.10, 0.40, 0.10, 1)
             end
-            lurek.render.rectangle("fill", c.x, c.y, c.w, c.h)
+            rect("fill", c.x, c.y, c.w, c.h)
         end
     end
 
@@ -742,10 +790,10 @@ function lurek.draw()
     for _, p in ipairs(pows) do
         if not p.rescued then
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.rectangle("fill", p.x, p.y, POW_W, POW_H)
+            rect("fill", p.x, p.y, POW_W, POW_H)
             -- "P" indicator
             lurek.render.setColor(0.8, 0.2, 0.2, 1)
-            lurek.render.rectangle("fill", p.x + 3, p.y + 2, 6, 8)
+            rect("fill", p.x + 3, p.y + 2, 6, 8)
         end
     end
 
@@ -754,15 +802,15 @@ function lurek.draw()
         if e.alive then
             local c = ENEMY_COLORS[e.etype]
             lurek.render.setColor(c[1], c[2], c[3], 1)
-            lurek.render.rectangle("fill", e.x, e.y, ENEMY_W[e.etype], ENEMY_H[e.etype])
+            rect("fill", e.x, e.y, ENEMY_W[e.etype], ENEMY_H[e.etype])
             -- HP bar for bosses
             if e.etype == E_BOSS then
                 local bar_w = ENEMY_W[E_BOSS]
                 local hp_frac = e.hp / ENEMY_HP[E_BOSS]
                 lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
-                lurek.render.rectangle("fill", e.x, e.y - 8, bar_w, 4)
+                rect("fill", e.x, e.y - 8, bar_w, 4)
                 lurek.render.setColor(1, 0.2, 0.2, 1)
-                lurek.render.rectangle("fill", e.x, e.y - 8, bar_w * hp_frac, 4)
+                rect("fill", e.x, e.y - 8, bar_w * hp_frac, 4)
             end
         end
     end
@@ -770,28 +818,28 @@ function lurek.draw()
     -- Enemy bullets
     lurek.render.setColor(1, 0.3, 0.1, 1)
     for _, b in ipairs(enemy_bullets) do
-        lurek.render.rectangle("fill", b.x - 3, b.y - 3, 6, 6)
+        rect("fill", b.x - 3, b.y - 3, 6, 6)
     end
 
     -- Player bullets
     lurek.render.setColor(1, 1, 0.4, 1)
     for _, b in ipairs(player_bullets) do
-        lurek.render.rectangle("fill", b.x, b.y, BULLET_W, BULLET_H)
+        rect("fill", b.x, b.y, BULLET_W, BULLET_H)
     end
 
     -- Grenades in flight
     lurek.render.setColor(0.3, 0.5, 0.1, 1)
     for _, g in ipairs(grenades_in_flight) do
-        lurek.render.rectangle("fill", g.x - 4, g.y - 4, 8, 8)
+        rect("fill", g.x - 4, g.y - 4, 8, 8)
     end
 
     -- Player
     if invuln_timer <= 0 or math.floor(invuln_timer * 10) % 2 == 0 then
         lurek.render.setColor(0.2, 0.6, 0.15, 1)
-        lurek.render.rectangle("fill", player.x, player.y, PLAYER_W, PLAYER_H)
+        rect("fill", player.x, player.y, PLAYER_W, PLAYER_H)
         -- Head
         lurek.render.setColor(0.25, 0.7, 0.2, 1)
-        lurek.render.rectangle("fill", player.x + 3, player.y - 4, 10, 6)
+        rect("fill", player.x + 3, player.y - 4, 10, 6)
     end
 
     -- Particles & score pops
@@ -806,49 +854,49 @@ function lurek.draw_ui()
     if current_state == STATE.TITLE then
         -- Title screen
         lurek.render.setColor(0.2, 0.8, 0.15, 1)
-        lurek.render.print("COMMANDO", SCREEN_W / 2 - 60, SCREEN_H / 2 - 60)
+        text_("COMMANDO", SCREEN_W / 2 - 60, SCREEN_H / 2 - 60)
         lurek.render.setColor(0.9, 0.9, 0.7, 1)
-        lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 50, SCREEN_H / 2 + 10)
+        text_("PRESS ENTER", SCREEN_W / 2 - 50, SCREEN_H / 2 + 10)
         lurek.render.setColor(0.6, 0.6, 0.5, 1)
-        lurek.render.print("WASD - Move   SPACE - Fire   G - Grenade", SCREEN_W / 2 - 140, SCREEN_H / 2 + 50)
-        lurek.render.print("Rescue POWs for bonus points!", SCREEN_W / 2 - 110, SCREEN_H / 2 + 75)
+        text_("WASD - Move   SPACE - Fire   G - Grenade", SCREEN_W / 2 - 140, SCREEN_H / 2 + 50)
+        text_("Rescue POWs for bonus points!", SCREEN_W / 2 - 110, SCREEN_H / 2 + 75)
         return
     end
 
     if current_state == STATE.GAME_OVER then
         lurek.render.setColor(1, 0.2, 0.15, 1)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 50, SCREEN_H / 2 - 40)
+        text_("GAME OVER", SCREEN_W / 2 - 50, SCREEN_H / 2 - 40)
         lurek.render.setColor(1, 1, 0.8, 1)
-        lurek.render.print("Score: " .. score, SCREEN_W / 2 - 40, SCREEN_H / 2)
-        lurek.render.print("High Score: " .. high_score, SCREEN_W / 2 - 55, SCREEN_H / 2 + 25)
+        text_("Score: " .. score, SCREEN_W / 2 - 40, SCREEN_H / 2)
+        text_("High Score: " .. high_score, SCREEN_W / 2 - 55, SCREEN_H / 2 + 25)
         lurek.render.setColor(0.7, 0.7, 0.6, 1)
-        lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 50, SCREEN_H / 2 + 60)
+        text_("PRESS ENTER", SCREEN_W / 2 - 50, SCREEN_H / 2 + 60)
         return
     end
 
     -- HUD — top bar
     lurek.render.setColor(0, 0, 0, 0.5)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 24)
+    rect("fill", 0, 0, SCREEN_W, 24)
 
     lurek.render.setColor(1, 1, 0.8, 1)
-    lurek.render.print("SCORE: " .. score, 10, 4)
+    text_("SCORE: " .. score, 10, 4)
 
     lurek.render.setColor(0.3, 1, 0.3, 1)
-    lurek.render.print("LIVES: " .. lives, 200, 4)
+    text_("LIVES: " .. lives, 200, 4)
 
     lurek.render.setColor(0.9, 0.7, 0.2, 1)
-    lurek.render.print("GRENADES: " .. grenades, 340, 4)
+    text_("GRENADES: " .. grenades, 340, 4)
 
     lurek.render.setColor(0.7, 0.8, 1, 1)
-    lurek.render.print("DIST: " .. math.floor(distance), 530, 4)
+    text_("DIST: " .. math.floor(distance), 530, 4)
 
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.5, 0.5, 0.5, 0.8)
-    lurek.render.print("FPS: " .. fps, SCREEN_W - 80, 4)
+    text_("FPS: " .. fps, SCREEN_W - 80, 4)
 
     -- High score
     if high_score > 0 then
         lurek.render.setColor(0.8, 0.8, 0.3, 0.7)
-        lurek.render.print("HI: " .. high_score, SCREEN_W - 80, SCREEN_H - 20)
+        text_("HI: " .. high_score, SCREEN_W - 80, SCREEN_H - 20)
     end
 end

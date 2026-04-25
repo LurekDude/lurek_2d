@@ -5,7 +5,6 @@
 //! and `PaletteLUT` (palette-swap look-up tables). All operations run on the CPU;
 //! upload to GPU is handled by the render layer.
 
-use super::render_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -37,8 +36,8 @@ impl LuaUserData for LuaProvinceGrid {
 
         // -- getAt --
         /// Returns the province ID at pixel coordinates (x, y). Returns 0 for background or out-of-bounds.
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return integer
         methods.add_method("getAt", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.get_at(x, y))
@@ -96,7 +95,7 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- addLayer --
         /// Appends a new blank transparent layer on top and returns its 1-based index.
-        /// @param name : string?
+        /// @param name string?
         /// @return integer
         methods.add_method_mut("addLayer", |_, this, name: Option<String>| {
             let label = name.unwrap_or_else(|| format!("Layer {}", this.inner.layer_count() + 1));
@@ -106,7 +105,7 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- removeLayer --
         /// Removes the layer at the given 1-based index. Returns true on success.
-        /// @param index : integer
+        /// @param index integer
         /// @return boolean
         methods.add_method_mut("removeLayer", |_, this, index: usize| {
             if index == 0 {
@@ -117,7 +116,7 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- getLayer --
         /// Returns a copy of the layer's pixel buffer as an ImageData.
-        /// @param index : integer
+        /// @param index integer
         /// @return ImageData
         methods.add_method("getLayer", |lua, this, index: usize| {
             if index == 0 {
@@ -131,8 +130,8 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- setLayer --
         /// Replaces a layer's pixel buffer with a copy of the given ImageData.
-        /// @param index : integer
-        /// @param imagedata : ImageData
+        /// @param index integer
+        /// @param imagedata ImageData
         /// @return boolean
         methods.add_method_mut(
             "setLayer",
@@ -149,7 +148,7 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- getOpacity --
         /// Returns the opacity of a layer in [0.0, 1.0].
-        /// @param index : integer
+        /// @param index integer
         /// @return number
         methods.add_method("getOpacity", |_, this, index: usize| {
             if index == 0 {
@@ -163,8 +162,8 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- setOpacity --
         /// Sets the opacity of a layer. Value is clamped to [0.0, 1.0].
-        /// @param index : integer
-        /// @param opacity : number
+        /// @param index integer
+        /// @param opacity number
         /// @return boolean
         methods.add_method_mut("setOpacity", |_, this, (index, opacity): (usize, f32)| {
             if index == 0 {
@@ -175,7 +174,7 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- isVisible --
         /// Returns whether a layer is visible.
-        /// @param index : integer
+        /// @param index integer
         /// @return boolean
         methods.add_method("isVisible", |_, this, index: usize| {
             if index == 0 {
@@ -189,8 +188,8 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- setVisible --
         /// Shows or hides a layer during compositing.
-        /// @param index : integer
-        /// @param visible : boolean
+        /// @param index integer
+        /// @param visible boolean
         /// @return boolean
         methods.add_method_mut("setVisible", |_, this, (index, visible): (usize, bool)| {
             if index == 0 {
@@ -201,7 +200,7 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- getName --
         /// Returns the name of a layer.
-        /// @param index : integer
+        /// @param index integer
         /// @return string
         methods.add_method("getName", |_, this, index: usize| {
             if index == 0 {
@@ -215,8 +214,8 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- setName --
         /// Renames the layer at the given index to the new name string.
-        /// @param index : integer
-        /// @param name : string
+        /// @param index integer
+        /// @param name string
         /// @return boolean
         methods.add_method_mut("setName", |_, this, (index, name): (usize, String)| {
             if index == 0 {
@@ -227,8 +226,8 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- swapLayers --
         /// Swaps two layers by their 1-based indices, changing their compositing order.
-        /// @param a : integer
-        /// @param b : integer
+        /// @param a integer
+        /// @param b integer
         /// @return boolean
         methods.add_method_mut("swapLayers", |_, this, (a, b): (usize, usize)| {
             if a == 0 || b == 0 {
@@ -239,8 +238,8 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- moveLayer --
         /// Moves a layer from one position to another, shifting layers in between.
-        /// @param from_index : integer
-        /// @param to_index : integer
+        /// @param from_index integer
+        /// @param to_index integer
         /// @return boolean
         methods.add_method_mut(
             "moveLayer",
@@ -261,7 +260,7 @@ impl LuaUserData for LuaLayeredImage {
 
         // -- save --
         /// Saves the layered image to a LIMG binary file at the given path.
-        /// @param path : string
+        /// @param path string
         /// @return nil
         methods.add_method("save", |_, this, path: String| {
             serial::save_layered(&this.inner, &path).map_err(LuaError::external)
@@ -319,17 +318,17 @@ impl LuaUserData for LuaCompressedImageData {
 
 /// Registers the `lurek.image` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- newImageData --
     /// Creates a new blank ImageData or loads one from a file.
-    /// @param width_or_filename : integer|string
-    /// @param height : integer?
+    /// @param width_or_filename integer|string
+    /// @param height integer?
     /// @return ImageData
     let s = state.clone();
     tbl.set(
@@ -372,7 +371,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newCompressedData --
     /// Loads compressed texture data from a DDS file.
-    /// @param filename : string
+    /// @param filename string
     /// @return CompressedImageData
     let s = state.clone();
     tbl.set(
@@ -389,7 +388,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isCompressed --
     /// Returns true if the file at the given path is a DDS file.
-    /// @param filename : string
+    /// @param filename string
     /// @return boolean
     let s = state.clone();
     tbl.set(
@@ -404,8 +403,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newLayeredImage --
     /// Creates a new empty LayeredImage canvas with no layers.
-    /// @param width : integer
-    /// @param height : integer
+    /// @param width integer
+    /// @param height integer
     /// @return LayeredImage
     tbl.set(
         "newLayeredImage",
@@ -418,8 +417,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- saveImage --
     /// Saves a flat ImageData to a LIMG binary file at the given path.
-    /// @param imagedata : ImageData
-    /// @param path : string
+    /// @param imagedata ImageData
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -438,23 +437,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- savePNG --
     /// Saves a flat ImageData as a PNG file at the given path.
-    /// @param imagedata : ImageData
-    /// @param path : string
+    /// @param imagedata ImageData
+    /// @param path string
     /// @return nil
     let s = state.clone();
     tbl.set(
         "savePNG",
         lua.create_function(move |_, (img_ud, filename): (LuaAnyUserData, String)| {
             let path = s.borrow().game_dir.join(&filename);
-            // Accept both LuaImageData (from render/spine) and raw ImageData (from image module).
-            let bytes = if let Ok(wrapper) = img_ud.borrow::<LuaImageData>() {
-                wrapper.inner.encode_png().map_err(LuaError::RuntimeError)?
-            } else {
-                let raw = img_ud
-                    .borrow::<ImageData>()
-                    .map_err(|_| LuaError::RuntimeError("argument must be an ImageData".into()))?;
-                raw.encode_png().map_err(LuaError::RuntimeError)?
-            };
+            let raw = img_ud
+                .borrow::<ImageData>()
+                .map_err(|_| LuaError::RuntimeError("argument must be an ImageData".into()))?;
+            let bytes = raw.encode_png().map_err(LuaError::RuntimeError)?;
             if let Some(parent) = path.parent() {
                 std::fs::create_dir_all(parent).map_err(LuaError::external)?;
             }
@@ -464,7 +458,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- loadImage --
     /// Loads an ImageData from a LIMG binary file.
-    /// @param path : string
+    /// @param path string
     /// @return ImageData
     let s = state.clone();
     tbl.set(
@@ -481,7 +475,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- loadLayered --
     /// Loads a LayeredImage from a LIMG binary file.
-    /// @param path : string
+    /// @param path string
     /// @return LayeredImage
     let s = state.clone();
     tbl.set(
@@ -512,7 +506,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Loads a province map PNG and builds an O(1) spatial index with adjacency data.
     /// Each unique RGB color in the PNG is assigned a sequential province ID (1..n).
     /// Black pixels (0,0,0) are treated as background and return ID 0.
-    /// @param filename : string
+    /// @param filename string
     /// @return ProvinceGrid
     let s = state.clone();
     tbl.set(
@@ -549,8 +543,8 @@ impl mlua::UserData for ImageData {
         });
         /// Returns the pixel.
         ///
-        /// @param x : integer
-        /// @param y : integer
+        /// @param x integer
+        /// @param y integer
         /// @return nil
         methods.add_method("getPixel", |_, this, (x, y): (u32, u32)| {
             this.get_pixel(x, y).ok_or_else(|| {
@@ -581,7 +575,7 @@ impl mlua::UserData for ImageData {
         );
         /// Encode.
         ///
-        /// @param format : string
+        /// @param format string
         /// @return nil
         methods.add_method("encode", |_, this, format: String| match format.as_str() {
             "png" => this.encode_png().map_err(LuaError::RuntimeError),
@@ -597,7 +591,7 @@ impl mlua::UserData for ImageData {
 
         /// Map pixel.
         ///
-        /// @param func : function
+        /// @param func function
         /// @return nil
         methods.add_method_mut("mapPixel", |_, this, func: LuaFunction| {
             let w = this.width();
@@ -619,7 +613,7 @@ impl mlua::UserData for ImageData {
         // -- brightness --
         /// Brightness.
         ///
-        /// @param factor : number
+        /// @param factor number
         /// @return nil
         methods.add_method_mut("brightness", |_, this, factor: f32| {
             this.brightness(factor);
@@ -628,7 +622,7 @@ impl mlua::UserData for ImageData {
         // -- contrast --
         /// Contrast.
         ///
-        /// @param factor : number
+        /// @param factor number
         /// @return nil
         methods.add_method_mut("contrast", |_, this, factor: f32| {
             this.contrast(factor);
@@ -637,7 +631,7 @@ impl mlua::UserData for ImageData {
         // -- saturation --
         /// Saturation.
         ///
-        /// @param factor : number
+        /// @param factor number
         /// @return nil
         methods.add_method_mut("saturation", |_, this, factor: f32| {
             this.saturation(factor);
@@ -646,7 +640,7 @@ impl mlua::UserData for ImageData {
         // -- gamma --
         /// Gamma.
         ///
-        /// @param gamma : number
+        /// @param gamma number
         /// @return nil
         methods.add_method_mut("gamma", |_, this, gamma: f32| {
             this.gamma(gamma);
@@ -687,7 +681,7 @@ impl mlua::UserData for ImageData {
         // -- threshold --
         /// Threshold.
         ///
-        /// @param value : u8
+        /// @param value u8
         /// @return nil
         methods.add_method_mut("threshold", |_, this, value: u8| {
             this.threshold(value);
@@ -696,7 +690,7 @@ impl mlua::UserData for ImageData {
         // -- posterize --
         /// Posterize.
         ///
-        /// @param levels : u8
+        /// @param levels u8
         /// @return nil
         methods.add_method_mut("posterize", |_, this, levels: u8| {
             this.posterize(levels);
@@ -705,10 +699,10 @@ impl mlua::UserData for ImageData {
         // -- fill --
         /// Fill.
         ///
-        /// @param r : u8
-        /// @param g : u8
-        /// @param b : u8
-        /// @param a : u8
+        /// @param r u8
+        /// @param g u8
+        /// @param b u8
+        /// @param a u8
         /// @return nil
         methods.add_method_mut("fill", |_, this, (r, g, b, a): (u8, u8, u8, u8)| {
             this.fill(r, g, b, a);
@@ -717,7 +711,7 @@ impl mlua::UserData for ImageData {
         // -- noise --
         /// Noise.
         ///
-        /// @param amount : u8
+        /// @param amount u8
         /// @return nil
         methods.add_method_mut("noise", |_, this, amount: u8| {
             this.noise(amount);
@@ -726,7 +720,7 @@ impl mlua::UserData for ImageData {
         // -- alphaMask --
         /// Alpha mask.
         ///
-        /// @param factor : number
+        /// @param factor number
         /// @return nil
         methods.add_method_mut("alphaMask", |_, this, factor: f32| {
             this.alpha_mask(factor);
@@ -751,18 +745,18 @@ impl mlua::UserData for ImageData {
         // -- rotate90cw --
         /// Rotate90cw.
         ///
-        /// @return nil
+        /// @return ImageData
         methods.add_method("rotate90cw", |lua, this, ()| {
             lua.create_userdata(this.rotate_90_cw())
         });
         // -- crop --
         /// Crop.
         ///
-        /// @param x : integer
-        /// @param y : integer
-        /// @param w : integer
-        /// @param h : integer
-        /// @return nil
+        /// @param x integer
+        /// @param y integer
+        /// @param w integer
+        /// @param h integer
+        /// @return ImageData
         methods.add_method("crop", |lua, this, (x, y, w, h): (u32, u32, u32, u32)| {
             this.crop(x, y, w, h)
                 .ok_or_else(|| {
@@ -781,37 +775,37 @@ impl mlua::UserData for ImageData {
         // -- resizeNearest --
         /// Resize nearest.
         ///
-        /// @param new_w : integer
-        /// @param new_h : integer
-        /// @return nil
+        /// @param new_w integer
+        /// @param new_h integer
+        /// @return ImageData
         methods.add_method("resizeNearest", |lua, this, (new_w, new_h): (u32, u32)| {
             lua.create_userdata(this.resize_nearest(new_w, new_h))
         });
         // -- blur --
         /// Blur.
         ///
-        /// @param radius : integer
-        /// @return nil
+        /// @param radius integer
+        /// @return ImageData
         methods.add_method("blur", |lua, this, radius: u32| {
             lua.create_userdata(this.blur(radius))
         });
         // -- sharpen --
         /// Sharpen.
         ///
-        /// @return nil
+        /// @return ImageData
         methods.add_method("sharpen", |lua, this, ()| {
             lua.create_userdata(this.sharpen())
         });
         // -- drawRect --
         /// Draws a filled rectangle onto the image.
-        /// @param x : integer
-        /// @param y : integer
-        /// @param w : integer
-        /// @param h : integer
-        /// @param r : integer
-        /// @param g : integer
-        /// @param b : integer
-        /// @param a : integer
+        /// @param x integer
+        /// @param y integer
+        /// @param w integer
+        /// @param h integer
+        /// @param r integer
+        /// @param g integer
+        /// @param b integer
+        /// @param a integer
         /// @return nil
         methods.add_method_mut(
             "drawRect",
@@ -822,13 +816,13 @@ impl mlua::UserData for ImageData {
         );
         // -- drawCircle --
         /// Draws a filled circle onto the image.
-        /// @param cx : integer
-        /// @param cy : integer
-        /// @param radius : integer
-        /// @param r : integer
-        /// @param g : integer
-        /// @param b : integer
-        /// @param a : integer
+        /// @param cx integer
+        /// @param cy integer
+        /// @param radius integer
+        /// @param r integer
+        /// @param g integer
+        /// @param b integer
+        /// @param a integer
         /// @return nil
         methods.add_method_mut(
             "drawCircle",
@@ -839,14 +833,14 @@ impl mlua::UserData for ImageData {
         );
         // -- drawLine --
         /// Draws a line using Bresenham's algorithm.
-        /// @param x0 : integer
-        /// @param y0 : integer
-        /// @param x1 : integer
-        /// @param y1 : integer
-        /// @param r : integer
-        /// @param g : integer
-        /// @param b : integer
-        /// @param a : integer
+        /// @param x0 integer
+        /// @param y0 integer
+        /// @param x1 integer
+        /// @param y1 integer
+        /// @param r integer
+        /// @param g integer
+        /// @param b integer
+        /// @param a integer
         /// @return nil
         methods.add_method_mut(
             "drawLine",
@@ -861,10 +855,9 @@ impl mlua::UserData for ImageData {
         ///
         /// Returns nil if either dimension is zero or the source image is empty.
         ///
-        /// @param width : integer
-        /// @param height : integer
-        /// @return nil
-        /// ImageData?
+        /// @param width integer
+        /// @param height integer
+        /// @return ImageData?
         methods.add_method("resize", |lua, this, (w, h): (u32, u32)| {
             match this.resize(w, h) {
                 Some(img) => Ok(LuaValue::UserData(lua.create_userdata(img)?)),
@@ -877,9 +870,9 @@ impl mlua::UserData for ImageData {
         ///
         /// Out-of-bounds pixels are silently clipped.
         ///
-        /// @param src : ImageData
-        /// @param dst_x : integer
-        /// @param dst_y : integer
+        /// @param src ImageData
+        /// @param dst_x integer
+        /// @param dst_y integer
         /// @return nil
         methods.add_method_mut(
             "blit",
@@ -895,12 +888,11 @@ impl mlua::UserData for ImageData {
         ///
         /// Returns nil if the region is empty or entirely outside the image.
         ///
-        /// @param x : integer
-        /// @param y : integer
-        /// @param width : integer
-        /// @param height : integer
-        /// @return nil
-        /// ImageData?
+        /// @param x integer
+        /// @param y integer
+        /// @param width integer
+        /// @param height integer
+        /// @return ImageData?
         methods.add_method(
             "getRegion",
             |lua, this, (x, y, w, h): (u32, u32, u32, u32)| match this.get_region(x, y, w, h) {
@@ -914,7 +906,7 @@ impl mlua::UserData for ImageData {
         ///
         /// Returns `u32::MAX` when the two images have different dimensions.
         ///
-        /// @param other : ImageData
+        /// @param other ImageData
         /// @return integer
         methods.add_method("diff", |_, this, other_ud: LuaAnyUserData| {
             let other_ref = other_ud.borrow::<ImageData>()?;
@@ -927,7 +919,7 @@ impl mlua::UserData for ImageData {
         /// The callback receives `(x, y, r, g, b, a)` (integers 0-255) and must return
         /// `r, g, b, a`. Pixels are visited in row-major order.
         ///
-        /// @param fn : function
+        /// @param fn function
         /// @return nil
         methods.add_method_mut("mapPixels", |_, this, func: LuaFunction| {
             let w = this.width();
@@ -951,8 +943,8 @@ impl mlua::UserData for ImageData {
         /// RGB channels are convolved; alpha is copied unchanged.
         /// Output values are clamped to [0, 255].
         ///
-        /// @param kernel : table
-        /// @param ksize : integer
+        /// @param kernel table
+        /// @param ksize integer
         /// @return ImageData
         methods.add_method(
             "convolve",
@@ -970,7 +962,7 @@ impl mlua::UserData for ImageData {
         // -- applyPaletteLut --
         /// Applies a `PaletteLUT` to the image in place, replacing exact colour matches.
         ///
-        /// @param lut : PaletteLUT
+        /// @param lut PaletteLUT
         /// @return nil
         methods.add_method_mut("applyPaletteLut", |_, this, lut_ud: LuaAnyUserData| {
             let lut = lut_ud.borrow::<LuaPaletteLUT>()?;
@@ -982,7 +974,7 @@ impl mlua::UserData for ImageData {
         /// Replaces all pixel data from a raw RGBA byte string.
         /// The string length must equal `width * height * 4`.
         ///
-        /// @param bytes : string
+        /// @param bytes string
         /// @return nil
         methods.add_method_mut("setRawData", |_, this, bytes: LuaString| {
             this.set_raw_data(bytes.as_bytes())
@@ -993,9 +985,9 @@ impl mlua::UserData for ImageData {
         /// Copies pixels from `source` onto this image starting at (dx, dy).
         /// Pixels that fall outside the destination bounds are clipped.
         ///
-        /// @param source : ImageData
-        /// @param dx : integer
-        /// @param dy : integer
+        /// @param source ImageData
+        /// @param dx integer
+        /// @param dy integer
         /// @return nil
         methods.add_method_mut(
             "paste",
@@ -1005,6 +997,18 @@ impl mlua::UserData for ImageData {
                 Ok(())
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        ///
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("ImageData"));
+        // -- typeOf --
+        /// Returns true if this object is of the given type name.
+        ///
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| Ok(name == "ImageData"));
     }
 }
 
@@ -1023,14 +1027,14 @@ impl LuaUserData for LuaPaletteLUT {
         /// `from_r, from_g, from_b, from_a` (0â€“255) is encountered it is replaced by
         /// `to_r, to_g, to_b, to_a`.
         ///
-        /// @param from_r : integer   0-255
-        /// @param from_g : integer   0-255
-        /// @param from_b : integer   0-255
-        /// @param from_a : integer   0-255  (255 = fully opaque)
-        /// @param to_r : integer     0-255
-        /// @param to_g : integer     0-255
-        /// @param to_b : integer     0-255
-        /// @param to_a : integer     0-255
+        /// @param from_r integer   0-255
+        /// @param from_g integer   0-255
+        /// @param from_b integer   0-255
+        /// @param from_a integer   0-255  (255 = fully opaque)
+        /// @param to_r integer     0-255
+        /// @param to_g integer     0-255
+        /// @param to_b integer     0-255
+        /// @param to_a integer     0-255
         /// @return nil
         methods.add_method_mut(
             "setColor",

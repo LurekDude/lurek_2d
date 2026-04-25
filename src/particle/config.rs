@@ -218,6 +218,7 @@ pub struct BounceBounds {
 /// - `shape` â€” `ParticleShape`. Rendered primitive type (point, rect, sprite).
 /// - (additional fields: gravity, accel, damping, turbulence, drag, orbit, animation, etc.)
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(default)]
 pub struct ParticleConfig {
     /// Maximum number of live particles (pool size).
     pub max_particles: u32,

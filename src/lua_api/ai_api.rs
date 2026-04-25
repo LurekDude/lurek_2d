@@ -71,7 +71,7 @@ impl LuaUserData for LuaAIWorld {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addAgent --
         /// Registers a new named agent and returns its handle.
-        /// @param name : string
+        /// @param name string
         /// @return Agent
         methods.add_method("addAgent", |_, this, name: String| {
             let mut w = this.inner.borrow_mut();
@@ -85,7 +85,7 @@ impl LuaUserData for LuaAIWorld {
 
         // -- getAgent --
         /// Returns the agent handle for the given name, or nil.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         /// Agent?
         methods.add_method("getAgent", |_, this, name: String| {
@@ -103,7 +103,7 @@ impl LuaUserData for LuaAIWorld {
 
         // -- removeAgent --
         /// Removes an agent by its userdata handle.
-        /// @param agent : Agent
+        /// @param agent Agent
         /// @return nil
         methods.add_method("removeAgent", |_, this, agent: LuaAnyUserData| {
             let a = agent.borrow::<LuaAgent>()?;
@@ -120,17 +120,17 @@ impl LuaUserData for LuaAIWorld {
 
         // -- getGlobalBlackboard --
         /// Returns a snapshot of the world-level blackboard.
-        /// @return Blackboard
+        /// @return AIBlackboard
         methods.add_method("getGlobalBlackboard", |_, this, ()| {
             let w = this.inner.borrow();
-            Ok(LuaBlackboard {
+            Ok(LuaAIBlackboard {
                 inner: Rc::new(RefCell::new(w.global_blackboard().clone())),
             })
         });
 
         // -- update --
         /// Advances all agents by dt seconds, then invokes any custom-model callbacks.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method("update", |lua, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
@@ -157,7 +157,7 @@ impl LuaUserData for LuaAIWorld {
                 let lua_bb = {
                     let w = this.inner.borrow();
                     match w.get_agent_index(&name) {
-                        Some(idx) => LuaBlackboard {
+                        Some(idx) => LuaAIBlackboard {
                             inner: Rc::new(RefCell::new(w.agents[idx].blackboard.clone())),
                         },
                         None => continue,
@@ -185,7 +185,7 @@ impl LuaUserData for LuaAIWorld {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "AIWorld" || name == "Object")
@@ -215,8 +215,8 @@ impl LuaUserData for LuaAgent {
 
         // -- setPosition --
         /// Sets the agent's world-space position.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut w = this.world.borrow_mut();
@@ -240,8 +240,8 @@ impl LuaUserData for LuaAgent {
 
         // -- setVelocity --
         /// Sets the agent's velocity vector.
-        /// @param x : number
-        /// @param y : number
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method("setVelocity", |_, this, (x, y): (f32, f32)| {
             let mut w = this.world.borrow_mut();
@@ -265,7 +265,7 @@ impl LuaUserData for LuaAgent {
 
         // -- setMaxSpeed --
         /// Sets the maximum speed cap.
-        /// @param v : number
+        /// @param v number
         /// @return nil
         methods.add_method("setMaxSpeed", |_, this, v: f32| {
             let mut w = this.world.borrow_mut();
@@ -289,7 +289,7 @@ impl LuaUserData for LuaAgent {
 
         // -- setMaxForce --
         /// Sets the maximum steering force cap.
-        /// @param v : number
+        /// @param v number
         /// @return nil
         methods.add_method("setMaxForce", |_, this, v: f32| {
             let mut w = this.world.borrow_mut();
@@ -313,7 +313,7 @@ impl LuaUserData for LuaAgent {
 
         // -- setPriority --
         /// Sets the scheduling priority (higher = earlier).
-        /// @param p : integer
+        /// @param p integer
         /// @return nil
         methods.add_method("setPriority", |_, this, p: i32| {
             let mut w = this.world.borrow_mut();
@@ -337,7 +337,7 @@ impl LuaUserData for LuaAgent {
 
         // -- setDecisionModel --
         /// Sets the active decision model.
-        /// @param model : string
+        /// @param model string
         /// @return nil
         methods.add_method("setDecisionModel", |_, this, model: String| {
             let mut w = this.world.borrow_mut();
@@ -364,7 +364,7 @@ impl LuaUserData for LuaAgent {
         // -- setCustomModel --
         /// Installs a Lua-driven decision model on this agent.
         /// The callback is invoked by `world:update(dt)` each frame.
-        /// @param callback : function(agent, blackboard, dt)
+        /// @param callback function(agent, blackboard, dt)
         /// @return nil
         methods.add_method("setCustomModel", |lua, this, callback: LuaFunction| {
             let key = lua.create_registry_value(callback)?;
@@ -378,7 +378,7 @@ impl LuaUserData for LuaAgent {
 
         // -- addTag --
         /// Adds a tag to this agent.
-        /// @param tag : string
+        /// @param tag string
         /// @return nil
         methods.add_method("addTag", |_, this, tag: String| {
             let mut w = this.world.borrow_mut();
@@ -390,7 +390,7 @@ impl LuaUserData for LuaAgent {
 
         // -- removeTag --
         /// Removes a tag from this agent.
-        /// @param tag : string
+        /// @param tag string
         /// @return nil
         methods.add_method("removeTag", |_, this, tag: String| {
             let mut w = this.world.borrow_mut();
@@ -402,7 +402,7 @@ impl LuaUserData for LuaAgent {
 
         // -- hasTag --
         /// Returns true if the agent has the given tag.
-        /// @param tag : string
+        /// @param tag string
         /// @return boolean
         methods.add_method("hasTag", |_, this, tag: String| {
             let w = this.world.borrow();
@@ -415,15 +415,15 @@ impl LuaUserData for LuaAgent {
 
         // -- getBlackboard --
         /// Returns the agent's local blackboard.
-        /// @return Blackboard
+        /// @return AIBlackboard
         methods.add_method("getBlackboard", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
-                Ok(LuaBlackboard {
+                Ok(LuaAIBlackboard {
                     inner: Rc::new(RefCell::new(w.agents[idx].blackboard.clone())),
                 })
             } else {
-                Ok(LuaBlackboard {
+                Ok(LuaAIBlackboard {
                     inner: Rc::new(RefCell::new(Blackboard::new())),
                 })
             }
@@ -436,7 +436,7 @@ impl LuaUserData for LuaAgent {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "Agent" || name == "Object")
@@ -445,21 +445,21 @@ impl LuaUserData for LuaAgent {
 }
 
 // -------------------------------------------------------------------------------
-// LuaBlackboard UserData
+// LuaAIBlackboard UserData
 // -------------------------------------------------------------------------------
 
 /// Lua-side wrapper around a [`Blackboard`].
 #[derive(Clone)]
-struct LuaBlackboard {
+struct LuaAIBlackboard {
     inner: Rc<RefCell<Blackboard>>,
 }
 
-impl LuaUserData for LuaBlackboard {
+impl LuaUserData for LuaAIBlackboard {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- setNumber --
         /// Stores a number under the given key.
-        /// @param key : string
-        /// @param value : number
+        /// @param key string
+        /// @param value number
         /// @return nil
         methods.add_method("setNumber", |_, this, (key, value): (String, f64)| {
             this.inner.borrow_mut().set_number(&key, value);
@@ -468,8 +468,8 @@ impl LuaUserData for LuaBlackboard {
 
         // -- getNumber --
         /// Returns the number for the given key, or default.
-        /// @param key : string
-        /// @param default : number?
+        /// @param key string
+        /// @param default number?
         /// @return number
         methods.add_method(
             "getNumber",
@@ -480,8 +480,8 @@ impl LuaUserData for LuaBlackboard {
 
         // -- setBool --
         /// Stores a boolean under the given key.
-        /// @param key : string
-        /// @param value : boolean
+        /// @param key string
+        /// @param value boolean
         /// @return nil
         methods.add_method("setBool", |_, this, (key, value): (String, bool)| {
             this.inner.borrow_mut().set_bool(&key, value);
@@ -490,8 +490,8 @@ impl LuaUserData for LuaBlackboard {
 
         // -- getBool --
         /// Returns the boolean for the given key, or default.
-        /// @param key : string
-        /// @param default : boolean?
+        /// @param key string
+        /// @param default boolean?
         /// @return boolean
         methods.add_method(
             "getBool",
@@ -502,8 +502,8 @@ impl LuaUserData for LuaBlackboard {
 
         // -- setString --
         /// Stores a string under the given key.
-        /// @param key : string
-        /// @param value : string
+        /// @param key string
+        /// @param value string
         /// @return nil
         methods.add_method("setString", |_, this, (key, value): (String, String)| {
             this.inner.borrow_mut().set_string(&key, &value);
@@ -512,8 +512,8 @@ impl LuaUserData for LuaBlackboard {
 
         // -- getString --
         /// Returns the string for the given key, or default.
-        /// @param key : string
-        /// @param default : string?
+        /// @param key string
+        /// @param default string?
         /// @return string
         methods.add_method(
             "getString",
@@ -525,7 +525,7 @@ impl LuaUserData for LuaBlackboard {
 
         // -- has --
         /// Returns true if a value exists under the key.
-        /// @param key : string
+        /// @param key string
         /// @return boolean
         methods.add_method("has", |_, this, key: String| {
             Ok(this.inner.borrow().has(&key))
@@ -533,7 +533,7 @@ impl LuaUserData for LuaBlackboard {
 
         // -- remove --
         /// Removes the entry at key.
-        /// @param key : string
+        /// @param key string
         /// @return nil
         methods.add_method("remove", |_, this, key: String| {
             this.inner.borrow_mut().remove(&key);
@@ -568,14 +568,14 @@ impl LuaUserData for LuaBlackboard {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Blackboard"));
+        methods.add_method("type", |_, _, ()| Ok("AIBlackboard"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "Blackboard" || name == "Object")
+            Ok(name == "AIBlackboard" || name == "Blackboard" || name == "Object")
         });
     }
 }
@@ -594,8 +594,8 @@ impl LuaUserData for LuaStateMachine {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addState --
         /// Registers a named state with optional lifecycle callbacks.
-        /// @param name : string
-        /// @param opts : table
+        /// @param name string
+        /// @param opts table
         /// @return nil
         methods.add_method("addState", |lua, this, (name, opts): (String, LuaTable)| {
             let on_enter: Option<LuaFunction> = opts.get("onEnter").ok();
@@ -614,10 +614,10 @@ impl LuaUserData for LuaStateMachine {
 
         // -- addTransition --
         /// Adds a guarded transition between states.
-        /// @param from : string
-        /// @param to : string
-        /// @param guard : function?
-        /// @param priority : integer?
+        /// @param from string
+        /// @param to string
+        /// @param guard function?
+        /// @param priority integer?
         /// @return nil
         methods.add_method(
             "addTransition",
@@ -630,7 +630,7 @@ impl LuaUserData for LuaStateMachine {
 
         // -- setInitialState --
         /// Sets the FSM's initial state; must be called before the first update.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method("setInitialState", |_, this, name: String| {
             let mut fsm = this.inner.borrow_mut();
@@ -650,7 +650,7 @@ impl LuaUserData for LuaStateMachine {
 
         // -- forceState --
         /// Forces a transition to the named state.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method("forceState", |_, this, name: String| {
             let mut fsm = this.inner.borrow_mut();
@@ -673,7 +673,7 @@ impl LuaUserData for LuaStateMachine {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "StateMachine" || name == "Object")
@@ -695,7 +695,7 @@ impl LuaUserData for LuaBehaviorTree {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- setRoot --
         /// Sets the root node of this behavior tree.
-        /// @param node : BTNode
+        /// @param node BTNode
         /// @return nil
         methods.add_method("setRoot", |_, this, node_ud: LuaAnyUserData| {
             let node = node_ud.borrow::<LuaBTNode>()?;
@@ -736,7 +736,7 @@ impl LuaUserData for LuaBehaviorTree {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "BehaviorTree" || name == "Object")
@@ -758,7 +758,7 @@ impl LuaUserData for LuaBTNode {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addChild --
         /// Adds a child node (Selector, Sequence, or Parallel only).
-        /// @param child : BTNode
+        /// @param child BTNode
         /// @return nil
         methods.add_method("addChild", |_, this, child_ud: LuaAnyUserData| {
             let child = child_ud.borrow::<LuaBTNode>()?;
@@ -803,7 +803,7 @@ impl LuaUserData for LuaBTNode {
 
         // -- setChild --
         /// Sets the single child of a decorator node.
-        /// @param child : BTNode
+        /// @param child BTNode
         /// @return nil
         methods.add_method("setChild", |_, this, child_ud: LuaAnyUserData| {
             let child = child_ud.borrow::<LuaBTNode>()?;
@@ -837,7 +837,7 @@ impl LuaUserData for LuaBTNode {
 
         // -- setCount --
         /// Sets the repeat count for a Repeater node.
-        /// @param n : integer
+        /// @param n integer
         /// @return nil
         methods.add_method("setCount", |_, this, n: u32| {
             let mut node = this.inner.borrow_mut();
@@ -861,7 +861,7 @@ impl LuaUserData for LuaBTNode {
 
         // -- setSuccessPolicy --
         /// Sets the success policy for a Parallel node.
-        /// @param policy : string
+        /// @param policy string
         /// @return nil
         methods.add_method("setSuccessPolicy", |_, this, policy: String| {
             let mut node = this.inner.borrow_mut();
@@ -873,7 +873,7 @@ impl LuaUserData for LuaBTNode {
 
         // -- setFailurePolicy --
         /// Sets the failure policy for a Parallel node.
-        /// @param policy : string
+        /// @param policy string
         /// @return nil
         methods.add_method("setFailurePolicy", |_, this, policy: String| {
             let mut node = this.inner.borrow_mut();
@@ -909,7 +909,7 @@ impl LuaUserData for LuaBTNode {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "BTNode" || name == "Object")
@@ -933,9 +933,9 @@ impl LuaUserData for LuaSteeringManager {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addSeek --
         /// Adds a Seek behavior toward the target.
-        /// @param tx : number
-        /// @param ty : number
-        /// @param weight : number?
+        /// @param tx number
+        /// @param ty number
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addSeek",
@@ -949,10 +949,10 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- addFlee --
         /// Adds a Flee behavior away from the target.
-        /// @param tx : number
-        /// @param ty : number
-        /// @param panicDist : number?
-        /// @param weight : number?
+        /// @param tx number
+        /// @param ty number
+        /// @param panicDist number?
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addFlee",
@@ -969,10 +969,10 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- addArrive --
         /// Adds an Arrive behavior with deceleration.
-        /// @param tx : number
-        /// @param ty : number
-        /// @param slowingRadius : number?
-        /// @param weight : number?
+        /// @param tx number
+        /// @param ty number
+        /// @param slowingRadius number?
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addArrive",
@@ -989,10 +989,10 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- addWander --
         /// Adds a Wander behavior for random meandering.
-        /// @param radius : number?
-        /// @param dist : number?
-        /// @param jitter : number?
-        /// @param weight : number?
+        /// @param radius number?
+        /// @param dist number?
+        /// @param jitter number?
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addWander",
@@ -1016,8 +1016,8 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- addPursue --
         /// Adds a Pursue behavior targeting a named agent.
-        /// @param targetName : string?
-        /// @param weight : number?
+        /// @param targetName string?
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addPursue",
@@ -1031,8 +1031,8 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- addEvade --
         /// Adds an Evade behavior fleeing from a named agent.
-        /// @param threatName : string?
-        /// @param weight : number?
+        /// @param threatName string?
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addEvade",
@@ -1046,11 +1046,11 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- addFlock --
         /// Adds a Flock behavior for group movement.
-        /// @param neighborRadius : number?
-        /// @param sepWeight : number?
-        /// @param alignWeight : number?
-        /// @param cohWeight : number?
-        /// @param weight : number?
+        /// @param neighborRadius number?
+        /// @param sepWeight number?
+        /// @param alignWeight number?
+        /// @param cohWeight number?
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addFlock",
@@ -1084,7 +1084,7 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- setCombineMode --
         /// Sets the force combination mode.
-        /// @param mode : string
+        /// @param mode string
         /// @return nil
         methods.add_method("setCombineMode", |_, this, mode: String| {
             this.inner.borrow_mut().set_combine_mode_str(&mode);
@@ -1107,13 +1107,13 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- calculate --
         /// Computes the combined steering force for the given agent state.
-        /// @param px : number
-        /// @param py : number
-        /// @param vx : number
-        /// @param vy : number
-        /// @param maxSpeed : number
-        /// @param maxForce : number
-        /// @param dt : number
+        /// @param px number
+        /// @param py number
+        /// @param vx number
+        /// @param vy number
+        /// @param maxSpeed number
+        /// @param maxForce number
+        /// @param dt number
         /// @return number, number
         methods.add_method(
             "calculate",
@@ -1136,7 +1136,7 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "SteeringManager" || name == "Object")
@@ -1145,7 +1145,7 @@ impl LuaUserData for LuaSteeringManager {
         // -- setSpatialHashCellSize --
         /// Sets the cell size used by the spatial-hash neighbourhood search.
         /// Smaller cells yield finer buckets; larger cells cover more ground per lookup.
-        /// @param size : number
+        /// @param size number
         /// @return nil
         methods.add_method_mut("setSpatialHashCellSize", |_, this, size: f32| {
             this.inner.borrow_mut().set_cell_size(size);
@@ -1154,7 +1154,7 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- enableSpatialHash --
         /// Enables or disables spatial-hash bucketing for neighbourhood queries.
-        /// @param enabled : boolean
+        /// @param enabled boolean
         /// @return nil
         methods.add_method_mut("enableSpatialHash", |_, this, enabled: bool| {
             this.inner.borrow_mut().set_use_spatial_hash(enabled);
@@ -1164,8 +1164,8 @@ impl LuaUserData for LuaSteeringManager {
         // -- addCustomBehavior --
         /// Registers a Lua callback as a custom steering behavior.
         /// The callback is invoked by `applyCustomSteering(agent, dt)` each frame.
-        /// @param callback : function(agent, dt) -> dx, dy
-        /// @param weight : number?
+        /// @param callback function(agent, dt) -> dx, dy
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addCustomBehavior",
@@ -1189,8 +1189,8 @@ impl LuaUserData for LuaSteeringManager {
         // -- applyCustomSteering --
         /// Invokes all registered custom steering callbacks and returns the combined force.
         /// Call this each frame after `world:update(dt)` and apply the result to agent velocity.
-        /// @param agent : Agent
-        /// @param dt : number
+        /// @param agent Agent
+        /// @param dt number
         /// @return number, number  (fx, fy)
         methods.add_method(
             "applyCustomSteering",
@@ -1252,7 +1252,7 @@ impl LuaUserData for LuaQLearner {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- chooseAction --
         /// Selects an action using epsilon-greedy policy (1-based).
-        /// @param state : integer
+        /// @param state integer
         /// @return integer
         methods.add_method("chooseAction", |_, this, state: usize| {
             Ok(this.inner.borrow().choose_action(state.saturating_sub(1)) + 1)
@@ -1260,7 +1260,7 @@ impl LuaUserData for LuaQLearner {
 
         // -- bestAction --
         /// Returns the greedy-best action for the state (1-based).
-        /// @param state : integer
+        /// @param state integer
         /// @return integer
         methods.add_method("bestAction", |_, this, state: usize| {
             Ok(this.inner.borrow().best_action(state.saturating_sub(1)) + 1)
@@ -1268,10 +1268,10 @@ impl LuaUserData for LuaQLearner {
 
         // -- learn --
         /// Performs one Bellman Q-learning update (1-based indices).
-        /// @param state : integer
-        /// @param action : integer
-        /// @param reward : number
-        /// @param nextState : integer
+        /// @param state integer
+        /// @param action integer
+        /// @param reward number
+        /// @param nextState integer
         /// @return nil
         methods.add_method(
             "learn",
@@ -1288,8 +1288,8 @@ impl LuaUserData for LuaQLearner {
 
         // -- getQValue --
         /// Returns the Q-value for a state-action pair (1-based).
-        /// @param state : integer
-        /// @param action : integer
+        /// @param state integer
+        /// @param action integer
         /// @return number
         methods.add_method("getQValue", |_, this, (state, action): (usize, usize)| {
             Ok(this
@@ -1300,9 +1300,9 @@ impl LuaUserData for LuaQLearner {
 
         // -- setQValue --
         /// Overwrites the Q-value for a state-action pair (1-based).
-        /// @param state : integer
-        /// @param action : integer
-        /// @param value : number
+        /// @param state integer
+        /// @param action integer
+        /// @param value number
         /// @return nil
         methods.add_method(
             "setQValue",
@@ -1347,7 +1347,7 @@ impl LuaUserData for LuaQLearner {
 
         // -- setLearningRate --
         /// Sets the learning rate alpha.
-        /// @param v : number
+        /// @param v number
         /// @return nil
         methods.add_method("setLearningRate", |_, this, v: f64| {
             this.inner.borrow_mut().alpha = v;
@@ -1363,7 +1363,7 @@ impl LuaUserData for LuaQLearner {
 
         // -- setDiscountFactor --
         /// Sets the discount factor gamma.
-        /// @param v : number
+        /// @param v number
         /// @return nil
         methods.add_method("setDiscountFactor", |_, this, v: f64| {
             this.inner.borrow_mut().gamma = v;
@@ -1379,7 +1379,7 @@ impl LuaUserData for LuaQLearner {
 
         // -- setExplorationRate --
         /// Sets the exploration rate epsilon.
-        /// @param v : number
+        /// @param v number
         /// @return nil
         methods.add_method("setExplorationRate", |_, this, v: f64| {
             this.inner.borrow_mut().epsilon = v;
@@ -1395,7 +1395,7 @@ impl LuaUserData for LuaQLearner {
 
         // -- setExplorationDecay --
         /// Sets the epsilon decay multiplier.
-        /// @param v : number
+        /// @param v number
         /// @return nil
         methods.add_method("setExplorationDecay", |_, this, v: f64| {
             this.inner.borrow_mut().epsilon_decay = v;
@@ -1418,7 +1418,7 @@ impl LuaUserData for LuaQLearner {
 
         // -- deserialize --
         /// Restores the Q-table from a JSON string.
-        /// @param json : string
+        /// @param json string
         /// @return nil
         methods.add_method("deserialize", |_, this, json: String| {
             this.inner
@@ -1435,7 +1435,7 @@ impl LuaUserData for LuaQLearner {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "QLearner" || name == "Object")
@@ -1459,9 +1459,9 @@ impl LuaUserData for LuaUtilityAI {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addAction --
         /// Adds a scored action with optional momentum weight.
-        /// @param name : string
-        /// @param scorer : function
-        /// @param weight : number?
+        /// @param name string
+        /// @param scorer function
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addAction",
@@ -1506,14 +1506,14 @@ impl LuaUserData for LuaUtilityAI {
         /// Adds a multi-axis consideration to a named action.
         /// The curve argument may be a string ("linear", "quadratic", etc.) or a
         /// Lua function `fn(x) -> y` for a fully custom curve.
-        /// @param actionName : string
-        /// @param name : string
-        /// @param scorerFn : function()  -- returns the raw consideration value
-        /// @param curve : string | function(x) -> y
-        /// @param p1 : number?
-        /// @param p2 : number?
-        /// @param p3 : number?
-        /// @param weight : number?
+        /// @param actionName string
+        /// @param name string
+        /// @param scorerFn function()  -- returns the raw consideration value
+        /// @param curve string | function(x) -> y
+        /// @param p1 number?
+        /// @param p2 number?
+        /// @param p3 number?
+        /// @param weight number?
         /// @return nil
         methods.add_method(
             "addConsideration",
@@ -1588,7 +1588,7 @@ impl LuaUserData for LuaUtilityAI {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "UtilityAI" || name == "Object")
@@ -1610,9 +1610,9 @@ impl LuaUserData for LuaGOAPPlanner {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addAction --
         /// Adds a GOAP action with optional cost and callback.
-        /// @param name : string
-        /// @param cost : number?
-        /// @param callback : function?
+        /// @param name string
+        /// @param cost number?
+        /// @param callback function?
         /// @return nil
         methods.add_method(
             "addAction",
@@ -1631,9 +1631,9 @@ impl LuaUserData for LuaGOAPPlanner {
 
         // -- setPrecondition --
         /// Sets a boolean precondition on an action.
-        /// @param actionName : string
-        /// @param key : string
-        /// @param value : boolean
+        /// @param actionName string
+        /// @param key string
+        /// @param value boolean
         /// @return nil
         methods.add_method(
             "setPrecondition",
@@ -1648,9 +1648,9 @@ impl LuaUserData for LuaGOAPPlanner {
 
         // -- setEffect --
         /// Sets a boolean effect on an action.
-        /// @param actionName : string
-        /// @param key : string
-        /// @param value : boolean
+        /// @param actionName string
+        /// @param key string
+        /// @param value boolean
         /// @return nil
         methods.add_method(
             "setEffect",
@@ -1665,8 +1665,8 @@ impl LuaUserData for LuaGOAPPlanner {
 
         // -- addGoal --
         /// Adds a planning goal with optional priority.
-        /// @param name : string
-        /// @param priority : number?
+        /// @param name string
+        /// @param priority number?
         /// @return nil
         methods.add_method(
             "addGoal",
@@ -1682,9 +1682,9 @@ impl LuaUserData for LuaGOAPPlanner {
 
         // -- setGoalState --
         /// Sets a boolean condition on a goal.
-        /// @param goalName : string
-        /// @param key : string
-        /// @param value : boolean
+        /// @param goalName string
+        /// @param key string
+        /// @param value boolean
         /// @return nil
         methods.add_method(
             "setGoalState",
@@ -1699,8 +1699,8 @@ impl LuaUserData for LuaGOAPPlanner {
 
         // -- plan --
         /// Runs A* planning and returns an action sequence table.
-        /// @param worldState : table
-        /// @param maxDepth : integer?
+        /// @param worldState table
+        /// @param maxDepth integer?
         /// @return table
         methods.add_method(
             "plan",
@@ -1743,7 +1743,7 @@ impl LuaUserData for LuaGOAPPlanner {
 
         // -- setMaxIterations --
         /// Sets the maximum A* planning iterations (0 = unlimited).
-        /// @param n : integer
+        /// @param n integer
         /// @return nil
         methods.add_method_mut("setMaxIterations", |_, this, n: u64| {
             this.inner.borrow_mut().set_max_iterations(n as usize);
@@ -1757,7 +1757,7 @@ impl LuaUserData for LuaGOAPPlanner {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "GOAPPlanner" || name == "Object")
@@ -1779,7 +1779,7 @@ impl LuaUserData for LuaInfluenceMap {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addLayer --
         /// Adds a named influence layer.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method("addLayer", |_, this, name: String| {
             this.inner.borrow_mut().add_layer(&name);
@@ -1788,7 +1788,7 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- hasLayer --
         /// Returns true if the named layer exists.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("hasLayer", |_, this, name: String| {
             Ok(this.inner.borrow().has_layer(&name))
@@ -1796,10 +1796,10 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- setInfluence --
         /// Sets the influence value at a cell (1-based).
-        /// @param layer : string
-        /// @param x : integer
-        /// @param y : integer
-        /// @param value : number
+        /// @param layer string
+        /// @param x integer
+        /// @param y integer
+        /// @param value number
         /// @return nil
         methods.add_method(
             "setInfluence",
@@ -1816,9 +1816,9 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- getInfluence --
         /// Returns the influence value at a cell (1-based).
-        /// @param layer : string
-        /// @param x : integer
-        /// @param y : integer
+        /// @param layer string
+        /// @param x integer
+        /// @param y integer
         /// @return number
         methods.add_method(
             "getInfluence",
@@ -1833,12 +1833,12 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- stampInfluence --
         /// Stamps influence in a radial area.
-        /// @param layer : string
-        /// @param wx : number
-        /// @param wy : number
-        /// @param radius : number
-        /// @param value : number
-        /// @param falloff : number?
+        /// @param layer string
+        /// @param wx number
+        /// @param wy number
+        /// @param radius number
+        /// @param value number
+        /// @param falloff number?
         /// @return nil
         methods.add_method(
             "stampInfluence",
@@ -1857,8 +1857,8 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- propagate --
         /// Propagates influence values with momentum.
-        /// @param layer : string
-        /// @param momentum : number?
+        /// @param layer string
+        /// @param momentum number?
         /// @return nil
         methods.add_method(
             "propagate",
@@ -1872,8 +1872,8 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- decay --
         /// Multiplies all influences by a decay factor.
-        /// @param layer : string
-        /// @param factor : number
+        /// @param layer string
+        /// @param factor number
         /// @return nil
         methods.add_method("decay", |_, this, (layer, factor): (String, f32)| {
             this.inner.borrow_mut().decay(&layer, factor);
@@ -1882,7 +1882,7 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- clearLayer --
         /// Clears all influence in a layer.
-        /// @param layer : string
+        /// @param layer string
         /// @return nil
         methods.add_method("clearLayer", |_, this, layer: String| {
             this.inner.borrow_mut().clear_layer(&layer);
@@ -1899,7 +1899,7 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- getMaxPosition --
         /// Returns the world-space position of the maximum value.
-        /// @param layer : string
+        /// @param layer string
         /// @return number, number
         methods.add_method("getMaxPosition", |_, this, layer: String| {
             Ok(this.inner.borrow().max_position(&layer))
@@ -1907,7 +1907,7 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- getMinPosition --
         /// Returns the world-space position of the minimum value.
-        /// @param layer : string
+        /// @param layer string
         /// @return number, number
         methods.add_method("getMinPosition", |_, this, layer: String| {
             Ok(this.inner.borrow().min_position(&layer))
@@ -1915,11 +1915,11 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- queryRect --
         /// Returns the summed influence in a world-space rectangle.
-        /// @param layer : string
-        /// @param wx : number
-        /// @param wy : number
-        /// @param ww : number
-        /// @param wh : number
+        /// @param layer string
+        /// @param wx number
+        /// @param wy number
+        /// @param ww number
+        /// @param wh number
         /// @return number
         methods.add_method(
             "queryRect",
@@ -1930,11 +1930,11 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- blend --
         /// Blends two layers into a destination layer.
-        /// @param layerA : string
-        /// @param weightA : number
-        /// @param layerB : string
-        /// @param weightB : number
-        /// @param dest : string
+        /// @param layerA string
+        /// @param weightA number
+        /// @param layerB string
+        /// @param weightB number
+        /// @param dest string
         /// @return nil
         methods.add_method(
             "blend",
@@ -1968,7 +1968,7 @@ impl LuaUserData for LuaInfluenceMap {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "InfluenceMap" || name == "Object")
@@ -1997,7 +1997,7 @@ impl LuaUserData for LuaSquad {
 
         // -- addMember --
         /// Adds an agent by name to this squad.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method("addMember", |_, this, name: String| {
             this.inner.borrow_mut().members.push(name);
@@ -2006,7 +2006,7 @@ impl LuaUserData for LuaSquad {
 
         // -- removeMember --
         /// Removes an agent by name from this squad.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method("removeMember", |_, this, name: String| {
             this.inner.borrow_mut().members.retain(|m| m != &name);
@@ -2034,7 +2034,7 @@ impl LuaUserData for LuaSquad {
 
         // -- setLeader --
         /// Sets the squad leader by name.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method("setLeader", |_, this, name: String| {
             this.inner.borrow_mut().leader = Some(name);
@@ -2050,8 +2050,8 @@ impl LuaUserData for LuaSquad {
 
         // -- setFormation --
         /// Sets the formation type and optional spacing.
-        /// @param ftype : string
-        /// @param spacing : number?
+        /// @param ftype string
+        /// @param spacing number?
         /// @return nil
         methods.add_method(
             "setFormation",
@@ -2081,9 +2081,9 @@ impl LuaUserData for LuaSquad {
 
         // -- getFormationPosition --
         /// Computes the world-space position for a member index (1-based).
-        /// @param memberIdx : integer
-        /// @param leaderX : number
-        /// @param leaderY : number
+        /// @param memberIdx integer
+        /// @param leaderX number
+        /// @param leaderY number
         /// @return number, number
         methods.add_method(
             "getFormationPosition",
@@ -2097,10 +2097,10 @@ impl LuaUserData for LuaSquad {
 
         // -- getBlackboard --
         /// Returns the squad's shared blackboard.
-        /// @return Blackboard
+        /// @return AIBlackboard
         methods.add_method("getBlackboard", |_, this, ()| {
             let sq = this.inner.borrow();
-            Ok(LuaBlackboard {
+            Ok(LuaAIBlackboard {
                 inner: Rc::new(RefCell::new(sq.blackboard.clone())),
             })
         });
@@ -2112,7 +2112,7 @@ impl LuaUserData for LuaSquad {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "Squad" || name == "Object")
@@ -2148,9 +2148,9 @@ impl LuaUserData for LuaCommandQueue {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- enqueue --
         /// Appends a command to the back of the queue.
-        /// @param kind : string
-        /// @param callback : function
-        /// @param opts : table?
+        /// @param kind string
+        /// @param callback function
+        /// @param opts table?
         /// @return nil
         methods.add_method(
             "enqueue",
@@ -2166,9 +2166,9 @@ impl LuaUserData for LuaCommandQueue {
 
         // -- pushFront --
         /// Inserts a command at the front, interrupting the current one.
-        /// @param kind : string
-        /// @param callback : function
-        /// @param opts : table?
+        /// @param kind string
+        /// @param callback function
+        /// @param opts table?
         /// @return nil
         methods.add_method(
             "pushFront",
@@ -2184,9 +2184,9 @@ impl LuaUserData for LuaCommandQueue {
 
         // -- replace --
         /// Clears the queue and enqueues one new command.
-        /// @param kind : string
-        /// @param callback : function
-        /// @param opts : table?
+        /// @param kind string
+        /// @param callback function
+        /// @param opts table?
         /// @return nil
         methods.add_method(
             "replace",
@@ -2246,7 +2246,7 @@ impl LuaUserData for LuaCommandQueue {
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "CommandQueue" || name == "Object")
@@ -2267,8 +2267,8 @@ struct LuaTraitProfile {
 impl LuaUserData for LuaTraitProfile {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Sets the base value of this trait, replacing any previous base.
-        /// @param name : string
-        /// @param value : number
+        /// @param name string
+        /// @param value number
         /// @return nil
         methods.add_method_mut("set", |_, this, (name, value): (String, f32)| {
             this.inner.borrow_mut().set(&name, value);
@@ -2276,24 +2276,24 @@ impl LuaUserData for LuaTraitProfile {
         });
 
         /// Returns the current float value of this emotion dimension.
-        /// @param name : string
+        /// @param name string
         /// @return number
         methods.add_method("get", |_, this, name: String| {
             Ok(this.inner.borrow().get(&name))
         });
 
         /// Returns the unmodified base value of this trait before modifiers.
-        /// @param name : string
+        /// @param name string
         /// @return number
         methods.add_method("getBase", |_, this, name: String| {
             Ok(this.inner.borrow().get_base(&name))
         });
 
         /// Adds a named modifier that adjusts the trait value by a delta.
-        /// @param trait_name : string
-        /// @param delta : number
-        /// @param duration : number|nil
-        /// @param source : string
+        /// @param trait_name string
+        /// @param delta number
+        /// @param duration number|nil
+        /// @param source string
         /// @return nil
         methods.add_method_mut(
             "addModifier",
@@ -2306,7 +2306,7 @@ impl LuaUserData for LuaTraitProfile {
         );
 
         /// Removes the specified modifiers.
-        /// @param source : string
+        /// @param source string
         /// @return nil
         methods.add_method_mut("removeModifiers", |_, this, source: String| {
             this.inner.borrow_mut().remove_modifiers_by_source(&source);
@@ -2314,7 +2314,7 @@ impl LuaUserData for LuaTraitProfile {
         });
 
         /// Advances the simulation by one time step.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
@@ -2322,7 +2322,7 @@ impl LuaUserData for LuaTraitProfile {
         });
 
         /// Returns true if a item is present.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("has", |_, this, name: String| {
             Ok(this.inner.borrow().has(&name))
@@ -2353,11 +2353,11 @@ struct LuaStimulusWorld {
 impl LuaUserData for LuaStimulusWorld {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Adds a visual stimulus at the specified world position with radius and intensity.
-        /// @param x : number
-        /// @param y : number
-        /// @param intensity : number
-        /// @param radius : number
-        /// @param tag : string|nil
+        /// @param x number
+        /// @param y number
+        /// @param intensity number
+        /// @param radius number
+        /// @param tag string|nil
         /// @return integer
         methods.add_method_mut(
             "addVisual",
@@ -2370,12 +2370,12 @@ impl LuaUserData for LuaStimulusWorld {
         );
 
         /// Registers an auditory stimulus at a world-space position.
-        /// @param x : number
-        /// @param y : number
-        /// @param intensity : number
-        /// @param radius : number
-        /// @param decay_rate : number
-        /// @param tag : string|nil
+        /// @param x number
+        /// @param y number
+        /// @param intensity number
+        /// @param radius number
+        /// @param decay_rate number
+        /// @param tag string|nil
         /// @return integer
         methods.add_method_mut(
             "addAuditory",
@@ -2398,14 +2398,14 @@ impl LuaUserData for LuaStimulusWorld {
         );
 
         /// Removes the specified item.
-        /// @param id : integer
+        /// @param id integer
         /// @return boolean
         methods.add_method_mut("remove", |_, this, id: u64| {
             Ok(this.inner.borrow_mut().remove(id))
         });
 
         /// Advances the simulation by one time step.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
@@ -2439,9 +2439,9 @@ struct LuaContextSteering {
 impl LuaUserData for LuaContextSteering {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Adds a world-space target that this agent steers towards.
-        /// @param tx : number
-        /// @param ty : number
-        /// @param weight : number
+        /// @param tx number
+        /// @param ty number
+        /// @param weight number
         /// @return nil
         methods.add_method_mut(
             "addSeekTarget",
@@ -2452,8 +2452,8 @@ impl LuaUserData for LuaContextSteering {
         );
 
         /// Adds a wander behavior with jitter and weight to the context steering evaluator.
-        /// @param jitter : number
-        /// @param weight : number
+        /// @param jitter number
+        /// @param weight number
         /// @return nil
         methods.add_method_mut("addWander", |_, this, (jitter, weight): (f32, f32)| {
             this.inner.borrow_mut().add_wander(jitter, weight);
@@ -2461,10 +2461,10 @@ impl LuaUserData for LuaContextSteering {
         });
 
         /// Adds a world-space point that this agent steers away from.
-        /// @param x : number
-        /// @param y : number
-        /// @param radius : number
-        /// @param weight : number
+        /// @param x number
+        /// @param y number
+        /// @param radius number
+        /// @param weight number
         /// @return nil
         methods.add_method_mut(
             "addAvoidPoint",
@@ -2477,12 +2477,12 @@ impl LuaUserData for LuaContextSteering {
         );
 
         /// Registers a rectangular region this agent must avoid.
-        /// @param min_x : number
-        /// @param min_y : number
-        /// @param max_x : number
-        /// @param max_y : number
-        /// @param margin : number
-        /// @param weight : number
+        /// @param min_x number
+        /// @param min_y number
+        /// @param max_x number
+        /// @param max_y number
+        /// @param margin number
+        /// @param weight number
         /// @return nil
         methods.add_method_mut("addAvoidBounds", |_, this, (min_x, min_y, max_x, max_y, margin, weight): (f32, f32, f32, f32, f32, f32)| {
             this.inner.borrow_mut().add_avoid_bounds(min_x, min_y, max_x, max_y, margin, weight);
@@ -2497,10 +2497,10 @@ impl LuaUserData for LuaContextSteering {
         });
 
         /// Evaluates and returns the computed result.
-        /// @param ax : number
-        /// @param ay : number
-        /// @param vx : number
-        /// @param vy : number
+        /// @param ax number
+        /// @param ay number
+        /// @param vx number
+        /// @param vy number
         /// @return number, number
         methods.add_method_mut(
             "evaluate",
@@ -2535,10 +2535,10 @@ struct LuaNeedSystem {
 impl LuaUserData for LuaNeedSystem {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Registers a new need with the specified name, urgency, and decay rate in the system.
-        /// @param name : string
-        /// @param decay_rate : number
-        /// @param urgency_threshold : number
-        /// @param urgency_factor : number
+        /// @param name string
+        /// @param decay_rate number
+        /// @param urgency_threshold number
+        /// @param urgency_factor number
         /// @return nil
         methods.add_method_mut("addNeed", |_, this, (name, decay_rate, urgency_threshold, urgency_factor): (String, f32, f32, f32)| {
             this.inner.borrow_mut().add_need(Need::new(&name, decay_rate, urgency_threshold, urgency_factor));
@@ -2546,7 +2546,7 @@ impl LuaUserData for LuaNeedSystem {
         });
 
         /// Advances the simulation by one time step.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
@@ -2560,8 +2560,8 @@ impl LuaUserData for LuaNeedSystem {
         });
 
         /// Returns or performs satisfy.
-        /// @param name : string
-        /// @param amount : number
+        /// @param name string
+        /// @param amount number
         /// @return nil
         methods.add_method_mut("satisfy", |_, this, (name, amount): (String, f32)| {
             this.inner.borrow_mut().satisfy(&name, amount);
@@ -2569,7 +2569,7 @@ impl LuaUserData for LuaNeedSystem {
         });
 
         /// Returns or performs value of.
-        /// @param name : string
+        /// @param name string
         /// @return number
         methods.add_method("valueOf", |_, this, name: String| {
             Ok(this.inner.borrow().value_of(&name))
@@ -2588,7 +2588,7 @@ struct LuaAIDirector {
 impl LuaUserData for LuaAIDirector {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Pushes a gameplay event with the given intensity to the director for awareness analysis.
-        /// @param intensity : number
+        /// @param intensity number
         /// @return nil
         methods.add_method_mut("pushEvent", |_, this, intensity: f32| {
             this.inner.borrow_mut().push_event(intensity);
@@ -2596,7 +2596,7 @@ impl LuaUserData for LuaAIDirector {
         });
 
         /// Advances the simulation by one time step.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
@@ -2632,7 +2632,7 @@ impl LuaUserData for LuaAIDirector {
         });
 
         /// Sets the global narrative tension level (0â€“1 scale).
-        /// @param value : number
+        /// @param value number
         /// @return nil
         methods.add_method_mut("setTension", |_, this, value: f32| {
             this.inner.borrow_mut().set_tension(value);
@@ -2659,10 +2659,10 @@ struct LuaHTNDomain {
 impl LuaUserData for LuaHTNDomain {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Registers a primitive HTN task with a direct operator function.
-        /// @param name : string
-        /// @param preconditions : table
-        /// @param effects : table
-        /// @param effects_clear : table
+        /// @param name string
+        /// @param preconditions table
+        /// @param effects table
+        /// @param effects_clear table
         /// @return nil
         methods.add_method_mut("addPrimitive", |_, this, (name, preconds, effects, clears): (String, Vec<String>, Vec<String>, Vec<String>)| {
             let p: Vec<&str> = preconds.iter().map(|s| s.as_str()).collect();
@@ -2673,8 +2673,8 @@ impl LuaUserData for LuaHTNDomain {
         });
 
         /// Registers a compound HTN task that decomposes into sub-tasks.
-        /// @param compound_name : string
-        /// @param methods : table  -- array of {preconditions=[], sub_tasks=[]}
+        /// @param compound_name string
+        /// @param methods table  -- array of {preconditions=[], sub_tasks=[]}
         /// @return nil
         methods.add_method_mut(
             "addCompound",
@@ -2703,8 +2703,8 @@ impl LuaUserData for LuaHTNDomain {
         );
 
         /// Runs planning and returns the resulting action sequence.
-        /// @param root_task : string
-        /// @param state : table
+        /// @param root_task string
+        /// @param state table
         /// @return table|nil
         methods.add_method(
             "plan",
@@ -2747,10 +2747,10 @@ struct LuaMCTSEngine {
 impl LuaUserData for LuaMCTSEngine {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Uses Lua closures for game logic. All closures receive/return integer states.
-        /// @param root_state : integer
-        /// @param get_actions : function(state) -> table
-        /// @param apply_action : function(state, action) -> integer
-        /// @param evaluate : function(state) -> number
+        /// @param root_state integer
+        /// @param get_actions function(state) -> table
+        /// @param apply_action function(state, action) -> integer
+        /// @param evaluate function(state) -> number
         /// @return integer|nil
         methods.add_method_mut(
             "search",
@@ -2793,10 +2793,10 @@ struct LuaEmotionModel {
 impl LuaUserData for LuaEmotionModel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Adds an emotion category with the given name and initial intensity to the model.
-        /// @param name : string
-        /// @param resting_level : number
-        /// @param decay_rate : number
-        /// @param min_visible : number
+        /// @param name string
+        /// @param resting_level number
+        /// @param decay_rate number
+        /// @param min_visible number
         /// @return nil
         methods.add_method_mut(
             "add",
@@ -2809,8 +2809,8 @@ impl LuaUserData for LuaEmotionModel {
         );
 
         /// Returns or performs trigger.
-        /// @param name : string
-        /// @param amount : number
+        /// @param name string
+        /// @param amount number
         /// @return nil
         methods.add_method_mut("trigger", |_, this, (name, amount): (String, f32)| {
             this.inner.borrow_mut().trigger(&name, amount);
@@ -2818,7 +2818,7 @@ impl LuaUserData for LuaEmotionModel {
         });
 
         /// Returns the current float value of this emotion dimension.
-        /// @param name : string
+        /// @param name string
         /// @return number
         methods.add_method("get", |_, this, name: String| {
             Ok(this.inner.borrow().get(&name))
@@ -2831,14 +2831,14 @@ impl LuaUserData for LuaEmotionModel {
         });
 
         /// Returns `true` if the emotion dimension is currently active and above threshold.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("isActive", |_, this, name: String| {
             Ok(this.inner.borrow().is_active(&name))
         });
 
         /// Advances the simulation by one time step.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
@@ -2865,10 +2865,10 @@ struct LuaORCASolver {
 impl LuaUserData for LuaORCASolver {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Adds an ORCA agent at the given position with radius and max speed to the solver.
-        /// @param x : number
-        /// @param y : number
-        /// @param radius : number
-        /// @param max_speed : number
+        /// @param x number
+        /// @param y number
+        /// @param radius number
+        /// @param max_speed number
         /// @return integer
         methods.add_method_mut(
             "addAgent",
@@ -2881,9 +2881,9 @@ impl LuaUserData for LuaORCASolver {
         );
 
         /// Sets the preferred velocity.
-        /// @param index : integer
-        /// @param pvx : number
-        /// @param pvy : number
+        /// @param index integer
+        /// @param pvx number
+        /// @param pvy number
         /// @return nil
         methods.add_method_mut(
             "setPreferredVelocity",
@@ -2896,9 +2896,9 @@ impl LuaUserData for LuaORCASolver {
         );
 
         /// Sets the agent's current world-space position for ORCA velocity computation.
-        /// @param index : integer
-        /// @param x : number
-        /// @param y : number
+        /// @param index integer
+        /// @param x number
+        /// @param y number
         /// @return nil
         methods.add_method_mut("setPosition", |_, this, (idx, x, y): (usize, f32, f32)| {
             if let Some(a) = this.inner.borrow_mut().agents.get_mut(idx) {
@@ -2908,7 +2908,7 @@ impl LuaUserData for LuaORCASolver {
         });
 
         /// Computes and returns the result.
-        /// @param dt : number
+        /// @param dt number
         /// @return nil
         methods.add_method_mut("compute", |_, this, dt: f32| {
             this.inner.borrow_mut().compute(dt);
@@ -2916,7 +2916,7 @@ impl LuaUserData for LuaORCASolver {
         });
 
         /// Returns the safe velocity.
-        /// @param index : integer
+        /// @param index integer
         /// @return number, number
         methods.add_method("getSafeVelocity", |_, this, idx: usize| {
             let solver = this.inner.borrow();
@@ -2947,9 +2947,9 @@ struct LuaNeuralNet {
 impl LuaUserData for LuaNeuralNet {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Adds a neural network layer with inputs, outputs, and an activation function.
-        /// @param inputs : integer
-        /// @param outputs : integer
-        /// @param activation : string
+        /// @param inputs integer
+        /// @param outputs integer
+        /// @param activation string
         /// @return nil
         methods.add_method_mut(
             "addLayer",
@@ -2961,7 +2961,7 @@ impl LuaUserData for LuaNeuralNet {
         );
 
         /// Returns or performs forward.
-        /// @param input : table
+        /// @param input table
         /// @return table
         methods.add_method("forward", |lua, this, input: Vec<f32>| {
             let out = this.inner.borrow().forward(&input);
@@ -2973,7 +2973,7 @@ impl LuaUserData for LuaNeuralNet {
         });
 
         /// Overwrites all connection weights with values from a flat table.
-        /// @param weights : table
+        /// @param weights table
         /// @return boolean
         methods.add_method_mut("setWeights", |_, this, weights: Vec<f32>| {
             Ok(this.inner.borrow_mut().set_weights(&weights))
@@ -3034,8 +3034,8 @@ impl LuaUserData for LuaGeneticAlgorithm {
         });
 
         /// Sets the fitness score used by the genetic algorithm selection step.
-        /// @param index : integer
-        /// @param fitness : number
+        /// @param index integer
+        /// @param fitness number
         /// @return nil
         methods.add_method_mut("setFitness", |_, this, (idx, fitness): (usize, f32)| {
             if let Some(c) = this.inner.borrow_mut().population.get_mut(idx) {
@@ -3045,7 +3045,7 @@ impl LuaUserData for LuaGeneticAlgorithm {
         });
 
         /// Returns the chromosome as an ordered table of gene values.
-        /// @param index : integer
+        /// @param index integer
         /// @return table
         methods.add_method("getGenes", |lua, this, idx: usize| {
             let ga = this.inner.borrow();
@@ -3090,8 +3090,8 @@ impl LuaUserData for LuaBandit {
         });
 
         /// Advances the simulation by one time step.
-        /// @param index : integer
-        /// @param reward : number
+        /// @param index integer
+        /// @param reward number
         /// @return nil
         methods.add_method_mut("update", |_, this, (idx, reward): (usize, f64)| {
             this.inner.borrow_mut().update(idx, reward);
@@ -3143,8 +3143,8 @@ impl LuaUserData for LuaNeuroevolution {
         });
 
         /// Sets the fitness score used by the genetic algorithm selection step.
-        /// @param index : integer
-        /// @param fitness : number
+        /// @param index integer
+        /// @param fitness number
         /// @return nil
         methods.add_method_mut("setFitness", |_, this, (idx, fitness): (usize, f32)| {
             this.inner.borrow_mut().set_fitness(idx, fitness);
@@ -3152,7 +3152,7 @@ impl LuaUserData for LuaNeuroevolution {
         });
 
         /// Returns or performs chromosome to net.
-        /// @param index : integer
+        /// @param index integer
         /// @return nil
         /// LuaNeuralNet|nil
         methods.add_method("chromosomeToNet", |_, this, idx: usize| {
@@ -3203,7 +3203,7 @@ struct LuaStrategyAI {
 impl LuaUserData for LuaStrategyAI {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Adds a strategic goal with priority score to the planner for future evaluation.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method_mut("addGoal", |_, this, name: String| {
             this.inner.borrow_mut().add_goal_named(&name);
@@ -3211,7 +3211,7 @@ impl LuaUserData for LuaStrategyAI {
         });
 
         /// Adds a string tag to the strategy AI instance for goal filtering and categorization.
-        /// @param tag : string
+        /// @param tag string
         /// @return nil
         methods.add_method_mut("addTag", |_, this, tag: String| {
             this.inner.borrow_mut().add_tag(&tag);
@@ -3219,7 +3219,7 @@ impl LuaUserData for LuaStrategyAI {
         });
 
         /// Removes the specified tag.
-        /// @param tag : string
+        /// @param tag string
         /// @return nil
         methods.add_method_mut("removeTag", |_, this, tag: String| {
             this.inner.borrow_mut().remove_tag(&tag);
@@ -3227,8 +3227,8 @@ impl LuaUserData for LuaStrategyAI {
         });
 
         /// Advances the simulation by one time step.
-        /// @param dt : number
-        /// @param scorer : function(goal_name) -> number
+        /// @param dt number
+        /// @param scorer function(goal_name) -> number
         /// @return nil
         methods.add_method_mut("update", |_, this, (dt, scorer_fn): (f32, LuaFunction)| {
             let mut scorer =
@@ -3238,7 +3238,7 @@ impl LuaUserData for LuaStrategyAI {
         });
 
         /// Returns or performs force evaluate.
-        /// @param scorer : function(goal_name) -> number
+        /// @param scorer function(goal_name) -> number
         /// @return nil
         methods.add_method_mut("forceEvaluate", |_, this, scorer_fn: LuaFunction| {
             let mut scorer =
@@ -3272,10 +3272,10 @@ struct LuaAILod {
 impl LuaUserData for LuaAILod {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns or performs tier for.
-        /// @param agent_x : number
-        /// @param agent_y : number
-        /// @param ref_x : number
-        /// @param ref_y : number
+        /// @param agent_x number
+        /// @param agent_y number
+        /// @param ref_x number
+        /// @param ref_y number
         /// @return integer
         methods.add_method(
             "tierFor",
@@ -3285,8 +3285,8 @@ impl LuaUserData for LuaAILod {
         );
 
         /// Returns or performs should update.
-        /// @param tier : integer
-        /// @param frame_number : integer
+        /// @param tier integer
+        /// @param frame_number integer
         /// @return boolean
         methods.add_method("shouldUpdate", |_, this, (tier, frame): (usize, u64)| {
             Ok(this.inner.borrow().should_update(tier, frame))
@@ -3299,7 +3299,7 @@ impl LuaUserData for LuaAILod {
         });
 
         /// Returns or performs tier name.
-        /// @param tier : integer
+        /// @param tier integer
         /// @return string
         methods.add_method("tierName", |_, this, tier: usize| {
             Ok(this.inner.borrow().tier(tier).map(|t| t.name.clone()))
@@ -3311,9 +3311,9 @@ impl LuaUserData for LuaAILod {
 
 /// Registers the `lurek.ai` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -3333,11 +3333,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newBlackboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new standalone blackboard.
-    /// @return Blackboard
+    /// @return AIBlackboard
     tbl.set(
         "newBlackboard",
         lua.create_function(|_, ()| {
-            Ok(LuaBlackboard {
+            Ok(LuaAIBlackboard {
                 inner: Rc::new(RefCell::new(Blackboard::new())),
             })
         })?,
@@ -3399,8 +3399,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newParallel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a BT parallel node with optional policies.
-    /// @param successPolicy : string?
-    /// @param failurePolicy : string?
+    /// @param successPolicy string?
+    /// @param failurePolicy string?
     /// @return BTNode
     tbl.set(
         "newParallel",
@@ -3438,7 +3438,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newRepeater â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a BT repeater decorator.
-    /// @param count : integer?
+    /// @param count integer?
     /// @return BTNode
     tbl.set(
         "newRepeater",
@@ -3475,7 +3475,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newAction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a BT action leaf with a Lua callback.
-    /// @param callback : function
+    /// @param callback function
     /// @return BTNode
     tbl.set(
         "newAction",
@@ -3489,7 +3489,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newCondition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a BT condition leaf with a Lua predicate.
-    /// @param callback : function
+    /// @param callback function
     /// @return BTNode
     tbl.set(
         "newCondition",
@@ -3504,8 +3504,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // ── newGuard ──────────────────────────────────────────────────────────────────
     /// Creates a BT Guard decorator. The predicate is evaluated before each tick;
     /// if it returns false the child is skipped and Failure is returned.
-    /// @param predicate : function(agent, blackboard) -> boolean
-    /// @param child : BTNode
+    /// @param predicate function(agent, blackboard) -> boolean
+    /// @param child BTNode
     /// @return BTNode
     tbl.set(
         "newGuard",
@@ -3547,8 +3547,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newQLearner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a tabular Q-learner.
-    /// @param stateCount : integer
-    /// @param actionCount : integer
+    /// @param stateCount integer
+    /// @param actionCount integer
     /// @return QLearner
     tbl.set(
         "newQLearner",
@@ -3586,9 +3586,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newInfluenceMap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a multi-layer influence map grid.
-    /// @param width : integer
-    /// @param height : integer
-    /// @param cellSize : number
+    /// @param width integer
+    /// @param height integer
+    /// @param cellSize number
     /// @return InfluenceMap
     tbl.set(
         "newInfluenceMap",
@@ -3601,7 +3601,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newSquad â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a named squad for formation positioning.
-    /// @param name : string
+    /// @param name string
     /// @return Squad
     tbl.set(
         "newSquad",
@@ -3650,7 +3650,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newContextSteering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new context steering controller.
-    /// @param slots : integer
+    /// @param slots integer
     /// @return ContextSteering
     tbl.set(
         "newContextSteering",
@@ -3700,10 +3700,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newMCTSEngine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new Monte Carlo Tree Search engine.
-    /// @param iterations : integer
-    /// @param uct_c : number
-    /// @param rollout_depth : integer
-    /// @param seed : integer
+    /// @param iterations integer
+    /// @param uct_c number
+    /// @param rollout_depth integer
+    /// @param seed integer
     /// @return MCTSEngine
     tbl.set(
         "newMCTSEngine",
@@ -3734,7 +3734,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newORCASolver â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new ORCA crowd avoidance solver.
-    /// @param time_horizon : number
+    /// @param time_horizon number
     /// @return ORCASolver
     tbl.set(
         "newORCASolver",
@@ -3759,9 +3759,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newGeneticAlgorithm â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new genetic algorithm.
-    /// @param pop_size : integer
-    /// @param gene_count : integer
-    /// @param seed : integer
+    /// @param pop_size integer
+    /// @param gene_count integer
+    /// @param seed integer
     /// @return GeneticAlgorithm
     tbl.set(
         "newGeneticAlgorithm",
@@ -3776,10 +3776,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newBandit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new multi-armed bandit.
-    /// @param arm_count : integer
-    /// @param strategy : string  -- "epsilon_greedy", "ucb1", or "thompson"
-    /// @param epsilon : number   -- only used for epsilon_greedy
-    /// @param seed : integer
+    /// @param arm_count integer
+    /// @param strategy string  -- "epsilon_greedy", "ucb1", or "thompson"
+    /// @param epsilon number   -- only used for epsilon_greedy
+    /// @param seed integer
     /// @return Bandit
     tbl.set(
         "newBandit",
@@ -3801,9 +3801,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newNeuroevolution â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a neuroevolution trainer (GA for neural network weights).
-    /// @param layer_spec : table  -- array of {inputs, outputs, activation}
-    /// @param pop_size : integer
-    /// @param seed : integer
+    /// @param layer_spec table  -- array of {inputs, outputs, activation}
+    /// @param pop_size integer
+    /// @param seed integer
     /// @return Neuroevolution
     tbl.set(
         "newNeuroevolution",
@@ -3834,7 +3834,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // â”€â”€ newStrategyAI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /// Creates a new throttled strategy AI.
-    /// @param update_interval : number  -- seconds between re-evaluations
+    /// @param update_interval number  -- seconds between re-evaluations
     /// @return StrategyAI
     tbl.set(
         "newStrategyAI",

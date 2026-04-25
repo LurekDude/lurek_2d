@@ -105,6 +105,32 @@ local proj_trail_ps  = nil
 local ko_text_scale  = 1.0
 local dmg_flash_p1   = 0
 local dmg_flash_p2   = 0
+local active_tweens  = {}
+
+local function tween_to(duration, on_step)
+    if type(on_step) ~= "function" then return end
+
+    local tween = {
+        elapsed = 0,
+        duration = math.max(duration or 0, 0.0001),
+        on_step = on_step,
+    }
+
+    on_step(0)
+    table.insert(active_tweens, tween)
+end
+
+local function update_tweens(dt)
+    for i = #active_tweens, 1, -1 do
+        local tween = active_tweens[i]
+        tween.elapsed = tween.elapsed + dt
+        local t = clamp(tween.elapsed / tween.duration, 0, 1)
+        tween.on_step(t)
+        if t >= 1 then
+            table.remove(active_tweens, i)
+        end
+    end
+end
 
 -- ── Initialization ───────────────────────────────────────────────────────
 local function reset_fighter_pos(f)
@@ -231,10 +257,10 @@ local function check_melee_hit(attacker, defender)
         -- Damage flash tween
         if defender.id == 1 then
             dmg_flash_p1 = 1.0
-            lurek.tween.to(0.4, function(t) dmg_flash_p1 = 1.0 - t end)
+            tween_to(0.4, function(t) dmg_flash_p1 = 1.0 - t end)
         else
             dmg_flash_p2 = 1.0
-            lurek.tween.to(0.4, function(t) dmg_flash_p2 = 1.0 - t end)
+            tween_to(0.4, function(t) dmg_flash_p2 = 1.0 - t end)
         end
 
         -- Hit burst particles
@@ -264,10 +290,10 @@ local function check_projectile_hits()
 
                     if def.id == 1 then
                         dmg_flash_p1 = 1.0
-                        lurek.tween.to(0.4, function(t) dmg_flash_p1 = 1.0 - t end)
+                        tween_to(0.4, function(t) dmg_flash_p1 = 1.0 - t end)
                     else
                         dmg_flash_p2 = 1.0
-                        lurek.tween.to(0.4, function(t) dmg_flash_p2 = 1.0 - t end)
+                        tween_to(0.4, function(t) dmg_flash_p2 = 1.0 - t end)
                     end
                     if hit_burst_ps then
                         hit_burst_ps:emit(proj.x, proj.y, 10)
@@ -365,32 +391,84 @@ local function update_fighter(f, dt, move_left, move_right, do_jump, do_attack, 
             ko_who = (f.id == 1) and "PLAYER 2" or "PLAYER 1"
             ko_timer = 2.0
             ko_text_scale = 3.0
-            lurek.tween.to(0.5, function(t) ko_text_scale = 3.0 - 2.0 * t end)
+            tween_to(0.5, function(t) ko_text_scale = 3.0 - 2.0 * t end)
         end
     end
 end
 
 -- ── lurek.init ───────────────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h, i)
+    if type(a) == "string" then
+        if type(f) == "table" then
+            _sc(f)
+        elseif type(f) == "number" then
+            _gfx.setColor(f or 1, g or 1, h or 1, i or 1)
+        end
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Platform Fighter — Lurek2D")
     lurek.render.setBackgroundColor(0.15, 0.2, 0.35)
 
     -- Input actions — P1
-    lurek.input.isActionDown("p1_left",    {"a"})
-    lurek.input.isActionDown("p1_right",   {"d"})
-    lurek.input.isActionDown("p1_jump",    {"w"})
-    lurek.input.isActionDown("p1_attack",  {"f"})
-    lurek.input.isActionDown("p1_special", {"g"})
+    lurek.input.bind("p1_left",    {"a"})
+    lurek.input.bind("p1_right",   {"d"})
+    lurek.input.bind("p1_jump",    {"w"})
+    lurek.input.bind("p1_attack",  {"f"})
+    lurek.input.bind("p1_special", {"g"})
     -- Input actions — P2
-    lurek.input.isActionDown("p2_left",    {"left"})
-    lurek.input.isActionDown("p2_right",   {"right"})
-    lurek.input.isActionDown("p2_jump",    {"up"})
-    lurek.input.isActionDown("p2_attack",  {"k"})
-    lurek.input.isActionDown("p2_special", {"l"})
+    lurek.input.bind("p2_left",    {"left"})
+    lurek.input.bind("p2_right",   {"right"})
+    lurek.input.bind("p2_jump",    {"up"})
+    lurek.input.bind("p2_attack",  {"k"})
+    lurek.input.bind("p2_special", {"l"})
     -- Global
-    lurek.input.isActionDown("quit",  {"escape"})
-    lurek.input.isActionDown("start", {"return"})
+    lurek.input.bind("quit",  {"escape"})
+    lurek.input.bind("start", {"return"})
 
     -- Particle systems
     hit_burst_ps = lurek.particle.newSystem({
@@ -427,13 +505,10 @@ function lurek.init()
     })
 end
 
--- ── lurek.ready ──────────────────────────────────────────────────────────
-local function _ready_setup()
-    _cam:setPosition(0, 0)
-end
-
 -- ── lurek.process ────────────────────────────────────────────────────────
 function lurek.process(dt)
+    update_tweens(dt)
+
     -- Quit
     if lurek.input.wasActionPressed("quit") then
         lurek.event.quit()
@@ -456,15 +531,15 @@ function lurek.process(dt)
     -- ── FIGHTING state ───────────────────────────────────────────────
     if game_state == STATES.FIGHTING then
         -- P1 input
-        local p1_left  = lurek.input.isDown("p1_left")
-        local p1_right = lurek.input.isDown("p1_right")
+        local p1_left  = lurek.input.isActionDown("p1_left")
+        local p1_right = lurek.input.isActionDown("p1_right")
         local p1_jump  = lurek.input.wasActionPressed("p1_jump")
         local p1_atk   = lurek.input.wasActionPressed("p1_attack")
         local p1_spc   = lurek.input.wasActionPressed("p1_special")
 
         -- P2 input
-        local p2_left  = lurek.input.isDown("p2_left")
-        local p2_right = lurek.input.isDown("p2_right")
+        local p2_left  = lurek.input.isActionDown("p2_left")
+        local p2_right = lurek.input.isActionDown("p2_right")
         local p2_jump  = lurek.input.wasActionPressed("p2_jump")
         local p2_atk   = lurek.input.wasActionPressed("p2_attack")
         local p2_spc   = lurek.input.wasActionPressed("p2_special")
@@ -527,7 +602,7 @@ end
 
 -- ── Draw helpers ─────────────────────────────────────────────────────────
 local function draw_platform(plat, color)
-    lurek.render.rectangle("fill", plat.x, plat.y, plat.w, plat.h,
+    rect("fill", plat.x, plat.y, plat.w, plat.h,
                            color[1], color[2], color[3], 1)
 end
 
@@ -542,16 +617,16 @@ local function draw_fighter(f)
     local alpha = 1.0
 
     -- Body rectangle
-    lurek.render.rectangle("fill", f.x, f.y, FIGHTER_W, FIGHTER_H,
+    rect("fill", f.x, f.y, FIGHTER_W, FIGHTER_H,
                            c[1], c[2], c[3], alpha)
 
     -- Simple face: two eyes + mouth
     local eye_y = f.y + 8
     local eye_lx = f.x + 5
     local eye_rx = f.x + 13
-    lurek.render.rectangle("fill", eye_lx, eye_y, 3, 3, 1, 1, 1, alpha)
-    lurek.render.rectangle("fill", eye_rx, eye_y, 3, 3, 1, 1, 1, alpha)
-    lurek.render.rectangle("fill", f.x + 6, f.y + 16, 8, 2, 1, 1, 1, alpha)
+    rect("fill", eye_lx, eye_y, 3, 3, 1, 1, 1, alpha)
+    rect("fill", eye_rx, eye_y, 3, 3, 1, 1, 1, alpha)
+    rect("fill", f.x + 6, f.y + 16, 8, 2, 1, 1, 1, alpha)
 
     -- Attack indicator: small rectangle extending from fighter
     if f.atk_timer > 0 and f.cur_attack ~= nil then
@@ -566,13 +641,13 @@ local function draw_fighter(f)
             atk_w = 12
             atk_h = 8
         end
-        lurek.render.rectangle("fill", atk_x, atk_y, atk_w, atk_h,
+        rect("fill", atk_x, atk_y, atk_w, atk_h,
                                1, 1, 0.3, 0.9)
     end
 end
 
 local function draw_projectile(proj)
-    lurek.render.circle("fill", proj.x + PROJECTILE_SIZE * 0.5,
+    circ("fill", proj.x + PROJECTILE_SIZE * 0.5,
                         proj.y + PROJECTILE_SIZE * 0.5, PROJECTILE_SIZE,
                         proj.color[1], proj.color[2], proj.color[3], 1)
 end
@@ -581,24 +656,24 @@ local function draw_blast_indicators()
     -- Faint lines at blast zone edges (visible portion)
     local a = 0.15
     -- Left
-    lurek.render.rectangle("fill", 0, 0, 2, SCREEN_H, 1, 0.3, 0.3, a)
+    rect("fill", 0, 0, 2, SCREEN_H, 1, 0.3, 0.3, a)
     -- Right
-    lurek.render.rectangle("fill", SCREEN_W - 2, 0, 2, SCREEN_H, 1, 0.3, 0.3, a)
+    rect("fill", SCREEN_W - 2, 0, 2, SCREEN_H, 1, 0.3, 0.3, a)
     -- Top
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 2, 1, 0.3, 0.3, a)
+    rect("fill", 0, 0, SCREEN_W, 2, 1, 0.3, 0.3, a)
     -- Bottom
-    lurek.render.rectangle("fill", 0, SCREEN_H - 2, SCREEN_W, 2, 1, 0.3, 0.3, a)
+    rect("fill", 0, SCREEN_H - 2, SCREEN_W, 2, 1, 0.3, 0.3, a)
 end
 
 -- ── lurek.render ─────────────────────────────────────────────────────────
 function lurek.draw()
     -- ── TITLE ────────────────────────────────────────────────────────
     if game_state == STATES.TITLE then
-        lurek.render.print("PLATFORM FIGHTER", SCREEN_W * 0.5 - 140, 180, 32, 1, 1, 1, 1)
-        lurek.render.print("2 PLAYERS", SCREEN_W * 0.5 - 60, 230, 20, 0.8, 0.8, 0.8, 1)
+        text_("PLATFORM FIGHTER", SCREEN_W * 0.5 - 140, 180, 32, 1, 1, 1, 1)
+        text_("2 PLAYERS", SCREEN_W * 0.5 - 60, 230, 20, 0.8, 0.8, 0.8, 1)
         local show = math.floor(title_blink * 2) % 2 == 0
         if show then
-            lurek.render.print("PRESS ENTER", SCREEN_W * 0.5 - 75, 320, 18, 0.9, 0.9, 0.3, 1)
+            text_("PRESS ENTER", SCREEN_W * 0.5 - 75, 320, 18, 0.9, 0.9, 0.3, 1)
         end
         -- Draw preview platforms
         for i, plat in ipairs(PLATFORMS) do
@@ -640,11 +715,11 @@ function lurek.draw_ui()
     local p1_g = math.max(0, 1.0 - p1.damage_pct / 150)
     local p1_b = math.max(0, 1.0 - p1.damage_pct / 100)
     local p1_flash_add = dmg_flash_p1 * 0.5
-    lurek.render.print(p1_dmg_str, 80, SCREEN_H - 60, 28,
+    text_(p1_dmg_str, 80, SCREEN_H - 60, 28,
                        math.min(1, p1_r + p1_flash_add),
                        math.min(1, p1_g + p1_flash_add),
                        math.min(1, p1_b + p1_flash_add), 1)
-    lurek.render.print("P1", 80, SCREEN_H - 82, 14,
+    text_("P1", 80, SCREEN_H - 82, 14,
                        P1_COLOR[1], P1_COLOR[2], P1_COLOR[3], 1)
 
     -- P2 damage (bottom right)
@@ -653,11 +728,11 @@ function lurek.draw_ui()
     local p2_g = math.max(0, 1.0 - p2.damage_pct / 150)
     local p2_b = math.max(0, 1.0 - p2.damage_pct / 100)
     local p2_flash_add = dmg_flash_p2 * 0.5
-    lurek.render.print(p2_dmg_str, SCREEN_W - 140, SCREEN_H - 60, 28,
+    text_(p2_dmg_str, SCREEN_W - 140, SCREEN_H - 60, 28,
                        math.min(1, p2_r + p2_flash_add),
                        math.min(1, p2_g + p2_flash_add),
                        math.min(1, p2_b + p2_flash_add), 1)
-    lurek.render.print("P2", SCREEN_W - 140, SCREEN_H - 82, 14,
+    text_("P2", SCREEN_W - 140, SCREEN_H - 82, 14,
                        P2_COLOR[1], P2_COLOR[2], P2_COLOR[3], 1)
 
     -- ── Stocks display ──────────────────────────────────────────────
@@ -665,47 +740,47 @@ function lurek.draw_ui()
         local sx = 80 + (i - 1) * 18
         local sy = SCREEN_H - 36
         local a = (i <= p1.stocks) and 1.0 or 0.2
-        lurek.render.circle("fill", sx + 5, sy + 5, 6,
+        circ("fill", sx + 5, sy + 5, 6,
                             P1_COLOR[1], P1_COLOR[2], P1_COLOR[3], a)
     end
     for i = 1, MAX_STOCKS do
         local sx = SCREEN_W - 140 + (i - 1) * 18
         local sy = SCREEN_H - 36
         local a = (i <= p2.stocks) and 1.0 or 0.2
-        lurek.render.circle("fill", sx + 5, sy + 5, 6,
+        circ("fill", sx + 5, sy + 5, 6,
                             P2_COLOR[1], P2_COLOR[2], P2_COLOR[3], a)
     end
 
     -- ── Special cooldown indicators ──────────────────────────────────
     if p1.special_cd > 0 then
         local pct = p1.special_cd / ATK_SPECIAL.cooldown
-        lurek.render.rectangle("fill", 80, SCREEN_H - 18, 50 * (1 - pct), 4,
+        rect("fill", 80, SCREEN_H - 18, 50 * (1 - pct), 4,
                                0.3, 0.8, 1, 0.7)
-        lurek.render.rectangle("line", 80, SCREEN_H - 18, 50, 4,
+        rect("line", 80, SCREEN_H - 18, 50, 4,
                                0.5, 0.5, 0.5, 0.4)
     end
     if p2.special_cd > 0 then
         local pct = p2.special_cd / ATK_SPECIAL.cooldown
-        lurek.render.rectangle("fill", SCREEN_W - 140, SCREEN_H - 18, 50 * (1 - pct), 4,
+        rect("fill", SCREEN_W - 140, SCREEN_H - 18, 50 * (1 - pct), 4,
                                1, 0.5, 0.3, 0.7)
-        lurek.render.rectangle("line", SCREEN_W - 140, SCREEN_H - 18, 50, 4,
+        rect("line", SCREEN_W - 140, SCREEN_H - 18, 50, 4,
                                0.5, 0.5, 0.5, 0.4)
     end
 
     -- ── KO text ──────────────────────────────────────────────────────
     if game_state == STATES.KO then
         local sz = math.floor(36 * ko_text_scale)
-        lurek.render.print("KO!", SCREEN_W * 0.5 - sz, SCREEN_H * 0.5 - sz * 0.5,
+        text_("KO!", SCREEN_W * 0.5 - sz, SCREEN_H * 0.5 - sz * 0.5,
                            sz, 1, 0.2, 0.2, 1)
-        lurek.render.print(ko_who .. " SCORES!", SCREEN_W * 0.5 - 100,
+        text_(ko_who .. " SCORES!", SCREEN_W * 0.5 - 100,
                            SCREEN_H * 0.5 + 30, 20, 1, 1, 0.5, 1)
     end
 
     -- ── Match over text ──────────────────────────────────────────────
     if game_state == STATES.MATCH_OVER then
-        lurek.render.print(match_winner, SCREEN_W * 0.5 - 120, SCREEN_H * 0.5 - 20,
+        text_(match_winner, SCREEN_W * 0.5 - 120, SCREEN_H * 0.5 - 20,
                            30, 1, 1, 0.3, 1)
-        lurek.render.print("PRESS ENTER TO RETURN", SCREEN_W * 0.5 - 120,
+        text_("PRESS ENTER TO RETURN", SCREEN_W * 0.5 - 120,
                            SCREEN_H * 0.5 + 30, 16, 0.8, 0.8, 0.8, 1)
     end
 end

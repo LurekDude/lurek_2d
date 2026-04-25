@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 local npc    = world:newAgent("villager", x, y)
 local planner = npc:useGoap()
 

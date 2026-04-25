@@ -78,7 +78,7 @@ function lurek.process(dt)
     end
 end
 
-function lurek.render()
+function lurek.draw()
     local px = (player.gx + (player.tx and (player.tx - player.gx) * player.progress or 0)) * TILE_SIZE
     local py = (player.gy + (player.ty and (player.ty - player.gy) * player.progress or 0)) * TILE_SIZE
     lurek.render.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)

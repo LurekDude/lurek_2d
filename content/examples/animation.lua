@@ -253,7 +253,7 @@ do  -- Animation:getCurrentFrame
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("walk", {0}, 8, true)
   anim:play("walk")
-  if anim:getCurrentFrame() == 3 then lurek.audio.play("sfx/step.ogg") end
+  if anim:getCurrentFrame() == 3 then lurek.audio.play(lurek.audio.newSource("tests/rust/fixtures/sine_mono_44100.wav")) end
 end
 
 --@api-stub: Animation:setFrame
@@ -289,7 +289,7 @@ do  -- Animation:drawToImage
     anim:addClip("idle", {0}, 4, true)
     anim:play("idle")
     local thumb = anim:drawToImage(64, 64)
-    thumb:save("save/anim_thumb.png")
+    lurek.image.savePNG(thumb, "save/anim_thumb.png")
   end)
 end
 
@@ -533,8 +533,8 @@ end
 -- Calculates frame indices automatically from the grid layout registered via addFramesFromGrid.
 do  -- Animation:addClipFromGrid
   local anim = lurek.animation.new()
-  anim:addFramesFromGrid(0, 0, 128, 128, 4, 4, 16)
-  anim:addClipFromGrid("run", 1, 0, 3, 8, true)
+  anim:addFramesFromGrid(128, 128, 32, 32, 0, 16)
+  anim:addClipFromGrid("run", 128, 128, 32, 32, 0, 4, 8, true)
   anim:play("run")
   lurek.log.info("clip from grid added", "anim")
 end
@@ -544,7 +544,7 @@ end
 -- Use instead of addFrame when the sprite sheet has regular tile-size cells.
 do  -- Animation:addFramesFromGrid
   local anim = lurek.animation.new()
-  local n = anim:addFramesFromGrid(0, 0, 64, 64, 4, 2, 8)
+  local n = anim:addFramesFromGrid(64, 64, 32, 32, 0, 8)
   lurek.log.info("frames added: " .. n, "anim")
 end
 
@@ -586,7 +586,7 @@ do  -- AnimStateMachine:addTransition
   local fsm = lurek.animation.newStateMachine(anim, "idle")
   fsm:addState("idle", "idle", true)
   fsm:addState("run", "run", true)
-  fsm:addTransition("idle", "run", "speed", ">", 0)
+  fsm:addTransition("idle", "run", "speed > 0")
   lurek.log.info("transition added", "anim")
 end
 

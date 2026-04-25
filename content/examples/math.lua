@@ -747,6 +747,7 @@ end
 -- Creates a 3D vector `{x, y, z}` table with numeric components.
 -- Make a 3D point; required for the few APIs (e.g. light direction) that work in 3-space.
 do  -- lurek.math.vec3
+  ---@type Vec3
   local p = lurek.math.vec3(1, 2, 3)
   local len = p:length()
   lurek.log.debug("vec3 len=" .. len, "math")
@@ -756,6 +757,7 @@ end
 -- Compatibility alias for `vec3`.
 -- PascalCase alias for vec3 for code that prefers the constructor convention.
 do  -- lurek.math.Vec3
+  ---@type Vec3
   local p = lurek.math.Vec3(0, 0, 1)
   local s = p:scale(5)
   lurek.log.debug("scaled z=" .. s.z, "math")
@@ -765,6 +767,7 @@ end
 -- Creates a Catmull-Rom spline through the given control points.
 -- Pass {x=..,y=..} or {x,y} tables; the spline interpolates THROUGH every control point.
 do  -- lurek.math.catmullRom
+  ---@type CatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=100,y=200},{x=300,y=200},{x=400,y=0}})
   local x, y = cr:sample(0.5)
   lurek.log.debug("catmull mid " .. x .. "," .. y, "spline")
@@ -774,6 +777,7 @@ end
 -- Creates a Hermite spline defined by two endpoints and tangents.
 -- Endpoints + tangents define the curve; double-check tangent magnitude for arc length sense.
 do  -- lurek.math.hermite
+  ---@type Hermite
   local h = lurek.math.hermite(0, 0, 100, 100, 50, 0, 0, 50)
   local mx, my = h:sample(0.5)
   lurek.log.debug("hermite mid " .. mx .. "," .. my, "spline")
@@ -1063,6 +1067,7 @@ end
 -- Returns the Euclidean length of the vector.
 -- Euclidean length in 3D; use for camera-to-actor distance in 2.5D scenes.
 do  -- Vec3:length
+  ---@type Vec3
   local v = lurek.math.vec3(1, 2, 2)
   lurek.log.debug("len=" .. v:length(), "math")
 end
@@ -1071,6 +1076,7 @@ end
 -- Returns the squared Euclidean length (avoids sqrt).
 -- Squared length — avoid the sqrt when sorting things by distance.
 do  -- Vec3:lengthSquared
+  ---@type Vec3
   local v = lurek.math.vec3(2, 2, 1)
   lurek.log.debug("len2=" .. v:lengthSquared(), "math")
 end
@@ -1079,7 +1085,9 @@ end
 -- Returns a unit-length version of this vector.
 -- Returns a new unit-length Vec3; required when computing reflection or lighting.
 do  -- Vec3:normalize
-  local n = lurek.math.vec3(0, 0, 5):normalize()
+  ---@type Vec3
+  local v = lurek.math.vec3(0, 0, 5)
+  local n = v:normalize()
   lurek.log.debug("n.z=" .. n.z, "math")
 end
 
@@ -1087,7 +1095,9 @@ end
 -- Dot product with another Vec3.
 -- Cosine of angle between unit vectors; use for diffuse light shading.
 do  -- Vec3:dot
+  ---@type Vec3
   local n = lurek.math.vec3(0, 1, 0)
+  ---@type Vec3
   local l = lurek.math.vec3(0, 1, 0)
   lurek.log.debug("ndotl=" .. n:dot(l), "light")
 end
@@ -1096,7 +1106,9 @@ end
 -- Cross product with another Vec3.
 -- Right-hand rule cross; use to derive a perpendicular axis for rotations.
 do  -- Vec3:cross
+  ---@type Vec3
   local x = lurek.math.vec3(1, 0, 0)
+  ---@type Vec3
   local y = lurek.math.vec3(0, 1, 0)
   local z = x:cross(y)
   lurek.log.debug("z.z=" .. z.z, "math")
@@ -1106,7 +1118,9 @@ end
 -- Linear interpolation towards another Vec3.
 -- Returns a new vector; component-wise linear blend.
 do  -- Vec3:lerp
+  ---@type Vec3
   local a = lurek.math.vec3(0, 0, 0)
+  ---@type Vec3
   local b = lurek.math.vec3(10, 10, 10)
   local m = a:lerp(b, 0.5)
   lurek.log.debug("mid.x=" .. m.x, "math")
@@ -1116,7 +1130,9 @@ end
 -- Euclidean distance to another Vec3.
 -- Plain Euclidean distance between two Vec3.
 do  -- Vec3:distance
+  ---@type Vec3
   local a = lurek.math.vec3(0, 0, 0)
+  ---@type Vec3
   local b = lurek.math.vec3(3, 4, 0)
   lurek.log.info("dist=" .. a:distance(b), "math")
 end
@@ -1125,8 +1141,11 @@ end
 -- Add another Vec3 and return the result.
 -- Returns a new Vec3 — does not mutate self.
 do  -- Vec3:add
+  ---@type Vec3
   local a = lurek.math.vec3(1, 2, 3)
-  local s = a:add(lurek.math.vec3(10, 0, 0))
+  ---@type Vec3
+  local b = lurek.math.vec3(10, 0, 0)
+  local s = a:add(b)
   lurek.log.debug("sum.x=" .. s.x, "math")
 end
 
@@ -1134,7 +1153,11 @@ end
 -- Subtract another Vec3 and return the result.
 -- Returns a new Vec3 representing self - other.
 do  -- Vec3:sub
-  local d = lurek.math.vec3(5, 5, 5):sub(lurek.math.vec3(1, 2, 3))
+  ---@type Vec3
+  local a = lurek.math.vec3(5, 5, 5)
+  ---@type Vec3
+  local b = lurek.math.vec3(1, 2, 3)
+  local d = a:sub(b)
   lurek.log.debug("diff.z=" .. d.z, "math")
 end
 
@@ -1142,7 +1165,9 @@ end
 -- Scale this vector by a scalar and return the result.
 -- Returns self * scalar without mutating; useful in physics impulse calc.
 do  -- Vec3:scale
-  local v = lurek.math.vec3(1, 0, 0):scale(9.81)
+  ---@type Vec3
+  local base = lurek.math.vec3(1, 0, 0)
+  local v = base:scale(9.81)
   lurek.log.debug("scaled.x=" .. v.x, "physics")
 end
 
@@ -1150,6 +1175,7 @@ end
 -- Sample the spline at global t in [0, 1].
 -- t in [0, 1] runs the whole curve; useful for moving an actor along a path.
 do  -- CatmullRom:sample
+  ---@type CatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=100,y=200},{x=300,y=200},{x=400,y=0}})
   local x, y = cr:sample(0.25)
   lurek.log.debug("sample " .. x .. "," .. y, "spline")
@@ -1159,6 +1185,7 @@ end
 -- Sample a specific segment at local t in [0, 1].
 -- 0-based segment index; useful when stepping per segment for variable speed.
 do  -- CatmullRom:sampleSegment
+  ---@type CatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=50,y=20},{x=100,y=0},{x=150,y=20}})
   local x, y = cr:sampleSegment(0, 0.5)
   lurek.log.debug("seg0 mid " .. x .. "," .. y, "spline")
@@ -1168,6 +1195,7 @@ end
 -- Number of control points.
 -- Returns the control-point count, not arc length; pre-allocate dot arrays from this.
 do  -- CatmullRom:len
+  ---@type CatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=10,y=10},{x=20,y=0},{x=30,y=10}})
   lurek.log.info("control points=" .. cr:len(), "spline")
 end
@@ -1176,6 +1204,7 @@ end
 -- Appends a control point to the spline.
 -- Appends a control point; the curve auto-extends so plan tangent continuity at the join.
 do  -- CatmullRom:addPoint
+  ---@type CatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=50,y=50},{x=100,y=0},{x=150,y=50}})
   cr:addPoint(200, 0)
   lurek.log.debug("after add count=" .. cr:len(), "spline")
@@ -1185,6 +1214,7 @@ end
 -- Removes the control point at `index` (0-based) and returns it.
 -- 0-based index; returns the removed (x, y) pair or errors if out of bounds.
 do  -- CatmullRom:removePoint
+  ---@type CatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=50,y=50},{x=100,y=0},{x=150,y=50}})
   local rx, ry = cr:removePoint(1)
   lurek.log.debug("removed " .. rx .. "," .. ry, "spline")
@@ -1194,6 +1224,7 @@ end
 -- Evaluate the spline at parameter t in [0, 1].
 -- t in [0, 1] traverses the segment; outside that range extrapolates the polynomial.
 do  -- Hermite:sample
+  ---@type Hermite
   local h = lurek.math.hermite(0, 0, 100, 100, 50, 0, 0, 50)
   local x, y = h:sample(0.5)
   lurek.log.debug("hermite mid " .. x .. "," .. y, "spline")
@@ -1828,7 +1859,7 @@ end
 -- scale controls zoom; offsets shift the sample window across the noise field.
 do  -- NoiseGenerator:generateMap
   local ng = lurek.math.newNoiseGenerator(99)
-  local map = ng:generateMap(32, 32, 0.05, 0.0, 0.0)
+  local map = ng:generateMap(32, 32, { scale = 0.05, offsetX = 0.0, offsetY = 0.0 })
   lurek.log.info("map size: " .. #map, "math")
 end
 
@@ -1847,8 +1878,8 @@ end
 -- Returns a proxy id for later update() or remove() calls.
 do  -- AabbTree:insert
   local tree = lurek.math.aabbTree()
-  local id1 = tree:insert(10, 10, 50, 50, "entity_a")
-  local id2 = tree:insert(80, 80, 120, 120, "entity_b")
+  tree:insert(1, 10, 10, 50, 50)
+  tree:insert(2, 80, 80, 120, 120)
   lurek.log.info("tree len: " .. tree:len(), "math")
 end
 
@@ -1866,8 +1897,8 @@ end
 -- Result is a table of user-data values passed to insert().
 do  -- AabbTree:query
   local tree = lurek.math.aabbTree()
-  tree:insert(0, 0, 40, 40, "box_a")
-  tree:insert(60, 60, 100, 100, "box_b")
+  tree:insert(1, 0, 0, 40, 40)
+  tree:insert(2, 60, 60, 100, 100)
   local hits = tree:query(10, 10, 50, 50)
   lurek.log.info("hits: " .. #hits, "math")
 end
@@ -1956,9 +1987,9 @@ end
 -- Call each frame; tween reports isComplete() = true when it reaches the end.
 do  -- Tween:update
   local tw = lurek.math.newTween(1.0, "inOutQuad")
-  tw:addValue("x", 0, 200)
+  tw:addValue(0, 200)
   tw:update(0.5)
-  lurek.log.info("x at t=0.5: " .. tw:getValue("x"), "math")
+  lurek.log.info("x at t=0.5: " .. tw:getValue(1), "math")
 end
 
 --@api-stub: SpatialHash:update
@@ -1976,7 +2007,10 @@ end
 -- Produces swirling, organic shapes; warp_scale controls the distortion magnitude.
 do  -- NoiseGenerator:warpDomain
   local ng = lurek.math.newNoiseGenerator(101)
-  local v = ng:warpDomain(0.3, 0.3, 0.8, 4, 2.0, 0.5)
+  local wx, wy = ng:warpDomain(0.3, 0.3, 0.8)
+  wx = wx or 0.0
+  wy = wy or 0.0
+  local v = ng:perlin2d(wx, wy)
   lurek.log.info("warped: " .. v, "math")
 end
 
@@ -2002,9 +2036,9 @@ end
 -- Advances the dynamic bounding-volume tree, refreshing moved body bounds.
 -- Call once per frame after updating body positions to maintain query accuracy.
 do  -- AabbTree:update
-  local tree = lurek.math.newAabbTree()
-  local id = tree:insert(100, 100, 132, 132, "entity_1")
-  tree:move(id, 110, 110, 142, 142)
-  tree:update()
+  local tree = lurek.math.aabbTree()
+  local id = 1
+  tree:insert(id, 100, 100, 132, 132)
+  tree:update(id, 110, 110, 142, 142)
   lurek.log.info("AABB tree updated", "math")
 end

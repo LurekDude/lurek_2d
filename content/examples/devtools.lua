@@ -80,7 +80,7 @@ end
 -- Returns recent log entries as an array of tables.
 -- Pass a small count (10–50) when feeding an in-game console; entries carry level, timestamp, message, source, line, category.
 do  -- lurek.devtools.getLogHistory
-  lurek.devtools.info("loaded forest_01", "scene")
+  lurek.devtools.info("loaded forest_01")
   local recent = lurek.devtools.getLogHistory(20)
   local last = recent[#recent]
   lurek.devtools.debug("last log: [" .. last.level .. "] " .. last.message)
@@ -211,7 +211,7 @@ end
 -- Larger buffers smooth percentile noise; 600 frames ≈ 10 seconds at 60 FPS is a good default.
 do  -- lurek.devtools.setFrameHistorySize
   lurek.devtools.setFrameHistorySize(600)
-  lurek.devtools.info("frame history sized for ~10s at 60fps")
+  lurek.devtools.info("frame history sized for approx 10s at 60fps")
 end
 
 --@api-stub: lurek.devtools.getFrameHistorySize

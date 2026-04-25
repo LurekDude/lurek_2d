@@ -46,8 +46,8 @@ impl LuaUserData for LuaScheduler {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- after --
         /// Schedules a callback to fire once after a delay.
-        /// @param delay : number
-        /// @param func : function
+        /// @param delay number
+        /// @param func function
         /// @return integer
         methods.add_method_mut("after", |lua, this, (delay, func): (f64, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
@@ -58,8 +58,8 @@ impl LuaUserData for LuaScheduler {
 
         // -- afterFrames --
         /// Schedules a callback to fire once after `n` frames.
-        /// @param n : integer
-        /// @param func : function
+        /// @param n integer
+        /// @param func function
         /// @return integer
         methods.add_method_mut("afterFrames", |lua, this, (n, func): (u64, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
@@ -70,9 +70,9 @@ impl LuaUserData for LuaScheduler {
 
         // -- afterNamed --
         /// Schedules a named one-shot callback, replacing any existing event with the same name.
-        /// @param name : string
-        /// @param delay : number
-        /// @param func : function
+        /// @param name string
+        /// @param delay number
+        /// @param func function
         /// @return integer
         methods.add_method_mut(
             "afterNamed",
@@ -91,9 +91,9 @@ impl LuaUserData for LuaScheduler {
 
         // -- every --
         /// Schedules a callback to fire repeatedly at the given interval.
-        /// @param interval : number
-        /// @param func : function
-        /// @param count : integer?
+        /// @param interval number
+        /// @param func function
+        /// @param count integer?
         /// @return integer
         methods.add_method_mut(
             "every",
@@ -107,9 +107,9 @@ impl LuaUserData for LuaScheduler {
 
         // -- everyFrames --
         /// Schedules a callback to fire every `n` frames.
-        /// @param n : integer â€” frame interval
-        /// @param func : function â€” callback
-        /// @param count : integer? â€” repetitions (-1 = infinite, default)
+        /// @param n integer â€” frame interval
+        /// @param func function â€” callback
+        /// @param count integer? â€” repetitions (-1 = infinite, default)
         /// @return integer â€” event ID
         methods.add_method_mut(
             "everyFrames",
@@ -123,10 +123,10 @@ impl LuaUserData for LuaScheduler {
 
         // -- everyNamed --
         /// Schedules a named repeating callback, replacing any existing event with the same name.
-        /// @param name : string
-        /// @param interval : number
-        /// @param func : function
-        /// @param count : integer?
+        /// @param name string
+        /// @param interval number
+        /// @param func function
+        /// @param count integer?
         /// @return integer
         methods.add_method_mut(
             "everyNamed",
@@ -147,7 +147,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- cancel --
         /// Cancels a scheduled event by its numeric ID.
-        /// @param id : integer
+        /// @param id integer
         /// @return boolean
         methods.add_method_mut("cancel", |lua, this, id: u32| {
             let removed = this.scheduler.cancel(id);
@@ -160,7 +160,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- cancelNamed --
         /// Cancels a scheduled event by its string name.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method_mut("cancelNamed", |lua, this, name: String| {
             if let Some(id) = this.named_ids.remove(&name) {
@@ -186,19 +186,19 @@ impl LuaUserData for LuaScheduler {
 
         // -- pause --
         /// Pauses a scheduled event by its ID.
-        /// @param id : integer
+        /// @param id integer
         /// @return boolean
         methods.add_method_mut("pause", |_, this, id: u32| Ok(this.scheduler.pause(id)));
 
         // -- resume --
         /// Resumes a paused event by its ID.
-        /// @param id : integer
+        /// @param id integer
         /// @return boolean
         methods.add_method_mut("resume", |_, this, id: u32| Ok(this.scheduler.resume(id)));
 
         // -- isPaused --
         /// Returns whether the given event is currently paused.
-        /// @param id : integer
+        /// @param id integer
         /// @return boolean
         methods.add_method("isPaused", |_, this, id: u32| {
             Ok(this.scheduler.is_paused(id))
@@ -206,7 +206,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- pauseNamed --
         /// Pauses a scheduled event by its string name.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method_mut("pauseNamed", |_, this, name: String| {
             Ok(this.scheduler.pause_named(&name))
@@ -214,7 +214,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- resumeNamed --
         /// Resumes a paused event by its string name.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method_mut("resumeNamed", |_, this, name: String| {
             Ok(this.scheduler.resume_named(&name))
@@ -222,7 +222,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- isPausedNamed --
         /// Returns whether the named event is currently paused.
-        /// @param name : string
+        /// @param name string
         /// @return boolean
         methods.add_method("isPausedNamed", |_, this, name: String| {
             Ok(this.scheduler.is_paused_named(&name))
@@ -230,7 +230,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- getRemaining --
         /// Returns the seconds remaining until the next fire for an event, or nil.
-        /// @param id : integer
+        /// @param id integer
         /// @return number?
         methods.add_method("getRemaining", |_, this, id: u32| {
             Ok(this.scheduler.get_remaining(id))
@@ -238,7 +238,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- getInterval --
         /// Returns the base interval in seconds for an event, or nil.
-        /// @param id : integer
+        /// @param id integer
         /// @return number?
         methods.add_method("getInterval", |_, this, id: u32| {
             Ok(this.scheduler.get_interval(id))
@@ -246,7 +246,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- getRepeatCount --
         /// Returns the repeat count remaining for an event, or nil.
-        /// @param id : integer
+        /// @param id integer
         /// @return integer?
         methods.add_method("getRepeatCount", |_, this, id: u32| {
             Ok(this.scheduler.get_repeat_count(id))
@@ -264,8 +264,8 @@ impl LuaUserData for LuaScheduler {
 
         // -- setInterval --
         /// Changes the repeat interval of an existing event.
-        /// @param id : integer
-        /// @param interval : number
+        /// @param id integer
+        /// @param interval number
         /// @return boolean
         methods.add_method_mut("setInterval", |_, this, (id, interval): (u32, f64)| {
             Ok(this.scheduler.set_interval(id, interval))
@@ -273,7 +273,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- resetEvent --
         /// Resets an event's remaining time back to its original interval.
-        /// @param id : integer
+        /// @param id integer
         /// @return boolean
         methods.add_method_mut("resetEvent", |_, this, id: u32| {
             Ok(this.scheduler.reset_event(id))
@@ -281,7 +281,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- setTimeScale --
         /// Sets a global time-scale multiplier for this scheduler.
-        /// @param scale : number
+        /// @param scale number
         /// @return nil
         methods.add_method_mut("setTimeScale", |_, this, scale: f64| {
             this.scheduler.set_time_scale(scale);
@@ -297,7 +297,7 @@ impl LuaUserData for LuaScheduler {
 
         // -- update --
         /// Advances all timers by dt seconds, firing due callbacks.
-        /// @param dt : number
+        /// @param dt number
         /// @return integer
         methods.add_method_mut("update", |lua, this, dt: f64| {
             let fired_ids = this.scheduler.update(dt);
@@ -359,9 +359,9 @@ impl LuaUserData for LuaScheduler {
 
 /// Registers the `lurek.timer` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -441,7 +441,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setPhysicsDelta --
     /// Sets the fixed timestep for `process_physics` callbacks (seconds).
     /// Clamped to [1/240, 1/10] to prevent instability.
-    /// @param dt : number
+    /// @param dt number
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -464,7 +464,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setPhysicsMaxSteps --
     /// Sets the maximum number of physics sub-steps allowed per frame (clamped 1â€“64).
-    /// @param n : integer
+    /// @param n integer
     let s = state.clone();
     tbl.set(
         "setPhysicsMaxSteps",
@@ -476,7 +476,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- sleep --
     /// Suspends execution for the given number of seconds.
-    /// @param seconds : number
+    /// @param seconds number
     /// @return nil
     tbl.set(
         "sleep",
@@ -498,7 +498,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Creates a new Scheduler loaded with a sequenced one-shot chain.
     /// Each step fires after the previous step's delay has elapsed (additive).
     /// Returns the scheduler so the caller can drive it with `:update(dt)`.
-    /// @param steps : table   array of `{delay: number, func: function}` entries
+    /// @param steps table   array of `{delay: number, func: function}` entries
     /// @return Scheduler
     tbl.set(
         "chain",
@@ -529,8 +529,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Schedules a one-shot callback that fires after `delay` wall-clock seconds,
     /// unaffected by engine time scale. Call `lurek.timer.tickRealTimers()` once
     /// per frame to poll for expired timers.
-    /// @param delay : number   wall-clock seconds to wait
-    /// @param func : function
+    /// @param delay number   wall-clock seconds to wait
+    /// @param func function
     /// @return nil
     let rt = real_timers.clone();
     tbl.set(
@@ -582,7 +582,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setSmoothingFactor --
     /// Sets the smoothing factor (alpha) for `getSmoothedDelta`. Must be in [0.01, 1.0].
     /// Lower values smooth more aggressively; 1.0 disables smoothing.
-    /// @param alpha : number
+    /// @param alpha number
     /// @return nil
     let sa = smooth_alpha.clone();
     tbl.set(
@@ -631,7 +631,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// function. Call `lurek.timer.tickWaits()` once per frame in `lurek.process`
     /// to resume expired waits.
     ///
-    /// @param seconds : number
+    /// @param seconds number
     /// @return nil
     let ws = wait_secs.clone();
     tbl.set(
@@ -660,7 +660,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Must be called from within a coroutine. Call `lurek.timer.tickWaits()` once
     /// per frame to resume expired waits.
     ///
-    /// @param frames : integer
+    /// @param frames integer
     /// @return nil
     let wf = wait_frames.clone();
     let s_wf = state.clone();
@@ -756,7 +756,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Coroutine-based yield-for-duration sugar.  Call from within a coroutine to pause
     /// execution for `seconds` engine-time seconds.  Requires `tickWaits()` to be called
     /// each frame to resume suspended coroutines.  Semantic alias for `waitSeconds`.
-    /// @param seconds : number
+    /// @param seconds number
     /// @return nil
     tbl.set("delay", wait_fn)?;
 

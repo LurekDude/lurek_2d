@@ -54,6 +54,7 @@ local STATE = { TITLE = 1, PLAYING = 2, GAME_OVER = 3, LEVEL_COMPLETE = 4 }
 local game_state = STATE.TITLE
 
 -- ── Game state ────────────────────────────────────────────────────────────
+---@type any
 local player = {
     x = 0, y = 0, r = PLAYER_R,
     crouching = false, hidden = false, hide_spot = nil,
@@ -70,8 +71,11 @@ local title_blink  = 0
 local message      = { text = "", alpha = 0 }
 
 -- Particles
+---@type any
 local noise_ps     = nil
+---@type any
 local alert_ps     = nil
+---@type any
 local sparkle_ps   = nil
 
 -- Tween state
@@ -301,14 +305,65 @@ end
 local function show_message(text)
     message.text = text
     message.alpha = 1.0
-    lurek.tween.to(message, 2.0, { alpha = 0 })
+    lurek.tween.tween(2.0, message, { alpha = 0 }, "linear")
 end
 
 -- ── Engine callbacks ──────────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+---@type any
+local _cam = nil
+
 function lurek.init()
     lurek.window.setTitle("Stealth — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.08, 0.05)
+    _cam = lurek.camera.new()
 
     -- Input actions
     lurek.input.bind("up",       {"w", "up"})
@@ -437,7 +492,9 @@ function lurek.process(dt)
     if lurek.input.wasActionPressed("interact") then
         if player.hidden then
             player.hidden = false
-            if player.hide_spot then player.hide_spot.occupied = false end
+            ---@type any
+            local hide_spot = player.hide_spot
+            if hide_spot ~= nil then hide_spot.occupied = false end
             player.hide_spot = nil
         else
             for _, hs in ipairs(hide_spots) do
@@ -516,7 +573,7 @@ function lurek.process(dt)
                 g.mode = "chase"
                 alert_ps:emit(g.x, g.y - 12, 15)
                 alert_flash.alpha = 0.4
-                lurek.tween.to(alert_flash, 0.5, { alpha = 0 })
+                lurek.tween.tween(0.5, alert_flash, { alpha = 0 }, "linear")
             end
         elseif g.suspicion >= SUSPICION_INVESTIGATE then
             if g.mode == "patrol" then
@@ -617,21 +674,21 @@ function lurek.draw()
 
             if t == T_WALL then
                 lurek.render.setColor(0.2, 0.2, 0.25, 1)
-                lurek.render.rectangle(tx, ty, TILE, TILE)
+                rect(tx, ty, TILE, TILE)
             elseif t == T_EXIT then
                 if player.keys_collected >= 3 then
                     lurek.render.setColor(0.1, 0.8, 0.2, 0.8)
                 else
                     lurek.render.setColor(0.1, 0.4, 0.15, 0.5)
                 end
-                lurek.render.rectangle(tx, ty, TILE, TILE)
+                rect(tx, ty, TILE, TILE)
             else
                 lurek.render.setColor(0.08, 0.12, 0.08, 1)
-                lurek.render.rectangle(tx, ty, TILE, TILE)
+                rect(tx, ty, TILE, TILE)
                 -- Grid lines
                 lurek.render.setColor(0.1, 0.15, 0.1, 1)
-                lurek.render.line(tx, ty, tx + TILE, ty, 1)
-                lurek.render.line(tx, ty, tx, ty + TILE, 1)
+                ln(tx, ty, tx + TILE, ty, 1)
+                ln(tx, ty, tx, ty + TILE, 1)
             end
         end
     end
@@ -639,21 +696,21 @@ function lurek.draw()
     -- Draw hide spots
     for _, hs in ipairs(hide_spots) do
         lurek.render.setColor(0.4, 0.28, 0.12, 0.9)
-        lurek.render.rectangle(hs.x + 2, hs.y + 2, hs.w - 4, hs.h - 4)
+        rect(hs.x + 2, hs.y + 2, hs.w - 4, hs.h - 4)
         -- Crate marks
         lurek.render.setColor(0.3, 0.2, 0.08, 1)
-        lurek.render.line(hs.x + 4, hs.y + 4, hs.x + hs.w - 4, hs.y + hs.h - 4, 1)
-        lurek.render.line(hs.x + hs.w - 4, hs.y + 4, hs.x + 4, hs.y + hs.h - 4, 1)
+        ln(hs.x + 4, hs.y + 4, hs.x + hs.w - 4, hs.y + hs.h - 4, 1)
+        ln(hs.x + hs.w - 4, hs.y + 4, hs.x + 4, hs.y + hs.h - 4, 1)
     end
 
     -- Draw keycards
     for _, kc in ipairs(keycards) do
         if not kc.collected then
             lurek.render.setColor(1.0, 0.9, 0.15, 1)
-            lurek.render.rectangle(kc.x - 6, kc.y - 4, 12, 8)
+            rect(kc.x - 6, kc.y - 4, 12, 8)
             -- Key notch
             lurek.render.setColor(0.8, 0.7, 0.1, 1)
-            lurek.render.rectangle(kc.x + 3, kc.y - 2, 4, 4)
+            rect(kc.x + 3, kc.y - 2, 4, 4)
         end
     end
 
@@ -680,6 +737,7 @@ function lurek.draw()
             local a1 = start_a + i * step
             local a2 = start_a + (i + 1) * step
             lurek.render.triangle(
+                "fill",
                 g.x, g.y,
                 g.x + math.cos(a1) * cone_r, g.y + math.sin(a1) * cone_r,
                 g.x + math.cos(a2) * cone_r, g.y + math.sin(a2) * cone_r
@@ -690,8 +748,8 @@ function lurek.draw()
         lurek.render.setColor(cr, cg_col, cb, ca + 0.15)
         local la = g.dir - VISION_HALF_ANGLE
         local ra = g.dir + VISION_HALF_ANGLE
-        lurek.render.line(g.x, g.y, g.x + math.cos(la) * cone_r, g.y + math.sin(la) * cone_r, 1)
-        lurek.render.line(g.x, g.y, g.x + math.cos(ra) * cone_r, g.y + math.sin(ra) * cone_r, 1)
+        ln(g.x, g.y, g.x + math.cos(la) * cone_r, g.y + math.sin(la) * cone_r, 1)
+        ln(g.x, g.y, g.x + math.cos(ra) * cone_r, g.y + math.sin(ra) * cone_r, 1)
     end
 
     -- Draw guards
@@ -704,13 +762,13 @@ function lurek.draw()
         else
             lurek.render.setColor(0.8, 0.2, 0.2, 1)
         end
-        lurek.render.rectangle(g.x - 10, g.y - 10, 20, 20)
+        rect(g.x - 10, g.y - 10, 20, 20)
 
         -- Direction indicator
         lurek.render.setColor(1, 1, 1, 0.9)
         local dx = math.cos(g.dir) * 12
         local dy = math.sin(g.dir) * 12
-        lurek.render.line(g.x, g.y, g.x + dx, g.y + dy, 2)
+        ln(g.x, g.y, g.x + dx, g.y + dy, 2)
 
         -- Suspicion indicator above guard
         if g.suspicion > 5 then
@@ -719,7 +777,7 @@ function lurek.draw()
             local bx = g.x - bw / 2
             local by = g.y - 18
             lurek.render.setColor(0.3, 0.3, 0.3, 0.7)
-            lurek.render.rectangle(bx, by, bw, bh)
+            rect(bx, by, bw, bh)
             local fill = (g.suspicion / SUSPICION_ALERT) * bw
             if g.suspicion >= SUSPICION_ALERT then
                 lurek.render.setColor(1, 0.1, 0.1, 0.9)
@@ -728,16 +786,16 @@ function lurek.draw()
             else
                 lurek.render.setColor(0.2, 0.8, 0.2, 0.9)
             end
-            lurek.render.rectangle(bx, by, fill, bh)
+            rect(bx, by, fill, bh)
         end
 
         -- Exclamation mark when alert
         if g.mode == "chase" then
             lurek.render.setColor(1, 0.2, 0.1, 1)
-            lurek.render.print("!", g.x - 3, g.y - 26)
+            text_("!", g.x - 3, g.y - 26)
         elseif g.mode == "investigate" then
             lurek.render.setColor(1, 0.9, 0.2, 1)
-            lurek.render.print("?", g.x - 3, g.y - 26)
+            text_("?", g.x - 3, g.y - 26)
         end
     end
 
@@ -745,10 +803,10 @@ function lurek.draw()
     if not player.hidden then
         if player.crouching then
             lurek.render.setColor(0.3, 0.7, 0.4, 0.8)
-            lurek.render.circle(player.x, player.y, PLAYER_R - 2)
+            circ(player.x, player.y, PLAYER_R - 2)
         else
             lurek.render.setColor(0.3, 0.85, 0.4, 1)
-            lurek.render.circle(player.x, player.y, PLAYER_R)
+            circ(player.x, player.y, PLAYER_R)
         end
     end
 
@@ -760,7 +818,7 @@ function lurek.draw()
     -- Alert flash overlay
     if alert_flash.alpha > 0 then
         lurek.render.setColor(1, 0.1, 0.05, alert_flash.alpha)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
     end
 end
 
@@ -769,26 +827,26 @@ function lurek.draw_ui()
     if game_state == STATE.TITLE then
         -- Title screen
         lurek.render.setColor(0.2, 0.9, 0.3, 1)
-        lurek.render.print("STEALTH", SCREEN_W / 2 - 50, SCREEN_H / 2 - 60)
+        text_("STEALTH", SCREEN_W / 2 - 50, SCREEN_H / 2 - 60)
 
         local show = math.floor(title_blink * 2) % 2 == 0
         if show then
             lurek.render.setColor(0.7, 0.9, 0.7, 0.8)
-            lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 55, SCREEN_H / 2 + 10)
+            text_("PRESS ENTER", SCREEN_W / 2 - 55, SCREEN_H / 2 + 10)
         end
 
         lurek.render.setColor(0.5, 0.6, 0.5, 0.6)
-        lurek.render.print("Sneak past guards. Collect keycards. Reach the exit.", 175, SCREEN_H / 2 + 60)
+        text_("Sneak past guards. Collect keycards. Reach the exit.", 175, SCREEN_H / 2 + 60)
         return
     end
 
     -- HUD — keycards
     lurek.render.setColor(1, 0.9, 0.2, 1)
-    lurek.render.print("KEYS: " .. player.keys_collected .. "/3", 10, 10)
+    text_("KEYS: " .. player.keys_collected .. "/3", 10, 10)
 
     -- Level indicator
     lurek.render.setColor(0.7, 0.8, 0.7, 0.8)
-    lurek.render.print("LEVEL " .. current_level, SCREEN_W / 2 - 25, 10)
+    text_("LEVEL " .. current_level, SCREEN_W / 2 - 25, 10)
 
     -- Suspicion bar (top-right)
     if susp_bar.value > 0 then
@@ -797,7 +855,7 @@ function lurek.draw_ui()
         local bx = SCREEN_W - bw - 10
         local by = 10
         lurek.render.setColor(0.3, 0.3, 0.3, 0.7)
-        lurek.render.rectangle(bx, by, bw, bh)
+        rect(bx, by, bw, bh)
         local fill = (susp_bar.value / SUSPICION_ALERT) * bw
         if susp_bar.value >= SUSPICION_ALERT then
             lurek.render.setColor(1, 0.1, 0.1, 1)
@@ -806,50 +864,50 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.2, 0.8, 0.2, 1)
         end
-        lurek.render.rectangle(bx, by, fill, bh)
+        rect(bx, by, fill, bh)
         lurek.render.setColor(0.8, 0.8, 0.8, 0.7)
-        lurek.render.print("SUSPICION", bx, by + 12)
+        text_("SUSPICION", bx, by + 12)
     end
 
     -- Crouch indicator
     if player.crouching and not player.hidden then
         lurek.render.setColor(0.5, 0.8, 0.5, 0.6)
-        lurek.render.print("CROUCHING", 10, SCREEN_H - 25)
+        text_("CROUCHING", 10, SCREEN_H - 25)
     end
 
     -- Hidden indicator
     if player.hidden then
         lurek.render.setColor(0.4, 0.7, 0.9, 0.7)
-        lurek.render.print("HIDDEN", 10, SCREEN_H - 25)
+        text_("HIDDEN", 10, SCREEN_H - 25)
     end
 
     -- Message overlay
     if message.alpha > 0 then
         lurek.render.setColor(1, 1, 1, message.alpha)
-        lurek.render.print(message.text, SCREEN_W / 2 - 60, SCREEN_H / 2 - 10)
+        text_(message.text, SCREEN_W / 2 - 60, SCREEN_H / 2 - 10)
     end
 
     -- Game over screen
     if game_state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.6)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
         lurek.render.setColor(1, 0.2, 0.15, 1)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 45, SCREEN_H / 2 - 30)
+        text_("GAME OVER", SCREEN_W / 2 - 45, SCREEN_H / 2 - 30)
         lurek.render.setColor(0.8, 0.8, 0.8, 0.8)
-        lurek.render.print("Press ENTER to return to title", SCREEN_W / 2 - 100, SCREEN_H / 2 + 10)
+        text_("Press ENTER to return to title", SCREEN_W / 2 - 100, SCREEN_H / 2 + 10)
     end
 
     -- Level complete screen
     if game_state == STATE.LEVEL_COMPLETE then
         lurek.render.setColor(0, 0, 0, 0.5)
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H)
+        rect(0, 0, SCREEN_W, SCREEN_H)
         lurek.render.setColor(0.2, 0.9, 0.3, 1)
         if current_level >= #LEVELS then
-            lurek.render.print("ALL LEVELS COMPLETE!", SCREEN_W / 2 - 75, SCREEN_H / 2 - 30)
+            text_("ALL LEVELS COMPLETE!", SCREEN_W / 2 - 75, SCREEN_H / 2 - 30)
         else
-            lurek.render.print("LEVEL " .. current_level .. " COMPLETE!", SCREEN_W / 2 - 65, SCREEN_H / 2 - 30)
+            text_("LEVEL " .. current_level .. " COMPLETE!", SCREEN_W / 2 - 65, SCREEN_H / 2 - 30)
         end
         lurek.render.setColor(0.8, 0.8, 0.8, 0.8)
-        lurek.render.print("Press ENTER to continue", SCREEN_W / 2 - 80, SCREEN_H / 2 + 10)
+        text_("Press ENTER to continue", SCREEN_W / 2 - 80, SCREEN_H / 2 + 10)
     end
 end

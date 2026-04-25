@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { WebviewEditor, getNonce, wrapHtml } from "./shared.js";
+import { WebviewEditor, getNonce, wrapHtml, ICONS, iconButton, panelSection, fieldInline, toolbarSep, toolbarSpacer } from "./shared.js";
 
 export class ColorPaletteEditor extends WebviewEditor {
   static open(context: vscode.ExtensionContext): ColorPaletteEditor {
@@ -22,334 +22,272 @@ export class ColorPaletteEditor extends WebviewEditor {
     const nonce = getNonce();
     return wrapHtml(nonce, "Color Palette", `
       .editor-layout {
-        display: grid; grid-template-columns: 280px 1fr 240px;
+        display: grid; grid-template-columns: 240px 1fr 210px;
         grid-template-rows: auto 1fr auto;
         height: 100vh;
       }
       .toolbar { grid-column: 1 / -1; }
-      .picker-panel { grid-row: 2; }
-      .palette-area { grid-row: 2; padding: 12px; overflow-y: auto; }
-      .harmony-panel { grid-row: 2; }
       .status-bar { grid-column: 1 / -1; }
+      .picker-panel {
+        grid-row: 2; overflow-y: auto; border-right: 1px solid var(--border);
+        background: var(--surface); padding: 6px;
+      }
+      .palette-area { grid-row: 2; padding: 10px; overflow-y: auto; background: var(--bg); }
+      .harmony-panel {
+        grid-row: 2; overflow-y: auto; border-left: 1px solid var(--border);
+        background: var(--surface); padding: 6px;
+      }
       .color-preview {
-        width: 100%; height: 80px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 8px;
+        width: 100%; height: 64px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 6px;
       }
-      .slider-group { margin-bottom: 8px; }
-      .slider-group label { display: flex; justify-content: space-between; }
-      .slider-group input[type="range"] { width: 100%; }
-      .hex-input { width: 100%; font-family: monospace; font-size: 14px; text-align: center; }
-      .palette-grid {
-        display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px;
-      }
+      .slider-grp { margin-bottom: 5px; }
+      .slider-grp label { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); }
+      .slider-grp input[type="range"] { width: 100%; }
+      .hex-input { width: 100%; font-family: var(--font-mono, monospace); font-size: 12px; text-align: center; }
+      .palette-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; }
       .swatch {
-        aspect-ratio: 1; border-radius: 4px; border: 2px solid transparent;
-        cursor: pointer; position: relative; min-height: 36px;
+        aspect-ratio: 1; border-radius: var(--radius); border: 2px solid transparent;
+        cursor: pointer; position: relative; min-height: 32px; transition: border-color 0.1s;
       }
       .swatch:hover { border-color: var(--text); }
-      .swatch.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
-      .swatch-label {
+      .swatch.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+      .swatch-num {
         position: absolute; bottom: 1px; left: 0; right: 0; text-align: center;
-        font-size: 8px; color: #fff; text-shadow: 0 0 2px #000;
+        font-size: 7px; color: #fff; text-shadow: 0 0 2px #000;
       }
       .harmony-wheel {
-        width: 180px; height: 180px; border-radius: 50%; margin: 10px auto;
+        width: 160px; height: 160px; border-radius: 50%; margin: 8px auto;
         background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
         position: relative;
       }
       .harmony-dot {
-        width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff;
-        position: absolute; transform: translate(-50%,-50%); box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff;
+        position: absolute; transform: translate(-50%,-50%); box-shadow: 0 0 3px rgba(0,0,0,0.5);
       }
-      .contrast-badge {
-        display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;
+      .contrast-pill {
+        display: inline-block; padding: 1px 6px; border-radius: var(--radius); font-size: 10px; font-weight: 600;
       }
-      .contrast-pass { background: var(--success); color: #fff; }
-      .contrast-fail { background: var(--danger); color: #fff; }
-      .harmony-swatches { display: flex; gap: 4px; margin-top: 8px; justify-content: center; }
-      .harmony-swatch { width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--border); cursor: pointer; }
+      .contrast-ok { background: var(--success); color: #fff; }
+      .contrast-no { background: var(--error); color: #fff; }
+      .harmony-swatches { display: flex; gap: 3px; margin-top: 6px; justify-content: center; }
+      .harmony-sw { width: 24px; height: 24px; border-radius: var(--radius); border: 1px solid var(--border); cursor: pointer; }
     `, `
       <div class="editor-layout">
         <div class="toolbar">
-          <button id="btnAddColor">+ Add Color</button>
-          <button id="btnRemoveColor" class="danger">Remove</button>
-          <div class="sep"></div>
-          <label>Mode:</label>
-          <select id="colorMode">
-            <option value="hsl">HSL</option>
-            <option value="rgb">RGB</option>
-            <option value="hsv">HSV</option>
-          </select>
-          <div class="sep"></div>
-          <button id="btnSortHue">Sort by Hue</button>
-          <button id="btnSortLight">Sort by Lightness</button>
-          <div class="sep"></div>
-          <button id="btnExport">Export Lua</button>
+          <div class="group">
+            ${iconButton(ICONS.add, 'btnAdd', 'Add Color')}
+            ${iconButton(ICONS.delete, 'btnRem', 'Remove Color')}
+          </div>
+          ${toolbarSep()}
+          <div class="group">
+            <select id="colorMode" style="font-size:10px">
+              <option value="hsl">HSL</option>
+              <option value="rgb">RGB</option>
+            </select>
+          </div>
+          ${toolbarSep()}
+          <div class="group">
+            <button id="btnSortH" style="font-size:10px;padding:2px 6px">Sort Hue</button>
+            <button id="btnSortL" style="font-size:10px;padding:2px 6px">Sort Light</button>
+          </div>
+          ${toolbarSpacer()}
+          ${iconButton(ICONS.save, 'btnExport', 'Export Lua')}
         </div>
 
-        <div class="panel picker-panel">
-          <div class="section">
-            <h3>Color Picker</h3>
+        <div class="picker-panel">
+          ${panelSection('Color Picker', `
             <div class="color-preview" id="colorPreview"></div>
-            <div class="field"><input type="text" class="hex-input" id="hexInput" value="#007ACC"></div>
-          </div>
-          <div class="section" id="slidersHSL">
-            <div class="slider-group">
-              <label>H <span id="hVal">210</span></label>
-              <input type="range" id="hSlider" min="0" max="360" value="210">
+            <input type="text" class="hex-input" id="hexInput" value="#89B4FA">
+          `)}
+          ${panelSection('Sliders', `
+            <div class="slider-grp"><label>H <span id="hVal">217</span></label><input type="range" id="hSlider" min="0" max="360" value="217"></div>
+            <div class="slider-grp"><label>S <span id="sVal">92</span></label><input type="range" id="sSlider" min="0" max="100" value="92"></div>
+            <div class="slider-grp"><label>L <span id="lVal">76</span></label><input type="range" id="lSlider" min="0" max="100" value="76"></div>
+            <div class="slider-grp"><label>A <span id="aVal">255</span></label><input type="range" id="aSlider" min="0" max="255" value="255"></div>
+          `)}
+          ${panelSection('Accessibility', `
+            <div style="font-size:10px">
+              <p>On white: <span id="crW" class="contrast-pill">--</span></p>
+              <p style="margin-top:3px">On black: <span id="crB" class="contrast-pill">--</span></p>
             </div>
-            <div class="slider-group">
-              <label>S <span id="sVal">100</span></label>
-              <input type="range" id="sSlider" min="0" max="100" value="100">
-            </div>
-            <div class="slider-group">
-              <label>L <span id="lVal">40</span></label>
-              <input type="range" id="lSlider" min="0" max="100" value="40">
-            </div>
-            <div class="slider-group">
-              <label>A <span id="aVal">255</span></label>
-              <input type="range" id="aSlider" min="0" max="255" value="255">
-            </div>
-          </div>
-          <div class="section">
-            <h3>Accessibility</h3>
-            <div id="contrastInfo" style="font-size:11px;">
-              <p>On white: <span id="contrastWhite" class="contrast-badge">--</span></p>
-              <p style="margin-top:4px;">On black: <span id="contrastBlack" class="contrast-badge">--</span></p>
-            </div>
-          </div>
+          `)}
         </div>
 
         <div class="palette-area">
-          <h3 style="margin-bottom:8px;">Palette (<span id="paletteCount">0</span>/64)</h3>
-          <div class="palette-grid" id="paletteGrid"></div>
+          <div style="font-size:11px;margin-bottom:6px;color:var(--text-dim)">Palette (<span id="pCount">0</span>/64)</div>
+          <div class="palette-grid" id="pGrid"></div>
         </div>
 
-        <div class="panel harmony-panel">
-          <div class="section">
-            <h3>Harmony</h3>
-            <select id="harmonyType" style="width:100%;">
+        <div class="harmony-panel">
+          ${panelSection('Harmony', `
+            <select id="harmType" style="width:100%;font-size:10px">
               <option value="complementary">Complementary</option>
               <option value="triadic">Triadic</option>
               <option value="analogous">Analogous</option>
               <option value="split">Split-Complementary</option>
               <option value="tetradic">Tetradic</option>
             </select>
-            <div class="harmony-wheel" id="harmonyWheel"></div>
-            <div class="harmony-swatches" id="harmonySwatches"></div>
-            <button id="btnApplyHarmony" style="width:100%;margin-top:6px;">Add Harmony Colors</button>
-          </div>
+            <div class="harmony-wheel" id="hWheel"></div>
+            <div class="harmony-swatches" id="hSwatches"></div>
+            <button id="btnApplyH" style="width:100%;margin-top:4px;font-size:10px">Add Harmony Colors</button>
+          `)}
         </div>
 
         <div class="status-bar">
-          <span id="statusColor">Color: #007ACC</span>
-          <span id="statusIndex">Index: 0</span>
-          <span id="statusCount">Total: 0</span>
+          <span id="stColor" class="badge">#89B4FA</span>
+          <div class="sep"></div>
+          <span id="stIdx">Idx: —</span>
+          <div class="sep"></div>
+          <span id="stTotal">0 colors</span>
+          <div class="spacer"></div>
+          <span id="stDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
         </div>
       </div>
     `, `
-      let palette = [];
-      let selectedIdx = -1;
-      let h = 210, s = 100, l = 40, a = 255;
+      const undo = new UndoStack();
+      let palette = [], selIdx = -1;
+      let h = 217, s = 92, l = 76, a = 255;
 
-      function hslToHex(h, s, l) {
-        s /= 100; l /= 100;
-        const k = n => (n + h / 30) % 12;
-        const a2 = s * Math.min(l, 1 - l);
-        const f = n => l - a2 * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
-        const toHex = v => Math.round(v * 255).toString(16).padStart(2, '0');
-        return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
+      function snap() { return JSON.parse(JSON.stringify({ palette, selIdx })); }
+      function loadSnap(st) { palette = st.palette; selIdx = st.selIdx; renderPal(); updateColor(); }
+      function push() { undo.push(snap()); markDirty(); }
+      registerShortcut('ctrl+z', () => { const s2 = undo.undo(); if (s2) loadSnap(s2); });
+      registerShortcut('ctrl+shift+z', () => { const s2 = undo.redo(); if (s2) loadSnap(s2); });
+      registerShortcut('ctrl+s', () => document.getElementById('btnExport').click());
+
+      function hslHex(h, s, l) {
+        const s2 = s/100, l2 = l/100;
+        const k = n => (n + h/30)%12;
+        const a2 = s2*Math.min(l2, 1-l2);
+        const f = n => l2 - a2*Math.max(-1, Math.min(k(n)-3, 9-k(n), 1));
+        const x = v => Math.round(v*255).toString(16).padStart(2,'0');
+        return '#'+x(f(0))+x(f(8))+x(f(4));
       }
-
-      function hexToRgb(hex) {
+      function hexRgb(hex) {
         const m = hex.match(/^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i);
-        return m ? { r: parseInt(m[1],16), g: parseInt(m[2],16), b: parseInt(m[3],16) } : { r:0, g:0, b:0 };
+        return m ? {r:parseInt(m[1],16),g:parseInt(m[2],16),b:parseInt(m[3],16)} : {r:0,g:0,b:0};
       }
-
-      function luminance(r, g, b) {
-        const [rs, gs, bs] = [r, g, b].map(c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); });
-        return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+      function lum(r,g,b) {
+        const [rs,gs,bs] = [r,g,b].map(c => { c/=255; return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4); });
+        return 0.2126*rs+0.7152*gs+0.0722*bs;
       }
-
-      function contrastRatio(l1, l2) {
-        const lighter = Math.max(l1, l2), darker = Math.min(l1, l2);
-        return (lighter + 0.05) / (darker + 0.05);
-      }
+      function cr(l1,l2) { return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05); }
 
       function updateColor() {
-        const hex = hslToHex(h, s, l);
+        const hex = hslHex(h,s,l);
         document.getElementById('colorPreview').style.background = hex;
         document.getElementById('hexInput').value = hex;
         document.getElementById('hVal').textContent = h;
         document.getElementById('sVal').textContent = s;
         document.getElementById('lVal').textContent = l;
         document.getElementById('aVal').textContent = a;
-        document.getElementById('statusColor').textContent = 'Color: ' + hex;
-
-        // Contrast
-        const rgb = hexToRgb(hex);
-        const lum = luminance(rgb.r, rgb.g, rgb.b);
-        const crWhite = contrastRatio(1, lum).toFixed(1);
-        const crBlack = contrastRatio(lum, 0).toFixed(1);
-        const eWhite = document.getElementById('contrastWhite');
-        const eBlack = document.getElementById('contrastBlack');
-        eWhite.textContent = crWhite + ':1';
-        eWhite.className = 'contrast-badge ' + (crWhite >= 4.5 ? 'contrast-pass' : 'contrast-fail');
-        eBlack.textContent = crBlack + ':1';
-        eBlack.className = 'contrast-badge ' + (crBlack >= 4.5 ? 'contrast-pass' : 'contrast-fail');
-
-        updateHarmony();
-        if (selectedIdx >= 0 && selectedIdx < palette.length) {
-          palette[selectedIdx] = { hex, h, s, l, a };
-          renderPalette();
-        }
+        document.getElementById('stColor').textContent = hex;
+        const rgb = hexRgb(hex), lu = lum(rgb.r,rgb.g,rgb.b);
+        const cw = cr(1,lu).toFixed(1), cb = cr(lu,0).toFixed(1);
+        const ew = document.getElementById('crW'), eb = document.getElementById('crB');
+        ew.textContent = cw+':1'; ew.className = 'contrast-pill '+(cw>=4.5?'contrast-ok':'contrast-no');
+        eb.textContent = cb+':1'; eb.className = 'contrast-pill '+(cb>=4.5?'contrast-ok':'contrast-no');
+        updateHarm();
+        if (selIdx >= 0 && selIdx < palette.length) { palette[selIdx] = {hex,h,s,l,a}; renderPal(); }
       }
 
-      function renderPalette() {
-        const grid = document.getElementById('paletteGrid');
-        grid.innerHTML = '';
-        palette.forEach((c, i) => {
+      function renderPal() {
+        const g = document.getElementById('pGrid'); g.innerHTML = '';
+        palette.forEach((c,i) => {
           const el = document.createElement('div');
-          el.className = 'swatch' + (i === selectedIdx ? ' selected' : '');
+          el.className = 'swatch'+(i===selIdx?' sel':'');
           el.style.background = c.hex;
-          el.innerHTML = '<span class="swatch-label">' + (i+1) + '</span>';
+          el.innerHTML = '<span class="swatch-num">'+(i+1)+'</span>';
           el.addEventListener('click', () => {
-            selectedIdx = i; h = c.h; s = c.s; l = c.l; a = c.a;
+            selIdx = i; h = c.h; s = c.s; l = c.l; a = c.a;
             document.getElementById('hSlider').value = h;
             document.getElementById('sSlider').value = s;
             document.getElementById('lSlider').value = l;
             document.getElementById('aSlider').value = a;
-            updateColor();
-            renderPalette();
-            document.getElementById('statusIndex').textContent = 'Index: ' + i;
+            updateColor(); renderPal();
+            document.getElementById('stIdx').textContent = 'Idx: '+i;
           });
-          grid.appendChild(el);
+          g.appendChild(el);
         });
-        document.getElementById('paletteCount').textContent = palette.length;
-        document.getElementById('statusCount').textContent = 'Total: ' + palette.length;
+        document.getElementById('pCount').textContent = palette.length;
+        document.getElementById('stTotal').textContent = palette.length+' colors';
       }
 
-      function getHarmonyHues(type) {
-        switch (type) {
-          case 'complementary': return [h, (h + 180) % 360];
-          case 'triadic': return [h, (h + 120) % 360, (h + 240) % 360];
-          case 'analogous': return [(h - 30 + 360) % 360, h, (h + 30) % 360];
-          case 'split': return [h, (h + 150) % 360, (h + 210) % 360];
-          case 'tetradic': return [h, (h + 90) % 360, (h + 180) % 360, (h + 270) % 360];
+      function harmHues(type) {
+        switch(type) {
+          case 'complementary': return [h,(h+180)%360];
+          case 'triadic': return [h,(h+120)%360,(h+240)%360];
+          case 'analogous': return [(h-30+360)%360,h,(h+30)%360];
+          case 'split': return [h,(h+150)%360,(h+210)%360];
+          case 'tetradic': return [h,(h+90)%360,(h+180)%360,(h+270)%360];
           default: return [h];
         }
       }
-
-      function updateHarmony() {
-        const type = document.getElementById('harmonyType').value;
-        const hues = getHarmonyHues(type);
-        const wheel = document.getElementById('harmonyWheel');
-        const swatches = document.getElementById('harmonySwatches');
-        wheel.innerHTML = '';
-        swatches.innerHTML = '';
-        hues.forEach((hue) => {
-          const angle = (hue - 90) * Math.PI / 180;
-          const r = 80;
-          const x = 90 + r * Math.cos(angle);
-          const y = 90 + r * Math.sin(angle);
+      function updateHarm() {
+        const type = document.getElementById('harmType').value;
+        const hues = harmHues(type);
+        const wheel = document.getElementById('hWheel'); wheel.innerHTML = '';
+        const sw = document.getElementById('hSwatches'); sw.innerHTML = '';
+        hues.forEach(hu => {
+          const ang = (hu-90)*Math.PI/180, r = 70;
           const dot = document.createElement('div');
           dot.className = 'harmony-dot';
-          dot.style.left = x + 'px';
-          dot.style.top = y + 'px';
-          dot.style.background = hslToHex(hue, s, l);
+          dot.style.left = (80+r*Math.cos(ang))+'px';
+          dot.style.top = (80+r*Math.sin(ang))+'px';
+          dot.style.background = hslHex(hu,s,l);
           wheel.appendChild(dot);
-          const sw = document.createElement('div');
-          sw.className = 'harmony-swatch';
-          sw.style.background = hslToHex(hue, s, l);
-          sw.addEventListener('click', () => {
-            if (palette.length < 64) {
-              palette.push({ hex: hslToHex(hue, s, l), h: hue, s, l, a });
-              renderPalette();
-            }
-          });
-          swatches.appendChild(sw);
+          const sc = document.createElement('div');
+          sc.className = 'harmony-sw';
+          sc.style.background = hslHex(hu,s,l);
+          sc.addEventListener('click', () => { if (palette.length<64) { push(); palette.push({hex:hslHex(hu,s,l),h:hu,s,l,a}); renderPal(); }});
+          sw.appendChild(sc);
         });
       }
 
       ['hSlider','sSlider','lSlider','aSlider'].forEach(id => {
-        document.getElementById(id).addEventListener('input', (e) => {
-          if (id === 'hSlider') h = parseInt(e.target.value);
-          if (id === 'sSlider') s = parseInt(e.target.value);
-          if (id === 'lSlider') l = parseInt(e.target.value);
-          if (id === 'aSlider') a = parseInt(e.target.value);
+        document.getElementById(id).addEventListener('input', e => {
+          if (id==='hSlider') h=+e.target.value; if (id==='sSlider') s=+e.target.value;
+          if (id==='lSlider') l=+e.target.value; if (id==='aSlider') a=+e.target.value;
           updateColor();
         });
       });
-
-      document.getElementById('hexInput').addEventListener('change', (e) => {
-        const rgb = hexToRgb(e.target.value);
-        // Simplified re-derive HSL
-        const r2 = rgb.r/255, g2 = rgb.g/255, b2 = rgb.b/255;
-        const max = Math.max(r2,g2,b2), min = Math.min(r2,g2,b2);
-        l = Math.round((max+min)/2*100);
-        if (max !== min) {
-          const d = max - min;
-          s = Math.round((l > 50 ? d/(2-max-min) : d/(max+min))*100);
-          if (max === r2) h = Math.round(((g2-b2)/d + (g2<b2?6:0))*60);
-          else if (max === g2) h = Math.round(((b2-r2)/d+2)*60);
-          else h = Math.round(((r2-g2)/d+4)*60);
-        } else { s = 0; h = 0; }
-        document.getElementById('hSlider').value = h;
-        document.getElementById('sSlider').value = s;
-        document.getElementById('lSlider').value = l;
+      document.getElementById('hexInput').addEventListener('change', e => {
+        const rgb = hexRgb(e.target.value);
+        const r2=rgb.r/255,g2=rgb.g/255,b2=rgb.b/255;
+        const mx=Math.max(r2,g2,b2),mn=Math.min(r2,g2,b2);
+        l=Math.round((mx+mn)/2*100);
+        if(mx!==mn){const d=mx-mn;s=Math.round((l>50?d/(2-mx-mn):d/(mx+mn))*100);
+        if(mx===r2)h=Math.round(((g2-b2)/d+(g2<b2?6:0))*60);
+        else if(mx===g2)h=Math.round(((b2-r2)/d+2)*60);
+        else h=Math.round(((r2-g2)/d+4)*60);}else{s=0;h=0;}
+        document.getElementById('hSlider').value=h;
+        document.getElementById('sSlider').value=s;
+        document.getElementById('lSlider').value=l;
         updateColor();
       });
 
-      document.getElementById('btnAddColor').addEventListener('click', () => {
-        if (palette.length < 64) {
-          const hex = hslToHex(h, s, l);
-          palette.push({ hex, h, s, l, a });
-          selectedIdx = palette.length - 1;
-          renderPalette();
-        }
+      document.getElementById('btnAdd').addEventListener('click', () => {
+        if (palette.length<64) { push(); palette.push({hex:hslHex(h,s,l),h,s,l,a}); selIdx=palette.length-1; renderPal(); }
       });
-
-      document.getElementById('btnRemoveColor').addEventListener('click', () => {
-        if (selectedIdx >= 0) {
-          palette.splice(selectedIdx, 1);
-          selectedIdx = Math.min(selectedIdx, palette.length - 1);
-          renderPalette();
-        }
+      document.getElementById('btnRem').addEventListener('click', () => {
+        if (selIdx>=0) { push(); palette.splice(selIdx,1); selIdx=Math.min(selIdx,palette.length-1); renderPal(); }
       });
-
-      document.getElementById('btnSortHue').addEventListener('click', () => {
-        palette.sort((a, b) => a.h - b.h);
-        renderPalette();
+      document.getElementById('btnSortH').addEventListener('click', () => { push(); palette.sort((a,b)=>a.h-b.h); renderPal(); });
+      document.getElementById('btnSortL').addEventListener('click', () => { push(); palette.sort((a,b)=>a.l-b.l); renderPal(); });
+      document.getElementById('harmType').addEventListener('change', updateHarm);
+      document.getElementById('btnApplyH').addEventListener('click', () => {
+        const hues = harmHues(document.getElementById('harmType').value);
+        push(); hues.forEach(hu => { if (palette.length<64) palette.push({hex:hslHex(hu,s,l),h:hu,s,l,a}); }); renderPal();
       });
-      document.getElementById('btnSortLight').addEventListener('click', () => {
-        palette.sort((a, b) => a.l - b.l);
-        renderPalette();
-      });
-
-      document.getElementById('harmonyType').addEventListener('change', updateHarmony);
-
-      document.getElementById('btnApplyHarmony').addEventListener('click', () => {
-        const type = document.getElementById('harmonyType').value;
-        const hues = getHarmonyHues(type);
-        hues.forEach(hue => {
-          if (palette.length < 64) {
-            palette.push({ hex: hslToHex(hue, s, l), h: hue, s, l, a });
-          }
-        });
-        renderPalette();
-      });
-
       document.getElementById('btnExport').addEventListener('click', () => {
         let lua = 'return {\\n';
-        palette.forEach((c, i) => {
-          const rgb = hexToRgb(c.hex);
-          lua += '  { r = ' + rgb.r + ', g = ' + rgb.g + ', b = ' + rgb.b + ', a = ' + c.a + ' }, -- ' + c.hex + '\\n';
-        });
+        palette.forEach(c => { const rgb=hexRgb(c.hex); lua+='  { r = '+rgb.r+', g = '+rgb.g+', b = '+rgb.b+', a = '+c.a+' }, -- '+c.hex+'\\n'; });
         lua += '}';
         vscode.postMessage({ type: 'exportLua', content: lua });
       });
 
-      updateColor();
-      renderPalette();
+      updateColor(); renderPal();
+      vscode.postMessage({ type: 'stateChanged', state: { ready: true } });
     `);
   }
 }

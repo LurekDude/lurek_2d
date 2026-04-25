@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 -- CORRECT
 world:newBody(x, y, "dynamic")
 world:newBody(x, y, "static")

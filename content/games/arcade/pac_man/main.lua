@@ -366,6 +366,53 @@ end
 -- ===========================================================================
 --  lurek.init — runs ONCE before the window opens
 -- ===========================================================================
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Pac-Man — Lurek2D")
     lurek.render.setBackgroundColor(0, 0, 0)
@@ -699,15 +746,15 @@ local function draw_ghost(g)
     if color then
         -- Body rectangle
         lurek.render.setColor(color[1], color[2], color[3])
-        lurek.render.rectangle("fill", px - half, py - half, half * 2, half * 1.7)
+        rect("fill", px - half, py - half, half * 2, half * 1.7)
         -- Rounded top (approximate with a circle segment)
-        lurek.render.circle("fill", px, py - half * 0.3, half)
+        circ("fill", px, py - half * 0.3, half)
         -- Wavy bottom (3 bumps)
         local bw = half * 2 / 3
         for b = 0, 2 do
             local bx = px - half + b * bw + bw / 2
             local by = py + half * 0.7
-            lurek.render.circle("fill", bx, by, bw / 2.2)
+            circ("fill", bx, by, bw / 2.2)
         end
     end
 
@@ -722,15 +769,15 @@ local function draw_ghost(g)
 
     -- Left eye
     lurek.render.setColor(1, 1, 1)
-    lurek.render.circle("fill", px - eye_off_x, py - half * 0.2, eye_r)
+    circ("fill", px - eye_off_x, py - half * 0.2, eye_r)
     lurek.render.setColor(0.1, 0.1, 0.8)
-    lurek.render.circle("fill", px - eye_off_x + pdx, py - half * 0.2 + pdy, pupil_r)
+    circ("fill", px - eye_off_x + pdx, py - half * 0.2 + pdy, pupil_r)
 
     -- Right eye
     lurek.render.setColor(1, 1, 1)
-    lurek.render.circle("fill", px + eye_off_x, py - half * 0.2, eye_r)
+    circ("fill", px + eye_off_x, py - half * 0.2, eye_r)
     lurek.render.setColor(0.1, 0.1, 0.8)
-    lurek.render.circle("fill", px + eye_off_x + pdx, py - half * 0.2 + pdy, pupil_r)
+    circ("fill", px + eye_off_x + pdx, py - half * 0.2 + pdy, pupil_r)
 end
 
 -- ===========================================================================
@@ -748,29 +795,29 @@ function lurek.draw()
 
             if ch == "W" then
                 lurek.render.setColor(WALL_COLOR[1], WALL_COLOR[2], WALL_COLOR[3])
-                lurek.render.rectangle("fill", px, py, TILE, TILE)
+                rect("fill", px, py, TILE, TILE)
                 -- Slightly brighter border for depth
                 lurek.render.setColor(0.25, 0.25, 0.95)
-                lurek.render.rectangle("line", px, py, TILE, TILE)
+                rect("line", px, py, TILE, TILE)
 
             elseif ch == "." then
                 -- Small dot
                 local cx = px + TILE / 2
                 local cy = py + TILE / 2
                 lurek.render.setColor(DOT_COLOR[1], DOT_COLOR[2], DOT_COLOR[3])
-                lurek.render.circle("fill", cx, cy, 2)
+                circ("fill", cx, cy, 2)
 
             elseif ch == "O" then
                 -- Power pellet (pulsing)
                 local cx = px + TILE / 2
                 local cy = py + TILE / 2
                 lurek.render.setColor(PELLET_COLOR[1], PELLET_COLOR[2], PELLET_COLOR[3])
-                lurek.render.circle("fill", cx, cy, 4 * pellet_scale)
+                circ("fill", cx, cy, 4 * pellet_scale)
 
             elseif ch == "-" then
                 -- Ghost gate
                 lurek.render.setColor(0.9, 0.7, 0.8)
-                lurek.render.rectangle("fill", px, py + TILE / 2 - 1, TILE, 3)
+                rect("fill", px, py + TILE / 2 - 1, TILE, 3)
             end
         end
     end
@@ -791,7 +838,7 @@ function lurek.draw()
     -- ── Score pop text ────────────────────────────────────────────────
     if score_pop_alpha > 0 then
         lurek.render.setColor(1, 1, 1, score_pop_alpha)
-        lurek.render.print(tostring(score_pop_val), score_pop_x - 12, score_pop_y, 1.5)
+        text_(tostring(score_pop_val), score_pop_x - 12, score_pop_y, 1.5)
     end
 
     cam:reset()
@@ -805,7 +852,7 @@ function lurek.draw_ui()
     if game_state == STATE.TITLE then
         -- Game title
         lurek.render.setColor(1.0, 1.0, 0.0)
-        lurek.render.print("P A C - M A N", SCREEN_W / 2 - 130, 100, 4)
+        text_("P A C - M A N", SCREEN_W / 2 - 130, 100, 4)
 
         -- Ghost legend
         local legend_y = 210
@@ -813,7 +860,7 @@ function lurek.draw_ui()
         for i = 1, 4 do
             local gc = GHOST_COLORS[i]
             lurek.render.setColor(gc[1], gc[2], gc[3])
-            lurek.render.rectangle("fill", legend_x, legend_y + (i-1) * 30, 16, 16)
+            rect("fill", legend_x, legend_y + (i-1) * 30, 16, 16)
             lurek.render.setColor(0.8, 0.8, 0.8)
             local desc = ""
             if i == 1 then desc = "Blinky — chases directly"
@@ -821,59 +868,59 @@ function lurek.draw_ui()
             elseif i == 3 then desc = "Inky   — unpredictable"
             elseif i == 4 then desc = "Clyde  — shy when close"
             end
-            lurek.render.print(desc, legend_x + 24, legend_y + (i-1) * 30, 1.3)
+            text_(desc, legend_x + 24, legend_y + (i-1) * 30, 1.3)
         end
 
         -- Blinking prompt
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(1, 1, 1)
-            lurek.render.print("PRESS ENTER TO START", SCREEN_W / 2 - 120, 380, 2)
+            text_("PRESS ENTER TO START", SCREEN_W / 2 - 120, 380, 2)
         end
 
         -- Controls
         lurek.render.setColor(0.4, 0.4, 0.5)
-        lurek.render.print("WASD / Arrows  Move",   SCREEN_W / 2 - 100, 440, 1.3)
-        lurek.render.print("Escape         Quit",   SCREEN_W / 2 - 100, 460, 1.3)
+        text_("WASD / Arrows  Move",   SCREEN_W / 2 - 100, 440, 1.3)
+        text_("Escape         Quit",   SCREEN_W / 2 - 100, 460, 1.3)
         return
     end
 
     -- ── HUD: Score ────────────────────────────────────────────────────
     lurek.render.setColor(1, 1, 1)
-    lurek.render.print("SCORE", 10, 4, 1.4)
-    lurek.render.print(tostring(score), 80, 4, 1.4)
+    text_("SCORE", 10, 4, 1.4)
+    text_(tostring(score), 80, 4, 1.4)
 
     -- ── HUD: Level ────────────────────────────────────────────────────
     lurek.render.setColor(0.8, 0.8, 0.3)
-    lurek.render.print("LVL " .. tostring(level), SCREEN_W / 2 - 20, 4, 1.4)
+    text_("LVL " .. tostring(level), SCREEN_W / 2 - 20, 4, 1.4)
 
     -- ── HUD: Lives (pac-man icons) ────────────────────────────────────
     lurek.render.setColor(1, 1, 0)
     for i = 1, lives - 1 do
         local lx = SCREEN_W - 30 * i
-        lurek.render.circle("fill", lx, 12, 8)
+        circ("fill", lx, 12, 8)
     end
     lurek.render.setColor(0.7, 0.7, 0.7)
-    lurek.render.print("x" .. tostring(lives), SCREEN_W - 30 * lives - 20, 4, 1.2)
+    text_("x" .. tostring(lives), SCREEN_W - 30 * lives - 20, 4, 1.2)
 
     -- ── FPS counter ───────────────────────────────────────────────────
     lurek.render.setColor(0.4, 0.4, 0.5)
-    lurek.render.print("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 18, 1)
+    text_("FPS: " .. math.floor(lurek.timer.getFPS()), 8, SCREEN_H - 18, 1)
 
     -- ── GAME OVER overlay ─────────────────────────────────────────────
     if game_state == STATE.GAME_OVER then
         lurek.render.setColor(0, 0, 0, 0.75)
-        lurek.render.rectangle("fill", 0, 0, SCREEN_W, SCREEN_H)
+        rect("fill", 0, 0, SCREEN_W, SCREEN_H)
 
         lurek.render.setColor(1.0, 0.2, 0.2)
-        lurek.render.print("G A M E   O V E R", SCREEN_W / 2 - 140, 200, 3)
+        text_("G A M E   O V E R", SCREEN_W / 2 - 140, 200, 3)
 
         lurek.render.setColor(1, 1, 1)
-        lurek.render.print("Score: " .. tostring(score), SCREEN_W / 2 - 60, 280, 2)
-        lurek.render.print("Level: " .. tostring(level), SCREEN_W / 2 - 60, 310, 2)
+        text_("Score: " .. tostring(score), SCREEN_W / 2 - 60, 280, 2)
+        text_("Level: " .. tostring(level), SCREEN_W / 2 - 60, 310, 2)
 
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(0.8, 0.8, 0.8)
-            lurek.render.print("PRESS R TO RESTART", SCREEN_W / 2 - 110, 380, 2)
+            text_("PRESS R TO RESTART", SCREEN_W / 2 - 110, 380, 2)
         end
     end
 end

@@ -28,7 +28,7 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 TOOLS_DIR = WORKSPACE_ROOT / "tools"
 SRC_DIR = WORKSPACE_ROOT / "src"
 TESTS_DIR = WORKSPACE_ROOT / "tests"
-OUTPUT_FILE = WORKSPACE_ROOT / "logs" / "lua_api_data.json"
+OUTPUT_FILE = WORKSPACE_ROOT / "logs" / "data" / "lua_api_data.json"
 
 
 # ── Load gen_lua_api as a module (avoids duplicating parser logic) ─────────────

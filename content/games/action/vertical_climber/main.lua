@@ -235,6 +235,53 @@ end
 
 -- ── Engine callbacks ──────────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Vertical Climber — Lurek2D")
     lurek.render.setBackgroundColor(0.6, 0.75, 0.9)
@@ -522,44 +569,44 @@ function lurek.draw()
             if p.ptype == P_NORMAL then
                 -- Green platform
                 lurek.render.setColor(0.2, 0.75, 0.3, 1)
-                lurek.render.rectangle(px, py, p.w, p.h)
+                rect(px, py, p.w, p.h)
                 -- Grass accent on top
                 lurek.render.setColor(0.3, 0.85, 0.4, 1)
-                lurek.render.rectangle(px, py, p.w, 2)
+                rect(px, py, p.w, 2)
 
             elseif p.ptype == P_MOVING then
                 -- Blue platform
                 lurek.render.setColor(0.2, 0.5, 0.9, 1)
-                lurek.render.rectangle(px, py, p.w, p.h)
+                rect(px, py, p.w, p.h)
                 -- Arrow indicators
                 lurek.render.setColor(0.4, 0.7, 1.0, 0.7)
-                lurek.render.rectangle(px + 2, py + 1, 4, 4)
-                lurek.render.rectangle(px + p.w - 6, py + 1, 4, 4)
+                rect(px + 2, py + 1, 4, 4)
+                rect(px + p.w - 6, py + 1, 4, 4)
 
             elseif p.ptype == P_CRUMBLE then
                 -- Brown platform with cracks
                 local shake = p.crumbling and (math.random() * 2 - 1) or 0
                 lurek.render.setColor(0.55, 0.35, 0.15, 1)
-                lurek.render.rectangle(px + shake, py, p.w, p.h)
+                rect(px + shake, py, p.w, p.h)
                 -- Crack lines
                 lurek.render.setColor(0.35, 0.2, 0.08, 1)
-                lurek.render.rectangle(px + 8 + shake, py + 1, 6, 1)
-                lurek.render.rectangle(px + 20 + shake, py + 3, 8, 1)
-                lurek.render.rectangle(px + 35 + shake, py + 2, 5, 1)
+                rect(px + 8 + shake, py + 1, 6, 1)
+                rect(px + 20 + shake, py + 3, 8, 1)
+                rect(px + 35 + shake, py + 2, 5, 1)
 
             elseif p.ptype == P_SPRING then
                 -- Yellow platform base
                 lurek.render.setColor(0.85, 0.75, 0.1, 1)
-                lurek.render.rectangle(px, py, p.w, p.h)
+                rect(px, py, p.w, p.h)
                 -- Coil spring on top
                 local stretch = p.spring_stretch or 0
                 lurek.render.setColor(0.95, 0.85, 0.15, 1)
-                lurek.render.rectangle(px + p.w / 2 - 4, py - 8 - stretch, 8, 8 + stretch)
+                rect(px + p.w / 2 - 4, py - 8 - stretch, 8, 8 + stretch)
                 -- Coil lines
                 lurek.render.setColor(0.7, 0.6, 0.0, 1)
                 for ci = 0, 2 do
                     local cy = py - 2 - ci * 3 - stretch * (ci / 3)
-                    lurek.render.rectangle(px + p.w / 2 - 5, cy, 10, 1)
+                    rect(px + p.w / 2 - 5, cy, 10, 1)
                 end
             end
         end
@@ -572,19 +619,19 @@ function lurek.draw()
             local ey = e.y + oy
             -- Red circle body (drawn as small rects to approximate)
             lurek.render.setColor(0.9, 0.15, 0.1, 1)
-            lurek.render.rectangle(ex - ENEMY_RADIUS, ey, ENEMY_RADIUS * 2, ENEMY_RADIUS * 2)
-            lurek.render.rectangle(ex - ENEMY_RADIUS + 1, ey - 1, ENEMY_RADIUS * 2 - 2, ENEMY_RADIUS * 2 + 2)
+            rect(ex - ENEMY_RADIUS, ey, ENEMY_RADIUS * 2, ENEMY_RADIUS * 2)
+            rect(ex - ENEMY_RADIUS + 1, ey - 1, ENEMY_RADIUS * 2 - 2, ENEMY_RADIUS * 2 + 2)
             -- Angry eyes
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.rectangle(ex - 3, ey + 3, 2, 2)
-            lurek.render.rectangle(ex + 2, ey + 3, 2, 2)
+            rect(ex - 3, ey + 3, 2, 2)
+            rect(ex + 2, ey + 3, 2, 2)
         end
     end
 
     -- ── Bullets ───────────────────────────────────────────────────────────
     lurek.render.setColor(1, 1, 1, 1)
     for _, b in ipairs(bullets) do
-        lurek.render.rectangle(b.x, b.y + oy, BULLET_SIZE, BULLET_SIZE)
+        rect(b.x, b.y + oy, BULLET_SIZE, BULLET_SIZE)
     end
 
     -- ── Player ────────────────────────────────────────────────────────────
@@ -593,18 +640,18 @@ function lurek.draw()
 
     -- Body (blue square)
     lurek.render.setColor(0.2, 0.4, 0.9, 1)
-    lurek.render.rectangle(px, py, PLAYER_W, PLAYER_H)
+    rect(px, py, PLAYER_W, PLAYER_H)
     -- Highlight
     lurek.render.setColor(0.35, 0.55, 1.0, 0.5)
-    lurek.render.rectangle(px + 1, py + 1, PLAYER_W - 4, 3)
+    rect(px + 1, py + 1, PLAYER_W - 4, 3)
     -- Eyes
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.rectangle(px + 3, py + 4, 3, 3)
-    lurek.render.rectangle(px + 10, py + 4, 3, 3)
+    rect(px + 3, py + 4, 3, 3)
+    rect(px + 10, py + 4, 3, 3)
     -- Pupils
     lurek.render.setColor(0, 0, 0, 1)
-    lurek.render.rectangle(px + 4, py + 5, 2, 2)
-    lurek.render.rectangle(px + 11, py + 5, 2, 2)
+    rect(px + 4, py + 5, 2, 2)
+    rect(px + 11, py + 5, 2, 2)
 
     -- ── Particles (world space) ───────────────────────────────────────────
     dust_ps:draw()
@@ -621,78 +668,78 @@ function lurek.draw_ui()
     -- ── Title screen ──────────────────────────────────────────────────────
     if game_state == STATE.TITLE then
         lurek.render.setColor(1, 1, 1, 1)
-        lurek.render.print("VERTICAL CLIMBER", SCREEN_W / 2 - 120, 160, 32)
+        text_("VERTICAL CLIMBER", SCREEN_W / 2 - 120, 160, 32)
 
         lurek.render.setColor(0.8, 0.85, 1.0, 1)
-        lurek.render.print("Auto-bounce to the top!", SCREEN_W / 2 - 100, 220, 16)
+        text_("Auto-bounce to the top!", SCREEN_W / 2 - 100, 220, 16)
 
         if high_score > 0 then
             lurek.render.setColor(1, 0.9, 0.2, 1)
-            lurek.render.print("HIGH SCORE: " .. high_score, SCREEN_W / 2 - 70, 280, 18)
+            text_("HIGH SCORE: " .. high_score, SCREEN_W / 2 - 70, 280, 18)
         end
 
         -- Blink prompt
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(1, 1, 1, 0.9)
-            lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 60, 360, 18)
+            text_("PRESS ENTER", SCREEN_W / 2 - 60, 360, 18)
         end
 
         -- Controls
         lurek.render.setColor(0.7, 0.7, 0.8, 0.7)
-        lurek.render.print("A/D  Move   Space/W  Shoot   Esc  Quit", SCREEN_W / 2 - 160, 440, 14)
+        text_("A/D  Move   Space/W  Shoot   Esc  Quit", SCREEN_W / 2 - 160, 440, 14)
 
         lurek.render.setColor(0.5, 0.5, 0.6, 0.5)
-        lurek.render.print("FPS: " .. fps, 10, SCREEN_H - 20, 12)
+        text_("FPS: " .. fps, 10, SCREEN_H - 20, 12)
         return
     end
 
     -- ── Game Over screen ──────────────────────────────────────────────────
     if game_state == STATE.GAME_OVER then
         lurek.render.setColor(0.9, 0.15, 0.15, 1)
-        lurek.render.print("GAME OVER", SCREEN_W / 2 - 80, 200, 32)
+        text_("GAME OVER", SCREEN_W / 2 - 80, 200, 32)
 
         lurek.render.setColor(1, 1, 1, 1)
-        lurek.render.print("Score: " .. score, SCREEN_W / 2 - 50, 270, 22)
+        text_("Score: " .. score, SCREEN_W / 2 - 50, 270, 22)
 
         if score >= high_score and high_score > 0 then
             lurek.render.setColor(1, 0.9, 0.2, 1)
-            lurek.render.print("NEW HIGH SCORE!", SCREEN_W / 2 - 80, 310, 20)
+            text_("NEW HIGH SCORE!", SCREEN_W / 2 - 80, 310, 20)
         end
 
         if math.floor(title_blink * 2) % 2 == 0 then
             lurek.render.setColor(1, 1, 1, 0.9)
-            lurek.render.print("PRESS ENTER", SCREEN_W / 2 - 60, 380, 18)
+            text_("PRESS ENTER", SCREEN_W / 2 - 60, 380, 18)
         end
 
         lurek.render.setColor(0.5, 0.5, 0.6, 0.5)
-        lurek.render.print("FPS: " .. fps, 10, SCREEN_H - 20, 12)
+        text_("FPS: " .. fps, 10, SCREEN_H - 20, 12)
         return
     end
 
     -- ── HUD (playing) ─────────────────────────────────────────────────────
     -- Score
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("Score: " .. score, 10, 10, 18)
+    text_("Score: " .. score, 10, 10, 18)
 
     -- High score
     if high_score > 0 then
         lurek.render.setColor(1, 0.9, 0.2, 0.8)
-        lurek.render.print("Best: " .. high_score, 10, 34, 14)
+        text_("Best: " .. high_score, 10, 34, 14)
     end
 
     -- Height indicator
     local height_m = math.floor(math.abs(max_height) / 10)
     lurek.render.setColor(0.8, 0.9, 1.0, 0.7)
-    lurek.render.print(height_m .. "m", SCREEN_W - 60, 10, 16)
+    text_(height_m .. "m", SCREEN_W - 60, 10, 16)
 
     -- Score popup
     if score_pop.alpha > 0.01 then
         lurek.render.setColor(1, 1, 0.3, score_pop.alpha)
         local pop_screen_y = score_pop.y - cam_y
-        lurek.render.print(score_pop.text, SCREEN_W / 2 - 15, pop_screen_y, 16)
+        text_(score_pop.text, SCREEN_W / 2 - 15, pop_screen_y, 16)
     end
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.6, 0.5)
-    lurek.render.print("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 20, 12)
+    text_("FPS: " .. fps, SCREEN_W - 70, SCREEN_H - 20, 12)
 end

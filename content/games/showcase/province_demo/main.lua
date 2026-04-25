@@ -441,6 +441,53 @@ end
 
 -- ── lurek callbacks ────────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Province Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.05, 0.08, 0.1)
@@ -576,7 +623,7 @@ function lurek.draw()
         for y = 0, 5 do
             local a = 0.03 + y * 0.01
             lurek.render.setColor(0.1, 0.15, 0.25, a)
-            lurek.render.rectangle("fill", 0, y * 100, SCREEN_W, 100)
+            rect("fill", 0, y * 100, SCREEN_W, 100)
         end
         return
     end
@@ -609,17 +656,17 @@ function lurek.draw()
                 end
 
                 lurek.render.setColor(r, g, b, 1)
-                lurek.render.rectangle("fill", px, py, CELL_SIZE, CELL_SIZE)
+                rect("fill", px, py, CELL_SIZE, CELL_SIZE)
 
                 -- Border cells: darker outline
                 if is_border_cell(x, y) then
                     lurek.render.setColor(r * 0.5, g * 0.5, b * 0.5, 0.8)
-                    lurek.render.rectangle("line", px, py, CELL_SIZE, CELL_SIZE)
+                    rect("line", px, py, CELL_SIZE, CELL_SIZE)
                 end
             else
                 -- Fog
                 lurek.render.setColor(0.08, 0.08, 0.1, 1)
-                lurek.render.rectangle("fill", px, py, CELL_SIZE, CELL_SIZE)
+                rect("fill", px, py, CELL_SIZE, CELL_SIZE)
             end
         end
     end
@@ -631,7 +678,7 @@ function lurek.draw()
             local a = provinces[path_cells[i]]
             local b = provinces[path_cells[i + 1]]
             if a and b then
-                lurek.render.line(a.cx * CELL_SIZE, a.cy * CELL_SIZE, b.cx * CELL_SIZE, b.cy * CELL_SIZE)
+                ln(a.cx * CELL_SIZE, a.cy * CELL_SIZE, b.cx * CELL_SIZE, b.cy * CELL_SIZE)
             end
         end
         -- Path endpoints
@@ -639,11 +686,11 @@ function lurek.draw()
         local e = provinces[path_cells[#path_cells]]
         if s then
             lurek.render.setColor(0.2, 1.0, 0.4, 1)
-            lurek.render.circle("fill", s.cx * CELL_SIZE, s.cy * CELL_SIZE, 4)
+            circ("fill", s.cx * CELL_SIZE, s.cy * CELL_SIZE, 4)
         end
         if e then
             lurek.render.setColor(1.0, 0.3, 0.2, 1)
-            lurek.render.circle("fill", e.cx * CELL_SIZE, e.cy * CELL_SIZE, 4)
+            circ("fill", e.cx * CELL_SIZE, e.cy * CELL_SIZE, 4)
         end
     end
 
@@ -651,7 +698,7 @@ function lurek.draw()
     for _, p in ipairs(particles) do
         local a = clamp(p.life / p.max_life, 0, 1)
         lurek.render.setColor(p.r, p.g, p.b, a * 0.8)
-        lurek.render.circle("fill", p.x, p.y, p.size * a)
+        circ("fill", p.x, p.y, p.size * a)
     end
 end
 
@@ -660,23 +707,23 @@ end
 function lurek.draw_ui()
     if state == STATE_TITLE then
         lurek.render.setColor(0.4, 0.7, 1.0, title_alpha)
-        lurek.render.print("PROVINCE MAP", SCREEN_W / 2 - 100, SCREEN_H / 2 - 40)
+        text_("PROVINCE MAP", SCREEN_W / 2 - 100, SCREEN_H / 2 - 40)
         lurek.render.setColor(0.6, 0.8, 0.9, title_sub_alpha * 0.7)
-        lurek.render.print("PROCEDURAL WORLD", SCREEN_W / 2 - 80, SCREEN_H / 2 + 10)
+        text_("PROCEDURAL WORLD", SCREEN_W / 2 - 80, SCREEN_H / 2 + 10)
         lurek.render.setColor(0.5, 0.5, 0.6, math.abs(math.sin(title_alpha * 3.14)) * 0.6)
-        lurek.render.print("Click to begin", SCREEN_W / 2 - 55, SCREEN_H / 2 + 60)
+        text_("Click to begin", SCREEN_W / 2 - 55, SCREEN_H / 2 + 60)
         return
     end
 
     -- Top HUD bar
     lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 22)
+    rect("fill", 0, 0, SCREEN_W, 22)
     lurek.render.setColor(0.9, 0.9, 0.9, 1)
-    lurek.render.print("Mode: " .. MODE_NAMES[display_mode] .. " (M)  |  Fog: " .. (fog_enabled and "ON" or "OFF") .. " (F)  |  G=New Map  |  1/2/3=Assign Owner", 8, 4)
+    text_("Mode: " .. MODE_NAMES[display_mode] .. " (M)  |  Fog: " .. (fog_enabled and "ON" or "OFF") .. " (F)  |  G=New Map  |  1/2/3=Assign Owner", 8, 4)
 
     -- FPS
     lurek.render.setColor(0.6, 0.6, 0.3, 1)
-    lurek.render.print("FPS: " .. fps_display, SCREEN_W - 70, 4)
+    text_("FPS: " .. fps_display, SCREEN_W - 70, 4)
 
     -- Detail panel (right side)
     if selected_id and provinces[selected_id] then
@@ -687,22 +734,22 @@ function lurek.draw_ui()
 
         -- Panel background
         lurek.render.setColor(0.05, 0.05, 0.1, 0.85)
-        lurek.render.rectangle("fill", px, 30, pw, ph)
+        rect("fill", px, 30, pw, ph)
         lurek.render.setColor(0.3, 0.5, 0.8, 0.8)
-        lurek.render.rectangle("line", px, 30, pw, ph)
+        rect("line", px, 30, pw, ph)
 
         -- Province details
         lurek.render.setColor(1.0, 0.9, 0.5, 1)
-        lurek.render.print(prov.name, px + 8, 38)
+        text_(prov.name, px + 8, 38)
 
         lurek.render.setColor(0.8, 0.8, 0.8, 1)
-        lurek.render.print("Terrain: " .. TERRAIN_NAMES[prov.terrain], px + 8, 58)
-        lurek.render.print("Owner: " .. OWNER_NAMES[prov.owner], px + 8, 74)
-        lurek.render.print("Population: " .. prov.population, px + 8, 90)
-        lurek.render.print("Cells: " .. #prov.cells, px + 8, 106)
+        text_("Terrain: " .. TERRAIN_NAMES[prov.terrain], px + 8, 58)
+        text_("Owner: " .. OWNER_NAMES[prov.owner], px + 8, 74)
+        text_("Population: " .. prov.population, px + 8, 90)
+        text_("Cells: " .. #prov.cells, px + 8, 106)
 
         local ncount = #prov.neighbors
-        lurek.render.print("Neighbors: " .. ncount, px + 8, 122)
+        text_("Neighbors: " .. ncount, px + 8, 122)
 
         if #path_cells > 1 then
             local total_cost = 0
@@ -710,22 +757,22 @@ function lurek.draw_ui()
                 total_cost = total_cost + (TERRAIN_COSTS[provinces[pid].terrain] or 1)
             end
             lurek.render.setColor(0.3, 0.85, 1.0, 1)
-            lurek.render.print("Path cost: " .. total_cost, px + 8, 145)
+            text_("Path cost: " .. total_cost, px + 8, 145)
         end
 
         -- Owner color swatch
         local oc = OWNER_COLORS[prov.owner]
         lurek.render.setColor(oc[1], oc[2], oc[3], 1)
-        lurek.render.rectangle("fill", px + pw - 20, 38, 12, 12)
+        rect("fill", px + pw - 20, 38, 12, 12)
     end
 
     -- Statistics panel (bottom)
     local counts, total_pop, terrain_dist = compute_stats()
     local sy = SCREEN_H - 60
     lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
-    lurek.render.rectangle("fill", 0, sy, SCREEN_W, 60)
+    rect("fill", 0, sy, SCREEN_W, 60)
     lurek.render.setColor(0.8, 0.8, 0.8, 1)
-    lurek.render.print("Provinces: " .. #provinces .. "  |  Total Pop: " .. total_pop, 8, sy + 4)
+    text_("Provinces: " .. #provinces .. "  |  Total Pop: " .. total_pop, 8, sy + 4)
 
     -- Owner counts
     local ox = 8
@@ -733,9 +780,9 @@ function lurek.draw_ui()
     for owner = 0, 3 do
         local c = OWNER_COLORS[owner]
         lurek.render.setColor(c[1], c[2], c[3], 1)
-        lurek.render.rectangle("fill", ox, oy, 10, 10)
+        rect("fill", ox, oy, 10, 10)
         lurek.render.setColor(0.8, 0.8, 0.8, 1)
-        lurek.render.print(OWNER_NAMES[owner] .. ": " .. counts[owner], ox + 14, oy)
+        text_(OWNER_NAMES[owner] .. ": " .. counts[owner], ox + 14, oy)
         ox = ox + 110
     end
 
@@ -745,7 +792,7 @@ function lurek.draw_ui()
     for _, name in ipairs({"Plains", "Forest", "Mountain", "Desert", "Coast"}) do
         local cnt = terrain_dist[name] or 0
         lurek.render.setColor(0.6, 0.7, 0.6, 1)
-        lurek.render.print(name .. ":" .. cnt, tx, ty)
+        text_(name .. ":" .. cnt, tx, ty)
         tx = tx + 100
     end
 end

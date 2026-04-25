@@ -1,4 +1,4 @@
-﻿--- @module library.crafting
+﻿-- @module library.crafting
 --- @status full
 --- Crafting system: recipes, ingredients, outputs, job queues, stations,
 --- craft skills, perk trees, upgrade trees, modifier pools, and recipe knowledge.

@@ -9,15 +9,15 @@ use std::rc::Rc;
 use crate::image::ImageData;
 use crate::image::Texture;
 use crate::math::Rect;
+use crate::render::renderer::{BevelStyle, GradientDirection, HexOrientation, PathSegment};
 use crate::render::shape::{CompoundShape, ShapeCommand};
-use crate::sprite::sprite_batch::BatchEntry;
 use crate::render::{
     BlendMode, Canvas, CompareMode, DepthMode, DrawMode, Font, Mesh, MeshDrawMode, MeshVertex,
     RenderCommand, Shader, StencilAction, StencilMode, TextAlign, UniformValue,
 };
-use crate::render::renderer::{BevelStyle, GradientDirection, HexOrientation, PathSegment};
 use crate::runtime::resource_keys::*;
 use crate::runtime::ScreenshotRequest;
+use crate::sprite::sprite_batch::BatchEntry;
 use crate::sprite::SpriteBatch;
 
 // ===============================================================================
@@ -58,9 +58,9 @@ impl LuaUserData for LuaImageData {
         /// ImageData?
         methods.add_method("resize", |lua, this, (w, h): (u32, u32)| {
             match this.inner.resize(w, h) {
-                Some(img) => Ok(LuaValue::UserData(lua.create_userdata(LuaImageData {
-                    inner: img,
-                })?)),
+                Some(img) => Ok(LuaValue::UserData(
+                    lua.create_userdata(LuaImageData { inner: img })?,
+                )),
                 None => Ok(LuaValue::Nil),
             }
         });
@@ -96,13 +96,12 @@ impl LuaUserData for LuaImageData {
         /// ImageData?
         methods.add_method(
             "getRegion",
-            |lua, this, (x, y, w, h): (u32, u32, u32, u32)| {
-                match this.inner.get_region(x, y, w, h) {
-                    Some(img) => Ok(LuaValue::UserData(lua.create_userdata(LuaImageData {
-                        inner: img,
-                    })?)),
-                    None => Ok(LuaValue::Nil),
-                }
+            |lua, this, (x, y, w, h): (u32, u32, u32, u32)| match this.inner.get_region(x, y, w, h)
+            {
+                Some(img) => Ok(LuaValue::UserData(
+                    lua.create_userdata(LuaImageData { inner: img })?,
+                )),
+                None => Ok(LuaValue::Nil),
             },
         );
 
@@ -133,9 +132,9 @@ impl LuaUserData for LuaImageData {
             for py in 0..h {
                 for px in 0..w {
                     if let Some((r, g, b, a)) = this.inner.get_pixel(px, py) {
-                        let result: (u8, u8, u8, u8) =
-                            callback.call((px, py, r, g, b, a))?;
-                        this.inner.set_pixel(px, py, result.0, result.1, result.2, result.3);
+                        let result: (u8, u8, u8, u8) = callback.call((px, py, r, g, b, a))?;
+                        this.inner
+                            .set_pixel(px, py, result.0, result.1, result.2, result.3);
                     }
                 }
             }
@@ -261,6 +260,7 @@ impl LuaUserData for LuaImage {
 
         // -- typeOf --
         /// Returns the type name of this object.
+        /// @param name : string?
         /// @return string
         methods.add_method("typeOf", |_, _, ()| Ok("Image"));
 
@@ -401,6 +401,7 @@ impl LuaUserData for LuaFont {
 
         // -- typeOf --
         /// Returns the type name of this object.
+        /// @param name : string?
         /// @return string
         methods.add_method("typeOf", |_, _, ()| Ok("Font"));
 
@@ -480,6 +481,7 @@ impl LuaUserData for LuaCanvas {
 
         // -- typeOf --
         /// Returns the type name of this object.
+        /// @param name : string?
         /// @return string
         methods.add_method("typeOf", |_, _, ()| Ok("Canvas"));
 
@@ -513,6 +515,11 @@ impl LuaUserData for LuaSpriteBatch {
         /// Adds a sprite entry to this batch.
         /// @param x : number
         /// @param y : number
+        /// @param r : number?
+        /// @param sx : number?
+        /// @param sy : number?
+        /// @param ox : number?
+        /// @param oy : number?
         /// @return integer?
         methods.add_method(
             "add",
@@ -591,6 +598,7 @@ impl LuaUserData for LuaSpriteBatch {
 
         // -- typeOf --
         /// Returns the type name of this object.
+        /// @param name : string?
         /// @return string
         methods.add_method("typeOf", |_, _, ()| Ok("SpriteBatch"));
 
@@ -705,6 +713,7 @@ impl LuaUserData for LuaMesh {
 
         // -- typeOf --
         /// Returns the type name of this object.
+        /// @param name : string?
         /// @return string
         methods.add_method("typeOf", |_, _, ()| Ok("Mesh"));
 
@@ -777,6 +786,7 @@ impl LuaUserData for LuaShader {
 
         // -- typeOf --
         /// Returns the type name of this object.
+        /// @param name : string?
         /// @return string
         methods.add_method("typeOf", |_, _, ()| Ok("Shader"));
 
@@ -851,6 +861,7 @@ impl LuaUserData for LuaQuad {
 
         // -- typeOf --
         /// Returns the type name of this object.
+        /// @param name : string?
         /// @return string
         methods.add_method("typeOf", |_, _, ()| Ok("Quad"));
 
@@ -1410,7 +1421,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getColor --
     /// Returns the current drawing color.
-    /// @return number, number, number, number
+    /// @return number  r
+    /// @return number  g
+    /// @return number  b
+    /// @return number  a
     let s = state.clone();
     graphics.set(
         "getColor",
@@ -1626,7 +1640,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- polygon --
     /// Draws a polygon from a list of vertices.
     /// @param mode : string
-    /// @param vertices : table|...
+    /// @param ... : number  flat x1, y1, x2, y2, ... (minimum 6 numbers = 3 vertices)
     let s = state.clone();
     graphics.set(
         "polygon",
@@ -2062,14 +2076,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 let scale: f32 = span_tbl.get::<_, f32>("scale").unwrap_or(1.0);
                 spans.push(TextSpan::new(text, r, g, b, a, scale));
             }
-            s.borrow_mut()
-                .render_commands
-                .push(crate::render::renderer::RenderCommand::DrawRichText {
+            s.borrow_mut().render_commands.push(
+                crate::render::renderer::RenderCommand::DrawRichText {
                     font_key,
                     spans,
                     x,
                     y,
-                });
+                },
+            );
             Ok(())
         })?,
     )?;
@@ -3614,16 +3628,26 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(
             move |_,
                   (x1, y1, cx1, cy1, cx2, cy2, x2, y2, segs): (
-                f32, f32, f32, f32, f32, f32, f32, f32, Option<u32>,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                Option<u32>,
             )| {
                 use crate::math::Vec2;
-                s.borrow_mut().render_commands.push(RenderCommand::DrawCubicBezier {
-                    start: Vec2::new(x1, y1),
-                    c1: Vec2::new(cx1, cy1),
-                    c2: Vec2::new(cx2, cy2),
-                    end: Vec2::new(x2, y2),
-                    segments: segs.unwrap_or(16),
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawCubicBezier {
+                        start: Vec2::new(x1, y1),
+                        c1: Vec2::new(cx1, cy1),
+                        c2: Vec2::new(cx2, cy2),
+                        end: Vec2::new(x2, y2),
+                        segments: segs.unwrap_or(16),
+                    });
                 Ok(())
             },
         )?,
@@ -3686,11 +3710,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     };
                     segs.push(seg);
                 }
-                s.borrow_mut().render_commands.push(RenderCommand::DrawPath {
-                    segments: segs,
-                    mode: draw_mode,
-                    close: close.unwrap_or(false),
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawPath {
+                        segments: segs,
+                        mode: draw_mode,
+                        close: close.unwrap_or(false),
+                    });
                 Ok(())
             },
         )?,
@@ -3713,7 +3739,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(
             move |_,
                   (x, y, w, h, c1, c2, dir): (
-                f32, f32, f32, f32, LuaTable, LuaTable, Option<String>,
+                f32,
+                f32,
+                f32,
+                f32,
+                LuaTable,
+                LuaTable,
+                Option<String>,
             )| {
                 if w <= 0.0 || h <= 0.0 {
                     return Err(LuaError::RuntimeError(
@@ -3734,19 +3766,27 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 ];
                 let direction = match dir.as_deref().unwrap_or("vertical") {
                     "horizontal" => GradientDirection::Horizontal,
-                    "vertical"   => GradientDirection::Vertical,
-                    "diagDown"   => GradientDirection::DiagDown,
-                    "diagUp"     => GradientDirection::DiagUp,
-                    "radial"     => GradientDirection::Radial,
+                    "vertical" => GradientDirection::Vertical,
+                    "diagDown" => GradientDirection::DiagDown,
+                    "diagUp" => GradientDirection::DiagUp,
+                    "radial" => GradientDirection::Radial,
                     other => {
                         return Err(LuaError::RuntimeError(format!(
                             "drawGradientRect: unknown direction '{other}'"
                         )))
                     }
                 };
-                s.borrow_mut().render_commands.push(RenderCommand::DrawGradientRect {
-                    x, y, w, h, color1, color2, direction,
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawGradientRect {
+                        x,
+                        y,
+                        w,
+                        h,
+                        color1,
+                        color2,
+                        direction,
+                    });
                 Ok(())
             },
         )?,
@@ -3824,10 +3864,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "drawIsoCubeTile",
         lua.create_function(
-            move |_,
-                  (sx, sy, half_w, half_h, opts): (
-                f32, f32, f32, f32, Option<LuaTable>,
-            )| {
+            move |_, (sx, sy, half_w, half_h, opts): (f32, f32, f32, f32, Option<LuaTable>)| {
                 let parse_color = |tbl: Option<LuaTable>| -> [f32; 4] {
                     tbl.map(|t| {
                         [
@@ -3839,44 +3876,72 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     })
                     .unwrap_or([1.0, 1.0, 1.0, 1.0])
                 };
-                let (depth, top_color, top_tex_key, left_color, left_tex_key, right_color, right_tex_key) =
-                    if let Some(ref o) = opts {
-                        let depth = o.get::<_, f32>("depth").unwrap_or(0.0);
-                        let top_color = parse_color(o.get::<_, Option<LuaTable>>("topColor").ok().flatten());
-                        let left_color = parse_color(o.get::<_, Option<LuaTable>>("leftColor").ok().flatten());
-                        let right_color = parse_color(o.get::<_, Option<LuaTable>>("rightColor").ok().flatten());
-                        let top_tex = o
-                            .get::<_, Option<LuaAnyUserData>>("topTexture")
-                            .ok()
-                            .flatten()
-                            .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
-                        let left_tex = o
-                            .get::<_, Option<LuaAnyUserData>>("leftTexture")
-                            .ok()
-                            .flatten()
-                            .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
-                        let right_tex = o
-                            .get::<_, Option<LuaAnyUserData>>("rightTexture")
-                            .ok()
-                            .flatten()
-                            .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
-                        (depth, top_color, top_tex, left_color, left_tex, right_color, right_tex)
-                    } else {
-                        (0.0, [1.0; 4], None, [0.7, 0.7, 0.7, 1.0], None, [0.5, 0.5, 0.5, 1.0], None)
-                    };
-                s.borrow_mut().render_commands.push(RenderCommand::DrawIsoCubeTile {
-                    screen_x: sx,
-                    screen_y: sy,
-                    half_w,
-                    half_h,
+                let (
                     depth,
                     top_color,
-                    top_texture: top_tex_key,
+                    top_tex_key,
                     left_color,
-                    left_texture: left_tex_key,
+                    left_tex_key,
                     right_color,
-                    right_texture: right_tex_key,
-                });
+                    right_tex_key,
+                ) = if let Some(ref o) = opts {
+                    let depth = o.get::<_, f32>("depth").unwrap_or(0.0);
+                    let top_color =
+                        parse_color(o.get::<_, Option<LuaTable>>("topColor").ok().flatten());
+                    let left_color =
+                        parse_color(o.get::<_, Option<LuaTable>>("leftColor").ok().flatten());
+                    let right_color =
+                        parse_color(o.get::<_, Option<LuaTable>>("rightColor").ok().flatten());
+                    let top_tex = o
+                        .get::<_, Option<LuaAnyUserData>>("topTexture")
+                        .ok()
+                        .flatten()
+                        .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
+                    let left_tex = o
+                        .get::<_, Option<LuaAnyUserData>>("leftTexture")
+                        .ok()
+                        .flatten()
+                        .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
+                    let right_tex = o
+                        .get::<_, Option<LuaAnyUserData>>("rightTexture")
+                        .ok()
+                        .flatten()
+                        .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
+                    (
+                        depth,
+                        top_color,
+                        top_tex,
+                        left_color,
+                        left_tex,
+                        right_color,
+                        right_tex,
+                    )
+                } else {
+                    (
+                        0.0,
+                        [1.0; 4],
+                        None,
+                        [0.7, 0.7, 0.7, 1.0],
+                        None,
+                        [0.5, 0.5, 0.5, 1.0],
+                        None,
+                    )
+                };
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawIsoCubeTile {
+                        screen_x: sx,
+                        screen_y: sy,
+                        half_w,
+                        half_h,
+                        depth,
+                        top_color,
+                        top_texture: top_tex_key,
+                        left_color,
+                        left_texture: left_tex_key,
+                        right_color,
+                        right_texture: right_tex_key,
+                    });
                 Ok(())
             },
         )?,
@@ -3897,7 +3962,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(
             move |_,
                   (cx, cy, size, orientation, mode): (
-                f32, f32, f32, Option<String>, Option<String>,
+                f32,
+                f32,
+                f32,
+                Option<String>,
+                Option<String>,
             )| {
                 if size <= 0.0 {
                     return Err(LuaError::RuntimeError(
@@ -3906,7 +3975,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 }
                 let orientation = match orientation.as_deref().unwrap_or("pointyTop") {
                     "pointyTop" | "pointy" => HexOrientation::PointyTop,
-                    "flatTop" | "flat"     => HexOrientation::FlatTop,
+                    "flatTop" | "flat" => HexOrientation::FlatTop,
                     other => {
                         return Err(LuaError::RuntimeError(format!(
                             "drawHexTile: unknown orientation '{other}'"
@@ -3922,13 +3991,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                         )))
                     }
                 };
-                s.borrow_mut().render_commands.push(RenderCommand::DrawHexTile {
-                    cx,
-                    cy,
-                    size,
-                    orientation,
-                    mode: draw_mode,
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawHexTile {
+                        cx,
+                        cy,
+                        size,
+                        orientation,
+                        mode: draw_mode,
+                    });
                 Ok(())
             },
         )?,
@@ -3996,7 +4067,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(
             move |_,
                   (x, y, w, h, bevel_w, style, opts): (
-                f32, f32, f32, f32, Option<f32>, Option<String>, Option<LuaTable>,
+                f32,
+                f32,
+                f32,
+                f32,
+                Option<f32>,
+                Option<String>,
+                Option<LuaTable>,
             )| {
                 if w <= 0.0 || h <= 0.0 {
                     return Err(LuaError::RuntimeError(
@@ -4005,11 +4082,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 }
                 let bevel_w = bevel_w.unwrap_or(2.0).max(0.0);
                 let bevel_style = match style.as_deref().unwrap_or("raised") {
-                    "raised"  => BevelStyle::Raised,
-                    "sunken"  => BevelStyle::Sunken,
-                    "ridge"   => BevelStyle::Ridge,
-                    "groove"  => BevelStyle::Groove,
-                    "flat"    => BevelStyle::Flat,
+                    "raised" => BevelStyle::Raised,
+                    "sunken" => BevelStyle::Sunken,
+                    "ridge" => BevelStyle::Ridge,
+                    "groove" => BevelStyle::Groove,
+                    "flat" => BevelStyle::Flat,
                     other => {
                         return Err(LuaError::RuntimeError(format!(
                             "drawBevelRect: unknown style '{other}'"
@@ -4029,17 +4106,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                         })
                         .unwrap_or(def)
                 };
-                let highlight  = parse_color_tbl("highlight",  [1.0, 1.0, 1.0, 1.0]);
-                let shadow     = parse_color_tbl("shadow",     [0.2, 0.2, 0.2, 1.0]);
-                let fill_color = parse_color_tbl("fillColor",  [0.5, 0.5, 0.5, 1.0]);
-                s.borrow_mut().render_commands.push(RenderCommand::DrawBevelRect {
-                    x, y, w, h,
-                    bevel_w,
-                    style: bevel_style,
-                    highlight,
-                    shadow,
-                    fill_color,
-                });
+                let highlight = parse_color_tbl("highlight", [1.0, 1.0, 1.0, 1.0]);
+                let shadow = parse_color_tbl("shadow", [0.2, 0.2, 0.2, 1.0]);
+                let fill_color = parse_color_tbl("fillColor", [0.5, 0.5, 0.5, 1.0]);
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawBevelRect {
+                        x,
+                        y,
+                        w,
+                        h,
+                        bevel_w,
+                        style: bevel_style,
+                        highlight,
+                        shadow,
+                        fill_color,
+                    });
                 Ok(())
             },
         )?,
@@ -4059,18 +4141,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             move |_, (id, alpha, blend_mode): (u64, Option<f32>, Option<String>)| {
                 let alpha = alpha.unwrap_or(1.0).clamp(0.0, 1.0);
                 let blend = match blend_mode.as_deref().unwrap_or("alpha") {
-                    "alpha"    => BlendMode::Alpha,
+                    "alpha" => BlendMode::Alpha,
                     "add" | "additive" => BlendMode::Add,
                     "multiply" => BlendMode::Multiply,
                     "replace" | "none" => BlendMode::Replace,
-                    "screen"   => BlendMode::Screen,
+                    "screen" => BlendMode::Screen,
                     other => {
                         return Err(LuaError::RuntimeError(format!(
                             "pushLayer: unknown blend mode '{other}'"
                         )))
                     }
                 };
-                s.borrow_mut().render_commands.push(RenderCommand::PushLayer { id, alpha, blend });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::PushLayer { id, alpha, blend });
                 Ok(())
             },
         )?,
@@ -4101,13 +4185,24 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "drawQuadBezier",
         lua.create_function(
-            move |_, (x1, y1, cx, cy, x2, y2, segments): (f32, f32, f32, f32, f32, f32, Option<u32>)| {
-                s.borrow_mut().render_commands.push(RenderCommand::DrawQuadBezier {
-                    start: crate::math::Vec2::new(x1, y1),
-                    control: crate::math::Vec2::new(cx, cy),
-                    end: crate::math::Vec2::new(x2, y2),
-                    segments: segments.unwrap_or(16),
-                });
+            move |_,
+                  (x1, y1, cx, cy, x2, y2, segments): (
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                Option<u32>,
+            )| {
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawQuadBezier {
+                        start: crate::math::Vec2::new(x1, y1),
+                        control: crate::math::Vec2::new(cx, cy),
+                        end: crate::math::Vec2::new(x2, y2),
+                        segments: segments.unwrap_or(16),
+                    });
                 Ok(())
             },
         )?,
@@ -4129,14 +4224,27 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "drawCubicBezier",
         lua.create_function(
-            move |_, (x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments): (f32, f32, f32, f32, f32, f32, f32, f32, Option<u32>)| {
-                s.borrow_mut().render_commands.push(RenderCommand::DrawCubicBezier {
-                    start: crate::math::Vec2::new(x1, y1),
-                    c1: crate::math::Vec2::new(cx1, cy1),
-                    c2: crate::math::Vec2::new(cx2, cy2),
-                    end: crate::math::Vec2::new(x2, y2),
-                    segments: segments.unwrap_or(16),
-                });
+            move |_,
+                  (x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments): (
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                f32,
+                Option<u32>,
+            )| {
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawCubicBezier {
+                        start: crate::math::Vec2::new(x1, y1),
+                        c1: crate::math::Vec2::new(cx1, cy1),
+                        c2: crate::math::Vec2::new(cx2, cy2),
+                        end: crate::math::Vec2::new(x2, y2),
+                        segments: segments.unwrap_or(16),
+                    });
                 Ok(())
             },
         )?,
@@ -4191,11 +4299,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     };
                     segs.push(seg);
                 }
-                s.borrow_mut().render_commands.push(RenderCommand::DrawPath {
-                    segments: segs,
-                    mode: draw_mode,
-                    close: close.unwrap_or(false),
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawPath {
+                        segments: segs,
+                        mode: draw_mode,
+                        close: close.unwrap_or(false),
+                    });
                 Ok(())
             },
         )?,
@@ -4216,7 +4326,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "drawGradientRect",
         lua.create_function(
-            move |_, (x, y, w, h, c1, c2, dir): (f32, f32, f32, f32, LuaTable, LuaTable, Option<String>)| {
+            move |_,
+                  (x, y, w, h, c1, c2, dir): (
+                f32,
+                f32,
+                f32,
+                f32,
+                LuaTable,
+                LuaTable,
+                Option<String>,
+            )| {
                 if w <= 0.0 || h <= 0.0 {
                     return Err(LuaError::RuntimeError(
                         "drawGradientRect: w and h must be positive".into(),
@@ -4236,19 +4355,27 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 ];
                 let direction = match dir.as_deref().unwrap_or("vertical") {
                     "horizontal" => GradientDirection::Horizontal,
-                    "vertical"   => GradientDirection::Vertical,
-                    "diagDown"   => GradientDirection::DiagDown,
-                    "diagUp"     => GradientDirection::DiagUp,
-                    "radial"     => GradientDirection::Radial,
+                    "vertical" => GradientDirection::Vertical,
+                    "diagDown" => GradientDirection::DiagDown,
+                    "diagUp" => GradientDirection::DiagUp,
+                    "radial" => GradientDirection::Radial,
                     other => {
                         return Err(LuaError::RuntimeError(format!(
                             "drawGradientRect: unknown direction '{other}'"
                         )))
                     }
                 };
-                s.borrow_mut().render_commands.push(RenderCommand::DrawGradientRect {
-                    x, y, w, h, color1, color2, direction,
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawGradientRect {
+                        x,
+                        y,
+                        w,
+                        h,
+                        color1,
+                        color2,
+                        direction,
+                    });
                 Ok(())
             },
         )?,
@@ -4322,42 +4449,82 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(
             move |_, (sx, sy, half_w, half_h, opts): (f32, f32, f32, f32, Option<LuaTable>)| {
                 let parse_color = |tbl: Option<LuaTable>| -> [f32; 4] {
-                    tbl.map(|t| [
-                        t.get::<_, f32>(1).unwrap_or(1.0),
-                        t.get::<_, f32>(2).unwrap_or(1.0),
-                        t.get::<_, f32>(3).unwrap_or(1.0),
-                        t.get::<_, f32>(4).unwrap_or(1.0),
-                    ]).unwrap_or([1.0, 1.0, 1.0, 1.0])
+                    tbl.map(|t| {
+                        [
+                            t.get::<_, f32>(1).unwrap_or(1.0),
+                            t.get::<_, f32>(2).unwrap_or(1.0),
+                            t.get::<_, f32>(3).unwrap_or(1.0),
+                            t.get::<_, f32>(4).unwrap_or(1.0),
+                        ]
+                    })
+                    .unwrap_or([1.0, 1.0, 1.0, 1.0])
                 };
-                let (depth, top_color, top_tex_key, left_color, left_tex_key, right_color, right_tex_key) =
-                    if let Some(ref o) = opts {
-                        let depth = o.get::<_, f32>("depth").unwrap_or(0.0);
-                        let top_color = parse_color(o.get::<_, Option<LuaTable>>("topColor").ok().flatten());
-                        let left_color = parse_color(o.get::<_, Option<LuaTable>>("leftColor").ok().flatten());
-                        let right_color = parse_color(o.get::<_, Option<LuaTable>>("rightColor").ok().flatten());
-                        let top_tex = o.get::<_, Option<LuaAnyUserData>>("topTexture").ok().flatten()
-                            .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
-                        let left_tex = o.get::<_, Option<LuaAnyUserData>>("leftTexture").ok().flatten()
-                            .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
-                        let right_tex = o.get::<_, Option<LuaAnyUserData>>("rightTexture").ok().flatten()
-                            .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
-                        (depth, top_color, top_tex, left_color, left_tex, right_color, right_tex)
-                    } else {
-                        (0.0, [1.0; 4], None, [0.7, 0.7, 0.7, 1.0], None, [0.5, 0.5, 0.5, 1.0], None)
-                    };
-                s.borrow_mut().render_commands.push(RenderCommand::DrawIsoCubeTile {
-                    screen_x: sx,
-                    screen_y: sy,
-                    half_w,
-                    half_h,
+                let (
                     depth,
                     top_color,
-                    top_texture: top_tex_key,
+                    top_tex_key,
                     left_color,
-                    left_texture: left_tex_key,
+                    left_tex_key,
                     right_color,
-                    right_texture: right_tex_key,
-                });
+                    right_tex_key,
+                ) = if let Some(ref o) = opts {
+                    let depth = o.get::<_, f32>("depth").unwrap_or(0.0);
+                    let top_color =
+                        parse_color(o.get::<_, Option<LuaTable>>("topColor").ok().flatten());
+                    let left_color =
+                        parse_color(o.get::<_, Option<LuaTable>>("leftColor").ok().flatten());
+                    let right_color =
+                        parse_color(o.get::<_, Option<LuaTable>>("rightColor").ok().flatten());
+                    let top_tex = o
+                        .get::<_, Option<LuaAnyUserData>>("topTexture")
+                        .ok()
+                        .flatten()
+                        .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
+                    let left_tex = o
+                        .get::<_, Option<LuaAnyUserData>>("leftTexture")
+                        .ok()
+                        .flatten()
+                        .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
+                    let right_tex = o
+                        .get::<_, Option<LuaAnyUserData>>("rightTexture")
+                        .ok()
+                        .flatten()
+                        .and_then(|ud| ud.borrow::<LuaImage>().ok().map(|img| img.key));
+                    (
+                        depth,
+                        top_color,
+                        top_tex,
+                        left_color,
+                        left_tex,
+                        right_color,
+                        right_tex,
+                    )
+                } else {
+                    (
+                        0.0,
+                        [1.0; 4],
+                        None,
+                        [0.7, 0.7, 0.7, 1.0],
+                        None,
+                        [0.5, 0.5, 0.5, 1.0],
+                        None,
+                    )
+                };
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawIsoCubeTile {
+                        screen_x: sx,
+                        screen_y: sy,
+                        half_w,
+                        half_h,
+                        depth,
+                        top_color,
+                        top_texture: top_tex_key,
+                        left_color,
+                        left_texture: left_tex_key,
+                        right_color,
+                        right_texture: right_tex_key,
+                    });
                 Ok(())
             },
         )?,
@@ -4376,7 +4543,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "drawHexTile",
         lua.create_function(
-            move |_, (cx, cy, size, orientation, mode): (f32, f32, f32, Option<String>, Option<String>)| {
+            move |_,
+                  (cx, cy, size, orientation, mode): (
+                f32,
+                f32,
+                f32,
+                Option<String>,
+                Option<String>,
+            )| {
                 if size <= 0.0 {
                     return Err(LuaError::RuntimeError(
                         "drawHexTile: size must be positive".into(),
@@ -4384,15 +4558,23 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 }
                 let orientation = match orientation.as_deref().unwrap_or("pointyTop") {
                     "pointyTop" | "pointy" => HexOrientation::PointyTop,
-                    "flatTop" | "flat"     => HexOrientation::FlatTop,
-                    other => return Err(LuaError::RuntimeError(format!(
-                        "drawHexTile: unknown orientation '{other}'"
-                    ))),
+                    "flatTop" | "flat" => HexOrientation::FlatTop,
+                    other => {
+                        return Err(LuaError::RuntimeError(format!(
+                            "drawHexTile: unknown orientation '{other}'"
+                        )))
+                    }
                 };
                 let draw_mode = parse_draw_mode(mode.as_deref().unwrap_or("line"))?;
-                s.borrow_mut().render_commands.push(RenderCommand::DrawHexTile {
-                    cx, cy, size, orientation, mode: draw_mode,
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawHexTile {
+                        cx,
+                        cy,
+                        size,
+                        orientation,
+                        mode: draw_mode,
+                    });
                 Ok(())
             },
         )?,
@@ -4408,7 +4590,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "beginSortGroup",
         lua.create_function(move |_, id: u64| {
-            s.borrow_mut().render_commands.push(RenderCommand::BeginSortGroup { group_id: id });
+            s.borrow_mut()
+                .render_commands
+                .push(RenderCommand::BeginSortGroup { group_id: id });
             Ok(())
         })?,
     )?;
@@ -4420,7 +4604,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "pushSortKey",
         lua.create_function(move |_, depth: f32| {
-            s.borrow_mut().render_commands.push(RenderCommand::PushSortKey(depth));
+            s.borrow_mut()
+                .render_commands
+                .push(RenderCommand::PushSortKey(depth));
             Ok(())
         })?,
     )?;
@@ -4432,7 +4618,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "flushSortGroup",
         lua.create_function(move |_, id: u64| {
-            s.borrow_mut().render_commands.push(RenderCommand::FlushSortGroup { group_id: id });
+            s.borrow_mut()
+                .render_commands
+                .push(RenderCommand::FlushSortGroup { group_id: id });
             Ok(())
         })?,
     )?;
@@ -4453,7 +4641,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "drawBevelRect",
         lua.create_function(
-            move |_, (x, y, w, h, bevel_w, style, opts): (f32, f32, f32, f32, Option<f32>, Option<String>, Option<LuaTable>)| {
+            move |_,
+                  (x, y, w, h, bevel_w, style, opts): (
+                f32,
+                f32,
+                f32,
+                f32,
+                Option<f32>,
+                Option<String>,
+                Option<LuaTable>,
+            )| {
                 if w <= 0.0 || h <= 0.0 {
                     return Err(LuaError::RuntimeError(
                         "drawBevelRect: w and h must be positive".into(),
@@ -4461,34 +4658,46 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 }
                 let bevel_w = bevel_w.unwrap_or(2.0).max(0.0);
                 let bevel_style = match style.as_deref().unwrap_or("raised") {
-                    "raised"  => BevelStyle::Raised,
-                    "sunken"  => BevelStyle::Sunken,
-                    "ridge"   => BevelStyle::Ridge,
-                    "groove"  => BevelStyle::Groove,
-                    "flat"    => BevelStyle::Flat,
-                    other => return Err(LuaError::RuntimeError(format!(
-                        "drawBevelRect: unknown style '{other}'"
-                    ))),
+                    "raised" => BevelStyle::Raised,
+                    "sunken" => BevelStyle::Sunken,
+                    "ridge" => BevelStyle::Ridge,
+                    "groove" => BevelStyle::Groove,
+                    "flat" => BevelStyle::Flat,
+                    other => {
+                        return Err(LuaError::RuntimeError(format!(
+                            "drawBevelRect: unknown style '{other}'"
+                        )))
+                    }
                 };
                 let parse_color_tbl = |key: &str, def: [f32; 4]| -> [f32; 4] {
                     opts.as_ref()
                         .and_then(|t| t.get::<_, LuaTable>(key).ok())
-                        .map(|c| [
-                            c.get::<_, f32>(1).unwrap_or(def[0]),
-                            c.get::<_, f32>(2).unwrap_or(def[1]),
-                            c.get::<_, f32>(3).unwrap_or(def[2]),
-                            c.get::<_, f32>(4).unwrap_or(def[3]),
-                        ])
+                        .map(|c| {
+                            [
+                                c.get::<_, f32>(1).unwrap_or(def[0]),
+                                c.get::<_, f32>(2).unwrap_or(def[1]),
+                                c.get::<_, f32>(3).unwrap_or(def[2]),
+                                c.get::<_, f32>(4).unwrap_or(def[3]),
+                            ]
+                        })
                         .unwrap_or(def)
                 };
-                let highlight  = parse_color_tbl("highlight",  [1.0, 1.0, 1.0, 1.0]);
-                let shadow     = parse_color_tbl("shadow",     [0.2, 0.2, 0.2, 1.0]);
-                let fill_color = parse_color_tbl("fillColor",  [0.5, 0.5, 0.5, 1.0]);
-                s.borrow_mut().render_commands.push(RenderCommand::DrawBevelRect {
-                    x, y, w, h, bevel_w,
-                    style: bevel_style,
-                    highlight, shadow, fill_color,
-                });
+                let highlight = parse_color_tbl("highlight", [1.0, 1.0, 1.0, 1.0]);
+                let shadow = parse_color_tbl("shadow", [0.2, 0.2, 0.2, 1.0]);
+                let fill_color = parse_color_tbl("fillColor", [0.5, 0.5, 0.5, 1.0]);
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawBevelRect {
+                        x,
+                        y,
+                        w,
+                        h,
+                        bevel_w,
+                        style: bevel_style,
+                        highlight,
+                        shadow,
+                        fill_color,
+                    });
                 Ok(())
             },
         )?,
@@ -4512,7 +4721,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     .map(parse_blend_mode)
                     .transpose()?
                     .unwrap_or(BlendMode::Alpha);
-                s.borrow_mut().render_commands.push(RenderCommand::PushLayer { id, alpha, blend });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::PushLayer { id, alpha, blend });
                 Ok(())
             },
         )?,
@@ -4525,7 +4736,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "popLayer",
         lua.create_function(move |_, id: u64| {
-            s.borrow_mut().render_commands.push(RenderCommand::PopLayer { id });
+            s.borrow_mut()
+                .render_commands
+                .push(RenderCommand::PopLayer { id });
             Ok(())
         })?,
     )?;
@@ -4538,8 +4751,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         Rc::new(RefCell::new(std::collections::HashMap::new()));
     let layer_visible: Rc<RefCell<std::collections::HashMap<String, bool>>> =
         Rc::new(RefCell::new(std::collections::HashMap::new()));
-    let current_layer: Rc<RefCell<String>> =
-        Rc::new(RefCell::new("default".to_string()));
+    let current_layer: Rc<RefCell<String>> = Rc::new(RefCell::new("default".to_string()));
 
     // -- newLayer --
     /// Registers a named render layer with an optional z-order (default 0).
@@ -4609,9 +4821,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let lv4 = layer_visible.clone();
     graphics.set(
         "isLayerVisible",
-        lua.create_function(move |_, name: String| {
-            Ok(*lv4.borrow().get(&name).unwrap_or(&true))
-        })?,
+        lua.create_function(move |_, name: String| Ok(*lv4.borrow().get(&name).unwrap_or(&true)))?,
     )?;
 
     // -- getLayerZOrder --
@@ -4621,9 +4831,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let lz3 = layer_zorders.clone();
     graphics.set(
         "getLayerZOrder",
-        lua.create_function(move |_, name: String| {
-            Ok(*lz3.borrow().get(&name).unwrap_or(&0))
-        })?,
+        lua.create_function(move |_, name: String| Ok(*lz3.borrow().get(&name).unwrap_or(&0)))?,
     )?;
 
     // -- setLayerZOrder --

@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- BAD: per-frame table allocation
 function lurek.process(dt)
     local pos = vector(player.x, player.y)   -- new table every frame

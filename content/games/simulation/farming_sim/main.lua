@@ -162,6 +162,53 @@ end
 -- Input Setup
 -- ---------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Farming Sim — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.15, 0.05)
@@ -431,19 +478,19 @@ end
 function lurek.draw()
     -- Title screen
     if current_state == STATE.TITLE then
-        lurek.render.print("FARMING SIM", 200, 180, { size = 48, color = { 0.9, 0.80, 0.20, 1 } })
-        lurek.render.print("GROW YOUR FORTUNE", 240, 250, { size = 22, color = { 0.6, 0.75, 0.35, 1 } })
-        lurek.render.print("Press SPACE to start", 280, 350, { size = 16, color = { 0.6, 0.6, 0.6, 1 } })
-        lurek.render.print("WASD move  |  1-4 tools  |  SPACE interact  |  M market", 120, 420, { size = 12, color = { 0.45, 0.45, 0.45, 1 } })
+        text_("FARMING SIM", 200, 180, { size = 48, color = { 0.9, 0.80, 0.20, 1 } })
+        text_("GROW YOUR FORTUNE", 240, 250, { size = 22, color = { 0.6, 0.75, 0.35, 1 } })
+        text_("Press SPACE to start", 280, 350, { size = 16, color = { 0.6, 0.6, 0.6, 1 } })
+        text_("WASD move  |  1-4 tools  |  SPACE interact  |  M market", 120, 420, { size = 12, color = { 0.45, 0.45, 0.45, 1 } })
         return
     end
 
     -- Victory screen
     if current_state == STATE.VICTORY then
-        lurek.render.print("VICTORY!", 260, 180, { size = 48, color = { 1, 0.85, 0.15, 1 } })
+        text_("VICTORY!", 260, 180, { size = 48, color = { 1, 0.85, 0.15, 1 } })
         local msg = string.format("You earned %d gold in %d days!", gold, day_count)
-        lurek.render.print(msg, 210, 260, { size = 20, color = { 0.85, 0.85, 0.85, 1 } })
-        lurek.render.print("Press SPACE to play again", 260, 350, { size = 16, color = { 0.6, 0.6, 0.6, 1 } })
+        text_(msg, 210, 260, { size = 20, color = { 0.85, 0.85, 0.85, 1 } })
+        text_("Press SPACE to play again", 260, 350, { size = 16, color = { 0.6, 0.6, 0.6, 1 } })
         return
     end
 
@@ -462,7 +509,7 @@ function lurek.draw()
             -- Plot background
             local bg = COL_EMPTY
             if plot.state == PLOT_TILLED then bg = COL_TILLED end
-            lurek.render.rectangle(px, py, PLOT_SIZE, PLOT_SIZE, { color = { bg[1], bg[2], bg[3], 1 } })
+            rect(px, py, PLOT_SIZE, PLOT_SIZE, { color = { bg[1], bg[2], bg[3], 1 } })
 
             -- Crop
             if plot.state >= PLOT_PLANTED then
@@ -470,25 +517,25 @@ function lurek.draw()
                 local crop_size = 12 + 14 * math.min(1, plot.growth / (plot.grow_time + 0.01))
                 local cx = px + PLOT_SIZE * 0.5
                 local cy = py + PLOT_SIZE * 0.5
-                lurek.render.circle(cx, cy, crop_size * 0.5, { color = { crop_col[1], crop_col[2], crop_col[3], 1 } })
+                circ(cx, cy, crop_size * 0.5, { color = { crop_col[1], crop_col[2], crop_col[3], 1 } })
 
                 -- Watered indicator
                 if plot.watered then
-                    lurek.render.circle(cx, cy, crop_size * 0.5 + 3, { color = { COL_WATER[1], COL_WATER[2], COL_WATER[3], 0.3 }, mode = "line" })
+                    circ(cx, cy, crop_size * 0.5 + 3, { color = { COL_WATER[1], COL_WATER[2], COL_WATER[3], 0.3 }, mode = "line" })
                 end
             end
 
             -- Grid line
-            lurek.render.rectangle(px, py, PLOT_SIZE, PLOT_SIZE, { color = { COL_GRID[1], COL_GRID[2], COL_GRID[3], 0.4 }, mode = "line" })
+            rect(px, py, PLOT_SIZE, PLOT_SIZE, { color = { COL_GRID[1], COL_GRID[2], COL_GRID[3], 0.4 }, mode = "line" })
         end
     end
 
     -- Player
     local player_px, player_py = plot_screen_pos(player.col, player.row)
     local pad = 6
-    lurek.render.rectangle(player_px + pad, player_py + pad, PLOT_SIZE - pad * 2, PLOT_SIZE - pad * 2,
+    rect(player_px + pad, player_py + pad, PLOT_SIZE - pad * 2, PLOT_SIZE - pad * 2,
         { color = { COL_PLAYER[1], COL_PLAYER[2], COL_PLAYER[3], 0.7 }, mode = "line" })
-    lurek.render.rectangle(player_px + pad + 2, player_py + pad + 2, PLOT_SIZE - pad * 2 - 4, PLOT_SIZE - pad * 2 - 4,
+    rect(player_px + pad + 2, player_py + pad + 2, PLOT_SIZE - pad * 2 - 4, PLOT_SIZE - pad * 2 - 4,
         { color = { COL_PLAYER[1], COL_PLAYER[2], COL_PLAYER[3], 0.35 } })
 
     -- Particles (world-space)
@@ -499,12 +546,12 @@ function lurek.draw()
 
     -- Night overlay
     if night_alpha > 0 then
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, { color = { 0.02, 0.02, 0.12, night_alpha } })
+        rect(0, 0, SCREEN_W, SCREEN_H, { color = { 0.02, 0.02, 0.12, night_alpha } })
     end
 
     -- Rain overlay
     if is_raining then
-        lurek.render.rectangle(0, 0, SCREEN_W, SCREEN_H, { color = { 0.15, 0.20, 0.35, 0.12 } })
+        rect(0, 0, SCREEN_W, SCREEN_H, { color = { 0.15, 0.20, 0.35, 0.12 } })
     end
 end
 
@@ -519,10 +566,10 @@ function lurek.draw_ui()
     -- ─── Market overlay ───
     if current_state == STATE.MARKET then
         -- Dim background
-        lurek.render.rectangle(0, 0, W, SCREEN_H, { color = { 0, 0, 0, 0.6 } })
+        rect(0, 0, W, SCREEN_H, { color = { 0, 0, 0, 0.6 } })
 
-        lurek.render.print("MARKET", 330, 60, { size = 36, color = { 0.95, 0.85, 0.2, 1 } })
-        lurek.render.print(string.format("Gold: %d", gold), 340, 110, { size = 18, color = { 1, 0.9, 0.3, 1 } })
+        text_("MARKET", 330, 60, { size = 36, color = { 0.95, 0.85, 0.2, 1 } })
+        text_(string.format("Gold: %d", gold), 340, 110, { size = 18, color = { 1, 0.9, 0.3, 1 } })
 
         local items = {
             { label = string.format("Sell Wheat   (%d) → +%dg", inventory.crops[CROP_WHEAT], CROP_SELL[CROP_WHEAT]),   ok = inventory.crops[CROP_WHEAT] > 0 },
@@ -539,56 +586,56 @@ function lurek.draw_ui()
             local col = item.ok and { 0.85, 0.85, 0.85, 1 } or { 0.4, 0.4, 0.4, 1 }
             if is_sel then col = { 1, 1, 0.6, 1 } end
             local prefix = is_sel and "> " or "  "
-            lurek.render.print(prefix .. item.label, 220, y, { size = 16, color = col })
+            text_(prefix .. item.label, 220, y, { size = 16, color = col })
         end
 
-        lurek.render.print("W/S navigate  |  SPACE select  |  ESC close", 210, 420, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
+        text_("W/S navigate  |  SPACE select  |  ESC close", 210, 420, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
         return
     end
 
     -- ─── Playing HUD ───
     local hud_h = 28
-    lurek.render.rectangle(0, 0, W, hud_h, { color = { 0, 0, 0, 0.7 } })
+    rect(0, 0, W, hud_h, { color = { 0, 0, 0, 0.7 } })
 
     -- Gold
     local gold_str = string.format("Gold: %d/%d", math.floor(gold_display), GOLD_GOAL)
-    lurek.render.print(gold_str, 10, 6, { size = 13, color = { 1, 0.9, 0.3, 1 } })
+    text_(gold_str, 10, 6, { size = 13, color = { 1, 0.9, 0.3, 1 } })
 
     -- Day/Time
     local time_frac = day_timer / DAY_LENGTH
     local time_str = string.format("Day %d  %s", day_count, is_daytime and "DAY" or "NIGHT")
-    lurek.render.print(time_str, 170, 6, { size = 13, color = is_daytime and { 1, 0.95, 0.6, 1 } or { 0.5, 0.5, 0.8, 1 } })
+    text_(time_str, 170, 6, { size = 13, color = is_daytime and { 1, 0.95, 0.6, 1 } or { 0.5, 0.5, 0.8, 1 } })
 
     -- Weather
     if is_raining then
-        lurek.render.print("RAIN", 310, 6, { size = 13, color = { 0.4, 0.65, 1, 1 } })
+        text_("RAIN", 310, 6, { size = 13, color = { 0.4, 0.65, 1, 1 } })
     end
 
     -- Tool
     local tool_str = string.format("Tool: %s [%d]", TOOL_NAMES[player.tool], player.tool)
-    lurek.render.print(tool_str, 380, 6, { size = 13, color = { 0.8, 0.8, 0.8, 1 } })
+    text_(tool_str, 380, 6, { size = 13, color = { 0.8, 0.8, 0.8, 1 } })
 
     -- Seed type (when seed tool active)
     if player.tool == TOOL_SEEDS then
         local seed_str = string.format("Seed: %s (%d)", CROP_NAMES[player.seed_type], inventory.seeds[player.seed_type])
-        lurek.render.print(seed_str, 540, 6, { size = 13, color = { 0.7, 0.9, 0.5, 1 } })
+        text_(seed_str, 540, 6, { size = 13, color = { 0.7, 0.9, 0.5, 1 } })
     end
 
     -- FPS
     local fps = lurek.timer.getFPS()
-    lurek.render.print(string.format("FPS: %d", fps), W - 75, 6, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
+    text_(string.format("FPS: %d", fps), W - 75, 6, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
 
     -- Bottom bar — inventory
     local bot_y = SCREEN_H - 26
-    lurek.render.rectangle(0, bot_y, W, 26, { color = { 0, 0, 0, 0.7 } })
+    rect(0, bot_y, W, 26, { color = { 0, 0, 0, 0.7 } })
 
     local inv_str = string.format(
         "Seeds: W%d C%d T%d  |  Crops: W%d C%d T%d  |  M=Market",
         inventory.seeds[CROP_WHEAT], inventory.seeds[CROP_CARROT], inventory.seeds[CROP_TOMATO],
         inventory.crops[CROP_WHEAT], inventory.crops[CROP_CARROT], inventory.crops[CROP_TOMATO]
     )
-    lurek.render.print(inv_str, 10, bot_y + 5, { size = 12, color = { 0.75, 0.75, 0.75, 1 } })
+    text_(inv_str, 10, bot_y + 5, { size = 12, color = { 0.75, 0.75, 0.75, 1 } })
 
     -- Controls hint
-    lurek.render.print("Q=Wheat E=Carrot R=Tomato", W - 210, bot_y + 5, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
+    text_("Q=Wheat E=Carrot R=Tomato", W - 210, bot_y + 5, { size = 12, color = { 0.5, 0.5, 0.5, 1 } })
 end

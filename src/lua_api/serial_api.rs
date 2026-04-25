@@ -24,16 +24,16 @@ fn parse_delimiter(delim: Option<String>) -> u8 {
 
 /// Registers the `lurek.serial` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- fromJson --
     /// Parses a JSON string and returns a Lua table.
-    /// @param s : string
+    /// @param s string
     /// @return table
     tbl.set(
         "fromJson",
@@ -45,8 +45,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- toJson --
     /// Serializes a Lua value to a JSON string.
-    /// @param value : table
-    /// @param pretty : boolean?
+    /// @param value table
+    /// @param pretty boolean?
     /// @return string
     tbl.set(
         "toJson",
@@ -58,7 +58,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- fromToml --
     /// Parses a TOML string and returns a Lua table.
-    /// @param s : string
+    /// @param s string
     /// @return table
     tbl.set(
         "fromToml",
@@ -70,7 +70,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- toToml --
     /// Serializes a Lua table to a TOML string.
-    /// @param value : table
+    /// @param value table
     /// @return string
     tbl.set(
         "toToml",
@@ -82,9 +82,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- fromCsv --
     /// Parses a CSV string and returns a sequence of row tables.
-    /// @param s : string
-    /// @param delimiter : string?
-    /// @param has_headers : boolean?
+    /// @param s string
+    /// @param delimiter string?
+    /// @param has_headers boolean?
     /// @return table
     tbl.set(
         "fromCsv",
@@ -102,9 +102,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- toCsv --
     /// Serializes a sequence of row tables to a CSV string.
-    /// @param value : table
-    /// @param delimiter : string?
-    /// @param has_headers : boolean?
+    /// @param value table
+    /// @param delimiter string?
+    /// @param has_headers boolean?
     /// @return string
     tbl.set(
         "toCsv",
@@ -122,7 +122,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- encodeMsgPack --
     /// Encodes a Lua table to a binary MessagePack string.
-    /// @param value : table
+    /// @param value table
     /// @return string
     tbl.set(
         "encodeMsgPack",
@@ -140,7 +140,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- decodeMsgPack --
     /// Decodes a binary MessagePack string into a Lua table.
-    /// @param bytes : string
+    /// @param bytes string
     /// @return table
     tbl.set(
         "decodeMsgPack",
@@ -156,7 +156,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     ///
     /// Each element becomes a table with keys: `tag` (string), `attrs` (table, optional),
     /// `text` (string, optional), `children` (sequence, optional).
-    /// @param s : string
+    /// @param s string
     /// @return table
     tbl.set(
         "decodeXml",
@@ -170,8 +170,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Validates a Lua table against a schema table.
     ///
     /// Returns `true` on success, or `false` plus an error message string on failure.
-    /// @param value  : table
-    /// @param schema : table
+    /// @param value table
+    /// @param schema table
     /// boolean, string?
     tbl.set(
         "validate",

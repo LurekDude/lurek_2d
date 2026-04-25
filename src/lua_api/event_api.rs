@@ -35,8 +35,8 @@ impl LuaUserData for LuaSignal {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- register --
         /// Registers a callback for the named event and returns its handle ID.
-        /// @param name : string
-        /// @param callback : function
+        /// @param name string
+        /// @param callback function
         /// @return integer
         methods.add_method(
             "register",
@@ -52,7 +52,7 @@ impl LuaUserData for LuaSignal {
         /// Emits the named event, calling all registered callbacks with extra arguments.
         /// Filter predicates (from `registerWithFilter`) are evaluated first; callbacks
         /// registered with `once` are automatically removed after firing.
-        /// @param name : string
+        /// @param name string
         /// @return nil
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut iter = args.into_iter();
@@ -122,7 +122,7 @@ impl LuaUserData for LuaSignal {
 
         // -- remove --
         /// Removes a subscription by handle ID.
-        /// @param handle : integer
+        /// @param handle integer
         /// @return boolean
         methods.add_method("remove", |lua, this, handle: u64| {
             let removed = this.inner.borrow_mut().remove(handle);
@@ -136,7 +136,7 @@ impl LuaUserData for LuaSignal {
 
         // -- clear --
         /// Removes all callbacks for the named event.
-        /// @param name : string
+        /// @param name string
         /// @return integer
         methods.add_method("clear", |lua, this, name: String| {
             let handles = this.inner.borrow().get_handles(&name);
@@ -164,7 +164,7 @@ impl LuaUserData for LuaSignal {
 
         // -- getCount --
         /// Returns the callback count for the named event.
-        /// @param name : string
+        /// @param name string
         /// @return integer
         methods.add_method("getCount", |_, this, name: String| {
             Ok(this.inner.borrow().get_count(&name))
@@ -179,8 +179,8 @@ impl LuaUserData for LuaSignal {
 
         // -- once --
         /// Registers a one-shot callback that fires at most once then auto-removes itself.
-        /// @param name : string
-        /// @param callback : function
+        /// @param name string
+        /// @param callback function
         /// @return integer
         methods.add_method(
             "once",
@@ -196,9 +196,9 @@ impl LuaUserData for LuaSignal {
         // -- registerWithFilter --
         /// Registers a callback with a filter predicate. The callback only fires if the
         /// filter function returns true when called with the same arguments as emit.
-        /// @param name : string
-        /// @param callback : function
-        /// @param filter : function
+        /// @param name string
+        /// @param callback function
+        /// @param filter function
         /// @return integer
         methods.add_method(
             "registerWithFilter",
@@ -217,8 +217,8 @@ impl LuaUserData for LuaSignal {
         /// `*` or `?`, uses glob matching against all emitted event names. Otherwise
         /// behaves identically to `register`. Returns a numeric handle for later removal.
         ///
-        /// @param name : string   event name or glob pattern (e.g. "damage.*")
-        /// @param func : function callback invoked with (...) args from emit
+        /// @param name string   event name or glob pattern (e.g. "damage.*")
+        /// @param func function callback invoked with (...) args from emit
         /// @return nil
         /// integer        handle for later `remove`
         methods.add_method(
@@ -242,7 +242,7 @@ impl LuaUserData for LuaSignal {
 
         // -- typeOf --
         /// Returns true if the given type name matches this object's type or any parent type.
-        /// @param name : string  type name to test
+        /// @param name string  type name to test
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "Signal" || name == "Object")
@@ -256,16 +256,16 @@ impl LuaUserData for LuaSignal {
 
 /// Registers the `lurek.signal` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- exit --
     /// Pushes an exit event, requesting the engine to stop.
-    /// @param code : integer?
+    /// @param code integer?
     /// @return nil
     let s = state.clone();
     tbl.set(
@@ -334,7 +334,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- wait --
     /// Blocks until the next event arrives or the optional timeout elapses.
-    /// @param timeout : number?
+    /// @param timeout number?
     /// @return string?
     let s = state.clone();
     tbl.set(
@@ -382,7 +382,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- pushDeferred --
     /// Pushes a named event to the deferred buffer; it will not reach the main queue
     /// until `flushDeferred()` is called.
-    /// @param name : string
+    /// @param name string
     /// @return nil
     let deferred = deferred_queue.clone();
     tbl.set(
@@ -436,7 +436,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- enableHistory --
     /// Enables event history recording, keeping the last `capacity` pushed events.
     /// Pass 0 to disable.
-    /// @param capacity : integer
+    /// @param capacity integer
     /// @return nil
     let cap = history_cap.clone();
     let hist = history_buf.clone();
@@ -496,14 +496,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- push --
     /// Pushes a custom event onto the event queue. When history is enabled via
     /// `enableHistory`, the event is also appended to the history ring.
-    /// @param name : string
+    /// @param name string
     /// @return nil
     let s = state.clone();
     let hist_p = history_buf;
     let cap_p = history_cap;
     /// Adds an event item to the end of the event queue for processing.
     ///
-    /// @param args : MultiValue
+    /// @param args MultiValue
     tbl.set(
         "push",
         lua.create_function(move |_, args: LuaMultiValue| {

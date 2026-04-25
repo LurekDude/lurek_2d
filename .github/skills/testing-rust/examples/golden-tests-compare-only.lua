@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- CORRECT: golden test re-runs algorithm and compares against baseline
 it("perlin noise value is stable across engine versions", function()
     local v = lurek.procgen.perlinNoise(0.5, 0.5, 8.0, 8.0)

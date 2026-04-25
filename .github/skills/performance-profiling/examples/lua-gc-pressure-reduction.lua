@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 local before = collectgarbage("count")
 doFrame()
 local after = collectgarbage("count")

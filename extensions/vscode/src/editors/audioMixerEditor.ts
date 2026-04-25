@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { WebviewEditor, getNonce, wrapHtml } from "./shared.js";
+import { WebviewEditor, getNonce, wrapHtml, ICONS, iconButton, panelSection, fieldInline, toolbarSep, toolbarSpacer } from "./shared.js";
 
 export class AudioMixerEditor extends WebviewEditor {
   static open(context: vscode.ExtensionContext): AudioMixerEditor {
@@ -22,70 +22,84 @@ export class AudioMixerEditor extends WebviewEditor {
     const nonce = getNonce();
     return wrapHtml(nonce, "Audio Mixer", `
       .editor-layout {
-        display: grid; grid-template-columns: 1fr 220px;
+        display: grid; grid-template-columns: 1fr 210px;
         grid-template-rows: auto 1fr auto;
         height: 100vh;
       }
       .toolbar { grid-column: 1 / -1; }
-      .mixer-area { grid-row: 2; display: flex; gap: 2px; padding: 10px; overflow-x: auto; align-items: stretch; }
-      .effects-panel { grid-row: 2; }
       .status-bar { grid-column: 1 / -1; }
-      .channel-strip {
-        display: flex; flex-direction: column; align-items: center; gap: 4px;
-        background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-        padding: 8px; min-width: 80px; flex-shrink: 0;
+      .mixer-area {
+        grid-row: 2; display: flex; gap: 2px; padding: 8px; overflow-x: auto;
+        align-items: stretch; background: var(--bg);
       }
-      .channel-strip.master { border-color: var(--accent); min-width: 100px; }
-      .channel-label { font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-dim); }
-      .fader-container { display: flex; flex-direction: column; align-items: center; flex: 1; min-height: 150px; justify-content: center; }
+      .fx-panel {
+        grid-row: 2; overflow-y: auto; border-left: 1px solid var(--border);
+        background: var(--surface); padding: 6px;
+      }
+      .ch-strip {
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 6px; min-width: 72px; flex-shrink: 0; cursor: pointer; transition: border-color 0.12s;
+      }
+      .ch-strip:hover { border-color: var(--hover); }
+      .ch-strip.sel { border-color: var(--accent); }
+      .ch-strip.master { min-width: 88px; }
+      .ch-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.3px; }
+      .fader-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; min-height: 140px; justify-content: center; }
       .fader {
-        -webkit-appearance: none; appearance: none; width: 6px; height: 140px;
+        -webkit-appearance: none; appearance: none; width: 5px; height: 130px;
         background: var(--surface-2); border-radius: 3px; outline: none;
         writing-mode: vertical-lr; direction: rtl;
       }
       .fader::-webkit-slider-thumb {
-        -webkit-appearance: none; width: 20px; height: 10px;
+        -webkit-appearance: none; width: 18px; height: 8px;
         background: var(--text); border-radius: 2px; cursor: pointer;
       }
-      .fader-value { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
-      .vu-meter { width: 12px; height: 100px; background: var(--bg); border: 1px solid var(--border); border-radius: 2px; position: relative; overflow: hidden; }
-      .vu-fill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, var(--success), var(--warning), var(--danger)); transition: height 0.1s; }
+      .fader-val { font-size: 9px; color: var(--text-dim); margin-top: 3px; font-family: var(--font-mono, monospace); }
+      .vu { width: 10px; height: 90px; background: var(--bg); border: 1px solid var(--border); border-radius: 2px; position: relative; overflow: hidden; }
+      .vu-bar { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, var(--success), var(--warning), var(--error)); transition: height 0.08s; }
       .pan-knob {
-        width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2);
+        width: 28px; height: 28px; border-radius: 50%; background: var(--surface-2);
         border: 2px solid var(--border); position: relative; cursor: pointer;
       }
-      .pan-indicator {
-        position: absolute; width: 2px; height: 10px; background: var(--accent);
+      .pan-dot {
+        position: absolute; width: 2px; height: 8px; background: var(--accent);
         top: 3px; left: 50%; transform-origin: bottom center;
       }
-      .btn-row { display: flex; gap: 2px; }
-      .btn-mute, .btn-solo { width: 28px; height: 20px; font-size: 10px; font-weight: bold; padding: 0; }
-      .btn-mute.active { background: var(--danger); border-color: var(--danger); }
-      .btn-solo.active { background: var(--warning); border-color: var(--warning); color: #000; }
-      .effect-item {
+      .ch-btns { display: flex; gap: 2px; }
+      .btn-m, .btn-s { width: 24px; height: 18px; font-size: 9px; font-weight: 700; padding: 0; border-radius: 2px; }
+      .btn-m.active { background: var(--error); border-color: var(--error); color: #fff; }
+      .btn-s.active { background: var(--warning); border-color: var(--warning); color: #000; }
+      .fx-item {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 4px 8px; background: var(--surface-2); border-radius: 3px; margin-bottom: 4px; font-size: 12px;
+        padding: 3px 6px; background: var(--surface-2); border-radius: var(--radius); margin-bottom: 3px; font-size: 11px;
+        cursor: pointer; transition: background 0.1s;
       }
-      .bus-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; font-size: 11px; }
+      .fx-item:hover { background: var(--hover); }
+      .fx-item.sel { border-left: 2px solid var(--accent); }
+      .bus-row { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; font-size: 10px; }
     `, `
       <div class="editor-layout">
         <div class="toolbar">
-          <button id="btnAddChannel">+ Channel</button>
-          <button id="btnRemoveChannel">- Channel</button>
-          <div class="sep"></div>
-          <button id="btnResetAll">Reset All</button>
-          <div class="sep"></div>
-          <button id="btnExport">Export Lua</button>
+          <div class="group">
+            ${iconButton(ICONS.add, 'btnAddCh', 'Add Channel')}
+            ${iconButton(ICONS.delete, 'btnRemCh', 'Remove Channel')}
+          </div>
+          ${toolbarSep()}
+          <div class="group">
+            <button id="btnReset" title="Reset All" style="font-size:10px;padding:2px 8px">Reset</button>
+          </div>
+          ${toolbarSpacer()}
+          ${iconButton(ICONS.save, 'btnExport', 'Export Lua')}
         </div>
 
         <div class="mixer-area" id="mixerArea"></div>
 
-        <div class="panel effects-panel">
-          <div class="section">
-            <h3>Effects Chain</h3>
-            <div id="effectsList"></div>
-            <select id="addEffect" style="width:100%;margin-top:4px;">
-              <option value="">+ Add Effect...</option>
+        <div class="fx-panel">
+          ${panelSection('Effects Chain', `
+            <div id="fxList"></div>
+            <select id="addFx" style="width:100%;margin-top:4px;font-size:10px;">
+              <option value="">+ Add Effect…</option>
               <option value="reverb">Reverb</option>
               <option value="delay">Delay</option>
               <option value="lpf">Low-Pass Filter</option>
@@ -93,186 +107,137 @@ export class AudioMixerEditor extends WebviewEditor {
               <option value="compressor">Compressor</option>
               <option value="distortion">Distortion</option>
             </select>
-          </div>
-          <div class="section">
-            <h3>Bus Routing</h3>
-            <div id="busRouting"></div>
-          </div>
-          <div class="section">
-            <h3>Selected Effect</h3>
-            <div id="effectParams">
-              <p style="font-size:11px;color:var(--text-dim);">Select an effect to edit</p>
-            </div>
-          </div>
+          `)}
+          ${panelSection('Bus Routing', '<div id="busRouting"></div>')}
+          ${panelSection('Effect Params', `
+            <div id="fxParams"><p style="font-size:10px;color:var(--text-dim)">Select an effect</p></div>
+          `)}
         </div>
 
         <div class="status-bar">
-          <span id="statusChannels">Channels: 5</span>
-          <span id="statusSelected">Selected: Master</span>
-          <span id="statusEffects">Effects: 0</span>
+          <span id="stCh" class="badge">5 ch</span>
+          <div class="sep"></div>
+          <span id="stSel">Master</span>
+          <div class="sep"></div>
+          <span id="stFx">0 fx</span>
+          <div class="spacer"></div>
+          <span id="stDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
         </div>
       </div>
     `, `
-      const CHANNEL_NAMES = ['Master', 'Music', 'SFX', 'Voice', 'Ambient'];
-      let channels = CHANNEL_NAMES.map((name, i) => ({
-        name, volume: i === 0 ? 100 : 80, pan: 50, mute: false, solo: false, vu: 0, bus: 'master'
-      }));
+      const undo = new UndoStack();
+      const NAMES = ['Master','Music','SFX','Voice','Ambient'];
+      let channels = NAMES.map((name, i) => ({ name, vol: i===0?100:80, pan: 50, mute: false, solo: false, bus: 'master' }));
       let effects = [];
-      let selectedChannel = 0;
-      let selectedEffect = -1;
+      let selCh = 0, selFx = -1;
 
-      function buildMixer() {
-        const area = document.getElementById('mixerArea');
-        area.innerHTML = '';
+      function snap() { return JSON.parse(JSON.stringify({ channels, effects })); }
+      function load(s) { channels = s.channels; effects = s.effects; build(); buildFx(); buildBus(); }
+      function push() { undo.push(snap()); markDirty(); }
+
+      registerShortcut('ctrl+z', () => { const s = undo.undo(); if (s) load(s); });
+      registerShortcut('ctrl+shift+z', () => { const s = undo.redo(); if (s) load(s); });
+      registerShortcut('ctrl+s', () => document.getElementById('btnExport').click());
+
+      function build() {
+        const area = document.getElementById('mixerArea'); area.innerHTML = '';
         channels.forEach((ch, i) => {
-          const strip = document.createElement('div');
-          strip.className = 'channel-strip' + (i === 0 ? ' master' : '');
-          const vuLevel = 30 + Math.random() * 50;
-          strip.innerHTML =
-            '<span class="channel-label">' + ch.name + '</span>' +
-            '<div class="vu-meter"><div class="vu-fill" style="height:' + vuLevel + '%"></div></div>' +
-            '<div class="fader-container">' +
-              '<input type="range" class="fader" min="0" max="100" value="' + ch.volume + '" data-ch="' + i + '">' +
-              '<span class="fader-value">' + ch.volume + '%</span>' +
-            '</div>' +
-            '<div class="pan-knob" title="Pan: ' + (ch.pan - 50) + '">' +
-              '<div class="pan-indicator" style="transform:rotate(' + ((ch.pan - 50) * 1.35) + 'deg)"></div>' +
-            '</div>' +
-            '<div class="btn-row">' +
-              '<button class="btn-mute' + (ch.mute ? ' active' : '') + '" data-ch="' + i + '">M</button>' +
-              '<button class="btn-solo' + (ch.solo ? ' active' : '') + '" data-ch="' + i + '">S</button>' +
-            '</div>';
-          strip.addEventListener('click', () => {
-            selectedChannel = i;
-            document.getElementById('statusSelected').textContent = 'Selected: ' + ch.name;
-            buildBusRouting();
-          });
-          area.appendChild(strip);
+          const s = document.createElement('div');
+          s.className = 'ch-strip' + (i===0?' master':'') + (i===selCh?' sel':'');
+          const vu = 30 + Math.random()*50;
+          s.innerHTML =
+            '<span class="ch-label">'+ch.name+'</span>'+
+            '<div class="vu"><div class="vu-bar" style="height:'+vu+'%"></div></div>'+
+            '<div class="fader-wrap"><input type="range" class="fader" min="0" max="100" value="'+ch.vol+'" data-i="'+i+'"><span class="fader-val">'+ch.vol+'</span></div>'+
+            '<div class="pan-knob" title="Pan: '+(ch.pan-50)+'"><div class="pan-dot" style="transform:rotate('+((ch.pan-50)*1.35)+'deg)"></div></div>'+
+            '<div class="ch-btns"><button class="btn-m'+(ch.mute?' active':'')+'" data-i="'+i+'">M</button><button class="btn-s'+(ch.solo?' active':'')+'" data-i="'+i+'">S</button></div>';
+          s.addEventListener('click', () => { selCh = i; document.getElementById('stSel').textContent = ch.name; build(); buildBus(); });
+          area.appendChild(s);
         });
-
-        // Attach fader events
-        area.querySelectorAll('.fader').forEach(f => {
-          f.addEventListener('input', (e) => {
-            const idx = parseInt(e.target.dataset.ch);
-            channels[idx].volume = parseInt(e.target.value);
-            e.target.parentElement.querySelector('.fader-value').textContent = e.target.value + '%';
-          });
-        });
-        area.querySelectorAll('.btn-mute').forEach(b => {
-          b.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const idx = parseInt(b.dataset.ch);
-            channels[idx].mute = !channels[idx].mute;
-            b.classList.toggle('active', channels[idx].mute);
-          });
-        });
-        area.querySelectorAll('.btn-solo').forEach(b => {
-          b.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const idx = parseInt(b.dataset.ch);
-            channels[idx].solo = !channels[idx].solo;
-            b.classList.toggle('active', channels[idx].solo);
-          });
-        });
-        document.getElementById('statusChannels').textContent = 'Channels: ' + channels.length;
+        area.querySelectorAll('.fader').forEach(f => f.addEventListener('input', e => {
+          const idx = +e.target.dataset.i; channels[idx].vol = +e.target.value;
+          e.target.parentElement.querySelector('.fader-val').textContent = e.target.value;
+          push();
+        }));
+        area.querySelectorAll('.btn-m').forEach(b => b.addEventListener('click', e => {
+          e.stopPropagation(); const idx = +b.dataset.i; push(); channels[idx].mute = !channels[idx].mute; b.classList.toggle('active', channels[idx].mute);
+        }));
+        area.querySelectorAll('.btn-s').forEach(b => b.addEventListener('click', e => {
+          e.stopPropagation(); const idx = +b.dataset.i; push(); channels[idx].solo = !channels[idx].solo; b.classList.toggle('active', channels[idx].solo);
+        }));
+        document.getElementById('stCh').textContent = channels.length + ' ch';
       }
 
-      function buildEffects() {
-        const list = document.getElementById('effectsList');
-        list.innerHTML = '';
+      function buildFx() {
+        const list = document.getElementById('fxList'); list.innerHTML = '';
         effects.forEach((fx, i) => {
           const el = document.createElement('div');
-          el.className = 'effect-item';
-          el.innerHTML = '<span>' + fx.type + '</span><button class="danger" data-fx="' + i + '" style="padding:1px 6px;">x</button>';
-          el.addEventListener('click', () => { selectedEffect = i; showEffectParams(fx); });
-          el.querySelector('button').addEventListener('click', (e) => {
-            e.stopPropagation();
-            effects.splice(i, 1);
-            buildEffects();
-          });
+          el.className = 'fx-item' + (i===selFx?' sel':'');
+          el.innerHTML = '<span>'+fx.type+'</span><button style="padding:0 4px;font-size:9px" data-i="'+i+'">×</button>';
+          el.addEventListener('click', () => { selFx = i; showFxParams(fx); buildFx(); });
+          el.querySelector('button').addEventListener('click', e => { e.stopPropagation(); push(); effects.splice(i,1); buildFx(); });
           list.appendChild(el);
         });
-        document.getElementById('statusEffects').textContent = 'Effects: ' + effects.length;
+        document.getElementById('stFx').textContent = effects.length + ' fx';
       }
 
-      function showEffectParams(fx) {
-        const container = document.getElementById('effectParams');
-        const params = { reverb: ['mix','decay','damping'], delay: ['time','feedback','mix'], lpf: ['cutoff','resonance'], hpf: ['cutoff','resonance'], compressor: ['threshold','ratio','attack','release'], distortion: ['drive','tone'] };
-        const p = params[fx.type] || [];
-        container.innerHTML = '<h3 style="font-size:11px;margin-bottom:6px;">' + fx.type + '</h3>';
-        p.forEach(param => {
-          const val = fx.params[param] || 50;
-          container.innerHTML += '<div class="field"><label>' + param + '</label><input type="range" min="0" max="100" value="' + val + '"><span style="font-size:10px;">' + val + '</span></div>';
+      function showFxParams(fx) {
+        const c = document.getElementById('fxParams');
+        const map = { reverb:['mix','decay','damping'], delay:['time','feedback','mix'], lpf:['cutoff','resonance'], hpf:['cutoff','resonance'], compressor:['threshold','ratio','attack','release'], distortion:['drive','tone'] };
+        const ps = map[fx.type] || [];
+        c.innerHTML = '<div style="font-size:10px;font-weight:600;margin-bottom:4px;text-transform:uppercase;color:var(--text-dim)">'+fx.type+'</div>';
+        ps.forEach(p => {
+          const v = fx.params[p] || 50;
+          c.innerHTML += '<div class="field-inline"><label style="font-size:10px">'+p+'</label><input type="range" min="0" max="100" value="'+v+'" style="flex:1"><span style="font-size:9px;min-width:20px">'+v+'</span></div>';
         });
       }
 
-      function buildBusRouting() {
-        const container = document.getElementById('busRouting');
-        container.innerHTML = '';
+      function buildBus() {
+        const c = document.getElementById('busRouting'); c.innerHTML = '';
         channels.forEach((ch, i) => {
-          if (i === 0) return;
-          const row = document.createElement('div');
-          row.className = 'bus-row';
-          row.innerHTML = '<span style="width:60px;">' + ch.name + '</span><select data-ch="' + i + '"><option value="master">Master</option><option value="bus1">Bus 1</option><option value="bus2">Bus 2</option></select>';
-          row.querySelector('select').value = ch.bus;
-          row.querySelector('select').addEventListener('change', (e) => { channels[i].bus = e.target.value; });
-          container.appendChild(row);
+          if (i===0) return;
+          const r = document.createElement('div'); r.className = 'bus-row';
+          r.innerHTML = '<span style="min-width:48px">'+ch.name+'</span><select data-i="'+i+'"><option value="master">Master</option><option value="bus1">Bus 1</option><option value="bus2">Bus 2</option></select>';
+          r.querySelector('select').value = ch.bus;
+          r.querySelector('select').addEventListener('change', e => { push(); channels[i].bus = e.target.value; });
+          c.appendChild(r);
         });
       }
 
-      document.getElementById('addEffect').addEventListener('change', (e) => {
-        if (e.target.value) {
-          effects.push({ type: e.target.value, channel: selectedChannel, params: {} });
-          e.target.value = '';
-          buildEffects();
-        }
+      document.getElementById('addFx').addEventListener('change', e => {
+        if (e.target.value) { push(); effects.push({ type: e.target.value, channel: selCh, params: {} }); e.target.value = ''; buildFx(); }
       });
-
-      document.getElementById('btnAddChannel').addEventListener('click', () => {
-        const n = channels.length;
-        channels.push({ name: 'Ch ' + n, volume: 80, pan: 50, mute: false, solo: false, vu: 0, bus: 'master' });
-        buildMixer();
+      document.getElementById('btnAddCh').addEventListener('click', () => {
+        push(); channels.push({ name: 'Ch '+channels.length, vol: 80, pan: 50, mute: false, solo: false, bus: 'master' }); build();
       });
-
-      document.getElementById('btnRemoveChannel').addEventListener('click', () => {
-        if (channels.length > 1) { channels.pop(); buildMixer(); }
+      document.getElementById('btnRemCh').addEventListener('click', () => {
+        if (channels.length > 1) { push(); channels.pop(); if (selCh >= channels.length) selCh = channels.length-1; build(); }
       });
-
-      document.getElementById('btnResetAll').addEventListener('click', () => {
-        channels.forEach((ch, i) => { ch.volume = i === 0 ? 100 : 80; ch.pan = 50; ch.mute = false; ch.solo = false; });
-        effects = [];
-        buildMixer(); buildEffects();
+      document.getElementById('btnReset').addEventListener('click', () => {
+        push(); channels.forEach((ch,i) => { ch.vol = i===0?100:80; ch.pan = 50; ch.mute = false; ch.solo = false; });
+        effects = []; build(); buildFx();
       });
-
       document.getElementById('btnExport').addEventListener('click', () => {
         let lua = 'return {\\n  channels = {\\n';
         channels.forEach(ch => {
-          lua += '    { name = "' + ch.name + '", volume = ' + (ch.volume/100).toFixed(2) + ', pan = ' + ((ch.pan-50)/50).toFixed(2) + ', mute = ' + ch.mute + ', bus = "' + ch.bus + '" },\\n';
+          lua += '    { name = "'+ch.name+'", volume = '+(ch.vol/100).toFixed(2)+', pan = '+((ch.pan-50)/50).toFixed(2)+', mute = '+ch.mute+', bus = "'+ch.bus+'" },\\n';
         });
         lua += '  },\\n  effects = {\\n';
-        effects.forEach(fx => {
-          lua += '    { type = "' + fx.type + '", channel = ' + (fx.channel+1) + ' },\\n';
-        });
+        effects.forEach(fx => { lua += '    { type = "'+fx.type+'", channel = '+(fx.channel+1)+' },\\n'; });
         lua += '  }\\n}';
         vscode.postMessage({ type: 'exportLua', content: lua });
       });
 
-      // Animate VU meters
       setInterval(() => {
-        document.querySelectorAll('.vu-fill').forEach((el, i) => {
+        document.querySelectorAll('.vu-bar').forEach((el, i) => {
           const ch = channels[i];
-          if (ch && !ch.mute) {
-            const level = 20 + Math.random() * 60 * (ch.volume / 100);
-            el.style.height = level + '%';
-          } else if (ch && ch.mute) {
-            el.style.height = '0%';
-          }
+          if (ch && !ch.mute) el.style.height = (20 + Math.random()*60*(ch.vol/100)) + '%';
+          else if (ch) el.style.height = '0%';
         });
       }, 100);
 
-      buildMixer();
-      buildEffects();
-      buildBusRouting();
+      build(); buildFx(); buildBus();
+      vscode.postMessage({ type: 'stateChanged', state: { ready: true } });
     `);
   }
 }

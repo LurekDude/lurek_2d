@@ -102,7 +102,7 @@ function lurek.process(dt)
     if s and s.update then s.update(dt) end
 end
 
-function lurek.render()
+function lurek.draw()
     -- Draw all states bottom to top (so overlay draws over game)
     for _, s in ipairs(state_stack) do
         if s.draw then s.draw() end

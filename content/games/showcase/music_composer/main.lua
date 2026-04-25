@@ -225,6 +225,53 @@ end
 -- Init
 -- ---------------------------------------------------------------------------
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Music Composer — Lurek2D")
     lurek.render.setBackgroundColor(COL_BG[1], COL_BG[2], COL_BG[3])
@@ -348,7 +395,7 @@ function lurek.process(dt)
     end
 
     -- Mouse click → toggle note
-    if lurek.input.isDown(1) then
+    if lurek.input.mouse.isDown(1) then
         local mx, my = lurek.input.mouse.getPosition()
         local col, row = pixel_to_grid(mx, my)
         if col and row then
@@ -414,13 +461,13 @@ function lurek.draw()
 
     -- Grid background
     lurek.render.setColor(COL_GRID_BG[1], COL_GRID_BG[2], COL_GRID_BG[3], 1)
-    lurek.render.rectangle("fill", GRID_X, GRID_Y, GRID_COLS * CELL_W, GRID_ROWS * CELL_H)
+    rect("fill", GRID_X, GRID_Y, GRID_COLS * CELL_W, GRID_ROWS * CELL_H)
 
     -- Grid lines — horizontal
     lurek.render.setColor(COL_GRID_LINE[1], COL_GRID_LINE[2], COL_GRID_LINE[3], 0.5)
     for r = 0, GRID_ROWS do
         local y = GRID_Y + r * CELL_H
-        lurek.render.line(GRID_X, y, GRID_X + GRID_COLS * CELL_W, y)
+        ln(GRID_X, y, GRID_X + GRID_COLS * CELL_W, y)
     end
     -- Grid lines — vertical (thicker every 4 beats)
     for c = 0, GRID_COLS do
@@ -430,7 +477,7 @@ function lurek.draw()
         else
             lurek.render.setColor(COL_GRID_LINE[1], COL_GRID_LINE[2], COL_GRID_LINE[3], 0.3)
         end
-        lurek.render.line(x, GRID_Y, x, GRID_Y + GRID_ROWS * CELL_H)
+        ln(x, GRID_Y, x, GRID_Y + GRID_ROWS * CELL_H)
     end
 
     -- Black-key row shading
@@ -438,7 +485,7 @@ function lurek.draw()
         if is_black_key(r) then
             lurek.render.setColor(0, 0, 0, 0.15)
             local py = GRID_Y + (r - 1) * CELL_H
-            lurek.render.rectangle("fill", GRID_X, py, GRID_COLS * CELL_W, CELL_H)
+            rect("fill", GRID_X, py, GRID_COLS * CELL_W, CELL_H)
         end
     end
 
@@ -462,10 +509,10 @@ function lurek.draw()
                     else
                         lurek.render.setColor(dim[1], dim[2], dim[3], 0.65)
                     end
-                    lurek.render.rectangle("fill", px + 1, py + 1, CELL_W - 2, CELL_H - 2)
+                    rect("fill", px + 1, py + 1, CELL_W - 2, CELL_H - 2)
                     -- Border
                     lurek.render.setColor(col[1], col[2], col[3], 0.4)
-                    lurek.render.rectangle("line", px + 1, py + 1, CELL_W - 2, CELL_H - 2)
+                    rect("line", px + 1, py + 1, CELL_W - 2, CELL_H - 2)
                 end
             end
         end
@@ -474,10 +521,10 @@ function lurek.draw()
     -- Playback cursor column highlight
     if playing then
         lurek.render.setColor(COL_CURSOR[1], COL_CURSOR[2], COL_CURSOR[3], COL_CURSOR[4])
-        lurek.render.rectangle("fill", cursor_x, GRID_Y, CELL_W, GRID_ROWS * CELL_H)
+        rect("fill", cursor_x, GRID_Y, CELL_W, GRID_ROWS * CELL_H)
         -- Cursor line
         lurek.render.setColor(COL_CURSOR_LINE[1], COL_CURSOR_LINE[2], COL_CURSOR_LINE[3], COL_CURSOR_LINE[4])
-        lurek.render.line(cursor_x + CELL_W * 0.5, GRID_Y, cursor_x + CELL_W * 0.5, GRID_Y + GRID_ROWS * CELL_H)
+        ln(cursor_x + CELL_W * 0.5, GRID_Y, cursor_x + CELL_W * 0.5, GRID_Y + GRID_ROWS * CELL_H)
     end
 
     -- Particles
@@ -501,19 +548,19 @@ function lurek.draw_ui()
         local pulse = 0.85 + 0.15 * math.sin(title_pulse)
 
         lurek.render.setColor(COL_TITLE[1] * pulse, COL_TITLE[2] * pulse, COL_TITLE[3], alpha)
-        lurek.render.print("MUSIC COMPOSER", cx - 120, SCREEN_H * 0.32, 0, 2.2, 2.2)
+        text_("MUSIC COMPOSER", cx - 120, SCREEN_H * 0.32, 0, 2.2, 2.2)
 
         lurek.render.setColor(COL_SUBTITLE[1], COL_SUBTITLE[2], COL_SUBTITLE[3], alpha * 0.8)
-        lurek.render.print("CREATE YOUR MELODY", cx - 95, SCREEN_H * 0.45, 0, 1.2, 1.2)
+        text_("CREATE YOUR MELODY", cx - 95, SCREEN_H * 0.45, 0, 1.2, 1.2)
 
         local blink = math.floor(title_timer * 2) % 2 == 0
         if blink then
             lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], alpha * 0.7)
-            lurek.render.print("Press SPACE to start", cx - 85, SCREEN_H * 0.65)
+            text_("Press SPACE to start", cx - 85, SCREEN_H * 0.65)
         end
 
         lurek.render.setColor(COL_TEXT_DIM[1], COL_TEXT_DIM[2], COL_TEXT_DIM[3], alpha * 0.5)
-        lurek.render.print("A Lurek2D Showcase", cx - 72, SCREEN_H * 0.85)
+        text_("A Lurek2D Showcase", cx - 72, SCREEN_H * 0.85)
         return
     end
 
@@ -528,52 +575,52 @@ function lurek.draw_ui()
         -- Key background
         if bk then
             lurek.render.setColor(COL_KEY_BLACK[1], COL_KEY_BLACK[2], COL_KEY_BLACK[3], 1)
-            lurek.render.rectangle("fill", 2, py - 3, GRID_X - 6, CELL_H)
+            rect("fill", 2, py - 3, GRID_X - 6, CELL_H)
             lurek.render.setColor(0.75, 0.75, 0.80, 0.9)
         else
             lurek.render.setColor(COL_KEY_WHITE[1], COL_KEY_WHITE[2], COL_KEY_WHITE[3], 0.12)
-            lurek.render.rectangle("fill", 2, py - 3, GRID_X - 6, CELL_H)
+            rect("fill", 2, py - 3, GRID_X - 6, CELL_H)
             lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 0.7)
         end
-        lurek.render.print(name, 10, py)
+        text_(name, 10, py)
     end
 
     -- Top bar: Track indicator, BPM, beat counter
     local bar_y = 8
     lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-    lurek.render.print("Track:", 10, bar_y)
+    text_("Track:", 10, bar_y)
 
     for t = 1, TRACK_COUNT do
         local tx = 60 + (t - 1) * 50
         local tc = muted[t] and COL_MUTED or TRACK_COLORS[t]
         if t == active_track then
             lurek.render.setColor(tc[1], tc[2], tc[3], 1)
-            lurek.render.rectangle("fill", tx, bar_y - 2, 38, 18)
+            rect("fill", tx, bar_y - 2, 38, 18)
             lurek.render.setColor(0, 0, 0, 1)
-            lurek.render.print(tostring(t), tx + 14, bar_y)
+            text_(tostring(t), tx + 14, bar_y)
         else
             lurek.render.setColor(tc[1], tc[2], tc[3], 0.5)
-            lurek.render.rectangle("line", tx, bar_y - 2, 38, 18)
+            rect("line", tx, bar_y - 2, 38, 18)
             lurek.render.setColor(tc[1], tc[2], tc[3], 0.7)
-            lurek.render.print(tostring(t), tx + 14, bar_y)
+            text_(tostring(t), tx + 14, bar_y)
         end
         if muted[t] then
             lurek.render.setColor(COL_MUTED[1], COL_MUTED[2], COL_MUTED[3], 0.8)
-            lurek.render.print("M", tx + 28, bar_y)
+            text_("M", tx + 28, bar_y)
         end
     end
 
     -- BPM display
     lurek.render.setColor(COL_TEXT[1], COL_TEXT[2], COL_TEXT[3], 1)
-    lurek.render.print(string.format("BPM: %d", bpm), 240, bar_y)
+    text_(string.format("BPM: %d", bpm), 240, bar_y)
 
     -- Beat counter
     if playing then
         lurek.render.setColor(COL_CURSOR_LINE[1], COL_CURSOR_LINE[2], COL_CURSOR_LINE[3], 1)
-        lurek.render.print(string.format("Beat %d/%d", play_beat, GRID_COLS), 340, bar_y)
+        text_(string.format("Beat %d/%d", play_beat, GRID_COLS), 340, bar_y)
     else
         lurek.render.setColor(COL_TEXT_DIM[1], COL_TEXT_DIM[2], COL_TEXT_DIM[3], 0.7)
-        lurek.render.print("PAUSED", 340, bar_y)
+        text_("PAUSED", 340, bar_y)
     end
 
     -- Metronome indicator
@@ -581,17 +628,17 @@ function lurek.draw_ui()
     if playing and beat_flash > 0 then
         local f = beat_flash / 0.15
         lurek.render.setColor(COL_METRO_ON[1], COL_METRO_ON[2], COL_METRO_ON[3], f)
-        lurek.render.circle("fill", metro_x + 6, metro_y + 7, 6 + f * 3)
+        circ("fill", metro_x + 6, metro_y + 7, 6 + f * 3)
     else
         lurek.render.setColor(COL_METRO_OFF[1], COL_METRO_OFF[2], COL_METRO_OFF[3], 0.6)
-        lurek.render.circle("fill", metro_x + 6, metro_y + 7, 6)
+        circ("fill", metro_x + 6, metro_y + 7, 6)
     end
 
     -- Preset label
     if preset_index > 0 then
         local pnames = { "Bass Line", "Chords", "Melody" }
         lurek.render.setColor(COL_TEXT_DIM[1], COL_TEXT_DIM[2], COL_TEXT_DIM[3], 0.8)
-        lurek.render.print("Preset: " .. pnames[preset_index], 500, bar_y)
+        text_("Preset: " .. pnames[preset_index], 500, bar_y)
     end
 
     -- Note counts (bottom)
@@ -602,15 +649,15 @@ function lurek.draw_ui()
         local nx = GRID_X + (t - 1) * 180
         local label = string.format("Track %d: %d notes", t, count_notes(t))
         if muted[t] then label = label .. " [MUTED]" end
-        lurek.render.print(label, nx, bot_y)
+        text_(label, nx, bot_y)
     end
 
     -- Controls help (bottom right)
     lurek.render.setColor(COL_TEXT_DIM[1], COL_TEXT_DIM[2], COL_TEXT_DIM[3], 0.5)
-    lurek.render.print("Space:Play  +/-:BPM  C:Clear  X:ClearAll  P:Preset  V:Mute", GRID_X, bot_y + 20)
+    text_("Space:Play  +/-:BPM  C:Clear  X:ClearAll  P:Preset  V:Mute", GRID_X, bot_y + 20)
 
     -- FPS
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(COL_TEXT_DIM[1], COL_TEXT_DIM[2], COL_TEXT_DIM[3], 0.4)
-    lurek.render.print(string.format("%d FPS", fps), SCREEN_W - 60, SCREEN_H - 20)
+    text_(string.format("%d FPS", fps), SCREEN_W - 60, SCREEN_H - 20)
 end

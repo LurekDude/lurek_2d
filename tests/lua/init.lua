@@ -176,7 +176,7 @@ end
 function expect_near(expected, actual, tolerance, msg)
     tolerance = tolerance or 0.0001
     if math.abs(expected - actual) > tolerance then
-        error(string.format("%s: expected ~%s, got %s (tol=%s)",
+        error(string.format("%s: expected approximately %s, got %s (tol=%s)",
             msg or "near", tostring(expected), tostring(actual), tostring(tolerance)), 2)
     end
 end
@@ -371,12 +371,12 @@ function expect_canvas_pixel(canvas, x, y, er, eg, eb, ea, tolerance, msg)
     ch("a", ea, a or 0)
 end
 
---                                                                                                                                                                                                                                           
+--
 -- Evidence test helpers
---                                                                                                                                                                                                                                           
+--
 
 --- Returns the standard evidence output directory for a category.
---- @param category : string      e.g. "physics", "animation"
+--- @param category string  e.g. "physics", "animation"
 --- @return string path like "tests/output/physics/"
 function evidence_output_dir(category)
     return "tests/output/" .. category .. "/"
@@ -384,7 +384,7 @@ end
 
 --- Ensures the evidence output directory exists for a category.
 --- Creates intermediate directories as needed.
---- @param category : string
+--- @param category string
 function ensure_evidence_dir(category)
     local dir = evidence_output_dir(category)
     -- os.execute is sandboxed (nil) in the test VM; output dirs are pre-created on disk.
@@ -400,8 +400,8 @@ end
 
 --- Asserts that an evidence file was created at the given path.
 --- Evidence tests use this instead of value assertions     they only check the file exists.
---- @param path : string     file path to check
---- @param msg  : string     optional label
+--- @param path string  file path to check
+--- @param msg? string  optional label
 function expect_evidence_created(path, msg)
     -- io.open is sandboxed (nil) in the test VM; if we reach this point the
     -- savePNG call above already succeeded (it errors on write failure), so we
@@ -421,12 +421,12 @@ function expect_evidence_created(path, msg)
     end
 end
 
---                                                                                                                                                                                                                                           
+--
 -- Golden test helpers
---                                                                                                                                                                                                                                           
+--
 
 --- Reads a file and returns its contents as a string, or nil on failure.
---- @param path : string
+--- @param path string
 --- @return string|nil
 local function _read_file_bytes(path)
     if not io.open and lurek and lurek.filesystem and lurek.filesystem.read then
@@ -445,9 +445,9 @@ end
 
 --- Compares an evidence file against a golden sample file (binary-exact).
 --- Golden tests use this     they do NOT create content, only compare.
---- @param evidence_path : string     path to evidence output (created by evidence test)
---- @param golden_path   : string     path to committed golden sample
---- @param msg           : string     optional label
+--- @param evidence_path string  path to evidence output (created by evidence test)
+--- @param golden_path string  path to committed golden sample
+--- @param msg? string  optional label
 function expect_golden_file_match(evidence_path, golden_path, msg)
     local evidence = _read_file_bytes(evidence_path)
     if not evidence then
@@ -467,9 +467,9 @@ end
 
 --- Compares evidence text against a golden sample, ignoring trailing whitespace per line.
 --- Useful for text-based golden tests where line endings may differ.
---- @param evidence_path : string     path to evidence output
---- @param golden_path   : string     path to committed golden sample
---- @param msg           : string     optional label
+--- @param evidence_path string  path to evidence output
+--- @param golden_path string  path to committed golden sample
+--- @param msg? string  optional label
 function expect_golden_text_match(evidence_path, golden_path, msg)
     local evidence = _read_file_bytes(evidence_path)
     if not evidence then

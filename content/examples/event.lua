@@ -255,7 +255,7 @@ end
 -- connect is an alias that emphasises the observer-pattern usage style.
 do  -- Signal:connect
   local sig = lurek.event.newSignal()
-  local id = sig:connect(function(data)
+  local id = sig:connect("*", function(data)
     lurek.log.info("received: " .. tostring(data), "event")
   end)
   sig:emit("hello")
@@ -267,12 +267,12 @@ end
 -- Use to wait for a single event (load complete, door open) without manual cleanup.
 do  -- Signal:once
   local sig = lurek.event.newSignal()
-  sig:once(function(val)
+  sig:once("*", function(val)
     lurek.log.info("once fired: " .. tostring(val), "event")
   end)
-  sig:emit(42)
-  sig:emit(99)
-  lurek.log.info("count after once: " .. sig:getCount(), "event")
+  sig:emit("*", 42)
+  sig:emit("*", 99)
+  lurek.log.info("count after once: " .. sig:getCount("*"), "event")
 end
 
 --@api-stub: Signal:register
@@ -280,7 +280,7 @@ end
 -- Listeners fire in registration order; remove with signal:remove(id).
 do  -- Signal:register
   local sig = lurek.event.newSignal()
-  local id = sig:register(function(payload)
+  local id = sig:register("*", function(payload)
     lurek.log.info("payload: " .. tostring(payload), "event")
   end)
   sig:emit("damage")
@@ -293,10 +293,11 @@ end
 do  -- Signal:registerWithFilter
   local sig = lurek.event.newSignal()
   sig:registerWithFilter(
+    "*",
     function(evt) return evt.type == "damage" end,
     function(evt) lurek.log.info("damage event", "event") end
   )
-  sig:emit({type="damage", amount=10})
-  sig:emit({type="heal", amount=5})
+  sig:emit("*", {type="damage", amount=10})
+  sig:emit("*", {type="heal", amount=5})
   lurek.log.info("filtered listener ok", "event")
 end

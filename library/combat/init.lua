@@ -1,4 +1,4 @@
-﻿--- @module library.combat
+﻿-- @module library.combat
 --- @status full
 --- Vehicle/turret/weapon combat system: collision groups, armor, chassis,
 --- turrets, weapons, projectiles, projectile pools, and the combat world.

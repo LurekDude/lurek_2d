@@ -23,7 +23,7 @@ local GEM_COLORS = {
 }
 
 -- Grid: grid[r][c] = { color=1..6, special=nil/"bomb"/"row", fall_y=0 }
-local grid       = {}
+local grid       = {} ---@type any
 local sel_r, sel_c = nil, nil
 local score      = 0
 local combo      = 0
@@ -35,7 +35,7 @@ local fall_anim  = false
 local fall_speed = 300   -- px/s
 
 -- Swap animation
-local swap_src, swap_dst = nil, nil
+local swap_src, swap_dst = nil, nil ---@type any, any
 local swap_t, swap_max   = 0, 0.12
 local swap_revert        = false
 
@@ -130,18 +130,25 @@ end
 local function clear_matches(marked)
     local cleared = count_keys(marked)
     for key in pairs(marked) do
-        local r, c = key:match("(%d+),(%d+)")
-        r, c = tonumber(r), tonumber(c)
-        local g = grid[r][c]
-        -- Emit particles at gem position
-        local px = GRID_X + (c-1)*CELL + CELL/2
-        local py = GRID_Y + (r-1)*CELL + CELL/2
-        if g.special == "bomb" then
-            if bomb_burst then bomb_burst:emit(px, py, 16) end
-        else
-            if match_sparks then match_sparks:emit(px, py, 5) end
+        local r_s, c_s = key:match("(%d+),(%d+)")
+        local r = tonumber(r_s)
+        local c = tonumber(c_s)
+        if r ~= nil and c ~= nil then
+            local g = grid[r][c]
+            -- Emit particles at gem position
+            local px = GRID_X + (c-1)*CELL + CELL/2
+            local py = GRID_Y + (r-1)*CELL + CELL/2
+            if g.special == "bomb" then
+                if bomb_burst then bomb_burst:emit(px, py, 16) end
+            else
+                if match_sparks then match_sparks:emit(px, py, 5) end
+            end
+            ---@type any
+            local row = grid[r]
+            if row then
+                row[c] = nil  -- cleared
+            end
         end
-        grid[r][c] = nil  -- cleared
     end
 
     -- Handle bomb specials: clear 3×3 around them
@@ -159,12 +166,17 @@ local function clear_matches(marked)
     if cleared >= 5 then
         -- Find first non-nil in the group
         for key in pairs(marked) do
-            local r, c = key:match("(%d+),(%d+)")
-            r, c = tonumber(r), tonumber(c)
-            if grid[r] and grid[r][c] == nil then
-                grid[r][c] = new_gem(math.random(1, NUM_COLORS))
-                grid[r][c].special = "bomb"
-                break
+            local r_s, c_s = key:match("(%d+),(%d+)")
+            local r = tonumber(r_s)
+            local c = tonumber(c_s)
+            if r ~= nil and c ~= nil then
+                ---@type any
+                local row = grid[r]
+                if row and row[c] == nil then
+                    row[c] = new_gem(math.random(1, NUM_COLORS))
+                    row[c].special = "bomb"
+                    break
+                end
             end
         end
     end
@@ -218,9 +230,56 @@ lurek.input.bind("quit",  "escape")
 
 -- ── Init ──────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Match 3 — Lurek2D")
-    lurek.render.setBackgroundColor(0.05, 0.04, 0.10, 1.0)
+    lurek.render.setBackgroundColor(0.05, 0.04, 0.10)
     math.randomseed(os.time())
 
     match_sparks = lurek.particle.newSystem({
@@ -315,7 +374,7 @@ function lurek.process(dt)
 
     -- Idle: handle click selection / swap
     if game_state == "idle" then
-        local mx, my = lurek.input.mouse.getPosition()
+        local mx, my = lurek.input.getPosition()
         local c = math.floor((mx - GRID_X) / CELL) + 1
         local r = math.floor((my - GRID_Y) / CELL) + 1
 
@@ -345,7 +404,7 @@ end
 -- ── Render ────────────────────────────────────────────────
 function lurek.draw()
     -- Board background
-    lurek.render.rectangle(GRID_X - 6, GRID_Y - 6, GRID_SIZE*CELL + 12, GRID_SIZE*CELL + 12, { color = {0.15,0.12,0.2,1} })
+    rect(GRID_X - 6, GRID_Y - 6, GRID_SIZE*CELL + 12, GRID_SIZE*CELL + 12, { color = {0.15,0.12,0.2,1} })
 
     -- Gems
     for r = 1, GRID_SIZE do
@@ -357,15 +416,15 @@ function lurek.draw()
 
                 -- Selection highlight
                 if r == sel_r and c == sel_c then
-                    lurek.render.rectangle(gx - 4, gy - 4, CELL, CELL, { color = {1,1,1,0.3} })
+                    rect(gx - 4, gy - 4, CELL, CELL, { color = {1,1,1,0.3} })
                 end
 
                 local col = GEM_COLORS[g.color]
-                lurek.render.rectangle(gx, gy, CELL - 8, CELL - 8, { color = col })
+                rect(gx, gy, CELL - 8, CELL - 8, { color = col })
 
                 -- Special bomb marker
                 if g.special == "bomb" then
-                    lurek.render.circle(gx + (CELL-8)/2, gy + (CELL-8)/2, 10, { color = {1,0.5,0.1,0.9}, segments = 6 })
+                    circ(gx + (CELL-8)/2, gy + (CELL-8)/2, 10, { color = {1,0.5,0.1,0.9}, segments = 6 })
                 end
             end
         end
@@ -378,17 +437,17 @@ end
 
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.draw_ui()
-    lurek.render.rectangle(0, 0, W, GRID_Y - 4, { color = {0.08,0.06,0.14,1} })
-    lurek.render.print("Score: " .. score, 14, 10, { color = {1,1,0.3,1}, size = 18 })
-    lurek.render.print("Moves: " .. moves_left, 240, 10, { color = {0.4,0.9,0.4,1}, size = 18 })
+    rect(0, 0, W, GRID_Y - 4, { color = {0.08,0.06,0.14,1} })
+    text_("Score: " .. score, 14, 10, { color = {1,1,0.3,1}, size = 18 })
+    text_("Moves: " .. moves_left, 240, 10, { color = {0.4,0.9,0.4,1}, size = 18 })
     if combo > 1 then
-        lurek.render.print("COMBO x" .. combo .. "!", 420, 10, { color = {1,0.5,0.2,1}, size = 18 })
+        text_("COMBO x" .. combo .. "!", 420, 10, { color = {1,0.5,0.2,1}, size = 18 })
     end
-    lurek.render.print("Click gem then adjacent gem to swap", 14, 40, { color = {0.4,0.4,0.4,1}, size = 11 })
+    text_("Click gem then adjacent gem to swap", 14, 40, { color = {0.4,0.4,0.4,1}, size = 11 })
 
     if game_state == "gameover" then
-        lurek.render.rectangle(180, 220, 440, 100, { color = {0,0,0,0.88} })
-        lurek.render.print("GAME OVER", 280, 245, { color = {0.9,0.2,0.2,1}, size = 34 })
-        lurek.render.print("Final score: " .. score, 300, 295, { color = {1,1,1,1}, size = 18 })
+        rect(180, 220, 440, 100, { color = {0,0,0,0.88} })
+        text_("GAME OVER", 280, 245, { color = {0.9,0.2,0.2,1}, size = 34 })
+        text_("Final score: " .. score, 300, 295, { color = {1,1,1,1}, size = 18 })
     end
 end

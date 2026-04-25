@@ -488,6 +488,53 @@ end
 -- Callbacks
 -- ============================================================
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Patterns Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.06, 0.1)
@@ -576,9 +623,9 @@ function lurek.draw()
 
     -- Demo area border
     lurek.render.setColor(0.15, 0.13, 0.2, 0.5)
-    lurek.render.rectangle("fill", DEMO_X, DEMO_Y, DEMO_W, DEMO_H)
+    rect("fill", DEMO_X, DEMO_Y, DEMO_W, DEMO_H)
     lurek.render.setColor(0.3, 0.25, 0.4, 0.4)
-    lurek.render.rectangle("line", DEMO_X, DEMO_Y, DEMO_W, DEMO_H)
+    rect("line", DEMO_X, DEMO_Y, DEMO_W, DEMO_H)
 
     if state == STATE_P1 then
         -- EventBus: show listeners as boxes
@@ -586,15 +633,15 @@ function lurek.draw()
         for name, listener in pairs(bus_listeners) do
             local c = listener.col
             lurek.render.setColor(c[1], c[2], c[3], 0.3)
-            lurek.render.rectangle("fill", lx, ly, 90, 36)
+            rect("fill", lx, ly, 90, 36)
             lurek.render.setColor(c[1], c[2], c[3], 0.8)
-            lurek.render.rectangle("line", lx, ly, 90, 36)
-            lurek.render.print(name, lx + 6, ly + 10, 11)
+            rect("line", lx, ly, 90, 36)
+            text_(name, lx + 6, ly + 10, 11)
             lx = lx + 100
             if lx > DEMO_X + DEMO_W - 100 then lx = DEMO_X + 30; ly = ly + 50 end
         end
         lurek.render.setColor(0.6, 0.6, 0.7, 0.7)
-        lurek.render.print("A: player_hit  B: score_up  C: level_up", DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
+        text_("A: player_hit  B: score_up  C: level_up", DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
 
     elseif state == STATE_P2 then
         -- ObjectPool: draw pool objects
@@ -602,26 +649,26 @@ function lurek.draw()
             if obj.active then
                 lurek.render.setColor(obj.r, obj.g, obj.b, 0.9)
                 local sz = 10 * obj.scale
-                lurek.render.circle("fill", obj.x, obj.y, sz)
+                circ("fill", obj.x, obj.y, sz)
             end
         end
         local active, free = pool_counts()
         lurek.render.setColor(0.6, 0.8, 0.6, 0.8)
-        lurek.render.print(string.format("Pool: %d/%d  Active: %d  Free: %d", #pool.objects, pool.max_size, active, free), DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
+        text_(string.format("Pool: %d/%d  Active: %d  Free: %d", #pool.objects, pool.max_size, active, free), DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
 
     elseif state == STATE_P3 then
         -- CommandStack: draw square and trail
         for i, cmd in ipairs(cmd_stack) do
             local alpha = 0.1 + 0.4 * (i / #cmd_stack)
             lurek.render.setColor(0.3, 0.5, 0.8, alpha)
-            lurek.render.rectangle("fill", cmd_square.x - 10 - cmd.dx * (#cmd_stack - i) / #cmd_stack, cmd_square.y - 10 - cmd.dy * (#cmd_stack - i) / #cmd_stack, 20, 20)
+            rect("fill", cmd_square.x - 10 - cmd.dx * (#cmd_stack - i) / #cmd_stack, cmd_square.y - 10 - cmd.dy * (#cmd_stack - i) / #cmd_stack, 20, 20)
         end
         lurek.render.setColor(0.4, 0.7, 1, 1)
-        lurek.render.rectangle("fill", cmd_square.x - 12, cmd_square.y - 12, 24, 24)
+        rect("fill", cmd_square.x - 12, cmd_square.y - 12, 24, 24)
         lurek.render.setColor(1, 1, 1, 0.8)
-        lurek.render.rectangle("line", cmd_square.x - 12, cmd_square.y - 12, 24, 24)
+        rect("line", cmd_square.x - 12, cmd_square.y - 12, 24, 24)
         lurek.render.setColor(0.6, 0.6, 0.7, 0.7)
-        lurek.render.print(string.format("Stack: %d  Redo: %d", #cmd_stack, #cmd_redo), DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
+        text_(string.format("Stack: %d  Redo: %d", #cmd_stack, #cmd_redo), DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
 
     elseif state == STATE_P4 then
         -- ServiceLocator: draw services as cards
@@ -629,38 +676,38 @@ function lurek.draw()
         for _, svc in ipairs(services) do
             local c = svc.color
             lurek.render.setColor(c[1], c[2], c[3], 0.2)
-            lurek.render.rectangle("fill", DEMO_X + 30, sy, 200, 40)
+            rect("fill", DEMO_X + 30, sy, 200, 40)
             lurek.render.setColor(c[1], c[2], c[3], 0.8)
-            lurek.render.rectangle("line", DEMO_X + 30, sy, 200, 40)
-            lurek.render.print(svc.name, DEMO_X + 40, sy + 6, 12)
+            rect("line", DEMO_X + 30, sy, 200, 40)
+            text_(svc.name, DEMO_X + 40, sy + 6, 12)
             local stat_col = svc.status == "ready" and {0.3, 1, 0.4} or {1, 0.6, 0.2}
             lurek.render.setColor(stat_col[1], stat_col[2], stat_col[3], 0.9)
-            lurek.render.print("[" .. svc.status .. "]", DEMO_X + 40, sy + 22, 10)
+            text_("[" .. svc.status .. "]", DEMO_X + 40, sy + 22, 10)
             sy = sy + 52
         end
         lurek.render.setColor(0.6, 0.6, 0.7, 0.7)
-        lurek.render.print("S: Query all services", DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
+        text_("S: Query all services", DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
 
     elseif state == STATE_P5 then
         -- Factory: draw created entities
         for _, e in ipairs(factory_entities) do
             local sz = 10 * e.scale
             lurek.render.setColor(e.r, e.g, e.b, 0.9)
-            lurek.render.circle("fill", e.x, e.y, sz)
+            circ("fill", e.x, e.y, sz)
             lurek.render.setColor(1, 1, 1, 0.7)
-            lurek.render.print(e.name, e.x - 16, e.y - sz - 12, 9)
+            text_(e.name, e.x - 16, e.y - sz - 12, 9)
         end
         lurek.render.setColor(0.6, 0.6, 0.7, 0.7)
-        lurek.render.print(string.format("F: Create entity  (%d alive)", #factory_entities), DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
+        text_(string.format("F: Create entity  (%d alive)", #factory_entities), DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
 
     elseif state == STATE_P6 then
         -- SimpleState: traffic light
         local cx = DEMO_X + DEMO_W / 2
         local cy_base = DEMO_Y + 40
         lurek.render.setColor(0.12, 0.12, 0.15, 0.9)
-        lurek.render.rectangle("fill", cx - 30, cy_base, 60, 170)
+        rect("fill", cx - 30, cy_base, 60, 170)
         lurek.render.setColor(0.25, 0.25, 0.3, 0.8)
-        lurek.render.rectangle("line", cx - 30, cy_base, 60, 170)
+        rect("line", cx - 30, cy_base, 60, 170)
         local light_states = { "RED", "YELLOW", "GREEN" }
         for i, ls in ipairs(light_states) do
             local ly = cy_base + 10 + (i - 1) * 55
@@ -668,25 +715,25 @@ function lurek.draw()
             local is_active = (fsm.state == ls)
             local alpha = is_active and 1.0 or 0.15
             lurek.render.setColor(c[1], c[2], c[3], alpha)
-            lurek.render.circle("fill", cx, ly + 20, 18)
+            circ("fill", cx, ly + 20, 18)
             if is_active then
                 lurek.render.setColor(fsm_blend.r, fsm_blend.g, fsm_blend.b, 0.3)
-                lurek.render.circle("fill", cx, ly + 20, 26)
+                circ("fill", cx, ly + 20, 26)
             end
         end
         local progress = fsm.timer / FSM_DURATIONS[fsm.state]
         lurek.render.setColor(0.5, 0.5, 0.6, 0.6)
-        lurek.render.rectangle("fill", cx - 40, cy_base + 180, 80, 6)
+        rect("fill", cx - 40, cy_base + 180, 80, 6)
         lurek.render.setColor(fsm_blend.r, fsm_blend.g, fsm_blend.b, 0.9)
-        lurek.render.rectangle("fill", cx - 40, cy_base + 180, 80 * progress, 6)
+        rect("fill", cx - 40, cy_base + 180, 80 * progress, 6)
         lurek.render.setColor(0.6, 0.6, 0.7, 0.7)
-        lurek.render.print("Space: Force transition", DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
+        text_("Space: Force transition", DEMO_X + 20, DEMO_Y + DEMO_H - 30, 10)
     end
 
     -- Particles (world-space)
     for _, p in ipairs(particles) do
         lurek.render.setColor(p.r, p.g, p.b, p.a)
-        lurek.render.circle("fill", p.x, p.y, p.size)
+        circ("fill", p.x, p.y, p.size)
     end
 end
 
@@ -698,52 +745,52 @@ function lurek.draw_ui()
     if state == STATE_TITLE then
         local pulse = 0.7 + 0.3 * math.sin(title_timer * 2.5)
         lurek.render.setColor(0.5, 0.4, 1.0, pulse)
-        lurek.render.print("PATTERNS DEMO", SCREEN_W / 2 - 110, SCREEN_H / 2 - 70, 28)
+        text_("PATTERNS DEMO", SCREEN_W / 2 - 110, SCREEN_H / 2 - 70, 28)
         lurek.render.setColor(0.7, 0.6, 0.9, 0.8)
-        lurek.render.print("DESIGN PATTERNS IN ACTION", SCREEN_W / 2 - 130, SCREEN_H / 2 - 30, 16)
+        text_("DESIGN PATTERNS IN ACTION", SCREEN_W / 2 - 130, SCREEN_H / 2 - 30, 16)
         lurek.render.setColor(0.6, 0.6, 0.7, 0.5 + 0.3 * math.sin(title_timer * 1.8))
-        lurek.render.print("Press 1-6 to select a pattern", SCREEN_W / 2 - 130, SCREEN_H / 2 + 30, 14)
+        text_("Press 1-6 to select a pattern", SCREEN_W / 2 - 130, SCREEN_H / 2 + 30, 14)
         lurek.render.setColor(0.4, 0.4, 0.5, 0.6)
-        lurek.render.print("1: EventBus   2: ObjectPool   3: CommandStack", SCREEN_W / 2 - 180, SCREEN_H / 2 + 70, 11)
-        lurek.render.print("4: ServiceLocator   5: Factory   6: SimpleState", SCREEN_W / 2 - 180, SCREEN_H / 2 + 88, 11)
+        text_("1: EventBus   2: ObjectPool   3: CommandStack", SCREEN_W / 2 - 180, SCREEN_H / 2 + 70, 11)
+        text_("4: ServiceLocator   5: Factory   6: SimpleState", SCREEN_W / 2 - 180, SCREEN_H / 2 + 88, 11)
         lurek.render.setColor(0.3, 0.3, 0.4, 0.5)
-        lurek.render.print("ESC to quit", SCREEN_W / 2 - 35, SCREEN_H - 40, 12)
+        text_("ESC to quit", SCREEN_W / 2 - 35, SCREEN_H - 40, 12)
         return
     end
 
     -- Tab bar
     lurek.render.setColor(0.1, 0.08, 0.14, 0.95)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, TAB_H)
+    rect("fill", 0, 0, SCREEN_W, TAB_H)
     local tw = SCREEN_W / 6
     for i, ps in ipairs(pattern_order) do
         local tx = (i - 1) * tw
         local is_active = (ps == state)
         if is_active then
             lurek.render.setColor(0.2, 0.15, 0.35, 1)
-            lurek.render.rectangle("fill", tx, 0, tw, TAB_H)
+            rect("fill", tx, 0, tw, TAB_H)
         end
         local c_a = is_active and 1.0 or 0.5
         lurek.render.setColor(0.6, 0.5, 1.0, c_a)
-        lurek.render.print(i .. ": " .. pattern_names[ps], tx + 8, 9, 11)
+        text_(i .. ": " .. pattern_names[ps], tx + 8, 9, 11)
     end
     -- Active tab indicator (tweened)
     lurek.render.setColor(0.6, 0.4, 1, 0.9)
-    lurek.render.rectangle("fill", tab_slide_x, TAB_H - 3, tw, 3)
+    rect("fill", tab_slide_x, TAB_H - 3, tw, 3)
 
     -- Pattern description
     lurek.render.setColor(0.08, 0.07, 0.12, 0.85)
-    lurek.render.rectangle("fill", 0, TAB_H, SCREEN_W, 30)
+    rect("fill", 0, TAB_H, SCREEN_W, 30)
     lurek.render.setColor(0.7, 0.65, 0.9, 0.9)
     local desc = pattern_desc[state] or ""
-    lurek.render.print(desc, 12, TAB_H + 8, 11)
+    text_(desc, 12, TAB_H + 8, 11)
 
     -- Pseudocode panel
     lurek.render.setColor(0.1, 0.09, 0.15, 0.9)
-    lurek.render.rectangle("fill", CODE_X, CODE_Y, CODE_W, CODE_H)
+    rect("fill", CODE_X, CODE_Y, CODE_W, CODE_H)
     lurek.render.setColor(0.3, 0.25, 0.45, 0.5)
-    lurek.render.rectangle("line", CODE_X, CODE_Y, CODE_W, CODE_H)
+    rect("line", CODE_X, CODE_Y, CODE_W, CODE_H)
     lurek.render.setColor(0.5, 0.45, 0.7, 0.9)
-    lurek.render.print("Pseudocode", CODE_X + 8, CODE_Y + 6, 12)
+    text_("Pseudocode", CODE_X + 8, CODE_Y + 6, 12)
     local lines = pseudocode[state] or {}
     for i, line in ipairs(lines) do
         local is_comment = (line:sub(1, 2) == "--")
@@ -752,25 +799,25 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.7, 0.8, 0.9, 0.85)
         end
-        lurek.render.print(line, CODE_X + 10, CODE_Y + 24 + (i - 1) * 15, 10)
+        text_(line, CODE_X + 10, CODE_Y + 24 + (i - 1) * 15, 10)
     end
 
     -- Log window
     lurek.render.setColor(0.06, 0.05, 0.09, 0.92)
-    lurek.render.rectangle("fill", 0, LOG_Y, SCREEN_W, LOG_H)
+    rect("fill", 0, LOG_Y, SCREEN_W, LOG_H)
     lurek.render.setColor(0.25, 0.2, 0.35, 0.5)
-    lurek.render.line(0, LOG_Y, SCREEN_W, LOG_Y)
+    ln(0, LOG_Y, SCREEN_W, LOG_Y)
     lurek.render.setColor(0.45, 0.4, 0.6, 0.8)
-    lurek.render.print("Log", 8, LOG_Y + 4, 10)
+    text_("Log", 8, LOG_Y + 4, 10)
     local max_visible = math.floor((LOG_H - 20) / 13)
     for i = 1, math.min(#log_entries, max_visible) do
         local entry = log_entries[i]
         local alpha = math.min(entry.timer / 2.0, 1.0)
         lurek.render.setColor(entry.r, entry.g, entry.b, alpha * 0.9)
-        lurek.render.print(entry.text, 12, LOG_Y + 16 + (i - 1) * 13, 9)
+        text_(entry.text, 12, LOG_Y + 16 + (i - 1) * 13, 9)
     end
 
     -- FPS
     lurek.render.setColor(0.5, 0.5, 0.6, 0.7)
-    lurek.render.print(string.format("FPS: %d", fps), SCREEN_W - 70, TAB_H + 8, 10)
+    text_(string.format("FPS: %d", fps), SCREEN_W - 70, TAB_H + 8, 10)
 end

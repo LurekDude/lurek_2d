@@ -619,6 +619,7 @@ describe("data.msgpack", function()
         expect_equal(val.player.hp, 100)
     end)
 
+
     it("produces a binary string shorter than JSON for integers", function()
         local data = { a = 1, b = 2, c = 3 }
         local bytes = lurek.data.toMsgPack(data)

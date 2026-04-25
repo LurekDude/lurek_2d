@@ -235,9 +235,56 @@ local hover_c, hover_r = 0, 0
 
 -- ── Init ──────────────────────────────────────────────────
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Tactical Battle — Lurek2D")
-    lurek.render.setBackgroundColor(0.06, 0.08, 0.12, 1.0)
+    lurek.render.setBackgroundColor(0.06, 0.08, 0.12)
     math.randomseed(os.time())
 
     attack_sparks = lurek.particle.newSystem({
@@ -307,7 +354,7 @@ function lurek.process(dt)
         return
     end
 
-    local mx, my = lurek.input.mouse.getPosition()
+    local mx, my = lurek.input.getPosition()
     hover_c = math.floor((mx - OX) / CELL) + 1
     hover_r = math.floor((my - OY) / CELL) + 1
 
@@ -396,21 +443,21 @@ function lurek.draw()
         for c = 1, COLS do
             local v   = MAP[r][c]
             local col = v == TILE_FOREST and {0.15,0.3,0.15,1} or v == TILE_WATER and {0.1,0.2,0.45,1} or {0.1,0.12,0.1,1}
-            lurek.render.rectangle(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-1, CELL-1, { color = col })
+            rect(OX + (c-1)*CELL, OY + (r-1)*CELL, CELL-1, CELL-1, { color = col })
         end
     end
 
     -- Move/attack overlay
     for _, t in ipairs(move_tiles) do
-        lurek.render.rectangle(OX + (t.c-1)*CELL, OY + (t.r-1)*CELL, CELL-1, CELL-1, { color = {0.2,0.6,1.0,0.35} })
+        rect(OX + (t.c-1)*CELL, OY + (t.r-1)*CELL, CELL-1, CELL-1, { color = {0.2,0.6,1.0,0.35} })
     end
     for _, t in ipairs(attack_tiles) do
-        lurek.render.rectangle(OX + (t.c-1)*CELL, OY + (t.r-1)*CELL, CELL-1, CELL-1, { color = {0.9,0.2,0.2,0.35} })
+        rect(OX + (t.c-1)*CELL, OY + (t.r-1)*CELL, CELL-1, CELL-1, { color = {0.9,0.2,0.2,0.35} })
     end
 
     -- Hover
     if hover_c >= 1 and hover_c <= COLS and hover_r >= 1 and hover_r <= ROWS then
-        lurek.render.rectangle(OX + (hover_c-1)*CELL, OY + (hover_r-1)*CELL, CELL-1, CELL-1, { color = {1,1,1,0.12} })
+        rect(OX + (hover_c-1)*CELL, OY + (hover_r-1)*CELL, CELL-1, CELL-1, { color = {1,1,1,0.12} })
     end
 
     -- Units
@@ -420,14 +467,14 @@ function lurek.draw()
         local uy = OY + (u.r-1)*CELL
         local col = u.team == "player" and {0.3,0.6,1.0,1} or {0.8,0.3,0.2,1}
         if (u.moved and u.attacked) then col[4] = 0.5 end
-        lurek.render.rectangle(ux + 6, uy + 6, CELL - 14, CELL - 14, { color = col })
-        lurek.render.print(u.icon, ux + 18, uy + 16, { color = {1,1,1,1}, size = 18 })
+        rect(ux + 6, uy + 6, CELL - 14, CELL - 14, { color = col })
+        text_(u.icon, ux + 18, uy + 16, { color = {1,1,1,1}, size = 18 })
         -- HP bar
-        lurek.render.rectangle(ux + 2, uy + CELL - 10, CELL - 6, 6, { color = {0.2,0,0,1} })
-        lurek.render.rectangle(ux + 2, uy + CELL - 10, math.floor((CELL-6) * u.hp / u.maxHp), 6, { color = {0.2,0.8,0.2,1} })
+        rect(ux + 2, uy + CELL - 10, CELL - 6, 6, { color = {0.2,0,0,1} })
+        rect(ux + 2, uy + CELL - 10, math.floor((CELL-6) * u.hp / u.maxHp), 6, { color = {0.2,0.8,0.2,1} })
 
         if selected and selected.id == u.id then
-            lurek.render.rectangle(ux + 2, uy + 2, CELL - 6, CELL - 6, { color = {1,1,0.3,0.3} })
+            rect(ux + 2, uy + 2, CELL - 6, CELL - 6, { color = {1,1,0.3,0.3} })
         end
         ::skip::
     end
@@ -439,25 +486,25 @@ end
 
 -- ── Render UI ─────────────────────────────────────────────
 function lurek.draw_ui()
-    lurek.render.print(turn == "player" and "YOUR TURN" or "ENEMY TURN", 14, 8, { color = turn == "player" and {0.3,0.9,0.4,1} or {0.9,0.3,0.3,1}, size = 16 })
-    lurek.render.print("Score: " .. score, 400, 8, { color = {1,1,1,1}, size = 14 })
-    lurek.render.print("Click unit to select → move tile → attack tile   Enter=end turn", 14, H - 26, { color = {0.4,0.4,0.4,1}, size = 11 })
+    text_(turn == "player" and "YOUR TURN" or "ENEMY TURN", 14, 8, { color = turn == "player" and {0.3,0.9,0.4,1} or {0.9,0.3,0.3,1}, size = 16 })
+    text_("Score: " .. score, 400, 8, { color = {1,1,1,1}, size = 14 })
+    text_("Click unit to select → move tile → attack tile   Enter=end turn", 14, H - 26, { color = {0.4,0.4,0.4,1}, size = 11 })
 
     if selected then
-        lurek.render.print(selected.kind .. " HP:" .. selected.hp .. "/" .. selected.maxHp, 320, 8, { color = {0.9,0.9,0.4,1}, size = 13 })
+        text_(selected.kind .. " HP:" .. selected.hp .. "/" .. selected.maxHp, 320, 8, { color = {0.9,0.9,0.4,1}, size = 13 })
     end
 
     -- Log
     for i, msg in ipairs(log_msgs) do
         local a = math.min(1.0, msg.timer)
-        lurek.render.print(msg.t, 14, ROWS * CELL + OY + 8 + (i-1) * 16, { color = {0.8,0.8,0.6, a}, size = 11 })
+        text_(msg.t, 14, ROWS * CELL + OY + 8 + (i-1) * 16, { color = {0.8,0.8,0.6, a}, size = 11 })
     end
 
     if state == "win" then
-        lurek.render.rectangle(200, 220, 400, 100, { color = {0,0,0,0.85} })
-        lurek.render.print("VICTORY!", 300, 246, { color = {1,0.9,0.2,1}, size = 36 })
+        rect(200, 220, 400, 100, { color = {0,0,0,0.85} })
+        text_("VICTORY!", 300, 246, { color = {1,0.9,0.2,1}, size = 36 })
     elseif state == "lose" then
-        lurek.render.rectangle(200, 220, 400, 100, { color = {0,0,0,0.85} })
-        lurek.render.print("DEFEATED", 290, 246, { color = {0.9,0.2,0.2,1}, size = 36 })
+        rect(200, 220, 400, 100, { color = {0,0,0,0.85} })
+        text_("DEFEATED", 290, 246, { color = {0.9,0.2,0.2,1}, size = 36 })
     end
 end

@@ -22,7 +22,7 @@ function lurek.process(dt)
     -- Turn-based: logic runs in keypressed
 end
 
-function lurek.render()
+function lurek.draw()
     lurek.render.clear(0.05, 0.05, 0.08)
     -- Draw map
     for y = 1, #map do

@@ -245,6 +245,53 @@ end
 -- ---------------------------------------------------------------------------
 -- Init
 -- ---------------------------------------------------------------------------
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
 function lurek.init()
     lurek.window.setTitle("Localization Demo — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.06, 0.1)
@@ -363,15 +410,15 @@ function lurek.draw()
         local pulse = 0.85 + 0.15 * math.sin(title_timer * 2.5)
 
         lurek.render.setColor(0.3, 0.7, 1.0, title_alpha.a * pulse * title_scale.s)
-        lurek.render.print("LOCALIZATION DEMO", cx - 160, cy, 32)
+        text_("LOCALIZATION DEMO", cx - 160, cy, 32)
 
         lurek.render.setColor(0.8, 0.6, 1.0, subtitle_alpha.a * pulse)
-        lurek.render.print("SPEAK EVERY LANGUAGE", cx - 130, cy + 50, 20)
+        text_("SPEAK EVERY LANGUAGE", cx - 130, cy + 50, 20)
 
         -- Blinking prompt
         if math.floor(title_timer * 2) % 2 == 0 then
             lurek.render.setColor(0.6, 0.6, 0.6, title_alpha.a * 0.8)
-            lurek.render.print("Press ENTER", cx - 55, cy + 130, 16)
+            text_("Press ENTER", cx - 55, cy + 130, 16)
         end
     else
         -- Particles in world space
@@ -394,27 +441,27 @@ function lurek.draw_ui()
 
     -- ── Header bar ────────────────────────────────────────────
     lurek.render.setColor(0.12, 0.10, 0.16, 0.95)
-    lurek.render.rectangle("fill", 0, 0, SCREEN_W, 44)
+    rect("fill", 0, 0, SCREEN_W, 44)
 
     -- Language name
     lurek.render.setColor(0.4, 0.85, 1.0, fade)
     local lang_x = rtl_mode and (SCREEN_W - 20) or 20
-    lurek.render.print(tr("language") .. ": " .. LANG_NAMES[current_lang], lang_x, 12, 18)
+    text_(tr("language") .. ": " .. LANG_NAMES[current_lang], lang_x, 12, 18)
 
     -- FPS
     local fps = lurek.timer.getFPS()
     lurek.render.setColor(0.6, 0.6, 0.6, 0.8)
-    lurek.render.print(tr("fps_label") .. ": " .. tostring(fps), SCREEN_W - 110, 12, 14)
+    text_(tr("fps_label") .. ": " .. tostring(fps), SCREEN_W - 110, 12, 14)
 
     -- Key hints
     lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.render.print("1:EN  2:FR  3:ES  4:PL  R:RTL", SCREEN_W / 2 - 100, 14, 12)
+    text_("1:EN  2:FR  3:ES  4:PL  R:RTL", SCREEN_W / 2 - 100, 14, 12)
 
     -- ── Welcome banner ────────────────────────────────────────
     local welcome_text = tr_interp("welcome", { name = player_name })
     lurek.render.setColor(1.0, 0.9, 0.5, fade)
     local welcome_x = rtl_mode and (SCREEN_W - 60) or 60
-    lurek.render.print(welcome_text, welcome_x, 60, 22)
+    text_(welcome_text, welcome_x, 60, 22)
 
     -- ── Menu buttons ──────────────────────────────────────────
     for i, btn in ipairs(menu_buttons) do
@@ -427,16 +474,16 @@ function lurek.draw_ui()
         else
             lurek.render.setColor(0.15, 0.12, 0.22, btn.alpha * fade)
         end
-        lurek.render.rectangle("fill", bx, btn.y - 18, bw, bh, 6)
+        rect("fill", bx, btn.y - 18, bw, bh, 6)
 
         -- Button border
         lurek.render.setColor(0.4, 0.3, 0.6, btn.alpha * fade * 0.6)
-        lurek.render.rectangle("line", bx, btn.y - 18, bw, bh, 6)
+        rect("line", bx, btn.y - 18, bw, bh, 6)
 
         -- Button text
         lurek.render.setColor(0.9, 0.85, 1.0, btn.alpha * fade)
         local label = tr(btn.label_key)
-        lurek.render.print(label, bx + 20, btn.y - 8, 18)
+        text_(label, bx + 20, btn.y - 8, 18)
     end
 
     -- ── Left column: localization info ────────────────────────
@@ -445,33 +492,33 @@ function lurek.draw_ui()
 
     -- Time display
     lurek.render.setColor(0.7, 0.7, 0.9, fade)
-    lurek.render.print(tr("time_label") .. ": " .. format_time(clock_seconds + 43200), col_x, cy, 16)
+    text_(tr("time_label") .. ": " .. format_time(clock_seconds + 43200), col_x, cy, 16)
     cy = cy + 30
 
     -- Number formatting
     local big_number = 1234.56
     lurek.render.setColor(0.7, 0.9, 0.7, fade)
-    lurek.render.print("Number: " .. format_number(big_number), col_x, cy, 16)
+    text_("Number: " .. format_number(big_number), col_x, cy, 16)
     cy = cy + 30
 
     -- Pluralization
     local count = item_counts[item_index]
     lurek.render.setColor(0.9, 0.7, 0.5, fade)
-    lurek.render.print(tr("items_label") .. ": " .. plural(count), col_x, cy, 16)
+    text_(tr("items_label") .. ": " .. plural(count), col_x, cy, 16)
     cy = cy + 30
 
     -- Interpolation demo
     lurek.render.setColor(0.9, 0.8, 0.6, fade)
-    lurek.render.print(tr_interp("welcome", { name = "Player1" }), col_x, cy, 14)
+    text_(tr_interp("welcome", { name = "Player1" }), col_x, cy, 14)
     cy = cy + 25
-    lurek.render.print(tr_interp("welcome", { name = "世界" }), col_x, cy, 14)
+    text_(tr_interp("welcome", { name = "世界" }), col_x, cy, 14)
     cy = cy + 40
 
     -- ── Additional labels showcase ────────────────────────────
     local labels = { "score", "level", "health", "controls", "inventory", "mission", "paused" }
     lurek.render.setColor(0.6, 0.6, 0.8, fade * 0.9)
     for _, key in ipairs(labels) do
-        lurek.render.print(key .. " → " .. tr(key), col_x, cy, 13)
+        text_(key .. " → " .. tr(key), col_x, cy, 13)
         cy = cy + 20
     end
 
@@ -483,18 +530,18 @@ function lurek.draw_ui()
         local label = tr(key)
         local bw = #label * 9 + 20
         lurek.render.setColor(0.2, 0.18, 0.28, fade)
-        lurek.render.rectangle("fill", dx, cy, bw, 26, 4)
+        rect("fill", dx, cy, bw, 26, 4)
         lurek.render.setColor(0.4, 0.35, 0.55, fade * 0.7)
-        lurek.render.rectangle("line", dx, cy, bw, 26, 4)
+        rect("line", dx, cy, bw, 26, 4)
         lurek.render.setColor(0.85, 0.8, 0.95, fade)
-        lurek.render.print(label, dx + 10, cy + 5, 13)
+        text_(label, dx + 10, cy + 5, 13)
         dx = dx + bw + 8
     end
 
     -- ── RTL indicator ─────────────────────────────────────────
     if rtl_mode then
         lurek.render.setColor(1.0, 0.6, 0.2, 0.9)
-        lurek.render.print("◀ " .. tr("rtl_hint") .. " ▶", SCREEN_W / 2 - 60, SCREEN_H - 80, 16)
+        text_("◀ " .. tr("rtl_hint") .. " ▶", SCREEN_W / 2 - 60, SCREEN_H - 80, 16)
     end
 
     -- ── Coverage meter ────────────────────────────────────────
@@ -506,14 +553,14 @@ function lurek.draw_ui()
     local bar_y = SCREEN_H - 50
 
     lurek.render.setColor(0.15, 0.12, 0.2, 0.9)
-    lurek.render.rectangle("fill", bar_x - 4, bar_y - 20, bar_w + 8, 46, 6)
+    rect("fill", bar_x - 4, bar_y - 20, bar_w + 8, 46, 6)
 
     lurek.render.setColor(0.5, 0.5, 0.6, fade * 0.8)
-    lurek.render.print(tr("coverage") .. ": " .. translated .. "/" .. total .. " (" .. pct .. "%)", bar_x, bar_y - 16, 12)
+    text_(tr("coverage") .. ": " .. translated .. "/" .. total .. " (" .. pct .. "%)", bar_x, bar_y - 16, 12)
 
     -- Bar background
     lurek.render.setColor(0.2, 0.2, 0.3, 0.8)
-    lurek.render.rectangle("fill", bar_x, bar_y, bar_w, bar_h, 3)
+    rect("fill", bar_x, bar_y, bar_w, bar_h, 3)
 
     -- Bar fill
     local fill_w = math.floor(bar_w * translated / total)
@@ -522,7 +569,7 @@ function lurek.draw_ui()
     else
         lurek.render.setColor(0.9, 0.7, 0.2, fade)
     end
-    lurek.render.rectangle("fill", bar_x, bar_y, fill_w, bar_h, 3)
+    rect("fill", bar_x, bar_y, fill_w, bar_h, 3)
 
     -- ── Missing key demo ──────────────────────────────────────
     local missing_text = tr("nonexistent_key")
@@ -531,5 +578,5 @@ function lurek.draw_ui()
     else
         lurek.render.setColor(0.8, 0.8, 0.8, fade)
     end
-    lurek.render.print(missing_text, bar_x, bar_y + 20, 11)
+    text_(missing_text, bar_x, bar_y + 20, 11)
 end

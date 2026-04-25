@@ -179,7 +179,7 @@ end
 --- Non-authority calls are rejected and return `false, "not authority"`.
 --- Keys must be non-empty strings.
 --- @tparam string key  The state key (must be a non-empty string).
---- @param value  Any MessagePack-serializable value.
+--- @param value  any MessagePack-serializable value.
 --- @treturn boolean  True if the value was set successfully.
 --- @treturn string|nil  Error message on failure.
 function NetState:set(key, value)
@@ -642,17 +642,33 @@ do
     if rawget(_G, "bit") then
         _bit = _G.bit
     elseif rawget(_G, "bit32") then
-        _bit = _G.bit32
+        _bit = rawget(_G, "bit32")
     else
-        -- Lua 5.3+ fallback using load() so that 5.1/LuaJIT parsers do not
-        -- choke on the `~` / `&` syntax.
-        local chunk = load([[
-            return {
-                bxor = function(a, b) return (a ~ b) & 0xFFFFFFFF end,
-                band = function(a, b) return (a & b) & 0xFFFFFFFF end,
-            }
-        ]])
-        if chunk then _bit = chunk() end
+        local function band(a, b)
+            local result, bit_value = 0, 1
+            while a > 0 and b > 0 do
+                local abit = a % 2
+                local bbit = b % 2
+                if abit == 1 and bbit == 1 then result = result + bit_value end
+                a = math.floor(a / 2)
+                b = math.floor(b / 2)
+                bit_value = bit_value * 2
+            end
+            return result
+        end
+        local function bxor(a, b)
+            local result, bit_value = 0, 1
+            while a > 0 or b > 0 do
+                local abit = a % 2
+                local bbit = b % 2
+                if abit ~= bbit then result = result + bit_value end
+                a = math.floor(a / 2)
+                b = math.floor(b / 2)
+                bit_value = bit_value * 2
+            end
+            return result
+        end
+        _bit = { bxor = bxor, band = band }
     end
 end
 

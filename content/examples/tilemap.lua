@@ -232,9 +232,18 @@ end
 -- Returns a metadata table — width/height/tileWidth/tileHeight/orientation/layers — not a TileMap.
 do  -- lurek.tilemap.loadTMX
   pcall(function()
-    local xml = lurek.fs.read("levels/forest.tmx")
+    local xml = [[
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="2" height="2" tilewidth="16" tileheight="16" infinite="0">
+  <layer id="1" name="Ground" width="2" height="2">
+    <data encoding="csv">1,0,0,1</data>
+  </layer>
+</map>
+]]
     local meta = lurek.tilemap.loadTMX(xml)
-    lurek.log.info("TMX " .. meta.width .. "x" .. meta.height .. " orient=" .. meta.orientation .. " layers=" .. #meta.layers, "tilemap")
+    if meta ~= nil then
+      lurek.log.info("TMX " .. meta.width .. "x" .. meta.height .. " orient=" .. meta.orientation .. " layers=" .. #meta.layers, "tilemap")
+    end
   end)
 end
 
@@ -243,7 +252,45 @@ end
 -- Pass an optional level name to pick from a multi-level project; defaults to the first level.
 do  -- lurek.tilemap.fromLDtk
   pcall(function()
-    local json = lurek.fs.read("levels/world.ldtk")
+    local json = [[
+{
+  "iid": "example-project",
+  "jsonVersion": "1.5.3",
+  "defs": {
+    "layers": [
+      {
+        "identifier": "Ground",
+        "type": "IntGrid",
+        "uid": 1,
+        "gridSize": 16
+      }
+    ],
+    "tilesets": []
+  },
+  "levels": [
+    {
+      "identifier": "Level_0",
+      "uid": 1,
+      "pxWid": 32,
+      "pxHei": 32,
+      "worldX": 0,
+      "worldY": 0,
+      "layerInstances": [
+        {
+          "__identifier": "Ground",
+          "__type": "IntGrid",
+          "__cWid": 2,
+          "__cHei": 2,
+          "__gridSize": 16,
+          "intGridCsv": [1, 0, 0, 1],
+          "autoLayerTiles": [],
+          "gridTiles": []
+        }
+      ]
+    }
+  ]
+}
+]]
     local map = lurek.tilemap.fromLDtk(json, "Level_0")
     lurek.log.info("LDtk level loaded with " .. map:getLayerCount() .. " layer(s)", "tilemap")
   end)
@@ -697,8 +744,8 @@ end
 do  -- AutoTileSheet:getQuad
   pcall(function()
     local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
-    local q = sheet:getQuad(3)
-    lurek.log.info("autotile 3 quad x=" .. q.x .. " y=" .. q.y, "tilemap")
+    local x, y = sheet:getQuad(3)
+    lurek.log.info("autotile 3 quad x=" .. x .. " y=" .. y, "tilemap")
   end)
 end
 
@@ -1370,7 +1417,7 @@ end
 do  -- AutoTileSheet:applyToTileSet
   local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
   local ats = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
-  ats:applyToTileSet(ts, 1)
+  ats:applyToTileSet(ts, "normal")
   lurek.log.info("auto-tile sheet applied to tileset", "tilemap")
 end
 

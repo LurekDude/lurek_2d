@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, param-type-mismatch
 -- CORRECT
 lurek.render.rectangle("fill", x, y, w, h)
 lurek.render.rectangle("line", x, y, w, h)

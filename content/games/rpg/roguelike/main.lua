@@ -28,7 +28,7 @@ local state        = STATE_TITLE
 local map          = {}
 local visible      = {}
 local explored     = {}
-local player       = nil
+local player       = nil ---@type any
 local enemies      = {}
 local pickups      = {}
 local particles    = {}
@@ -461,7 +461,57 @@ lurek.input.bind("move_right", {"right", "d"})
 lurek.input.bind("confirm",    {"return"})
 lurek.input.bind("quit",       {"escape"})
 
+-- Universal render helpers (handles all legacy and current call signatures)
+local _gfx = lurek.render
+local function _sc(c)
+    if type(c) == "table" then
+        local col = c.color or c
+        if type(col) == "table" then
+            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+        end
+    end
+end
+local function rect(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        _gfx.rectangle(a, b, c, d, e)
+    elseif type(e) == "table" then
+        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
+    elseif type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
+    else
+        _gfx.rectangle("fill", a, b, c, d)
+    end
+end
+local function circ(a, b, c, d, e, f, g, h)
+    if type(a) == "string" then
+        if type(e) == "table" then _sc(e)
+        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
+        _gfx.circle(a, b, c, d)
+    elseif type(d) == "table" then
+        _sc(d); _gfx.circle("fill", a, b, c)
+    elseif type(d) == "number" then
+        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
+    else
+        _gfx.circle("fill", a, b, c)
+    end
+end
+local function text_(a, b, c, d, e, f, g, h)
+    if type(d) == "table" then
+        _sc(d)
+    elseif type(d) == "number" and type(e) == "number" then
+        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+    end
+    _gfx.print(tostring(a), b, c)
+end
+local function ln(x1, y1, x2, y2, c)
+    if type(c) == "table" then _sc(c) end
+    _gfx.line(x1, y1, x2, y2)
+end
+
+local _cam = nil ---@type any
+
 function lurek.init()
+    _cam = lurek.camera.new()
     lurek.window.setTitle("Roguelike — Lurek2D")
     math.randomseed(os.time())
     player = make_player()
@@ -529,26 +579,26 @@ function lurek.draw()
             if visible[y][x] then
                 if map[y][x] == WALL then
                     lurek.render.setColor(0.25, 0.22, 0.30, 1)
-                    lurek.render.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
+                    rect("fill", px, py, TILE_SIZE, TILE_SIZE)
                 elseif map[y][x] == FLOOR then
                     lurek.render.setColor(0.12, 0.11, 0.15, 1)
-                    lurek.render.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
+                    rect("fill", px, py, TILE_SIZE, TILE_SIZE)
                     -- Grid lines
                     lurek.render.setColor(0.16, 0.15, 0.19, 1)
-                    lurek.render.rectangle("line", px, py, TILE_SIZE, TILE_SIZE)
+                    rect("line", px, py, TILE_SIZE, TILE_SIZE)
                 elseif map[y][x] == STAIRS then
                     lurek.render.setColor(0.15, 0.3, 0.6, 1)
-                    lurek.render.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
+                    rect("fill", px, py, TILE_SIZE, TILE_SIZE)
                     lurek.render.setColor(0.4, 0.7, 1, 1)
-                    lurek.render.print(">", px + 6, py + 3)
+                    text_(">", px + 6, py + 3)
                 end
             elseif explored[y][x] then
                 if map[y][x] == WALL then
                     lurek.render.setColor(0.12, 0.11, 0.14, 1)
-                    lurek.render.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
+                    rect("fill", px, py, TILE_SIZE, TILE_SIZE)
                 else
                     lurek.render.setColor(0.07, 0.06, 0.09, 1)
-                    lurek.render.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
+                    rect("fill", px, py, TILE_SIZE, TILE_SIZE)
                 end
             end
         end
@@ -561,10 +611,10 @@ function lurek.draw()
             local py = p.y * TILE_SIZE
             if p.kind == "potion" then
                 lurek.render.setColor(0.2, 0.9, 0.3, 1)
-                lurek.render.print("!", px + 8, py + 3)
+                text_("!", px + 8, py + 3)
             else
                 lurek.render.setColor(0.9, 0.8, 0.2, 1)
-                lurek.render.print("+", px + 6, py + 3)
+                text_("+", px + 6, py + 3)
             end
         end
     end
@@ -575,15 +625,15 @@ function lurek.draw()
             local px = e.x * TILE_SIZE
             local py = e.y * TILE_SIZE
             lurek.render.setColor(e.color[1], e.color[2], e.color[3], 1)
-            lurek.render.print(e.glyph, px + 7, py + 3)
+            text_(e.glyph, px + 7, py + 3)
 
             -- HP bar above enemy
             local bar_w = TILE_SIZE - 4
             local hp_ratio = e.hp / e.max_hp
             lurek.render.setColor(0.3, 0.0, 0.0, 0.8)
-            lurek.render.rectangle("fill", px + 2, py - 4, bar_w, 3)
+            rect("fill", px + 2, py - 4, bar_w, 3)
             lurek.render.setColor(0.9, 0.1, 0.1, 0.9)
-            lurek.render.rectangle("fill", px + 2, py - 4, bar_w * hp_ratio, 3)
+            rect("fill", px + 2, py - 4, bar_w * hp_ratio, 3)
         end
     end
 
@@ -591,21 +641,21 @@ function lurek.draw()
     local ppx = player.x * TILE_SIZE
     local ppy = player.y * TILE_SIZE
     lurek.render.setColor(1, 1, 0.3, 1)
-    lurek.render.print("@", ppx + 6, ppy + 3)
+    text_("@", ppx + 6, ppy + 3)
 
     -- Draw particles (world-space)
     for _, p in ipairs(particles) do
         local alpha = clamp(p.life / p.max_life, 0, 1)
         local size = 2 + alpha * 2
         lurek.render.setColor(p.r, p.g, p.b, alpha)
-        lurek.render.rectangle("fill", p.x - size / 2, p.y - size / 2, size, size)
+        rect("fill", p.x - size / 2, p.y - size / 2, size, size)
     end
 
     -- Draw damage popups (world-space)
     for _, t in ipairs(tweens_list) do
         local alpha = clamp(t.life / t.max_life, 0, 1)
         lurek.render.setColor(t.r, t.g, t.b, alpha)
-        lurek.render.print(t.text, t.x - 8, t.y)
+        text_(t.text, t.x - 8, t.y)
     end
 end
 
@@ -615,75 +665,75 @@ end
 function lurek.draw_ui()
     if state == STATE_TITLE then
         lurek.render.setColor(0.8, 0.6, 1, 1)
-        lurek.render.print("ROGUELIKE", 290, 200, 0, 2.5, 2.5)
+        text_("ROGUELIKE", 290, 200, 0, 2.5, 2.5)
         lurek.render.setColor(0.6, 0.6, 0.6, 1)
-        lurek.render.print("A turn-based dungeon crawler", 270, 270)
+        text_("A turn-based dungeon crawler", 270, 270)
         lurek.render.setColor(1, 1, 1, math.abs(math.sin(lurek.timer.getTime() * 2)))
-        lurek.render.print("PRESS ENTER", 330, 340)
+        text_("PRESS ENTER", 330, 340)
         lurek.render.setColor(0.4, 0.4, 0.4, 1)
-        lurek.render.print("Arrow keys / WASD to move  |  ESC to quit", 200, 500)
+        text_("Arrow keys / WASD to move  |  ESC to quit", 200, 500)
         return
     end
 
     if state == STATE_GAMEOVER then
         lurek.render.setColor(0.9, 0.1, 0.1, 1)
-        lurek.render.print("GAME OVER", 300, 180, 0, 2.5, 2.5)
+        text_("GAME OVER", 300, 180, 0, 2.5, 2.5)
         lurek.render.setColor(0.8, 0.8, 0.8, 1)
-        lurek.render.print("Floors explored: " .. floor_num, 310, 280)
-        lurek.render.print("Enemies slain:   " .. total_kills, 310, 310)
-        lurek.render.print("Turns survived:  " .. turn_count, 310, 340)
-        lurek.render.print("Player level:    " .. player.level, 310, 370)
+        text_("Floors explored: " .. floor_num, 310, 280)
+        text_("Enemies slain:   " .. total_kills, 310, 310)
+        text_("Turns survived:  " .. turn_count, 310, 340)
+        text_("Player level:    " .. player.level, 310, 370)
         lurek.render.setColor(0.6, 0.6, 0.6, 1)
-        lurek.render.print("Press ENTER to return to title", 260, 450)
+        text_("Press ENTER to return to title", 260, 450)
         return
     end
 
     -- HUD background bar
     lurek.render.setColor(0.0, 0.0, 0.0, 0.7)
-    lurek.render.rectangle("fill", 0, 0, 800, 28)
+    rect("fill", 0, 0, 800, 28)
 
     -- HP bar with tween
     local hp_pct = clamp(player.display_hp / player.max_hp, 0, 1)
     local bar_x, bar_y, bar_w, bar_h = 70, 6, 140, 14
     lurek.render.setColor(0.2, 0.0, 0.0, 1)
-    lurek.render.rectangle("fill", bar_x, bar_y, bar_w, bar_h)
+    rect("fill", bar_x, bar_y, bar_w, bar_h)
     -- Tween trail (slightly different color)
     local tween_pct = clamp(player.display_hp / player.max_hp, 0, 1)
     if tween_pct > hp_pct then
         lurek.render.setColor(0.7, 0.2, 0.1, 0.7)
-        lurek.render.rectangle("fill", bar_x, bar_y, bar_w * tween_pct, bar_h)
+        rect("fill", bar_x, bar_y, bar_w * tween_pct, bar_h)
     end
     -- Actual HP
     local real_pct = clamp(player.hp / player.max_hp, 0, 1)
     local r_hp = real_pct > 0.5 and 0.2 or (real_pct > 0.25 and 0.9 or 0.9)
     local g_hp = real_pct > 0.5 and 0.8 or (real_pct > 0.25 and 0.6 or 0.1)
     lurek.render.setColor(r_hp, g_hp, 0.1, 1)
-    lurek.render.rectangle("fill", bar_x, bar_y, bar_w * real_pct, bar_h)
+    rect("fill", bar_x, bar_y, bar_w * real_pct, bar_h)
     -- HP text
     lurek.render.setColor(1, 1, 1, 1)
-    lurek.render.print("HP", 46, 7)
-    lurek.render.print(math.floor(player.hp) .. "/" .. player.max_hp, bar_x + 4, bar_y + 1)
+    text_("HP", 46, 7)
+    text_(math.floor(player.hp) .. "/" .. player.max_hp, bar_x + 4, bar_y + 1)
 
     -- Stats
     lurek.render.setColor(0.9, 0.9, 0.9, 1)
-    lurek.render.print("ATK:" .. player.atk, 230, 7)
-    lurek.render.print("DEF:" .. player.def, 300, 7)
-    lurek.render.print("Lv:" .. player.level, 370, 7)
-    lurek.render.print("Floor:" .. floor_num, 440, 7)
-    lurek.render.print("Turn:" .. turn_count, 540, 7)
-    lurek.render.print("Kills:" .. total_kills, 640, 7)
+    text_("ATK:" .. player.atk, 230, 7)
+    text_("DEF:" .. player.def, 300, 7)
+    text_("Lv:" .. player.level, 370, 7)
+    text_("Floor:" .. floor_num, 440, 7)
+    text_("Turn:" .. turn_count, 540, 7)
+    text_("Kills:" .. total_kills, 640, 7)
 
     -- FPS
     lurek.render.setColor(0.4, 0.4, 0.4, 1)
-    lurek.render.print("FPS:" .. lurek.timer.getFPS(), 740, 7)
+    text_("FPS:" .. lurek.timer.getFPS(), 740, 7)
 
     -- Message log at bottom
     lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
-    lurek.render.rectangle("fill", 0, 510, 640, 90)
+    rect("fill", 0, 510, 640, 90)
     for i, msg in ipairs(messages) do
         local alpha = 0.4 + 0.6 * (i / #messages)
         lurek.render.setColor(0.9, 0.85, 0.7, alpha)
-        lurek.render.print(msg, 10, 510 + (i - 1) * 16)
+        text_(msg, 10, 510 + (i - 1) * 16)
     end
 
     -- Minimap (top-right)
@@ -691,7 +741,7 @@ function lurek.draw_ui()
     local mm_y = 40
     local mm_s = 4
     lurek.render.setColor(0.0, 0.0, 0.0, 0.5)
-    lurek.render.rectangle("fill", mm_x - 2, mm_y - 2, MAP_W * mm_s + 4, MAP_H * mm_s + 4)
+    rect("fill", mm_x - 2, mm_y - 2, MAP_W * mm_s + 4, MAP_H * mm_s + 4)
     for y = 0, MAP_H - 1 do
         for x = 0, MAP_W - 1 do
             if explored[y][x] then
@@ -708,18 +758,18 @@ function lurek.draw_ui()
                 else
                     lurek.render.setColor(0.1, 0.1, 0.12, 0.5)
                 end
-                lurek.render.rectangle("fill", mx, my, mm_s, mm_s)
+                rect("fill", mx, my, mm_s, mm_s)
             end
         end
     end
     -- Player on minimap
     lurek.render.setColor(1, 1, 0.3, 1)
-    lurek.render.rectangle("fill", mm_x + player.x * mm_s, mm_y + player.y * mm_s, mm_s, mm_s)
+    rect("fill", mm_x + player.x * mm_s, mm_y + player.y * mm_s, mm_s, mm_s)
     -- Enemies on minimap (visible only)
     for _, e in ipairs(enemies) do
         if visible[e.y] and visible[e.y][e.x] then
             lurek.render.setColor(0.9, 0.2, 0.2, 0.8)
-            lurek.render.rectangle("fill", mm_x + e.x * mm_s, mm_y + e.y * mm_s, mm_s, mm_s)
+            rect("fill", mm_x + e.x * mm_s, mm_y + e.y * mm_s, mm_s, mm_s)
         end
     end
 end

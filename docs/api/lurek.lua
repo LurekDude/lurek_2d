@@ -254,7 +254,6 @@ function Agent:getName() end
 
 --- Returns the agent's current position.
 ---@return number
----@return number
 function Agent:getPosition() end
 
 --- Returns the agent's scheduling priority.
@@ -262,7 +261,6 @@ function Agent:getPosition() end
 function Agent:getPriority() end
 
 --- Returns the agent's current velocity.
----@return number
 ---@return number
 function Agent:getVelocity() end
 
@@ -457,7 +455,6 @@ function CommandQueue:getCount() end
 
 --- Returns the target coordinates of the front command.
 ---@return number
----@return number
 function CommandQueue:getCurrentTarget() end
 
 --- Returns the kind of the front command, or nil.
@@ -539,7 +536,6 @@ function ContextSteering:clearBehaviors() end
 ---@param ay number
 ---@param vx number
 ---@param vy number
----@return number
 ---@return number
 function ContextSteering:evaluate(ax, ay, vx, vy) end
 
@@ -768,12 +764,10 @@ function InfluenceMap:getInfluence(layer, x, y) end
 --- Returns the world-space position of the maximum value.
 ---@param layer string
 ---@return number
----@return number
 function InfluenceMap:getMaxPosition(layer) end
 
 --- Returns the world-space position of the minimum value.
 ---@param layer string
----@return number
 ---@return number
 function InfluenceMap:getMinPosition(layer) end
 
@@ -964,7 +958,6 @@ function ORCASolver:compute(dt) end
 --- Returns the safe velocity.
 ---@param index integer
 ---@return number
----@return number
 function ORCASolver:getSafeVelocity(index) end
 
 --- Sets the agent's current world-space position for ORCA velocity computation.
@@ -1107,7 +1100,6 @@ function Squad:getFormation() end
 ---@param memberIdx integer
 ---@param leaderX number
 ---@param leaderY number
----@return number
 ---@return number
 function Squad:getFormationPosition(memberIdx, leaderX, leaderY) end
 
@@ -1267,7 +1259,6 @@ function SteeringManager:addWander(radius, dist, jitter, weight) end
 ---@param agent Agent
 ---@param dt number
 ---@return number
----@return number
 function SteeringManager:applyCustomSteering(agent, dt) end
 
 --- Computes the combined steering force for the given agent state.
@@ -1278,7 +1269,6 @@ function SteeringManager:applyCustomSteering(agent, dt) end
 ---@param maxSpeed number
 ---@param maxForce number
 ---@param dt number
----@return number
 ---@return number
 function SteeringManager:calculate(px, py, vx, vy, maxSpeed, maxForce, dt) end
 
@@ -1296,7 +1286,6 @@ function SteeringManager:getBehaviorCount() end
 function SteeringManager:getCombineMode() end
 
 --- Returns the last computed steering force.
----@return number
 ---@return number
 function SteeringManager:getLastSteering() end
 
@@ -2621,12 +2610,9 @@ lurek.audio.getHighpass = function(source) end
 
 --- Returns the 3D listener position (x, y, z).
 ---@return number
----@return number
----@return number
 lurek.audio.getListener = function() end
 
 --- Returns the 2D listener position (x, y).
----@return number
 ---@return number
 lurek.audio.getListener2D = function() end
 
@@ -2673,8 +2659,6 @@ lurek.audio.getPlaybackDevices = function() end
 --- Returns the 3D position of a source (x, y, z).
 ---@param source Source
 ---@return number
----@return number
----@return number
 lurek.audio.getPosition = function(source) end
 
 --- Returns the bus a source is assigned to, or nil.
@@ -2698,8 +2682,6 @@ lurek.audio.getStereoWidth = function(src) end
 
 --- Returns the velocity of a source (x, y, z).
 ---@param source Source
----@return number
----@return number
 ---@return number
 lurek.audio.getVelocity = function(source) end
 
@@ -3238,7 +3220,6 @@ function Camera2D:followPath(points, duration) end
 
 --- Returns the current sway x, y world-space offset.
 ---@return number
----@return number
 function Camera2D:getEffectOffset() end
 
 --- Returns the current zoom level including zoom pulse and breathing deltas.
@@ -3252,7 +3233,6 @@ function Camera2D:getParallaxFactor(layer) end
 
 --- Returns the camera's world-space position as x, y.
 ---@return number
----@return number
 function Camera2D:getPosition() end
 
 --- Returns the rotation in radians.
@@ -3261,15 +3241,9 @@ function Camera2D:getRotation() end
 
 --- Returns the current viewport as x, y, w, h.
 ---@return number
----@return number
----@return number
----@return number
 function Camera2D:getViewport() end
 
 --- Returns the visible world area as x, y, w, h.
----@return number
----@return number
----@return number
 ---@return number
 function Camera2D:getVisibleArea() end
 
@@ -3409,13 +3383,11 @@ function Camera2D:stopZoom() end
 ---@param wx number
 ---@param wy number
 ---@return number
----@return number
 function Camera2D:toScreen(wx, wy) end
 
 --- Converts screen coordinates to world coordinates.
 ---@param sx number
 ---@param sy number
----@return number
 ---@return number
 function Camera2D:toWorld(sx, sy) end
 
@@ -3585,7 +3557,7 @@ function Array:erode(radius) end
 
 --- Evaluate a Lua expression string element-wise, returning a new Array.
 ---@param expr string — Lua expression using `x` as the input variable
----@return Array
+---@return Array — new array with transformed values
 function Array:eval(expr) end
 
 --- Fills all elements with the given value in-place.
@@ -3651,7 +3623,7 @@ function Array:luDecompose() end
 
 --- Apply a Lua callback element-wise, returning a new Array of the same shape.
 ---@param fn function(value: number)→ number — called for each element
----@return Array
+---@return Array — new array with transformed values
 function Array:map(fn) end
 
 --- Matrix multiplication of two 2D arrays.
@@ -3722,7 +3694,7 @@ function Array:reshape(shape) end
 --- Running accumulation — like reduce but returns every intermediate result.
 ---@param fn function(acc: number,value: number)→ number — accumulator function
 ---@param init number — initial accumulator value
----@return Array
+---@return Array — array of cumulative values(same length as input)
 function Array:scan(fn, init) end
 
 --- Sets the element at the given 1-based indices to a value.
@@ -4633,7 +4605,7 @@ GroupedFrame = {}
 --- Apply a Lua function to aggregate a column's values per group.
 ---@param col_name string — column to aggregate
 ---@param fn function(values: table)→ number — receives array of column values,returns aggregate
----@return DataFrame
+---@return DataFrame — new dataframe with group keys and aggregated values
 function GroupedFrame:aggregate(col_name, fn) end
 
 --- Thin Lua wrapper around a [`VecFrame`]: typed-column vectorized DataFrame.
@@ -5367,15 +5339,13 @@ lurek.docs.checkStaleness = function(catalog_ud, source_dir) end
 
 --- Return (documented_count, total_live_count) coverage tuple.
 ---@param catalog_ud? userdata
----@return integer
----@return integer
+---@return number
 lurek.docs.coverage = function(catalog_ud) end
 
 --- Return (documented_count, total_live_count) for a single module.
 ---@param module_name string
 ---@param catalog_ud? userdata
----@return integer
----@return integer
+---@return number
 lurek.docs.coverageModule = function(module_name, catalog_ud) end
 
 --- Inject or update a description for a named API entry.
@@ -5919,9 +5889,6 @@ function Overlay:flash(r, g, b, a, duration) end
 
 --- Returns the current ambient tint as r, g, b, a components.
 ---@return number
----@return number
----@return number
----@return number
 function Overlay:getAmbientColor() end
 
 --- Returns the current cloud shadow instance count.
@@ -5941,8 +5908,7 @@ function Overlay:getCloudScale() end
 function Overlay:getCloudSpeed() end
 
 --- Returns the effect width and height.
----@return integer
----@return integer
+---@return number
 function Overlay:getDimensions() end
 
 --- Returns the current film-grain intensity.
@@ -5954,9 +5920,6 @@ function Overlay:getFilmGrainIntensity() end
 function Overlay:getFlashAlpha() end
 
 --- Returns the current fog tint as r, g, b, a components.
----@return number
----@return number
----@return number
 ---@return number
 function Overlay:getFogColor() end
 
@@ -5978,13 +5941,9 @@ function Overlay:getLightningAlpha() end
 
 --- Returns the lightning flash tint as r, g, b, a components.
 ---@return number
----@return number
----@return number
----@return number
 function Overlay:getLightningColor() end
 
 --- Returns the current shake displacement as x, y.
----@return number
 ---@return number
 function Overlay:getShakeOffset() end
 
@@ -6416,8 +6375,7 @@ function PostFxStack:dedup() end
 function PostFxStack:endCapture() end
 
 --- Returns width and height of the render target.
----@return integer
----@return integer
+---@return number
 function PostFxStack:getDimensions() end
 
 --- Returns the effect at the given 1-based position, or nil.
@@ -6504,9 +6462,6 @@ function PostFxStack:typeOf(name) end
 ScreenTransition = {}
 
 --- Returns the fill color as four numbers: `r, g, b, a`.
----@return number
----@return number
----@return number
 ---@return number
 function ScreenTransition:color() end
 
@@ -7108,8 +7063,6 @@ function Globe:findPath(from_id, to_id) end
 
 --- Get the current camera (lat, lon, zoom).
 ---@return number
----@return number
----@return number
 function Globe:getCamera() end
 
 --- Returns the current LOD tier as a string: "far", "mid", or "near".
@@ -7182,7 +7135,7 @@ function Globe:provinceCount() end
 --- Return all provinces reachable within `max_cost` steps from `start_id`.
 ---@param start_id integer
 ---@param max_cost number
----@return table<integer,number>
+---@return number
 function Globe:reachable(start_id, max_cost) end
 
 --- Removes an arc from the globe map by its unique string identifier.
@@ -8134,8 +8087,7 @@ lurek.image = {}
 CompressedImageData = {}
 
 --- Returns the width and height of the base mip level.
----@return integer
----@return integer
+---@return number
 function CompressedImageData:getDimensions() end
 
 --- Returns the compressed format name string.
@@ -8387,6 +8339,15 @@ function ImageData:threshold(value) end
 ---@param factor any
 function ImageData:tint(tr, tg, tb, factor) end
 
+--- Returns the type name of this object.
+---@return string
+function ImageData:type() end
+
+--- Returns true if this object is of the given type name.
+---@param name string
+---@return boolean
+function ImageData:typeOf(name) end
+
 --- Lua-side wrapper around [`LayeredImage`].
 ---@class LayeredImage
 LayeredImage = {}
@@ -8583,18 +8544,6 @@ lurek.image.savePNG = function(imagedata, path) end
 ---@class lurek.input
 lurek.input = {}
 
----@class lurek.input.gamepad
-lurek.input.gamepad = {}
-
----@class lurek.input.keyboard
-lurek.input.keyboard = {}
-
----@class lurek.input.mouse
-lurek.input.mouse = {}
-
----@class lurek.input.touch
-lurek.input.touch = {}
-
 --- Lua-side wrapper for a [`ComboDetector`] with an integrated millisecond clock.
 ---@class Combo
 Combo = {}
@@ -8676,16 +8625,16 @@ lurek.input.clearBindings = function() end
 ---@param id integer
 ---@param axis integer
 ---@return number
-lurek.input.gamepad.getAxis = function(id, axis) end
+lurek.input.getAxis = function(id, axis) end
 
 --- Returns the total number of analog axes on the gamepad.
 ---@param id integer
 ---@return number
-lurek.input.gamepad.getAxisCount = function(id) end
+lurek.input.getAxisCount = function(id) end
 
 --- Returns whether background gamepad events are enabled.
 ---@return boolean
-lurek.input.gamepad.getBackgroundEvents = function() end
+lurek.input.getBackgroundEvents = function() end
 
 --- Returns a table mapping each action name to its bound keys.
 ---@return table
@@ -8694,49 +8643,49 @@ lurek.input.getBindings = function() end
 --- Returns the total number of buttons on the gamepad.
 ---@param id integer
 ---@return number
-lurek.input.gamepad.getButtonCount = function(id) end
+lurek.input.getButtonCount = function(id) end
 
 --- Returns the number of connected gamepads.
 ---@return number
-lurek.input.gamepad.getCount = function() end
+lurek.input.getCount = function() end
 
 --- Returns the name of the currently active system cursor.
 ---@return string
-lurek.input.mouse.getCursor = function() end
+lurek.input.getCursor = function() end
 
 --- Returns the hardware GUID string of the gamepad.
 ---@param id integer
 ---@return string
-lurek.input.gamepad.getGUID = function(id) end
+lurek.input.getGUID = function(id) end
 
 --- Returns the stored mapping string for the given GUID, or nil.
 ---@param guid string
 ---@return string
-lurek.input.gamepad.getGamepadMappingString = function(guid) end
+lurek.input.getGamepadMappingString = function(guid) end
 
 --- Returns the direction string of a hat switch on the gamepad.
 ---@param id integer
 ---@param hat integer
 ---@return string
-lurek.input.gamepad.getHat = function(id, hat) end
+lurek.input.getHat = function(id, hat) end
 
 --- Returns the number of tracked gamepad slots.
 ---@return number
-lurek.input.gamepad.getJoystickCount = function() end
+lurek.input.getJoystickCount = function() end
 
 --- Returns a list of connected gamepad IDs.
 ---@return table
-lurek.input.gamepad.getJoysticks = function() end
+lurek.input.getJoysticks = function() end
 
 --- Returns the key name for the given hardware scancode.
 ---@param scancode string
 ---@return string
-lurek.input.keyboard.getKeyFromScancode = function(scancode) end
+lurek.input.getKeyFromScancode = function(scancode) end
 
 --- Returns the human-readable name of a gamepad.
 ---@param id integer
 ---@return string
-lurek.input.gamepad.getName = function(id) end
+lurek.input.getName = function(id) end
 
 --- Returns the current playback frame index (0-based).  Returns 0 when not playing.
 ---@return number
@@ -8744,62 +8693,59 @@ lurek.input.getPlaybackFrame = function() end
 
 --- Returns the current cursor position as (x, y).
 ---@return number
----@return number
-lurek.input.mouse.getPosition = function() end
+lurek.input.getPosition = function() end
 
 --- Returns the position (x, y) of the touch with the given ID.
 ---@param id integer
 ---@return number
----@return number
-lurek.input.touch.getPosition = function(id) end
+lurek.input.getPosition = function(id) end
 
 --- Returns the pressure (0-1) of the touch with the given ID.
 ---@param id integer
 ---@return number
-lurek.input.touch.getPressure = function(id) end
+lurek.input.getPressure = function(id) end
 
 --- Returns whether relative mouse mode is active.
 ---@return boolean
-lurek.input.mouse.getRelativeMode = function() end
+lurek.input.getRelativeMode = function() end
 
 --- Returns the hardware scancode for the given key name.
 ---@param key string
 ---@return string
-lurek.input.keyboard.getScancodeFromKey = function(key) end
+lurek.input.getScancodeFromKey = function(key) end
 
 --- Returns a system cursor object for the named cursor shape.
 ---@param name string
 ---@return Cursor
-lurek.input.mouse.getSystemCursor = function(name) end
+lurek.input.getSystemCursor = function(name) end
 
 --- Returns the number of currently active touch points.
 ---@return number
-lurek.input.touch.getTouchCount = function() end
+lurek.input.getTouchCount = function() end
 
 --- Returns a table of active touch points with id, x, y, and pressure fields.
 ---@return table
-lurek.input.touch.getTouches = function() end
+lurek.input.getTouches = function() end
 
 --- Returns the mouse scroll wheel delta (dx, dy) since last frame.
 ---@return number
----@return number
-lurek.input.mouse.getWheelDelta = function() end
+lurek.input.getWheelDelta = function() end
 
 --- Returns the current mouse X position in window coordinates.
 ---@return number
-lurek.input.mouse.getX = function() end
+lurek.input.getX = function() end
 
 --- Returns the current mouse Y position in window coordinates.
 ---@return number
-lurek.input.mouse.getY = function() end
+lurek.input.getY = function() end
 
 --- Returns whether key-repeat is currently enabled.
 ---@return boolean
-lurek.input.keyboard.hasKeyRepeat = function() end
+lurek.input.hasKeyRepeat = function() end
 
 --- Returns whether text input mode is currently active.
 ---@return boolean
-lurek.input.keyboard.hasTextInput = function() end
+lurek.input.hasTextInput = function() end
 
 --- Returns true if any key bound to the action is currently held down.
 ---@param action string
@@ -8809,41 +8755,41 @@ lurek.input.isActionDown = function(action) end
 --- Returns whether the gamepad with the given ID is connected.
 ---@param id integer
 ---@return boolean
-lurek.input.gamepad.isConnected = function(id) end
+lurek.input.isConnected = function(id) end
 
 --- Returns whether cursor customisation is supported on this platform.
 ---@return boolean
-lurek.input.mouse.isCursorSupported = function() end
+lurek.input.isCursorSupported = function() end
 
 --- Returns true if any of the given keys is currently held down.
 ---@param ... string
 ---@return boolean
-lurek.input.keyboard.isDown = function(...) end
+lurek.input.isDown = function(...) end
 
 --- Returns whether the given mouse button is currently held down.
 ---@param button integer
 ---@return boolean
-lurek.input.mouse.isDown = function(button) end
+lurek.input.isDown = function(button) end
 
 --- Returns whether the given button on the gamepad is currently held.
 ---@param id integer
 ---@param button integer
 ---@return boolean
-lurek.input.gamepad.isDown = function(id, button) end
+lurek.input.isDown = function(id, button) end
 
 --- Returns whether the joystick at the given slot is a recognized gamepad.
 ---@param id integer
 ---@return boolean
-lurek.input.gamepad.isGamepad = function(id) end
+lurek.input.isGamepad = function(id) end
 
 --- Returns whether the mouse cursor is locked to the window.
 ---@return boolean
-lurek.input.mouse.isGrabbed = function() end
+lurek.input.isGrabbed = function() end
 
 --- Returns whether the named modifier key is currently held.
 ---@param modifier string
 ---@return boolean
-lurek.input.keyboard.isModifierActive = function(modifier) end
+lurek.input.isModifierActive = function(modifier) end
 
 --- Returns true if input playback is currently active.
 ---@return boolean
@@ -8856,21 +8802,21 @@ lurek.input.isRecording = function() end
 --- Returns whether the key with the given scancode is held.
 ---@param scancode string
 ---@return boolean
-lurek.input.keyboard.isScancodeDown = function(scancode) end
+lurek.input.isScancodeDown = function(scancode) end
 
 --- Returns whether the gamepad supports haptic vibration.
 ---@param id integer
 ---@return boolean
-lurek.input.gamepad.isVibrationSupported = function(id) end
+lurek.input.isVibrationSupported = function(id) end
 
 --- Returns whether the mouse cursor is currently visible.
 ---@return boolean
-lurek.input.mouse.isVisible = function() end
+lurek.input.isVisible = function() end
 
 --- Loads SDL2 GameControllerDB-format mappings from a file.
 ---@param path string
 ---@return number
-lurek.input.gamepad.loadGamepadMappings = function(path) end
+lurek.input.loadGamepadMappings = function(path) end
 
 --- Loads a JSON-encoded recording string for playback.
 ---@param json string
@@ -8890,64 +8836,64 @@ lurek.input.newCombo = function(steps, opts) end
 ---@param hotx? integer
 ---@param hoty? integer
 ---@return Cursor
-lurek.input.mouse.newCursor = function(pixels, width, height, hotx, hoty) end
+lurek.input.newCursor = function(pixels, width, height, hotx, hoty) end
 
 --- Saves all stored gamepad mappings to a plain-text file.
 ---@param path string
 ---@return nil
-lurek.input.gamepad.saveGamepadMappings = function(path) end
+lurek.input.saveGamepadMappings = function(path) end
 
 --- Enable or disable receiving gamepad events when the window is not focused.
 ---@param enable boolean
 ---@return nil
-lurek.input.gamepad.setBackgroundEvents = function(enable) end
+lurek.input.setBackgroundEvents = function(enable) end
 
 --- Sets the active mouse cursor from a Cursor handle, name string, or nil to reset.
 ---@param cursor Cursor|string|nil
 ---@return nil
-lurek.input.mouse.setCursor = function(cursor) end
+lurek.input.setCursor = function(cursor) end
 
 --- Stores or replaces the SDL2 GameControllerDB mapping string for the given GUID.
 ---@param guid string
 ---@param mapping string
 ---@return nil
-lurek.input.gamepad.setGamepadMapping = function(guid, mapping) end
+lurek.input.setGamepadMapping = function(guid, mapping) end
 
 --- Locks or unlocks the mouse cursor to the window.
 ---@param grabbed boolean
 ---@return nil
-lurek.input.mouse.setGrabbed = function(grabbed) end
+lurek.input.setGrabbed = function(grabbed) end
 
 --- Enables or disables key-repeat events.
 ---@param enabled boolean
 ---@return nil
-lurek.input.keyboard.setKeyRepeat = function(enabled) end
+lurek.input.setKeyRepeat = function(enabled) end
 
 --- Moves the mouse cursor to the given window-space position.
 ---@param x number
 ---@param y number
 ---@return nil
-lurek.input.mouse.setPosition = function(x, y) end
+lurek.input.setPosition = function(x, y) end
 
 --- Enables or disables raw relative mouse motion mode.
 ---@param relative boolean
 ---@return nil
-lurek.input.mouse.setRelativeMode = function(relative) end
+lurek.input.setRelativeMode = function(relative) end
 
 --- Enables or disables Unicode text input mode.
 ---@param enabled boolean
 ---@return nil
-lurek.input.keyboard.setTextInput = function(enabled) end
+lurek.input.setTextInput = function(enabled) end
 
 --- Triggers haptic rumble (currently a no-op stub).
 ---@param ... any
 ---@return boolean
-lurek.input.gamepad.setVibration = function(...) end
+lurek.input.setVibration = function(...) end
 
 --- Shows or hides the operating-system mouse cursor.
 ---@param visible boolean
 ---@return nil
-lurek.input.mouse.setVisible = function(visible) end
+lurek.input.setVisible = function(visible) end
 
 --- Starts playback from the beginning of the loaded recording.
 ---@return nil
@@ -8976,7 +8922,7 @@ lurek.input.unbind = function(action) end
 ---@param high_freq number
 ---@param duration_ms number
 ---@return boolean
-lurek.input.gamepad.vibrate = function(id, low_freq, high_freq, duration_ms) end
+lurek.input.vibrate = function(id, low_freq, high_freq, duration_ms) end
 
 --- Returns true if any key bound to the action was pressed this frame.
 ---@param action string
@@ -9014,8 +8960,6 @@ function Light:clearCookie() end
 
 --- Returns the custom attenuation coefficients as (constant, linear, quadratic).
 ---@return number
----@return number
----@return number
 function Light:getAttenuation() end
 
 --- Returns the blend mode as a string.
@@ -9023,9 +8967,6 @@ function Light:getAttenuation() end
 function Light:getBlendMode() end
 
 --- Returns the light's tint color as (r, g, b, a).
----@return number
----@return number
----@return number
 ---@return number
 function Light:getColor() end
 
@@ -9046,7 +8987,6 @@ function Light:getEnergy() end
 function Light:getFalloff() end
 
 --- Returns the flicker effect speed and strength.
----@return number
 ---@return number
 function Light:getFlicker() end
 
@@ -9076,7 +9016,6 @@ function Light:getOuterAngle() end
 
 --- Returns the light's world-space position.
 ---@return number
----@return number
 function Light:getPosition() end
 
 --- Returns the light's influence radius.
@@ -9084,9 +9023,6 @@ function Light:getPosition() end
 function Light:getRadius() end
 
 --- Returns the shadow region color as (r, g, b, a).
----@return number
----@return number
----@return number
 ---@return number
 function Light:getShadowColor() end
 
@@ -9289,7 +9225,6 @@ function Occluder:getOpacity() end
 
 --- Returns the translation offset as (x, y).
 ---@return number
----@return number
 function Occluder:getPosition() end
 
 --- Returns the polygon vertices as a flat table {x1,y1,x2,y2,...}.
@@ -9344,9 +9279,6 @@ lurek.light.advanceFlickers = function(dt) end
 lurek.light.clear = function() end
 
 --- Returns the global ambient light color as (r, g, b, a).
----@return number
----@return number
----@return number
 ---@return number
 lurek.light.getAmbient = function() end
 
@@ -9429,9 +9361,6 @@ lurek.light.setGroupIntensity = function(groupId, intensity) end
 lurek.light.setMaxLights = function(n) end
 
 --- Returns the current ambient light colour as (r, g, b, a).
----@return number
----@return number
----@return number
 ---@return number
 lurek.light.syncAmbient = function() end
 
@@ -9539,9 +9468,6 @@ lurek.log.warn = function(message, tag) end
 lurek.log.warn_fields = function(message, fields_table) end
 
 ---@class lurek.math
----@field pi number  circle constant pi
----@field tau number  circle constant tau
----@field huge number  positive infinity
 lurek.math = {}
 
 --- Lua-side wrapper around an [`AabbTree`].
@@ -9608,7 +9534,6 @@ BezierCurve = {}
 
 --- Evaluates the curve at parameter t, returning (x, y).
 ---@param t number
----@return number
 ---@return number
 function BezierCurve:evaluate(t) end
 
@@ -9689,19 +9614,16 @@ function CatmullRom:len() end
 --- Removes the control point at `index` (0-based) and returns it.
 ---@param index integer
 ---@return number
----@return number
 function CatmullRom:removePoint(index) end
 
 --- Sample the spline at global t in [0, 1].
 ---@param t number
----@return number
 ---@return number
 function CatmullRom:sample(t) end
 
 --- Sample a specific segment at local t in [0, 1].
 ---@param seg integer
 ---@param t number
----@return number
 ---@return number
 function CatmullRom:sampleSegment(seg, t) end
 
@@ -9710,9 +9632,6 @@ function CatmullRom:sampleSegment(seg, t) end
 Circle = {}
 
 --- Returns the axis-aligned bounding box as (min_x, min_y, max_x, max_y).
----@return number
----@return number
----@return number
 ---@return number
 function Circle:aabb() end
 
@@ -9753,7 +9672,6 @@ Hermite = {}
 
 --- Evaluate the spline at parameter t in [0, 1].
 ---@param t number
----@return number
 ---@return number
 function Hermite:sample(t) end
 
@@ -9855,7 +9773,6 @@ function NoiseGenerator:turbulence(x, y, octaves, lacunarity, persistence, kind)
 ---@param x number
 ---@param y number
 ---@param strength number
----@return number
 ---@return number
 function NoiseGenerator:warpDomain(x, y, strength) end
 
@@ -9993,9 +9910,6 @@ function Transform:clone() end
 --- Decomposes this transform into translation, rotation, and scale.
 ---@return number
 ---@return number
----@return number
----@return number
----@return number
 function Transform:decompose() end
 
 --- Returns the 3x3 matrix as a flat table of 9 numbers (row-major).
@@ -10009,7 +9923,6 @@ function Transform:inverse() end
 --- Transforms a point from world space back to local space.
 ---@param x number
 ---@param y number
----@return number
 ---@return number
 function Transform:inverseTransformPoint(x, y) end
 
@@ -10049,7 +9962,6 @@ function Transform:shear(kx, ky) end
 --- Transforms a point from local space to world space.
 ---@param x number
 ---@param y number
----@return number
 ---@return number
 function Transform:transformPoint(x, y) end
 
@@ -10123,8 +10035,6 @@ function Tween:update(dt) end
 
 --- Lua-side wrapper around a [`Vec2`] value type.
 ---@class Vec2
----@field x number  horizontal component
----@field y number  vertical component
 Vec2 = {}
 
 --- Returns the angle of this vector in radians (atan2(y, x)).
@@ -10197,9 +10107,6 @@ function Vec2:y() end
 
 --- Lua-side wrapper around a [`Vec3`] value type.
 ---@class Vec3
----@field x number  x component
----@field y number  y component
----@field z number  z component
 Vec3 = {}
 
 --- Add another Vec3 and return the result.
@@ -10387,7 +10294,6 @@ lurek.math.clamp = function(v, min, max) end
 ---@param x2 number
 ---@param y2 number
 ---@return number
----@return number
 lurek.math.closestPointOnSegment = function(px, py, x1, y1, x2, y2) end
 
 --- Computes the convex hull of a flat {x1,y1,...} point list. Returns a flat table.
@@ -10455,9 +10361,6 @@ lurek.math.fmod = function(x, y) end
 --- Parses a hex color string (#RRGGBB or #RRGGBBAA) into (r, g, b, a) floats.
 ---@param hex string
 ---@return number
----@return number
----@return number
----@return number
 lurek.math.fromHex = function(hex) end
 
 --- Converts a gamma-encoded sRGB value to linear space.
@@ -10481,9 +10384,6 @@ lurek.math.hermite = function(p0x, p0y, p1x, p1y, m0x, m0y, m1x, m1y) end
 ---@param h number
 ---@param s number
 ---@param l number
----@return number
----@return number
----@return number
 ---@return number
 lurek.math.hslToRgb = function(h, s, l) end
 
@@ -10740,7 +10640,6 @@ lurek.math.polygonArea = function(polygon) end
 --- Returns the centroid (cx, cy) of a polygon given as a flat {x1,y1,...} table.
 ---@param polygon table
 ---@return number
----@return number
 lurek.math.polygonCentroid = function(polygon) end
 
 --- Clips a polygon against a single half-plane using the Sutherland-Hodgman algorithm.
@@ -10798,9 +10697,6 @@ lurek.math.randomInt = function(lo, hi) end
 ---@param w number
 ---@param h number
 ---@return number
----@return number
----@return number
----@return number
 lurek.math.rectFromCenter = function(cx, cy, w, h) end
 
 --- Returns the union (bounding box) of two rectangles.
@@ -10812,9 +10708,6 @@ lurek.math.rectFromCenter = function(cx, cy, w, h) end
 ---@param y2 number
 ---@param w2 number
 ---@param h2 number
----@return number
----@return number
----@return number
 ---@return number
 lurek.math.rectUnion = function(x1, y1, w1, h1, x2, y2, w2, h2) end
 
@@ -10831,8 +10724,6 @@ lurek.math.remap = function(v, in_min, in_max, out_min, out_max) end
 ---@param r number
 ---@param g number
 ---@param b number
----@return number
----@return number
 ---@return number
 lurek.math.rgbToHsl = function(r, g, b) end
 
@@ -11002,7 +10893,6 @@ function Minimap:drawToImage(pixel_size) end
 
 --- Returns the center coordinates as x, y.
 ---@return number
----@return number
 function Minimap:getCenter() end
 
 --- Returns the center X coordinate.
@@ -11022,8 +10912,7 @@ function Minimap:getColorMode() end
 function Minimap:getDisplayHeight() end
 
 --- Returns the display width and height as two values.
----@return integer
----@return integer
+---@return number
 function Minimap:getDisplaySize() end
 
 --- Returns the display width in pixels.
@@ -11031,9 +10920,6 @@ function Minimap:getDisplaySize() end
 function Minimap:getDisplayWidth() end
 
 --- Returns the fog overlay color as r, g, b, a.
----@return number
----@return number
----@return number
 ---@return number
 function Minimap:getFogColor() end
 
@@ -11048,8 +10934,7 @@ function Minimap:getFogLevel(x, y) end
 function Minimap:getGridHeight() end
 
 --- Returns the grid width and height as two values.
----@return integer
----@return integer
+---@return number
 function Minimap:getGridSize() end
 
 --- Returns the grid width in cells.
@@ -11088,9 +10973,6 @@ function Minimap:getObjectTypeCount() end
 --- Returns the display color for an owner/faction as r, g, b, a.
 ---@param owner integer
 ---@return number
----@return number
----@return number
----@return number
 function Minimap:getOwnerColor(owner) end
 
 --- Returns the number of active pings.
@@ -11106,9 +10988,6 @@ function Minimap:getTerrain(x, y) end
 --- Returns the display color for a terrain type as r, g, b, a.
 ---@param terrain_type integer
 ---@return number
----@return number
----@return number
----@return number
 function Minimap:getTerrainColor(terrain_type) end
 
 --- Returns the hover tooltip string for a terrain type ID, or nil.
@@ -11117,9 +10996,6 @@ function Minimap:getTerrainColor(terrain_type) end
 function Minimap:getTileDescription(type_id) end
 
 --- Returns the viewport rectangle color as r, g, b, a.
----@return number
----@return number
----@return number
 ---@return number
 function Minimap:getViewportColor() end
 
@@ -11136,7 +11012,6 @@ function Minimap:getZoom() end
 ---@param gy number
 ---@param minimap_x number
 ---@param minimap_y number
----@return number
 ---@return number
 function Minimap:gridToScreen(gx, gy, minimap_x, minimap_y) end
 
@@ -11187,7 +11062,6 @@ function Minimap:render(x, y) end
 ---@param sy number
 ---@param minimap_x number
 ---@param minimap_y number
----@return number
 ---@return number
 function Minimap:screenToGrid(sx, sy, minimap_x, minimap_y) end
 
@@ -11381,11 +11255,11 @@ function ContentRegistry:get(type_name, id) end
 
 --- Get all entries for a type.
 ---@param type_name string — registered type name
----@return table
+---@return number
 function ContentRegistry:getAll(type_name) end
 
 --- Get all registered type names.
----@return table
+---@return string
 function ContentRegistry:getTypes() end
 
 --- Register a content entry.
@@ -11772,8 +11646,8 @@ function NetworkRuntime:shutdown() end
 function NetworkRuntime:tcpClose(id) end
 
 --- Opens a TCP connection to a remote address.
----@param addr string — "host:port"
----@return nil
+---@param addr string
+---@return number
 function NetworkRuntime:tcpConnect(addr) end
 
 --- Sends data over a TCP connection.
@@ -11788,8 +11662,8 @@ function NetworkRuntime:tcpSend(id, data) end
 function NetworkRuntime:wsClose(id) end
 
 --- Opens a WebSocket connection.
----@param url string — "ws://host:port/path" or "wss://..."
----@return nil
+---@param url string
+---@return number
 function NetworkRuntime:wsConnect(url) end
 
 --- Sends a text message over a WebSocket connection.
@@ -11862,7 +11736,6 @@ function ParallaxLayer:clearClamp() end
 
 --- Returns the autoscroll velocity as `(vx, vy)`.
 ---@return number
----@return number
 function ParallaxLayer:getAutoscroll() end
 
 --- Returns the current blend mode as a string.
@@ -11875,7 +11748,6 @@ function ParallaxLayer:getDepth() end
 
 --- Returns the static offset as `(x, y)`.
 ---@return number
----@return number
 function ParallaxLayer:getOffset() end
 
 --- Returns the current opacity.
@@ -11884,7 +11756,6 @@ function ParallaxLayer:getOpacity() end
 
 --- Returns the scroll factor as `(x, y)`.
 ---@return number
----@return number
 function ParallaxLayer:getScrollFactor() end
 
 --- Returns `true` if seamless infinite tiling is enabled.
@@ -11892,9 +11763,6 @@ function ParallaxLayer:getScrollFactor() end
 function ParallaxLayer:getTiling() end
 
 --- Returns the current tint as `(r, g, b, a)`.
----@return number
----@return number
----@return number
 ---@return number
 function ParallaxLayer:getTint() end
 
@@ -12171,7 +12039,6 @@ function ParticleSystem:getFlipbook() end
 
 --- Returns the gravity acceleration applied to particles as two numbers `gx, gy`.
 ---@return number
----@return number
 function ParticleSystem:getGravity() end
 
 --- Returns the insert mode as a string.
@@ -12180,38 +12047,29 @@ function ParticleSystem:getInsertMode() end
 
 --- Returns linear acceleration range.
 ---@return number
----@return number
----@return number
----@return number
 function ParticleSystem:getLinearAcceleration() end
 
 --- Returns linear damping range.
----@return number
 ---@return number
 function ParticleSystem:getLinearDamping() end
 
 --- Returns the render origin offset.
 ---@return number
----@return number
 function ParticleSystem:getOffset() end
 
 --- Returns min and max particle lifetime.
----@return number
 ---@return number
 function ParticleSystem:getParticleLifetime() end
 
 --- Returns the emitter world position.
 ---@return number
----@return number
 function ParticleSystem:getPosition() end
 
 --- Returns radial acceleration range.
 ---@return number
----@return number
 function ParticleSystem:getRadialAcceleration() end
 
 --- Returns initial rotation range.
----@return number
 ---@return number
 function ParticleSystem:getRotation() end
 
@@ -12229,11 +12087,9 @@ function ParticleSystem:getSizes() end
 
 --- Returns min/max initial speed.
 ---@return number
----@return number
 function ParticleSystem:getSpeed() end
 
 --- Returns angular velocity range.
----@return number
 ---@return number
 function ParticleSystem:getSpin() end
 
@@ -12246,7 +12102,6 @@ function ParticleSystem:getSpinVariation() end
 function ParticleSystem:getSpread() end
 
 --- Returns tangential acceleration range.
----@return number
 ---@return number
 function ParticleSystem:getTangentialAcceleration() end
 
@@ -12526,7 +12381,6 @@ function Trail:getPointCount() end
 
 --- Returns the start and end width.
 ---@return number
----@return number
 function Trail:getWidth() end
 
 --- Appends a new point to the trail head.
@@ -12599,7 +12453,6 @@ AiFlowField = {}
 ---@param x integer
 ---@param y integer
 ---@return number
----@return number
 function AiFlowField:getDirection(x, y) end
 
 --- Returns the BFS distance to the goal (1-based coordinates).
@@ -12666,7 +12519,6 @@ function FlowField:getCostToTarget(x, y) end
 ---@param x integer
 ---@param y integer
 ---@return number
----@return number
 function FlowField:getDirection(x, y) end
 
 --- Returns the flow direction as an angle in radians (1-based coordinates).
@@ -12689,7 +12541,6 @@ function FlowField:isCalculated() end
 ---@param speed number
 ---@param tw number
 ---@param th number
----@return number
 ---@return number
 function FlowField:steer(wx, wy, speed, tw, th) end
 
@@ -12826,8 +12677,7 @@ function NavGrid:getCost(x, y) end
 function NavGrid:getDiagonalMode() end
 
 --- Returns the grid dimensions as width, height.
----@return integer
----@return integer
+---@return number
 function NavGrid:getDimensions() end
 
 --- Returns the grid height in cells.
@@ -12995,7 +12845,6 @@ function UnitPathfinder:findNearestWalkable(x, y, maxRadius, unitSize) end
 ---@param y2 integer
 ---@param maxNodes integer
 ---@param unitSize? integer
----@return table
 ---@return boolean
 function UnitPathfinder:findPartialPath(x1, y1, x2, y2, maxNodes, unitSize) end
 
@@ -14131,7 +13980,6 @@ function Body:getMass() end
 
 --- Returns the body position (x, y).
 ---@return number
----@return number
 function Body:getPosition() end
 
 --- Returns the body restitution (bounciness).
@@ -14143,7 +13991,6 @@ function Body:getRestitution() end
 function Body:getType() end
 
 --- Returns the body velocity (vx, vy).
----@return number
 ---@return number
 function Body:getVelocity() end
 
@@ -14328,7 +14175,7 @@ function Cellular:stepN(n) end
 function Cellular:toBytes() end
 
 --- Returns the full grid as an RGBA byte string using the default colour palette.
----@return string
+---@return nil
 function Cellular:toImageData() end
 
 --- Returns a sub-region as an RGBA byte string.
@@ -14348,9 +14195,6 @@ PhysicsShape = {}
 function PhysicsShape:destroy() end
 
 --- Returns the axis-aligned bounding box (x1, y1, x2, y2).
----@return number
----@return number
----@return number
 ---@return number
 function PhysicsShape:getBoundingBox() end
 
@@ -14653,7 +14497,7 @@ function World:getBodyCount() end
 
 --- Returns the Lua data previously attached to a body, or nil if none is set.
 ---@param bodyId integer
----@return table
+---@return nil
 function World:getBodyData(bodyId) end
 
 --- Returns all body IDs in the world.
@@ -14684,13 +14528,11 @@ function World:getEndContactEvents() end
 
 --- Returns the gravity vector (gx, gy).
 ---@return number
----@return number
 function World:getGravity() end
 
 --- Returns the two body IDs connected by a joint.
 ---@param jointId integer
----@return integer
----@return integer
+---@return number
 function World:getJointBodies(jointId) end
 
 --- Returns the break threshold for a joint, or nil if not set.
@@ -14704,7 +14546,6 @@ function World:getJointIds() end
 
 --- Returns the angular limits on a joint.
 ---@param jointId integer
----@return number
 ---@return number
 function World:getJointLimits(jointId) end
 
@@ -15027,7 +14868,7 @@ function Zone:setPriority(priority) end
 
 --- Attaches a standalone shape to a body as an additional fixture.
 ---@param body Body
----@param shape PhysicsShape
+---@param shape Shape
 ---@return nil
 lurek.physics.attachShape = function(body, shape) end
 
@@ -15050,9 +14891,6 @@ lurek.physics.drawDebugGpu = function(world, config) end
 --- Returns the position and velocity of a body (x, y, vx, vy).
 ---@param world World
 ---@param body Body
----@return number
----@return number
----@return number
 ---@return number
 lurek.physics.getBody = function(world, body) end
 
@@ -15709,8 +15547,6 @@ PointLight = {}
 
 --- Returns the RGB color as three separate values.
 ---@return number
----@return number
----@return number
 function PointLight:color() end
 
 --- Returns the intensity multiplier.
@@ -16018,8 +15854,6 @@ lurek.raycaster.newSpriteManager = function() end
 ---@param fov number
 ---@param screen_height number
 ---@return number
----@return number
----@return number
 lurek.raycaster.projectColumn = function(distance, fov, screen_height) end
 
 ---@class lurek.render
@@ -16030,8 +15864,7 @@ lurek.render = {}
 Canvas = {}
 
 --- Returns width and height of this canvas.
----@return integer
----@return integer
+---@return number
 function Canvas:getDimensions() end
 
 --- Returns the height of this canvas in pixels.
@@ -16140,8 +15973,7 @@ function Font:typeOf(name) end
 Image = {}
 
 --- Returns width and height of this image.
----@return integer
----@return integer
+---@return number
 function Image:getDimensions() end
 
 --- Returns the height of this image in pixels.
@@ -16164,6 +15996,58 @@ function Image:type() end
 ---@param name? string
 ---@return string
 function Image:typeOf(name) end
+
+--- Lua-side handle to a loaded texture stored in SharedState.
+---@class ImageData
+ImageData = {}
+
+--- Blits the source ImageData onto this image at (dst_x, dst_y) using Porter-Duff `over`.
+---@param src ImageData
+---@param dst_x integer
+---@param dst_y integer
+---@return nil
+function ImageData:blit(src, dst_x, dst_y) end
+
+--- Returns the sum of absolute per-channel differences between this image and `other`.
+---@param other ImageData
+---@return number
+function ImageData:diff(other) end
+
+--- Returns the pixel height of this image buffer.
+---@return number
+function ImageData:getHeight() end
+
+--- Returns a copy of the rectangular sub-region as a new ImageData.
+---@param x integer
+---@param y integer
+---@param width integer
+---@param height integer
+---@return nil
+function ImageData:getRegion(x, y, width, height) end
+
+--- Returns the pixel width of this image buffer.
+---@return number
+function ImageData:getWidth() end
+
+--- Applies a Lua function to every pixel in-place.
+---@param fn function
+---@return nil
+function ImageData:mapPixels(fn) end
+
+--- Returns a new ImageData scaled to the given dimensions using bilinear interpolation.
+---@param width integer
+---@param height integer
+---@return nil
+function ImageData:resize(width, height) end
+
+--- Returns the type name "ImageData".
+---@return string
+function ImageData:type() end
+
+--- Returns true when the given name matches "ImageData" or a parent type.
+---@param name string
+---@return boolean
+function ImageData:typeOf(name) end
 
 --- Lua-side handle to a mesh stored in SharedState.
 ---@class Mesh
@@ -16216,14 +16100,10 @@ function NineSlice:draw(x, y, w, h) end
 
 --- Returns the four inset values as (top, right, bottom, left).
 ---@return number
----@return number
----@return number
----@return number
 function NineSlice:getInsets() end
 
 --- Returns the width and height of the source texture.
----@return integer
----@return integer
+---@return number
 function NineSlice:getTextureSize() end
 
 --- Returns the type name "NineSlice".
@@ -16241,13 +16121,9 @@ Quad = {}
 
 --- Returns the reference texture dimensions.
 ---@return number
----@return number
 function Quad:getTextureDimensions() end
 
 --- Returns the quad viewport rectangle.
----@return number
----@return number
----@return number
 ---@return number
 function Quad:getViewport() end
 
@@ -16613,9 +16489,6 @@ lurek.render.flushSortGroup = function(id) end
 
 --- Returns the current background color.
 ---@return number
----@return number
----@return number
----@return number
 lurek.render.getBackgroundColor = function() end
 
 --- Returns the current blend mode as a string.
@@ -16628,8 +16501,7 @@ lurek.render.getCanvas = function() end
 
 --- Returns the dimensions of a canvas.
 ---@param canvas Canvas
----@return integer
----@return integer
+---@return number
 lurek.render.getCanvasSize = function(canvas) end
 
 --- Returns the current drawing color.
@@ -16653,8 +16525,7 @@ lurek.render.getDefaultFont = function(pixel_height) end
 lurek.render.getDepthMode = function() end
 
 --- Returns window width and height.
----@return integer
----@return integer
+---@return number
 lurek.render.getDimensions = function() end
 
 --- Returns the currently active font, or nil.
@@ -17716,13 +17587,11 @@ function SpriteSheet:getFrame(index) end
 function SpriteSheet:getFrameCount() end
 
 --- Returns the width and height of a single frame cell in pixels.
----@return integer
----@return integer
+---@return number
 function SpriteSheet:getFrameSize() end
 
 --- Returns the number of columns and rows in the grid.
----@return integer
----@return integer
+---@return number
 function SpriteSheet:getGridSize() end
 
 --- Returns a sequential table of quad tables for the named frame group, or nil.
@@ -17795,9 +17664,7 @@ lurek.runtime.getArgs = function() end
 
 --- Returns the output table from the most recently completed runBatch call.
 ---@param results table
----@return integer
----@return integer
----@return integer
+---@return number
 lurek.runtime.getBatchResults = function(results) end
 
 --- Returns the current contents of the system clipboard.
@@ -17929,8 +17796,7 @@ function Terminal:get(col, row) end
 function Terminal:getCellSize() end
 
 --- Returns the terminal grid dimensions.
----@return integer
----@return integer
+---@return number
 function Terminal:getDimensions() end
 
 --- Returns the currently focused widget, or nil.
@@ -18027,9 +17893,6 @@ function Widget:getChildCount() end
 
 --- Returns the colour of a label or border widget.
 ---@return number
----@return number
----@return number
----@return number
 function Widget:getColor() end
 
 --- Returns a list item by 1-based index.
@@ -18046,8 +17909,7 @@ function Widget:getItemCount() end
 function Widget:getMaxLength() end
 
 --- Returns the widget position as 1-based coordinates.
----@return integer
----@return integer
+---@return number
 function Widget:getPosition() end
 
 --- Returns the selected item index (1-based) in a list widget, or nil.
@@ -18055,8 +17917,7 @@ function Widget:getPosition() end
 function Widget:getSelected() end
 
 --- Returns the widget size in cells.
----@return integer
----@return integer
+---@return number
 function Widget:getSize() end
 
 --- Returns the border style name of a border widget.
@@ -18526,10 +18387,6 @@ lurek.thread.newPool = function(size, code) end
 lurek.thread.newThread = function(code) end
 
 ---@class lurek.tilemap
----@field FLOOR integer  IsoMap floor layer index (1)
----@field NORTH_WALL integer  IsoMap north-wall layer index (2)
----@field WEST_WALL integer  IsoMap west-wall layer index (3)
----@field OBJECT integer  IsoMap object layer index (4)
 lurek.tilemap = {}
 
 --- Lua-side wrapper around an [`AutoTileSheet`].
@@ -18554,9 +18411,6 @@ function AutoTileSheet:getLayout() end
 
 --- Returns the atlas region rectangle for the 1-based tile ID.
 ---@param tileId integer
----@return number
----@return number
----@return number
 ---@return number
 function AutoTileSheet:getQuad(tileId) end
 
@@ -18584,10 +18438,7 @@ ChunkMap = {}
 --- Returns the tile coordinate range for chunk (cx, cy) as (x0, y0, x1, y1).
 ---@param cx integer
 ---@param cy integer
----@return integer
----@return integer
----@return integer
----@return integer
+---@return number
 function ChunkMap:chunkTileRange(cx, cy) end
 
 --- Clears the tile at (x, y) by setting its GID to 0.
@@ -18712,7 +18563,6 @@ function IsoMap:isLevelVisible(z) end
 ---@param sx number
 ---@param sy number
 ---@return number
----@return number
 function IsoMap:screenToTile(sx, sy) end
 
 --- Sets the visibility of a level (1-based z).
@@ -18746,7 +18596,6 @@ function IsoMap:setTilePart(z, x, y, part, gid) end
 ---@param ty number
 ---@param tz number
 ---@return number
----@return number
 function IsoMap:tileToScreen(tx, ty, tz) end
 
 --- Lua-side wrapper around a [`LargeMapRenderer`] for chunk-level occlusion culling on large worlds.
@@ -18758,8 +18607,7 @@ LargeMapRenderer = {}
 function LargeMapRenderer:getChunkSize() end
 
 --- Returns the map dimensions as (width, height) in tiles.
----@return integer
----@return integer
+---@return number
 function LargeMapRenderer:getMapSize() end
 
 --- Returns the tile ID at (x, y), or nil if out of bounds.
@@ -18846,8 +18694,7 @@ function LargeMapRenderer:setViewport(width, height) end
 MapBlock = {}
 
 --- Returns the block dimensions as (width, height) in tiles.
----@return integer
----@return integer
+---@return number
 function MapBlock:getDimensions() end
 
 --- Returns the block height in tiles.
@@ -19066,9 +18913,6 @@ function TileMap:getChunkSize() end
 --- Returns the RGBA tint color of a layer.
 ---@param idx integer
 ---@return number
----@return number
----@return number
----@return number
 function TileMap:getLayerColor(idx) end
 
 --- Returns the number of layers.
@@ -19083,12 +18927,10 @@ function TileMap:getLayerName(idx) end
 --- Returns the pixel offset of a layer.
 ---@param idx integer
 ---@return number
----@return number
 function TileMap:getLayerOffset(idx) end
 
 --- Returns the parallax factor of a layer.
 ---@param idx integer
----@return number
 ---@return number
 function TileMap:getLayerParallax(idx) end
 
@@ -19109,8 +18951,7 @@ function TileMap:getOrientation() end
 function TileMap:getTile(layer, x, y) end
 
 --- Returns tile dimensions as (width, height).
----@return integer
----@return integer
+---@return number
 function TileMap:getTileDimensions() end
 
 --- Returns the tile height in pixels.
@@ -19131,9 +18972,6 @@ function TileMap:getTileSetCount() end
 function TileMap:getTileWidth() end
 
 --- Returns the viewport as (x, y, w, h) or nil if not set.
----@return number
----@return number
----@return number
 ---@return number
 function TileMap:getViewport() end
 
@@ -19253,7 +19091,6 @@ function TileMap:sweepRect(layer, x, y, w, h, dx, dy) end
 ---@param tx integer
 ---@param ty integer
 ---@return number
----@return number
 function TileMap:tileToWorld(tx, ty) end
 
 --- Converts the given layer into a 2D navigation grid.
@@ -19270,8 +19107,7 @@ function TileMap:update(dt) end
 --- Converts world pixel coordinates to tile coordinates.
 ---@param wx number
 ---@param wy number
----@return integer
----@return integer
+---@return number
 function TileMap:worldToTile(wx, wy) end
 
 --- Lua-side wrapper around a [`TileSet`].
@@ -19321,8 +19157,7 @@ function TileSet:getSpacing() end
 function TileSet:getTileCount() end
 
 --- Returns the tile dimensions as (width, height).
----@return integer
----@return integer
+---@return number
 function TileSet:getTileDimensions() end
 
 --- Returns the height of a single tile in pixels.
@@ -19374,8 +19209,7 @@ lurek.tilemap.fromLDtk = function(json_str, level_name) end
 ---@param sx number
 ---@param sy number
 ---@param size number
----@return integer
----@return integer
+---@return number
 lurek.tilemap.fromScreenHex = function(sx, sy, size) end
 
 --- Converts screen position back to tile coordinates for diamond isometric projection.
@@ -19383,7 +19217,6 @@ lurek.tilemap.fromScreenHex = function(sx, sy, size) end
 ---@param sy number
 ---@param tileW number
 ---@param tileH number
----@return number
 ---@return number
 lurek.tilemap.fromScreenIso = function(sx, sy, tileW, tileH) end
 
@@ -19422,8 +19255,7 @@ lurek.tilemap.hexNeighbors = function(q, r) end
 ---@param centerQ integer
 ---@param centerR integer
 ---@param axis string
----@return integer
----@return integer
+---@return number
 lurek.tilemap.hexReflect = function(q, r, centerQ, centerR, axis) end
 
 --- Returns all cells at exactly radius distance from (q, r) as a table.
@@ -19439,15 +19271,13 @@ lurek.tilemap.hexRing = function(q, r, radius) end
 ---@param centerQ integer
 ---@param centerR integer
 ---@param steps integer
----@return integer
----@return integer
+---@return number
 lurek.tilemap.hexRotate = function(q, r, centerQ, centerR, steps) end
 
 --- Rounds fractional axial coordinates to the nearest hex cell.
 ---@param q number
 ---@param r number
----@return integer
----@return integer
+---@return number
 lurek.tilemap.hexRound = function(q, r) end
 
 --- Returns all hex cells from center outward to radius, ring by ring, as a table.
@@ -19553,7 +19383,6 @@ lurek.tilemap.newTileSet = function(firstGid, tileCount, columns, tileWidth, til
 ---@param r integer
 ---@param size number
 ---@return number
----@return number
 lurek.tilemap.toScreenHex = function(q, r, size) end
 
 --- Converts tile coordinates to screen position using diamond isometric projection.
@@ -19561,7 +19390,6 @@ lurek.tilemap.toScreenHex = function(q, r, size) end
 ---@param ty number
 ---@param tileW number
 ---@param tileH number
----@return number
 ---@return number
 lurek.tilemap.toScreenIso = function(tx, ty, tileW, tileH) end
 
@@ -19864,18 +19692,21 @@ function Tween:isActive() end
 
 --- Sets a callback called when the tween is cancelled. Returns self.
 ---@param fn function
+---@param f any
 ---@return Tween
-function Tween:onCancel(fn) end
+Tween.onCancel = function(fn, f) end
 
 --- Sets a callback to fire when the tween finishes all cycles. Returns self for chaining.
 ---@param fn function
+---@param f any
 ---@return Tween
-function Tween:onComplete(fn) end
+Tween.onComplete = function(fn, f) end
 
 --- Sets a callback called every tick with the current eased `t` (0..=1). Returns self.
 ---@param fn function
+---@param f any
 ---@return Tween
-function Tween:onUpdate(fn) end
+Tween.onUpdate = function(fn, f) end
 
 --- Pauses this tween; time stops advancing but the tween is not cancelled.
 ---@return nil
@@ -19900,10 +19731,10 @@ function Tween:setYoyo(enabled) end
 TweenParallel = {}
 
 --- Adds an existing LuaTween to the parallel group; marks the tween as owned.
+---@param self TweenParallel
 ---@param tween Tween
----@param tw_ud any
 ---@return nil
-TweenParallel.add = function(tween, tw_ud) end
+TweenParallel.add = function(self, tween) end
 
 --- Cancels the parallel group immediately.
 ---@return nil
@@ -19914,64 +19745,72 @@ function TweenParallel:cancel() end
 function TweenParallel:isActive() end
 
 --- Sets a callback fired when all child tweens finish. Returns self.
+---@param self TweenParallel
 ---@param fn function
 ---@return TweenParallel
-function TweenParallel:onComplete(fn) end
+TweenParallel.onComplete = function(self, fn) end
 
 --- Marks the parallel as active. Returns self.
+---@param self TweenParallel
 ---@return TweenParallel
-function TweenParallel:start() end
+TweenParallel.start = function(self) end
 
 --- Creates and adds an inline tween entry to the parallel group. Returns self.
+---@param self TweenParallel
 ---@param duration number
 ---@param target table
 ---@param fields table
 ---@param easing? string
 ---@return TweenParallel
-function TweenParallel:tween(duration, target, fields, easing) end
+TweenParallel.tween = function(self, duration, target, fields, easing) end
 
 --- A chained sequence of animations that run one after another.
 ---@class TweenSequence
 TweenSequence = {}
 
 --- Appends an immediate callback step. Returns self.
+---@param self TweenSequence
 ---@param fn function
 ---@return TweenSequence
-function TweenSequence:callback(fn) end
+TweenSequence.callback = function(self, fn) end
 
 --- Cancels the sequence and stops all pending steps.
 ---@return nil
 function TweenSequence:cancel() end
 
 --- Appends a delay step that waits `seconds` before proceeding. Returns self.
+---@param self TweenSequence
 ---@param seconds number
+---@param fn? function
 ---@return TweenSequence
-function TweenSequence:delay(seconds) end
+TweenSequence.delay = function(self, seconds, fn) end
 
 --- Returns true if the sequence has been started and has not yet completed.
 ---@return boolean
 function TweenSequence:isActive() end
 
 --- Sets a callback fired when all steps complete. Returns self.
+---@param self TweenSequence
 ---@param fn function
 ---@return TweenSequence
-function TweenSequence:onComplete(fn) end
+TweenSequence.onComplete = function(self, fn) end
 
 --- Marks the sequence as active so `lurek.tween.update(dt)` begins ticking it. Returns self.
+---@param self TweenSequence
 ---@return TweenSequence
-function TweenSequence:start() end
+TweenSequence.start = function(self) end
 
 --- Appends a tween step: animates `fields` on `target` over `duration`. Returns self.
+---@param self TweenSequence
 ---@param duration number
 ---@param target table
 ---@param fields table
 ---@param easing? string
 ---@return TweenSequence
-function TweenSequence:tween(duration, target, fields, easing) end
+TweenSequence.tween = function(self, duration, target, fields, easing) end
 
 --- Lua-side wrapper around the pure-Rust [`TweenState`] timing core.
 ---@class TweenState
----@field paused boolean  When true, tick() does not advance progress.
 TweenState = {}
 
 --- Returns whether the tween state has completed.
@@ -20207,9 +20046,6 @@ function Checkbox:setText(text) end
 Color_Picker = {}
 
 --- Returns the color of this Color_Picker widget.
----@return number
----@return number
----@return number
 ---@return number
 function Color_Picker:getColor() end
 
@@ -20472,6 +20308,255 @@ function Gui_Window:setResizable(v) end
 ---@return nil
 function Gui_Window:setTitle(title) end
 
+---@class HtmlDocument
+HtmlDocument = {}
+
+--- Appends stylesheet text after existing CSS rules.
+---@param css string
+---@return nil
+function HtmlDocument:addCss(css) end
+
+--- Removes all stylesheet rules from this document.
+---@return nil
+function HtmlDocument:clearCss() end
+
+--- Builds the current draw command list and discards it for now.
+---@param x? number
+---@param y? number
+---@return nil
+function HtmlDocument:draw(x, y) end
+
+--- Finds one element by id.
+---@param id string
+---@return HtmlElement?
+function HtmlDocument:getElementById(id) end
+
+--- Returns the source markup used by this document.
+---@return string
+function HtmlDocument:getHtml() end
+
+--- Returns the root element for this document.
+---@return HtmlElement
+function HtmlDocument:getRoot() end
+
+--- Returns the document layout viewport in UI pixels.
+---@return number
+function HtmlDocument:getViewport() end
+
+--- Returns whether DOM, CSS, viewport, or layout state changed.
+---@return boolean
+function HtmlDocument:isDirty() end
+
+--- Forwards a key press and emits a keydown event.
+---@param key string
+---@return boolean
+function HtmlDocument:keypressed(key) end
+
+--- Forwards a mouse move event.
+---@param x number
+---@param y number
+---@return boolean
+function HtmlDocument:mousemoved(x, y) end
+
+--- Forwards a mouse press and emits a minimal click event.
+---@param x number
+---@param y number
+---@param button? integer
+---@return boolean
+function HtmlDocument:mousepressed(x, y, button) end
+
+--- Forwards a mouse release event.
+---@param x number
+---@param y number
+---@param button? integer
+---@return boolean
+function HtmlDocument:mousereleased(x, y, button) end
+
+--- Removes a document-level event listener.
+---@param handle integer
+---@return nil
+function HtmlDocument:off(handle) end
+
+--- Registers a document-level event listener.
+---@param event string
+---@param fn function
+---@return number
+function HtmlDocument:on(event, fn) end
+
+--- Finds the first element matching a supported selector.
+---@param selector string
+---@return HtmlElement?
+function HtmlDocument:query(selector) end
+
+--- Returns all elements matching a supported selector in document order.
+---@param selector string
+---@return table
+function HtmlDocument:queryAll(selector) end
+
+--- Forces a layout pass immediately.
+---@return nil
+function HtmlDocument:relayout() end
+
+--- Replaces this document's stylesheet text.
+---@param css string
+---@return nil
+function HtmlDocument:setCss(css) end
+
+--- Replaces this document's markup and invalidates existing element handles.
+---@param html string
+---@return nil
+function HtmlDocument:setHtml(html) end
+
+--- Sets the document layout viewport in UI pixels.
+---@param w number
+---@param h number
+---@return nil
+function HtmlDocument:setViewport(w, h) end
+
+--- Forwards text input and emits an input event for focused input elements.
+---@param text string
+---@return boolean
+function HtmlDocument:textinput(text) end
+
+--- Advances document state and runs layout if needed.
+---@param dt number
+---@return nil
+function HtmlDocument:update(dt) end
+
+--- Forwards a mouse wheel event.
+---@param dx number
+---@param dy number
+---@return boolean
+function HtmlDocument:wheelmoved(dx, dy) end
+
+---@class HtmlElement
+HtmlElement = {}
+
+--- Adds a CSS class to this element.
+---@param name string
+---@return nil
+function HtmlElement:addClass(name) end
+
+--- Appends HTML inside this element.
+---@param html string
+---@return nil
+function HtmlElement:appendHtml(html) end
+
+--- Clears focus from this element if it currently has focus.
+---@return nil
+function HtmlElement:blur() end
+
+--- Gives focus to this element.
+---@return nil
+function HtmlElement:focus() end
+
+--- Returns an attribute value or nil.
+---@param name string
+---@return string
+function HtmlElement:getAttribute(name) end
+
+--- Returns the owning HtmlDocument.
+---@return HtmlDocument
+function HtmlElement:getDocument() end
+
+--- Returns this element's inner HTML.
+---@return string
+function HtmlElement:getHtml() end
+
+--- Returns this element's id or nil.
+---@return string
+function HtmlElement:getId() end
+
+--- Returns this element's last computed layout rectangle.
+---@return number
+function HtmlElement:getRect() end
+
+--- Returns an inline or stylesheet value for a property.
+---@param name string
+---@return string
+function HtmlElement:getStyle(name) end
+
+--- Returns this element's tag name.
+---@return string
+function HtmlElement:getTagName() end
+
+--- Returns this element's text content.
+---@return string
+function HtmlElement:getText() end
+
+--- Returns whether this element has a CSS class.
+---@param name string
+---@return boolean
+function HtmlElement:hasClass(name) end
+
+--- Removes an element event listener.
+---@param handle integer
+---@return nil
+function HtmlElement:off(handle) end
+
+--- Registers an element event listener.
+---@param event string
+---@param fn function
+---@return number
+function HtmlElement:on(event, fn) end
+
+--- Finds the first descendant matching a selector.
+---@param selector string
+---@return HtmlElement?
+function HtmlElement:query(selector) end
+
+--- Returns all descendants matching a selector.
+---@param selector string
+---@return table
+function HtmlElement:queryAll(selector) end
+
+--- Removes this element from the document tree.
+---@return nil
+function HtmlElement:remove() end
+
+--- Removes an attribute.
+---@param name string
+---@return nil
+function HtmlElement:removeAttribute(name) end
+
+--- Removes a CSS class from this element.
+---@param name string
+---@return nil
+function HtmlElement:removeClass(name) end
+
+--- Sets or removes an attribute value.
+---@param name string
+---@param value? string
+---@return nil
+function HtmlElement:setAttribute(name, value) end
+
+--- Replaces this element's inner HTML.
+---@param html string
+---@return nil
+function HtmlElement:setHtml(html) end
+
+--- Sets or removes this element's id.
+---@param id? string
+---@return nil
+function HtmlElement:setId(id) end
+
+--- Sets or removes an inline style value.
+---@param name string
+---@param value? string
+---@return nil
+function HtmlElement:setStyle(name, value) end
+
+--- Replaces this element's text content.
+---@param text string
+---@return nil
+function HtmlElement:setText(text) end
+
+--- Toggles a CSS class and returns the final state.
+---@param name string
+---@param force? boolean
+---@return boolean
+function HtmlElement:toggleClass(name, force) end
+
 --- Adds ImageWidget-specific methods.
 ---@class Image_Widget
 Image_Widget = {}
@@ -20481,9 +20566,6 @@ Image_Widget = {}
 function Image_Widget:getScaleMode() end
 
 --- Returns the tint of this Image_Widget widget.
----@return number
----@return number
----@return number
 ---@return number
 function Image_Widget:getTint() end
 
@@ -20708,15 +20790,11 @@ function Menu_Item:setText(text) end
 Nine_Patch = {}
 
 --- Returns the image dimensions of this Nine_Patch widget.
----@return integer
----@return integer
+---@return number
 function Nine_Patch:getImageDimensions() end
 
 --- Returns the insets of this Nine_Patch widget.
----@return integer
----@return integer
----@return integer
----@return integer
+---@return number
 function Nine_Patch:getInsets() end
 
 --- Returns the slices of this Nine_Patch widget.
@@ -20916,16 +20994,13 @@ Scroll_Panel = {}
 
 --- Returns the content size of this Scroll_Panel widget.
 ---@return number
----@return number
 function Scroll_Panel:getContentSize() end
 
 --- Returns the max scroll of this Scroll_Panel widget.
 ---@return number
----@return number
 function Scroll_Panel:getMaxScroll() end
 
 --- Returns the scroll position of this Scroll_Panel widget.
----@return number
 ---@return number
 function Scroll_Panel:getScrollPosition() end
 
@@ -21525,37 +21600,25 @@ lurek.ui.getId = function() end
 
 --- Returns the widget margin (top, right, bottom, left).
 ---@return number
----@return number
----@return number
----@return number
 lurek.ui.getMargin = function() end
 
 --- Returns the maximum widget size.
----@return number
 ---@return number
 lurek.ui.getMaxSize = function() end
 
 --- Returns the minimum widget size.
 ---@return number
----@return number
 lurek.ui.getMinSize = function() end
 
 --- Returns the widget padding (top, right, bottom, left).
----@return number
----@return number
----@return number
 ---@return number
 lurek.ui.getPadding = function() end
 
 --- Returns the widget position.
 ---@return number
----@return number
 lurek.ui.getPosition = function() end
 
 --- Returns the computed screen-space rectangle after layout.
----@return number
----@return number
----@return number
 ---@return number
 lurek.ui.getRect = function() end
 
@@ -21564,7 +21627,6 @@ lurek.ui.getRect = function() end
 lurek.ui.getRoot = function() end
 
 --- Returns the current width and height of the widget in UI pixels.
----@return number
 ---@return number
 lurek.ui.getSize = function() end
 
@@ -21592,6 +21654,8 @@ lurek.ui.getWidgetCount = function() end
 ---@return number
 lurek.ui.getZOrder = function() end
 
+lurek.ui.isDefaultPrevented = function() end
+
 --- Returns whether the widget is enabled.
 ---@return boolean
 lurek.ui.isEnabled = function() end
@@ -21604,6 +21668,12 @@ lurek.ui.isVisible = function() end
 ---@param key string
 ---@return boolean
 lurek.ui.keypressed = function(key) end
+
+--- Placeholder for future sandboxed document loading.
+---@param path string
+---@param opts? table
+---@return HtmlDocument
+lurek.ui.loadDocument = function(path, opts) end
 
 --- Load a widget tree from a Lua table definition and attach it to the UI
 ---@param def table
@@ -21685,6 +21755,12 @@ lurek.ui.newDialog = function(title) end
 --- Creates and returns a new docking panel that arranges children along its edges.
 ---@return table
 lurek.ui.newDockPanel = function() end
+
+--- Creates a detached HTML document from markup and optional CSS/viewport options.
+---@param html? string
+---@param opts? table
+---@return HtmlDocument
+lurek.ui.newDocument = function(html, opts) end
 
 --- Creates an image display widget.
 ---@return table
@@ -21840,6 +21916,8 @@ lurek.ui.newWindow = function(title) end
 ---@return string
 lurek.ui.parseWidgetState = function(state) end
 
+lurek.ui.preventDefault = function() end
+
 --- Removes a child widget from this container.
 ---@param child table|integer
 ---@return nil
@@ -21990,6 +22068,13 @@ lurek.ui.slideIn = function(x, y) end
 ---@param y number
 lurek.ui.slideOut = function(x, y) end
 
+lurek.ui.stopPropagation = function() end
+
+--- Returns whether the active HTML facade supports a named feature.
+---@param feature string
+---@return boolean
+lurek.ui.supports = function(feature) end
+
 --- Forwards text input to the focused text input widget.
 ---@param text string
 ---@return boolean
@@ -22035,13 +22120,11 @@ lurek.window.fromPixels = function(value) end
 lurek.window.getDPIScale = function() end
 
 --- Returns the desktop resolution as width, height.
----@return integer
----@return integer
+---@return number
 lurek.window.getDesktopDimensions = function() end
 
 --- Returns the window dimensions as width, height.
----@return integer
----@return integer
+---@return number
 lurek.window.getDimensions = function() end
 
 --- Returns the number of connected displays.
@@ -22058,7 +22141,6 @@ lurek.window.getDisplayName = function(display) end
 lurek.window.getDisplayOrientation = function() end
 
 --- Returns the fullscreen state and type string.
----@return boolean
 ---@return string
 lurek.window.getFullscreen = function() end
 
@@ -22079,9 +22161,7 @@ lurek.window.getGameWidth = function() end
 lurek.window.getHeight = function() end
 
 --- Returns the window dimensions and mode flags as width, height, flags.
----@return integer
----@return integer
----@return table
+---@return number
 lurek.window.getMode = function() end
 
 --- Returns the native DPI scale factor.
@@ -22089,19 +22169,14 @@ lurek.window.getMode = function() end
 lurek.window.getNativeDPIScale = function() end
 
 --- Returns the window dimensions in physical pixels.
----@return integer
----@return integer
+---@return number
 lurek.window.getPixelDimensions = function() end
 
 --- Returns the window position as x, y in screen coordinates.
----@return integer
----@return integer
+---@return number
 lurek.window.getPosition = function() end
 
 --- Returns the safe display area as x, y, w, h.
----@return number
----@return number
----@return number
 ---@return number
 lurek.window.getSafeArea = function() end
 
