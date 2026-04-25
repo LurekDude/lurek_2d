@@ -445,8 +445,9 @@ end
 -- Call after setCell() changes; subsequent castRays use the compiled scene.
 do  -- Raycaster:buildScene
   local rc = lurek.raycaster.new(16, 16, 1)
-  rc:setCells(1, 1, 1, 1, 1, 0)
-  rc:buildScene()
+  local params = { px = 8, py = 8, angle = 0, fov = math.pi/3, rays = 320,
+                   max_dist = 16, screen_w = 320, screen_h = 240 }
+  rc:buildScene(params, nil, nil, nil)
   lurek.log.info("scene built", "raycaster")
 end
 
@@ -455,8 +456,8 @@ end
 -- Call for each screen row between the horizon and the floor to build the floor plane.
 do  -- Raycaster:castFloorRow
   local rc = lurek.raycaster.new(16, 16, 1)
-  local depths, us, vs = rc:castFloorRow(240, 400, 300, 0, 0.5)
-  lurek.log.info("floor row depth count: " .. (depths and #depths or 0), "raycaster")
+  local uvs = rc:castFloorRow(8, 8, 1, 0, 0, 0.66, 240)
+  lurek.log.info("floor row uv count: " .. (uvs and #uvs or 0), "raycaster")
 end
 
 --@api-stub: Raycaster:castRay
@@ -464,8 +465,8 @@ end
 -- Returns distance, wallType, side, and texture coordinates for the hit cell.
 do  -- Raycaster:castRay
   local rc = lurek.raycaster.new(16, 16, 1)
-  local dist, wtype, side, tx = rc:castRay(8, 8, 0)
-  lurek.log.info("ray dist: " .. (dist or -1), "raycaster")
+  local hit = rc:castRay(8, 8, 0, 16)
+  lurek.log.info("ray dist: " .. (hit and hit.dist or -1), "raycaster")
 end
 
 --@api-stub: Raycaster:castRayMulti
@@ -473,7 +474,7 @@ end
 -- Useful for multi-camera setups or custom rendering passes.
 do  -- Raycaster:castRayMulti
   local rc = lurek.raycaster.new(16, 16, 1)
-  local results = rc:castRayMulti({{x=8,y=8,angle=0},{x=4,y=4,angle=math.pi/2}})
+  local results = rc:castRayMulti(8, 8, 0, 16)
   lurek.log.info("multi-ray results: " .. #results, "raycaster")
 end
 
@@ -482,7 +483,7 @@ end
 -- Returns a table of per-column hit data; used by drawView() internally.
 do  -- Raycaster:castRays
   local rc = lurek.raycaster.new(16, 16, 1)
-  local cols = rc:castRays(8, 8, 0, math.pi/3, 320)
+  local cols = rc:castRays(8, 8, 0, math.pi/3, 320, 16)
   lurek.log.info("columns: " .. (cols and #cols or 0), "raycaster")
 end
 
@@ -491,7 +492,7 @@ end
 -- More cache-friendly than castRays for large column counts.
 do  -- Raycaster:castRaysFlat
   local rc = lurek.raycaster.new(16, 16, 1)
-  local flat = rc:castRaysFlat(8, 8, 0, math.pi/3, 320)
+  local flat = rc:castRaysFlat(8, 8, 0, math.pi/3, 320, 16)
   lurek.log.info("flat ray count: " .. (flat and #flat or 0), "raycaster")
 end
 
@@ -500,8 +501,7 @@ end
 -- fov and range control the visible arc; useful for guard-vision debugging.
 do  -- Raycaster:drawCameraSweep
   local rc = lurek.raycaster.new(16, 16, 1)
-  local img = lurek.image.newImageData(128, 128)
-  rc:drawCameraSweep(img, 8, 8, 0, math.pi/3, 6, 8, 8)
+  local img = rc:drawCameraSweep(8, 8, math.pi/3, 16, 6, 64, 48)
   lurek.log.info("camera sweep drawn", "raycaster")
 end
 
@@ -510,9 +510,7 @@ end
 -- Useful for debugging occlusion and rendering artefacts.
 do  -- Raycaster:drawDepthMap
   local rc = lurek.raycaster.new(16, 16, 1)
-  local img = lurek.image.newImageData(320, 240)
-  local cols = rc:castRays(8, 8, 0, math.pi/3, 320)
-  rc:drawDepthMap(img, cols)
+  local img = rc:drawDepthMap(8, 8, 0, math.pi/3, 320, 320, 240, 16)
   lurek.log.info("depth map drawn", "raycaster")
 end
 
@@ -521,8 +519,7 @@ end
 -- Shows visible area from a guard's perspective for minimap or debugging.
 do  -- Raycaster:drawLineOfSight
   local rc = lurek.raycaster.new(16, 16, 1)
-  local img = lurek.image.newImageData(128, 128)
-  rc:drawLineOfSight(img, 8, 8, 0, math.pi/3, 8, 8, 8)
+  local img = rc:drawLineOfSight(4, 4, 12, 12, 8)
   lurek.log.info("LOS drawn", "raycaster")
 end
 
@@ -531,8 +528,7 @@ end
 -- Use for minimaps, editor overlays, or debugging spatial relationships.
 do  -- Raycaster:drawTopDown
   local rc = lurek.raycaster.new(16, 16, 1)
-  local img = lurek.image.newImageData(128, 128)
-  rc:drawTopDown(img, 8, 8)
+  local img = rc:drawTopDown(8, 8, 0, 8)
   lurek.log.info("top-down drawn", "raycaster")
 end
 
@@ -541,8 +537,7 @@ end
 -- Writes column-by-column into an ImageData; call once per frame in lurek.render().
 do  -- Raycaster:drawView
   local rc = lurek.raycaster.new(16, 16, 1)
-  local img = lurek.image.newImageData(320, 240)
-  rc:drawView(img, 8, 8, 0, math.pi/3, 240)
+  local img = rc:drawView(8, 8, 0, math.pi/3, 320, 240, 16)
   lurek.log.info("view rendered", "raycaster")
 end
 
@@ -587,7 +582,7 @@ end
 -- Configures a PointLight's position, colour, and radius in one call.
 -- Use instead of separate property setters when updating all fields each frame.
 do  -- PointLight:set
-  local light = lurek.raycaster.newPointLight()
-  light:set(4.5, 3.5, 1.0, 0.9, 0.7, 6.0)
+  local light = lurek.raycaster.newPointLight(4.5, 3.5, 1.0, 0.9, 0.7, 6.0, 1.0)
+  light:set(4.5, 3.5, 1.0, 0.9, 0.7, 6.0, 1.0)
   lurek.log.info("point light configured", "raycaster")
 end

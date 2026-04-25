@@ -56,7 +56,7 @@ impl LuaUserData for LuaCombo {
         // -- feed --
         /// Feed a key-press event into the combo detector.
         /// Time elapsed since the last `feed` or `tick` call is taken from the internal clock.
-        /// @param key : string
+        /// @param key string
         /// @return nil
         /// string  "idle"|"advanced"|"completed"|"broken"
         methods.add_method_mut("feed", |_, this, key: String| {
@@ -74,7 +74,7 @@ impl LuaUserData for LuaCombo {
         // -- tick --
         /// Advance the internal clock by `dt` seconds and check for timeouts.
         /// Call once per frame with the frame delta even when no key is pressed.
-        /// @param dt : number   frame delta in seconds
+        /// @param dt number   frame delta in seconds
         /// @return nil
         /// string  "expired" if a running combo just timed out; "in_progress" or "idle" otherwise
         methods.add_method_mut("tick", |_, this, dt: f64| {
@@ -120,7 +120,7 @@ impl LuaUserData for LuaCombo {
 
         // -- getStep --
         /// Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
-        /// @param index : integer   1-based
+        /// @param index integer   1-based
         /// @return nil
         /// table | nil
         methods.add_method("getStep", |lua, this, index: usize| {
@@ -179,9 +179,9 @@ impl LuaUserData for LuaInputRecording {
 
 /// Registers the `lurek.input.keyboard`, `lurek.input.mouse`, `lurek.input.gamepad`, and `lurek.input.touch` API tables.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     // lurek.input â€” parent table that nests keyboard, mouse, gamepad, touch
@@ -194,7 +194,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isDown --
     /// Returns true if any of the given keys is currently held down.
-    /// @param keys : string...
+    /// @param ... string
     /// @return boolean
     let s = state.clone();
     keyboard.set(
@@ -206,7 +206,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isScancodeDown --
     /// Returns whether the key with the given scancode is held.
-    /// @param scancode : string
+    /// @param scancode string
     /// @return boolean
     let s = state.clone();
     keyboard.set(
@@ -218,7 +218,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setKeyRepeat --
     /// Enables or disables key-repeat events.
-    /// @param enabled : boolean
+    /// @param enabled boolean
     /// @return nil
     let s = state.clone();
     keyboard.set(
@@ -240,7 +240,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setTextInput --
     /// Enables or disables Unicode text input mode.
-    /// @param enabled : boolean
+    /// @param enabled boolean
     /// @return nil
     let s = state.clone();
     keyboard.set(
@@ -262,7 +262,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getScancodeFromKey --
     /// Returns the hardware scancode for the given key name.
-    /// @param key : string
+    /// @param key string
     /// @return string?
     keyboard.set(
         "getScancodeFromKey",
@@ -271,7 +271,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getKeyFromScancode --
     /// Returns the key name for the given hardware scancode.
-    /// @param scancode : string
+    /// @param scancode string
     /// @return string?
     keyboard.set(
         "getKeyFromScancode",
@@ -280,7 +280,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isModifierActive --
     /// Returns whether the named modifier key is currently held.
-    /// @param modifier : string
+    /// @param modifier string
     /// @return boolean
     let s = state.clone();
     keyboard.set(
@@ -328,7 +328,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isDown --
     /// Returns whether the given mouse button is currently held down.
-    /// @param button : integer
+    /// @param button integer
     /// @return boolean
     let s = state.clone();
     mouse.set(
@@ -340,7 +340,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setVisible --
     /// Shows or hides the operating-system mouse cursor.
-    /// @param visible : boolean
+    /// @param visible boolean
     /// @return nil
     let s = state.clone();
     mouse.set(
@@ -362,7 +362,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setGrabbed --
     /// Locks or unlocks the mouse cursor to the window.
-    /// @param grabbed : boolean
+    /// @param grabbed boolean
     /// @return nil
     let s = state.clone();
     mouse.set(
@@ -384,7 +384,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setRelativeMode --
     /// Enables or disables raw relative mouse motion mode.
-    /// @param relative : boolean
+    /// @param relative boolean
     /// @return nil
     let s = state.clone();
     mouse.set(
@@ -406,8 +406,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setPosition --
     /// Moves the mouse cursor to the given window-space position.
-    /// @param x : number
-    /// @param y : number
+    /// @param x number
+    /// @param y number
     /// @return nil
     let s = state.clone();
     mouse.set(
@@ -420,7 +420,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setCursor --
     /// Sets the active mouse cursor from a Cursor handle, name string, or nil to reset.
-    /// @param cursor : Cursor?
+    /// @param cursor Cursor?
     /// @return nil
     let s = state.clone();
     mouse.set(
@@ -454,11 +454,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newCursor --
     /// Creates a custom mouse cursor from RGBA pixel data.
-    /// @param pixels : table
-    /// @param width : integer
-    /// @param height : integer
-    /// @param hotx : integer?
-    /// @param hoty : integer?
+    /// @param pixels table
+    /// @param width integer
+    /// @param height integer
+    /// @param hotx integer?
+    /// @param hoty integer?
     /// @return Cursor
     mouse.set(
         "newCursor",
@@ -486,7 +486,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getSystemCursor --
     /// Returns a system cursor object for the named cursor shape.
-    /// @param name : string
+    /// @param name string
     /// @return Cursor
     mouse.set(
         "getSystemCursor",
@@ -567,7 +567,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isConnected --
     /// Returns whether the gamepad with the given ID is connected.
-    /// @param id : integer
+    /// @param id integer
     /// @return boolean
     let s = state.clone();
     gamepad.set(
@@ -579,7 +579,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getName --
     /// Returns the human-readable name of a gamepad.
-    /// @param id : integer
+    /// @param id integer
     /// @return string
     let s = state.clone();
     gamepad.set(
@@ -595,7 +595,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isGamepad --
     /// Returns whether the joystick at the given slot is a recognized gamepad.
-    /// @param id : integer
+    /// @param id integer
     /// @return boolean
     let s = state.clone();
     gamepad.set(
@@ -607,7 +607,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getButtonCount --
     /// Returns the total number of buttons on the gamepad.
-    /// @param id : integer
+    /// @param id integer
     /// @return integer
     let s = state.clone();
     gamepad.set(
@@ -622,7 +622,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getAxisCount --
     /// Returns the total number of analog axes on the gamepad.
-    /// @param id : integer
+    /// @param id integer
     /// @return integer
     let s = state.clone();
     gamepad.set(
@@ -637,8 +637,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isDown --
     /// Returns whether the given button on the gamepad is currently held.
-    /// @param id : integer
-    /// @param button : integer
+    /// @param id integer
+    /// @param button integer
     /// @return boolean
     let s = state.clone();
     gamepad.set(
@@ -653,8 +653,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getAxis --
     /// Returns the current value (-1 to 1) of a gamepad analog axis.
-    /// @param id : integer
-    /// @param axis : integer
+    /// @param id integer
+    /// @param axis integer
     /// @return number
     let s = state.clone();
     gamepad.set(
@@ -673,7 +673,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// winit 0.30 does not expose a haptics API on any desktop platform. This function
     /// always returns `false` in the current release. When platform support is added the
     /// return value will reflect actual capability.
-    /// @param id : integer
+    /// @param id integer
     /// @return boolean
     gamepad.set(
         "isVibrationSupported",
@@ -693,10 +693,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// platforms.  When a winit haptics backend is available this function will return
     /// `true` on success.
     ///
-    /// @param id : integer
-    /// @param low_freq : number
-    /// @param high_freq : number
-    /// @param duration_ms : number
+    /// @param id integer
+    /// @param low_freq number
+    /// @param high_freq number
+    /// @param duration_ms number
     /// @return boolean
     gamepad.set(
         "vibrate",
@@ -717,7 +717,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getGUID --
     /// Returns the hardware GUID string of the gamepad.
-    /// @param id : integer
+    /// @param id integer
     /// @return string
     let s = state.clone();
     gamepad.set(
@@ -733,8 +733,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getHat --
     /// Returns the direction string of a hat switch on the gamepad.
-    /// @param id : integer
-    /// @param hat : integer
+    /// @param id integer
+    /// @param hat integer
     /// @return string
     let s = state.clone();
     gamepad.set(
@@ -750,7 +750,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setVibration --
     /// Triggers haptic rumble (currently a no-op stub).
-    /// @param args : any...
+    /// @param args any...
     /// @return boolean
     gamepad.set(
         "setVibration",
@@ -759,7 +759,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setBackgroundEvents --
     /// Enable or disable receiving gamepad events when the window is not focused.
-    /// @param enable : boolean
+    /// @param enable boolean
     /// @return nil
     let s = state.clone();
     gamepad.set(
@@ -781,8 +781,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setGamepadMapping --
     /// Stores or replaces the SDL2 GameControllerDB mapping string for the given GUID.
-    /// @param guid : string
-    /// @param mapping : string
+    /// @param guid string
+    /// @param mapping string
     /// @return nil
     let s = state.clone();
     gamepad.set(
@@ -795,7 +795,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getGamepadMappingString --
     /// Returns the stored mapping string for the given GUID, or nil.
-    /// @param guid : string
+    /// @param guid string
     /// @return string?
     let s = state.clone();
     gamepad.set(
@@ -810,7 +810,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- loadGamepadMappings --
     /// Loads SDL2 GameControllerDB-format mappings from a file.
-    /// @param path : string
+    /// @param path string
     /// @return integer
     let s = state.clone();
     gamepad.set(
@@ -825,7 +825,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- saveGamepadMappings --
     /// Saves all stored gamepad mappings to a plain-text file.
-    /// @param path : string
+    /// @param path string
     /// @return nil
     let s = state.clone();
     gamepad.set(
@@ -869,7 +869,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getPosition --
     /// Returns the position (x, y) of the touch with the given ID.
-    /// @param id : integer
+    /// @param id integer
     /// @return number, number
     let s = state.clone();
     touch.set(
@@ -883,7 +883,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getPressure --
     /// Returns the pressure (0-1) of the touch with the given ID.
-    /// @param id : integer
+    /// @param id integer
     /// @return number
     let s = state.clone();
     touch.set(
@@ -918,8 +918,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- bind --
     /// Maps an action name to one or more key/button names.
     /// Multiple `bind` calls for the same action append to its key list.
-    /// @param action : string
-    /// @param keys : string | table   one key name or an array of key names
+    /// @param action string
+    /// @param keys string | table   one key name or an array of key names
     /// @return nil
     let am = action_map.clone();
     input_tbl.set(
@@ -957,7 +957,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- unbind --
     /// Removes all key bindings for the given action name.
-    /// @param action : string
+    /// @param action string
     /// boolean  true if the action existed
     let am = action_map.clone();
     /// @return boolean
@@ -1002,7 +1002,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isActionDown --
     /// Returns true if any key bound to the action is currently held down.
-    /// @param action : string
+    /// @param action string
     /// @return boolean
     let am = action_map.clone();
     let s = state.clone();
@@ -1025,7 +1025,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- wasActionPressed --
     /// Returns true if any key bound to the action was pressed this frame.
     /// Also records the frame number for use with `wasActionPressedWithin`.
-    /// @param action : string
+    /// @param action string
     /// @return boolean
     let am = action_map.clone();
     let lpf = last_pressed_frame.clone();
@@ -1049,7 +1049,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- wasActionReleased --
     /// Returns true if any key bound to the action was released this frame.
-    /// @param action : string
+    /// @param action string
     /// @return boolean
     let am = action_map.clone();
     let s = state.clone();
@@ -1069,15 +1069,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns true if the action was pressed within the last `frames` frames.
     /// Requires `wasActionPressed` to have been called at least once per frame;
     /// it is the mechanism that records the last-press frame number.
-    /// @param action : string
-    /// @param frames : integer
+    /// @param action string
+    /// @param frames integer
     /// @return boolean
     let lpf = last_pressed_frame;
     let s = state.clone();
     /// Was action pressed within.
     ///
-    /// @param action : string
-    /// @param frames : integer
+    /// @param action string
+    /// @param frames integer
     /// @return boolean
     input_tbl.set(
         "wasActionPressedWithin",
@@ -1099,8 +1099,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// `opts` is an optional table that may contain:
     ///   `total_gap` (integer, ms) â€” budget for the entire sequence (default 2000 ms).
     ///
-    /// @param steps : table   array of strings or `{key,gap}` tables
-    /// @param opts  : table?  `{total_gap=integer?}`
+    /// @param steps table   array of strings or `{key,gap}` tables
+    /// @param opts table?  `{total_gap=integer?}`
     /// @return Combo
     input_tbl.set(
         "newCombo",
@@ -1188,7 +1188,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     let rc = rec_rc.clone();
     /// Loads a JSON-encoded recording string for playback.
-    /// @param json : string
+    /// @param json string
     /// @return nil
     input_tbl.set(
         "loadRecording",

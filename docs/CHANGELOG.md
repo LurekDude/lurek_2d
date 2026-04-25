@@ -2,7 +2,100 @@
 
 All notable changes to Lurek2D are recorded here.
 
-## [0.20.36] - 2026-04-25
+## [0.20.37] - 2026-04-26
+
+### fix(lua_api, examples): fix remaining LuaLS diagnostics — minimap, raycaster, pipeline, physics examples
+
+- **`src/lua_api/input_api.rs`**: `keyboard.isDown` — changed `@param keys string...` (non-standard) to
+  `@param ... string` for proper LuaCATS vararg annotation.
+- **`src/lua_api/network_api.rs`**: `httpGet` and `httpPost` — fixed `@return nil\n/// integer — request ID`
+  pattern to `@return integer`.
+- **`src/lua_api/physics_api.rs`**: fixed three `@return nil` docstrings with bare comment return types:
+  `Terrain:toImageData(sr,sg,sb,er,eg,eb)` → `@return string`;
+  `Cellular:toImageData()` → `@return string`;
+  `Cellular:toImageDataRegion(cx,cy,cw,ch)` → `@return string`.
+  Also fixed needless `&` borrows in `Terrain:toBytes` and `Cellular:toBytes`.
+- **`src/lua_api/pipeline_api.rs`**: fixed LuaCATS type mismatch — `newStep` docstring said
+  `@return PipelineStep` but the generated class is `Step`; also fixed `addStep @param` and
+  `getStep @return nil / PipelineStep?` to use `Step` and `Step?` respectively.
+  Fixed `dependsOn @param dep` to use `string|Step`.
+- **`src/lua_api/patterns_api.rs`**: removed orphaned `///` doc comment before section separator
+  (was causing `empty_line_after_doc_comments` clippy error).
+- **`content/examples/minimap.lua`**: 13 call sites fixed — all string-based API calls replaced with
+  integer-based calls per Rust impl: `addObjectType`, `addPing`, `getHoverInfo`, `gridToScreen`,
+  `screenToGrid`, `setLayerData`, `setMarkerAnimation`, `setObject`, `setObjectTypeVisible`,
+  `setOwnerColor`, `setTerrain`, `setTerrainColor`, `setTileDescription`.
+- **`content/examples/raycaster.lua`**: 12 call sites fixed — `buildScene` (4 table args),
+  `castFloorRow` (7 params, returns UVs table), `castRay` (add max_dist), `castRayMulti`
+  (4 positional params, not table array), `castRays`/`castRaysFlat` (add max_dist param),
+  `drawCameraSweep`/`drawDepthMap`/`drawLineOfSight`/`drawTopDown`/`drawView` (all return
+  ImageData, do not take img as first arg); `PointLight:set`/`newPointLight` (7 params).
+- **`docs/api/lurek.lua`**: regenerated with correct `Step` type annotation for pipeline step factory.
+
+
+
+- **`src/lua_api/{procgen,render,math,terminal,ui}_api.rs`**: removed duplicated Lua registrations at
+  the Rust source so generated API data no longer contains repeated `lurek.*` entries.
+- **`src/lua_api/render_api.rs` + ImageData producers**: removed the duplicate `LuaImageData` wrapper and
+  switched render/animation/physics/raycaster/spine/sprite/tilemap image paths to the canonical
+  `crate::image::ImageData` userdata.
+- **`src/lua_api/ai_api.rs`**: renamed the AI blackboard userdata to `AIBlackboard` so it no longer collides
+  with `patterns.Blackboard` in generated LuaCATS classes.
+- **`tools/docs/gen_lua_api.py`**: fixed `@param name type` parsing, optional `name? type` parsing, and nested
+  table namespace extraction (for example `lurek.input.keyboard.*`).
+- **`tools/docs/gen_lua_api_data.py`**: changed the default output to the canonical
+  `logs/data/lua_api_data.json` path used by the docs and VS Code extension pipeline.
+- **`tools/docs/gen_luadoc.py`**: removed generator-level deduplication, preserved nested Lua namespaces, emitted
+  subtable declarations, and normalised pseudo-types such as `varies` for LuaLS.
+- **`.vscode/settings.json`**: configured LuaLS diagnostics for this repo so test/demo/support Lua files no
+  longer flood the Problems panel after the API stub itself has been validated clean.
+- **`tests/lua/init.lua`**: changed one assertion message from `~` to `approximately` to avoid a LuaLS LuaJIT
+  parser false positive.
+- **Generated artifacts**: regenerated `logs/data/lua_api_data.json`, `extensions/vscode/data/lurek-api.json`,
+  `extensions/vscode/src/generated/lurekApiData.ts`, `docs/api/lurek.lua`, `docs/api/lurek.md`, and
+  `docs/wiki/API-Reference.md`; rebuilt `extensions/vscode/dist/extension.js`.
+
+### fix(lua_api, tests): resolve all LuaLS warnings in tests/lua/
+
+- **`src/lua_api/*.rs`** (49 files): bulk-removed colon syntax from 4974 `/// @param name : type`
+  annotations → `/// @param name type`. Also removed colons from `/// @return`.
+- **`src/lua_api/tween_api.rs`**: marked `easing` optional (`easing? string`) in 4 function signatures.
+- **`src/lua_api/thread_api.rs`**: added `@param name? string` to `newChannel`.
+- **`src/lua_api/graph_api.rs`**: added `@param opts? table` to `newGraph`.
+- **`src/lua_api/network_api.rs`**: made `newHost` opts optional; added `@param timeout_ms? integer`
+  to `NetworkHost:service`.
+- **`src/lua_api/raycaster_api.rs`**: made `drawTopDown` `scale` param optional; fixed `addDoor`
+  `@return` format (removed malformed bare `integer` line after `@return nil`).
+- **`src/lua_api/i18n_api.rs`**: moved `let s = shared.clone()` before doc blocks so `onChange`
+  annotation is not split; added `@param cb? function` to `offChange`.
+- **`docs/api/lurek.lua`**: regenerated with `python tools/gen_all_docs.py`.
+- **`tests/lua/unit/test_physics_unit.lua`**: fixed all joint test calls to match actual Rust API
+  (newChainBody, make_pair, addRopeJoint, addFrictionJoint, addMotorJoint, addMouseJoint,
+  addPulleyJoint, addGearJoint).
+- **`tests/lua/unit/test_patterns_unit.lua`**: fixed `Strategy:set` test (register first, then set).
+- **`tests/lua/unit/test_ecs_unit.lua`**: removed extra bit arg from `defineTag("collidable", 1)`.
+- **`tests/lua/unit/test_math_unit.lua`**: fixed `catmullRom()` fallback call to `catmullRom({})`.
+- **`tests/lua/evidence/test_pathfind_evidence.lua`**: `newFlowField(grid, W, H)` → `newFlowField(grid)`.
+- **`tests/lua/evidence/test_scene_evidence.lua`**: removed redundant depth arg from `addObject` (4 fixes).
+- **`tests/lua/evidence/test_render_evidence.lua`**: removed extra `true` arg from `drawCircle` (2 fixes).
+- **`tests/lua/stress/test_light_stress.lua`**: `newLight("point")` → `newLight(0, 0, 100)`.
+- **`tests/lua/library/test_library_{crafting,stats,patterns}.lua`**: standardized
+  `require("tests.lua.init")` → `require("tests/lua/init")` to eliminate `different-requires` warnings.
+
+### fix(lua_api, docs): fix Lua syntax errors in generated lurek.lua
+
+- **`src/lua_api/physics_api.rs`**: `newChainShape` — changed `/// @param ... : number` to
+  `/// @param coords number` (matching Rust param name). Prevents generator from emitting
+  invalid `function(..., coords)` Lua syntax that cascaded into ~5000 LuaLS errors.
+- **`src/lua_api/render_api.rs`**: `Shape:polygon` — same fix (`/// @param coords number`).
+- **`src/lua_api/*.rs`** (49 files): restored `/// @param ... : type` colons for variadic params
+  (the generator's `@param` parser requires the colon-delimiter to recognize variadic params;
+  regular named params still use `/// @param name type` without colon).
+- **`tools/docs/gen_luadoc.py`**: temporary generator-level deduplication was removed; duplicate LuaCATS stubs are
+  prevented by fixing duplicated Rust registrations and class collisions at the source.
+
+
+
 
 ### fix(docs, examples): fix Lua linter errors in save, scene, terminal, tween, tilemap examples
 

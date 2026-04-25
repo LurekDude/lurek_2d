@@ -558,8 +558,8 @@ end
 -- Object types control how setObject() icons appear on the minimap.
 do  -- Minimap:addObjectType
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  mm:addObjectType("enemy", {1, 0, 0, 1})
-  mm:addObjectType("ally",  {0, 0.5, 1, 1})
+  local enemy_idx = mm:addObjectType("enemy", 1, 0, 0, 1)
+  local ally_idx = mm:addObjectType("ally",  0, 0.5, 1, 1)
   lurek.log.info("object types: " .. mm:getObjectTypeCount(), "minimap")
 end
 
@@ -568,7 +568,7 @@ end
 -- Use for unit selection highlights or tactical markers in multiplayer.
 do  -- Minimap:addPing
   local mm = lurek.minimap.newMinimap(64, 64, 4)
-  mm:addPing(32, 32, 2.0, {0, 1, 1, 1})
+  mm:addPing(32, 32, 2.0, 0, 1, 1, 1)
   lurek.log.info("ping added; count: " .. mm:getPingCount(), "minimap")
 end
 
@@ -595,8 +595,8 @@ end
 -- Call from mousemoved to implement minimap hover tooltips.
 do  -- Minimap:getHoverInfo
   local mm = lurek.minimap.newMinimap(64, 64, 4)
-  mm:setTerrain(10, 10, "forest")
-  local info = mm:getHoverInfo(40, 40)
+  mm:setTerrain(10, 10, 1)
+  local info = mm:getHoverInfo(40, 40, 0, 0)
   lurek.log.info("hover info: " .. tostring(info), "minimap")
 end
 
@@ -605,7 +605,7 @@ end
 -- Inverse of screenToGrid; use for placing HUD elements above minimap cells.
 do  -- Minimap:gridToScreen
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  local sx, sy = mm:gridToScreen(16, 16)
+  local sx, sy = mm:gridToScreen(16, 16, 0, 0)
   lurek.log.info("grid 16,16 -> screen " .. sx .. "," .. sy, "minimap")
 end
 
@@ -614,7 +614,7 @@ end
 -- Use in mouse-click handlers to translate HUD clicks to world actions.
 do  -- Minimap:screenToGrid
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  local gx, gy = mm:screenToGrid(64, 64)
+  local gx, gy = mm:screenToGrid(64, 64, 0, 0)
   lurek.log.info("screen -> grid: " .. gx .. "," .. gy, "minimap")
 end
 
@@ -635,7 +635,7 @@ do  -- Minimap:setLayerData
   local mm = lurek.minimap.newMinimap(8, 8, 8)
   local data = {}
   for i = 1, 64 do data[i] = (i % 2 == 0) and 1 or 0 end
-  mm:setLayerData("custom_layer", data)
+  mm:setLayerData(0, data)
   lurek.log.info("layer data set", "minimap")
 end
 
@@ -644,7 +644,8 @@ end
 -- Pass a table of icon frame indices and a frames-per-second rate.
 do  -- Minimap:setMarkerAnimation
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  mm:setMarkerAnimation("quest_marker", {1, 2, 3, 4}, 4)
+  local marker_id = mm:addMarker(16, 16, "quest_marker", 1, 1, 0, 1)
+  mm:setMarkerAnimation(marker_id, "pulse", 4)
   lurek.log.info("marker animation set", "minimap")
 end
 
@@ -653,8 +654,8 @@ end
 -- Objects appear as coloured icons; update their position by calling setObject again.
 do  -- Minimap:setObject
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  mm:addObjectType("unit", {0, 0.7, 1, 1})
-  mm:setObject("hero_01", 16, 16, "unit")
+  local unit_idx = mm:addObjectType("unit", 0, 0.7, 1, 1)
+  mm:setObject(1, 16, 16, unit_idx)
   lurek.log.info("object count: " .. mm:getObjectCount(), "minimap")
 end
 
@@ -663,9 +664,9 @@ end
 -- Use to toggle unit icons by army or faction without removing them.
 do  -- Minimap:setObjectTypeVisible
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  mm:addObjectType("enemy", {1, 0, 0, 1})
-  mm:setObjectTypeVisible("enemy", false)
-  lurek.log.info("enemy visible: " .. tostring(mm:isObjectTypeVisible("enemy")), "minimap")
+  local enemy_idx = mm:addObjectType("enemy", 1, 0, 0, 1)
+  mm:setObjectTypeVisible(enemy_idx, false)
+  lurek.log.info("enemy visible: " .. tostring(mm:isObjectTypeVisible(enemy_idx)), "minimap")
 end
 
 --@api-stub: Minimap:setOwnerColor
@@ -673,8 +674,8 @@ end
 -- Call once per faction at init; provinces tagged with that owner use this colour.
 do  -- Minimap:setOwnerColor
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  mm:setOwnerColor("player_red",   {0.9, 0.1, 0.1, 1})
-  mm:setOwnerColor("player_blue",  {0.1, 0.2, 0.9, 1})
+  mm:setOwnerColor(1, 0.9, 0.1, 0.1, 1)
+  mm:setOwnerColor(2, 0.1, 0.2, 0.9, 1)
   lurek.log.info("owner colours set", "minimap")
 end
 
@@ -683,8 +684,8 @@ end
 -- Terrain types are registered with setTerrainColor; unknown types fall back to white.
 do  -- Minimap:setTerrain
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  mm:setTerrainColor("water", {0.2, 0.4, 0.9, 1})
-  mm:setTerrain(5, 10, "water")
+  mm:setTerrainColor(1, 0.2, 0.4, 0.9, 1)
+  mm:setTerrain(5, 10, 1)
   lurek.log.info("terrain set", "minimap")
 end
 
@@ -693,8 +694,8 @@ end
 -- Cells set to this terrain type render in the registered colour on the minimap.
 do  -- Minimap:setTerrainColor
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  mm:setTerrainColor("forest",  {0.1, 0.6, 0.1, 1})
-  mm:setTerrainColor("desert",  {0.9, 0.8, 0.4, 1})
+  mm:setTerrainColor(1, 0.1, 0.6, 0.1, 1)
+  mm:setTerrainColor(2, 0.9, 0.8, 0.4, 1)
   lurek.log.info("terrain colours registered", "minimap")
 end
 
@@ -703,8 +704,8 @@ end
 -- Returned by getHoverInfo when the player hovers over cells of this terrain.
 do  -- Minimap:setTileDescription
   local mm = lurek.minimap.newMinimap(32, 32, 4)
-  mm:setTerrainColor("mountain", {0.5, 0.5, 0.5, 1})
-  mm:setTileDescription("mountain", "Impassable rock face")
+  mm:setTerrainColor(1, 0.5, 0.5, 0.5, 1)
+  mm:setTileDescription(1, "Impassable rock face")
   lurek.log.info("tile description set", "minimap")
 end
 

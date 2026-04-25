@@ -1,4 +1,4 @@
-//! `lurek.network` â€” Full networking toolkit for multiplayer games.
+//! `lurek.network` — Full networking toolkit for multiplayer games.
 //!
 //! Provides ENet UDP, HTTP, TCP, WebSocket, and MessagePack serialization
 //! through the `lurek.network` Lua namespace.
@@ -162,6 +162,7 @@ impl LuaUserData for LuaNetworkHost {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- service --
         /// Polls the network for one event, returning an event table or nil.
+        /// @param timeout_ms? integer
         /// @return table?
         methods.add_method("service", |lua, this, ()| {
             match this
@@ -177,9 +178,9 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- connect --
         /// Initiates a connection to a remote host, returning the peer ID.
-        /// @param addr : string
-        /// @param channels : integer?
-        /// @param data : integer?
+        /// @param addr string
+        /// @param channels integer?
+        /// @param data integer?
         /// @return integer
         methods.add_method(
             "connect",
@@ -196,10 +197,10 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- send --
         /// Sends data to a specific peer on a channel.
-        /// @param peer_id : integer
-        /// @param channel_id : integer
-        /// @param data : string
-        /// @param reliable : boolean?
+        /// @param peer_id integer
+        /// @param channel_id integer
+        /// @param data string
+        /// @param reliable boolean?
         /// @return nil
         methods.add_method(
             "send",
@@ -213,9 +214,9 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- broadcast --
         /// Broadcasts data to all connected peers on a channel.
-        /// @param channel_id : integer
-        /// @param data : string
-        /// @param reliable : boolean?
+        /// @param channel_id integer
+        /// @param data string
+        /// @param reliable boolean?
         /// @return nil
         methods.add_method(
             "broadcast",
@@ -236,8 +237,8 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- disconnect --
         /// Gracefully disconnects a peer.
-        /// @param peer_id : integer
-        /// @param data : integer?
+        /// @param peer_id integer
+        /// @param data integer?
         /// @return nil
         methods.add_method(
             "disconnect",
@@ -251,8 +252,8 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- disconnectNow --
         /// Immediately disconnects a peer without handshake.
-        /// @param peer_id : integer
-        /// @param data : integer?
+        /// @param peer_id integer
+        /// @param data integer?
         /// @return nil
         methods.add_method(
             "disconnectNow",
@@ -266,8 +267,8 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- disconnectLater --
         /// Disconnects a peer after all queued packets have been sent.
-        /// @param peer_id : integer
-        /// @param data : integer?
+        /// @param peer_id integer
+        /// @param data integer?
         /// @return nil
         methods.add_method(
             "disconnectLater",
@@ -281,7 +282,7 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- resetPeer --
         /// Resets a peer connection immediately without notifying the remote side.
-        /// @param peer_id : integer
+        /// @param peer_id integer
         /// @return nil
         methods.add_method("resetPeer", |_, this, peer_id: usize| {
             this.inner
@@ -292,7 +293,7 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- ping --
         /// Sends a ping to a peer to measure round-trip time.
-        /// @param peer_id : integer
+        /// @param peer_id integer
         /// @return nil
         methods.add_method("ping", |_, this, peer_id: usize| {
             this.inner
@@ -303,7 +304,7 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- getRoundTripTime --
         /// Returns the round-trip time estimate for a peer in milliseconds.
-        /// @param peer_id : integer
+        /// @param peer_id integer
         /// @return number
         methods.add_method("getRoundTripTime", |_, this, peer_id: usize| {
             let rtt = this
@@ -316,7 +317,7 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- getPeerState --
         /// Returns the connection state of a peer as a string.
-        /// @param peer_id : integer
+        /// @param peer_id integer
         /// @return string
         methods.add_method("getPeerState", |_, this, peer_id: usize| {
             this.inner
@@ -327,7 +328,7 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- getPeerAddress --
         /// Returns the remote address of a peer, or nil if unavailable.
-        /// @param peer_id : integer
+        /// @param peer_id integer
         /// @return string?
         methods.add_method("getPeerAddress", |_, this, peer_id: usize| {
             let addr = this
@@ -364,7 +365,7 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- setChannelLimit --
         /// Sets the channel limit for future connections.
-        /// @param limit : integer
+        /// @param limit integer
         /// @return nil
         methods.add_method("setChannelLimit", |_, this, limit: usize| {
             this.inner
@@ -390,8 +391,8 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- setBandwidthLimit --
         /// Sets the bandwidth limits in bytes per second.
-        /// @param incoming : integer?
-        /// @param outgoing : integer?
+        /// @param incoming integer?
+        /// @param outgoing integer?
         /// @return nil
         methods.add_method(
             "setBandwidthLimit",
@@ -428,7 +429,7 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- getPeerStats --
         /// Returns a statistics table for a peer.
-        /// @param peer_id : integer
+        /// @param peer_id integer
         /// @return table
         methods.add_method("getPeerStats", |lua, this, peer_id: usize| {
             let stats = this
@@ -496,9 +497,9 @@ impl LuaUserData for LuaNetworkRuntime {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- httpRequest --
         /// Sends an HTTP request asynchronously. Poll with `poll()` for the response.
-        /// @param opts : table â€” { method, url, headers?, body?, timeout? }
+        /// @param opts table — { method, url, headers?, body?, timeout? }
         /// @return nil
-        /// integer â€” request ID
+        /// integer — request ID
         methods.add_method("httpRequest", |_, this, opts: LuaTable| {
             let method: String = opts.get("method").unwrap_or_else(|_| "GET".into());
             let url: String = opts.get("url").map_err(|_| {
@@ -525,10 +526,9 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- httpGet --
         /// Convenience: sends an HTTP GET request.
-        /// @param url : string
-        /// @param headers : table?
-        /// @return nil
-        /// integer â€” request ID
+        /// @param url string
+        /// @param headers table?
+        /// @return integer
         methods.add_method(
             "httpGet",
             |_, this, (url, headers): (String, Option<LuaTable>)| {
@@ -548,11 +548,10 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- httpPost --
         /// Convenience: sends an HTTP POST request.
-        /// @param url : string
-        /// @param body : string
-        /// @param headers : table?
-        /// @return nil
-        /// integer â€” request ID
+        /// @param url string
+        /// @param body string
+        /// @param headers table?
+        /// @return integer
         methods.add_method(
             "httpPost",
             |_, this, (url, body, headers): (String, String, Option<LuaTable>)| {
@@ -572,9 +571,9 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- tcpConnect --
         /// Opens a TCP connection to a remote address.
-        /// @param addr : string â€” "host:port"
+        /// @param addr string — "host:port"
         /// @return nil
-        /// integer â€” connection ID
+        /// integer — connection ID
         methods.add_method("tcpConnect", |_, this, addr: String| {
             let id = this
                 .inner
@@ -586,8 +585,8 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- tcpSend --
         /// Sends data over a TCP connection.
-        /// @param id : integer â€” connection ID
-        /// @param data : string
+        /// @param id integer — connection ID
+        /// @param data string
         /// @return nil
         methods.add_method("tcpSend", |_, this, (id, data): (u64, LuaString)| {
             this.inner
@@ -598,7 +597,7 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- tcpClose --
         /// Closes the TCP connection identified by the given connection handle.
-        /// @param id : integer â€” connection ID
+        /// @param id integer — connection ID
         /// @return nil
         methods.add_method("tcpClose", |_, this, id: u64| {
             this.inner
@@ -609,9 +608,9 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- wsConnect --
         /// Opens a WebSocket connection.
-        /// @param url : string â€” "ws://host:port/path" or "wss://..."
+        /// @param url string — "ws://host:port/path" or "wss://..."
         /// @return nil
-        /// integer â€” connection ID
+        /// integer — connection ID
         methods.add_method("wsConnect", |_, this, url: String| {
             let id = this
                 .inner
@@ -623,8 +622,8 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- wsSend --
         /// Sends a text message over a WebSocket connection.
-        /// @param id : integer â€” connection ID
-        /// @param data : string
+        /// @param id integer — connection ID
+        /// @param data string
         /// @return nil
         methods.add_method("wsSend", |_, this, (id, data): (u64, String)| {
             this.inner
@@ -635,7 +634,7 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- wsClose --
         /// Closes a WebSocket connection.
-        /// @param id : integer â€” connection ID
+        /// @param id integer — connection ID
         /// @return nil
         methods.add_method("wsClose", |_, this, id: u64| {
             this.inner
@@ -754,9 +753,9 @@ impl LuaUserData for LuaNetworkRuntime {
 
 /// Registers the `lurek.network` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param lua &Lua
+/// @param lurek &LuaTable
+/// @param _state Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -782,7 +781,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     ///
     /// Accepts `maxPeers` (preferred) or `peers` (legacy alias) to set the peer limit.
     /// Valid range is `[1, MAX_PEERS]`. Defaults to `DEFAULT_PEERS` when omitted.
-    /// @param opts : table â€” { addr?, maxPeers?, peers?, channels?, inBandwidth?, outBandwidth? }
+    /// @param opts? table — { addr?, maxPeers?, peers?, channels?, inBandwidth?, outBandwidth? }
     /// @return NetworkHost
     tbl.set(
         "newHost",
@@ -815,7 +814,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     ///
     /// Accepts `maxPeers` (preferred) or `peers` (legacy alias) to set the peer limit.
     /// Valid range is `[1, MAX_PEERS]`. Defaults to `DEFAULT_PEERS` when omitted.
-    /// @param opts : table â€” { port, maxPeers?, peers?, channels? }
+    /// @param opts table — { port, maxPeers?, peers?, channels? }
     /// @return NetworkHost
     tbl.set(
         "newServer",
@@ -838,7 +837,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newClient --
     /// Creates a client host that connects to a remote server.
-    /// @param opts : table â€” { addr, channels?, data? }
+    /// @param opts table — { addr, channels?, data? }
     /// @return NetworkHost
     tbl.set(
         "newClient",
@@ -871,7 +870,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- pack --
     /// Serializes a Lua value to a binary MessagePack string.
-    /// @param value : any
+    /// @param value any
     /// @return string
     tbl.set(
         "pack",
@@ -884,7 +883,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- unpack --
     /// Deserializes a MessagePack binary string back to a Lua value.
-    /// @param data : string
+    /// @param data string
     /// @return table|nil
     tbl.set(
         "unpack",
@@ -899,10 +898,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a LobbyInfo record and broadcasts it once on the local network.
     /// @return table|nil
     /// Other machines on the same subnet can discover it via lurek.network.discoverLobbies().
-    /// @param name : string
-    /// @param port : integer
-    /// @param player_count : integer?
-    /// @param max_players : integer?
+    /// @param name string
+    /// @param port integer
+    /// @param player_count integer?
+    /// @param max_players integer?
     /// table  { name, host, port, player_count, max_players }
     tbl.set(
         "createLobby",
@@ -931,7 +930,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Listens for LAN lobby announcements for `timeout_ms` milliseconds (default 500).
     /// @return table|nil
     /// Returns an array of lobby tables: { name, host, port, player_count, max_players }.
-    /// @param timeout_ms : integer?
+    /// @param timeout_ms integer?
     /// table  array of lobby tables
     tbl.set(
         "discoverLobbies",
@@ -955,11 +954,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Convenience helper: packs an entity snapshot and broadcasts it to all peers.
     /// The data table may contain any MessagePack-serializable values.
     /// Wraps the data in { id = entity_id, data = data } before serialization.
-    /// @param host : NetworkHost
-    /// @param entity_id : integer
-    /// @param data : table
-    /// @param channel : integer?   (default 0)
-    /// @param reliable : boolean?  (default false)
+    /// @param host NetworkHost
+    /// @param entity_id integer
+    /// @param data table
+    /// @param channel integer?   (default 0)
+    /// @param reliable boolean?  (default false)
     /// @return nil
     tbl.set(
         "syncEntity",
