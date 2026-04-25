@@ -294,7 +294,7 @@ local function make_raycaster()
         {1, 0, 0, 0, 1},
         {1, 1, 1, 1, 1},
     }
-    local rc = lurek.raycaster.new(5, 5, map)
+    local rc = lurek.raycaster.new(5, 5)
     return rc
 end
 
@@ -803,7 +803,7 @@ describe("DoorManager:addDoor", function()
     it("addDoor increments door count", function()
         -- @covers DoorManager:addDoor
         local dm = lurek.raycaster.newDoorManager()
-        dm:addDoor(3, 5, 0, 0.0, 2.0)
+        dm:addDoor(3, 5, 0, 0.0)
         expect_equal(1, dm:count())
     end)
 end)
@@ -812,20 +812,20 @@ end)
 describe("PointLight accessors and set", function()
     it("x returns a number", function()
         -- @covers PointLight:x
-        local pl = lurek.raycaster.newPointLight(10.0, 20.0, 5.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        local pl = lurek.raycaster.newPointLight(10.0, 20.0, 5.0, 1.0, 1.0, 1.0, 1.0)
         expect_type("number", pl:x())
     end)
 
     it("y returns a number", function()
         -- @covers PointLight:y
-        local pl = lurek.raycaster.newPointLight(10.0, 20.0, 5.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        local pl = lurek.raycaster.newPointLight(10.0, 20.0, 5.0, 1.0, 1.0, 1.0, 1.0)
         expect_type("number", pl:y())
     end)
 
     it("set updates the position", function()
         -- @covers PointLight:set
-        local pl = lurek.raycaster.newPointLight(0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-        pl:set(7.0, 9.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        local pl = lurek.raycaster.newPointLight(0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        pl:set(7.0, 9.0, 2.0, 1.0, 1.0, 1.0, 1.0)
         expect_near(7.0, pl:x(), 1e-5)
         expect_near(9.0, pl:y(), 1e-5)
     end)
@@ -836,7 +836,7 @@ describe("Raycaster:buildScene", function()
     it("buildScene does not panic on empty grid", function()
         -- @covers Raycaster:buildScene
         local rc = lurek.raycaster.new(8, 8)
-        local ok, _ = pcall(function() rc:buildScene() end)
+        local ok, _ = pcall(function() rc:buildScene({px=0,py=0,angle=0,fov=1.0,rays=1,max_dist=10,screen_w=320,screen_h=240}) end)
         -- headless: accept success or a headless-specific nil return
         expect_type("boolean", ok)
     end)
@@ -847,7 +847,7 @@ describe("Raycaster:drawTopDown", function()
     it("drawTopDown does not crash in headless mode", function()
         -- @covers Raycaster:drawTopDown
         local rc = lurek.raycaster.new(8, 8)
-        local ok, _ = pcall(function() rc:drawTopDown(0.0, 0.0, 1.0) end)
+        local ok, _ = pcall(function() rc:drawTopDown(0.0, 0.0, 1.0, 1) end)
         expect_type("boolean", ok)
     end)
 end)

@@ -11,7 +11,7 @@ describe("integration: tilemap visibility through camera", function()
     -- @covers lurek.camera.newCamera
     -- @description Verifies a tilemap can be filled and queried before applying any camera-based visibility math.
     it("creates tilemap and fills tiles", function()
-        local tm = lurek.tilemap.newTileMap(20, 20, 16, 16)
+        local tm = lurek.tilemap.newTileMap(20, 20, 16)
         tm:addLayer("tiles", 20, 20)
         expect_not_nil(tm, "tilemap created")
 
@@ -35,7 +35,7 @@ describe("integration: tilemap visibility through camera", function()
     -- @covers lurek.camera.Camera2D.setPosition
     -- @description Verifies camera position math selects different tile columns as the camera scrolls.
     it("camera scrolling reads different tiles (coordinate math)", function()
-        local tm  = lurek.tilemap.newTileMap(50, 50, 32, 32)
+        local tm  = lurek.tilemap.newTileMap(50, 50, 32)
         tm:addLayer("tiles", 50, 50)
         local cam = lurek.camera.newCamera()
 
@@ -63,7 +63,7 @@ describe("integration: tilemap visibility through camera", function()
     -- @covers lurek.camera
     -- @description Verifies out-of-bounds reads stay safe even when tile visibility code queries beyond the camera's valid range.
     it("out-of-bounds tile read returns nil without crashing", function()
-        local tm = lurek.tilemap.newTileMap(10, 10, 16, 16)
+        local tm = lurek.tilemap.newTileMap(10, 10, 16)
         tm:addLayer("tiles", 10, 10)
         expect_no_error(function()
             local t = tm:getTile(1, 100, 100)

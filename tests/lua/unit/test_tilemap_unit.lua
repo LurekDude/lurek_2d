@@ -1815,7 +1815,7 @@ describe("lurek.tilemap.newMapGen", function()
     -- @description Confirms newMapGen also accepts explicit numeric dimensions.
     it("creates a MapGen from numeric dimensions", function()
         local group = lurek.tilemap.newMapGroup("world")
-        local gen = lurek.tilemap.newMapGen(group, 4, 4, 4)
+        local gen = lurek.tilemap.newMapGen(group, 4, 4)
         expect_type("userdata", gen)
     end)
 

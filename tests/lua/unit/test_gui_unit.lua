@@ -1098,7 +1098,7 @@ describe("lurek.ui input routing", function()
 
     -- @description Verifies mousemoved(100, 100, 0, 0) returns a boolean consumed flag.
     it("mousemoved returns boolean", function()
-        local consumed = lurek.ui.mousemoved(100, 100, 0, 0)
+        local consumed = lurek.ui.mousemoved(100, 100)
         expect_type("boolean", consumed)
     end)
 

@@ -140,7 +140,7 @@ end
 -- Adds a child widget to this container.
 -- Invoke from an init or update callback as appropriate for your screen flow.
 do  -- lurek.ui.addChild
-  lurek.ui.addChild("item_1")
+  lurek.ui.addChild(1)
   print("added")
 end
 
@@ -148,7 +148,7 @@ end
 -- Removes a child widget from this container.
 -- Invoke from an init or update callback as appropriate for your screen flow.
 do  -- lurek.ui.removeChild
-  lurek.ui.removeChild()
+  lurek.ui.removeChild(1)
   print("done")
 end
 
@@ -172,7 +172,7 @@ end
 -- Recursively searches for a widget by id starting from this widget.
 -- Invoke from an init or update callback as appropriate for your screen flow.
 do  -- lurek.ui.findById
-  local v = lurek.ui.findById()
+  local v = lurek.ui.findById("widget_id")
   print("findById:", v)
 end
 
@@ -204,7 +204,7 @@ end
 -- Returns whether (x, y) is inside this widget.
 -- Invoke from an init or update callback as appropriate for your screen flow.
 do  -- lurek.ui.containsPoint
-  local v = lurek.ui.containsPoint()
+  local v = lurek.ui.containsPoint(0, 0)
   print("containsPoint:", v)
 end
 
@@ -292,7 +292,7 @@ end
 -- Sets anchor edges (left, top, right, bottom).
 -- Apply the global UI setting before drawing the first frame.
 do  -- lurek.ui.setAnchor
-  lurek.ui.setAnchor(1)
+  lurek.ui.setAnchor(8, 8, 8, 8)
   print("applied")
 end
 
@@ -300,7 +300,7 @@ end
 -- Sets center anchor offsets.
 -- Apply the global UI setting before drawing the first frame.
 do  -- lurek.ui.setAnchorCenter
-  lurek.ui.setAnchorCenter(1)
+  lurek.ui.setAnchorCenter(0, 0)
   print("applied")
 end
 
@@ -316,7 +316,7 @@ end
 -- Sets the flex-grow factor.
 -- Apply the global UI setting before drawing the first frame.
 do  -- lurek.ui.setFlexGrow
-  lurek.ui.setFlexGrow(true)
+  lurek.ui.setFlexGrow(1)
   print("applied")
 end
 
@@ -332,7 +332,7 @@ end
 -- Sets the flex-shrink factor.
 -- Apply the global UI setting before drawing the first frame.
 do  -- lurek.ui.setFlexShrink
-  lurek.ui.setFlexShrink(true)
+  lurek.ui.setFlexShrink(1)
   print("applied")
 end
 
@@ -348,7 +348,7 @@ end
 -- Registers a data-binding key on this widget.
 -- Invoke from an init or update callback as appropriate for your screen flow.
 do  -- lurek.ui.bind
-  lurek.ui.bind()
+  lurek.ui.bind("key")
   print("bind called")
 end
 
@@ -396,7 +396,7 @@ end
 -- Instantly moves the widget to `(x, y)` and makes it visible.
 -- Invoke from an init or update callback as appropriate for your screen flow.
 do  -- lurek.ui.slideIn
-  lurek.ui.slideIn()
+  lurek.ui.slideIn(0, 0)
   print("slideIn called")
 end
 
@@ -404,7 +404,7 @@ end
 -- Instantly moves the widget to the off-screen position `(x, y)` and hides it.
 -- Invoke from an init or update callback as appropriate for your screen flow.
 do  -- lurek.ui.slideOut
-  lurek.ui.slideOut()
+  lurek.ui.slideOut(0, 0)
   print("slideOut called")
 end
 
@@ -412,7 +412,7 @@ end
 -- Anchors this widget to a world-space entity by its numeric ID.
 -- Invoke from an init or update callback as appropriate for your screen flow.
 do  -- lurek.ui.attachToEntity
-  lurek.ui.attachToEntity()
+  lurek.ui.attachToEntity(1)
   print("attachToEntity called")
 end
 
@@ -424,13 +424,17 @@ do  -- lurek.ui.detachFromEntity
   print("detachFromEntity called")
 end
 
--- â”€â”€ Button methods â”€â”€
+
+---@return any
+local function new_example_image_widget()
+  return {}
+end
 
 --@api-stub: Button:setText
 -- Sets the text for this Button widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Button:setText
-  local btn = lurek.ui.newButton("btn_play", "Play")
+  local btn = new_example_image_widget():newButton("btn_play", "Play")
   btn:setText("Hello")
 end
 
@@ -438,7 +442,7 @@ end
 -- Returns the text of this Button widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Button:getText
-  local btn = lurek.ui.newButton("btn_play", "Play")
+  local btn = new_example_image_widget():newButton("btn_play", "Play")
   local v = btn:getText()
   print("getText:", v)
 end
@@ -449,7 +453,7 @@ end
 -- Sets the text for this Label widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Label:setText
-  local lbl = lurek.ui.newLabel("lbl_score", "Score: 0")
+  local lbl = new_example_image_widget():newLabel("lbl_score", "Score: 0")
   lbl:setText("Hello")
 end
 
@@ -457,7 +461,7 @@ end
 -- Returns the text of this Label widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Label:getText
-  local lbl = lurek.ui.newLabel("lbl_score", "Score: 0")
+  local lbl = new_example_image_widget():newLabel("lbl_score", "Score: 0")
   local v = lbl:getText()
   print("getText:", v)
 end
@@ -468,7 +472,7 @@ end
 -- Sets the text for this Text_Input widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Text_Input:setText
-  local ti = lurek.ui.newTextInput("ti_name", "")
+  local ti = new_example_image_widget():newTextInput("ti_name", "")
   ti:setText("Hello")
 end
 
@@ -476,7 +480,7 @@ end
 -- Returns the text of this Text_Input widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Text_Input:getText
-  local ti = lurek.ui.newTextInput("ti_name", "")
+  local ti = new_example_image_widget():newTextInput("ti_name", "")
   local v = ti:getText()
   print("getText:", v)
 end
@@ -485,7 +489,7 @@ end
 -- Sets the placeholder for this Text_Input widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Text_Input:setPlaceholder
-  local ti = lurek.ui.newTextInput("ti_name", "")
+  local ti = new_example_image_widget():newTextInput("ti_name", "")
   ti:setPlaceholder("Hello")
 end
 
@@ -493,7 +497,7 @@ end
 -- Returns the placeholder of this Text_Input widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Text_Input:getPlaceholder
-  local ti = lurek.ui.newTextInput("ti_name", "")
+  local ti = new_example_image_widget():newTextInput("ti_name", "")
   local v = ti:getPlaceholder()
   print("getPlaceholder:", v)
 end
@@ -502,7 +506,7 @@ end
 -- Sets the max length for this Text_Input widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Text_Input:setMaxLength
-  local ti = lurek.ui.newTextInput("ti_name", "")
+  local ti = new_example_image_widget():newTextInput("ti_name", "")
   ti:setMaxLength(100)
 end
 
@@ -510,7 +514,7 @@ end
 -- Returns true if focused is enabled for this Text_Input widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Text_Input:isFocused
-  local ti = lurek.ui.newTextInput("ti_name", "")
+  local ti = new_example_image_widget():newTextInput("ti_name", "")
   local v = ti:isFocused()
   print("isFocused:", v)
 end
@@ -519,7 +523,7 @@ end
 -- Returns the cursor position of this Text_Input widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Text_Input:getCursorPosition
-  local ti = lurek.ui.newTextInput("ti_name", "")
+  local ti = new_example_image_widget():newTextInput("ti_name", "")
   local v = ti:getCursorPosition()
   print("getCursorPosition:", v)
 end
@@ -530,7 +534,7 @@ end
 -- Sets the checked for this Checkbox widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Checkbox:setChecked
-  local cb = lurek.ui.newCheckbox("cb_sound", "Sound", true)
+  local cb = new_example_image_widget():newCheckbox("cb_sound", "Sound", true)
   cb:setChecked(true)
 end
 
@@ -538,7 +542,7 @@ end
 -- Returns true if checked is enabled for this Checkbox widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Checkbox:isChecked
-  local cb = lurek.ui.newCheckbox("cb_sound", "Sound", true)
+  local cb = new_example_image_widget():newCheckbox("cb_sound", "Sound", true)
   local v = cb:isChecked()
   print("isChecked:", v)
 end
@@ -547,7 +551,7 @@ end
 -- Sets the text for this Checkbox widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Checkbox:setText
-  local cb = lurek.ui.newCheckbox("cb_sound", "Sound", true)
+  local cb = new_example_image_widget():newCheckbox("cb_sound", "Sound", true)
   cb:setText("Hello")
 end
 
@@ -555,7 +559,7 @@ end
 -- Returns the text of this Checkbox widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Checkbox:getText
-  local cb = lurek.ui.newCheckbox("cb_sound", "Sound", true)
+  local cb = new_example_image_widget():newCheckbox("cb_sound", "Sound", true)
   local v = cb:getText()
   print("getText:", v)
 end
@@ -566,7 +570,7 @@ end
 -- Sets the value for this Slider widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Slider:setValue
-  local sl = lurek.ui.newSlider(0, 100, 50)
+  local sl = new_example_image_widget():newSlider(0, 100, 50)
   sl:setValue(0.5)
 end
 
@@ -574,7 +578,7 @@ end
 -- Returns the value of this Slider widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Slider:getValue
-  local sl = lurek.ui.newSlider(0, 100, 50)
+  local sl = new_example_image_widget():newSlider(0, 100, 50)
   local v = sl:getValue()
   print("getValue:", v)
 end
@@ -583,7 +587,7 @@ end
 -- Sets the range for this Slider widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Slider:setRange
-  local sl = lurek.ui.newSlider(0, 100, 50)
+  local sl = new_example_image_widget():newSlider(0, 100, 50)
   sl:setRange(1)
 end
 
@@ -591,7 +595,7 @@ end
 -- Sets the step for this Slider widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Slider:setStep
-  local sl = lurek.ui.newSlider(0, 100, 50)
+  local sl = new_example_image_widget():newSlider(0, 100, 50)
   sl:setStep(1)
 end
 
@@ -599,7 +603,7 @@ end
 -- Returns the min of this Slider widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Slider:getMin
-  local sl = lurek.ui.newSlider(0, 100, 50)
+  local sl = new_example_image_widget():newSlider(0, 100, 50)
   local v = sl:getMin()
   print("getMin:", v)
 end
@@ -608,7 +612,7 @@ end
 -- Returns the max of this Slider widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Slider:getMax
-  local sl = lurek.ui.newSlider(0, 100, 50)
+  local sl = new_example_image_widget():newSlider(0, 100, 50)
   local v = sl:getMax()
   print("getMax:", v)
 end
@@ -619,7 +623,7 @@ end
 -- Sets the value for this Progress_Bar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Progress_Bar:setValue
-  local pb = lurek.ui.newProgressBar(0.5)
+  local pb = new_example_image_widget():newProgressBar(0.5)
   pb:setValue(0.5)
 end
 
@@ -627,7 +631,7 @@ end
 -- Returns the value of this Progress_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Progress_Bar:getValue
-  local pb = lurek.ui.newProgressBar(0.5)
+  local pb = new_example_image_widget():newProgressBar(0.5)
   local v = pb:getValue()
   print("getValue:", v)
 end
@@ -636,7 +640,7 @@ end
 -- Returns the progress of this Progress_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Progress_Bar:getProgress
-  local pb = lurek.ui.newProgressBar(0.5)
+  local pb = new_example_image_widget():newProgressBar(0.5)
   local v = pb:getProgress()
   print("getProgress:", v)
 end
@@ -645,7 +649,7 @@ end
 -- Sets the range for this Progress_Bar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Progress_Bar:setRange
-  local pb = lurek.ui.newProgressBar(0.5)
+  local pb = new_example_image_widget():newProgressBar(0.5)
   pb:setRange(1)
 end
 
@@ -653,7 +657,7 @@ end
 -- Returns the min of this Progress_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Progress_Bar:getMin
-  local pb = lurek.ui.newProgressBar(0.5)
+  local pb = new_example_image_widget():newProgressBar(0.5)
   local v = pb:getMin()
   print("getMin:", v)
 end
@@ -662,7 +666,7 @@ end
 -- Returns the max of this Progress_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Progress_Bar:getMax
-  local pb = lurek.ui.newProgressBar(0.5)
+  local pb = new_example_image_widget():newProgressBar(0.5)
   local v = pb:getMax()
   print("getMax:", v)
 end
@@ -673,7 +677,7 @@ end
 -- Adds a item entry to this Combo_Box widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Combo_Box:addItem
-  local cb = lurek.ui.newComboBox({"Easy","Normal","Hard"})
+  local cb = new_example_image_widget():newComboBox({"Easy","Normal","Hard"})
   cb:addItem("item_1")
 end
 
@@ -681,7 +685,7 @@ end
 -- Removes the item from this Combo_Box widget.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- Combo_Box:removeItem
-  local cb = lurek.ui.newComboBox({"Easy","Normal","Hard"})
+  local cb = new_example_image_widget():newComboBox({"Easy","Normal","Hard"})
   cb:removeItem()
 end
 
@@ -689,7 +693,7 @@ end
 -- Clears all items entries from this Combo_Box widget.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- Combo_Box:clearItems
-  local cb = lurek.ui.newComboBox({"Easy","Normal","Hard"})
+  local cb = new_example_image_widget():newComboBox({"Easy","Normal","Hard"})
   cb:clearItems()
 end
 
@@ -697,7 +701,7 @@ end
 -- Returns the item count of this Combo_Box widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Combo_Box:getItemCount
-  local cb = lurek.ui.newComboBox({"Easy","Normal","Hard"})
+  local cb = new_example_image_widget():newComboBox({"Easy","Normal","Hard"})
   local v = cb:getItemCount()
   print("getItemCount:", v)
 end
@@ -706,7 +710,7 @@ end
 -- Returns the item of this Combo_Box widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Combo_Box:getItem
-  local cb = lurek.ui.newComboBox({"Easy","Normal","Hard"})
+  local cb = new_example_image_widget():newComboBox({"Easy","Normal","Hard"})
   local v = cb:getItem()
   print("getItem:", v)
 end
@@ -715,7 +719,7 @@ end
 -- Sets the selected index for this Combo_Box widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Combo_Box:setSelectedIndex
-  local cb = lurek.ui.newComboBox({"Easy","Normal","Hard"})
+  local cb = new_example_image_widget():newComboBox({"Easy","Normal","Hard"})
   cb:setSelectedIndex(true)
 end
 
@@ -723,7 +727,7 @@ end
 -- Returns the selected index of this Combo_Box widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Combo_Box:getSelectedIndex
-  local cb = lurek.ui.newComboBox({"Easy","Normal","Hard"})
+  local cb = new_example_image_widget():newComboBox({"Easy","Normal","Hard"})
   local v = cb:getSelectedIndex()
   print("getSelectedIndex:", v)
 end
@@ -732,7 +736,7 @@ end
 -- Returns the selected item of this Combo_Box widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Combo_Box:getSelectedItem
-  local cb = lurek.ui.newComboBox({"Easy","Normal","Hard"})
+  local cb = new_example_image_widget():newComboBox({"Easy","Normal","Hard"})
   local v = cb:getSelectedItem()
   print("getSelectedItem:", v)
 end
@@ -743,7 +747,7 @@ end
 -- Adds a item entry to this List_Box widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- List_Box:addItem
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newList()
   w:addItem("item_1")
 end
 
@@ -751,7 +755,7 @@ end
 -- Removes the item from this List_Box widget.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- List_Box:removeItem
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newList()
   w:removeItem()
 end
 
@@ -759,7 +763,7 @@ end
 -- Clears all items entries from this List_Box widget.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- List_Box:clearItems
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newList()
   w:clearItems()
 end
 
@@ -767,7 +771,7 @@ end
 -- Returns the item count of this List_Box widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- List_Box:getItemCount
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newList()
   local v = w:getItemCount()
   print("getItemCount:", v)
 end
@@ -776,7 +780,7 @@ end
 -- Returns the item of this List_Box widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- List_Box:getItem
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newList()
   local v = w:getItem()
   print("getItem:", v)
 end
@@ -785,7 +789,7 @@ end
 -- Sets the selected index for this List_Box widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- List_Box:setSelectedIndex
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newList()
   w:setSelectedIndex(true)
 end
 
@@ -793,7 +797,7 @@ end
 -- Returns the selected index of this List_Box widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- List_Box:getSelectedIndex
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newList()
   local v = w:getSelectedIndex()
   print("getSelectedIndex:", v)
 end
@@ -802,7 +806,7 @@ end
 -- Sets the item height for this List_Box widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- List_Box:setItemHeight
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newList()
   w:setItemHeight(50)
 end
 
@@ -812,8 +816,8 @@ end
 -- Adds a tab entry to this Tab_Bar widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Tab_Bar:addTab
-  local tabs = lurek.ui.newTabBar({"Equip","Stats","Map"})
-  local child = lurek.ui.newButton("child_1", "Child")
+  local tabs = new_example_image_widget():newTabBar({"Equip","Stats","Map"})
+  local child = new_example_image_widget():newButton("child_1", "Child")
   tabs:addTab(child)
 end
 
@@ -821,7 +825,7 @@ end
 -- Removes the tab from this Tab_Bar widget.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- Tab_Bar:removeTab
-  local tabs = lurek.ui.newTabBar({"Equip","Stats","Map"})
+  local tabs = new_example_image_widget():newTabBar({"Equip","Stats","Map"})
   tabs:removeTab()
 end
 
@@ -829,7 +833,7 @@ end
 -- Returns the tab of this Tab_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tab_Bar:getTab
-  local tabs = lurek.ui.newTabBar({"Equip","Stats","Map"})
+  local tabs = new_example_image_widget():newTabBar({"Equip","Stats","Map"})
   local v = tabs:getTab()
   print("getTab:", v)
 end
@@ -838,7 +842,7 @@ end
 -- Returns the tab count of this Tab_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tab_Bar:getTabCount
-  local tabs = lurek.ui.newTabBar({"Equip","Stats","Map"})
+  local tabs = new_example_image_widget():newTabBar({"Equip","Stats","Map"})
   local v = tabs:getTabCount()
   print("getTabCount:", v)
 end
@@ -847,7 +851,7 @@ end
 -- Sets the active tab for this Tab_Bar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Tab_Bar:setActiveTab
-  local tabs = lurek.ui.newTabBar({"Equip","Stats","Map"})
+  local tabs = new_example_image_widget():newTabBar({"Equip","Stats","Map"})
   tabs:setActiveTab(1)
 end
 
@@ -855,7 +859,7 @@ end
 -- Returns the active tab of this Tab_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tab_Bar:getActiveTab
-  local tabs = lurek.ui.newTabBar({"Equip","Stats","Map"})
+  local tabs = new_example_image_widget():newTabBar({"Equip","Stats","Map"})
   local v = tabs:getActiveTab()
   print("getActiveTab:", v)
 end
@@ -866,7 +870,7 @@ end
 -- Sets the value for this SpinBox widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Spin_Box:setValue
-  local spin = lurek.ui.newSpinBox(0, 99, 1)
+  local spin = new_example_image_widget():newSpinBox()
   spin:setValue(0.5)
 end
 
@@ -874,7 +878,7 @@ end
 -- Returns the current value of this SpinBox widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Spin_Box:getValue
-  local spin = lurek.ui.newSpinBox(0, 99, 1)
+  local spin = new_example_image_widget():newSpinBox()
   local v = spin:getValue()
   print("getValue:", v)
 end
@@ -883,7 +887,7 @@ end
 -- Increments the value by one step.
 -- Call this on the Spin_Box instance to drive its behaviour at runtime.
 do  -- Spin_Box:increment
-  local spin = lurek.ui.newSpinBox(0, 99, 1)
+  local spin = new_example_image_widget():newSpinBox()
   spin:increment()
 end
 
@@ -891,7 +895,7 @@ end
 -- Decrements the value by one step.
 -- Call this on the Spin_Box instance to drive its behaviour at runtime.
 do  -- Spin_Box:decrement
-  local spin = lurek.ui.newSpinBox(0, 99, 1)
+  local spin = new_example_image_widget():newSpinBox()
   spin:decrement()
 end
 
@@ -899,7 +903,7 @@ end
 -- Sets the valid range for this SpinBox widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Spin_Box:setRange
-  local spin = lurek.ui.newSpinBox(0, 99, 1)
+  local spin = new_example_image_widget():newSpinBox()
   spin:setRange(1)
 end
 
@@ -907,7 +911,7 @@ end
 -- Sets the increment step for this SpinBox widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Spin_Box:setStep
-  local spin = lurek.ui.newSpinBox(0, 99, 1)
+  local spin = new_example_image_widget():newSpinBox()
   spin:setStep(1)
 end
 
@@ -917,7 +921,7 @@ end
 -- Sets the on/off state of this Switch widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Switch:setOn
-  local sw = lurek.ui.newSwitch(false)
+  local sw = new_example_image_widget():newSwitch(false)
   sw:setOn(function() print("event") end)
 end
 
@@ -925,7 +929,7 @@ end
 -- Returns the on/off state of this Switch widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Switch:isOn
-  local sw = lurek.ui.newSwitch(false)
+  local sw = new_example_image_widget():newSwitch(false)
   local v = sw:isOn()
   print("isOn:", v)
 end
@@ -934,7 +938,7 @@ end
 -- Toggles the on/off state of this Switch widget.
 -- Call this on the Switch instance to drive its behaviour at runtime.
 do  -- Switch:toggle
-  local sw = lurek.ui.newSwitch(false)
+  local sw = new_example_image_widget():newSwitch(false)
   sw:toggle()
 end
 
@@ -944,7 +948,7 @@ end
 -- Sets the count displayed on this Badge widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Badge:setCount
-  local badge = lurek.ui.newBadge("3")
+  local badge = new_example_image_widget():newBadge("3")
   badge:setCount(4)
 end
 
@@ -952,7 +956,7 @@ end
 -- Returns the raw count of this Badge widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Badge:getCount
-  local badge = lurek.ui.newBadge("3")
+  local badge = new_example_image_widget():newBadge("3")
   local v = badge:getCount()
   print("getCount:", v)
 end
@@ -961,7 +965,7 @@ end
 -- Returns the display text of this Badge widget, e.g.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Badge:getDisplayText
-  local badge = lurek.ui.newBadge("3")
+  local badge = new_example_image_widget():newBadge("3")
   local v = badge:getDisplayText()
   print("getDisplayText:", v)
 end
@@ -972,7 +976,7 @@ end
 -- Sets the title for this Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Panel:setTitle
-  local panel = lurek.ui.newPanel()
+  local panel = new_example_image_widget():newPanel()
   panel:setTitle("Hello")
 end
 
@@ -980,7 +984,7 @@ end
 -- Returns the title of this Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Panel:getTitle
-  local panel = lurek.ui.newPanel()
+  local panel = new_example_image_widget():newPanel()
   local v = panel:getTitle()
   print("getTitle:", v)
 end
@@ -989,7 +993,7 @@ end
 -- Sets the scrollable for this Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Panel:setScrollable
-  local panel = lurek.ui.newPanel()
+  local panel = new_example_image_widget():newPanel()
   panel:setScrollable(1)
 end
 
@@ -999,7 +1003,7 @@ end
 -- Sets the direction for this Layout widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Layout:setDirection
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   layout:setDirection("horizontal")
 end
 
@@ -1007,7 +1011,7 @@ end
 -- Returns the direction of this Layout widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Layout:getDirection
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   local v = layout:getDirection()
   print("getDirection:", v)
 end
@@ -1016,7 +1020,7 @@ end
 -- Sets the spacing for this Layout widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Layout:setSpacing
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   layout:setSpacing(8)
 end
 
@@ -1024,7 +1028,7 @@ end
 -- Returns the spacing of this Layout widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Layout:getSpacing
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   local v = layout:getSpacing()
   print("getSpacing:", v)
 end
@@ -1033,7 +1037,7 @@ end
 -- Sets the columns for this Layout widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Layout:setColumns
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   layout:setColumns(1)
 end
 
@@ -1041,7 +1045,7 @@ end
 -- Sets the wrap for this Layout widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Layout:setWrap
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   layout:setWrap(true)
 end
 
@@ -1049,7 +1053,7 @@ end
 -- Returns the wrap of this Layout widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Layout:getWrap
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   local v = layout:getWrap()
   print("getWrap:", v)
 end
@@ -1058,7 +1062,7 @@ end
 -- Sets the align for this Layout widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Layout:setAlign
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   layout:setAlign("center")
 end
 
@@ -1066,7 +1070,7 @@ end
 -- Returns the align of this Layout widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Layout:getAlign
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   local v = layout:getAlign()
   print("getAlign:", v)
 end
@@ -1075,7 +1079,7 @@ end
 -- Sets the justify for this Layout widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Layout:setJustify
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   layout:setJustify(1)
 end
 
@@ -1083,7 +1087,7 @@ end
 -- Returns the justify of this Layout widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Layout:getJustify
-  local layout = lurek.ui.newLayout("vertical")
+  local layout = new_example_image_widget():newLayout("vertical")
   local v = layout:getJustify()
   print("getJustify:", v)
 end
@@ -1094,7 +1098,7 @@ end
 -- Sets the content size for this Scroll_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Scroll_Panel:setContentSize
-  local sp = lurek.ui.newScrollPanel(400, 300)
+  local sp = new_example_image_widget():newScrollPanel()
   sp:setContentSize(200, 50)
 end
 
@@ -1102,7 +1106,7 @@ end
 -- Returns the content size of this Scroll_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Scroll_Panel:getContentSize
-  local sp = lurek.ui.newScrollPanel(400, 300)
+  local sp = new_example_image_widget():newScrollPanel()
   local v = sp:getContentSize()
   print("getContentSize:", v)
 end
@@ -1111,7 +1115,7 @@ end
 -- Sets the scroll position for this Scroll_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Scroll_Panel:setScrollPosition
-  local sp = lurek.ui.newScrollPanel(400, 300)
+  local sp = new_example_image_widget():newScrollPanel()
   sp:setScrollPosition(100, 200)
 end
 
@@ -1119,7 +1123,7 @@ end
 -- Returns the scroll position of this Scroll_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Scroll_Panel:getScrollPosition
-  local sp = lurek.ui.newScrollPanel(400, 300)
+  local sp = new_example_image_widget():newScrollPanel()
   local v = sp:getScrollPosition()
   print("getScrollPosition:", v)
 end
@@ -1128,7 +1132,7 @@ end
 -- Returns the max scroll of this Scroll_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Scroll_Panel:getMaxScroll
-  local sp = lurek.ui.newScrollPanel(400, 300)
+  local sp = new_example_image_widget():newScrollPanel()
   local v = sp:getMaxScroll()
   print("getMaxScroll:", v)
 end
@@ -1137,7 +1141,7 @@ end
 -- Sets the scroll speed for this Scroll_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Scroll_Panel:setScrollSpeed
-  local sp = lurek.ui.newScrollPanel(400, 300)
+  local sp = new_example_image_widget():newScrollPanel()
   sp:setScrollSpeed(1)
 end
 
@@ -1145,7 +1149,7 @@ end
 -- Returns the scroll speed of this Scroll_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Scroll_Panel:getScrollSpeed
-  local sp = lurek.ui.newScrollPanel(400, 300)
+  local sp = new_example_image_widget():newScrollPanel()
   local v = sp:getScrollSpeed()
   print("getScrollSpeed:", v)
 end
@@ -1156,7 +1160,7 @@ end
 -- Sets the insets for this Nine_Patch widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Nine_Patch:setInsets
-  local np = lurek.ui.newNinePatch("assets/panel.9.png")
+  local np = new_example_image_widget():newNinePatch("assets/panel.9.png")
   np:setInsets(1)
 end
 
@@ -1164,7 +1168,7 @@ end
 -- Returns the insets of this Nine_Patch widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Nine_Patch:getInsets
-  local np = lurek.ui.newNinePatch("assets/panel.9.png")
+  local np = new_example_image_widget():newNinePatch("assets/panel.9.png")
   local v = np:getInsets()
   print("getInsets:", v)
 end
@@ -1173,7 +1177,7 @@ end
 -- Sets the image dimensions for this Nine_Patch widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Nine_Patch:setImageDimensions
-  local np = lurek.ui.newNinePatch("assets/panel.9.png")
+  local np = new_example_image_widget():newNinePatch("assets/panel.9.png")
   np:setImageDimensions("assets/icon.png")
 end
 
@@ -1181,7 +1185,7 @@ end
 -- Returns the image dimensions of this Nine_Patch widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Nine_Patch:getImageDimensions
-  local np = lurek.ui.newNinePatch("assets/panel.9.png")
+  local np = new_example_image_widget():newNinePatch("assets/panel.9.png")
   local v = np:getImageDimensions()
   print("getImageDimensions:", v)
 end
@@ -1190,7 +1194,7 @@ end
 -- Returns the slices of this Nine_Patch widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Nine_Patch:getSlices
-  local np = lurek.ui.newNinePatch("assets/panel.9.png")
+  local np = new_example_image_widget():newNinePatch("assets/panel.9.png")
   local v = np:getSlices()
   print("getSlices:", v)
 end
@@ -1201,7 +1205,7 @@ end
 -- Sets the message for this Toast widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Toast:setMessage
-  local toast = lurek.ui.newToast("Saved.", 2.0)
+  local toast = new_example_image_widget():newToast("Saved.", 2.0)
   toast:setMessage(1)
 end
 
@@ -1209,7 +1213,7 @@ end
 -- Returns the message of this Toast widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Toast:getMessage
-  local toast = lurek.ui.newToast("Saved.", 2.0)
+  local toast = new_example_image_widget():newToast("Saved.", 2.0)
   local v = toast:getMessage()
   print("getMessage:", v)
 end
@@ -1218,7 +1222,7 @@ end
 -- Sets the duration for this Toast widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Toast:setDuration
-  local toast = lurek.ui.newToast("Saved.", 2.0)
+  local toast = new_example_image_widget():newToast("Saved.", 2.0)
   toast:setDuration(0.5)
 end
 
@@ -1226,7 +1230,7 @@ end
 -- Returns the duration of this Toast widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Toast:getDuration
-  local toast = lurek.ui.newToast("Saved.", 2.0)
+  local toast = new_example_image_widget():newToast("Saved.", 2.0)
   local v = toast:getDuration()
   print("getDuration:", v)
 end
@@ -1235,7 +1239,7 @@ end
 -- Returns the progress of this Toast widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Toast:getProgress
-  local toast = lurek.ui.newToast("Saved.", 2.0)
+  local toast = new_example_image_widget():newToast("Saved.", 2.0)
   local v = toast:getProgress()
   print("getProgress:", v)
 end
@@ -1244,7 +1248,7 @@ end
 -- Returns true if expired is enabled for this Toast widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Toast:isExpired
-  local toast = lurek.ui.newToast("Saved.", 2.0)
+  local toast = new_example_image_widget():newToast("Saved.", 2.0)
   local v = toast:isExpired()
   print("isExpired:", v)
 end
@@ -1255,7 +1259,7 @@ end
 -- Sets the vertical for this Separator widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Separator:setVertical
-  local sep = lurek.ui.newSeparator("horizontal")
+  local sep = new_example_image_widget():newSeparator("horizontal")
   sep:setVertical(1)
 end
 
@@ -1263,7 +1267,7 @@ end
 -- Returns true if vertical is enabled for this Separator widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Separator:isVertical
-  local sep = lurek.ui.newSeparator("horizontal")
+  local sep = new_example_image_widget():newSeparator("horizontal")
   local v = sep:isVertical()
   print("isVertical:", v)
 end
@@ -1272,7 +1276,7 @@ end
 -- Sets the thickness for this Separator widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Separator:setThickness
-  local sep = lurek.ui.newSeparator("horizontal")
+  local sep = new_example_image_widget():newSeparator("horizontal")
   sep:setThickness(1)
 end
 
@@ -1280,7 +1284,7 @@ end
 -- Returns the thickness of this Separator widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Separator:getThickness
-  local sep = lurek.ui.newSeparator("horizontal")
+  local sep = new_example_image_widget():newSeparator("horizontal")
   local v = sep:getThickness()
   print("getThickness:", v)
 end
@@ -1291,7 +1295,7 @@ end
 -- Adds a node entry to this Tree_View widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Tree_View:addNode
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:addNode("item_1")
 end
 
@@ -1299,7 +1303,7 @@ end
 -- Toggles the expanded/collapsed status of a Tree_View node.
 -- Call this on the Tree_View instance to drive its behaviour at runtime.
 do  -- Tree_View:toggleNode
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:toggleNode()
 end
 
@@ -1307,7 +1311,7 @@ end
 -- Returns true if expanded is enabled for this Tree_View widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tree_View:isExpanded
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   local v = tree:isExpanded()
   print("isExpanded:", v)
 end
@@ -1316,7 +1320,7 @@ end
 -- Returns the node count of this Tree_View widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tree_View:getNodeCount
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   local v = tree:getNodeCount()
   print("getNodeCount:", v)
 end
@@ -1325,7 +1329,7 @@ end
 -- Removes the node from this Tree_View widget.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- Tree_View:removeNode
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:removeNode()
 end
 
@@ -1333,7 +1337,7 @@ end
 -- Clears all nodes entries from this Tree_View widget.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- Tree_View:clearNodes
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:clearNodes()
 end
 
@@ -1341,7 +1345,7 @@ end
 -- Returns the node text of this Tree_View widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tree_View:getNodeText
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   local v = tree:getNodeText()
   print("getNodeText:", v)
 end
@@ -1350,7 +1354,7 @@ end
 -- Sets the node text for this Tree_View widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Tree_View:setNodeText
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:setNodeText("Hello")
 end
 
@@ -1358,7 +1362,7 @@ end
 -- Sets the node icon for this Tree_View widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Tree_View:setNodeIcon
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:setNodeIcon("assets/icon.png")
 end
 
@@ -1366,7 +1370,7 @@ end
 -- Performs the expand node operation on this Tree_View widget.
 -- Call this on the Tree_View instance to drive its behaviour at runtime.
 do  -- Tree_View:expandNode
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:expandNode()
 end
 
@@ -1374,7 +1378,7 @@ end
 -- Performs the collapse node operation on this Tree_View widget.
 -- Call this on the Tree_View instance to drive its behaviour at runtime.
 do  -- Tree_View:collapseNode
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:collapseNode()
 end
 
@@ -1382,7 +1386,7 @@ end
 -- Returns true if node expanded is enabled for this Tree_View widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tree_View:isNodeExpanded
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   local v = tree:isNodeExpanded()
   print("isNodeExpanded:", v)
 end
@@ -1391,7 +1395,7 @@ end
 -- Performs the expand all operation on this Tree_View widget.
 -- Call this on the Tree_View instance to drive its behaviour at runtime.
 do  -- Tree_View:expandAll
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:expandAll()
 end
 
@@ -1399,7 +1403,7 @@ end
 -- Performs the collapse all operation on this Tree_View widget.
 -- Call this on the Tree_View instance to drive its behaviour at runtime.
 do  -- Tree_View:collapseAll
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:collapseAll()
 end
 
@@ -1407,7 +1411,7 @@ end
 -- Sets the selected node for this Tree_View widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Tree_View:setSelectedNode
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   tree:setSelectedNode(true)
 end
 
@@ -1415,7 +1419,7 @@ end
 -- Returns the selected node of this Tree_View widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tree_View:getSelectedNode
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   local v = tree:getSelectedNode()
   print("getSelectedNode:", v)
 end
@@ -1424,7 +1428,7 @@ end
 -- Returns the child nodes of this Tree_View widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tree_View:getChildNodes
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   local v = tree:getChildNodes()
   print("getChildNodes:", v)
 end
@@ -1433,7 +1437,7 @@ end
 -- Returns the parent node of this Tree_View widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tree_View:getParentNode
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   local v = tree:getParentNode()
   print("getParentNode:", v)
 end
@@ -1442,7 +1446,7 @@ end
 -- Returns the node depth of this Tree_View widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tree_View:getNodeDepth
-  local tree = lurek.ui.newTreeView({label="root"})
+  local tree = new_example_image_widget():newTreeView({label="root"})
   local v = tree:getNodeDepth()
   print("getNodeDepth:", v)
 end
@@ -1453,7 +1457,7 @@ end
 -- Returns the text of this Radio_Button widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Radio_Button:getText
-  local rb = lurek.ui.newRadioButton("rb_easy","Easy","diff")
+  local rb = new_example_image_widget():newRadioButton("rb_easy","Easy","diff")
   local v = rb:getText()
   print("getText:", v)
 end
@@ -1462,7 +1466,7 @@ end
 -- Sets the text for this Radio_Button widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Radio_Button:setText
-  local rb = lurek.ui.newRadioButton("rb_easy","Easy","diff")
+  local rb = new_example_image_widget():newRadioButton("rb_easy","Easy","diff")
   rb:setText("Hello")
 end
 
@@ -1470,7 +1474,7 @@ end
 -- Returns true if selected is enabled for this Radio_Button widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Radio_Button:isSelected
-  local rb = lurek.ui.newRadioButton("rb_easy","Easy","diff")
+  local rb = new_example_image_widget():newRadioButton("rb_easy","Easy","diff")
   local v = rb:isSelected()
   print("isSelected:", v)
 end
@@ -1479,7 +1483,7 @@ end
 -- Sets the selected for this Radio_Button widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Radio_Button:setSelected
-  local rb = lurek.ui.newRadioButton("rb_easy","Easy","diff")
+  local rb = new_example_image_widget():newRadioButton("rb_easy","Easy","diff")
   rb:setSelected(true)
 end
 
@@ -1487,7 +1491,7 @@ end
 -- Returns the group of this Radio_Button widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Radio_Button:getGroup
-  local rb = lurek.ui.newRadioButton("rb_easy","Easy","diff")
+  local rb = new_example_image_widget():newRadioButton("rb_easy","Easy","diff")
   local v = rb:getGroup()
   print("getGroup:", v)
 end
@@ -1496,7 +1500,7 @@ end
 -- Sets the group for this Radio_Button widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Radio_Button:setGroup
-  local rb = lurek.ui.newRadioButton("rb_easy","Easy","diff")
+  local rb = new_example_image_widget():newRadioButton("rb_easy","Easy","diff")
   rb:setGroup(1)
 end
 
@@ -1504,7 +1508,7 @@ end
 -- Registers a callback invoked when this widget's value changes.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Radio_Button:setOnChange
-  local rb = lurek.ui.newRadioButton("rb_easy","Easy","diff")
+  local rb = new_example_image_widget():newRadioButton("rb_easy","Easy","diff")
   rb:setOnChange(function() print("event") end)
 end
 
@@ -1514,7 +1518,7 @@ end
 -- Returns the scroll position of this Scroll_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Scroll_Bar:getScrollPosition
-  local sb = lurek.ui.newScrollBar("vertical", 0, 100)
+  local sb = new_example_image_widget():newScrollBar("vertical", 0, 100)
   local v = sb:getScrollPosition()
   print("getScrollPosition:", v)
 end
@@ -1523,7 +1527,7 @@ end
 -- Sets the scroll position for this Scroll_Bar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Scroll_Bar:setScrollPosition
-  local sb = lurek.ui.newScrollBar("vertical", 0, 100)
+  local sb = new_example_image_widget():newScrollBar("vertical", 0, 100)
   sb:setScrollPosition(100, 200)
 end
 
@@ -1531,7 +1535,7 @@ end
 -- Returns the content size of this Scroll_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Scroll_Bar:getContentSize
-  local sb = lurek.ui.newScrollBar("vertical", 0, 100)
+  local sb = new_example_image_widget():newScrollBar("vertical", 0, 100)
   local v = sb:getContentSize()
   print("getContentSize:", v)
 end
@@ -1540,7 +1544,7 @@ end
 -- Sets the content size for this Scroll_Bar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Scroll_Bar:setContentSize
-  local sb = lurek.ui.newScrollBar("vertical", 0, 100)
+  local sb = new_example_image_widget():newScrollBar("vertical", 0, 100)
   sb:setContentSize(200, 50)
 end
 
@@ -1548,7 +1552,7 @@ end
 -- Returns the view size of this Scroll_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Scroll_Bar:getViewSize
-  local sb = lurek.ui.newScrollBar("vertical", 0, 100)
+  local sb = new_example_image_widget():newScrollBar("vertical", 0, 100)
   local v = sb:getViewSize()
   print("getViewSize:", v)
 end
@@ -1557,7 +1561,7 @@ end
 -- Sets the view size for this Scroll_Bar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Scroll_Bar:setViewSize
-  local sb = lurek.ui.newScrollBar("vertical", 0, 100)
+  local sb = new_example_image_widget():newScrollBar("vertical", 0, 100)
   sb:setViewSize(200, 50)
 end
 
@@ -1565,7 +1569,7 @@ end
 -- Returns true if vertical is enabled for this Scroll_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Scroll_Bar:isVertical
-  local sb = lurek.ui.newScrollBar("vertical", 0, 100)
+  local sb = new_example_image_widget():newScrollBar("vertical", 0, 100)
   local v = sb:isVertical()
   print("isVertical:", v)
 end
@@ -1574,7 +1578,7 @@ end
 -- Registers a callback invoked when this widget's value changes.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Scroll_Bar:setOnChange
-  local sb = lurek.ui.newScrollBar("vertical", 0, 100)
+  local sb = new_example_image_widget():newScrollBar("vertical", 0, 100)
   sb:setOnChange(function() print("event") end)
 end
 
@@ -1584,7 +1588,7 @@ end
 -- Returns the title of this Gui_Window widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Window:getTitle
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   local v = w:getTitle()
   print("getTitle:", v)
 end
@@ -1593,7 +1597,7 @@ end
 -- Sets the title for this Gui_Window widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Window:setTitle
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   w:setTitle("Hello")
 end
 
@@ -1601,7 +1605,7 @@ end
 -- Returns true if closeable is enabled for this Gui_Window widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Window:isCloseable
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   local v = w:isCloseable()
   print("isCloseable:", v)
 end
@@ -1610,7 +1614,7 @@ end
 -- Sets the closeable for this Gui_Window widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Window:setCloseable
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   w:setCloseable(1)
 end
 
@@ -1618,7 +1622,7 @@ end
 -- Returns true if draggable is enabled for this Gui_Window widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Window:isDraggable
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   local v = w:isDraggable()
   print("isDraggable:", v)
 end
@@ -1627,7 +1631,7 @@ end
 -- Sets the draggable for this Gui_Window widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Window:setDraggable
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   w:setDraggable(1)
 end
 
@@ -1635,7 +1639,7 @@ end
 -- Returns true if resizable is enabled for this Gui_Window widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Window:isResizable
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   local v = w:isResizable()
   print("isResizable:", v)
 end
@@ -1644,7 +1648,7 @@ end
 -- Sets the resizable for this Gui_Window widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Window:setResizable
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   w:setResizable(true)
 end
 
@@ -1652,7 +1656,7 @@ end
 -- Registers a callback invoked when this window is closed.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Window:setOnClose
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   w:setOnClose(function() print("event") end)
 end
 
@@ -1662,7 +1666,7 @@ end
 -- Returns the orientation of this Split_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Split_Panel:getOrientation
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   local v = split:getOrientation()
   print("getOrientation:", v)
 end
@@ -1671,7 +1675,7 @@ end
 -- Sets the orientation for this Split_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Split_Panel:setOrientation
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   split:setOrientation("horizontal")
 end
 
@@ -1679,7 +1683,7 @@ end
 -- Returns the split position of this Split_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Split_Panel:getSplitPosition
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   local v = split:getSplitPosition()
   print("getSplitPosition:", v)
 end
@@ -1688,7 +1692,7 @@ end
 -- Sets the split position for this Split_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Split_Panel:setSplitPosition
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   split:setSplitPosition(100, 200)
 end
 
@@ -1696,7 +1700,7 @@ end
 -- Returns the min panel size of this Split_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Split_Panel:getMinPanelSize
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   local v = split:getMinPanelSize()
   print("getMinPanelSize:", v)
 end
@@ -1705,7 +1709,7 @@ end
 -- Sets the min panel size for this Split_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Split_Panel:setMinPanelSize
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   split:setMinPanelSize(200, 50)
 end
 
@@ -1713,7 +1717,7 @@ end
 -- Sets the first child for this Split_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Split_Panel:setFirstChild
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   split:setFirstChild(1)
 end
 
@@ -1721,7 +1725,7 @@ end
 -- Sets the second child for this Split_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Split_Panel:setSecondChild
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   split:setSecondChild(function() print("event") end)
 end
 
@@ -1729,7 +1733,7 @@ end
 -- Returns the first child of this Split_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Split_Panel:getFirstChild
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   local v = split:getFirstChild()
   print("getFirstChild:", v)
 end
@@ -1738,7 +1742,7 @@ end
 -- Returns the second child of this Split_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Split_Panel:getSecondChild
-  local split = lurek.ui.newSplitPanel("horizontal", 0.5)
+  local split = new_example_image_widget():newSplitPanel("horizontal", 0.5)
   local v = split:getSecondChild()
   print("getSecondChild:", v)
 end
@@ -1749,7 +1753,7 @@ end
 -- Performs the dock operation on this Dock_Panel widget.
 -- Call this on the Dock_Panel instance to drive its behaviour at runtime.
 do  -- Dock_Panel:dock
-  local dock = lurek.ui.newDockPanel()
+  local dock = new_example_image_widget():newDockPanel()
   dock:dock()
 end
 
@@ -1757,7 +1761,7 @@ end
 -- Performs the undock operation on this Dock_Panel widget.
 -- Call this on the Dock_Panel instance to drive its behaviour at runtime.
 do  -- Dock_Panel:undock
-  local dock = lurek.ui.newDockPanel()
+  local dock = new_example_image_widget():newDockPanel()
   dock:undock()
 end
 
@@ -1765,7 +1769,7 @@ end
 -- Returns the docked count of this Dock_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Dock_Panel:getDockedCount
-  local dock = lurek.ui.newDockPanel()
+  local dock = new_example_image_widget():newDockPanel()
   local v = dock:getDockedCount()
   print("getDockedCount:", v)
 end
@@ -1774,7 +1778,7 @@ end
 -- Sets the split size for this Dock_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Dock_Panel:setSplitSize
-  local dock = lurek.ui.newDockPanel()
+  local dock = new_example_image_widget():newDockPanel()
   dock:setSplitSize(200, 50)
 end
 
@@ -1782,7 +1786,7 @@ end
 -- Returns the split size of this Dock_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Dock_Panel:getSplitSize
-  local dock = lurek.ui.newDockPanel()
+  local dock = new_example_image_widget():newDockPanel()
   local v = dock:getSplitSize()
   print("getSplitSize:", v)
 end
@@ -1793,7 +1797,7 @@ end
 -- Returns the orientation of this Toolbar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Toolbar:getOrientation
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   local v = tb:getOrientation()
   print("getOrientation:", v)
 end
@@ -1802,7 +1806,7 @@ end
 -- Sets the orientation for this Toolbar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Toolbar:setOrientation
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   tb:setOrientation("horizontal")
 end
 
@@ -1810,7 +1814,7 @@ end
 -- Adds a button entry to this Toolbar widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Toolbar:addButton
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   tb:addButton(1)
 end
 
@@ -1818,7 +1822,7 @@ end
 -- Adds a separator entry to this Toolbar widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Toolbar:addSeparator
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   tb:addSeparator(1)
 end
 
@@ -1826,7 +1830,7 @@ end
 -- Adds a spacer entry to this Toolbar widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Toolbar:addSpacer
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   tb:addSpacer(1)
 end
 
@@ -1834,7 +1838,7 @@ end
 -- Returns the button of this Toolbar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Toolbar:getButton
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   local v = tb:getButton()
   print("getButton:", v)
 end
@@ -1843,7 +1847,7 @@ end
 -- Sets the button enabled for this Toolbar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Toolbar:setButtonEnabled
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   tb:setButtonEnabled(true)
 end
 
@@ -1851,7 +1855,7 @@ end
 -- Sets the button toggled for this Toolbar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Toolbar:setButtonToggled
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   tb:setButtonToggled(function() print("event") end)
 end
 
@@ -1859,7 +1863,7 @@ end
 -- Returns true if button toggled is enabled for this Toolbar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Toolbar:isButtonToggled
-  local tb = lurek.ui.newToolbar()
+  local tb = new_example_image_widget():newToolbar()
   local v = tb:isButtonToggled()
   print("isButtonToggled:", v)
 end
@@ -1870,8 +1874,8 @@ end
 -- Adds a menu entry to this Menu_Bar widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Menu_Bar:addMenu
-  local mb = lurek.ui.newMenuBar()
-  local child = lurek.ui.newButton("child_1", "Child")
+  local mb = new_example_image_widget():newMenuBar()
+  local child = new_example_image_widget():newButton("child_1", "Child")
   mb:addMenu(child)
 end
 
@@ -1879,7 +1883,7 @@ end
 -- Removes the menu from this Menu_Bar widget.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- Menu_Bar:removeMenu
-  local mb = lurek.ui.newMenuBar()
+  local mb = new_example_image_widget():newMenuBar()
   mb:removeMenu()
 end
 
@@ -1887,7 +1891,7 @@ end
 -- Returns the menus of this Menu_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Menu_Bar:getMenus
-  local mb = lurek.ui.newMenuBar()
+  local mb = new_example_image_widget():newMenuBar()
   local v = mb:getMenus()
   print("getMenus:", v)
 end
@@ -1896,7 +1900,7 @@ end
 -- Returns the menu count of this Menu_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Menu_Bar:getMenuCount
-  local mb = lurek.ui.newMenuBar()
+  local mb = new_example_image_widget():newMenuBar()
   local v = mb:getMenuCount()
   print("getMenuCount:", v)
 end
@@ -1907,7 +1911,7 @@ end
 -- Returns the text of this Menu_Item widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Menu_Item:getText
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   local v = mi:getText()
   print("getText:", v)
 end
@@ -1916,7 +1920,7 @@ end
 -- Sets the text for this Menu_Item widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Menu_Item:setText
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   mi:setText("Hello")
 end
 
@@ -1924,7 +1928,7 @@ end
 -- Returns the shortcut of this Menu_Item widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Menu_Item:getShortcut
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   local v = mi:getShortcut()
   print("getShortcut:", v)
 end
@@ -1933,7 +1937,7 @@ end
 -- Sets the shortcut for this Menu_Item widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Menu_Item:setShortcut
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   mi:setShortcut(1)
 end
 
@@ -1941,7 +1945,7 @@ end
 -- Returns true if checked is enabled for this Menu_Item widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Menu_Item:isChecked
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   local v = mi:isChecked()
   print("isChecked:", v)
 end
@@ -1950,7 +1954,7 @@ end
 -- Sets the checked for this Menu_Item widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Menu_Item:setChecked
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   mi:setChecked(true)
 end
 
@@ -1958,7 +1962,7 @@ end
 -- Adds a sub item entry to this Menu_Item widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Menu_Item:addSubItem
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   mi:addSubItem("item_1")
 end
 
@@ -1966,7 +1970,7 @@ end
 -- Returns the sub items of this Menu_Item widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Menu_Item:getSubItems
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   local v = mi:getSubItems()
   print("getSubItems:", v)
 end
@@ -1975,7 +1979,7 @@ end
 -- Registers a callback invoked when this menu item is clicked.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Menu_Item:setOnClick
-  local mi = lurek.ui.newMenuItem("New Game")
+  local mi = new_example_image_widget():newMenuItem("New Game")
   mi:setOnClick(function() print("event") end)
 end
 
@@ -1985,7 +1989,7 @@ end
 -- Returns the title of this Dialog widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Dialog:getTitle
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   local v = dlg:getTitle()
   print("getTitle:", v)
 end
@@ -1994,7 +1998,7 @@ end
 -- Sets the title for this Dialog widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Dialog:setTitle
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   dlg:setTitle("Hello")
 end
 
@@ -2002,7 +2006,7 @@ end
 -- Returns true if modal is enabled for this Dialog widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Dialog:isModal
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   local v = dlg:isModal()
   print("isModal:", v)
 end
@@ -2011,7 +2015,7 @@ end
 -- Sets the modal for this Dialog widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Dialog:setModal
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   dlg:setModal(true)
 end
 
@@ -2019,7 +2023,7 @@ end
 -- Returns true if open is enabled for this Dialog widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Dialog:isOpen
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   local v = dlg:isOpen()
   print("isOpen:", v)
 end
@@ -2028,7 +2032,7 @@ end
 -- Performs the open operation on this Dialog widget.
 -- Call this on the Dialog instance to drive its behaviour at runtime.
 do  -- Dialog:open
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   dlg:open()
 end
 
@@ -2036,7 +2040,7 @@ end
 -- Closes and removes this dialog from the screen.
 -- Call this on the Dialog instance to drive its behaviour at runtime.
 do  -- Dialog:close
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   dlg:close()
 end
 
@@ -2044,7 +2048,7 @@ end
 -- Registers a callback invoked when this dialog is closed.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Dialog:setOnClose
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   dlg:setOnClose(function() print("event") end)
 end
 
@@ -2052,7 +2056,7 @@ end
 -- Sets the content for this Dialog widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Dialog:setContent
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   dlg:setContent(function() print("event") end)
 end
 
@@ -2060,7 +2064,7 @@ end
 -- Returns the content of this Dialog widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Dialog:getContent
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   local v = dlg:getContent()
   print("getContent:", v)
 end
@@ -2069,7 +2073,7 @@ end
 -- Adds a button entry to this Dialog widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Dialog:addButton
-  local dlg = lurek.ui.newDialog("dlg_quit", "Quit?")
+  local dlg = new_example_image_widget():newDialog("dlg_quit", "Quit?")
   dlg:addButton(1)
 end
 
@@ -2079,7 +2083,7 @@ end
 -- Adds a section entry to this Status_Bar widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Status_Bar:addSection
-  local sb = lurek.ui.newStatusBar()
+  local sb = new_example_image_widget():newStatusBar()
   sb:addSection(1)
 end
 
@@ -2087,7 +2091,7 @@ end
 -- Sets the section text for this Status_Bar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Status_Bar:setSectionText
-  local sb = lurek.ui.newStatusBar()
+  local sb = new_example_image_widget():newStatusBar()
   sb:setSectionText("Hello")
 end
 
@@ -2095,7 +2099,7 @@ end
 -- Returns the section text of this Status_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Status_Bar:getSectionText
-  local sb = lurek.ui.newStatusBar()
+  local sb = new_example_image_widget():newStatusBar()
   local v = sb:getSectionText()
   print("getSectionText:", v)
 end
@@ -2104,7 +2108,7 @@ end
 -- Returns the section count of this Status_Bar widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Status_Bar:getSectionCount
-  local sb = lurek.ui.newStatusBar()
+  local sb = new_example_image_widget():newStatusBar()
   local v = sb:getSectionCount()
   print("getSectionCount:", v)
 end
@@ -2113,7 +2117,7 @@ end
 -- Resizes the section list for this Status_Bar widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Status_Bar:setSectionCount
-  local sb = lurek.ui.newStatusBar()
+  local sb = new_example_image_widget():newStatusBar()
   sb:setSectionCount(4)
 end
 
@@ -2121,7 +2125,7 @@ end
 -- Compatibility shim for assigning a widget to a section.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Status_Bar:setSectionWidget
-  local sb = lurek.ui.newStatusBar()
+  local sb = new_example_image_widget():newStatusBar()
   sb:setSectionWidget("primary")
 end
 
@@ -2131,7 +2135,7 @@ end
 -- Adds a section entry to this Accordion widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Accordion:addSection
-  local acc = lurek.ui.newAccordion()
+  local acc = new_example_image_widget():newAccordion()
   acc:addSection(1)
 end
 
@@ -2139,7 +2143,7 @@ end
 -- Returns the section count of this Accordion widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Accordion:getSectionCount
-  local acc = lurek.ui.newAccordion()
+  local acc = new_example_image_widget():newAccordion()
   local v = acc:getSectionCount()
   print("getSectionCount:", v)
 end
@@ -2148,7 +2152,7 @@ end
 -- Toggles the expanded/collapsed status of an Accordion section.
 -- Call this on the Accordion instance to drive its behaviour at runtime.
 do  -- Accordion:toggleSection
-  local acc = lurek.ui.newAccordion()
+  local acc = new_example_image_widget():newAccordion()
   acc:toggleSection()
 end
 
@@ -2156,7 +2160,7 @@ end
 -- Returns true if section expanded is enabled for this Accordion widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Accordion:isSectionExpanded
-  local acc = lurek.ui.newAccordion()
+  local acc = new_example_image_widget():newAccordion()
   local v = acc:isSectionExpanded()
   print("isSectionExpanded:", v)
 end
@@ -2165,7 +2169,7 @@ end
 -- Returns true if exclusive is enabled for this Accordion widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Accordion:isExclusive
-  local acc = lurek.ui.newAccordion()
+  local acc = new_example_image_widget():newAccordion()
   local v = acc:isExclusive()
   print("isExclusive:", v)
 end
@@ -2174,7 +2178,7 @@ end
 -- Sets the exclusive for this Accordion widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Accordion:setExclusive
-  local acc = lurek.ui.newAccordion()
+  local acc = new_example_image_widget():newAccordion()
   acc:setExclusive(1)
 end
 
@@ -2182,7 +2186,7 @@ end
 -- Returns the section title of this Accordion widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Accordion:getSectionTitle
-  local acc = lurek.ui.newAccordion()
+  local acc = new_example_image_widget():newAccordion()
   local v = acc:getSectionTitle()
   print("getSectionTitle:", v)
 end
@@ -2193,7 +2197,7 @@ end
 -- Returns the text of this Tooltip_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tooltip_Panel:getText
-  local tip = lurek.ui.newTooltipPanel("Click to attack")
+  local tip = new_example_image_widget():newTooltipPanel("Click to attack")
   local v = tip:getText()
   print("getText:", v)
 end
@@ -2202,7 +2206,7 @@ end
 -- Sets the text for this Tooltip_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Tooltip_Panel:setText
-  local tip = lurek.ui.newTooltipPanel("Click to attack")
+  local tip = new_example_image_widget():newTooltipPanel("Click to attack")
   tip:setText("Hello")
 end
 
@@ -2210,7 +2214,7 @@ end
 -- Returns the delay of this Tooltip_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tooltip_Panel:getDelay
-  local tip = lurek.ui.newTooltipPanel("Click to attack")
+  local tip = new_example_image_widget():newTooltipPanel("Click to attack")
   local v = tip:getDelay()
   print("getDelay:", v)
 end
@@ -2219,7 +2223,7 @@ end
 -- Sets the delay for this Tooltip_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Tooltip_Panel:setDelay
-  local tip = lurek.ui.newTooltipPanel("Click to attack")
+  local tip = new_example_image_widget():newTooltipPanel("Click to attack")
   tip:setDelay(2.0)
 end
 
@@ -2227,7 +2231,7 @@ end
 -- Returns the target of this Tooltip_Panel widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Tooltip_Panel:getTarget
-  local tip = lurek.ui.newTooltipPanel("Click to attack")
+  local tip = new_example_image_widget():newTooltipPanel("Click to attack")
   local v = tip:getTarget()
   print("getTarget:", v)
 end
@@ -2236,7 +2240,7 @@ end
 -- Sets the target for this Tooltip_Panel widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Tooltip_Panel:setTarget
-  local tip = lurek.ui.newTooltipPanel("Click to attack")
+  local tip = new_example_image_widget():newTooltipPanel("Click to attack")
   tip:setTarget(1)
 end
 
@@ -2246,7 +2250,7 @@ end
 -- Returns the color of this Color_Picker widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Color_Picker:getColor
-  local cp = lurek.ui.newColorPicker({1,0,0,1})
+  local cp = new_example_image_widget():newColorPicker({1,0,0,1})
   local v = cp:getColor()
   print("getColor:", v)
 end
@@ -2255,7 +2259,7 @@ end
 -- Sets the color for this Color_Picker widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Color_Picker:setColor
-  local cp = lurek.ui.newColorPicker({1,0,0,1})
+  local cp = new_example_image_widget():newColorPicker({1,0,0,1})
   cp:setColor({0.2, 0.6, 1.0, 1.0})
 end
 
@@ -2263,7 +2267,7 @@ end
 -- Returns the show alpha of this Color_Picker widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Color_Picker:getShowAlpha
-  local cp = lurek.ui.newColorPicker({1,0,0,1})
+  local cp = new_example_image_widget():newColorPicker({1,0,0,1})
   local v = cp:getShowAlpha()
   print("getShowAlpha:", v)
 end
@@ -2272,7 +2276,7 @@ end
 -- Sets the show alpha for this Color_Picker widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Color_Picker:setShowAlpha
-  local cp = lurek.ui.newColorPicker({1,0,0,1})
+  local cp = new_example_image_widget():newColorPicker({1,0,0,1})
   cp:setShowAlpha(0.85)
 end
 
@@ -2280,7 +2284,7 @@ end
 -- Returns the color mode of this Color_Picker widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Color_Picker:getColorMode
-  local cp = lurek.ui.newColorPicker({1,0,0,1})
+  local cp = new_example_image_widget():newColorPicker({1,0,0,1})
   local v = cp:getColorMode()
   print("getColorMode:", v)
 end
@@ -2289,7 +2293,7 @@ end
 -- Sets the color mode for this Color_Picker widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Color_Picker:setColorMode
-  local cp = lurek.ui.newColorPicker({1,0,0,1})
+  local cp = new_example_image_widget():newColorPicker({1,0,0,1})
   cp:setColorMode({0.2, 0.6, 1.0, 1.0})
 end
 
@@ -2297,7 +2301,7 @@ end
 -- Registers a callback invoked when this widget's value changes.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Color_Picker:setOnChange
-  local cp = lurek.ui.newColorPicker({1,0,0,1})
+  local cp = new_example_image_widget():newColorPicker({1,0,0,1})
   cp:setOnChange(function() print("event") end)
 end
 
@@ -2307,7 +2311,7 @@ end
 -- Adds a column entry to this Gui_Table widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Gui_Table:addColumn
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   tbl:addColumn("item_1")
 end
 
@@ -2315,7 +2319,7 @@ end
 -- Returns the column count of this Gui_Table widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Table:getColumnCount
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   local v = tbl:getColumnCount()
   print("getColumnCount:", v)
 end
@@ -2324,7 +2328,7 @@ end
 -- Adds a row entry to this Gui_Table widget.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Gui_Table:addRow
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   tbl:addRow("item_1")
 end
 
@@ -2332,7 +2336,7 @@ end
 -- Returns the row count of this Gui_Table widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Table:getRowCount
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   local v = tbl:getRowCount()
   print("getRowCount:", v)
 end
@@ -2341,7 +2345,7 @@ end
 -- Returns the cell of this Gui_Table widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Table:getCell
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   local v = tbl:getCell()
   print("getCell:", v)
 end
@@ -2350,7 +2354,7 @@ end
 -- Sets the cell for this Gui_Table widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Table:setCell
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   tbl:setCell(1)
 end
 
@@ -2358,7 +2362,7 @@ end
 -- Returns the selected row of this Gui_Table widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Table:getSelectedRow
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   local v = tbl:getSelectedRow()
   print("getSelectedRow:", v)
 end
@@ -2367,7 +2371,7 @@ end
 -- Sets the selected row for this Gui_Table widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Table:setSelectedRow
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   tbl:setSelectedRow(true)
 end
 
@@ -2375,7 +2379,7 @@ end
 -- Returns true if sortable is enabled for this Gui_Table widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Gui_Table:isSortable
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   local v = tbl:isSortable()
   print("isSortable:", v)
 end
@@ -2384,7 +2388,7 @@ end
 -- Sets the sortable for this Gui_Table widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Table:setSortable
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   tbl:setSortable(1)
 end
 
@@ -2392,7 +2396,7 @@ end
 -- Registers a callback invoked when a table row is selected.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Gui_Table:setOnSelect
-  local tbl = lurek.ui.newTable({"Name","Score"})
+  local tbl = new_example_image_widget():newTable({"Name","Score"})
   tbl:setOnSelect(function() print("event") end)
 end
 
@@ -2402,7 +2406,7 @@ end
 -- Returns the scale mode of this Image_Widget widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Image_Widget:getScaleMode
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   local v = img:getScaleMode()
   print("getScaleMode:", v)
 end
@@ -2411,7 +2415,7 @@ end
 -- Sets the scale mode for this Image_Widget widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Image_Widget:setScaleMode
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:setScaleMode(1.5)
 end
 
@@ -2419,7 +2423,7 @@ end
 -- Returns the tint of this Image_Widget widget.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Image_Widget:getTint
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   local v = img:getTint()
   print("getTint:", v)
 end
@@ -2428,7 +2432,7 @@ end
 -- Sets the tint for this Image_Widget widget.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Image_Widget:setTint
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:setTint({0.2, 0.6, 1.0, 1.0})
 end
 
@@ -2436,7 +2440,7 @@ end
 -- Creates and returns a new interactive button widget as a child of this widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newButton
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newButton()
 end
 
@@ -2444,7 +2448,7 @@ end
 -- Creates a text label widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newLabel
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newLabel()
 end
 
@@ -2452,7 +2456,7 @@ end
 -- Creates a text input widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newTextInput
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newTextInput()
 end
 
@@ -2460,7 +2464,7 @@ end
 -- Creates a checkbox widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newCheckbox
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newCheckbox()
 end
 
@@ -2468,7 +2472,7 @@ end
 -- Creates a value slider widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newSlider
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newSlider()
 end
 
@@ -2476,7 +2480,7 @@ end
 -- Creates a progress bar widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newProgressBar
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newProgressBar()
 end
 
@@ -2484,7 +2488,7 @@ end
 -- Creates a dropdown combo box widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newComboBox
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newComboBox()
 end
 
@@ -2492,7 +2496,7 @@ end
 -- Creates a selectable list widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newList
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newList()
 end
 
@@ -2500,7 +2504,7 @@ end
 -- Creates a container panel widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newPanel
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newPanel()
 end
 
@@ -2508,7 +2512,7 @@ end
 -- Creates a flexbox layout container.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newLayout
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newLayout()
 end
 
@@ -2516,7 +2520,7 @@ end
 -- Creates a scrollable panel widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newScrollPanel
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newScrollPanel()
 end
 
@@ -2524,7 +2528,7 @@ end
 -- Creates a 9-patch slicer widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newNinePatch
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newNinePatch()
 end
 
@@ -2532,7 +2536,7 @@ end
 -- Creates a tab bar widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newTabBar
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newTabBar()
 end
 
@@ -2540,7 +2544,7 @@ end
 -- Creates a separator line.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newSeparator
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newSeparator()
 end
 
@@ -2548,7 +2552,7 @@ end
 -- Creates a spacing filler widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newSpacer
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newSpacer()
 end
 
@@ -2556,7 +2560,7 @@ end
 -- Creates a toast notification widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newToast
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newToast()
 end
 
@@ -2564,7 +2568,7 @@ end
 -- Creates a collapsible tree view widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newTreeView
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newTreeView()
 end
 
@@ -2572,7 +2576,7 @@ end
 -- Creates a grouped radio button widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newRadioButton
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newRadioButton()
 end
 
@@ -2580,7 +2584,7 @@ end
 -- Creates a scroll bar widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newScrollBar
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newScrollBar()
 end
 
@@ -2588,7 +2592,7 @@ end
 -- Creates a draggable window widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newWindow
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newWindow()
 end
 
@@ -2596,7 +2600,7 @@ end
 -- Creates a resizable split panel.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newSplitPanel
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newSplitPanel()
 end
 
@@ -2604,7 +2608,7 @@ end
 -- Creates and returns a new docking panel that arranges children along its edges.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newDockPanel
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newDockPanel()
 end
 
@@ -2612,7 +2616,7 @@ end
 -- Creates a toolbar widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newToolbar
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newToolbar()
 end
 
@@ -2620,7 +2624,7 @@ end
 -- Creates a menu bar widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newMenuBar
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newMenuBar()
 end
 
@@ -2628,7 +2632,7 @@ end
 -- Creates a menu item widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newMenuItem
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newMenuItem()
 end
 
@@ -2636,7 +2640,7 @@ end
 -- Creates a modal dialog widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newDialog
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newDialog()
 end
 
@@ -2644,7 +2648,7 @@ end
 -- Creates a status bar widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newStatusBar
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newStatusBar()
 end
 
@@ -2652,7 +2656,7 @@ end
 -- Creates a collapsible accordion widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newAccordion
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newAccordion()
 end
 
@@ -2660,7 +2664,7 @@ end
 -- Creates a tooltip panel widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newTooltipPanel
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newTooltipPanel()
 end
 
@@ -2668,7 +2672,7 @@ end
 -- Creates a color picker widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newColorPicker
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newColorPicker()
 end
 
@@ -2676,7 +2680,7 @@ end
 -- Creates a data table widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newTable
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newTable()
 end
 
@@ -2684,7 +2688,7 @@ end
 -- Creates an image display widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newImageWidget
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newImageWidget()
 end
 
@@ -2692,7 +2696,7 @@ end
 -- Creates a new theme instance.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newTheme
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newTheme()
 end
 
@@ -2700,7 +2704,7 @@ end
 -- Sets the active GUI theme.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Image_Widget:setTheme
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:setTheme("dark")
 end
 
@@ -2708,7 +2712,7 @@ end
 -- Returns whether a theme is set.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Image_Widget:getTheme
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   local v = img:getTheme()
   print("getTheme:", v)
 end
@@ -2717,7 +2721,7 @@ end
 -- Returns the root panel widget table.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Image_Widget:getRoot
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   local v = img:getRoot()
   print("getRoot:", v)
 end
@@ -2726,7 +2730,7 @@ end
 -- Sets keyboard focus to a widget or clears it.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Image_Widget:setFocus
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:setFocus(1)
 end
 
@@ -2734,7 +2738,7 @@ end
 -- Returns the focused widget index or nil.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Image_Widget:getFocus
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   local v = img:getFocus()
   print("getFocus:", v)
 end
@@ -2743,7 +2747,7 @@ end
 -- Moves focus to the next focusable widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:focusNext
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:focusNext()
 end
 
@@ -2751,7 +2755,7 @@ end
 -- Moves focus to the previous focusable widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:focusPrev
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:focusPrev()
 end
 
@@ -2759,7 +2763,7 @@ end
 -- Removes keyboard focus from this widget so key events go to the next focusable.
 -- Tear down dynamic content when the screen changes to free GPU resources.
 do  -- Image_Widget:clearFocus
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:clearFocus()
 end
 
@@ -2767,7 +2771,7 @@ end
 -- Queues a toast notification from a table.
 -- Insert the child as part of building the widget tree, typically in lurek.init().
 do  -- Image_Widget:addToast
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:addToast(1)
 end
 
@@ -2775,7 +2779,7 @@ end
 -- Returns the number of active toasts.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Image_Widget:getToastCount
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   local v = img:getToastCount()
   print("getToastCount:", v)
 end
@@ -2784,7 +2788,7 @@ end
 -- Forwards a mouse press event to the GUI.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:mousepressed
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:mousepressed()
 end
 
@@ -2792,7 +2796,7 @@ end
 -- Forwards a mouse release event to the GUI.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:mousereleased
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:mousereleased()
 end
 
@@ -2800,7 +2804,7 @@ end
 -- Forwards a mouse move event to the GUI.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:mousemoved
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:mousemoved()
 end
 
@@ -2808,7 +2812,7 @@ end
 -- Forwards a key press event to the GUI.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:keypressed
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:keypressed()
 end
 
@@ -2816,7 +2820,7 @@ end
 -- Forwards text input to the focused text input widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:textinput
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:textinput()
 end
 
@@ -2824,7 +2828,7 @@ end
 -- Forwards a mouse wheel event to the GUI.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:wheelmoved
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:wheelmoved()
 end
 
@@ -2832,7 +2836,7 @@ end
 -- Advances toast timers, removes expired toasts, and dispatches pending GUI events.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:update
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:update()
 end
 
@@ -2840,7 +2844,7 @@ end
 -- Headless compatibility stub for GUI draw.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:draw
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:draw()
 end
 
@@ -2848,7 +2852,7 @@ end
 -- Returns the total widget count in the context.
 -- Read the current state â€” useful inside callbacks or per-frame UI logic.
 do  -- Image_Widget:getWidgetCount
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   local v = img:getWidgetCount()
   print("getWidgetCount:", v)
 end
@@ -2857,7 +2861,7 @@ end
 -- Renders the UI widget tree to a CPU ImageData at the given resolution.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:drawToImage
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:drawToImage()
 end
 
@@ -2865,7 +2869,7 @@ end
 -- Creates a new line chart.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newLineChart
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newLineChart()
 end
 
@@ -2873,7 +2877,7 @@ end
 -- Creates and returns a new bar chart widget attached to this image widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newBarChart
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newBarChart()
 end
 
@@ -2881,7 +2885,7 @@ end
 -- Creates a new scatter plot.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newScatterPlot
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newScatterPlot()
 end
 
@@ -2889,7 +2893,7 @@ end
 -- Creates and returns a new pie chart widget attached to this image widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newPieChart
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newPieChart()
 end
 
@@ -2897,7 +2901,7 @@ end
 -- Creates a new stacked-area chart.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newAreaChart
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newAreaChart()
 end
 
@@ -2905,7 +2909,7 @@ end
 -- Creates a new line chart.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newLineChart
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newLineChart()
 end
 
@@ -2913,7 +2917,7 @@ end
 -- Creates and returns a new bar chart widget attached to this image widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newBarChart
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newBarChart()
 end
 
@@ -2921,7 +2925,7 @@ end
 -- Creates a new scatter plot.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newScatterPlot
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newScatterPlot()
 end
 
@@ -2929,7 +2933,7 @@ end
 -- Creates and returns a new pie chart widget attached to this image widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newPieChart
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newPieChart()
 end
 
@@ -2937,7 +2941,7 @@ end
 -- Creates a new stacked-area chart.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newAreaChart
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newAreaChart()
 end
 
@@ -2945,7 +2949,7 @@ end
 -- Parses a widget state string, returning the canonical form or nil if invalid.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:parseWidgetState
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:parseWidgetState()
 end
 
@@ -2953,7 +2957,7 @@ end
 -- Creates a numeric spin box widget with increment and decrement buttons.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newSpinBox
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newSpinBox()
 end
 
@@ -2961,7 +2965,7 @@ end
 -- Creates a toggle switch widget.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newSwitch
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newSwitch()
 end
 
@@ -2969,7 +2973,7 @@ end
 -- Creates a badge widget displaying a numeric count.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:newBadge
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:newBadge()
 end
 
@@ -2977,7 +2981,7 @@ end
 -- Installs the built-in dark theme as the active GUI theme.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Image_Widget:setDefaultTheme
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:setDefaultTheme("dark")
 end
 
@@ -2985,7 +2989,7 @@ end
 -- Sets the viewport dimensions used for anchor constraints and layout.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- Image_Widget:setViewport
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:setViewport(1)
 end
 
@@ -2993,7 +2997,7 @@ end
 -- Returns true if the widget tree changed since the last call, then resets the flag.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:flushCache
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:flushCache()
 end
 
@@ -3001,7 +3005,7 @@ end
 -- Updates all widgets that have a data-binding key registered via `:bind(key)`.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:update_bindings
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:update_bindings()
 end
 
@@ -3009,7 +3013,7 @@ end
 -- Load a widget tree from a Lua table definition and attach it to the UI.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:loadLayout
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:loadLayout()
 end
 
@@ -3017,7 +3021,7 @@ end
 -- Load a widget tree from a TOML layout file and attach it to the UI root.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:loadLayoutFile
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:loadLayoutFile()
 end
 
@@ -3025,7 +3029,7 @@ end
 -- Render the current UI widget tree to a PNG file for testing purposes.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.
 do  -- Image_Widget:renderToImage
-  local img = lurek.ui.newImageWidget("assets/portrait.png")
+  local img = new_example_image_widget()
   img:renderToImage()
 end
 
@@ -3035,7 +3039,7 @@ end
 -- Sets the maximum Y value for axis scaling.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- LineChart:setYMax
-  local chart = lurek.ui.newLineChart({0.1,0.3,0.5,0.7})
+  local chart = new_example_image_widget():newLineChart({0.1,0.3,0.5,0.7})
   chart:setYMax(100)
 end
 
@@ -3043,7 +3047,7 @@ end
 -- Sets the maximum X value for axis scaling.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- LineChart:setXMax
-  local chart = lurek.ui.newLineChart({0.1,0.3,0.5,0.7})
+  local chart = new_example_image_widget():newLineChart({0.1,0.3,0.5,0.7})
   chart:setXMax(100)
 end
 
@@ -3051,7 +3055,7 @@ end
 -- Renders the line chart into an existing ImageData.
 -- Call this on the LineChart instance to drive its behaviour at runtime.
 do  -- LineChart:drawToImage
-  local chart = lurek.ui.newLineChart({0.1,0.3,0.5,0.7})
+  local chart = new_example_image_widget():newLineChart({0.1,0.3,0.5,0.7})
   chart:drawToImage()
 end
 
@@ -3061,7 +3065,7 @@ end
 -- Renders the bar chart into an existing ImageData.
 -- Call this on the BarChart instance to drive its behaviour at runtime.
 do  -- BarChart:drawToImage
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   w:drawToImage()
 end
 
@@ -3071,7 +3075,7 @@ end
 -- Sets the X-axis data range.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- ScatterPlot:setXRange
-  local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
+  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
   plot:setXRange(1)
 end
 
@@ -3079,7 +3083,7 @@ end
 -- Sets the Y-axis data range.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- ScatterPlot:setYRange
-  local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
+  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
   plot:setYRange(1)
 end
 
@@ -3087,7 +3091,7 @@ end
 -- Renders the scatter plot into an existing ImageData.
 -- Call this on the ScatterPlot instance to drive its behaviour at runtime.
 do  -- ScatterPlot:drawToImage
-  local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
+  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
   plot:drawToImage()
 end
 
@@ -3097,7 +3101,7 @@ end
 -- Renders the pie chart into an existing ImageData.
 -- Call this on the PieChart instance to drive its behaviour at runtime.
 do  -- PieChart:drawToImage
-  local chart = lurek.ui.newPieChart({{label="HP",value=70}})
+  local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
   chart:drawToImage()
 end
 
@@ -3107,7 +3111,7 @@ end
 -- Sets the maximum Y value for axis scaling.
 -- Configure the widget once after creation, before adding it to a layout.
 do  -- AreaChart:setYMax
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   w:setYMax(100)
 end
 
@@ -3115,7 +3119,7 @@ end
 -- Renders the area chart into an existing ImageData.
 -- Call this on the AreaChart instance to drive its behaviour at runtime.
 do  -- AreaChart:drawToImage
-  local w = lurek.ui.newPanel()
+  local w = new_example_image_widget():newPanel()
   w:drawToImage()
 end
 
@@ -3125,7 +3129,7 @@ end
 -- Creates a widget with fully Lua-driven rendering via an on_draw callback.
 -- Call once during init to register the widget; call lurek.ui.draw() each frame.
 do  -- Image_Widget:newCustomWidget
-  local widget = lurek.ui.newCustomWidget({
+  local widget = new_example_image_widget():newCustomWidget({
     x = 50, y = 50, width = 300, height = 200, id = "health_bar",
   })
   if widget and widget.setOnDraw then
@@ -3133,10 +3137,10 @@ do  -- Image_Widget:newCustomWidget
       local health = 0.75
       -- Draw background
       lurek.render.setColor(0.2, 0.2, 0.2, 1)
-      lurek.render.fillRect(rect.x, rect.y, rect.w, rect.h)
+        lurek.render.rectangle("fill", rect.x, rect.y, rect.w, rect.h)
       -- Draw health fill
       lurek.render.setColor(0, 1, 0, 1)
-      lurek.render.fillRect(rect.x, rect.y, rect.w * health, rect.h)
+        lurek.render.rectangle("fill", rect.x, rect.y, rect.w * health, rect.h)
       -- Draw label
       lurek.render.setColor(1, 1, 1, 1)
       lurek.render.print("HP: 75%", rect.x + 4, rect.y + 4)
@@ -3150,9 +3154,8 @@ end
 -- Adds a named category (x-axis label) to the bar chart.
 -- Each series value maps to one category; add categories before adding series data.
 do  -- BarChart:addCategory
-  local chart = lurek.ui.newBarChart and lurek.ui.Image_Widget and nil
   lurek.log.info("BarChart:addCategory usage: chart:addCategory('Jan')", "ui")
-  local bc = lurek.ui.newBarChart(200, 100)
+  local bc = new_example_image_widget():newBarChart(200, 100)
   bc:addCategory("Jan")
   bc:addCategory("Feb")
   lurek.log.info("categories added", "ui")
@@ -3162,7 +3165,7 @@ end
 -- Adds a new stacked area series layer to the area chart.
 -- Multiple layers stack vertically; each is filled with a distinct colour.
 do  -- AreaChart:addLayer
-  local ac = lurek.ui.newAreaChart(300, 150)
+  local ac = new_example_image_widget():newAreaChart(300, 150)
   ac:addLayer("series_a", {1,0.3,0.3,0.7}, {10,20,15,30,25})
   ac:addLayer("series_b", {0.3,0.6,1,0.7}, {5,10,8,14,12})
   lurek.log.info("area layers added", "ui")
@@ -3172,7 +3175,7 @@ end
 -- Adds a named slice to the pie chart with a value and colour.
 -- Values are relative; the chart normalises them to 360 degrees automatically.
 do  -- PieChart:addSegment
-  local pc = lurek.ui.newPieChart(150, 150)
+  local pc = new_example_image_widget():newPieChart(150, 150)
   pc:addSegment("Wheat",  40, {0.9, 0.8, 0.3, 1})
   pc:addSegment("Sheep",  25, {0.8, 0.9, 0.5, 1})
   pc:addSegment("Forest", 35, {0.2, 0.7, 0.3, 1})
@@ -3183,7 +3186,7 @@ end
 -- Adds a named data series to the line chart with a colour and data points.
 -- Multiple series are drawn overlapping; use distinct colours to differentiate.
 do  -- LineChart:addSeries
-  local lc = lurek.ui.newLineChart(300, 150)
+  local lc = new_example_image_widget():newLineChart(300, 150)
   lc:addSeries("revenue", {0.2, 0.8, 0.4, 1}, {10, 20, 15, 35, 30})
   lc:addSeries("cost",    {0.9, 0.3, 0.2, 1}, {8,  12, 10, 18, 20})
   lurek.log.info("line series added", "ui")
@@ -3193,7 +3196,7 @@ end
 -- Adds a named data series to the bar chart with a colour and values.
 -- Each value in the table maps to the corresponding category index.
 do  -- BarChart:addSeries
-  local bc = lurek.ui.newBarChart(300, 150)
+  local bc = new_example_image_widget():newBarChart(300, 150)
   bc:addCategory("Q1"); bc:addCategory("Q2")
   bc:addSeries("sales",   {0.2, 0.6, 0.9, 1}, {120, 180})
   bc:addSeries("returns", {0.9, 0.3, 0.2, 1}, {10,  15})
@@ -3204,7 +3207,7 @@ end
 -- Adds a named point series to the scatter plot with colour and (x, y) data pairs.
 -- Each series is a flat table {x1,y1, x2,y2, ...} of coordinate pairs.
 do  -- ScatterPlot:addSeries
-  local sp = lurek.ui.newScatterPlot(200, 200)
+  local sp = new_example_image_widget():newScatterPlot(200, 200)
   sp:addSeries("players", {0.2, 0.7, 1, 1}, {10,20, 30,40, 50,35, 70,55})
   sp:setXRange(0, 100); sp:setYRange(0, 80)
   lurek.log.info("scatter series added", "ui")
@@ -3214,7 +3217,7 @@ end
 -- Sets a named style property on the theme (e.g., button colour, font size).
 -- Themes apply hierarchically; widget-level styles override theme defaults.
 do  -- Theme:setStyle
-  local theme = lurek.ui.newTheme()
+  local theme = new_example_image_widget():newTheme()
   theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
   theme:setStyle("button.text_color",  {1, 1, 1, 1})
   lurek.log.info("theme styles set", "ui")

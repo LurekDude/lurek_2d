@@ -148,7 +148,7 @@ describe("fuzz: wrong types to data module", function()
     -- @description Passes nil into compression to exercise null payload handling on the binary transform path.
     it("lurek.data.compress rejects nil", function()
         expect_error(function()
-            lurek.data.compress(nil)
+            lurek.data.compress("deflate", nil)
         end)
     end)
 
@@ -156,7 +156,7 @@ describe("fuzz: wrong types to data module", function()
     -- @description Uses arbitrary non-compressed bytes against decompression to ensure garbage input cannot corrupt or crash the decompressor.
     it("lurek.data.decompress rejects garbage", function()
         expect_error(function()
-            lurek.data.decompress("not compressed data at all!!")
+            lurek.data.decompress("deflate", "not compressed data at all!!")
         end)
     end)
 end)

@@ -2764,7 +2764,7 @@ lurek.audio.newPool = function(file_path, voice_count) end
 ---@param sample_rate integer
 ---@param bit_depth integer
 ---@param channels integer
----@param buffer_count integer
+---@param buffer_count? integer
 ---@return number
 lurek.audio.newQueueableSource = function(sample_rate, bit_depth, channels, buffer_count) end
 
@@ -8903,7 +8903,7 @@ lurek.input.gamepad.saveGamepadMappings = function(path) end
 lurek.input.gamepad.setBackgroundEvents = function(enable) end
 
 --- Sets the active mouse cursor from a Cursor handle, name string, or nil to reset.
----@param cursor? Cursor
+---@param cursor Cursor|string|nil
 ---@return nil
 lurek.input.mouse.setCursor = function(cursor) end
 
@@ -16357,9 +16357,9 @@ function Shape:line(x1, y1, x2, y2) end
 
 --- Queues a polygon command from variadic (x, y) coordinate pairs.
 ---@param mode string
----@param coords number
+---@param ... number
 ---@return nil
-function Shape:polygon(mode, coords) end
+function Shape:polygon(mode, ...) end
 
 --- Queues a polyline command from variadic (x, y) coordinate pairs.
 ---@param ... number
@@ -19899,10 +19899,9 @@ function Tween:setYoyo(enabled) end
 TweenParallel = {}
 
 --- Adds an existing LuaTween to the parallel group; marks the tween as owned.
----@param tween Tween
 ---@param tw_ud any
 ---@return nil
-TweenParallel.add = function(tween, tw_ud) end
+function TweenParallel:add(tw_ud) end
 
 --- Cancels the parallel group immediately.
 ---@return nil
@@ -19913,15 +19912,13 @@ function TweenParallel:cancel() end
 function TweenParallel:isActive() end
 
 --- Sets a callback fired when all child tweens finish. Returns self.
----@param fn function
 ---@param f any
 ---@return TweenParallel
-TweenParallel.onComplete = function(fn, f) end
+function TweenParallel:onComplete(f) end
 
 --- Marks the parallel as active. Returns self.
----@param ud any
 ---@return TweenParallel
-TweenParallel.start = function(ud) end
+function TweenParallel:start() end
 
 --- Creates and adds an inline tween entry to the parallel group. Returns self.
 ---@param duration number
@@ -19929,17 +19926,16 @@ TweenParallel.start = function(ud) end
 ---@param fields table
 ---@param easing? string
 ---@return TweenParallel
-TweenParallel.tween = function(duration, target, fields, easing) end
+function TweenParallel:tween(duration, target, fields, easing) end
 
 --- A chained sequence of animations that run one after another.
 ---@class TweenSequence
 TweenSequence = {}
 
 --- Appends an immediate callback step. Returns self.
----@param fn function
 ---@param f any
 ---@return TweenSequence
-TweenSequence.callback = function(fn, f) end
+function TweenSequence:callback(f) end
 
 --- Cancels the sequence and stops all pending steps.
 ---@return nil
@@ -19947,25 +19943,23 @@ function TweenSequence:cancel() end
 
 --- Appends a delay step that waits `seconds` before proceeding. Returns self.
 ---@param seconds number
----@param fn function
+---@param fn? function
 ---@param cb? any
 ---@return TweenSequence
-TweenSequence.delay = function(seconds, fn, cb) end
+function TweenSequence:delay(seconds, fn, cb) end
 
 --- Returns true if the sequence has been started and has not yet completed.
 ---@return boolean
 function TweenSequence:isActive() end
 
 --- Sets a callback fired when all steps complete. Returns self.
----@param fn function
 ---@param f any
 ---@return TweenSequence
-TweenSequence.onComplete = function(fn, f) end
+function TweenSequence:onComplete(f) end
 
 --- Marks the sequence as active so `lurek.tween.update(dt)` begins ticking it. Returns self.
----@param ud any
 ---@return TweenSequence
-TweenSequence.start = function(ud) end
+function TweenSequence:start() end
 
 --- Appends a tween step: animates `fields` on `target` over `duration`. Returns self.
 ---@param duration number
@@ -19973,7 +19967,7 @@ TweenSequence.start = function(ud) end
 ---@param fields table
 ---@param easing? string
 ---@return TweenSequence
-TweenSequence.tween = function(duration, target, fields, easing) end
+function TweenSequence:tween(duration, target, fields, easing) end
 
 --- Lua-side wrapper around the pure-Rust [`TweenState`] timing core.
 ---@class TweenState

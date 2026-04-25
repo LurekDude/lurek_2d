@@ -2,6 +2,32 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.38] - 2026-04-25
+
+### fix(tests, examples, stubs): fix LuaLS redundant/missing-parameter diagnostics
+
+- **`docs/api/lurek.lua`**: Fixed `TweenSequence.tween` and `TweenParallel.tween` stub style from
+  `.method = function(...)` to `:method(...)` so LuaLS sees self correctly.
+  Fixed `Shape:polygon(mode, coords)` to accept variadic vertex args `Shape:polygon(mode, ...)`.
+  Marked `lurek.patterns.newObserver` `name` param as optional (`name?`).
+- **`tests/lua/stress/test_physics_stress.lua`**: Removed extra width/height args from
+  `world:newBody(x, y, w, h, type)` → `world:newBody(x, y, type)` (Rust: 3 params).
+- **`tests/lua/unit/test_gui_unit.lua`**: `lurek.ui.mousemoved(100, 100, 0, 0)` → `lurek.ui.mousemoved(100, 100)`.
+- **`tests/lua/stress/test_save_stress.lua`**: `sm:setSummary("k", v)` → `sm:setSummary(tostring(v))`;
+  `sm:getSummary("k")` → `sm:getSummary()`.
+- **`tests/lua/stress/test_serial_stress.lua`**, **`tests/lua/security/test_render.lua`**:
+  Added required `"deflate"` format arg to `compress`/`decompress` calls.
+- **`tests/lua/integration/test_tilemap_camera.lua`**: Removed extra 4th arg from `newTileMap` calls (3 params).
+- **`tests/lua/unit/test_raycaster_unit.lua`**: Removed extra arg from `newPointLight` (7 params, not 8).
+  Fixed `lurek.raycaster.new` calls and other raycaster method arities.
+- **`tests/lua/unit/test_tilemap_unit.lua`**, **`tests/lua/library/test_library_province_map.lua`**:
+  Fixed call site arity to match actual Rust-registered signatures.
+- **`tests/lua/stress/test_patterns_stress.lua`**, **`tests/lua/unit/test_audio_unit.lua`**:
+  Added missing required arguments at call sites.
+- **`tests/lua/golden/test_math_golden.lua`**, **`tests/lua/demos/test_globe_demo.lua`**:
+  Suppressed false-positive LuaLS diagnostics with `---@diagnostic disable-line` annotations.
+- **`content/examples/tween.lua`**, **`content/examples/ui.lua`**: Fixed call sites to match corrected stubs.
+
 ## [0.20.37] - 2026-04-26
 
 ### fix(lua_api, examples): fix remaining LuaLS diagnostics — minimap, raycaster, pipeline, physics examples

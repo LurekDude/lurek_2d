@@ -15,7 +15,7 @@ describe("stress: patterns observer throughput", function()
         local count = 0
 
         for _ = 1, SUBS do
-            obs:subscribe(function() count = count + 1 end)
+            obs:subscribe("*", function() count = count + 1 end)
         end
 
         local start = os.clock()

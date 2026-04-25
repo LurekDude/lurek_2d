@@ -49,8 +49,8 @@ describe("stress: savegame collect cycles", function()
         local sm    = lurek.save.newSaveManager()
 
         local elapsed = measure("savegame:setSummary+getSummary x" .. COUNT, COUNT, function()
-            sm:setSummary("iteration", math.random())
-            local _ = sm:getSummary("iteration")
+            sm:setSummary(tostring(math.random()))
+            local _ = sm:getSummary()
         end)
 
         expect_true(elapsed < 5.0, "summary r/w budget: " .. elapsed .. "s")

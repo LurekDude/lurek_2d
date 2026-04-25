@@ -326,7 +326,7 @@ describe("stress: physics zones throughput", function()
         for i = 1, 500 do
             local x = (i % 50) * 8 - 200
             local y = math.floor(i / 50) * 8 - 200
-            world:newBody(x, y, 4, 4, "dynamic")
+            world:newBody(x, y, "dynamic")
         end
 
         -- Step 60 frames.
@@ -485,7 +485,7 @@ describe("stress: physics zones throughput", function()
         for i = 1, 500 do
             local x = (i % 50) * 8 - 200
             local y = math.floor(i / 50) * 8 - 200
-            world:newBody(x, y, 4, 4, "dynamic")
+            world:newBody(x, y, "dynamic")
         end
 
         -- Step 60 frames.

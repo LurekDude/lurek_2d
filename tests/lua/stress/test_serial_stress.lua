@@ -54,8 +54,8 @@ describe("serial stress: data encode throughput", function()
     xit("100 compression cycles on 10KB data", function()
         local input = string.rep("ABCDEFGHIJ", 1000)  -- 10KB
         for i = 1, 100 do
-            local compressed = lurek.data.compress(input)
-            local decompressed = lurek.data.decompress(compressed)
+            local compressed = lurek.data.compress("deflate", input)
+            local decompressed = lurek.data.decompress("deflate", compressed)
         end
         expect_true(true, "100 compress cycles completed")
     end)

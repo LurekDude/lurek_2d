@@ -17,6 +17,9 @@
 
 local DEMO_PATH = "content/games/showcase/globe_demo/main.lua"
 
+-- read_file is injected by the Rust test harness at runtime (tests/lua/harness.rs).
+local read_file = read_file ---@diagnostic disable-line: undefined-global
+
 -- Inline common checks (dofile and io.open are sandboxed; use read_file helper).
 local _demo_src = nil
 

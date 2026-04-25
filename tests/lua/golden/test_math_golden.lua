@@ -156,7 +156,7 @@ end)
 
 -- @description Covers suite: golden: migrated 15 evidence comparison.
 describe("golden: migrated 15 evidence comparison", function()
-    local OUT = evidence_output_dir("migrated_15")
+    local OUT = evidence_output_dir("migrated_15") ---@diagnostic disable-line: redundant-parameter
     local SAMP = "tests/samples/migrated_15/"
 
     -- @golden
