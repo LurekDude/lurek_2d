@@ -96,6 +96,9 @@ pub mod pipeline_api;
 /// Registers the `lurek.graph.*` directed-graph and item-flow simulation API.
 pub mod graph_api;
 
+/// Registers the `lurek.html.*` lightweight HTML/CSS layout engine API.
+pub mod html_api;
+
 /// Registers the `lurek.globe.*` Geoscape-style province sphere API.
 pub mod globe_api;
 

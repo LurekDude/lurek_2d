@@ -2807,7 +2807,6 @@ do  -- Image_Widget:mousemoved
   local img = new_example_image_widget()
   img:mousemoved()
 end
-
 --@api-stub: Image_Widget:keypressed
 -- Forwards a key press event to the GUI.
 -- Call this on the Image_Widget instance to drive its behaviour at runtime.

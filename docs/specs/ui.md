@@ -35,6 +35,8 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 
 **Lua surface.** `lurek.ui.new()` → context. Widget factories: `ctx:panel(opts)`, `ctx:button(label, opts)`, `ctx:label(text, opts)`, `ctx:textInput(opts)`, `ctx:slider(opts)`, `ctx:checkbox(label, opts)`, `ctx:window(title, opts)`, `ctx:scrollPanel(opts)`, `ctx:listBox(items, opts)`, `ctx:comboBox(items, opts)`, `ctx:tabBar(tabs, opts)`, `ctx:toast(msg, opts)`, `ctx:dialog(title, buttons, opts)`, `ctx:richText(markup, opts)`, `ctx:chart(config, opts)`, `ctx:tooltip(target_id, text, opts)`. Operations: `ctx:update(dt)`, `ctx:render(commands)`, `ctx:events()` → table of events, `ctx:setTheme(theme_tbl)`, `ctx:load(layout_path)`, `ctx:getElementById(id)` → widget_id or nil. Widget methods: `widget:setText(s)`, `widget:getValue()`, `widget:setEnabled(bool)`, `widget:setVisible(bool)`, `widget:addCallback(event_name, fn)`.
 
+**HTML/CSS layout engine.** The HTML/CSS layout engine is now a standalone top-level module at `lurek.html` (see [html.md](html.md)). It is independent of `lurek.ui` — games may use either, both, or neither.
+
 **Scope boundary.** Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/ui_api.rs`.
 
 ## Files

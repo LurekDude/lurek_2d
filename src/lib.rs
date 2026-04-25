@@ -111,6 +111,8 @@ pub mod filesystem;
 pub mod globe;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
 pub mod graph;
+/// Lightweight pure-Rust HTML/CSS layout engine for `lurek.html`.
+pub mod html;
 /// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
 pub mod i18n;
 /// CPU-side pixel-level image manipulation.

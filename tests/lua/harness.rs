@@ -687,6 +687,11 @@ fn lua_unit_ui_unit() {
 }
 
 #[test]
+fn lua_unit_html_unit() {
+    run_lua_test("unit/test_html_unit.lua");
+}
+
+#[test]
 fn lua_unit_window_unit() {
     run_lua_test("unit/test_window_unit.lua");
 }
@@ -751,6 +756,11 @@ fn lua_evidence_graph_evidence() {
 #[test]
 fn lua_evidence_gui_evidence() {
     run_lua_test("evidence/test_gui_evidence.lua");
+}
+
+#[test]
+fn lua_evidence_html_evidence() {
+    run_lua_test("evidence/test_html_evidence.lua");
 }
 
 #[test]
@@ -1082,6 +1092,33 @@ fn lua_security_render() {
 #[test]
 fn lua_security_runtime() {
     run_lua_test("security/test_runtime.lua");
+}
+
+// ─── demo layer: html-ui showcase ────────────────────────────────────────────
+
+#[test]
+fn lua_demo_html_hud() {
+    run_lua_test("demos/test_html_hud.lua");
+}
+
+#[test]
+fn lua_demo_html_inventory() {
+    run_lua_test("demos/test_html_inventory.lua");
+}
+
+#[test]
+fn lua_demo_html_dialog() {
+    run_lua_test("demos/test_html_dialog.lua");
+}
+
+#[test]
+fn lua_demo_html_settings() {
+    run_lua_test("demos/test_html_settings.lua");
+}
+
+#[test]
+fn lua_demo_html_scoreboard() {
+    run_lua_test("demos/test_html_scoreboard.lua");
 }
 
 #[test]

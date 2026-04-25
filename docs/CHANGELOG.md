@@ -2,7 +2,76 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.20.42] - 2026-04-25
+
+### refactor(html): extract lurek.html as standalone top-level module
+
+- **`src/html/`**: Moved from `src/ui/html/` to a standalone top-level module. Six files: `mod.rs`, `document.rs`, `element.rs`, `parser.rs`, `selector.rs`, `style.rs`. All `crate::ui::html::` paths updated to `crate::html::`.
+- **`src/lua_api/html_api.rs`**: New thin Lua wrapper registering `lurek.html` as a top-level namespace (was `lurek.ui.html`). Full `LuaHtmlDocument` and `LuaHtmlElement` userdata with 100% docstring coverage.
+- **`src/lua_api/register.rs`**: `html_api::register` wired unconditionally (no modules guard — lightweight, no GPU).
+- **`src/lua_api/ui_api.rs`**: Removed ~900 lines of HTML code (now in `html_api.rs`). Removed `register_html_api` call and `use crate::ui::html::` import.
+- **`src/ui/mod.rs`**: Removed `pub mod html;` and `pub use html::{...}` re-exports.
+- **`src/ui/html/`**: Deleted (replaced by `src/html/`).
+- **`docs/specs/html.md`**: New module spec for the standalone HTML module.
+- **`content/examples/html.lua`**: New example file covering full `lurek.html` API surface.
+- **`tests/lua/unit/test_html_unit.lua`**: New Lua unit tests for `lurek.html`.
+- **`.github/skills/html-css/`**: Updated all references from `lurek.ui.html` to `lurek.html`.
+
+## [0.20.41] - 2026-04-25
+
+### feat(ui): complete lurek.ui.html module — tests, examples, skill, demo registration
+
+- **`tests/lua/unit/test_ui_unit.lua`**: Appended 10 `describe` blocks (~58 tests) covering the full
+  `lurek.ui.html` API surface: module availability, `newDocument`/`loadDocument`/`supports`, document
+  HTML/CSS/viewport API, element access (`getRoot`, `getElementById`, `query`, `queryAll`), event and
+  input API (`on`/`off`, all six input-forwarding methods), `HtmlElement` DOM manipulation (28 methods),
+  and `supports()` feature flags.
+- **`tests/lua/demos/test_html_{hud,inventory,dialog,settings,scoreboard}.lua`**: Five static-analysis
+  demo tests, each verifying file existence, key API call sites, and presence of all three `lurek.*`
+  callbacks.
+- **`tests/lua/harness.rs`**: Registered `lua_demo_html_{hud,inventory,dialog,settings,scoreboard}`
+  test functions.
+- **`tests/demo_smoke_tests.rs`**: Registered `demo_smoke_html_{hud,inventory,dialog,settings,scoreboard}`
+  smoke tests under `// ─── showcase: HTML UI demos ───`.
+- **`content/examples/ui.lua`**: Appended `--@api-stub:` blocks for all 37 `lurek.ui.html.*` functions
+  and methods (`newDocument`, `loadDocument`, `supports`, plus full `HtmlDocument` and `HtmlElement`
+  method sets).
+- **`content/games/README.md`**: Added "Showcase — HTML UI Demos" table registering all five demos.
+- **`.github/skills/html-css/SKILL.md`**: New CAG skill for building HTML/CSS UI in Lurek2D games.
+  Covers document lifecycle, input forwarding, CSS class state machine, radio-group pattern, viewport
+  sync, and performance guidelines.  No fenced code blocks — code lives in companion files.
+- **`.github/skills/html-css/examples/quickstart.lua`**: Minimal HUD skeleton companion.
+- **`.github/skills/html-css/snippets/common-patterns.lua`**: 8 copy-paste patterns companion.
+- **`src/ui/html/{document,element,parser,selector,style}.rs`**: Added `//!` module-level docs and
+  `///` item docstrings to all five HTML domain files (`HtmlDocumentOptions`, `HtmlDrawCommand`,
+  `HtmlDocument`, `HtmlRect`, `HtmlElement`, `CssRule`).
+
+## [0.20.40] - 2026-04-25
+
+### fix(lua_api, stubs): fix LuaLS diagnostics in tween, audio, render Shape methods
+
+- **`src/lua_api/tween_api.rs`**: Added `@param self TweenSequence/TweenParallel` to all `add_function` method docstrings so LuaCATS stubs include the implicit self parameter (`tween`, `delay`, `callback`, `start`, `onComplete` on both types).
+- **`src/lua_api/audio_api.rs`**: Made `buffer_count` optional (`@param buffer_count? integer`) in `newQueueableSource`, fixing "requires 4 args, receiving 3" errors in tests.
+- **`src/lua_api/render_api.rs`**: Fixed `Shape:polygon` docstring `@param coords number` → `@param ... number` so variadic coordinate pairs generate a correct LuaCATS `...` stub.
+- **`extensions/vscode/src/providers/diagnostics.ts`**: Excluded `content/examples/` files from `checkPerFrameAllocation` to suppress false `lurek.perFrameAlloc` warnings in example scripts.
+- **`docs/api/lurek.lua`**: Regenerated — `Shape:polygon(mode, ...)`, `TweenSequence:tween(self, ...)`, `newQueueableSource(path, type, buffer_count?)` now correct.
+
+## [0.20.39] - 2026-04-25
+
+### fix(lua_api, stubs): fix LuaLS diagnostics in physics.lua and restore LuaImageData
+
+- **`src/lua_api/physics_api.rs`**: Fixed docstrings for `newPolygonShape`/`newChainShape` (variadic params), `drawDebug` (optional r/g/b/a), return types (`LuaTerrain`→`Terrain`, `LuaCellular`→`Cellular`, `LuaZone`→`Zone`), `spawnDebris` (`@return table`), `Terrain:toImageData` (`@return string`, 6 u8 params), `Cellular:toImageDataRegion` (`@return string`), `getZoneEvents` (`@return table`), all 5 shape constructors (`@return PhysicsShape`), `newTerrain` world param (`World` not `LuaWorld`), `addFixture` variadic (`any`).
+- **`content/examples/physics.lua`**: Fixed `fillAll`/`fillCircle`/`fillRect`/`setCell` to use booleans; `toImageData` called with 6 u8 color params; `toImageDataRegion` result used as string; `spawnDebris` signature corrected; `lurek.input.isDown` → `lurek.input.keyboard.isDown`.
+- **`src/lua_api/render_api.rs`**: Restored accidentally-deleted `LuaImageData` struct and `LuaUserData` impl with corrected single-blank doc comment (was double-blank `///`). Fixed `empty_line_after_doc_comments` clippy lint that caused compile failure.
+- **`src/render/renderer.rs`**, **`src/render/gpu_renderer.rs`**, **`src/lua_api/animation_api.rs`**, **`src/lua_api/effect_api.rs`**, **`src/lua_api/devtools_api.rs`**: Fixed `empty_line_after_doc_comments` clippy lint in each file.
+- **`tools/docs/gen_luadoc.py`**: Fixed `INPUT_FILE` path to read from `logs/data/lua_api_data.json` (was incorrectly `logs/lua_api_data.json`). Added `CELL_AIR/CELL_SAND/CELL_WATER/CELL_ROCK/CELL_FIRE/CELL_GAS` constants as `@field` on `lurek.physics`.
+
 ## [0.20.38] - 2026-04-25
+
+### docs(ui): propose `lurek.ui.html` API surface
+
+- **`docs/specs/ui.md`**: Added a focused design proposal for the planned `lurek.ui.html` HTML/CSS UI facade, including backend-neutral `HtmlDocument`/`HtmlElement` signatures, event callback shape, lifecycle calls, RML-compatible subset wording, and testing placement notes.
+- **`work/rmlui-integration-20260425/`**: Added Lua-Designer proposal artifacts and draft example/test coverage for Developer handoff; no Rust implementation was added.
 
 ### fix(tests, stubs): fix LuaLS diagnostics in 7 test files and regenerate type stubs
 

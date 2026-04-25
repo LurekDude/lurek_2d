@@ -1,4 +1,4 @@
--- test_ui_layout.lua
+﻿-- test_ui_layout.lua
 -- Unit tests for lurek.ui.loadLayout and lurek.ui.loadLayoutFile.
 -- Covers: API existence, widget tree creation from a Lua table definition,
 -- child attachment, ID lookup, flat and nested layouts.
@@ -28,10 +28,10 @@ describe("lurek.ui layout loader API exists", function()
 end)
 
 -- =========================================================================
--- 2. loadLayout — flat single-widget definition
+-- 2. loadLayout â€” flat single-widget definition
 -- =========================================================================
 -- @description loadLayout creates a panel widget from a minimal Lua table.
-describe("lurek.ui.loadLayout — flat single widget", function()
+describe("lurek.ui.loadLayout â€” flat single widget", function()
     -- @tests lurek.ui.loadLayout
     -- @tests lurek.ui.getWidgetCount
     -- @description Returns a positive pool index
@@ -88,10 +88,10 @@ describe("lurek.ui.loadLayout — flat single widget", function()
 end)
 
 -- =========================================================================
--- 3. loadLayout — nested widget tree with id lookup
+-- 3. loadLayout â€” nested widget tree with id lookup
 -- =========================================================================
 -- @description loadLayout builds child widgets and id-based lookup finds them.
-describe("lurek.ui.loadLayout — nested tree with id lookup", function()
+describe("lurek.ui.loadLayout â€” nested tree with id lookup", function()
     -- @tests lurek.ui.loadLayout
     -- @tests lurek.ui.getRoot
     -- @description Nested children increase the widget count
@@ -148,11 +148,11 @@ describe("lurek.ui.loadLayout — nested tree with id lookup", function()
 end)
 
 -- =========================================================================
--- 4. loadLayout — all supported widget types do not crash
+-- 4. loadLayout â€” all supported widget types do not crash
 -- =========================================================================
 -- @description Each recognised widget_type string can be loaded individually
 -- without a Lua error.
-describe("lurek.ui.loadLayout — widget type coverage", function()
+describe("lurek.ui.loadLayout â€” widget type coverage", function()
     -- @tests lurek.ui.loadLayout
     local widget_types = {
         "panel", "label", "button", "checkbox", "slider", "progressbar",
@@ -245,6 +245,7 @@ describe("UI custom widget", function()
         expect_true(called, "on_draw callback must be called by lurek.ui.draw()")
     end)
 end)
+
 
 test_summary()
 
