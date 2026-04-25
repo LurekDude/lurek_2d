@@ -4,6 +4,9 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.20.38] - 2026-04-25
 
+### docs(research): added smallest-html-renderers report
+- **`work/html-rendering-research/reports/smallest-html-renderers.md`**: Created a comparison of native Rust HTML renderers focusing on minimal binary footprint.
+
 ### fix(tests, examples, stubs): fix LuaLS redundant/missing-parameter diagnostics
 
 - **`docs/api/lurek.lua`**: Fixed `TweenSequence.tween` and `TweenParallel.tween` stub style from
